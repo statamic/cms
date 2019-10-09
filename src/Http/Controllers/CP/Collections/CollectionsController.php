@@ -105,8 +105,9 @@ class CollectionsController extends CpController
             'route' => 'required_with:structure',
             'orderable' => 'boolean',
             'dated' => 'boolean',
-            'dateBehavior' => 'nullable',
-            'sortDirection' => 'in:asc,desc',
+            'date_behavior' => 'nullable',
+            'sort_direction' => 'in:asc,desc',
+            'default_publish_state' => 'boolean',
             'amp' => 'boolean',
             'structure' => 'nullable',
             'mount' => 'nullable',
@@ -119,7 +120,7 @@ class CollectionsController extends CpController
 
         $collection = $this->updateCollection(Collection::make($handle), $data);
 
-        switch ($data['dateBehavior']) {
+        switch ($data['date_behavior']) {
             case 'articles':
                 $collection
                     ->pastDateBehavior('public')
@@ -184,6 +185,8 @@ class CollectionsController extends CpController
             ->layout($data['layout'])
             ->structure($structure = array_get($data, 'structure'))
             ->orderable($structure ? false : $data['orderable'])
+            ->defaultPublishState($data['default_publish_state'])
+            ->sortDirection($data['sort_direction'])
             ->ampable($data['amp'])
             ->entryBlueprints($data['blueprints'])
             ->mount($data['mount'] ?? null)
@@ -291,14 +294,9 @@ class CollectionsController extends CpController
                 'instructions' => __('Set a default layout.'),
                 'width' => 50
             ],
-            'default_status' => [
-                'type' => 'radio',
-                'instructions' => __('Default publish status when creating new entries.'),
-                'width' => 100,
-                 'options' => [
-                    'published' => 'Published',
-                    'draft' => 'Draft'
-                 ]
+            'default_publish_state' => [
+                'type' => 'toggle',
+                'instructions' => __('Whether new entries created in the Control Panel should be published by default.'),
             ],
 
             'routing' => ['type' => 'section'],

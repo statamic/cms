@@ -21,7 +21,7 @@ class Taxonomy implements Contract, Responsable
     protected $blueprints = [];
     protected $sites = [];
     protected $collection;
-    protected $defaultStatus = 'published';
+    protected $defaultPublishState = true;
     protected $revisions = false;
     protected $searchIndex;
 
@@ -144,9 +144,9 @@ class Taxonomy implements Contract, Responsable
         ]);
     }
 
-    public function defaultStatus($status = null)
+    public function defaultPublishState($state = null)
     {
-        return $this->fluentlyGetOrSet('defaultStatus')->args(func_get_args());
+        return $this->fluentlyGetOrSet('defaultPublishState')->args(func_get_args());
     }
 
     public function toArray()

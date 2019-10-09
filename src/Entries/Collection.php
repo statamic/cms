@@ -37,7 +37,7 @@ class Collection implements Contract
     protected $ampable = false;
     protected $revisions = false;
     protected $positions = [];
-    protected $defaultStatus = 'published';
+    protected $defaultPublishState = true;
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
     protected $structure;
@@ -365,6 +365,7 @@ class Collection implements Contract
             'handle',
             'past_date_behavior',
             'future_date_behavior',
+            'default_publish_state',
             'dated',
         ]);
 
@@ -375,7 +376,7 @@ class Collection implements Contract
             'orderable' => $array['orderable'] ?: null,
             'sort_by' => $this->sortField,
             'sort_dir' => $this->sortDirection,
-            'default_status' => $this->defaultStatus,
+            'default_status' => $this->defaultPublishState === false ? 'draft' : null,
             'date_behavior' => [
                 'past' => $this->pastDateBehavior,
                 'future' => $this->futureDateBehavior,
@@ -406,9 +407,9 @@ class Collection implements Contract
     }
 
 
-    public function defaultStatus($status = null)
+    public function defaultPublishState($state = null)
     {
-        return $this->fluentlyGetOrSet('defaultStatus')->args(func_get_args());
+        return $this->fluentlyGetOrSet('defaultPublishState')->args(func_get_args());
     }
 
     public function toArray()
@@ -420,7 +421,7 @@ class Collection implements Contract
             'dated' => $this->dated,
             'past_date_behavior' => $this->pastDateBehavior(),
             'future_date_behavior' => $this->futureDateBehavior(),
-            'default_status' => $this->defaultStatus(),
+            'default_publish_state' => $this->defaultPublishState,
             'amp' => $this->ampable,
             'sites' => $this->sites,
             'template' => $this->template,

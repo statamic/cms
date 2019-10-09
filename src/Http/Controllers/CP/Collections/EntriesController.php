@@ -253,7 +253,8 @@ class EntriesController extends CpController
 
         $values = array_merge($fields->values(), [
             'title' => null,
-            'slug' => null
+            'slug' => null,
+            'published' => $collection->defaultPublishState()
         ]);
 
         $viewData = [
@@ -265,7 +266,7 @@ class EntriesController extends CpController
             'meta' => $fields->meta(),
             'collection' => $collection->handle(),
             'blueprint' => $blueprint->toPublishArray(),
-            'published' => $collection->defaultStatus() === 'published',
+            'published' => $collection->defaultPublishState(),
             'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site) {
                 return [
                     'handle' => $handle,

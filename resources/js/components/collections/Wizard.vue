@@ -42,15 +42,15 @@
 
             <div class="max-w-md mx-auto px-2 pb-6">
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-4">
-                    <input type="radio" v-model="collection.dateBehavior" value="articles" />
+                    <input type="radio" v-model="collection.date_behavior" value="articles" />
                     <p><strong class="text-md ml-2 font-bold">Articles</strong> &ndash; Entries with dates in the future will be private.</p>
                 </label>
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-4">
-                    <input type="radio" v-model="collection.dateBehavior" value="events" />
+                    <input type="radio" v-model="collection.date_behavior" value="events" />
                     <p><strong class="text-md ml-2 font-bold">Events</strong> &ndash; Entries with dates in the past will be private.</p>
                 </label>
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-4">
-                    <input type="radio" v-model="collection.dateBehavior" :value="null" />
+                    <input type="radio" v-model="collection.date_behavior" :value="null" />
                     <p><strong class="text-md ml-2 font-bold">No dates</strong> &ndash; Entries will not have any dates.</p>
                 </label>
             </div>
@@ -91,7 +91,7 @@
 
             <div class="max-w-md mx-auto pb-4">
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="direction-desc">
-                    <input type="radio" v-model="collection.sortDirection" value="desc" id="direction-desc">
+                    <input type="radio" v-model="collection.sort_direction" value="desc" id="direction-desc">
                     <p><strong class="text-md ml-2 font-bold">Descending</strong> &ndash;
                         <template v-if="collection.orderable">
                             Entries will be sorted from highest to lowest.
@@ -105,7 +105,7 @@
                     </p>
                 </label>
                 <label class="border-2 mt-4 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="direction-asc">
-                    <input type="radio" v-model="collection.sortDirection" value="asc" id="direction-asc">
+                    <input type="radio" v-model="collection.sort_direction" value="asc" id="direction-asc">
                     <p><strong class="text-md ml-2 font-bold">Ascending</strong> &ndash;
                         <template v-if="collection.orderable">
                             Entries will be sorted from lowest to highest.
@@ -205,13 +205,13 @@
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-6">
-                <label class="font-bold text-base mb-sm" for="defaultStatus">Default Status</label>
+                <label class="font-bold text-base mb-sm" for="default_publish_state">Default Status</label>
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-2">
-                    <input type="radio" v-model="collection.defaultStatus" value="published" />
+                    <input type="radio" v-model="collection.default_publish_state" value="true" />
                     <p><strong class="text-md ml-2 font-bold">Published</strong> &ndash; Entries will default to <span class="text-green">published</span> status.</p>
                 </label>
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center">
-                    <input type="radio" v-model="collection.defaultStatus" value="draft" />
+                    <input type="radio" v-model="collection.default_publish_state" value="false" />
                     <p><strong class="text-md ml-2 font-bold">Draft</strong> &ndash; Entries will default to <span class="text-grey-60">draft</span> status.</p>
                 </label>
             </div>
@@ -320,8 +320,8 @@ export default {
                 handle: null,
                 orderable: false,
                 dated: true,
-                dateBehavior: 'articles',
-                sortDirection: 'desc',
+                date_behavior: 'articles',
+                sort_direction: 'desc',
                 blueprints: [],
                 taxonomies: [],
                 template: null,
@@ -330,7 +330,7 @@ export default {
                 amp: false,
                 structure: null,
                 mount: null,
-                defaultStatus: 'published',
+                default_publish_state: true,
             }
         }
     },
@@ -341,7 +341,7 @@ export default {
             this.collection.route = this.collection.handle + '/{slug}';
         },
 
-        'collection.dateBehavior': function (behavior) {
+        'collection.date_behavior': function (behavior) {
             this.collection.dated = behavior === null ? false : true;
         }
     },

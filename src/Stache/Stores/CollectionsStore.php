@@ -48,7 +48,7 @@ class CollectionsStore extends BasicStore
             ->entryBlueprints(array_get($data, 'blueprints'))
             ->searchIndex(array_get($data, 'search_index'))
             ->revisionsEnabled(array_get($data, 'revisions', false))
-            ->defaultStatus(array_get($data, 'default_status'))
+            ->defaultPublishState($this->getDefaultPublishState($data))
             ->structure(array_get($data, 'structure'))
             ->orderable(array_get($data, 'orderable', false))
             ->sortField(array_get($data, 'sort_by'))
@@ -66,6 +66,17 @@ class CollectionsStore extends BasicStore
         //     ->save();
 
         return $collection;
+    }
+
+    protected function getDefaultPublishState($data)
+    {
+        $value = array_get($data, 'default_status', 'published');
+
+        if (! in_array($value, ['published', 'draft'])) {
+            throw new \Exception('Invalid collection default_status value. Must be "published" or "draft".');
+        }
+
+        return $value === 'published';
     }
 
     protected function getEntryPositions($data, $collection)
