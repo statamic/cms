@@ -218,8 +218,9 @@ class DataCollection extends IlluminateCollection
     public function preProcessForIndex()
     {
         return $this->each(function ($item) {
+            $blueprint = $item->blueprint();
             foreach ($item->values() as $key => $value) {
-                if ($field = $item->blueprint()->field($key)) {
+                if ($field = $blueprint->field($key)) {
                     $processed = $field->setValue($value)->preProcessIndex()->value();
                     $item->setSupplement($key, $processed);
                 }
