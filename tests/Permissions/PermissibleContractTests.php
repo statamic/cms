@@ -142,32 +142,16 @@ trait PermissibleContractTests
     /** @test */
     function it_gets_and_checks_permissions()
     {
-        $directRole = new class extends Role {
-            public function handle(string $handle = null)
-            {
-                return 'direct';
-            }
-            public function permissions($permissions = null)
-            {
-                return collect([
-                    'permission one directly through role',
-                    'permission two directly through role',
-                ]);
-            }
-        };
-        $userGroupRole = new class extends UserGroup {
-            public function handle(string $handle = null)
-            {
-                return 'usergrouprole';
-            }
-            public function permissions($permissions = null)
-            {
-                return collect([
-                    'permission one through user group',
-                    'permission two through user group',
-                ]);
-            }
-        };
+        $directRole = RoleAPI::make('direct')->addPermission([
+            'permission one directly through role',
+            'permission two directly through role',
+        ]);
+
+        $userGroupRole = RoleAPI::make('usergrouprole')->addPermission([
+            'permission one through user group',
+            'permission two through user group',
+        ]);
+
         $userGroup = (new UserGroup)->handle('usergroup')->assignRole($userGroupRole);
 
         RoleAPI::shouldReceive('find')->with('direct')->andReturn($directRole);
@@ -194,6 +178,12 @@ trait PermissibleContractTests
         $this->assertTrue($user->hasPermission('permission one through user group'));
         $this->assertTrue($user->hasPermission('permission two through user group'));
         $this->assertFalse($user->hasPermission('something else'));
+
+        $directRole->addPermission('permission three directly through role');
+        $userGroupRole->addPermission('permission three through user group');
+
+        $this->assertTrue($user->hasPermission('permission three directly through role'));
+        $this->assertTrue($user->hasPermission('permission three through user group'));
     }
 
     /** @test */
