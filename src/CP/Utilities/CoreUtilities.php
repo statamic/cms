@@ -20,7 +20,7 @@ class CoreUtilities
             ->description('Manage and view important information about Statamic\'s various caching layers.')
             ->docsUrl(Statamic::docsUrl('utilities/cache-manager'))
             ->routes(function ($router) {
-                $router->post('cache/{cache}', [CacheController::class, 'clear'])->name('utilities.cache.clear');
+                $router->post('cache/{cache}', [CacheController::class, 'clear'])->name('clear');
             })
             ->register();
 
