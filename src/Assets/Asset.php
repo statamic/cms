@@ -316,7 +316,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
      */
     public function isImage()
     {
-        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif']);
+        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif', 'webp']);
     }
 
     /**
