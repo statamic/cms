@@ -305,7 +305,7 @@ class CollectionsController extends CpController
                 'instructions' => __("The route controls entries URL pattern."),
             ],
             'mount' => [
-                'type' => 'relationship',
+                'type' => 'entries',
                 'max_items' => 1,
                 'instructions' => __('Enable add/edit shortcuts from Structures and `mount` variable in your route.'),
             ],
