@@ -2,57 +2,30 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Entry;
-use Statamic\CP\Column;
-use Statamic\Facades\Content;
 use Illuminate\Support\Arr;
-use Statamic\Facades\Collection;
+use Statamic\CP\Column;
 use Statamic\Fields\Fieldtype;
 
-class Relationship extends Fieldtype
+abstract class Relationship extends Fieldtype
 {
     protected static $preloadable = true;
     protected $component = 'relationship';
     protected $indexComponent = 'relationship';
     protected $itemComponent = 'related-item';
-    protected $formComponent = 'entry-publish-form';
+    protected $formComponent;
     protected $categories = ['relationship'];
-    protected $canEdit = true;
-    protected $canCreate = true;
-    protected $canSearch = true;
-    protected $statusIcons = true;
+    protected $canEdit = false;
+    protected $canCreate = false;
+    protected $canSearch = false;
+    protected $statusIcons = false;
     protected $taggable = false;
     protected $defaultValue = [];
-
-    protected $formComponentProps = [
-        'initialActions' => 'actions',
-        'initialTitle' => 'title',
-        'initialReference' => 'reference',
-        'initialFieldset' => 'blueprint',
-        'initialValues' => 'values',
-        'initialLocalizedFields' => 'localizedFields',
-        'initialMeta' => 'meta',
-        'initialPermalink' => 'permalink',
-        'initialLocalizations' => 'localizations',
-        'initialHasOrigin' => 'hasOrigin',
-        'initialOriginValues' => 'originValues',
-        'initialOriginMeta' => 'originMeta',
-        'initialSite' => 'locale',
-        'initialIsWorkingCopy' => 'hasWorkingCopy',
-        'initialIsRoot' => 'isRoot',
-        'initialReadOnly' => 'readOnly',
-        'revisionsEnabled' => 'revisionsEnabled',
-        'breadcrumbs' => 'breadcrumbs',
-    ];
-
+    protected $formComponentProps = [];
+    protected $extraConfigFields = [];
     protected $configFields = [
         'max_items' => [
             'type' => 'integer',
             'instructions' => 'Set a maximum number of selectable items',
-        ],
-        'collections' => [
-            'type' => 'collections'
         ],
         'mode' => [
             'type' => 'radio',
@@ -63,6 +36,11 @@ class Relationship extends Fieldtype
             ]
         ]
     ];
+
+    protected function configFieldItems(): array
+    {
+        return array_merge($this->configFields, $this->extraConfigFields);
+    }
 
     public function preProcess($data)
     {
@@ -174,8 +152,6 @@ class Relationship extends Fieldtype
     {
         return [
             Column::make('title'),
-            Column::make('collection'),
-            Column::make('url')->label('URL'),
         ];
     }
 
@@ -191,27 +167,12 @@ class Relationship extends Fieldtype
 
     protected function getBaseSelectionsUrlParameters()
     {
-        return [
-            'collections' => $this->config('collections'),
-        ];
+        return [];
     }
 
     protected function getCreatables()
     {
-        if ($url = $this->getCreateItemUrl()) {
-            return [['url' => $url]];
-        }
-
-        $collections = $this->config('collections', Collection::handles());
-
-        return collect($collections)->map(function ($collection) {
-            $collection = Collection::findByHandle($collection);
-
-            return [
-                'title' => $collection->title(),
-                'url' => $collection->createEntryUrl(Site::selected()->handle()),
-            ];
-        })->all();
+        return [];
     }
 
     protected function getCreateItemUrl()
@@ -226,14 +187,7 @@ class Relationship extends Fieldtype
         })->values();
     }
 
-    protected function toItemArray($id)
-    {
-        if ($entry = Entry::find($id)) {
-            return $entry->toArray();
-        }
-
-        return $this->invalidItemArray($id);
-    }
+    abstract protected function toItemArray($id);
 
     protected function invalidItemArray($id)
     {
@@ -253,61 +207,19 @@ class Relationship extends Fieldtype
 
     protected function augmentValue($value)
     {
-        if ($entry = Entry::find($value)) {
-            return $entry;
-        }
+        return $value;
     }
 
-    public function getIndexItems($request)
-    {
-        $query = $this->getIndexQuery($request);
-
-        if ($sort = $this->getSortColumn($request)) {
-            $query->orderBy($sort, $this->getSortDirection($request));
-        }
-
-        return $query->paginate();
-    }
+    abstract public function getIndexItems($request);
 
     public function getSortColumn($request)
     {
-        $column = $request->get('sort');
-
-        if (!$column && !$request->search) {
-            $column = 'title'; // todo: get from collection or config
-        }
-
-        return $column;
+        return $request->get('sort');
     }
 
     public function getSortDirection($request)
     {
-        $order = $request->get('order', 'asc');
-
-        if (!$request->sort && !$request->search) {
-            // $order = 'asc'; // todo: get from collection or config
-        }
-
-        return $order;
-    }
-
-    protected function getIndexQuery($request)
-    {
-        $query = Entry::query();
-
-        if ($collections = $request->collections) {
-            $query->whereIn('collection', $collections);
-        }
-
-        if ($search = $request->search) {
-            $query->where('title', 'like', '%'.$search.'%');
-        }
-
-        if ($site = $request->site) {
-            $query->where('site', $site);
-        }
-
-        return $query;
+        return $request->get('order', 'asc');
     }
 
     protected function getTaggable()

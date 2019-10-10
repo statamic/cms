@@ -80,6 +80,39 @@ class Taxonomy extends Relationship
         return $data;
     }
 
+    public function getIndexItems($request)
+    {
+        $query = $this->getIndexQuery($request);
+
+        if ($sort = $this->getSortColumn($request)) {
+            $query->orderBy($sort, $this->getSortDirection($request));
+        }
+
+        return $query->paginate();
+    }
+
+    public function getSortColumn($request)
+    {
+        $column = $request->get('sort');
+
+        if (!$column && !$request->search) {
+            $column = 'title'; // todo: get from taxonomy or config
+        }
+
+        return $column;
+    }
+
+    public function getSortDirection($request)
+    {
+        $order = $request->get('order', 'asc');
+
+        if (!$request->sort && !$request->search) {
+            // $order = 'asc'; // todo: get from taxonomy or config
+        }
+
+        return $order;
+    }
+
     protected function getBaseSelectionsUrlParameters()
     {
         return [
