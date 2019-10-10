@@ -34,6 +34,7 @@ export default {
                     save: true
                 }
             },
+            outputPrecision: 1,
             strings: {
                 save: __('Save'),
                 clear: __('Clear')
@@ -53,7 +54,7 @@ export default {
             var rep = args[1].getColorRepresentation();
             if (args[0] && rep) {
                 // Dynamically call toHEX(), toRGBA(), etc
-                this.update(args[0]['to' + rep]().toString());
+                this.update(args[0]['to' + rep]().toString(0));
             } else {
                 // Color was manually cleared
                 this.update(null);
