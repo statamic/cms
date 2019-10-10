@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "81864e31314fea49ebcdff837bb2fa7c",
+    "content-hash": "9fea7fd094180bece3e779e07e642947",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -2022,54 +2022,6 @@
                 "time"
             ],
             "time": "2019-08-31T16:37:55+00:00"
-        },
-        {
-            "name": "netcarver/textile",
-            "version": "3.6.x-dev",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/textile/php-textile.git",
-                "reference": "d7c869ea16d41ace40e8419550ea72762354121e"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/textile/php-textile/zipball/d7c869ea16d41ace40e8419550ea72762354121e",
-                "reference": "d7c869ea16d41ace40e8419550ea72762354121e",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=5.3.0"
-            },
-            "require-dev": {
-                "phpunit/phpunit": "5.7.*",
-                "satooshi/php-coveralls": "0.6.*",
-                "squizlabs/php_codesniffer": "3.*",
-                "symfony/yaml": "2.4.*"
-            },
-            "type": "library",
-            "autoload": {
-                "psr-4": {
-                    "Netcarver\\Textile\\": "src/Netcarver/Textile/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "BSD-3-Clause"
-            ],
-            "description": "Textile markup language parser",
-            "homepage": "https://github.com/textile/php-textile",
-            "keywords": [
-                "document",
-                "format",
-                "html",
-                "language",
-                "markup",
-                "parser",
-                "php-textile",
-                "plaintext",
-                "textile"
-            ],
-            "time": "2018-11-13T18:24:39+00:00"
         },
         {
             "name": "opis/closure",
@@ -6997,7 +6949,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "netcarver/textile": 20,
         "scrumpy/html-to-prosemirror": 20,
         "scrumpy/prosemirror-to-html": 20,
         "symfony/yaml": 20

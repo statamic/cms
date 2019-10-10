@@ -13,7 +13,6 @@
         "league/csv": "^9.0",
         "league/glide": "^1.1",
         "michelf/php-smartypants": "^1.8",
-        "netcarver/textile": "3.6.*@dev",
         "scrumpy/html-to-prosemirror": "dev-master",
         "scrumpy/prosemirror-to-html": "dev-master",
         "statamic/stringy": "^3.1",

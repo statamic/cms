@@ -1761,17 +1761,6 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Parse content as Textile.
-     *
-     * @param $value
-     * @return string
-     */
-    public function textile($value)
-    {
-        return Html::textile($value);
-    }
-
-    /**
      * Returns a string with smart quotes, ellipsis characters, and dashes from
      * Windows-1252 (commonly used in Word documents) replaced by their ASCII equivalents.
      *
