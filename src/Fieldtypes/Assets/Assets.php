@@ -21,6 +21,16 @@ class Assets extends Fieldtype
             'instructions' => 'The asset container to work with.',
             'width' => 50
         ],
+        'mode' => [
+            'type' => 'select',
+            'default' => 'grid',
+            'options' => [
+                'grid' => 'Grid',
+                'list' => 'List',
+            ],
+            'instructions' => 'Default layout interface.',
+            'width' => 50
+        ],
         'folder' => [
             'type' => 'asset_folder',
             'max_items' => 1,
@@ -32,25 +42,16 @@ class Assets extends Fieldtype
             'instructions' => 'Prevent users from navigating to other folders.',
             'width' => 50
         ],
-        'max_files' => [
-            'type' => 'integer',
-            'instructions' => 'The maximum number of selectable assets.',
-            'width' => 50
-        ],
         'allow_uploads' => [
             'type' => 'toggle',
             'default' => true,
             'instructions' => 'Allow new files to be uploaded?',
             'width' => 50
         ],
-        'mode' => [
-            'type' => 'select',
-            'default' => 'grid',
-            'options' => [
-                'grid' => 'Grid',
-                'list' => 'List',
-            ],
-            'instructions' => 'Default layout interface.'
+         'max_files' => [
+            'type' => 'integer',
+            'instructions' => 'The maximum number of selectable assets.',
+            'width' => 50
         ],
     ];
 
