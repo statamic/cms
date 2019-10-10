@@ -9,6 +9,7 @@ class Users extends Relationship
 {
     protected $statusIcons = false;
     protected $formComponent = 'user-publish-form';
+    protected $canEdit = true;
 
     protected $formComponentProps = [
         'initialTitle' => 'title',
