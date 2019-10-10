@@ -274,7 +274,7 @@ class Relationship extends Fieldtype
         $column = $request->get('sort');
 
         if (!$column && !$request->search) {
-            $column = 'title';
+            $column = 'title'; // todo: get from collection or config
         }
 
         return $column;
@@ -284,8 +284,8 @@ class Relationship extends Fieldtype
     {
         $order = $request->get('order', 'asc');
 
-        if (!$order && !$request->search) {
-            $order = 'title';
+        if (!$request->sort && !$request->search) {
+            // $order = 'asc'; // todo: get from collection or config
         }
 
         return $order;
