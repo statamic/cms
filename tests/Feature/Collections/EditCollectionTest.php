@@ -32,7 +32,7 @@ class EditCollectionTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = User::make()->assignRole('test');
+        $user = tap(User::make()->assignRole('test'))->save();
 
         $collection = Collection::make('test')->save();
 

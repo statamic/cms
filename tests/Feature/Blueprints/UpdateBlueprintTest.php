@@ -10,10 +10,12 @@ use Statamic\Fields\Blueprint;
 use Statamic\Entries\Collection;
 use Tests\Fakes\FakeBlueprintRepository;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class UpdateBlueprintTest extends TestCase
 {
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     protected function setUp(): void
     {
@@ -26,7 +28,7 @@ class UpdateBlueprintTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = Facades\User::make()->assignRole('test');
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
         $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -43,7 +45,7 @@ class UpdateBlueprintTest extends TestCase
     /** @test */
     function blueprint_gets_saved()
     {
-        $user = Facades\User::make()->makeSuper();
+        $user = tap(Facades\User::make()->makeSuper())->save();
         $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -110,7 +112,7 @@ class UpdateBlueprintTest extends TestCase
     /** @test */
     function title_is_required()
     {
-        $user = Facades\User::make()->makeSuper();
+        $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Blueprint::all());
         $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
@@ -127,7 +129,7 @@ class UpdateBlueprintTest extends TestCase
     /** @test */
     function sections_are_required()
     {
-        $user = Facades\User::make()->makeSuper();
+        $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Blueprint::all());
         $blueprint = (new Blueprint)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
@@ -147,7 +149,7 @@ class UpdateBlueprintTest extends TestCase
     /** @test */
     function sections_must_be_an_array()
     {
-        $user = Facades\User::make()->makeSuper();
+        $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Blueprint::all());
         $blueprint = (new Blueprint)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',

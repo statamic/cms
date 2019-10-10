@@ -108,13 +108,13 @@ class StoreAssetTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp', 'upload test_container assets']]);
 
-        return Facades\User::make()->assignRole('test');
+        return tap(Facades\User::make()->assignRole('test'))->save();
     }
 
     private function userWithoutPermission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
 
-        return Facades\User::make()->assignRole('test');
+        return tap(Facades\User::make()->assignRole('test'))->save();
     }
 }

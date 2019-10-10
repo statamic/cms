@@ -232,7 +232,7 @@ trait PermissibleContractTests
     /** @test */
     function it_checks_if_it_has_super_permissions_on_itself()
     {
-        $user = $this->createPermissible();
+        $user = $this->createPermissible()->save();
         $this->assertFalse($user->isSuper());
         $return = $user->makeSuper();
         $this->assertTrue($user->isSuper());
