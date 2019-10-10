@@ -20,7 +20,6 @@
         "symfony/var-exporter": "^4.3",
         "symfony/yaml": "^4.1@dev",
         "twistor/flysystem-guzzle": "^6.0",
-        "webpatser/laravel-uuid": "1.*",
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
