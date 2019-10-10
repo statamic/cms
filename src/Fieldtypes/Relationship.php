@@ -20,7 +20,9 @@ abstract class Relationship extends Fieldtype
     protected $statusIcons = false;
     protected $taggable = false;
     protected $defaultValue = [];
-    protected $formComponentProps = [];
+    protected $formComponentProps = [
+        '_' => '_' // forces an object in js
+    ];
     protected $extraConfigFields = [];
     protected $configFields = [
         'max_items' => [
