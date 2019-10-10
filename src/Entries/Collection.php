@@ -205,7 +205,7 @@ class Collection implements Contract
 
         if ($this->hasStructure()) {
             $blueprint->ensureField('parent', [
-                'type' => 'relationship',
+                'type' => 'entries',
                 'collections' => [$this->handle()],
                 'max_items' => 1,
                 'listable' => false,
