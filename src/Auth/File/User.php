@@ -323,12 +323,12 @@ class User extends BaseUser
     }
 
     /**
-    * Write to the user's meta YAML file
-    *
-    * @param  string $key
-    * @param  mixed $value
-    * @return void
-    */
+     * Write to the user's meta YAML file
+     *
+     * @param  string $key
+     * @param  mixed $value
+     * @return void
+     */
     public function setMeta($key, $value)
     {
         $yaml = YAML::parse(File::get($this->metaPath(), ''));
