@@ -110,7 +110,8 @@ export default {
             }
         },
 
-        date(value) {
+        date(value, oldValue) {
+            if (JSON.stringify(value) === JSON.stringify(oldValue)) return;
             this.handleUpdate(value)
         },
 
