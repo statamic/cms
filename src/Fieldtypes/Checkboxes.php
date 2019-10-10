@@ -17,4 +17,15 @@ class Checkboxes extends Fieldtype
             'instructions' => 'Show the checkboxes in a row.'
         ]
     ];
+
+    public function augment($values)
+    {
+        $augmented = [];
+
+        foreach ($values as $key => $value) {
+            $augmented[$key] = ['value' => $value, 'label' => array_get($this->config('options'), $value)];
+        }
+
+        return $augmented;
+    }
 }
