@@ -236,7 +236,7 @@ class AssetTest extends TestCase
     /** @test */
     function it_checks_if_its_an_image_file()
     {
-        $extensions = ['jpg', 'jpeg', 'png', 'gif'];
+        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
         foreach ($extensions as $ext) {
             $this->assertTrue((new Asset)->path("path/to/asset.$ext")->isImage());
