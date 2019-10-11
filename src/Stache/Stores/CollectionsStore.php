@@ -61,9 +61,7 @@ class CollectionsStore extends BasicStore
                 ->pastDateBehavior($dateBehavior['past'] ?? null);
         }
 
-        // $collection
-        //     ->setEntryPositions($this->getEntryPositions($data, $collection))
-        //     ->save();
+        $collection = $this->setPositions($collection, $data);
 
         return $collection;
     }
@@ -79,19 +77,26 @@ class CollectionsStore extends BasicStore
         return $value === 'published';
     }
 
-    protected function getEntryPositions($data, $collection)
+    protected function setPositions($collection, $data)
     {
-        if (! array_get($data, 'orderable', false)) {
-            return [];
+        if (! $collection->orderable()) {
+            return $collection;
         }
 
-        $positions = array_get($data, 'entry_order', function () use ($collection) {
-            return $collection->queryEntries()->get()->map->id()->all();
+        // If it's not set, it'll work out the order automatically by querying entries when it needs to.
+        if (! array_has($data, 'entry_order')) {
+            return $collection;
+        }
+
+        $order = array_get($data, 'entry_order');
+
+        // The entries are in the YAML as a simple zero-indexed array. The positions on the
+        // collection object expect the keys to be the actual positions (ie. starts with 1)
+        $positions = collect($order)->mapWithKeys(function ($entry, $index) {
+            return [$index + 1 => $entry];
         });
 
-        return collect($positions)->mapWithKeys(function ($id, $index) {
-            return [$index + 1 => $id];
-        })->all();
+        return $collection->setEntryPositions($positions);
     }
 
     public function updateEntryUris($collection)
@@ -112,5 +117,10 @@ class CollectionsStore extends BasicStore
 
         // TODO: only update structures for collections that were modified.
         Structure::all()->each->updateEntryUris();
+
+        // TODO: only update order indexes for collections that were modified.
+        Collection::all()->filter->orderable()->each(function ($collection) {
+            Stache::store('entries')->store($collection->handle())->index('order')->update();
+        });
     }
 }

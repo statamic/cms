@@ -11,10 +11,12 @@ use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
 
 class CollectionRepository implements RepositoryContract
 {
+    protected $stache;
     protected $store;
 
     public function __construct(Stache $stache)
     {
+        $this->stache = $stache;
         $this->store = $stache->store('collections');
     }
 
@@ -59,6 +61,10 @@ class CollectionRepository implements RepositoryContract
     public function save(Collection $collection)
     {
         $this->store->save($collection);
+
+        if ($collection->orderable()) {
+            $this->stache->store('entries')->store($collection->handle())->index('order')->update();
+        }
 
         CollectionSaved::dispatch($collection);
     }

@@ -364,8 +364,8 @@ class EntryTest extends TestCase
         $one->order('3');
         $two->order('2');
 
-        $this->assertEquals([2 => 'two', 3 => 'one'], $collection->getEntryPositions());
-        $this->assertEquals(['two', 'one'], $collection->getEntryOrder());
+        $this->assertEquals([2 => 'two', 3 => 'one'], $collection->getEntryPositions()->all());
+        $this->assertEquals(['two', 'one'], $collection->getEntryOrder()->all());
 
         $this->assertEquals(2, $one->order());
         $this->assertEquals(1, $two->order());

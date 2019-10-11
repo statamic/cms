@@ -36,7 +36,7 @@ class Collection implements Contract
     protected $sortDirection;
     protected $ampable = false;
     protected $revisions = false;
-    protected $positions = [];
+    protected $positions;
     protected $defaultPublishState = true;
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
@@ -295,52 +295,71 @@ class Collection implements Contract
 
     public function getEntryPositions()
     {
+        if ($this->positions) {
+            return $this->positions;
+        }
+
+        $this->positions = $this->queryEntries()->get()->mapWithKeys(function ($entry, $index) {
+            return [$index + 1 => $entry->id()];
+        });
+
         return $this->positions;
     }
 
     public function setEntryPositions($positions)
     {
-        $this->positions = $positions;
+        $this->positions = collect($positions);
 
         return $this;
     }
 
     public function setEntryPosition($id, $position)
     {
-        Arr::set($this->positions, $position, $id);
-        ksort($this->positions);
+        $positions = $this->getEntryPositions()->all();
+
+        dump('entry positions before setting', $positions, $position);
+
+        Arr::set($positions, $position, $id);
+
+        ksort($positions);
+
+        $this->setEntryPositions($positions);
 
         return $this;
     }
 
     public function appendEntryPosition($id)
     {
-        $position = collect($this->positions)->keys()->sort()->last() + 1;
+        $position = $this->getEntryPositions()->keys()->sort()->last() + 1;
 
         return $this->setEntryPosition($id, $position);
     }
 
     public function removeEntryPosition($id)
     {
-        unset($this->positions[$this->getEntryPosition($id)]);
+        $positions = $this->getEntryPositions()->all();
+
+        unset($positions[$this->getEntryPosition($id)]);
+
+        $this->setEntryPositions($positions);
 
         return $this;
     }
 
     public function getEntryPosition($id)
     {
-        return array_flip($this->positions)[$id] ?? null;
+        return $this->getEntryPositions()->flip()->get($id);
     }
 
     public function getEntryOrder($id = null)
     {
-        $order = array_values($this->positions);
+        $order = $this->getEntryPositions()->values();
 
         if (func_num_args() === 0) {
             return $order;
         }
 
-        $index = array_flip($order)[$id] ?? null;
+        $index = $order->flip()->get($id);
 
         return $index === null ? null : $index + 1;
     }
@@ -370,7 +389,7 @@ class Collection implements Contract
         ]);
 
         $array = Arr::removeNullValues(array_merge($array, [
-            'entry_order' => $this->getEntryOrder(),
+            'entry_order' => $this->getEntryOrder()->all(),
             'amp' => $array['amp'] ?: null,
             'date' => $this->dated ?: null,
             'orderable' => $array['orderable'] ?: null,
