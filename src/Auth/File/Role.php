@@ -5,6 +5,7 @@ namespace Statamic\Auth\File;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Illuminate\Support\Collection;
+use Statamic\Auth\PermissionCache;
 use Statamic\Auth\Role as BaseRole;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\Role as RoleContract;
@@ -77,6 +78,8 @@ class Role extends BaseRole
             ->merge(Arr::wrap($permission))
             ->unique()
             ->values();
+
+        app(PermissionCache::class)->clear();
 
         return $this;
     }

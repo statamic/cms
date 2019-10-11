@@ -10,6 +10,7 @@ use Statamic\Data\Data;
 use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Auth\PermissionCache;
 use Statamic\Auth\User as BaseUser;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -29,6 +30,7 @@ class User extends BaseUser
     protected $id;
     protected $email;
     protected $password;
+    protected $permissions;
 
     public function __construct()
     {
@@ -259,13 +261,23 @@ class User extends BaseUser
 
     public function permissions()
     {
-        return $this
+        $cache = app(PermissionCache::class);
+
+        if ($cached = $cache->get($this->id)) {
+            return $cached;
+        }
+
+        $permissions = $this
             ->groups()
             ->flatMap->roles()
             ->merge($this->roles())
             ->flatMap->permissions()
             ->unique()
             ->values();
+
+        $cache->put($this->id, $permissions);
+
+        return $permissions;
     }
 
     public function hasPermission($permission)
@@ -317,7 +329,7 @@ class User extends BaseUser
         return array_get($yaml, $key, $default);
     }
 
-     /**
+    /**
      * Write to the user's meta YAML file
      *
      * @param  string $key
