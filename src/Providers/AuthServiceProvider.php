@@ -6,6 +6,7 @@ use Statamic\Facades\User;
 use Statamic\Policies;
 use Statamic\Auth\UserProvider;
 use Statamic\Contracts\Auth\Role;
+use Statamic\Auth\PermissionCache;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Contracts\Http\Kernel;
@@ -62,6 +63,10 @@ class AuthServiceProvider extends ServiceProvider
 
         $this->app->singleton(ProtectorManager::class, function ($app) {
             return new ProtectorManager($app);
+        });
+
+        $this->app->singleton(PermissionCache::class, function ($app) {
+            return new PermissionCache;
         });
     }
 

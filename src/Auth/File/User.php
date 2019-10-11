@@ -10,6 +10,7 @@ use Statamic\Data\Data;
 use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Auth\PermissionCache;
 use Statamic\Auth\User as BaseUser;
 use Illuminate\Support\Facades\Hash;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -260,17 +261,23 @@ class User extends BaseUser
 
     public function permissions()
     {
-        if (empty($this->permissions)) {
-            $this->permissions = $this
+        $cache = app(PermissionCache::class);
+
+        if ($cached = $cache->get($this->id)) {
+            return $cached;
+        }
+
+        $permissions = $this
             ->groups()
             ->flatMap->roles()
             ->merge($this->roles())
             ->flatMap->permissions()
             ->unique()
             ->values();
-        }
 
-        return $this->permissions;
+        $cache->put($this->id, $permissions);
+
+        return $permissions;
     }
 
     public function hasPermission($permission)
