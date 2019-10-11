@@ -1,12 +1,13 @@
 <template>
 
     <sortable-list
-        v-model="sortableRows"
+        :value="rows"
         :vertical="true"
         :item-class="sortableItemClass"
         :handle-class="sortableHandleClass"
         @dragstart="$emit('focus')"
         @dragend="$emit('blur')"
+        @input="(rows) => $emit('sorted', rows)"
     >
         <div class="grid-stacked" slot-scope="{}">
             <stacked-row

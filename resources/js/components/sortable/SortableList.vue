@@ -78,7 +78,6 @@ export default {
 
         sortable.on('sortable:stop', ({ oldIndex, newIndex }) => {
             this.$emit('input', move(this.value, oldIndex, newIndex))
-            this.$emit('sorted', this.value);
         })
 
         this.$on('hook:destroyed', () => {

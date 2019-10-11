@@ -102,9 +102,11 @@ export default {
     },
 
     watch: {
-
-        rows(rows) {
-            this.update(rows);
+        value(newVal) {
+            if (JSON.stringify(this.rows) == JSON.stringify(newVal)) {
+                return;
+            }
+            this.rows = newVal;
         },
 
         isReorderable: {
@@ -142,15 +144,18 @@ export default {
 
             this.updateRowMeta(id, this.meta.new);
             this.rows.push(row);
+            this.update(this.rows);
         },
 
         updated(index, row) {
             this.rows.splice(index, 1, row);
+            this.update(this.rows);
         },
 
         removed(index) {
             if (confirm(__('Are you sure?'))) {
                 this.rows.splice(index, 1);
+                this.update(this.rows);
             }
         },
 
@@ -161,10 +166,11 @@ export default {
 
             this.updateRowMeta(row._id, this.meta.existing[old_id]);
             this.rows.push(row);
+            this.update(this.rows);
         },
 
         sorted(rows) {
-            this.rows = rows;
+            this.update(rows);
         },
 
         getReplicatorPreviewText() {
