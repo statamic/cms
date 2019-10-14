@@ -317,8 +317,6 @@ class Collection implements Contract
     {
         $positions = $this->getEntryPositions()->all();
 
-        dump('entry positions before setting', $positions, $position);
-
         Arr::set($positions, $position, $id);
 
         ksort($positions);
