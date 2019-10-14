@@ -9,6 +9,7 @@ use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Contracts\Entries\Collection;
+use Statamic\Stache\Stores\EntriesStore;
 
 class CollectionsStoreTest extends TestCase
 {
@@ -20,6 +21,7 @@ class CollectionsStoreTest extends TestCase
 
         $stache = (new Stache)->sites(['en']);
         $this->app->instance(Stache::class, $stache);
+        $stache->registerStore((new EntriesStore)->directory($this->tempDir));
         $stache->registerStore($this->store = (new CollectionsStore($stache, app('files')))->directory($this->tempDir));
     }
 

@@ -215,26 +215,26 @@ class CollectionTest extends TestCase
 
         $return = $collection->setEntryPosition('one', 3);
         $this->assertEquals($collection, $return);
-        $this->assertSame([3 => 'one'], $collection->getEntryPositions());
-        $this->assertSame(['one'], $collection->getEntryOrder());
+        $this->assertSame([3 => 'one'], $collection->getEntryPositions()->all());
+        $this->assertSame(['one'], $collection->getEntryOrder()->all());
         $this->assertEquals(1, $collection->getEntryOrder('one'));
 
         $collection->setEntryPosition('two', 7);
-        $this->assertSame([3 => 'one', 7 => 'two'], $collection->getEntryPositions());
-        $this->assertSame(['one', 'two'], $collection->getEntryOrder());
+        $this->assertSame([3 => 'one', 7 => 'two'], $collection->getEntryPositions()->all());
+        $this->assertSame(['one', 'two'], $collection->getEntryOrder()->all());
         $this->assertEquals(1, $collection->getEntryOrder('one'));
         $this->assertEquals(2, $collection->getEntryOrder('two'));
 
         $collection->setEntryPosition('three', 5);
-        $this->assertSame([3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions());
-        $this->assertSame(['one', 'three', 'two'], $collection->getEntryOrder());
+        $this->assertSame([3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions()->all());
+        $this->assertSame(['one', 'three', 'two'], $collection->getEntryOrder()->all());
         $this->assertEquals(1, $collection->getEntryOrder('one'));
         $this->assertEquals(3, $collection->getEntryOrder('two'));
         $this->assertEquals(2, $collection->getEntryOrder('three'));
 
         $collection->setEntryPosition('four', 1);
-        $this->assertSame([1 => 'four', 3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions());
-        $this->assertSame(['four', 'one', 'three', 'two'], $collection->getEntryOrder());
+        $this->assertSame([1 => 'four', 3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions()->all());
+        $this->assertSame(['four', 'one', 'three', 'two'], $collection->getEntryOrder()->all());
         $this->assertEquals(2, $collection->getEntryOrder('one'));
         $this->assertEquals(4, $collection->getEntryOrder('two'));
         $this->assertEquals(3, $collection->getEntryOrder('three'));
