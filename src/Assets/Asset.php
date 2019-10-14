@@ -402,6 +402,16 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
     }
 
     /**
+     * Get the container's handle
+     *
+     * @return string
+     */
+    public function containerHandle()
+    {
+        return $this->container->handle();
+    }
+
+    /**
      * Rename the asset
      *
      * @param string $filename

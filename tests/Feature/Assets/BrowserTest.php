@@ -198,6 +198,55 @@ class BrowserTest extends TestCase
             ->assertNotFound();
     }
 
+    /** @test */
+    function it_shows_an_assets_edit_page()
+    {
+        $container = AssetContainer::make('test')->disk('test')->save();
+        $container
+            ->makeAsset('one.txt')
+            ->upload(UploadedFile::fake()->create('one.txt'));
+
+        $this->setTestRoles(['test' => ['access cp', 'edit test assets']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $this
+            ->actingAs($user)
+            ->getJson('/cp/assets/browse/test/one.txt/edit')
+            ->assertSuccessful()
+            ->assertViewIs('statamic::assets.browse');
+    }
+
+    /** @test */
+    function it_404s_when_the_asset_doesnt_exist()
+    {
+        $container = AssetContainer::make('test')->disk('test')->save();
+
+        $this->setTestRoles(['test' => ['access cp', 'edit test assets']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $this
+            ->actingAs($user)
+            ->getJson('/cp/assets/browse/test/unknown.txt/edit')
+            ->assertNotFound();
+    }
+
+    /** @test */
+    function it_denies_access_without_permission_to_edit_asset()
+    {
+        $container = AssetContainer::make('test')->disk('test')->save();
+        $container
+            ->makeAsset('one.txt')
+            ->upload(UploadedFile::fake()->create('one.txt'));
+
+        $this->setTestRoles(['test' => ['access cp', 'view test assets']]);
+        $user = User::make()->assignRole('test')->save();
+
+        $this
+            ->actingAs($user)
+            ->getJson('/cp/assets/browse/test/one.txt/edit')
+            ->assertForbidden();
+    }
+
     private function userWithPermission()
     {
         $this->setTestRoles(['test' => ['access cp', 'view test assets']]);

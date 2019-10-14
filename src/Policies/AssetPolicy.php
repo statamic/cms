@@ -6,6 +6,11 @@ use Statamic\Facades\User;
 
 class AssetPolicy
 {
+    public function edit($user, $asset)
+    {
+        return User::fromUser($user)->hasPermission("edit {$asset->containerHandle()} assets");
+    }
+
     public function store($user, $assetContainer)
     {
         $user = User::fromUser($user);

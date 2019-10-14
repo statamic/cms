@@ -47,15 +47,19 @@ class BrowserController extends CpController
 
     public function edit($containerHandle, $path)
     {
-        // TODO: Auth
-
         $container = AssetContainer::find($containerHandle);
         $asset = Asset::find("{$containerHandle}::{$path}");
 
         abort_unless($container && $asset, 404);
 
+        $this->authorize('edit', $asset);
+
         return view('statamic::assets.browse', [
-            'container' => $this->toContainerArray($container),
+            'container' => [
+                'id' => $container->id(),
+                'title' => $container->title(),
+                'edit_url' => $container->editUrl()
+            ],
             'folder' => $asset->folder(),
             'editing' => $asset->id(),
         ]);
