@@ -92,7 +92,7 @@ class UserGroupsController extends CpController
             'roles' => 'required|array',
         ]);
 
-        $group = UserGroup::create()
+        $group = UserGroup::make()
             ->title($request->title)
             ->handle($request->handle ?: snake_case($request->title))
             ->roles($request->roles)
