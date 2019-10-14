@@ -6,13 +6,19 @@ use Statamic\Facades\File;
 use Statamic\Facades\User;
 use Statamic\Facades\YAML;
 use Statamic\Facades\UserGroup;
+use Statamic\Stache\Indexes\Users\Group;
 use Symfony\Component\Finder\SplFileInfo;
 
 class UsersStore extends BasicStore
 {
-    protected $storeIndexes = [
-        'email'
-    ];
+    protected function storeIndexes()
+    {
+        return UserGroup::all()->mapWithKeys(function ($group) {
+            return ['groups/'.$group->handle() => Group::class];
+        })
+        ->push('email')
+        ->all();
+    }
 
     protected $groups = [];
 

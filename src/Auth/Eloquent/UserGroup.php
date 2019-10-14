@@ -2,14 +2,14 @@
 
 namespace Statamic\Auth\Eloquent;
 
-use Statamic\Contracts\Auth\UserRepository;
 use Statamic\Auth\File\UserGroup as FileUserGroup;
+use Statamic\Facades\User;
 
 class UserGroup extends FileUserGroup
 {
     public function users($users = null)
     {
-        return $this->queryUsers()
+        return User::query()
             ->whereIn('id', $this->getUserIds())
             ->get();
     }
