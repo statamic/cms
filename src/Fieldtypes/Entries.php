@@ -121,6 +121,13 @@ class Entries extends Relationship
         ];
     }
 
+    protected function getBaseSelectionsUrlParameters()
+    {
+        return [
+            'collections' => $this->config('collections'),
+        ];
+    }
+
     protected function toItemArray($id)
     {
         if ($entry = Entry::find($id)) {
