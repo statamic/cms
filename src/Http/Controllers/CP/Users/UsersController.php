@@ -15,7 +15,6 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\UserGroup;
 use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
-use Statamic\Auth\PasswordReset;
 use Illuminate\Notifications\Notifiable;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Notifications\ActivateAccount;
@@ -230,41 +229,5 @@ class UsersController extends CpController
         $user->delete();
 
         return response('', 204);
-    }
-
-    public function getResetUrl($username)
-    {
-        $user = User::whereUsername($username);
-
-        // Users can reset their own password
-        if ($user !== User::current()) {
-            $this->authorize('super');
-        }
-
-        $resetter = new PasswordReset;
-
-        $resetter->user($user);
-
-        return [
-            'success' => true,
-            'url' => $resetter->url()
-        ];
-    }
-
-    public function sendResetEmail($username)
-    {
-        $user = User::whereUsername($username);
-
-        if (! $user->email()) {
-            return ['success' => false];
-        }
-
-        $resetter = new PasswordReset;
-
-        $resetter->user($user);
-
-        $resetter->send();
-
-        return ['success' => true];
     }
 }
