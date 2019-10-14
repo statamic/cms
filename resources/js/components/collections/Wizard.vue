@@ -245,12 +245,12 @@
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="mount">Mount to an Entry</label>
                 <publish-field-meta
-                    :config="{ handle: 'mount', type: 'relationship', max_items: 1 }"
+                    :config="{ handle: 'mount', type: 'entries', max_items: 1 }"
                     :initial-value="collection.mount ? [collection.mount] : []">
                     <div slot-scope="{ meta, value, loading }">
                         <relationship-fieldtype
                             v-if="!loading"
-                            :config="{ handle: 'mount', type: 'relationship', max_items: 1 }"
+                            :config="{ handle: 'mount', type: 'entries', max_items: 1 }"
                             :value="value"
                             :meta="meta"
                             handle="mount"

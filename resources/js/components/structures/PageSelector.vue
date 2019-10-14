@@ -34,7 +34,7 @@ export default {
     data() {
         return {
             config: {
-                type: 'relationship',
+                type: 'entries',
             },
             selections: [],
             columns: [
