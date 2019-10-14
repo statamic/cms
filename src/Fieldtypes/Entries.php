@@ -79,7 +79,7 @@ class Entries extends Relationship
     {
         $query = Entry::query();
 
-        if ($collections = $request->collections) {
+        if ($collections = $this->config('collections')) {
             $query->whereIn('collection', $collections);
         }
 
