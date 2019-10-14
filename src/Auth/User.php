@@ -3,23 +3,24 @@
 namespace Statamic\Auth;
 
 use ArrayAccess;
+use Illuminate\Auth\Passwords\CanResetPassword;
+use Illuminate\Contracts\Auth\Authenticatable;
+use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Password;
+use Statamic\Auth\Passwords\PasswordReset;
+use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Data\Augmentable;
 use Statamic\Facades;
-use Statamic\Facades\URL;
-use Statamic\Support\Arr;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Preference;
-use Statamic\Data\Augmentable;
-use Illuminate\Support\Facades\Password;
-use Illuminate\Notifications\Notifiable;
-use Statamic\Notifications\PasswordReset;
-use Illuminate\Contracts\Support\Arrayable;
-use Statamic\Notifications\ActivateAccount;
-use Illuminate\Contracts\Auth\Authenticatable;
-use Illuminate\Auth\Passwords\CanResetPassword;
-use Statamic\Contracts\Auth\User as UserContract;
-use Illuminate\Foundation\Auth\Access\Authorizable;
-use Statamic\Contracts\Data\Augmentable as AugmentableContract;
-use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Statamic\Facades\URL;
+use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
+use Statamic\Notifications\PasswordReset as PasswordResetNotification;
+use Statamic\Support\Arr;
 
 abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, AugmentableContract, Arrayable, ArrayAccess
 {
@@ -216,16 +217,26 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
 
     public function sendPasswordResetNotification($token)
     {
-        $notification = $this->password() ? new PasswordReset($token) : new ActivateAccount($token);
+        $notification = $this->password()
+            ? new PasswordResetNotification($token)
+            : new ActivateAccountNotification($token);
 
         $this->notify($notification);
     }
 
     public function generateTokenAndSendPasswordResetNotification()
     {
-        $token = Password::broker()->createToken($this);
+        $this->sendPasswordResetNotification($this->generatePasswordResetToken());
+    }
 
-        $this->sendPasswordResetNotification($token);
+    public function getPasswordResetUrl()
+    {
+        return PasswordReset::url($this->generatePasswordResetToken());
+    }
+
+    public function generatePasswordResetToken()
+    {
+        return Password::broker()->createToken($this);
     }
 
     public static function __callStatic($method, $parameters)

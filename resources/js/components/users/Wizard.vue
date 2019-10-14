@@ -10,7 +10,7 @@
         </div>
 
         <!-- Step 1 -->
-        <div v-if="currentStep === 0">
+        <div v-if="!completed && currentStep === 0">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('Create a New User') }}</h1>
                 <p class="text-grey">Users can be assigned to roles that customize their permissions, access, and abilities throughout the Control Panel.</p>
@@ -43,7 +43,7 @@
         </div>
 
         <!-- Step 2 -->
-        <div v-if="currentStep === 1" class="max-w-md mx-auto px-2 pb-2">
+        <div v-if="!completed && currentStep === 1" class="max-w-md mx-auto px-2 pb-2">
             <div class="py-6 text-center">
                 <h1 class="mb-3">{{ __('Roles & Groups') }}</h1>
                 <p class="text-grey">Users can be assigned to roles that customize their permissions, access, and abilities throughout the Control Panel.</p>
@@ -81,7 +81,7 @@
         </div>
 
         <!-- Step 3 -->
-        <div v-if="currentStep === 2">
+        <div v-if="!completed && currentStep === 2">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('Invitation') }}</h1>
                 <p class="text-grey">Send a welcome email with account activiation details to the new user.</p>
@@ -113,9 +113,22 @@
 
             <!-- Copy Pasta -->
             <div class="max-w-md mx-auto px-2 pb-7" v-else>
+                <p class="mb-1">After you create the user, you'll be given details to share with <code>{{ user.email }}</code> via your preferred method.</p>
+            </div>
+        </div>
+
+        <!-- Post creation -->
+        <div v-if="completed">
+            <div class="max-w-md mx-auto px-2 py-6 text-center">
+                <h1 class="mb-3">{{ __('User created') }}</h1>
+                <p class="text-grey">The user account has been created.</p>
+            </div>
+
+            <!-- Copy Pasta -->
+            <div class="max-w-md mx-auto px-2 pb-7">
                 <p class="mb-1">Copy these credentials and share them with <code>{{ user.email }}</code> via your preferred method.</p>
                 <textarea readonly class="input-text" v-elastic onclick="this.select()">
-Activation URL: url
+Activation URL: {{ activationUrl }}
 Username: {{ user.email }}
 </textarea>
             </div>
@@ -123,15 +136,18 @@ Username: {{ user.email }}
 
         <div class="border-t p-2">
             <div class="max-w-md mx-auto flex items-center justify-center">
-                <button tabindex="3" class="btn mx-2 w-32" @click="previous" v-if="! onFirstStep">
+                <button tabindex="3" class="btn mx-2 w-32" @click="previous" v-if="! completed && ! onFirstStep">
                     &larr; {{ __('Previous')}}
                 </button>
-                <button tabindex="4" class="btn mx-2 w-32" :disabled="! canContinue" @click="next" v-if="! onLastStep">
+                <button tabindex="4" class="btn mx-2 w-32" :disabled="! canContinue" @click="next" v-if="! completed && ! onLastStep">
                     {{ __('Next')}} &rarr;
                 </button>
-                <button tabindex="4" class="btn-primary mx-3" @click="submit" v-if="onLastStep">
+                <button tabindex="4" class="btn-primary mx-3" @click="submit" v-if="! completed && onLastStep">
                     {{ finishButtonText }}
                 </button>
+                <a :href="editUrl" class="btn-primary mx-3" v-if="completed">
+                    {{ __('Edit User') }}
+                </a>
             </div>
         </div>
     </div>
@@ -166,7 +182,10 @@ export default {
                 subject: __('Activate your new Statamic account on ') + window.location.hostname,
                 message: `Activate your new Statamic account on ${window.location.hostname} to begin managing this website.\n\nFor your security, the link below expires after 48 hours. After that, please contact the site administrator for a new password.`,
             },
-            userExists: false
+            userExists: false,
+            completed: false,
+            activationUrl: null,
+            editUrl: null,
         }
     },
 
@@ -181,6 +200,8 @@ export default {
 
     methods: {
         canGoToStep(step) {
+            if (this.completed) return false;
+
             if (step === 1) {
                 return this.isValidEmail && ! this.userExists;
             } else if (step === 2) {
@@ -200,7 +221,13 @@ export default {
             let payload = {...this.user, invitation: this.invitation};
 
             this.$axios.post(this.route, payload).then(response => {
-                window.location = response.data.redirect;
+                if (this.invitation.send) {
+                    window.location = response.data.redirect;
+                } else {
+                    this.completed = true;
+                    this.editUrl = response.data.redirect;
+                    this.activationUrl = response.data.activationUrl;
+                }
             }).catch(error => {
                 this.$notify.error(error.response.data.message);
             });

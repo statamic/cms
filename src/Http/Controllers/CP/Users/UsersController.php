@@ -2,26 +2,19 @@
 
 namespace Statamic\Http\Controllers\CP\Users;
 
-use Statamic\Facades\URL;
-use Statamic\Facades\User;
-use Statamic\Facades\Email;
-use Statamic\Facades\Scope;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Action;
-use Statamic\Facades\Config;
-use Statamic\Facades\Helper;
-use Statamic\Facades\Fieldset;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
-use Illuminate\Http\Request;
 use Statamic\Fields\Validation;
-use Illuminate\Notifications\Notifiable;
+use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Notifications\ActivateAccount;
-use Illuminate\Http\Resources\Json\Resource;
-use Statamic\Notifications\NewUserInvitation;
-use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Contracts\Auth\User as UserContract;
 
 class UsersController extends CpController
 {
@@ -152,6 +145,7 @@ class UsersController extends CpController
 
         return array_merge($user->toArray(), [
             'redirect' => $user->editUrl(),
+            'activationUrl' => $request->invitation['send'] ? null : $user->getPasswordResetUrl(),
         ]);
     }
 
