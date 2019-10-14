@@ -115,4 +115,11 @@ abstract class Builder extends BaseBuilder
             return in_array($value, $where['values']);
         });
     }
+
+    protected function filterWhereNotIn($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            return !in_array($value, $where['values']);
+        });
+    }
 }

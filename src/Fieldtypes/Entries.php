@@ -91,6 +91,10 @@ class Entries extends Relationship
             $query->where('site', $site);
         }
 
+        if ($request->exclusions) {
+            $query->whereNotIn('id', $request->exclusions);
+        }
+
         return $query;
     }
 

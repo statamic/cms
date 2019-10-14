@@ -119,6 +119,17 @@ abstract class Builder
         return $this;
     }
 
+    public function whereNotIn($column, $values)
+    {
+        $this->wheres[] = [
+            'type' => 'NotIn',
+            'column' => $column,
+            'values' => $values,
+        ];
+
+        return $this;
+    }
+
     public function first()
     {
         return $this->get()->first();

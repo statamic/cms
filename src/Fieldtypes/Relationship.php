@@ -214,6 +214,11 @@ abstract class Relationship extends Fieldtype
 
     abstract public function getIndexItems($request);
 
+    public function filterExcludedItems($items, $exclusions)
+    {
+        return $items->whereNotIn('id', $exclusions)->values();
+    }
+
     public function getSortColumn($request)
     {
         return $request->get('sort');

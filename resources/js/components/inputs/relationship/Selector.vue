@@ -8,7 +8,7 @@
 
         <data-list
             v-if="!initializing"
-            :rows="itemsWithExclusions"
+            :rows="items"
             :columns="columns"
             :sort="false"
             :sort-column="sortColumn"
@@ -144,16 +144,13 @@ export default {
                 sort: this.sortColumn,
                 order: this.sortDirection,
                 page: this.page,
-                site: this.site
+                site: this.site,
+                exclusions: this.exclusions,
             }
         },
 
         hasMaxSelections() {
             return (this.maxSelections === Infinity) ? false : Boolean(this.maxSelections);
-        },
-
-        itemsWithExclusions() {
-            return this.items.filter(item => !this.exclusions.includes(item.id));
         }
 
     },
@@ -198,7 +195,7 @@ export default {
             this.loading = true;
 
             const params = {...this.parameters, ...{
-                search: this.searchQuery
+                search: this.searchQuery,
             }};
 
             return this.$axios.get(this.url, { params }).then(response => {

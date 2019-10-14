@@ -66,6 +66,14 @@ abstract class IteratorBuilder extends Builder
         });
     }
 
+    protected function filterWhereNotIn($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+            return !in_array($value, $where['values']);
+        });
+    }
+
     protected function filterWhereBasic($entries, $where)
     {
         return $entries->filter(function ($entry) use ($where) {

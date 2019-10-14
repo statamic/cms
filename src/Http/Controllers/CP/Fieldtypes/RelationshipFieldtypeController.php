@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Fieldtypes;
 
 use Statamic\Fields\Field;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Facades\Statamic\Fields\FieldtypeRepository as Fieldtype;
@@ -14,7 +15,13 @@ class RelationshipFieldtypeController extends CpController
     {
         $fieldtype = $this->fieldtype($request);
 
-        return Resource::collection($fieldtype->getIndexItems($request))->additional(['meta' => [
+        $items = $fieldtype->getIndexItems($request);
+
+        if ($items instanceof Collection) {
+            $items = $fieldtype->filterExcludedItems($items, $request->exclusions ?? []);
+        }
+
+        return Resource::collection($items)->additional(['meta' => [
             'sortColumn' => $fieldtype->getSortColumn($request),
         ]]);
     }
