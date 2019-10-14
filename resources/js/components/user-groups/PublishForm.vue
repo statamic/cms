@@ -30,13 +30,23 @@
                     {{ __('role_change_handle_warning') }}
                 </div>
 
-                <form-group
-                    fieldtype="user_roles"
-                    :display="__('Roles')"
-                    handle="roles"
-                    :errors="errors.roles"
-                    v-model="roles"
-                />
+                <div class="form-group publish-field field-w-full">
+                    <label class="publish-field-label" v-text="__('Roles')" />
+                    <publish-field-meta
+                        :config="{ handle: 'roles', type: 'user_roles' }"
+                        :initial-value="roles">
+                        <div slot-scope="{ meta, value, loading }">
+                            <relationship-fieldtype
+                                v-if="!loading"
+                                :config="{ handle: 'roles', type: 'user_roles' }"
+                                :value="value"
+                                :meta="meta"
+                                handle="roles"
+                                @input="roles = $event" />
+                        </div>
+                    </publish-field-meta>
+                    <small class="help-block text-red mt-1 mb-0" v-if="errors.roles" v-text="errors.roles[0]" />
+                </div>
 
             </div>
 
