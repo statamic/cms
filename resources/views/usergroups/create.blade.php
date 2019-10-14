@@ -10,8 +10,9 @@
     >
 
         <h1 class="flex-1" slot="heading" slot-scope="{ title }">
-            <a href="{{ cp_route('user-groups.index') }}">{{ __('User Groups') }}</a>
-            @svg('chevron-right')
+            <div class="subhead">
+                <a href="{{ cp_route('user-groups.index') }}">{{ __('User Groups') }}</a>
+            </div>
             {{ __('Create User Group') }}
         </h1>
 
