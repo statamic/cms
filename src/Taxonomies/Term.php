@@ -124,7 +124,7 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
             'taxonomy' => $this->taxonomyHandle(),
             'edit_url' => $this->editUrl(),
             'permalink' => $this->absoluteUrl(),
-        ])->merge($this->supplements);
+        ])->merge($this->supplements)->all();
     }
 
     public function fileData()
