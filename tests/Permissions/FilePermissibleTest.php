@@ -47,6 +47,7 @@ class FilePermissibleTest extends TestCase
 
         Role::shouldReceive('find')->with('direct')->andReturn($directRole);
         UserGroup::shouldReceive('find')->with('usergroup')->andReturn($userGroup);
+        UserGroup::shouldReceive('all')->andReturn(collect([$userGroup])); // the stache calls this when getting a user. unrelated to test.
 
         $user = $this->createPermissible()
             ->assignRole($directRole)

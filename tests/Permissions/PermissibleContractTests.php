@@ -156,6 +156,7 @@ trait PermissibleContractTests
 
         RoleAPI::shouldReceive('find')->with('direct')->andReturn($directRole);
         UserGroupAPI::shouldReceive('find')->with('usergroup')->andReturn($userGroup);
+        UserGroupAPI::shouldReceive('all')->andReturn(collect([$userGroup])); // the stache calls this when getting a user. unrelated to test.
 
         $user = $this->createPermissible()
             ->assignRole($directRole)
@@ -217,6 +218,7 @@ trait PermissibleContractTests
         RoleAPI::shouldReceive('find')->with('nonsuperrole')->andReturn($nonSuperRole);
         UserGroupAPI::shouldReceive('find')->with('supergroup')->andReturn($superGroup);
         UserGroupAPI::shouldReceive('find')->with('nonsupergroup')->andReturn($nonSuperGroup);
+        UserGroupAPI::shouldReceive('all')->andReturn(collect([$superGroup, $nonSuperGroup])); // the stache calls this when getting a user. unrelated to test.
 
         $superUserThroughRole = $this->createPermissible()->assignRole($superRole)->save();
         $nonSuperUserThroughRole = $this->createPermissible()->assignRole($nonSuperRole)->save();
