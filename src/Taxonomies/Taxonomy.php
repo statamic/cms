@@ -9,6 +9,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Data\ExistsAsFile;
 use Illuminate\Contracts\Support\Responsable;
+use Statamic\Facades\Site;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 
@@ -163,7 +164,7 @@ class Taxonomy implements Contract, Responsable
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                return collect($sites);
+                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
             })
             ->args(func_get_args());
     }
