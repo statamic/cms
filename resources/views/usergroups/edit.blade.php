@@ -3,6 +3,9 @@
 
 @section('content')
 
+    <collection-edit-form>
+    </collection-edit-form>
+
     <user-group-publish-form
         action="{{ cp_route('user-groups.update', $group->handle()) }}"
         method="patch"
@@ -26,7 +29,7 @@
         group="{{ $group->id() }}"
         :filters="{{ $filters->toJson() }}"
         :actions="{{ $actions->toJson() }}"
-        action-url="{{ cp_route('users.action') }}"
+        action-url="{{ cp_route('users.actions') }}"
     ></user-listing>
 
 @endsection
