@@ -3,12 +3,6 @@ export default {
 
     props: ['fields', 'rows', 'meta', 'name'],
 
-    data() {
-        return {
-            sortableRows: this.rows
-        }
-    },
-
     computed: {
 
         sortableItemClass() {
@@ -27,14 +21,6 @@ export default {
             sortableHandleClass: this.sortableHandleClass
         }
     },
-
-    watch: {
-
-        sortableRows(rows) {
-            this.$emit('sorted', rows);
-        }
-
-    }
 
 }
 </script>
