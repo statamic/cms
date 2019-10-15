@@ -73,7 +73,6 @@ export default {
         return {
             assetId: null,
             asset: null,
-            showingToolbar: false,
             showingSelector: false,
             loading: false,
             alt: this.node.attrs.alt,
@@ -114,8 +113,6 @@ export default {
         }
 
         this.loadAsset(this.assetId);
-
-        this.options.bard.$on('image-deselected', () => this.showingToolbar = false);
     },
 
     watch: {
