@@ -33,7 +33,7 @@
                     </sortable-list>
 
                     <div v-if="preferencesKey">
-                        <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
+                        <loading-graphic class="mt-3 ml-3" v-if="saving" :inline="true" :text="__('Saving')" />
                         <template v-else>
                             <div class="flex justify-center p-3">
                                 <button class="btn-flat w-full mr-sm block" @click="reset">{{ __('Reset') }}</button>
