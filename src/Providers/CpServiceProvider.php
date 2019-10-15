@@ -36,6 +36,7 @@ class CpServiceProvider extends ServiceProvider
                 'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
                 'livePreview' => config('statamic.live_preview'),
                 'locale' => config('app.locale'),
+                'permissions' => base64_encode(json_encode(User::current()->permissions()))
             ]);
         });
 

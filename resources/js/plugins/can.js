@@ -1,27 +1,7 @@
-var can = function(permission) {
-    var permissions = JSON.parse(atob(Statamic.$config.get('permissions')));
+const can = function(permission) {
+    const permissions = JSON.parse(atob(Statamic.$config.get('permissions')));
 
-    if (_.contains(permissions, 'super')) {
-        return true;
-    }
-
-    var colons = permission.split(':').length - 1;
-
-    if (colons === 2) {
-        var parts = permission.split(':');
-        var cascade = parts[0] + ':';
-        if (parts[2] === 'delete') {
-            cascade += 'delete';
-        } else {
-            cascade += 'manage';
-        }
-
-        if (_.contains(permissions, cascade)) {
-            return true;
-        }
-    }
-
-    return _.contains(permissions, permission);
+    return permissions.includes('super') || permissions.includes(permission);
 };
 
 export default {
@@ -29,10 +9,6 @@ export default {
     install(Vue, options) {
 
         Vue.prototype.can = function(permission) {
-            return can(permission);
-        };
-
-        Vue.can = function(permission) {
             return can(permission);
         };
 
