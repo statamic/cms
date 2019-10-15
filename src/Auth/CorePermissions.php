@@ -93,6 +93,8 @@ class CorePermissions
 
     protected function registerGlobals()
     {
+        Permission::register('configure globals');
+
         Permission::register('edit {global} globals', function ($permission) {
             $permission->withReplacements('global', function () {
                 return GlobalSet::all()->map(function ($global) {
@@ -104,6 +106,8 @@ class CorePermissions
 
     protected function registerTaxonomies()
     {
+        Permission::register('configure taxonomies');
+
         Permission::register('view {taxonomy} terms', function ($permission) {
             $permission->withChildren([
                 Permission::make('edit {taxonomy} terms')->withChildren([
@@ -181,7 +185,9 @@ class CorePermissions
     {
         Utility::all()->each(function ($utility) {
             Permission::register("access {$utility->handle()} utility", function ($perm) use ($utility) {
-                return $perm->withLabel(__('statamic::permissions.access_utility', ['title' => $utility->title()]));
+                return $perm
+                    ->withLabel(__('statamic::permissions.access_utility', ['title' => $utility->title()]))
+                    ->withDescription(__('statamic::permissions.access_utility_desc', ['title' => $utility->title()]));
             });
         });
     }

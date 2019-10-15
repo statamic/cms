@@ -12,6 +12,7 @@ class Permission
     protected $replacementLabel;
     protected $children;
     protected $label;
+    protected $description;
     protected $group;
 
     public function value(string $value = null)
@@ -34,27 +35,17 @@ class Permission
 
     public function label()
     {
-        $permission = $this;
-        $replacements = [];
-
-        if ($this->original) {
-            $permission = $this->original;
-            $replacements = [$this->original->placeholder() => $this->replacementLabel];
-        }
-
         if ($this->label && !$this->placeholder) {
             return $this->label;
         }
 
-        $key = $this->label
-            ? $this->label
-            : 'statamic::permissions.' .  str_replace(' ', '_', $permission->value);
+        $permission = $this->getTranslationPermission();
 
-        if ($key !== ($translation = __($key, $replacements))) {
-            return $translation;
-        }
+        $key = $this->getTranslationKey($permission);
 
-        return title_case($permission->value);
+        $translation = __($key, $this->getTranslationReplacements());
+
+        return $key === $translation ? title_case($permission->value) : $translation;
     }
 
     public function placeholder()
@@ -174,5 +165,46 @@ class Permission
     public function group()
     {
         return $this->group;
+    }
+
+    public function withDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    public function description()
+    {
+        if ($this->description && !$this->placeholder) {
+            return $this->description;
+        }
+
+        $permission = $this->getTranslationPermission();
+
+        $key = $this->getTranslationKey($permission).'_desc';
+
+        $translation = __($key, $this->getTranslationReplacements());
+
+        return $key === $translation ? null : $translation;
+    }
+
+    private function getTranslationPermission()
+    {
+        return $this->original ?? $this;
+    }
+
+    private function getTranslationReplacements()
+    {
+        if (! $this->original) {
+            return [];
+        }
+
+        return [$this->original->placeholder() => $this->replacementLabel];
+    }
+
+    private function getTranslationKey($permission)
+    {
+        return 'statamic::permissions.' .  str_replace(' ', '_', $permission->value);
     }
 }

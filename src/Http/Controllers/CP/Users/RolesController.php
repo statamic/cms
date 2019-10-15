@@ -146,6 +146,7 @@ class RolesController extends CpController
             return [
                 'value' => $permission->value(),
                 'label' => $permission->label(),
+                'description' => $permission->description(),
                 'group' => $permission->group() ?? 'misc',
                 'checked' => $role ? $role->hasPermission($permission->value()) : false,
                 'children' => $this->toTree($item['children'], $role),

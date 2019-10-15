@@ -17,7 +17,7 @@
         <div v-if="!isSuper">
             <div class="mt-3" v-for="group in groups" :key="group.handle">
                 <h2 class="mt-4 mb-2 font-bold text-xl">{{ group.label }}</h2>
-                <role-permission-tree class="card p-3 pb-2" :initial-permissions="group.permissions" />
+                <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
             </div>
         </div>
 
