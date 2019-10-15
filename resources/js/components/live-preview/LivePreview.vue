@@ -24,6 +24,7 @@
                                 :key="handle"
                                 :is="component"
                                 :value="extras[handle]"
+                                :loading="loading"
                                 @input="componentUpdated(handle, $event)"
                                 class="ml-2" />
 
@@ -110,6 +111,7 @@ export default {
             poppedOut: false,
             popoutWindow: null,
             popoutResponded: false,
+            loading: true,
             extras: {},
         }
     },
@@ -204,6 +206,8 @@ export default {
             if (source) source.cancel();
             source = this.$axios.CancelToken.source();
 
+            this.loading = true;
+
             this.$axios.post(this.url, this.payload, { cancelToken: source.token }).then(response => {
                 this.updateIframeContents(response.data);
             }).catch(e => {
@@ -222,6 +226,7 @@ export default {
             iframe.contentWindow.document.open();
             iframe.contentWindow.document.write(contents);
             iframe.contentWindow.document.close();
+            this.loading = false;
         },
 
         close() {
@@ -275,6 +280,12 @@ export default {
                         this.update();
                     case 'popout.pong':
                         this.popoutResponded = true;
+                        break;
+                    case 'popout.loading':
+                        this.loading = true;
+                        break;
+                    case 'popout.loaded':
+                        this.loading = false;
                         break;
                     default:
                         break;

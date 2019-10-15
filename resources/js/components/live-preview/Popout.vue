@@ -45,6 +45,8 @@ export default {
             if (source) source.cancel();
             source = this.$axios.CancelToken.source();
 
+            this.channel.postMessage({ event: 'popout.loading' });
+
             this.$axios.post(this.url, this.payload, { cancelToken: source.token }).then(response => {
                 this.updateIframeContents(response.data);
             }).catch(e => {
@@ -63,6 +65,7 @@ export default {
             iframe.contentWindow.document.open();
             iframe.contentWindow.document.write(contents);
             iframe.contentWindow.document.close();
+            this.channel.postMessage({ event: 'popout.loaded' })
         },
 
     }
