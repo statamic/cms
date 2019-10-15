@@ -353,6 +353,15 @@
             @apply border align-top relative py-sm px-1;
             min-width: 1em;
         }
+
+        .selectedCell {
+            @apply relative;
+
+            &:after {
+                @apply bg-grey-40 absolute pin pointer-events-none opacity-25;
+                content: '';
+            }
+        }
     }
 
     p > code {
