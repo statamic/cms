@@ -2,21 +2,24 @@
 
     <div>
 
-        <label class="flex">
-            <div class="leading-normal">
-                <input type="checkbox" v-model="isSuper" name="super" />
-            </div>
-            <div class="pl-1">
-                {{ __('Super User') }}
-                <div class="text-grey text-xs">{{ __('permission_super') }}</div>
-            </div>
-        </label>
+        <div class="card">
+            <label class="flex">
+                <div class="leading-normal">
+                    <input type="checkbox" v-model="isSuper" name="super" />
+                </div>
+                <div class="pl-1">
+                    {{ __('permissions.super') }}
+                    <div class="text-grey text-xs">{{ __('permissions.super_desc') }}</div>
+                </div>
+            </label>
+        </div>
 
-        <role-permission-tree
-            v-if="!isSuper"
-            class="mt-3 pt-3 border-t"
-            :initial-permissions="permissions"
-        />
+        <div v-if="!isSuper">
+            <div class="mt-3" v-for="group in groups" :key="group.handle">
+                <h2 class="mt-4 mb-2 font-bold text-xl">{{ group.label }}</h2>
+                <role-permission-tree class="card p-3 pb-2" :initial-permissions="group.permissions" />
+            </div>
+        </div>
 
     </div>
 
@@ -33,7 +36,7 @@ export default {
     data() {
         return {
             isSuper: this.initialSuper,
-            permissions: this.value
+            groups: this.value
         }
     },
 

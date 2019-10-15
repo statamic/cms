@@ -12,6 +12,7 @@ class Permission
     protected $replacementLabel;
     protected $children;
     protected $label;
+    protected $group;
 
     public function value(string $value = null)
     {
@@ -47,7 +48,7 @@ class Permission
 
         $key = $this->label
             ? $this->label
-            : 'statamic::messages.permission_' .  str_replace(' ', '_', $permission->value);
+            : 'statamic::permissions.' .  str_replace(' ', '_', $permission->value);
 
         if ($key !== ($translation = __($key, $replacements))) {
             return $translation;
@@ -101,6 +102,7 @@ class Permission
         return (new self)
             ->value($value)
             ->withLabel($permission->label)
+            ->inGroup($permission->group())
             ->replaces($permission, $replacement, $label);
     }
 
@@ -160,5 +162,17 @@ class Permission
             'permission' => $this,
             'children' => $children->map->toTree()
         ];
+    }
+
+    public function inGroup($group)
+    {
+        $this->group = $group;
+
+        return $this;
+    }
+
+    public function group()
+    {
+        return $this->group;
     }
 }

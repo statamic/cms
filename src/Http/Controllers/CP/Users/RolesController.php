@@ -78,7 +78,7 @@ class RolesController extends CpController
         return view('statamic::roles.edit', [
             'role' => $role,
             'super' => $role->isSuper(),
-            'permissions' => $this->toTreeArray(Permission::tree(), $role),
+            'permissions' => $this->toGroupedTree(Permission::tree(), $role),
         ]);
     }
 
@@ -119,15 +119,36 @@ class RolesController extends CpController
         return response('', 204);
     }
 
-    protected function toTreeArray($tree, $role = null)
+    protected function toGroupedTree($tree, $role = null)
+    {
+        $tree = $this->toTree($tree, $role)
+            ->groupBy('group')
+            ->map(function ($permissions, $group) {
+                return [
+                    'handle' => $group,
+                    'label' => __('statamic::permissions.group_'.$group),
+                    'permissions' => $permissions
+                ];
+            });
+
+        // Place ungrouped permissions at the end.
+        if ($tree->has('misc')) {
+            $tree->put('misc', $tree->pull('misc'));
+        }
+
+        return $tree->values();
+    }
+
+    protected function toTree($tree, $role = null)
     {
         return $tree->map(function ($item) use ($role) {
             $permission = $item['permission'];
             return [
                 'value' => $permission->value(),
                 'label' => $permission->label(),
+                'group' => $permission->group() ?? 'misc',
                 'checked' => $role ? $role->hasPermission($permission->value()) : false,
-                'children' => $this->toTreeArray($item['children'], $role),
+                'children' => $this->toTree($item['children'], $role),
             ];
         });
     }

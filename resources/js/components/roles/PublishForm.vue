@@ -32,15 +32,11 @@
 
             </div>
 
-            <div class="card">
-
-                <role-permissions
-                    :initial-super="isSuper"
-                    v-model="permissions"
-                    @super-updated="isSuper = $event"
-                ></role-permissions>
-
-            </div>
+            <role-permissions
+                :initial-super="isSuper"
+                v-model="permissions"
+                @super-updated="isSuper = $event"
+            />
 
         </div>
 </template>
@@ -104,7 +100,9 @@ export default {
         },
 
         checkedPermissions() {
-            return checked(this.permissions);
+            return this.permissions.reduce((carry, group) => {
+                return [...carry, ...checked(group.permissions)];
+            }, []);
         }
 
     },

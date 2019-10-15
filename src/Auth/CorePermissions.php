@@ -15,26 +15,45 @@ class CorePermissions
 {
     public function boot()
     {
-        $this
-            ->register('access cp')
-            ->registerCollections()
-            ->registerStructures()
-            ->registerGlobals()
-            ->registerTaxonomies()
-            ->registerAssetContainers()
-            ->registerUpdates()
-            ->registerUsers()
-            ->registerForms()
-            ->registerUtilities()
-            ->register('configure fields')
-            ->register('configure addons');
-    }
+        Permission::group('cp', function () {
+            Permission::register('access cp');
+        });
 
-    protected function register($permission)
-    {
-        Permission::register($permission);
+        Permission::group('collections', function () {
+            $this->registerCollections();
+        });
 
-        return $this;
+        Permission::group('structures', function () {
+            $this->registerStructures();
+        });
+
+        Permission::group('globals', function () {
+            $this->registerGlobals();
+        });
+
+        Permission::group('taxonomies', function () {
+            $this->registerTaxonomies();
+        });
+
+        Permission::group('assets', function () {
+            $this->registerAssets();
+        });
+
+        Permission::group('users', function () {
+            $this->registerUsers();
+        });
+
+        Permission::group('updates', function () {
+            $this->registerUpdates();
+        });
+
+        Permission::group('forms', function () {
+            $this->registerForms();
+        });
+
+        Permission::group('utilities', function () {
+            $this->registerUtilities();
+        });
     }
 
     protected function registerCollections()
@@ -55,8 +74,6 @@ class CorePermissions
                 });
             });
         });
-
-        return $this;
     }
 
     protected function registerStructures()
@@ -72,8 +89,6 @@ class CorePermissions
                 });
             });
         });
-
-        return $this;
     }
 
     protected function registerGlobals()
@@ -85,14 +100,10 @@ class CorePermissions
                 });
             });
         });
-
-        return $this;
     }
 
     protected function registerTaxonomies()
     {
-        return $this; // TODO: Remove this when taxonomies work again.
-
         Permission::register('view {taxonomy} terms', function ($permission) {
             $permission->withChildren([
                 Permission::make('edit {taxonomy} terms')->withChildren([
@@ -105,11 +116,9 @@ class CorePermissions
                 });
             });
         });
-
-        return $this;
     }
 
-    protected function registerAssetContainers()
+    protected function registerAssets()
     {
         Permission::register('configure asset containers');
 
@@ -127,8 +136,6 @@ class CorePermissions
                 });
             });
         });
-
-        return $this;
     }
 
     protected function registerUpdates()
@@ -138,8 +145,6 @@ class CorePermissions
                 Permission::make('perform updates'),
             ]);
         });
-
-        return $this;
     }
 
     protected function registerUsers()
@@ -155,8 +160,6 @@ class CorePermissions
                 ]),
             ]);
         });
-
-        return $this;
     }
 
     protected function registerForms()
@@ -172,18 +175,14 @@ class CorePermissions
                 });
             });
         });
-
-        return $this;
     }
 
     protected function registerUtilities()
     {
         Utility::all()->each(function ($utility) {
             Permission::register("access {$utility->handle()} utility", function ($perm) use ($utility) {
-                return $perm->withLabel(__('statamic::messages.permission_access_utility', ['title' => $utility->title()]));
+                return $perm->withLabel(__('statamic::permissions.access_utility', ['title' => $utility->title()]));
             });
         });
-
-        return $this;
     }
 }

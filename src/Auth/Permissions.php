@@ -7,10 +7,17 @@ use Illuminate\Support\Facades\Gate;
 class Permissions
 {
     protected static $permissions = [];
+    protected $pendingGroup = null;
 
     public function make(string $value)
     {
-        return (new Permission)->value($value);
+        $permission = (new Permission)->value($value);
+
+        if ($this->pendingGroup) {
+            $permission->inGroup($this->pendingGroup);
+        }
+
+        return $permission;
     }
 
     public function register($permission, $callback = null)
@@ -62,5 +69,16 @@ class Permissions
                     'children' => $this->toTree($permission->children())
                 ];
             });
+    }
+
+    public function group($name, $permissions)
+    {
+        throw_if($this->pendingGroup, new \Exception('Cannot double nest permission groups'));
+
+        $this->pendingGroup = $name;
+
+        $permissions();
+
+        $this->pendingGroup = null;
     }
 }
