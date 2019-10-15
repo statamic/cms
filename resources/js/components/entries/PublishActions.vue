@@ -141,7 +141,7 @@ export default {
                 .then(this.performPublishRequest)
                 .catch(error => {
                     this.saving = false;
-                    this.$notify.error(error || 'Something went wrong');
+                    this.$toast.error(error || 'Something went wrong');
                 });
         },
 
@@ -150,7 +150,7 @@ export default {
             this.$axios.post(this.actions.publish, payload)
                 .then(response => {
                     this.saving = false;
-                    this.$notify.success(__('Published'));
+                    this.$toast.success(__('Published'));
                     this.runAfterPublishHook(response);
                 }).catch(error => this.handleAxiosError(error));
         },
@@ -181,7 +181,7 @@ export default {
             const payload = { message: this.revisionMessage };
 
             this.$axios.delete(this.actions.publish, { data: payload }).then(response => {
-                this.$notify.success(__('Unpublished'));
+                this.$toast.success(__('Unpublished'));
                 this.revisionMessage = null;
                 this.$emit('saved', { published: false, isWorkingCopy: false, response });
             }).catch(e => this.handleAxiosError(e));
@@ -191,7 +191,7 @@ export default {
             const payload = { message: this.revisionMessage };
 
             this.$axios.post(this.actions.createRevision, payload).then(response => {
-                this.$notify.success(__('Revision created'));
+                this.$toast.success(__('Revision created'));
                 this.revisionMessage = null;
                 this.$emit('saved', { isWorkingCopy: true, response });
             }).catch(e => this.handleAxiosError(e));
@@ -199,7 +199,7 @@ export default {
 
         handleAxiosError(e) {
             this.saving = false;
-            this.$notify.error(e || 'Something went wrong');
+            this.$toast.error(e || 'Something went wrong');
         }
 
     }

@@ -418,7 +418,7 @@ export default {
          */
         uploadError(upload, uploads) {
             this.uploads = uploads;
-            this.$notify.error(upload.errorMessage);
+            this.$toast.error(upload.errorMessage);
         },
 
         /**

@@ -169,10 +169,10 @@ export default {
             this.$axios.post(this.reorderUrl, {ids})
                 .then(response => {
                     this.reordering = false;
-                    this.$notify.success(__('Entries successfully reordered'))
+                    this.$toast.success(__('Entries successfully reordered'))
                 })
                 .catch(e => {
-                    this.$notify.error('Something went wrong');
+                    this.$toast.error('Something went wrong');
                 });
         },
 

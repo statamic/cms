@@ -55,7 +55,7 @@ export default {
                     this.success();
                 })
                 .catch(() => {
-                    this.$notify.error(__('Something went wrong'));
+                    this.$toast.error(__('Something went wrong'));
                 });
         },
 

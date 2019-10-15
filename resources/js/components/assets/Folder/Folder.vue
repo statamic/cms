@@ -65,10 +65,10 @@ export default {
             if (e.response && e.response.status === 422) {
                 const { message, errors } = e.response.data;
                 this.errors = errors;
-                this.$notify.error(message);
+                this.$toast.error(message);
                 this.saving = false;
             } else {
-                this.$notify.error(__('Something went wrong'));
+                this.$toast.error(__('Something went wrong'));
             }
         }
 

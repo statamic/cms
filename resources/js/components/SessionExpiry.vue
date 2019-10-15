@@ -175,15 +175,15 @@ export default {
                 this.errors = {};
                 this.password = null;
                 this.isShowingLogin = false;
-                this.$notify.success(__('Logged in'));
+                this.$toast.success(__('Logged in'));
                 this.restartCountdown();
                 this.updateCsrfToken();
             }).catch(e => {
                 if (e.response.status === 422) {
                     this.errors = e.response.data.errors;
-                    this.$notify.error(e.response.data.message);
+                    this.$toast.error(e.response.data.message);
                 } else {
-                    this.$notify.error(__('Something went wrong'))
+                    this.$toast.error(__('Something went wrong'))
                 }
             });
         },

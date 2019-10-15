@@ -104,7 +104,7 @@ export default {
 
             this.$axios[this.method](this.actions.save, this.values).then(response => {
                 this.title = response.data.title;
-                if (!this.isCreating) this.$notify.success('Saved');
+                if (!this.isCreating) this.$toast.success('Saved');
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => {
@@ -112,9 +112,9 @@ export default {
                     const { message, errors } = e.response.data;
                     this.error = message;
                     this.errors = errors;
-                    this.$notify.error(message);
+                    this.$toast.error(message);
                 } else {
-                    this.$notify.error('Something went wrong');
+                    this.$toast.error('Something went wrong');
                 }
             });
         }

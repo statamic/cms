@@ -29,12 +29,12 @@ export default {
                     let i = _.indexOf(this.rows, _.findWhere(this.rows, { id }));
                     this.rows.splice(i, 1);
                     this.deletingRow = false;
-                    this.$notify.success(message);
+                    this.$toast.success(message);
 
                     if (this.rows.length === 0) location.reload();
                 })
                 .catch(e => {
-                    this.$notify.error(e.response
+                    this.$toast.error(e.response
                         ? e.response.data.message
                         : __('Something went wrong'));
                 });

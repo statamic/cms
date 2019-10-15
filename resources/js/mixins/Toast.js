@@ -22,9 +22,9 @@ export default {
     created() {
         this.flash = Statamic.$config.get('flash');
 
-        this.$events.$on('notify.success', this.setFlashSuccess);
-        this.$events.$on('notify.info', this.setFlashMessage);
-        this.$events.$on('notify.error', this.setFlashError);
+        this.$events.$on('toast.success', this.setFlashSuccess);
+        this.$events.$on('toast.info', this.setFlashMessage);
+        this.$events.$on('toast.error', this.setFlashError);
     },
 
     mounted() {

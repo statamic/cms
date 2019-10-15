@@ -23,7 +23,7 @@ export default {
             };
 
             this.$axios.post(url, payload).then(response => {
-                this.$notify.success(__('Folder created'));
+                this.$toast.success(__('Folder created'));
                 this.$emit('created', response.data);
             }).catch(e => {
                 this.handleErrors(e);

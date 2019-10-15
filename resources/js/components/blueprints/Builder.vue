@@ -79,13 +79,13 @@ export default {
             this.$axios['patch'](this.action, this.blueprint)
                 .then(response => this.saved(response))
                 .catch(e => {
-                    this.$notify.error(e.response.data.message);
+                    this.$toast.error(e.response.data.message);
                     this.errors = e.response.data.errors;
                 })
         },
 
         saved(response) {
-            this.$notify.success('Saved');
+            this.$toast.success('Saved');
             this.errors = {};
         }
 

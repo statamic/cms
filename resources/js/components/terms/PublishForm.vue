@@ -376,7 +376,7 @@ export default {
                 this.title = response.data.title;
                 this.permalink = response.data.permalink;
                 this.isWorkingCopy = true;
-                if (!this.isCreating) this.$notify.success('Saved');
+                if (!this.isCreating) this.$toast.success('Saved');
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => this.handleAxiosError(e));
@@ -394,9 +394,9 @@ export default {
                 const { message, errors } = e.response.data;
                 this.error = message;
                 this.errors = errors;
-                this.$notify.error(message);
+                this.$toast.error(message);
             } else {
-                this.$notify.error('Something went wrong');
+                this.$toast.error('Something went wrong');
             }
         },
 

@@ -179,7 +179,7 @@ export default {
             this.$axios.post(this.route, this.taxonomy).then(response => {
                 window.location = response.data.redirect;
             }).catch(error => {
-                this.$notify.error(error.response.data.message);
+                this.$toast.error(error.response.data.message);
             });
         }
     },

@@ -93,7 +93,7 @@ export default {
                 password: this.password,
                 password_confirmation: this.confirmation
             }).then(response => {
-                this.$notify.success(__('Password changed'));
+                this.$toast.success(__('Password changed'));
                 this.$refs.popper.doClose();
                 this.saving = false;
                 this.password = null;
@@ -103,10 +103,10 @@ export default {
                     const { message, errors } = e.response.data;
                     this.error = message;
                     this.errors = errors;
-                    this.$notify.error(message);
+                    this.$toast.error(message);
                     this.saving = false;
                 } else {
-                    this.$notify.error('Something went wrong');
+                    this.$toast.error('Something went wrong');
                 }
             })
         }

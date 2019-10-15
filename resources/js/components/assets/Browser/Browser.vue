@@ -460,7 +460,7 @@ export default {
                 this.loadingAssets = false;
                 this.initializing = false;
             }).catch(e => {
-                this.$notify.error(e.response.data.message, { action: null, duration: null });
+                this.$toast.error(e.response.data.message, { action: null, duration: null });
                 this.assets = [];
                 this.folders = [];
                 this.loadingAssets = false;
@@ -513,12 +513,12 @@ export default {
 
         uploadCompleted(asset) {
             this.loadAssets();
-            this.$notify.success(__(':file uploaded', { file: asset.basename }));
+            this.$toast.success(__(':file uploaded', { file: asset.basename }));
         },
 
         uploadError(upload, uploads) {
             this.uploads = uploads;
-            this.$notify.error(upload.errorMessage);
+            this.$toast.error(upload.errorMessage);
         },
 
         openFileBrowser() {

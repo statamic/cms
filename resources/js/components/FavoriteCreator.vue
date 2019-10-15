@@ -69,21 +69,21 @@ export default {
             this.saving = true;
             this.$preferences.append('favorites', this.favorite).then(response => {
                 this.saving = false;
-                this.$notify.success(__('Favorite saved'));
+                this.$toast.success(__('Favorite saved'));
                 this.$refs.popper.doClose();
             }).catch(e => {
                 this.saving = false;
                 if (e.response) {
-                    this.$notify.error(e.response.data.message);
+                    this.$toast.error(e.response.data.message);
                 } else {
-                    this.$notify.error(__('Something went wrong'));
+                    this.$toast.error(__('Something went wrong'));
                 }
             });
         },
 
         remove() {
             this.$preferences.remove('favorites', this.persistedFavorite).then(response => {
-                this.$notify.success(__('Favorite removed'));
+                this.$toast.success(__('Favorite removed'));
             });
         }
     },

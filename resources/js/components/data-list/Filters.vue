@@ -107,11 +107,11 @@ export default {
             this.$preferences.set(this.preferencesKey, this.preferencesPayload)
                 .then(response => {
                     this.saving = false;
-                    this.$notify.success(__('Filters saved'));
+                    this.$toast.success(__('Filters saved'));
                 })
                 .catch(error => {
                     this.saving = false;
-                    this.$notify.error(__('Something went wrong'));
+                    this.$toast.error(__('Something went wrong'));
                 });
         },
 
@@ -121,12 +121,12 @@ export default {
             this.$preferences.remove(this.preferencesKey)
                 .then(response => {
                     this.saving = false;
-                    this.$notify.success(__('Filters reset'));
+                    this.$toast.success(__('Filters reset'));
                     this.$events.$emit('filters-reset');
                 })
                 .catch(error => {
                     this.saving = false;
-                    this.$notify.error(__('Something went wrong'));
+                    this.$toast.error(__('Something went wrong'));
                 });
         }
     },

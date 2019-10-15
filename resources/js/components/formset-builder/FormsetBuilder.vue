@@ -198,7 +198,7 @@ export default {
 
         save: function() {
             if (! this.formset.title) {
-                this.$notify.error(__('validation.required', { attribute: 'title' }));
+                this.$toast.error(__('validation.required', { attribute: 'title' }));
                 return;
             }
 
@@ -208,7 +208,7 @@ export default {
             }).then(function(response) {
                 window.location = response.data.redirect;
             }).catch(e => {
-                this.$notify.error(e.response.data.message)
+                this.$toast.error(e.response.data.message)
             });
         }
     },

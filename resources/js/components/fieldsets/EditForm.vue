@@ -54,11 +54,11 @@ export default {
         save() {
             this.$axios[this.method](this.action, this.fieldset)
                 .then(response => {
-                    this.$notify.success('Saved');
+                    this.$toast.success('Saved');
                     this.errors = {};
                 })
                 .catch(e => {
-                    this.$notify.error(e.response.data.message);
+                    this.$toast.error(e.response.data.message);
                     this.errors = e.response.data.errors;
                 })
         },

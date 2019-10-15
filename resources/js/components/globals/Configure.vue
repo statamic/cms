@@ -121,10 +121,10 @@ export default {
                     const { message, errors } = e.response.data;
                     this.error = message;
                     this.errors = errors;
-                    this.$notify.error(message);
+                    this.$toast.error(message);
                     this.saving = false;
                 } else {
-                    this.$notify.error('Something went wrong');
+                    this.$toast.error('Something went wrong');
                 }
             })
         }

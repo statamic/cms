@@ -311,7 +311,7 @@ export default {
 
             this.$axios.patch(url, this.values).then(response => {
                 this.$emit('saved', response.data.asset);
-                this.$notify.success('Saved');
+                this.$toast.success('Saved');
                 this.saving = false;
                 this.clearErrors();
             }).catch(e => {
@@ -320,9 +320,9 @@ export default {
                     this.error = message;
                     this.errors = errors;
                     this.saving = false;
-                    this.$notify.error(error);
+                    this.$toast.error(error);
                 } else {
-                    this.$notify.error('Something went wrong');
+                    this.$toast.error('Something went wrong');
                 }
             });
         },

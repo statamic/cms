@@ -121,9 +121,9 @@ export default {
             const url = cp_url(`forms/${this.form}/submissions/${id}`);
             this.$axios.delete(url).then(response => {
                 this.submissions.splice(index, 1);
-                this.$notify.success(__('Submission deleted'));
+                this.$toast.success(__('Submission deleted'));
             }).catch(error => {
-                this.$notify.error(error.response.data.message);
+                this.$toast.error(error.response.data.message);
             })
         },
 

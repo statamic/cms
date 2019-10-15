@@ -246,7 +246,7 @@ export default {
             this.$axios.post(this.submitUrl, payload).then(response => {
                 this.changed = false;
                 this.saving = false;
-                this.$notify.success(__('Saved'));
+                this.$toast.success(__('Saved'));
             });
         },
 

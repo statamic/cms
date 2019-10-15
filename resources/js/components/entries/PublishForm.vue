@@ -409,7 +409,7 @@ export default {
             .then(this.performSaveRequest)
             .catch(error => {
                 this.saving = false;
-                this.$notify.error(error || 'Something went wrong');
+                this.$toast.error(error || 'Something went wrong');
             });
         },
 
@@ -426,7 +426,7 @@ export default {
                 this.title = this.values.title;
                 this.isWorkingCopy = true;
                 if (!this.revisionsEnabled) this.permalink = response.data.permalink;
-                if (!this.isCreating) this.$notify.success('Saved');
+                if (!this.isCreating) this.$toast.success('Saved');
                 this.$refs.container.saved();
                 this.runAfterSaveHook(response);
             }).catch(error => this.handleAxiosError(error));
@@ -462,11 +462,11 @@ export default {
                 const { message, errors } = e.response.data;
                 this.error = message;
                 this.errors = errors;
-                this.$notify.error(message);
+                this.$toast.error(message);
             } else if (e.response) {
-                this.$notify.error(e.response.data.message);
+                this.$toast.error(e.response.data.message);
             } else {
-                this.$notify.error(e || 'Something went wrong');
+                this.$toast.error(e || 'Something went wrong');
             }
         },
 

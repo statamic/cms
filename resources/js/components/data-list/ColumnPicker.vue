@@ -97,7 +97,7 @@ export default {
 
         save() {
             if (! this.selectedColumns.length) {
-                return this.$notify.error(__('At least 1 column is required'));
+                return this.$toast.error(__('At least 1 column is required'));
             }
 
             this.saving = true;
@@ -106,11 +106,11 @@ export default {
                 .then(response => {
                     this.saving = false;
                     this.customizing = false;
-                    this.$notify.success(__('Columns saved'));
+                    this.$toast.success(__('Columns saved'));
                 })
                 .catch(error => {
                     this.saving = false;
-                    this.$notify.error(__('Something went wrong'));
+                    this.$toast.error(__('Something went wrong'));
                 });
         },
 
@@ -123,11 +123,11 @@ export default {
                 .then(response => {
                     this.saving = false;
                     this.customizing = false;
-                    this.$notify.success(__('Columns reset'));
+                    this.$toast.success(__('Columns reset'));
                 })
                 .catch(error => {
                     this.saving = false;
-                    this.$notify.error(__('Something went wrong'));
+                    this.$toast.error(__('Something went wrong'));
                 });
         }
     },

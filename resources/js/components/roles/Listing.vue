@@ -39,9 +39,9 @@ export default {
             const url = cp_url(`roles/${id}`);
             this.$axios.delete(url).then(response => {
                 this.rows.splice(index, 1);
-                this.$notify.success(__('Role deleted'));
+                this.$toast.success(__('Role deleted'));
             }).catch(error => {
-                this.$notify.error(error.response.data.message);
+                this.$toast.error(error.response.data.message);
             })
         }
 

@@ -214,7 +214,7 @@ export default {
             this.$axios.post(cp_url('user-exists'), {email: this.user.email}).then(response => {
                 this.userExists = response.data.exists
             }).catch(error => {
-                this.$notify.error(error.response.data.message);
+                this.$toast.error(error.response.data.message);
             });
         },
         submit() {
@@ -229,7 +229,7 @@ export default {
                     this.activationUrl = response.data.activationUrl;
                 }
             }).catch(error => {
-                this.$notify.error(error.response.data.message);
+                this.$toast.error(error.response.data.message);
             });
         }
     },

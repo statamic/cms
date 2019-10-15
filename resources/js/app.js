@@ -1,5 +1,5 @@
 import Vue from 'vue';
-import Notifications from './mixins/Notifications.js';
+import Toast from './mixins/Toast.js';
 import Statamic from './components/Statamic.js';
 
 Vue.config.silent = false;
@@ -85,7 +85,7 @@ Statamic.$store = new Vuex.Store({
     }
 });
 
-require('./components/NotificationBus');
+require('./components/ToastBus');
 require('./components/ModalBus');
 require('./components/stacks/Stacks');
 require('./components/panes/Panes');
@@ -98,7 +98,7 @@ require('./components/Permission');
 Statamic.app({
     el: '#statamic',
 
-    mixins: [Notifications],
+    mixins: [Toast],
 
     store: Statamic.$store,
 

@@ -62,7 +62,7 @@ export default {
 
             this.$axios.post(cp_url('auth/login'), payload).then(response => {
                 this.errors = [];
-                this.$notify.success(__('Logged in'));
+                this.$toast.success(__('Logged in'));
                 this.show = false;
                 this.$emit('closed');
             }).catch(response => {
