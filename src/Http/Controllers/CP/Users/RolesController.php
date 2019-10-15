@@ -43,7 +43,7 @@ class RolesController extends CpController
         $this->authorize('edit roles');
 
         return view('statamic::roles.create', [
-            'permissions' => $this->toTreeArray(Permission::tree()),
+            'permissions' => $this->toGroupedTree(Permission::tree()),
         ]);
     }
 
