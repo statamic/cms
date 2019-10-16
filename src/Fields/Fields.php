@@ -2,9 +2,10 @@
 
 namespace Statamic\Fields;
 
-use Illuminate\Support\Collection;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
+use Facades\Statamic\Fields\Validator;
+use Illuminate\Support\Collection;
 
 class Fields
 {
@@ -193,5 +194,15 @@ class Fields
     public function meta()
     {
         return $this->fields->map->meta();
+    }
+
+    public function validator()
+    {
+        return Validator::make()->fields($this);
+    }
+
+    public function validate($extraRules = [])
+    {
+        return $this->validator()->withRules($extraRules)->validate();
     }
 }

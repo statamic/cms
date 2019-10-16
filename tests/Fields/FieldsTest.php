@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Facades\Statamic\Fields\Validator;
 
 class FieldsTest extends TestCase
 {
@@ -532,5 +533,39 @@ class FieldsTest extends TestCase
             ['three'],
             $fields->localizable()->all()->keys()->all()
         );
+    }
+
+    /** @test */
+    function it_gets_a_validator()
+    {
+        $fields = new Fields;
+        Validator::shouldReceive('make')->once()->andReturnSelf();
+        $mock = Validator::shouldReceive('fields')->once()->andReturnSelf()->getMock();
+
+        $this->assertEquals($mock, $fields->validator());
+    }
+
+    /** @test */
+    function it_validates_immediately()
+    {
+        $fields = new Fields;
+        Validator::shouldReceive('make')->once()->andReturnSelf();
+        Validator::shouldReceive('fields')->once()->andReturnSelf();
+        Validator::shouldReceive('withRules')->with([])->once()->andReturnSelf();
+        Validator::shouldReceive('validate')->once();
+
+        $fields->validate();
+    }
+
+    /** @test */
+    function it_validates_immediately_with_extra_rules()
+    {
+        $fields = new Fields;
+        Validator::shouldReceive('make')->once()->andReturnSelf();
+        Validator::shouldReceive('fields')->once()->andReturnSelf();
+        Validator::shouldReceive('withRules')->with(['foo' => 'bar'])->once()->andReturnSelf();
+        Validator::shouldReceive('validate')->once();
+
+        $fields->validate(['foo' => 'bar']);
     }
 }

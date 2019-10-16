@@ -10,6 +10,11 @@ class Validator
     protected $data = [];
     protected $extraRules = [];
 
+    public function make()
+    {
+        return new static;
+    }
+
     public function fields($fields)
     {
         $this->fields = $fields;
