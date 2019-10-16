@@ -5,7 +5,6 @@ namespace Statamic\Fieldtypes;
 use Statamic\Facades\Helper;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
-use Statamic\Fields\Validator;
 use Statamic\CP\FieldtypeFactory;
 use Statamic\Fields\ConfigFields;
 
@@ -108,7 +107,7 @@ class Grid extends Fieldtype
 
     public function extraRules(): array
     {
-        $rules = (new Validator)->fields($this->fields())->rules();
+        $rules = $this->fields()->validator()->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) {
             return ["{$this->field->handle()}.*.{$handle}" => $rules];

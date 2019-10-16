@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
-use Statamic\Fields\Validator;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Events\Data\PublishBlueprintFound;
@@ -180,11 +179,11 @@ class EntriesController extends CpController
 
         $fields = $entry->blueprint()->fields()->addValues($request->except('id'));
 
-        (new Validator)->fields($fields)->withRules([
-            'title' => 'required',
+        $fields->validate([
+            'title' => 'required|min:3',
             'slug' => 'required|alpha_dash',
             'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id(),
-        ])->validate();
+        ]);
 
         $values = $fields->process()->values();
         $parent = array_pull($values, 'parent');
@@ -298,10 +297,10 @@ class EntriesController extends CpController
 
         $fields = $blueprint->fields()->addValues($request->all());
 
-        (new Validator)->fields($fields)->withRules([
+        $fields->validate([
             'title' => 'required',
             'slug' => 'required|unique_entry_value:'.$collection->handle(),
-        ])->validate();
+        ]);
 
         $values = array_except($fields->process()->values(), ['slug', 'blueprint']);
 

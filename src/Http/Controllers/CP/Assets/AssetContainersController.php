@@ -7,7 +7,6 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
-use Statamic\Fields\Validator;
 use Statamic\Http\Controllers\CP\CpController;
 
 class AssetContainersController extends CpController
@@ -70,7 +69,7 @@ class AssetContainersController extends CpController
 
         $fields = $this->formBlueprint()->fields()->addValues($request->all());
 
-        (new Validator)->fields($fields)->validate();
+        $fields->validate();
 
         $values = $fields->process()->values();
 
@@ -112,13 +111,11 @@ class AssetContainersController extends CpController
     {
         $this->authorize('create', AssetContainerContract::class, 'You are not authorized to create asset containers.');
 
-        $validation = (new Validator)->fields(
-            $fields = $this->formBlueprint()->fields()->addValues($request->all())->process()
-        );
+        $fields = $this->formBlueprint()->fields()->addValues($request->all());
 
-        $request->validate($validation->rules());
+        $fields->validate();
 
-        $values = $fields->values();
+        $values = $fields->process()->values();
 
         if (AssetContainer::find($values['handle'])) {
             throw new \Exception('Asset container already exists');

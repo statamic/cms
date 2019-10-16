@@ -10,7 +10,6 @@ use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
-use Statamic\Fields\Validator;
 use Statamic\Http\Controllers\CP\CpController;
 
 class AssetsController extends CpController
@@ -75,7 +74,7 @@ class AssetsController extends CpController
 
         $fields = $asset->blueprint()->fields()->addValues($request->all());
 
-        (new Validator)->fields($fields)->validate();
+        $fields->validate();
 
         $values = array_merge($fields->process()->values(), [
             'focus' => $request->focus

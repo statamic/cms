@@ -11,7 +11,6 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
-use Statamic\Fields\Validator;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Notifications\ActivateAccount;
@@ -119,9 +118,7 @@ class UsersController extends CpController
 
         $fields = $blueprint->fields()->addValues($request->all());
 
-        (new Validator)->fields($fields)->withRules([
-            'email' => 'required|email|unique_user_value',
-        ])->validate();
+        $fields->validate(['email' => 'required|email|unique_user_value']);
 
         $values = array_except($fields->process()->values(), ['email', 'groups', 'roles']);
 
@@ -188,9 +185,7 @@ class UsersController extends CpController
 
         $fields = $user->blueprint()->fields()->addValues($request->all());
 
-        (new Validator)->fields($fields)->withRules([
-            'email' => 'required|unique_user_value:'.$id,
-        ])->validate();
+        $fields->validate(['email' => 'required|unique_user_value:'.$id]);
 
         $values = array_except($fields->process()->values(), ['email', 'groups', 'roles']);
 

@@ -4,7 +4,6 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
-use Statamic\Fields\Validator;
 use Statamic\CP\FieldtypeFactory;
 
 class Replicator extends Fieldtype
@@ -63,7 +62,7 @@ class Replicator extends Fieldtype
 
     protected function setRules($handle, $data, $index)
     {
-        $rules = (new Validator)->fields($this->fields($handle))->rules();
+        $rules = $this->fields($handle)->validator()->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
             return [$this->setRuleFieldKey($handle, $index) => $rules];
