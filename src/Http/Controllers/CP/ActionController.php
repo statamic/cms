@@ -5,7 +5,7 @@ namespace Statamic\Http\Controllers\CP;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Action;
 use Illuminate\Http\Request;
-use Statamic\Fields\Validation;
+use Statamic\Fields\Validator;
 
 abstract class ActionController extends CpController
 {
@@ -37,7 +37,7 @@ abstract class ActionController extends CpController
 
         $action = Action::get($request->action)->context($context);
 
-        $validation = (new Validation)->fields($action->fields());
+        $validation = (new Validator)->fields($action->fields());
 
         $request->replace($request->values)->validate($validation->rules());
 

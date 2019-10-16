@@ -7,7 +7,7 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
-use Statamic\Fields\Validation;
+use Statamic\Fields\Validator;
 use Statamic\Http\Controllers\CP\CpController;
 
 class AssetContainersController extends CpController
@@ -70,7 +70,7 @@ class AssetContainersController extends CpController
 
         $fields = $this->formBlueprint()->fields()->addValues($request->all());
 
-        (new Validation)->fields($fields)->validate();
+        (new Validator)->fields($fields)->validate();
 
         $values = $fields->process()->values();
 
@@ -112,7 +112,7 @@ class AssetContainersController extends CpController
     {
         $this->authorize('create', AssetContainerContract::class, 'You are not authorized to create asset containers.');
 
-        $validation = (new Validation)->fields(
+        $validation = (new Validator)->fields(
             $fields = $this->formBlueprint()->fields()->addValues($request->all())->process()
         );
 

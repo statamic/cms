@@ -60,12 +60,12 @@ class Field implements Arrayable
     {
         $rules = [$this->handle => $this->addNullableRule(array_merge(
             $this->get('required') ? ['required'] : [],
-            Validation::explodeRules(array_get($this->config, 'validate')),
-            Validation::explodeRules($this->fieldtype()->rules())
+            Validator::explodeRules(array_get($this->config, 'validate')),
+            Validator::explodeRules($this->fieldtype()->rules())
         ))];
 
         $extra = collect($this->fieldtype()->extraRules())->map(function ($rules) {
-            return $this->addNullableRule(Validation::explodeRules($rules));
+            return $this->addNullableRule(Validator::explodeRules($rules));
         })->all();
 
         return array_merge($rules, $extra);

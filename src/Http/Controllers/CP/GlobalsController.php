@@ -7,7 +7,7 @@ use Statamic\Facades\Helper;
 use Statamic\Facades\GlobalSet;
 use Illuminate\Http\Request;
 use Statamic\Facades\User;
-use Statamic\Fields\Validation;
+use Statamic\Fields\Validator;
 use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Contracts\Globals\GlobalSet as GlobalSetContract;
 
@@ -118,7 +118,7 @@ class GlobalsController extends CpController
 
         $fields = $set->blueprint()->fields()->addValues($request->all());
 
-        (new Validation)->fields($fields)->validate();
+        (new Validator)->fields($fields)->validate();
 
         $values = $fields->process()->values();
 
