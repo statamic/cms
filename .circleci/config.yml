@@ -35,3 +35,4 @@ jobs:
             - node_modules
 
       - run: ./vendor/bin/phpunit
+      - run: npm run test
