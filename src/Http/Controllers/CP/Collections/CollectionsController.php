@@ -46,7 +46,7 @@ class CollectionsController extends CpController
 
     public function show($collection)
     {
-        $this->authorize('view', $collection, 'You are not authorized to view any collections.');
+        $this->authorize('view', $collection, 'You are not authorized to view this collection.');
 
         $blueprints = $collection->entryBlueprints()->map(function ($blueprint) {
             return [
@@ -75,7 +75,7 @@ class CollectionsController extends CpController
 
     public function edit($collection)
     {
-        $this->authorize('edit', $collection, 'You are not authorized to edit collections.');
+        $this->authorize('edit', $collection, 'You are not authorized to edit this collection.');
 
         $values = $collection->toArray();
 
@@ -147,7 +147,7 @@ class CollectionsController extends CpController
 
     public function update(Request $request, $collection)
     {
-        $this->authorize('update', $collection, 'You are not authorized to edit collections.');
+        $this->authorize('update', $collection, 'You are not authorized to edit this collection.');
 
         $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 
