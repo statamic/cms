@@ -21,6 +21,23 @@ class Users extends Relationship
         'canEditPassword' => 'canEditPassword',
     ];
 
+    protected $configFields = [
+        'max_items' => [
+            'type' => 'integer',
+            'default' => 1,
+            'instructions' => 'Set a maximum number of selectable users',
+        ],
+        'mode' => [
+            'type' => 'radio',
+            'default' => 'select',
+            'options' => [
+                'default' => 'Stack Selector',
+                'select' => 'Select Dropdown',
+                'typeahead' => 'Typeahead Field'
+            ]
+        ]
+    ];
+
     public function preProcess($data)
     {
         if ($data === 'current') {
