@@ -771,6 +771,16 @@ EOT;
     }
 
     /** @test */
+    function it_gets_nested_values_from_augmentable_objects()
+    {
+        $value = new AugmentableObject(['foo' => 'bar']);
+
+        $parsed = Antlers::parse('{{ test:foo }}', ['test' => $value]);
+
+        $this->assertEquals('bar', $parsed);
+    }
+
+    /** @test */
     function it_loops_over_value_object()
     {
         $fieldtype = new class extends Fieldtype {
