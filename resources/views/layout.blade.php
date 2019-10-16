@@ -9,7 +9,6 @@
 
       @include('statamic::partials.session-expiry')
       @include('statamic::partials.global-header')
-      @include('statamic::partials.alerts')
 
       <div id="main" class="@yield('content-class')" :class="{'nav-closed': ! computedNavOpen}">
             @include('statamic::partials.nav-main')
