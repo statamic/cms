@@ -22,7 +22,6 @@ class JavascriptComposer
             'urlPath' => '/' . request()->path(),
             'resourceUrl' => Statamic::assetUrl(),
             'locales' => config('statamic.system.locales'),
-            'markdownHardWrap' => config('statamic.theming.markdown_hard_wrap'),
             'conditions' => [],
             'MediumEditorExtensions' => [],
             'flash' => Statamic::flash(),

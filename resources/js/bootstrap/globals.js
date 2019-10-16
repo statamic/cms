@@ -53,11 +53,6 @@ global.tailwind_width_class = function (width) {
 }
 
 global.markdown = function (value) {
-    marked.setOptions({
-        gfm: true,
-        breaks: Statamic.$config.get('markdownHardWrap'),
-        tables: true
-    });
     return marked(value);
 };
 
