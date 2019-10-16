@@ -12,15 +12,12 @@
     &.multi .selectize-input > div,
     &.multi .selectize-input > div.focus,
     &.multi .selectize-input > div.active {
-        background: $brand-primary;
-        border-radius: 2px;
-        color: #fff;
-        margin: 4px 8px 4px 0;
+        @apply bg-blue rounded-sm text-white mr-1 my-sm inline-block;
         padding: 2px 8px;
 
+
         &.focus, &.active {
-            background: darken($brand-primary, 13%);
-            color: #fff;
+            @apply bg-blue-dark text-white;
         }
     }
 }
