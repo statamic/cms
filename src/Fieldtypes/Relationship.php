@@ -32,9 +32,9 @@ abstract class Relationship extends Fieldtype
         'mode' => [
             'type' => 'radio',
             'options' => [
-                'default' => 'Default (Drag and drop UI with item selector in a stack)',
-                'select' => 'Select (A dropdown field with prepopulated options)',
-                'typeahead' => 'Typeahead (A dropdown field with options requested as you type)'
+                'default' => 'Stack Selector',
+                'select' => 'Select Dropdown',
+                'typeahead' => 'Typeahead Field'
             ]
         ]
     ];
