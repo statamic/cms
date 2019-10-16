@@ -42,7 +42,7 @@ class FieldsController extends CpController
         return [
             'fieldtype' => $fieldtype->toArray(),
             'blueprint' => $blueprint->toPublishArray(),
-            'values' => array_merge($request->values, $fields->values()),
+            'values' => array_merge($request->values, $fields->values()->all()),
             'meta' => $fields->meta()
         ];
     }
@@ -63,6 +63,6 @@ class FieldsController extends CpController
             ->addValues($request->values)
             ->process();
 
-        return array_merge($request->values, $fields->values());
+        return array_merge($request->values, $fields->values()->all());
     }
 }

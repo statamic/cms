@@ -58,7 +58,7 @@ class Grid extends Fieldtype
     {
         $row = array_except($row, '_id');
 
-        $fields = $this->fields()->addValues($row)->process()->values();
+        $fields = $this->fields()->addValues($row)->process()->values()->all();
 
         return array_merge($row, $fields);
     }
@@ -78,7 +78,7 @@ class Grid extends Fieldtype
 
     private function preProcessRow($row, $index)
     {
-        $fields = $this->fields()->addValues($row)->preProcess()->values();
+        $fields = $this->fields()->addValues($row)->preProcess()->values()->all();
 
         return array_merge($row, $fields, [
             '_id' => "row-$index",
@@ -133,7 +133,7 @@ class Grid extends Fieldtype
     public function augment($value)
     {
         return collect($value)->map(function ($row) {
-            return $this->fields()->addValues($row)->augment()->values();
+            return $this->fields()->addValues($row)->augment()->values()->all();
         });
     }
 }

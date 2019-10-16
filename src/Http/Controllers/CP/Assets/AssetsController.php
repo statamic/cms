@@ -76,7 +76,7 @@ class AssetsController extends CpController
 
         $fields->validate();
 
-        $values = array_merge($fields->process()->values(), [
+        $values = $fields->process()->values()->merge([
             'focus' => $request->focus
         ]);
 

@@ -131,7 +131,7 @@ class TaxonomiesController extends CpController
 
         $fields->validate();
 
-        $taxonomy = $this->updateTaxonomy($taxonomy, $fields->process()->values());
+        $taxonomy = $this->updateTaxonomy($taxonomy, $fields->process()->values()->all());
 
         $taxonomy->save();
 

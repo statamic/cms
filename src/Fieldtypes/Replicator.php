@@ -24,7 +24,7 @@ class Replicator extends Fieldtype
     {
         $row = array_except($row, '_id');
 
-        $fields = $this->fields($row['type'])->addValues($row)->process()->values();
+        $fields = $this->fields($row['type'])->addValues($row)->process()->values()->all();
 
         return array_merge($row, $fields);
     }
@@ -38,7 +38,7 @@ class Replicator extends Fieldtype
 
     protected function preProcessRow($row, $index)
     {
-        $fields = $this->fields($row['type'])->addValues($row)->preProcess()->values();
+        $fields = $this->fields($row['type'])->addValues($row)->preProcess()->values()->all();
 
         return array_merge($row, $fields, [
             '_id' => "set-$index",

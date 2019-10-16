@@ -105,7 +105,7 @@ class Fields
     {
         return $this->fields->mapWithKeys(function ($field) {
             return [$field->handle() => $field->value()];
-        })->all();
+        });
     }
 
     public function process()

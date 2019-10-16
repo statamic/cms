@@ -52,7 +52,7 @@ class TermRevisionsController extends CpController
             ->addValues($term->data())
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = array_merge($fields->values()->all(), [
             'title' => $term->get('title'),
             'slug' => $term->slug()
         ]);

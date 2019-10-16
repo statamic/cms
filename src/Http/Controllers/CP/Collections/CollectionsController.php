@@ -152,7 +152,7 @@ class CollectionsController extends CpController
 
         $fields->validate();
 
-        $collection = $this->updateCollection($collection, $values = $fields->process()->values());
+        $collection = $this->updateCollection($collection, $values = $fields->process()->values()->all());
 
         if ($futureDateBehavior = array_get($values, 'future_date_behavior')) {
             $collection->futureDateBehavior($futureDateBehavior);

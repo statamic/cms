@@ -96,7 +96,7 @@ class AssetContainersController extends CpController
             ->fields()
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = $fields->values()->merge([
             'disk' => $this->disks()->first(),
         ]);
 

@@ -175,7 +175,7 @@ class TermsController extends CpController
             'slug' => 'required|alpha_dash',
         ]);
 
-        $values = array_except($fields->process()->values(), ['slug', 'date']);
+        $values = array_except($fields->process()->values()->all(), ['slug', 'date']);
 
         if ($term->hasOrigin()) {
             $values = array_only($values, $request->input('_localized'));
@@ -220,7 +220,7 @@ class TermsController extends CpController
             ->fields()
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = $fields->values()->merge([
             'title' => null,
             'slug' => null,
             'published' => $taxonomy->defaultPublishState()
@@ -270,7 +270,7 @@ class TermsController extends CpController
             'slug' => 'required',
         ]);
 
-        $values = array_except($fields->process()->values(), ['slug', 'blueprint']);
+        $values = $fields->process()->values()->except(['slug', 'blueprint']);
 
         $term = Term::make()
             ->taxonomy($taxonomy)
@@ -313,12 +313,12 @@ class TermsController extends CpController
             ->addValues($term->values()->all())
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = $fields->values()->merge([
             'title' => $term->value('title'),
             'slug' => $term->slug()
         ]);
 
-        return [$values, $fields->meta()];
+        return [$values->all(), $fields->meta()];
     }
 
     protected function extractAssetsFromValues($values)

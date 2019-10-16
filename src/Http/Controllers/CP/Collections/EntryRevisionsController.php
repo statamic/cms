@@ -54,7 +54,7 @@ class EntryRevisionsController extends CpController
             ->addValues($entry->data()->all())
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = array_merge($fields->values()->all(), [
             'title' => $entry->get('title'),
             'slug' => $entry->slug()
         ]);

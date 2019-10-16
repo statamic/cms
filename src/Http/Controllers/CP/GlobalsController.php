@@ -122,7 +122,7 @@ class GlobalsController extends CpController
         $values = $fields->process()->values();
 
         if ($set->hasOrigin()) {
-            $values = array_only($values, $request->input('_localized'));
+            $values = $values->only($request->input('_localized'));
         }
 
         $set->data($values);
@@ -221,6 +221,6 @@ class GlobalsController extends CpController
             ->addValues($set->values()->all())
             ->preProcess();
 
-        return [$fields->values(), $fields->meta()];
+        return [$fields->values()->all(), $fields->meta()];
     }
 }

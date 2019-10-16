@@ -126,7 +126,7 @@ class StructuresController extends CpController
 
         $expectedRoot = $structure->expectsRoot();
 
-        $values = $fields->process()->values();
+        $values = $fields->process()->values()->all();
 
         $structure
             ->title($values['title'])

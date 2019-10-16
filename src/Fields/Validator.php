@@ -68,7 +68,7 @@ class Validator
 
     public function validate()
     {
-        return LaravelValidator::validate($this->fields->values(), $this->rules());
+        return LaravelValidator::validate($this->fields->values()->all(), $this->rules());
     }
 
     public static function explodeRules($rules)
