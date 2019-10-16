@@ -30,21 +30,28 @@
                     {{ __('role_change_handle_warning') }}
                 </div>
 
+                <form-group
+                    fieldtype="toggle"
+                    handle="super"
+                    :display="__('permissions.super')"
+                    :instructions="__('permissions.super_desc')"
+                    v-model="isSuper"
+                />
+
             </div>
 
-            <role-permissions
-                :initial-super="isSuper"
-                v-model="permissions"
-                @super-updated="isSuper = $event"
-            />
+            <div v-if="!isSuper">
+                <div class="mt-3" v-for="group in permissions" :key="group.handle">
+                    <h2 class="mt-4 mb-2 font-bold text-xl">{{ group.label }}</h2>
+                    <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
+                </div>
+            </div>
 
         </div>
 </template>
 
 
 <script>
-import RolePermissions from './Permissions.vue';
-
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {
         if (! permission.checked) return carry;
@@ -53,10 +60,6 @@ const checked = function (permissions) {
 };
 
 export default {
-
-    components: {
-        RolePermissions
-    },
 
     props: {
         initialTitle: String,
