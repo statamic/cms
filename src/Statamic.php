@@ -127,27 +127,7 @@ class Statamic
 
     public static function jsonVariables(Request $request)
     {
-        $defaults = [
-            'version' => static::version(),
-            'laravelVersion' => app()->version(),
-            'csrfToken' => csrf_token(),
-            'cpRoot' => str_start(config('statamic.cp.route'), '/'),
-            'urlPath' => '/' . request()->path(),
-            'resourceUrl' => Statamic::assetUrl(),
-            'locales' => \Statamic\Facades\Config::get('statamic.system.locales'),
-            'markdownHardWrap' => \Statamic\Facades\Config::get('statamic.theming.markdown_hard_wrap'),
-            'conditions' => [],
-            'MediumEditorExtensions' => [],
-            'flash' => static::flash(),
-            'ajaxTimeout' => config('statamic.system.ajax_timeout'),
-            'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
-            'user' => ($user = User::current()) ? $user->toJavascriptArray() : [],
-            'paginationSize' => config('statamic.cp.pagination_size'),
-        ];
-
-        $vars = array_merge($defaults, static::$jsonVariables);
-
-        return collect($vars)->map(function ($variable) use ($request) {
+        return collect(static::$jsonVariables)->map(function ($variable) use ($request) {
             return is_callable($variable) ? $variable($request) : $variable;
         })->all();
     }
