@@ -19,7 +19,7 @@ class TaxonomiesController extends CpController
 {
     public function index()
     {
-        $this->authorize('index', TaxonomyContract::class, 'You are not authorized to view any taxonomies.');
+        $this->authorize('index', TaxonomyContract::class);
 
         $taxonomies = Taxonomy::all()->filter(function ($taxonomy) {
             return User::current()->can('view', $taxonomy);
@@ -45,6 +45,8 @@ class TaxonomiesController extends CpController
 
     public function show($taxonomy)
     {
+        $this->authorize('view', $taxonomy);
+
         $blueprints = $taxonomy->termBlueprints()->map(function ($blueprint) {
             return [
                 'handle' => $blueprint->handle(),
@@ -67,6 +69,8 @@ class TaxonomiesController extends CpController
 
     public function create()
     {
+        $this->authorize('create', TaxonomyContract::class, 'You are not authorized to create taxonomies.');
+
         return view('statamic::taxonomies.create');
     }
 
@@ -103,7 +107,7 @@ class TaxonomiesController extends CpController
 
     public function edit($taxonomy)
     {
-        $this->authorize('edit', $taxonomy, 'You are not authorized to edit taxonomies.');
+        $this->authorize('edit', $taxonomy, 'You are not authorized to edit this taxonomy.');
 
         $values = $taxonomy->toArray();
 
@@ -122,7 +126,7 @@ class TaxonomiesController extends CpController
 
     public function update(Request $request, $taxonomy)
     {
-        $this->authorize('update', $taxonomy, 'You are not authorized to edit taxonomies.');
+        $this->authorize('update', $taxonomy, 'You are not authorized to edit this taxonomy.');
 
         $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 

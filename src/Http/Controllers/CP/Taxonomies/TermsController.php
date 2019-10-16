@@ -24,6 +24,8 @@ class TermsController extends CpController
 {
     public function index(FilteredSiteRequest $request, $taxonomy)
     {
+        $this->authorize('view', $taxonomy);
+
         $query = $this->indexQuery($taxonomy);
 
         $this->filter($query, $request->filters);
