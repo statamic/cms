@@ -14,7 +14,7 @@
             <publish-container
                 v-if="action.fields.length"
                 name="confirm-action"
-                :fieldset="fieldset"
+                :blueprint="fieldset"
                 :values="values"
                 :meta="action.meta"
                 :errors="errors"

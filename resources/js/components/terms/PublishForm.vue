@@ -46,7 +46,7 @@
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
-            :fieldset="fieldset"
+            :blueprint="fieldset"
             :values="values"
             :reference="initialReference"
             :meta="meta"

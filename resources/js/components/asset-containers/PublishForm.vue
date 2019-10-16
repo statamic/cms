@@ -4,7 +4,7 @@
         v-if="blueprint"
         ref="container"
         name="asset-container"
-        :fieldset="blueprint"
+        :blueprint="blueprint"
         :values="values"
         reference="asset-container"
         :meta="meta"

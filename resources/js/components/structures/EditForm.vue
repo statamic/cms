@@ -4,7 +4,7 @@
         v-if="blueprint"
         ref="container"
         name="collection"
-        :fieldset="blueprint"
+        :blueprint="blueprint"
         :values="values"
         reference="collection"
         :meta="meta"

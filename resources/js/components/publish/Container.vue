@@ -12,7 +12,7 @@ export default {
             type: String,
             required: true
         },
-        fieldset: {
+        blueprint: {
             type: Object,
             default: () => {}
         },
@@ -67,7 +67,7 @@ export default {
             const vm = this;
 
             const initial = {
-                fieldset: _.clone(this.fieldset),
+                blueprint: _.clone(this.blueprint),
                 values: _.clone(this.values),
                 meta: _.clone(this.meta),
                 localizedFields: _.clone(this.localizedFields),
@@ -85,7 +85,7 @@ export default {
             this.$store.registerModule(['publish', this.name], {
                 namespaced: true,
                 state: {
-                    fieldset: initial.fieldset,
+                    blueprint: initial.blueprint,
                     values: initial.values,
                     meta: initial.meta,
                     localizedFields: initial.localizedFields,
@@ -113,8 +113,8 @@ export default {
                     setIsRoot(state, isRoot) {
                         state.isRoot = isRoot;
                     },
-                    setFieldset(state, fieldset) {
-                        state.fieldset = fieldset;
+                    setBlueprint(state, blueprint) {
+                        state.blueprint = blueprint;
                     },
                     setErrors(state, errors) {
                         state.errors = errors;
@@ -132,7 +132,7 @@ export default {
                         Vue.delete(state.fieldLocks, handle);
                     },
                     initialize(state, payload) {
-                        state.fieldset = payload.fieldset;
+                        state.blueprint = payload.blueprint;
                         state.values = payload.values;
                         state.meta = payload.meta;
                         state.site = payload.site;
@@ -222,10 +222,10 @@ export default {
             this.$store.commit(`publish/${this.name}/setIsRoot`, isRoot);
         },
 
-        fieldset: {
+        blueprint: {
             deep: true,
-            handler(fieldset) {
-                this.$store.commit(`publish/${this.name}/setFieldset`, fieldset);
+            handler(blueprint) {
+                this.$store.commit(`publish/${this.name}/setBlueprint`, blueprint);
             }
         },
 
