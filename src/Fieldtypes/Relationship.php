@@ -58,7 +58,15 @@ abstract class Relationship extends Fieldtype
 
     public function preProcessIndex($data)
     {
-        return $this->augment($data)->map(function ($item) use ($data) {
+        if (! $items = $this->augment($data)) {
+            return [];
+        }
+
+        if ($this->config('max_items') === 1) {
+            $items = collect([$items]);
+        }
+
+        return $items->map(function ($item) use ($data) {
             return [
                 'id' => method_exists($item, 'id') ? $item->id() : $item->handle(),
                 'title' => method_exists($item, 'title') ? $item->title() : $item->get('title'),
