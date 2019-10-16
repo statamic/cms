@@ -22,8 +22,6 @@ class JavascriptComposer
             'urlPath' => '/' . request()->path(),
             'resourceUrl' => Statamic::assetUrl(),
             'locales' => config('statamic.system.locales'),
-            'conditions' => [],
-            'MediumEditorExtensions' => [],
             'flash' => Statamic::flash(),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
