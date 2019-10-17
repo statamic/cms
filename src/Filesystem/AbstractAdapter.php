@@ -190,7 +190,12 @@ abstract class AbstractAdapter implements Filesystem
 
     protected function relativePath($path)
     {
-        return Str::removeLeft($path, $this->root);
+        return $this->normalizeSlashes(Str::removeLeft($path, $this->root));
+    }
+
+    protected function normalizeSlashes($path)
+    {
+        return str_replace(DIRECTORY_SEPARATOR, '/', $path);
     }
 
     public function collection($files = [])
