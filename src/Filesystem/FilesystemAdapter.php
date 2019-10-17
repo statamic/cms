@@ -19,7 +19,7 @@ class FilesystemAdapter extends AbstractAdapter
 
     public function setRootDirectory($directory)
     {
-        $this->root = Str::ensureRight($directory, '/');
+        $this->root = Str::ensureRight($directory, DIRECTORY_SEPARATOR);
 
         return $this;
     }
