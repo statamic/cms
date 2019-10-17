@@ -30,8 +30,11 @@ class FieldsetRepository
             return $cached;
         }
 
-        $handle = str_replace('/', '.', $handle);
-        $path = str_replace('.', '/', $handle);
+        $handle = str_after($handle, str_finish($this->directory, DIRECTORY_SEPARATOR));
+        $handle = str_replace(DIRECTORY_SEPARATOR, '.', $handle);
+
+        $path = str_replace('.', DIRECTORY_SEPARATOR, $handle);
+        $path = str_after($path, str_finish($this->directory, DIRECTORY_SEPARATOR));
 
         if (! $this->files->exists($path = "{$this->directory}/{$path}.yaml")) {
             return null;
@@ -50,6 +53,7 @@ class FieldsetRepository
     {
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
+        $path = str_after($path, str_finish($this->directory, DIRECTORY_SEPARATOR));
 
         return $this->files->exists($path = "{$this->directory}/{$path}.yaml");
     }
@@ -70,9 +74,9 @@ class FieldsetRepository
                 return $file->getExtension() === 'yaml';
             })
             ->map(function ($file) {
-                $basename = str_after($file->getPathname(), str_finish($this->directory, '/'));
+                $basename = str_after($file->getPathname(), str_finish($this->directory, DIRECTORY_SEPARATOR));
                 $handle = str_before($basename, '.yaml');
-                $handle = str_replace('/', '.', $handle);
+                $handle = str_replace(DIRECTORY_SEPARATOR, '.', $handle);
 
                 return (new Fieldset)
                     ->setHandle($handle)
