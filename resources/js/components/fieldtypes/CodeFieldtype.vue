@@ -52,7 +52,8 @@ export default {
 
     computed: {
         modeLabel() {
-            return  this.config.mode.replace('text/x-', '');
+            var label = this.config.mode.replace('text/x-', '')
+            return label.replace('htmlmixed', 'html');
         },
         exactTheme() {
             return (this.config.theme === 'light') ? 'default' : 'material'
