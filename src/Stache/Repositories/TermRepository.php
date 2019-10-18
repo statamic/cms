@@ -92,7 +92,7 @@ class TermRepository implements RepositoryContract
         return new TermQueryBuilder($this->store);
     }
 
-    public function make($slug = null): Term
+    public function make(string $slug = null): Term
     {
         return (new \Statamic\Taxonomies\Term)->slug($slug);
     }
