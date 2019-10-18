@@ -19,6 +19,7 @@ class FilesystemAdapter extends AbstractAdapter
 
     public function setRootDirectory($directory)
     {
+        $directory = str_replace('\\', '/', $directory);
         $this->root = Str::ensureRight($directory, '/');
 
         return $this;
@@ -26,6 +27,7 @@ class FilesystemAdapter extends AbstractAdapter
 
     protected function normalizePath($path)
     {
+        $path = str_replace('\\', '/', $path);
         if ($path !== '/' && Str::startsWith($path, '/')) {
             return $path;
         }
