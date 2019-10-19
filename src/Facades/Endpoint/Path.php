@@ -222,12 +222,12 @@ class Path
      */
     public function tidy($path)
     {
-        // Remove occurrences of "//" in a $path (except when part of a protocol).
-        $path = preg_replace('#(^|[^:])//+#', '\\1/', $path);
-
         // Replace backslashes with forward slashes for consistency between platforms.
         // PHP is capable of understanding Windows paths that use forward slashes.
-        return str_replace('\\', '/', $path);
+        $path = str_replace('\\', '/', $path);
+
+        // Remove occurrences of "//" in a $path (except when part of a protocol).
+        return preg_replace('#(^|[^:])//+#', '\\1/', $path);
     }
 
     /**
