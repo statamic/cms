@@ -79,4 +79,34 @@ class FilesystemAdapterTest extends TestCase
         $this->assertEquals('C:/path/to/bar.txt', $this->adapter->normalizePath('C:\path\to/bar.txt'));
         $this->assertEquals('C:/path/to/foo/bar.txt', $this->adapter->normalizePath('C:\path\to/foo/bar.txt'));
     }
+
+    /** @test */
+    function it_checks_if_a_path_is_within_the_root()
+    {
+        $this->assertTrue($this->adapter->isWithinRoot('relative/test.txt'));
+        $this->assertTrue($this->adapter->isWithinRoot($this->tempDir.'/test.txt'));
+        $this->assertFalse($this->adapter->isWithinRoot('/absolute/path/test.txt'));
+        $this->assertFalse($this->adapter->isWithinRoot('C:\windows\path\test.txt'));
+        $this->assertFalse($this->adapter->isWithinRoot('C:/windows/path/test.txt'));
+
+        // test with the root with backslashes just to be sure.
+        $this->assertTrue($this->adapter->isWithinRoot(
+            str_replace('/', '\\', $this->tempDir).'/test.txt')
+        );
+    }
+
+    /** @test */
+    function it_gets_files_from_outside_of_the_root_and_outputs_absolute_paths()
+    {
+        mkdir($this->outsideRoot.'/sub', 0755, true);
+        file_put_contents($this->outsideRoot.'/sub/one.txt', '');
+        file_put_contents($this->outsideRoot.'/sub/two.txt', '');
+
+        $dir = Path::tidy($this->outsideRoot);
+
+        $this->assertArraysHaveSameValues([
+            $dir.'/sub/one.txt',
+            $dir.'/sub/two.txt'
+        ], $this->adapter->getFiles($dir.'/sub')->all());
+    }
 }

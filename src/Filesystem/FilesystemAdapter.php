@@ -39,6 +39,13 @@ class FilesystemAdapter extends AbstractAdapter
         return $path;
     }
 
+    public function isWithinRoot($path)
+    {
+        $path = $this->normalizePath($path);
+
+        return Str::startsWith($path, Path::tidy($this->root));
+    }
+
     protected function relativePath($path)
     {
         $root = Path::tidy($this->root);
@@ -63,8 +70,11 @@ class FilesystemAdapter extends AbstractAdapter
 
         $files = $this->filesystem->$method($this->normalizePath($path), true);
 
-        return $this->collection($files)->map(function ($file) {
-            return $this->relativePath($file->getPathname());
+        $inRoot = $this->isWithinRoot($path);
+
+        return $this->collection($files)->map(function ($file) use ($inRoot) {
+            $path = $file->getPathname();
+            return $inRoot ? $this->relativePath($path) : $this->normalizePath($path);
         });
     }
 
