@@ -4,28 +4,9 @@ namespace Tests\Filesystem;
 
 use Illuminate\Support\Collection;
 use Statamic\Support\FileCollection;
-use Illuminate\Filesystem\Filesystem;
-use Statamic\Filesystem\FilesystemAdapter;
 
 trait FilesystemAdapterTests
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->tempDir = __DIR__.'/tmp';
-        mkdir($this->tempDir);
-
-        $this->adapter = $this->makeAdapter();
-    }
-
-    public function tearDown(): void
-    {
-        parent::tearDown();
-
-        (new Filesystem)->deleteDirectory($this->tempDir);
-    }
-
     /** @test */
     function it_makes_a_file_collection()
     {

@@ -2,16 +2,33 @@
 
 namespace Tests\Filesystem;
 
-use Tests\TestCase;
-use League\Flysystem\Adapter\Local;
-use Statamic\Filesystem\FlysystemAdapter;
-use Statamic\Filesystem\FilesystemAdapter;
-use League\Flysystem\Filesystem as Flysystem;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Filesystem\FilesystemAdapter as IlluminateFilesystemAdapter;
+use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem as Flysystem;
+use Statamic\Filesystem\FlysystemAdapter;
+use Tests\TestCase;
 
 class FlysystemAdapterTest extends TestCase
 {
     use FilesystemAdapterTests;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->tempDir = __DIR__.'/tmp';
+        mkdir($this->tempDir);
+
+        $this->adapter = $this->makeAdapter();
+    }
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        (new Filesystem)->deleteDirectory($this->tempDir);
+    }
 
     protected function makeAdapter()
     {

@@ -11,6 +11,26 @@ class FilesystemAdapterTest extends TestCase
 {
     use FilesystemAdapterTests;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->tempDir = __DIR__.'/tmp';
+        mkdir($this->tempDir);
+        $this->baseDir = $this->tempDir;
+        mkdir($this->outsideRoot = $this->tempDir . '/outside-root');
+        mkdir($this->tempDir = $this->tempDir . '/root');
+
+        $this->adapter = $this->makeAdapter();
+    }
+
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        (new Filesystem)->deleteDirectory($this->baseDir);
+    }
+
     protected function makeAdapter()
     {
         return new FilesystemAdapter(
