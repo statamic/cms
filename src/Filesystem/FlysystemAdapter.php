@@ -20,8 +20,8 @@ class FlysystemAdapter extends AbstractAdapter
     {
         $path = Path::tidy($path);
 
-        if ($path === '/' || $path === '.') {
-            return null;
+        if ($path === '' || $path === '/' || $path === '.') {
+            return '/';
         }
 
         if (Path::isAbsolute($path)) {

@@ -29,8 +29,8 @@ class FlysystemAdapterTest extends TestCase
         $this->assertEquals('bar.txt', $this->adapter->normalizePath('bar.txt'));
         $this->assertEquals('foo/bar.txt', $this->adapter->normalizePath('foo/bar.txt'));
         $this->assertEquals('foo/bar.txt', $this->adapter->normalizePath('foo\bar.txt'));
-        $this->assertNull($this->adapter->normalizePath('/'));
-        $this->assertNull($this->adapter->normalizePath('.'));
+        $this->assertEquals('/', $this->adapter->normalizePath('/'));
+        $this->assertEquals('/', $this->adapter->normalizePath('.'));
     }
 
     /** @test */
