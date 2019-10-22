@@ -11,6 +11,10 @@ class ComposerTest extends TestCase
 {
     public function setUp(): void
     {
+        if ($this->isRunningWindows()) {
+            $this->markTestSkipped();
+        }
+
         parent::setUp();
 
         Composer::swap(new \Statamic\Console\Processes\Composer($this->basePath()));
