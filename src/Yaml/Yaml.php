@@ -144,7 +144,7 @@ class Yaml
 
         $e = new StatamicParseException('You cannot have a YAML variable named "content" while document content is present');
 
-        foreach (collect(explode(PHP_EOL, $str))->reverse() as $i => $text) {
+        foreach (collect(explode("\n", $str))->reverse() as $i => $text) {
             if ($text === '---') {
                 $line = $i + 2;
                 break;

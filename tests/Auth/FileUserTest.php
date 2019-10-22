@@ -2,9 +2,11 @@
 
 namespace Tests\Auth;
 
-use Tests\TestCase;
-use Statamic\Auth\File\User;
 use Illuminate\Support\Facades\Hash;
+use Statamic\Auth\File\User;
+use Statamic\Facades\Path;
+use Statamic\Support\Arr;
+use Tests\TestCase;
 
 /** @group user */
 class FileUserTest extends TestCase
@@ -18,7 +20,7 @@ class FileUserTest extends TestCase
     /** @test */
     function it_gets_path()
     {
-        $dir = realpath(__DIR__.'/../') . '/__fixtures__/users';
+        $dir = Path::tidy(realpath(__DIR__.'/../') . '/__fixtures__/users');
 
         $this->assertEquals($dir . '/john@example.com.yaml', $this->user()->path());
     }
@@ -44,22 +46,20 @@ class FileUserTest extends TestCase
 
         $user = $this->user()->password('secret');
 
-        $expected = <<<'EOT'
----
-name: 'John Smith'
-foo: bar
-roles:
-  - role_one
-  - role_two
-groups:
-  - group_one
-  - group_two
-id: '123'
-password_hash: hashed-secret
----
-Lorem Ipsum
-EOT;
-
-        $this->assertEquals($expected, $user->fileContents());
+        $this->assertEquals([
+            'name' => 'John Smith',
+            'foo' => 'bar',
+            'roles' => [
+              'role_one',
+              'role_two',
+            ],
+            'groups' => [
+              'group_one',
+              'group_two',
+            ],
+            'id' => '123',
+            'password_hash' => 'hashed-secret',
+            'content' => 'Lorem Ipsum',
+        ], Arr::removeNullValues($user->fileData()));
     }
 }

@@ -2,20 +2,21 @@
 
 namespace Tests\Data\Entries;
 
-use Statamic\Facades;
-use Tests\TestCase;
-use Statamic\Facades\User;
-use Statamic\Sites\Site;
+use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Carbon;
-use Statamic\Fields\Blueprint;
+use Illuminate\Support\Facades\Event;
+use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
 use Statamic\Events\Data\EntrySaved;
-use Illuminate\Support\Facades\Event;
 use Statamic\Events\Data\EntrySaving;
-use Statamic\Entries\Collection;
-use Tests\PreventSavingStacheItemsToDisk;
-use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Exceptions\InvalidLocalizationException;
+use Statamic\Facades;
+use Statamic\Facades\User;
+use Statamic\Fields\Blueprint;
+use Statamic\Sites\Site;
+use Statamic\Support\Arr;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class EntryTest extends TestCase
 {
@@ -515,19 +516,16 @@ class EntryTest extends TestCase
                 'content' => 'The content'
             ]);
 
-        $expected = <<<'EOT'
----
-title: 'The title'
-array:
-  - 'first one'
-  - 'second one'
-id: '123'
-published: false
----
-The content
-EOT;
-
-        $this->assertEquals($expected, $entry->fileContents());
+        $this->assertEquals([
+            'title' => 'The title',
+            'array' => [
+                'first one',
+                'second one',
+            ],
+            'id' => '123',
+            'published' => false,
+            'content' => 'The content',
+        ], Arr::removeNullValues($entry->fileData()));
     }
 
     /** @test */
