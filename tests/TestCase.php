@@ -147,4 +147,9 @@ class TestCase extends \Orchestra\Testbench\TestCase
     {
         Assert::assertArraySubset($subset, $array, $checkForObjectIdentity, $message);
     }
+
+    protected function isRunningWindows()
+    {
+        return DIRECTORY_SEPARATOR === '\\';
+    }
 }
