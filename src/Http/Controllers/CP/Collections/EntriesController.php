@@ -151,6 +151,7 @@ class EntriesController extends CpController
                     'origin' => $exists ? $localized->id() === optional($entry->origin())->id() : null,
                     'published' => $exists ? $localized->published() : false,
                     'url' => $exists ? $localized->editUrl() : null,
+                    'livePreviewUrl' => $exists ? $localized->livePreviewUrl() : null,
                 ];
             })->all(),
             'hasWorkingCopy' => $entry->hasWorkingCopy(),
@@ -275,6 +276,7 @@ class EntriesController extends CpController
                     'exists' => false,
                     'published' => false,
                     'url' => cp_route('collections.entries.create', [$collection->handle(), $handle]),
+                    'livePreviewUrl' => cp_route('collections.entries.preview.create', [$collection->handle(), $handle]),
                 ];
             })->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),

@@ -341,7 +341,7 @@ export default {
         },
 
         livePreviewUrl() {
-            return _.findWhere(this.localizations, { active: true }).url + '/preview';
+            return _.findWhere(this.localizations, { active: true }).livePreviewUrl;
         },
 
         isBase() {
