@@ -9,6 +9,7 @@ use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\TaxonomiesStore;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Facades\Path;
 
 class TaxonomiesStoreTest extends TestCase
 {
@@ -42,13 +43,14 @@ class TaxonomiesStoreTest extends TestCase
 
         $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 
+        $dir = Path::tidy($this->tempDir);
         $this->assertEquals([
-            $this->tempDir.'/one.yaml' => 1234567890,
-            $this->tempDir.'/two.yaml' => 1234567890,
+            $dir.'/one.yaml' => 1234567890,
+            $dir.'/two.yaml' => 1234567890,
         ], $files->all());
 
         // Sanity check. Make sure the file is there but wasn't included.
-        $this->assertTrue(file_exists($this->tempDir.'/top-level-non-yaml-file.md'));
+        $this->assertTrue(file_exists($dir.'/top-level-non-yaml-file.md'));
     }
 
     /** @test */

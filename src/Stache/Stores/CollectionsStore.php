@@ -2,11 +2,12 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\Facades\Collection;
+use Statamic\Facades\Path;
 use Statamic\Facades\Site;
-use Statamic\Facades\YAML;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Structure;
-use Statamic\Facades\Collection;
+use Statamic\Facades\YAML;
 use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionsStore extends BasicStore
@@ -24,7 +25,7 @@ class CollectionsStore extends BasicStore
     public function getFileFilter(SplFileInfo $file)
     {
         $dir = str_finish($this->directory, '/');
-        $relative = str_after($file->getPathname(), $dir);
+        $relative = str_after(Path::tidy($file->getPathname()), $dir);
         return $file->getExtension() === 'yaml' && substr_count($relative, '/') === 0;
     }
 

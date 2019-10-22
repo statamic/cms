@@ -26,7 +26,7 @@ class TaxonomyTermsStore extends ChildStore
     ];
 
     public function getFileFilter(SplFileInfo $file) {
-        $dir = str_finish($this->directory, '/');
+        $dir = str_finish($this->directory(), '/');
         $relative = $file->getPathname();
 
         if (substr($relative, 0, strlen($dir)) == $dir) {
@@ -37,7 +37,7 @@ class TaxonomyTermsStore extends ChildStore
         //     return false;
         // }
 
-        return $file->getExtension() === 'yaml' && substr_count($relative, '/') > 0;
+        return $file->getExtension() === 'yaml';
     }
 
     public function makeItemFromFile($path, $contents)

@@ -4,6 +4,7 @@ namespace Tests\Stache;
 
 use Mockery;
 use Tests\TestCase;
+use Statamic\Facades\Path;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Traverser;
 use Illuminate\Support\Collection;
@@ -60,10 +61,10 @@ class TraverserTest extends TestCase
     function gets_files_in_a_stores_directory()
     {
         mkdir($this->tempDir.'/nested');
-        touch($this->tempDir.'/one.txt', 1234567890);
-        touch($this->tempDir.'/nested/three.txt', 4567890123);
-        touch($this->tempDir.'/.hidden.txt', 2345678901);
-        touch($this->tempDir.'/two.txt', 3456789012);
+        touch($this->tempDir.'/one.txt', 1234567891);
+        touch($this->tempDir.'/nested/three.txt', 1234567892);
+        touch($this->tempDir.'/.hidden.txt', 1234567893);
+        touch($this->tempDir.'/two.txt', 1234567894);
 
         $store = Mockery::mock();
         $store->shouldReceive('directory')->andReturn($this->tempDir);
@@ -75,19 +76,20 @@ class TraverserTest extends TestCase
         $this->assertCount(3, $files);
         // We use assertSame because we care about the order.
         // Paths should be output by depth then alphabetical.
+        $dir = Path::tidy($this->tempDir);
         $this->assertSame([
-            $this->tempDir.'/one.txt' => 1234567890,
-            $this->tempDir.'/two.txt' => 3456789012,
-            $this->tempDir.'/nested/three.txt' => 4567890123,
+            $dir.'/one.txt' => 1234567891,
+            $dir.'/two.txt' => 1234567894,
+            $dir.'/nested/three.txt' => 1234567892,
         ], $files->all());
     }
 
     /** @test */
     function files_can_be_filtered()
     {
-        touch($this->tempDir.'/one.txt', 1234567890);
-        touch($this->tempDir.'/two.yaml', 2345678901);
-        touch($this->tempDir.'/three.txt', 3456789012);
+        touch($this->tempDir.'/one.txt', 1234567891);
+        touch($this->tempDir.'/two.yaml', 1234567892);
+        touch($this->tempDir.'/three.txt', 1234567893);
 
         $stache = Mockery::mock(Stache::class);
         $stache->shouldReceive('sites')->andReturn(collect(['en']));
@@ -105,9 +107,10 @@ class TraverserTest extends TestCase
         $files = $this->traverser->filter($filter)->traverse($store);
 
         $this->assertCount(2, $files);
+        $dir = Path::tidy($this->tempDir);
         $this->assertEquals([
-            $this->tempDir.'/one.txt' => 1234567890,
-            $this->tempDir.'/three.txt' => 3456789012
+            $dir.'/one.txt' => 1234567891,
+            $dir.'/three.txt' => 1234567893
         ], $files->all());
     }
 }

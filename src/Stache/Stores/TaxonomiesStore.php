@@ -2,9 +2,10 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\Facades\Path;
 use Statamic\Facades\Site;
-use Statamic\Facades\YAML;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\YAML;
 use Symfony\Component\Finder\SplFileInfo;
 
 class TaxonomiesStore extends BasicStore
@@ -25,7 +26,7 @@ class TaxonomiesStore extends BasicStore
 
     public function getFileFilter(SplFileInfo $file)
     {
-        $filename = str_after($file->getPathName(), $this->directory);
+        $filename = str_after(Path::tidy($file->getPathName()), $this->directory);
 
         return $file->getExtension() === 'yaml' && substr_count($filename, '/') === 0;
     }
