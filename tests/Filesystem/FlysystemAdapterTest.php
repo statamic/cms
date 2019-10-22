@@ -72,4 +72,12 @@ class FlysystemAdapterTest extends TestCase
     {
         $this->markTestIncomplete();
     }
+
+    /** @test */
+    function it_throws_an_exception_when_requesting_absolute_paths()
+    {
+        $this->expectException(\LogicException::class);
+
+        $this->adapter->withAbsolutePaths();
+    }
 }

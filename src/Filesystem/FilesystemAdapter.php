@@ -11,6 +11,7 @@ class FilesystemAdapter extends AbstractAdapter
 {
     protected $root;
     protected $filesystem;
+    protected $withAbsolutePaths = false;
 
     public function __construct(Filesystem $filesystem, $root)
     {
@@ -74,7 +75,9 @@ class FilesystemAdapter extends AbstractAdapter
 
         return $this->collection($files)->map(function ($file) use ($inRoot) {
             $path = $file->getPathname();
-            return $inRoot ? $this->relativePath($path) : $this->normalizePath($path);
+            return $inRoot && !$this->withAbsolutePaths
+                ? $this->relativePath($path)
+                : $this->normalizePath($path);
         });
     }
 
@@ -100,5 +103,12 @@ class FilesystemAdapter extends AbstractAdapter
     public function moveDirectory($src, $dest, $overwrite = false)
     {
         return $this->filesystem->moveDirectory($this->normalizePath($src), $this->normalizePath($dest), $overwrite);
+    }
+
+    public function withAbsolutePaths()
+    {
+        $this->withAbsolutePaths = true;
+
+        return $this;
     }
 }

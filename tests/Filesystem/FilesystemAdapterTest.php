@@ -109,4 +109,27 @@ class FilesystemAdapterTest extends TestCase
             $dir.'/sub/two.txt'
         ], $this->adapter->getFiles($dir.'/sub')->all());
     }
+
+    /** @test */
+    function it_can_explicitly_request_absolute_paths()
+    {
+        mkdir($this->tempDir.'/sub/sub', 0755, true);
+        file_put_contents($this->tempDir.'/one.txt', '');
+        file_put_contents($this->tempDir.'/sub/two.txt', '');
+        file_put_contents($this->tempDir.'/sub/three.txt', '');
+        file_put_contents($this->tempDir.'/sub/sub/four.txt', '');
+
+        $return = $this->adapter->withAbsolutePaths();
+        $this->assertEquals($this->adapter, $return);
+
+        $files = $this->adapter->getFiles('sub');
+        $dir = Path::tidy($this->tempDir);
+        $this->assertArraysHaveSameValues(
+            [
+                $dir.'/sub/two.txt',
+                $dir.'/sub/three.txt'
+            ],
+            $files->all()
+        );
+    }
 }

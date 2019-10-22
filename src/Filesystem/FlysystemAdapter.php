@@ -104,4 +104,9 @@ class FlysystemAdapter extends AbstractAdapter
     {
         return $this->filesystem->path($path);
     }
+
+    public function withAbsolutePaths()
+    {
+        throw new \LogicException('Cannot use absolute paths');
+    }
 }
