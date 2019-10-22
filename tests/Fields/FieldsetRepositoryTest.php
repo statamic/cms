@@ -2,13 +2,15 @@
 
 namespace Tests\Fields;
 
-use Tests\TestCase;
-use Statamic\Fields\Field;
-use Statamic\Fields\Fieldset;
-use Illuminate\Support\Collection;
-use Statamic\Fields\FieldRepository;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
+use Statamic\Facades\File;
+use Statamic\Fields\Field;
+use Statamic\Fields\FieldRepository;
+use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldsetRepository;
+use Statamic\Support\FileCollection;
+use Tests\TestCase;
 
 class FieldsetRepositoryTest extends TestCase
 {
@@ -16,17 +18,8 @@ class FieldsetRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->tempDir = __DIR__.'/tmp';
-        mkdir($this->tempDir);
-
-        $this->repo = app(FieldsetRepository::class)->setDirectory($this->tempDir);
-    }
-
-    public function tearDown(): void
-    {
-        (new Filesystem)->deleteDirectory($this->tempDir);
-
-        parent::tearDown();
+        $this->repo = app(FieldsetRepository::class)
+            ->setDirectory('/path/to/resources/fieldsets');
     }
 
     /** @test */
@@ -42,7 +35,8 @@ fields:
     type: text
     display: Second Field
 EOT;
-        file_put_contents($this->tempDir.'/test.yaml', $contents);
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturn($contents);
 
         $fieldset = $this->repo->find('test');
 
@@ -60,8 +54,8 @@ EOT;
 title: Test Fieldset
 fields: []
 EOT;
-        mkdir($this->tempDir.'/sub');
-        file_put_contents($this->tempDir.'/sub/test.yaml', $contents);
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/sub/test.yaml')->twice()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/sub/test.yaml')->twice()->andReturn($contents);
 
         $fieldset = $this->repo->find('sub.test');
 
@@ -76,26 +70,19 @@ EOT;
     /** @test */
     function it_returns_null_if_fieldset_doesnt_exist()
     {
-        $this->assertNull($this->repo->find('unknown'));
-    }
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/unknown.yaml')->once()->andReturnFalse();
 
-    /** @test */
-    function it_returns_null_if_fieldset_directory_doesnt_exist()
-    {
-        $this->repo->setDirectory(__DIR__.'/nope');
         $this->assertNull($this->repo->find('unknown'));
     }
 
     /** @test */
     function it_checks_if_a_fieldset_exists()
     {
-        file_put_contents($this->tempDir.'/test.yaml', '');
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets/unknown.yaml')->once()->andReturnFalse();
 
         $this->assertTrue($this->repo->exists('test'));
         $this->assertFalse($this->repo->exists('unknown'));
-
-        $this->repo->setDirectory(__DIR__.'/nope');
-        $this->assertFalse($this->repo->exists('test'));
     }
 
     /** @test */
@@ -108,8 +95,6 @@ fields:
     type: text
     display: First Field
 EOT;
-        file_put_contents($this->tempDir.'/first.yaml', $firstContents);
-
         $secondContents = <<<'EOT'
 title: Second Fieldset
 fields:
@@ -117,11 +102,6 @@ fields:
     type: text
     display: Second Field
 EOT;
-        file_put_contents($this->tempDir.'/second.yaml', $secondContents);
-
-        file_put_contents($this->tempDir.'/not-a-yaml-file.txt', '');
-
-        mkdir($this->tempDir.'/sub');
         $thirdContents = <<<'EOT'
 title: Third Fieldset
 fields:
@@ -129,7 +109,17 @@ fields:
     type: text
     display: Third Field
 EOT;
-        file_put_contents($this->tempDir.'/sub/third.yaml', $thirdContents);
+
+        File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnTrue();
+        File::shouldReceive('getFilesByTypeRecursively')->with('/path/to/resources/fieldsets', 'yaml')->once()->andReturn(new FileCollection([
+            '/path/to/resources/fieldsets/first.yaml',
+            '/path/to/resources/fieldsets/second.yaml',
+            '/path/to/resources/fieldsets/sub/third.yaml',
+        ]));
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/first.yaml')->once()->andReturn($firstContents);
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/second.yaml')->once()->andReturn($secondContents);
+        File::shouldReceive('get')->with('/path/to/resources/fieldsets/sub/third.yaml')->once()->andReturn($thirdContents);
 
         $all = $this->repo->all();
 
@@ -144,7 +134,7 @@ EOT;
     /** @test */
     function it_returns_empty_collection_if_fieldset_directory_doesnt_exist()
     {
-        $this->repo->setDirectory(__DIR__.'/nope');
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnFalse();
 
         $all = $this->repo->all();
 
@@ -155,9 +145,17 @@ EOT;
     /** @test */
     function it_saves_to_disk()
     {
-        // Set the directory to one that doesn't exist so we can test that the directory would also get created.
-        $directory = $this->tempDir . '/doesnt-exist';
-        $this->repo->setDirectory($directory);
+        $expectedYaml = <<<'EOT'
+title: 'Test Fieldset'
+fields:
+  foo:
+    type: textarea
+    bar: baz
+
+EOT;
+        File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnFalse();
+        File::shouldReceive('makeDirectory')->with('/path/to/resources/fieldsets')->once();
+        File::shouldReceive('put')->with('/path/to/resources/fieldsets/the_test_fieldset.yaml', $expectedYaml)->once();
 
         $fieldset = (new Fieldset)->setHandle('the_test_fieldset')->setContents([
             'title' => 'Test Fieldset',
@@ -167,17 +165,5 @@ EOT;
         ]);
 
         $this->repo->save($fieldset);
-
-$expectedYaml = <<<'EOT'
-title: 'Test Fieldset'
-fields:
-  foo:
-    type: textarea
-    bar: baz
-
-EOT;
-        $this->assertFileExists($path = $directory.'/the_test_fieldset.yaml');
-        $this->assertFileEqualsString($path, $expectedYaml);
-        @unlink($path);
     }
 }

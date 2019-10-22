@@ -61,7 +61,8 @@ class FieldsetRepository
             return collect();
         }
 
-        return File::getFilesByTypeRecursively($this->directory, 'yaml')
+        return File::withAbsolutePaths()
+            ->getFilesByTypeRecursively($this->directory, 'yaml')
             ->map(function ($file) {
                 $basename = str_after($file, str_finish($this->directory, '/'));
                 $handle = str_before($basename, '.yaml');
