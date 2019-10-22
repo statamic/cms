@@ -10,7 +10,7 @@ use Statamic\Statamic;
 
 class JavascriptComposer
 {
-    const VIEWS = ['statamic::layout'];
+    const VIEWS = ['statamic::partials.scripts'];
 
     public function compose(View $view)
     {
