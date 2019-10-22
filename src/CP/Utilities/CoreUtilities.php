@@ -47,7 +47,7 @@ class CoreUtilities
             ->description('Check email configuration and send a test.')
             ->docsUrl(Statamic::docsUrl('utilities/email'))
             ->routes(function ($router) {
-                $router->post('email', [EmailController::class, 'send']);
+                $router->post('/', [EmailController::class, 'send']);
             })
             ->register();
     }
