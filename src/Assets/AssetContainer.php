@@ -335,7 +335,11 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function assetFolder($path)
     {
-        $data = YAML::parse($this->disk()->get("{$path}/folder.yaml", ''));
+        $filePath = ltrim("{$path}/folder.yaml", '/');
+
+        $contents = $this->disk()->get($filePath, '');
+
+        $data = YAML::parse($contents);
 
         return (new AssetFolder)
             ->container($this)

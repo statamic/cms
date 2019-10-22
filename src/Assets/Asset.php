@@ -159,7 +159,9 @@ class Asset implements AssetContract, Arrayable, ArrayAccess, AugmentableContrac
 
     public function metaPath()
     {
-        return dirname($this->path()) . '/.meta/' . $this->basename() . '.yaml';
+        $path = dirname($this->path()) . '/.meta/' . $this->basename() . '.yaml';
+
+        return ltrim($path, '/');
     }
 
     public function writeMeta($meta)
@@ -607,6 +609,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess, AugmentableContrac
         $directory = $this->folder();
         $directory = ($directory === '.') ? '/' : $directory;
         $path      = Path::tidy($directory . '/' . $filename . '.' . $ext);
+        $path      = ltrim($path, '/');
 
         // If the file exists, we'll append a timestamp to prevent overwriting.
         if ($this->disk()->exists($path)) {
