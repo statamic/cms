@@ -14,6 +14,8 @@ class JavascriptComposer
 
     public function compose(View $view)
     {
+        $user = User::current();
+
         Statamic::provideToScript([
             'version' => Statamic::version(),
             'laravelVersion' => app()->version(),
@@ -25,7 +27,7 @@ class JavascriptComposer
             'flash' => Statamic::flash(),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
-            'user' => ($user = User::current()) ? $user->toJavascriptArray() : [],
+            'user' => $user ? $user->toJavascriptArray() : [],
             'paginationSize' => config('statamic.cp.pagination_size'),
             'translationLocale' => app('translator')->locale(),
             'translations' => app('translator')->toJson(),
@@ -35,7 +37,7 @@ class JavascriptComposer
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
             'locale' => config('app.locale'),
-            'permissions' => base64_encode(json_encode(User::current()->permissions()))
+            'permissions' => $this->permissions($user)
         ]);
     }
 
@@ -47,5 +49,12 @@ class JavascriptComposer
                 'handle' => $site->handle(),
             ];
         })->values();
+    }
+
+    protected function permissions($user)
+    {
+        $permissions = $user ? $user->permissions() : [];
+
+        return base64_encode(json_encode($permissions));
     }
 }
