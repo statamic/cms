@@ -175,6 +175,10 @@ export default {
         }
     },
 
+    created() {
+        this.$events.$on('favorites.added', this.focus);
+    },
+
     mounted() {
         this.$mousetrap.bind(['/', 'ctrl+f', 'alt+f', 'shift+f'], e => {
             e.preventDefault();

@@ -71,6 +71,7 @@ export default {
                 this.saving = false;
                 this.$toast.success(__('Favorite saved'));
                 this.$refs.popper.doClose();
+                this.$events.$emit('favorites.added');
             }).catch(e => {
                 this.saving = false;
                 if (e.response) {
