@@ -65,7 +65,7 @@ class Users extends Relationship
         return User::all()->map(function ($user) {
             return [
                 'id' => $user->id(),
-                'name' => $user->name(),
+                'title' => $user->name(),
                 'email' => $user->email(),
             ];
         })->values();
@@ -74,7 +74,7 @@ class Users extends Relationship
     protected function getColumns()
     {
         return [
-            Column::make('name'),
+            Column::make('title')->label('Name'),
             Column::make('email'),
         ];
     }
