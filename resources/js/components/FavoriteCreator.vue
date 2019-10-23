@@ -62,7 +62,7 @@ export default {
 
     methods: {
         highlight() {
-            this.$refs.fave.select();
+            setTimeout(() => this.$refs.fave.select(), 20);
         },
 
         save() {
