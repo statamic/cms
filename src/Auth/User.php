@@ -107,6 +107,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         })->all();
 
         return $this->data()->merge([
+            'name' => $this->name(),
             'id' => $this->id(),
             'title' => $this->title(),
             'email' => $this->email(),
@@ -230,5 +231,22 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
     public function offsetUnset($key)
     {
         $this->remove($key);
+    }
+
+    public function name()
+    {
+        if ($name = $this->get('name')) {
+            return $name;
+        }
+
+        if ($name = $this->get('first_name')) {
+            if ($lastName = $this->get('last_name')) {
+                $name .= ' ' . $lastName;
+            }
+
+            return $name;
+        }
+
+        return $this->email();
     }
 }
