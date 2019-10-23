@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Permissions;
+namespace Tests\Auth;
 
 use Statamic\Auth\File\Role;
 use Statamic\Facades\Role as RoleAPI;

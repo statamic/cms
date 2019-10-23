@@ -4,10 +4,10 @@ namespace Tests\Auth\Eloquent;
 
 use Tests\TestCase;
 use Faker\Generator as Faker;
+use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
 use Illuminate\Database\Eloquent\Factory;
 use Tests\Preferences\HasPreferencesTests;
-use Tests\Permissions\PermissibleContractTests;
 use Statamic\Auth\Eloquent\User as EloquentUser;
 
 class EloquentUserTest extends TestCase

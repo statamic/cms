@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Permissions;
+namespace Tests\Auth;
 
 use Statamic\Auth\File\User;
 use Statamic\Contracts\Auth\Role as RoleContract;
