@@ -96,38 +96,6 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         return cp_route('users.update', $this->id());
     }
 
-    /**
-     * Add supplemental data to the attributes
-     */
-    public function supplement()
-    {
-        $this->supplements['last_modified'] = $this->lastModified()->timestamp;
-        $this->supplements['email'] = $this->email();
-        $this->supplements['edit_url'] = $this->editUrl();
-
-        if ($first_name = $this->get('first_name')) {
-            $name = $first_name;
-
-            if ($last_name = $this->get('last_name')) {
-                $name .= ' ' . $last_name;
-            }
-
-            $this->supplements['name'] = $name;
-        }
-
-        foreach ($this->roles() as $role) {
-            $this->supplements['is_'.$role->handle()] = true;
-        }
-
-        foreach ($this->groups() as $group) {
-            $this->supplements['in_'.$group->handle()] = true;
-        }
-
-        if ($this->supplement_taxonomies) {
-            $this->addTaxonomySupplements();
-        }
-    }
-
     public function toArray()
     {
         $roles = $this->roles()->mapWithKeys(function ($role) {
