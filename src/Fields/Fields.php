@@ -69,13 +69,6 @@ class Fields
         );
     }
 
-    public function merge($fields)
-    {
-        $items = $this->items->merge($fields->items());
-
-        return new static($items);
-    }
-
     public function has($field)
     {
         return $this->fields->has($field);

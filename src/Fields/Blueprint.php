@@ -72,9 +72,7 @@ class Blueprint
 
         $this->validateUniqueHandles();
 
-        $fields = $this->sections()->map->fields()->reduce(function ($carry, $fields) {
-            return $carry->merge($fields);
-        }, new Fields);
+        $fields = new Fields($this->sections()->map->fields()->flatMap->items());
 
         $this->fieldsCache = $fields;
 
