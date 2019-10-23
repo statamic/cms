@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Permissions;
+namespace Tests\Auth;
 
 use Tests\TestCase;
 use Statamic\Facades\File;

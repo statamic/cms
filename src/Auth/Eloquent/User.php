@@ -225,9 +225,15 @@ class User extends BaseUser
 
     public function permissions()
     {
-        return $this->groups()->flatMap->roles()
+        $permissions = $this->groups()->flatMap->roles()
             ->merge($this->roles())
             ->flatMap->permissions();
+
+        if ($this->get('super', false)) {
+            $permissions[] = 'super';
+        }
+
+        return $permissions;
     }
 
     public function hasPermission($permission)
