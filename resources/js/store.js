@@ -33,7 +33,7 @@ export default {
         },
 
         preferences(state, preferences) {
-            state.config.preferences = preferences;
+            state.config.user.preferences = preferences;
         },
 
         condition(state, payload) {
