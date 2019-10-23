@@ -271,9 +271,13 @@ class User extends BaseUser
             ->groups()
             ->flatMap->roles()
             ->merge($this->roles())
-            ->flatMap->permissions()
-            ->unique()
-            ->values();
+            ->flatMap->permissions();
+
+        if ($this->get('super', false)) {
+            $permissions[] = 'super';
+        }
+
+        $permissions = $permissions->unique()->values();
 
         $cache->put($this->id, $permissions);
 
