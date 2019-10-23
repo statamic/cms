@@ -50,7 +50,7 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        return $query->paginate();
+        return $query->paginate()->preProcessForIndex();
     }
 
     public function getSortColumn($request)
