@@ -51,7 +51,7 @@ class Users extends Relationship
     {
         if ($user = User::find($id)) {
             return [
-                'title' => $user->email(),
+                'title' => $user->get('name'),
                 'id' => $id,
                 'edit_url' => $user->editUrl(),
             ];
