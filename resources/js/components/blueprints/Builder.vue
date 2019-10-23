@@ -64,6 +64,13 @@ export default {
 
         sections(sections) {
             this.blueprint.sections = sections;
+        },
+
+        blueprint: {
+            deep: true,
+            handler() {
+                this.$dirty.add('blueprints');
+            }
         }
 
     },
@@ -87,6 +94,7 @@ export default {
         saved(response) {
             this.$toast.success('Saved');
             this.errors = {};
+            this.$dirty.remove('blueprints');
         }
 
     }
