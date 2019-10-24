@@ -272,7 +272,7 @@ export default {
                 this.fieldset = data.blueprint;
                 this.site = localization.handle;
                 this.localizing = false;
-                this.$nextTick(() => this.$refs.container.removeNavigationWarning());
+                this.$nextTick(() => this.$refs.container.clearDirtyState());
             })
         },
 

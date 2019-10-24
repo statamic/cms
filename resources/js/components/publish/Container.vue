@@ -51,7 +51,7 @@ export default {
 
     destroyed() {
         this.removeVuexModule();
-        this.removeNavigationWarning();
+        this.clearDirtyState();
         this.$events.$emit('publish-container-destroyed', this);
     },
 
@@ -167,10 +167,10 @@ export default {
         },
 
         saved() {
-            this.removeNavigationWarning();
+            this.clearDirtyState();
         },
 
-        removeNavigationWarning() {
+        clearDirtyState() {
             this.$dirty.remove(this.name);
         },
 
