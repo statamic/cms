@@ -8,9 +8,9 @@
         reference="collection"
         :meta="meta"
         :errors="errors"
+        v-slot="{ setFieldValue, setFieldMeta }"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }">
-
+        <div>
             <breadcrumbs v-if="breadcrumbs" :crumbs="breadcrumbs" />
 
             <div class="flex items-center mb-3">
