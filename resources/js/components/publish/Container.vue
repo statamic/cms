@@ -4,6 +4,11 @@ import Component from '../Component';
 
 export default {
 
+    model: {
+        prop: 'values',
+        event: 'updated',
+    },
+
     props: {
         reference: {
             type: String
