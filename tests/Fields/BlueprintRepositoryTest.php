@@ -2,14 +2,16 @@
 
 namespace Tests\Fields;
 
-use Tests\TestCase;
-use Statamic\Fields\Field;
-use Statamic\Fields\Factory;
-use Statamic\Fields\Section;
-use Statamic\Fields\Blueprint;
-use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
+use Statamic\Facades\File;
+use Statamic\Fields\Blueprint;
 use Statamic\Fields\BlueprintRepository;
+use Statamic\Fields\Factory;
+use Statamic\Fields\Field;
+use Statamic\Fields\Section;
+use Statamic\Support\FileCollection;
+use Tests\TestCase;
 
 class BlueprintRepositoryTest extends TestCase
 {
@@ -17,17 +19,9 @@ class BlueprintRepositoryTest extends TestCase
     {
         parent::setUp();
 
-        $this->tempDir = __DIR__.'/tmp';
-        mkdir($this->tempDir);
-
-        $this->repo = app(BlueprintRepository::class)->setDirectory($this->tempDir);
-    }
-
-    public function tearDown(): void
-    {
-        parent::tearDown();
-
-        (new Filesystem)->deleteDirectory($this->tempDir);
+        $this->repo = app(BlueprintRepository::class)
+            ->setDirectory('/path/to/resources/blueprints')
+            ->setFallbackDirectory('/path/to/vendor/fallbacks');
     }
 
     /** @test */
@@ -41,7 +35,8 @@ sections:
       - one
       - two
 EOT;
-        file_put_contents($this->tempDir.'/test.yaml', $contents);
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/resources/blueprints/test.yaml')->once()->andReturn($contents);
 
         $blueprint = $this->repo->find('test');
 
@@ -60,32 +55,27 @@ EOT;
     /** @test */
     function it_returns_null_if_blueprint_doesnt_exist()
     {
-        $this->assertNull($this->repo->find('unknown'));
-    }
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/unknown.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/path/to/vendor/fallbacks/unknown.yaml')->once()->andReturnFalse();
 
-    /** @test */
-    function it_returns_null_if_blueprint_directory_doesnt_exist()
-    {
-        $this->repo->setDirectory(__DIR__.'/nope');
         $this->assertNull($this->repo->find('unknown'));
     }
 
     /** @test */
     function it_gets_fallback_blueprint()
     {
-        $dir = $this->tempDir . '/fallbacks';
-        mkdir($dir);
         $contents = <<<'EOT'
-title: Test
+title: Fallback Blueprint
 sections: []
 EOT;
-        file_put_contents($dir . '/test-fallback.yaml', $contents);
-        $this->repo->setFallbackDirectory($dir);
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/test.yaml')->once()->andReturnFalse();
+        File::shouldReceive('exists')->with('/path/to/vendor/fallbacks/test.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/vendor/fallbacks/test.yaml')->once()->andReturn($contents);
 
-        $blueprint = $this->repo->find('test-fallback');
+        $blueprint = $this->repo->find('test');
 
         $this->assertInstanceOf(Blueprint::class, $blueprint);
-        $this->assertEquals('test-fallback', $blueprint->handle());
+        $this->assertEquals('Fallback Blueprint', $blueprint->title());
     }
 
     /** @test */
@@ -99,7 +89,6 @@ sections:
       - one
       - two
 EOT;
-        file_put_contents($this->tempDir.'/first.yaml', $firstContents);
 
         $secondContents = <<<'EOT'
 title: Second Blueprint
@@ -109,11 +98,7 @@ sections:
       - two
       - one
 EOT;
-        file_put_contents($this->tempDir.'/second.yaml', $secondContents);
 
-        file_put_contents($this->tempDir.'/not-a-yaml-file.txt', '');
-
-        mkdir($this->tempDir.'/sub');
         $thirdContents = <<<'EOT'
 title: Third Blueprint
 sections:
@@ -122,7 +107,17 @@ sections:
       - two
       - one
 EOT;
-        file_put_contents($this->tempDir.'/sub/third.yaml', $thirdContents);
+
+        File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints')->once()->andReturnTrue();
+        File::shouldReceive('getFilesByTypeRecursively')->with('/path/to/resources/blueprints', 'yaml')->once()->andReturn(new FileCollection([
+            '/path/to/resources/blueprints/first.yaml',
+            '/path/to/resources/blueprints/second.yaml',
+            '/path/to/resources/blueprints/sub/third.yaml',
+        ]));
+        File::shouldReceive('get')->with('/path/to/resources/blueprints/first.yaml')->once()->andReturn($firstContents);
+        File::shouldReceive('get')->with('/path/to/resources/blueprints/second.yaml')->once()->andReturn($secondContents);
+        File::shouldReceive('get')->with('/path/to/resources/blueprints/sub/third.yaml')->once()->andReturn($thirdContents);
 
         $all = $this->repo->all();
 
@@ -137,7 +132,7 @@ EOT;
     /** @test */
     function it_returns_empty_collection_if_blueprint_directory_doesnt_exist()
     {
-        $this->repo->setDirectory(__DIR__.'/nope');
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints')->once()->andReturnFalse();
 
         $all = $this->repo->all();
 
@@ -148,9 +143,30 @@ EOT;
     /** @test */
     function it_saves_to_disk()
     {
-        // Set the directory to one that doesn't exist so we can test that the directory would also get created.
-        $directory = $this->tempDir . '/doesnt-exist';
-        $this->repo->setDirectory($directory);
+        $expectedYaml = <<<'EOT'
+title: 'Test Blueprint'
+sections:
+  one:
+    display: One
+    fields:
+      -
+        handle: foo
+        field: foo.bar
+        config:
+          display: Foo
+          foo: bar
+      -
+        handle: bar
+        field:
+          type: bar
+          display: Bar
+          bar: foo
+
+EOT;
+
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints')->once()->andReturnFalse();
+        File::shouldReceive('makeDirectory')->with('/path/to/resources/blueprints')->once();
+        File::shouldReceive('put')->with('/path/to/resources/blueprints/the_test_blueprint.yaml', $expectedYaml)->once();
 
         $fieldset = (new Blueprint)->setHandle('the_test_blueprint')->setContents([
             'title' => 'Test Blueprint',
@@ -180,29 +196,5 @@ EOT;
         ]);
 
         $this->repo->save($fieldset);
-
-$expectedYaml = <<<'EOT'
-title: 'Test Blueprint'
-sections:
-  one:
-    display: One
-    fields:
-      -
-        handle: foo
-        field: foo.bar
-        config:
-          display: Foo
-          foo: bar
-      -
-        handle: bar
-        field:
-          type: bar
-          display: Bar
-          bar: foo
-
-EOT;
-        $this->assertFileExists($path = $directory.'/the_test_blueprint.yaml');
-        $this->assertFileEqualsString($path, $expectedYaml);
-        @unlink($path);
     }
 }

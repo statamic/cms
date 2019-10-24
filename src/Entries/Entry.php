@@ -169,6 +169,11 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
         return $this->cpUrl('collections.entries.restore-revision');
     }
 
+    public function livePreviewUrl()
+    {
+        return $this->cpUrl('collections.entries.preview.edit');
+    }
+
     protected function cpUrl($route)
     {
         return cp_route($route, [$this->collectionHandle(), $this->id(), $this->slug()]);

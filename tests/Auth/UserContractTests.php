@@ -35,6 +35,16 @@ trait UserContractTests
     }
 
     /** @test */
+    function gets_the_name()
+    {
+        $this->assertEquals('John', $this->makeUser()->set('name', 'John')->name());
+        $this->assertEquals('John Smith', $this->makeUser()->set('name', 'John Smith')->name());
+        $this->assertEquals('John', $this->makeUser()->data(['name' => null, 'first_name' => 'John'])->name());
+        $this->assertEquals('John Smith', $this->makeUser()->data(['name' => null, 'first_name' => 'John', 'last_name' => 'Smith'])->name());
+        $this->assertEquals('john@example.com', $this->makeUser()->remove('name')->email('john@example.com')->name());
+    }
+
+    /** @test */
     function it_gets_data()
     {
         $this->assertEquals(array_merge([

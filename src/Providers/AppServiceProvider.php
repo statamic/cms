@@ -44,8 +44,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->publishes([
-            "{$this->root}/config/user_roles.yaml" => config_path('statamic/user_roles.yaml'),
-            "{$this->root}/config/user_groups.yaml" => config_path('statamic/user_groups.yaml')
+            "{$this->root}/resources/users" => resource_path('users'),
         ], 'statamic');
 
         $this->publishes([

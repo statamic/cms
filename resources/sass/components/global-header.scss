@@ -49,7 +49,6 @@
 
     .global-search-result-item {
         @apply border-t cursor-pointer;
-        padding: 8px 12px;
 
         &:first-child {
             @apply rounded-t border-none;

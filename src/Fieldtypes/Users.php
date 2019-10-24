@@ -2,8 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\User;
 use Statamic\CP\Column;
+use Statamic\Facades\User;
 
 class Users extends Relationship
 {
@@ -33,9 +33,9 @@ class Users extends Relationship
             'options' => [
                 'default' => 'Stack Selector',
                 'select' => 'Select Dropdown',
-                'typeahead' => 'Typeahead Field'
-            ]
-        ]
+                'typeahead' => 'Typeahead Field',
+            ],
+        ],
     ];
 
     public function preProcess($data)
@@ -51,7 +51,7 @@ class Users extends Relationship
     {
         if ($user = User::find($id)) {
             return [
-                'title' => $user->email(),
+                'title' => $user->name(),
                 'id' => $id,
                 'edit_url' => $user->editUrl(),
             ];
@@ -65,7 +65,7 @@ class Users extends Relationship
         return User::all()->map(function ($user) {
             return [
                 'id' => $user->id(),
-                'title' => $user->get('name'),
+                'title' => $user->name(),
                 'email' => $user->email(),
             ];
         })->values();
@@ -81,7 +81,13 @@ class Users extends Relationship
 
     public function preProcessIndex($data)
     {
-        return $this->augment($data)->map(function ($user) use ($data) {
+        $users = $this->augment($data);
+
+        if ($this->config('max_items') === 1) {
+            $users = collect([$users]);
+        }
+
+        return $users->map(function ($user) {
             return [
                 'id' => $user->id(),
                 'title' => $user->get('name', $user->email()),

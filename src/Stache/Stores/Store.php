@@ -2,10 +2,11 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\Facades\File;
-use Statamic\Stache\Indexes;
-use Illuminate\Support\Facades\Cache;
 use Facades\Statamic\Stache\Traverser;
+use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\File;
+use Statamic\Facades\Path;
+use Statamic\Stache\Indexes;
 
 abstract class Store
 {
@@ -26,7 +27,7 @@ abstract class Store
             return $this->directory;
         }
 
-        $this->directory = str_finish($directory, '/');
+        $this->directory = str_finish(Path::tidy($directory), '/');
 
         return $this;
     }

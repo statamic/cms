@@ -217,43 +217,6 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_merges_with_other_fields()
-    {
-        FieldRepository::shouldReceive('find')
-            ->with('fieldset_one.field_one')
-            ->andReturnUsing(function () {
-                return new Field('field_one', ['type' => 'text']);
-            });
-
-        FieldRepository::shouldReceive('find')
-            ->with('fieldset_one.field_two')
-            ->andReturnUsing(function () {
-                return new Field('field_one', ['type' => 'textarea']);
-            });
-
-        $fields = new Fields([
-            [
-                'handle' => 'one',
-                'field' => 'fieldset_one.field_one'
-            ]
-        ]);
-
-        $second = new Fields([
-            [
-                'handle' => 'two',
-                'field' => 'fieldset_one.field_two'
-            ]
-        ]);
-
-        $merged = $fields->merge($second);
-
-        $this->assertCount(1, $fields->all());
-        $this->assertCount(2, $items = $merged->all());
-        $this->assertEquals(['one', 'two'], $items->map->handle()->values()->all());
-        $this->assertEquals(['text', 'textarea'], $items->map->type()->values()->all());
-    }
-
-    /** @test */
     function it_checks_if_a_given_field_exists()
     {
         $fields = new Fields([

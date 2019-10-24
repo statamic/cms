@@ -138,6 +138,10 @@ class ExtensionGeneratorTest extends TestCase
     /** @test */
     function it_cannot_make_addon_with_invalid_composer_package_name()
     {
+        if ($this->isRunningWindows()) {
+            $this->markTestSkipped();
+        }
+
         $path = $this->preparePath('addons/erso/deaths-tar-vulnerability');
 
         $this->artisan('statamic:make:addon', ['package' => 'deaths-tar-vulnerability'])
@@ -152,6 +156,10 @@ class ExtensionGeneratorTest extends TestCase
     /** @test */
     function it_will_not_overwrite_an_existing_addon()
     {
+        if ($this->isRunningWindows()) {
+            $this->markTestSkipped();
+        }
+
         $path = $this->preparePath('addons/erso/deaths-tar-vulnerability');
 
         $this->artisan('statamic:make:addon', ['package' => 'erso/deaths-tar-vulnerability']);
@@ -168,6 +176,10 @@ class ExtensionGeneratorTest extends TestCase
     /** @test */
     function using_force_option_will_overwrite_original_addon()
     {
+        if ($this->isRunningWindows()) {
+            $this->markTestSkipped();
+        }
+
         $path = $this->preparePath('addons/erso/deaths-tar-vulnerability');
 
         $this->artisan('statamic:make:addon', ['package' => 'erso/deaths-tar-vulnerability']);
@@ -183,6 +195,10 @@ class ExtensionGeneratorTest extends TestCase
     /** @test */
     function it_can_make_an_addon_with_an_extension()
     {
+        if ($this->isRunningWindows()) {
+            $this->markTestSkipped();
+        }
+
         $path = $this->preparePath('addons/ford/san-holo');
 
         $this->assertFileNotExists($path);
@@ -196,6 +212,10 @@ class ExtensionGeneratorTest extends TestCase
     /** @test */
     function it_can_make_an_addon_with_everything_including_the_kitchen_sink()
     {
+        if ($this->isRunningWindows()) {
+            $this->markTestSkipped();
+        }
+
         $path = $this->preparePath('addons/ford/san-holo');
 
         $this->assertFileNotExists($path);
@@ -218,6 +238,10 @@ class ExtensionGeneratorTest extends TestCase
     /** @test */
     function it_can_make_an_extension_into_an_addon()
     {
+        if ($this->isRunningWindows()) {
+            $this->markTestSkipped();
+        }
+
         $path = $this->preparePath('addons/yoda/bag-odah');
 
         $this->artisan('statamic:make:addon', ['package' => 'yoda/bag-odah']);
@@ -247,6 +271,18 @@ class ExtensionGeneratorTest extends TestCase
             $this->files->isDirectory($path)
                 ? $this->files->deleteDirectory($path)
                 : $this->files->delete($path);
+        }
+
+        $dirs = [
+            base_path('addons'),
+            base_path('app/Fieldtypes'),
+            base_path('app/Scopes'),
+            base_path('app/Tags'),
+            base_path('app/Widgets'),
+        ];
+
+        foreach ($dirs as $dir) {
+            $this->files->deleteDirectory($dir, true);
         }
     }
 }

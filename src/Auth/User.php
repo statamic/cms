@@ -96,38 +96,6 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         return cp_route('users.update', $this->id());
     }
 
-    /**
-     * Add supplemental data to the attributes
-     */
-    public function supplement()
-    {
-        $this->supplements['last_modified'] = $this->lastModified()->timestamp;
-        $this->supplements['email'] = $this->email();
-        $this->supplements['edit_url'] = $this->editUrl();
-
-        if ($first_name = $this->get('first_name')) {
-            $name = $first_name;
-
-            if ($last_name = $this->get('last_name')) {
-                $name .= ' ' . $last_name;
-            }
-
-            $this->supplements['name'] = $name;
-        }
-
-        foreach ($this->roles() as $role) {
-            $this->supplements['is_'.$role->handle()] = true;
-        }
-
-        foreach ($this->groups() as $group) {
-            $this->supplements['in_'.$group->handle()] = true;
-        }
-
-        if ($this->supplement_taxonomies) {
-            $this->addTaxonomySupplements();
-        }
-    }
-
     public function toArray()
     {
         $roles = $this->roles()->mapWithKeys(function ($role) {
@@ -139,6 +107,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         })->all();
 
         return $this->data()->merge([
+            'name' => $this->name(),
             'id' => $this->id(),
             'title' => $this->title(),
             'email' => $this->email(),
@@ -150,11 +119,6 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
             'is_user' => true,
             'last_login' => $this->lastLogin(),
         ])->merge($roles)->merge($groups)->merge($this->supplements)->all();
-    }
-
-    public function toJavascriptArray()
-    {
-        return Arr::only($this->toArray(), ['id', 'email', 'avatar', 'initials', 'name', 'preferences', 'permissions']);
     }
 
     public function getAuthIdentifierName()
@@ -262,5 +226,22 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
     public function offsetUnset($key)
     {
         $this->remove($key);
+    }
+
+    public function name()
+    {
+        if ($name = $this->get('name')) {
+            return $name;
+        }
+
+        if ($name = $this->get('first_name')) {
+            if ($lastName = $this->get('last_name')) {
+                $name .= ' ' . $lastName;
+            }
+
+            return $name;
+        }
+
+        return $this->email();
     }
 }

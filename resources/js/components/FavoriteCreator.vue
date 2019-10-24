@@ -31,13 +31,10 @@ export default {
         Popper
     },
 
-    props: {
-        currentUrl: String,
-    },
-
     data() {
         return {
-            name: document.title
+            name: document.title.substr(0, '‹ Statamic'.length+1),
+            currentUrl: this.$config.get('urlPath').substr(this.$config.get('cpRoot').length+1)
         }
     },
 
@@ -62,7 +59,7 @@ export default {
 
     methods: {
         highlight() {
-            this.$refs.fave.select();
+            setTimeout(() => this.$refs.fave.select(), 20);
         },
 
         save() {
@@ -71,6 +68,7 @@ export default {
                 this.saving = false;
                 this.$toast.success(__('Favorite saved'));
                 this.$refs.popper.doClose();
+                this.$events.$emit('favorites.added');
             }).catch(e => {
                 this.saving = false;
                 if (e.response) {

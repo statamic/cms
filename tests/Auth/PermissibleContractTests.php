@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Permissions;
+namespace Tests\Auth;
 
 use Statamic\Auth\File\Role;
 use Statamic\Facades\Role as RoleAPI;
@@ -158,33 +158,50 @@ trait PermissibleContractTests
         UserGroupAPI::shouldReceive('find')->with('usergroup')->andReturn($userGroup);
         UserGroupAPI::shouldReceive('all')->andReturn(collect([$userGroup])); // the stache calls this when getting a user. unrelated to test.
 
-        $user = $this->createPermissible()
+        $nonSuperUser = $this->createPermissible()
             ->assignRole($directRole)
             ->addToGroup($userGroup);
-        $user->save();
+        $nonSuperUser->save();
 
-        $expectedPermissions = [
-            'permission one directly through role',
-            'permission two directly through role',
+        $superUser = $this->createPermissible()
+            ->assignRole($directRole)
+            ->addToGroup($userGroup)
+            ->makeSuper();
+        $superUser->save();
+
+        $this->assertEquals([
             'permission one through user group',
             'permission two through user group',
-        ];
-        $actualPermissions = $user->permissions()->all();
-        sort($expectedPermissions);
-        sort($actualPermissions);
-        $this->assertEquals($expectedPermissions, $actualPermissions);
+            'permission one directly through role',
+            'permission two directly through role',
+        ], $nonSuperUser->permissions()->all());
 
-        $this->assertTrue($user->hasPermission('permission one directly through role'));
-        $this->assertTrue($user->hasPermission('permission two directly through role'));
-        $this->assertTrue($user->hasPermission('permission one through user group'));
-        $this->assertTrue($user->hasPermission('permission two through user group'));
-        $this->assertFalse($user->hasPermission('something else'));
+        $this->assertEquals([
+            'permission one through user group',
+            'permission two through user group',
+            'permission one directly through role',
+            'permission two directly through role',
+            'super',
+        ], $superUser->permissions()->all());
+
+        foreach ([$nonSuperUser, $superUser] as $user) {
+            $this->assertTrue($user->hasPermission('permission one directly through role'));
+            $this->assertTrue($user->hasPermission('permission two directly through role'));
+            $this->assertTrue($user->hasPermission('permission one through user group'));
+            $this->assertTrue($user->hasPermission('permission two through user group'));
+            $this->assertFalse($user->hasPermission('something else'));
+        }
 
         $directRole->addPermission('permission three directly through role');
         $userGroupRole->addPermission('permission three through user group');
 
-        $this->assertTrue($user->hasPermission('permission three directly through role'));
-        $this->assertTrue($user->hasPermission('permission three through user group'));
+        foreach ([$nonSuperUser, $superUser] as $user) {
+            $this->assertTrue($user->hasPermission('permission three directly through role'));
+            $this->assertTrue($user->hasPermission('permission three through user group'));
+        }
+
+        $this->assertFalse($nonSuperUser->hasPermission('super'));
+        $this->assertTrue($superUser->hasPermission('super'));
     }
 
     /** @test */
