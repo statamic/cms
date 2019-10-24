@@ -32,12 +32,12 @@
 export default {
 
     props: {
-        blueprint: Object,
-        meta: Object,
-        values: Object,
+        blueprint: { required: true, type: Object },
+        meta: { required: true, type: Object },
+        values: { required: true, type: Object },
+        title: { required: true, type: String },
         name: { type: String, default: 'base' },
         breadcrumbs: Array,
-        title: String,
         action: String,
         method: { type: String, default: 'post' }
     },
