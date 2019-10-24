@@ -31,13 +31,10 @@ export default {
         Popper
     },
 
-    props: {
-        currentUrl: String,
-    },
-
     data() {
         return {
             name: document.title
+            currentUrl: this.$config.get('urlPath').substr(this.$config.get('cpRoot').length+1)
         }
     },
 

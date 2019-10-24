@@ -136,7 +136,7 @@ export default {
             if (this.hasResults) {
                 window.location.href = this.results[this.current].edit_url;
             } else {
-                window.location.href = this.favorites[this.current].url;
+                window.location.href = `${this.$config.get('cpRoot')}/${this.favorites[this.current].url}`;
             }
         },
 
