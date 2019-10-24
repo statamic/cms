@@ -53,17 +53,4 @@ return [
         'default' => 'default',
     ],
 
-    /*
-    |--------------------------------------------------------------------------
-    | Use dedicated view directories
-    |--------------------------------------------------------------------------
-    |
-    | In v3, all of your view files are located within a single "views"
-    | directory. Enabling this option will revert to a v2 style where
-    | you must separate out "layouts", "templates", and "partials".
-    |
-    */
-
-    'dedicated_view_directories' => false,
-
 ];
