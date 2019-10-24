@@ -33,7 +33,7 @@ export default {
 
     data() {
         return {
-            name: document.title
+            name: document.title.substr(0, '‹ Statamic'.length+1),
             currentUrl: this.$config.get('urlPath').substr(this.$config.get('cpRoot').length+1)
         }
     },
