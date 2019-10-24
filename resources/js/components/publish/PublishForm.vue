@@ -4,11 +4,10 @@
         ref="container"
         :name="name"
         :blueprint="blueprint"
-        :values="currentValues"
+        v-model="currentValues"
         reference="collection"
         :meta="meta"
         :errors="errors"
-        @updated="currentValues = $event"
     >
         <div slot-scope="{ setFieldValue, setFieldMeta }">
 
