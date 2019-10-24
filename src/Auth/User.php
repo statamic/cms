@@ -121,11 +121,6 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         ])->merge($roles)->merge($groups)->merge($this->supplements)->all();
     }
 
-    public function toJavascriptArray()
-    {
-        return Arr::only($this->toArray(), ['id', 'email', 'avatar', 'initials', 'name', 'preferences', 'permissions']);
-    }
-
     public function getAuthIdentifierName()
     {
         //
