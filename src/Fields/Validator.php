@@ -2,13 +2,18 @@
 
 namespace Statamic\Fields;
 
-use Illuminate\Support\Facades\Validator;
+use Illuminate\Support\Facades\Validator as LaravelValidator;
 
-class Validation
+class Validator
 {
     protected $fields;
     protected $data = [];
     protected $extraRules = [];
+
+    public function make()
+    {
+        return new static;
+    }
 
     public function fields($fields)
     {
@@ -63,7 +68,7 @@ class Validation
 
     public function validate()
     {
-        return Validator::validate($this->fields->values(), $this->rules());
+        return LaravelValidator::validate($this->fields->values()->all(), $this->rules());
     }
 
     public static function explodeRules($rules)

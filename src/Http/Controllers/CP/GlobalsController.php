@@ -7,7 +7,6 @@ use Statamic\Facades\Helper;
 use Statamic\Facades\GlobalSet;
 use Illuminate\Http\Request;
 use Statamic\Facades\User;
-use Statamic\Fields\Validation;
 use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Contracts\Globals\GlobalSet as GlobalSetContract;
 
@@ -118,12 +117,12 @@ class GlobalsController extends CpController
 
         $fields = $set->blueprint()->fields()->addValues($request->all());
 
-        (new Validation)->fields($fields)->validate();
+        $fields->validate();
 
         $values = $fields->process()->values();
 
         if ($set->hasOrigin()) {
-            $values = array_only($values, $request->input('_localized'));
+            $values = $values->only($request->input('_localized'));
         }
 
         $set->data($values);
@@ -222,6 +221,6 @@ class GlobalsController extends CpController
             ->addValues($set->values()->all())
             ->preProcess();
 
-        return [$fields->values(), $fields->meta()];
+        return [$fields->values()->all(), $fields->meta()];
     }
 }

@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Facades\Statamic\Fields\Validator;
 
 class FieldsTest extends TestCase
 {
@@ -323,12 +324,12 @@ class FieldsTest extends TestCase
             ['handle' => 'two', 'field' => 'two']
         ]);
 
-        $this->assertEquals(['one' => null, 'two' => null], $fields->values());
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
 
         $return = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
         $this->assertNotSame($fields->get('one'), $return->get('one'));
-        $this->assertEquals(['one' => 'foo', 'two' => 'bar'], $return->values());
+        $this->assertEquals(['one' => 'foo', 'two' => 'bar'], $return->values()->all());
     }
 
     /** @test */
@@ -352,7 +353,7 @@ class FieldsTest extends TestCase
             ['handle' => 'two', 'field' => 'two']
         ]);
 
-        $this->assertEquals(['one' => null, 'two' => null], $fields->values());
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
 
         $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
@@ -362,11 +363,11 @@ class FieldsTest extends TestCase
         $this->assertEquals([
             'one' => 'foo',
             'two' => 'bar'
-        ], $fields->values());
+        ], $fields->values()->all());
         $this->assertEquals([
             'one' => 'foo processed',
             'two' => 'bar processed'
-        ], $processed->values());
+        ], $processed->values()->all());
     }
 
     /** @test */
@@ -390,7 +391,7 @@ class FieldsTest extends TestCase
             ['handle' => 'two', 'field' => 'two']
         ]);
 
-        $this->assertEquals(['one' => null, 'two' => null], $fields->values());
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
 
         $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
@@ -400,11 +401,11 @@ class FieldsTest extends TestCase
         $this->assertEquals([
             'one' => 'foo',
             'two' => 'bar'
-        ], $fields->values());
+        ], $fields->values()->all());
         $this->assertEquals([
             'one' => 'foo preprocessed',
             'two' => 'bar preprocessed'
-        ], $preProcessed->values());
+        ], $preProcessed->values()->all());
     }
 
     /** @test */
@@ -428,7 +429,7 @@ class FieldsTest extends TestCase
             ['handle' => 'two', 'field' => 'two']
         ]);
 
-        $this->assertEquals(['one' => null, 'two' => null], $fields->values());
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
 
         $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
@@ -438,11 +439,11 @@ class FieldsTest extends TestCase
         $this->assertEquals([
             'one' => 'foo',
             'two' => 'bar'
-        ], $fields->values());
+        ], $fields->values()->all());
         $this->assertEquals([
             'one' => 'foo augmented',
             'two' => 'bar augmented'
-        ], $augmented->values());
+        ], $augmented->values()->all());
     }
 
     /** @test */
@@ -495,5 +496,39 @@ class FieldsTest extends TestCase
             ['three'],
             $fields->localizable()->all()->keys()->all()
         );
+    }
+
+    /** @test */
+    function it_gets_a_validator()
+    {
+        $fields = new Fields;
+        Validator::shouldReceive('make')->once()->andReturnSelf();
+        $mock = Validator::shouldReceive('fields')->once()->andReturnSelf()->getMock();
+
+        $this->assertEquals($mock, $fields->validator());
+    }
+
+    /** @test */
+    function it_validates_immediately()
+    {
+        $fields = new Fields;
+        Validator::shouldReceive('make')->once()->andReturnSelf();
+        Validator::shouldReceive('fields')->once()->andReturnSelf();
+        Validator::shouldReceive('withRules')->with([])->once()->andReturnSelf();
+        Validator::shouldReceive('validate')->once();
+
+        $fields->validate();
+    }
+
+    /** @test */
+    function it_validates_immediately_with_extra_rules()
+    {
+        $fields = new Fields;
+        Validator::shouldReceive('make')->once()->andReturnSelf();
+        Validator::shouldReceive('fields')->once()->andReturnSelf();
+        Validator::shouldReceive('withRules')->with(['foo' => 'bar'])->once()->andReturnSelf();
+        Validator::shouldReceive('validate')->once();
+
+        $fields->validate(['foo' => 'bar']);
     }
 }

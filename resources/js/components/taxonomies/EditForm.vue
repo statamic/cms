@@ -4,7 +4,7 @@
         v-if="blueprint"
         ref="container"
         name="taxonomy"
-        :fieldset="blueprint"
+        :blueprint="blueprint"
         :values="values"
         reference="taxonomy"
         :meta="meta"

@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
-use Statamic\Fields\Validation;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Events\Data\PublishBlueprintFound;
@@ -171,12 +170,12 @@ class TermsController extends CpController
 
         $fields = $term->blueprint()->fields()->addValues($request->except('id'));
 
-        (new Validation)->fields($fields)->withRules([
+        $fields->validate([
             'title' => 'required',
             'slug' => 'required|alpha_dash',
-        ])->validate();
+        ]);
 
-        $values = array_except($fields->process()->values(), ['slug', 'date']);
+        $values = array_except($fields->process()->values()->all(), ['slug', 'date']);
 
         if ($term->hasOrigin()) {
             $values = array_only($values, $request->input('_localized'));
@@ -221,7 +220,7 @@ class TermsController extends CpController
             ->fields()
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = $fields->values()->merge([
             'title' => null,
             'slug' => null,
             'published' => $taxonomy->defaultPublishState()
@@ -266,12 +265,12 @@ class TermsController extends CpController
 
         $fields = $blueprint->fields()->addValues($request->all());
 
-        (new Validation)->fields($fields)->withRules([
+        $fields->validate([
             'title' => 'required',
             'slug' => 'required',
-        ])->validate();
+        ]);
 
-        $values = array_except($fields->process()->values(), ['slug', 'blueprint']);
+        $values = $fields->process()->values()->except(['slug', 'blueprint']);
 
         $term = Term::make()
             ->taxonomy($taxonomy)
@@ -314,12 +313,12 @@ class TermsController extends CpController
             ->addValues($term->values()->all())
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = $fields->values()->merge([
             'title' => $term->value('title'),
             'slug' => $term->slug()
         ]);
 
-        return [$values, $fields->meta()];
+        return [$values->all(), $fields->meta()];
     }
 
     protected function extractAssetsFromValues($values)

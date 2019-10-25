@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
-use Statamic\Fields\Validation;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Events\Data\PublishBlueprintFound;
@@ -181,18 +180,20 @@ class EntriesController extends CpController
 
         $fields = $entry->blueprint()->fields()->addValues($request->except('id'));
 
-        (new Validation)->fields($fields)->withRules([
-            'title' => 'required',
+        $fields->validate([
+            'title' => 'required|min:3',
             'slug' => 'required|alpha_dash',
             'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id(),
-        ])->validate();
+        ]);
 
         $values = $fields->process()->values();
-        $parent = array_pull($values, 'parent');
-        $values = array_except($values, ['slug', 'date']);
+
+        $parent = $values->pull('parent');
+
+        $values = $values->except(['slug', 'date']);
 
         if ($entry->hasOrigin()) {
-            $entry->data(array_only($values, $request->input('_localized')));
+            $entry->data($values->only($request->input('_localized')));
         } else {
             $entry->merge($values);
         }
@@ -252,7 +253,7 @@ class EntriesController extends CpController
             ->addValues($values)
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = $fields->values()->merge([
             'title' => null,
             'slug' => null,
             'published' => $collection->defaultPublishState()
@@ -263,7 +264,7 @@ class EntriesController extends CpController
             'actions' => [
                 'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()])
             ],
-            'values' => $values,
+            'values' => $values->all(),
             'meta' => $fields->meta(),
             'collection' => $collection->handle(),
             'blueprint' => $blueprint->toPublishArray(),
@@ -300,12 +301,12 @@ class EntriesController extends CpController
 
         $fields = $blueprint->fields()->addValues($request->all());
 
-        (new Validation)->fields($fields)->withRules([
+        $fields->validate([
             'title' => 'required',
             'slug' => 'required|unique_entry_value:'.$collection->handle(),
-        ])->validate();
+        ]);
 
-        $values = array_except($fields->process()->values(), ['slug', 'blueprint']);
+        $values = $fields->process()->values()->except(['slug', 'blueprint']);
 
         $entry = Entry::make()
             ->collection($collection)
@@ -377,7 +378,7 @@ class EntriesController extends CpController
             ->addValues($values)
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = $fields->values()->merge([
             'title' => $entry->value('title'),
             'slug' => $entry->slug(),
             'published' => $entry->published(),
@@ -389,7 +390,7 @@ class EntriesController extends CpController
             $values['date'] = $datetime;
         }
 
-        return [$values, $fields->meta()];
+        return [$values->all(), $fields->meta()];
     }
 
     protected function extractAssetsFromValues($values)

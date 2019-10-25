@@ -13,6 +13,7 @@ Vue.component('composer-output', require('../components/ComposerOutput.vue'));
 
 // Publish
 Vue.component('publish-container', require('../components/publish/Container.vue'));
+Vue.component('publish-form', require('../components/publish/PublishForm.vue'));
 Vue.component('publish-fields', require('../components/publish/Fields.vue'));
 Vue.component('publish-field-meta', require('../components/publish/FieldMeta.vue'));
 Vue.component('publish-sections', require('../components/publish/Sections.vue'));

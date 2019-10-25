@@ -9,7 +9,6 @@ use Statamic\Facades\Structure;
 use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
-use Statamic\Fields\Validation;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Structures\Structure as StructureContract;
@@ -119,7 +118,7 @@ class StructuresController extends CpController
     {
         $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 
-        (new Validation)->fields($fields)->validate();
+        $fields->validate();
 
         $structure = Structure::find($structure);
 
@@ -127,7 +126,7 @@ class StructuresController extends CpController
 
         $expectedRoot = $structure->expectsRoot();
 
-        $values = $fields->process()->values();
+        $values = $fields->process()->values()->all();
 
         $structure
             ->title($values['title'])

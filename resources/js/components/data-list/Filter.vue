@@ -4,7 +4,7 @@
         <publish-container
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"
-            :fieldset="fieldset"
+            :blueprint="fieldset"
             :values="values"
             :meta="filter.meta"
             :errors="errors"

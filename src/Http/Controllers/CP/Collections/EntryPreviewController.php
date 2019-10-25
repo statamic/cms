@@ -31,7 +31,7 @@ class EntryPreviewController extends CpController
             ->addValues($request->input('preview', []))
             ->process();
 
-        foreach (array_except($fields->values(), ['slug']) as $key => $value) {
+        foreach (array_except($fields->values()->all(), ['slug']) as $key => $value) {
             $entry->setSupplement($key, $value);
         }
 
@@ -45,7 +45,7 @@ class EntryPreviewController extends CpController
             ->addValues($preview = $request->preview)
             ->process();
 
-        $values = array_except($fields->values(), ['slug']);
+        $values = array_except($fields->values()->all(), ['slug']);
 
         $entry = Entry::make()
             ->slug($preview['slug'] ?? 'slug')

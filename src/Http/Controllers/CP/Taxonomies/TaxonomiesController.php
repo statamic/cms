@@ -11,7 +11,6 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
-use Statamic\Fields\Validation;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 
@@ -130,9 +129,9 @@ class TaxonomiesController extends CpController
 
         $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 
-        (new Validation)->fields($fields)->validate();
+        $fields->validate();
 
-        $taxonomy = $this->updateTaxonomy($taxonomy, $fields->process()->values());
+        $taxonomy = $this->updateTaxonomy($taxonomy, $fields->process()->values()->all());
 
         $taxonomy->save();
 

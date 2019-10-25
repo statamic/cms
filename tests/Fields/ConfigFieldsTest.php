@@ -28,7 +28,7 @@ class ConfigFieldsTest extends TestCase
             ['handle' => 'two', 'field' => ['type' => 'fieldtype']]
         ]);
 
-        $this->assertEquals(['one' => null, 'two' => null], $fields->values());
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
 
         $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
@@ -38,6 +38,6 @@ class ConfigFieldsTest extends TestCase
         $this->assertEquals([
             'one' => 'foo preprocessed config',
             'two' => 'bar preprocessed config'
-        ], $preProcessed->values());
+        ], $preProcessed->values()->all());
     }
 }

@@ -12,7 +12,6 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Structure;
 use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
-use Statamic\Fields\Validation;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 
@@ -151,9 +150,9 @@ class CollectionsController extends CpController
 
         $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 
-        (new Validation)->fields($fields)->validate();
+        $fields->validate();
 
-        $collection = $this->updateCollection($collection, $values = $fields->process()->values());
+        $collection = $this->updateCollection($collection, $values = $fields->process()->values()->all());
 
         if ($futureDateBehavior = array_get($values, 'future_date_behavior')) {
             $collection->futureDateBehavior($futureDateBehavior);

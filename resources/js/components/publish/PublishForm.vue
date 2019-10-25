@@ -1,33 +1,27 @@
 <template>
 
     <publish-container
-        v-if="blueprint"
         ref="container"
-        name="collection"
+        :name="name"
         :blueprint="blueprint"
-        :values="values"
+        v-model="currentValues"
         reference="collection"
         :meta="meta"
         :errors="errors"
-        @updated="values = $event"
+        v-slot="{ setFieldValue, setFieldMeta }"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }">
+        <div>
+            <breadcrumbs v-if="breadcrumbs" :crumbs="breadcrumbs" />
 
             <div class="flex items-center mb-3">
-                <h1 class="flex-1">
-                    <small class="subhead block">
-                        <a :href="listingUrl" v-text="__('Collections')" />
-                    </small>
-
-                    {{ title }}
-                </h1>
-                <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
+                <h1 class="flex-1">{{ title }}</h1>
+                <button v-if="action" type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
             <publish-sections
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
-                :enable-sidebar="false"/>
+                :enable-sidebar="hasSidebar" />
         </div>
     </publish-container>
 
@@ -37,20 +31,22 @@
 export default {
 
     props: {
-        blueprint: Object,
-        initialValues: Object,
-        meta: Object,
-        initialTitle: String,
-        url: String,
-        listingUrl: String,
+        blueprint: { required: true, type: Object },
+        meta: { required: true, type: Object },
+        values: { required: true, type: Object },
+        title: { required: true, type: String },
+        name: { type: String, default: 'base' },
+        breadcrumbs: Array,
+        action: String,
+        method: { type: String, default: 'post' }
     },
 
     data() {
         return {
-            title: this.initialTitle,
-            values: this.initialValues,
+            currentValues: this.values,
             error: null,
             errors: {},
+            hasSidebar: this.blueprint.sections.map(section => section.handle).includes('sidebar'),
         }
     },
 
@@ -62,14 +58,16 @@ export default {
         },
 
         submit() {
+            if (!this.action) return;
+
             this.saving = true;
             this.clearErrors();
 
-            this.$axios.patch(this.url, this.values).then(response => {
+            this.$axios[this.method](this.action, this.currentValues).then(response => {
                 this.saving = false;
-                this.title = response.data.title;
                 this.$toast.success('Saved');
                 this.$refs.container.saved();
+                this.$emit('saved', response);
             }).catch(e => this.handleAxiosError(e));
         },
 
@@ -81,7 +79,9 @@ export default {
                 this.errors = errors;
                 this.$toast.error(message);
             } else {
-                this.$toast.error('Something went wrong');
+                const message = data_get(e, 'response.data.message');
+                this.$toast.error(message || e);
+                console.log(e);
             }
         },
 

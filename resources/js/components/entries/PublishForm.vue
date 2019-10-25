@@ -45,7 +45,7 @@
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
-            :fieldset="fieldset"
+            :blueprint="fieldset"
             :values="values"
             :reference="initialReference"
             :meta="meta"
@@ -510,7 +510,7 @@ export default {
                 this.isRoot = data.isRoot;
                 this.site = localization.handle;
                 this.localizing = false;
-                this.$nextTick(() => this.$refs.container.removeNavigationWarning());
+                this.$nextTick(() => this.$refs.container.clearDirtyState());
             })
         },
 

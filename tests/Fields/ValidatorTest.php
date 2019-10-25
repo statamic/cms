@@ -7,22 +7,22 @@ use Tests\TestCase;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Extend\Fieldtype;
-use Statamic\Fields\Validation;
+use Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
 use Facades\Statamic\Fields\FieldtypeRepository;
 
-class ValidationTest extends TestCase
+class ValidatorTest extends TestCase
 {
     /** @test */
     function it_explodes_pipe_style_rules_into_arrays()
     {
-        $this->assertEquals(['foo'], Validation::explodeRules('foo'));
+        $this->assertEquals(['foo'], Validator::explodeRules('foo'));
 
-        $this->assertEquals(['foo', 'bar'], Validation::explodeRules('foo|bar'));
+        $this->assertEquals(['foo', 'bar'], Validator::explodeRules('foo|bar'));
 
-        $this->assertEquals([], Validation::explodeRules(null));
+        $this->assertEquals([], Validator::explodeRules(null));
 
-        $this->assertEquals(['foo', 'bar'], Validation::explodeRules(['foo', 'bar']));
+        $this->assertEquals(['foo', 'bar'], Validator::explodeRules(['foo', 'bar']));
     }
 
     /** @test */
@@ -38,7 +38,7 @@ class ValidationTest extends TestCase
             'three' => ['required'],
         ];
 
-        $merged = (new Validation)->merge($original, $overrides);
+        $merged = (new Validator)->merge($original, $overrides);
 
         $this->assertInstanceOf(Collection::class, $merged);
         $this->assertEquals([
@@ -67,7 +67,7 @@ class ValidationTest extends TestCase
             $fieldWithExtraRules,
         ]));
 
-        $validation = (new Validation)->fields($fields);
+        $validation = (new Validator)->fields($fields);
 
         $this->assertEquals([
             'one' => ['required'],
@@ -83,7 +83,7 @@ class ValidationTest extends TestCase
         $fields->shouldReceive('all')->andReturn(collect([]));
         $fields->shouldReceive('preProcessValidatables')->andReturnSelf();
 
-        $validation = (new Validation)->fields($fields)->withRules([
+        $validation = (new Validator)->fields($fields)->withRules([
             'foo' => 'required',
             'test' => 'required|array'
         ]);
@@ -107,7 +107,7 @@ class ValidationTest extends TestCase
         $fields->shouldReceive('all')->andReturn(collect([$field]));
         $fields->shouldReceive('preProcessValidatables')->andReturnSelf();
 
-        $validation = (new Validation)->fields($fields)->withRules([
+        $validation = (new Validator)->fields($fields)->withRules([
             'one' => 'required|min:2',
             'additional' => 'required'
         ]);

@@ -3,14 +3,20 @@
 namespace Statamic\CP;
 
 use Illuminate\Contracts\Support\Arrayable;
+use JsonSerializable;
 
-class Breadcrumbs implements Arrayable
+class Breadcrumbs implements Arrayable, JsonSerializable
 {
     protected $crumbs;
 
     public function __construct($crumbs)
     {
         $this->crumbs = collect($crumbs);
+    }
+
+    public static function make($crumbs)
+    {
+        return new static($crumbs);
     }
 
     public function toArray()
@@ -21,6 +27,11 @@ class Breadcrumbs implements Arrayable
     public function toJson()
     {
         return $this->crumbs->toJson();
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->crumbs->toArray();
     }
 
     public function title($title = null)

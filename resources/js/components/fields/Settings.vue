@@ -45,7 +45,7 @@
 
             <publish-container
                 :name="publishContainer"
-                :fieldset="blueprint"
+                :blueprint="blueprint"
                 :values="values"
                 :meta="meta"
                 :is-root="true"

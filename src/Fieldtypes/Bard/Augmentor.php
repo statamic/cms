@@ -107,7 +107,7 @@ class Augmentor
                 return $set;
             }
 
-            $values = (new Fields($config))->addValues($set)->augment()->values();
+            $values = (new Fields($config))->addValues($set)->augment()->values()->all();
 
             return array_merge($values, ['type' => $set['type']]);
         })->all();
