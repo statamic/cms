@@ -146,10 +146,7 @@ class ImageGenerator
 
         $path = $this->server->makeImage($image, $this->params);
 
-        event('glide.generated', [
-            storage_path('statamic/cache/glide/'.$path),
-            $this->params
-        ]);
+        // TODO: GlideImageGenerated event
 
         return $path;
     }
