@@ -19,7 +19,6 @@ class GlideServer
        return ServerFactory::create([
             'source'   => base_path(), // this gets overriden on the fly by the image generator
             'cache'    => $this->cachePath(),
-            'base_url' => Config::get('statamic.assets.image_manipulation.route', 'img'),
             'response' => new LaravelResponseFactory(app('request')),
             'driver'   => Config::get('statamic.assets.image_manipulation.driver'),
             'cache_with_file_extensions' => true,
