@@ -3,7 +3,8 @@
 
 require __DIR__.'/vendor/autoload.php';
 
-$discovery = new Statamic\Translator\MethodDiscovery(new Illuminate\Filesystem\Filesystem, [
+$files = new Illuminate\Filesystem\Filesystem;
+$discovery = new Statamic\Translator\MethodDiscovery($files, [
     __DIR__.'/src',
     __DIR__.'/resources/js',
     __DIR__.'/resources/views'
@@ -11,6 +12,6 @@ $discovery = new Statamic\Translator\MethodDiscovery(new Illuminate\Filesystem\F
 
 $app = new Symfony\Component\Console\Application('Statamic Translator');
 $app->add(new Statamic\Translator\Commands\Stats($discovery));
-$app->add(new Statamic\Translator\Commands\Generate($discovery));
+$app->add(new Statamic\Translator\Commands\Generate($discovery, $files));
 
 $app->run();
