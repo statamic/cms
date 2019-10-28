@@ -9,45 +9,39 @@ use Statamic\Translator\MethodDiscovery;
 
 class MethodDiscoveryTest extends TestCase
 {
-    /** @test */
-    function it_discovers_methods()
+    protected $discovery;
+
+    public function setUp(): void
     {
-        $discovery = new MethodDiscovery(new Filesystem, [
+        $this->discovery = new MethodDiscovery(new Filesystem, [
             __DIR__.'/__fixtures__/php',
             __DIR__.'/__fixtures__/blade',
             __DIR__.'/__fixtures__/vue',
         ]);
+    }
 
+    /** @test */
+    function it_doesnt_allow_discovery_without_first_choosing_a_method()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('A discovery method was not specified');
+
+        $this->discovery->discover();
+    }
+
+    /** @test */
+    function it_discovers_string_based_methods()
+    {
         $expected = collect([
             'blade underscore single quote string',
             'blade underscore single quote :param',
             'blade underscore double quote string',
             'blade underscore double quote :param',
 
-            'blade trans single quote string',
-            'blade trans single quote :param',
-            'blade trans double quote string',
-            'blade trans double quote :param',
-
-            'blade trans_choice single quote string',
-            'blade trans_choice single quote :param',
-            'blade trans_choice double quote string',
-            'blade trans_choice double quote :param',
-
             'php underscore single quote string',
             'php underscore single quote :param',
             'php underscore double quote string',
             'php underscore double quote :param',
-
-            'php trans single quote string',
-            'php trans single quote :param',
-            'php trans double quote string',
-            'php trans double quote :param',
-
-            'php trans_choice single quote string',
-            'php trans_choice single quote :param',
-            'php trans_choice double quote string',
-            'php trans_choice double quote :param',
 
             'vue template single quote',
             'vue template single quote :count',
@@ -67,6 +61,39 @@ class MethodDiscoveryTest extends TestCase
             'vue script backtick quote',
             'vue script backtick quote :count',
             'vue script backtick quote :param',
+        ]);
+
+        $actual = $this->discovery->withStrings()->discover();
+        $this->assertInstanceOf(Collection::class, $actual);
+        $this->assertEquals(
+            $expected->sort()->values()->all(),
+            $actual->sort()->values()->all()
+        );
+    }
+
+    /** @test */
+    function it_discovers_key_based_methods()
+    {
+        $expected = collect([
+            'blade trans single quote string',
+            'blade trans single quote :param',
+            'blade trans double quote string',
+            'blade trans double quote :param',
+
+            'blade trans_choice single quote string',
+            'blade trans_choice single quote :param',
+            'blade trans_choice double quote string',
+            'blade trans_choice double quote :param',
+
+            'php trans single quote string',
+            'php trans single quote :param',
+            'php trans double quote string',
+            'php trans double quote :param',
+
+            'php trans_choice single quote string',
+            'php trans_choice single quote :param',
+            'php trans_choice double quote string',
+            'php trans_choice double quote :param',
 
             'vue template trans single quote',
             'vue template trans single quote :param',
@@ -95,7 +122,7 @@ class MethodDiscoveryTest extends TestCase
             'vue script trans_choice backtick quote :param',
         ]);
 
-        $actual = $discovery->discover();
+        $actual = $this->discovery->withKeys()->discover();
         $this->assertInstanceOf(Collection::class, $actual);
         $this->assertEquals(
             $expected->sort()->values()->all(),

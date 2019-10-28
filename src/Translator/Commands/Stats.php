@@ -33,7 +33,11 @@ class Stats extends Command
     {
         $counts = collect();
 
-        foreach ($this->discovery->discover() as $string) {
+        $strings = $this->discovery->withKeys()->discover()->merge(
+            $this->discovery->withStrings()->discover()
+        );
+
+        foreach ($strings as $string) {
             $count = $counts[$string] ?? 0;
             $counts[$string] = ++$count;
         }
