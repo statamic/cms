@@ -49,8 +49,8 @@ class Stats extends Command
             ];
         })->sortBy(function ($item) use ($input) {
             return ($input->getOption('sort') === 'usages')
-                ? [$item['usages'], $item['string']]
-                : $item['string'];
+                ? [$item['usages'], strtolower($item['string'])]
+                : strtolower($item['string']);
         });
 
         if ($filter = $input->getOption('filter')) {
