@@ -32,7 +32,7 @@ class MethodDiscovery
 
     protected function regex()
     {
-        return '(trans|__n?)'
+        return '(trans(?:_choice)?|__n?)'
             . '\([\'"`]'
             . '([\w\d\s\t\n\r,.\'\":\\\?!@£$%^&*<>_\-=\|\+]+)'
             . '[\'\"`]';

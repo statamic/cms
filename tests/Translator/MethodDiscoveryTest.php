@@ -23,10 +23,32 @@ class MethodDiscoveryTest extends TestCase
             'blade underscore single quote :param',
             'blade underscore double quote string',
             'blade underscore double quote :param',
+
+            'blade trans single quote string',
+            'blade trans single quote :param',
+            'blade trans double quote string',
+            'blade trans double quote :param',
+
+            'blade trans_choice single quote string',
+            'blade trans_choice single quote :param',
+            'blade trans_choice double quote string',
+            'blade trans_choice double quote :param',
+
             'php underscore single quote string',
             'php underscore single quote :param',
             'php underscore double quote string',
             'php underscore double quote :param',
+
+            'php trans single quote string',
+            'php trans single quote :param',
+            'php trans double quote string',
+            'php trans double quote :param',
+
+            'php trans_choice single quote string',
+            'php trans_choice single quote :param',
+            'php trans_choice double quote string',
+            'php trans_choice double quote :param',
+
             'vue template single quote',
             'vue template single quote :count',
             'vue template single quote :param',
@@ -45,6 +67,32 @@ class MethodDiscoveryTest extends TestCase
             'vue script backtick quote',
             'vue script backtick quote :count',
             'vue script backtick quote :param',
+
+            'vue template trans single quote',
+            'vue template trans single quote :param',
+            'vue template trans double quote',
+            'vue template trans double quote :param',
+            'vue template trans backtick quote',
+            'vue template trans backtick quote :param',
+            'vue script trans single quote',
+            'vue script trans single quote :param',
+            'vue script trans double quote',
+            'vue script trans double quote :param',
+            'vue script trans backtick quote',
+            'vue script trans backtick quote :param',
+
+            'vue template trans_choice single quote',
+            'vue template trans_choice single quote :param',
+            'vue template trans_choice double quote',
+            'vue template trans_choice double quote :param',
+            'vue template trans_choice backtick quote',
+            'vue template trans_choice backtick quote :param',
+            'vue script trans_choice single quote',
+            'vue script trans_choice single quote :param',
+            'vue script trans_choice double quote',
+            'vue script trans_choice double quote :param',
+            'vue script trans_choice backtick quote',
+            'vue script trans_choice backtick quote :param',
         ]);
 
         $actual = $discovery->discover();
