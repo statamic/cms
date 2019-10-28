@@ -1,9 +1,13 @@
 <template>
 
     <div>
-        {{ __('vue template') }}
-        {{ __n('vue template :count', 3) }}
-        {{ __n('vue template :param', { param: 'test' }) }}
+        {{ __('vue template single quote') }}
+        {{ __n('vue template single quote :count', 3) }}
+        {{ __n('vue template single quote :param', { param: 'test' }) }}
+
+        {{ __("vue template double quote") }}
+        {{ __n("vue template double quote :count", 3) }}
+        {{ __n("vue template double quote :param", { param: 'test' }) }}
     </div>
 
 </template>
@@ -11,20 +15,15 @@
 <script>
 export default {
 
-    computed: {
-
-        one() {
-            return __('vue script');
-        },
-
-        two() {
-            return __n('vue script :count', 2);
-        },
-
-        three() {
-            return __n('vue script :param', { param: 'test' });
-        }
-
+    data() {
+        return [
+            __('vue script single quote'),
+            __n('vue script single quote :count', 2),
+            __n('vue script single quote :param', { param: 'test' }),
+            __("vue script double quote"),
+            __n("vue script double quote :count", 2),
+            __n("vue script double quote :param", { param: 'test' }),
+        ];
     }
 
 }

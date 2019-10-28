@@ -19,16 +19,26 @@ class MethodDiscoveryTest extends TestCase
         ]);
 
         $expected = collect([
-            'blade underscore string',
-            'blade underscore :param',
-            'php underscore string',
-            'php underscore :param',
-            'vue template',
-            'vue template :count',
-            'vue template :param',
-            'vue script',
-            'vue script :count',
-            'vue script :param',
+            'blade underscore single quote string',
+            'blade underscore single quote :param',
+            'blade underscore double quote string',
+            'blade underscore double quote :param',
+            'php underscore single quote string',
+            'php underscore single quote :param',
+            'php underscore double quote string',
+            'php underscore double quote :param',
+            'vue template single quote',
+            'vue template single quote :count',
+            'vue template single quote :param',
+            'vue template double quote',
+            'vue template double quote :count',
+            'vue template double quote :param',
+            'vue script single quote',
+            'vue script single quote :count',
+            'vue script single quote :param',
+            'vue script double quote',
+            'vue script double quote :count',
+            'vue script double quote :param',
         ]);
 
         $actual = $discovery->discover();
