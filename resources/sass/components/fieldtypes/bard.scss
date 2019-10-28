@@ -413,6 +413,14 @@
 
     .bard-link-toolbar-buttons {
         @apply ml-1 flex items-center;
+
+        button {
+            @apply text-sm opacity-75;
+
+            &:hover {
+                @apply opacity-100 bg-transparent;
+            }
+        }
     }
 
     button {
