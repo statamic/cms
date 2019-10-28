@@ -33,12 +33,18 @@ class MethodDiscoveryTest extends TestCase
             'vue template double quote',
             'vue template double quote :count',
             'vue template double quote :param',
+            'vue template backtick quote',
+            'vue template backtick quote :count',
+            'vue template backtick quote :param',
             'vue script single quote',
             'vue script single quote :count',
             'vue script single quote :param',
             'vue script double quote',
             'vue script double quote :count',
             'vue script double quote :param',
+            'vue script backtick quote',
+            'vue script backtick quote :count',
+            'vue script backtick quote :param',
         ]);
 
         $actual = $discovery->discover();
