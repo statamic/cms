@@ -11,6 +11,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Generate extends Command
 {
+    protected $discovery;
+
+    public function __construct(MethodDiscovery $discovery)
+    {
+        $this->discovery = $discovery;
+        parent::__construct();
+    }
+
     protected function configure()
     {
         $this
@@ -20,7 +28,7 @@ class Generate extends Command
 
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $json = $this->discover()
+        $json = $this->discovery->discover()
             ->sort()
             ->mapWithKeys(function ($string) {
                 return [$string => ''];
@@ -38,13 +46,5 @@ class Generate extends Command
             (new Filesystem)->put(__DIR__.'/../../../'.$path, $json);
             $output->writeln("<info>Translation file for <comment>$lang</comment> written to <comment>$path</comment></info>");
         }
-    }
-
-    protected function discover()
-    {
-        $dir = getcwd();
-        $paths = [$dir.'/src', $dir.'/resources'];
-        $discovery = new MethodDiscovery(new Filesystem, $paths);
-        return $discovery->discover();
     }
 }

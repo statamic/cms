@@ -12,6 +12,14 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class Stats extends Command
 {
+    protected $discovery;
+
+    public function __construct(MethodDiscovery $discovery)
+    {
+        $this->discovery = $discovery;
+        parent::__construct();
+    }
+
     protected function configure()
     {
         $this
@@ -25,7 +33,7 @@ class Stats extends Command
     {
         $counts = collect();
 
-        foreach ($this->discover() as $string) {
+        foreach ($this->discovery->discover() as $string) {
             $count = $counts[$string] ?? 0;
             $counts[$string] = ++$count;
         }
