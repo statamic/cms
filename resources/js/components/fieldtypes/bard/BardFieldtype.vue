@@ -17,13 +17,13 @@
                 </div>
                 <div class="flex items-center no-select">
                 <div class="h-10 -my-sm border-l pr-1 w-px" v-if="hasExtraButtons"></div>
-                    <button @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
+                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
                         <svg-icon name="file-code" class="w-4 h-4 "/>
                     </button>
-                    <button @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
+                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
                         <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
                     </button>
-                    <button @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
+                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
                         <svg-icon name="shrink-all" class="w-4 h-4" v-if="fullScreenMode" />
                         <svg-icon name="expand" class="w-4 h-4" v-else />
                     </button>
