@@ -22,6 +22,7 @@
                         <data-list-search v-model="searchQuery" />
                         <data-list-bulk-actions
                             :url="actionUrl"
+                            :context="{collection: collection}"
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
