@@ -212,6 +212,8 @@ export default {
 
             this.loading = true;
 
+            this.$refs.iframe.contentDocument.location.reload(true);
+
             this.$axios.post(this.url, this.payload, { cancelToken: source.token }).then(response => {
                 this.updateIframeContents(response.data);
             }).catch(e => {
