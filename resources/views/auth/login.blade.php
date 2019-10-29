@@ -16,7 +16,7 @@
                 @foreach ($providers as $provider)
                     <div class="provider mb-1">
                         <a href="{{ $provider->loginUrl() }}?redirect={{ parse_url(cp_route('index'))['path'] }}" class="btn block btn-primary">
-                            {{ __('Login with :provider', ['provider' => $provider->label()]) }}
+                            {{ __('Log in with :provider', ['provider' => $provider->label()]) }}
                         </a>
                     </div>
                 @endforeach
@@ -26,7 +26,7 @@
 
             <div class="login-with-email" v-if="! showEmailLogin">
                 <a class="btn block" @click.prevent="showEmailLogin = true">
-                    {{ __('Login with email') }}
+                    {{ __('Log in with email') }}
                 </a>
             </div>
         @endif

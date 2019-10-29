@@ -191,7 +191,7 @@ class FormsController extends CpController
                 'type' => 'text',
                 'validate' => 'required',
                 'width' => 50,
-                'instructions' => __('Usually a call to action, like "Contact Us" or "Vote for Your Favorite Porg".'),
+                'instructions' => __('statamic::messages.forms_title_instructions'),
             ],
             'handle' => [
                 'type' => 'text',
@@ -202,7 +202,7 @@ class FormsController extends CpController
             'fields' => ['type' => 'section'],
             'blueprint' => [
                 'type' => 'blueprints',
-                'instructions' => __('You can pick an existing Blueprint or create a new one.'),
+                'instructions' => __('statamic::messages.forms_blueprint_instructions'),
                 'validate' => 'min:1',
                 'max_items' => 1,
                 'width' => 50,
@@ -210,19 +210,19 @@ class FormsController extends CpController
             'honeypot' => [
                 'type' => 'text',
                 'width' => 50,
-                'instructions' => __('The field name to be used for the honeypot.'),
+                'instructions' => __('statamic::messages.forms_honeypot_instructions'),
             ],
             'submissions' => ['type' => 'section'],
             'store' => [
                 'display' => __('Store Submissions'),
                 'type' => 'toggle',
                 'width' => 100,
-                'instructions' => __('Whether form submissions should be stored. Turn off if you only wish to get email notifications.'),
+                'instructions' => __('statamic::messages.forms_store_instructions'),
             ],
             'email' => [
                 'type' => 'grid',
                 'mode' => 'stacked',
-                'instructions' => __('Add any emails you want to be sent upon submission.'),
+                'instructions' => __('statamic::messages.forms_email_instructions'),
                 'fields' => [
                     [
                         'handle' => 'to',
@@ -233,7 +233,7 @@ class FormsController extends CpController
                             'validate' => [
                                 'required',
                             ],
-                            'instructions' => __('Email address of the recipient.'),
+                            'instructions' => __('statamic::messages.forms_email_to_instructions'),
                         ]
                     ],
                     [
@@ -242,7 +242,7 @@ class FormsController extends CpController
                             'type' => 'text',
                             'display' => __('Sender (From)'),
                             'width' => 50,
-                            'instructions' => __('Leave blank to fall back to the site default.'),
+                            'instructions' => __('statamic::messages.forms_email_from_instructions'),
                         ]
                     ],
                     [
@@ -251,7 +251,7 @@ class FormsController extends CpController
                             'type' => 'text',
                             'display' => __('Reply To'),
                             'width' => 50,
-                            'instructions' => __('Leave blank to fall back to sender.'),
+                            'instructions' => __('statamic::messages.forms_email_reply_to_instructions'),
                         ]
                     ],
                     [
@@ -259,7 +259,7 @@ class FormsController extends CpController
                         'field' => [
                             'type' => 'text',
                             'width' => 100,
-                            'instructions' => __('Email subject line.'),
+                            'instructions' => __('statamic::messages.forms_email_subject_instructions'),
                         ]
                     ],
                     [
@@ -267,7 +267,7 @@ class FormsController extends CpController
                         'field' => [
                             'type' => 'text',
                             'width' => 100,
-                            'instructions' => __('Leave blank to use an automagic email template.'),
+                            'instructions' => __('statamic::messages.forms_email_template_instructions'),
                         ]
                     ],
                 ]

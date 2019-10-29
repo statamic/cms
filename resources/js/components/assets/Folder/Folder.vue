@@ -18,7 +18,7 @@
                 v-if="!initialDirectory"
                 handle="directory"
                 :display="__('Folder Name')"
-                :instructions="__('We recommend avoiding spaces and special characters to keep your URLs clean.')"
+                :instructions="__('messages.asset_folders_directory_instructions')"
                 :errors="errors.directory"
                 autofocus
                 v-model="directory"

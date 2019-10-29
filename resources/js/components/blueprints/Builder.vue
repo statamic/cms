@@ -10,7 +10,7 @@
         <div class="publish-form card p-0">
             <div class="form-group">
                 <label class="block">{{ __('Title') }}</label>
-                <small class="help-block">{{ __('How this blueprint will be referenced throughout the Control Panel') }}</small>
+                <small class="help-block">{{ __('messages.blueprints_title_instructions') }}</small>
                 <div v-if="errors.title">
                     <small class="help-block text-red" v-for="(error, i) in errors.title" :key="i" v-text="error" />
                 </div>

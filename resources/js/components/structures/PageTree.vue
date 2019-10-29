@@ -53,7 +53,7 @@
                 <slot name="no-pages-svg" />
                 <h1 class="my-3" v-text="__('Create your first link now.')" />
                 <p class="text-grey mb-3">
-                    {{ __('Structures can contain links arranged into a heirarchy from which you can create URLs or navigation areas.') }}
+                    {{ __('messages.structures_empty') }}
                 </p>
                 <button class="btn btn-primary btn-lg" v-text="__('Create first page')" @click="makeFirstPage" />
             </div>

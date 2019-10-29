@@ -38,7 +38,7 @@
                 <form-group
                     handle="prefix"
                     :display="__('Prefix')"
-                    :instructions="__(`The prefix that should be applied to each field when they are imported. eg. _hero`)"
+                    :instructions="__('messages.fieldset_import_prefix_instructions')"
                     :value="config.prefix"
                     @input="updateField('prefix', $event)"
                 />

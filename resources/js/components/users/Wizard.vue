@@ -179,8 +179,8 @@ export default {
             },
             invitation: {
                 send: true,
-                subject: __('Activate your new Statamic account on ') + window.location.hostname,
-                message: `Activate your new Statamic account on ${window.location.hostname} to begin managing this website.\n\nFor your security, the link below expires after 48 hours. After that, please contact the site administrator for a new password.`,
+                subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
+                message: __('messages.user_wizard_invitation_body', { site: window.location.hostname }),
             },
             userExists: false,
             completed: false,

@@ -6,7 +6,7 @@
         <div class="ml-2">
             <h1 class="mb-sm">{{ __('Updates') }}</h1>
             @if ($count)
-                <p>{{ $count }} {{ __('updates available') }}</p>
+                <p>{{ trans_choice('messages.updates_available', $count) }}</p>
             @else
                 <p>{{ __('Everything is up to date.') }}</p>
             @endif

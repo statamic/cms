@@ -37,8 +37,8 @@ class ActivateAccount extends PasswordReset
     public function toMail($notifiable)
     {
         return (new MailMessage)
-            ->subject(static::$subject ?? __('Activate Your Account'))
-            ->line(static::$body ?? __('You are receiving this email because we received a password reset request for your account.'))
+            ->subject(static::$subject ?? __('statamic::messages.activate_account_notification_subject'))
+            ->line(static::$body ?? __('statamic::messages.activate_account_notification_body'))
             ->action(__('Reset Password'), PasswordResetManager::url($this->token));
     }
 

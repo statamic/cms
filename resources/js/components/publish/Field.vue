@@ -22,7 +22,7 @@
                 @click="$emit('desynced')"
             >
                 <svg-icon name="hyperlink" class="h-4 ml-sm w-4 text-grey-60"
-                    v-tooltip.top="__('Synced with origin. Click or edit the field to desync.')" />
+                    v-tooltip.top="__('messages.field_synced_with_origin')" />
             </button>
 
             <button
@@ -32,7 +32,7 @@
                 @click="$emit('synced')"
             >
                 <svg-icon name="hyperlink-broken" class="h-4 ml-sm w-4 text-grey-60"
-                    v-tooltip.top="__('Desynced from origin. Click to sync and revert to the origin\'s value.')" />
+                    v-tooltip.top="__('messages.field_desynced_from_origin')" />
             </button>
         </label>
 

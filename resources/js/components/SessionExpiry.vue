@@ -23,7 +23,7 @@
 
             <div v-if="!isUsingOauth" class="publish-fields">
                 <div class="form-group">
-                    <label v-text="__('Enter your password to continue where you left off')" />
+                    <label v-text="__('messages.session_expiry_enter_password')" />
                     <small
                         class="help-block text-red"
                         v-if="errors.email"
@@ -84,8 +84,8 @@ export default {
 
         warningText() {
             return (this.remaining === 0)
-                ? __("You have been logged out because you've been inactive for a while.")
-                : __('You have been inactive for a while and will be logged out in :seconds seconds.', { seconds: this.remaining });
+                ? __('messages.session_expiry_logged_out_for_inactivity')
+                : __('messages.session_expiry_logging_out_in_seconds', { seconds: this.remaining });
         },
 
         isUsingOauth() {

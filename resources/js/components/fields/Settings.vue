@@ -56,7 +56,7 @@
                     <form-group
                         handle="display"
                         :display="__('Display')"
-                        :instructions="__(`The field's label shown in the Control Panel.`)"
+                        :instructions="__('messages.fields_display_instructions')"
                         width="50"
                         autofocus
                         :value="values.display"

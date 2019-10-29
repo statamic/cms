@@ -14,7 +14,7 @@
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3" v-text="__('Structures')" />
                 <p class="text-grey">
-                    {{ __('Structures are link trees most often used to create nav bars and other forms of site navigation.') }}
+                    {{ __('messages.structure_wizard_description') }}
                 </p>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
@@ -142,7 +142,7 @@
                     {{ __('Next')}} &rarr;
                 </button>
                 <button tabindex="4" class="btn-primary mx-3" :disabled="! canComplete" @click="submit" v-if="onLastStep">
-                    {{ __('Create structure')}}
+                    {{ __('Create Structure')}}
                 </button>
             </div>
         </div>

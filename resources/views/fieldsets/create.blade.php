@@ -15,7 +15,7 @@
                 <form-group
                     handle="title"
                     :display="__('Title')"
-                    :instructions="__('Usually describes what fields will be inside, like Image Block')"
+                    :instructions="__('messages.fieldsets_title_instructions')"
                     autofocus />
             </div>
         </div>

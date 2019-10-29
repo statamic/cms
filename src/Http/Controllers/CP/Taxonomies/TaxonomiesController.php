@@ -169,7 +169,7 @@ class TaxonomiesController extends CpController
             'content_model' => ['type' => 'section'],
             'blueprints' => [
                 'type' => 'blueprints',
-                'instructions' => __('Terms in this taxonomy may use any of these blueprints.'),
+                'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
                 'validate' => 'array',
             ],
         ]);
