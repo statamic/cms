@@ -2,6 +2,8 @@
 
 namespace Statamic\Actions;
 
+use Statamic\Facades\User;
+
 class ActionRepository
 {
     public function get($action)
@@ -23,7 +25,7 @@ class ActionRepository
         return $this->all()
             ->each->context($context)
             ->filter->filter($item)
-            ->filter->authorize($item)
+            ->filter->authorize(User::current(), $item)
             ->values();
     }
 }

@@ -46,7 +46,7 @@ abstract class Action implements Arrayable
         return $this->fields;
     }
 
-    public function authorize($item)
+    public function authorize($user, $item)
     {
         return true;
     }

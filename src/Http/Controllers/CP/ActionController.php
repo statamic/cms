@@ -2,9 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\Facades\Entry;
-use Statamic\Facades\Action;
 use Illuminate\Http\Request;
+use Statamic\Facades\Action;
+use Statamic\Facades\Entry;
+use Statamic\Facades\User;
 
 abstract class ActionController extends CpController
 {
@@ -27,7 +28,7 @@ abstract class ActionController extends CpController
         $items = $this->getSelectedItems(collect($data['selections']), $context);
 
         $unauthorized = $items->reject(function ($item) use ($action) {
-            return $action->authorize($item);
+            return $action->authorize(User::current(), $item);
         });
 
         abort_unless($unauthorized->isEmpty(), 403, 'You are not authorized to run this action.');

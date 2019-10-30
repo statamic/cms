@@ -2,9 +2,6 @@
 
 namespace Statamic\Actions;
 
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Facades\User;
-
 class Delete extends Action
 {
     protected $dangerous = true;
@@ -14,9 +11,9 @@ class Delete extends Action
         return true;
     }
 
-    public function authorize($item)
+    public function authorize($user, $item)
     {
-        return User::current()->can('delete', $item);
+        return $user->can('delete', $item);
     }
 
     public function run($items)

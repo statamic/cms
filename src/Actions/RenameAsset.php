@@ -3,7 +3,6 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Assets\Asset;
-use Statamic\Facades\User;
 
 class RenameAsset extends Action
 {
@@ -14,9 +13,9 @@ class RenameAsset extends Action
         return $item instanceof Asset;
     }
 
-    public function authorize($asset)
+    public function authorize($user, $asset)
     {
-        return User::current()->can('rename', $asset);
+        return $user->can('rename', $asset);
     }
 
     public function run($assets, $values)

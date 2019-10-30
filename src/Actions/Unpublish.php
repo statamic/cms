@@ -12,9 +12,9 @@ class Unpublish extends Action
         return $item instanceof Entry;
     }
 
-    public function authorize($entry)
+    public function authorize($user, $entry)
     {
-        return User::current()->can('publish', $entry);
+        return $user->can('publish', $entry);
     }
 
     public function run($entries)
