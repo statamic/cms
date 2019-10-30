@@ -16,6 +16,7 @@ use Illuminate\Support\ServiceProvider;
 use Statamic\Auth\UserRepositoryManager;
 use Facades\Statamic\Auth\CorePermissions;
 use Statamic\Auth\Passwords\PasswordReset;
+use Statamic\Auth\Permissions;
 use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\UserRepository;
@@ -64,6 +65,10 @@ class AuthServiceProvider extends ServiceProvider
 
         $this->app->singleton(ProtectorManager::class, function ($app) {
             return new ProtectorManager($app);
+        });
+
+        $this->app->singleton(Permissions::class, function () {
+            return new Permissions;
         });
 
         $this->app->singleton(PermissionCache::class, function ($app) {

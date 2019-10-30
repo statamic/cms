@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Gate;
 
 class Permissions
 {
-    protected static $permissions = [];
+    protected $permissions = [];
     protected $pendingGroup = null;
 
     public function make(string $value)
@@ -30,14 +30,14 @@ class Permissions
             }
         }
 
-        static::$permissions[] = $permission;
+        $this->permissions[] = $permission;
 
         return $permission;
     }
 
     public function all()
     {
-        return collect(static::$permissions)->flatMap(function ($permission) {
+        return collect($this->permissions)->flatMap(function ($permission) {
             return $this->mergePermissions($permission);
         })->keyBy->value();
     }
@@ -52,7 +52,7 @@ class Permissions
 
     public function tree()
     {
-        return collect(static::$permissions)->flatMap(function ($permission) {
+        return collect($this->permissions)->flatMap(function ($permission) {
             return $permission->permissions();
         })->map(function ($permission) {
             return $permission->toTree();
