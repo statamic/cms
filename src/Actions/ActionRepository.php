@@ -2,8 +2,6 @@
 
 namespace Statamic\Actions;
 
-use Illuminate\Support\Collection;
-
 class ActionRepository
 {
     public function get($action)
@@ -20,39 +18,12 @@ class ActionRepository
         })->values();
     }
 
-    public function for($key, $context = [], $items = null)
+    public function for($item, $context = [])
     {
-        $actions = $this->all()
-            ->filter->visibleTo($key, $context)
+        return $this->all()
             ->each->context($context)
+            ->filter->filter($item)
+            ->filter->authorize($item)
             ->values();
-
-        if ($items) {
-            return $this->filterAuthorized($actions, $items)->values();
-        }
-
-        return $actions;
-    }
-
-    protected function filterAuthorized($actions, $item)
-    {
-        if (! $item instanceof Collection) {
-            return $actions->filter->authorize($item);
-        }
-
-        $items = $item;
-
-        return $actions->filter(function ($action) use ($items) {
-            return $this->canActionBeRunOnAllItems($action, $items);
-        });
-    }
-
-    protected function canActionBeRunOnAllItems($action, $items)
-    {
-        $authorized = $items->filter(function ($item) use ($action) {
-            return $action->authorize($item);
-        });
-
-        return $authorized->count() === $items->count();
     }
 }

@@ -2,13 +2,14 @@
 
 namespace Statamic\Actions;
 
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\User;
 
 class SendPasswordReset extends Action
 {
-    public function visibleTo($key, $context)
+    public function filter($item)
     {
-        return $key === 'users';
+        return $item instanceof UserContract;
     }
 
     public function authorize($user)

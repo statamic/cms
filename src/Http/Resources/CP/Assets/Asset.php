@@ -23,9 +23,9 @@ class Asset extends Resource
                 ];
             }),
 
-            'actions' => Action::for('asset-browser', [
+            'actions' => Action::for($this->resource, [
                 'container' => $this->container()->handle()
-            ], $this->resource),
+            ]),
         ];
     }
 }

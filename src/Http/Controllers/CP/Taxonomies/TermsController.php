@@ -43,11 +43,11 @@ class TermsController extends CpController
 
         $paginator = $query->paginate(request('perPage'));
 
-        $paginator->supplement(function ($term) {
+        $paginator->supplement(function ($term) use ($taxonomy) {
             return [
                 'viewable' => User::current()->can('view', $term),
                 'editable' => User::current()->can('edit', $term),
-                'actions' => Action::for('terms', [], $term),
+                'actions' => Action::for($term, ['taxonomy' => $taxonomy->handle()]),
             ];
         })->preProcessForIndex();
 

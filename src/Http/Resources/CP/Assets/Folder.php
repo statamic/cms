@@ -21,7 +21,7 @@ class Folder extends Resource
         return [
             $this->merge($this->resource->toArray()),
 
-            'actions' => Action::for('asset-folders', ['container' => $this->container()->handle()], $this),
+            'actions' => Action::for($this->resource, ['container' => $this->container()->handle()]),
 
             $this->mergeWhen($this->withChildFolders, function () {
                 return ['folders' => Folder::collection($this->assetFolders()->values())];

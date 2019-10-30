@@ -2,6 +2,7 @@
 
 namespace Statamic\Actions;
 
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
@@ -11,9 +12,9 @@ class DeleteEntry extends Action
 
     protected $dangerous = true;
 
-    public function visibleTo($key, $context)
+    public function filter($item)
     {
-        return $key === 'entries';
+        return $item instanceof Entry;
     }
 
     public function authorize($entry)

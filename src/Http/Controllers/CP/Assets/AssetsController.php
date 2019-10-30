@@ -45,7 +45,6 @@ class AssetsController extends CpController
             'values' => $asset->data()->merge($fields->values()),
             'meta' => $fields->meta(),
             'actionUrl' => cp_route('assets.actions'),
-            'actions' => Action::for('asset-browser', ['container' => $asset->container()->handle()], $asset),
         ];
     }
 

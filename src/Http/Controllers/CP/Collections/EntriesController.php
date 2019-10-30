@@ -43,11 +43,11 @@ class EntriesController extends CpController
 
         $entries = $query
             ->paginate(request('perPage'))
-            ->supplement(function ($entry) {
+            ->supplement(function ($entry) use ($collection) {
                 return [
                     'viewable' => User::current()->can('view', $entry),
                     'editable' => User::current()->can('edit', $entry),
-                    'actions' => Action::for('entries', [], $entry),
+                    'actions' => Action::for($entry, ['collection' => $collection->handle()]),
                 ];
             })
             ->preProcessForIndex();

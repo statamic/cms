@@ -8,23 +8,7 @@ use Illuminate\Http\Request;
 
 abstract class ActionController extends CpController
 {
-    public function index(Request $request)
-    {
-        $data = $request->validate([
-            'selections' => 'required|array',
-            'context' => 'sometimes',
-        ]);
-
-        $context = isset($data['context']) ? json_decode($data['context'], true) : [];
-
-        $items = $this->getSelectedItems(collect($data['selections']), $context);
-
-        $actions = Action::for($this->getKey(), $context, $items);
-
-        return $actions;
-    }
-
-    public function run(Request $request)
+    public function __invoke(Request $request)
     {
         $data = $request->validate([
             'action' => 'required',
@@ -52,9 +36,4 @@ abstract class ActionController extends CpController
     }
 
     abstract protected function getSelectedItems($items, $context);
-
-    protected function getKey()
-    {
-        return static::$key;
-    }
 }

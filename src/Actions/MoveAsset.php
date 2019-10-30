@@ -10,9 +10,9 @@ class MoveAsset extends Action
 {
     protected static $title = 'Move';
 
-    public function visibleTo($key, $context)
+    public function filter($item)
     {
-        return $key === 'asset-browser';
+        return $item instanceof Asset;
     }
 
     public function authorize($asset)

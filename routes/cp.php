@@ -38,8 +38,7 @@ Route::group([
 
         Route::group(['prefix' => 'collections/{collection}/entries'], function () {
             Route::get('/', 'EntriesController@index')->name('collections.entries.index');
-            Route::get('actions', 'EntryActionController@index')->name('collections.entries.actions');
-            Route::post('actions', 'EntryActionController@run');
+            Route::post('actions', 'EntryActionController')->name('collections.entries.actions');
             Route::get('create/{site}', 'EntriesController@create')->name('collections.entries.create');
             Route::post('create/{site}/preview', 'EntryPreviewController@create')->name('collections.entries.preview.create');
             Route::post('reorder', 'ReorderEntriesController')->name('collections.entries.reorder');
@@ -69,8 +68,7 @@ Route::group([
 
         Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
             Route::get('/', 'TermsController@index')->name('taxonomies.terms.index');
-            Route::get('actions', 'TermActionController@index')->name('taxonomies.terms.actions');
-            Route::post('actions', 'TermActionController@run');
+            Route::post('actions', 'TermActionController')->name('taxonomies.terms.actions');
             Route::get('create/{site}', 'TermsController@create')->name('taxonomies.terms.create');
             Route::post('{site}', 'TermsController@store')->name('taxonomies.terms.store');
 
@@ -103,12 +101,10 @@ Route::group([
         Route::resource('asset-containers', 'AssetContainersController');
         Route::post('asset-containers/{container}/folders', 'FoldersController@store');
         Route::patch('asset-containers/{container}/folders/{path}', 'FoldersController@update')->where('path', '.*');
-        Route::get('assets/actions', 'ActionController@index')->name('assets.actions');
-        Route::post('assets/actions', 'ActionController@run');
+        Route::post('assets/actions', 'ActionController')->name('assets.actions');
         Route::get('assets/browse', 'BrowserController@index')->name('assets.browse.index');
         Route::get('assets/browse/search/{container}', 'BrowserController@search');
-        Route::get('assets/browse/folders/{container}/actions', 'FolderActionController@index')->name('assets.folders.actions');
-        Route::post('assets/browse/folders/{container}/actions', 'FolderActionController@run');
+        Route::post('assets/browse/folders/{container}/actions', 'FolderActionController')->name('assets.folders.actions');
         Route::get('assets/browse/folders/{container}/{path?}', 'BrowserController@folder')->where('path', '.*');
         Route::get('assets/browse/{container}/{path?}/edit', 'BrowserController@edit')->where('path', '.*')->name('assets.browse.edit');
         Route::get('assets/browse/{container}/{path?}', 'BrowserController@show')->where('path', '.*')->name('assets.browse.show');
@@ -154,8 +150,7 @@ Route::group([
     });
 
     Route::group(['namespace' => 'Users'], function () {
-        Route::get('users/actions', 'UserActionController@index')->name('users.actions');
-        Route::post('users/actions', 'UserActionController@run');
+        Route::post('users/actions', 'UserActionController')->name('users.actions');
         Route::resource('users', 'UsersController');
         Route::patch('users/{user}/password', 'PasswordController@update')->name('users.password.update');
         Route::get('account', 'AccountController')->name('account');

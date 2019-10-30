@@ -20,6 +20,11 @@ abstract class Action implements Arrayable
     protected $fields = [];
     protected $context = [];
 
+    public function filter($item)
+    {
+        return true;
+    }
+
     public function context($context)
     {
         $this->context = $context;
