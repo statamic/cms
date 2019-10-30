@@ -39,11 +39,13 @@ trait ExistsAsFile
 
         $data = Arr::removeNullValues($this->fileData());
 
+        if ($this->fileExtension() === 'yaml') {
+            return YAML::dump($data);
+        }
+
         $content = array_pull($data, 'content');
 
-        return $this->fileExtension() === 'yaml'
-            ? YAML::dump($data, $content)
-            : YAML::dumpFrontMatter($data, $content);
+        return YAML::dumpFrontMatter($data, $content);
     }
 
     public function fileLastModified()
