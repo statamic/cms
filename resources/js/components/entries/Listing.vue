@@ -60,7 +60,7 @@
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
                                 <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
-                                <a @click.stop="redirect(entry.edit_url)">{{ entry.title }}</a>
+                                <a :href="entry.edit_url">{{ entry.title }}</a>
                             </div>
                         </template>
                         <template slot="cell-slug" slot-scope="{ row: entry }">
@@ -184,11 +184,6 @@ export default {
 
         reordered(items) {
             this.items = items;
-        },
-
-        redirect(url) {
-            location.href = url;
-            return;
         }
 
     }
