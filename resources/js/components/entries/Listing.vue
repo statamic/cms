@@ -60,7 +60,7 @@
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
                                 <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
-                                <a :href="entry.edit_url">{{ entry.title }}</a>
+                                <a :href="entry.edit_url" @click.stop>{{ entry.title }}</a>
                             </div>
                         </template>
                         <template slot="cell-slug" slot-scope="{ row: entry }">
