@@ -2,8 +2,6 @@
 
 namespace Statamic\Auth;
 
-use Illuminate\Support\Facades\Gate;
-
 class Permissions
 {
     protected $permissions = [];
@@ -52,23 +50,27 @@ class Permissions
 
     public function tree()
     {
-        return collect($this->permissions)->flatMap(function ($permission) {
-            return $permission->permissions();
-        })->map(function ($permission) {
-            return $permission->toTree();
-        });
-    }
+        $tree = collect($this->permissions)
+            ->flatMap(function ($permission) {
+                return $permission->permissions()->flatMap->toTree();
+            })
+            ->groupBy(function ($permission) {
+                return $permission['group'] ?? 'misc';
+            });
 
-    protected function toTree($permissions)
-    {
-        return $permissions
-            ->keyBy->value()
-            ->map(function($permission) {
+            // Place ungrouped permissions at the end.
+            if ($tree->has('misc')) {
+                $tree->put('misc', $tree->pull('misc'));
+            }
+
+            $tree = $tree->map(function ($permissions, $group) {
                 return [
-                    'permission' => $permission,
-                    'children' => $this->toTree($permission->children())
+                    'handle' => $group,
+                    'permissions' => $permissions->all(),
                 ];
             });
+
+        return $tree->values();
     }
 
     public function group($name, $permissions)
