@@ -15,7 +15,6 @@ class Permission
     protected $callback;
     protected $children;
     protected $label;
-    protected $translation;
     protected $description;
     protected $group;
 
@@ -29,11 +28,6 @@ class Permission
         return $this->label;
     }
 
-    public function translation(string $translation = null)
-    {
-        return $this->fluentlyGetOrSet('translation')->args(func_get_args());
-    }
-
     public function label(string $label = null)
     {
         if (func_num_args() > 0) {
@@ -42,15 +36,7 @@ class Permission
             return $this;
         }
 
-        if (! $this->label && ! $this->translation) {
-            return $this->value;
-        }
-
-        if ($this->label && !$this->placeholder) {
-            return $this->label;
-        }
-
-        return __($this->translation ?? $this->label, [$this->placeholder => $this->placeholderLabel]);
+        return __($this->label ?? $this->value, [$this->placeholder => $this->placeholderLabel]);
     }
 
     public function placeholder(string $placeholder = null)
@@ -94,11 +80,11 @@ class Permission
 
         return collect($items)->map(function ($replacement) {
             $value = str_replace('{'.$this->placeholder.'}', $replacement['value'], $this->value());
+            $label = $this->label ?? str_replace('{'.$this->placeholder.'}', ':'.$this->placeholder, $this->value());
 
             $replaced = (new self)
                 ->value($value)
-                ->label($this->label)
-                ->translation($this->translation)
+                ->label($label)
                 ->replacement($replacement['value'])
                 ->placeholder($this->placeholder)
                 ->placeholderLabel($replacement['label'])
@@ -133,11 +119,11 @@ class Permission
             if ($permission->placeholder()) {
                 $children = $children->map(function ($child) use ($permission) {
                     $value = str_replace('{'.$this->placeholder.'}', $permission->replacement(), $child->value());
+                    $label = $child->originalLabel() ?? str_replace('{'.$this->placeholder.'}', ':'.$this->placeholder, $child->value());
 
                     return (new self)
                         ->value($value)
-                        ->label($child->originalLabel())
-                        ->translation($child->translation())
+                        ->label($label)
                         ->replacement($permission->replacement())
                         ->placeholder($permission->placeholder())
                         ->placeholderLabel($permission->placeholderLabel())

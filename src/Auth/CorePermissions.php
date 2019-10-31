@@ -205,8 +205,8 @@ class CorePermissions
             $permission = Permission::make($permission);
         }
 
-        return $permission->translation(
-            'statamic::permissions.'.str_replace(' ', '_', $permission->value())
+        return $permission->label(
+            __('statamic::permissions.'.str_replace(' ', '_', $permission->value()))
         );
     }
 }
