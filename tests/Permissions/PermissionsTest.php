@@ -26,6 +26,25 @@ class PermissionsTest extends TestCase
     }
 
     /** @test */
+    function it_registers_a_permission_with_a_closure()
+    {
+        $permissions = new Permissions;
+        $this->assertInstanceOf(Collection::class, $permissions->all());
+        $this->assertCount(0, $permissions->all());
+
+        $permission = $permissions->make('one');
+        $this->assertCount(0, $permissions->all());
+
+        $permissions->register($permission, function ($p) {
+            $p->value('adjusted');
+        });
+        $this->assertCount(1, $permissions->all());
+        $this->assertEquals([
+            'adjusted' => $permission,
+        ], $permissions->all()->all());
+    }
+
+    /** @test */
     function it_registers_a_permission_via_a_string()
     {
         $permissions = new Permissions;

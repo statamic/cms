@@ -23,10 +23,10 @@ class Permissions
     {
         if (! $permission instanceof Permission) {
             $permission = self::make($permission);
+        }
 
-            if ($callback) {
-                $callback($permission);
-            }
+        if ($callback) {
+            $callback($permission);
         }
 
         $this->permissions[] = $permission;
