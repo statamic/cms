@@ -128,7 +128,10 @@ class PermissionsTest extends TestCase
         $permissions->group('group-with-replacements', 'Group with Replacements', function () use ($permissions) {
             $permissions->register('four {placeholder}', function ($permission) use ($permissions) {
                 $permission->children([
-                    $permissions->make('replaced child {placeholder}')->label('Replaced :placeholder')
+                    $permissions->make('replaced child {placeholder}')->label('Replaced :placeholder')->children([
+                        $permissions->make('replaced nested child {placeholder}')
+                                    ->label('Replaced Nested :placeholder')
+                    ])
                 ])->replacements('placeholder', function () {
                     return [
                         ['value' => 'first', 'label' => 'FIRST'],
@@ -183,7 +186,15 @@ class PermissionsTest extends TestCase
                                 'label' => 'Replaced FIRST',
                                 'description' => null,
                                 'group' => 'group-with-replacements',
-                                'children' => [],
+                                'children' => [
+                                    [
+                                        'value' => 'replaced nested child first',
+                                        'label' => 'Replaced Nested FIRST',
+                                        'description' => null,
+                                        'group' => 'group-with-replacements',
+                                        'children' => []
+                                    ]
+                                ],
                             ]
                         ],
                     ],
@@ -198,7 +209,15 @@ class PermissionsTest extends TestCase
                                 'label' => 'Replaced SECOND',
                                 'description' => null,
                                 'group' => 'group-with-replacements',
-                                'children' => [],
+                                'children' => [
+                                    [
+                                        'value' => 'replaced nested child second',
+                                        'label' => 'Replaced Nested SECOND',
+                                        'description' => null,
+                                        'group' => 'group-with-replacements',
+                                        'children' => []
+                                    ]
+                                ],
                             ]
                         ],
                     ]

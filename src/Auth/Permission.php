@@ -121,13 +121,19 @@ class Permission
                     $value = str_replace('{'.$this->placeholder.'}', $permission->replacement(), $child->value());
                     $label = $child->originalLabel() ?? str_replace('{'.$this->placeholder.'}', ':'.$this->placeholder, $child->value());
 
-                    return (new self)
+                    $replaced = (new self)
                         ->value($value)
                         ->label($label)
                         ->replacement($permission->replacement())
                         ->placeholder($permission->placeholder())
                         ->placeholderLabel($permission->placeholderLabel())
                         ->group($permission->group());
+
+                    if ($children = $child->children()) {
+                        $replaced->children($children->all());
+                    }
+
+                    return $replaced;
                 });
             }
 
