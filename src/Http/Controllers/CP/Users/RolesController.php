@@ -123,7 +123,6 @@ class RolesController extends CpController
     {
         return $tree->map(function ($group) use ($role) {
             return array_merge($group, [
-                'label' => __('statamic::permissions.group_'.$group['handle']),
                 'permissions' => $this->updatePermissions($group['permissions'], $role)
             ]);
         });

@@ -15,43 +15,43 @@ class CorePermissions
 {
     public function boot()
     {
-        Permission::group('cp', function () {
+        $this->group('cp', function () {
             $this->register('access cp');
         });
 
-        Permission::group('collections', function () {
+        $this->group('collections', function () {
             $this->registerCollections();
         });
 
-        Permission::group('structures', function () {
+        $this->group('structures', function () {
             $this->registerStructures();
         });
 
-        Permission::group('globals', function () {
+        $this->group('globals', function () {
             $this->registerGlobals();
         });
 
-        Permission::group('taxonomies', function () {
+        $this->group('taxonomies', function () {
             $this->registerTaxonomies();
         });
 
-        Permission::group('assets', function () {
+        $this->group('assets', function () {
             $this->registerAssets();
         });
 
-        Permission::group('users', function () {
+        $this->group('users', function () {
             $this->registerUsers();
         });
 
-        Permission::group('updates', function () {
+        $this->group('updates', function () {
             $this->registerUpdates();
         });
 
-        Permission::group('forms', function () {
+        $this->group('forms', function () {
             $this->registerForms();
         });
 
-        Permission::group('utilities', function () {
+        $this->group('utilities', function () {
             $this->registerUtilities();
         });
     }
@@ -208,5 +208,10 @@ class CorePermissions
         return $permission->label(
             __('statamic::permissions.'.str_replace(' ', '_', $permission->value()))
         );
+    }
+
+    protected function group($name, $callback)
+    {
+        return Permission::group($name, __('statamic::permissions.group_'.$name), $callback);
     }
 }

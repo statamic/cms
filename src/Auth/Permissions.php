@@ -5,6 +5,7 @@ namespace Statamic\Auth;
 class Permissions
 {
     protected $permissions = [];
+    protected $groups = [];
     protected $pendingGroup = null;
 
     public function make(string $value)
@@ -66,6 +67,7 @@ class Permissions
             $tree = $tree->map(function ($permissions, $group) {
                 return [
                     'handle' => $group,
+                    'label' => $this->groups[$group] ?? __('Miscellaneous'),
                     'permissions' => $permissions->all(),
                 ];
             });
@@ -73,9 +75,11 @@ class Permissions
         return $tree->values();
     }
 
-    public function group($name, $permissions)
+    public function group($name, $label, $permissions)
     {
         throw_if($this->pendingGroup, new \Exception('Cannot double nest permission groups'));
+
+        $this->groups[$name] = $label;
 
         $this->pendingGroup = $name;
 

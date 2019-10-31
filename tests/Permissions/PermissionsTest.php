@@ -60,13 +60,13 @@ class PermissionsTest extends TestCase
         $permissions = new Permissions;
 
         $one = $two = null;
-        $permissions->group('foo', function () use ($permissions, &$one, &$two) {
+        $permissions->group('foo', 'Foo', function () use ($permissions, &$one, &$two) {
             $one = $permissions->register('one');
             $two = $permissions->register('two');
         });
 
         $three = null;
-        $permissions->group('bar', function () use ($permissions, &$three) {
+        $permissions->group('bar', 'Bar', function () use ($permissions, &$three) {
             $three = $permissions->register('three');
         });
 
@@ -87,7 +87,7 @@ class PermissionsTest extends TestCase
         ]);
 
         $permissionTwo = null;
-        $permissions->group('test', function () use ($permissions, &$permissionTwo) {
+        $permissions->group('test', 'Test Group', function () use ($permissions, &$permissionTwo) {
             $permissionTwo = $permissions->make('two')->children([
                 $childPermissionThree = $permissions->make('child-three')->children([
                     $nestedChildPermission = $permissions->make('nested-child'),
@@ -104,6 +104,7 @@ class PermissionsTest extends TestCase
         $this->assertEquals([
             [
                 'handle' => 'test',
+                'label' => 'Test Group',
                 'permissions' => [
                     [
                         'value' => 'two',
@@ -132,6 +133,7 @@ class PermissionsTest extends TestCase
             ],
             [
                 'handle' => 'misc',
+                'label' => 'Miscellaneous',
                 'permissions' => [
                     [
                         'value' => 'one',
