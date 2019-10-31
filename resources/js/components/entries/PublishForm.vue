@@ -34,7 +34,7 @@
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
                     <span v-text="__('Publish')" />
-                    <svg-icon name="chevron-down-xs" class="ml-1" />
+                    <svg-icon name="chevron-down-xs" class="ml-1 w-auto" />
                 </button>
             </div>
 
@@ -189,7 +189,7 @@
                         :disabled="!canPublish"
                         @click="confirmingPublish = true">
                         <span v-text="__('Publish')" />
-                        <svg-icon name="chevron-down-xs" class="ml-1" />
+                        <svg-icon name="chevron-down-xs" class="ml-1 w-auto" />
                     </button>
                 </template>
             </live-preview>
@@ -213,7 +213,7 @@
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
                 <span v-text="__('Publish')" />
-                <svg-icon name="chevron-down-xs" class="ml-1" />
+                <svg-icon name="chevron-down-xs" class="ml-1 w-auto" />
             </button>
         </div>
 
