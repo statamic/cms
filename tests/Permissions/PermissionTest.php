@@ -55,6 +55,22 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
+    function it_adds_a_child()
+    {
+        $permission = (new Permission)->value('test')->group('testgroup');
+        $this->assertEmpty($permission->children());
+
+        $permission->addChild(
+            $child = (new Permission)->value('child')
+        );
+
+        $children = $permission->children();
+        $this->assertCount(1, $children);
+        $this->assertEquals($child, $children[0]);
+        $this->assertEquals('testgroup', $children[0]->group());
+    }
+
+    /** @test */
     function it_adds_a_label()
     {
         $permission = (new Permission)->value('test');
@@ -143,7 +159,9 @@ class PermissionTest extends TestCase
             ->value('view {handle} entries')
             ->group('test-group')
             ->children([
-                (new Permission)->value('edit {handle} entries'),
+                (new Permission)->value('edit {handle} entries')->children([
+                    (new Permission)->value('delete {handle} entries')
+                ]),
                 (new Permission)->value('publish {handle} entries'),
             ])
             ->replacements('handle', function () {
@@ -182,7 +200,15 @@ class PermissionTest extends TestCase
                         'label' => 'edit FIRST entries',
                         'description' => null,
                         'group' => 'test-group',
-                        'children' => []
+                        'children' => [
+                            [
+                                'value' => 'delete first entries',
+                                'label' => 'delete FIRST entries',
+                                'description' => null,
+                                'group' => 'test-group',
+                                'children' => [],
+                            ]
+                        ]
                     ],
                     [
                         'value' => 'publish first entries',
@@ -204,7 +230,15 @@ class PermissionTest extends TestCase
                         'label' => 'edit SECOND entries',
                         'description' => null,
                         'group' => 'test-group',
-                        'children' => []
+                        'children' => [
+                            [
+                                'value' => 'delete second entries',
+                                'label' => 'delete SECOND entries',
+                                'description' => null,
+                                'group' => 'test-group',
+                                'children' => [],
+                            ]
+                        ]
                     ],
                     [
                         'value' => 'publish second entries',

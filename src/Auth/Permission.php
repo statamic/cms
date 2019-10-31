@@ -11,7 +11,7 @@ class Permission
     protected $value;
     protected $placeholder;
     protected $placeholderLabel;
-    protected $replacement;
+    protected $placeholderValue;
     protected $callback;
     protected $children;
     protected $label;
@@ -20,7 +20,18 @@ class Permission
 
     public function value(string $value = null)
     {
-        return $this->fluentlyGetOrSet('value')->args(func_get_args());
+        if (func_num_args() > 0) {
+            $this->value = $value;
+
+            return $this;
+        }
+
+        return str_replace('{'.$this->placeholder.'}', $this->placeholderValue, $this->value);
+    }
+
+    public function originalValue()
+    {
+        return $this->value;
     }
 
     public function originalLabel()
@@ -36,7 +47,9 @@ class Permission
             return $this;
         }
 
-        return __($this->label ?? $this->value, [$this->placeholder => $this->placeholderLabel]);
+        $label = $this->label ?? str_replace('{'.$this->placeholder.'}', ':'.$this->placeholder, $this->value);
+
+        return __($label, [$this->placeholder => $this->placeholderLabel]);
     }
 
     public function placeholder(string $placeholder = null)
@@ -49,22 +62,17 @@ class Permission
         return $this->fluentlyGetOrSet('placeholderLabel')->args(func_get_args());
     }
 
+    public function placeholderValue(string $placeholderValue = null)
+    {
+        return $this->fluentlyGetOrSet('placeholderValue')->args(func_get_args());
+    }
+
     public function replacements(string $placeholder, callable $callback)
     {
         $this->placeholder = $placeholder;
         $this->callback = $callback;
 
         return $this;
-    }
-
-    public function replacement(string $replacement = null)
-    {
-        return $this->fluentlyGetOrSet('replacement')->args(func_get_args());
-    }
-
-    public function callback()
-    {
-        return $this->callback;
     }
 
     public function permissions()
@@ -79,20 +87,17 @@ class Permission
         $items = call_user_func($this->callback);
 
         return collect($items)->map(function ($replacement) {
-            $value = str_replace('{'.$this->placeholder.'}', $replacement['value'], $this->value());
-            $label = $this->label ?? str_replace('{'.$this->placeholder.'}', ':'.$this->placeholder, $this->value());
-
             $replaced = (new self)
-                ->value($value)
-                ->label($label)
-                ->replacement($replacement['value'])
+                ->value($this->value)
+                ->label($this->label)
                 ->placeholder($this->placeholder)
                 ->placeholderLabel($replacement['label'])
+                ->placeholderValue($replacement['value'])
                 ->group($this->group());
 
             if ($this->children()) {
                 $replaced->children($this->children()->all());
-            };
+            }
 
             return $replaced;
         })->values();
@@ -111,6 +116,13 @@ class Permission
             ->args(func_get_args());
     }
 
+    public function addChild($child)
+    {
+        $children = $this->children()->merge([$child])->all();
+
+        return $this->children($children);
+    }
+
     public function toTree()
     {
         return $this->permissions()->map(function ($permission) {
@@ -118,15 +130,12 @@ class Permission
 
             if ($permission->placeholder()) {
                 $children = $children->map(function ($child) use ($permission) {
-                    $value = str_replace('{'.$this->placeholder.'}', $permission->replacement(), $child->value());
-                    $label = $child->originalLabel() ?? str_replace('{'.$this->placeholder.'}', ':'.$this->placeholder, $child->value());
-
                     $replaced = (new self)
-                        ->value($value)
-                        ->label($label)
-                        ->replacement($permission->replacement())
+                        ->value($child->originalValue())
+                        ->label($child->originalLabel())
                         ->placeholder($permission->placeholder())
                         ->placeholderLabel($permission->placeholderLabel())
+                        ->placeholderValue($permission->placeholderValue())
                         ->group($permission->group());
 
                     if ($children = $child->children()) {

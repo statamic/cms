@@ -19,10 +19,8 @@ class PermissionsTest extends TestCase
         $this->assertCount(0, $permissions->all());
 
         $permissions->register($permission);
-        $this->assertCount(1, $permissions->all());
-        $this->assertEquals([
-            'one' => $permission,
-        ], $permissions->all()->all());
+        $this->assertEquals(['one' => $permission], $permissions->all()->all());
+        $this->assertEquals($permission, $permissions->get('one'));
     }
 
     /** @test */
@@ -104,42 +102,7 @@ class PermissionsTest extends TestCase
     /** @test */
     function it_makes_a_tree()
     {
-        $permissions = new Permissions;
-
-        $permissions->register('one', function ($permission) use ($permissions) {
-            $permission->children([
-                $permissions->make('child-one'),
-                $permissions->make('child-two'),
-            ]);
-        });
-
-        $permissions->group('test', 'Test Group', function () use ($permissions) {
-            $permissions->register('two', function ($permission) use ($permissions) {
-                $permission->children([
-                    $permissions->make('child-three')->children([
-                        $permissions->make('nested-child'),
-                    ])
-                ]);
-            });
-        });
-
-        $permissions->register('three');
-
-        $permissions->group('group-with-replacements', 'Group with Replacements', function () use ($permissions) {
-            $permissions->register('four {placeholder}', function ($permission) use ($permissions) {
-                $permission->children([
-                    $permissions->make('replaced child {placeholder}')->label('Replaced :placeholder')->children([
-                        $permissions->make('replaced nested child {placeholder}')
-                                    ->label('Replaced Nested :placeholder')
-                    ])
-                ])->replacements('placeholder', function () {
-                    return [
-                        ['value' => 'first', 'label' => 'FIRST'],
-                        ['value' => 'second', 'label' => 'SECOND'],
-                    ];
-                });
-            });
-        });
+        $this->setupComplicatedTest($permissions = new Permissions);
 
         $this->assertEquals([
             [
@@ -259,5 +222,83 @@ class PermissionsTest extends TestCase
                 ],
             ],
         ], $permissions->tree()->all());
+    }
+
+    /** @test */
+    function it_gets_all_permissions_in_a_flattened_structure()
+    {
+        $this->setupComplicatedTest($permissions = new Permissions);
+
+        $all = $permissions->all();
+
+        $this->assertEquals(collect([
+            'one',
+            'child-one',
+            'child-two',
+
+            'two',
+            'child-three',
+            'nested-child',
+
+            'three',
+
+            'four {placeholder}',
+            'replaced child {placeholder}',
+            'replaced nested child {placeholder}',
+        ])->sort()->values()->all(), $all->keys()->sort()->values()->all());
+    }
+
+    /** @test */
+    function existing_permissions_can_be_modified()
+    {
+        $permissions = new Permissions;
+
+        $permissions->register('one', function ($permission) {
+            $permission->label('Test');
+        });
+
+        $this->assertEquals(['one' => 'Test'], $permissions->all()->map->label()->all());
+
+        $permissions->get('one')->label('Modified');
+
+        $this->assertEquals(['one' => 'Modified'], $permissions->all()->map->label()->all());
+    }
+
+    function setupComplicatedTest($permissions)
+    {
+        $permissions->register('one', function ($permission) use ($permissions) {
+            $permission->children([
+                $permissions->make('child-one'),
+                $permissions->make('child-two'),
+            ]);
+        });
+
+        $permissions->group('test', 'Test Group', function () use ($permissions) {
+            $permissions->register('two', function ($permission) use ($permissions) {
+                $permission->children([
+                    $permissions->make('child-three')->children([
+                        $permissions->make('nested-child'),
+                    ])
+                ]);
+            });
+        });
+
+        $permissions->register('three');
+
+        $permissions->group('group-with-replacements', 'Group with Replacements', function () use ($permissions) {
+            $permissions->register('four {placeholder}', function ($permission) use ($permissions) {
+                $permission->children([
+                    $permissions->make('replaced child {placeholder}')->label('Replaced :placeholder')->children([
+                        $permissions->make('replaced nested child {placeholder}')
+                                    ->label('Replaced Nested :placeholder')
+                    ])
+                ])->replacements('placeholder', function () {
+                    return [
+                        ['value' => 'first', 'label' => 'FIRST'],
+                        ['value' => 'second', 'label' => 'SECOND'],
+                    ];
+                });
+            });
+        });
     }
 }

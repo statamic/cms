@@ -36,17 +36,27 @@ class Permissions
 
     public function all()
     {
-        return collect($this->permissions)->flatMap(function ($permission) {
-            return $this->mergePermissions($permission);
-        })->keyBy->value();
+        return collect($this->permissions)
+            ->flatMap(function ($permission) {
+                return collect([$permission])->merge($this->mergeChildPermissions($permission));
+            })
+            ->keyBy->originalValue();
     }
 
-    protected function mergePermissions($permission)
+    private function mergeChildPermissions($permission)
     {
-        return $permission->permissions()
-            ->merge($permission->children()->flatMap(function ($perm) {
-                return $this->mergePermissions($perm);
-            }));
+        $permissions = $permission->children();
+
+        foreach ($permissions as $p) {
+            $permissions = $permissions->merge($this->mergeChildPermissions($p));
+        }
+
+        return $permissions;
+    }
+
+    public function get($key)
+    {
+        return $this->all()->get($key);
     }
 
     public function tree()
