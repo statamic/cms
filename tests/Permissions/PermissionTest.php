@@ -29,10 +29,10 @@ class PermissionTest extends TestCase
     {
         $permission = (new Permission)
             ->value('parent')
-            ->inGroup('foo');
+            ->group('foo');
 
-        $permission->withChildren([
-            (new Permission)->value('child')->withLabel('Child!')
+        $permission->children([
+            (new Permission)->value('child')->label('Child!')
         ]);
 
         $this->assertEquals([
@@ -61,8 +61,9 @@ class PermissionTest extends TestCase
         $this->assertEquals('test', $permission->label());
         $this->assertEquals('test', $permission->toTree()[0]['label']);
 
-        $permission->withLabel('The label');
+        $return = $permission->label('The label');
 
+        $this->assertEquals($permission, $return);
         $this->assertEquals('The label', $permission->label());
         $this->assertEquals('The label', $permission->toTree()[0]['label']);
     }
@@ -74,8 +75,9 @@ class PermissionTest extends TestCase
         $this->assertNull($permission->description());
         $this->assertNull($permission->toTree()[0]['description']);
 
-        $permission->withDescription('The description');
+        $return = $permission->description('The description');
 
+        $this->assertEquals($permission, $return);
         $this->assertEquals('The description', $permission->description());
         $this->assertEquals('The description', $permission->toTree()[0]['description']);
     }
@@ -87,8 +89,9 @@ class PermissionTest extends TestCase
         $this->assertEquals('test', $permission->label());
         $this->assertEquals('test', $permission->toTree()[0]['label']);
 
-        $permission->withTranslation('statamic::permissions.configure_collections');
+        $return = $permission->translation('statamic::permissions.configure_collections');
 
+        $this->assertEquals($permission, $return);
         $this->assertEquals('Configure Collections', $permission->label());
         $this->assertEquals('Configure Collections', $permission->toTree()[0]['label']);
     }
@@ -100,8 +103,9 @@ class PermissionTest extends TestCase
         $this->assertNull($permission->group());
         $this->assertNull($permission->toTree()[0]['group']);
 
-        $permission->inGroup('the-group');
+        $return = $permission->group('the-group');
 
+        $this->assertEquals($permission, $return);
         $this->assertEquals('the-group', $permission->group());
         $this->assertEquals('the-group', $permission->toTree()[0]['group']);
     }
@@ -120,9 +124,9 @@ class PermissionTest extends TestCase
     {
         $permission = (new Permission)
             ->value('view {handle} entries')
-            ->withLabel('Viewable :handle')
-            ->inGroup('test-group')
-            ->withReplacements('handle', function () {
+            ->label('Viewable :handle')
+            ->group('test-group')
+            ->replacements('handle', function () {
                 return [
                     ['value' => 'first', 'label' => 'FIRST'],
                     ['value' => 'second', 'label' => 'SECOND'],
@@ -144,7 +148,7 @@ class PermissionTest extends TestCase
         $this->assertCount(2, $permission->toTree());
 
         app('translator')->addNamespace('test', __DIR__.'/__fixtures__/lang');
-        $translatedPermission = $permission->withTranslation('test::test.edit_permission');
+        $translatedPermission = $permission->translation('test::test.edit_permission');
         $this->assertEquals([
             'Editable FIRST',
             'Editable SECOND',
@@ -158,13 +162,13 @@ class PermissionTest extends TestCase
 
         $permission = (new Permission)
             ->value('view {handle} entries')
-            ->withLabel('Viewable :handle')
-            ->inGroup('test-group')
-            ->withChildren([
-                (new Permission)->value('edit {handle} entries')->withTranslation('test::test.edit_permission'),
-                (new Permission)->value('publish {handle} entries')->withLabel('Publishable :handle'),
+            ->label('Viewable :handle')
+            ->group('test-group')
+            ->children([
+                (new Permission)->value('edit {handle} entries')->translation('test::test.edit_permission'),
+                (new Permission)->value('publish {handle} entries')->label('Publishable :handle'),
             ])
-            ->withReplacements('handle', function () {
+            ->replacements('handle', function () {
                 return [
                     ['value' => 'first', 'label' => 'FIRST'],
                     ['value' => 'second', 'label' => 'SECOND'],

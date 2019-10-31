@@ -61,14 +61,14 @@ class CorePermissions
         $this->register('configure collections');
 
         $this->register('view {collection} entries', function ($permission) {
-            $this->permission($permission)->withChildren([
-                $this->permission('edit {collection} entries')->withChildren([
+            $this->permission($permission)->children([
+                $this->permission('edit {collection} entries')->children([
                     $this->permission('create {collection} entries'),
                     $this->permission('delete {collection} entries'),
                     $this->permission('publish {collection} entries'),
                     $this->permission('reorder {collection} entries')
                 ])
-            ])->withReplacements('collection', function () {
+            ])->replacements('collection', function () {
                 return Collection::all()->map(function ($collection) {
                     return ['value' => $collection->handle(), 'label' => $collection->title()];
                 });
@@ -81,9 +81,9 @@ class CorePermissions
         $this->register('configure structures');
 
         $this->register('view {structure} structure', function ($permission) {
-            $this->permission($permission)->withChildren([
+            $this->permission($permission)->children([
                 $this->permission('edit {structure} structure')
-            ])->withReplacements('structure', function () {
+            ])->replacements('structure', function () {
                 return Structure::all()->map(function ($structure) {
                     return ['value' => $structure->handle(), 'label' => $structure->title()];
                 });
@@ -96,7 +96,7 @@ class CorePermissions
         $this->register('configure globals');
 
         $this->register('edit {global} globals', function ($permission) {
-            $permission->withReplacements('global', function () {
+            $permission->replacements('global', function () {
                 return GlobalSet::all()->map(function ($global) {
                     return ['value' => $global->handle(), 'label' => $global->title()];
                 });
@@ -109,12 +109,12 @@ class CorePermissions
         $this->register('configure taxonomies');
 
         $this->register('view {taxonomy} terms', function ($permission) {
-            $this->permission($permission)->withChildren([
-                $this->permission('edit {taxonomy} terms')->withChildren([
+            $this->permission($permission)->children([
+                $this->permission('edit {taxonomy} terms')->children([
                     $this->permission('create {taxonomy} terms'),
                     $this->permission('delete {taxonomy} terms')
                 ])
-            ])->withReplacements('taxonomy', function () {
+            ])->replacements('taxonomy', function () {
                 return Taxonomy::all()->map(function ($taxonomy) {
                     return ['value' => $taxonomy->handle(), 'label' => $taxonomy->title()];
                 });
@@ -127,14 +127,14 @@ class CorePermissions
         $this->register('configure asset containers');
 
         $this->register('view {container} assets', function ($permission) {
-            $this->permission($permission)->withChildren([
+            $this->permission($permission)->children([
                 $this->permission('upload {container} assets'),
-                $this->permission('edit {container} assets')->withChildren([
+                $this->permission('edit {container} assets')->children([
                     $this->permission('move {container} assets'),
                     $this->permission('rename {container} assets'),
                     $this->permission('delete {container} assets')
                 ])
-            ])->withReplacements('container', function () {
+            ])->replacements('container', function () {
                 return AssetContainer::all()->map(function ($container) {
                     return ['value' => $container->handle(), 'label' => $container->title()];
                 });
@@ -145,7 +145,7 @@ class CorePermissions
     protected function registerUpdates()
     {
         $this->register('view updates', function ($permission) {
-            $this->permission($permission)->withChildren([
+            $this->permission($permission)->children([
                 $this->permission('perform updates'),
             ]);
         });
@@ -154,8 +154,8 @@ class CorePermissions
     protected function registerUsers()
     {
         $this->register('view users', function ($permission) {
-            $this->permission($permission)->withChildren([
-                $this->permission('edit users')->withChildren([
+            $this->permission($permission)->children([
+                $this->permission('edit users')->children([
                     $this->permission('create users'),
                     $this->permission('delete users'),
                     $this->permission('change passwords'),
@@ -171,9 +171,9 @@ class CorePermissions
         $this->register('configure forms');
 
         $this->register('view {form} form submissions', function ($permission) {
-            $this->permission($permission)->withChildren([
+            $this->permission($permission)->children([
                 $this->permission('delete {form} form submissions')
-            ])->withReplacements('form', function () {
+            ])->replacements('form', function () {
                 return Form::all()->map(function ($form) {
                     return ['value' => $form->handle(), 'label' => $form->title()];
                 });
@@ -186,8 +186,8 @@ class CorePermissions
         Utility::all()->each(function ($utility) {
             Permission::register("access {$utility->handle()} utility", function ($perm) use ($utility) {
                 return $perm
-                    ->withLabel(__('statamic::permissions.access_utility', ['title' => $utility->title()]))
-                    ->withDescription(__('statamic::permissions.access_utility_desc', ['title' => $utility->title()]));
+                    ->label(__('statamic::permissions.access_utility', ['title' => $utility->title()]))
+                    ->description(__('statamic::permissions.access_utility_desc', ['title' => $utility->title()]));
             });
         });
     }
@@ -205,7 +205,7 @@ class CorePermissions
             $permission = Permission::make($permission);
         }
 
-        return $permission->withTranslation(
+        return $permission->translation(
             'statamic::permissions.'.str_replace(' ', '_', $permission->value())
         );
     }

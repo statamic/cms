@@ -2,8 +2,12 @@
 
 namespace Statamic\Auth;
 
+use Statamic\Support\Traits\FluentlyGetsAndSets;
+
 class Permission
 {
+    use FluentlyGetsAndSets;
+
     protected $value;
     protected $placeholder;
     protected $placeholderLabel;
@@ -17,20 +21,7 @@ class Permission
 
     public function value(string $value = null)
     {
-        if (is_null($value)) {
-            return $this->value;
-        }
-
-        $this->value = $value;
-
-        return $this;
-    }
-
-    public function withLabel($label)
-    {
-        $this->label = $label;
-
-        return $this;
+        return $this->fluentlyGetOrSet('value')->args(func_get_args());
     }
 
     public function originalLabel()
@@ -38,20 +29,19 @@ class Permission
         return $this->label;
     }
 
-    public function withTranslation($translation)
+    public function translation(string $translation = null)
     {
-        $this->translation = $translation;
-
-        return $this;
+        return $this->fluentlyGetOrSet('translation')->args(func_get_args());
     }
 
-    public function translation()
+    public function label(string $label = null)
     {
-        return $this->translation;
-    }
+        if (func_num_args() > 0) {
+            $this->label = $label;
 
-    public function label()
-    {
+            return $this;
+        }
+
         if (! $this->label && ! $this->translation) {
             return $this->value;
         }
@@ -63,31 +53,17 @@ class Permission
         return __($this->translation ?? $this->label, [$this->placeholder => $this->placeholderLabel]);
     }
 
-    public function placeholder()
+    public function placeholder(string $placeholder = null)
     {
-        return $this->placeholder;
+        return $this->fluentlyGetOrSet('placeholder')->args(func_get_args());
     }
 
-    public function withPlaceholder($placeholder)
+    public function placeholderLabel(string $label = null)
     {
-        $this->placeholder = $placeholder;
-
-        return $this;
+        return $this->fluentlyGetOrSet('placeholderLabel')->args(func_get_args());
     }
 
-    public function withPlaceholderLabel($label)
-    {
-        $this->placeholderLabel = $label;
-
-        return $this;
-    }
-
-    public function placeholderLabel()
-    {
-        return $this->placeholderLabel;
-    }
-
-    public function withReplacements(string $placeholder, callable $callback)
+    public function replacements(string $placeholder, callable $callback)
     {
         $this->placeholder = $placeholder;
         $this->callback = $callback;
@@ -95,16 +71,9 @@ class Permission
         return $this;
     }
 
-    public function withReplacement(string $replacement)
+    public function replacement(string $replacement = null)
     {
-        $this->replacement = $replacement;
-
-        return $this;
-    }
-
-    public function replacement()
-    {
-        return $this->replacement;
+        return $this->fluentlyGetOrSet('replacement')->args(func_get_args());
     }
 
     public function callback()
@@ -128,31 +97,32 @@ class Permission
 
             $replaced = (new self)
                 ->value($value)
-                ->withLabel($this->label)
-                ->withTranslation($this->translation)
-                ->withReplacement($replacement['value'])
-                ->withPlaceholder($this->placeholder)
-                ->withPlaceholderLabel($replacement['label'])
-                ->inGroup($this->group());
+                ->label($this->label)
+                ->translation($this->translation)
+                ->replacement($replacement['value'])
+                ->placeholder($this->placeholder)
+                ->placeholderLabel($replacement['label'])
+                ->group($this->group());
 
             if ($this->children()) {
-                $replaced->withChildren($this->children()->all());
+                $replaced->children($this->children()->all());
             };
 
             return $replaced;
         })->values();
     }
 
-    public function withChildren(array $children)
+    public function children(array $children = null)
     {
-        $this->children = collect($children)->map->inGroup($this->group);
-
-        return $this;
-    }
-
-    public function children()
-    {
-        return $this->children ?? collect();
+        return $this
+            ->fluentlyGetOrSet('children')
+            ->getter(function ($children) {
+                return $children ?? collect();
+            })
+            ->setter(function ($children) {
+                return collect($children)->map->group($this->group);
+            })
+            ->args(func_get_args());
     }
 
     public function toTree()
@@ -166,12 +136,12 @@ class Permission
 
                     return (new self)
                         ->value($value)
-                        ->withLabel($child->originalLabel())
-                        ->withTranslation($child->translation())
-                        ->withReplacement($permission->replacement())
-                        ->withPlaceholder($permission->placeholder())
-                        ->withPlaceholderLabel($permission->placeholderLabel())
-                        ->inGroup($permission->group());
+                        ->label($child->originalLabel())
+                        ->translation($child->translation())
+                        ->replacement($permission->replacement())
+                        ->placeholder($permission->placeholder())
+                        ->placeholderLabel($permission->placeholderLabel())
+                        ->group($permission->group());
                 });
             }
 
@@ -185,27 +155,13 @@ class Permission
         })->all();
     }
 
-    public function inGroup($group)
+    public function group(string $group = null)
     {
-        $this->group = $group;
-
-        return $this;
-    }
-
-    public function group()
-    {
-        return $this->group;
-    }
-
-    public function withDescription($description)
-    {
-        $this->description = $description;
-
-        return $this;
+        return $this->fluentlyGetOrSet('group')->args(func_get_args());
     }
 
     public function description()
     {
-        return $this->description;
+        return $this->fluentlyGetOrSet('description')->args(func_get_args());
     }
 }

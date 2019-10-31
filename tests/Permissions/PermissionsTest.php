@@ -43,7 +43,7 @@ class PermissionsTest extends TestCase
         $permissions = new Permissions;
 
         $permissions->register('one', function ($permission) use ($permissions) {
-            $permission->withChildren([
+            $permission->children([
                 $permissions->make('two')
             ]);
         });
@@ -59,13 +59,13 @@ class PermissionsTest extends TestCase
     {
         $permissions = new Permissions;
 
-        $permissionOne = $permissions->make('one')->withChildren([
+        $permissionOne = $permissions->make('one')->children([
             $childPermissionOne = $permissions->make('child-one'),
             $childPermissionTwo = $permissions->make('child-two'),
         ]);
-        $permissionTwo = $permissions->make('two')->inGroup('test')->withChildren([
-            $childPermissionThree = $permissions->make('child-three')->inGroup('test')->withChildren([
-                $nestedChildPermission = $permissions->make('nested-child')->inGroup('test'),
+        $permissionTwo = $permissions->make('two')->group('test')->children([
+            $childPermissionThree = $permissions->make('child-three')->group('test')->children([
+                $nestedChildPermission = $permissions->make('nested-child')->group('test'),
             ])
         ]);
         $permissionThree = $permissions->make('three');

@@ -12,7 +12,7 @@ class Permissions
         $permission = (new Permission)->value($value);
 
         if ($this->pendingGroup) {
-            $permission->inGroup($this->pendingGroup);
+            $permission->group($this->pendingGroup);
         }
 
         return $permission;
