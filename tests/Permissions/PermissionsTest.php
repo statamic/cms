@@ -89,10 +89,16 @@ class PermissionsTest extends TestCase
             $three = $permissions->register('three');
         });
 
+        $four = null;
+        $permissions->group('foo', function () use ($permissions, &$four) {
+            $four = $permissions->register('four');
+        });
+
         $all = $permissions->all();
         $this->assertEquals('foo', $one->group());
         $this->assertEquals('foo', $two->group());
         $this->assertEquals('bar', $three->group());
+        $this->assertEquals('foo', $four->group());
     }
 
     /** @test */

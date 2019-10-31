@@ -75,11 +75,17 @@ class Permissions
         return $tree->values();
     }
 
-    public function group($name, $label, $permissions)
+    public function group($name, $label, $permissions = null)
     {
         throw_if($this->pendingGroup, new \Exception('Cannot double nest permission groups'));
 
-        $this->groups[$name] = $label;
+        if (func_num_args() === 3) {
+            $this->groups[$name] = $label;
+        }
+
+        if (func_num_args() === 2) {
+            $permissions = $label;
+        }
 
         $this->pendingGroup = $name;
 
