@@ -55,6 +55,28 @@ class PermissionsTest extends TestCase
     }
 
     /** @test */
+    function any_permissions_registered_within_a_group_callback_will_belong_to_that_group()
+    {
+        $permissions = new Permissions;
+
+        $one = $two = null;
+        $permissions->group('foo', function () use ($permissions, &$one, &$two) {
+            $one = $permissions->register('one');
+            $two = $permissions->register('two');
+        });
+
+        $three = null;
+        $permissions->group('bar', function () use ($permissions, &$three) {
+            $three = $permissions->register('three');
+        });
+
+        $all = $permissions->all();
+        $this->assertEquals('foo', $one->group());
+        $this->assertEquals('foo', $two->group());
+        $this->assertEquals('bar', $three->group());
+    }
+
+    /** @test */
     function it_makes_a_tree()
     {
         $permissions = new Permissions;
@@ -63,11 +85,16 @@ class PermissionsTest extends TestCase
             $childPermissionOne = $permissions->make('child-one'),
             $childPermissionTwo = $permissions->make('child-two'),
         ]);
-        $permissionTwo = $permissions->make('two')->group('test')->children([
-            $childPermissionThree = $permissions->make('child-three')->group('test')->children([
-                $nestedChildPermission = $permissions->make('nested-child')->group('test'),
-            ])
-        ]);
+
+        $permissionTwo = null;
+        $permissions->group('test', function () use ($permissions, &$permissionTwo) {
+            $permissionTwo = $permissions->make('two')->children([
+                $childPermissionThree = $permissions->make('child-three')->children([
+                    $nestedChildPermission = $permissions->make('nested-child'),
+                ])
+            ]);
+        });
+
         $permissionThree = $permissions->make('three');
 
         $permissions->register($permissionOne);
