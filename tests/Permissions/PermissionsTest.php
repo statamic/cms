@@ -81,25 +81,37 @@ class PermissionsTest extends TestCase
     {
         $permissions = new Permissions;
 
-        $permissionOne = $permissions->make('one')->children([
-            $childPermissionOne = $permissions->make('child-one'),
-            $childPermissionTwo = $permissions->make('child-two'),
-        ]);
-
-        $permissionTwo = null;
-        $permissions->group('test', 'Test Group', function () use ($permissions, &$permissionTwo) {
-            $permissionTwo = $permissions->make('two')->children([
-                $childPermissionThree = $permissions->make('child-three')->children([
-                    $nestedChildPermission = $permissions->make('nested-child'),
-                ])
+        $permissions->register('one', function ($permission) use ($permissions) {
+            $permission->children([
+                $permissions->make('child-one'),
+                $permissions->make('child-two'),
             ]);
         });
 
-        $permissionThree = $permissions->make('three');
+        $permissions->group('test', 'Test Group', function () use ($permissions) {
+            $permissions->register('two', function ($permission) use ($permissions) {
+                $permission->children([
+                    $permissions->make('child-three')->children([
+                        $permissions->make('nested-child'),
+                    ])
+                ]);
+            });
+        });
 
-        $permissions->register($permissionOne);
-        $permissions->register($permissionTwo);
-        $permissions->register($permissionThree);
+        $permissions->register('three');
+
+        $permissions->group('group-with-replacements', 'Group with Replacements', function () use ($permissions) {
+            $permissions->register('four {placeholder}', function ($permission) use ($permissions) {
+                $permission->children([
+                    $permissions->make('replaced child {placeholder}')->label('Replaced :placeholder')
+                ])->replacements('placeholder', function () {
+                    return [
+                        ['value' => 'first', 'label' => 'FIRST'],
+                        ['value' => 'second', 'label' => 'SECOND'],
+                    ];
+                });
+            });
+        });
 
         $this->assertEquals([
             [
@@ -130,6 +142,42 @@ class PermissionsTest extends TestCase
                         ],
                     ],
                 ]
+            ],
+            [
+                'handle' => 'group-with-replacements',
+                'label' => 'Group with Replacements',
+                'permissions' => [
+                    [
+                        'value' => 'four first',
+                        'label' => 'four FIRST',
+                        'description' => null,
+                        'group' => 'group-with-replacements',
+                        'children' => [
+                            [
+                                'value' => 'replaced child first',
+                                'label' => 'Replaced FIRST',
+                                'description' => null,
+                                'group' => 'group-with-replacements',
+                                'children' => [],
+                            ]
+                        ],
+                    ],
+                    [
+                        'value' => 'four second',
+                        'label' => 'four SECOND',
+                        'description' => null,
+                        'group' => 'group-with-replacements',
+                        'children' => [
+                            [
+                                'value' => 'replaced child second',
+                                'label' => 'Replaced SECOND',
+                                'description' => null,
+                                'group' => 'group-with-replacements',
+                                'children' => [],
+                            ]
+                        ],
+                    ]
+                ],
             ],
             [
                 'handle' => 'misc',
