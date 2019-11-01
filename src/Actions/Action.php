@@ -20,6 +20,11 @@ abstract class Action implements Arrayable
     protected $fields = [];
     protected $context = [];
 
+    public function filter($item)
+    {
+        return true;
+    }
+
     public function context($context)
     {
         $this->context = $context;
@@ -41,7 +46,7 @@ abstract class Action implements Arrayable
         return $this->fields;
     }
 
-    public function authorize($item)
+    public function authorize($user, $item)
     {
         return true;
     }

@@ -25,13 +25,13 @@
             </div>
             <div class="bard-link-toolbar-buttons">
                 <button @click="edit" v-tooltip="__('Edit Link')" v-show="!isEditing">
-                    edit
+                    <span class="icon icon-pencil" />
                 </button>
                 <button @click="remove" v-tooltip="__('Remove Link')" v-show="hasLink && isEditing">
-                    remove
+                    <span class="icon icon-trash" />
                 </button>
                 <button @click="commit" v-tooltip="__('Done')" v-show="isEditing">
-                    <i class="fa fa-check"></i>
+                    <span class="icon icon-check" />
                 </button>
             </div>
         </div>

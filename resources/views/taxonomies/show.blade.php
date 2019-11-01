@@ -29,7 +29,6 @@
             initial-sort-column="{{ $taxonomy->sortField() }}"
             initial-sort-direction="{{ $taxonomy->sortDirection() }}"
             :filters="{{ $filters->toJson() }}"
-            :actions="{{ $actions->toJson() }}"
             action-url="{{ cp_route('taxonomies.terms.actions', $taxonomy->handle()) }}"
         ></term-list>
 

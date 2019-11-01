@@ -2,20 +2,20 @@
 
 namespace Statamic\Actions;
 
-use Statamic\Facades\User;
+use Statamic\Contracts\Assets\Asset;
 
 class RenameAsset extends Action
 {
     protected static $title = 'Rename';
 
-    public function visibleTo($key, $context)
+    public function filter($item)
     {
-        return $key === 'asset-browser';
+        return $item instanceof Asset;
     }
 
-    public function authorize($asset)
+    public function authorize($user, $asset)
     {
-        return User::current()->can('rename', $asset);
+        return $user->can('rename', $asset);
     }
 
     public function run($assets, $values)

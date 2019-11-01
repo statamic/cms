@@ -33,7 +33,6 @@
                 </div>
 
                 <data-list
-                    :class="{ 'shadow': showContainerTabs }"
                     v-if="!initializing"
                     :rows="assets"
                     :columns="columns"
@@ -46,7 +45,7 @@
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
                     <div slot-scope="{ filteredRows: rows }">
-                        <div class="card p-0" :class="{ 'rounded-t-none shadow-none': showContainerTabs }">
+                        <div class="card p-0" :class="{ 'rounded-tl-none': showContainerTabs }">
 
                             <div class="data-list-header">
                                 <data-list-toggle-all ref="toggleAll" v-if="!hasMaxFiles" />

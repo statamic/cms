@@ -25,26 +25,26 @@
     padding: 4px 8px;
     z-index: 1;
 
-     button {
+    .bard-toolbar-button {
         @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center;
         height: 32px;
         width: 32px;
         margin: 0 2px;
     }
 
-    button:hover {
+    .bard-toolbar-button:hover {
         @apply bg-grey-20;
     }
 
-    button.active {
+    .bard-toolbar-button.active {
         @apply bg-grey-30 text-black;
     }
 
-    button:focus {
+    .bard-toolbar-button:focus {
         outline: none;
     }
 
-    button:disabled {
+    .bard-toolbar-button:disabled {
         @apply .opacity-50;
         &:hover {
             @apply .text-grey-80;

@@ -3,6 +3,7 @@
     <div class="inline-block relative">
 
         <button
+            class="bard-toolbar-button"
             :class="{ active }"
             v-html="button.html"
             v-tooltip="button.text"

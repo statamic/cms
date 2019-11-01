@@ -73,7 +73,12 @@ export default {
         },
 
         errorKey() {
-            return `${this.gridName}.${this.rowIndex}.${this.field.handle}`;
+            let key = `${this.gridName}.${this.rowIndex}.${this.field.handle}`;
+            key = key.replace('][', '.');
+            key = key.replace('[', '.');
+            key = key.replace(']', '.');
+            key = key.replace('..', '.');
+            return key;
         },
 
         errors() {

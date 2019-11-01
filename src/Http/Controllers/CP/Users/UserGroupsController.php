@@ -48,7 +48,6 @@ class UserGroupsController extends CpController
             'group' => $group,
             'roles' => $group->roles()->map->handle()->values()->all(),
             'filters' => Scope::filters('usergroup-users'),
-            'actions' => Action::for('usergroup-users'),
         ]);
     }
 

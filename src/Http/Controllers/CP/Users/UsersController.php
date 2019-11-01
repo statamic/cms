@@ -55,7 +55,7 @@ class UsersController extends CpController
                     'deleteable' => User::current()->can('delete', $user),
                     'roles' => $user->isSuper() ? ['Super Admin'] : $user->roles()->map->title()->values(),
                     'last_login' => optional($user->lastLogin())->diffForHumans() ?? __("Never"),
-                    'actions' => Action::for('users', [], $user),
+                    'actions' => Action::for($user),
                 ];
             });
 

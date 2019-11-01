@@ -25,7 +25,7 @@
         <button
             class="btn"
             v-if="canAddRows"
-            v-text="__('Add Row')"
+            v-text="addRowButtonLabel"
             @click.prevent="addRow" />
 
     </div>
@@ -78,6 +78,10 @@ export default {
 
         canAddRows() {
             return !this.isReadOnly && this.value.length < this.maxRows;
+        },
+
+        addRowButtonLabel() {
+            return this.config.add_row || __('Add Row');
         },
 
         hasMaxRows() {

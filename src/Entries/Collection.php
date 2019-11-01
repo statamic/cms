@@ -426,7 +426,12 @@ class Collection implements Contract
 
     public function defaultPublishState($state = null)
     {
-        return $this->fluentlyGetOrSet('defaultPublishState')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('defaultPublishState')
+            ->getter(function ($state) {
+                return $this->revisionsEnabled() ? false : $state;
+            })
+            ->args(func_get_args());
     }
 
     public function toArray()

@@ -2,18 +2,19 @@
 
 namespace Statamic\Actions;
 
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\User;
 
 class Unpublish extends Action
 {
-    public function visibleTo($key, $context)
+    public function filter($item)
     {
-        return $key === 'entries';
+        return $item instanceof Entry;
     }
 
-    public function authorize($entry)
+    public function authorize($user, $entry)
     {
-        return User::current()->can('publish', $entry);
+        return $user->can('publish', $entry);
     }
 
     public function run($entries)

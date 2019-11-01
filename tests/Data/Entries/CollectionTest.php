@@ -273,4 +273,37 @@ class CollectionTest extends TestCase
         $this->assertEquals($collection, $return);
         $this->assertEquals('public', $collection->pastDateBehavior());
     }
+
+    /** @test */
+    function it_gets_and_sets_the_default_publish_state()
+    {
+        $collection = (new Collection)->handle('test');
+        $this->assertTrue($collection->defaultPublishState());
+
+        $return = $collection->defaultPublishState(true);
+        $this->assertEquals($collection, $return);
+        $this->assertTrue($collection->defaultPublishState());
+
+        $return = $collection->defaultPublishState(false);
+        $this->assertEquals($collection, $return);
+        $this->assertFalse($collection->defaultPublishState());
+    }
+
+    /** @test */
+    function default_publish_state_is_always_false_when_using_revisions()
+    {
+        config(['statamic.revisions.enabled' => true]);
+
+        $collection = (new Collection)->handle('test');
+        $this->assertTrue($collection->defaultPublishState());
+
+        $collection->revisionsEnabled(true);
+        $this->assertFalse($collection->defaultPublishState());
+
+        $collection->defaultPublishState(true);
+        $this->assertFalse($collection->defaultPublishState());
+
+        $collection->defaultPublishState(false);
+        $this->assertFalse($collection->defaultPublishState());
+    }
 }

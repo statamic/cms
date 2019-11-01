@@ -28,7 +28,6 @@
         listing-key="usergroup-users"
         group="{{ $group->id() }}"
         :filters="{{ $filters->toJson() }}"
-        :actions="{{ $actions->toJson() }}"
         action-url="{{ cp_route('users.actions') }}"
     ></user-listing>
 

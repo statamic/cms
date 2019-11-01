@@ -6,7 +6,6 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Facades\Scope;
 use Statamic\CP\Column;
-use Statamic\Facades\Action;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
@@ -58,11 +57,10 @@ class TaxonomiesController extends CpController
             'hasTerms' => true, // todo $taxonomy->queryTerms()->count(),
             'blueprints' => $blueprints,
             'site' => Site::selected(),
-            'filters' => Scope::filters('terms', $context = [
+            'filters' => Scope::filters('terms', [
                 'taxonomy' => $taxonomy->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-            'actions' => Action::for('terms', $context),
         ]);
     }
 
