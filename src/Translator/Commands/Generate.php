@@ -17,11 +17,13 @@ class Generate extends Command
     protected $discovery;
     protected $discovered;
     protected $files;
+    protected $manualFiles;
 
-    public function __construct(MethodDiscovery $discovery, Filesystem $files)
+    public function __construct(MethodDiscovery $discovery, Filesystem $files, array $manualFiles)
     {
         $this->discovery = $discovery;
         $this->files = $files;
+        $this->manualFiles = $manualFiles;
         parent::__construct();
     }
 
@@ -41,6 +43,7 @@ class Generate extends Command
 
         $this->generateStringFiles();
         $this->generateKeyFiles();
+        $this->generateManualKeyFiles();
     }
 
     protected function generateStringFiles()
@@ -96,6 +99,10 @@ class Generate extends Command
 
                 $file = explode('::', $file, 2)[1];
 
+                if (Str::startsWith($file, $this->manualFiles)) {
+                    return null;
+                }
+
                 return compact('file', 'string');
             })
             ->filter()
@@ -130,6 +137,42 @@ class Generate extends Command
             ? "<info>Translation file for <comment>$lang</comment> merged into <comment>$path</comment></info>"
             : "<info>Translation file for <comment>$lang</comment> created at <comment>$path</comment></info>"
         );
+    }
+
+    protected function generateManualKeyFiles()
+    {
+        foreach ($this->manualFiles as $file) {
+            $source = 'resources/lang/en/'.$file.'.php';
+            $fullSourcePath = __DIR__.'/../../../'.$source;
+            $sourceStrings = collect(require $source);
+
+            foreach ($this->languages() as $lang) {
+                if ($lang === 'en') {
+                    continue;
+                }
+
+                $path = 'resources/lang/'.$lang.'/'.$file.'.php';
+                $fullPath = __DIR__.'/../../../'.$path;
+
+                $exists = file_exists($fullPath);
+                $existing = $exists ? require $fullPath : [];
+
+                $strings = $sourceStrings->mapWithKeys(function ($string, $key) use ($existing) {
+                    $translation = $existing[$key] ?? '';
+                    return [$key => $translation];
+                })->all();
+
+                $contents = "<?php\n\nreturn " . VarExporter::export($strings) . ";\n";
+
+                $this->files->makeDirectory(dirname($fullPath), 0755, true, true);
+                $this->files->put($fullPath, $contents);
+
+                $this->output->writeln($exists
+                    ? "<info>Translation file for <comment>$lang</comment> merged into <comment>$path</comment></info>"
+                    : "<info>Translation file for <comment>$lang</comment> created at <comment>$path</comment></info>"
+                );
+            }
+        }
     }
 
     protected function languages()

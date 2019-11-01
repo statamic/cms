@@ -16,8 +16,16 @@ $ignoredSubstrings = [
     'statamic::permissions.',
 ];
 
+// These files will not be generated from method discovery, but they will be
+// copied to the other languages from English.
+$manualFiles = [
+    'permissions',
+    'markdown',
+    'validation',
+];
+
 $app = new Symfony\Component\Console\Application('Statamic Translator');
-$app->add(new Statamic\Translator\Commands\Generate($discovery, $files));
 $app->add(new Statamic\Translator\Commands\Stats($discovery, $ignoredSubstrings));
+$app->add(new Statamic\Translator\Commands\Generate($discovery, $files, $manualFiles));
 
 $app->run();
