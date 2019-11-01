@@ -50,7 +50,9 @@ class Generate extends Command
     {
         $strings = $this->discovered->filter(function ($string) {
             return Util::isString($string);
-        })->sort();
+        })->sortBy(function ($string) {
+            return strtolower($string);
+        });
 
         foreach ($this->languages() as $lang) {
             if ($lang === 'en') {
