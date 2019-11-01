@@ -2,10 +2,7 @@
 
     <div class="session-expiry">
 
-        <button v-if="isWarning" class="session-expiry-stripe" @click="extend">
-            <span v-text="warningText" />
-            <span v-if="remaining > 0">{{ __("Click to extend your session.") }}</span>
-        </button>
+        <button v-if="isWarning" class="session-expiry-stripe" @click="extend" v-text="warningText" />
 
         <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true" :pivotY=".1">
             <div class="flex items-center p-3 bg-grey-20 border-b text-center">
