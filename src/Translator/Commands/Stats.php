@@ -3,7 +3,9 @@
 namespace Statamic\Translator\Commands;
 
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Support\Str;
 use Statamic\Translator\MethodDiscovery;
+use Statamic\Translator\Util;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,10 +15,12 @@ use Symfony\Component\Console\Output\OutputInterface;
 class Stats extends Command
 {
     protected $discovery;
+    protected $ignored;
 
-    public function __construct(MethodDiscovery $discovery)
+    public function __construct(MethodDiscovery $discovery, array $ignored)
     {
         $this->discovery = $discovery;
+        $this->ignored = $ignored;
         parent::__construct();
     }
 
@@ -35,6 +39,10 @@ class Stats extends Command
         $counts = collect();
 
         $strings = $this->discovery->discover();
+
+        $strings = $strings->reject(function ($string) {
+            return Str::startsWith($string, $this->ignored);
+        });
 
         foreach ($strings as $string) {
             $count = $counts[$string] ?? 0;
