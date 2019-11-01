@@ -27,7 +27,7 @@ class Stats extends Command
             ->addOption('sort', null, InputOption::VALUE_OPTIONAL, 'Sort method. string or usages', 'string')
             ->addOption('filter', null, InputOption::VALUE_OPTIONAL, 'Filter by string')
             ->addOption('min-words', null, InputOption::VALUE_OPTIONAL, 'Filter by strings with at least this many words')
-            ->addOption('type', null, InputOption::VALUE_OPTIONAL, 'Either "strings" or "keys"');
+            ->addOption('type', null, InputOption::VALUE_OPTIONAL, 'Either "string" or "key"');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -49,6 +49,9 @@ class Stats extends Command
         });
 
         if ($type = $input->getOption('type')) {
+            if (! in_array($type, ['key', 'string'])) {
+                throw new \LogicException('Invalid type. Allowed: "key" or "string"');
+            }
             $rows = $rows->filter(function ($item) use ($type) {
                 $isKey = $this->isKey($item['string']);;
                 return $type === 'key' ? $isKey : !$isKey;
