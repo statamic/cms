@@ -109,7 +109,7 @@ class Generate extends Command
             ->groupBy('file')
             ->each(function ($items, $file) {
                 foreach ($this->languages() as $lang) {
-                    $this->generateKeyFile($lang, $file, $items->map->string);
+                    $this->generateKeyFile($lang, $file, $items->map->string->sort()->values());
                 }
             });
     }
@@ -122,47 +122,10 @@ class Generate extends Command
         $exists = file_exists($fullPath);
         $existing = $exists ? require $fullPath : [];
 
-        $strings = $strings->sort()->values()
-            ->mapWithKeys(function ($key) use ($existing) {
-                $translation = $existing[$key] ?? '';
-                return [$key => $translation];
-            })->all();
-
-        $this->writeKeyFile($strings, $path, $lang);
-    }
-
-    protected function generateManualKeyFiles()
-    {
-        foreach ($this->manualFiles as $file) {
-            $source = 'resources/lang/en/'.$file.'.php';
-            $fullSourcePath = __DIR__.'/../../../'.$source;
-            $sourceStrings = collect(require $fullSourcePath);
-
-            foreach ($this->languages() as $lang) {
-                if ($lang === 'en') {
-                    continue;
-                }
-
-                $path = 'resources/lang/'.$lang.'/'.$file.'.php';
-                $fullPath = __DIR__.'/../../../'.$path;
-
-                $exists = file_exists($fullPath);
-                $existing = $exists ? require $fullPath : [];
-
-                $strings = $sourceStrings->mapWithKeys(function ($string, $key) use ($existing) {
-                    $translation = $existing[$key] ?? '';
-                    return [$key => $translation];
-                })->all();
-
-                $this->writeKeyFile($strings, $path, $lang);
-            }
-        }
-    }
-
-    protected function writeKeyFile($strings, $path, $lang)
-    {
-        $fullPath =__DIR__.'/../../../'.$path;
-        $exists = file_exists($fullPath);
+        $strings = $strings->mapWithKeys(function ($key) use ($existing) {
+            $translation = $existing[$key] ?? '';
+            return [$key => $translation];
+        })->all();
 
         $contents = "<?php\n\nreturn " . VarExporter::export($strings) . ";\n";
 
@@ -173,6 +136,23 @@ class Generate extends Command
             ? "<info>Translation file for <comment>$lang</comment> merged into <comment>$path</comment></info>"
             : "<info>Translation file for <comment>$lang</comment> created at <comment>$path</comment></info>"
         );
+    }
+
+    protected function generateManualKeyFiles()
+    {
+        foreach ($this->manualFiles as $file) {
+            $source = 'resources/lang/en/'.$file.'.php';
+            $fullSourcePath = __DIR__.'/../../../'.$source;
+            $strings = collect(require $fullSourcePath)->keys()->sort()->values();
+
+            foreach ($this->languages() as $lang) {
+                if ($lang === 'en') {
+                    continue;
+                }
+
+                $this->generateKeyFile($lang, $file, $strings);
+            }
+        }
     }
 
     protected function languages()
