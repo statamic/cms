@@ -10,7 +10,7 @@ $discovery = new Statamic\Translator\MethodDiscovery($files, [
     __DIR__.'/resources/views'
 ]);
 
-// Translation strings starting with these substrings will be ignored in stats.
+// Translation strings starting with these substrings will be ignored.
 $ignoredSubstrings = [
     'permissions.',
     'statamic::permissions.',
@@ -26,6 +26,6 @@ $manualFiles = [
 
 $app = new Symfony\Component\Console\Application('Statamic Translator');
 $app->add(new Statamic\Translator\Commands\Stats($discovery, $ignoredSubstrings));
-$app->add(new Statamic\Translator\Commands\Generate($discovery, $files, $manualFiles));
+$app->add(new Statamic\Translator\Commands\Generate($discovery, $files, $manualFiles, $ignoredSubstrings));
 
 $app->run();

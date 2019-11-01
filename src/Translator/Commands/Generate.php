@@ -17,13 +17,14 @@ class Generate extends Command
     protected $discovery;
     protected $discovered;
     protected $files;
-    protected $manualFiles;
+    protected $ignored;
 
-    public function __construct(MethodDiscovery $discovery, Filesystem $files, array $manualFiles)
+    public function __construct(MethodDiscovery $discovery, Filesystem $files, array $manualFiles, array $ignored)
     {
         $this->discovery = $discovery;
         $this->files = $files;
         $this->manualFiles = $manualFiles;
+        $this->ignored = $ignored;
         parent::__construct();
     }
 
@@ -49,7 +50,7 @@ class Generate extends Command
     protected function generateStringFiles()
     {
         $strings = $this->discovered->filter(function ($string) {
-            return Util::isString($string);
+            return !Str::startsWith($string, $this->ignored) && Util::isString($string);
         })->sortBy(function ($string) {
             return strtolower($string);
         });
