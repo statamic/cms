@@ -50,7 +50,7 @@ class Generate extends Command
         })->sort();
 
         foreach ($this->languages() as $lang) {
-            if ($lang !== 'en') {
+            if ($lang === 'en') {
                 continue;
             }
 
