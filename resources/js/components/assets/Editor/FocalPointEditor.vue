@@ -2,7 +2,7 @@
 
     <div class="focal-point">
         <div class="focal-point-toolbox card p-0">
-            <div class="form-group pb-0">
+            <div class="p-2">
                 <label>{{ __('Focal Point') }}</label>
                 <small class="help-block">{{ __('focal_point_instructions') }}</small>
                 <div class="focal-point-image">
@@ -17,30 +17,26 @@
                     }"></div>
                 </div>
             </div>
-            <div class="flex items-center justify-between px-2">
-                <div>
-                    <div class="mb-2">
-                        <button type="button" class="btn" @click.prevent="close">{{ __('Cancel') }}</button>
-                        <button type="button" class="btn btn-default mx-1" @click.prevent="reset">{{ __('Reset') }}</button>
-                        <button type="button" class="btn btn-primary" @click="select">{{ __('Select') }}</button>
-                    </div>
-                    <div>
-                        <input type="range" v-model="z" min="1" max="10" step="0.1" class="w-full" />
-                    </div>
+            <div class="flex items-center text-sm justify-center mb-2">
+                <div class="flex items-center mx-2">
+                    <div class="mr-sm">X</div>
+                    <div class="value">{{ x }}<sup>%</sup></div>
                 </div>
-                <div class="focal-point-coordinates">
-                    <div class="pair">
-                        <div class="axis">X</div>
-                        <div class="value">{{ x }}<sup>%</sup></div>
-                    </div>
-                    <div class="pair">
-                        <div class="axis">Y</div>
-                        <div class="value">{{ y }}<sup>%</sup></div>
-                    </div>
-                    <div class="pair">
-                        <div class="axis">Z</div>
-                        <div class="value">{{ z }}</div>
-                    </div>
+                <div class="flex items-center mx-2">
+                    <div class="mr-sm">Y</div>
+                    <div class="value">{{ y }}<sup>%</sup></div>
+                </div>
+                <div class="flex items-center mx-2">
+                    <div class="mr-sm">Z</div>
+                    <div class="value">{{ z }}</div>
+                </div>
+            </div>
+            <div class="px-2">
+                <input type="range" v-model="z" min="1" max="10" step="0.1" class="w-full mb-2" />
+                <div class="mb-1 flex flex-wrap items-center justify-center">
+                    <button type="button" class="btn mb-1" @click.prevent="close">{{ __('Cancel') }}</button>
+                    <button type="button" class="btn mb-1 btn-default mx-1" @click.prevent="reset">{{ __('Reset') }}</button>
+                    <button type="button" class="btn mb-1 btn-primary" @click="select">{{ __('Finish') }}</button>
                 </div>
             </div>
             <h6 class="p-2 text-center bg-grey-30 rounded-b">{{ __('Crop previews are for example only') }}</h6>
