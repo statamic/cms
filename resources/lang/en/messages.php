@@ -60,7 +60,7 @@ return [
     'structure_wizard_description' => 'Structures are link trees most often used to create nav bars and other forms of site navigation.',
     'structures_empty' => 'Structures can contain links arranged into a heirarchy from which you can create URLs or navigation areas.',
     'taxonomies_blueprints_instructions' => 'Terms in this taxonomy may use any of these blueprints.',
+    'updates_available' => 'Update available|:count updates available',
     'user_wizard_invitation_body' => 'Activate your new Statamic account on :site to begin managing this website. For your security, the link below expires after 48 hours. After that, please contact the site administrator for a new password.',
     'user_wizard_invitation_subject' => 'Activate your new Statamic account on :site',
-    'updates_available' => 'Update available|:count updates available',
 ];
