@@ -128,15 +128,7 @@ class Generate extends Command
                 return [$key => $translation];
             })->all();
 
-        $contents = "<?php\n\nreturn " . VarExporter::export($strings) . ";\n";
-
-        $this->files->makeDirectory(dirname($fullPath), 0755, true, true);
-        $this->files->put($fullPath, $contents);
-
-        $this->output->writeln($exists
-            ? "<info>Translation file for <comment>$lang</comment> merged into <comment>$path</comment></info>"
-            : "<info>Translation file for <comment>$lang</comment> created at <comment>$path</comment></info>"
-        );
+        $this->writeKeyFile($strings, $path, $lang);
     }
 
     protected function generateManualKeyFiles()
@@ -162,17 +154,25 @@ class Generate extends Command
                     return [$key => $translation];
                 })->all();
 
-                $contents = "<?php\n\nreturn " . VarExporter::export($strings) . ";\n";
-
-                $this->files->makeDirectory(dirname($fullPath), 0755, true, true);
-                $this->files->put($fullPath, $contents);
-
-                $this->output->writeln($exists
-                    ? "<info>Translation file for <comment>$lang</comment> merged into <comment>$path</comment></info>"
-                    : "<info>Translation file for <comment>$lang</comment> created at <comment>$path</comment></info>"
-                );
+                $this->writeKeyFile($strings, $path, $lang);
             }
         }
+    }
+
+    protected function writeKeyFile($strings, $path, $lang)
+    {
+        $fullPath =__DIR__.'/../../../'.$path;
+        $exists = file_exists($fullPath);
+
+        $contents = "<?php\n\nreturn " . VarExporter::export($strings) . ";\n";
+
+        $this->files->makeDirectory(dirname($fullPath), 0755, true, true);
+        $this->files->put($fullPath, $contents);
+
+        $this->output->writeln($exists
+            ? "<info>Translation file for <comment>$lang</comment> merged into <comment>$path</comment></info>"
+            : "<info>Translation file for <comment>$lang</comment> created at <comment>$path</comment></info>"
+        );
     }
 
     protected function languages()
