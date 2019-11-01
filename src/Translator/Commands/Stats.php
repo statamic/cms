@@ -26,7 +26,8 @@ class Stats extends Command
             ->setName('stats')
             ->addOption('sort', null, InputOption::VALUE_OPTIONAL, 'Sort method. string or usages', 'string')
             ->addOption('filter', null, InputOption::VALUE_OPTIONAL, 'Filter by string')
-            ->addOption('min-words', null, InputOption::VALUE_OPTIONAL, 'Filter by strings with at least this many words');
+            ->addOption('min-words', null, InputOption::VALUE_OPTIONAL, 'Filter by strings with at least this many words')
+            ->addOption('type', null, InputOption::VALUE_OPTIONAL, 'Either "strings" or "keys"');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -47,7 +48,16 @@ class Stats extends Command
                 'string' => $string,
                 'usages' => $count,
             ];
-        })->sortBy(function ($item) use ($input) {
+        });
+
+        if ($type = $input->getOption('type')) {
+            $rows = $rows->filter(function ($item) use ($type) {
+                $isKey = $this->isKey($item['string']);;
+                return $type === 'key' ? $isKey : !$isKey;
+            });
+        }
+
+        $rows = $rows->sortBy(function ($item) use ($input) {
             return ($input->getOption('sort') === 'usages')
                 ? [$item['usages'], strtolower($item['string'])]
                 : strtolower($item['string']);
@@ -77,5 +87,15 @@ class Stats extends Command
         $paths = [$dir.'/src', $dir.'/resources'];
         $discovery = new MethodDiscovery(new Filesystem, $paths);
         return $discovery->discover();
+    }
+
+    protected function isKey($string)
+    {
+        // It's considered a translation key if:
+        // - it has a dot (eg. "foo.bar")
+        // - the dot is *not* at the end of the string (eg. "Hello.")
+        // - there's not a space after the dot (eg. "No. Forking. Way.")
+        // - there's not another dot after the dot. (eg. "What...")
+        return preg_match('/\.(?![\.\s]).+/', $string);
     }
 }
