@@ -8,7 +8,7 @@
             @if ($count)
                 <p>{{ trans_choice('messages.updates_available', $count) }}</p>
             @else
-                <p>{{ __('Everything is up to date.') }}</p>
+                <p>{{ __('Everything is up to date') }}</p>
             @endif
         </div>
     </div>

@@ -31,7 +31,7 @@ class LoginController extends CpController
     public function showLoginForm(Request $request)
     {
         $data = [
-            'title' => __('Login'),
+            'title' => __('Log in'),
             'oauth' => $enabled = OAuth::enabled(),
             'providers' => $enabled ? OAuth::providers() : [],
             'referer' => url()->previous()

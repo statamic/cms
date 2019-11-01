@@ -132,7 +132,7 @@ export default {
 
             this.$emit('field-created', field);
 
-            this.$toast.success(__('Field added.'));
+            this.$toast.success(__('Field added'));
             this.pendingCreatedField = null;
         }
 

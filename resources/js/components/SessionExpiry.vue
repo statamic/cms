@@ -11,10 +11,10 @@
 
             <div v-if="isUsingOauth" class="p-3">
                 <a :href="oauthProvider.loginUrl" target="_blank" class="btn btn-primary">
-                    {{ __('Login with :provider', {provider: oauthProvider.label}) }}
+                    {{ __('Log in with :provider', {provider: oauthProvider.label}) }}
                 </a>
                 <div class="text-2xs text-grey mt-2">
-                    {{ __(`Opens in a new window. Come back once you've logged in.`) }}
+                    {{ __('messages.session_expiry_new_window') }}
                 </div>
             </div>
 
@@ -38,7 +38,7 @@
                             tabindex="1"
                             autofocus
                             @keydown.enter.prevent="submit" />
-                        <button @click="submit" class="btn btn-primary ml-1" v-text="__('Login')" />
+                        <button @click="submit" class="btn btn-primary ml-1" v-text="__('Log in')" />
                     </div>
                 </div>
             </div>

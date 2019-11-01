@@ -34,7 +34,7 @@
                 class="min-w-md"
                 :options="fieldOptions"
                 :reduce="field => field.value"
-                :placeholder="__('Select Field')"
+                :placeholder="__('Select field')"
                 :taggable="true"
                 :create-option="field => ({value: field, label: field })" />
 

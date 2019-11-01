@@ -95,7 +95,7 @@ export default {
 
         fieldLinked(field) {
             this.section.fields.push(field);
-            this.$toast.success(__('Field added.'));
+            this.$toast.success(__('Field added'));
 
             if (field.type === 'reference') {
                 this.$nextTick(() => this.editingField = field._id);

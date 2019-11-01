@@ -51,7 +51,7 @@
         <div v-if="pages.length == 0" class="no-results border-dashed border-2 w-full flex items-center">
             <div class="text-center max-w-md mx-auto rounded-lg px-4 py-4">
                 <slot name="no-pages-svg" />
-                <h1 class="my-3" v-text="__('Create your first link now.')" />
+                <h1 class="my-3" v-text="__('Create your first link now')" />
                 <p class="text-grey mb-3">
                     {{ __('messages.structures_empty') }}
                 </p>

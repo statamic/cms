@@ -44,7 +44,7 @@ export default {
             const url = cp_url(`user-groups/${id}`);
             this.$axios.delete(url).then(response => {
                 this.rows.splice(index, 1);
-                this.$toast.success(__('User group deleted'));
+                this.$toast.success(__('User Group deleted'));
             }).catch(error => {
                 this.$toast.error(error.response.data.message);
             })

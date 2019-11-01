@@ -40,7 +40,7 @@ export default {
         },
 
         modalBody() {
-            return __('Are you sure you want to delete this') + ' ' + this.resourceTitle.toLowerCase();
+            return __('Are you sure you want to delete this item?');
         }
     },
 

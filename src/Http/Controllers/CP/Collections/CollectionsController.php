@@ -301,12 +301,12 @@ class CollectionsController extends CpController
             'routing' => ['type' => 'section'],
             'route' => [
                 'type' => 'text',
-                'instructions' => __("The route controls entries URL pattern."),
+                'instructions' => __('statamic::messages.collections_route_instructions'),
             ],
             'mount' => [
                 'type' => 'entries',
                 'max_items' => 1,
-                'instructions' => __('Enable add/edit shortcuts from Structures and `mount` variable in your route.'),
+                'instructions' => __('statamic::messages.collections_mount_instructions'),
             ],
             'amp' => [
                 'type' => 'toggle',

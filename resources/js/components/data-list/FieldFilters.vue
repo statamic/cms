@@ -10,7 +10,7 @@
                     name="operator"
                     :options="fieldOptions(filter)"
                     v-model="filter.field"
-                    :placeholder="__('Select Field')"
+                    :placeholder="__('Select field')"
                     @input="reset(index, $event)" />
 
                 <field-filter
