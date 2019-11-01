@@ -8,7 +8,6 @@ class MethodDiscovery
 {
     protected $files;
     protected $paths;
-    protected $methodRegex;
 
     public function __construct(Filesystem $files, array $paths)
     {
@@ -18,10 +17,6 @@ class MethodDiscovery
 
     public function discover()
     {
-        if (! $this->methodRegex) {
-            throw new \Exception('A discovery method was not specified');
-        }
-
         $strings = [];
 
         foreach ($this->files->allFiles($this->paths) as $file) {
@@ -35,23 +30,9 @@ class MethodDiscovery
         return collect($strings);
     }
 
-    public function withStrings()
-    {
-        $this->methodRegex = '__n?';
-
-        return $this;
-    }
-
-    public function withKeys()
-    {
-        $this->methodRegex = 'trans(?:_choice)?';
-
-        return $this;
-    }
-
     protected function regex()
     {
-        return '('.$this->methodRegex.')'
+        return '(trans(?:_choice)?|__n?)'
             . '\([\'"`]'
             . '([\w\d\s\t\n\r,.\'\":\\\?!@£$%^&*<>_\-=\|\+]+)'
             . '[\'\"`]';

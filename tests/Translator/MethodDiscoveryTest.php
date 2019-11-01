@@ -21,16 +21,7 @@ class MethodDiscoveryTest extends TestCase
     }
 
     /** @test */
-    function it_doesnt_allow_discovery_without_first_choosing_a_method()
-    {
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('A discovery method was not specified');
-
-        $this->discovery->discover();
-    }
-
-    /** @test */
-    function it_discovers_string_based_methods()
+    function it_discovers_methods()
     {
         $expected = collect([
             'blade underscore single quote string',
@@ -61,20 +52,7 @@ class MethodDiscoveryTest extends TestCase
             'vue script backtick quote',
             'vue script backtick quote :count',
             'vue script backtick quote :param',
-        ]);
 
-        $actual = $this->discovery->withStrings()->discover();
-        $this->assertInstanceOf(Collection::class, $actual);
-        $this->assertEquals(
-            $expected->sort()->values()->all(),
-            $actual->sort()->values()->all()
-        );
-    }
-
-    /** @test */
-    function it_discovers_key_based_methods()
-    {
-        $expected = collect([
             'blade trans single quote string',
             'blade trans single quote :param',
             'blade trans double quote string',
@@ -122,7 +100,7 @@ class MethodDiscoveryTest extends TestCase
             'vue script trans_choice backtick quote :param',
         ]);
 
-        $actual = $this->discovery->withKeys()->discover();
+        $actual = $this->discovery->discover();
         $this->assertInstanceOf(Collection::class, $actual);
         $this->assertEquals(
             $expected->sort()->values()->all(),
