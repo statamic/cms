@@ -8,7 +8,7 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false"
-         printerClass="Codedungeon\PHPUnitPrettyResultPrinter\Printer">
+         testdox="true">
     <testsuites>
         <testsuite name="Tests">
             <directory suffix="Test.php">./tests</directory>

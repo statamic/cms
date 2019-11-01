@@ -22,7 +22,6 @@
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
-        "codedungeon/phpunit-result-printer": "^0.26",
         "fzaninotto/faker": "~1.4",
         "mockery/mockery": "~1.0",
         "nunomaduro/collision": "^3.0",
