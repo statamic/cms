@@ -122,19 +122,24 @@ class Generate extends Command
         $exists = file_exists($fullPath);
         $existing = $exists ? require $fullPath : [];
 
-        $strings = $strings->mapWithKeys(function ($key) use ($existing) {
+        $translations = $strings->mapWithKeys(function ($key) use ($existing) {
             $translation = $existing[$key] ?? '';
             return [$key => $translation];
         })->all();
 
-        $contents = "<?php\n\nreturn " . VarExporter::export($strings) . ";\n";
+        if ($translations === $existing) {
+            $this->output->writeln("<info>Translation file for <comment>$lang/$file</comment> not written because there are no changes.</info>");
+            return;
+        }
+
+        $contents = "<?php\n\nreturn " . VarExporter::export($translations) . ";\n";
 
         $this->files->makeDirectory(dirname($fullPath), 0755, true, true);
         $this->files->put($fullPath, $contents);
 
         $this->output->writeln($exists
-            ? "<info>Translation file for <comment>$lang</comment> merged into <comment>$path</comment></info>"
-            : "<info>Translation file for <comment>$lang</comment> created at <comment>$path</comment></info>"
+            ? "<info>Translation file for <comment>$lang/$file</comment> merged into <comment>$path</comment></info>"
+            : "<info>Translation file for <comment>$lang/$file</comment> created at <comment>$path</comment></info>"
         );
     }
 
