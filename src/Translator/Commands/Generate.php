@@ -109,12 +109,18 @@ class Generate extends Command
             ->groupBy('file')
             ->each(function ($items, $file) {
                 foreach ($this->languages() as $lang) {
-                    $this->generateKeyFile($lang, $file, $items->map->string->sort()->values());
+                    $strings = $items->map->string->sort()->values();
+                    $this->generateKeyFile($lang, $file, function ($existing) use ($strings) {
+                        return $strings->mapWithKeys(function ($key) use ($existing) {
+                            $translation = $existing[$key] ?? '';
+                            return [$key => $translation];
+                        })->all();
+                    });
                 }
             });
     }
 
-    protected function generateKeyFile($lang, $file, $strings)
+    protected function generateKeyFile($lang, $file, $translationCallback)
     {
         $path = 'resources/lang/'.$lang.'/'.$file.'.php';
         $fullPath =__DIR__.'/../../../'.$path;
@@ -122,10 +128,7 @@ class Generate extends Command
         $exists = file_exists($fullPath);
         $existing = $exists ? require $fullPath : [];
 
-        $translations = $strings->mapWithKeys(function ($key) use ($existing) {
-            $translation = $existing[$key] ?? '';
-            return [$key => $translation];
-        })->all();
+        $translations = $translationCallback($existing);
 
         if ($translations === $existing) {
             $this->output->writeln("<info>Translation file for <comment>$lang/$file</comment> not written because there are no changes.</info>");
@@ -148,16 +151,32 @@ class Generate extends Command
         foreach ($this->manualFiles as $file) {
             $source = 'resources/lang/en/'.$file.'.php';
             $fullSourcePath = __DIR__.'/../../../'.$source;
-            $strings = collect(require $fullSourcePath)->keys()->sort()->values();
+            $strings = collect(require $fullSourcePath);
 
             foreach ($this->languages() as $lang) {
                 if ($lang === 'en') {
                     continue;
                 }
 
-                $this->generateKeyFile($lang, $file, $strings);
+                $this->generateKeyFile($lang, $file, function ($existing) use ($strings) {
+                    return $strings->mapWithKeys(function ($value, $key) use ($existing) {
+                        return [$key => $this->getManualKeyFileTranslation($key, $value, $existing)];
+                    })->all();
+                });
             }
         }
+    }
+
+    private function getManualKeyFileTranslation($key, $value, $existing)
+    {
+        if (is_array($value)) {
+            $existing = $existing[$key] ?? [];
+            return collect($value)->map(function ($v, $k) use ($existing) {
+                return $this->getManualKeyFileTranslation($k, $v, $existing);
+            })->all();
+        }
+
+        return $existing[$key] ?? '';
     }
 
     protected function languages()
