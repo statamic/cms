@@ -53,7 +53,7 @@ class Stats extends Command
                 throw new \LogicException('Invalid type. Allowed: "key" or "string"');
             }
             $rows = $rows->filter(function ($item) use ($type) {
-                $isKey = $this->isKey($item['string']);;
+                $isKey = Util::isKey($item['string']);;
                 return $type === 'key' ? $isKey : !$isKey;
             });
         }
@@ -88,15 +88,5 @@ class Stats extends Command
         $paths = [$dir.'/src', $dir.'/resources'];
         $discovery = new MethodDiscovery(new Filesystem, $paths);
         return $discovery->discover();
-    }
-
-    protected function isKey($string)
-    {
-        // It's considered a translation key if:
-        // - it has a dot (eg. "foo.bar")
-        // - the dot is *not* at the end of the string (eg. "Hello.")
-        // - there's not a space after the dot (eg. "No. Forking. Way.")
-        // - there's not another dot after the dot. (eg. "What...")
-        return preg_match('/\.(?![\.\s]).+/', $string);
     }
 }

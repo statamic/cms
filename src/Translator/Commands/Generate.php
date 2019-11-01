@@ -3,7 +3,9 @@
 namespace Statamic\Translator\Commands;
 
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Support\Str;
 use Statamic\Translator\MethodDiscovery;
+use Statamic\Translator\Util;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
@@ -13,6 +15,7 @@ use Symfony\Component\VarExporter\VarExporter;
 class Generate extends Command
 {
     protected $discovery;
+    protected $discovered;
     protected $files;
 
     public function __construct(MethodDiscovery $discovery, Filesystem $files)
@@ -34,13 +37,17 @@ class Generate extends Command
         $this->input = $input;
         $this->output = $output;
 
+        $this->discovered = $this->discovery->discover();
+
         $this->generateStringFiles();
         $this->generateKeyFiles();
     }
 
     protected function generateStringFiles()
     {
-        $strings = $this->discovery->withStrings()->discover()->sort();
+        $strings = $this->discovered->filter(function ($string) {
+            return Util::isString($string);
+        })->sort();
 
         foreach ($this->languages() as $lang) {
             if ($lang !== 'en') {
@@ -72,11 +79,26 @@ class Generate extends Command
 
     protected function generateKeyFiles()
     {
-        $this->discovery->withKeys()->discover()
+        $this->discovered
+            ->filter(function ($string) {
+                return Util::isKey($string);
+            })
             ->map(function ($string) {
                 [$file, $string] = explode('.', $string, 2);
+
+                if (! str_contains($file, '::')) {
+                    $file = 'statamic::'.$file;
+                }
+
+                if (! Str::startsWith($file, 'statamic::')) {
+                    return null;
+                }
+
+                $file = explode('::', $file, 2)[1];
+
                 return compact('file', 'string');
             })
+            ->filter()
             ->groupBy('file')
             ->each(function ($items, $file) {
                 foreach ($this->languages() as $lang) {
