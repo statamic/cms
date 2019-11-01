@@ -43,7 +43,7 @@ class RolesController extends CpController
         $this->authorize('edit roles');
 
         return view('statamic::roles.create', [
-            'permissions' => $this->toGroupedTree(Permission::tree()),
+            'permissions' => $this->updateTree(Permission::tree()),
         ]);
     }
 
@@ -78,7 +78,7 @@ class RolesController extends CpController
         return view('statamic::roles.edit', [
             'role' => $role,
             'super' => $role->isSuper(),
-            'permissions' => $this->toGroupedTree(Permission::tree(), $role),
+            'permissions' => $this->updateTree(Permission::tree(), $role),
         ]);
     }
 
@@ -119,38 +119,22 @@ class RolesController extends CpController
         return response('', 204);
     }
 
-    protected function toGroupedTree($tree, $role = null)
+    protected function updateTree($tree, $role = null)
     {
-        $tree = $this->toTree($tree, $role)
-            ->groupBy('group')
-            ->map(function ($permissions, $group) {
-                return [
-                    'handle' => $group,
-                    'label' => __('statamic::permissions.group_'.$group),
-                    'permissions' => $permissions
-                ];
-            });
-
-        // Place ungrouped permissions at the end.
-        if ($tree->has('misc')) {
-            $tree->put('misc', $tree->pull('misc'));
-        }
-
-        return $tree->values();
+        return $tree->map(function ($group) use ($role) {
+            return array_merge($group, [
+                'permissions' => $this->updatePermissions($group['permissions'], $role)
+            ]);
+        });
     }
 
-    protected function toTree($tree, $role = null)
+    protected function updatePermissions($permissions, $role = null)
     {
-        return $tree->map(function ($item) use ($role) {
-            $permission = $item['permission'];
-            return [
-                'value' => $permission->value(),
-                'label' => $permission->label(),
-                'description' => $permission->description(),
-                'group' => $permission->group() ?? 'misc',
-                'checked' => $role ? $role->hasPermission($permission->value()) : false,
-                'children' => $this->toTree($item['children'], $role),
-            ];
-        });
+        return collect($permissions)->map(function ($item) use ($role) {
+            return array_merge($item, [
+                'checked' => $role ? $role->hasPermission($item['value']) : false,
+                'children' => $this->updatePermissions($item['children'], $role),
+            ]);
+        })->all();
     }
 }
