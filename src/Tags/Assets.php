@@ -56,7 +56,7 @@ class Assets extends Tags
      */
     public function index()
     {
-        $id = $this->get(['container', 'id']);
+        $id = $this->get(['container', 'handle', 'id']);
         $path = $this->get('path');
 
         if (!$id && !$path) {
@@ -115,6 +115,10 @@ class Assets extends Tags
     {
         $this->sort();
         $this->limit();
+
+        if ($as = $this->get('as')) {
+            return $this->parse([$as => $this->assets]);
+        }
 
         return $this->parseLoop($this->assets);
     }
