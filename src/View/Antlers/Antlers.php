@@ -39,24 +39,24 @@ class Antlers
      */
     public function parseLoop($content, $data, $supplement = true)
     {
-        $output = '';
-        $i      = 1;
         $total  = count($data);
+        $i = 0;
 
-        foreach ($data as $item) {
+        return collect($data)->reduce(function ($carry, $item) use ($content, &$i, $total, $supplement) {
+            $i++;
+
             if ($supplement) {
-                $item['first']         = ($i === 1);
-                $item['last']          = ($i === $total);
-                $item['zero_index']    = $i - 1;
-                $item['index']         = $i;
-                $item['count']         = $i;
-                $item['total_results'] = $total;
+                $item = array_merge($item, [
+                    'first' => ($i === 1),
+                    'last' => ($i === $total),
+                    'zero_index' => $i - 1,
+                    'index' => $i,
+                    'count' => $i,
+                    'total_results' => $total,
+                ]);
             }
 
-            $output .= $this->parse($content, $item);
-            $i++;
-        }
-
-        return $output;
+            return $carry . $this->parse($content, $item);
+        }, '');
     }
 }
