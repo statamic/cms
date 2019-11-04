@@ -65,7 +65,7 @@ before
 after
 EOT;
 
-$expected = <<<EOT
+        $expected = <<<EOT
 before
     one, 0, 1, 0, 3
     first
@@ -479,18 +479,6 @@ EOT;
         $this->assertEquals($expected, Antlers::parse($template, []));
     }
 
-    public function testRecursiveChildrenWithScope()
-    {
-        // the variables are inside RecursiveChildren@index
-        $this->app['statamic.tags']['recursive_children'] = \Foo\Bar\Tags\RecursiveChildren::class;
-
-        $template = '<ul>{{ recursive_children scope="item" }}<li>{{ item:title }}{{ if item:children }}<ul>{{ *recursive item:children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
-
-        $expected = '<ul><li>One<ul><li>Two</li><li>Three<ul><li>Four</li></ul></li></ul></li></ul>';
-
-        $this->assertEquals($expected, Antlers::parse($template, []));
-    }
-
     public function testEmptyValuesAreNotOverriddenByPreviousIteration()
     {
         $variables = [
@@ -549,11 +537,6 @@ EOT;
         $this->assertEquals(
             '[one][two]',
             Antlers::parse('{{ hello:world }}[{{ baz }}]{{ /hello:world }}', $variables)
-        );
-
-        $this->assertEquals(
-            '[one][two]',
-            Antlers::parse('{{ hello:world scope="s" }}[{{ s:baz }}]{{ /hello:world }}', $variables)
         );
     }
 

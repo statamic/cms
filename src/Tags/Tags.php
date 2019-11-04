@@ -170,10 +170,8 @@ abstract class Tags
             $this->content = trim($this->content);
         }
 
-        $variables = $this->addScope($data); // todo: get rid of scope, but its not under test yet.
-
-        return Antlers::usingParser($this->parser, function ($antlers) use ($variables) {
-            return $antlers->parse($this->content, $variables);
+        return Antlers::usingParser($this->parser, function ($antlers) use ($data) {
+            return $antlers->parse($this->content, $data);
         });
     }
 
@@ -191,7 +189,7 @@ abstract class Tags
         }
 
         return Antlers::usingParser($this->parser, function ($antlers) use ($data, $supplement) {
-            return $antlers->parseLoop($this->content, $this->addScope($data), $supplement);
+            return $antlers->parseLoop($this->content, $data, $supplement);
         });
     }
 
@@ -207,25 +205,6 @@ abstract class Tags
             'no_results' => true,
             'total_results' => 0
         ]));
-    }
-
-    /**
-     * Add the provided $data to its own scope
-     *
-     * @param array|\Statamic\Data\DataCollection $data
-     * @return mixed
-     */
-    private function addScope($data)
-    {
-        if ($scope = $this->getParam('scope')) {
-            $data = Arr::addScope($data, $scope);
-        }
-
-        if ($data instanceof DataCollection) {
-            $data = $data->toArray();
-        }
-
-        return $data;
     }
 
     /**

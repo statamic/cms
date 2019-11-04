@@ -1471,20 +1471,6 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Place variables in a scope
-     *
-     * @param  $value
-     * @param  $params
-     * @return array
-     */
-    public function scope($value, $params)
-    {
-        $scope = Arr::get($params, 0, 'tag');
-
-        return Arr::addScope($value, $scope);
-    }
-
-    /**
      * Returns a segment by number from any valid URL or UI
      *
      * @param  $value
