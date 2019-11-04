@@ -161,6 +161,10 @@ abstract class Tags
      */
     public function parseLoop($data, $supplement = true)
     {
+        if ($as = $this->params->get('as')) {
+            return $this->parse([$as => $data]);
+        }
+
         return Antlers::usingParser($this->parser, function ($antlers) use ($data, $supplement) {
             return $antlers->parseLoop($this->content, $data, $supplement);
         });

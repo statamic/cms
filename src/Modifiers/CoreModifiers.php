@@ -54,23 +54,21 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Scope an array variable
+     * Alias an array variable
      *
      * @param $value
      * @param $params
-     * @return string
+     * @return array
      */
-    public function scopeAs($value, $params)
+    public function alias($value, $params)
     {
-        if ( is_array($value)) {
-            $as = Arr::get($params, 0);
-
-            foreach ($value as $key => $data) {
-              $value[$key][$as] = $data;
-            }
-
-            return $value;
+        if (! is_array($value)) {
+            return;
         }
+
+        $as = Arr::get($params, 0);
+
+        return [$as => $value];
     }
 
     /**

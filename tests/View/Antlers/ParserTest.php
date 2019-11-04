@@ -1246,6 +1246,76 @@ EOT;
             ['foo' => 'baz'],
         ]);
     }
+
+    /** @test */
+    function it_aliases_array_tag_pairs_using_the_as_modifier()
+    {
+                $template = <<<EOT
+{{ array as="stuff" }}
+before
+{{ stuff }}
+{{ foo }}
+{{ /stuff }}
+after
+{{ /array }}
+EOT;
+
+        $expected = <<<EOT
+before
+bar
+baz
+qux
+
+after
+
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template, [
+            'array' => [
+                ['foo' => 'bar'],
+                ['foo' => 'baz'],
+                ['foo' => 'qux'],
+            ]
+        ]));
+    }
+
+    /** @test */
+    function it_aliases_callback_tag_pair_loop_using_the_as_param()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return [
+                    ['foo' => 'bar'],
+                    ['foo' => 'baz'],
+                    ['foo' => 'qux'],
+                ];
+            }
+        })::register();
+
+
+        $template = <<<EOT
+{{ tag as="stuff" }}
+before
+{{ stuff }}
+{{ foo }}
+{{ /stuff }}
+after
+{{ /tag }}
+EOT;
+
+        $expected = <<<EOT
+before
+bar
+baz
+qux
+
+after
+
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template));
+    }
 }
 
 class NonArrayableObject
