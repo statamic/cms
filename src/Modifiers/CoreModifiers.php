@@ -1775,9 +1775,11 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function toJson($value)
+    public function toJson($value, $params)
     {
-        return json_encode($value);
+        $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : null;
+
+        return json_encode($value, $options);
     }
 
     /**
