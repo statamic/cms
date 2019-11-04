@@ -8,7 +8,7 @@
                 <div class="flex items-center">
                     <span v-if="! isCreating"
                         class="little-dot mr-1"
-                        :class="{ 'bg-green-light': published, 'bg-grey-60': !published }" />
+                        :class="publishedClass" />
                     <span v-html="$options.filters.striptags(title)" />
                 </div>
             </h1>
@@ -364,6 +364,17 @@ export default {
             if (!this.published && this.initialPublished) return __('Save & Unpublish');
 
             return __('Save');
+        },
+
+        isPublishDateInFuture() {
+            return moment(this.values.publish_date).isAfter(window.moment().unix())
+        },
+
+        publishedClass() {
+            if (this.published && !this.isPublishDateInFuture) return 'bg-green-light';
+            if (this.published && this.isPublishDateInFuture) return 'bg-orange';
+
+            return 'bg-grey-60';
         }
 
     },

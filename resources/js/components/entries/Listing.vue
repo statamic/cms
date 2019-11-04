@@ -59,7 +59,7 @@
                     >
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
-                                <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
+                                <div class="little-dot mr-1" :class="publishedClass(entry)" />
                                 <a :href="entry.edit_url" @click.stop>{{ entry.title }}</a>
                             </div>
                         </template>
@@ -138,6 +138,17 @@ export default {
     },
 
     methods: {
+
+        publishedClass(entry) {
+            if (entry.published && !this.isPublishDateInFuture(entry.publish_date)) return 'bg-green';
+            if (entry.published && this.isPublishDateInFuture(entry.publish_date)) return 'bg-orange';
+
+            return 'bg-grey-40';
+        },
+
+        isPublishDateInFuture(publishDate) {
+            return moment(publishDate).isAfter(window.moment().unix())
+        },
 
         afterRequestCompleted(response) {
             if (this.reorderingRequested) this.reorder();
