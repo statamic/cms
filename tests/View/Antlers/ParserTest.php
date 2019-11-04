@@ -1227,6 +1227,25 @@ EOT;
 
         $this->assertEquals($expected, trim(Antlers::parse($template, $context)));
     }
+
+    /** @test */
+    function it_does_not_accept_sequences()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expecting an associative array');
+        Antlers::parse('', ['foo', 'bar']);
+    }
+
+    /** @test */
+    function it_does_not_accept_multidimensional_array()
+    {
+        $this->expectException(\InvalidArgumentException::class);
+        $this->expectExceptionMessage('Expecting an associative array');
+        Antlers::parse('', [
+            ['foo' => 'bar'],
+            ['foo' => 'baz'],
+        ]);
+    }
 }
 
 class NonArrayableObject

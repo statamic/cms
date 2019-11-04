@@ -143,6 +143,10 @@ class Parser
     {
         $data = $this->normalizeData($data);
 
+        if (! empty($data) && ! Arr::assoc($data)) {
+            throw new \InvalidArgumentException('Expecting an associative array');
+        }
+
         // Save the original text coming in so that we can parse it recursively
         // later on without this needing to be within a callback
         $this->original_text = $text;
