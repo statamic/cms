@@ -63,12 +63,6 @@ abstract class Tags
     public $isPair;
 
     /**
-     * Whether to trim the whitespace from the content before parsing
-     * @var  bool
-     */
-    protected $trim = false;
-
-    /**
      * The parser instance that executed this tag.
      * @var \Statamic\View\Antlers\Parser
      */
@@ -146,19 +140,6 @@ abstract class Tags
     }
 
     /**
-     * Trim the content
-     *
-     * @param   bool    $trim  Whether to trim the content
-     * @return  $this
-     */
-    protected function trim($trim = true)
-    {
-        $this->trim = $trim;
-
-        return $this;
-    }
-
-    /**
      * Parse the tag pair contents with scoped variables
      *
      * @param array $data     Data to be parsed into template
@@ -166,10 +147,6 @@ abstract class Tags
      */
     public function parse($data = [])
     {
-        if ($this->trim) {
-            $this->content = trim($this->content);
-        }
-
         return Antlers::usingParser($this->parser, function ($antlers) use ($data) {
             return $antlers->parse($this->content, $data);
         });
@@ -184,10 +161,6 @@ abstract class Tags
      */
     public function parseLoop($data, $supplement = true)
     {
-        if ($this->trim) {
-            $this->content = trim($this->content);
-        }
-
         return Antlers::usingParser($this->parser, function ($antlers) use ($data, $supplement) {
             return $antlers->parseLoop($this->content, $data, $supplement);
         });
