@@ -57,7 +57,7 @@ class ParserTest extends TestCase
         $template = <<<EOT
 before
 {{ simple }}
-    {{ value }}, {{ key or "0" }}, {{ index or "0" }}, {{ zero_index or "0" }}, {{ total_results }}
+    {{ value }}, {{ count or "0" }}, {{ index or "0" }}, {{ total_results }}
     {{ if first }}first{{ elseif last }}last{{ else }}neither{{ /if }}
 
 
@@ -67,13 +67,13 @@ EOT;
 
         $expected = <<<EOT
 before
-    one, 0, 1, 0, 3
+    one, 1, 0, 3
     first
 
-    two, 1, 2, 1, 3
+    two, 2, 1, 3
     neither
 
-    three, 2, 3, 2, 3
+    three, 3, 2, 3
     last
 
 
@@ -88,7 +88,7 @@ EOT;
         $template = <<<EOT
 before
 {{ complex }}
-    {{ string }}, {{ key or "0" }}, {{ index or "0" }}, {{ zero_index or "0" }}, {{ total_results }}
+    {{ string }}, {{ count or "0" }}, {{ index or "0" }}, {{ total_results }}
     {{ if first }}first{{ elseif last }}last{{ else }}neither{{ /if }}
 
 
@@ -98,10 +98,10 @@ EOT;
 
 $expected = <<<EOT
 before
-    the first string, 0, 1, 0, 2
+    the first string, 1, 0, 2
     first
 
-    the second string, 1, 2, 1, 2
+    the second string, 2, 1, 2
     last
 
 
@@ -120,8 +120,8 @@ before
     {{ two }}
     {{ value or "no value" }}
     {{ key or "no key" }}
+    {{ count or "no count" }}
     {{ index or "no index" }}
-    {{ zero_index or "no zero_index" }}
     {{ total_results or "no total_results" }}
     {{ first or "no first" }}
     {{ last or "no last" }}
@@ -135,8 +135,8 @@ before
     wilderness
     no value
     no key
+    no count
     no index
-    no zero_index
     no total_results
     no first
     no last
@@ -610,14 +610,14 @@ EOT;
 
 $expectedBeforeInjection = <<<EOT
 noparse_ac3458695912d204af897d3c67f93cbe
-    1 noparse_ac3458695912d204af897d3c67f93cbe One
-    2 noparse_ac3458695912d204af897d3c67f93cbe Two
+    0 noparse_ac3458695912d204af897d3c67f93cbe One
+    1 noparse_ac3458695912d204af897d3c67f93cbe Two
 EOT;
 
 $expectedAfterInjection = <<<EOT
 {{ string }}
-    1 {{ string }} One
-    2 {{ string }} Two
+    0 {{ string }} One
+    1 {{ string }} Two
 EOT;
 
         $parsed = $parser->parse($template, $this->variables);
@@ -658,7 +658,7 @@ EOT;
 $template = <<<EOT
 {{ tag:array }}{{ content | noparse }}{{ /tag:array }}
 {{ tag:loop }}
-    {{ index }} {{ content | noparse }} {{ string }}
+    {{ count }} {{ content | noparse }} {{ string }}
 {{ /tag:loop }}
 EOT;
 
@@ -966,7 +966,7 @@ EOT;
         $template = <<<EOT
 {{ string }}
 {{ tag }}
-    {{ index }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} >{{ string }}<
+    {{ count }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} >{{ string }}<
 {{ /tag }}
 EOT;
 
@@ -1019,7 +1019,7 @@ EOT;
         $template = <<<EOT
 {{ string }}
 {{ tag }}
-    {{ index }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} >{{ string }}<
+    {{ count }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} >{{ string }}<
 {{ /tag }}
 EOT;
 

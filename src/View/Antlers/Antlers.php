@@ -43,18 +43,17 @@ class Antlers
         $i = 0;
 
         return collect($data)->reduce(function ($carry, $item) use ($content, &$i, $total, $supplement) {
-            $i++;
-
             if ($supplement) {
                 $item = array_merge($item, [
-                    'first' => ($i === 1),
-                    'last' => ($i === $total),
-                    'zero_index' => $i - 1,
                     'index' => $i,
-                    'count' => $i,
+                    'count' => $i+1,
                     'total_results' => $total,
+                    'first' => ($i === 0),
+                    'last' => ($i === $total-1),
                 ]);
             }
+
+            $i++;
 
             return $carry . $this->parse($content, $item);
         }, '');

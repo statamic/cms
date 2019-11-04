@@ -311,8 +311,6 @@ class Parser
         $total = count($loop);
 
         foreach ($loop as $key => &$value) {
-            $index++;
-
             // If the value of the current iteration is *not* already an array (ie. we're
             // dealing with a super basic list like [one, two, three] then convert it
             // to one, where the value is stored in a key named "value".
@@ -321,13 +319,14 @@ class Parser
             }
 
             $value = array_merge($value, [
-                'key'           => $key,
+                'count'         => $index + 1,
                 'index'         => $index,
-                'zero_index'    => $index - 1,
                 'total_results' => $total,
-                'first'         => ($index === 1) ? true : false,
-                'last'          => ($index === $total) ? true : false,
+                'first'         => ($index === 0),
+                'last'          => ($index === $total-1),
             ]);
+
+            $index++;
         }
 
         return $loop;
