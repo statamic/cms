@@ -37,7 +37,7 @@ class Antlers
      * @param bool    $supplement
      * @return string
      */
-    public function parseLoop($content, $data, $supplement)
+    public function parseLoop($content, $data, $supplement = true)
     {
         $output = '';
         $i      = 1;
