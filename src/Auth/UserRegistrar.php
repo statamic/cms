@@ -114,7 +114,7 @@ class UserRegistrar
 
         // Need to validate a password and make sure it's confirmed.
         array_set($fields, 'password', [
-            'display' => trans_choice('cp.passwords', 1),
+            'display' => __('Password'),
             'validate' => 'required|confirmed'
         ]);
 
