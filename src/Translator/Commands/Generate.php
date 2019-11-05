@@ -32,7 +32,7 @@ class Generate extends Command
     {
         $this
             ->setName('generate')
-            ->addArgument('lang', InputArgument::OPTIONAL, 'A comma delimited list of language codes to generate.', 'en,fr,de');
+            ->addArgument('lang', InputArgument::OPTIONAL, 'A comma delimited list of language codes to generate.', 'en,de');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
