@@ -43,14 +43,21 @@
         </div>
         <div v-for="n in 9" :key="n"
              :class="`frame frame-${n}`">
-            <div class="frame-image" :style="{ backgroundImage: 'url('+bgImage+')', backgroundPosition: bgPosition, transform: bgTransform, transformOrigin: bgPosition }" />
+            <focal-point-preview-frame :x="x" :y="y" :z="z" :image-url="image" :image-dimensions="imageDimensions" />
         </div>
     </div>
 
 </template>
 
 <script>
+import FocalPointPreviewFrame from './FocalPointPreviewFrame.vue';
+
 export default {
+
+    components: {
+        FocalPointPreviewFrame,
+    },
+
 
     props: [
         'data',   // The initial focus point data stored in the asset, if applicable.
@@ -64,24 +71,11 @@ export default {
             y: 50,
             z: 1,
             reticleSize: 0,
+            imageDimensions: {
+                w: 100,
+                h: 100
+            }
         }
-    },
-
-
-    computed: {
-
-        bgPosition() {
-            return this.x + '% ' + this.y + '%';
-        },
-
-        bgImage() {
-            return encodeURI(this.image);
-        },
-
-        bgTransform() {
-            return `scale(${this.z})`;
-        }
-
     },
 
 
@@ -91,14 +85,15 @@ export default {
         this.x = coords[0];
         this.y = coords[1];
         this.z = coords[2] || 1;
+        const image = this.$refs.image;
+        this.imageDimensions = { w: image.clientWidth, h: image.clientHeight };
     },
 
 
     watch: {
 
         z(z) {
-            const image = this.$refs.image;
-            const smaller = Math.min(image.clientWidth, image.clientHeight);
+            const smaller = Math.min(this.imageDimensions.w, this.imageDimensions.h);
             this.reticleSize = smaller / z;
         }
 
