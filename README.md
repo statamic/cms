@@ -34,4 +34,18 @@ composer install
 ./vendor/bin/phpunit
 ```
 
+### Translations
+
+The source can be scanned for `__()` method usage and translation files will be generated.
+
+```
+php translator generate
+```
+
+By default, only existing languages will be generated. If you would like to contribute a new language, specify it as an argument:
+
+```
+php translator generate fr
+```
+
 [ideas]: https://github.com/statamic/ideas
