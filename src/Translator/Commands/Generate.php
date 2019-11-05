@@ -32,7 +32,7 @@ class Generate extends Command
     {
         $this
             ->setName('generate')
-            ->addArgument('lang', InputArgument::OPTIONAL, 'A comma delimited list of language codes to generate.', 'en,de');
+            ->addArgument('lang', InputArgument::OPTIONAL, 'A comma delimited list of language codes to generate.', implode(',', $this->existingLanguages()));
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -191,5 +191,15 @@ class Generate extends Command
     protected function languages()
     {
         return explode(',', $this->input->getArgument('lang'));
+    }
+
+    protected function existingLanguages()
+    {
+        return collect($this->files->directories(getcwd().'/resources/lang'))
+            ->map(function ($dir) {
+                return basename($dir);
+            })
+            ->prepend('en')->unique()
+            ->all();
     }
 }
