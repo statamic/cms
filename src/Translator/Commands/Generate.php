@@ -70,11 +70,17 @@ class Generate extends Command
         $fullPath = __DIR__.'/../../../'.$path;
 
         $exists = file_exists($fullPath);
-        $existing = $exists ? json_decode($this->files->get($fullPath), true) : [];
+        $existingJson = $this->files->get($fullPath);
+        $existing = $exists ? json_decode($existingJson, true) : [];
 
         $json = $strings->mapWithKeys(function ($string) use ($existing) {
             return [$string => $existing[$string] ?? ''];
         })->toJson(JSON_PRETTY_PRINT);
+
+        if ($json === $existingJson) {
+            $this->output->writeln("<info>Translation file for <comment>$lang</comment> not written because there are no changes.</info>");
+            return;
+        }
 
         $this->files->put($fullPath, $json);
         $this->output->writeln($exists
