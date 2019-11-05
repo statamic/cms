@@ -315,7 +315,7 @@ class EntryRevisionsTest extends TestCase
 
     private function unpublish($entry, $payload)
     {
-        return $this->delete($entry->publishUrl(), $payload);
+        return $this->post($entry->unpublishUrl(), $payload);
     }
 
     private function restore($entry, $payload)

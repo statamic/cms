@@ -63,6 +63,7 @@ class TermRevisionsController extends CpController
             'actions' => [
                 'save' => $term->updateUrl(),
                 'publish' => $term->publishUrl(),
+                'unpublish' => $term->unpublishUrl(),
                 'revisions' => $term->revisionsUrl(),
                 'restore' => $term->restoreRevisionUrl(),
                 'createRevision' => $term->createRevisionUrl(),

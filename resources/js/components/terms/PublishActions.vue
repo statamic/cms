@@ -146,7 +146,7 @@ export default {
         submitUnpublish() {
             const payload = { message: this.revisionMessage };
 
-            this.$axios.delete(this.actions.publish, { data: payload }).then(response => {
+            this.$axios.post(this.actions.unpublish, { data: payload }).then(response => {
                 this.$toast.success(__('Unpublished'));
                 this.revisionMessage = null;
                 this.$emit('saved', { published: false, isWorkingCopy: false, response });
