@@ -1,5 +1,5 @@
 import { Mark, Plugin } from 'tiptap';
-import { updateMark, removeMark, pasteRule } from 'tiptap-commands';
+import { updateMark, removeMark, toggleMark, pasteRule } from 'tiptap-commands';
 
 export default function (extension) {
     return new class extends Mark {
@@ -12,7 +12,7 @@ export default function (extension) {
         }
 
         commands(args) {
-            return extension.commands({...args, updateMark, removeMark });
+            return extension.commands({...args, updateMark, removeMark, toggleMark });
         }
 
         pasteRules(args) {
