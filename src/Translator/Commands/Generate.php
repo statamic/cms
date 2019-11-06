@@ -77,14 +77,14 @@ class Generate extends Command
         })->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
         if ($json === ($existingJson ?? null)) {
-            $this->output->writeln("<info>Translation file for <comment>$lang</comment> not written because there are no changes.</info>");
+            $this->output->writeln("<comment>[!]</comment> Translation file for <comment>$lang</comment> not written because there are no changes.");
             return;
         }
 
         $this->files->put($fullPath, $json);
         $this->output->writeln($exists
-            ? "<info>Translation file for <comment>$lang</comment> merged into <comment>$path</comment></info>"
-            : "<info>Translation file for <comment>$lang</comment> created at <comment>$path</comment></info>"
+            ? "<info>[✓] Translation file for <comment>$lang</comment> merged into <comment>$path</comment></info>"
+            : "<info>[✓] Translation file for <comment>$lang</comment> created at <comment>$path</comment></info>"
         );
     }
 
@@ -139,7 +139,7 @@ class Generate extends Command
         $translations = $translationCallback($existing);
 
         if ($translations === $existing) {
-            $this->output->writeln("<info>Translation file for <comment>$lang/$file</comment> not written because there are no changes.</info>");
+            $this->output->writeln("<comment>[!]</comment> Translation file for <comment>$lang/$file</comment> not written because there are no changes.");
             return;
         }
 
@@ -149,8 +149,8 @@ class Generate extends Command
         $this->files->put($fullPath, $contents);
 
         $this->output->writeln($exists
-            ? "<info>Translation file for <comment>$lang/$file</comment> merged into <comment>$path</comment></info>"
-            : "<info>Translation file for <comment>$lang/$file</comment> created at <comment>$path</comment></info>"
+            ? "<info>[✓] Translation file for <comment>$lang/$file</comment> merged into <comment>$path</comment></info>"
+            : "<info>[✓] Translation file for <comment>$lang/$file</comment> created at <comment>$path</comment></info>"
         );
     }
 
