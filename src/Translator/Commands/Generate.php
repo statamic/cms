@@ -74,7 +74,7 @@ class Generate extends Command
 
         $json = $strings->mapWithKeys(function ($string) use ($existing) {
             return [$string => $existing[$string] ?? ''];
-        })->toJson(JSON_PRETTY_PRINT);
+        })->toJson(JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
 
         if ($json === ($existingJson ?? null)) {
             $this->output->writeln("<info>Translation file for <comment>$lang</comment> not written because there are no changes.</info>");
