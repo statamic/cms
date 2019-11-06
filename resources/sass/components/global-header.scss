@@ -95,6 +95,10 @@
         left: -3px;
         position: relative;
     }
+
+    kbd {
+        @apply font-sans rounded px-sm pb-px text-2xs border text-grey-50;
+    }
 }
 
 @screen md {

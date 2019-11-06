@@ -46,6 +46,7 @@ return [
     'forms_honeypot_instructions' => 'The field name to be used for the honeypot.',
     'forms_store_instructions' => 'Whether form submissions should be stored. Turn off if you only wish to get email notifications.',
     'forms_title_instructions' => 'Usually a call to action, like "Contact Us" or "Vote for Your Favorite Porg".',
+    'global_search_open_using_slash' => 'You can open global search using the <kbd>/</kbd> key',
     'global_set_blueprint_instructions' => 'Defines the field layout when editing this global set.',
     'global_set_handle_instructions' => 'How you will reference this global set in templates, etc.',
     'global_set_title_instructions' => 'The display name of this global set.',

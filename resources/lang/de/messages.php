@@ -46,6 +46,7 @@ return [
     'forms_honeypot_instructions' => '',
     'forms_store_instructions' => '',
     'forms_title_instructions' => '',
+    'global_search_open_using_slash' => '',
     'global_set_blueprint_instructions' => 'Definiert das Feldlayout bei der Bearbeitung des globalen Sets.',
     'global_set_handle_instructions' => 'Wie sie das globale Set in Templates etc. referenzieren.',
     'global_set_title_instructions' => 'Der Anzeigename des globales Sets.',
