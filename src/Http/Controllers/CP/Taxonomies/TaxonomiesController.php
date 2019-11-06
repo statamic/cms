@@ -35,8 +35,8 @@ class TaxonomiesController extends CpController
         return view('statamic::taxonomies.index', [
             'taxonomies' => $taxonomies,
             'columns' => [
-                Column::make('title'),
-                Column::make('terms'),
+                Column::make('title')->label(__('Title')),
+                Column::make('terms')->label(__('Terms')),
             ],
         ]);
     }
