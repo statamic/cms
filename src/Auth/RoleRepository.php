@@ -13,6 +13,7 @@ use Statamic\Contracts\Auth\RoleRepository as RepositoryContract;
 abstract class RoleRepository implements RepositoryContract
 {
     protected $path;
+    protected $roles = [];
 
     public function path($path)
     {
@@ -34,7 +35,15 @@ abstract class RoleRepository implements RepositoryContract
 
     public function find(string $id): ?Role
     {
-        return $this->all()->get($id);
+        if ($cached = array_get($this->roles, $id)) {
+            return $cached;
+        }
+
+        $role = $this->all()->get($id);
+
+        $this->roles[$id] = $role;
+
+        return $role;
     }
 
     public function exists(string $id): bool
