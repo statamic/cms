@@ -181,11 +181,7 @@ class EntriesController extends CpController
 
         $fields = $entry->blueprint()->fields()->addValues($request->except('id'));
 
-        $fields->validate([
-            'title' => 'required|min:3',
-            'slug' => 'required|alpha_dash',
-            'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id(),
-        ]);
+        $fields->validate(Entry::updateRules($collection, $entry));
 
         $values = $fields->process()->values();
 
@@ -302,10 +298,7 @@ class EntriesController extends CpController
 
         $fields = $blueprint->fields()->addValues($request->all());
 
-        $fields->validate([
-            'title' => 'required',
-            'slug' => 'required|unique_entry_value:'.$collection->handle(),
-        ]);
+        $fields->validate(Entry::createRules($collection));
 
         $values = $fields->process()->values()->except(['slug', 'blueprint']);
 
