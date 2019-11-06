@@ -124,6 +124,7 @@ import javascript from 'highlight.js/lib/languages/javascript'
 import css from 'highlight.js/lib/languages/css'
 import hljs from 'highlight.js/lib/highlight';
 import 'highlight.js/styles/github.css';
+import mark from './Mark';
 
 export default {
 
@@ -475,7 +476,7 @@ export default {
             }
 
             this.$bard.extensionCallbacks.forEach(callback => {
-                let returned = callback(this);
+                let returned = callback({ bard: this, mark });
                 exts = exts.concat(
                     Array.isArray(returned) ? returned : [returned]
                 );
