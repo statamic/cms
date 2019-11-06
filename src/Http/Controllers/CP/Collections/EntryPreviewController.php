@@ -12,6 +12,7 @@ use Statamic\Facades\Collection;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Http\Controllers\CP\CpController;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -24,7 +25,7 @@ class EntryPreviewController extends CpController
 
     public function edit(Request $request, $collection, $entry)
     {
-        $this->authorize('preview', $entry);
+        $this->authorize('view', $entry);
 
         $fields = $entry->blueprint()
             ->fields()
@@ -40,6 +41,8 @@ class EntryPreviewController extends CpController
 
     public function create(Request $request, $collection, $site)
     {
+        $this->authorize('create', [EntryContract::class, $collection]);
+
         $fields = Blueprint::find($request->blueprint)
             ->fields()
             ->addValues($preview = $request->preview)
