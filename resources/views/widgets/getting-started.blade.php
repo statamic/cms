@@ -1,18 +1,18 @@
 <div class="card p-0 content">
     <div class="p-3">
-        <h1>Getting started with Statamic</h1>
-        <p>To begin building your new Statamic site, we recommend starting with these steps.</p>
+        <h1>{{ __('statamic::messages.getting_started_widget_header') }}</h1>
+        <p>{{ __('statamic::messages.getting_started_widget_intro') }}</p>
     </div>
     <div class="p-3 border-t md:flex items-center">
         <div class="h-8 w-8 mr-2 hidden md:block text-blue">
             @svg('book-pages')
         </div>
         <div class="flex-1 mb-2 md:mb-0 md:mr-3">
-            <h3 class="mb-0">Read the Documentation</h3>
-            <p>Get to know Statamic understand its capabilities the right way.</p>
+            <h3 class="mb-0">{{ __('Read the Documentation') }}</h3>
+            <p>{{ __('statamic::messages.getting_started_widget_docs') }}</p>
         </div>
         <a href="https://statamic.dev" class="btn btn-primary min-w-xs block">
-            Visit the Docs
+            {{ __('Read the Docs') }}
         </a>
     </div>
     <div class="p-3 border-t md:flex items-center">
@@ -20,11 +20,11 @@
             @svg('content-writing')
         </div>
         <div class="flex-1 mb-2 md:mb-0 md:mr-3">
-            <h3 class="mb-0">Collections</h3>
-            <p>Collections contain the different types of content in your site.</p>
+            <h3 class="mb-0">{{ __('Collections') }}</h3>
+            <p>{{ __('statamic::messages.getting_started_widget_collections') }}</p>
         </div>
         <a href="{{ cp_route('collections.create') }}" class="btn btn-primary min-w-xs block">
-            Create Collection
+            {{ __('Create Collection') }}
         </a>
     </div>
     <div class="p-3 border-t md:flex items-center">
@@ -32,11 +32,11 @@
             @svg('blueprints')
         </div>
         <div class="flex-1 mb-2 md:mb-0 md:mr-3">
-            <h3 class="mb-0">Blueprints</h3>
-            <p>Blueprints define the custom fields used to create and store your content.</p>
+            <h3 class="mb-0">{{ __('Blueprints') }}</h3>
+            <p>{{ __('statamic::messages.getting_started_widget_blueprints') }}</p>
         </div>
         <a href="{{ cp_route('blueprints.create') }}" class="btn btn-primary min-w-xs block">
-            Create Blueprint
+            {{ __('Create Blueprint') }}
         </a>
     </div>
     <div class="p-3 border-t md:flex items-center">
@@ -44,11 +44,11 @@
             @svg('structures')
         </div>
         <div class="flex-1 mb-2 md:mb-0 md:mr-3">
-            <h3 class="mb-0">Structures</h3>
-            <p>Structures establish the heirarchy of your pages and help you manage your site navigation.</p>
+            <h3 class="mb-0">{{ __('Structures') }}</h3>
+            <p>{{ __('statamic::messages.getting_started_widget_structures') }}</p>
         </div>
         <a href="{{ cp_route('structures.create') }}" class="btn btn-primary min-w-xs block">
-            Create Structure
+            {{ __('Create Structure') }}
         </a>
     </div>
     {{-- <div class="p-3 border-t md:flex items-center">
@@ -56,11 +56,11 @@
             @svg('addons')
         </div>
         <div class="flex-1 mb-2 md:mb-0 md:mr-3">
-            <h3 class="mb-0">Explore the Addon Marketplace</h3>
-            <p>Addons extend Statamic's core capabilities. Go see what's possible!</p>
+            <h3 class="mb-0">__('Explore the Addon Marketplace') }}</h3>
+            <p>{{ __('statamic::messages.getting_started_widget_addons') }}</p>
         </div>
         <a href="{{ cp_route('addons.index') }}" class="btn btn-primary min-w-xs block">
-            Explore Addons
+            {{ __('Explore Addons') }}
         </a>
     </div> --}}
 </div>
