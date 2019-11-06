@@ -63,10 +63,10 @@ class UsersController extends CpController
             'filters' => $request->filters,
             'sortColumn' => $sort,
             'columns' => [
-                Column::make('email'),
-                Column::make('name'),
-                Column::make('roles'),
-                Column::make('last_login'),
+                Column::make('email')->label(__('Email')),
+                Column::make('name')->label(__('Name')),
+                Column::make('roles')->label(__('Roles')),
+                Column::make('last_login')->label(__('Last Login')),
             ],
         ]]);
     }
