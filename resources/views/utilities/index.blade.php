@@ -4,7 +4,7 @@
 @section('content')
 
     <div class="content">
-        <h1 class="mb">Utilities</h1>
+        <h1 class="mb">{{ __('Utilities') }}</h1>
     </div>
 
     <div class="flex flex-wrap -mx-2 mt-3">
