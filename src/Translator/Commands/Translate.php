@@ -70,6 +70,8 @@ class Translate extends Command
             return;
         }
 
+        $this->output->writeln("Translating $lang...");
+
         $bar = new ProgressBar($this->output, $pendingTranslations);
 
         $translations = collect($existingTranslations)
@@ -120,6 +122,8 @@ class Translate extends Command
             $this->output->writeln("<comment>[!]</comment> No pending translations for <comment>$lang/$filename</comment>.");
             return;
         }
+
+        $this->output->writeln("Translating $lang/$filename...");
 
         $bar = new ProgressBar($this->output, $pendingTranslations);
 
