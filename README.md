@@ -34,4 +34,30 @@ composer install
 ./vendor/bin/phpunit
 ```
 
+### Translations
+
+The source can be scanned for `__()` method usage and translation files will be generated.
+
+```
+php translator generate
+```
+
+By default, only existing languages will be generated. If you would like to contribute a new language, specify it as an argument:
+
+```
+php translator generate fr
+```
+
+Generating a translation file will populate it with empty strings. If you don't want to manually enter all the strings, you can have Google Translate do it. You need an API key.
+
+```
+php translator translate fr --key=123
+```
+
+You may review and update existing translation files. This provides a nice way to correct any mistakes. It will loop over each line in the requested file, show you the key, the English phrase, and the current translated phrase. You can enter a new translation if you like.
+
+```
+php translator review fr messages
+```
+
 [ideas]: https://github.com/statamic/ideas

@@ -12,23 +12,23 @@
         <!-- Step 1 -->
         <div v-show="currentStep === 0">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Create a new Taxonomy</h1>
-                <p class="text-grey">A Taxonomy is a system of classifying data around a set of unique characteristics, such as category or color.</p>
+                <h1 class="mb-3">{{ __('Create a new Taxonomy') }}</h1>
+                <p class="text-grey" v-text="__('messages.taxonomy_wizard_intro')" />
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Name of your Taxonomy</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Title') }}</label>
                 <input type="text" v-model="taxonomy.title" class="input-text" autofocus tabindex="1">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Usually a noun, like "Categories" or "Tags".
+                    {{ __('messages.taxonomy_wizard_title_instructions') }}
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Handle</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Handle') }}</label>
                 <input type="text" v-model="taxonomy.handle" class="input-text" tabindex="2">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    How you'll reference to this taxonomy in your templates. Cannot be easily changed.
+                    {{ __('messages.taxonomy_wizard_handle_instructions') }}
                 </div>
             </div>
         </div>
@@ -36,11 +36,11 @@
         <!-- Step 2 -->
         <div v-show="currentStep === 1">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Content Model</h1>
-                <p class="text-grey">Your content model determines what field and data are stored in this taxonomy.</p>
+                <h1 class="mb-3">{{ __('Content Model') }}</h1>
+                <p class="text-grey" v-text="__('messages.taxonomy_wizard_content_model_intro')" />
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Blueprint</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Blueprint') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'blueprints', type: 'blueprints' }"
                     :initial-value="taxonomy.blueprints">
@@ -56,18 +56,18 @@
                 </publish-field-meta>
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    You can pick an existing Blueprint or creates a new one.
+                    {{ __('messages.taxonomy_wizard_blueprint_instructions') }}
                 </div>
             </div>
         </div>
 
         <div v-if="currentStep === 2">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Collections</h1>
-                <p class="text-grey">Create the links between taxonomy and collection.</p>
+                <h1 class="mb-3">{{ __('Collections') }}</h1>
+                <p class="text-grey" v-text="__('messages.taxonomy_wizard_collections_intro')" />
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Collections</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Collections') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'collections', type: 'collections' }"
                     :initial-value="taxonomy.collections">
@@ -83,7 +83,7 @@
                 </publish-field-meta>
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    When a collection is linked to a taxonomy, its entries will automatically get fields added to their forms.
+                    {{ __('messages.taxonomy_wizard_collections_instructions') }}
                 </div>
             </div>
         </div>
@@ -115,7 +115,7 @@ export default {
 
     data() {
         return {
-            steps: ['Naming', 'Content Model', 'Collections'],
+            steps: [__('Naming'), __('Content Model'), __('Collections')],
             currentStep: 0,
             taxonomy: {
                 title: null,

@@ -4,7 +4,7 @@
     </div>
     <div class="card-body pad-16">
         @if ( ! $submissions)
-            <p class="text-center light mv-16">{{ __('This form is awaiting responses.') }}</p>
+            <p class="text-center light mv-16">{{ __('This form is awaiting responses') }}</p>
         @else
             <table class="dossier">
                 @foreach($submissions as $submission)

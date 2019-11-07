@@ -9,7 +9,7 @@
     <div class="card auth-card mx-auto">
         <div class="text-center pb-2 mb-2">
             <h1 class="mb-2 text-lg text-grey-80">{{ __('Forgot Your Password?') }}</h1>
-            <p class="text-sm text-grey">{{ __('Enter your email address so we can send a reset password link.') }}</p>
+            <p class="text-sm text-grey">{{ __('messages.forgot_password_enter_email') }}</p>
         </div>
 
         @if (session('status'))
@@ -37,7 +37,7 @@
 
     <div class="w-full text-center mt-2">
         <a href="{{ cp_route('login')}}" class="forgot-password-link text-sm opacity-75 hover:opacity-100">
-            {{ __('Go back, I remember my password') }}
+            {{ __('I remember my password') }}
         </a>
     </div>
 

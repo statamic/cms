@@ -11,7 +11,7 @@
 
             <div class="form-group">
                 <label class="block">{{ __('Title') }}</label>
-                <small class="help-block">{{ __('The proper name of your fieldset.') }}</small>
+                <small class="help-block">{{ __('messages.fieldsets_title_instructions') }}</small>
                 <div v-if="errors.title">
                     <small class="help-block text-red" v-for="(error, i) in errors.title" :key="i" v-text="error" />
                 </div>

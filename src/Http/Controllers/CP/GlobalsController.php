@@ -93,7 +93,7 @@ class GlobalsController extends CpController
         }
 
         if ($request->has('created')) {
-            session()->now('success', __('Globals created'));
+            session()->now('success', __('Global Set created'));
         }
 
         return view('statamic::globals.edit', array_merge($viewData, [

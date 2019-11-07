@@ -29,7 +29,7 @@
                 <form-group
                     handle="fieldset"
                     :display="__('Fieldset')"
-                    :instructions="__(`The fieldset to be imported.`)"
+                    :instructions="__('messages.fieldset_import_fieldset_instructions')"
                     autofocus
                     :value="config.fieldset"
                     @input="updateField('fieldset', $event)"
@@ -38,7 +38,7 @@
                 <form-group
                     handle="prefix"
                     :display="__('Prefix')"
-                    :instructions="__(`The prefix that should be applied to each field when they are imported. eg. _hero`)"
+                    :instructions="__('messages.fieldset_import_prefix_instructions')"
                     :value="config.prefix"
                     @input="updateField('prefix', $event)"
                 />

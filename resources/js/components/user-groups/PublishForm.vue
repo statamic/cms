@@ -27,7 +27,7 @@
                 />
 
                 <div class="text-xs text-red p-3 pt-0" v-if="initialHandle && handle != initialHandle">
-                    {{ __('role_change_handle_warning') }}
+                    {{ __('messages.role_change_handle_warning') }}
                 </div>
 
                 <div class="form-group publish-field field-w-full">

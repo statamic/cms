@@ -12,7 +12,6 @@ Vue.component('slug-fieldtype', require('../components/fieldtypes/SlugFieldtype.
 
 // Fieldtypes
 import FieldsetFieldtype from '../components/fieldtypes/FieldsetFieldtype.vue'
-import LocaleSettingsFieldtype from '../components/fieldtypes/LocaleSettingsFieldtype.vue'
 import RelateFieldtype from '../components/fieldtypes/relate/RelateFieldtype.vue'
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
 import RoutesFieldtype from '../components/fieldtypes/RoutesFieldtype.vue'
@@ -36,7 +35,6 @@ Vue.component('grid-fieldtype-index', require('../components/fieldtypes/grid/Gri
 Vue.component('hidden-fieldtype', require('../components/fieldtypes/HiddenFieldtype.vue'));
 Vue.component('integer-fieldtype', require('../components/fieldtypes/IntegerFieldtype.vue'));
 Vue.component('list-fieldtype', require('../components/fieldtypes/ListFieldtype.vue'));
-Vue.component('locale_settings-fieldtype', LocaleSettingsFieldtype);
 Vue.component('markdown-fieldtype', require('../components/fieldtypes/MarkdownFieldtype.vue'));
 Vue.component('radio-fieldtype', require('../components/fieldtypes/RadioFieldtype.vue'));
 Vue.component('range-fieldtype', require('../components/fieldtypes/RangeFieldtype.vue'));

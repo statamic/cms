@@ -15,9 +15,9 @@ class CoreUtilities
     {
         Utility::make('cache')
             ->action([CacheController::class, 'index'])
-            ->title('Cache Manager')
-            ->navTitle('Cache')
-            ->description('Manage and view important information about Statamic\'s various caching layers.')
+            ->title(__('Cache Manager'))
+            ->navTitle(__('Cache'))
+            ->description(__('statamic::messages.cache_utility_description'))
             ->docsUrl(Statamic::docsUrl('utilities/cache-manager'))
             ->routes(function ($router) {
                 $router->post('cache/{cache}', [CacheController::class, 'clear'])->name('clear');
@@ -26,15 +26,15 @@ class CoreUtilities
 
         Utility::make('phpinfo')
             ->action(PhpInfoController::class)
-            ->title('PHP Info')
-            ->description('Check your PHP configuration settings and installed modules.')
+            ->title(__('PHP Info'))
+            ->description(__('statamic::messages.phpinfo_utility_description'))
             ->docsUrl(Statamic::docsUrl('utilities/phpinfo'))
             ->register();
 
         Utility::make('search')
             ->view('statamic::utilities.search')
-            ->title('Search')
-            ->description('Manage and view important information about Statamic\'s search indexes.')
+            ->title(__('Search'))
+            ->description(__('statamic::messages.search_utility_description'))
             ->docsUrl(Statamic::docsUrl('utilities/search'))
             ->routes(function ($router) {
                 $router->post('/', [UpdateSearchController::class, 'update'])->name('update');
@@ -43,8 +43,8 @@ class CoreUtilities
 
         Utility::make('email')
             ->view('statamic::utilities.email')
-            ->title('Email')
-            ->description('Check email configuration and send a test.')
+            ->title(__('Email'))
+            ->description(__('statamic::messages.email_utility_description'))
             ->docsUrl(Statamic::docsUrl('utilities/email'))
             ->routes(function ($router) {
                 $router->post('/', [EmailController::class, 'send']);

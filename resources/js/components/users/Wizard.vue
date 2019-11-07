@@ -13,31 +13,31 @@
         <div v-if="!completed && currentStep === 0">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('Create a New User') }}</h1>
-                <p class="text-grey">Users can be assigned to roles that customize their permissions, access, and abilities throughout the Control Panel.</p>
+                <p class="text-grey" v-text="__('messages.user_wizard_intro')" />
             </div>
 
             <!-- Email Address -->
             <div class="max-w-md mx-auto px-2 pb-5">
-                <label class="font-bold text-base mb-sm" for="email">Email Address*</label>
+                <label class="font-bold text-base mb-sm" for="email">{{ __('Email Address') }}*</label>
                 <input type="email" v-model="user.email" id="email" class="input-text" required autofocus tabindex="1">
 
                 <div class="text-2xs text-red mt-1 flex items-center" v-if="userExists">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    This user already exists.
+                    {{ __('This user already exists.') }}
                 </div>
                 <div class="text-2xs text-grey-60 mt-1 flex items-center" v-else>
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    The email address also serves as a username and must be unique
+                    {{ __('messages.user_wizard_email_instructions') }}
                 </div>
             </div>
 
             <!-- Name -->
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Name</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Name') }}</label>
                 <input type="text" v-model="user.name" id="name" class="input-text" autofocus tabindex="2">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    You can leave the name blank if you want to let the user fill it in.
+                    {{ __('messages.user_wizard_name_instructions') }}
                 </div>
             </div>
         </div>
@@ -46,24 +46,24 @@
         <div v-if="!completed && currentStep === 1" class="max-w-md mx-auto px-2 pb-2">
             <div class="py-6 text-center">
                 <h1 class="mb-3">{{ __('Roles & Groups') }}</h1>
-                <p class="text-grey">Users can be assigned to roles that customize their permissions, access, and abilities throughout the Control Panel.</p>
+                <p class="text-grey" v-text="__('messages.user_wizard_roles_groups_intro')" />
             </div>
 
             <!-- Super Admin -->
              <div class="pb-5">
                 <div class="flex items-center">
                     <toggle-input v-model="user.super" />
-                    <label class="font-bold ml-1">Super Admin</label>
+                    <label class="font-bold ml-1">{{ __('Super Admin') }}</label>
                 </div>
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Super admins have complete control and access to everything in the control panel. Grant this role wisely.
+                    {{ __('messages.user_wizard_super_admin_instructions') }}
                 </div>
             </div>
 
             <!-- Roles -->
             <div class="pb-5" v-if="! user.super">
-                <label class="font-bold text-base mb-sm" for="role">Roles</label>
+                <label class="font-bold text-base mb-sm" for="role">{{ __('Roles') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'user.roles', type: 'user_roles' }"
                     :initial-value="user.roles">
@@ -84,25 +84,25 @@
         <div v-if="!completed && currentStep === 2">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('Invitation') }}</h1>
-                <p class="text-grey">Send a welcome email with account activiation details to the new user.</p>
+                <p class="text-grey" v-text="__('messages.user_wizard_invitation_intro')" />
             </div>
 
             <!-- Send Email? -->
             <div class="max-w-md mx-auto px-2 mb-3 flex items-center">
                 <toggle-input v-model="invitation.send" />
-                <label class="font-bold ml-1">Send Email Invitation</label>
+                <label class="font-bold ml-1">{{ __('Send Email Invitation') }}</label>
             </div>
 
             <div class="max-w-lg mx-auto bg-grey-10 py-5 mb-7 border rounded-lg " v-if="invitation.send">
                 <!-- Subject Line -->
                 <div class="max-w-md mx-auto px-2 pb-5">
-                    <label class="font-bold text-base mb-sm" for="email">Email Subject</label>
+                    <label class="font-bold text-base mb-sm" for="email">{{ __('Email Subject') }}</label>
                     <input type="text" v-model="invitation.subject" class="input-text bg-white">
                 </div>
 
                 <!-- Email Content -->
                 <div class="max-w-md mx-auto px-2">
-                    <label class="font-bold text-base mb-sm" for="email">Email Content</label>
+                    <label class="font-bold text-base mb-sm" for="email">{{ __('Email Content') }}</label>
                     <textarea
                         class="input-text min-h-48 p-2 bg-white"
                         v-model="invitation.message"
@@ -113,7 +113,7 @@
 
             <!-- Copy Pasta -->
             <div class="max-w-md mx-auto px-2 pb-7" v-else>
-                <p class="mb-1">After you create the user, you'll be given details to share with <code>{{ user.email }}</code> via your preferred method.</p>
+                <p class="mb-1" v-text="__('messages.user_wizard_invitation_share_before', { email: user.email })" />
             </div>
         </div>
 
@@ -121,15 +121,15 @@
         <div v-if="completed">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('User created') }}</h1>
-                <p class="text-grey">The user account has been created.</p>
+                <p class="text-grey" v-text="__('messages.user_wizard_account_created')" />
             </div>
 
             <!-- Copy Pasta -->
             <div class="max-w-md mx-auto px-2 pb-7">
-                <p class="mb-1">Copy these credentials and share them with <code>{{ user.email }}</code> via your preferred method.</p>
+                <p class="mb-1" v-text="__('messages.user_wizard_invitation_share', { email: user.email })" />
                 <textarea readonly class="input-text" v-elastic onclick="this.select()">
-Activation URL: {{ activationUrl }}
-Username: {{ user.email }}
+{{ __('Activation URL') }}: {{ activationUrl }}
+{{ __('Username') }}: {{ user.email }}
 </textarea>
             </div>
         </div>
@@ -179,8 +179,8 @@ export default {
             },
             invitation: {
                 send: true,
-                subject: __('Activate your new Statamic account on ') + window.location.hostname,
-                message: `Activate your new Statamic account on ${window.location.hostname} to begin managing this website.\n\nFor your security, the link below expires after 48 hours. After that, please contact the site administrator for a new password.`,
+                subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
+                message: __('messages.user_wizard_invitation_body', { site: window.location.hostname }),
             },
             userExists: false,
             completed: false,
@@ -191,7 +191,7 @@ export default {
 
     computed: {
         finishButtonText() {
-            return this.invitation.send ? 'Create and Send Email' : 'Create User';
+            return this.invitation.send ? __('Create and Send Email') : __('Create User');
         },
         isValidEmail() {
             return this.user.email && isEmail(this.user.email)

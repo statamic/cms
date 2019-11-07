@@ -2,10 +2,7 @@
 
     <div class="session-expiry">
 
-        <button v-if="isWarning" class="session-expiry-stripe" @click="extend">
-            <span v-text="warningText" />
-            <span v-if="remaining > 0">{{ __("Click to extend your session.") }}</span>
-        </button>
+        <button v-if="isWarning" class="session-expiry-stripe" @click="extend" v-text="warningText" />
 
         <modal name="session-timeout-login" v-if="isShowingLogin" height="auto" width="500px" :adaptive="true" :pivotY=".1">
             <div class="flex items-center p-3 bg-grey-20 border-b text-center">
@@ -14,16 +11,16 @@
 
             <div v-if="isUsingOauth" class="p-3">
                 <a :href="oauthProvider.loginUrl" target="_blank" class="btn btn-primary">
-                    {{ __('Login with :provider', {provider: oauthProvider.label}) }}
+                    {{ __('Log in with :provider', {provider: oauthProvider.label}) }}
                 </a>
                 <div class="text-2xs text-grey mt-2">
-                    {{ __(`Opens in a new window. Come back once you've logged in.`) }}
+                    {{ __('messages.session_expiry_new_window') }}
                 </div>
             </div>
 
             <div v-if="!isUsingOauth" class="publish-fields">
                 <div class="form-group">
-                    <label v-text="__('Enter your password to continue where you left off')" />
+                    <label v-text="__('messages.session_expiry_enter_password')" />
                     <small
                         class="help-block text-red"
                         v-if="errors.email"
@@ -41,7 +38,7 @@
                             tabindex="1"
                             autofocus
                             @keydown.enter.prevent="submit" />
-                        <button @click="submit" class="btn btn-primary ml-1" v-text="__('Login')" />
+                        <button @click="submit" class="btn btn-primary ml-1" v-text="__('Log in')" />
                     </div>
                 </div>
             </div>
@@ -84,8 +81,8 @@ export default {
 
         warningText() {
             return (this.remaining === 0)
-                ? __("You have been logged out because you've been inactive for a while.")
-                : __('You have been inactive for a while and will be logged out in :seconds seconds.', { seconds: this.remaining });
+                ? __('messages.session_expiry_logged_out_for_inactivity')
+                : __('messages.session_expiry_logging_out_in_seconds', { seconds: this.remaining });
         },
 
         isUsingOauth() {

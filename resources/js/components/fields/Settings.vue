@@ -56,7 +56,7 @@
                     <form-group
                         handle="display"
                         :display="__('Display')"
-                        :instructions="__(`The field's label shown in the Control Panel.`)"
+                        :instructions="__('messages.fields_display_instructions')"
                         width="50"
                         autofocus
                         :value="values.display"
@@ -66,7 +66,7 @@
                     <form-group
                         handle="handle"
                         :display="__('Handle')"
-                        :instructions="__(`The field's template variable.`)"
+                        :instructions="__('messages.fields_handle_instructions')"
                         width="50"
                         :value="values.handle"
                         @input="updateField('handle', $event, setFieldValue); isHandleModified = true"
@@ -76,7 +76,7 @@
                         fieldtype="text"
                         handle="instructions"
                         :display="__('Instructions')"
-                        :instructions="__(`Shown under the field's display label, this like very text. Markdown is supported.`)"
+                        :instructions="__('messages.fields_instructions_instructions')"
                         :value="values.instructions"
                         @input="updateField('instructions', $event, setFieldValue)"
                     />

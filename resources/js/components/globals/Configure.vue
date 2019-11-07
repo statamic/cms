@@ -20,7 +20,7 @@
                     <form-group
                         handle="title"
                         display="Title"
-                        :instructions="__('global_set_title_instructions')"
+                        :instructions="__('messages.global_set_title_instructions')"
                         v-model="title"
                         :errors="errors.title"
                         width="50"
@@ -29,7 +29,7 @@
                         fieldtype="slug"
                         handle="handle"
                         :display="__('Handle')"
-                        :instructions="__('global_set_handle_instructions')"
+                        :instructions="__('messages.global_set_handle_instructions')"
                         :config="{ slugify_using: 'instance' }"
                         v-model="handle"
                         :errors="errors.handle"
@@ -41,7 +41,7 @@
                         fieldtype="blueprints"
                         :config="{ component: 'relationship', max_items: 1 }"
                         :display="__('Blueprint')"
-                        :instructions="__('global_set_blueprint_instructions')"
+                        :instructions="__('messages.global_set_blueprint_instructions')"
                         v-model="blueprint"
                         :errors="errors.blueprint"
                     />

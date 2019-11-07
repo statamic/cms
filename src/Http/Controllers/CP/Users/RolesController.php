@@ -31,9 +31,9 @@ class RolesController extends CpController
         return view('statamic::roles.index', [
             'roles' => $roles,
             'columns' => [
-                Column::make('title'),
-                Column::make('handle'),
-                Column::make('permissions'),
+                Column::make('title')->label(__('Title')),
+                Column::make('handle')->label(__('Handle')),
+                Column::make('permissions')->label(__('Permissions')),
             ],
         ]);
     }

@@ -5,7 +5,7 @@
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 pr-2 py-1 pl-1">
-                    <svg-icon class="text-grey-70 mr-1" name="paperclip" v-tooltip="__('linked fieldset')" />
+                    <svg-icon class="text-grey-70 mr-1" name="paperclip" v-tooltip="__('Linked fieldset')" />
                     <a @click="$emit('edit')">
                         <span v-text="__('Fieldset')" />
                         <span class="font-mono text-3xs text-grey-60">{{ field.fieldset }}</span>

@@ -44,7 +44,7 @@ export default {
             const url = cp_url(`globals/${id}`);
             this.$axios.delete(url).then(response => {
                 this.rows.splice(index, 1);
-                this.$toast.success(__('Global set deleted'));
+                this.$toast.success(__('Global Set deleted'));
             }).catch(error => {
                 this.$toast.error(error.response.data.message);
             })

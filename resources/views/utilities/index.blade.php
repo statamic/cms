@@ -4,7 +4,7 @@
 @section('content')
 
     <div class="content">
-        <h1 class="mb">Utilities</h1>
+        <h1 class="mb">{{ __('Utilities') }}</h1>
     </div>
 
     <div class="flex flex-wrap -mx-2 mt-3">
@@ -15,7 +15,7 @@
                         <h2><a href="{{ $utility->url() }}" class="text-grey-90 hover:text-blue">{{ $utility->title() }}</a></h2>
                         <p>{{ $utility->description() }}</p>
                         @if ($utility->docsUrl())
-                            <p><a href="{{ $utility->docsUrl() }}" class="font-bold text-blue">{{ __('Read the docs') }}</a><span class="inline-block text-blue w-4 h-4 ml-1">@svg('external-link')</span></p>
+                            <p><a href="{{ $utility->docsUrl() }}" class="font-bold text-blue">{{ __('Read the Docs') }}</a><span class="inline-block text-blue w-4 h-4 ml-1">@svg('external-link')</span></p>
                         @endif
                     </div>
                     <div class="flex p-2 border-t items-center">

@@ -200,7 +200,7 @@
                                 </div>
                             </div>
 
-                            <div class="p-2 text-grey-70" v-if="containerIsEmpty">{{ __('This container is empty.') }}</div>
+                            <div class="p-2 text-grey-70" v-if="containerIsEmpty">{{ __('This container is empty') }}</div>
 
                         </div>
 

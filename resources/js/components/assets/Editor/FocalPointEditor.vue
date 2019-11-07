@@ -4,7 +4,7 @@
         <div class="focal-point-toolbox card p-0">
             <div class="p-2">
                 <label>{{ __('Focal Point') }}</label>
-                <small class="help-block">{{ __('focal_point_instructions') }}</small>
+                <small class="help-block">{{ __('messages.focal_point_instructions') }}</small>
                 <div class="focal-point-image">
                     <img ref="image" :src="image" @click="define" />
                     <div class="focal-point-reticle" :class="{ zoomed: z > 1 }" :style="{
@@ -39,7 +39,7 @@
                     <button type="button" class="btn mb-1 btn-primary" @click="select">{{ __('Finish') }}</button>
                 </div>
             </div>
-            <h6 class="p-2 text-center bg-grey-30 rounded-b">{{ __('Crop previews are for example only') }}</h6>
+            <h6 class="p-2 text-center bg-grey-30 rounded-b">{{ __('messages.focal_point_previews_are_examples') }}</h6>
         </div>
         <div v-for="n in 9" :key="n"
              :class="`frame frame-${n}`">

@@ -47,7 +47,10 @@
                         <div class="p-1 text-grey-60 hover:text-grey-80" @click="removeFavorite(favorite)">&times;</div>
                     </div>
 
-                    <div class="text-grey text-xs px-1.5 py-1 border-t text-center"><b class="tracking-wide uppercase text-3xs">{{ __('Pro Tip')}}:</b> You can open global search using the <span class="rounded px-sm pb-px text-2xs border text-grey-50">/</span> key</div>
+                    <div class="text-grey text-xs px-1.5 py-1 border-t text-center">
+                        <b class="tracking-wide uppercase text-3xs">{{ __('Pro Tip')}}:</b>
+                        <span v-html="__('messages.global_search_open_using_slash')" />
+                    </div>
                 </div>
             </div>
         </div>

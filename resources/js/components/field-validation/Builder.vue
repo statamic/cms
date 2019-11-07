@@ -4,7 +4,7 @@
         <label class="publish-field-label">{{ __('Validation Rules') }}</label>
         <div class="help-block -mt-1">
             <p>
-                {{ __("Has access to all of Laravel's validation rules.") }}
+                {{ __('messages.field_validation_instructions') }}
                 <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
             </p>
         </div>

@@ -2,7 +2,7 @@
 
     <div class="form-group publish-field select-fieldtype field-w-full">
         <label class="publish-field-label">{{ __('Conditions') }}</label>
-        <div class="help-block -mt-1"><p>{{ __('When to show or hide this field.') }}</p></div>
+        <div class="help-block -mt-1"><p>{{ __('messages.field_conditions_instructions') }}</p></div>
 
         <div class="flex items-center mb-3">
             <select-input
@@ -34,7 +34,7 @@
                 class="min-w-md"
                 :options="fieldOptions"
                 :reduce="field => field.value"
-                :placeholder="__('Select Field')"
+                :placeholder="__('Select field')"
                 :taggable="true"
                 :create-option="field => ({value: field, label: field })" />
 
@@ -104,8 +104,8 @@ export default {
 
         typeOptions() {
             return this.normalizeInputOptions({
-                all: __('All of following conditions pass'),
-                any: __('Any of following conditions pass'),
+                all: __('All of the following conditions pass'),
+                any: __('Any of the following conditions pass'),
                 custom: __('Custom method passes')
             });
         },

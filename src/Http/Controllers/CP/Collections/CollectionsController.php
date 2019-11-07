@@ -37,8 +37,8 @@ class CollectionsController extends CpController
         return view('statamic::collections.index', [
             'collections' => $collections,
             'columns' => [
-                Column::make('title'),
-                Column::make('entries'),
+                Column::make('title')->label(__('Title')),
+                Column::make('entries')->label(__('Entries')),
             ],
         ]);
     }
@@ -230,7 +230,7 @@ class CollectionsController extends CpController
             'past_date_behavior' => [
                 'type' => 'select',
                 'display' => __('Past Date Behavior'),
-                'instructions' => __('How past dated entries should behave.'),
+                'instructions' => __('statamic::messages.collections_past_date_behavior_instructions'),
                 'width' => 50,
                 'options' => [
                     'public' => 'Public - Always visible',
@@ -241,7 +241,7 @@ class CollectionsController extends CpController
             'future_date_behavior' => [
                 'type' => 'select',
                 'display' => __('Future Date Behavior'),
-                'instructions' => __('How future dated entries should behave.'),
+                'instructions' => __('statamic::messages.collections_future_date_behavior_instructions'),
                 'width' => 50,
                 'options' => [
                     'public' => 'Public - Always visible',
@@ -253,13 +253,13 @@ class CollectionsController extends CpController
             'ordering' => ['type' => 'section'],
             'orderable' => [
                 'type' => 'toggle',
-                'instructions' => __('Enable manual ordering via drag & drop.'),
+                'instructions' => __('statamic::messages.collections_orderable_instructions'),
                 'width' => 50,
                 'if' => ['structure' => 'empty']
             ],
             'sort_direction' => [
                 'type' => 'select',
-                'instructions' => __('The default sort direction.'),
+                'instructions' => __('statamic::messages.collections_sort_direction_instructions'),
                 'width' => 50,
                 'options' => [
                     'asc' => 'Ascending',
@@ -270,43 +270,43 @@ class CollectionsController extends CpController
             'structure' => [
                 'type' => 'structures',
                 'max_items' => 1,
-                'instructions' => __('Structures enable page hierarchies that control order and URL.'),
+                'instructions' => __('statamic::messages.collections_structure_instructions'),
             ],
 
             'content_model' => ['type' => 'section'],
             'blueprints' => [
                 'type' => 'blueprints',
-                'instructions' => __('Entries in this collection may use any of these blueprints.'),
+                'instructions' => __('statamic::messages.collections_blueprint_instructions'),
                 'validate' => 'array',
             ],
             'taxonomies' => [
                 'type' => 'taxonomies',
-                'instructions' => __('Connect entries in this collection to taxonomies. Fields are be automatically added to publish forms.'),
+                'instructions' => __('statamic::messages.collections_taxonomies_instructions'),
             ],
             'template' => [
                 'type' => 'text',
-                'instructions' => __('Set a default template.'),
+                'instructions' => __('statamic::messages.collections_template_instructions'),
                 'width' => 50
             ],
             'layout' => [
                 'type' => 'text',
-                'instructions' => __('Set a default layout.'),
+                'instructions' => __('statamic::messages.collections_layout_instructions'),
                 'width' => 50
             ],
             'default_publish_state' => [
                 'type' => 'toggle',
-                'instructions' => __('Whether new entries created in the Control Panel should be published by default.'),
+                'instructions' => __('statamic::messages.collections_default_publish_state_instructions'),
             ],
 
             'routing' => ['type' => 'section'],
             'route' => [
                 'type' => 'text',
-                'instructions' => __("The route controls entries URL pattern."),
+                'instructions' => __('statamic::messages.collections_route_instructions'),
             ],
             'mount' => [
                 'type' => 'entries',
                 'max_items' => 1,
-                'instructions' => __('Enable add/edit shortcuts from Structures and `mount` variable in your route.'),
+                'instructions' => __('statamic::messages.collections_mount_instructions'),
             ],
             'amp' => [
                 'type' => 'toggle',

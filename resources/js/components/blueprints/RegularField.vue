@@ -58,7 +58,7 @@ export default {
     computed: {
 
         tooltipText() {
-            return this.field.fieldtype + ' ' + __('fieldtype')
+            return this.field.fieldtype;
         },
 
         isReferenceField() {

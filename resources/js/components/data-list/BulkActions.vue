@@ -3,7 +3,7 @@
     <div v-if="hasSelections" class="flex items-center">
 
         <div class="text-grey text-2xs mr-1"
-            v-text="__n(`:count Selected`, selections.length)" />
+            v-text="__n(`:count selected`, selections.length)" />
 
             <data-list-action
                 v-for="action in sortedActions"
