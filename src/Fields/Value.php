@@ -4,9 +4,10 @@ namespace Statamic\Fields;
 
 use ArrayIterator;
 use IteratorAggregate;
+use JsonSerializable;
 use Statamic\View\Antlers\Parser;
 
-class Value implements IteratorAggregate
+class Value implements IteratorAggregate, JsonSerializable
 {
     protected $raw;
     protected $handle;
@@ -46,6 +47,11 @@ class Value implements IteratorAggregate
     public function __toString()
     {
         return (string) $this->value();
+    }
+
+    public function jsonSerialize($options = 0)
+    {
+        return $this->value();
     }
 
     public function getIterator()

@@ -113,4 +113,20 @@ class EntryRepository implements RepositoryContract
             $entry->collection()->removeEntryPosition($entry->id())->save();
         }
     }
+
+    public function createRules($collection)
+    {
+        return [
+            'title' => 'required',
+            'slug' => 'required|unique_entry_value:'.$collection->handle(),
+        ];
+    }
+
+    public function updateRules($collection, $entry)
+    {
+        return [
+            'title' => 'required|min:3',
+            'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id(),
+        ];
+    }
 }

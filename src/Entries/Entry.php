@@ -154,6 +154,11 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
         return $this->cpUrl('collections.entries.published.store');
     }
 
+    public function unpublishUrl()
+    {
+        return $this->cpUrl('collections.entries.published.destroy');
+    }
+
     public function revisionsUrl()
     {
         return $this->cpUrl('collections.entries.revisions.index');

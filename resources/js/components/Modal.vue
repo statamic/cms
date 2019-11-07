@@ -1,7 +1,7 @@
 <template>
 
     <portal :to="portal">
-        <vue-modal v-bind="modalProps" @opened="modalOpened" @closed="modalClosed" :class="{'disable-overflow': overflow === false}">
+        <vue-modal v-bind="modalProps" :delay="25" @opened="modalOpened" @closed="modalClosed" :class="{'disable-overflow': overflow === false}">
             <slot :close="close" />
         </vue-modal>
     </portal>

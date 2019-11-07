@@ -264,6 +264,11 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
         return $this->cpUrl('taxonomies.terms.published.store');
     }
 
+    public function unpublishUrl()
+    {
+        return $this->cpUrl('taxonomies.terms.published.destroy');
+    }
+
     public function revisionsUrl()
     {
         return $this->cpUrl('taxonomies.terms.revisions.index');

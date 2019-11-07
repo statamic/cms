@@ -4,7 +4,7 @@ namespace Tests;
 
 use Illuminate\Foundation\Testing\Assert;
 
-class TestCase extends \Orchestra\Testbench\TestCase
+abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $shouldFakeVersion = true;
     protected $shouldPreventNavBeingBuilt = true;

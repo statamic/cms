@@ -116,11 +116,7 @@ class Assets extends Tags
         $this->sort();
         $this->limit();
 
-        if ($as = $this->get('as')) {
-            return $this->parse([$as => $this->assets]);
-        }
-
-        return $this->parseLoop($this->assets);
+        return $this->assets;
     }
 
     private function sort()

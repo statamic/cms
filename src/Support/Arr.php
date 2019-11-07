@@ -212,36 +212,6 @@ class Arr extends IlluminateArr
         return $ordered + $array;
     }
 
-    public static function addScope($data, $scope)
-    {
-        if ($data instanceof DataCollection) {
-            $data = $data->toArray();
-        }
-
-        // If it's already an associative array, we can just grab
-        // the whole thing and duplicate it into its own scope.
-        if (self::assoc($data)) {
-            $data[$scope] = $data;
-            return $data;
-        }
-
-        $output = [];
-
-        foreach ($data as $i => $iteration) {
-            if (is_array($iteration)) {
-                foreach ($iteration as $key => $val) {
-                    $output[$i][$scope][$key] = $val;
-                    $output[$i][$key] = $val;
-                }
-            } else {
-                $output[$scope][$i] = $iteration;
-                $output[$i] = $iteration;
-            }
-        }
-
-        return $output;
-    }
-
     /**
      * Get rid of null values. (Empty arrays, literal null values, and empty strings)
      *

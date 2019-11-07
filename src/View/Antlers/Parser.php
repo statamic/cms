@@ -143,6 +143,10 @@ class Parser
     {
         $data = $this->normalizeData($data);
 
+        if (! empty($data) && ! Arr::assoc($data)) {
+            throw new \InvalidArgumentException('Expecting an associative array');
+        }
+
         // Save the original text coming in so that we can parse it recursively
         // later on without this needing to be within a callback
         $this->original_text = $text;
@@ -307,8 +311,6 @@ class Parser
         $total = count($loop);
 
         foreach ($loop as $key => &$value) {
-            $index++;
-
             // If the value of the current iteration is *not* already an array (ie. we're
             // dealing with a super basic list like [one, two, three] then convert it
             // to one, where the value is stored in a key named "value".
@@ -317,13 +319,14 @@ class Parser
             }
 
             $value = array_merge($value, [
-                'key'           => $key,
+                'count'         => $index + 1,
                 'index'         => $index,
-                'zero_index'    => $index - 1,
                 'total_results' => $total,
-                'first'         => ($index === 1) ? true : false,
-                'last'          => ($index === $total) ? true : false,
+                'first'         => ($index === 0),
+                'last'          => ($index === $total-1),
             ]);
+
+            $index++;
         }
 
         return $loop;
@@ -886,12 +889,6 @@ class Parser
 
             $next_tag = null;
             $children = Arr::get($data, $array_key);
-
-            // if the array key is scoped, we'll add a scope to the array
-            if (strpos($array_key, ':') !== false) {
-                $scope = explode(':', $array_key)[0];
-                $children = Arr::addScope($children, $scope);
-            }
 
             $child_count = count($children);
             $count = 1;

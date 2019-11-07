@@ -71,6 +71,7 @@ class EntryRevisionsController extends CpController
             'actions' => [
                 'save' => $entry->updateUrl(),
                 'publish' => $entry->publishUrl(),
+                'unpublish' => $entry->unpublishUrl(),
                 'revisions' => $entry->revisionsUrl(),
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),

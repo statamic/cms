@@ -76,7 +76,9 @@ export default {
 
     created() {
         // Allow key commands with a focused input
-        this.$mousetrap.prototype.stopCallback = function () { return false; }
+        this.$mousetrap.prototype.stopCallback = (e) => {
+            return ! ['enter', 'escape'].includes(e.code.toLowerCase());
+        }
 
         this.$mousetrap.bind('enter', this.submit)
         this.$mousetrap.bind('esc', this.cancel)

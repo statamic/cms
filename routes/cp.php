@@ -46,8 +46,8 @@ Route::group([
 
             Route::group(['prefix' => '{entry}/{slug}'], function () {
                 Route::get('/', 'EntriesController@edit')->name('collections.entries.edit');
-                Route::post('/', 'PublishedEntriesController@store')->name('collections.entries.published.store');
-                Route::delete('/', 'PublishedEntriesController@destroy')->name('collections.entries.published.destroy');
+                Route::post('publish', 'PublishedEntriesController@store')->name('collections.entries.published.store');
+                Route::post('unpublish', 'PublishedEntriesController@destroy')->name('collections.entries.published.destroy');
                 Route::post('localize', 'LocalizeEntryController')->name('collections.entries.localize');
 
                 Route::resource('revisions', 'EntryRevisionsController', [

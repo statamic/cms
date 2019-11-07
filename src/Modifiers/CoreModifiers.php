@@ -54,23 +54,21 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Scope an array variable
+     * Alias an array variable
      *
      * @param $value
      * @param $params
-     * @return string
+     * @return array
      */
-    public function scopeAs($value, $params)
+    public function alias($value, $params)
     {
-        if ( is_array($value)) {
-            $as = Arr::get($params, 0);
-
-            foreach ($value as $key => $data) {
-              $value[$key][$as] = $data;
-            }
-
-            return $value;
+        if (! is_array($value)) {
+            return;
         }
+
+        $as = Arr::get($params, 0);
+
+        return [$as => $value];
     }
 
     /**
@@ -1471,20 +1469,6 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Place variables in a scope
-     *
-     * @param  $value
-     * @param  $params
-     * @return array
-     */
-    public function scope($value, $params)
-    {
-        $scope = Arr::get($params, 0, 'tag');
-
-        return Arr::addScope($value, $scope);
-    }
-
-    /**
      * Returns a segment by number from any valid URL or UI
      *
      * @param  $value
@@ -1791,9 +1775,11 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function toJson($value)
+    public function toJson($value, $params)
     {
-        return json_encode($value);
+        $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : null;
+
+        return json_encode($value, $options);
     }
 
     /**

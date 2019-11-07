@@ -49,7 +49,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'tz' => 'timezone',
         'inFuture' => 'isFuture',
         'inPast' => 'isPast',
-        'as' => 'scopeAs',
+        'as' => 'alias',
     ];
 
     /**
