@@ -128,7 +128,7 @@ class Translate extends Command
                 if ($string == '') {
                     // Only translate empty lines.
                     $english = $this->getEnglishTranslation($filename, $key);
-                    $string = $this->translate($english, $lang);
+                    $string = $english == '' ? '' : $this->translate($english, $lang);
                     $bar->advance();
                 }
                 return [$key => $string];
