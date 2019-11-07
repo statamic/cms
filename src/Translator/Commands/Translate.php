@@ -5,6 +5,7 @@ namespace Statamic\Translator\Commands;
 use Google\Cloud\Translate\V2\TranslateClient;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Support\Arr;
+use Statamic\Translator\Placeholders;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
@@ -152,7 +153,9 @@ class Translate extends Command
 
     protected function getEnglishTranslation($file, $key)
     {
-        return Arr::get($this->getEnglishTranslations($file), $key);
+        $translation = Arr::get($this->getEnglishTranslations($file), $key);
+
+        return (new Placeholders)->wrap($translation);
     }
 
     protected function getEnglishTranslations($file)
@@ -197,6 +200,6 @@ class Translate extends Command
     {
         $response = $this->client->translate($string, ['target' => $lang]);
 
-        return $response['text'];
+        return (new Placeholders)->unwrap($response['text']);
     }
 }
