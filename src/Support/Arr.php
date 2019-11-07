@@ -276,4 +276,15 @@ class Arr extends IlluminateArr
 
         return $value ?? $default;
     }
+
+    public static function undot($dotted)
+    {
+        $array = [];
+
+        foreach ($dotted as $key => $value) {
+            static::set($array, $key, $value);
+        }
+
+        return $array;
+    }
 }
