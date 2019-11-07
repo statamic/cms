@@ -4,6 +4,7 @@ namespace Statamic\Translator\Commands;
 
 use Google\Cloud\Translate\V2\TranslateClient;
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Support\Arr;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Helper\ProgressBar;
 use Symfony\Component\Console\Input\InputArgument;
@@ -15,13 +16,13 @@ use Symfony\Component\VarExporter\VarExporter;
 class Translate extends Command
 {
     protected $files;
-    protected $manualFiles;
+    protected $excluded;
     protected $englishTranslations = [];
 
-    public function __construct(Filesystem $files, array $manualFiles)
+    public function __construct(Filesystem $files, array $excluded)
     {
         $this->files = $files;
-        $this->manualFiles = $manualFiles;
+        $this->excluded = $excluded;
         parent::__construct();
     }
 
@@ -100,7 +101,7 @@ class Translate extends Command
         collect($this->files->files(getcwd().'/resources/lang/'.$lang))
             ->filter(function ($file) {
                 $filename = substr($file->getBasename(), 0, -4); // without extension
-                return !in_array($filename, $this->manualFiles);
+                return !in_array($filename, $this->excluded);
             })
             ->each(function ($file) use ($lang) {
                 $this->translateKeyFile($file, $lang);
@@ -111,7 +112,7 @@ class Translate extends Command
     {
         $fullPath = $file->getPathname();
         $filename = substr($file->getBasename(), 0, -4); // without extension
-        $existing = include $fullPath;
+        $existing = Arr::dot(include $fullPath);
         $path = "resources/lang/{$lang}/{$filename}.php";
 
         $pendingTranslations = collect($existing)->filter(function ($string) {
@@ -142,7 +143,7 @@ class Translate extends Command
         $bar->finish();
         $this->output->writeln('');
 
-        $contents = "<?php\n\nreturn " . VarExporter::export($translations) . ";\n";
+        $contents = "<?php\n\nreturn " . VarExporter::export(Arr::undot($translations)) . ";\n";
 
         $this->files->put($fullPath, $contents);
 
@@ -151,7 +152,7 @@ class Translate extends Command
 
     protected function getEnglishTranslation($file, $key)
     {
-        return $this->getEnglishTranslations($file)[$key];
+        return Arr::get($this->getEnglishTranslations($file), $key);
     }
 
     protected function getEnglishTranslations($file)
