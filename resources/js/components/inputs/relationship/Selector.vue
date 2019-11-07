@@ -51,9 +51,9 @@
                     </div>
                 </div>
 
-                <div class="flex-1 flex flex-col">
+                <div class="flex-1 flex flex-col overflow-scroll">
                     <div class="flex flex-col h-full justify-start">
-                        <div class="flex-1 overflow-scroll">
+                        <div class="flex-1">
                             <data-list-table
                                 :loading="loading"
                                 :allow-bulk-actions="true"
