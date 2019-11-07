@@ -18,11 +18,11 @@
                 </p>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name" v-text="__('Structure Name')" />
+                <label class="font-bold text-base mb-sm" for="name" v-text="__('Title')" />
                 <input type="text" v-model="structure.title" class="input-text" autofocus tabindex="1">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    For example: "Pages", "Main Nav Bar", or "Documentation".
+                    {{ __('messages.structure_wizard_title_instructions') }}
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
@@ -30,7 +30,7 @@
                 <input type="text" v-model="structure.handle" class="input-text" tabindex="2">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    How you'll reference to this structure in your templates. Cannot easily be changed.
+                    {{ __('messages.structure_wizard_handle_instructions') }}
                 </div>
             </div>
         </div>
@@ -39,7 +39,7 @@
         <div v-if="currentStep === 1">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3" v-text="__('Purpose')" />
-                <p class="text-grey">Structures can either control a collection with parent/child URLs, or define hand-crafted nav trees from existing entries and user-defined URLs.</p>
+                <p class="text-grey" v-text="__('messages.structure_wizard_purpose_intro')" />
             </div>
             <div class="max-w-lg px-4 mx-auto pb-6 text-center">
                 <div class="-mx-2 flex flex-wrap justify-center">
@@ -48,9 +48,7 @@
                             <input id="purpose-collection" class="absolute pin-t pin-r m-1" type="radio" v-model="purpose" value="collection" />
                             <svg-icon name="calendar" class="w-8 h-8 mx-auto"></svg-icon>
                             <h3 class="my-2 font-bold" v-text="__('Collection')" />
-                            <p class="text-2xs text-grey">
-                                Control a collection's URLs with parent/child relationships.
-                            </p>
+                            <p class="text-2xs text-grey" v-text="__('messages.structure_wizard_purpose_collection')" />
                         </label>
                     </div>
                     <div class="w-full md:w-1/3 px-2 mb-2">
@@ -58,9 +56,7 @@
                             <input id="purpose-navigation" class="absolute pin-t pin-r m-1" type="radio" v-model="purpose" value="navigation" />
                             <svg-icon name="calendar" class="w-8 h-8 mx-auto"></svg-icon>
                             <h3 class="my-2 font-bold" v-text="__('Navigation')" />
-                            <p class="text-2xs text-grey">
-                                Create a tree of links to existing entries and/or user-defined URLs.
-                            </p>
+                            <p class="text-2xs text-grey" v-text="__('messages.structure_wizard_purpose_navigation')" />
                         </label>
                     </div>
                 </div>
@@ -70,8 +66,8 @@
         <!-- Step 3 -->
         <div v-if="currentStep === 2">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Settings</h1>
-                <p class="text-grey">Define which collections are available to this Structure and how deep it can grow.</p>
+                <h1 class="mb-3">{{ __('Settings') }}</h1>
+                <p class="text-grey" v-text="__('messages.structure_wizard_settings_intro')" />
             </div>
             <div class="max-w-md mx-auto px-2 pb-7" v-if="purpose === 'navigation'">
                 <label class="font-bold text-base mb-sm" for="name" v-text="__('Collections')" />
@@ -90,7 +86,7 @@
                 </publish-field-meta>
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Entries from selected collections will be available to choose from when building the page tree.
+                    {{ __('messages.structure_wizard_collections_instructions') }}
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7" v-if="purpose === 'collection'">
@@ -110,25 +106,25 @@
                 </publish-field-meta>
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    <span>If the collection you intend to use does not exist yet, choose <b>this structure</b> later while creating it.</span>
+                    <span v-html="__('messages.structure_wizard_collection_instructions')" />
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7" v-if="purpose === 'collection'">
-                <label class="font-bold text-base mb-sm" for="name">Expect a root page</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Expect a root page') }}</label>
                 <toggle-fieldtype
                     handle="expects_root"
                     v-model="structure.expects_root"  />
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Whether you want the first page in the tree to be considered the "root" or "home" page.
+                    {{ __('messages.structure_wizard_expect_root_instructions') }}
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Max Depth</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Max Depth') }}</label>
                 <input type="number" min="1" step="1" v-model="structure.max_depth" class="input-text">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    The maximum number of levels deep a page may be nested. Leave blank for no limit.
+                    {{ __('messages.structure_wizard_max_depth_instructions') }}
                 </div>
             </div>
         </div>
@@ -166,7 +162,7 @@ export default {
 
     data() {
         return {
-            steps: ['Naming', 'Purpose', 'Settings'],
+            steps: [__('Naming'), __('Purpose'), __('Settings')],
             purpose: null,
             structure: {
                 title: null,
