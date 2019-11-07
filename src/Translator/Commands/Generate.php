@@ -45,6 +45,8 @@ class Generate extends Command
         $this->generateStringFiles();
         $this->generateKeyFiles();
         $this->generateManualKeyFiles();
+
+        $output->writeln('Run `php translator translate` to translate any missing lines using Google Translate.');
     }
 
     protected function generateStringFiles()
