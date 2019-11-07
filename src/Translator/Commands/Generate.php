@@ -7,8 +7,10 @@ use Statamic\Support\Str;
 use Statamic\Translator\MethodDiscovery;
 use Statamic\Translator\Util;
 use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\ArrayInput;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\VarExporter\VarExporter;
 
@@ -32,7 +34,9 @@ class Generate extends Command
     {
         $this
             ->setName('generate')
-            ->addArgument('lang', InputArgument::OPTIONAL, 'A comma delimited list of language codes to generate.', implode(',', $this->existingLanguages()));
+            ->addArgument('lang', InputArgument::OPTIONAL, 'A comma delimited list of language codes to generate.', implode(',', $this->existingLanguages()))
+            ->addOption('translate', null, InputOption::VALUE_NONE, 'Whether to translate using Google Translate')
+            ->addOption('key', null, InputOption::VALUE_REQUIRED, 'Google Translate API Key');
     }
 
     protected function execute(InputInterface $input, OutputInterface $output)
@@ -46,7 +50,7 @@ class Generate extends Command
         $this->generateKeyFiles();
         $this->generateManualKeyFiles();
 
-        $output->writeln('Run `php translator translate` to translate any missing lines using Google Translate.');
+        $this->translate();
     }
 
     protected function generateStringFiles()
@@ -202,5 +206,19 @@ class Generate extends Command
             })
             ->prepend('en')->unique()
             ->all();
+    }
+
+    protected function translate()
+    {
+        if (! $this->input->getOption('translate')) {
+            $this->output->writeln('Run `php translator translate` to translate any missing lines using Google Translate.');
+            return;
+        }
+
+        $this->getApplication()->find('translate')->run(new ArrayInput([
+            'command' => 'translate',
+            'lang' => $this->input->getArgument('lang'),
+            '--key'  => $this->input->getOption('key'),
+        ]), $this->output);
     }
 }
