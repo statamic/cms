@@ -28,5 +28,6 @@ $app = new Symfony\Component\Console\Application('Statamic Translator');
 $app->add(new Statamic\Translator\Commands\Stats($discovery, $ignoredSubstrings));
 $app->add(new Statamic\Translator\Commands\Generate($discovery, $files, $manualFiles, $ignoredSubstrings));
 $app->add(new Statamic\Translator\Commands\Translate($files, $manualFiles));
+$app->add(new Statamic\Translator\Commands\Review($files));
 
 $app->run();
