@@ -6,6 +6,7 @@ use Statamic\CP\Column;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 
 class Entries extends Relationship
 {
@@ -51,6 +52,26 @@ class Entries extends Relationship
         }
 
         return $query->paginate()->preProcessForIndex();
+    }
+
+    public function getResourceCollection($request, $items)
+    {
+        return (new EntriesResource($items))
+            ->blueprint($this->getBlueprint($request))
+            ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
+            ->additional(['meta' => ['sortColumn' => $this->getSortColumn($request)]]);
+    }
+
+    protected function getBlueprint($request)
+    {
+        return $this->getFirstCollectionFromRequest($request)->entryBlueprint();
+    }
+
+    protected function getFirstCollectionFromRequest($request)
+    {
+        return $request->collections
+            ? Collection::findByHandle($request->collections[0])
+            : Collection::all()->first();
     }
 
     public function getSortColumn($request)
@@ -116,15 +137,6 @@ class Entries extends Relationship
         })->all();
     }
 
-    protected function getColumns()
-    {
-        return [
-            Column::make('title'),
-            Column::make('collection'),
-            Column::make('url')->label('URL'),
-        ];
-    }
-
     protected function getBaseSelectionsUrlParameters()
     {
         return [
@@ -134,11 +146,16 @@ class Entries extends Relationship
 
     protected function toItemArray($id)
     {
-        if ($entry = Entry::find($id)) {
-            return $entry->toArray();
+        if (! $entry = Entry::find($id)) {
+            return $this->invalidItemArray($id);
         }
 
-        return $this->invalidItemArray($id);
+        return [
+            'id' => $id,
+            'title' => $entry->value('title'),
+            'published' => $entry->published(),
+            'edit_url' => $entry->editUrl(),
+        ];
     }
 
     protected function augmentValue($value)
