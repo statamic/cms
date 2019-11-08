@@ -52,7 +52,7 @@
 .replicator-fieldtype {
     @apply py-3 px-0 bg-grey-20 border-t border-b;
 
-    > label, .help-block {
+    > label, > .help-block {
         @apply ml-3;
     }
 
