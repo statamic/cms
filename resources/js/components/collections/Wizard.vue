@@ -348,7 +348,7 @@ export default {
 
     methods: {
         canGoToStep(step) {
-            if (step === 1) {
+            if (step >= 1) {
                 return Boolean(this.collection.title && this.collection.handle);
             }
 

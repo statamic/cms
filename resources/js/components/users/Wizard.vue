@@ -202,10 +202,8 @@ export default {
         canGoToStep(step) {
             if (this.completed) return false;
 
-            if (step === 1) {
+            if (step >= 1) {
                 return this.isValidEmail && ! this.userExists;
-            } else if (step === 2) {
-                return this.canGoToStep(1);
             }
 
             return true;

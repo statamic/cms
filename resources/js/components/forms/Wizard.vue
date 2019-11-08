@@ -157,7 +157,7 @@ export default {
 
     methods: {
         canGoToStep(step) {
-            if (step === 1) {
+            if (step >= 1) {
                 return Boolean(this.form.title && this.form.handle);
             }
 

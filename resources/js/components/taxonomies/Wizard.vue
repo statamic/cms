@@ -169,7 +169,7 @@ export default {
             }
         },
         canGoToStep(step) {
-            if (step === 1) {
+            if (step >= 1) {
                 return Boolean(this.taxonomy.title && this.taxonomy.handle);
             }
 
