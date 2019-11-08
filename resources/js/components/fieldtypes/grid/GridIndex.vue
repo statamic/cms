@@ -1,7 +1,7 @@
 <template>
 
     <div v-if="value">
-        {{ __n(':count rows', value) }}
+        {{ __n(':count row|:count rows', value) }}
     </div>
 
 </template>

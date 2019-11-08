@@ -1,7 +1,7 @@
 {
-    ":count rows": ": contar filas",
+    ":count row|:count rows": ":count fila|:count filas",
     ":count selected": ": recuento seleccionado",
-    ":count sets": ": conjuntos de conteo",
+    ":count set|:count sets": ":count conjunto|:count conjuntos",
     ":file uploaded": ":Archivo subido",
     "Activation URL": "URL de activación",
     "Active": "Activo",

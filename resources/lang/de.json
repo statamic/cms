@@ -1,7 +1,7 @@
 {
-    ":count rows": ":count reihen",
+    ":count row|:count rows": ":count reihe|:count reihen",
     ":count selected": ":count ausgewählt",
-    ":count sets": ":count set",
+    ":count set|:count sets": "",
     ":file uploaded": ":file hochgeladen",
     "Activation URL": "Aktivierungs-URL",
     "Active": "Active",

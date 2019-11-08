@@ -1,7 +1,7 @@
 <template>
 
     <div v-if="value">
-        {{ __n(':count sets', value) }}
+        {{ __n(':count set|:count sets', value) }}
     </div>
 
 </template>
