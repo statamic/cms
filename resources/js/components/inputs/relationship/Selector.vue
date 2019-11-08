@@ -109,7 +109,6 @@ export default {
         initialSelections: Array,
         initialSortColumn: String,
         initialSortDirection: String,
-        initialColumns: Array,
         maxSelections: Number,
         site: String,
         search: Boolean,
@@ -126,7 +125,6 @@ export default {
             loading: true,
             items: [],
             meta: {},
-            columns: this.initialColumns,
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             page: 1,
@@ -199,6 +197,7 @@ export default {
             }};
 
             return this.$axios.get(this.url, { params }).then(response => {
+                this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
                 this.items = response.data.data;
                 this.meta = response.data.meta;
