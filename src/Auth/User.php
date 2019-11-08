@@ -56,7 +56,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         return strtoupper(substr($name, 0, 1) . substr($surname, 0, 1));
     }
 
-    protected function augmentedArrayData()
+    public function augmentedArrayData()
     {
         return $this->data();
     }

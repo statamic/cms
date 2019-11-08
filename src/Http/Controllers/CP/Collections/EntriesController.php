@@ -7,8 +7,8 @@ use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\CP\Column;
 use Statamic\CP\Breadcrumbs;
-use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
+use Statamic\Http\Resources\CP\Entries\Entries;
 use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Preference;
@@ -41,34 +41,15 @@ class EntriesController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $entries = $query
-            ->paginate(request('perPage'))
-            ->supplement(function ($entry) use ($collection) {
-                return [
-                    'viewable' => User::current()->can('view', $entry),
-                    'editable' => User::current()->can('edit', $entry),
-                    'actions' => Action::for($entry, ['collection' => $collection->handle()]),
-                ];
-            })
-            ->preProcessForIndex();
+        $entries = $query->paginate(request('perPage'));
 
-        if ($collection->dated()) {
-            $entries->supplement('date', function ($entry) {
-                return $entry->date()->inPreferredFormat();
-            });
-        }
-
-        $columns = $collection->entryBlueprint()
-            ->columns()
-            ->setPreferred("collections.{$collection->handle()}.columns")
-            ->rejectUnlisted()
-            ->values();
-
-        return Resource::collection($entries)->additional(['meta' => [
-            'filters' => $request->filters,
-            'sortColumn' => $sortField,
-            'columns' => $columns,
-        ]]);
+        return (new Entries($entries))
+            ->blueprint($collection->entryBlueprint())
+            ->columnPreferenceKey("collections.{$collection->handle()}.columns")
+            ->additional(['meta' => [
+                'filters' => $request->filters,
+                'sortColumn' => $sortField,
+            ]]);
     }
 
     protected function filter($query, $filters)

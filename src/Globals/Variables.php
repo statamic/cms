@@ -143,7 +143,7 @@ class Variables implements Contract, Localization, AugmentableContract
         ], $this->data()->all());
     }
 
-    protected function augmentedArrayData()
+    public function augmentedArrayData()
     {
         return $this->values();
     }

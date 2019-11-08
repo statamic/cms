@@ -22,7 +22,7 @@ trait Augmentable
         })->all();
     }
 
-    protected function augmentedArrayData()
+    public function augmentedArrayData()
     {
         return $this->toArray();
     }

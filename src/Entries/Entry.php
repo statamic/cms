@@ -98,6 +98,11 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
 
     public function toArray()
     {
+        return [];
+    }
+
+    public function augmentedArrayData()
+    {
         return $this->values()->merge([
             'id' => $this->id(),
             'slug' => $this->slug(),
