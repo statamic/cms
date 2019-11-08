@@ -9,7 +9,8 @@ use Statamic\Http\Resources\CP\Assets\Folder;
 class Entries extends ResourceCollection
 {
     public $collects = Entry::class;
-    public $blueprint;
+    protected $blueprint;
+    protected $columnPreferenceKey;
 
     public function blueprint($blueprint)
     {
