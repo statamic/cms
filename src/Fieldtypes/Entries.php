@@ -81,6 +81,8 @@ class Entries extends Relationship
 
         if ($collections = $request->collections) {
             $query->whereIn('collection', $collections);
+        } elseif ($collections = $this->config('collections')) {
+            $query->whereIn('collection', $collections);
         }
 
         if ($search = $request->search) {
@@ -122,13 +124,6 @@ class Entries extends Relationship
             Column::make('title'),
             Column::make('collection'),
             Column::make('url')->label('URL'),
-        ];
-    }
-
-    protected function getBaseSelectionsUrlParameters()
-    {
-        return [
-            'collections' => $this->config('collections'),
         ];
     }
 

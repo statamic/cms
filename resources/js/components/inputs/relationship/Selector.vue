@@ -28,6 +28,20 @@
                                 class="bg-transparent p-0" />
                         </div>
 
+                        <select-fieldtype
+                            v-if="Array.isArray(collections) && collections.length > 1"
+                            handle="collections"
+                            name-prefix="selector"
+                            v-model="enabledCollections"
+                            :config="{
+                                options: collectionsOptions,
+                                clearable: true,
+                                placeholder: __('Collections'), // TODO: placeholder isn't shown
+                                searchable: false,
+                                multiple: true,
+                                reset_on_options_change: false,
+                            }" />
+
                         <button
                             v-if="canCreate"
                             type="button"
@@ -114,6 +128,10 @@ export default {
         site: String,
         search: Boolean,
         canCreate: Boolean,
+        collections: {
+            type: Array,
+            required: true,
+        },
         exclusions: {
             type: Array,
             default: () => []
@@ -131,6 +149,7 @@ export default {
             sortDirection: this.initialSortDirection,
             page: 1,
             searchQuery: '',
+            enabledCollections: this.collections,
             selections: _.clone(this.initialSelections),
             isCreating: false,
             requestOnParameterChange: true,
@@ -145,13 +164,23 @@ export default {
                 order: this.sortDirection,
                 page: this.page,
                 site: this.site,
+                collections: this.enabledCollections,
                 exclusions: this.exclusions,
             }
         },
 
         hasMaxSelections() {
             return (this.maxSelections === Infinity) ? false : Boolean(this.maxSelections);
-        }
+        },
+
+        collectionsOptions() {
+            if (!Array.isArray(this.collections)) return {};
+            const opts = {};
+            for (const collection of this.collections) {
+                opts[collection] = collection.toUpperCase(); // TODO: use collection's display name here
+            }
+            return opts;
+        },
 
     },
 

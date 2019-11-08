@@ -70,6 +70,7 @@
                     :max-selections="maxItems"
                     :search="search"
                     :can-create="canCreate"
+                    :collections="config.collections"
                     :exclusions="exclusions"
                     @selected="selectionsUpdated"
                     @closed="close"
