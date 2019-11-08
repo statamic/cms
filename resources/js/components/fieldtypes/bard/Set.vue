@@ -33,7 +33,7 @@
                 :meta="meta[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
-                :error-key="`${parentName}.${index}.attrs.values.${field.handle}`"
+                :error-key="errorKey(field)"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="focused"
@@ -154,6 +154,11 @@ export default {
         expand() {
             // this.$events.$emit('expanded', this.node.attrs.id);
             this.options.bard.expandSet(this.node.attrs.id);
+        },
+
+        errorKey(field) {
+            let prefix = this.options.bard.errorKeyPrefix || this.options.bard.handle;
+            return `${prefix}.${this.index}.attrs.values.${field.handle}`;
         }
 
     }

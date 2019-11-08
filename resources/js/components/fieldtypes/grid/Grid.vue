@@ -101,7 +101,7 @@ export default {
 
     reactiveProvide: {
         name: 'grid',
-        include: ['config', 'isReorderable', 'isReadOnly']
+        include: ['config', 'isReorderable', 'isReadOnly', 'handle', 'errorKeyPrefix']
     },
 
     watch: {

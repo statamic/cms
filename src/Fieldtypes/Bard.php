@@ -277,6 +277,28 @@ class Bard extends Replicator
 
     public function preProcessValidatable($value)
     {
-        return json_decode($value, true);
+        if (is_array($value)) {
+            return $value;
+        }
+
+        $value = json_decode($value, true);
+
+        return collect($value)->map(function ($item) {
+            if ($item['type'] !== 'set') {
+                return $item;
+            }
+
+            $values = $item['attrs']['values'];
+
+            $processed = $this->fields($values['type'])
+                ->addValues($values)
+                ->preProcessValidatables()
+                ->values()
+                ->all();
+
+            $item['attrs']['values'] = array_merge($values, $processed);
+
+            return $item;
+        })->all();
     }
 }

@@ -9,6 +9,7 @@
                 :meta="meta"
                 :handle="field.handle"
                 :name-prefix="namePrefix"
+                :error-key-prefix="errorKey"
                 :read-only="grid.isReadOnly"
                 @input="$emit('updated', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
@@ -53,10 +54,18 @@ export default {
         showInner: {
             type: Boolean,
             required: true
+        },
+        errors: {
+            type: Array,
+            required: true
+        },
+        errorKey: {
+            type: String,
+            required: true
         }
     },
 
-    inject: ['storeName', 'grid'],
+    inject: ['grid'],
 
     computed: {
 
@@ -70,21 +79,6 @@ export default {
 
         hasError() {
             return this.errors.length > 0;
-        },
-
-        errorKey() {
-            let key = `${this.gridName}.${this.rowIndex}.${this.field.handle}`;
-            key = key.replace('][', '.');
-            key = key.replace('[', '.');
-            key = key.replace(']', '.');
-            key = key.replace('..', '.');
-            return key;
-        },
-
-        errors() {
-            const state = this.$store.state.publish[this.storeName];
-            if (! state) return [];
-            return state.errors[this.errorKey] || [];
         }
 
     }

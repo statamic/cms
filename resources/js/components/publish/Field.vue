@@ -51,6 +51,7 @@
                 :meta="meta"
                 :handle="config.handle"
                 :name-prefix="namePrefix"
+                :error-key-prefix="errorKeyPrefix"
                 :read-only="isReadOnly"
                 @input="$emit('input', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
@@ -86,6 +87,7 @@ export default {
         readOnly: Boolean,
         syncable: Boolean,
         namePrefix: String,
+        errorKeyPrefix: String,
     },
 
     data() {

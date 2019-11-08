@@ -30,6 +30,7 @@
                     :values="row"
                     :meta="meta[row._id]"
                     :name="name"
+                    :error-key-prefix="errorKeyPrefix"
                     @updated="(row, value) => $emit('updated', row, value)"
                     @meta-updated="$emit('meta-updated', row._id, $event)"
                     @duplicate="(row) => $emit('duplicate', row)"
@@ -52,8 +53,6 @@ import { SortableList, SortableItem } from '../../sortable/Sortable';
 export default {
 
     mixins: [View],
-
-    inject: ['grid'],
 
     components: {
         GridRow,

@@ -30,7 +30,7 @@
                 :value="values[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
-                :error-key="`${parentName}.${index}.${field.handle}`"
+                :error-key="errorKey(field)"
                 :read-only="isReadOnly"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
@@ -87,6 +87,10 @@ export default {
             required: true
         },
         parentName: {
+            type: String,
+            required: true
+        },
+        errorKeyPrefix: {
             type: String,
             required: true
         },
@@ -165,6 +169,10 @@ export default {
 
         expand() {
             this.$emit('expanded');
+        },
+
+        errorKey(field) {
+            return `${this.errorKeyPrefix}.${this.index}.${field.handle}`;
         }
 
     }

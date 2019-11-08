@@ -16,7 +16,6 @@
             <small class="help-block text-red" v-for="(error, i) in errors" :key="i" v-text="error" />
         </div>
 
-
         <component
             :is="fieldtypeComponent"
             :config="field"
@@ -24,6 +23,7 @@
             :value="value"
             :handle="field.handle"
             :name-prefix="namePrefix"
+            :error-key-prefix="errorKey"
             :read-only="isReadOnly"
             @input="$emit('updated', $event)"
             @meta-updated="$emit('meta-updated', $event)"

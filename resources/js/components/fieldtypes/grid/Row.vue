@@ -12,6 +12,8 @@
             :index="i"
             :row-index="index"
             :grid-name="name"
+            :errors="errors(field.handle)"
+            :error-key="errorKey(field.handle)"
             @updated="updated(field.handle, $event)"
             @meta-updated="metaUpdated(field.handle, $event)"
             @focus="$emit('focus')"
@@ -64,6 +66,9 @@ export default {
         name: {
             type: String,
             required: true
+        },
+        errorKeyPrefix: {
+            type: String
         }
     },
 
@@ -71,6 +76,7 @@ export default {
         'grid',
         'sortableItemClass',
         'sortableHandleClass',
+        'storeName',
     ],
 
     computed: {
@@ -93,6 +99,16 @@ export default {
             meta[handle] = value;
             this.$emit('meta-updated', meta);
         },
+
+        errorKey(handle) {
+            return `${this.errorKeyPrefix}.${this.index}.${handle}`;
+        },
+
+        errors(handle) {
+            const state = this.$store.state.publish[this.storeName];
+            if (! state) return [];
+            return state.errors[this.errorKey(handle)] || [];
+        }
     }
 
 }

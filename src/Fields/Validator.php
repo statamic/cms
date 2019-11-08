@@ -31,8 +31,6 @@ class Validator
 
     public function rules()
     {
-        $this->fields = $this->fields->preProcessValidatables();
-
         return $this
             ->merge($this->fieldRules(), $this->extraRules)
             ->all();
@@ -44,7 +42,7 @@ class Validator
             return collect();
         }
 
-        return $this->fields->all()->reduce(function ($carry, $field) {
+        return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
             return $carry->merge($field->rules());
         }, collect());
     }
@@ -68,7 +66,10 @@ class Validator
 
     public function validate()
     {
-        return LaravelValidator::validate($this->fields->values()->all(), $this->rules());
+        return LaravelValidator::validate(
+            $this->fields->preProcessValidatables()->values()->all(),
+            $this->rules()
+        );
     }
 
     public static function explodeRules($rules)

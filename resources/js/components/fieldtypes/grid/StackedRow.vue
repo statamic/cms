@@ -20,6 +20,7 @@
                 :meta="meta[field.handle]"
                 :read-only="grid.isReadOnly"
                 :name-prefix="namePrefix"
+                :errors="errors(field.handle)"
                 class="p-2"
                 @input="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"

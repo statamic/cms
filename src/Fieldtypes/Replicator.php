@@ -62,7 +62,7 @@ class Replicator extends Fieldtype
 
     protected function setRules($handle, $data, $index)
     {
-        $rules = $this->fields($handle)->validator()->rules();
+        $rules = $this->fields($handle)->addValues($data)->validator()->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
             return [$this->setRuleFieldKey($handle, $index) => $rules];

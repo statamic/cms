@@ -22,6 +22,7 @@ export default {
             default: false
         },
         namePrefix: String,
+        errorKeyPrefix: String,
     },
 
     methods: {

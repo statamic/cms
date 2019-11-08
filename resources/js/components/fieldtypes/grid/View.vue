@@ -3,6 +3,8 @@ export default {
 
     props: ['fields', 'rows', 'meta', 'name'],
 
+    inject: ['grid'],
+
     computed: {
 
         sortableItemClass() {
@@ -11,6 +13,10 @@ export default {
 
         sortableHandleClass() {
             return `${this.name}-drag-handle`;
+        },
+
+        errorKeyPrefix() {
+            return this.grid.errorKeyPrefix || this.grid.handle;
         }
 
     },
