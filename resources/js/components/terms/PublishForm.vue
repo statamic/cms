@@ -35,7 +35,7 @@
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
                     <span v-text="__('Publish')" />
-                    <svg-icon name="chevron-down-xs" class="ml-1 w-auto" />
+                    <svg-icon name="chevron-down-xs" class="ml-1 w-2" />
                 </button>
             </div>
 
@@ -196,7 +196,7 @@
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
                 <span v-text="__('Publish')" />
-                <svg-icon name="chevron-down-xs" class="ml-1 w-auto" />
+                <svg-icon name="chevron-down-xs" class="ml-1 w-2" />
             </button>
         </div>
 
