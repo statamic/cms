@@ -375,6 +375,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess, AugmentableContrac
     public function delete()
     {
         $this->disk()->delete($this->path());
+        $this->disk()->delete($this->metaPath());
 
         return $this;
     }
