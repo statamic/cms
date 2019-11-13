@@ -59,7 +59,7 @@
                     >
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
-                                <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
+                                <div class="little-dot mr-1" :class="getStatusClass(entry)" />
                                 <a :href="entry.edit_url" @click.stop>{{ entry.title }}</a>
                             </div>
                         </template>
@@ -141,6 +141,16 @@ export default {
 
         afterRequestCompleted(response) {
             if (this.reorderingRequested) this.reorder();
+        },
+
+        getStatusClass(entry) {
+            if (entry.published && entry.private) {
+                return 'bg-transparent border border-grey-60';
+            } else if (entry.published) {
+                return 'bg-green';
+            } else {
+                return 'bg-grey-40';
+            }
         },
 
         reorder() {
