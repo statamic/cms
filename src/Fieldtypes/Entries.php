@@ -154,6 +154,7 @@ class Entries extends Relationship
             'id' => $id,
             'title' => $entry->value('title'),
             'published' => $entry->published(),
+            'private' => $entry->private(),
             'edit_url' => $entry->editUrl(),
         ];
     }

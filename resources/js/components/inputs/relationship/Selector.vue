@@ -63,7 +63,7 @@
                             >
                                 <template slot="cell-title" slot-scope="{ row: entry }">
                                     <div class="flex items-center">
-                                        <div v-if="entry.published !== undefined" class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
+                                        <div v-if="entry.published !== undefined" class="little-dot mr-1" :class="getStatusClass(entry)" />
                                         {{ entry.title }}
                                     </div>
                                 </template>
@@ -236,6 +236,16 @@ export default {
 
         stopCreating() {
             this.isCreating = false;
+        },
+
+        getStatusClass(entry) {
+            if (entry.published && entry.private) {
+                return 'bg-transparent border border-grey-60';
+            } else if (entry.published) {
+                return 'bg-green';
+            } else {
+                return 'bg-grey-40';
+            }
         }
 
     }

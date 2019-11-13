@@ -33,6 +33,7 @@ class Entry extends Resource
         return [
             'id' => $entry->id(),
             'published' => $entry->published(),
+            'private' => $entry->private(),
             'date' => $this->when($collection->dated(), function () {
                 return $this->resource->date()->inPreferredFormat();
             }),

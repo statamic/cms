@@ -12,24 +12,9 @@
         @apply w-full flex items-center p-1;
     }
 
-    &.published {
-        .little-dot {
-            @apply bg-green;
-        }
-    }
-
-    &.unpublished {
-        .little-dot {
-            @apply bg-grey-40;
-        }
-    }
-
     &.invalid {
         .item-inner {
             @apply border-red bg-red-lighter text-red;
-        }
-        .little-dot {
-            @apply bg-red;
         }
     }
 
