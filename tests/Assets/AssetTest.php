@@ -488,7 +488,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_converts_to_array()
+    function it_compiles_augmented_array_data()
     {
         Facades\Blueprint::shouldReceive('find')->once()
             ->with('test_blueprint')
@@ -500,7 +500,7 @@ class AssetTest extends TestCase
             ->setSupplement('foo', 'bar')
             ->path('path/to/asset.jpg');
 
-        $array = $asset->toArray();
+        $array = $asset->augmentedArrayData();
 
         $this->assertArraySubset([
             'id' => 'test_container::path/to/asset.jpg',
@@ -535,7 +535,7 @@ class AssetTest extends TestCase
             ->path('path/to/asset.jpg')
             ->set('foo', 'bar')
             ->set('bar', 'baz')
-            ->toArray();
+            ->augmentedArrayData();
 
         $this->assertEquals('bar', $array['foo']);
         $this->assertEquals('baz', $array['bar']);
@@ -549,7 +549,7 @@ class AssetTest extends TestCase
 
         $asset = (new Asset)->container($container)->path('test.txt');
 
-        $array = $asset->toArray();
+        $array = $asset->augmentedArrayData();
         foreach ($this->toArrayKeysWhenFileExists() as $key) {
             $this->assertArrayHasKey($key, $array);
         }
