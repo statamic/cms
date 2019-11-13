@@ -2,7 +2,7 @@
 
 return [
     'activate_account_notification_body' => 'Sie erhalten diese E-Mail, weil wir eine Aufforderung zum Zurücksetzen des Passworts für Ihr Konto erhalten haben.',
-    'activate_account_notification_subject' => 'Aktiviere deinen Account',
+    'activate_account_notification_subject' => 'Aktivieren Sie Ihren Account',
     'asset_container_blueprint_instructions' => 'Die Möglichkeit zum Hochladen in diesen Container.',
     'asset_container_create_folder_instructions' => 'Die Möglichkeit, Ordner in diesem Container zu erstellen.',
     'asset_container_disk_instructions' => 'Die Dateisystemfestplatte, die dieser Container verwenden wird.',
