@@ -42,7 +42,7 @@ class Structure extends Tags
                 return null;
             }
 
-            $data = $page->toArray();
+            $data = $page->toAugmentedArray();
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data);
 
             return array_merge($data, [

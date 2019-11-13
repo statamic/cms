@@ -13,9 +13,11 @@ trait Augmentable
 
     public function toAugmentedArray()
     {
-        $fields = (method_exists($this, 'blueprint') ? $this->blueprint() : false)
-            ? $this->blueprint()->fields()->all()
-            : collect();
+        if (method_exists($this, 'blueprint') && ($blueprint = $this->blueprint())) {
+            $fields = $blueprint->fields()->all();
+        } else {
+            $fields = collect();
+        }
 
         return collect($this->augmentedArrayData())->map(function ($value, $handle) use ($fields) {
             return new Value($value, $handle, optional($fields->get($handle))->fieldtype(), $this);
