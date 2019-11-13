@@ -2,12 +2,13 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
-use Statamic\Support\Arr;
+use Statamic\Assets\AssetCollection;
 use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Helper;
 use Statamic\Fields\Fieldtype;
-use Statamic\Facades\AssetContainer;
-use Statamic\Assets\AssetCollection;
+use Statamic\Support\Arr;
+use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
 
 class Assets extends Fieldtype
 {
@@ -101,22 +102,11 @@ class Assets extends Fieldtype
 
     public function getItemData($items)
     {
-        $assets = new AssetCollection;
-
-        foreach ($items as $url) {
-            if (! $asset = Asset::find($url)) {
-                continue;
-            }
-
-            if ($asset->isImage()) {
-                $asset->setSupplement('thumbnail', $asset->thumbnailUrl('small'));
-                $asset->setSupplement('toenail', $asset->thumbnailUrl('large'));
-            }
-
-            $assets->put($url, $asset);
-        }
-
-        return $assets->values();
+        return collect($items)->map(function ($url) {
+            return ($asset = Asset::find($url))
+                ? (new AssetResource($asset))->resolve()
+                : null;
+        })->filter()->values();
     }
 
     public function augment($value)

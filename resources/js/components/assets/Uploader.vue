@@ -115,7 +115,7 @@ export default {
                 },
 
                 onUploadSuccess: (id, response) => {
-                    this.$emit('upload-complete', response, this.uploads);
+                    this.$emit('upload-complete', response.data, this.uploads);
 
                     let index = _(this.uploads).findIndex({ id });
                     this.uploads.splice(index, 1);

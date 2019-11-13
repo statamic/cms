@@ -6,11 +6,11 @@ use Illuminate\Http\Request;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
-use Statamic\Facades\Action;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
 
 class AssetsController extends CpController
 {
@@ -33,37 +33,7 @@ class AssetsController extends CpController
 
         // TODO: Auth
 
-        $asset = $this->supplementAssetForEditing($asset);
-
-        $fields = $asset->blueprint()->fields()
-            ->addValues($asset->data()->all())
-            ->preProcess();
-
-        return [
-            'asset' => $asset->toArray(),
-            'container' => $asset->container()->toArray(),
-            'values' => $asset->data()->merge($fields->values()),
-            'meta' => $fields->meta(),
-            'actionUrl' => cp_route('assets.actions'),
-            'actions' => Action::for($asset, ['container' => $asset->container()->handle()]),
-        ];
-    }
-
-    private function supplementAssetForEditing($asset)
-    {
-        if ($asset->isImage()) {
-            $asset->setSupplement('width', $asset->width());
-            $asset->setSupplement('height', $asset->height());
-
-            // Public asset containers can use their regular URLs.
-            // Private ones don't have URLs so we'll generate an actual-size "thumbnail".
-            $asset->setSupplement('preview', $asset->container()->accessible() ? $asset->url() : $this->thumbnail($asset));
-        }
-
-        $asset->setSupplement('last_modified_relative', $asset->lastModified()->diffForHumans());
-        $asset->setSupplement('download_url', cp_route('assets.download', base64_encode($asset->id())));
-
-        return $asset;
+        return new AssetResource($asset);
     }
 
     public function update(Request $request, $asset)
@@ -86,12 +56,7 @@ class AssetsController extends CpController
 
         $asset->save();
 
-        if ($asset->isImage()) {
-            $asset->setSupplement('thumbnail', $this->thumbnail($asset, 'small'));
-            $asset->setSupplement('toenail', $this->thumbnail($asset, 'large'));
-        }
-
-        return ['success' => true, 'message' => 'Asset updated', 'asset' => $asset->toArray()];
+        return ['success' => true, 'message' => 'Asset updated', 'asset' => new AssetResource($asset)];
     }
 
     public function store(Request $request)
@@ -112,12 +77,7 @@ class AssetsController extends CpController
 
         $asset = $container->makeAsset($path)->upload($file);
 
-        if ($asset->isImage()) {
-            $asset->setSupplement('thumbnail', $this->thumbnail($asset, 'small'));
-            $asset->setSupplement('toenail', $this->thumbnail($asset, 'large'));
-        }
-
-        return $asset;
+        return new AssetResource($asset);
     }
 
     public function download($asset)
@@ -149,10 +109,5 @@ class AssetsController extends CpController
         $asset->delete();
 
         return response('', 204);
-    }
-
-    private function thumbnail($asset, $preset = null)
-    {
-        return $asset->thumbnailUrl($preset);
     }
 }
