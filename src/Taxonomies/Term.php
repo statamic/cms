@@ -115,18 +115,6 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
             ->args(func_get_args());
     }
 
-    public function toArray()
-    {
-        return $this->values()->merge([
-            'id' => $this->id(),
-            'slug' => $this->slug(),
-            'title' => $this->title(),
-            'taxonomy' => $this->taxonomyHandle(),
-            'edit_url' => $this->editUrl(),
-            'permalink' => $this->absoluteUrl(),
-        ])->merge($this->supplements)->all();
-    }
-
     public function fileData()
     {
         $array = array_merge($this->data()->all(), [
@@ -203,7 +191,7 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
             'title' => $this->title(),
             'entries' => $entryQuery = $this->queryEntries(),
             'entries_count' => $entryQuery->count(),
-        ])->all();
+        ])->merge($this->supplements)->all();
     }
 
     public function collection($collection = null)

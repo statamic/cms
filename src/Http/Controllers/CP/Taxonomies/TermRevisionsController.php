@@ -2,10 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
+use Illuminate\Http\Request;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 
 class TermRevisionsController extends CpController
 {
@@ -37,6 +38,8 @@ class TermRevisionsController extends CpController
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
         ]);
+
+        return new TermResource($term);
     }
 
     public function show(Request $request, $taxonomy, $term, $site, $revision)

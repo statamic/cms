@@ -373,8 +373,8 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
-                this.title = response.data.title;
-                this.permalink = response.data.permalink;
+                this.title = response.data.data.title;
+                this.permalink = response.data.data.permalink;
                 this.isWorkingCopy = true;
                 if (!this.isCreating) this.$toast.success('Saved');
                 this.$refs.container.saved();
@@ -480,7 +480,7 @@ export default {
             if (published !== undefined) this.published = published;
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
-            this.permalink = response.data.permalink
+            this.permalink = response.data.data.permalink
             this.$nextTick(() => this.$emit('saved', response));
         },
 

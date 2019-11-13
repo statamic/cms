@@ -17,6 +17,8 @@ use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Http\Requests\FilteredSiteRequest;
+use Statamic\Http\Resources\CP\Taxonomies\Terms;
+use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 
 class TermsController extends CpController
@@ -41,27 +43,15 @@ class TermsController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $paginator = $query->paginate(request('perPage'));
+        $terms = $query->paginate(request('perPage'));
 
-        $paginator->supplement(function ($term) use ($taxonomy) {
-            return [
-                'viewable' => User::current()->can('view', $term),
-                'editable' => User::current()->can('edit', $term),
-                'actions' => Action::for($term, ['taxonomy' => $taxonomy->handle()]),
-            ];
-        })->preProcessForIndex();
-
-        $columns = $taxonomy->termBlueprint()
-            ->columns()
-            ->setPreferred("taxonomies.{$taxonomy->handle()}.columns")
-            ->rejectUnlisted()
-            ->values();
-
-        return Resource::collection($paginator)->additional(['meta' => [
-            'filters' => $request->filters,
-            'sortColumn' => $sortField,
-            'columns' => $columns,
-        ]]);
+        return (new Terms($terms))
+            ->blueprint($taxonomy->termBlueprint())
+            ->columnPreferenceKey("taxonomies.{$taxonomy->handle()}.columns")
+            ->additional(['meta' => [
+                'filters' => $request->filters,
+                'sortColumn' => $sortField,
+            ]]);
     }
 
     protected function filter($query, $filters)
@@ -202,7 +192,7 @@ class TermsController extends CpController
                 ->save();
         }
 
-        return $term->toArray();
+        return new TermResource($term);
     }
 
     public function create(Request $request, $taxonomy, $site)
@@ -293,9 +283,7 @@ class TermsController extends CpController
                 ->save();
         }
 
-        return array_merge($term->toArray(), [
-            'redirect' => $term->editUrl(),
-        ]);
+        return ['data' => ['redirect' => $term->editUrl()]];
     }
 
     // TODO: Change to $taxonomy->toArray()
