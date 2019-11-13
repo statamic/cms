@@ -18,6 +18,7 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Http\Requests\FilteredSiteRequest;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 
 class EntriesController extends CpController
 {
@@ -205,7 +206,7 @@ class EntriesController extends CpController
                 ->save();
         }
 
-        return $entry->fresh()->toArray();
+        return new EntryResource($entry->fresh());
     }
 
     public function create(Request $request, $collection, $site)
@@ -322,9 +323,7 @@ class EntriesController extends CpController
             $tree->save();
         }
 
-        return array_merge($entry->toArray(), [
-            'redirect' => $entry->editUrl(),
-        ]);
+        return ['redirect' => $entry->editUrl()];
     }
 
     public function destroy($collection, $entry)

@@ -2,10 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
+use Illuminate\Http\Request;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 
 class EntryRevisionsController extends CpController
 {
@@ -38,7 +39,7 @@ class EntryRevisionsController extends CpController
             'user' => User::fromUser($request->user()),
         ]);
 
-        return $entry->toArray();
+        return new EntryResource($entry);
     }
 
     public function show(Request $request, $collection, $entry, $slug, $revision)

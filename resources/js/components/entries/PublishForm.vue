@@ -425,7 +425,7 @@ export default {
                 this.saving = false;
                 this.title = this.values.title;
                 this.isWorkingCopy = true;
-                if (!this.revisionsEnabled) this.permalink = response.data.permalink;
+                if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
                 if (!this.isCreating) this.$toast.success('Saved');
                 this.$refs.container.saved();
                 this.runAfterSaveHook(response);
@@ -550,8 +550,8 @@ export default {
             if (published !== undefined) this.published = this.initialPublished = published;
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
-            this.title = response.data.title;
-            this.permalink = response.data.permalink
+            this.title = response.data.data.title;
+            this.permalink = response.data.data.permalink
             this.$nextTick(() => this.$emit('saved', response));
         },
 
