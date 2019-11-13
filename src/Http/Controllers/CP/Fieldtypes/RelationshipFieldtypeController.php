@@ -31,7 +31,7 @@ class RelationshipFieldtypeController extends CpController
             ->getItemData($request->selections)
             ->values();
 
-        return $fieldtype->getResourceCollection($request, $items);
+        return ['data' => $items];
     }
 
     protected function fieldtype($request)
