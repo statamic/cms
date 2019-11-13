@@ -129,7 +129,7 @@ class GlobalsController extends CpController
 
         $set->save();
 
-        return $set->toArray();
+        return response('', 204);
     }
 
     public function updateMeta(Request $request, $set)
