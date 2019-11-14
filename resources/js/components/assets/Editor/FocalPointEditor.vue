@@ -88,6 +88,8 @@ export default {
     watch: {
 
         z(z) {
+            if (!this.imageDimensions) return 0;
+
             const smaller = Math.min(this.imageDimensions.w, this.imageDimensions.h);
             this.reticleSize = smaller / z;
         }
