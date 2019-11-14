@@ -8,6 +8,7 @@ use Statamic\Support\Str;
 use Statamic\Facades\Term;
 use Statamic\CP\Column;
 use Statamic\Taxonomies\TermCollection;
+use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
 
 class Taxonomy extends Relationship
 {
@@ -89,6 +90,26 @@ class Taxonomy extends Relationship
         }
 
         return $query->paginate();
+    }
+
+    public function getResourceCollection($request, $items)
+    {
+        return (new TermsResource($items))
+            ->blueprint($this->getBlueprint($request))
+            ->columnPreferenceKey("taxonomies.{$this->getFirstTaxonomyFromRequest($request)->handle()}.columns")
+            ->additional(['meta' => ['sortColumn' => $this->getSortColumn($request)]]);
+    }
+
+    protected function getBlueprint($request)
+    {
+        return $this->getFirstTaxonomyFromRequest($request)->termBlueprint();
+    }
+
+    protected function getFirstTaxonomyFromRequest($request)
+    {
+        return $request->taxonomies
+            ? Facades\Taxonomy::findByHandle($request->taxonomies[0])
+            : Facades\Taxonomy::all()->first();
     }
 
     public function getSortColumn($request)
