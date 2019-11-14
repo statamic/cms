@@ -52,6 +52,7 @@ Vue.component('status-fieldtype', StatusFieldtype);
 Vue.component('structure_sites-fieldtype', require('../components/structures/Sites.vue'));
 Vue.component('table-fieldtype', require('../components/fieldtypes/TableFieldtype.vue'));
 Vue.component('tags-fieldtype', require('../components/fieldtypes/TagsFieldtype.vue'));
+Vue.component('tags-fieldtype-index', require('../components/fieldtypes/TagsIndexFieldtype.vue'));
 Vue.component('template-fieldtype', TemplateFieldtype);
 Vue.component('time-fieldtype', require('../components/fieldtypes/TimeFieldtype.vue'));
 Vue.component('toggle-fieldtype', require('../components/fieldtypes/ToggleFieldtype.vue'));
