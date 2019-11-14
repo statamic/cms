@@ -238,6 +238,10 @@ class EntriesController extends CpController
             'published' => $collection->defaultPublishState()
         ]);
 
+        if ($collection->dated()) {
+            $values['date'] = substr(now()->toDateTimeString(), 0, 10);
+        }
+
         $viewData = [
             'title' => __('Create Entry'),
             'actions' => [
@@ -282,7 +286,7 @@ class EntriesController extends CpController
 
         $fields->validate(Entry::createRules($collection));
 
-        $values = $fields->process()->values()->except(['slug', 'blueprint']);
+        $values = $fields->process()->values()->except(['slug', 'date', 'blueprint']);
 
         $entry = Entry::make()
             ->collection($collection)
@@ -293,10 +297,7 @@ class EntriesController extends CpController
             ->data($values);
 
         if ($collection->dated()) {
-            $date = $values['date']
-                ? $this->formatDateForSaving($values['date'])
-                : now()->format('Y-m-d-Hi');
-            $entry->date($date);
+            $entry->date($this->formatDateForSaving($request->date));
         }
 
         if ($entry->revisionsEnabled()) {
