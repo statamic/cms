@@ -51,7 +51,7 @@
                     </div>
                 </div>
 
-                <div class="flex-1 flex flex-col">
+                <div class="flex-1 flex flex-col min-h-0">
                     <div class="flex flex-col h-full justify-start">
                         <div class="flex-1 overflow-scroll">
                             <data-list-table
