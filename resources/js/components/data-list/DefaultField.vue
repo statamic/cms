@@ -14,6 +14,8 @@ export default {
     computed: {
 
         text() {
+            if (!this.value) return '';
+
             if (typeof this.value !== 'string') return JSON.stringify(this.value);
 
             if (this.value.length > this.truncateAt) {
