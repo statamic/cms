@@ -14,9 +14,13 @@ class Tags extends BaseTags
 
     public function results()
     {
+        if (! $query = request($this->get('query', 'q'))) {
+            return $this->parseNoResults();
+        }
+
         $results = Search::index($this->get('index'))
             ->ensureExists()
-            ->search(request($this->get('query', 'q')))
+            ->search($query)
             ->withData($this->get('supplement_data', true))
             ->limit($this->get('limit'))
             ->offset($this->get('offset'))
