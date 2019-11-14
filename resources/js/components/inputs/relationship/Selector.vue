@@ -74,6 +74,7 @@
                         </div>
 
                         <data-list-pagination
+                            v-if="meta.last_page > 1"
                             class="p-1 border-t shadow-lg"
                             :resource-meta="meta"
                             @page-selected="setPage" />
