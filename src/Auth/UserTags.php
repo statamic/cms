@@ -6,7 +6,6 @@ use Statamic\Support\Arr;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Tags\Tags;
-use Statamic\Exceptions\RedirectException;
 use Statamic\Contracts\Auth\User as UserContract;
 
 class UserTags extends Tags
@@ -171,19 +170,12 @@ class UserTags extends Tags
      * Logs a user out and performs a redirect
      *
      * Maps to {{ user:logout }}
-     *
-     * @throws RedirectException
      */
     public function logout()
     {
         \Auth::logout();
 
-        $e = new RedirectException;
-
-        $e->setUrl($this->get('redirect', '/'));
-        $e->setCode($this->get('response', 302));
-
-        throw $e;
+        abort(redirect($this->get('redirect', '/'), $this->get('response', 302)));
     }
 
     /**

@@ -18,6 +18,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Facade\Ignition\Exceptions\ViewException;
 use Facade\IgnitionContracts\ProvidesSolution;
 use Statamic\Ignition\Value as IgnitionViewValue;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Facade\Ignition\Exceptions\ViewExceptionWithSolution;
 
 class Parser
@@ -1387,6 +1388,11 @@ class Parser
     protected function viewException($e, $data)
     {
         if (! class_exists(ViewException::class)) {
+            return $e;
+        }
+
+        // Redirects etc should work instead of actually generating an exception.
+        if ($e instanceof HttpResponseException) {
             return $e;
         }
 

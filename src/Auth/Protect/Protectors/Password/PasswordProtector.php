@@ -2,7 +2,6 @@
 
 namespace Statamic\Auth\Protect\Protectors\Password;
 
-use Statamic\Exceptions\RedirectException;
 use Statamic\Auth\Protect\Protectors\Protector;
 use Facades\Statamic\Auth\Protect\Protectors\Password\Token;
 
