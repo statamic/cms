@@ -113,7 +113,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
             'collection' => $this->collectionHandle(),
             'last_modified' => $lastModified = $this->lastModified(),
             'updated_at' => $lastModified,
-            'updated_by' => optional($this->lastModifiedBy())->toArray(),
+            'updated_by' => optional($this->lastModifiedBy())->toAugmentedArray(),
         ])->merge($this->supplements)->all();
     }
 

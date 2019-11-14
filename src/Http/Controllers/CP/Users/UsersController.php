@@ -13,6 +13,7 @@ use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
+use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
 
 class UsersController extends CpController
@@ -47,28 +48,20 @@ class UsersController extends CpController
 
         $users = $query
             ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
-            ->paginate(request('perPage'))
-            ->supplement(function ($user) use ($request) {
-                return [
-                    'edit_url' => $user->editUrl(),
-                    'editable' => User::current()->can('edit', $user),
-                    'deleteable' => User::current()->can('delete', $user),
-                    'roles' => $user->isSuper() ? ['Super Admin'] : $user->roles()->map->title()->values(),
-                    'last_login' => optional($user->lastLogin())->diffForHumans() ?? __("Never"),
-                    'actions' => Action::for($user),
-                ];
-            });
+            ->paginate(request('perPage'));
 
-        return Resource::collection($users)->additional(['meta' => [
-            'filters' => $request->filters,
-            'sortColumn' => $sort,
-            'columns' => [
+        return (new Users($users))
+            ->blueprint(Blueprint::find('user'))
+            ->columns([
                 Column::make('email')->label(__('Email')),
                 Column::make('name')->label(__('Name')),
-                Column::make('roles')->label(__('Roles')),
-                Column::make('last_login')->label(__('Last Login')),
-            ],
-        ]]);
+                Column::make('roles')->label(__('Roles'))->fieldtype('relationship')->sortable(false),
+                Column::make('last_login')->label(__('Last Login'))->sortable(false),
+            ])
+            ->additional(['meta' => [
+                'filters' => $request->filters,
+                'sortColumn' => $sort,
+            ]]);
     }
 
     protected function filter($query, $filters)
@@ -140,10 +133,10 @@ class UsersController extends CpController
             $user->generateTokenAndSendPasswordResetNotification();
         }
 
-        return array_merge($user->toArray(), [
+        return [
             'redirect' => $user->editUrl(),
             'activationUrl' => $request->invitation['send'] ? null : $user->getPasswordResetUrl(),
-        ]);
+        ];
     }
 
     public function edit(Request $request, $id)
@@ -204,7 +197,7 @@ class UsersController extends CpController
 
         $user->save();
 
-        return $user->toArray();
+        return ['title' => $user->title()];
     }
 
     public function destroy($user)

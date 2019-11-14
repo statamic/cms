@@ -165,16 +165,14 @@ trait UserContractTests
             'is_role_two' => true,
             'in_group_one' => true,
             'in_group_two' => true,
-            'preferences' => [],
             'supplemented' => 'qux',
             'avatar' => null,
             'initials' => 'JS',
             'is_user' => true,
             'title' => 'john@example.com',
             'edit_url' => 'http://localhost/cp/users/123/edit',
-            'permissions' => [],
             'last_login' => null,
-        ], $this->additionalToArrayValues()), $this->user()->toArray());
+        ], $this->additionalToArrayValues()), $this->user()->augmentedArrayData());
     }
 
     function additionalToArrayValues()

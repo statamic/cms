@@ -6,7 +6,6 @@ use ArrayAccess;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
-use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
@@ -16,13 +15,12 @@ use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Data\Augmentable;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\Preference;
 use Statamic\Facades\URL;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
 use Statamic\Support\Arr;
 
-abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, AugmentableContract, Arrayable, ArrayAccess
+abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, AugmentableContract, ArrayAccess
 {
     use Authorizable, Notifiable, CanResetPassword, Augmentable;
 
@@ -54,11 +52,6 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         }
 
         return strtoupper(substr($name, 0, 1) . substr($surname, 0, 1));
-    }
-
-    public function augmentedArrayData()
-    {
-        return $this->data();
     }
 
     public function avatar($size = 64)
@@ -96,7 +89,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         return cp_route('users.update', $this->id());
     }
 
-    public function toArray()
+    public function augmentedArrayData()
     {
         $roles = $this->roles()->mapWithKeys(function ($role) {
             return ["is_{$role->handle()}" => true];
@@ -113,8 +106,6 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
             'email' => $this->email(),
             'avatar' => $this->avatar(),
             'initials' => $this->initials(),
-            'preferences' => Preference::all(), // Preference API respects fallbacks to role preferences!
-            'permissions' => $this->permissions()->all(),
             'edit_url' => $this->editUrl(),
             'is_user' => true,
             'last_login' => $this->lastLogin(),
