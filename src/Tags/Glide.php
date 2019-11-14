@@ -28,6 +28,10 @@ class Glide extends Tags
 
         $item = $this->context->get($tag);
 
+        if ($this->isPair) {
+            return $this->generate($item);
+        }
+
         return $this->output($this->generateGlideUrl($item));
     }
 
@@ -40,9 +44,11 @@ class Glide extends Tags
      */
     public function index()
     {
-        $item = ($this->content)
-            ? $this->parse([])
-            : $this->get(['src', 'id', 'path']);
+        if ($this->isPair) {
+            return $this->generate();
+        }
+
+        $item = $this->get(['src', 'id', 'path']);
 
         return $this->output($this->generateGlideUrl($item));
     }
@@ -83,9 +89,9 @@ class Glide extends Tags
      *
      * @return string
      */
-    public function generate()
+    public function generate($item = null)
     {
-        $item = $this->get(['src', 'id', 'path']);
+        $item = $item ?? $this->get(['src', 'id', 'path']);
 
         $url = $this->generateGlideUrl($item);
 
@@ -121,6 +127,11 @@ class Glide extends Tags
      */
     private function output($url)
     {
+        if ($this->isPair) {
+            return $this->parse(
+                compact('url', 'width', 'height')
+            );
+        }
         if ($this->getBool('tag')) {
             return "<img src=\"$url\" alt=\"{$this->get('alt')}\" />";
         }
