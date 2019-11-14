@@ -126,11 +126,17 @@ class Taxonomy extends Relationship
             $id = "{$this->taxonomies()[0]}::{$id}";
         }
 
-        if ($term = Term::find($id)) {
-            return $term->toArray();
+        if (! $term = Term::find($id)) {
+            return $this->invalidItemArray($id);
         }
 
-        return $this->invalidItemArray($id);
+        return [
+            'id' => $id,
+            'title' => $term->value('title'),
+            'published' => $term->published(),
+            'private' => $term->private(),
+            'edit_url' => $term->editUrl(),
+        ];
     }
 
     protected function getColumns()
