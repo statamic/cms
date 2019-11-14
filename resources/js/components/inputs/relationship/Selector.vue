@@ -25,7 +25,7 @@
                             <data-list-search
                                 v-if="search"
                                 v-model="searchQuery"
-                                class="bg-transparent p-0" />
+                                class="w-full bg-transparent p-0" />
                         </div>
 
                         <button
