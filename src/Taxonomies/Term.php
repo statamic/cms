@@ -297,7 +297,7 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
-            'data' => Arr::except($this->data(), ['updated_by', 'updated_at']),
+            'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
         ];
     }
 

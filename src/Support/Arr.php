@@ -97,7 +97,7 @@ class Arr extends IlluminateArr
      * @param bool $keyed  Are options keyed?
      * @return array
      */
-    public function explodeOptions($string, $keyed = false)
+    public static function explodeOptions($string, $keyed = false)
     {
         $options = explode('|', $string);
 
@@ -131,7 +131,7 @@ class Arr extends IlluminateArr
      * @param mixed  $value  Value to check
      * @return bool
      */
-    public function isEmpty($value)
+    public static function isEmpty($value)
     {
         if (is_array($value)) {
             foreach ($value as $subvalue) {
@@ -154,7 +154,7 @@ class Arr extends IlluminateArr
      * @param mixed
      * @return array
      */
-    public function normalizeArguments($args)
+    public static function normalizeArguments($args)
     {
         $output = [];
 
@@ -174,7 +174,7 @@ class Arr extends IlluminateArr
      *
      * @return mixed
      */
-    public function pick()
+    public static function pick()
     {
         $args = func_get_args();
 
