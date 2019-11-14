@@ -90,8 +90,8 @@ class Replicator extends Fieldtype
 
             $values = (new Fields($config))->addValues($set)->augment()->values();
 
-            return array_merge($values, ['type' => $set['type']]);
-        });
+            return $values->merge(['type' => $set['type']])->all();
+        })->all();
     }
 
     public function preload()
