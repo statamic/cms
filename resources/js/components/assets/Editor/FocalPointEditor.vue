@@ -6,7 +6,7 @@
                 <label>{{ __('Focal Point') }}</label>
                 <small class="help-block">{{ __('messages.focal_point_instructions') }}</small>
                 <div class="focal-point-image">
-                    <img ref="image" :src="image" @click="define" />
+                    <img ref="image" :src="image" @click="define" @load="setImageDimensions" />
                     <div class="focal-point-reticle" :class="{ zoomed: z > 1 }" :style="{
                         top: `${y}%`,
                         left: `${x}%`,
@@ -43,7 +43,7 @@
         </div>
         <div v-for="n in 9" :key="n"
              :class="`frame frame-${n}`">
-            <focal-point-preview-frame :x="x" :y="y" :z="z" :image-url="image" :image-dimensions="imageDimensions" />
+            <focal-point-preview-frame v-if="imageDimensions" :x="x" :y="y" :z="z" :image-url="image" :image-dimensions="imageDimensions" />
         </div>
     </div>
 
@@ -71,10 +71,7 @@ export default {
             y: 50,
             z: 1,
             reticleSize: 0,
-            imageDimensions: {
-                w: 100,
-                h: 100
-            }
+            imageDimensions: null,
         }
     },
 
@@ -85,14 +82,14 @@ export default {
         this.x = coords[0];
         this.y = coords[1];
         this.z = coords[2] || 1;
-        const image = this.$refs.image;
-        this.imageDimensions = { w: image.clientWidth, h: image.clientHeight };
     },
 
 
     watch: {
 
         z(z) {
+            if (!this.imageDimensions) return 0;
+
             const smaller = Math.min(this.imageDimensions.w, this.imageDimensions.h);
             this.reticleSize = smaller / z;
         }
@@ -101,6 +98,10 @@ export default {
 
 
     methods: {
+        setImageDimensions() {
+            const image = this.$refs.image;
+            this.imageDimensions = { w: image.clientWidth, h: image.clientHeight };
+        },
 
         define(e) {
             var $el = $(e.target);
