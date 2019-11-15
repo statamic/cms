@@ -263,6 +263,7 @@ class ExtensionServiceProvider extends ServiceProvider
             Scopes\Filters\Site::class,
             Scopes\Filters\UserRole::class,
             Scopes\Filters\UserGroup::class,
+            Scopes\Filters\Collection::class,
         ];
 
         $this->registerParent($parent);

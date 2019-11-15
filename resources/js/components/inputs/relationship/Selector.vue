@@ -28,10 +28,16 @@
                                 class="w-full bg-transparent p-0" />
                         </div>
 
+                        <data-list-filters
+                            class="ml-1"
+                            :filters="filters"
+                            :active-filters="activeFilters"
+                            :active-count="activeFilterCount" />
+
                         <button
                             v-if="canCreate"
                             type="button"
-                            class="ml-2 btn"
+                            class="ml-2 btn btn-flat"
                             @click="isCreating = true"
                             v-text="`${__('Create')}...`" />
                     </div>
@@ -106,8 +112,13 @@
 <script>
 import Popper from 'vue-popperjs';
 import InlineCreateForm from './InlineCreateForm.vue';
+import HasFilters from '../../data-list/HasFilters';
 
 export default {
+
+    mixins: [
+        HasFilters,
+    ],
 
     components: {
         Popper,
@@ -141,7 +152,9 @@ export default {
             searchQuery: '',
             selections: _.clone(this.initialSelections),
             isCreating: false,
-            requestOnParameterChange: true,
+            requestOnParameterChange: false,
+            columns: [],
+            filters: [],
         }
     },
 
@@ -154,6 +167,7 @@ export default {
                 page: this.page,
                 site: this.site,
                 exclusions: this.exclusions,
+                filters: btoa(JSON.stringify(this.activeFilters)),
             }
         },
 
@@ -164,7 +178,8 @@ export default {
     },
 
     created() {
-        this.request();
+        this.request()
+            .then(() => this.requestOnParameterChange = true);
     },
 
     mounted() {
@@ -173,8 +188,13 @@ export default {
 
     watch: {
 
-        parameters(param, oldparam) {
-            if (this.requestOnParameterChange) this.request();
+        parameters: {
+            deep: true,
+            handler(after, before) {
+                if (! this.requestOnParameterChange) return;
+                if (JSON.stringify(before) === JSON.stringify(after)) return;
+                this.request();
+            }
         },
 
         loading: {
@@ -211,6 +231,8 @@ export default {
                 this.sortColumn = response.data.meta.sortColumn;
                 this.items = response.data.data;
                 this.meta = response.data.meta;
+                this.filters = response.data.meta.filters;
+                this.activeFilters = {...response.data.meta.activeFilters};
                 this.loading = false;
                 this.initializing = false;
             });

@@ -5,12 +5,13 @@ namespace Statamic\Http\Controllers\CP\Fieldtypes;
 use Statamic\Fields\Field;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Controllers\CP\CpController;
 use Facades\Statamic\Fields\FieldtypeRepository as Fieldtype;
 
 class RelationshipFieldtypeController extends CpController
 {
-    public function index(Request $request)
+    public function index(FilteredRequest $request)
     {
         $fieldtype = $this->fieldtype($request);
 

@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\CP\Column;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 
@@ -45,7 +46,13 @@ class Entries extends Relationship
 
     public function getIndexItems($request)
     {
+        $this->updateRequest($request);
+
         $query = $this->getIndexQuery($request);
+
+        foreach ($request->filters as $handle => $values) {
+            Scope::find($handle, $this->getSelectionFilterContext($request))->apply($query, $values);
+        }
 
         if ($sort = $this->getSortColumn($request)) {
             $query->orderBy($sort, $this->getSortDirection($request));
@@ -54,12 +61,23 @@ class Entries extends Relationship
         return $query->paginate()->preProcessForIndex();
     }
 
+    protected function updateRequest($request)
+    {
+        if (! $request->filters->has('collection')) {
+            $request->filters['collection'] = ['value' => []];
+        }
+    }
+
     public function getResourceCollection($request, $items)
     {
         return (new EntriesResource($items))
             ->blueprint($this->getBlueprint($request))
             ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
-            ->additional(['meta' => ['sortColumn' => $this->getSortColumn($request)]]);
+            ->additional(['meta' => [
+                'sortColumn' => $this->getSortColumn($request),
+                'filters' => $this->getSelectionFilters($request),
+                'activeFilters' => $this->getActiveFilters($request),
+            ]]);
     }
 
     protected function getBlueprint($request)
@@ -69,9 +87,13 @@ class Entries extends Relationship
 
     protected function getFirstCollectionFromRequest($request)
     {
-        return $request->collections
-            ? Collection::findByHandle($request->collections[0])
-            : Collection::all()->first();
+        $collections = $request->filters['collection']['value'];
+
+        if (empty($collections)) {
+            $collections = $this->getConfiguredCollections();
+        }
+
+        return Collection::findByHandle($collections[0]);
     }
 
     public function getSortColumn($request)
@@ -100,10 +122,6 @@ class Entries extends Relationship
     {
         $query = Entry::query();
 
-        if ($collections = $request->collections) {
-            $query->whereIn('collection', $collections);
-        }
-
         if ($search = $request->search) {
             $query->where('title', 'like', '%'.$search.'%');
         }
@@ -125,7 +143,7 @@ class Entries extends Relationship
             return [['url' => $url]];
         }
 
-        $collections = $this->config('collections', Collection::handles());
+        $collections = $this->getConfiguredCollections();
 
         return collect($collections)->map(function ($collection) {
             $collection = Collection::findByHandle($collection);
@@ -135,13 +153,6 @@ class Entries extends Relationship
                 'url' => $collection->createEntryUrl(Site::selected()->handle()),
             ];
         })->all();
-    }
-
-    protected function getBaseSelectionsUrlParameters()
-    {
-        return [
-            'collections' => $this->config('collections'),
-        ];
     }
 
     protected function toItemArray($id)
@@ -164,5 +175,36 @@ class Entries extends Relationship
         if ($entry = Entry::find($value)) {
             return $entry;
         }
+    }
+
+    protected function getSelectionFilters($request)
+    {
+        return Scope::filters('entries-fieldtype', $this->getSelectionFilterContext($request));
+    }
+
+    protected function getSelectionFilterContext($request)
+    {
+        return [
+            'collections' => $this->getConfiguredCollections(),
+            'blueprints' => [$this->getBlueprint($request)->handle()]
+        ];
+    }
+
+    protected function getActiveFilters($request)
+    {
+        $filters = $request->filters;
+
+        if (empty($filters['collection']['value'])) {
+            unset($filters['collection']);
+        }
+
+        return $filters;
+    }
+
+    protected function getConfiguredCollections()
+    {
+        return empty($collections = $this->config('collections'))
+            ? Collection::handles()->all()
+            : $collections;
     }
 }

@@ -54,6 +54,6 @@ class Fields extends Filter
 
     public function visibleTo($key)
     {
-        return in_array($key, ['entries', 'terms']);
+        return in_array($key, ['entries', 'entries-fieldtype', 'terms']);
     }
 }
