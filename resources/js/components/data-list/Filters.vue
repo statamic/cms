@@ -26,6 +26,7 @@
                 />
 
                 <field-filters
+                    v-if="fieldsFilter"
                     :filter="fieldsFilter"
                     :initial-filters="activeFilters['fields']"
                     @changed="filterChanged('fields', $event)"
