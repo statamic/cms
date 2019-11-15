@@ -34,12 +34,16 @@ export default {
 
     watch: {
 
-        values(values) {
+        values(values, oldValues) {
+            values = this.sortValues(values);
+
+            if (JSON.stringify(values) === JSON.stringify(oldValues)) return;
+
             this.update(values);
         },
 
         value(value) {
-            this.values = value;
+            this.values = this.sortValues(value);
         }
 
     },
@@ -56,6 +60,12 @@ export default {
                 return (option) ? option.text : item;
             }).join(', ');
         },
+
+        sortValues(values) {
+            return this.options
+                .filter(opt => values.includes(opt.value))
+                .map(opt => opt.value);
+        }
 
     }
 };
