@@ -19,6 +19,7 @@ use Statamic\Facades\URL;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
 use Statamic\Support\Arr;
+use Statamic\Fields\Value;
 
 abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, AugmentableContract, ArrayAccess
 {
@@ -56,13 +57,25 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
 
     public function avatar($size = 64)
     {
-        if ($this->blueprint()->hasField('avatar') && $this->has('avatar') && $this->augment('avatar')->value()) {
-            return $this->augment('avatar')->value()->url();
+        if ($this->hasAvatarField()) {
+            return $this->avatarFieldUrl();
         }
 
         return config('statamic.users.avatars') === 'gravatar'
             ? URL::gravatar($this->email(), $size)
             : null;
+    }
+
+    protected function hasAvatarField()
+    {
+        return $this->has('avatar') && $this->blueprint()->hasField('avatar');
+    }
+
+    protected function avatarFieldUrl()
+    {
+        $value = (new Value($this->get('avatar'), 'avatar', $this->blueprint()->field('avatar')->fieldtype(), $this));
+
+        return $value->value()->url();
     }
 
     public function isSuper()
@@ -99,17 +112,22 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
             return ["in_{$group->handle()}" => true];
         })->all();
 
-        return $this->data()->merge([
+        $data = $this->data()->merge([
             'name' => $this->name(),
             'id' => $this->id(),
             'title' => $this->title(),
             'email' => $this->email(),
-            'avatar' => $this->avatar(),
             'initials' => $this->initials(),
             'edit_url' => $this->editUrl(),
             'is_user' => true,
             'last_login' => $this->lastLogin(),
-        ])->merge($roles)->merge($groups)->merge($this->supplements)->all();
+        ]);
+
+        if (! $this->hasAvatarField()) {
+            $data['avatar'] = $this->avatar();
+        }
+
+        return $data->merge($roles)->merge($groups)->merge($this->supplements)->all();
     }
 
     public function getAuthIdentifierName()

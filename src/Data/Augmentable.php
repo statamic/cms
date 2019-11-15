@@ -6,11 +6,6 @@ use Statamic\Fields\Value;
 
 trait Augmentable
 {
-    public function augment($key)
-    {
-        return $this->toAugmentedArray()[$key];
-    }
-
     public function toAugmentedArray()
     {
         if (method_exists($this, 'blueprint') && ($blueprint = $this->blueprint())) {
