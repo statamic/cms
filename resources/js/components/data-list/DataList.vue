@@ -88,6 +88,10 @@ export default {
             this.$emit('selections-updated', selections);
         },
 
+        columns(columns) {
+            this.sharedState.columns = columns;
+        },
+
         sortColumn(column) {
             this.sharedState.sortColumn = column;
         }
