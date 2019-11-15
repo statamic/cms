@@ -10,6 +10,7 @@ use Statamic\Exceptions;
 use Illuminate\Support\Collection;
 use Facades\Statamic\View\Cascade;
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Extend\Management\TagLoader;
 use Illuminate\Contracts\View\Engine as EngineInterface;
 
@@ -150,6 +151,10 @@ class Engine implements EngineInterface
             $output = call_user_func([$tag, $method]);
 
             if ($output instanceof Collection) {
+                $output = $output->toAugmentedArray();
+            }
+
+            if ($output instanceof Augmentable) {
                 $output = $output->toAugmentedArray();
             }
 

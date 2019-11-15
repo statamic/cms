@@ -27,7 +27,7 @@ class UserTags extends Tags
             return;
         }
 
-        return $this->parseUser($user);
+        return $user;
     }
 
     /**
@@ -69,7 +69,7 @@ class UserTags extends Tags
             }
         }
 
-        return $this->parseUser($user);
+        return $user;
     }
 
     /**
@@ -423,10 +423,5 @@ class UserTags extends Tags
         }
 
         return $return;
-    }
-
-    private function parseUser(UserContract $user)
-    {
-        return $this->parse($user->toArray());
     }
 }

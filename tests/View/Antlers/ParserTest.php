@@ -1050,6 +1050,25 @@ EOT;
     }
 
     /** @test */
+    function it_automatically_augments_augmentable_objects_when_returned_from_a_callback_tag()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return new AugmentableObject([
+                    'one' => 'foo',
+                    'two' => 'bar',
+                ]);
+            }
+        })::register();
+
+        $this->assertEquals(
+            'FOO! bar',
+            Antlers::parse('{{ tag }}{{ one }} {{ two }}{{ /tag }}')
+        );
+    }
+
+    /** @test */
     function it_automatically_augments_collections_when_using_tag_pairs()
     {
         $augmentable = collect([
