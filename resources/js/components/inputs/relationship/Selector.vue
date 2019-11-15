@@ -34,20 +34,6 @@
                             class="ml-2 btn"
                             @click="isCreating = true"
                             v-text="`${__('Create')}...`" />
-
-                        <button
-                            type="button"
-                            class="btn btn-primary ml-2"
-                            @click="select"
-                            v-text="hasMaxSelections
-                                ? __n('Select (:count/:max)', selections, { max: maxSelections })
-                                : __n('Select (:count)', selections)" />
-
-                        <button
-                            type="button"
-                            class="btn-close"
-                            @click="close"
-                            v-html="'&times'" />
                     </div>
                 </div>
 
@@ -78,6 +64,29 @@
                             class="p-1 border-t shadow-lg"
                             :resource-meta="meta"
                             @page-selected="setPage" />
+
+                        <div class="p-2 border-t flex items-center justify-between bg-grey-20">
+                            <div class="text-sm text-grey-40"
+                                v-text="hasMaxSelections
+                                    ? __n(':count/:max selected', selections, { max: maxSelections })
+                                    : __n(':count selected', selections)" />
+
+                            <div>
+                                <button
+                                    type="button"
+                                    class="btn"
+                                    @click="close">
+                                    {{ __('Cancel') }}
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-primary ml-1"
+                                    @click="select">
+                                    {{ __('Select') }}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
 
