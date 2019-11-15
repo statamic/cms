@@ -25,6 +25,7 @@ use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Data\HasOrigin;
 use Statamic\Contracts\Data\Localization;
+use Statamic\Data\Publishable;
 
 class Entry implements Contract, AugmentableContract, Responsable, Localization, ArrayAccess
 {
@@ -32,7 +33,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, Augmentable, FluentlyGetsAndSets, Revisable;
+    use ContainsData, ExistsAsFile, Augmentable, FluentlyGetsAndSets, Revisable, Publishable;
 
     use HasOrigin {
         value as originValue;

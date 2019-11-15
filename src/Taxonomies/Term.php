@@ -30,10 +30,11 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
+use Statamic\Data\Publishable;
 
 class Term implements TermContract, Responsable, AugmentableContract, ArrayAccess
 {
-    use ContainsData, Routable, ExistsAsFile, FluentlyGetsAndSets, Augmentable, Revisable, HasOrigin;
+    use ContainsData, Routable, ExistsAsFile, FluentlyGetsAndSets, Augmentable, Revisable, HasOrigin, Publishable;
 
     protected $taxonomy;
     protected $blueprint;
