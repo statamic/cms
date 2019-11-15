@@ -25,6 +25,7 @@
                             <data-list-search
                                 v-if="search"
                                 v-model="searchQuery"
+                                ref="search"
                                 class="w-full bg-transparent p-0" />
                         </div>
 
@@ -159,13 +160,11 @@ export default {
 
     },
 
-    created() {
-        this.request()
-            .then(() => this.requestOnParameterChange = true);
-    },
-
     mounted() {
-        this.$modal.show('item-selector');
+        this.request().then(() => {
+            this.requestOnParameterChange = true
+            if (this.search) this.$refs.search.focus();
+        });
     },
 
     watch: {
