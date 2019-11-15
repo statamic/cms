@@ -2,14 +2,19 @@
 
     <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow" contenteditable="false" @paste.stop>
         <div ref="content" hidden />
-        <div class="replicator-set-header" :class="{'collapsed': collapsed}" @dblclick="toggleCollapsedState">
+        <div class="replicator-set-header" :class="{'collapsed': collapsed}">
             <div class="item-move sortable-handle" data-drag-handle />
-            <div class="flex-1 ml-1 flex items-center" @click="expand">
-                <label v-text="config.display" class="text-xs"/>
+            <div class="flex-1 p-1" :class="{'flex items-center': collapsed}" @dblclick="toggleCollapsedState">
+                <label v-text="config.display" class="text-xs whitespace-no-wrap mr-1"/>
                 <div
                     v-if="config.instructions"
+                    v-show="!collapsed"
                     v-html="instructions"
-                    class="help-block replicator-set-instructions" />
+                    class="help-block mt-1 -mb-1" />
+                <div
+                    v-show="collapsed"
+                    v-html="previewText"
+                    class="help-block mb-0" />
             </div>
             <div class="replicator-set-controls">
                 <toggle-fieldtype
@@ -17,7 +22,7 @@
                     class="toggle-sm mr-2"
                     v-model="enabled"
                     v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
-                <dropdown-list>
+                <dropdown-list class="-mt-sm">
                     <dropdown-item :text="__(collapsed ? 'Expand Set' : 'Collapse Set')" @click="toggleCollapsedState" />
                     <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                 </dropdown-list>
@@ -25,7 +30,7 @@
         </div>
         <div class="replicator-set-body" v-show="!collapsed" v-if="index !== undefined">
             <set-field
-                v-for="field in config.fields"
+                v-for="field in fields"
                 v-show="showField(field)"
                 :key="field.handle"
                 :field="field"
@@ -38,6 +43,7 @@
                 @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="focused"
                 @blur="blurred"
+                @replicator-preview-updated="previews[field.handle] = $event"
             />
         </div>
     </div>
@@ -46,6 +52,7 @@
 
 <script>
 import SetField from '../replicator/Field.vue';
+import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 
 export default {
@@ -62,11 +69,15 @@ export default {
 
     components: { SetField },
 
-    mixins: [ValidatesFieldConditions],
+    mixins: [ValidatesFieldConditions, ManagesPreviewText],
 
     inject: ['setConfigs'],
 
     computed: {
+
+        fields() {
+            return this.config.fields;
+        },
 
         values() {
             return this.node.attrs.values;
@@ -99,8 +110,16 @@ export default {
 
         index() {
             return this.options.bard.setIndexes[this.node.attrs.id];
-        }
+        },
 
+        instructions() {
+            return this.config.instructions ? markdown(this.config.instructions) : null;
+        },
+
+    },
+
+    created() {
+        this.initPreviews();
     },
 
     methods: {

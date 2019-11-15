@@ -29,6 +29,7 @@
             @meta-updated="$emit('meta-updated', $event)"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
+            @replicator-preview-updated="$emit('replicator-preview-updated', $event)"
         />
 
     </div>

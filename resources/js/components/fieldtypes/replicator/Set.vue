@@ -4,16 +4,26 @@
 
         <div class="replicator-set-header" :class="{ 'p-1': isReadOnly, 'collapsed': collapsed }">
             <div class="item-move sortable-handle" :class="sortableHandleClass" v-if="!isReadOnly"></div>
-            <div class="flex-1 ml-1 flex items-center" @dblclick="toggleCollapsedState">
-                <label v-text="config.display" class="text-xs"/>
+            <div class="flex-1 p-1" :class="{'flex items-center': collapsed}" @dblclick="toggleCollapsedState">
+                <label v-text="config.display" class="text-xs whitespace-no-wrap mr-1"/>
                 <div
                     v-if="config.instructions"
+                    v-show="!collapsed"
                     v-html="instructions"
-                    class="help-block replicator-set-instructions" />
+                    class="help-block mt-1 -mb-1" />
+                <div
+                    v-show="collapsed"
+                    v-html="previewText"
+                    class="help-block mb-0" />
             </div>
             <div class="replicator-set-controls" v-if="!isReadOnly">
-                <toggle-fieldtype handle="set-enabled" class="toggle-sm mr-2" @input="toggleEnabledState" :value="values.enabled" />
-                <dropdown-list>
+                <toggle-fieldtype
+                    handle="set-enabled"
+                    class="toggle-sm mr-2"
+                    @input="toggleEnabledState"
+                    :value="values.enabled"
+                    v-tooltip.top="(values.enabled) ? __('Included in output') : __('Hidden from output')" />
+                <dropdown-list class="-mt-sm">
                     <dropdown-item :text="__(collapsed ? 'Expand Set' : 'Collapse Set')" @click="toggleCollapsedState" />
                     <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                 </dropdown-list>
@@ -36,6 +46,7 @@
                 @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
+                @replicator-preview-updated="previews[field.handle] = $event"
             />
         </div>
 
@@ -57,13 +68,14 @@
 
 <script>
 import SetField from './Field.vue';
+import ManagesPreviewText from './ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 
 export default {
 
     components: { SetField },
 
-    mixins: [ValidatesFieldConditions],
+    mixins: [ValidatesFieldConditions, ManagesPreviewText],
 
     props: {
         config: {
@@ -125,6 +137,10 @@ export default {
             return this.values['#hidden'] === true;
         }
 
+    },
+
+    created() {
+        this.initPreviews();
     },
 
     methods: {
