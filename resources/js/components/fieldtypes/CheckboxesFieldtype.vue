@@ -62,6 +62,8 @@ export default {
         },
 
         sortValues(values) {
+            if (!values) return [];
+
             return this.options
                 .filter(opt => values.includes(opt.value))
                 .map(opt => opt.value);
