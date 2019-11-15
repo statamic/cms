@@ -21,6 +21,6 @@ trait Augmentable
 
     public function augmentedArrayData()
     {
-        return $this->toArray();
+        return method_exists($this, 'values') ? $this->values() : $this->data();
     }
 }

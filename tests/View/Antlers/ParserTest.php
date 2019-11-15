@@ -1328,7 +1328,8 @@ class NonArrayableObject
 
 class ArrayableObject extends NonArrayableObject implements Arrayable
 {
-    function toArray() {
+    public function toArray()
+    {
         return $this->data;
     }
 }
@@ -1336,6 +1337,11 @@ class ArrayableObject extends NonArrayableObject implements Arrayable
 class AugmentableObject extends ArrayableObject implements Augmentable
 {
     use AugmentableTrait;
+
+    function augmentedArrayData()
+    {
+        return $this->toArray();
+    }
 
     public function blueprint()
     {

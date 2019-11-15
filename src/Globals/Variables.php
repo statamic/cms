@@ -135,11 +135,6 @@ class Variables implements Contract, Localization, AugmentableContract
         ], $this->data()->all());
     }
 
-    public function augmentedArrayData()
-    {
-        return $this->values();
-    }
-
     public function reference()
     {
         return "globals::{$this->id()}";
