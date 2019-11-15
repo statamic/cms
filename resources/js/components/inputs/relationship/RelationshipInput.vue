@@ -66,7 +66,6 @@
                     initial-sort-column="title"
                     initial-sort-direction="asc"
                     :initial-selections="selections"
-                    :initial-columns="columns"
                     :max-selections="maxItems"
                     :search="search"
                     :can-create="canCreate"
@@ -105,7 +104,6 @@ export default {
         itemDataUrl: String,
         selectionsUrl: String,
         statusIcons: Boolean,
-        columns: Array,
         site: String,
         search: Boolean,
         canEdit: Boolean,
