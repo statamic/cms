@@ -33,13 +33,6 @@
                             :filters="filters"
                             :active-filters="activeFilters"
                             :active-count="activeFilterCount" />
-
-                        <button
-                            v-if="canCreate"
-                            type="button"
-                            class="ml-2 btn btn-flat"
-                            @click="isCreating = true"
-                            v-text="`${__('Create')}...`" />
                     </div>
                 </div>
 
@@ -96,13 +89,6 @@
                     </div>
                 </div>
 
-                <inline-create-form
-                    v-if="isCreating"
-                    :site="site"
-                    @created="itemCreated"
-                    @closed="stopCreating"
-                />
-
             </div>
         </data-list>
     </div>
@@ -111,7 +97,6 @@
 
 <script>
 import Popper from 'vue-popperjs';
-import InlineCreateForm from './InlineCreateForm.vue';
 import HasFilters from '../../data-list/HasFilters';
 
 export default {
@@ -121,8 +106,7 @@ export default {
     ],
 
     components: {
-        Popper,
-        InlineCreateForm
+        Popper
     },
 
     props: {
@@ -133,7 +117,6 @@ export default {
         maxSelections: Number,
         site: String,
         search: Boolean,
-        canCreate: Boolean,
         exclusions: {
             type: Array,
             default: () => []
@@ -151,7 +134,6 @@ export default {
             page: 1,
             searchQuery: '',
             selections: _.clone(this.initialSelections),
-            isCreating: false,
             requestOnParameterChange: false,
             columns: [],
             filters: [],
@@ -258,16 +240,6 @@ export default {
 
         selectionsUpdated(selections) {
             this.selections = selections;
-        },
-
-        itemCreated(item) {
-            this.request();
-            this.selections.push(item.id);
-            this.stopCreating();
-        },
-
-        stopCreating() {
-            this.isCreating = false;
         },
 
         getStatusClass(entry) {

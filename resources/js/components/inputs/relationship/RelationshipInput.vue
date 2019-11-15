@@ -68,7 +68,6 @@
                     :initial-selections="selections"
                     :max-selections="maxItems"
                     :search="search"
-                    :can-create="canCreate"
                     :exclusions="exclusions"
                     @selected="selectionsUpdated"
                     @closed="close"
