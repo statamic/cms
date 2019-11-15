@@ -37,6 +37,6 @@ class Collection extends Filter
 
     public function visibleTo($key)
     {
-        return 'entries-fieldtype' && count($this->context['collections']) > 1;
+        return $key === 'entries-fieldtype' && count($this->context['collections']) > 1;
     }
 }
