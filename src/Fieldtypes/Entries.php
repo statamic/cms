@@ -8,6 +8,7 @@ use Statamic\Facades\Entry;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
+use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 
 class Entries extends Relationship
 {
@@ -161,13 +162,7 @@ class Entries extends Relationship
             return $this->invalidItemArray($id);
         }
 
-        return [
-            'id' => $id,
-            'title' => $entry->value('title'),
-            'published' => $entry->published(),
-            'private' => $entry->private(),
-            'edit_url' => $entry->editUrl(),
-        ];
+        return (new EntryResource($entry))->resolve();
     }
 
     protected function augmentValue($value)

@@ -324,7 +324,7 @@ class EntriesController extends CpController
             $tree->save();
         }
 
-        return ['data' => ['redirect' => $entry->editUrl()]];
+        return new EntryResource($entry);
     }
 
     public function destroy($collection, $entry)
