@@ -11,10 +11,12 @@
                     v-show="!collapsed"
                     v-html="instructions"
                     class="help-block mt-1 -mb-1" />
-                <div
-                    v-show="collapsed"
-                    v-html="previewText"
-                    class="help-block mb-0" />
+
+                <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-4">
+                    <div
+                        v-html="previewText"
+                        class="help-block mb-0 whitespace-no-wrap overflow-hidden text-overflow-ellipsis" />
+                </div>
             </div>
             <div class="replicator-set-controls" v-if="!isReadOnly">
                 <toggle-fieldtype
