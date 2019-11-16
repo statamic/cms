@@ -29,7 +29,14 @@ export default {
     computed: {
         options() {
             return this.normalizeInputOptions(this.config.options);
-        }
+        },
+
+        replicatorPreview() {
+            return this.values.map(value => {
+                const option = _.findWhere(this.options, { value });
+                return option ? option.label : value;
+            }).join(', ');
+        },
     },
 
     watch: {
@@ -52,13 +59,6 @@ export default {
 
         focus() {
             document.getElementById(`${this.name}-0`).focus();
-        },
-
-        getReplicatorPreviewText() {
-            return this.values.map(item => {
-                var option = _.findWhere(this.config.options, {value: item});
-                return (option) ? option.text : item;
-            }).join(', ');
         },
 
         sortValues(values) {

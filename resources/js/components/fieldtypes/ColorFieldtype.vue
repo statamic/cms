@@ -11,9 +11,19 @@ export default {
 
     mixins: [Fieldtype],
 
+    computed: {
+
+        replicatorPreview() {
+            return this.value
+                ? `<span class="little-dot" style="background-color:${this.value}"></span>`
+                : null;
+        }
+
+    },
+
     mounted() {
         const pickr = Pickr.create({
-            el: '.color-picker',
+            el: this.$el,
             disabled: this.isReadOnly,
             components: {
 

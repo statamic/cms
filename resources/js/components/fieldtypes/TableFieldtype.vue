@@ -145,6 +145,13 @@ export default {
 
         canDeleteColumns() {
             return !this.isReadOnly && this.columnCount > 1;
+        },
+
+        replicatorPreview() {
+            // Join all values with commas. Exclude any empties.
+            return _(this.data)
+                .map(row => row.value.cells.filter(cell => !!cell).join(', '))
+                .filter(row => !!row).join(', ');
         }
     },
 
@@ -190,13 +197,6 @@ export default {
         deleteCancelled() {
             this.deletingRow = false;
             this.deletingColumn = false;
-        },
-
-        getReplicatorPreviewText() {
-            // Join all values with commas. Exclude any empties.
-            return _(this.data)
-                .map(row => row.value.cells.filter(cell => !!cell).join(', '))
-                .filter(row => !!row).join(', ');
         }
     }
 

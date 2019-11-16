@@ -122,6 +122,13 @@ export default {
 
         taggable() {
             return this.meta.taggable;
+        },
+
+        replicatorPreview() {
+            return this.value.map(id => {
+                const item = _.findWhere(this.meta.data, { id });
+                return item ? item.title : id;
+            });
         }
 
     },

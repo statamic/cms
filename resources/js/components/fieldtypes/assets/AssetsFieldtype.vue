@@ -310,6 +310,14 @@ export default {
 
                 vm = parent;
             }
+        },
+
+        replicatorPreview() {
+            return _.map(this.assets, (asset) => {
+                return asset.isImage ?
+                    `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
+                    : asset.basename;
+            }).join(', ');
         }
 
     },
