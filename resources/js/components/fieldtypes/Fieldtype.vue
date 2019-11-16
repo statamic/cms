@@ -49,15 +49,7 @@ export default {
         },
 
         replicatorPreview() {
-            if (!this.value) return null;
-
-            if (typeof this.value === 'string') return this.value;
-
-            const json = JSON.stringify(this.value);
-
-            if (json === '[]' || json === '{}') return null;
-
-            return json;
+            return this.value;
         }
     },
 
