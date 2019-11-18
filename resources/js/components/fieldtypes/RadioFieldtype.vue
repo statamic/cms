@@ -27,19 +27,19 @@ export default {
     computed: {
         options() {
             return this.normalizeInputOptions(this.config.options);
-        }
+        },
+
+        replicatorPreview() {
+            var option = _.findWhere(this.config.options, {value: this.value});
+            return (option) ? option.label : this.value;
+        },
     },
 
     methods: {
 
         focus() {
             document.getElementById(`${this.name}-0`).focus();
-        },
-
-        getReplicatorPreviewText() {
-            var option = _.findWhere(this.config.options, {value: this.value});
-            return (option) ? option.text : this.value;
-        },
+        }
 
     }
 };
