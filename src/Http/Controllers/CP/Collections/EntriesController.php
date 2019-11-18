@@ -284,7 +284,7 @@ class EntriesController extends CpController
 
         $fields = $blueprint->fields()->addValues($request->all());
 
-        $fields->validate(Entry::createRules($collection));
+        $fields->validate(Entry::createRules($collection, $site));
 
         $values = $fields->process()->values()->except(['slug', 'date', 'blueprint']);
 
