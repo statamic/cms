@@ -109,7 +109,7 @@ class Revision implements Contract, Arrayable
     public function toArray()
     {
         if ($user = $this->user()) {
-            $user = Arr::only($user->toArray(), ['id', 'email', 'name', 'avatar', 'initials']);
+            $user = Arr::only($user->augmentedArrayData(), ['id', 'email', 'name', 'avatar', 'initials']);
         }
 
         return [
