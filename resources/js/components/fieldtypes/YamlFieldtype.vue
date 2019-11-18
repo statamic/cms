@@ -28,6 +28,7 @@ export default {
             mode: 'yaml',
             tabSize: 2,
             indentUnit: 2,
+            autoRefresh: true,
             indentWithTabs: false,
             lineNumbers: true,
             lineWrapping: true,
