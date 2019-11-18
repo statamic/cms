@@ -58,7 +58,7 @@ return [
     |
     */
 
-    'redirects' => [
+    'redirect' => [
         // '/here' => '/there',
     ],
 
