@@ -33,6 +33,17 @@ class Modify implements \IteratorAggregate
     }
 
     /**
+     * Invoke the class as a function
+     *
+     * @param mixed $value
+     * @return \Statamic\Modifiers\Modify
+     */
+    public function __invoke($value)
+    {
+        return static::value($value);
+    }
+
+    /**
      * Specify a value to start the modification chain
      *
      * @param mixed $value
