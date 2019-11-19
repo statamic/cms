@@ -15,7 +15,6 @@ return [
 
     'views' => [
         'layout' => 'layout',
-        'page' => 'default',
         'entry' => 'post',
         'term' => 'term',
         'default' => 'default',
@@ -46,7 +45,6 @@ return [
     */
 
     'blueprints' => [
-        'page' => 'page',
         'entry' => 'entry',
         'term' => 'term',
         'asset' => 'asset',
