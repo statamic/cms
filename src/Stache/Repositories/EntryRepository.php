@@ -118,7 +118,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => 'required',
-            'slug' => 'required|unique_entry_value:'.$collection->handle().',null,'.$site,
+            'slug' => 'required|unique_entry_value:'.$collection->handle().',null,'.$site->handle(),
         ];
     }
 
