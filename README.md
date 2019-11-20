@@ -11,7 +11,7 @@ It's important to note that while this repo is open and we welcome your feedback
 
 ## Open Beta
 
-Statamic 3 is now in **open beta!** We welcome you try it out, [read the docs](https://statamic.dev), experiment, send [bug reports][contributing], provide thoughtful feedback, and otherwise do anything you feel will make the platform better and more stable for launch.
+Statamic 3 is now in **open beta!** We welcome you try it out, [read the docs](https://statamic.dev), experiment, send [bug reports][contribution], provide thoughtful feedback, and otherwise do anything you feel will make the platform better and more stable for launch.
 
 If this is your first experience with Statamic, please reserve your final judgement until we're out of beta. We've built a solid and flexible foundation and most bugs and rough edges should be minor efforts to address.
 
