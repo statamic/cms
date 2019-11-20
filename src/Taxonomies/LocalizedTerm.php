@@ -227,9 +227,15 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
         return $this->locale;
     }
 
-    public function revisionsEnabled()
+    public function revisionsEnabled($enabled = null)
     {
-        return $this->term->revisionsEnabled();
+        if (func_num_args() === 0) {
+            return $this->term->revisionsEnabled();
+        }
+
+        $this->term->revisionsEnabled($enabled);
+
+        return $this;
     }
 
     public function editUrl()

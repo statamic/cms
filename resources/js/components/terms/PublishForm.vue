@@ -111,6 +111,8 @@
                                     </div>
                                 </div>
 
+                                <!--
+                                TODO
                                 <div class="flex items-center border-t justify-between px-2 py-1" v-if="!revisionsEnabled">
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
                                     <toggle-input v-model="published" />
@@ -146,6 +148,7 @@
                                             <span>{{ __('View History') }}</span>
                                         </button>
                                 </div>
+                                -->
 
                                 <div class="p-2 site-list border-t" v-if="localizations.length > 1">
                                     <label class="publish-field-label font-medium mb-1" v-text="__('Sites')" />

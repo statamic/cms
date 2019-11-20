@@ -271,9 +271,11 @@ class TermsController extends CpController
         $term = Term::make()
             ->taxonomy($taxonomy)
             ->blueprint($request->blueprint)
-            ->locale($site->handle())
-            ->published($request->get('published'))
+            ->in($site->handle());
+
+        $term
             ->slug($request->slug)
+            ->published($request->get('published')) // TODO
             ->data($values);
 
         if ($term->revisionsEnabled()) {

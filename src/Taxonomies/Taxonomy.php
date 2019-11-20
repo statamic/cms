@@ -178,6 +178,8 @@ class Taxonomy implements Contract, Responsable
                     return false;
                 }
 
+                return false; // TODO
+
                 return $enabled;
             })
             ->args(func_get_args());
