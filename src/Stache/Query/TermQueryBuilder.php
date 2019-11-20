@@ -53,9 +53,13 @@ class TermQueryBuilder extends Builder
             ? Facades\Taxonomy::handles()
             : $this->taxonomies;
 
-        return empty($this->wheres)
+        $keys = empty($this->wheres)
             ? $this->getKeysFromTaxonomies($taxonomies)
             : $this->getKeysFromTaxonomiesWithWheres($taxonomies, $this->wheres);
+
+        return $keys->unique(function ($key) {
+            return explode('::', $key)[2];
+        });
     }
 
     protected function getKeysFromTaxonomies($taxonomies)

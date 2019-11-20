@@ -105,7 +105,7 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
         return $this->taxonomy()->sites()->first();
     }
 
-    protected function inDefaultLocale()
+    public function inDefaultLocale()
     {
         return $this->in($this->defaultLocale());
     }
@@ -355,7 +355,7 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
             'uri' => $this->uri(),
             'url' => $this->url(),
             'title' => $this->title(),
-            'entries' => $entryQuery = $this->queryEntries(),
+            'entries' => $entryQuery = $this->queryEntries()->where('site', $this->locale),
             'entries_count' => $entryQuery->count(),
         ])->all();
     }
@@ -373,5 +373,10 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
     public function private()
     {
         return false;
+    }
+
+    public function path()
+    {
+        return $this->term->path();
     }
 }

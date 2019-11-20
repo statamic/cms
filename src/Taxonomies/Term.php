@@ -114,6 +114,13 @@ class Term implements TermContract
         return $this->taxonomy()->sites()->first();
     }
 
+    public function localizations()
+    {
+        return $this->taxonomy()->sites()->mapWithKeys(function ($site) {
+            return [$site => $this->in($site)];
+        });
+    }
+
     public function collection($collection = null)
     {
         return $this->fluentlyGetOrSet('collection')->args(func_get_args());
@@ -182,6 +189,10 @@ class Term implements TermContract
 
     public function __call($method, $args)
     {
-        return $this->inDefaultLocale()->$method(...$args);
+        $default = $this->inDefaultLocale();
+
+        $return = $default->$method(...$args);
+
+        return ($return == $default) ? $this : $return;
     }
 }
