@@ -43,6 +43,7 @@ class SiteClear extends Command
         $this
             ->clearCollections()
             ->clearStructures()
+            ->clearAssets()
             ->clearViews();
     }
 
@@ -70,6 +71,20 @@ class SiteClear extends Command
         $this->files->cleanDirectory(base_path('content/structures'));
 
         $this->info('Structures cleared successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Clear all assets.
+     *
+     * @return $this
+     */
+    public function clearAssets()
+    {
+        $this->files->cleanDirectory(base_path('content/assets'));
+
+        $this->info('Assets cleared successfully.');
 
         return $this;
     }
