@@ -239,6 +239,7 @@ class TermsController extends CpController
                     'exists' => false,
                     'published' => false,
                     'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $handle]),
+                    'livePreviewUrl' => cp_route('taxonomies.terms.preview.create', [$taxonomy->handle(), $handle]),
                 ];
             })->all()
         ];
