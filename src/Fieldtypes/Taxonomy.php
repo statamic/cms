@@ -26,7 +26,7 @@ class Taxonomy extends Relationship
         }
 
         return (new TermCollection(Arr::wrap($value)))
-            ->map(function ($value) use ($handle, $taxonomy, $collection) {
+            ->map(function ($value) use ($handle, $taxonomy, $collection, $entry) {
                 if ($taxonomy) {
                     $slug = $value;
                     $id = "{$handle}::{$slug}";
@@ -41,7 +41,7 @@ class Taxonomy extends Relationship
 
                 $term = Term::find($id) ?? Term::make($slug)->taxonomy($taxonomy);
 
-                return $term->collection($collection);
+                return $term->collection($collection)->in($entry->locale());
             });
     }
 

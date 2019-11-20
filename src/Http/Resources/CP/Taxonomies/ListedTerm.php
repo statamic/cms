@@ -35,7 +35,10 @@ class ListedTerm extends Resource
             'published' => $term->published(),
             'private' => $term->private(),
 
-            $this->merge($this->values(['slug' => $term->slug()])),
+            $this->merge($this->values([
+                'title' => $term->title(),
+                'slug' => $term->slug(),
+            ])),
 
             'edit_url' => $term->editUrl(),
             'viewable' => User::current()->can('view', $term),

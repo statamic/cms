@@ -12,8 +12,8 @@ class Value extends Index
         $associatedItems = $this->store->index('associations')->items()
             ->mapWithKeys(function ($association) {
                 $term = Term::make($value = $association['value'])
-                    ->set('title', $value)
-                    ->taxonomy($this->store->childKey());
+                    ->taxonomy($this->store->childKey())
+                    ->set('title', $value);
 
                 return [$term->slug() => $this->getItemValue($term)];
             });

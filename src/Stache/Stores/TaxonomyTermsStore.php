@@ -42,17 +42,24 @@ class TaxonomyTermsStore extends ChildStore
 
     public function makeItemFromFile($path, $contents)
     {
-        $site = Site::default()->handle();
         $taxonomy = pathinfo($path, PATHINFO_DIRNAME);
         $taxonomy = str_after($taxonomy, $this->parent->directory());
 
-        return Term::make()
+        $data = YAML::file($path)->parse($contents);
+
+        $term = Term::make()
             ->taxonomy($taxonomy)
             ->slug(pathinfo(Path::clean($path), PATHINFO_FILENAME))
             ->initialPath($path)
-            ->locale($site)
-            ->data($data = YAML::file($path)->parse($contents))
             ->blueprint($data['blueprint'] ?? null);
+
+        foreach (Arr::pull($data, 'localizations', []) as $locale => $localeData) {
+            $term->dataForLocale($locale, $localeData);
+        }
+
+        $term->dataForLocale($term->defaultLocale(), $data);
+
+        return $term;
     }
 
     public function getItemKey($item)
@@ -73,7 +80,6 @@ class TaxonomyTermsStore extends ChildStore
         } else {
             $item = Term::make($key)
                 ->taxonomy($this->childKey())
-                ->locale(Site::default()->handle())
                 ->set('title', $this->index('title')->get($key));
         }
 
