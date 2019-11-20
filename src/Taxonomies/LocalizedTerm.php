@@ -125,9 +125,15 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
         return $this->term->id();
     }
 
-    public function taxonomy()
+    public function taxonomy($taxonomy = null)
     {
-        return $this->term->taxonomy();
+        if (func_num_args() === 0) {
+            return $this->term->taxonomy();
+        }
+
+        return $this->term->taxonomy($taxonomy);
+
+        return $this;
     }
 
     public function taxonomyHandle()
@@ -135,9 +141,15 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
         return $this->term->taxonomyHandle();
     }
 
-    public function collection()
+    public function collection($collection = null)
     {
-        return $this->term->collection();
+        if (func_num_args() === 0) {
+            return $this->term->collection();
+        }
+
+        $this->term->collection($collection);
+
+        return $this;
     }
 
     public function blueprint()
