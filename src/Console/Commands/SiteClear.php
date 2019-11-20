@@ -2,6 +2,7 @@
 
 namespace Statamic\Console\Commands;
 
+use Statamic\Facades\YAML;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Illuminate\Filesystem\Filesystem;
@@ -52,7 +53,7 @@ class SiteClear extends Command
      *
      * @return $this
      */
-    public function clearCollections()
+    protected function clearCollections()
     {
         $this->files->cleanDirectory(base_path('content/collections'));
 
@@ -66,7 +67,7 @@ class SiteClear extends Command
      *
      * @return $this
      */
-    public function clearStructures()
+    protected function clearStructures()
     {
         $this->files->cleanDirectory(base_path('content/structures'));
 
@@ -80,9 +81,17 @@ class SiteClear extends Command
      *
      * @return $this
      */
-    public function clearAssets()
+    protected function clearAssets()
     {
-        $this->files->cleanDirectory(base_path('content/assets'));
+        $path = base_path('content/assets');
+
+        if ($this->files->exists($path)) {
+            collect($this->files->files($path))->each(function ($container) {
+                $this->removeAssetContainerDisk($container);
+            });
+        }
+
+        $this->files->cleanDirectory($path);
 
         $this->info('Assets cleared successfully.');
 
@@ -90,11 +99,32 @@ class SiteClear extends Command
     }
 
     /**
+     * Remove asset container disk.
+     */
+    protected function removeAssetContainerDisk($container)
+    {
+        if ($container->getExtension() !== 'yaml') {
+            return;
+        }
+
+        if (! $disk = YAML::parse($container->getContents())['disk'] ?? false) {
+            return;
+        }
+
+        // TODO: Maybe we can eventually bring in and extract this to statamic/migrator's Configurator class...
+        $filesystemsPath = config_path('filesystems.php');
+        $filesystems = $this->files->get($filesystemsPath);
+        $updatedFilesystems = preg_replace("/\s{8}['\"]{$disk}['\"]\X*\s{8}\],?+\n\n?+/mU", '', $filesystems);
+
+        $this->files->put($filesystemsPath, $updatedFilesystems);
+    }
+
+    /**
      * Clear all views.
      *
      * @return $this
      */
-    public function clearViews()
+    protected function clearViews()
     {
         $this->files->cleanDirectory(resource_path('views'));
 
