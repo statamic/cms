@@ -150,11 +150,11 @@ class CoreNav
                 });
             });
 
-        Nav::tools('Updates')
-            ->route('updater')
-            ->icon('loading-bar')
-            ->view('statamic::nav.updates')
-            ->can('view updates');
+        // Nav::tools('Updates')
+        //     ->route('updater')
+        //     ->icon('loading-bar')
+        //     ->view('statamic::nav.updates')
+        //     ->can('view updates');
 
         $this->makeUtilitiesSection();
 
