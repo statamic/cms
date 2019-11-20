@@ -52,7 +52,7 @@ Thank you for considering contributing to Statamic! Please review the [contribut
 
 ## Code of Conduct
 
-In order to ensure that the Statamic community is welcoming to all and generally a rad place to belong, please review and abide by the [Code of Conduct](https://github.com/statamic/three-cms/wiki/Code-of-Conduct).
+In order to ensure that the Statamic community is welcoming to all and generally a rad place to belong, please review and abide by the [Code of Conduct](https://github.com/statamic/cms/wiki/Code-of-Conduct).
 
 
 ## Important Links
@@ -65,5 +65,5 @@ In order to ensure that the Statamic community is welcoming to all and generally
 
 [docs]: https://statamic.dev/
 [discord]: https://statamic.com/discord
-[contribution]: https://github.com/statamic/three-cms/blob/master/CONTRIBUTING.md
-[app-repo]: https://github.com/statamic/three-statamic
+[contribution]: https://github.com/statamic/cms/blob/master/CONTRIBUTING.md
+[app-repo]: https://github.com/statamicstatamic
