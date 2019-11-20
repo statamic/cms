@@ -42,7 +42,7 @@ Thank you for considering contributing to Statamic! Please review the [contribut
 
 - [Statamic 3 Documentation][docs]
 - [Statamic 3 Migrator](https://github.com/statamic/migrator)
-- [Statamic 3 Development Blog](https://v3.statamic.com]
+- [Statamic 3 Development Blog](https://v3.statamic.com)
 - [Discord][discord]
 
 [docs]: https://statamic.dev/
