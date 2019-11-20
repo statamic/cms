@@ -6,7 +6,7 @@ Statamic 3 is the very latest and greatest version of Statamic, a uniquely power
 
 It's important to note that while this repo is open and we welcome your feedback and contributions, Statamic is not FOSS (Free and Open Source Software). Please review our [contritubtion guidelines][contribution] guidelines for more details!
 
-> **Note:** This repository contains the code for the CMS core. To start your own website project with Statamic, visit the main [Statamic repository](https://github.com/statamic/three-statamic).
+> **Note:** This repository contains the code for the core CMS package. To start your own website project with Statamic, visit the [Statamic application repository][app-repo].
 
 
 ## Open Beta
@@ -58,10 +58,12 @@ In order to ensure that the Statamic community is welcoming to all and generally
 ## Important Links
 
 - [Statamic 3 Documentation][docs]
+- [Statamic 3 Application Repo][app-repo]
 - [Statamic 3 Migrator](https://github.com/statamic/migrator)
 - [Statamic 3 Development Blog](https://v3.statamic.com)
-- [Discord][discord]
+- [Statamic Discord][discord]
 
 [docs]: https://statamic.dev/
 [discord]: https://statamic.com/discord
 [contribution]: https://github.com/statamic/three-cms/blob/master/CONTRIBUTING.md
+[app-repo]: https://github.com/statamic/three-statamic
