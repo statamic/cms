@@ -1,0 +1,32 @@
+<svg version="1.1"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+     x="0px" y="0px" width="16px" height="15px" viewBox="0 0 16 15" style="enable-background:new 0 0 16 15;" xml:space="preserve">
+<style type="text/css">
+    .st0{fill:none;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<defs>
+</defs>
+<g>
+    <circle class="st0" cx="12.6" cy="2.6" r="2.1"/>
+    <line class="st0" x1="14.1" y1="4.1" x2="15.5" y2="5.5"/>
+</g>
+<path class="st0" d="M8.5,4.5h-7c-0.6,0-1-0.4-1-1v-1c0-0.6,0.4-1,1-1h7"/>
+<g>
+    <path d="M1.8,6.5C1.3,6.5,1,6.8,1,7.2S1.3,8,1.8,8s0.8-0.3,0.8-0.8S2.2,6.5,1.8,6.5L1.8,6.5z"/>
+</g>
+<g>
+    <line class="st0" x1="4" y1="7.5" x2="12" y2="7.5"/>
+</g>
+<g>
+    <path d="M1.8,10C1.3,10,1,10.3,1,10.8s0.3,0.8,0.8,0.8s0.8-0.3,0.8-0.8S2.2,10,1.8,10L1.8,10z"/>
+</g>
+<g>
+    <line class="st0" x1="4" y1="11" x2="12" y2="11"/>
+</g>
+<g>
+    <path d="M1.8,13.5c-0.4,0-0.8,0.3-0.8,0.8S1.3,15,1.8,15s0.8-0.3,0.8-0.8S2.2,13.5,1.8,13.5L1.8,13.5z"/>
+</g>
+<g>
+    <line class="st0" x1="4" y1="14.5" x2="12" y2="14.5"/>
+</g>
+</svg>
