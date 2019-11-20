@@ -55,6 +55,7 @@ class ListedEntry extends Resource
             $value = $this->blueprint
                 ->field($key)
                 ->setValue($extra[$key] ?? $this->resource->value($key))
+                ->setParent($this->resource)
                 ->preProcessIndex()
                 ->value();
 
