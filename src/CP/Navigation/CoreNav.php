@@ -222,10 +222,10 @@ class CoreNav
      */
     protected function makeSiteSection()
     {
-        Nav::site('Addons')
-            ->route('addons.index')
-            ->icon('addons')
-            ->can('configure addons');
+        // Nav::site('Addons')
+        //     ->route('addons.index')
+        //     ->icon('addons')
+        //     ->can('configure addons');
 
         Nav::site('Fields')
             ->route('fields.index')
