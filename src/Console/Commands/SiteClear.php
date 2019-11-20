@@ -45,7 +45,8 @@ class SiteClear extends Command
             ->clearCollections()
             ->clearStructures()
             ->clearAssets()
-            ->clearViews();
+            ->clearViews()
+            ->resetStatamicConfigs();
     }
 
     /**
@@ -129,6 +130,24 @@ class SiteClear extends Command
         $this->files->cleanDirectory(resource_path('views'));
 
         $this->info('Views cleared successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Reset statamic configs to defaults.
+     *
+     * @return $this
+     */
+    protected function resetStatamicConfigs()
+    {
+        $this->files->cleanDirectory(config_path('statamic'));
+
+        $this->files->copyDirectory(__DIR__.'/../../../config', config_path('statamic'));
+        $this->files->copy(__DIR__.'/stubs/config/stache.php.stub', config_path('statamic/stache.php'));
+        $this->files->copy(__DIR__.'/stubs/config/users.php.stub', config_path('statamic/users.php'));
+
+        $this->info('Statamic configs cleared successfully.');
 
         return $this;
     }
