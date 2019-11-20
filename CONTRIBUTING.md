@@ -14,6 +14,7 @@ This is a guideline for contributing to Statamic, its documentation, and addons.
 - [Feature Requests](#feature-requests)
 - [Security Disclosures](#security-disclosures)
 - [Core Enhancements](#core-enhancements)
+- [Compiled Assets](#compiled-assets)
 - [Control Panel Translations](#control-panel-translations)
 - [Documentation Edits](#documentation-edits)
 - [Pull Requests](#pull-requests)
@@ -61,6 +62,10 @@ Statamic's documentation lives in the [https://github.com/statamic/three-docs](h
 ### Core Enhancements
 
 If you would like to work on a new core feature or improvement, first create a [Github issue](https://github.com/statamic/three-cms/issues) for it if there’s not one already. While we appreciate community contributions, we do remain selective about what features make it into Statamic itself, so don’t take it the wrong way if we recommend that you to pursue the idea as an addon instead.
+
+### Compiled Assets
+
+If you are submitting a change that will affect a compiled file, such as most of the files in `resources/sass` or `resources/j`s, do not commit the compiled files. Due to their large size, they cannot realistically be reviewed by our team. This could be exploited as a way to inject malicious code into Statamic. In order to defensively prevent this, all compiled files will be generated and committed by the core Statamic team.
 
 ### Control Panel Translations
 
