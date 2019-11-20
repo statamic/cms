@@ -1,4 +1,4 @@
-# How to Contribte to Statamic
+# How to Contribute to Statamic
 
 :sparkles: Before we get started, thank you for taking the time to contribute! :sparkles:
 
