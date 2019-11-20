@@ -52,13 +52,12 @@ class Install extends Command
             base_path('content/taxonomies'),
             base_path('content/structures'),
             base_path('users'),
-            storage_path('statamic/users'),
-            storage_path('statamic/search'),
-            storage_path('statamic/revisions'),
         ];
 
         $gitignores = [
-            //
+            storage_path('statamic/users'),
+            storage_path('statamic/search'),
+            storage_path('statamic/revisions'),
         ];
 
         foreach ($gitkeeps as $dir) {
