@@ -38,6 +38,10 @@ Our [#v3 channel][discord] is the best place to casually chat with us and other 
 
 Thank you for considering contributing to Statamic! Please review the [contribution guide][contribution] before you open issues or send pull requests.
 
+## Code of Conduct
+
+In order to ensure that the Statamic community is welcoming to all and generally a rad place to belong, please review and abide by the [Code of Conduct](https://github.com/statamic/three-cms/wiki/Code-of-Conduct).
+
 ## Important Links
 
 - [Statamic 3 Documentation][docs]
