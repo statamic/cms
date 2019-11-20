@@ -131,7 +131,7 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
             return $this->term->taxonomy();
         }
 
-        return $this->term->taxonomy($taxonomy);
+        $this->term->taxonomy($taxonomy);
 
         return $this;
     }
