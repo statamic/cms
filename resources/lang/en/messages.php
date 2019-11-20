@@ -97,7 +97,7 @@ return [
     'getting_started_widget_blueprints' => 'Blueprints define the custom fields used to create and store your content.',
     'getting_started_widget_collections' => 'Collections contain the different types of content in your site.',
     'getting_started_widget_docs' => 'Get to know Statamic understand its capabilities the right way.',
-    'getting_started_widget_header' => 'Getting started with Statamic',
+    'getting_started_widget_header' => 'Getting Started with Statamic',
     'getting_started_widget_intro' => 'To begin building your new Statamic site, we recommend starting with these steps.',
     'getting_started_widget_structures' => 'Structures establish the heirarchy of your pages and help you manage your site navigation.',
     'global_search_open_using_slash' => 'You can open global search using the <kbd>/</kbd> key',
