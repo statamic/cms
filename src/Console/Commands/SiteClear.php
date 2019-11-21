@@ -47,10 +47,10 @@ class SiteClear extends Command
             ->clearTaxonomies()
             ->clearAssets()
             ->clearGlobals()
-            ->clearViews()
             ->clearUsers()
             ->clearGroups()
             ->clearRoles()
+            ->clearViews()
             ->resetStatamicConfigs();
     }
 
@@ -154,20 +154,6 @@ class SiteClear extends Command
     }
 
     /**
-     * Clear all views.
-     *
-     * @return $this
-     */
-    protected function clearViews()
-    {
-        $this->files->cleanDirectory(resource_path('views'));
-
-        $this->info('Views cleared successfully.');
-
-        return $this;
-    }
-
-    /**
      * Clear all users.
      *
      * @return $this
@@ -217,6 +203,20 @@ EOT
         );
 
         $this->info('User roles cleared successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Clear all views.
+     *
+     * @return $this
+     */
+    protected function clearViews()
+    {
+        $this->files->cleanDirectory(resource_path('views'));
+
+        $this->info('Views cleared successfully.');
 
         return $this;
     }
