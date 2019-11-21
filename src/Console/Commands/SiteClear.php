@@ -61,7 +61,7 @@ class SiteClear extends Command
      */
     protected function clearCollections()
     {
-        $this->files->cleanDirectory(base_path('content/collections'));
+        $this->cleanAndKeep(base_path('content/collections'));
 
         $this->info('Collections cleared successfully.');
 
@@ -75,7 +75,7 @@ class SiteClear extends Command
      */
     protected function clearStructures()
     {
-        $this->files->cleanDirectory(base_path('content/structures'));
+        $this->cleanAndKeep(base_path('content/structures'));
 
         $this->info('Structures cleared successfully.');
 
@@ -89,7 +89,7 @@ class SiteClear extends Command
      */
     protected function clearTaxonomies()
     {
-        $this->files->cleanDirectory(base_path('content/taxonomies'));
+        $this->cleanAndKeep(base_path('content/taxonomies'));
 
         $this->info('Taxonomies cleared successfully.');
 
@@ -111,7 +111,7 @@ class SiteClear extends Command
             });
         }
 
-        $this->files->cleanDirectory($path);
+        $this->cleanAndKeep($path);
 
         $this->info('Assets cleared successfully.');
 
@@ -146,7 +146,7 @@ class SiteClear extends Command
      */
     protected function clearGlobals()
     {
-        $this->files->cleanDirectory(base_path('content/globals'));
+        $this->cleanAndKeep(base_path('content/globals'));
 
         $this->info('Globals cleared successfully.');
 
@@ -160,7 +160,7 @@ class SiteClear extends Command
      */
     protected function clearUsers()
     {
-        $this->files->cleanDirectory(base_path('users'));
+        $this->cleanAndKeep(base_path('users'));
 
         $this->info('Users cleared successfully.');
 
@@ -214,7 +214,7 @@ EOT
      */
     protected function clearViews()
     {
-        $this->files->cleanDirectory(resource_path('views'));
+        $this->cleanAndKeep(resource_path('views'));
 
         $this->info('Views cleared successfully.');
 
@@ -234,8 +234,20 @@ EOT
         $this->files->copy(__DIR__.'/stubs/config/stache.php.stub', config_path('statamic/stache.php'));
         $this->files->copy(__DIR__.'/stubs/config/users.php.stub', config_path('statamic/users.php'));
 
-        $this->info('Statamic configs cleared successfully.');
+        $this->info('Statamic configs reset successfully.');
 
         return $this;
+    }
+
+    /**
+     * Clean directory and add .gitkeep file.
+     *
+     * @param string $path
+     */
+    protected function cleanAndKeep($path)
+    {
+        $this->files->cleanDirectory($path);
+
+        $this->files->put("{$path}/.gitkeep", '');
     }
 }
