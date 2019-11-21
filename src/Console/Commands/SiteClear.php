@@ -188,13 +188,13 @@ class SiteClear extends Command
      */
     protected function clearGroups()
     {
-        $this->files->put(resource_path('users/groups.yaml', <<<EOT
+        $this->files->put(resource_path('users/groups.yaml'), <<<EOT
 # admin:
 #   title: Administrators
 #   roles:
-#     - admin
+#     - admin\n
 EOT
-        ));
+        );
 
         $this->info('User groups cleared successfully.');
 
@@ -208,13 +208,13 @@ EOT
      */
     protected function clearRoles()
     {
-        $this->files->put(resource_path('users/roles.yaml', <<<EOT
+        $this->files->put(resource_path('users/roles.yaml'), <<<EOT
 # admin:
 #   title: Administrator
 #   permissions:
-#     - super
+#     - super\n
 EOT
-        ));
+        );
 
         $this->info('User roles cleared successfully.');
 
