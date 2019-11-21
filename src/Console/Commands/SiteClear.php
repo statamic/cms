@@ -50,6 +50,7 @@ class SiteClear extends Command
             ->clearUsers()
             ->clearGroups()
             ->clearRoles()
+            ->clearBlueprints()
             ->clearViews()
             ->resetStatamicConfigs();
     }
@@ -203,6 +204,20 @@ EOT
         );
 
         $this->info('User roles cleared successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Clear all blueprints.
+     *
+     * @return $this
+     */
+    protected function clearBlueprints()
+    {
+        $this->cleanAndKeep(resource_path('blueprints'));
+
+        $this->info('Blueprints cleared successfully.');
 
         return $this;
     }
