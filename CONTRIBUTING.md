@@ -10,6 +10,7 @@ This is a guideline for contributing to Statamic, its documentation, and addons.
 - [Statamic isn’t FOSS](#statamic-isnt-foss)
 - [How to Get Support](#how-to-get-support)
 - [How You Can Contribute](#how-you-can-contribute)
+- [Which Repo?](#which-repo)
 - [Bug Reports](#bug-reports)
 - [Feature Requests](#feature-requests)
 - [Security Disclosures](#security-disclosures)
@@ -36,6 +37,14 @@ If you're looking for official developer support (and you own a license), please
 You can chat and collaborate with other developers in the community — [Discord](https://statamic.com/discord) and the [forum](https://statamic.com/forum) are the best places to go. You will find many helpful folks who may be willing to help.
 
 ## How You Can Contribute
+
+### Which Repo?
+
+Statamic 3 is broken out into a few Github repositories. Here's a quick summary of each.
+
+- [`statamic/cms`][https://github.com/statamic/cms] is the core package. It doesn't run by itself but is instead a dependency consumed by Laravel apps. 99% of the work goes on here.
+- [`statamic/statamic`][https://github.com/statamic/statamic] is the starter Laravel app used to build a new site.
+- [`statamic/docs`][https://github.com/statamic/docs] is the Statamic 3 documentation site that is curently running on [statamic.dev](https://statamic.dev).
 
 ### Bug Reports
 
