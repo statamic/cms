@@ -19,3 +19,9 @@ install:
 script:
   - vendor/bin/phpunit
   - npm run test
+
+notifications:
+  slack:
+    secure: kH+s232YWQgPussKFmk7MbroldvLcNTORQAdOfN8/nLxuApZN57expLaQhTHp/lJYs0dhWlqViz2uQYTLpNqKKu0WJAt4Wl56Fdp3x2NZXrL8DrUk+5LZpu1TDQIrdKDpVCYs3VM6c6WK3slRdKqfDAtyLyTqVJwrA4VRlKqIgNEzTvB37gzHd7NLjwTnkl71FD4JGBQ20/g8isd1s1ANWSgqMypeTJAe+GpG3IN9O3odG3APDmMcp6dVRQTDA0gb++od2z2/5abvbXCaGhYW+T12duQlGSEZxj431+TRhteIiOd4zkRugFGigjPAlTJeha6+hzs/ytb7hydga/ofxyV6X3aQBLcBjnaSFOglZAMZmUwNLLsnk24s9awJVC7ZPcheaX6mKMhVlVTOYcF5u0vZiS0LJRm6II951Ax32Maso9bP/ijyTun68CSFDnEdlq1/x7qjIGSGPZgKuA01XjuWPBAL/UQifLolgb6OtFHYifZJc85MAXrKntSEYGOv39EbdBm6ZXzxGlvEQXdlCERYc9dgMt3p0RW6MIc7Hx9NQoXBkLINViooeTbY19HgbZPvyVCMGPbOIgWinrsukKkFGM/BL091JC7RWiaZX5awDSpygtXSifHvDepfeM7t16K77ZTNATOtK/3DVb2gJhCr3Luqs15ApwVlBcJOx4=
+    on_success: change
+    on_failure: change
