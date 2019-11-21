@@ -52,6 +52,7 @@ class SiteClear extends Command
             ->clearGroups()
             ->clearRoles()
             ->clearBlueprints()
+            ->clearFieldsets()
             ->clearViews()
             ->resetStatamicConfigs();
     }
@@ -234,6 +235,20 @@ EOT
         $this->cleanAndKeep(resource_path('blueprints'));
 
         $this->info('Blueprints cleared successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Clear all fieldsets.
+     *
+     * @return $this
+     */
+    protected function clearFieldsets()
+    {
+        $this->cleanAndKeep(resource_path('fieldsets'));
+
+        $this->info('Fieldsets cleared successfully.');
 
         return $this;
     }
