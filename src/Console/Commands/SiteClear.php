@@ -292,6 +292,10 @@ EOT
      */
     protected function cleanAndKeep($path)
     {
+        if (! $this->files->exists($path)) {
+            $this->files->makeDirectory($path, 0755, true);
+        }
+
         $this->files->cleanDirectory($path);
 
         $this->files->put("{$path}/.gitkeep", '');
