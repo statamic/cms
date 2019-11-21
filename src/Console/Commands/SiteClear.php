@@ -46,6 +46,7 @@ class SiteClear extends Command
             ->clearStructures()
             ->clearAssets()
             ->clearViews()
+            ->clearUsers()
             ->resetStatamicConfigs();
     }
 
@@ -130,6 +131,20 @@ class SiteClear extends Command
         $this->files->cleanDirectory(resource_path('views'));
 
         $this->info('Views cleared successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Clear all users.
+     *
+     * @return $this
+     */
+    protected function clearUsers()
+    {
+        $this->files->cleanDirectory(base_path('users'));
+
+        $this->info('Users cleared successfully.');
 
         return $this;
     }
