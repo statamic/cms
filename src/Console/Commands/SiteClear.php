@@ -49,6 +49,7 @@ class SiteClear extends Command
             ->clearGlobals()
             ->clearViews()
             ->clearUsers()
+            ->clearGroups()
             ->resetStatamicConfigs();
     }
 
@@ -175,6 +176,26 @@ class SiteClear extends Command
         $this->files->cleanDirectory(base_path('users'));
 
         $this->info('Users cleared successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Clear all user groups.
+     *
+     * @return $this
+     */
+    protected function clearGroups()
+    {
+        $this->files->put(resource_path('users/groups.yaml', <<<EOT
+# admin:
+#   title: Administrators
+#   roles:
+#     - admin
+EOT
+        ));
+
+        $this->info('User groups cleared successfully.');
 
         return $this;
     }
