@@ -314,14 +314,17 @@ export default {
                 this.saving = false;
                 this.clearErrors();
             }).catch(e => {
+                this.saving = false;
+
                 if (e.response && e.response.status === 422) {
                     const { message, errors, error } = e.response.data;
                     this.error = message;
                     this.errors = errors;
-                    this.saving = false;
                     this.$toast.error(error);
+                } else if (e.response) {
+                    this.$toast.error(e.response.data.message);
                 } else {
-                    this.$toast.error('Something went wrong');
+                    this.$toast.error(__('Something went wrong'));
                 }
             });
         },

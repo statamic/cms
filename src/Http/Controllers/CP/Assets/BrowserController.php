@@ -52,7 +52,7 @@ class BrowserController extends CpController
 
         abort_unless($container && $asset, 404);
 
-        $this->authorize('edit', $asset);
+        $this->authorize('view', $asset);
 
         return view('statamic::assets.browse', [
             'container' => [
