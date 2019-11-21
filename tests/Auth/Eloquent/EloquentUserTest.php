@@ -4,6 +4,7 @@ namespace Tests\Auth\Eloquent;
 
 use Tests\TestCase;
 use Faker\Generator as Faker;
+use Illuminate\Support\Carbon;
 use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
 use Illuminate\Database\Eloquent\Factory;
@@ -17,6 +18,8 @@ class EloquentUserTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        Carbon::setTestNow(Carbon::create(2019, 11, 21, 23, 39, 29));
 
         config(['statamic.users.repository' => 'eloquent']);
 
@@ -47,16 +50,16 @@ class EloquentUserTest extends TestCase
     function additionalToArrayValues()
     {
         return [
-            'created_at' => now()->format('Y-m-d H:i:s'),
-            'updated_at' => now()->format('Y-m-d H:i:s'),
+            'created_at' => '2019-11-21 23:39:29',
+            'updated_at' => '2019-11-21 23:39:29',
         ];
     }
 
     function additionalDataValues()
     {
         return [
-            'created_at' => now()->format('Y-m-d H:i:s'),
-            'updated_at' => now()->format('Y-m-d H:i:s'),
+            'created_at' => '2019-11-21 23:39:29',
+            'updated_at' => '2019-11-21 23:39:29',
         ];
     }
 }
