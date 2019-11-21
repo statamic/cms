@@ -47,6 +47,7 @@ class SiteClear extends Command
             ->clearTaxonomies()
             ->clearAssets()
             ->clearGlobals()
+            ->clearForms()
             ->clearUsers()
             ->clearGroups()
             ->clearRoles()
@@ -150,6 +151,21 @@ class SiteClear extends Command
         $this->cleanAndKeep(base_path('content/globals'));
 
         $this->info('Globals cleared successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Clear all forms and submissions.
+     *
+     * @return $this
+     */
+    protected function clearForms()
+    {
+        $this->files->deleteDirectory(resource_path('forms'));
+        $this->files->deleteDirectory(storage_path('forms'));
+
+        $this->info('Forms cleared successfully.');
 
         return $this;
     }
