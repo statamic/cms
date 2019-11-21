@@ -54,7 +54,8 @@ class SiteClear extends Command
             ->clearBlueprints()
             ->clearFieldsets()
             ->clearViews()
-            ->resetStatamicConfigs();
+            ->resetStatamicConfigs()
+            ->clearCache();
     }
 
     /**
@@ -281,6 +282,18 @@ EOT
         $this->files->copy(__DIR__.'/stubs/config/users.php.stub', config_path('statamic/users.php'));
 
         $this->info('Statamic configs reset successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Clear cache.
+     *
+     * @return $this
+     */
+    protected function clearCache()
+    {
+        $this->callSilent('cache:clear');
 
         return $this;
     }
