@@ -11,6 +11,7 @@ class View
     protected $layout;
     protected $template;
     protected $cascadeContent;
+    protected $defaultTemplate = 'default';
 
     public static function make($template = null)
     {
@@ -63,7 +64,10 @@ class View
     {
         $cascade = $this->gatherData();
 
-        $contents = view($this->template, $cascade);
+        $contents = view()->first([
+            $this->template,
+            $this->defaultTemplate,
+        ], $cascade);
 
         if ($this->layout) {
             $contents = view($this->layout, array_merge($cascade, [
