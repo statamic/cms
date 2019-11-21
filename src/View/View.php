@@ -3,6 +3,7 @@
 namespace Statamic\View;
 
 use Facades\Statamic\View\Cascade;
+use Statamic\Support\Str;
 use Statamic\View\Events\ViewRendered;
 
 class View
@@ -65,7 +66,10 @@ class View
 
         $contents = view($this->template, $cascade);
 
-        if ($this->layout) {
+        // We only want the template-in-a-layout behavior if the template is Antlers.
+        $isAntlers = Str::endsWith($contents->getPath(), ['.antlers.html', '.antlers.php']);
+
+        if ($this->layout && $isAntlers) {
             $contents = view($this->layout, array_merge($cascade, [
                 'template_content' => $contents->withoutExtractions()->render()
             ]));
