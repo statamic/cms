@@ -126,7 +126,7 @@
 
             <!-- Copy Pasta -->
             <div class="max-w-md mx-auto px-2 pb-7">
-                <p class="mb-1" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
+                <p class="mb-1" v-text="__('messages.user_wizard_invitation_share', { email: user.email })" />
                 <textarea readonly class="input-text" v-elastic onclick="this.select()">
 {{ __('Activation URL') }}: {{ activationUrl }}
 {{ __('Username') }}: {{ user.email }}
