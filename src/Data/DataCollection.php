@@ -221,7 +221,7 @@ class DataCollection extends IlluminateCollection
             $blueprint = $item->blueprint();
             foreach ($item->values() as $key => $value) {
                 if ($field = $blueprint->field($key)) {
-                    $processed = $field->setValue($value)->preProcessIndex()->value();
+                    $processed = $field->setValue($value)->setParent($item)->preProcessIndex()->value();
                     $item->setSupplement($key, $processed);
                 }
             }
