@@ -44,6 +44,7 @@ class SiteClear extends Command
         $this
             ->clearCollections()
             ->clearStructures()
+            ->clearTaxonomies()
             ->clearAssets()
             ->clearViews()
             ->clearUsers()
@@ -74,6 +75,20 @@ class SiteClear extends Command
         $this->files->cleanDirectory(base_path('content/structures'));
 
         $this->info('Structures cleared successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Clear all taxonomies.
+     *
+     * @return $this
+     */
+    protected function clearTaxonomies()
+    {
+        $this->files->cleanDirectory(base_path('content/taxonomies'));
+
+        $this->info('Taxonomies cleared successfully.');
 
         return $this;
     }
