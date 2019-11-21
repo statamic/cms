@@ -59,6 +59,11 @@ export default {
 
         laravelDocsLink() {
             let version = new RegExp('([0-9]+\.[0-9])\.[0-9]+').exec(this.laravelVersion)[1];
+            let majorVersion = Number(version.split('.', 1)[0]);
+
+            if (majorVersion >= 6) {
+                version = `${majorVersion}.x`;
+            }
 
             return `https://laravel.com/docs/${version}/validation#available-validation-rules`;
         },
