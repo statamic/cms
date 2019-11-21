@@ -46,6 +46,7 @@ class SiteClear extends Command
             ->clearStructures()
             ->clearTaxonomies()
             ->clearAssets()
+            ->clearGlobals()
             ->clearViews()
             ->clearUsers()
             ->resetStatamicConfigs();
@@ -134,6 +135,20 @@ class SiteClear extends Command
         $updatedFilesystems = preg_replace("/\s{8}['\"]{$disk}['\"]\X*\s{8}\],?+\n\n?+/mU", '', $filesystems);
 
         $this->files->put($filesystemsPath, $updatedFilesystems);
+    }
+
+    /**
+     * Clear all globals.
+     *
+     * @return $this
+     */
+    protected function clearGlobals()
+    {
+        $this->files->cleanDirectory(base_path('content/globals'));
+
+        $this->info('Globals cleared successfully.');
+
+        return $this;
     }
 
     /**
