@@ -66,4 +66,4 @@ In order to ensure that the Statamic community is welcoming to all and generally
 [docs]: https://statamic.dev/
 [discord]: https://statamic.com/discord
 [contribution]: https://github.com/statamic/cms/blob/master/CONTRIBUTING.md
-[app-repo]: https://github.com/statamicstatamic
+[app-repo]: https://github.com/statamic/statamic
