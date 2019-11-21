@@ -50,6 +50,7 @@ class SiteClear extends Command
             ->clearViews()
             ->clearUsers()
             ->clearGroups()
+            ->clearRoles()
             ->resetStatamicConfigs();
     }
 
@@ -196,6 +197,26 @@ EOT
         ));
 
         $this->info('User groups cleared successfully.');
+
+        return $this;
+    }
+
+    /**
+     * Clear all user roles.
+     *
+     * @return $this
+     */
+    protected function clearRoles()
+    {
+        $this->files->put(resource_path('users/roles.yaml', <<<EOT
+# admin:
+#   title: Administrator
+#   permissions:
+#     - super
+EOT
+        ));
+
+        $this->info('User roles cleared successfully.');
 
         return $this;
     }
