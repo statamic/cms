@@ -30,7 +30,7 @@
                     :rows="$screens({ default: 1, lg: config.rows })">
                         <input
                             slot-scope="{ inputProps, inputEvents }"
-                            class="bg-transparent leading-none w-full"
+                            class="bg-transparent leading-none w-full focus:outline-none"
                             v-bind="inputProps"
                             v-on="inputEvents" />
                 </v-date-picker>
