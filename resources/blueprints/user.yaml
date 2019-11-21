@@ -21,8 +21,3 @@ fields:
     field:
       type: user_groups
       width: 50
-  -
-    handle: avatar
-    field:
-      type: assets
-      max_files: 1
