@@ -89,8 +89,8 @@ class Bard extends Replicator
 
     public function augment($value)
     {
-        if ($this->field->handle() == "content") {
-            throw new \Exception("The fieldname `content` is reserved for string-based fieldtypes.");
+        if ($this->shouldSaveHtml()) {
+            return $value;
         }
 
         if ($this->isLegacyData($value)) {
