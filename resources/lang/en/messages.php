@@ -56,7 +56,7 @@ return [
     'collections_route_instructions' => 'The route controls entries URL pattern.',
     'collections_sort_direction_instructions' => 'The default sort direction.',
     'collections_structure_instructions' => 'Structures enable page hierarchies that control order and URL.',
-    'collections_taxonomies_instructions' => 'Connect entries in this collection to taxonomies. Fields are be automatically added to publish forms.',
+    'collections_taxonomies_instructions' => 'Connect entries in this collection to taxonomies. Fields will be automatically added to publish forms.',
     'collections_template_instructions' => 'Set a default template.',
     'email_utility_configuration_description' => 'Mail settings are configured in <code>:path</code>',
     'email_utility_description' => 'Check email configuration and send a test.',
