@@ -27,7 +27,7 @@ return [
     'collection_wizard_handle_instructions' => 'How you\'ll reference to this collection in your templates. Cannot easily be changed.',
     'collection_wizard_intro' => 'A Collection is a group of entries that holds similar content and shares behavior and attributes, like URL patterns, ordering, and visibility.',
     'collection_wizard_layout_instructions' => 'Set your default layout.',
-    'collection_wizard_mount_instructions' => 'Add Structure shortcuts to this collection.',
+    'collection_wizard_mount_instructions' => 'Optionally set an entry that will act as a parent. Also enables shortcut links in any structures.',
     'collection_wizard_no_dates_description' => 'Entries will not have any dates.',
     'collection_wizard_order_intro' => 'Choose how you want your Collection to be ordered.',
     'collection_wizard_ordered_alpha_ascending' => 'Entries will be sorted from A to Z.',
