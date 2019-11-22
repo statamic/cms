@@ -4,7 +4,7 @@
 
 Statamic 3 is the very latest and greatest version of Statamic, a uniquely powerful CMS built on [Laravel](https://laravel.com) and designed to make building and managing bespoke websites radically efficient and enjoyable.
 
-It's important to note that while this repo is open and we welcome your feedback and contributions, Statamic is not FOSS (Free and Open Source Software). Please review our [contritubtion guidelines][contribution] guidelines for more details!
+It's important to note that while this repo is open and we welcome your feedback and contributions, Statamic is not FOSS (Free and Open Source Software). Please review our [contribution guidelines][contribution] guidelines for more details!
 
 > **Note:** This repository contains the code for the core CMS package. To start your own website project with Statamic, visit the [Statamic application repository][app-repo].
 
