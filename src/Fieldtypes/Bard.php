@@ -181,6 +181,10 @@ class Bard extends Replicator
 
     public function preProcessIndex($value)
     {
+        if (is_string($value)) {
+            return $value;
+        }
+
         $data = collect($value)->reject(function ($value) {
             return $value['type'] === 'set';
         });
