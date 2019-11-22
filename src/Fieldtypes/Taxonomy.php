@@ -24,7 +24,7 @@ class Taxonomy extends Relationship
             $taxonomy = Facades\Taxonomy::findByHandle($handle);
         }
 
-        return (new TermCollection(Arr::wrap($value)))
+        $terms = (new TermCollection(Arr::wrap($value)))
             ->map(function ($value) use ($handle, $taxonomy) {
                 if ($taxonomy) {
                     $slug = $value;
@@ -46,6 +46,8 @@ class Taxonomy extends Relationship
                     ->collection($entry->collection())
                     ->in($entry->locale());
             });
+
+        return $this->config('max_items') === 1 ? $terms->first() : $terms;
     }
 
     public function process($data)
