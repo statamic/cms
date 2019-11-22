@@ -126,6 +126,7 @@ export default {
 
     data() {
         return {
+            source: null,
             initializing: true,
             loading: true,
             items: [],
@@ -135,7 +136,6 @@ export default {
             page: 1,
             searchQuery: '',
             selections: _.clone(this.initialSelections),
-            requestOnParameterChange: false,
             columns: [],
             filters: [],
         }
@@ -162,7 +162,6 @@ export default {
 
     mounted() {
         this.request().then(() => {
-            this.requestOnParameterChange = true
             if (this.search) this.$refs.search.focus();
         });
     },
@@ -172,7 +171,6 @@ export default {
         parameters: {
             deep: true,
             handler(after, before) {
-                if (! this.requestOnParameterChange) return;
                 if (JSON.stringify(before) === JSON.stringify(after)) return;
                 this.request();
             }
@@ -186,14 +184,11 @@ export default {
         },
 
         searchQuery(query) {
-            this.requestOnParameterChange = false;
-
             this.sortColumn = null;
             this.sortDirection = null;
             this.page = 1;
 
-            this.request()
-                .then(() => this.requestOnParameterChange = true);
+            this.request();
         }
 
     },
@@ -203,11 +198,14 @@ export default {
         request() {
             this.loading = true;
 
+            if (this.source) this.source.cancel();
+            this.source = this.$axios.CancelToken.source();
+
             const params = {...this.parameters, ...{
                 search: this.searchQuery,
             }};
 
-            return this.$axios.get(this.url, { params }).then(response => {
+            return this.$axios.get(this.url, { params, cancelToken: this.source.token }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
                 this.items = response.data.data;
@@ -216,6 +214,11 @@ export default {
                 this.activeFilters = {...response.data.meta.activeFilters};
                 this.loading = false;
                 this.initializing = false;
+            }).catch(e => {
+                if (this.$axios.isCancel(e)) return;
+                this.loading = false;
+                this.initializing = false;
+                this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { duration: null });
             });
         },
 
