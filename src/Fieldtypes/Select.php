@@ -48,7 +48,10 @@ class Select extends Fieldtype
 
     public function preProcessIndex($value)
     {
-        return array_get($this->field->get('options'), $value, $value);
+        if (array_has($this->field->get('options'), $value)) {
+            return array_get($this->field->get('options'), $value);
+        }
+        return $value;
     }
 
     public function augment($value)
