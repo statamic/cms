@@ -12,7 +12,7 @@
                 :options="operatorOptions" />
 
             <div class="flex-1">
-                <text-input name="value" v-model="filter.value" />
+                <text-input name="value" :value="filter.value" @input="updateFilterValue" />
             </div>
 
         </div>
@@ -64,7 +64,11 @@ export default {
             if (this.filter.field && ! this.filter.operator) {
                 this.filter.operator = this.operatorOptions[0].value;
             }
-        }
+        },
+
+        updateFilterValue: _.debounce(function (value) {
+            this.filter.value = value;
+        }, 300)
     }
 
 }
