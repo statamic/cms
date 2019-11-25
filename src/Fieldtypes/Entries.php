@@ -64,6 +64,10 @@ class Entries extends Relationship
 
     protected function updateRequest($request)
     {
+        if (! $request->filters) {
+            $request->filters = collect();
+        }
+
         if (! $request->filters->has('collection')) {
             $request->filters['collection'] = ['value' => []];
         }

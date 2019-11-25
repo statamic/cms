@@ -40,7 +40,7 @@ class AssetsController extends CpController
     {
         $asset = Asset::find(base64_decode($asset));
 
-        // TODO: Auth
+        $this->authorize('edit', $asset);
 
         $fields = $asset->blueprint()->fields()->addValues($request->all());
 

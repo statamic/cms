@@ -2,19 +2,19 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\Support\Arr;
-use Statamic\Support\Str;
+use Facades\Statamic\Stache\Traverser;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
-use Statamic\Facades\Site;
-use Statamic\Facades\Term;
-use Statamic\Facades\YAML;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
+use Statamic\Facades\YAML;
+use Statamic\Stache\Indexes;
 use Statamic\Stache\Indexes\Terms\Value;
-use Statamic\Stache\Indexes\Terms\Titles;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
-use Statamic\Stache\Indexes\Terms\Associations;
 
 class TaxonomyTermsStore extends ChildStore
 {
@@ -22,7 +22,8 @@ class TaxonomyTermsStore extends ChildStore
     protected $storeIndexes = [
         'slug',
         'taxonomy',
-        'associations' => Associations::class,
+        'associations' => Indexes\Terms\Associations::class,
+        'site' => Indexes\Terms\Site::class,
     ];
 
     public function getFileFilter(SplFileInfo $file) {
@@ -42,22 +43,29 @@ class TaxonomyTermsStore extends ChildStore
 
     public function makeItemFromFile($path, $contents)
     {
-        $site = Site::default()->handle();
         $taxonomy = pathinfo($path, PATHINFO_DIRNAME);
         $taxonomy = str_after($taxonomy, $this->parent->directory());
 
-        return Term::make()
+        $data = YAML::file($path)->parse($contents);
+
+        $term = Term::make()
             ->taxonomy($taxonomy)
             ->slug(pathinfo(Path::clean($path), PATHINFO_FILENAME))
             ->initialPath($path)
-            ->locale($site)
-            ->data($data = YAML::file($path)->parse($contents))
             ->blueprint($data['blueprint'] ?? null);
+
+        foreach (Arr::pull($data, 'localizations', []) as $locale => $localeData) {
+            $term->dataForLocale($locale, $localeData);
+        }
+
+        $term->dataForLocale($term->defaultLocale(), $data);
+
+        return $term;
     }
 
     public function getItemKey($item)
     {
-        return $item->slug();
+        return $item->locale() . '::' . $item->inDefaultLocale()->slug();
     }
 
     public function getItem($key)
@@ -68,13 +76,16 @@ class TaxonomyTermsStore extends ChildStore
             return $item;
         }
 
+        [$site, $slug] = explode('::', $key);
+
         if ($path = $this->getPath($key)) {
-            $item = $this->makeItemFromFile($path, File::get($path));
+            $path = explode('::', $path)[1];
+            $item = $this->makeItemFromFile($path, File::get($path))->in($site);
         } else {
-            $item = Term::make($key)
+            $item = Term::make($slug)
                 ->taxonomy($this->childKey())
-                ->locale(Site::default()->handle())
-                ->set('title', $this->index('title')->get($key));
+                ->set('title', $this->index('title')->get($key))
+                ->in($site);
         }
 
         $this->cacheItem($item);
@@ -95,11 +106,18 @@ class TaxonomyTermsStore extends ChildStore
         $uris = $this->index('uri');
 
         foreach ($terms as $slug => $value) {
-            $associations->push(compact('slug', 'entry'));
+            $associations->push([
+                'value' => $value,
+                'slug' => $slug,
+                'entry' => $entry->id(),
+                'site' => $entry->locale(),
+            ]);
 
-            $titles->put($slug, $value);
+            $key = $entry->locale().'::'.$slug;
 
-            $uris->put($slug, $this->makeTerm($taxonomy, $slug)->uri());
+            $titles->put($key, $value);
+
+            $uris->put($key, $this->makeTerm($taxonomy, $slug)->uri());
         }
 
         $associations->cache();
@@ -127,5 +145,105 @@ class TaxonomyTermsStore extends ChildStore
             });
 
         parent::handleFileChanges();
+    }
+
+    public function getItemsFromFiles()
+    {
+        if ($this->shouldCacheFileItems && $this->fileItems) {
+            return $this->fileItems;
+        }
+
+        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
+
+        $items = $files->flatMap(function ($timestamp, $path) {
+            $keys = $this->getKeyFromPath($path);
+            return $keys->map(function ($key) {
+                return $this->getItem($key);
+            });
+        })->keyBy(function ($item) {
+            return $this->getItemKey($item);
+        });
+
+        return $this->fileItems = $items;
+    }
+
+    public function paths()
+    {
+        if ($this->paths) {
+            return $this->paths;
+        }
+
+        if ($paths = Cache::get($this->pathsCacheKey())) {
+            return $this->paths = collect($paths);
+        }
+
+        $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
+
+        $paths = $files->mapWithKeys(function ($timestamp, $path) {
+            $term = $this->makeItemFromFile($path, File::get($path));
+            return $term->localizations()->flatMap(function ($localization, $locale) use ($path) {
+                $this->cacheItem($localization);
+                return [$this->getItemKey($localization) => $locale.'::'.$path];
+            })->all();
+        });
+
+        $this->cachePaths($paths);
+
+        return $paths;
+    }
+
+    protected function getKeyFromPath($path)
+    {
+        return $this->paths()->filter(function ($p) use ($path) {
+            return \Statamic\Support\Str::endsWith($p, $path);
+        })->keys();
+    }
+
+    public function save($term)
+    {
+        $this->writeItemToDisk($term);
+
+        foreach ($term->localizations() as $item) {
+            $key = $this->getItemKey($item);
+
+            $this->forgetItem($key);
+
+            $this->setPath($key, $item->path());
+
+            $this->resolveIndexes()->each->updateItem($item);
+
+            $this->cacheItem($item);
+        }
+    }
+
+    protected function adjustModifiedPaths($paths)
+    {
+        $sites = Taxonomy::find($this->childKey())->sites();
+
+        return $paths->flatMap(function ($timestamp, $path) use ($sites) {
+            return $sites->mapWithKeys(function ($site) use ($timestamp, $path) {
+                return [$site.'::'.$path => $timestamp];
+            });
+        });
+    }
+
+    protected function adjustDeletedPaths($paths)
+    {
+        return $this->adjustModifiedPaths($paths);
+    }
+
+    protected function getItemFromModifiedPath($path, $pathMap)
+    {
+        if ($key = $pathMap->get($path)) {
+            return $this->getItem($key);
+        }
+
+        $site = explode('::', $key)[0];
+
+        $item = $this->makeItemFromFile($path, File::get($path))->in($site);
+
+        $this->cacheItem($item);
+
+        return $item;
     }
 }

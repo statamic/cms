@@ -2,51 +2,30 @@
 
 namespace Statamic\Taxonomies;
 
-use ArrayAccess;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Facades\Data;
-use Statamic\Facades\File;
 use Statamic\Facades\Path;
-use Statamic\Facades\Site;
-use Statamic\Facades\YAML;
 use Statamic\Facades\Entry;
-use Statamic\Facades\Config;
 use Statamic\Facades\Stache;
-use Statamic\Facades\Fieldset;
-use Statamic\Routing\Routable;
-use Statamic\Data\HasOrigin;
-use Statamic\Data\Augmentable;
-use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Facades\Blueprint;
-use Statamic\Revisions\Revisable;
-use Statamic\Data\Content\Content;
-use Statamic\Data\Services\TermsService;
-use Statamic\Facades\Taxonomy as TaxonomyAPI;
-use Illuminate\Contracts\Support\Responsable;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
-use Statamic\Contracts\Data\Augmentable as AugmentableContract;
-use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
-use Statamic\Data\Publishable;
 
-class Term implements TermContract, Responsable, AugmentableContract, ArrayAccess
+class Term implements TermContract
 {
-    use ContainsData, Routable, ExistsAsFile, FluentlyGetsAndSets, Augmentable, Revisable, HasOrigin, Publishable;
+    use ExistsAsFile, FluentlyGetsAndSets;
 
     protected $taxonomy;
+    protected $slug;
     protected $blueprint;
-    protected $template;
-    protected $layout;
-    protected $locale;
     protected $collection;
+    protected $data;
 
     public function __construct()
     {
         $this->data = collect();
-        $this->supplements = collect();
     }
 
     public function id()
@@ -54,9 +33,11 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
         return $this->taxonomyHandle() . '::' . $this->slug();
     }
 
-    public function locale($locale = null)
+    public function slug($slug = null)
     {
-        return $this->fluentlyGetOrSet('locale')->args(func_get_args());
+        return $this->fluentlyGetOrSet('slug')->setter(function ($slug) {
+            return Str::slug($slug);
+        })->args(func_get_args());
     }
 
     public function taxonomy($taxonomy = null)
@@ -86,25 +67,6 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
         ]);
     }
 
-    public function route()
-    {
-        $route = '/' . str_replace('_', '-', $this->taxonomyHandle()) . '/{slug}';
-
-        if ($this->collection) {
-            $route = $this->collection()->url() . $route;
-        }
-
-        return $route;
-    }
-
-    public function routeData()
-    {
-        return $this->values()->merge([
-            'id' => $this->id(),
-            'slug' => $this->slug(),
-        ])->all();
-    }
-
     public function blueprint()
     {
         return $this->fluentlyGetOrSet('blueprint')
@@ -118,81 +80,45 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
 
     public function fileData()
     {
-        $array = array_merge($this->data()->all(), [
-            'origin' => optional($this->origin)->id(),
-            'published' => $this->published === false ? false : null,
-        ]);
+        $localizations = clone $this->data;
+
+        $array = $localizations->pull($this->defaultLocale());
+
+        // todo: add published bool (for each locale?)
 
         if ($this->blueprint) {
             $array['blueprint'] = $this->blueprint;
         }
 
-        return $array;
-    }
+        if (! $localizations->isEmpty()) {
+            $array['localizations'] = $localizations->map(function ($item) {
+                return Arr::removeNullValues($item->all());
+            })->all();
+        }
 
-    public function toCacheableArray()
-    {
-        return [
-            'taxonomy' => $this->taxonomyHandle(),
-            'locale' => $this->locale,
-            'origin' => $this->hasOrigin() ? $this->origin()->id() : null,
-            'slug' => $this->slug(),
-            'path' => $this->initialPath() ?? $this->path(),
-            'data' => $this->data(),
-        ];
-    }
-
-    public function private()
-    {
-        return false;
-    }
-
-    public function site()
-    {
-        return Site::current(); // todo
+        return $array->all();
     }
 
     public function in($site)
     {
-        return $this; // todo
+        return new LocalizedTerm($this, $site);
     }
 
-    public function toResponse($request)
+    public function inDefaultLocale()
     {
-        return (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
+        return $this->in($this->defaultLocale());
     }
 
-    public function template($template = null)
+    public function defaultLocale()
     {
-        return $this
-            ->fluentlyGetOrSet('template')
-            ->getter(function ($template) {
-                return $template ?? config('statamic.theming.views.term'); // todo: get the fallback template from the collection
-            })
-            ->args(func_get_args());
+        return $this->taxonomy()->sites()->first();
     }
 
-    public function layout($layout = null)
+    public function localizations()
     {
-        return $this
-            ->fluentlyGetOrSet('layout')
-            ->getter(function ($layout) {
-                return $layout ?? config('statamic.theming.views.layout');
-            })
-            ->args(func_get_args());
-    }
-
-    public function augmentedArrayData()
-    {
-        return $this->values()->merge([
-            'id' => $this->id(),
-            'slug' => $this->slug(),
-            'uri' => $this->uri(),
-            'url' => $this->url(),
-            'title' => $this->title(),
-            'entries' => $entryQuery = $this->queryEntries(),
-            'entries_count' => $entryQuery->count(),
-        ])->merge($this->supplements)->all();
+        return $this->taxonomy()->sites()->mapWithKeys(function ($site) {
+            return [$site => $this->in($site)];
+        });
     }
 
     public function collection($collection = null)
@@ -205,7 +131,7 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
         return $this->queryEntries()->get();
     }
 
-    protected function queryEntries()
+    public function queryEntries()
     {
         $entries = $this->collection
             ? $this->collection->queryEntries()
@@ -216,12 +142,7 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
 
     public function title()
     {
-        return $this->get('title', $this->slug());
-    }
-
-    public function editUrl()
-    {
-        return $this->cpUrl('taxonomies.terms.edit');
+        return $this->inDefaultLocale()->title();
     }
 
     public function save()
@@ -243,103 +164,35 @@ class Term implements TermContract, Responsable, AugmentableContract, ArrayAcces
         return "term::{$this->id()}";
     }
 
-    public function updateUrl()
-    {
-        return $this->cpUrl('taxonomies.terms.update');
-    }
-
-    public function publishUrl()
-    {
-        return $this->cpUrl('taxonomies.terms.published.store');
-    }
-
-    public function unpublishUrl()
-    {
-        return $this->cpUrl('taxonomies.terms.published.destroy');
-    }
-
-    public function revisionsUrl()
-    {
-        return $this->cpUrl('taxonomies.terms.revisions.index');
-    }
-
-    public function createRevisionUrl()
-    {
-        return $this->cpUrl('taxonomies.terms.revisions.store');
-    }
-
-    public function restoreRevisionUrl()
-    {
-        return $this->cpUrl('taxonomies.terms.restore-revision');
-    }
-
-    protected function cpUrl($route)
-    {
-        return cp_route($route, [$this->taxonomyHandle(), $this->slug(), $this->locale()]);
-    }
-
     public function revisionsEnabled()
     {
         return $this->taxonomy()->revisionsEnabled();
     }
 
-    protected function revisionKey()
+    public function dataForLocale($locale, $data = null)
     {
-        return vsprintf('taxonomies/%s/%s/%s', [
-            $this->taxonomyHandle(),
-            $this->locale(),
-            $this->slug()
-        ]);
-    }
-
-    protected function revisionAttributes()
-    {
-        return [
-            'id' => $this->id(),
-            'slug' => $this->slug(),
-            'published' => $this->published(),
-            'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
-        ];
-    }
-
-    public function makeFromRevision($revision)
-    {
-        $entry = clone $this;
-
-        if (! $revision) {
-            return $entry;
+        if (func_num_args() === 1) {
+            return $this->data[$locale] ?? collect();
         }
 
-        $attrs = $revision->attributes();
+        $this->data[$locale] = collect($data);
 
-        return $entry
-            ->published($attrs['published'])
-            ->data($attrs['data'])
-            ->slug($attrs['slug']);
+        return $this;
     }
 
-    protected function getOriginByString($origin)
+    public function set($key, $value)
     {
-        //
+        $this->inDefaultLocale()->set($key, $value);
+
+        return $this;
     }
 
-    public function offsetExists($key)
+    public function __call($method, $args)
     {
-        return $this->has($key);
-    }
+        $default = $this->inDefaultLocale();
 
-    public function offsetGet($key)
-    {
-        return $this->value($key);
-    }
+        $return = $default->$method(...$args);
 
-    public function offsetSet($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
+        return ($return == $default) ? $this : $return;
     }
 }

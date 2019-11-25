@@ -65,7 +65,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::bind('term', function ($term, $route) {
             $id = $route->parameter('taxonomy')->handle() . '::' . $term;
             abort_if(
-                ! ($term = Term::find($id))
+                ! ($term = Term::find($id)->in($route->parameter('site')))
                 || $term->taxonomy() !== $route->parameter('taxonomy')
             , 404);
 

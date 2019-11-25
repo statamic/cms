@@ -15,18 +15,17 @@ class Taxonomy extends Relationship
     protected $statusIcons = false;
     protected $taggable = true;
 
-    public function augment($value, $entry = null)
+    public function augment($value)
     {
         $handle = $taxonomy = null;
-        $collection = optional($entry)->collection();
 
         if ($this->usingSingleTaxonomy()) {
             $handle = $this->taxonomies()[0];
             $taxonomy = Facades\Taxonomy::findByHandle($handle);
         }
 
-        return (new TermCollection(Arr::wrap($value)))
-            ->map(function ($value) use ($handle, $taxonomy, $collection) {
+        $terms = (new TermCollection(Arr::wrap($value)))
+            ->map(function ($value) use ($handle, $taxonomy) {
                 if ($taxonomy) {
                     $slug = $value;
                     $id = "{$handle}::{$slug}";
@@ -41,8 +40,14 @@ class Taxonomy extends Relationship
 
                 $term = Term::find($id) ?? Term::make($slug)->taxonomy($taxonomy);
 
-                return $term->collection($collection);
+                $entry = $this->field->parent();
+
+                return $term
+                    ->collection($entry->collection())
+                    ->in($entry->locale());
             });
+
+        return $this->config('max_items') === 1 ? $terms->first() : $terms;
     }
 
     public function process($data)

@@ -16,14 +16,14 @@ use Statamic\Facades\User;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Events\Data\PublishBlueprintFound;
-use Statamic\Http\Requests\FilteredSiteRequest;
+use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Taxonomies\Terms;
 use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 
 class TermsController extends CpController
 {
-    public function index(FilteredSiteRequest $request, $taxonomy)
+    public function index(FilteredRequest $request, $taxonomy)
     {
         $this->authorize('view', $taxonomy);
 
@@ -44,6 +44,10 @@ class TermsController extends CpController
         }
 
         $terms = $query->paginate(request('perPage'));
+
+        $terms->setCollection(
+            $terms->getCollection()->map->in(Site::selected()->handle())
+        );
 
         return (new Terms($terms))
             ->blueprint($taxonomy->termBlueprint())
@@ -121,16 +125,16 @@ class TermsController extends CpController
             'permalink' => $term->absoluteUrl(),
             'localizations' => $taxonomy->sites()->map(function ($handle) use ($term) {
                 $localized = $term->in($handle);
-                $exists = $localized !== null;
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
                     'active' => $handle === $term->locale(),
-                    'exists' => $exists,
-                    'root' => $exists ? $localized->isRoot() : false,
-                    'origin' => $exists ? $localized->id() === optional($term->origin())->id() : null,
-                    'published' => $exists ? $localized->published() : false,
-                    'url' => $exists ? $localized->editUrl() : null,
+                    'exists' => true,
+                    'root' => $localized->isRoot(),
+                    'origin' => $localized->isRoot(),
+                    'published' => $localized->published(),
+                    'url' => $localized->editUrl(),
+                    'livePreviewUrl' => $localized->livePreviewUrl(),
                 ];
             })->all(),
             'hasWorkingCopy' => $term->hasWorkingCopy(),
@@ -153,7 +157,7 @@ class TermsController extends CpController
 
     public function update(Request $request, $taxonomy, $term, $site)
     {
-        $term = $term->in($site);
+        $term = $term->in($site->handle());
 
         $this->authorize('update', $term);
 
@@ -166,15 +170,15 @@ class TermsController extends CpController
             'slug' => 'required|alpha_dash',
         ]);
 
-        $values = array_except($fields->process()->values()->all(), ['slug', 'date']);
+        $values = $fields->process()->values()->except(['slug', 'date']);
 
         if ($term->hasOrigin()) {
-            $values = array_only($values, $request->input('_localized'));
+            $term->data($values->only($request->input('_localized')));
+        } else {
+            $term->merge($values);
         }
 
-        $term
-            ->merge($values)
-            ->slug($request->slug);
+        $term->slug($request->slug);
 
         if ($term->revisionsEnabled() && $term->published()) {
             $term
@@ -235,6 +239,7 @@ class TermsController extends CpController
                     'exists' => false,
                     'published' => false,
                     'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $handle]),
+                    'livePreviewUrl' => cp_route('taxonomies.terms.preview.create', [$taxonomy->handle(), $handle]),
                 ];
             })->all()
         ];
@@ -266,9 +271,11 @@ class TermsController extends CpController
         $term = Term::make()
             ->taxonomy($taxonomy)
             ->blueprint($request->blueprint)
-            ->locale($site->handle())
-            ->published($request->get('published'))
+            ->in($site->handle());
+
+        $term
             ->slug($request->slug)
+            ->published($request->get('published')) // TODO
             ->data($values);
 
         if ($term->revisionsEnabled()) {

@@ -150,11 +150,11 @@ class CoreNav
                 });
             });
 
-        Nav::tools('Updates')
-            ->route('updater')
-            ->icon('loading-bar')
-            ->view('statamic::nav.updates')
-            ->can('view updates');
+        // Nav::tools('Updates')
+        //     ->route('updater')
+        //     ->icon('loading-bar')
+        //     ->view('statamic::nav.updates')
+        //     ->can('view updates');
 
         $this->makeUtilitiesSection();
 
@@ -222,10 +222,10 @@ class CoreNav
      */
     protected function makeSiteSection()
     {
-        Nav::site('Addons')
-            ->route('addons.index')
-            ->icon('addons')
-            ->can('configure addons');
+        // Nav::site('Addons')
+        //     ->route('addons.index')
+        //     ->icon('addons')
+        //     ->can('configure addons');
 
         Nav::site('Fields')
             ->route('fields.index')

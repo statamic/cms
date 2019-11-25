@@ -33,12 +33,12 @@
                 </a>
             </template>
 
-            <dropdown-item redirect="https://docs.statamic.com" class="flex items-center">
+            <dropdown-item external-link="https://statamic.dev" class="flex items-center">
                 <span>{{__('Documentation')}}</span>
                 <i class="w-3 block ml-1">@svg('external-link')</i>
             </dropdown-item>
 
-            <dropdown-item redirect="https://statamic.com/forum" class="flex items-center">
+            <dropdown-item external-link="https://statamic.com/forum" class="flex items-center">
                 <span>{{__('Support')}}</span>
                 <i class="w-3 block ml-1">@svg('external-link')</i>
             </dropdown-item>

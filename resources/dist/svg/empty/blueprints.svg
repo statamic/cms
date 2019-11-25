@@ -1,0 +1,9 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100" class="heroicon-browser heroicon heroicons-lg">
+    <path class="heroicon-browser-interface-background heroicon-component-fill" fill="#FFFFFF" d="M0 31h100v55a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V31z"></path>
+    <rect class="heroicon-browser-interface-body heroicon-component-fill" width="56" height="36" x="10" y="48" fill="#FFFFFF"></rect>
+    <rect class="heroicon-browser-interface-sidebar heroicon-component-fill" width="22" height="36" x="68" y="48" fill="#FFFFFF"></rect>
+    <rect class="heroicon-browser-interface-top heroicon-component-fill" width="80" height="10" x="10" y="36" fill="#FFFFFF"></rect>
+    <path class="heroicon-browser-menu-bar heroicon-component-accent heroicon-component-fill" fill="#7ACFC0" d="M0 14a4 4 0 0 1 4-4h92a4 4 0 0 1 4 4v17H0V14z"></path>
+    <rect class="heroicon-browser-search heroicon-component-fill" width="92" height="4" x="4" y="24" fill="#FFFFFF"></rect>
+    <path class="heroicon-outline" fill="#4A4A4A" fill-rule="nonzero" d="M0 30V14a4 4 0 0 1 4-4h92a4 4 0 0 1 4 4v72a4 4 0 0 1-4 4H4a4 4 0 0 1-4-4V30zm96-18H4a2 2 0 0 0-2 2v6h16l6-6h18l6 6h50v-6a2 2 0 0 0-2-2zM2 30h96v-8H47.17l-.58-.59L41.17 16H24.83l-5.42 5.41-.58.59H2v8zm0 2v54c0 1.1.9 2 2 2h92a2 2 0 0 0 2-2V32H2zm3-8h91v4H4v-4h1zm90 1H5v2h90v-2zM10 36h80v10H10V36zm1 1v8h78v-8H11zm0 11h55v36H10V48h1zm54 1H11v34h54V49zm3-1h22v36H68V48zm1 1v34h20V49H69zM8 16a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm3 2a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm7-2a2 2 0 1 1-4 0 2 2 0 0 1 4 0z"></path>
+</svg>

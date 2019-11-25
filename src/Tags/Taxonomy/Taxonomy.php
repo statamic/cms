@@ -2,8 +2,10 @@
 
 namespace Statamic\Tags\Taxonomy;
 
-use Statamic\Tags\Tags;
+use Statamic\Facades\Site;
+use Statamic\Support\Arr;
 use Statamic\Tags\OutputsItems;
+use Statamic\Tags\Tags;
 
 class Taxonomy extends Tags
 {
@@ -27,6 +29,10 @@ class Taxonomy extends Tags
     public function index()
     {
         $terms = $this->terms()->get();
+
+        $site = Arr::getFirst($this->parameters, ['site', 'locale'], Site::current()->handle());
+
+        $terms = $terms->map->in($site);
 
         return $this->output($terms);
     }

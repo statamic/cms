@@ -1,0 +1,15 @@
+<svg version="1.1"
+     xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:a="http://ns.adobe.com/AdobeSVGViewerExtensions/3.0/"
+     x="0px" y="0px" width="16px" height="14.5px" viewBox="0 0 16 14.5" style="enable-background:new 0 0 16 14.5;"
+     xml:space="preserve">
+<style type="text/css">
+    .st0{fill:none;stroke:#000000;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:10;}
+</style>
+<defs>
+</defs>
+<path class="st0" d="M7.5,3l7.3,0c0.4,0,0.7,0.3,0.7,0.6v9.7c0,0.4-0.3,0.6-0.7,0.6H1.2c-0.4,0-0.7-0.3-0.7-0.6V3.6
+    C0.5,3.3,0.8,3,1.2,3l2.3,0"/>
+<line class="st0" x1="8" y1="7.5" x2="13.5" y2="7.5"/>
+<line class="st0" x1="4.5" y1="10.5" x2="13.5" y2="10.5"/>
+<path class="st0" d="M2.5,3V2c0-0.8,0.7-1.5,1.5-1.5h0c0.8,0,1.5,0.7,1.5,1.5v4.5c0,0.6-0.4,1-1,1h0c-0.6,0-1-0.4-1-1V5"/>
+</svg>

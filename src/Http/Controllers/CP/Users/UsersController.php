@@ -117,11 +117,17 @@ class UsersController extends CpController
 
         $user = User::make()
             ->email($request->email)
-            ->data($values)
-            ->roles($request->roles ?? [])
-            ->groups($request->groups ?? []);
+            ->data($values);
 
-        if ($request->super) {
+        if ($request->roles && User::current()->can('edit roles')) {
+            $user->roles($request->roles);
+        }
+
+        if ($request->groups && User::current()->can('edit user groups')) {
+            $user->groups($request->groups);
+        }
+
+        if ($request->super && User::current()->can('edit roles')) {
             $user->makeSuper();
         }
 
@@ -145,7 +151,17 @@ class UsersController extends CpController
 
         $this->authorize('edit', $user);
 
-        $fields = $user->blueprint()
+        $blueprint = $user->blueprint();
+
+        if (! User::current()->can('edit roles')) {
+            $blueprint->ensureField('roles', ['read_only' => true]);
+        }
+
+        if (! User::current()->can('edit user groups')) {
+            $blueprint->ensureField('groups', ['read_only' => true]);
+        }
+
+        $fields = $blueprint
             ->fields()
             ->addValues($user->data()->merge(['email' => $user->email()])->all())
             ->preProcess();
@@ -187,11 +203,11 @@ class UsersController extends CpController
         }
         $user->email($request->email);
 
-        if ($request->roles) {
+        if ($request->roles && User::current()->can('edit roles')) {
             $user->roles($request->roles);
         }
 
-        if ($request->groups) {
+        if ($request->groups && User::current()->can('edit user groups')) {
             $user->groups($request->groups);
         }
 

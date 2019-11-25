@@ -48,6 +48,10 @@ class Select extends Fieldtype
 
     public function preProcessIndex($value)
     {
+        if (! $value) {
+            return null;
+        }
+
         return array_get($this->field->get('options'), $value, $value);
     }
 

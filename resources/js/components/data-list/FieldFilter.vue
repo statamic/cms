@@ -61,10 +61,10 @@ export default {
             this.update();
         },
 
-        onValueUpdated(value) {
+        onValueUpdated: _.debounce(function (value) {
             this.filter.value = value;
             this.update();
-        },
+        }, 300),
 
         update() {
             this.$emit('updated', this.filter);
