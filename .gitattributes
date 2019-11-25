@@ -1,2 +1,19 @@
-/resources/dist/css/* binary
-/resources/dist/js/* binary
+* text=auto
+/.circleci export-ignore
+/.github export-ignore
+/tests export-ignore
+.babelrc export-ignore
+.gitattributes export-ignore
+.gitignore export-ignore
+.travis.yml export-ignore
+composer.lock
+CONTRIBUTING.md export-ignore
+jest.config.js export-ignore
+package-lock.json export-ignore
+package.json export-ignore
+phpunit.bat export-ignore
+phpunit.xml.dist export-ignore
+SECURITY.md export-ignore
+tailwind.js export-ignore
+translator export-ignore
+webpack.mix.js export-ignore
