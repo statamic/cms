@@ -10,7 +10,7 @@
 
             <data-list v-show="fields.length" :rows="fields" :columns="columns" :sort="false">
                 <div class="card p-0 mb-3" slot-scope="{}">
-                    <data-list-table :reorderable="true" @reordered="reordered">
+                    <data-list-table :reorderable="true" @reordered="$emit('updated', $event)">
                         <template slot="cell-display" slot-scope="{ row: field }">
                             <input
                                 type="text"
@@ -150,10 +150,6 @@ export default {
             const i = _.indexOf(this.fields, _.findWhere(this.fields, { _id }));
             this.fields.splice(i, 1, field);
             this.editingField = null;
-        },
-
-        reordered(fields) {
-            this.$emit('updated', fields);
         }
 
     }
