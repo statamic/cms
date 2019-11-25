@@ -29,9 +29,17 @@ $dontTranslate = [
     'markdown',
 ];
 
+// Additional strings to be translated that aren't picked up by the scanner.
+// eg. When variables as passed into translation helpers, like nav items.
+$additionalStrings = [
+    'Content',
+    'Groups',
+    'Tools',
+];
+
 $app = new Symfony\Component\Console\Application('Statamic Translator');
 $app->add(new Statamic\Translator\Commands\Stats($discovery, $ignoredSubstrings));
-$app->add(new Statamic\Translator\Commands\Generate($discovery, $files, $manualFiles, $ignoredSubstrings));
+$app->add(new Statamic\Translator\Commands\Generate($discovery, $files, $manualFiles, $ignoredSubstrings, $additionalStrings));
 $app->add(new Statamic\Translator\Commands\Translate($files, $dontTranslate));
 $app->add(new Statamic\Translator\Commands\Review($files));
 

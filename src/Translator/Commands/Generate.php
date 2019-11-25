@@ -20,13 +20,15 @@ class Generate extends Command
     protected $discovered;
     protected $files;
     protected $ignored;
+    protected $additionalStrings;
 
-    public function __construct(MethodDiscovery $discovery, Filesystem $files, array $manualFiles, array $ignored)
+    public function __construct(MethodDiscovery $discovery, Filesystem $files, array $manualFiles, array $ignored, array $additionalStrings)
     {
         $this->discovery = $discovery;
         $this->files = $files;
         $this->manualFiles = $manualFiles;
         $this->ignored = $ignored;
+        $this->additionalStrings = $additionalStrings;
         parent::__construct();
     }
 
@@ -57,9 +59,9 @@ class Generate extends Command
     {
         $strings = $this->discovered->filter(function ($string) {
             return !Str::startsWith($string, $this->ignored) && Util::isString($string);
-        })->sortBy(function ($string) {
+        })->merge($this->additionalStrings)->sortBy(function ($string) {
             return strtolower($string);
-        });
+        })->unique();
 
         foreach ($this->languages() as $lang) {
             if ($lang === 'en') {
