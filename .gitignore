@@ -3,3 +3,4 @@ node_modules
 .DS_Store
 .phpunit.result.cache
 tests/Fakes/Composer/Package/test-package/composer.json
+resources/dist
