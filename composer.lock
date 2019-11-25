@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ec858c9bd2c2ab66484b66d156f2e57f",
+    "content-hash": "39f547ab9cab9a0308e7823c8628a62f",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -2342,11 +2342,17 @@
         },
         {
             "name": "pixelfear/composer-dist-plugin",
-            "version": "dev-master",
+            "version": "v0.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pixelfear/composer-dist-plugin.git",
+                "reference": "4043a2681157392bd84342776f576d1993a77414"
+            },
             "dist": {
-                "type": "path",
-                "url": "/users/jason/code/composer-dist-plugin",
-                "reference": "aaf8ad96eeaf7122f4f8ad3444f241189ddb5599"
+                "type": "zip",
+                "url": "https://api.github.com/repos/pixelfear/composer-dist-plugin/zipball/4043a2681157392bd84342776f576d1993a77414",
+                "reference": "4043a2681157392bd84342776f576d1993a77414",
+                "shasum": ""
             },
             "require": {
                 "composer-plugin-api": "^1.1"
@@ -2363,7 +2369,9 @@
                     "Pixelfear\\ComposerDistPlugin\\": "src/"
                 }
             },
-            "description": "Downloads distributable assets to be used in packages so you don't have to commit them."
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Downloads distributable assets to be used in packages so you don't have to commit them.",
+            "time": "2019-11-25T23:37:11+00:00"
         },
         {
             "name": "psr/container",
@@ -2683,7 +2691,7 @@
         },
         {
             "name": "scrumpy/html-to-prosemirror",
-            "version": "dev-master",
+            "version": "0.5.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scrumpy/html-to-prosemirror.git",
@@ -2727,7 +2735,7 @@
         },
         {
             "name": "scrumpy/prosemirror-to-html",
-            "version": "dev-master",
+            "version": "0.7.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/scrumpy/prosemirror-to-html.git",
@@ -7398,9 +7406,6 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
-        "pixelfear/composer-dist-plugin": 20,
-        "scrumpy/html-to-prosemirror": 20,
-        "scrumpy/prosemirror-to-html": 20,
         "symfony/yaml": 20
     },
     "prefer-stable": false,
