@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "ddabc28f3dc0dccd4d7624a9e96259ad",
+    "content-hash": "a974e86b86ad89f5a86e734cccf9fb80",
     "packages": [
         {
             "name": "composer/ca-bundle",
@@ -337,6 +337,7 @@
             ],
             "description": "Promoting the interoperability of container objects (DIC, SL, etc.)",
             "homepage": "https://github.com/container-interop/container-interop",
+            "abandoned": "psr/container",
             "time": "2017-02-14T19:40:03+00:00"
         },
         {
@@ -2280,6 +2281,39 @@
                 "dependency injection"
             ],
             "time": "2018-01-21T07:42:36+00:00"
+        },
+        {
+            "name": "pixelfear/composer-dist-plugin",
+            "version": "dev-master",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/pixelfear/composer-dist-plugin.git",
+                "reference": "1792ab4b06185e6f6e220233941cf3692a8c35fe"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/pixelfear/composer-dist-plugin/zipball/1792ab4b06185e6f6e220233941cf3692a8c35fe",
+                "reference": "1792ab4b06185e6f6e220233941cf3692a8c35fe",
+                "shasum": ""
+            },
+            "require": {
+                "composer-plugin-api": "^1.1"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.4"
+            },
+            "type": "composer-plugin",
+            "extra": {
+                "class": "Pixelfear\\ComposerDistPlugin\\Plugin"
+            },
+            "autoload": {
+                "psr-4": {
+                    "Pixelfear\\ComposerDistPlugin\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "description": "Downloads distributable assets to be used in packages so you don't have to commit them.",
+            "time": "2019-11-25T16:13:11+00:00"
         },
         {
             "name": "psr/container",
@@ -7257,6 +7291,7 @@
     "aliases": [],
     "minimum-stability": "stable",
     "stability-flags": {
+        "pixelfear/composer-dist-plugin": 20,
         "scrumpy/html-to-prosemirror": 20,
         "scrumpy/prosemirror-to-html": 20,
         "symfony/yaml": 20
