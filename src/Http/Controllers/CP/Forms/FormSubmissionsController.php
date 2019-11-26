@@ -18,6 +18,10 @@ class FormSubmissionsController extends CpController
     {
         $this->authorize('view', $form);
 
+        if (! $form->blueprint()) {
+            return ['data' => [], 'meta' => ['columns' => []]];
+        }
+
         $columns = $form->blueprint()->columns()
             ->setPreferred("forms.{$form->handle()}.columns")
             ->ensurePrepended(Column::make('datestamp')->label('date')->value('datestring'))

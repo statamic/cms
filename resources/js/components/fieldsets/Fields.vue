@@ -10,7 +10,7 @@
 
             <data-list v-show="fields.length" :rows="fields" :columns="columns" :sort="false">
                 <div class="card p-0 mb-3" slot-scope="{}">
-                    <data-list-table>
+                    <data-list-table :reorderable="true" @reordered="$emit('updated', $event)">
                         <template slot="cell-display" slot-scope="{ row: field }">
                             <input
                                 type="text"

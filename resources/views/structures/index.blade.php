@@ -21,7 +21,7 @@
 
         @include('statamic::partials.create-first', [
             'resource' => 'Structure',
-            'description' => 'Structures are heirarchial arrangements of your content, most often used to represent forms of site navigation.',
+            'description' => 'Structures are hierarchical arrangements of your content, most often used to represent forms of site navigation.',
             'svg' => 'empty/structure',
             'route' => cp_route('structures.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Structures\Structure')
