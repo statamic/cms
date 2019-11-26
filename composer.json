@@ -67,14 +67,5 @@
             "Tests\\": "tests",
             "Foo\\Bar\\": "tests/fixtures/Addon"
         }
-    },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "tests/Fakes/Composer/Package/test-package",
-            "options": {
-                "symlink": false
-            }
-        }
-    ]
+    }
 }
