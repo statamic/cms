@@ -103,8 +103,6 @@ class ComposerTest extends TestCase
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
         $this->assertTrue(str_contains(Cache::get('composer.test/package')['output'], 'Installing test/package'));
 
-        return;
-
         // Test that we can update the package...
 
         PackToTheFuture::setVersion('1.0.1');
