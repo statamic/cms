@@ -79,7 +79,7 @@ return [
     'form_wizard_email_notifications_instructions' => 'Être informé des soumissions à cette adresse email. Vous pourrez personnaliser davantage les paramètres de notification ultérieurement.',
     'form_wizard_fields_intro' => 'Définissez les champs pour votre formulaire.',
     'form_wizard_handle_instructions' => 'Comment vous allez faire référence à ce formulaire dans vos modèles. Ne peut pas être facilement changé.',
-    'form_wizard_intro' => "Un formulaire est un groupe de champs utilisés pour collecter les entrées de l'utilisateur.",
+    'form_wizard_intro' => "Un formulaire est un groupe de champs utilisé pour collecter les entrées de l'utilisateur.",
     'form_wizard_store_submissions_instructions' => 'Si les formulaires doivent être stockés. Désactivez cette option si vous souhaitez uniquement recevoir des notifications par courrier électronique.',
     'form_wizard_submissions_intro' => 'Choisissez comment vous souhaitez gérer les soumissions de formulaire.',
     'form_wizard_title_instructions' => "Habituellement, un appel à l'action, comme Contactez-nous.",
