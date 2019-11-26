@@ -1,15 +1,20 @@
 {
     "name": "statamic/cms",
     "description": "Statamic CMS",
+    "keywords": [
+        "statamic",
+        "cms",
+        "flat file",
+        "laravel"
+    ],
     "license": "proprietary",
-    "keywords": ["statamic", "cms", "flat file", "laravel"],
     "require": {
         "composer/composer": "^1.7",
         "erusev/parsedown": "^1.7",
         "erusev/parsedown-extra": "^0.7.1",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
-        "laravel/framework": "5.6.*|5.7.*|5.8.*|^6.0",
+        "laravel/framework": "5.6.* || 5.7.* || 5.8.* || ^6.0",
         "laravel/helpers": "^1.1",
         "league/csv": "^9.0",
         "league/glide": "^1.1",
@@ -28,7 +33,26 @@
         "google/cloud-translate": "^1.6",
         "mockery/mockery": "~1.0",
         "nunomaduro/collision": "^3.0",
-        "orchestra/testbench": "3.8|4.0"
+        "orchestra/testbench": "3.8 || 4.0"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "extra": {
+        "download-dist": {
+            "url": "https://github.com/statamic/cms/releases/download/{$version}/dist.tar.gz",
+            "path": "resources/dist"
+        },
+        "laravel": {
+            "providers": [
+                "Statamic\\Providers\\StatamicServiceProvider"
+            ],
+            "aliases": {
+                "Statamic": "Statamic\\Statamic"
+            }
+        }
     },
     "autoload": {
         "psr-4": {
@@ -42,25 +66,6 @@
         "psr-4": {
             "Tests\\": "tests",
             "Foo\\Bar\\": "tests/fixtures/Addon"
-        }
-    },
-    "config": {
-        "preferred-install": "dist",
-        "sort-packages": true,
-        "optimize-autoloader": true
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Statamic\\Providers\\StatamicServiceProvider"
-            ],
-            "aliases": {
-                "Statamic": "Statamic\\Statamic"
-            }
-        },
-        "download-dist": {
-            "url": "https://github.com/statamic/cms/releases/download/{$version}/dist.tar.gz",
-            "path": "resources/dist"
         }
     },
     "repositories": [
