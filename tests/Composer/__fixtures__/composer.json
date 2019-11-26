@@ -7,11 +7,17 @@
     "repositories": [
         {
             "type": "path",
-            "url": "example-dependency"
+            "url": "example-dependency",
+            "options": {
+                "symlink": false
+            }
         },
         {
             "type": "path",
-            "url": "test-package"
+            "url": "test-package",
+            "options": {
+                "symlink": false
+            }
         }
     ]
 }
