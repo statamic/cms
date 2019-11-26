@@ -1,6 +1,6 @@
 {
     "name": "statamic/cms",
-    "description": "Statamic CMS",
+    "description": "The Statamic CMS Core Package",
     "keywords": [
         "statamic",
         "cms",
