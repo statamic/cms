@@ -245,6 +245,7 @@ class EntryTest extends TestCase
         $user = tap(User::make()->id('user-1'))->save();
 
         $entry = (new Entry)
+            ->id('test-id')
             ->locale('en')
             ->slug('test')
             ->collection(Collection::make('blog')->save())
