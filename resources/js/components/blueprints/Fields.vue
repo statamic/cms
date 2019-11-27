@@ -113,7 +113,7 @@ export default {
                     ...field,
                     isNew: true,
                     handle,
-                    display: field.type,
+                    display: handle.substring(0, 1).toUpperCase() + handle.substr(1),
                 }
             };
 

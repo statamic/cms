@@ -136,11 +136,12 @@ export default {
 
         fieldtypeSelected(field) {
             const id = uniqid();
+            const handle = field.type;
             this.fields.push({
                 ...field,
                 _id: id,
-                handle: 'new_field',
-                display: 'New Field'
+                handle,
+                display: handle.substring(0, 1).toUpperCase() + handle.substr(1),
             });
             this.selectingFieldtype = false;
             this.edit(id);
