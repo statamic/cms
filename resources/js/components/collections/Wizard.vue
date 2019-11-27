@@ -276,7 +276,7 @@
                 <label><input type="checkbox" v-model="collection.amp" /> {{ __('Enable AMP') }}</label>
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    {{ __('messages.collection_wizard_amp_instructions') }}
+                    <span v-html="__('messages.collection_wizard_amp_instructions')" />
                 </div>
             </div>
         </div>
