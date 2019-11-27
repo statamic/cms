@@ -167,6 +167,89 @@ class UpdateBlueprintTest extends TestCase
         $this->assertEquals($originalContents, Facades\Blueprint::find('test')->contents());
     }
 
+    /** @test */
+    function width_of_100_gets_stripped_out_for_inline_fields_but_left_in_for_reference_fields_with_config_overrides()
+    {
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
+
+        $this
+            ->actingAs($user)
+            ->submit($blueprint, [
+                'title' => 'Updated title',
+                'sections' => [
+                    [
+                        '_id' => 'id-one',
+                        'handle' => 'one',
+                        'display' => 'Section One',
+                        'fields' => [
+                            [
+                                '_id' => 'id-s1-f1',
+                                'handle' => 'one-one',
+                                'type' => 'reference',
+                                'field_reference' => 'somefieldset.somefield',
+                                'config' => [
+                                    'foo' => 'bar',
+                                    'width' => 100,
+                                ],
+                                'config_overrides' => ['width']
+                            ],
+                            [
+                                '_id' => 'id-s1-f2',
+                                'handle' => 'one-two',
+                                'type' => 'inline',
+                                'config' => [
+                                    'type' => 'text',
+                                    'width' => 100,
+                                ]
+                            ],
+                            [
+                                '_id' => 'id-s1-f3',
+                                'handle' => 'one-three',
+                                'type' => 'inline',
+                                'config' => [
+                                    'type' => 'text',
+                                    'width' => 50,
+                                ]
+                            ]
+                        ]
+                    ]
+                ]
+            ])
+            ->assertStatus(204);
+
+        $this->assertEquals([
+            'title' => 'Updated title',
+            'sections' => [
+                'one' => [
+                    'display' => 'Section One',
+                    'fields' => [
+                        [
+                            'handle' => 'one-one',
+                            'field' => 'somefieldset.somefield',
+                            'config' => [
+                                'width' => 100,
+                            ]
+                        ],
+                        [
+                            'handle' => 'one-two',
+                            'field' => [
+                                'type' => 'text',
+                            ]
+                        ],
+                        [
+                            'handle' => 'one-three',
+                            'field' => [
+                                'type' => 'text',
+                                'width' => 50,
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ], Facades\Blueprint::find('test')->contents());
+    }
+
     private function submit($blueprint, $params = [])
     {
         return $this->patch(
