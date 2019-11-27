@@ -193,7 +193,7 @@ class AssetContainersController extends CpController
             ],
             'create_folders' => [
                 'type' => 'toggle',
-                'display' => 'Create Folders',
+                'display' => __('Create Folders'),
                 'instructions' => __('statamic::messages.asset_container_create_folder_instructions'),
                 'default' => true,
                 'width' => 50,
@@ -207,14 +207,14 @@ class AssetContainersController extends CpController
             ],
             'allow_moving' => [
                 'type' => 'toggle',
-                'display' => 'Allow Moving',
+                'display' => __('Allow Moving'),
                 'instructions' => __('statamic::messages.asset_container_move_instructions'),
                 'default' => true,
                 'width' => 50,
             ],
             'allow_downloading' => [
                 'type' => 'toggle',
-                'display' => 'Allow Downloading',
+                'display' => __('Allow Downloading'),
                 'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
                 'default' => true,
                 'width' => 50,
