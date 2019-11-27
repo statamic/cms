@@ -8,7 +8,12 @@ export default {
 
     computed: {
         previewText() {
-            return Object.values(this.previews)
+            const previews = _(this.previews).filter((value, handle) => {
+                const config = _.findWhere(this.config.fields, { handle });
+                return config.replicator_preview === undefined ? true : config.replicator_preview;
+            });
+
+            return Object.values(previews)
                 .filter(value => {
                     if (['null', '[]', '{}', ''].includes(JSON.stringify(value))) return null;
                     return value;
