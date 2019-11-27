@@ -65,6 +65,7 @@ class UpdateBlueprintTest extends TestCase
                                 'field_reference' => 'somefieldset.somefield',
                                 'config' => [
                                     'foo' => 'bar',
+                                    'baz' => 'qux', // not in config_overrides so it shouldn't get saved
                                 ],
                                 'config_overrides' => ['foo']
                             ],
@@ -164,12 +165,6 @@ class UpdateBlueprintTest extends TestCase
             ->assertSessionHasErrors('sections');
 
         $this->assertEquals($originalContents, Facades\Blueprint::find('test')->contents());
-    }
-
-    /** @test */
-    function config_override_only_gets_saved_if_its_specified()
-    {
-        $this->markTestIncomplete();
     }
 
     private function submit($blueprint, $params = [])
