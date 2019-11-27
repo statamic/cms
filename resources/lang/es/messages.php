@@ -70,7 +70,7 @@ return [
     'fields_handle_instructions' => 'La variable de plantilla del campo.',
     'fields_instructions_instructions' => 'Se muestra debajo de la etiqueta de visualización del campo, como si fuera texto. Markdown es compatible.',
     'fieldset_import_fieldset_instructions' => 'El conjunto de campos a importar.',
-    'fieldset_import_prefix_instructions' => 'El prefijo que debe aplicarse a cada campo cuando se importan. p.ej. _héroe',
+    'fieldset_import_prefix_instructions' => 'El prefijo que debe aplicarse a cada campo cuando se importan. p.ej. héroe_',
     'fieldsets_title_instructions' => 'Por lo general, describe qué campos estarán dentro, como Bloque de imagen',
     'focal_point_instructions' => 'Establecer un punto focal permite el recorte dinámico de fotos con un sujeto que permanece en el cuadro.',
     'focal_point_previews_are_examples' => 'Las vistas previas de los cultivos son solo, por ejemplo,',

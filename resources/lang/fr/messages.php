@@ -70,7 +70,7 @@ return [
     'fields_handle_instructions' => 'La variable de modèle du champ.',
     'fields_instructions_instructions' => "Affiché sous l'étiquette d'affichage du champ, cela ressemble à du texte. Markdown est pris en charge.",
     'fieldset_import_fieldset_instructions' => 'Le fieldet à importer.',
-    'fieldset_import_prefix_instructions' => 'Le préfixe à appliquer à chaque champ lors de leur importation. par exemple. _héros',
+    'fieldset_import_prefix_instructions' => 'Le préfixe à appliquer à chaque champ lors de leur importation. par exemple. héros_',
     'fieldsets_title_instructions' => "Décrit généralement quels champs seront inclus, comme Image Block",
     'focal_point_instructions' => "La définition d'un point focal permet un recadrage dynamique des photos avec un sujet qui reste dans le cadre.",
     'focal_point_previews_are_examples' => "Les aperçus de recadrage n'ont qu'une valeur d'exemple",

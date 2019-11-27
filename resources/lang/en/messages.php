@@ -70,7 +70,7 @@ return [
     'fields_handle_instructions' => 'The field\'s template variable.',
     'fields_instructions_instructions' => 'Shown under the field\'s display label, this like very text. Markdown is supported.',
     'fieldset_import_fieldset_instructions' => 'The fieldset to be imported.',
-    'fieldset_import_prefix_instructions' => 'The prefix that should be applied to each field when they are imported. eg. _hero',
+    'fieldset_import_prefix_instructions' => 'The prefix that should be applied to each field when they are imported. eg. hero_',
     'fieldsets_title_instructions' => 'Usually describes what fields will be inside, like Image Block',
     'focal_point_instructions' => 'Setting a focal point allows dynamic photo cropping with a subject that stays in frame.',
     'focal_point_previews_are_examples' => 'Crop previews are for example only',

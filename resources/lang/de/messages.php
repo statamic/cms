@@ -70,7 +70,7 @@ return [
     'fields_handle_instructions' => 'Die Vorlagenvariable des Felds.',
     'fields_instructions_instructions' => 'Wird unter der Beschriftung des Felds angezeigt und sieht wie Text aus. Abschriften werden unterstützt.',
     'fieldset_import_fieldset_instructions' => 'Das zu importierende Feldset.',
-    'fieldset_import_prefix_instructions' => 'Das Präfix, das auf jedes Feld angewendet werden soll, wenn sie importiert werden. z.B. _Held',
+    'fieldset_import_prefix_instructions' => 'Das Präfix, das auf jedes Feld angewendet werden soll, wenn sie importiert werden. z.B. Held_',
     'fieldsets_title_instructions' => 'Beschreibt normalerweise, welche Felder enthalten sein werden, z. B. Bildblock',
     'focal_point_instructions' => 'Das Setzen des Focalpoint ermöglicht die dynmische Beschneidung von Bildern auf Motivschwerpunkt.',
     'focal_point_previews_are_examples' => 'Die Vorschau der Zuschnitte dient nur als Beispiel',
