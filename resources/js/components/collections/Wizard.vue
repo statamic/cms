@@ -207,11 +207,11 @@
             <div class="max-w-md mx-auto px-2 pb-6">
                 <label class="font-bold text-base mb-sm" for="default_publish_state">{{ __('Default Status') }}</label>
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-2">
-                    <input type="radio" v-model="collection.default_publish_state" value="true" />
+                    <input type="radio" v-model="collection.default_publish_state" :value="true" />
                     <p><strong class="text-md ml-2 font-bold">{{ __('Published') }}</strong> &ndash; <span v-html="__('messages.collection_wizard_default_status_published_description')" /></p>
                 </label>
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center">
-                    <input type="radio" v-model="collection.default_publish_state" value="false" />
+                    <input type="radio" v-model="collection.default_publish_state" :value="false" />
                     <p><strong class="text-md ml-2 font-bold">Draft</strong> &ndash;  <span v-html="__('messages.collection_wizard_default_status_draft_description')" /></p>
                 </label>
             </div>
