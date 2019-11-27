@@ -32,6 +32,9 @@
                                 <span v-text="fieldtype(type).title" />
                             </div>
                         </template>
+                        <template slot="cell-width" slot-scope="{ row: field }">
+                            <width-selector v-model="field.width" />
+                        </template>
                         <template slot="actions" slot-scope="{ row: field, index }">
                             <a class="mr-1 text-grey" @click.prevent="edit(field._id)"><span class="icon icon-pencil" /></a>
                             <a class="mr-1 text-grey" @click.prevent="destroy(index)"><span class="icon icon-cross" /></a>
@@ -66,6 +69,7 @@
 <script>
 import uniqid from 'uniqid';
 import FieldSettings from '../fields/Settings.vue';
+import WidthSelector from '../fields/WidthSelector.vue';
 import ProvidesFieldtypes from '../fields/ProvidesFieldtypes';
 import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
 
@@ -74,6 +78,7 @@ export default {
     components: {
         FieldSettings,
         FieldtypeSelector,
+        WidthSelector,
      },
 
     mixins: [ProvidesFieldtypes],
@@ -95,6 +100,7 @@ export default {
                 { label: __('Display'), field: 'display' },
                 { label: __('Handle'), field: 'handle' },
                 { label: __('Type'), field: 'type' },
+                { label: __('Width'), field: 'width' },
             ]
         }
     },
