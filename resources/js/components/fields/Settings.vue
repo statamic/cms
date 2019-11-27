@@ -216,10 +216,6 @@ export default {
 
     methods: {
 
-        focus() {
-            this.$els.display.select();
-        },
-
         configFieldClasses(field) {
             return [
                 `form-group p-2 m-0 ${field.type}-fieldtype`,
