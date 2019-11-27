@@ -38,10 +38,15 @@ export default {
         value: { required: true },
         prepend: { default: null },
         append: { default: null },
-        autofocus: { type: Boolean }
+        autofocus: { type: Boolean },
+        autoselect: { type: Boolean }
     },
     mounted() {
-        if (this.autofocus) this.$refs.input.focus();
+        if (this.autoselect) {
+            this.$refs.input.select();
+        } else if (this.autofocus) {
+            this.$refs.input.focus();
+        }
     }
 }
 </script>
