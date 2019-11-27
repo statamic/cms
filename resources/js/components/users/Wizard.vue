@@ -171,7 +171,7 @@ export default {
 
     data() {
         return {
-            steps: ['User Information', 'Roles & Groups', 'Customize Invitation'],
+            steps: [__('User Information'), __('Roles & Groups'), __('Customize Invitation')],
             user: {
                 email: null,
                 super: true,
