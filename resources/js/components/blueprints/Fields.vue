@@ -2,7 +2,7 @@
 
     <div class="flex flex-col text-sm">
 
-        <div class="blueprint-section-draggable-zone"
+        <div class="blueprint-section-draggable-zone -mx-sm"
             :class="{ 'flex flex-wrap flex-1': fields.length }"
         >
             <slot name="empty-state" v-if="!fields.length" />
