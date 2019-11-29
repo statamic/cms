@@ -7,12 +7,16 @@
             <select-input
                 class="w-1/3 mr-2"
                 name="operator"
-                v-model="filter.operator"
+                :value="filter.operator"
                 placeholder=""
-                :options="operatorOptions" />
+                :options="operatorOptions"
+                @input="onOperatorUpdated" />
 
             <div class="flex-1">
-                <text-input name="value" :value="filter.value" @input="updateFilterValue" />
+                <text-input
+                    name="value"
+                    :value="filter.value"
+                    @input="onValueUpdated" />
             </div>
 
         </div>
@@ -39,36 +43,32 @@ export default {
         }
     },
 
+    mounted() {
+        if (this.filter && !this.filter.operator && this.operatorOptions[0].value) {
+            this.onOperatorUpdated(this.operatorOptions[0].value);
+        }
+    },
+
     computed: {
         operatorOptions() {
             return this.normalizeInputOptions(this.operators);
         },
-
-        value() {
-            return this.filter;
-        }
-    },
-
-    watch: {
-        value: {
-            deep: true,
-            handler(value) {
-                this.ensureDefaults();
-                this.$emit('updated', value);
-            }
-        }
     },
 
     methods: {
-        ensureDefaults() {
-            if (this.filter.field && ! this.filter.operator) {
-                this.filter.operator = this.operatorOptions[0].value;
-            }
+        onOperatorUpdated(operator) {
+            this.filter.operator = operator;
+            this.update();
         },
 
-        updateFilterValue: _.debounce(function (value) {
+        onValueUpdated: _.debounce(function (value) {
             this.filter.value = value;
-        }, 300)
+            this.update();
+        }, 300),
+
+        update() {
+            this.$emit('updated', this.filter);
+        }
     }
 
 }

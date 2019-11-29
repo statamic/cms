@@ -16,11 +16,14 @@ class Collection extends Filter
         return [
             'value' => [
                 'display' => __('Collection'),
-                // TODO: Would prefer to use a select field here, but there's an issue with the reset-on-options-change
-                // prop that causes everything to be reset every time a new value is selected.
-                'type' => 'checkboxes',
-                'options' => $options
-            ]
+                'type' => 'select',
+                'options' => $options,
+                'clearable' => true,
+                'multiple' => true,
+
+                // This can be removed if/when https://github.com/sagalbot/vue-select/pull/1014 is merged
+                'reset_on_options_change' => false,
+            ],
         ];
     }
 

@@ -25,25 +25,40 @@ export default {
     },
 
     created() {
-        this.$events.$on('filters-changed', this.filtersChanged);
+        this.$events.$on('filter-changed', this.filterChanged);
         this.$events.$on('filters-reset', this.filtersReset);
     },
 
     methods: {
 
+        hasFields(values) {
+            for (const fieldHandle in values) {
+                if (values[fieldHandle]) return true;
+            }
+            return false;
+        },
+
+        filterChanged({ handle, values }, unselectAll = true) {
+            if (values && this.hasFields(values)) {
+                Vue.set(this.activeFilters, handle, values);
+            } else {
+                Vue.delete(this.activeFilters, handle);
+            }
+            if (unselectAll) this.unselectAllItems();
+        },
+
         filtersChanged(filters) {
-            this.activeFilters = filters || {};
+            for (const handle in filters) {
+                const values = filters[handle];
+                this.filterChanged({ handle, values }, false);
+            }
             this.unselectAllItems();
         },
 
         filtersReset() {
-            let activeFilters = {};
-
             this.filters.forEach(filter => {
-                activeFilters[filter.handle] = filter.values;
+                Vue.set(this.activeFilters, filter.handle, filter.values);
             });
-
-            this.activeFilters = activeFilters;
         },
 
         unselectAllItems() {

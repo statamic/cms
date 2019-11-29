@@ -5,7 +5,7 @@
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"
             :blueprint="fieldset"
-            :values="values"
+            :values="values || defaultValues"
             :meta="filter.meta"
             :errors="errors"
             @updated="$emit('changed', $event)"
@@ -27,31 +27,16 @@ export default {
 
     props: {
         filter: Object,
-        initialValues: Object
+        values: Object,
     },
 
     data() {
         return {
             fieldset: {sections:[{fields:this.filter.fields}]},
-            values: this.initialValues || this.filter.values || {},
+            defaultValues: this.filter.values || {},
             errors: {},
         }
     },
-
-    watch: {
-
-        initialValues() {
-            this.values = this.initialValues || {};
-        },
-
-        value: {
-            deep: true,
-            handler(value) {
-                this.$emit('changed', value);
-            }
-        }
-
-    }
 
 }
 </script>
