@@ -60,7 +60,8 @@ class UpdateFieldsetTest extends TestCase
                         'type' => 'textarea',
                         'display' => 'First Field',
                         'instructions' => 'First field instructions',
-                        'foo' => 'bar'
+                        'foo' => 'bar',
+                        'width' => 50,
                     ],
                     [
                         '_id' => 'id-two',
@@ -68,7 +69,8 @@ class UpdateFieldsetTest extends TestCase
                         'type' => 'text',
                         'display' => 'Second Field',
                         'instructions' => 'Second field instructions',
-                        'baz' => 'qux'
+                        'baz' => 'qux',
+                        'width' => 100,
                     ],
                 ]
             ])
@@ -81,7 +83,8 @@ class UpdateFieldsetTest extends TestCase
                     'type' => 'textarea',
                     'display' => 'First Field',
                     'instructions' => 'First field instructions',
-                    'foo' => 'bar'
+                    'foo' => 'bar',
+                    'width' => 50,
                 ],
                 'two' => [
                     'type' => 'text',

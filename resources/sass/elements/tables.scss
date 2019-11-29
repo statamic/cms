@@ -87,7 +87,7 @@
 	}
 
 	.sortable-row.draggable-mirror {
-		@apply bg-white border-b;
+		display: none;
 	}
 }
 

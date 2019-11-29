@@ -58,6 +58,11 @@ class CollectionRepository implements RepositoryContract
         return $this->all()->map->handle();
     }
 
+    public function handleExists(string $handle): bool
+    {
+        return $this->handles()->contains($handle);
+    }
+
     public function save(Collection $collection)
     {
         $this->store->save($collection);

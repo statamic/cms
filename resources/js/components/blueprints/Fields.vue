@@ -2,7 +2,7 @@
 
     <div class="flex flex-col text-sm">
 
-        <div class="blueprint-section-draggable-zone"
+        <div class="blueprint-section-draggable-zone -mx-sm"
             :class="{ 'flex flex-wrap flex-1': fields.length }"
         >
             <slot name="empty-state" v-if="!fields.length" />
@@ -113,7 +113,7 @@ export default {
                     ...field,
                     isNew: true,
                     handle,
-                    display: field.type,
+                    display: handle.substring(0, 1).toUpperCase() + handle.substr(1),
                 }
             };
 

@@ -1,0 +1,23 @@
+{
+    "name": "statamic/composer-test",
+    "require": {
+        "composer/composer": "^1.9",
+        "statamic/composer-test-example-dependency": "1.2.3"
+    },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "example-dependency",
+            "options": {
+                "symlink": false
+            }
+        },
+        {
+            "type": "path",
+            "url": "test-package",
+            "options": {
+                "symlink": false
+            }
+        }
+    ]
+}

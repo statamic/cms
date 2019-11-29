@@ -39,6 +39,10 @@ class SiteClear extends Command
      */
     public function handle()
     {
+        if (! $this->confirm('There is no site theme or sample content in v3 - are you sure you want to remove all new site defaults?', false)) {
+            return $this->info('Aborted successfully.');
+        }
+
         $this->files = app(Filesystem::class);
 
         $this
@@ -137,10 +141,15 @@ class SiteClear extends Command
 
         // TODO: Maybe we can eventually bring in and extract this to statamic/migrator's Configurator class...
         $filesystemsPath = config_path('filesystems.php');
-        $filesystems = $this->files->get($filesystemsPath);
-        $updatedFilesystems = preg_replace("/\s{8}['\"]{$disk}['\"]\X*\s{8}\],?+\n\n?+/mU", '', $filesystems);
+        $config = $this->files->get($filesystemsPath);
+        $diskRegex = "/\s{8}['\"]{$disk}['\"]\X*\s{8}\],?+\n\n?+/mU";
+        $updatedConfig = preg_replace($diskRegex, '', $config);
 
-        $this->files->put($filesystemsPath, $updatedFilesystems);
+        $this->files->put($filesystemsPath, $updatedConfig);
+
+        if (config("filesystems.disks.{$disk}.driver") === 'local') {
+            $this->files->deleteDirectory(config("filesystems.disks.{$disk}.root"));
+        }
     }
 
     /**

@@ -1,0 +1,1042 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "14c5fae6104dcb09d068d317384872c0",
+    "packages": [
+        {
+            "name": "composer/ca-bundle",
+            "version": "1.2.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/ca-bundle.git",
+                "reference": "10bb96592168a0f8e8f6dcde3532d9fa50b0b527"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/ca-bundle/zipball/10bb96592168a0f8e8f6dcde3532d9fa50b0b527",
+                "reference": "10bb96592168a0f8e8f6dcde3532d9fa50b0b527",
+                "shasum": ""
+            },
+            "require": {
+                "ext-openssl": "*",
+                "ext-pcre": "*",
+                "php": "^5.3.2 || ^7.0 || ^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || 6.5 - 8",
+                "psr/log": "^1.0",
+                "symfony/process": "^2.5 || ^3.0 || ^4.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Composer\\CaBundle\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                }
+            ],
+            "description": "Lets you find a path to the system CA bundle, and includes a fallback to the Mozilla CA bundle.",
+            "keywords": [
+                "cabundle",
+                "cacert",
+                "certificate",
+                "ssl",
+                "tls"
+            ],
+            "time": "2019-08-30T08:44:50+00:00"
+        },
+        {
+            "name": "composer/composer",
+            "version": "1.9.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/composer.git",
+                "reference": "bb01f2180df87ce7992b8331a68904f80439dd2f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/composer/zipball/bb01f2180df87ce7992b8331a68904f80439dd2f",
+                "reference": "bb01f2180df87ce7992b8331a68904f80439dd2f",
+                "shasum": ""
+            },
+            "require": {
+                "composer/ca-bundle": "^1.0",
+                "composer/semver": "^1.0",
+                "composer/spdx-licenses": "^1.2",
+                "composer/xdebug-handler": "^1.1",
+                "justinrainbow/json-schema": "^3.0 || ^4.0 || ^5.0",
+                "php": "^5.3.2 || ^7.0",
+                "psr/log": "^1.0",
+                "seld/jsonlint": "^1.4",
+                "seld/phar-utils": "^1.0",
+                "symfony/console": "^2.7 || ^3.0 || ^4.0",
+                "symfony/filesystem": "^2.7 || ^3.0 || ^4.0",
+                "symfony/finder": "^2.7 || ^3.0 || ^4.0",
+                "symfony/process": "^2.7 || ^3.0 || ^4.0"
+            },
+            "conflict": {
+                "symfony/console": "2.8.38"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35 || ^5.7",
+                "phpunit/phpunit-mock-objects": "^2.3 || ^3.0"
+            },
+            "suggest": {
+                "ext-openssl": "Enabling the openssl extension allows you to access https URLs for repositories and packages",
+                "ext-zip": "Enabling the zip extension allows you to unzip archives",
+                "ext-zlib": "Allow gzip compression of HTTP requests"
+            },
+            "bin": [
+                "bin/composer"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.9-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Composer\\": "src/Composer"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nils Adermann",
+                    "email": "naderman@naderman.de",
+                    "homepage": "http://www.naderman.de"
+                },
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                }
+            ],
+            "description": "Composer helps you declare, manage and install dependencies of PHP projects. It ensures you have the right stack everywhere.",
+            "homepage": "https://getcomposer.org/",
+            "keywords": [
+                "autoload",
+                "dependency",
+                "package"
+            ],
+            "time": "2019-11-01T16:20:17+00:00"
+        },
+        {
+            "name": "composer/semver",
+            "version": "1.5.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/semver.git",
+                "reference": "46d9139568ccb8d9e7cdd4539cab7347568a5e2e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/semver/zipball/46d9139568ccb8d9e7cdd4539cab7347568a5e2e",
+                "reference": "46d9139568ccb8d9e7cdd4539cab7347568a5e2e",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3.2 || ^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.5 || ^5.0.5",
+                "phpunit/phpunit-mock-objects": "2.3.0 || ^3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Composer\\Semver\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nils Adermann",
+                    "email": "naderman@naderman.de",
+                    "homepage": "http://www.naderman.de"
+                },
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                },
+                {
+                    "name": "Rob Bast",
+                    "email": "rob.bast@gmail.com",
+                    "homepage": "http://robbast.nl"
+                }
+            ],
+            "description": "Semver library that offers utilities, version constraint parsing and validation.",
+            "keywords": [
+                "semantic",
+                "semver",
+                "validation",
+                "versioning"
+            ],
+            "time": "2019-03-19T17:25:45+00:00"
+        },
+        {
+            "name": "composer/spdx-licenses",
+            "version": "1.5.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/spdx-licenses.git",
+                "reference": "7ac1e6aec371357df067f8a688c3d6974df68fa5"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/spdx-licenses/zipball/7ac1e6aec371357df067f8a688c3d6974df68fa5",
+                "reference": "7ac1e6aec371357df067f8a688c3d6974df68fa5",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3.2 || ^7.0 || ^8.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || 6.5 - 7"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Composer\\Spdx\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nils Adermann",
+                    "email": "naderman@naderman.de",
+                    "homepage": "http://www.naderman.de"
+                },
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                },
+                {
+                    "name": "Rob Bast",
+                    "email": "rob.bast@gmail.com",
+                    "homepage": "http://robbast.nl"
+                }
+            ],
+            "description": "SPDX licenses list and validation library.",
+            "keywords": [
+                "license",
+                "spdx",
+                "validator"
+            ],
+            "time": "2019-07-29T10:31:59+00:00"
+        },
+        {
+            "name": "composer/xdebug-handler",
+            "version": "1.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/composer/xdebug-handler.git",
+                "reference": "cbe23383749496fe0f373345208b79568e4bc248"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/composer/xdebug-handler/zipball/cbe23383749496fe0f373345208b79568e4bc248",
+                "reference": "cbe23383749496fe0f373345208b79568e4bc248",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3.2 || ^7.0 || ^8.0",
+                "psr/log": "^1.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || 6.5 - 8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Composer\\XdebugHandler\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "John Stevenson",
+                    "email": "john-stevenson@blueyonder.co.uk"
+                }
+            ],
+            "description": "Restarts a process without Xdebug.",
+            "keywords": [
+                "Xdebug",
+                "performance"
+            ],
+            "time": "2019-11-06T16:40:04+00:00"
+        },
+        {
+            "name": "justinrainbow/json-schema",
+            "version": "5.2.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/justinrainbow/json-schema.git",
+                "reference": "44c6787311242a979fa15c704327c20e7221a0e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/justinrainbow/json-schema/zipball/44c6787311242a979fa15c704327c20e7221a0e4",
+                "reference": "44c6787311242a979fa15c704327c20e7221a0e4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "~2.2.20||~2.15.1",
+                "json-schema/json-schema-test-suite": "1.2.0",
+                "phpunit/phpunit": "^4.8.35"
+            },
+            "bin": [
+                "bin/validate-json"
+            ],
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "5.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "JsonSchema\\": "src/JsonSchema/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bruno Prieto Reis",
+                    "email": "bruno.p.reis@gmail.com"
+                },
+                {
+                    "name": "Justin Rainbow",
+                    "email": "justin.rainbow@gmail.com"
+                },
+                {
+                    "name": "Igor Wiedler",
+                    "email": "igor@wiedler.ch"
+                },
+                {
+                    "name": "Robert Schönthal",
+                    "email": "seroscho@googlemail.com"
+                }
+            ],
+            "description": "A library to validate a json schema.",
+            "homepage": "https://github.com/justinrainbow/json-schema",
+            "keywords": [
+                "json",
+                "schema"
+            ],
+            "time": "2019-09-25T14:49:45+00:00"
+        },
+        {
+            "name": "psr/container",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/container.git",
+                "reference": "b7ce3b176482dbbc1245ebf52b181af44c2cf55f"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/container/zipball/b7ce3b176482dbbc1245ebf52b181af44c2cf55f",
+                "reference": "b7ce3b176482dbbc1245ebf52b181af44c2cf55f",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Container\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common Container Interface (PHP FIG PSR-11)",
+            "homepage": "https://github.com/php-fig/container",
+            "keywords": [
+                "PSR-11",
+                "container",
+                "container-interface",
+                "container-interop",
+                "psr"
+            ],
+            "time": "2017-02-14T16:28:37+00:00"
+        },
+        {
+            "name": "psr/log",
+            "version": "1.1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/php-fig/log.git",
+                "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/php-fig/log/zipball/446d54b4cb6bf489fc9d75f55843658e6f25d801",
+                "reference": "446d54b4cb6bf489fc9d75f55843658e6f25d801",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Psr\\Log\\": "Psr/Log/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "PHP-FIG",
+                    "homepage": "http://www.php-fig.org/"
+                }
+            ],
+            "description": "Common interface for logging libraries",
+            "homepage": "https://github.com/php-fig/log",
+            "keywords": [
+                "log",
+                "psr",
+                "psr-3"
+            ],
+            "time": "2019-11-01T11:05:21+00:00"
+        },
+        {
+            "name": "seld/jsonlint",
+            "version": "1.7.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Seldaek/jsonlint.git",
+                "reference": "e2e5d290e4d2a4f0eb449f510071392e00e10d19"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Seldaek/jsonlint/zipball/e2e5d290e4d2a4f0eb449f510071392e00e10d19",
+                "reference": "e2e5d290e4d2a4f0eb449f510071392e00e10d19",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3 || ^7.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^4.8.35 || ^5.7 || ^6.0"
+            },
+            "bin": [
+                "bin/jsonlint"
+            ],
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Seld\\JsonLint\\": "src/Seld/JsonLint/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be",
+                    "homepage": "http://seld.be"
+                }
+            ],
+            "description": "JSON Linter",
+            "keywords": [
+                "json",
+                "linter",
+                "parser",
+                "validator"
+            ],
+            "time": "2019-10-24T14:27:39+00:00"
+        },
+        {
+            "name": "seld/phar-utils",
+            "version": "1.0.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Seldaek/phar-utils.git",
+                "reference": "7009b5139491975ef6486545a39f3e6dad5ac30a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Seldaek/phar-utils/zipball/7009b5139491975ef6486545a39f3e6dad5ac30a",
+                "reference": "7009b5139491975ef6486545a39f3e6dad5ac30a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Seld\\PharUtils\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jordi Boggiano",
+                    "email": "j.boggiano@seld.be"
+                }
+            ],
+            "description": "PHAR file format utilities, for when PHP phars you up",
+            "keywords": [
+                "phra"
+            ],
+            "time": "2015-10-13T18:44:15+00:00"
+        },
+        {
+            "name": "statamic/composer-test-example-dependency",
+            "version": "1.2.3",
+            "dist": {
+                "type": "path",
+                "url": "example-dependency",
+                "reference": "6349bc5b40cfa002a93d0eb61e0921d8b62e72a1"
+            },
+            "type": "library"
+        },
+        {
+            "name": "symfony/console",
+            "version": "v4.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/console.git",
+                "reference": "35d9077f495c6d184d9930f7a7ecbd1ad13c7ab8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/console/zipball/35d9077f495c6d184d9930f7a7ecbd1ad13c7ab8",
+                "reference": "35d9077f495c6d184d9930f7a7ecbd1ad13c7ab8",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3",
+                "symfony/polyfill-mbstring": "~1.0",
+                "symfony/polyfill-php73": "^1.8",
+                "symfony/service-contracts": "^1.1|^2"
+            },
+            "conflict": {
+                "symfony/dependency-injection": "<3.4",
+                "symfony/event-dispatcher": "<4.3|>=5",
+                "symfony/lock": "<4.4",
+                "symfony/process": "<3.3"
+            },
+            "provide": {
+                "psr/log-implementation": "1.0"
+            },
+            "require-dev": {
+                "psr/log": "~1.0",
+                "symfony/config": "^3.4|^4.0|^5.0",
+                "symfony/dependency-injection": "^3.4|^4.0|^5.0",
+                "symfony/event-dispatcher": "^4.3",
+                "symfony/lock": "^4.4|^5.0",
+                "symfony/process": "^3.4|^4.0|^5.0",
+                "symfony/var-dumper": "^4.3|^5.0"
+            },
+            "suggest": {
+                "psr/log": "For using the console logger",
+                "symfony/event-dispatcher": "",
+                "symfony/lock": "",
+                "symfony/process": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Console\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Console Component",
+            "homepage": "https://symfony.com",
+            "time": "2019-11-13T07:39:40+00:00"
+        },
+        {
+            "name": "symfony/filesystem",
+            "version": "v4.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/filesystem.git",
+                "reference": "d12b01cba60be77b583c9af660007211e3909854"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/filesystem/zipball/d12b01cba60be77b583c9af660007211e3909854",
+                "reference": "d12b01cba60be77b583c9af660007211e3909854",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3",
+                "symfony/polyfill-ctype": "~1.8"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Filesystem\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Filesystem Component",
+            "homepage": "https://symfony.com",
+            "time": "2019-11-12T14:51:11+00:00"
+        },
+        {
+            "name": "symfony/finder",
+            "version": "v4.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/finder.git",
+                "reference": "ce8743441da64c41e2a667b8eb66070444ed911e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/finder/zipball/ce8743441da64c41e2a667b8eb66070444ed911e",
+                "reference": "ce8743441da64c41e2a667b8eb66070444ed911e",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Finder\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Finder Component",
+            "homepage": "https://symfony.com",
+            "time": "2019-11-17T21:56:56+00:00"
+        },
+        {
+            "name": "symfony/polyfill-ctype",
+            "version": "v1.12.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-ctype.git",
+                "reference": "550ebaac289296ce228a706d0867afc34687e3f4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-ctype/zipball/550ebaac289296ce228a706d0867afc34687e3f4",
+                "reference": "550ebaac289296ce228a706d0867afc34687e3f4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "suggest": {
+                "ext-ctype": "For best performance"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.12-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Polyfill\\Ctype\\": ""
+                },
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Gert de Pagter",
+                    "email": "BackEndTea@gmail.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill for ctype functions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "ctype",
+                "polyfill",
+                "portable"
+            ],
+            "time": "2019-08-06T08:03:45+00:00"
+        },
+        {
+            "name": "symfony/polyfill-mbstring",
+            "version": "v1.12.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-mbstring.git",
+                "reference": "b42a2f66e8f1b15ccf25652c3424265923eb4f17"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/b42a2f66e8f1b15ccf25652c3424265923eb4f17",
+                "reference": "b42a2f66e8f1b15ccf25652c3424265923eb4f17",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "suggest": {
+                "ext-mbstring": "For best performance"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.12-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Polyfill\\Mbstring\\": ""
+                },
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill for the Mbstring extension",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "mbstring",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "time": "2019-08-06T08:03:45+00:00"
+        },
+        {
+            "name": "symfony/polyfill-php73",
+            "version": "v1.12.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-php73.git",
+                "reference": "2ceb49eaccb9352bff54d22570276bb75ba4a188"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-php73/zipball/2ceb49eaccb9352bff54d22570276bb75ba4a188",
+                "reference": "2ceb49eaccb9352bff54d22570276bb75ba4a188",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.12-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Polyfill\\Php73\\": ""
+                },
+                "files": [
+                    "bootstrap.php"
+                ],
+                "classmap": [
+                    "Resources/stubs"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill backporting some PHP 7.3+ features to lower PHP versions",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "time": "2019-08-06T08:03:45+00:00"
+        },
+        {
+            "name": "symfony/process",
+            "version": "v4.4.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/process.git",
+                "reference": "75ad33d9b6f25325ebc396d68ad86fd74bcfbb06"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/process/zipball/75ad33d9b6f25325ebc396d68ad86fd74bcfbb06",
+                "reference": "75ad33d9b6f25325ebc396d68ad86fd74bcfbb06",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1.3"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "4.4-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\Process\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony Process Component",
+            "homepage": "https://symfony.com",
+            "time": "2019-10-28T20:30:34+00:00"
+        },
+        {
+            "name": "symfony/service-contracts",
+            "version": "v2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/service-contracts.git",
+                "reference": "9d99e1556417bf227a62e14856d630672bf10eaf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/service-contracts/zipball/9d99e1556417bf227a62e14856d630672bf10eaf",
+                "reference": "9d99e1556417bf227a62e14856d630672bf10eaf",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.2.9",
+                "psr/container": "^1.0"
+            },
+            "suggest": {
+                "symfony/service-implementation": ""
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "2.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Contracts\\Service\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Generic abstractions related to writing services",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "abstractions",
+                "contracts",
+                "decoupling",
+                "interfaces",
+                "interoperability",
+                "standards"
+            ],
+            "time": "2019-11-09T09:18:34+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}

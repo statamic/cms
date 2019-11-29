@@ -232,7 +232,8 @@ class Field implements Arrayable
     public function toArray()
     {
         return array_merge($this->config, [
-            'handle' => $this->handle
+            'handle' => $this->handle,
+            'width' => $this->config['width'] ?? 100
         ]);
     }
 

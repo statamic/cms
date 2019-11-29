@@ -4,7 +4,7 @@ const tailwindcss = require('tailwindcss');
 const src = 'resources';
 const dest = 'resources/dist';
 
-mix.setPublicPath('./');
+mix.setPublicPath('./resources/dist');
 
 mix.sass(`${src}/sass/cp.scss`, `${dest}/css`).options({
     processCssUrls: false,

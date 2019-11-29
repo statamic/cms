@@ -114,6 +114,9 @@ class FieldsetController extends CpController
         $fields = collect($request->fields)->mapWithKeys(function ($field) {
             $field = Arr::removeNullValues($field);
             $field = Arr::except($field, ['_id', 'isNew']);
+            if (Arr::get($field, 'width') === 100) {
+                unset($field['width']);
+            }
             return [Arr::pull($field, 'handle') => $field];
         })->all();
 

@@ -10,7 +10,7 @@
                     <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
                 <div class="pr-1 flex">
-                    <width-selector v-model="width" class="mr-1" v-show="isSectionExpanded" />
+                    <width-selector v-model="width" class="mr-1" />
                     <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100"><svg-icon name="trash" /></button>
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings

@@ -5,16 +5,37 @@ cache:
     - $HOME/.composer/cache
 
 matrix:
-  fast_finish: true
   include:
+    - php: 7.1
+      env: LARAVEL='5.8.*' TESTBENCH='3.8.*'
     - php: 7.2
+      env: LARAVEL='5.8.*' TESTBENCH='3.8.*'
+    - php: 7.3
+      env: LARAVEL='5.8.*' TESTBENCH='3.8.*'
+    - php: 7.4snapshot
+      env: LARAVEL='5.8.*' TESTBENCH='3.8.*'
+    - php: 7.2
+      env: LARAVEL='6.*' TESTBENCH='4.*'
+    - php: 7.3
+      env: LARAVEL='6.*' TESTBENCH='4.*'
+    - php: 7.4snapshot
+      env: LARAVEL='6.*' TESTBENCH='4.*'
+  fast_finish: true
+  allow_failures:
+    - php: 7.4snapshot
+    - env: LARAVEL='5.8.*' TESTBENCH='3.8.*'
 
 before_install:
+  - composer config discard-changes true
   - travis_retry composer self-update
+  - travis_retry composer require "laravel/framework:${LARAVEL}" "orchestra/testbench:${TESTBENCH}" --no-interaction --no-update
 
 install:
-  - travis_retry composer install --prefer-dist --no-interaction --no-suggest
+  - travis_retry composer update --prefer-dist --no-interaction --no-suggest
   - travis_retry npm install
+
+before_script:
+  - phpenv config-rm xdebug.ini
 
 script:
   - vendor/bin/phpunit

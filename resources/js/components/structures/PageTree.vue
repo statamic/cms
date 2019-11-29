@@ -4,7 +4,7 @@
         <div class="flex items-center mb-3">
             <slot name="header" />
 
-            <dropdown-list class="mr-2">
+            <dropdown-list class="mr-1">
                 <dropdown-item :text="__('Edit Structure Config')" :redirect="editUrl" />
             </dropdown-list>
 
