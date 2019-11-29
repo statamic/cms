@@ -61,6 +61,6 @@ class PackToTheFuture
             'version' => $version,
         ], $extra);
 
-        File::put(__DIR__.'/test-package/composer.json', json_encode($content, JSON_UNESCAPED_SLASHES));
+        File::put(__DIR__.'/../../../Composer/__fixtures__/test-package/composer.json', json_encode($content, JSON_UNESCAPED_SLASHES));
     }
 }

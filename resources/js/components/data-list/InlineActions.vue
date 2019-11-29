@@ -10,7 +10,7 @@
         >
             <div slot-scope="{ action, select }">
                 <button
-                    v-text="action.title"
+                    v-text="__(action.title)"
                     :class="{ warning: action.dangerous }"
                     @click="select" />
             </div>

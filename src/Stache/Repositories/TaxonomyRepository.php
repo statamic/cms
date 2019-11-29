@@ -33,6 +33,11 @@ class TaxonomyRepository implements RepositoryContract
         return $this->store->paths()->keys();
     }
 
+    public function handleExists(string $handle): bool
+    {
+        return $this->handles()->contains($handle);
+    }
+
     public function findByHandle($handle): ?Taxonomy
     {
         return $this->store->getItem($handle);

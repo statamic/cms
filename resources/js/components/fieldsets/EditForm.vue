@@ -4,7 +4,7 @@
 
         <div class="flex items-center mb-3">
             <h1 class="flex-1">{{ initialTitle }}</h1>
-            <button type="submit" class="btn btn-primary" @click.prevent="save">Save</button>
+            <button type="submit" class="btn btn-primary" @click.prevent="save" v-text="__('Save')" />
         </div>
 
         <div class="publish-form card p-0">

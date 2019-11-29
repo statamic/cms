@@ -3,6 +3,7 @@
 namespace Tests\Composer;
 
 use Tests\TestCase;
+use Symfony\Component\Process\Process;
 use Illuminate\Support\Facades\Cache;
 use Facades\Statamic\Console\Processes\Composer;
 use Tests\Fakes\Composer\Package\PackToTheFuture;
@@ -17,14 +18,22 @@ class ComposerTest extends TestCase
 
         parent::setUp();
 
-        Composer::swap(new \Statamic\Console\Processes\Composer($this->basePath()));
+        (new Process('tar -xzvf vendor.tar.gz', $this->basePath()))->mustRun();
+        copy($this->basePath('composer.json'), $this->basePath('composer.json.bak'));
+        copy($this->basePath('composer.lock'), $this->basePath('composer.lock.bak'));
+        Cache::forget('composer.test/package');
 
-        $this->ensureTestPackageNotInstalled();
+        Composer::swap(new \Statamic\Console\Processes\Composer($this->basePath()));
     }
 
     public function tearDown(): void
     {
-        $this->ensureTestPackageNotInstalled();
+        $fs = app('files');
+        $fs->deleteDirectory($this->basePath('vendor'));
+        $fs->delete($this->basePath('composer.json'));
+        $fs->delete($this->basePath('composer.lock'));
+        $fs->move($this->basePath('composer.lock.bak'), $this->basePath('composer.lock'));
+        $fs->move($this->basePath('composer.json.bak'), $this->basePath('composer.json'));
 
         parent::tearDown();
     }
@@ -38,8 +47,8 @@ class ComposerTest extends TestCase
         $installed = Composer::installed();
 
         $this->assertNotEmpty($installed);
-        $this->assertContains('laravel/framework', $installed->keys());
-        $this->assertEquals(app()->version(), $installed->get('laravel/framework')->version);
+        $this->assertContains('statamic/composer-test-example-dependency', $installed->keys());
+        $this->assertEquals('1.2.3', $installed->get('statamic/composer-test-example-dependency')->version);
     }
 
     /**
@@ -48,7 +57,7 @@ class ComposerTest extends TestCase
      */
     function it_can_get_installed_version_of_a_package_directly_from_composer_lock()
     {
-        $this->assertEquals(app()->version(), Composer::installedVersion('laravel/framework'));
+        $this->assertEquals('1.2.3', Composer::installedVersion('statamic/composer-test-example-dependency'));
     }
 
     /**
@@ -57,7 +66,15 @@ class ComposerTest extends TestCase
      */
     function it_can_get_installed_path_of_a_package()
     {
-        $this->assertStringContainsString('/vendor/laravel/framework', Composer::installedPath('laravel/framework'));
+        $this->assertEquals(
+            __DIR__.'/__fixtures__/example-dependency',
+            Composer::installedPath('statamic/composer-test-example-dependency')
+        );
+
+        $this->assertEquals(
+            __DIR__.'/__fixtures__/vendor/composer/composer',
+            Composer::installedPath('composer/composer')
+        );
     }
 
     /**
@@ -119,15 +136,6 @@ class ComposerTest extends TestCase
 
     private function basePath($path = null)
     {
-        return __DIR__ . '/../../' . $path;
-    }
-
-    private function ensureTestPackageNotInstalled()
-    {
-        Cache::forget('composer.test/package');
-
-        if (Composer::installed()->get('test/package')) {
-            Composer::remove('test/package');
-        }
+        return __DIR__ . '/__fixtures__/' . $path;
     }
 }

@@ -62,6 +62,10 @@ class TermRepository implements RepositoryContract
             return null;
         }
 
+        if (! Taxonomy::handleExists($taxonomy)) {
+            return null;
+        }
+
         $term = $this->query()
             ->where('slug', $slug)
             ->where('taxonomy', $taxonomy)

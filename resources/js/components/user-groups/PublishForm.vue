@@ -77,6 +77,12 @@ export default {
         }
     },
 
+    watch: {
+        'title': function(display) {
+            this.handle = this.$slugify(display, '_');
+        }
+    },
+
     computed: {
 
         hasErrors() {

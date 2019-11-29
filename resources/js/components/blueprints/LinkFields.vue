@@ -65,7 +65,7 @@
                         />
                         <p class="text-sm font-medium mt-3 mb-1">Prefix</p>
                         <p class="text-2xs text-grey mb-1">Every field in the linked fieldset will be prefixed with this. Useful if you want to import the same fields multiple times.</p>
-                        <text-input v-model="importPrefix" placeholder="eg. _hero" />
+                        <text-input v-model="importPrefix" placeholder="eg. hero_" />
                         <button
                             class="btn btn-primary w-full mt-3"
                             :class="{ 'opacity-50': !fieldset }"

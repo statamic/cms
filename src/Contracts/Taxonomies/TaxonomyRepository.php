@@ -13,4 +13,5 @@ interface TaxonomyRepository
     public function findByUri(string $uri): ?Taxonomy;
     public function make(string $handle = null): Taxonomy;
     public function handles(): Collection;
+    public function handleExists(string $handle): bool;
 }

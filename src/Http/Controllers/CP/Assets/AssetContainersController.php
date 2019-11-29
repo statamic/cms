@@ -159,11 +159,13 @@ class AssetContainersController extends CpController
         return Blueprint::makeFromFields([
             'title' => [
                 'type' => 'text',
+                'display' => __('Title'),
                 'validate' => 'required',
                 'width' => 50,
             ],
             'handle' => [
                 'type' => 'slug',
+                'display' => __('Slug'),
                 'validate' => 'required|alpha_dash',
                 'width' => 50,
             ],
@@ -177,36 +179,42 @@ class AssetContainersController extends CpController
             ],
             'blueprint' => [
                 'type' => 'blueprints',
+                'display' => __('Blueprints'),
                 'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
                 'max_items' => 1,
                 'width' => 50,
             ],
             'allow_uploads' => [
                 'type' => 'toggle',
+                'display' => __('Allow Uploads'),
                 'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
                 'default' => true,
                 'width' => 50,
             ],
             'create_folders' => [
                 'type' => 'toggle',
+                'display' => __('Create Folders'),
                 'instructions' => __('statamic::messages.asset_container_create_folder_instructions'),
                 'default' => true,
                 'width' => 50,
             ],
             'allow_renaming' => [
                 'type' => 'toggle',
+                'display' => __('Allow Renaming'),
                 'instructions' => __('statamic::messages.asset_container_rename_instructions'),
                 'default' => true,
                 'width' => 50,
             ],
             'allow_moving' => [
                 'type' => 'toggle',
+                'display' => __('Allow Moving'),
                 'instructions' => __('statamic::messages.asset_container_move_instructions'),
                 'default' => true,
                 'width' => 50,
             ],
             'allow_downloading' => [
                 'type' => 'toggle',
+                'display' => __('Allow Downloading'),
                 'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
                 'default' => true,
                 'width' => 50,

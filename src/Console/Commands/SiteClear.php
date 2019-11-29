@@ -39,6 +39,10 @@ class SiteClear extends Command
      */
     public function handle()
     {
+        if (! $this->confirm('There is no site theme or sample content in v3 - are you sure you want to remove all new site defaults?', false)) {
+            return $this->info('Aborted successfully.');
+        }
+
         $this->files = app(Filesystem::class);
 
         $this
