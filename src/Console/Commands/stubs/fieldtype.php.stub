@@ -11,7 +11,7 @@ class DummyClass extends Fieldtype
      *
      * @return array
      */
-    public function blank()
+    public function defaultValue()
     {
         return null;
     }
