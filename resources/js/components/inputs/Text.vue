@@ -5,6 +5,7 @@
             <input
                 ref="input"
                 class="input-text"
+                :class="classes"
                 :name="name"
                 :value="value"
                 :type="type"
@@ -32,6 +33,7 @@ export default {
     props: {
         name: {},
         disabled: { default: false },
+        classes: { default: null },
         isReadOnly: { type: Boolean, default: false },
         placeholder: { required: false },
         type: { default: "text" },
