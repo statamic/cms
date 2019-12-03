@@ -22,7 +22,7 @@ export default {
 
     created() {
         this.$events.$on('per-page-changed', this.perPageChanged);
-        this.$events.$on('filters-changed', this.pageReset);
+        this.$events.$on('filter-changed', this.pageReset);
     },
 
     methods: {
