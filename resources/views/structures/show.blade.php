@@ -10,7 +10,7 @@
         submit-url="{{ cp_route('structures.pages.store', $structure->handle()) }}"
         edit-url="{{ cp_route('structures.edit', $structure->handle()) }}"
         create-url="{{ $hasCollection ? cp_route('collections.entries.create', [$structure->collection()->handle(), $site]) : null }}"
-        sound-drop-url="{{ Statamic::assetUrl('audio/click.mp3') }}"
+        sound-drop-url="{{ Statamic::cpAssetUrl('audio/click.mp3') }}"
         site="{{ $site }}"
         :localizations="{{ json_encode($localizations) }}"
         :collections="{{ json_encode($collections) }}"

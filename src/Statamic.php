@@ -146,14 +146,14 @@ class Statamic
         );
     }
 
-    public static function assetUrl($url = '/')
+    public static function vendorAssetUrl($url = '/')
     {
-        return static::url('vendor/statamic/cp/' . $url);
+        return asset(URL::tidy('vendor/' . $url));
     }
 
-    public static function url($url = '/')
+    public static function cpAssetUrl($url = '/')
     {
-        return URL::tidy(Site::default()->url() . '/' . $url);
+        return static::vendorAssetUrl('statamic/cp/' . $url);
     }
 
     public static function flash()
