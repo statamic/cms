@@ -10,7 +10,9 @@ class NotFoundHttpException extends SymfonyException
 {
     public function render()
     {
-        return response($this->contents(), 404);
+        if (view()->exists('errors.404')) {
+            return response($this->contents(), 404);
+        }
     }
 
     protected function contents()

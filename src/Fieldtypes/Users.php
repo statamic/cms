@@ -81,6 +81,10 @@ class Users extends Relationship
 
     public function preProcessIndex($data)
     {
+        if (! $data) {
+            return collect();
+        }
+
         $users = $this->augment($data);
 
         if ($this->config('max_items') === 1) {

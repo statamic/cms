@@ -47,6 +47,10 @@ export default {
             type: Boolean
         },
 
+        autoselect: {
+            type: Boolean
+        },
+
         errors: {
             type: Array
         },
@@ -72,7 +76,8 @@ export default {
                 display: this.display,
                 instructions: this.instructions,
                 width: this.width,
-                autofocus: this.autofocus
+                autofocus: this.autofocus,
+                autoselect: this.autoselect,
             };
         },
 

@@ -7,8 +7,6 @@ use Statamic\Facades\Revision as Revisions;
 
 trait Revisable
 {
-    protected $published = true;
-
     public function revision(string $reference)
     {
         return $this->revisions()->get($reference);
@@ -68,18 +66,7 @@ trait Revisable
         return optional($this->workingCopy())->delete();
     }
 
-    public function published($published = null)
-    {
-        if (func_num_args() === 0) {
-            return $this->published;
-        }
-
-        $this->published = $published;
-
-        return $this;
-    }
-
-    public function publish($options = [])
+    public function publishWorkingCopy($options = [])
     {
         $item = $this->fromWorkingCopy();
 
@@ -101,7 +88,7 @@ trait Revisable
         return $item;
     }
 
-    public function unpublish($options = [])
+    public function unpublishWorkingCopy($options = [])
     {
         $item = $this->fromWorkingCopy();
 
@@ -119,6 +106,8 @@ trait Revisable
             ->save();
 
         $item->deleteWorkingCopy();
+
+        return $item;
     }
 
     public function store($options = [])

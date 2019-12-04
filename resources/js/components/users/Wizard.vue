@@ -113,7 +113,7 @@
 
             <!-- Copy Pasta -->
             <div class="max-w-md mx-auto px-2 pb-7" v-else>
-                <p class="mb-1" v-text="__('messages.user_wizard_invitation_share_before', { email: user.email })" />
+                <p class="mb-1" v-html="__('messages.user_wizard_invitation_share_before', { email: user.email })" />
             </div>
         </div>
 
@@ -121,12 +121,12 @@
         <div v-if="completed">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('User created') }}</h1>
-                <p class="text-grey" v-text="__('messages.user_wizard_account_created')" />
+                <p class="text-grey" v-html="__('messages.user_wizard_account_created')" />
             </div>
 
             <!-- Copy Pasta -->
             <div class="max-w-md mx-auto px-2 pb-7">
-                <p class="mb-1" v-text="__('messages.user_wizard_invitation_share', { email: user.email })" />
+                <p class="mb-1" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
                 <textarea readonly class="input-text" v-elastic onclick="this.select()">
 {{ __('Activation URL') }}: {{ activationUrl }}
 {{ __('Username') }}: {{ user.email }}
@@ -171,7 +171,7 @@ export default {
 
     data() {
         return {
-            steps: ['User Information', 'Roles & Groups', 'Customize Invitation'],
+            steps: [__('User Information'), __('Roles & Groups'), __('Customize Invitation')],
             user: {
                 email: null,
                 super: true,

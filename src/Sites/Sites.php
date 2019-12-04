@@ -59,7 +59,7 @@ class Sites
 
     public function selected()
     {
-        return $this->get(cache('statamic.cp.selected-site', $this->default()->handle()));
+        return $this->get(session('statamic.cp.selected-site', $this->default()->handle()));
     }
 
     public function setConfig($key, $value = null)

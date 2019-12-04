@@ -8,24 +8,24 @@ use Statamic\Support\Str;
 use Statamic\Facades\Term;
 use Statamic\CP\Column;
 use Statamic\Taxonomies\TermCollection;
+use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
 
 class Taxonomy extends Relationship
 {
     protected $statusIcons = false;
     protected $taggable = true;
 
-    public function augment($value, $entry = null)
+    public function augment($value)
     {
         $handle = $taxonomy = null;
-        $collection = optional($entry)->collection();
 
         if ($this->usingSingleTaxonomy()) {
             $handle = $this->taxonomies()[0];
             $taxonomy = Facades\Taxonomy::findByHandle($handle);
         }
 
-        return (new TermCollection(Arr::wrap($value)))
-            ->map(function ($value) use ($handle, $taxonomy, $collection) {
+        $terms = (new TermCollection(Arr::wrap($value)))
+            ->map(function ($value) use ($handle, $taxonomy) {
                 if ($taxonomy) {
                     $slug = $value;
                     $id = "{$handle}::{$slug}";
@@ -40,8 +40,14 @@ class Taxonomy extends Relationship
 
                 $term = Term::find($id) ?? Term::make($slug)->taxonomy($taxonomy);
 
-                return $term->collection($collection);
+                $entry = $this->field->parent();
+
+                return $term
+                    ->collection($entry->collection())
+                    ->in($entry->locale());
             });
+
+        return $this->config('max_items') === 1 ? $terms->first() : $terms;
     }
 
     public function process($data)
@@ -91,6 +97,26 @@ class Taxonomy extends Relationship
         return $query->paginate();
     }
 
+    public function getResourceCollection($request, $items)
+    {
+        return (new TermsResource($items))
+            ->blueprint($this->getBlueprint($request))
+            ->columnPreferenceKey("taxonomies.{$this->getFirstTaxonomyFromRequest($request)->handle()}.columns")
+            ->additional(['meta' => ['sortColumn' => $this->getSortColumn($request)]]);
+    }
+
+    protected function getBlueprint($request)
+    {
+        return $this->getFirstTaxonomyFromRequest($request)->termBlueprint();
+    }
+
+    protected function getFirstTaxonomyFromRequest($request)
+    {
+        return $request->taxonomies
+            ? Facades\Taxonomy::findByHandle($request->taxonomies[0])
+            : Facades\Taxonomy::all()->first();
+    }
+
     public function getSortColumn($request)
     {
         $column = $request->get('sort');
@@ -126,11 +152,17 @@ class Taxonomy extends Relationship
             $id = "{$this->taxonomies()[0]}::{$id}";
         }
 
-        if ($term = Term::find($id)) {
-            return $term->toArray();
+        if (! $term = Term::find($id)) {
+            return $this->invalidItemArray($id);
         }
 
-        return $this->invalidItemArray($id);
+        return [
+            'id' => $id,
+            'title' => $term->value('title'),
+            'published' => $term->published(),
+            'private' => $term->private(),
+            'edit_url' => $term->editUrl(),
+        ];
     }
 
     protected function getColumns()

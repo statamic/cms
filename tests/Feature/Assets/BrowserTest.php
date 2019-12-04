@@ -206,7 +206,7 @@ class BrowserTest extends TestCase
             ->makeAsset('one.txt')
             ->upload(UploadedFile::fake()->create('one.txt'));
 
-        $this->setTestRoles(['test' => ['access cp', 'edit test assets']]);
+        $this->setTestRoles(['test' => ['access cp', 'view test assets']]);
         $user = User::make()->assignRole('test')->save();
 
         $this
@@ -231,14 +231,14 @@ class BrowserTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_without_permission_to_edit_asset()
+    function it_denies_access_without_permission_to_view_asset()
     {
         $container = AssetContainer::make('test')->disk('test')->save();
         $container
             ->makeAsset('one.txt')
             ->upload(UploadedFile::fake()->create('one.txt'));
 
-        $this->setTestRoles(['test' => ['access cp', 'view test assets']]);
+        $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test')->save();
 
         $this

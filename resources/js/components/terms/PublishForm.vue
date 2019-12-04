@@ -111,6 +111,8 @@
                                     </div>
                                 </div>
 
+                                <!--
+                                TODO
                                 <div class="flex items-center border-t justify-between px-2 py-1" v-if="!revisionsEnabled">
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
                                     <toggle-input v-model="published" />
@@ -146,6 +148,7 @@
                                             <span>{{ __('View History') }}</span>
                                         </button>
                                 </div>
+                                -->
 
                                 <div class="p-2 site-list border-t" v-if="localizations.length > 1">
                                     <label class="publish-field-label font-medium mb-1" v-text="__('Sites')" />
@@ -373,8 +376,8 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
-                this.title = response.data.title;
-                this.permalink = response.data.permalink;
+                this.title = response.data.data.title;
+                this.permalink = response.data.data.permalink;
                 this.isWorkingCopy = true;
                 if (!this.isCreating) this.$toast.success('Saved');
                 this.$refs.container.saved();
@@ -480,7 +483,7 @@ export default {
             if (published !== undefined) this.published = published;
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
-            this.permalink = response.data.permalink
+            this.permalink = response.data.data.permalink
             this.$nextTick(() => this.$emit('saved', response));
         },
 

@@ -46,7 +46,22 @@ export default {
 
         isReadOnly() {
             return this.readOnly || this.config.read_only || false;
+        },
+
+        replicatorPreview() {
+            return this.value;
         }
+    },
+
+    watch: {
+
+        replicatorPreview: {
+            immediate: true,
+            handler(text) {
+                this.$emit('replicator-preview-updated', text);
+            }
+        }
+
     }
 
 }

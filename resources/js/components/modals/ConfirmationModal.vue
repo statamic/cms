@@ -47,11 +47,15 @@ export default {
     methods: {
         dismiss() {
             this.$emit('cancel')
+        },
+        submit() {
+            this.$emit('confirm')
         }
     },
 
     created() {
         this.$mousetrap.bind('esc', this.dismiss)
+        this.$mousetrap.bind('enter', this.submit)
     },
 }
 </script>

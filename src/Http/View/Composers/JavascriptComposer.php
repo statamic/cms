@@ -4,6 +4,7 @@ namespace Statamic\Http\View\Composers;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\View\View;
+use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Statamic;
@@ -22,12 +23,12 @@ class JavascriptComposer
             'csrfToken' => csrf_token(),
             'cpRoot' => str_start(config('statamic.cp.route'), '/'),
             'urlPath' => '/' . request()->path(),
-            'resourceUrl' => Statamic::assetUrl(),
+            'resourceUrl' => Statamic::cpAssetUrl(),
             'locales' => config('statamic.system.locales'),
             'flash' => Statamic::flash(),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),
             'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
-            'user' => $user ? $user->toArray() : [],
+            'user' => $this->user($user),
             'paginationSize' => config('statamic.cp.pagination_size'),
             'translationLocale' => app('translator')->locale(),
             'translations' => app('translator')->toJson(),
@@ -56,5 +57,17 @@ class JavascriptComposer
         $permissions = $user ? $user->permissions() : [];
 
         return base64_encode(json_encode($permissions));
+    }
+
+    protected function user($user)
+    {
+        if (! $user) {
+            return [];
+        }
+
+        return array_merge($user->augmentedArrayData(), [
+            'preferences' => Preference::all(),
+            'permissions' => $user->permissions()->all(),
+        ]);
     }
 }

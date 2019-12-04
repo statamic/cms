@@ -7,8 +7,8 @@ use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\CP\Column;
 use Statamic\CP\Breadcrumbs;
-use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
+use Statamic\Http\Resources\CP\Entries\Entries;
 use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Preference;
@@ -18,6 +18,7 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Http\Requests\FilteredSiteRequest;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 
 class EntriesController extends CpController
 {
@@ -41,34 +42,15 @@ class EntriesController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $entries = $query
-            ->paginate(request('perPage'))
-            ->supplement(function ($entry) use ($collection) {
-                return [
-                    'viewable' => User::current()->can('view', $entry),
-                    'editable' => User::current()->can('edit', $entry),
-                    'actions' => Action::for($entry, ['collection' => $collection->handle()]),
-                ];
-            })
-            ->preProcessForIndex();
+        $entries = $query->paginate(request('perPage'));
 
-        if ($collection->dated()) {
-            $entries->supplement('date', function ($entry) {
-                return $entry->date()->inPreferredFormat();
-            });
-        }
-
-        $columns = $collection->entryBlueprint()
-            ->columns()
-            ->setPreferred("collections.{$collection->handle()}.columns")
-            ->rejectUnlisted()
-            ->values();
-
-        return Resource::collection($entries)->additional(['meta' => [
-            'filters' => $request->filters,
-            'sortColumn' => $sortField,
-            'columns' => $columns,
-        ]]);
+        return (new Entries($entries))
+            ->blueprint($collection->entryBlueprint())
+            ->columnPreferenceKey("collections.{$collection->handle()}.columns")
+            ->additional(['meta' => [
+                'filters' => $request->filters,
+                'sortColumn' => $sortField,
+            ]]);
     }
 
     protected function filter($query, $filters)
@@ -126,6 +108,7 @@ class EntriesController extends CpController
                 'revisions' => $entry->revisionsUrl(),
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),
+                'editBlueprint' => $blueprint->editUrl(),
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
@@ -224,7 +207,7 @@ class EntriesController extends CpController
                 ->save();
         }
 
-        return $entry->fresh()->toArray();
+        return new EntryResource($entry->fresh());
     }
 
     public function create(Request $request, $collection, $site)
@@ -255,6 +238,10 @@ class EntriesController extends CpController
             'slug' => null,
             'published' => $collection->defaultPublishState()
         ]);
+
+        if ($collection->dated()) {
+            $values['date'] = substr(now()->toDateTimeString(), 0, 10);
+        }
 
         $viewData = [
             'title' => __('Create Entry'),
@@ -298,9 +285,9 @@ class EntriesController extends CpController
 
         $fields = $blueprint->fields()->addValues($request->all());
 
-        $fields->validate(Entry::createRules($collection));
+        $fields->validate(Entry::createRules($collection, $site));
 
-        $values = $fields->process()->values()->except(['slug', 'blueprint']);
+        $values = $fields->process()->values()->except(['slug', 'date', 'blueprint']);
 
         $entry = Entry::make()
             ->collection($collection)
@@ -311,10 +298,7 @@ class EntriesController extends CpController
             ->data($values);
 
         if ($collection->dated()) {
-            $date = $values['date']
-                ? $this->formatDateForSaving($values['date'])
-                : now()->format('Y-m-d-Hi');
-            $entry->date($date);
+            $entry->date($this->formatDateForSaving($request->date));
         }
 
         if ($entry->revisionsEnabled()) {
@@ -341,9 +325,7 @@ class EntriesController extends CpController
             $tree->save();
         }
 
-        return array_merge($entry->toArray(), [
-            'redirect' => $entry->editUrl(),
-        ]);
+        return new EntryResource($entry);
     }
 
     public function destroy($collection, $entry)

@@ -13,7 +13,7 @@ class Handler extends ExceptionHandler
 {
     public function render($request, Exception $e)
     {
-        if ($e instanceof IlluminateAuthException && !$request->expectsJson()) {
+        if ($e instanceof IlluminateAuthException && Statamic::isCpRoute() && !$request->expectsJson()) {
             return redirect($this->getAuthExceptionRedirectUrl())->withError($e->getMessage());
         }
 

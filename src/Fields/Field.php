@@ -12,6 +12,7 @@ class Field implements Arrayable
     protected $handle;
     protected $config;
     protected $value;
+    protected $parent;
 
     public function __construct($handle, array $config)
     {
@@ -179,6 +180,18 @@ class Field implements Arrayable
         return $this->fieldtype()->validationValue($this->value);
     }
 
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
+    public function parent()
+    {
+        return $this->parent;
+    }
+
     public function process()
     {
         return $this->newInstance()->setValue(
@@ -219,7 +232,8 @@ class Field implements Arrayable
     public function toArray()
     {
         return array_merge($this->config, [
-            'handle' => $this->handle
+            'handle' => $this->handle,
+            'width' => $this->config['width'] ?? 100
         ]);
     }
 

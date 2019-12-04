@@ -58,4 +58,25 @@ class UniqueEntryValueTest extends TestCase
             ['slug' => 'unique_entry_value:collection-one,456']
         )->fails());
     }
+
+    /** @test */
+    function it_passes_when_theres_a_duplicate_entry_value_in_a_different_site()
+    {
+        \Statamic\Facades\Site::setConfig(['sites' => [
+            'site-one' => ['url' => '/'],
+            'site-two' => ['url' => '/'],
+        ]]);
+
+        EntryFactory::id('123')->slug('foo')->collection('collection-one')->locale('site-one')->create();
+
+        $this->assertTrue(Validator::make(
+            ['slug' => 'foo'],
+            ['slug' => 'unique_entry_value:collection-one,null,site-one']
+        )->fails());
+
+        $this->assertTrue(Validator::make(
+            ['slug' => 'foo'],
+            ['slug' => 'unique_entry_value:collection-one,null,site-two']
+        )->passes());
+    }
 }

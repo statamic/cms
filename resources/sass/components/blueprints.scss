@@ -20,7 +20,7 @@
 }
 
 .blueprint-section-field {
-    @apply relative mb-1 z-10 outline-none;
+    @apply relative mb-1 px-sm z-10 outline-none;
 
     .blueprint-section-field-inner {
         @apply relative border rounded bg-grey-20 shadow-sm flex outline-none z-10;
@@ -45,7 +45,7 @@
     &:before {
         content: '';
         @apply border rounded absolute bg-grey-20 shadow-sm;
-        top: -3px; left: 3px; right: -3px; bottom: 3px; z-index: 1;
+        top: -3px; left: 6px; right: 0; bottom: 3px; z-index: 1;
     }
 }
 

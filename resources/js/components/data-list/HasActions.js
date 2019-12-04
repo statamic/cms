@@ -11,6 +11,7 @@ export default {
         },
 
         actionCompleted() {
+            this.$toast.success(__('Action completed'));
             this.request();
         }
 

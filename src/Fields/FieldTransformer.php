@@ -24,30 +24,27 @@ class FieldTransformer
 
     private static function inlineSectionField(array $submitted)
     {
+        $field = Arr::removeNullValues(array_except($submitted['config'], ['isNew']));
+
+        if (Arr::get($field, 'width') === 100) {
+            unset($field['width']);
+        }
+
         return array_filter([
             'handle' => $submitted['handle'],
-            'field' => static::cleanConfig(array_except($submitted['config'], ['isNew']))
+            'field' => $field
         ]);
     }
 
     private static function referenceSectionField(array $submitted)
     {
+        $config = Arr::removeNullValues(array_only($submitted['config'], $submitted['config_overrides']));
+
         return array_filter([
             'handle' => $submitted['handle'],
             'field' => $submitted['field_reference'],
-            'config' => static::cleanConfig(array_only($submitted['config'], $submitted['config_overrides']))
+            'config' => $config
         ]);
-    }
-
-    private static function cleanConfig($config)
-    {
-        $config = Arr::removeNullValues($config);
-
-        if (Arr::get($config, 'width') === 100) {
-            unset($config['width']);
-        }
-
-        return $config;
     }
 
     public static function toVue($field): array

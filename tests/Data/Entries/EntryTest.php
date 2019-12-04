@@ -240,11 +240,12 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_converts_to_array()
+    function it_compiles_augmented_array_data()
     {
         $user = tap(User::make()->id('user-1'))->save();
 
         $entry = (new Entry)
+            ->id('test-id')
             ->locale('en')
             ->slug('test')
             ->collection(Collection::make('blog')->save())
@@ -263,8 +264,8 @@ class EntryTest extends TestCase
             'baz' => 'qux',
             'last_modified' => $carbon = Carbon::createFromTimestamp($lastModified),
             'updated_at' => $carbon,
-            'updated_by' => $user->toArray(),
-        ], $entry->toArray());
+            'updated_by' => $user->toAugmentedArray(),
+        ], $entry->augmentedArrayData());
     }
 
     /** @test */

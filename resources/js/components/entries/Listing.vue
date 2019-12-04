@@ -32,8 +32,8 @@
                                 v-text="__('Reorder')"
                             />
                             <template v-if="reordering">
-                                <button class="btn btn-flat ml-1" @click="saveOrder">Save Order</button>
-                                <button class="btn btn-flat ml-1" @click="cancelReordering">Cancel</button>
+                                <button class="btn btn-flat ml-1" @click="saveOrder" v-text="__('Save Order')" />
+                                <button class="btn btn-flat ml-1" @click="cancelReordering" v-text="__('Cancel')" />
                             </template>
                             <data-list-filters
                                 class="ml-1"

@@ -23,7 +23,6 @@ use League\Flysystem\Adapter\Local;
 use Facades\Statamic\Assets\Dimensions;
 use Statamic\Events\Data\AssetReplaced;
 use Statamic\Events\Data\AssetUploaded;
-use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Contracts\Assets\Asset as AssetContract;
@@ -31,7 +30,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
-class Asset implements AssetContract, Arrayable, ArrayAccess, AugmentableContract
+class Asset implements AssetContract, ArrayAccess, AugmentableContract
 {
     use Augmentable, FluentlyGetsAndSets, ContainsData {
         set as traitSet;
@@ -539,11 +538,11 @@ class Asset implements AssetContract, Arrayable, ArrayAccess, AugmentableContrac
     }
 
     /**
-     * Convert to an array
+     * Get data for the augmented array
      *
      * @return array
      */
-    public function toArray()
+    public function augmentedArrayData()
     {
         $attributes = [
             'id'             => $this->id(),

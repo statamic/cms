@@ -2,10 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\Facades\User;
-use Statamic\Facades\Entry;
 use Illuminate\Http\Request;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 
 class PublishedEntriesController extends CpController
 {
@@ -18,18 +18,18 @@ class PublishedEntriesController extends CpController
             'user' => User::fromUser($request->user()),
         ]);
 
-        return $entry->toArray();
+        return new EntryResource($entry);
     }
 
     public function destroy(Request $request, $collection, $entry)
     {
         $this->authorize('publish', $entry);
 
-        $entry->unpublish([
+        $entry = $entry->unpublish([
             'message' => $request->message,
             'user' => User::fromUser($request->user()),
         ]);
 
-        return $entry->toArray();
+        return new EntryResource($entry);
     }
 }

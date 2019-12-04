@@ -16,6 +16,8 @@ if (config('statamic.cp.enabled')) {
         ->group(__DIR__.'/cp.php');
 }
 
-Route::middleware('web')
-     ->namespace('Statamic\Http\Controllers')
-     ->group(__DIR__.'/web.php');
+if (config('statamic.routes.enabled')) {
+    Route::middleware('web')
+        ->namespace('Statamic\Http\Controllers')
+        ->group(__DIR__.'/web.php');
+}

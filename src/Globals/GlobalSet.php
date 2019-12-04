@@ -160,14 +160,6 @@ class GlobalSet implements Contract
         return collect($this->localizations);
     }
 
-    public function toArray()
-    {
-        return [
-            'title' => $this->title,
-            'handle' => $this->handle,
-        ];
-    }
-
     public function editUrl()
     {
         return cp_route('globals.edit', [$this->id(), $this->handle()]);

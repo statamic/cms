@@ -3,12 +3,12 @@
 namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Statamic\Http\Resources\CP\Assets\Asset;
 use Statamic\Http\Resources\CP\Assets\Folder;
+use Statamic\Http\Resources\CP\Assets\FolderAsset;
 
 class FolderAssetsCollection extends ResourceCollection
 {
-    public $collects = Asset::class;
+    public $collects = FolderAsset::class;
     protected $folder;
 
     public function folder($folder)

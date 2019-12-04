@@ -2,7 +2,9 @@
     <text-input
         ref="input"
         :value="value"
+        :classes="config.classes"
         :autofocus="config.autofocus"
+        :autoselect="config.autoselect"
         :type="config.input"
         :isReadOnly="isReadOnly"
         :prepend="config.prepend"

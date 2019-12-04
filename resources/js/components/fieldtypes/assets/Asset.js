@@ -20,7 +20,7 @@ export default {
     computed: {
 
         isImage() {
-            return this.asset.is_image;
+            return this.asset.isImage;
         },
 
         canShowSvg() {

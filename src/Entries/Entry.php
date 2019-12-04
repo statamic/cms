@@ -25,6 +25,7 @@ use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Data\HasOrigin;
 use Statamic\Contracts\Data\Localization;
+use Statamic\Data\Publishable;
 
 class Entry implements Contract, AugmentableContract, Responsable, Localization, ArrayAccess
 {
@@ -32,7 +33,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, Augmentable, FluentlyGetsAndSets, Revisable;
+    use ContainsData, ExistsAsFile, Augmentable, FluentlyGetsAndSets, Revisable, Publishable;
 
     use HasOrigin {
         value as originValue;
@@ -96,7 +97,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
         return $this->collection;
     }
 
-    public function toArray()
+    public function augmentedArrayData()
     {
         return $this->values()->merge([
             'id' => $this->id(),
@@ -113,7 +114,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
             'collection' => $this->collectionHandle(),
             'last_modified' => $lastModified = $this->lastModified(),
             'updated_at' => $lastModified,
-            'updated_by' => optional($this->lastModifiedBy())->toArray(),
+            'updated_by' => optional($this->lastModifiedBy())->toAugmentedArray(),
         ])->merge($this->supplements)->all();
     }
 

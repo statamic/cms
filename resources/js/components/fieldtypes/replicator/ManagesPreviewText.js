@@ -1,0 +1,42 @@
+export default {
+
+    data() {
+        return {
+            previews: {},
+        }
+    },
+
+    computed: {
+        previewText() {
+            const previews = _(this.previews).filter((value, handle) => {
+                const config = _.findWhere(this.config.fields, { handle });
+                return config.replicator_preview === undefined ? true : config.replicator_preview;
+            });
+
+            return Object.values(previews)
+                .filter(value => {
+                    if (['null', '[]', '{}', ''].includes(JSON.stringify(value))) return null;
+                    return value;
+                })
+                .map(value => {
+                    if (typeof value === 'string') return value;
+
+                    if (Array.isArray(value) && typeof value[0] === 'string') {
+                        return value.join(', ');
+                    }
+
+                    return JSON.stringify(value);
+                })
+                .join(' / ');
+        }
+    },
+
+    methods: {
+        initPreviews() {
+            let previews = {};
+            this.fields.forEach(field => previews[field.handle] = null);
+            this.previews = previews;
+        }
+    }
+
+}

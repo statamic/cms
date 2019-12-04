@@ -60,6 +60,9 @@ export default {
         },
         themeClass() {
             return 'theme-' + this.config.theme;
+        },
+        replicatorPreview() {
+            return this.value.replace('<', '&lt;');
         }
     },
 

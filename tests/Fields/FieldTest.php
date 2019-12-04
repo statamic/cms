@@ -433,6 +433,7 @@ class FieldTest extends TestCase
         $this->assertEquals([
             'handle' => 'the_handle',
             'foo' => 'bar',
+            'width' => 100,
         ], $field->toArray());
     }
 

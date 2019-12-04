@@ -58,7 +58,7 @@
                         :display="__('Display')"
                         :instructions="__('messages.fields_display_instructions')"
                         width="50"
-                        autofocus
+                        autoselect
                         :value="values.display"
                         @input="updateField('display', $event, setFieldValue)"
                     />
@@ -215,10 +215,6 @@ export default {
     },
 
     methods: {
-
-        focus() {
-            this.$els.display.select();
-        },
 
         configFieldClasses(field) {
             return [

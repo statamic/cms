@@ -56,7 +56,23 @@ class TermRepository implements RepositoryContract
 
         $uri = Str::removeLeft($uri, '/');
 
-        if (! $term = $this->find(str_replace('/', '::', $uri))) {
+        [$taxonomy, $slug] = array_pad(explode('/', $uri), 2, null);
+
+        if (! $slug) {
+            return null;
+        }
+
+        if (! Taxonomy::handleExists($taxonomy)) {
+            return null;
+        }
+
+        $term = $this->query()
+            ->where('slug', $slug)
+            ->where('taxonomy', $taxonomy)
+            ->where('site', $site)
+            ->first();
+
+        if (! $term) {
             return null;
         }
 

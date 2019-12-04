@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Illuminate\Support\Arr;
 use Statamic\CP\Column;
 use Statamic\Fields\Fieldtype;
+use Illuminate\Http\Resources\Json\Resource;
 
 abstract class Relationship extends Fieldtype
 {
@@ -104,7 +105,6 @@ abstract class Relationship extends Fieldtype
     {
         return [
             'data' => $this->getItemData($this->field->value())->all(),
-            'columns' => $this->getColumns(),
             'itemDataUrl' => $this->getItemDataUrl(),
             'baseSelectionsUrl' => $this->getBaseSelectionsUrl(),
             'getBaseSelectionsUrlParameters' => $this->getBaseSelectionsUrlParameters(),
@@ -223,6 +223,14 @@ abstract class Relationship extends Fieldtype
     }
 
     abstract public function getIndexItems($request);
+
+    public function getResourceCollection($request, $items)
+    {
+        return Resource::collection($items)->additional(['meta' => [
+            'columns' => $this->getColumns(),
+            'sortColumn' => $this->getSortColumn($request),
+        ]]);
+    }
 
     public function filterExcludedItems($items, $exclusions)
     {

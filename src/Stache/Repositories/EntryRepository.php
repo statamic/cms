@@ -96,7 +96,7 @@ class EntryRepository implements RepositoryContract
         $entry->collection()->taxonomies()->each(function ($taxonomy) use ($entry) {
             $this->stache->store('terms')
                 ->store($taxonomy = $taxonomy->handle())
-                ->sync($entry->id(), $entry->value($taxonomy));
+                ->sync($entry, $entry->value($taxonomy));
         });
     }
 
@@ -114,11 +114,11 @@ class EntryRepository implements RepositoryContract
         }
     }
 
-    public function createRules($collection)
+    public function createRules($collection, $site)
     {
         return [
             'title' => 'required',
-            'slug' => 'required|unique_entry_value:'.$collection->handle(),
+            'slug' => 'required|unique_entry_value:'.$collection->handle().',null,'.$site->handle(),
         ];
     }
 
@@ -126,7 +126,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => 'required|min:3',
-            'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id(),
+            'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id().','.$entry->locale(),
         ];
     }
 }

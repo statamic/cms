@@ -2,11 +2,11 @@
 
     <div
         class="item mb-1 select-none"
-        :class="{ 'published': item.published, 'unpublished': !item.published, 'invalid': item.invalid }"
+        :class="{ 'invalid': item.invalid }"
     >
         <div class="item-move" v-if="sortable">&nbsp;</div>
         <div class="item-inner">
-            <div v-if="statusIcon" class="little-dot mr-1" />
+            <div v-if="statusIcon" class="little-dot mr-1" :class="getStatusClass(item)" />
 
             <div
                 v-if="item.invalid"
@@ -72,6 +72,16 @@ export default {
             if (! this.editable) return;
             if (this.item.invalid) return;
             this.isEditing = true;
+        },
+
+        getStatusClass(entry) {
+            if (entry.published && entry.private) {
+                return 'bg-transparent border border-grey-60';
+            } else if (entry.published) {
+                return 'bg-green';
+            } else {
+                return 'bg-grey-40';
+            }
         }
 
     }

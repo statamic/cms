@@ -4,6 +4,7 @@ namespace Statamic\Stache\Indexes\Terms;
 
 use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Indexes\Index;
+use Statamic\Support\Str;
 
 class Associations extends Index
 {
@@ -18,7 +19,12 @@ class Associations extends Index
                     ->flatMap(function ($entry) use ($handle) {
                         return collect($entry->value($handle))
                             ->map(function ($value) use ($entry) {
-                                return ['value' => $value, 'entry' => $entry->id()];
+                                return [
+                                    'value' => $value,
+                                    'slug' => Str::slug($value),
+                                    'entry' => $entry->id(),
+                                    'site' => $entry->locale()
+                                ];
                             });
                     })->all();
             })->all();

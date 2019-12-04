@@ -16,7 +16,7 @@ use Stringy\StaticStringy;
 class Statamic
 {
     const CORE_SLUG = 'statamic';
-    const CORE_REPO = 'statamic/definitely-not-v3'; // TODO: Change to `statamic/cms`
+    const CORE_REPO = 'statamic/cms';
 
     protected static $scripts = [];
     protected static $styles = [];
@@ -146,14 +146,14 @@ class Statamic
         );
     }
 
-    public static function assetUrl($url = '/')
+    public static function vendorAssetUrl($url = '/')
     {
-        return static::url('vendor/statamic/cp/' . $url);
+        return asset(URL::tidy('vendor/' . $url));
     }
 
-    public static function url($url = '/')
+    public static function cpAssetUrl($url = '/')
     {
-        return URL::tidy(Site::default()->url() . '/' . $url);
+        return static::vendorAssetUrl('statamic/cp/' . $url);
     }
 
     public static function flash()

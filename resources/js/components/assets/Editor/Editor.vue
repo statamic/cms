@@ -28,7 +28,7 @@
                     </div>
                     <div class="meta-item">
                         <span class="meta-label">{{ __('Last Modified') }}</span>
-                        <span class="meta-value" :title="asset.last_modified">{{ asset.last_modified_relative }}</span>
+                        <span class="meta-value" :title="asset.lastModified">{{ asset.lastModifiedRelative }}</span>
                     </div>
                 </div>
 
@@ -36,7 +36,7 @@
                     <a @click="open" v-tooltip="__('Open in a new window')">
                         <svg-icon name="external-link" class="h-6 w-6"/>
                     </a>
-                    <a @click="download" v-tooltip="__('Download file')" v-if="container.allow_downloading">
+                    <a @click="download" v-tooltip="__('Download file')" v-if="asset.allowDownloading">
                         <svg-icon name="download" class="h-6 w-6"/>
                     </a>
                     <a @click="close" v-tooltip="__('Close editor')">
@@ -55,11 +55,11 @@
                         </div>
                     </div>
 
-                    <div class="audio-wrapper" v-if="asset.is_audio">
+                    <div class="audio-wrapper" v-if="asset.isAudio">
                         <audio :src="asset.url" controls preload="auto"></audio>
                     </div>
 
-                    <div class="video-wrapper" v-if="asset.is_video">
+                    <div class="video-wrapper" v-if="asset.isVideo">
                         <video :src="asset.url" controls></video>
                     </div>
 
@@ -68,8 +68,8 @@
                         </object>
                     </div>
 
-                    <div class="h-full" v-if="asset.is_previewable && canUseGoogleDocsViewer">
-                        <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
+                    <div class="h-full" v-if="asset.isPreviewable && canUseGoogleDocsViewer">
+                        <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.url + '&embedded=true'"></iframe>
                     </div>
 
                     <div class="editor-file-actions">
@@ -183,7 +183,6 @@ export default {
             loading: true,
             saving: false,
             asset: null,
-            container: null,
             publishContainer: 'asset',
             values: {},
             meta: {},
@@ -205,7 +204,7 @@ export default {
         isImage() {
             if (! this.asset) return false;
 
-            return this.asset.is_image;
+            return this.asset.isImage;
         },
 
         /**
@@ -250,12 +249,12 @@ export default {
             const url = cp_url(`assets/${btoa(this.id)}`);
 
             this.$axios.get(url).then(response => {
-                this.asset = response.data.asset;
-                this.values = response.data.values;
-                this.meta = response.data.meta;
-                this.container = response.data.container;
-                this.actionUrl = response.data.actionUrl;
-                this.actions = response.data.actions;
+                const data = response.data.data;
+                this.asset = data;
+                this.values = data.values;
+                this.meta = data.meta;
+                this.actionUrl = data.actionUrl;
+                this.actions = data.actions;
                 this.getFieldset();
             });
         },
@@ -315,14 +314,17 @@ export default {
                 this.saving = false;
                 this.clearErrors();
             }).catch(e => {
+                this.saving = false;
+
                 if (e.response && e.response.status === 422) {
                     const { message, errors, error } = e.response.data;
                     this.error = message;
                     this.errors = errors;
-                    this.saving = false;
                     this.$toast.error(error);
+                } else if (e.response) {
+                    this.$toast.error(e.response.data.message);
                 } else {
-                    this.$toast.error('Something went wrong');
+                    this.$toast.error(__('Something went wrong'));
                 }
             });
         },
@@ -355,7 +357,7 @@ export default {
         },
 
         download() {
-            window.open(this.asset.download_url);
+            window.open(this.asset.downloadUrl);
         },
 
         canRunAction(handle) {

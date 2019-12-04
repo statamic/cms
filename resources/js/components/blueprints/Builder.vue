@@ -4,7 +4,7 @@
 
         <div class="flex items-center mb-3">
             <h1 class="flex-1">{{ initialTitle }}</h1>
-            <button type="submit" class="btn btn-primary" @click.prevent="save">Save</button>
+            <button type="submit" class="btn btn-primary" @click.prevent="save" v-text="__('Save')" />
         </div>
 
         <div class="publish-form card p-0">
@@ -19,8 +19,8 @@
         </div>
 
         <div class="content mt-5 mb-2">
-            <h2>Tab Sections</h2>
-            <p class="max-w-lg">The fields in each section will be grouped together into tabs. Create new fields, reuse existing fields, or import entire groups of fields from existing fieldsets.</p>
+            <h2>{{ __('Tab Sections') }}</h2>
+            <p class="max-w-lg">{{ __('messages.tab_sections_instructions') }}</p>
         </div>
 
         <sections

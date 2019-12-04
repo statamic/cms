@@ -21,13 +21,14 @@
                     v-for="filter in standardFilters"
                     :key="filter.handle"
                     :filter="filter"
-                    :initial-values="activeFilters[filter.handle]"
+                    :values="activeFilters[filter.handle]"
                     @changed="filterChanged(filter.handle, $event)"
                 />
 
                 <field-filters
-                    :filter="fieldsFilter"
-                    :initial-filters="activeFilters['fields']"
+                    v-if="fieldsFilter"
+                    :config="fieldsFilter"
+                    :filters="activeFilters['fields']"
                     @changed="filterChanged('fields', $event)"
                 />
 
@@ -76,7 +77,7 @@ export default {
         },
 
         fieldsFilter() {
-            return this.filters.filter(filter => filter.handle === 'fields')[0];
+            return this.filters.find(filter => filter.handle === 'fields');
         },
 
         preferencesPayload() {
@@ -91,14 +92,8 @@ export default {
             this.filtering = false
         },
 
-        filterChanged(handle, value) {
-            let filters = this.activeFilters;
-            if (value && ! _.isEmpty(value)) {
-                Vue.set(filters, handle, value);
-            } else {
-                Vue.delete(filters, handle);
-            }
-            this.$events.$emit('filters-changed', filters);
+        filterChanged(handle, values) {
+            this.$events.$emit('filter-changed', { handle, values });
         },
 
         save() {
@@ -121,8 +116,8 @@ export default {
             this.$preferences.remove(this.preferencesKey)
                 .then(response => {
                     this.saving = false;
-                    this.$toast.success(__('Filters reset'));
                     this.$events.$emit('filters-reset');
+                    this.$toast.success(__('Filters reset'));
                 })
                 .catch(error => {
                     this.saving = false;

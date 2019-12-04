@@ -128,24 +128,11 @@ class Variables implements Contract, Localization, AugmentableContract
         ]);
     }
 
-    public function toArray()
-    {
-        return $this->values()->merge([
-            'id' => $this->id(),
-            'handle' => $this->handle(),
-        ])->merge($this->supplements)->all();
-    }
-
     public function fileData()
     {
         return array_merge([
             'origin' => $this->hasOrigin() ? $this->origin->locale() : null,
         ], $this->data()->all());
-    }
-
-    protected function augmentedArrayData()
-    {
-        return $this->values();
     }
 
     public function reference()

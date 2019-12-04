@@ -32,7 +32,6 @@
                                 :active-filters="activeFilters"
                                 :per-page="perPage"
                                 :preferences-key="preferencesKey('filters')"
-                                @filters-changed="filtersChanged"
                                 @per-page-changed="perPageChanged" />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" />
                         </template>

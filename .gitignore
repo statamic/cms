@@ -1,6 +1,7 @@
 /vendor
 node_modules
 .DS_Store
-resources/dist
 .phpunit.result.cache
 tests/Fakes/Composer/Package/test-package/composer.json
+resources/dist
+composer.lock

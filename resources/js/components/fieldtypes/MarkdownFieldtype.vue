@@ -473,11 +473,6 @@ export default {
             }
         },
 
-        getReplicatorPreviewText() {
-            return marked(this.data || '', { renderer: new PlainTextRenderer })
-                .replace(/<\/?[^>]+(>|$)/g, "");
-        },
-
         focus() {
             this.codemirror.focus();
         },
@@ -518,7 +513,12 @@ export default {
 
         markdownPreviewText() {
             return markdown(this.data);
-        }
+        },
+
+        replicatorPreview() {
+            return marked(this.data || '', { renderer: new PlainTextRenderer })
+                .replace(/<\/?[^>]+(>|$)/g, "");
+        },
     },
 
     mounted() {

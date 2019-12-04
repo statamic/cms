@@ -13,10 +13,14 @@
                 </div>
             </h1>
 
+            <dropdown-list class="mr-2">
+                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+            </dropdown-list>
+
             <div class="pt-px text-2xs text-grey-60 flex mr-2" v-if="readOnly">
                 <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
             </div>
-
+            
             <div class="hidden md:flex items-center">
                 <button
                     v-if="!readOnly"
@@ -425,7 +429,7 @@ export default {
                 this.saving = false;
                 this.title = this.values.title;
                 this.isWorkingCopy = true;
-                if (!this.revisionsEnabled) this.permalink = response.data.permalink;
+                if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
                 if (!this.isCreating) this.$toast.success('Saved');
                 this.$refs.container.saved();
                 this.runAfterSaveHook(response);
@@ -550,8 +554,8 @@ export default {
             if (published !== undefined) this.published = this.initialPublished = published;
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
-            this.title = response.data.title;
-            this.permalink = response.data.permalink
+            this.title = response.data.data.title;
+            this.permalink = response.data.data.permalink
             this.$nextTick(() => this.$emit('saved', response));
         },
 

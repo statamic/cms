@@ -43,8 +43,10 @@ class StoreAssetTest extends TestCase
             ->submit()
             ->assertOk()
             ->assertJson([
-                'id' => 'test_container::path/to/test.jpg',
-                'path' => 'path/to/test.jpg',
+                'data' => [
+                    'id' => 'test_container::path/to/test.jpg',
+                    'path' => 'path/to/test.jpg',
+                ],
             ]);
 
         Storage::disk('test')->assertExists('path/to/test.jpg');

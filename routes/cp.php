@@ -70,6 +70,7 @@ Route::group([
             Route::get('/', 'TermsController@index')->name('taxonomies.terms.index');
             Route::post('actions', 'TermActionController')->name('taxonomies.terms.actions');
             Route::get('create/{site}', 'TermsController@create')->name('taxonomies.terms.create');
+            Route::post('create/{site}/preview', 'TermPreviewController@create')->name('taxonomies.terms.preview.create');
             Route::post('{site}', 'TermsController@store')->name('taxonomies.terms.store');
 
             Route::group(['prefix' => '{term}/{site?}'], function () {
@@ -83,6 +84,8 @@ Route::group([
                 ]);
 
                 Route::post('restore-revision', 'RestoreTermRevisionController')->name('taxonomies.terms.restore-revision');
+                Route::post('preview', 'TermPreviewController@edit')->name('taxonomies.terms.preview.edit');
+                Route::get('preview', 'TermPreviewController@show')->name('taxonomies.terms.preview.popout');
                 Route::patch('/', 'TermsController@update')->name('taxonomies.terms.update');
             });
         });
@@ -156,7 +159,8 @@ Route::group([
         Route::get('account', 'AccountController')->name('account');
         Route::resource('user-groups', 'UserGroupsController');
         Route::resource('roles', 'RolesController');
-        Route::resource('preferences', 'PreferenceController');
+        Route::resource('preferences', 'PreferenceController')->except('destroy');
+        Route::post('preferences/{key}/delete', 'PreferenceController@destroy')->name('preferences.destroy');
     });
 
     Route::post('user-exists', 'Users\UserWizardController')->name('user.exists');
