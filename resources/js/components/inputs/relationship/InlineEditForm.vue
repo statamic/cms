@@ -22,7 +22,7 @@ export default {
     methods: {
 
         saved(response) {
-            this.$emit('updated', response.data);
+            this.$emit('updated', response.data.data);
         }
 
     }
