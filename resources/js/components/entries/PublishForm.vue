@@ -13,10 +13,14 @@
                 </div>
             </h1>
 
+            <dropdown-list class="mr-2">
+                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+            </dropdown-list>
+
             <div class="pt-px text-2xs text-grey-60 flex mr-2" v-if="readOnly">
                 <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
             </div>
-
+            
             <div class="hidden md:flex items-center">
                 <button
                     v-if="!readOnly"
