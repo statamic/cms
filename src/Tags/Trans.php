@@ -11,10 +11,10 @@ class Trans extends Tags
      *
      * @return string
      */
-    public function __call($method, $args)
+    public function wildcard($tag)
     {
-        $key = $this->get('key', $this->method);
+        $key = $this->get('key', $tag);
 
-        return trans($key, $this->parameters);
+        return trans($key, $this->parameters->all());
     }
 }

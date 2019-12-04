@@ -11,11 +11,11 @@ class TransChoice extends Tags
      *
      * @return string
      */
-    public function __call($method, $args)
+    public function wildcard($tag)
     {
-        $key = $this->get('key', $this->method);
+        $key = $this->get('key', $tag);
         $count = $this->getInt('count', 1);
 
-        return trans_choice($key, $count, $this->parameters);
+        return trans_choice($key, $count, $this->parameters->all());
     }
 }
