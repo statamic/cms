@@ -143,6 +143,10 @@ class Multisite extends Command
     {
         $collection = Collection::all()->first();
 
+        if ( ! $collection) {
+            return false;
+        }
+
         $dir = "content/collections/{$collection->handle()}/{$this->siteOne}";
 
         return File::isDirectory($dir);
