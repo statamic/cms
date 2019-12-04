@@ -24,7 +24,7 @@
         :taggable="taggable"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
-        @input="selectionUpdated"
+        @input="update"
         @item-data-updated="itemDataUpdated"
     />
 
@@ -135,11 +135,6 @@ export default {
 
 
     methods: {
-
-        selectionUpdated(selection) {
-            if (JSON.stringify(selection) == JSON.stringify(this.value)) return;
-            this.update(selection);
-        },
 
         itemDataUpdated(data) {
             const meta = clone(this.meta);
