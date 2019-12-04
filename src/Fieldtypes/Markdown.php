@@ -55,15 +55,15 @@ class Markdown extends Fieldtype
     {
         $markdown = new \ParsedownExtra();
 
+        if ($this->config('smartypants')) {
+            $value = Html::smartypants($value);
+        }
+
         $html = $markdown
                 ->setBreaksEnabled($this->config('automatic_line_breaks'))
                 ->setMarkupEscaped($this->config('escape_markup'))
                 ->setUrlsLinked($this->config('automatic_links'))
                 ->text($value);
-
-        if ($this->config('smartypants')) {
-            $html = Html::smartypants($html);
-        }
 
         return $html;
     }
