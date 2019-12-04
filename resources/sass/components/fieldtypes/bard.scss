@@ -23,7 +23,7 @@
     position: sticky;
     top: 0;
     padding: 4px 8px;
-    z-index: 1;
+    z-index: 5;
 
     .bard-toolbar-button {
         @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center;
@@ -148,7 +148,7 @@
     position: absolute;
     left: -20px;
     margin-top: -6px;
-    z-index: 2;
+    z-index: 6;
     // transition: all .15s ease-in-out;
 
     .dropdown-menu {
