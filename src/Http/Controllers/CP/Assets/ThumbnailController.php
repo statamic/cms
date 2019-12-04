@@ -150,6 +150,6 @@ class ThumbnailController extends Controller
             return;
         }
 
-        return redirect(Statamic::assetUrl('img/filetypes/' . $this->asset->extension() . '.png'));
+        return redirect(Statamic::cpAssetUrl('img/filetypes/' . $this->asset->extension() . '.png'));
     }
 }
