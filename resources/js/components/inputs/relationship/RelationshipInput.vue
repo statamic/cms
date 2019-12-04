@@ -65,7 +65,7 @@
                     :site="site"
                     initial-sort-column="title"
                     initial-sort-direction="asc"
-                    :initial-selections="selections"
+                    :initial-selections="value"
                     :max-selections="maxItems"
                     :search="search"
                     :exclusions="exclusions"
@@ -132,7 +132,6 @@ export default {
         return {
             isSelecting: false,
             isCreating: false,
-            selections: this.value,
             itemData: [],
             initializing: true,
             loading: true,
@@ -143,7 +142,7 @@ export default {
     computed: {
 
         items() {
-            return this.selections.map(selection => {
+            return this.value.map(selection => {
                 const data = _.findWhere(this.itemData, { id: selection });
 
                 if (! data) return { id: selection, title: selection };
@@ -153,7 +152,7 @@ export default {
         },
 
         maxItemsReached() {
-            return this.selections.length >= this.maxItems;
+            return this.value.length >= this.maxItems;
         },
 
         canSelectOrCreate() {
@@ -175,15 +174,6 @@ export default {
 
     watch: {
 
-        selections(selections) {
-            this.$emit('input', this.selections);
-        },
-
-        value(value) {
-            if (JSON.stringify(value) == JSON.stringify(this.selections)) return;
-            this.selectionsUpdated(value);
-        },
-
         loading: {
             immediate: true,
             handler(loading) {
@@ -204,12 +194,22 @@ export default {
 
     methods: {
 
+        update(selections) {
+            if (JSON.stringify(selections) == JSON.stringify(this.value)) return;
+            this.$emit('input', selections);
+        },
+
         remove(index) {
-            this.selections.splice(index, 1);
+            this.update([
+                ...this.value.slice(0, index),
+                ...this.value.slice(index + 1),
+            ]);
         },
 
         selectionsUpdated(selections) {
-            this.getDataForSelections(selections);
+            this.getDataForSelections(selections).then(() => {
+                this.update(selections);
+            });
         },
 
         initializeData() {
@@ -227,13 +227,9 @@ export default {
             const params = { site: this.site, selections };
 
             return this.$axios.get(this.itemDataUrl, { params }).then(response => {
-                this.loading = false;
-
-                this.itemData = response.data.data;
-                this.selections = this.itemData.map(item => {
-                    return item.id;
+                    this.loading = false;
+                    this.itemData = response.data.data;
                 });
-            });
         },
 
         makeSortable() {
@@ -245,22 +241,24 @@ export default {
                 plugins: [Plugins.SwapAnimation],
                 delay: 200
             }).on('drag:start', e => {
-                this.selections.length === 1 ? e.cancel() : this.$emit('focus');
+                this.value.length === 1 ? e.cancel() : this.$emit('focus');
             }).on('drag:stop', e => {
                 this.$emit('blur');
             }).on('sortable:stop', e => {
-                this.selections.splice(e.newIndex, 0, this.selections.splice(e.oldIndex, 1)[0]);
+                const val = [...this.value];
+                val.splice(e.newIndex, 0, val.splice(e.oldIndex, 1)[0]);
+                this.update(val);
             })
         },
 
         itemCreated(item) {
-            this.selections.push(item.id);
             this.itemData.push(item);
+            this.update([...this.value, item.id]);
         },
 
         selectFieldSelected(selectedItemData) {
             this.itemData = selectedItemData.map(item => ({ id: item.id, title: item.title }));
-            this.selections = selectedItemData.map(item => item.id)
+            this.update(selectedItemData.map(item => item.id));
         }
 
     }
