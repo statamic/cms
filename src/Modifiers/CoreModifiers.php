@@ -1809,6 +1809,32 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Translates a string
+     *
+     * @param $value
+     * @return string
+     */
+    public function trans($value)
+    {
+        return trans($value);
+    }
+
+    /**
+     * Translates and pluralizes a string
+     *
+     * @param $value
+     * @param $params
+     * @param $context
+     * @return string
+     */
+    public function transChoice($value, $params, $context)
+    {
+        $count = Arr::get($context, $params[0], $params[0]);
+
+        return trans_choice($value, $count);
+    }
+
+    /**
      * Returns the trimmed string.
      * @param $value
      * @return string
