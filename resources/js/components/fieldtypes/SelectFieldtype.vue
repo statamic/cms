@@ -12,7 +12,7 @@
         :taggable="config.taggable"
         :push-tags="config.push_tags"
         :multiple="config.multiple"
-        :reset-on-options-change="typeof config.reset_on_options_change === 'boolean' ? config.reset_on_options_change : true"
+        :reset-on-options-change="resetOnOptionsChange"
         :close-on-select="!config.taggable"
         :value="value" />
 </template>
@@ -27,6 +27,18 @@ export default {
     computed: {
         options() {
             return this.normalizeInputOptions(this.config.options);
+        },
+
+        resetOnOptionsChange() {
+            // Reset logic should only happen when the config value is true.
+            // Nothing should be reset when it's false or undefined.
+            if (this.config.reset_on_options_change !== true) return false;
+
+            // Reset the value if the value doesn't exist in the new set of options.
+            return (options, old, val) => {
+                let opts = options.map(o => o.value);
+                return !val.some(v => opts.includes(v.value));
+            };
         }
     },
 

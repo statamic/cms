@@ -20,9 +20,6 @@ class Collection extends Filter
                 'options' => $options,
                 'clearable' => true,
                 'multiple' => true,
-
-                // This can be removed if/when https://github.com/sagalbot/vue-select/pull/1014 is merged
-                'reset_on_options_change' => false,
             ],
         ];
     }
