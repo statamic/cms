@@ -62,7 +62,7 @@ export default {
             return 'theme-' + this.config.theme;
         },
         replicatorPreview() {
-            return this.value.replace('<', '&lt;');
+            return this.value ? this.value.replace('<', '&lt;') : '';
         }
     },
 
