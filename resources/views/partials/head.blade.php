@@ -9,7 +9,7 @@
 <link href="{{ Statamic::cpAssetUrl('css/cp.css') }}?v={{ Statamic::version() }}" rel="stylesheet" />
 
 @foreach (Statamic::availableStyles(request()) as $name => $path)
-<link href="{{ Statamic::vendorAssetUrl("vendor/$name/css/$path") }}" rel="stylesheet" />
+<link href="{{ Statamic::vendorAssetUrl("$name/css/$path") }}" rel="stylesheet" />
 @endforeach
 
 @stack('head')
