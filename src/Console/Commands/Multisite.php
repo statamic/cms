@@ -42,9 +42,7 @@ class Multisite extends Command
 
         $config = $this->updateSiteConfig();
 
-        $collections = Collection::all();
-
-        $collections->each(function ($collection) {
+        Collection::all()->each(function ($collection) {
             $this->moveCollectionContent($collection);
             $this->addSitesToCollection($collection);
             $this->checkLine("Collection [<comment>{$collection->handle()}</comment>] updated.");
