@@ -141,10 +141,27 @@ class Multisite extends Command
 
     protected function commandMayHaveBeenRan()
     {
-        $collection = Collection::all()->first();
+        return $this->collectionsHaveBeenMoved()
+            || $this->globalsHaveBeenMoved()
+            || $this->structuresHaveBeenMoved();
+    }
 
-        $dir = "content/collections/{$collection->handle()}/{$this->siteOne}";
+    protected function collectionsHaveBeenMoved()
+    {
+        if (! $collection = Collection::all()->first()) {
+            return false;
+        }
 
-        return File::isDirectory($dir);
+        return File::isDirectory("content/collections/{$collection->handle()}/{$this->siteOne}");
+    }
+
+    protected function globalsHaveBeenMoved()
+    {
+        return File::isDirectory("content/globals/{$this->siteOne}");
+    }
+
+    protected function structuresHaveBeenMoved()
+    {
+        return File::isDirectory("content/structures/{$this->siteOne}");
     }
 }
