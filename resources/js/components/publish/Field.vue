@@ -44,7 +44,9 @@
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
 
         <slot name="fieldtype" v-if="!loadingMeta">
+            <div class="text-xs text-red" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
             <component
+                v-else
                 :is="fieldtypeComponent"
                 :config="config"
                 :value="value"
@@ -104,6 +106,10 @@ export default {
 
         fieldtypeComponent() {
             return `${this.config.component || this.config.type}-fieldtype`;
+        },
+
+        fieldtypeComponentExists() {
+            return Vue.options.components[this.fieldtypeComponent] !== undefined;
         },
 
         hasError() {
