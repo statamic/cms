@@ -42,10 +42,8 @@ class CollectionTest extends TestCase
     /** @test */
     function it_gets_and_sets_the_template()
     {
-        config(['statamic.theming.views.entry' => 'post']);
-
         $collection = new Collection;
-        $this->assertEquals('post', $collection->template());
+        $this->assertEquals('default', $collection->template());
 
         $return = $collection->template('foo');
 
@@ -56,10 +54,8 @@ class CollectionTest extends TestCase
     /** @test */
     function it_gets_and_sets_the_layout()
     {
-        config(['statamic.theming.views.layout' => 'default']);
-
         $collection = new Collection;
-        $this->assertEquals('default', $collection->layout());
+        $this->assertEquals('layout', $collection->layout());
 
         $return = $collection->layout('foo');
 

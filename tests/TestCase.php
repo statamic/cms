@@ -60,7 +60,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $configs = [
             'assets', 'cp', 'forms', 'routes', 'static_caching',
-            'sites', 'stache', 'system', 'theming', 'users'
+            'sites', 'stache', 'system', 'users'
         ];
 
         foreach ($configs as $config) {

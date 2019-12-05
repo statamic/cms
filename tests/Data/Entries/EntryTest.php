@@ -532,13 +532,11 @@ class EntryTest extends TestCase
     /** @test */
     function it_gets_and_sets_the_template()
     {
-        config(['statamic.theming.views.entry' => 'post']);
-
         $collection = tap(Collection::make('test'))->save();
         $entry = (new Entry)->collection($collection);
 
-        // defaults to the configured
-        $this->assertEquals('post', $entry->template());
+        // defaults to default
+        $this->assertEquals('default', $entry->template());
 
         // collection level overrides the configured
         $collection->template('foo');
@@ -553,13 +551,11 @@ class EntryTest extends TestCase
     /** @test */
     function it_gets_and_sets_the_layout()
     {
-        config(['statamic.theming.views.layout' => 'default']);
-
         $collection = tap(Collection::make('test'))->save();
         $entry = (new Entry)->collection($collection);
 
-        // defaults to the configured
-        $this->assertEquals('default', $entry->layout());
+        // defaults to layout
+        $this->assertEquals('layout', $entry->layout());
 
         // collection level overrides the configured
         $collection->layout('foo');

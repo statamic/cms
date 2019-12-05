@@ -145,10 +145,8 @@ class AssetContainerTest extends TestCase
     /** @test */
     function it_gets_and_sets_blueprint()
     {
-        config(['statamic.theming.blueprints.asset' => 'default-asset']);
-
         BlueprintRepository::shouldReceive('find')
-            ->with('default-asset')
+            ->with('asset')
             ->andReturn($defaultBlueprint = new Blueprint);
 
         BlueprintRepository::shouldReceive('find')

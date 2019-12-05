@@ -161,8 +161,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $this
             ->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) {
-                return Blueprint::find($blueprint ?? config('statamic.theming.blueprints.asset'))
-                    ?? Blueprint::find('asset');
+                return Blueprint::find($blueprint ?? 'asset');
             })
             ->args(func_get_args());
     }

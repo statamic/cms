@@ -337,8 +337,7 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
     public function template($template = null)
     {
         if (func_num_args() === 0) {
-            return $this->get('template')
-                ?? config('statamic.theming.views.term'); // todo: get the fallback template from the collection
+            return $this->get('template', 'default');
         }
 
         return $this->set('template', $template);
@@ -347,7 +346,7 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
     public function layout($layout = null)
     {
         if (func_num_args() === 0) {
-            return $this->get('layout', config('statamic.theming.views.layout'));
+            return $this->get('layout', 'layout');
         }
 
         return $this->set('layout', $layout);
