@@ -300,6 +300,16 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Dump, Die, and Debug using Ignition
+     *
+     * @param $value
+     */
+    public function ddd($value)
+    {
+        ddd($value);
+    }
+
+    /**
      * Dump a var into the Debug bar for data exploration
      *
      * @param $value
