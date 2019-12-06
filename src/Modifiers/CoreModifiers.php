@@ -372,7 +372,7 @@ class CoreModifiers extends Modifier
      */
     public function dump($value)
     {
-        dd($value);
+        function_exists('ddd') ? ddd($value) : dd($value);
     }
 
     /**
