@@ -84,6 +84,28 @@ class BardTest extends TestCase
     }
 
     /** @test */
+    function it_augments_to_html_when_there_are_no_sets()
+    {
+        $data = [
+            [
+                'type' => 'paragraph',
+                'content' => [
+                    ['type' => 'text', 'text' => 'This is a paragraph with '],
+                    ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
+                    ['type' => 'text', 'text' => ' and '],
+                    ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
+                    ['type' => 'text', 'text' => ' text.'],
+                ]
+            ]
+        ];
+
+        $expected = '<p>This is a paragraph with <strong>bold</strong> and <em>italic</em> text.</p>';
+
+        $this->assertEquals($expected, $this->bard(['sets' => []])->augment($data));
+        $this->assertEquals($expected, $this->bard(['sets' => null])->augment($data));
+    }
+
+    /** @test */
     function it_removes_disabled_sets()
     {
         $data = [
@@ -302,6 +324,6 @@ class BardTest extends TestCase
 
     private function bard($config = [])
     {
-        return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard'], $config)));
+        return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));
     }
 }
