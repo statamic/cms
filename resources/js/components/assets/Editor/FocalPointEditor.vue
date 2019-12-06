@@ -70,7 +70,6 @@ export default {
             x: 50,
             y: 50,
             z: 1,
-            reticleSize: 0,
             imageDimensions: null,
         }
     },
@@ -85,14 +84,13 @@ export default {
     },
 
 
-    watch: {
+    computed: {
 
-        z(z) {
-            if (!this.imageDimensions) return 0;
-
+        reticleSize() {
+            if (!this.imageDimensions || !this.z) return 0;
             const smaller = Math.min(this.imageDimensions.w, this.imageDimensions.h);
-            this.reticleSize = smaller / z;
-        }
+            return smaller / this.z;
+        },
 
     },
 
