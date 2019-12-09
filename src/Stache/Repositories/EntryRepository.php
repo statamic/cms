@@ -125,7 +125,7 @@ class EntryRepository implements RepositoryContract
     public function updateRules($collection, $entry)
     {
         return [
-            'title' => 'required|min:3',
+            'title' => 'required',
             'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id().','.$entry->locale(),
         ];
     }
