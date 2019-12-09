@@ -12,7 +12,6 @@ Vue.component('slug-fieldtype', require('../components/fieldtypes/SlugFieldtype.
 
 // Fieldtypes
 import FieldsetFieldtype from '../components/fieldtypes/FieldsetFieldtype.vue'
-import RelateFieldtype from '../components/fieldtypes/relate/RelateFieldtype.vue'
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
 import RoutesFieldtype from '../components/fieldtypes/RoutesFieldtype.vue'
 import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
@@ -38,7 +37,6 @@ Vue.component('list-fieldtype', require('../components/fieldtypes/ListFieldtype.
 Vue.component('markdown-fieldtype', require('../components/fieldtypes/MarkdownFieldtype.vue').default);
 Vue.component('radio-fieldtype', require('../components/fieldtypes/RadioFieldtype.vue').default);
 Vue.component('range-fieldtype', require('../components/fieldtypes/RangeFieldtype.vue').default);
-Vue.component('relate-fieldtype', RelateFieldtype);
 Vue.component('relationship-fieldtype', require('../components/fieldtypes/relationship/RelationshipFieldtype.vue').default);
 Vue.component('relationship-fieldtype-index', require('../components/fieldtypes/relationship/RelationshipIndexFieldtype.vue').default);
 Vue.component('replicator-fieldtype', require('../components/fieldtypes/replicator/Replicator.vue').default);
