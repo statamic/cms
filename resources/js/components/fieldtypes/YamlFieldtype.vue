@@ -5,9 +5,6 @@
     </div>
 </template>
 
-<style src="codemirror/theme/material.css">
-</style>
-
 <script>
 import CodeMirror from 'codemirror'
 import 'codemirror/mode/yaml/yaml'
