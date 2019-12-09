@@ -5,7 +5,6 @@ button, .btn, .btn-* {
     cursor: pointer;
 }
 
-.selectize-control.single .selectize-input,
 .btn,
 .btn-default {
     @include button(#fff, $color_gray_dark);

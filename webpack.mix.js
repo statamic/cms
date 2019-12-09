@@ -29,7 +29,6 @@ mix.extract([
     'marked-plaintext',
     'moment',
     'mousetrap',
-    'selectize',
     'sweetalert',
     '@shopify/draggable',
     'speakingurl',
