@@ -148,7 +148,7 @@ abstract class Tags
     public function parse($data = [])
     {
         return Antlers::usingParser($this->parser, function ($antlers) use ($data) {
-            return $antlers->parse($this->content, $data);
+            return $antlers->parse($this->content, array_merge($this->context->all(), $data));
         });
     }
 
