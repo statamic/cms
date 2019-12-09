@@ -21,7 +21,7 @@ trait HasScopes
 
     protected function parseQueryScopes()
     {
-        $scopes = Arr::getFirst($this->parameters, ['query', 'filter']);
+        $scopes = Arr::getFirst($this->parameters, ['query-scope', 'filter']);
 
         return collect(explode('|', $scopes));
     }
