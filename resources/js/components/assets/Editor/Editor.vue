@@ -157,12 +157,16 @@
 
 
 <script>
+import EditorActions from './EditorActions.vue';
+import FocalPointEditor from './FocalPointEditor.vue';
+import PublishFields from '../../publish/Fields.vue';
+
 export default {
 
     components: {
-        EditorActions: require('./EditorActions.vue'),
-        FocalPointEditor: require('./FocalPointEditor.vue'),
-        PublishFields: require('../../publish/Fields.vue'),
+        EditorActions,
+        FocalPointEditor,
+        PublishFields,
     },
 
     props: {
