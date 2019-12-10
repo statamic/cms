@@ -32,6 +32,7 @@
 
 <script>
 import Asset from './Asset';
+require('lazysizes')
 
 export default {
 
