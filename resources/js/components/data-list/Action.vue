@@ -62,15 +62,11 @@ export default {
     computed: {
 
         confirmationText() {
-            return this.selections === 1
-                ? __(this.action.confirmationText.single)
-                : __n(this.action.confirmationText.plural, this.selections);
+            return __n(this.action.confirmationText, this.selections);
         },
 
         runButtonText() {
-            return this.selections === 1
-                ? __(this.action.buttonText.single)
-                : __n(this.action.buttonText.plural, this.selections);
+            return __n(this.action.buttonText, this.selections);
         }
 
     },

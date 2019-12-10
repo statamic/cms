@@ -18,18 +18,12 @@ class SendPasswordReset extends Action
 
     public function confirmationText()
     {
-        return [
-            'single' => 'Send password reset email to this user?',
-            'plural' => 'Send password reset email to these :count users?'
-        ];
+        return 'Send password reset email to this user?|Send password reset email to these :count users?';
     }
 
     public function buttonText()
     {
-        return [
-            'single' => 'Send',
-            'plural' => 'Send to :count users'
-        ];
+        return 'Send|Send to :count users';
     }
 
     public function run($users)

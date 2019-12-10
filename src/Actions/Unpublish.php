@@ -19,18 +19,12 @@ class Unpublish extends Action
 
     public function confirmationText()
     {
-        return [
-            'single' => 'Are you sure you want to unpublish this entry?',
-            'plural' => 'Are you sure you want to unpublish these :count entries?'
-        ];
+        return 'Are you sure you want to unpublish this entry?|Are you sure you want to unpublish these :count entries?';
     }
 
     public function buttonText()
     {
-        return [
-            'single' => 'Unpublish Entry',
-            'plural' => 'Unpublish :count Entries'
-        ];
+        return 'Unpublish Entry|Unpublish :count Entries';
     }
 
     public function run($entries)

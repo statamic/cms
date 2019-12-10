@@ -18,18 +18,12 @@ class Delete extends Action
 
     public function buttonText()
     {
-        return [
-            'single' => 'Delete',
-            'plural' => 'Delete :count items?'
-        ];
+        return 'Delete|Delete :count items?';
     }
 
     public function confirmationText()
     {
-        return [
-            'single' => 'Are you sure you want to want to delete this?',
-            'plural' => 'Are you sure you want to delete these :count items?'
-        ];
+        return 'Are you sure you want to want to delete this?|Are you sure you want to delete these :count items?';
     }
 
     public function run($items)

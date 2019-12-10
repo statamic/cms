@@ -53,19 +53,14 @@ abstract class Action implements Arrayable
 
     public function buttonText()
     {
-        return [
-            'single' => 'Run action',
-            'plural' => 'Run action on :count items'
-        ];
+        return 'Run action|Run action on :count items';
     }
 
     public function confirmationText()
     {
-        return [
-            'single' => 'Are you sure you want to run this action?',
-            'plural' => 'Are you sure you want to run this action on :count items?'
-        ];
+        return 'Are you sure you want to run this action?|Are you sure you want to run this action on :count items?';
     }
+
     public function toArray()
     {
         return [

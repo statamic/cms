@@ -19,18 +19,12 @@ class Publish extends Action
 
     public function confirmationText()
     {
-        return [
-            'single' => 'Are you sure you want to publish this entry?',
-            'plural' => 'Are you sure you want to publish these :count entries?'
-        ];
+        return 'Are you sure you want to publish this entry?|Are you sure you want to publish these :count entries?';
     }
 
     public function buttonText()
     {
-        return [
-            'single' => 'Publish Entry',
-            'plural' => 'Publish :count Entries'
-        ];
+        return 'Publish Entry|Publish :count Entries';
     }
 
     public function run($entries)

@@ -21,18 +21,12 @@ class MoveAsset extends Action
 
     public function buttonText()
     {
-        return [
-            'single' => 'Move Asset',
-            'plural' => 'Move :count Assets'
-        ];
+        return 'Move Asset|Move :count Assets';
     }
 
     public function confirmationText()
     {
-        return [
-            'single' => 'Are you sure you want to move this asset?',
-            'plural' => 'Are you sure you want to move these :count assets?'
-        ];
+        return 'Are you sure you want to move this asset?|Are you sure you want to move these :count assets?';
     }
 
     public function run($assets, $values)

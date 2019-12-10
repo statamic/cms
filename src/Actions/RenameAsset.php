@@ -20,18 +20,12 @@ class RenameAsset extends Action
 
     public function buttonText()
     {
-        return [
-            'single' => 'Rename Asset',
-            'plural' => 'Rename :count Assets'
-        ];
+        return 'Rename Asset|Rename :count Assets';
     }
 
-        public function confirmationText()
+    public function confirmationText()
     {
-        return [
-            'single' => 'Are you sure you want to rename this asset?',
-            'plural' => 'Are you sure you want to rename these :count assets?'
-        ];
+        return 'Are you sure you want to rename this asset?|Are you sure you want to rename these :count assets?';
     }
 
     public function run($assets, $values)
