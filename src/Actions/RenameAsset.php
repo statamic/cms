@@ -18,6 +18,22 @@ class RenameAsset extends Action
         return $user->can('rename', $asset);
     }
 
+    public function buttonText()
+    {
+        return [
+            'single' => 'Rename Asset',
+            'plural' => 'Rename :count Assets'
+        ];
+    }
+
+        public function confirmationText()
+    {
+        return [
+            'single' => 'Are you sure you want to rename this asset?',
+            'plural' => 'Are you sure you want to rename these :count assets?'
+        ];
+    }
+
     public function run($assets, $values)
     {
         return $assets->each->rename($values['filename'], true);

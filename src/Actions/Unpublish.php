@@ -17,6 +17,22 @@ class Unpublish extends Action
         return $user->can('publish', $entry);
     }
 
+    public function confirmationText()
+    {
+        return [
+            'single' => 'Are you sure you want to unpublish this entry?',
+            'plural' => 'Are you sure you want to unpublish these :count entries?'
+        ];
+    }
+
+    public function buttonText()
+    {
+        return [
+            'single' => 'Unpublish Entry',
+            'plural' => 'Unpublish :count Entries'
+        ];
+    }
+
     public function run($entries)
     {
         $entries->each(function ($entry) {

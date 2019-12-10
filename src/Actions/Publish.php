@@ -17,6 +17,22 @@ class Publish extends Action
         return $user->can('publish', $entry);
     }
 
+    public function confirmationText()
+    {
+        return [
+            'single' => 'Are you sure you want to publish this entry?',
+            'plural' => 'Are you sure you want to publish these :count entries?'
+        ];
+    }
+
+    public function buttonText()
+    {
+        return [
+            'single' => 'Publish Entry',
+            'plural' => 'Publish :count Entries'
+        ];
+    }
+
     public function run($entries)
     {
         $entries->each(function ($entry) {

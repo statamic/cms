@@ -19,6 +19,22 @@ class MoveAsset extends Action
         return $user->can('move', $asset);
     }
 
+    public function buttonText()
+    {
+        return [
+            'single' => 'Move Asset',
+            'plural' => 'Move :count Assets'
+        ];
+    }
+
+    public function confirmationText()
+    {
+        return [
+            'single' => 'Are you sure you want to move this asset?',
+            'plural' => 'Are you sure you want to move these :count assets?'
+        ];
+    }
+
     public function run($assets, $values)
     {
         $assets->each->move($values['folder']);
