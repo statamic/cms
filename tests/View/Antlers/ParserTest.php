@@ -966,14 +966,14 @@ EOT;
         $template = <<<EOT
 {{ string }}
 {{ tag }}
-    {{ count }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} >{{ string }}<
+    {{ count }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} {{ string }}
 {{ /tag }}
 EOT;
 
         $expected = <<<EOT
 Hello wilderness
-    1 first not-last a b ><
-    2 not-first last c d ><
+    1 first not-last a b Hello wilderness
+    2 not-first last c d Hello wilderness
 
 EOT;
 
@@ -1019,14 +1019,14 @@ EOT;
         $template = <<<EOT
 {{ string }}
 {{ tag }}
-    {{ count }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} >{{ string }}<
+    {{ count }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} {{ string }}
 {{ /tag }}
 EOT;
 
         $expected = <<<EOT
 Hello wilderness
-    1 first not-last a b ><
-    2 not-first last c d ><
+    1 first not-last a b Hello wilderness
+    2 not-first last c d Hello wilderness
 
 EOT;
 
