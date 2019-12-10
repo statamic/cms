@@ -16,8 +16,10 @@ fields:
     field:
       type: user_roles
       width: 50
+      mode: select
   -
     handle: groups
     field:
       type: user_groups
       width: 50
+      mode: select
