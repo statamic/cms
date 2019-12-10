@@ -1141,6 +1141,34 @@ EOT;
     }
 
     /** @test */
+    function scope_modifier_can_add_scopes()
+    {
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+            'array' => [
+                ['drink' => 'juice'],
+                ['drink' => 'smoothie'],
+            ]
+        ];
+
+        $template = <<<EOT
+{{ food }} {{ drink }}
+{{ array scope="s" }}
+-{{ s:food }}- {{ s:drink }}
+{{ /array }}
+EOT;
+
+        $expected = <<<EOT
+burger whisky
+-- juice
+-- smoothie
+
+EOT;
+        $this->assertEquals($expected, Antlers::parse($template, $context));
+    }
+
+    /** @test */
     function it_can_reach_into_the_cascade()
     {
         $cascade = $this->mock(Cascade::class, function ($m) {

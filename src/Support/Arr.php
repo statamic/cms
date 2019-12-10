@@ -2,8 +2,9 @@
 
 namespace Statamic\Support;
 
-use Statamic\Data\DataCollection;
+use Exception;
 use Illuminate\Support\Arr as IlluminateArr;
+use Statamic\Data\DataCollection;
 
 class Arr extends IlluminateArr
 {
@@ -38,6 +39,24 @@ class Arr extends IlluminateArr
         }
 
         return parent::has($array, $key);
+    }
+
+    public static function addScope($array, $scope)
+    {
+        if (static::isAssoc($array)) {
+            $array[$scope] = $array;
+            return $array;
+        }
+
+        return collect($array)->map(function ($value) use ($scope) {
+            if (! is_array($value)) {
+                throw new Exception('Scopes can only be added to associative or multidimensional arrays.');
+            }
+
+            $value[$scope] = $value;
+
+            return $value;
+        })->all();
     }
 
     /**
