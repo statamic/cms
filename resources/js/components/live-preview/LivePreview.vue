@@ -186,7 +186,7 @@ export default {
     created() {
         this.editorWidth = localStorage.getItem(widthLocalStorageKey) || 400
 
-        this.$mousetrap.bindGlobal('mod+shift+p', () => {
+        this.$keys.bindGlobal('mod+shift+p', () => {
             this.previewing ? this.close() : this.$emit('opened-via-keyboard');
         });
     },
@@ -196,7 +196,7 @@ export default {
     },
 
     destroyed() {
-        this.$mousetrap.unbind('mod+shift+p');
+        this.$keys.unbind('mod+shift+p');
     },
 
     methods: {

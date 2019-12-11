@@ -54,11 +54,11 @@ export default {
     },
 
     created() {
-        this.$mousetrap.bind('esc', this.dismiss)
+        this.$keys.bind('esc', this.dismiss)
     },
 
     destroyed() {
-        this.$mousetrap.unbind('esc')
+        this.$keys.unbind('esc')
     },
 
     methods: {

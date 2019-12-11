@@ -172,7 +172,7 @@ Statamic.app({
     mounted() {
         this.bindWindowResizeListener();
 
-        this.$mousetrap.bind(['command+\\'], e => {
+        this.$keys.bind(['command+\\'], e => {
             e.preventDefault();
             this.toggleNav();
         });

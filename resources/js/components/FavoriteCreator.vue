@@ -87,7 +87,7 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bindGlobal(['esc'], e => {
+        this.$keys.bindGlobal(['esc'], e => {
             this.$refs.popper.doClose();
         });
     }

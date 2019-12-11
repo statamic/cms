@@ -364,11 +364,11 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bindGlobal(['command+return'], e => {
+        this.$keys.bindGlobal(['command+return'], e => {
             this.next();
         });
 
-        this.$mousetrap.bindGlobal(['command+delete'], e => {
+        this.$keys.bindGlobal(['command+delete'], e => {
             this.previous();
         });
     }

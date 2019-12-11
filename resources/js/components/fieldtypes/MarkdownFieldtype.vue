@@ -559,7 +559,7 @@ export default {
             }
         });
 
-        this.$mousetrap.bind('esc', this.closeFullScreen)
+        this.$keys.bind('esc', this.closeFullScreen)
 
         this.trackHeightUpdates();
     }
