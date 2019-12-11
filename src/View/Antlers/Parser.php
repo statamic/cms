@@ -891,6 +891,12 @@ class Parser
             $next_tag = null;
             $children = Arr::get($data, $array_key);
 
+            // if the array key is scoped, we'll add a scope to the array
+            if (strpos($array_key, ':') !== false) {
+                $scope = explode(':', $array_key)[0];
+                $children = Arr::addScope($children, $scope);
+            }
+
             $child_count = count($children);
             $count = 1;
 

@@ -479,6 +479,18 @@ EOT;
         $this->assertEquals($expected, Antlers::parse($template, []));
     }
 
+    public function testRecursiveChildrenWithScope()
+    {
+        // the variables are inside RecursiveChildren@index
+        $this->app['statamic.tags']['recursive_children'] = \Foo\Bar\Tags\RecursiveChildren::class;
+
+        $template = '<ul>{{ recursive_children scope="item" }}<li>{{ item:title }}{{ if item:children }}<ul>{{ *recursive item:children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
+
+        $expected = '<ul><li>One<ul><li>Two</li><li>Three<ul><li>Four</li></ul></li></ul></li></ul>';
+
+        $this->assertEquals($expected, Antlers::parse($template, []));
+    }
+
     public function testEmptyValuesAreNotOverriddenByPreviousIteration()
     {
         $variables = [
@@ -537,6 +549,11 @@ EOT;
         $this->assertEquals(
             '[one][two]',
             Antlers::parse('{{ hello:world }}[{{ baz }}]{{ /hello:world }}', $variables)
+        );
+
+        $this->assertEquals(
+            '[one][two]',
+            Antlers::parse('{{ hello:world scope="s" }}[{{ s:baz }}]{{ /hello:world }}', $variables)
         );
     }
 
@@ -939,6 +956,30 @@ EOT;
         $template = <<<EOT
 {{ tag }}
     {{ one }} {{ two }}
+{{ /tag }}
+EOT;
+
+        $expected = <<<EOT
+    a b
+
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template));
+    }
+
+    /** @test */
+    function callback_tags_that_return_unparsed_simple_arrays_get_parsed_with_scope()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return ['one' => 'a', 'two' => 'b'];
+            }
+        })::register();
+
+        $template = <<<EOT
+{{ tag scope="foo" }}
+    {{ foo:one }} {{ foo:two }}
 {{ /tag }}
 EOT;
 
