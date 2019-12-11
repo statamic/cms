@@ -25,7 +25,7 @@ return [
     'create_{taxonomy}_terms' => 'Bedingungen erstellen',
     'delete_{taxonomy}_terms' => 'Bedingungen löschen',
     'publish_{taxonomy}_terms' => 'Veröffentlichungsstatus verwalten',
-    'reorder_{taxonomy}_terms' => 'Bedingungen nachbestellen',
+    'reorder_{taxonomy}_terms' => 'Bedingungen neu anordnen',
     'group_structures' => 'Strukturen',
     'configure_structures' => 'Strukturen konfigurieren',
     'configure_structures_desc' => 'Gewährt Zugriff auf alle strukturbezogenen Berechtigungen',
