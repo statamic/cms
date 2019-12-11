@@ -318,7 +318,9 @@ export default {
             confirmingPublish: false,
             readOnly: this.initialReadOnly,
             isRoot: this.initialIsRoot,
-            permalink: this.initialPermalink
+            permalink: this.initialPermalink,
+
+            saveKeyBinding: null,
         }
     },
 
@@ -586,7 +588,7 @@ export default {
     },
 
     mounted() {
-        this.$keys.bindGlobal(['mod+s'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal('mod+s', e => {
             e.preventDefault();
             if (this.confirmingPublish) return;
             this.save();
@@ -597,6 +599,10 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+    },
+
+    destroyed() {
+        this.saveKeyBinding.destroy();
     }
 
 }
