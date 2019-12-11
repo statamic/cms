@@ -35,14 +35,15 @@ class Antlers
      * @param string  $content
      * @param array   $data
      * @param bool    $supplement
+     * @param array   $context
      * @return string
      */
-    public function parseLoop($content, $data, $supplement = true)
+    public function parseLoop($content, $data, $supplement = true, $context = [])
     {
         $total  = count($data);
         $i = 0;
 
-        return collect($data)->reduce(function ($carry, $item) use ($content, &$i, $total, $supplement) {
+        return collect($data)->reduce(function ($carry, $item) use ($content, &$i, $total, $supplement, $context) {
             if ($supplement) {
                 $item = array_merge($item, [
                     'index' => $i,
@@ -55,7 +56,7 @@ class Antlers
 
             $i++;
 
-            return $carry . $this->parse($content, $item);
+            return $carry . $this->parse($content, array_merge($context, $item));
         }, '');
     }
 }

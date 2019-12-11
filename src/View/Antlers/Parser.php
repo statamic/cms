@@ -291,8 +291,8 @@ class Parser
             // so it can be parsed over like the other cases, and then we'll pick out the first one after.
             $value = ($associative = Arr::assoc($value)) ? [$value] : $this->addLoopIterationVariables($value);
 
-            $parses = collect($value)->map(function ($iteration) use ($contents) {
-                return $this->parseLoopInstance($contents, $iteration);
+            $parses = collect($value)->map(function ($iteration) use ($contents, $data) {
+                return $this->parseLoopInstance($contents, array_merge($data, $iteration));
             });
 
             // Again, associative arrays just need the single iteration, so we'll grab
@@ -890,6 +890,12 @@ class Parser
 
             $next_tag = null;
             $children = Arr::get($data, $array_key);
+
+            // if the array key is scoped, we'll add a scope to the array
+            if (strpos($array_key, ':') !== false) {
+                $scope = explode(':', $array_key)[0];
+                $children = Arr::addScope($children, $scope);
+            }
 
             $child_count = count($children);
             $count = 1;

@@ -1479,6 +1479,22 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Place variables in a scope
+     *
+     * @param  $value
+     * @param  $params
+     * @return array
+     */
+    public function scope($value, $params)
+    {
+        if (! $scope = Arr::get($params, 0)) {
+            throw new \Exception('Scope modifier requires a name.');
+        }
+
+        return Arr::addScope($value, $scope);
+    }
+
+    /**
      * Returns a segment by number from any valid URL or UI
      *
      * @param  $value
