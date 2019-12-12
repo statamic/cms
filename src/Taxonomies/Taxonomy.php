@@ -98,7 +98,7 @@ class Taxonomy implements Contract, Responsable
 
     public function fallbackTermBlueprint()
     {
-        return Blueprint::find(config('statamic.theming.blueprints.default'));
+        return Blueprint::find('default');
     }
 
     public function sortField()
@@ -228,7 +228,7 @@ class Taxonomy implements Contract, Responsable
 
     public function layout()
     {
-        return config('statamic.theming.views.layout');
+        return 'layout';
     }
 
     public function searchIndex($index = null)

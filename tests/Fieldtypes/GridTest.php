@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Fields\Fieldtypes;
+namespace Tests\Fieldtypes;
 
 use Tests\TestCase;
 use Statamic\Fields\Field;

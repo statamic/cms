@@ -147,8 +147,12 @@ abstract class Tags
      */
     public function parse($data = [])
     {
+        if ($scope = $this->get('scope')) {
+            $data = Arr::addScope($data, $scope);
+        }
+
         return Antlers::usingParser($this->parser, function ($antlers) use ($data) {
-            return $antlers->parse($this->content, $data);
+            return $antlers->parse($this->content, array_merge($this->context->all(), $data));
         });
     }
 
@@ -165,8 +169,12 @@ abstract class Tags
             return $this->parse([$as => $data]);
         }
 
+        if ($scope = $this->get('scope')) {
+            $data = Arr::addScope($data, $scope);
+        }
+
         return Antlers::usingParser($this->parser, function ($antlers) use ($data, $supplement) {
-            return $antlers->parseLoop($this->content, $data, $supplement);
+            return $antlers->parseLoop($this->content, $data, $supplement, $this->context->all());
         });
     }
 

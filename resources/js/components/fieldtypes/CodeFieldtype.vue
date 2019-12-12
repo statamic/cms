@@ -5,8 +5,6 @@
     </div>
 </template>
 
-<style src="codemirror/theme/material.css"></style>
-
 <script>
 import CodeMirror from 'codemirror'
 
@@ -62,7 +60,10 @@ export default {
             return 'theme-' + this.config.theme;
         },
         replicatorPreview() {
-            return this.value.replace('<', '&lt;');
+            return this.value ? this.value.replace('<', '&lt;') : '';
+        },
+        readOnlyOption() {
+            return this.isReadOnly ? 'nocursor' : false;
         }
     },
 
@@ -77,13 +78,16 @@ export default {
             lineNumbers: this.config.line_numbers,
             lineWrapping: this.config.line_wrapping,
             matchBrackets: true,
-            readOnly: this.isReadOnly ? 'nocursor' : false,
+            readOnly: this.readOnlyOption,
             theme: this.exactTheme,
         });
 
         this.codemirror.on('change', (cm) => {
             this.update(cm.doc.getValue());
         });
+
+        this.codemirror.on('focus', () => this.$emit('focus'));
+        this.codemirror.on('blur', () => this.$emit('blur'));
 
         // Refresh to ensure proper size
         // Most applicable when loaded by another field like Bard, etc
@@ -96,6 +100,10 @@ export default {
         value(value, oldValue) {
             if (value == this.codemirror.doc.getValue()) return;
             this.codemirror.doc.setValue(value);
+        },
+
+        readOnlyOption(val) {
+            this.codemirror.setOption('readOnly', val);
         }
     },
 

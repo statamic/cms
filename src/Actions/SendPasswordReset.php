@@ -16,6 +16,18 @@ class SendPasswordReset extends Action
         return $authed->can('sendPasswordReset', $user);
     }
 
+    public function confirmationText()
+    {
+        /** @translation */
+        return 'Send password reset email to this user?|Send password reset email to these :count users?';
+    }
+
+    public function buttonText()
+    {
+        /** @translation */
+        return 'Send|Send to :count users';
+    }
+
     public function run($users)
     {
         $users->each->generateTokenAndSendPasswordResetNotification();

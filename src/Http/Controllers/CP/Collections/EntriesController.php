@@ -108,6 +108,7 @@ class EntriesController extends CpController
                 'revisions' => $entry->revisionsUrl(),
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),
+                'editBlueprint' => $blueprint->editUrl(),
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,

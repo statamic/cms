@@ -300,6 +300,16 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Dump, Die, and Debug using Ignition
+     *
+     * @param $value
+     */
+    public function ddd($value)
+    {
+        ddd($value);
+    }
+
+    /**
      * Dump a var into the Debug bar for data exploration
      *
      * @param $value
@@ -362,7 +372,7 @@ class CoreModifiers extends Modifier
      */
     public function dump($value)
     {
-        dd($value);
+        function_exists('ddd') ? ddd($value) : dd($value);
     }
 
     /**
@@ -1469,6 +1479,22 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Place variables in a scope
+     *
+     * @param  $value
+     * @param  $params
+     * @return array
+     */
+    public function scope($value, $params)
+    {
+        if (! $scope = Arr::get($params, 0)) {
+            throw new \Exception('Scope modifier requires a name.');
+        }
+
+        return Arr::addScope($value, $scope);
+    }
+
+    /**
      * Returns a segment by number from any valid URL or UI
      *
      * @param  $value
@@ -1806,6 +1832,32 @@ class CoreModifiers extends Modifier
     public function toTabs($value, $params)
     {
         return Stringy::toTabs($value, Arr::get($params, 0, 4));
+    }
+
+    /**
+     * Translates a string
+     *
+     * @param $value
+     * @return string
+     */
+    public function trans($value)
+    {
+        return trans($value);
+    }
+
+    /**
+     * Translates and pluralizes a string
+     *
+     * @param $value
+     * @param $params
+     * @param $context
+     * @return string
+     */
+    public function transChoice($value, $params, $context)
+    {
+        $count = Arr::get($context, $params[0], $params[0]);
+
+        return trans_choice($value, $count);
     }
 
     /**

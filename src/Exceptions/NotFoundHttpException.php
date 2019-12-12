@@ -27,7 +27,7 @@ class NotFoundHttpException extends SymfonyException
     {
         $layouts = collect([
             'errors.layout',
-            config('statamic.theming.views.layout'),
+            'layout',
             'statamic::blank'
         ]);
 

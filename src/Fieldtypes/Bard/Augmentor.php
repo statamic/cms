@@ -24,6 +24,10 @@ class Augmentor
             return $value;
         }
 
+        if (! $this->fieldtype->config('sets')) {
+            return $this->convertToHtml($value);
+        }
+
         if (!$this->includeDisabledSets) {
             $value = $this->removeDisabledSets($value);
         }

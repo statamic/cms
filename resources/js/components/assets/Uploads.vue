@@ -16,13 +16,15 @@
 
 
 <script>
+import Upload from './Upload.vue';
+
 export default {
 
     props: ['uploads'],
 
 
     components: {
-        Upload: require('./Upload.vue')
+        Upload
     },
 
 

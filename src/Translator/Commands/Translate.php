@@ -80,7 +80,7 @@ class Translate extends Command
             ->mapWithKeys(function ($string, $english) use ($lang, $bar) {
                 if ($string == '') {
                     // Only translate empty lines
-                    $string = $this->translate($english, $lang);
+                    $string = $this->translate((new Placeholders)->wrap($english), $lang);
                     $bar->advance();
                 }
                 return [$english => $string];

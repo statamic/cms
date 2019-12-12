@@ -190,7 +190,7 @@ class Collection implements Contract
 
     public function fallbackEntryBlueprint()
     {
-        return Blueprint::find(config('statamic.theming.blueprints.default'));
+        return Blueprint::find('default');
     }
 
     public function ensureEntryBlueprintFields($blueprint)
@@ -239,7 +239,7 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('template')
             ->getter(function ($template) {
-                return $template ?? config('statamic.theming.views.entry');
+                return $template ?? 'default';
             })
             ->args(func_get_args());
     }
@@ -249,7 +249,7 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('layout')
             ->getter(function ($layout) {
-                return $layout ?? config('statamic.theming.views.layout');
+                return $layout ?? 'layout';
             })
             ->args(func_get_args());
     }

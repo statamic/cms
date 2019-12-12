@@ -26,7 +26,6 @@ class StoreAssetTest extends TestCase
 
         $this->container = (new AssetContainer)
             ->handle('test_container')
-            ->blueprint('test_blueprint')
             ->disk('test')
             ->save();
 

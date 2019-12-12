@@ -67,4 +67,9 @@ class Markdown extends Fieldtype
 
         return $html;
     }
+
+    public function preProcessIndex($value)
+    {
+        return $value ? Html::markdown($value) : $value;
+    }
 }

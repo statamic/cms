@@ -1,11 +1,13 @@
 import Vue from 'vue';
 import Echo from './Echo';
 import Bard from './Bard';
+import Keys from './keys/Keys';
 import Hooks from './Hooks';
 import Components from './Components';
 import FieldConditions from './FieldConditions';
 const echo = new Echo;
 const bard = new Bard;
+const keys = new Keys;
 const hooks = new Hooks;
 const components = new Components;
 const conditions = new FieldConditions;
@@ -43,6 +45,10 @@ export default new Vue({
 
         $conditions() {
             return conditions;
+        },
+
+        $keys() {
+            return keys;
         },
 
         user() {

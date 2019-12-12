@@ -27,12 +27,12 @@ class Route implements Responsable
 
     public function template()
     {
-        return $this->get('template', config('statamic.theming.views.default'));
+        return $this->get('template', 'default');
     }
 
     public function layout()
     {
-        return $this->get('layout', config('statamic.theming.views.layout'));
+        return $this->get('layout', 'layout');
     }
 
     public function url()

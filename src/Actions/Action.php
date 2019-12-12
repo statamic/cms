@@ -51,12 +51,26 @@ abstract class Action implements Arrayable
         return true;
     }
 
+    public function buttonText()
+    {
+        /** @translation */
+        return 'Run action|Run action on :count items';
+    }
+
+    public function confirmationText()
+    {
+        /** @translation */
+        return 'Are you sure you want to run this action?|Are you sure you want to run this action on :count items?';
+    }
+
     public function toArray()
     {
         return [
             'handle' => $this->handle(),
             'title' => $this->title(),
             'confirm' => $this->confirm,
+            'buttonText' => $this->buttonText(),
+            'confirmationText' => $this->confirmationText(),
             'dangerous' => $this->dangerous,
             'fields' => $this->fields()->toPublishArray(),
             'meta' => $this->fields()->meta(),

@@ -224,7 +224,11 @@ class Bard extends Replicator
             return false;
         }
 
-        $configuredTypes = array_keys($this->config('sets', []));
+        if (! $setConfig = $this->config('sets')) {
+            return false;
+        }
+
+        $configuredTypes = array_keys($setConfig);
         $configuredTypes[] = 'text';
         $dataTypes = collect($value)->map->type;
 

@@ -529,6 +529,10 @@ class AssetTest extends TestCase
     /** @test */
     function data_keys_get_added_to_array()
     {
+        Facades\Blueprint::shouldReceive('find')->once()
+            ->with('test_blueprint')
+            ->andReturn((new Blueprint)->setHandle('test_blueprint'));
+
         $array = (new Asset)
             ->container($this->container)
             ->set('title', 'test')
@@ -544,6 +548,10 @@ class AssetTest extends TestCase
     /** @test */
     function extra_keys_get_added_to_array_when_file_exists()
     {
+        Facades\Blueprint::shouldReceive('find')->once()
+            ->with('test_blueprint')
+            ->andReturn((new Blueprint)->setHandle('test_blueprint'));
+
         $container = $this->container;
         Storage::disk('test')->put('test.txt', '');
 

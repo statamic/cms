@@ -30,7 +30,7 @@
                     {{ __('messages.role_change_handle_warning') }}
                 </div>
 
-                <div class="form-group publish-field field-w-full">
+                <div class="form-group publish-field w-1/2">
                     <label class="publish-field-label" v-text="__('Roles')" />
                     <publish-field-meta
                         :config="{ handle: 'roles', type: 'user_roles' }"
@@ -38,7 +38,7 @@
                         <div slot-scope="{ meta, value, loading }">
                             <relationship-fieldtype
                                 v-if="!loading"
-                                :config="{ handle: 'roles', type: 'user_roles' }"
+                                :config="{ handle: 'roles', type: 'user_roles', mode: 'select' }"
                                 :value="value"
                                 :meta="meta"
                                 handle="roles"
@@ -130,7 +130,7 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
             this.save();
         });

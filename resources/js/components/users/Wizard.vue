@@ -70,11 +70,29 @@
                     <div slot-scope="{ meta, value, loading }">
                         <relationship-fieldtype
                             v-if="!loading"
-                            :config="{ handle: 'user.roles', type: 'user_roles' }"
+                            handle="user.roles"
+                            :config="{ type: 'user_roles', mode: 'select' }"
                             :value="value"
                             :meta="meta"
-                            name="user.roles"
                             @input="user.roles = $event" />
+                    </div>
+                </publish-field-meta>
+            </div>
+
+            <!-- Groups -->
+            <div class="pb-5" v-if="! user.super">
+                <label class="font-bold text-base mb-sm" for="group">{{ __('Groups') }}</label>
+                <publish-field-meta
+                    :config="{ handle: 'user.groups', type: 'user_groups' }"
+                    :initial-value="user.groups">
+                    <div slot-scope="{ meta, value, loading }">
+                        <relationship-fieldtype
+                            v-if="!loading"
+                            handle="user.groups"
+                            :config="{ type: 'user_groups', mode: 'select' }"
+                            :value="value"
+                            :meta="meta"
+                            @input="user.groups = $event" />
                     </div>
                 </publish-field-meta>
             </div>
@@ -129,6 +147,7 @@
                 <p class="mb-1" v-html="__('messages.user_wizard_invitation_share', { email: user.email })" />
                 <textarea readonly class="input-text" v-elastic onclick="this.select()">
 {{ __('Activation URL') }}: {{ activationUrl }}
+
 {{ __('Username') }}: {{ user.email }}
 </textarea>
             </div>
@@ -142,11 +161,14 @@
                 <button tabindex="4" class="btn mx-2 w-32" :disabled="! canContinue" @click="next" v-if="! completed && ! onLastStep">
                     {{ __('Next')}} &rarr;
                 </button>
-                <button tabindex="4" class="btn-primary mx-3" @click="submit" v-if="! completed && onLastStep">
+                <button tabindex="4" class="btn-primary mx-2" @click="submit" v-if="! completed && onLastStep">
                     {{ finishButtonText }}
                 </button>
-                <a :href="editUrl" class="btn-primary mx-3" v-if="completed">
-                    {{ __('Edit User') }}
+                <a :href="usersIndexUrl" class="btn mx-2" v-if="completed">
+                    {{ __('Back to Users') }}
+                </a>
+                <a :href="usersCreateUrl" class="btn-primary mx-2" v-if="completed">
+                    {{ __('Create Another') }}
                 </a>
             </div>
         </div>
@@ -164,9 +186,9 @@ export default {
     mixins: [HasWizardSteps],
 
     props: {
-        route: {
-            type: String
-        }
+        route: { type: String },
+        usersCreateUrl: { type: String },
+        usersIndexUrl: { type: String }
     },
 
     data() {
@@ -175,7 +197,8 @@ export default {
             user: {
                 email: null,
                 super: true,
-                roles: []
+                roles: [],
+                groups: []
             },
             invitation: {
                 send: true,
@@ -241,11 +264,11 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bindGlobal(['command+return'], e => {
+        this.$keys.bindGlobal(['command+return'], e => {
             this.next();
         });
 
-        this.$mousetrap.bindGlobal(['command+delete'], e => {
+        this.$keys.bindGlobal(['command+delete'], e => {
             this.previous();
         });
     }

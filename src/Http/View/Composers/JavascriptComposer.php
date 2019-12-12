@@ -23,7 +23,7 @@ class JavascriptComposer
             'csrfToken' => csrf_token(),
             'cpRoot' => str_start(config('statamic.cp.route'), '/'),
             'urlPath' => '/' . request()->path(),
-            'resourceUrl' => Statamic::assetUrl(),
+            'resourceUrl' => Statamic::cpAssetUrl(),
             'locales' => config('statamic.system.locales'),
             'flash' => Statamic::flash(),
             'ajaxTimeout' => config('statamic.system.ajax_timeout'),

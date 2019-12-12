@@ -479,6 +479,18 @@ EOT;
         $this->assertEquals($expected, Antlers::parse($template, []));
     }
 
+    public function testRecursiveChildrenWithScope()
+    {
+        // the variables are inside RecursiveChildren@index
+        $this->app['statamic.tags']['recursive_children'] = \Foo\Bar\Tags\RecursiveChildren::class;
+
+        $template = '<ul>{{ recursive_children scope="item" }}<li>{{ item:title }}{{ if item:children }}<ul>{{ *recursive item:children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
+
+        $expected = '<ul><li>One<ul><li>Two</li><li>Three<ul><li>Four</li></ul></li></ul></li></ul>';
+
+        $this->assertEquals($expected, Antlers::parse($template, []));
+    }
+
     public function testEmptyValuesAreNotOverriddenByPreviousIteration()
     {
         $variables = [
@@ -537,6 +549,11 @@ EOT;
         $this->assertEquals(
             '[one][two]',
             Antlers::parse('{{ hello:world }}[{{ baz }}]{{ /hello:world }}', $variables)
+        );
+
+        $this->assertEquals(
+            '[one][two]',
+            Antlers::parse('{{ hello:world scope="s" }}[{{ s:baz }}]{{ /hello:world }}', $variables)
         );
     }
 
@@ -951,6 +968,30 @@ EOT;
     }
 
     /** @test */
+    function callback_tags_that_return_unparsed_simple_arrays_get_parsed_with_scope()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+            public function index() {
+                return ['one' => 'a', 'two' => 'b'];
+            }
+        })::register();
+
+        $template = <<<EOT
+{{ tag scope="foo" }}
+    {{ foo:one }} {{ foo:two }}
+{{ /tag }}
+EOT;
+
+        $expected = <<<EOT
+    a b
+
+EOT;
+
+        $this->assertEquals($expected, Antlers::parse($template));
+    }
+
+    /** @test */
     function callback_tags_that_return_unparsed_multidimensional_arrays_get_parsed()
     {
         (new class extends Tags {
@@ -966,14 +1007,14 @@ EOT;
         $template = <<<EOT
 {{ string }}
 {{ tag }}
-    {{ count }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} >{{ string }}<
+    {{ count }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} {{ string }}
 {{ /tag }}
 EOT;
 
         $expected = <<<EOT
 Hello wilderness
-    1 first not-last a b ><
-    2 not-first last c d ><
+    1 first not-last a b Hello wilderness
+    2 not-first last c d Hello wilderness
 
 EOT;
 
@@ -1019,14 +1060,14 @@ EOT;
         $template = <<<EOT
 {{ string }}
 {{ tag }}
-    {{ count }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} >{{ string }}<
+    {{ count }} {{ if first }}first{{ else }}not-first{{ /if }} {{ if last }}last{{ else }}not-last{{ /if }} {{ one }} {{ two }} {{ string }}
 {{ /tag }}
 EOT;
 
         $expected = <<<EOT
 Hello wilderness
-    1 first not-last a b ><
-    2 not-first last c d ><
+    1 first not-last a b Hello wilderness
+    2 not-first last c d Hello wilderness
 
 EOT;
 
@@ -1085,62 +1126,14 @@ EOT;
     }
 
     /** @test */
-    function callback_tag_pair_context_is_limited_to_its_own_variables()
-    {
-        (new class extends Tags {
-            public static $handle = 'tag';
-            public function index() {
-                return ['drink' => 'juice'];
-            }
-        })::register();
-
-        $context = [
-            'drink' => 'whisky',
-            'food' => 'burger',
-        ];
-
-        $template = <<<EOT
-{{ drink }} {{ food }}
->{{ tag }}{{ drink }} {{ food }}{{ /tag }}<
-EOT;
-
-        $expected = <<<EOT
-whisky burger
->juice <
-EOT;
-        $this->assertEquals($expected, Antlers::parse($template, $context));
-    }
-
-    /** @test */
-    function variable_tag_pair_context_is_limited_to_its_own_variables()
-    {
-        $context = [
-            'drink' => 'whisky',
-            'food' => 'burger',
-            'array' => ['drink' => 'juice']
-        ];
-
-        $template = <<<EOT
-{{ drink }} {{ food }}
->{{ array }}{{ drink }} {{ food }}{{ /array }}<
-EOT;
-
-        $expected = <<<EOT
-whisky burger
->juice <
-EOT;
-        $this->assertEquals($expected, Antlers::parse($template, $context));
-    }
-
-    /** @test */
-    function tags_can_access_context()
+    function callback_tag_pair_variables_get_context_merged_in_but_nulls_remain_null()
     {
         (new class extends Tags {
             public static $handle = 'tag';
             public function index() {
                 return [
-                    'parameter' => $this->context['food'],
                     'drink' => 'juice',
+                    'activity' => null,
                 ];
             }
         })::register();
@@ -1148,18 +1141,71 @@ EOT;
         $context = [
             'drink' => 'whisky',
             'food' => 'burger',
+            'activity' => 'singing',
         ];
 
         $template = <<<EOT
-{{ drink }} {{ food }}
->{{ tag }}{{ parameter }} {{ drink }} {{ food }}{{ /tag }}<
+{{ drink }} {{ food }} {{ activity }}
+{{ tag }}{{ drink }} {{ food }} -{{ activity }}-{{ /tag }}
 EOT;
 
         $expected = <<<EOT
-whisky burger
->burger juice <
+whisky burger singing
+juice burger --
+EOT;
+        $this->assertEquals($expected, Antlers::parse($template, $context));
+    }
+
+    /** @test */
+    function variable_tag_pair_get_context_merged_in_except_for_nulls()
+    {
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+            'activity' => 'singing',
+            'array' => [
+                'drink' => 'juice',
+                'activity' => null,
+            ]
+        ];
+
+        $template = <<<EOT
+{{ drink }} {{ food }} {{ activity }}
+{{ array }}{{ drink }} {{ food }} -{{ activity }}-{{ /array }}
 EOT;
 
+        $expected = <<<EOT
+whisky burger singing
+juice burger --
+EOT;
+        $this->assertEquals($expected, Antlers::parse($template, $context));
+    }
+
+    /** @test */
+    function scope_modifier_can_add_scopes()
+    {
+        $context = [
+            'drink' => 'whisky',
+            'food' => 'burger',
+            'array' => [
+                ['drink' => 'juice'],
+                ['drink' => 'smoothie'],
+            ]
+        ];
+
+        $template = <<<EOT
+{{ food }} {{ drink }}
+{{ array scope="s" }}
+-{{ s:food }}- {{ s:drink }}
+{{ /array }}
+EOT;
+
+        $expected = <<<EOT
+burger whisky
+-- juice
+-- smoothie
+
+EOT;
         $this->assertEquals($expected, Antlers::parse($template, $context));
     }
 
@@ -1217,19 +1263,26 @@ EOT;
         $context = [
             'drink' => 'whisky',
             'food' => 'burger',
-            'array' => ['drink' => 'juice']
+            'activity' => 'singing',
+            'array' => [
+                'drink' => 'juice',
+                'activity' => null,
+            ]
         ];
 
         $template = <<<EOT
 {{ scope:test }}
 drink: {{ drink }}
 food: {{ food }}
+activity: {{ activity }}
 
 {{ array }}
     array:drink: {{ drink }}
-    array:food: >{{ food }}<
+    array:food: {{ food }}
+    array:activity: -{{ activity }}-
     array:test:drink: {{ test:drink }}
     array:test:food: {{ test:food }}
+    array:test:activity: {{ test:activity }}
 {{ /array }}
 {{ /scope:test }}
 EOT;
@@ -1237,11 +1290,14 @@ EOT;
         $expected = <<<EOT
 drink: whisky
 food: burger
+activity: singing
 
     array:drink: juice
-    array:food: ><
+    array:food: burger
+    array:activity: --
     array:test:drink: whisky
     array:test:food: burger
+    array:test:activity: singing
 EOT;
 
         $this->assertEquals($expected, trim(Antlers::parse($template, $context)));

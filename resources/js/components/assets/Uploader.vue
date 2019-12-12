@@ -1,4 +1,6 @@
 <script>
+require('dmuploader')
+
 export default {
 
     render(h) {

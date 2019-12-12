@@ -18,6 +18,18 @@ class RenameAsset extends Action
         return $user->can('rename', $asset);
     }
 
+    public function buttonText()
+    {
+        /** @translation */
+        return 'Rename Asset|Rename :count Assets';
+    }
+
+    public function confirmationText()
+    {
+        /** @translation */
+        return 'Are you sure you want to rename this asset?|Are you sure you want to rename these :count assets?';
+    }
+
     public function run($assets, $values)
     {
         return $assets->each->rename($values['filename'], true);
@@ -29,6 +41,7 @@ class RenameAsset extends Action
             'filename' => [
                 'type' => 'text',
                 'validate' => 'required', // TODO: Better filename validation
+                'classes' => 'mousetrap'
             ]
         ];
     }

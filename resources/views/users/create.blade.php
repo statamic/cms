@@ -3,6 +3,9 @@
 
 @section('content')
     <user-wizard
-        route="{{ cp_route('users.store') }}">
+        route="{{ cp_route('users.store') }}"
+        users-index-url="{{ cp_route('users.index') }}"
+        users-create-url="{{ cp_route('users.create') }}"
+    >
     </user-wizard>
 @stop

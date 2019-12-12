@@ -20,7 +20,13 @@ class MethodDiscovery
         $strings = [];
 
         foreach ($this->files->allFiles($this->paths) as $file) {
-            if (preg_match_all('/' . $this->regex() . '/imu', $file->getContents(), $matches)) {
+            if (preg_match_all('/' . $this->methodRegex() . '/imu', $file->getContents(), $matches)) {
+                foreach ($matches[2] as $match) {
+                    $strings[] = trim(stripcslashes($match));
+                }
+            }
+
+            if (preg_match_all('/' . $this->annotatedReturnRegex() . '/imu', $file->getContents(), $matches)) {
                 foreach ($matches[2] as $match) {
                     $strings[] = trim(stripcslashes($match));
                 }
@@ -30,11 +36,17 @@ class MethodDiscovery
         return collect($strings);
     }
 
-    protected function regex()
+    protected function methodRegex()
     {
         return '(trans(?:_choice)?|__n?)'
             . '\([\'"`]'
             . '([\w\d\s\t\n\r,.\'\":\\\?!@£$%^&*<>_\-=\|\+]+)'
             . '[\'\"`]';
+    }
+
+    protected function annotatedReturnRegex()
+    {
+        return '\/\** @translation \*\/\s+'
+            . 'return ([\'"])([\w\d\s\t\n\r,.\'\":\\\?!@£$%^&*<>_\-=\|\+]+)\1;';
     }
 }

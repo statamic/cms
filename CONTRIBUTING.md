@@ -24,7 +24,7 @@ This is a guideline for contributing to Statamic, its documentation, and addons.
 
 ### Statamic isn’t FOSS
 
-Statamic is not Free Open Soft Software. It is **proprietary**. Everything in this and our other repos on Github — including community-contributed code — is the property of Wilderborn. For that reason there are a few limitations on how you can use the code:
+Statamic is not Free Open Source Software. It is **proprietary**. Everything in this and our other repos on Github — including community-contributed code — is the property of Wilderborn. For that reason there are a few limitations on how you can use the code:
 
 - You cannot redistribute or use Statamic as a dependency in another project — open source or otherwise — without prior permission or licensing.
 - You cannot alter anything related to licensing, updating, version/edition checking, or anything else that would circumvent our business model. We want to stay in business so we can support _you_ better.
@@ -74,7 +74,7 @@ If you would like to work on a new core feature or improvement, first create a [
 
 ### Compiled Assets
 
-If you are submitting a change that will affect a compiled file, such as most of the files in `resources/sass` or `resources/j`s, do not commit the compiled files. Due to their large size, they cannot realistically be reviewed by our team. This could be exploited as a way to inject malicious code into Statamic. In order to defensively prevent this, all compiled files will be generated and committed by the core Statamic team.
+If you are submitting a change that will affect a compiled file, such as most of the files in `resources/sass` or `resources/js`, do not commit the compiled files. Due to their large size, they cannot realistically be reviewed by our team. This could be exploited as a way to inject malicious code into Statamic. In order to defensively prevent this, all compiled files will be generated and committed by the core Statamic team.
 
 ### Control Panel Translations
 

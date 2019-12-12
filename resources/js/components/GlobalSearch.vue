@@ -192,7 +192,7 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bind(['/', 'ctrl+f', 'alt+f', 'shift+f'], e => {
+        this.$keys.bind(['/', 'ctrl+f', 'alt+f', 'shift+f'], e => {
             e.preventDefault();
             this.focus();
         });

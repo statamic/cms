@@ -1,9 +1,9 @@
-<script src="{{ Statamic::assetUrl('js/manifest.js') }}?v={{ Statamic::version() }}"></script>
-<script src="{{ Statamic::assetUrl('js/vendor.js') }}?v={{ Statamic::version() }}"></script>
-<script src="{{ Statamic::assetUrl('js/app.js') }}?v={{ Statamic::version() }}"></script>
+<script src="{{ Statamic::cpAssetUrl('js/manifest.js') }}?v={{ Statamic::version() }}"></script>
+<script src="{{ Statamic::cpAssetUrl('js/vendor.js') }}?v={{ Statamic::version() }}"></script>
+<script src="{{ Statamic::cpAssetUrl('js/app.js') }}?v={{ Statamic::version() }}"></script>
 
 @foreach (Statamic::availableScripts(request()) as $name => $path)
-    <script src="{{ Statamic::url("vendor/$name/js/$path") }}"></script>
+    <script src="{{ Statamic::vendorAssetUrl("$name/js/$path") }}"></script>
 @endforeach
 
 <script>

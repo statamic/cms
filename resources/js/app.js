@@ -57,12 +57,10 @@ Statamic.booting(Statamic => {
 });
 
 Vue.prototype.$axios = axios;
-Vue.prototype.$mousetrap = require('mousetrap');
-require('mousetrap/plugins/global-bind/mousetrap-global-bind');
-
 Vue.prototype.$events = new Vue();
 Vue.prototype.$echo = Statamic.$echo;
 Vue.prototype.$bard = Statamic.$bard;
+Vue.prototype.$keys = Statamic.$keys;
 
 window.moment = Vue.moment = Vue.prototype.$moment = require('moment');
 
@@ -103,43 +101,43 @@ Statamic.app({
     store: Statamic.$store,
 
     components: {
-        GlobalSearch: require('./components/GlobalSearch.vue'),
-        SiteSelector: require('./components/SiteSelector.vue'),
-        PageTree: require('./components/structures/PageTree.vue'),
+        GlobalSearch: require('./components/GlobalSearch.vue').default,
+        SiteSelector: require('./components/SiteSelector.vue').default,
+        PageTree: require('./components/structures/PageTree.vue').default,
         Login: require('./components/login/login'),
-        LoginModal: require('./components/login/LoginModal.vue'),
-        BaseEntryCreateForm: require('./components/entries/BaseCreateForm.vue'),
-        BaseTermCreateForm: require('./components/terms/BaseCreateForm.vue'),
-        CreateEntryButton: require('./components/entries/CreateEntryButton.vue'),
-        CreateTermButton: require('./components/terms/CreateTermButton.vue'),
+        LoginModal: require('./components/login/LoginModal.vue').default,
+        BaseEntryCreateForm: require('./components/entries/BaseCreateForm.vue').default,
+        BaseTermCreateForm: require('./components/terms/BaseCreateForm.vue').default,
+        CreateEntryButton: require('./components/entries/CreateEntryButton.vue').default,
+        CreateTermButton: require('./components/terms/CreateTermButton.vue').default,
         Importer: require('./components/importer/importer'),
-        FieldsetListing: require('./components/fieldsets/Listing.vue'),
-        FieldsetEditForm: require('./components/fieldsets/EditForm.vue'),
-        BlueprintListing: require('./components/blueprints/Listing.vue'),
-        BlueprintBuilder: require('./components/blueprints/Builder.vue'),
-        FormListing: require('./components/forms/Listing.vue'),
-        FormSubmissionListing: require('./components/forms/SubmissionListing.vue'),
-        GlobalListing: require('./components/globals/Listing.vue'),
-        GlobalPublishForm: require('./components/globals/PublishForm.vue'),
-        GlobalCreateForm: require('./components/globals/Create.vue'),
-        UserListing: require('./components/users/Listing.vue'),
-        UserWizard: require('./components/users/Wizard.vue'),
-        RoleListing: require('./components/roles/Listing.vue'),
-        RolePublishForm: require('./components/roles/PublishForm.vue'),
-        UserGroupListing: require('./components/user-groups/Listing.vue'),
-        UserGroupPublishForm: require('./components/user-groups/PublishForm.vue'),
-        CollectionWizard: require('./components/collections/Wizard.vue'),
-        CollectionEditForm: require('./components/collections/EditForm.vue'),
-        SessionExpiry: require('./components/SessionExpiry.vue'),
-        StructureWizard: require('./components/structures/Wizard.vue'),
-        StructureListing: require('./components/structures/Listing.vue'),
-        StructureEditForm: require('./components/structures/EditForm.vue'),
-        Stacks: require('./components/stacks/Stacks.vue'),
-        TaxonomyWizard: require('./components/taxonomies/Wizard.vue'),
-        TaxonomyEditForm: require('./components/taxonomies/EditForm.vue'),
-        AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue'),
-        AssetContainerEditForm: require('./components/asset-containers/EditForm.vue'),
-        FormWizard: require('./components/forms/Wizard.vue'),
+        FieldsetListing: require('./components/fieldsets/Listing.vue').default,
+        FieldsetEditForm: require('./components/fieldsets/EditForm.vue').default,
+        BlueprintListing: require('./components/blueprints/Listing.vue').default,
+        BlueprintBuilder: require('./components/blueprints/Builder.vue').default,
+        FormListing: require('./components/forms/Listing.vue').default,
+        FormSubmissionListing: require('./components/forms/SubmissionListing.vue').default,
+        GlobalListing: require('./components/globals/Listing.vue').default,
+        GlobalPublishForm: require('./components/globals/PublishForm.vue').default,
+        GlobalCreateForm: require('./components/globals/Create.vue').default,
+        UserListing: require('./components/users/Listing.vue').default,
+        UserWizard: require('./components/users/Wizard.vue').default,
+        RoleListing: require('./components/roles/Listing.vue').default,
+        RolePublishForm: require('./components/roles/PublishForm.vue').default,
+        UserGroupListing: require('./components/user-groups/Listing.vue').default,
+        UserGroupPublishForm: require('./components/user-groups/PublishForm.vue').default,
+        CollectionWizard: require('./components/collections/Wizard.vue').default,
+        CollectionEditForm: require('./components/collections/EditForm.vue').default,
+        SessionExpiry: require('./components/SessionExpiry.vue').default,
+        StructureWizard: require('./components/structures/Wizard.vue').default,
+        StructureListing: require('./components/structures/Listing.vue').default,
+        StructureEditForm: require('./components/structures/EditForm.vue').default,
+        Stacks: require('./components/stacks/Stacks.vue').default,
+        TaxonomyWizard: require('./components/taxonomies/Wizard.vue').default,
+        TaxonomyEditForm: require('./components/taxonomies/EditForm.vue').default,
+        AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue').default,
+        AssetContainerEditForm: require('./components/asset-containers/EditForm.vue').default,
+        FormWizard: require('./components/forms/Wizard.vue').default,
     },
 
     data: {
@@ -172,7 +170,7 @@ Statamic.app({
     mounted() {
         this.bindWindowResizeListener();
 
-        this.$mousetrap.bind(['command+\\'], e => {
+        this.$keys.bind(['command+\\'], e => {
             e.preventDefault();
             this.toggleNav();
         });

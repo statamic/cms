@@ -132,14 +132,18 @@ require('codemirror/mode/php/php');
 require('codemirror/mode/yaml/yaml');
 require('codemirror/addon/edit/continuelist');
 
+import Selector from '../assets/Selector.vue';
+import Uploader from '../assets/Uploader.vue';
+import Uploads from '../assets/Uploads.vue';
+
 export default {
 
     mixins: [Fieldtype],
 
     components: {
-        selector: require('../assets/Selector.vue'),
-        Uploader: require('../assets/Uploader.vue'),
-        Uploads: require('../assets/Uploads.vue'),
+        Selector,
+        Uploader,
+        Uploads
     },
 
     data: function() {
@@ -555,7 +559,7 @@ export default {
             }
         });
 
-        this.$mousetrap.bind('esc', this.closeFullScreen)
+        this.$keys.bind('esc', this.closeFullScreen)
 
         this.trackHeightUpdates();
     }

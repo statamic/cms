@@ -14,15 +14,20 @@ export default {
     computed: {
 
         text() {
-            if (!this.value) return '';
+            let value = this.value;
 
-            if (typeof this.value !== 'string') return JSON.stringify(this.value);
+            if (!value) return '';
 
-            if (this.value.length > this.truncateAt) {
-                return this.value.substring(0, this.truncateAt) + '&hellip;';
+            if (typeof value !== 'string') return JSON.stringify(value);
+
+            // Basic html stripping. https://stackoverflow.com/a/5002161
+            value = value.replace(/<\/?[^>]+(>|$)/g, '');
+
+            if (value.length > this.truncateAt) {
+                value = value.substring(0, this.truncateAt) + '&hellip;';
             }
 
-            return this.value;
+            return value;
         }
 
     },

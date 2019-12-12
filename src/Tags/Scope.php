@@ -10,8 +10,8 @@ class Scope extends Tags
     {
         throw_unless($this->isPair, new \Exception('Scope tag must be a pair'));
 
-        app(Cascade::class)->set($this->method, $this->context);
+        app(Cascade::class)->set($this->method, $this->context->all());
 
-        return $this->context;
+        return $this->context->all();
     }
 }

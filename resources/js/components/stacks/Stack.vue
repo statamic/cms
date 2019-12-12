@@ -134,7 +134,7 @@ export default {
     mounted() {
         this.visible = true;
 
-        this.$mousetrap.bindGlobal(['esc'], e => {
+        this.$keys.bindGlobal(['esc'], e => {
             this.close();
         });
     }

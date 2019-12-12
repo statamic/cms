@@ -51,7 +51,8 @@ export default {
 
     data() {
         return {
-            open: false
+            open: false,
+            keybinding: null,
         }
     },
 
@@ -59,9 +60,9 @@ export default {
 
         open(open) {
             if (open) {
-                this.$mousetrap.bind('esc', () => this.open = false);
+                this.keybinding = this.$keys.bind('esc', () => this.open = false);
             } else {
-                this.$mousetrap.unbind('esc');
+                this.keybinding.destroy();
             }
         },
     },
@@ -73,7 +74,7 @@ export default {
     },
 
     created() {
-        this.$mousetrap.bind('?', () => this.open = !this.open);
+        this.$keys.bind('?', () => this.open = !this.open);
 
         this.$events.$on('keyboard-shortcuts.open', () => {
            this.open = true;
