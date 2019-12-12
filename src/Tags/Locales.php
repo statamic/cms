@@ -23,7 +23,7 @@ class Locales extends Tags
      */
     public function index()
     {
-        return $this->parseLoop($this->getLocales());
+        return $this->getLocales();
     }
 
     /**
@@ -55,7 +55,7 @@ class Locales extends Tags
             return $this->sort($locales);
         })->pipe(function ($locales) {
             return $this->addData($locales);
-        });
+        })->values();
     }
 
     /**
@@ -101,7 +101,7 @@ class Locales extends Tags
      */
     private function getLocalizedData($locale)
     {
-        return $this->getData()->in($locale)->toArray();
+        return $this->getData()->in($locale)->toAugmentedArray();
     }
 
     /**
@@ -115,7 +115,7 @@ class Locales extends Tags
             return $this->data;
         }
 
-        $id = $this->get('id', array_get($this->context, 'id')->value());
+        $id = $this->get('id', $this->context->get('id'));
 
         return $this->data = Entry::find($id);
     }
