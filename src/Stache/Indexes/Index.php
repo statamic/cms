@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Indexes;
 
 use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Stache;
 
 abstract class Index
 {
@@ -80,6 +81,10 @@ abstract class Index
 
     public function update()
     {
+        if (! Stache::shouldUpdateIndexes()) {
+            return $this;
+        }
+
         debugbar()->addMessage("Updating index: {$this->store->key()}/{$this->name}", 'stache');
 
         $this->items = $this->getItems();
