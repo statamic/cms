@@ -370,9 +370,19 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      */
-    public function dump($value)
+    public function dd($value)
     {
         function_exists('ddd') ? ddd($value) : dd($value);
+    }
+
+    /**
+     * Dump a variable
+     *
+     * @param $value
+     */
+    public function dump($value)
+    {
+        dump($value);
     }
 
     /**
