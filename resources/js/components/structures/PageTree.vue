@@ -197,7 +197,7 @@ export default {
     created() {
         this.updateTreeData();
 
-        this.$mousetrap.bindGlobal(['mod+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
             this.save();
         });

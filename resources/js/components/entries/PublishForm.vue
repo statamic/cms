@@ -20,7 +20,7 @@
             <div class="pt-px text-2xs text-grey-60 flex mr-2" v-if="readOnly">
                 <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
             </div>
-            
+
             <div class="hidden md:flex items-center">
                 <button
                     v-if="!readOnly"
@@ -318,7 +318,9 @@ export default {
             confirmingPublish: false,
             readOnly: this.initialReadOnly,
             isRoot: this.initialIsRoot,
-            permalink: this.initialPermalink
+            permalink: this.initialPermalink,
+
+            saveKeyBinding: null,
         }
     },
 
@@ -586,7 +588,7 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bindGlobal(['mod+s'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal('mod+s', e => {
             e.preventDefault();
             if (this.confirmingPublish) return;
             this.save();
@@ -597,6 +599,10 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+    },
+
+    destroyed() {
+        this.saveKeyBinding.destroy();
     }
 
 }

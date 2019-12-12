@@ -54,8 +54,8 @@ export default {
     },
 
     created() {
-        this.$mousetrap.bind('esc', this.dismiss)
-        this.$mousetrap.bind('enter', this.submit)
+        this.$keys.bind('esc', this.dismiss)
+        this.$keys.bind('enter', this.submit)
     },
 }
 </script>

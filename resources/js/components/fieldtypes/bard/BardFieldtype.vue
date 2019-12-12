@@ -235,7 +235,7 @@ export default {
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.$mousetrap.bind('esc', this.closeFullscreen)
+        this.$keys.bind('esc', this.closeFullscreen)
 
         this.$nextTick(() => this.mounted = true);
     },
