@@ -18,8 +18,6 @@ class Locales extends Tags
 
     /**
      * The {{ locales }} tag.
-     *
-     * @return string
      */
     public function index()
     {
@@ -28,18 +26,18 @@ class Locales extends Tags
 
     /**
      * The {{ locale:[key] }} tag.
-     *
-     * @param string $method  The locale key
-     * @param array  $args
-     * @return string
      */
-    public function __call($method, $args)
+    public function wildcard($key)
     {
-        $data = $this->getLocalizedData($key = $this->method);
+        if (! $site = Site::get($key)) {
+            throw new \Exception("Site [$key] does not exist.");
+        }
 
-        $data['locale'] = $this->getLocale($key);
+        $data = $this->getLocalizedData($key);
 
-        return $this->parse($data);
+        $data['locale'] = $this->getLocale($site);
+
+        return $data;
     }
 
     /**
