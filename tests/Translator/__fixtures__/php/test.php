@@ -21,4 +21,28 @@ class Test
             trans_choice("php trans_choice double quote :param", 2, ['param']),
         ];
     }
+
+    public function returnMethodOne()
+    {
+        /** @translation */
+        return 'php annotated return single quote string';
+    }
+
+    public function returnMethodTwo()
+    {
+        /** @translation */
+        return 'php annotated return single quote :param';
+    }
+
+    public function returnMethodThree()
+    {
+        /** @translation */
+        return "php annotated return double quote string";
+    }
+
+    public function returnMethodFour()
+    {
+        /** @translation */
+        return 'php annotated return double quote :param';
+    }
 }
