@@ -51,7 +51,8 @@ export default {
 
     data() {
         return {
-            open: false
+            open: false,
+            keybinding: null,
         }
     },
 
@@ -59,9 +60,9 @@ export default {
 
         open(open) {
             if (open) {
-                this.$keys.bind('esc', () => this.open = false);
+                this.keybinding = this.$keys.bind('esc', () => this.open = false);
             } else {
-                this.$keys.unbind('esc');
+                this.keybinding.destroy();
             }
         },
     },

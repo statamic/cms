@@ -113,6 +113,7 @@ export default {
             popoutResponded: false,
             loading: true,
             extras: {},
+            keybinding: null,
         }
     },
 
@@ -186,7 +187,7 @@ export default {
     created() {
         this.editorWidth = localStorage.getItem(widthLocalStorageKey) || 400
 
-        this.$keys.bindGlobal('mod+shift+p', () => {
+        this.keybinding = this.$keys.bindGlobal('mod+shift+p', () => {
             this.previewing ? this.close() : this.$emit('opened-via-keyboard');
         });
     },
@@ -196,7 +197,7 @@ export default {
     },
 
     destroyed() {
-        this.$keys.unbind('mod+shift+p');
+        this.keybinding.destroy();
     },
 
     methods: {

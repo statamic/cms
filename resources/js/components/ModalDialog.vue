@@ -25,6 +25,12 @@ import { mixin as clickaway } from 'vue-clickaway';
 export default {
     mixins: [ clickaway ],
 
+    data() {
+        return {
+            keybinding: null,
+        }
+    },
+
     props: {
         show: {
             type: Boolean,
@@ -54,16 +60,15 @@ export default {
     },
 
     created() {
-        this.$keys.bind('esc', this.dismiss)
+        this.keybinding = this.$keys.bind('esc', this.dismiss)
     },
 
     destroyed() {
-        this.$keys.unbind('esc')
+        this.keybinding.destroy();
     },
 
     methods: {
         dismiss: function() {
-            console.log('Go away modal!')
             this.$emit('close')
         }
     },
