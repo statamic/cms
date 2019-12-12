@@ -21,11 +21,13 @@ class MoveAsset extends Action
 
     public function buttonText()
     {
+        /** @translation */
         return 'Move Asset|Move :count Assets';
     }
 
     public function confirmationText()
     {
+        /** @translation */
         return 'Are you sure you want to move this asset?|Are you sure you want to move these :count assets?';
     }
 

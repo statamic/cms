@@ -20,11 +20,13 @@ class RenameAsset extends Action
 
     public function buttonText()
     {
+        /** @translation */
         return 'Rename Asset|Rename :count Assets';
     }
 
     public function confirmationText()
     {
+        /** @translation */
         return 'Are you sure you want to rename this asset?|Are you sure you want to rename these :count assets?';
     }
 

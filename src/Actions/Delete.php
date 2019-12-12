@@ -18,11 +18,13 @@ class Delete extends Action
 
     public function buttonText()
     {
+        /** @translation */
         return 'Delete|Delete :count items?';
     }
 
     public function confirmationText()
     {
+        /** @translation */
         return 'Are you sure you want to want to delete this?|Are you sure you want to delete these :count items?';
     }
 

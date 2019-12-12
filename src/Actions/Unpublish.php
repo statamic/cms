@@ -19,11 +19,13 @@ class Unpublish extends Action
 
     public function confirmationText()
     {
+        /** @translation */
         return 'Are you sure you want to unpublish this entry?|Are you sure you want to unpublish these :count entries?';
     }
 
     public function buttonText()
     {
+        /** @translation */
         return 'Unpublish Entry|Unpublish :count Entries';
     }
 

@@ -19,11 +19,13 @@ class Publish extends Action
 
     public function confirmationText()
     {
+        /** @translation */
         return 'Are you sure you want to publish this entry?|Are you sure you want to publish these :count entries?';
     }
 
     public function buttonText()
     {
+        /** @translation */
         return 'Publish Entry|Publish :count Entries';
     }
 
