@@ -19,6 +19,7 @@ class Statamic
     const CORE_REPO = 'statamic/cms';
 
     protected static $scripts = [];
+    protected static $externalScripts = [];
     protected static $styles = [];
     protected static $cpRoutes = [];
     protected static $webRoutes = [];
@@ -42,12 +43,24 @@ class Statamic
         return static::$scripts;
     }
 
-   public static function script($name, $path)
-   {
-       static::$scripts[$name] = str_finish($path, '.js');
+    public static function availableExternalScripts(Request $request)
+    {
+        return static::$externalScripts;
+    }
 
-       return new static;
-   }
+    public static function script($name, $path)
+    {
+        static::$scripts[$name] = str_finish($path, '.js');
+
+        return new static;
+    }
+
+    public static function externalScript($url)
+    {
+        static::$externalScripts[] = $url;
+
+        return new static;
+    }
 
     public static function availableStyles(Request $request)
     {

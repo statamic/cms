@@ -2,6 +2,10 @@
 <script src="{{ Statamic::cpAssetUrl('js/vendor.js') }}?v={{ Statamic::version() }}"></script>
 <script src="{{ Statamic::cpAssetUrl('js/app.js') }}?v={{ Statamic::version() }}"></script>
 
+@foreach (Statamic::availableExternalScripts(request()) as $url)
+    <script src="{{ $url }}"></script>
+@endforeach
+
 @foreach (Statamic::availableScripts(request()) as $name => $path)
     <script src="{{ Statamic::vendorAssetUrl("$name/js/$path") }}"></script>
 @endforeach
