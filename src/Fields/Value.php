@@ -3,7 +3,6 @@
 namespace Statamic\Fields;
 
 use ArrayIterator;
-use JsonSerializable;
 use IteratorAggregate;
 use JsonSerializable;
 use Statamic\View\Antlers\Parser;
@@ -95,10 +94,5 @@ class Value implements IteratorAggregate, JsonSerializable
     public function fieldtype()
     {
         return $this->fieldtype;
-    }
-
-    public function jsonSerialize()
-    {
-        return $this->value();
     }
 }
