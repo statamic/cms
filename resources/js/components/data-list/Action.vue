@@ -8,7 +8,6 @@
             :title="action.title"
             :danger="action.dangerous"
             :buttonText="runButtonText"
-            :bodyText="confirmationText"
             @confirm="confirm"
             @cancel="cancel"
         >
