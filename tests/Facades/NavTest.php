@@ -60,8 +60,8 @@ class NavTest extends TestCase
 
         $this->assertEquals('Utilities', $item->section());
         $this->assertEquals('Wordpress Importer', $item->name());
-        $this->assertEquals(config('app.url').'wordpress-importer', $item->url());
-        $this->assertEquals(config('app.url').'wordpress-importer*', $item->active());
+        $this->assertEquals(config('app.url').'/wordpress-importer', $item->url());
+        $this->assertEquals(config('app.url').'/wordpress-importer*', $item->active());
         $this->assertEquals('up-arrow', $item->icon());
         $this->assertEquals('view updates', $item->authorization()->ability);
         $this->assertEquals('view updates', $item->can()->ability);
