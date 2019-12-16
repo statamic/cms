@@ -10,6 +10,11 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 
 class FieldsController extends CpController
 {
+    public function __construct()
+    {
+        $this->middleware('can:configure fields');
+    }
+
     public function index(Request $request)
     {
         return view('statamic::fields.index', [
@@ -37,7 +42,7 @@ class FieldsController extends CpController
         return [
             'fieldtype' => $fieldtype->toArray(),
             'blueprint' => $blueprint->toPublishArray(),
-            'values' => array_merge($request->values, $fields->values()),
+            'values' => array_merge($request->values, $fields->values()->all()),
             'meta' => $fields->meta()
         ];
     }
@@ -58,6 +63,6 @@ class FieldsController extends CpController
             ->addValues($request->values)
             ->process();
 
-        return array_merge($request->values, $fields->values());
+        return array_merge($request->values, $fields->values()->all());
     }
 }

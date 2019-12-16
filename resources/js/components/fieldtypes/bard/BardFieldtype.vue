@@ -17,13 +17,13 @@
                 </div>
                 <div class="flex items-center no-select">
                 <div class="h-10 -my-sm border-l pr-1 w-px" v-if="hasExtraButtons"></div>
-                    <button @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
+                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
                         <svg-icon name="file-code" class="w-4 h-4 "/>
                     </button>
-                    <button @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
+                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
                         <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
                     </button>
-                    <button @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
+                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
                         <svg-icon name="shrink-all" class="w-4 h-4" v-if="fullScreenMode" />
                         <svg-icon name="expand" class="w-4 h-4" v-else />
                     </button>
@@ -110,6 +110,7 @@ import {
     CodeBlockHighlight
 } from 'tiptap-extensions';
 import Set from './Set';
+import Doc from './Doc';
 import BardSource from './Source.vue';
 import Link from './Link';
 import Image from './Image';
@@ -123,6 +124,7 @@ import javascript from 'highlight.js/lib/languages/javascript'
 import css from 'highlight.js/lib/languages/css'
 import hljs from 'highlight.js/lib/highlight';
 import 'highlight.js/styles/github.css';
+import mark from './Mark';
 
 export default {
 
@@ -155,6 +157,7 @@ export default {
             fullScreenMode: false,
             buttons: [],
             collapsed: this.meta.collapsed,
+            mounted: false,
         }
     },
 
@@ -232,7 +235,9 @@ export default {
         this.json = this.editor.getJSON().content;
         this.html = this.editor.getHTML();
 
-        this.$mousetrap.bind('esc', this.closeFullscreen)
+        this.$keys.bind('esc', this.closeFullscreen)
+
+        this.$nextTick(() => this.mounted = true);
     },
 
     beforeDestroy() {
@@ -242,6 +247,8 @@ export default {
     watch: {
 
         json(json) {
+            if (!this.mounted) return;
+
             // Use a json string otherwise Laravel's TrimStrings middleware will remove spaces where we need them.
             this.update(JSON.stringify(json));
         },
@@ -411,40 +418,71 @@ export default {
         },
 
         getExtensions() {
-            let extensions = [
-                new Blockquote(),
-                new BulletList(),
-                new CodeBlock(),
-                new HardBreak(),
-                new Heading({ levels: [1, 2, 3, 4, 5, 6] }),
-                new ListItem(),
-                new OrderedList(),
-                new Bold(),
-                new Code(),
-                new Italic(),
-                new Strike(),
-                new Underline(),
-                new Table({ resizable: true }),
-                new TableHeader(),
-                new TableCell(),
-                new TableRow(),
-                new History(),
+            let exts = [
+                new Doc(),
                 new Set({ bard: this }),
                 new ConfirmSetDelete(),
-                new Link({ vm: this }),
-                new RemoveFormat(),
-                new Image({ bard: this }),
-                new CodeBlockHighlight({ languages: { javascript, css }})
+                new HardBreak(),
+                new History()
             ];
 
+            let btns = this.buttons.map(button => button.name);
+
+            if (btns.includes('quote')) exts.push(new Blockquote());
+            if (btns.includes('bold')) exts.push(new Bold());
+            if (btns.includes('italic')) exts.push(new Italic());
+            if (btns.includes('strikethrough')) exts.push(new Strike());
+            if (btns.includes('underline')) exts.push(new Underline());
+            if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
+            if (btns.includes('removeformat')) exts.push(new RemoveFormat());
+            if (btns.includes('image')) exts.push(new Image({ bard: this }));
+
+            if (btns.includes('orderedlist') || btns.includes('unorderedlist')) {
+                if (btns.includes('orderedlist')) exts.push(new OrderedList());
+                if (btns.includes('unorderedlist')) exts.push(new BulletList());
+                exts.push(new ListItem());
+            }
+
+            if (btns.includes('codeblock') || btns.includes('code')) {
+                if (btns.includes('code')) exts.push(new Code());
+                if (btns.includes('codeblock')) exts.push(new CodeBlock());
+                exts.push(new CodeBlockHighlight({ languages: { javascript, css }}));
+            }
+
+            if (btns.includes('table')) {
+                exts.push(
+                    new Table({ resizable: true }),
+                    new TableHeader(),
+                    new TableCell(),
+                    new TableRow(),
+                );
+            }
+
+            if (btns.includes('h1') ||
+                btns.includes('h2') ||
+                btns.includes('h3') ||
+                btns.includes('h4') ||
+                btns.includes('h5') ||
+                btns.includes('h6')
+            ) {
+                let levels = [];
+                if (btns.includes('h1')) levels.push(1);
+                if (btns.includes('h2')) levels.push(2);
+                if (btns.includes('h3')) levels.push(3);
+                if (btns.includes('h4')) levels.push(4);
+                if (btns.includes('h5')) levels.push(5);
+                if (btns.includes('h6')) levels.push(6);
+                exts.push(new Heading({ levels }));
+            }
+
             this.$bard.extensionCallbacks.forEach(callback => {
-                let returned = callback(this);
-                extensions = extensions.concat(
+                let returned = callback({ bard: this, mark });
+                exts = exts.concat(
                     Array.isArray(returned) ? returned : [returned]
                 );
             });
 
-            return extensions;
+            return exts;
         }
     }
 }

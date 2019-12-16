@@ -68,12 +68,12 @@ class AssetTest extends TestCase
     function it_gets_and_sets_all_data()
     {
         $asset = (new Asset)->container($this->container);
-        $this->assertEquals([], $asset->data());
+        $this->assertEquals([], $asset->data()->all());
 
         $return = $asset->data(['foo' => 'bar']);
 
         $this->assertEquals($asset, $return);
-        $this->assertEquals(['foo' => 'bar'], $asset->data());
+        $this->assertEquals(['foo' => 'bar'], $asset->data()->all());
     }
 
     /** @test */
@@ -236,7 +236,7 @@ class AssetTest extends TestCase
     /** @test */
     function it_checks_if_its_an_image_file()
     {
-        $extensions = ['jpg', 'jpeg', 'png', 'gif'];
+        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
         foreach ($extensions as $ext) {
             $this->assertTrue((new Asset)->path("path/to/asset.$ext")->isImage());
@@ -327,7 +327,7 @@ class AssetTest extends TestCase
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo/test.txt');
 
-        $this->assertEquals(['hello' => 'world'], $asset->data());
+        $this->assertEquals(['hello' => 'world'], $asset->data()->all());
     }
 
     /** @test */
@@ -380,7 +380,9 @@ class AssetTest extends TestCase
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
             'old/asset.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
 
         $return = $asset->move('new');
 
@@ -391,7 +393,9 @@ class AssetTest extends TestCase
         $disk->assertExists('new/.meta/asset.txt.yaml');
         $this->assertEquals([
             'new/asset.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
     }
 
     /** @test */
@@ -408,7 +412,9 @@ class AssetTest extends TestCase
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
             'old/asset.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
 
         $return = $asset->move('new', 'newfilename');
 
@@ -419,7 +425,9 @@ class AssetTest extends TestCase
         $disk->assertExists('new/.meta/newfilename.txt.yaml');
         $this->assertEquals([
             'new/newfilename.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
     }
 
     /** @test */
@@ -435,7 +443,9 @@ class AssetTest extends TestCase
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
             'old/asset.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
 
         $return = $asset->rename('newfilename');
 
@@ -446,7 +456,9 @@ class AssetTest extends TestCase
         $disk->assertExists('old/.meta/newfilename.txt.yaml');
         $this->assertEquals([
             'old/newfilename.txt' => ['foo' => 'bar']
-        ], $container->assets('/', true)->keyBy->path()->map->data()->all());
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
     }
 
     /** @test */
@@ -476,7 +488,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_converts_to_array()
+    function it_compiles_augmented_array_data()
     {
         Facades\Blueprint::shouldReceive('find')->once()
             ->with('test_blueprint')
@@ -488,7 +500,7 @@ class AssetTest extends TestCase
             ->setSupplement('foo', 'bar')
             ->path('path/to/asset.jpg');
 
-        $array = $asset->toArray();
+        $array = $asset->augmentedArrayData();
 
         $this->assertArraySubset([
             'id' => 'test_container::path/to/asset.jpg',
@@ -517,13 +529,17 @@ class AssetTest extends TestCase
     /** @test */
     function data_keys_get_added_to_array()
     {
+        Facades\Blueprint::shouldReceive('find')->once()
+            ->with('test_blueprint')
+            ->andReturn((new Blueprint)->setHandle('test_blueprint'));
+
         $array = (new Asset)
             ->container($this->container)
             ->set('title', 'test')
             ->path('path/to/asset.jpg')
             ->set('foo', 'bar')
             ->set('bar', 'baz')
-            ->toArray();
+            ->augmentedArrayData();
 
         $this->assertEquals('bar', $array['foo']);
         $this->assertEquals('baz', $array['bar']);
@@ -532,12 +548,16 @@ class AssetTest extends TestCase
     /** @test */
     function extra_keys_get_added_to_array_when_file_exists()
     {
+        Facades\Blueprint::shouldReceive('find')->once()
+            ->with('test_blueprint')
+            ->andReturn((new Blueprint)->setHandle('test_blueprint'));
+
         $container = $this->container;
         Storage::disk('test')->put('test.txt', '');
 
         $asset = (new Asset)->container($container)->path('test.txt');
 
-        $array = $asset->toArray();
+        $array = $asset->augmentedArrayData();
         foreach ($this->toArrayKeysWhenFileExists() as $key) {
             $this->assertArrayHasKey($key, $array);
         }
@@ -585,15 +605,38 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_url()
+    function it_gets_the_url_when_the_container_has_a_relative_url()
     {
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('private')->andReturnFalse();
-        $container->shouldReceive('url')->andReturn('http://example.com');
+        $container->shouldReceive('url')->andReturn('/container');
         $asset = (new Asset)->container($container)->path('path/to/test.txt');
 
-        $this->assertEquals('http://example.com/path/to/test.txt', $asset->url());
-        $this->assertEquals('http://example.com/path/to/test.txt', (string) $asset);
+        $this->assertEquals('/container/path/to/test.txt', $asset->url());
+        $this->assertEquals('/container/path/to/test.txt', (string) $asset);
+    }
+
+    /** @test */
+    function it_gets_the_url_when_the_container_has_an_absolute_url()
+    {
+        $container = $this->mock(AssetContainer::class);
+        $container->shouldReceive('private')->andReturnFalse();
+        $container->shouldReceive('url')->andReturn('http://example.com/container');
+        $asset = (new Asset)->container($container)->path('path/to/test.txt');
+
+        $this->assertEquals('http://example.com/container/path/to/test.txt', $asset->url());
+        $this->assertEquals('http://example.com/container/path/to/test.txt', (string) $asset);
+    }
+
+    /** @test */
+    function it_gets_the_absolute_url()
+    {
+        $container = $this->mock(AssetContainer::class);
+        $container->shouldReceive('private')->andReturnFalse();
+        $container->shouldReceive('absoluteUrl')->andReturn('http://example.com');
+        $asset = (new Asset)->container($container)->path('path/to/test.txt');
+
+        $this->assertEquals('http://example.com/path/to/test.txt', $asset->absoluteUrl());
     }
 
     /** @test */
@@ -605,6 +648,7 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($container)->path('path/to/test.txt');
 
         $this->assertNull($asset->url());
+        $this->assertNull($asset->absoluteUrl());
         $this->assertEquals('container-id::path/to/test.txt', (string) $asset);
     }
 

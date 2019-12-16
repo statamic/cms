@@ -31,9 +31,9 @@ class RolesController extends CpController
         return view('statamic::roles.index', [
             'roles' => $roles,
             'columns' => [
-                Column::make('title'),
-                Column::make('handle'),
-                Column::make('permissions'),
+                Column::make('title')->label(__('Title')),
+                Column::make('handle')->label(__('Handle')),
+                Column::make('permissions')->label(__('Permissions')),
             ],
         ]);
     }
@@ -43,7 +43,7 @@ class RolesController extends CpController
         $this->authorize('edit roles');
 
         return view('statamic::roles.create', [
-            'permissions' => $this->toTreeArray(Permission::tree()),
+            'permissions' => $this->updateTree(Permission::tree()),
         ]);
     }
 
@@ -78,7 +78,7 @@ class RolesController extends CpController
         return view('statamic::roles.edit', [
             'role' => $role,
             'super' => $role->isSuper(),
-            'permissions' => $this->toTreeArray(Permission::tree(), $role),
+            'permissions' => $this->updateTree(Permission::tree(), $role),
         ]);
     }
 
@@ -119,16 +119,22 @@ class RolesController extends CpController
         return response('', 204);
     }
 
-    protected function toTreeArray($tree, $role = null)
+    protected function updateTree($tree, $role = null)
     {
-        return $tree->map(function ($item) use ($role) {
-            $permission = $item['permission'];
-            return [
-                'value' => $permission->value(),
-                'label' => $permission->label(),
-                'checked' => $role ? $role->hasPermission($permission->value()) : false,
-                'children' => $this->toTreeArray($item['children'], $role),
-            ];
+        return $tree->map(function ($group) use ($role) {
+            return array_merge($group, [
+                'permissions' => $this->updatePermissions($group['permissions'], $role)
+            ]);
         });
+    }
+
+    protected function updatePermissions($permissions, $role = null)
+    {
+        return collect($permissions)->map(function ($item) use ($role) {
+            return array_merge($item, [
+                'checked' => $role ? $role->hasPermission($item['value']) : false,
+                'children' => $this->updatePermissions($item['children'], $role),
+            ]);
+        })->all();
     }
 }

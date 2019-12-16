@@ -6,12 +6,10 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Facades\Scope;
 use Statamic\CP\Column;
-use Statamic\Facades\Action;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
-use Statamic\Fields\Validation;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 
@@ -19,7 +17,7 @@ class TaxonomiesController extends CpController
 {
     public function index()
     {
-        $this->authorize('index', TaxonomyContract::class, 'You are not authorized to view any taxonomies.');
+        $this->authorize('index', TaxonomyContract::class);
 
         $taxonomies = Taxonomy::all()->filter(function ($taxonomy) {
             return User::current()->can('view', $taxonomy);
@@ -37,14 +35,16 @@ class TaxonomiesController extends CpController
         return view('statamic::taxonomies.index', [
             'taxonomies' => $taxonomies,
             'columns' => [
-                Column::make('title'),
-                Column::make('terms'),
+                Column::make('title')->label(__('Title')),
+                Column::make('terms')->label(__('Terms')),
             ],
         ]);
     }
 
     public function show($taxonomy)
     {
+        $this->authorize('view', $taxonomy);
+
         $blueprints = $taxonomy->termBlueprints()->map(function ($blueprint) {
             return [
                 'handle' => $blueprint->handle(),
@@ -57,16 +57,17 @@ class TaxonomiesController extends CpController
             'hasTerms' => true, // todo $taxonomy->queryTerms()->count(),
             'blueprints' => $blueprints,
             'site' => Site::selected(),
-            'filters' => Scope::filters('terms', $context = [
+            'filters' => Scope::filters('terms', [
                 'taxonomy' => $taxonomy->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-            'actions' => Action::for('terms', $context),
         ]);
     }
 
     public function create()
     {
+        $this->authorize('create', TaxonomyContract::class, 'You are not authorized to create taxonomies.');
+
         return view('statamic::taxonomies.create');
     }
 
@@ -103,7 +104,7 @@ class TaxonomiesController extends CpController
 
     public function edit($taxonomy)
     {
-        $this->authorize('edit', $taxonomy, 'You are not authorized to edit taxonomies.');
+        $this->authorize('edit', $taxonomy, 'You are not authorized to edit this taxonomy.');
 
         $values = $taxonomy->toArray();
 
@@ -122,15 +123,13 @@ class TaxonomiesController extends CpController
 
     public function update(Request $request, $taxonomy)
     {
-        $this->authorize('update', $taxonomy, 'You are not authorized to edit taxonomies.');
+        $this->authorize('update', $taxonomy, 'You are not authorized to edit this taxonomy.');
 
-        $validation = (new Validation)->fields(
-            $fields = $this->editFormBlueprint()->fields()->addValues($request->all())->process()
-        );
+        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 
-        $request->validate($validation->rules());
+        $fields->validate();
 
-        $taxonomy = $this->updateTaxonomy($taxonomy, $fields->values());
+        $taxonomy = $this->updateTaxonomy($taxonomy, $fields->process()->values()->all());
 
         $taxonomy->save();
 
@@ -168,7 +167,7 @@ class TaxonomiesController extends CpController
             'content_model' => ['type' => 'section'],
             'blueprints' => [
                 'type' => 'blueprints',
-                'instructions' => __('Terms in this taxonomy may use any of these blueprints.'),
+                'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
                 'validate' => 'array',
             ],
         ]);

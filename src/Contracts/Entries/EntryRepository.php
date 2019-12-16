@@ -14,4 +14,6 @@ interface EntryRepository
     public function query();
     public function save($entry);
     public function delete($entry);
+    public function createRules($collection, $site);
+    public function updateRules($collection, $entry);
 }

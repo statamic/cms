@@ -133,4 +133,13 @@ class Provider
     {
         return storage_path("statamic/oauth/{$this->name}.php");
     }
+
+    public function toArray()
+    {
+        return [
+            'name' => $this->name,
+            'label' => $this->label(),
+            'loginUrl' => $this->loginUrl(),
+        ];
+    }
 }

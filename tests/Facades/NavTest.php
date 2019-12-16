@@ -7,10 +7,12 @@ use Statamic\Facades\Nav;
 use Tests\FakesRoles;
 use Statamic\Facades\User;
 use Illuminate\Support\Facades\Route;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class NavTest extends TestCase
 {
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     protected $shouldPreventNavBeingBuilt = false;
 
@@ -28,12 +30,12 @@ class NavTest extends TestCase
         $expected = collect([
             'Top Level' => ['Dashboard', 'Playground'],
             'Content' => ['Collections', 'Structures', 'Taxonomies', 'Assets', 'Globals'],
-            'Tools' => ['Forms', 'Updates', 'Utilities'],
+            'Tools' => ['Forms', /*'Updates',*/ 'Utilities'],
             'Users' => ['Users', 'Groups', 'Permissions'],
-            'Site' => ['Addons', 'Fields', 'Preferences']
+            'Site' => [/*'Addons',*/ 'Fields']
         ]);
 
-        $this->actingAs(User::make()->makeSuper());
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
         $nav = Nav::build();
 
@@ -47,7 +49,7 @@ class NavTest extends TestCase
     /** @test */
     function is_can_create_a_nav_item()
     {
-        $this->actingAs(User::make()->makeSuper());
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::utilities('Wordpress Importer')
             ->route('wordpress-importer.index')
@@ -58,8 +60,8 @@ class NavTest extends TestCase
 
         $this->assertEquals('Utilities', $item->section());
         $this->assertEquals('Wordpress Importer', $item->name());
-        $this->assertEquals(config('app.url').'wordpress-importer', $item->url());
-        $this->assertEquals(config('app.url').'wordpress-importer*', $item->active());
+        $this->assertEquals(config('app.url').'/wordpress-importer', $item->url());
+        $this->assertEquals(config('app.url').'/wordpress-importer*', $item->active());
         $this->assertEquals('up-arrow', $item->icon());
         $this->assertEquals('view updates', $item->authorization()->ability);
         $this->assertEquals('view updates', $item->can()->ability);
@@ -68,7 +70,7 @@ class NavTest extends TestCase
     /** @test */
     function it_can_more_explicitly_create_a_nav_item()
     {
-        $this->actingAs(User::make()->makeSuper());
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::create('R2-D2')
             ->section('Droids')
@@ -84,7 +86,7 @@ class NavTest extends TestCase
     /** @test */
     function it_can_create_a_nav_item_with_a_more_custom_config()
     {
-        $this->actingAs(User::make()->makeSuper());
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::droids('C-3PO')
             ->active('threepio*')
@@ -106,7 +108,7 @@ class NavTest extends TestCase
     /** @test */
     function it_can_get_and_modify_an_existing_item()
     {
-        $this->actingAs(User::make()->makeSuper());
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::droids('WAC-47')
             ->url('/pit-droid')
@@ -127,7 +129,7 @@ class NavTest extends TestCase
     function it_doesnt_build_items_that_the_user_is_not_authorized_to_see()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $this->actingAs(User::make()->assignRole('test'));
+        $this->actingAs(tap(User::make()->assignRole('test'))->save());
 
         Nav::theEmpire('Death Star');
 
@@ -144,7 +146,7 @@ class NavTest extends TestCase
     /** @test */
     function it_can_create_a_nav_item_with_children()
     {
-        $this->actingAs(User::make()->makeSuper());
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::droids('Battle Droids')
             ->url('/battle-droids')
@@ -166,7 +168,7 @@ class NavTest extends TestCase
     function it_doesnt_build_children_that_the_user_is_not_authorized_to_see()
     {
         $this->setTestRoles(['sith' => ['view sith diaries']]);
-        $this->actingAs(User::make()->assignRole('sith'));
+        $this->actingAs(tap(User::make()->assignRole('sith'))->save());
 
         Nav::custom('Diaries')
             ->url('/diaries')
@@ -224,7 +226,7 @@ class NavTest extends TestCase
     /** @test */
     function it_can_remove_a_nav_section()
     {
-        $this->actingAs(User::make()->makeSuper());
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::ships('Millenium Falcon')
             ->url('/millenium-falcon')
@@ -244,7 +246,7 @@ class NavTest extends TestCase
     /** @test */
     function it_can_remove_a_specific_nav_item()
     {
-        $this->actingAs(User::make()->makeSuper());
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::ships('Y-Wing')
             ->url('/y-wing')
@@ -265,7 +267,7 @@ class NavTest extends TestCase
     /** @test */
     function it_can_use_extend_to_defer_the_creation_of_a_nav_item_until_build_time()
     {
-        $this->actingAs(User::make()->makeSuper());
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
         Nav::extend(function ($nav) {
             $nav->jedi('Yoda')->url('/yodas-hut')->icon('green-but-cute-alien');
@@ -282,7 +284,7 @@ class NavTest extends TestCase
     /** @test */
     function it_can_use_extend_to_remove_a_default_statamic_nav_item()
     {
-        $this->actingAs(User::make()->makeSuper());
+        $this->actingAs(tap(User::make()->makeSuper())->save());
 
         $nav = Nav::build();
 

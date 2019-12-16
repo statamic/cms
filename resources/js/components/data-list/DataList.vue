@@ -4,7 +4,8 @@ import Fuse from 'fuse.js';
 export default {
     props: {
         columns: {
-            required: true,
+            type: Array,
+            default: () => []
         },
         rows: {
             type: Array,
@@ -61,6 +62,11 @@ export default {
             let rows = this.rows;
             rows = this.filterBySearch(rows);
             return this.sortRows(rows);
+        },
+
+        visibleColumns() {
+            const columns = this.sharedState.columns;
+            return columns.filter(col => col.visible);
         }
 
     },
@@ -82,6 +88,10 @@ export default {
             this.$emit('selections-updated', selections);
         },
 
+        columns(columns) {
+            this.sharedState.columns = columns;
+        },
+
         sortColumn(column) {
             this.sharedState.sortColumn = column;
         }
@@ -89,22 +99,29 @@ export default {
     },
 
     created() {
-        let firstVisibleColumn = this.sharedState.columns.filter(col => col.visible)[0];
-        firstVisibleColumn = firstVisibleColumn ? firstVisibleColumn.field : this.sharedState.columns[0].field;
-        this.sharedState.sortColumn = this.sortColumn || (this.sort ? firstVisibleColumn : null);
+        this.setInitialSortColumn();
     },
 
     methods: {
 
+        setInitialSortColumn() {
+            const columns = this.sharedState.columns;
+
+            if (columns.length === 0) return;
+
+            let firstVisibleColumn = this.visibleColumns[0];
+            firstVisibleColumn = firstVisibleColumn ? firstVisibleColumn.field : columns[0].field;
+            this.sharedState.sortColumn = this.sortColumn || (this.sort ? firstVisibleColumn : null);
+        },
+
         filterBySearch(rows) {
             if (!this.search || !this.searchQuery) return rows;
 
-            // TODO: Ensure instance respects updates to visibleColumns
             const fuse = new Fuse(rows, {
                 findAllMatches: true,
                 threshold: 0.1,
                 minMatchCharLength: 2,
-                keys: this.visibleColumns
+                keys: this.columns.length ? this.visibleColumns : Object.keys(rows[0])
             });
 
             return fuse.search(this.searchQuery);

@@ -10,7 +10,7 @@
             </small>
             {{ $collection->title() }}
         </h1>
-        <dropdown-list class="mr-2">
+        <dropdown-list class="mr-1">
             @can('edit', $collection)
                 <dropdown-item :text="__('Edit Collection')" redirect="{{ $collection->editUrl() }}"></dropdown-item>
             @endcan

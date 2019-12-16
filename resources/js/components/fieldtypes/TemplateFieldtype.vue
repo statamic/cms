@@ -29,12 +29,15 @@ export default {
 
     mounted() {
         this.$axios.get(cp_url('api/templates')).then(response => {
-            var options = [];
+            var options = [{
+                label: __('Inherit (Default)'),
+                value: null
+            }];
 
             _.each(response.data, function(template) {
                 options.push({
-                    value: template,
-                    label: template
+                    label: template,
+                    value: template
                 });
             });
 

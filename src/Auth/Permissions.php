@@ -2,65 +2,105 @@
 
 namespace Statamic\Auth;
 
-use Illuminate\Support\Facades\Gate;
-
 class Permissions
 {
-    protected static $permissions = [];
+    protected $permissions = [];
+    protected $groups = [];
+    protected $pendingGroup = null;
 
     public function make(string $value)
     {
-        return (new Permission)->value($value);
+        $permission = (new Permission)->value($value);
+
+        if ($this->pendingGroup) {
+            $permission->group($this->pendingGroup);
+        }
+
+        return $permission;
     }
 
     public function register($permission, $callback = null)
     {
         if (! $permission instanceof Permission) {
             $permission = self::make($permission);
-
-            if ($callback) {
-                $callback($permission);
-            }
         }
 
-        static::$permissions[] = $permission;
+        if ($callback) {
+            $callback($permission);
+        }
+
+        $this->permissions[] = $permission;
 
         return $permission;
     }
 
     public function all()
     {
-        return collect(static::$permissions)->flatMap(function ($permission) {
-            return $this->mergePermissions($permission);
-        })->keyBy->value();
+        return collect($this->permissions)
+            ->flatMap(function ($permission) {
+                return collect([$permission])->merge($this->mergeChildPermissions($permission));
+            })
+            ->keyBy->originalValue();
     }
 
-    protected function mergePermissions($permission)
+    private function mergeChildPermissions($permission)
     {
-        return $permission->permissions()
-            ->merge($permission->children()->flatMap(function ($perm) {
-                return $this->mergePermissions($perm);
-            }));
+        $permissions = $permission->children();
+
+        foreach ($permissions as $p) {
+            $permissions = $permissions->merge($this->mergeChildPermissions($p));
+        }
+
+        return $permissions;
+    }
+
+    public function get($key)
+    {
+        return $this->all()->get($key);
     }
 
     public function tree()
     {
-        return collect(static::$permissions)->flatMap(function ($permission) {
-            return $permission->permissions();
-        })->map(function ($permission) {
-            return $permission->toTree();
-        });
-    }
+        $tree = collect($this->permissions)
+            ->flatMap(function ($permission) {
+                return $permission->permissions()->flatMap->toTree();
+            })
+            ->groupBy(function ($permission) {
+                return $permission['group'] ?? 'misc';
+            });
 
-    protected function toTree($permissions)
-    {
-        return $permissions
-            ->keyBy->value()
-            ->map(function($permission) {
+            // Place ungrouped permissions at the end.
+            if ($tree->has('misc')) {
+                $tree->put('misc', $tree->pull('misc'));
+            }
+
+            $tree = $tree->map(function ($permissions, $group) {
                 return [
-                    'permission' => $permission,
-                    'children' => $this->toTree($permission->children())
+                    'handle' => $group,
+                    'label' => $this->groups[$group] ?? __('Miscellaneous'),
+                    'permissions' => $permissions->all(),
                 ];
             });
+
+        return $tree->values();
+    }
+
+    public function group($name, $label, $permissions = null)
+    {
+        throw_if($this->pendingGroup, new \Exception('Cannot double nest permission groups'));
+
+        if (func_num_args() === 3) {
+            $this->groups[$name] = $label;
+        }
+
+        if (func_num_args() === 2) {
+            $permissions = $label;
+        }
+
+        $this->pendingGroup = $name;
+
+        $permissions();
+
+        $this->pendingGroup = null;
     }
 }

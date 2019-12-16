@@ -4,4 +4,4 @@ fields:
     field:
       display: Alt Text
       type: text
-      instructions: Description of the image or what the image is representing
+      instructions: Description of the image

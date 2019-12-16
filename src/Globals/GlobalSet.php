@@ -111,7 +111,7 @@ class GlobalSet implements Contract
         if (Site::hasMultiple()) {
             $data['sites'] = $this->sites()->all();
         } else {
-            $data['data'] = $this->in(Site::default()->handle())->data();
+            $data['data'] = $this->in(Site::default()->handle())->data()->all();
         }
 
         return $data;
@@ -158,14 +158,6 @@ class GlobalSet implements Contract
     public function localizations()
     {
         return collect($this->localizations);
-    }
-
-    public function toArray()
-    {
-        return [
-            'title' => $this->title,
-            'handle' => $this->handle,
-        ];
     }
 
     public function editUrl()

@@ -5,9 +5,6 @@
     </div>
 </template>
 
-<style src="codemirror/theme/material.css">
-</style>
-
 <script>
 import CodeMirror from 'codemirror'
 import 'codemirror/mode/yaml/yaml'
@@ -28,6 +25,7 @@ export default {
             mode: 'yaml',
             tabSize: 2,
             indentUnit: 2,
+            autoRefresh: true,
             indentWithTabs: false,
             lineNumbers: true,
             lineWrapping: true,

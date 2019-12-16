@@ -7,17 +7,17 @@
 
                 <select-input
                     class="mr-2"
-                    name="operator"
+                    name="fieldHandle"
                     :options="fieldOptions(filter)"
-                    v-model="filter.field"
-                    :placeholder="__('Select Field')"
-                    @input="reset(index, $event)" />
+                    :value="filter.fieldHandle"
+                    :placeholder="__('Select field')"
+                    @input="rekey(index, $event)" />
 
                 <field-filter
                     :filter="filter"
                     :operators="fieldOperators(filter)"
                     class="flex-1"
-                    @updated="update(index, $event)" />
+                    @updated="filterUpdated(index, $event)" />
 
                 <button @click="remove(index)" class="btn-close ml-1 group">
                     <svg-icon name="trash" class="w-auto group-hover:text-red" />
@@ -48,26 +48,32 @@ export default {
     },
 
     props: {
-        filter: {},
-        initialFilters: {
+        config: {},
+        values: {
             default() {
                 return {};
             }
         }
     },
 
-    data() {
-        return {
-            filters: [],
-        }
-    },
-
     computed: {
+
+        filters() {
+            if (!this.values) return [];
+            const filters = [];
+            for (const handle in this.values) {
+                filters.push({
+                    fieldHandle: handle,
+                    ...this.values[handle],
+                });
+            }
+            return filters;
+        },
 
         fields() {
             let fields = {};
 
-            this.filter.extra.forEach(field => {
+            this.config.extra.forEach(field => {
                 fields[field.handle] = field;
             });
 
@@ -79,21 +85,18 @@ export default {
         },
 
         unselectedFieldOptions() {
-            let fields = _.map(this.fields, (field, handle) => handle);
-            let selectedFields = this.filters.map(filter => filter.field);
+            const fieldHandles = this.config.extra.map((field) => field.handle);
 
-            return fields
-                .filter(field => ! selectedFields.includes(field))
-                .map(field => {
-                    return {
-                        value: this.fields[field].handle,
-                        label: this.fields[field].display
-                    };
-                });
+            return fieldHandles
+                .filter(fieldHandle => !this.values.hasOwnProperty(fieldHandle))
+                .map(fieldHandle => ({
+                    value: fieldHandle,
+                    label: this.fields[fieldHandle].display
+                }));
         },
 
         hasFilters() {
-            return this.filters.length;
+            return !!this.filters.length;
         },
 
         incompleteFilters() {
@@ -104,96 +107,76 @@ export default {
             return this.filters.length < this.fieldCount;
         },
 
-        values() {
-            let values = {};
-
-            this.filters
-                .filter(filter => this.isFilterComplete(filter))
-                .forEach(filter => {
-                    values[filter.field] = {
-                        operator: filter.operator,
-                        value: filter.value
-                    };
-                });
-
-            return values;
-        }
-
-    },
-
-    watch: {
-
-        values: {
-            deep: true,
-            handler(values) {
-                this.$emit('changed', values);
-            }
-        }
-
     },
 
     created() {
-        this.setInitialFilters();
-
         this.$events.$on('filters-reset', this.resetAll);
     },
 
     methods: {
 
-        setInitialFilters() {
-            _.each(this.initialFilters, (filter, field) => {
-                this.add(field, filter.operator, filter.value);
-            });
-
-            if (this.filters.length === 0) {
-                this.add();
-            }
-        },
-
         fieldOptions(filter) {
-            if (! filter.field) {
-                return this.unselectedFieldOptions;
-            }
-
-            return [{
-                value: filter.field,
-                label: this.fields[filter.field].display
-            }].concat(this.unselectedFieldOptions);
+            return [
+                {
+                    value: filter.fieldHandle,
+                    label: this.fields[filter.fieldHandle].display,
+                },
+                ...this.unselectedFieldOptions,
+            ];
         },
 
         fieldOperators(filter) {
-            return filter.field ? this.fields[filter.field].operators : {};
+            return filter.fieldHandle ? this.fields[filter.fieldHandle].operators : {};
         },
 
         isFilterComplete(filter) {
-            return filter.field !== null && filter.operator !== null && filter.value;
+            return filter.fieldHandle !== null && filter.operator !== null && filter.value;
         },
 
-        add(handle=null, operator=null, value=null) {
-            this.filters.push({
-                _id: uniqid(),
-                field: handle,
-                operator,
-                value
+        add() {
+            Vue.set(this.values, this.unselectedFieldOptions[0].value, {
+                operator: null,
+                value: null,
             });
         },
 
-        update(index, event) {
-            this.filters[index].operator = event.operator;
-            this.filters[index].value = event.value;
+        filterUpdated(index, { operator, value }) {
+            const handle = this.filters[index].fieldHandle;
+            const filter = this.values[handle];
+            filter.operator = operator;
+            filter.value = value;
+            Vue.set(this.values, handle, filter);
+            if (this.isFilterComplete(filter)) {
+                this.update();
+            }
         },
 
-        reset(index) {
-            this.filters[index].operator = null;
-            this.filters[index].value = null;
+        rekey(index, newHandle) {
+            const handle = this.filters[index].fieldHandle;
+            const filter = this.values[handle];
+            Vue.delete(this.values, handle);
+            Vue.set(this.values, newHandle, filter);
+            if (this.isFilterComplete(filter)) {
+                this.update();
+            }
         },
 
         remove(index) {
-            this.filters.splice(index, 1);
+            const handle = this.filters[index].fieldHandle;
+            const filter = this.values[handle];
+            Vue.delete(this.values, handle);
+            if (this.isFilterComplete(filter)) {
+                this.update();
+            }
         },
 
         resetAll() {
-            this.filters = [];
+            this.values = {};
+            this.update();
+        },
+
+        update() {
+            this.$emit('changed', this.values);
         }
 
     }

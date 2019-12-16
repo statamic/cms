@@ -9,6 +9,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Data\ExistsAsFile;
 use Illuminate\Contracts\Support\Responsable;
+use Statamic\Facades\Site;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 
@@ -21,7 +22,7 @@ class Taxonomy implements Contract, Responsable
     protected $blueprints = [];
     protected $sites = [];
     protected $collection;
-    protected $defaultStatus = 'published';
+    protected $defaultPublishState = true;
     protected $revisions = false;
     protected $searchIndex;
 
@@ -97,7 +98,7 @@ class Taxonomy implements Contract, Responsable
 
     public function fallbackTermBlueprint()
     {
-        return Blueprint::find(config('statamic.theming.blueprints.default'));
+        return Blueprint::find('default');
     }
 
     public function sortField()
@@ -144,9 +145,9 @@ class Taxonomy implements Contract, Responsable
         ]);
     }
 
-    public function defaultStatus($status = null)
+    public function defaultPublishState($state = null)
     {
-        return $this->fluentlyGetOrSet('defaultStatus')->args(func_get_args());
+        return $this->fluentlyGetOrSet('defaultPublishState')->args(func_get_args());
     }
 
     public function toArray()
@@ -163,7 +164,7 @@ class Taxonomy implements Contract, Responsable
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                return collect($sites);
+                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
             })
             ->args(func_get_args());
     }
@@ -176,6 +177,8 @@ class Taxonomy implements Contract, Responsable
                 if (! config('statamic.revisions.enabled')) {
                     return false;
                 }
+
+                return false; // TODO
 
                 return $enabled;
             })
@@ -225,7 +228,7 @@ class Taxonomy implements Contract, Responsable
 
     public function layout()
     {
-        return config('statamic.theming.views.layout');
+        return 'layout';
     }
 
     public function searchIndex($index = null)

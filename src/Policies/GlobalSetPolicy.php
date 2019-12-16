@@ -7,6 +7,15 @@ use Statamic\Facades\GlobalSet;
 
 class GlobalSetPolicy
 {
+    public function before($user, $ability)
+    {
+        $user = User::fromUser($user);
+
+        if ($user->hasPermission('configure globals')) {
+            return true;
+        }
+    }
+
     public function index($user)
     {
         $user = User::fromUser($user);

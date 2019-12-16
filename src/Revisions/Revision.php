@@ -8,7 +8,6 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Facades\Revision as Revisions;
 use Statamic\Contracts\Auth\User;
 use Illuminate\Contracts\Support\Arrayable;
-use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Revisions\Revision as Contract;
 
@@ -109,7 +108,13 @@ class Revision implements Contract, Arrayable
     public function toArray()
     {
         if ($user = $this->user()) {
-            $user = Arr::only($user->toArray(), ['id', 'email', 'name', 'avatar', 'initials']);
+            $user = [
+                'id' => $user->id(),
+                'email' => $user->email(),
+                'name' => $user->name(),
+                'avatar' => $user->avatar(),
+                'initials' => $user->initials(),
+            ];
         }
 
         return [

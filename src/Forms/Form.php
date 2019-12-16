@@ -14,6 +14,7 @@ use Statamic\Exceptions\FatalException;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 
 class Form implements FormContract
 {
@@ -130,7 +131,11 @@ class Form implements FormContract
      */
     public function fields()
     {
-        return $this->blueprint()->fields()->all();
+        if (! $blueprint = $this->blueprint()) {
+            throw BlueprintUndefinedException::create($this);
+        }
+
+        return $blueprint->fields()->all();
     }
 
     /**

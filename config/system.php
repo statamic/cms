@@ -18,21 +18,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Default File Extension
-    |--------------------------------------------------------------------------
-    |
-    | When creating content through the Control Panel, this file extension
-    | will be used. The extension may imply that certain processing will
-    | be made automatically. eg. "md" will render content as Markdown.
-    |
-    | Supported: "md", "html", "textile"
-    |
-    */
-
-    'default_extension' => 'md',
-
-    /*
-    |--------------------------------------------------------------------------
     | Default Addons Paths
     |--------------------------------------------------------------------------
     |

@@ -2,20 +2,19 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
-use Statamic\Fields\Validation;
-use Statamic\Facades\AssetContainer;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\CP\CpController;
 
 class AssetContainersController extends CpController
 {
     public function index(Request $request)
     {
         $containers = AssetContainer::all()->filter(function ($container) {
-            return true; // TODO: auth.
-            // return \Statamic\Facades\User::current()->can('view', $container);
+            return User::current()->can('view', $container);
         })->map(function ($container) {
             return [
                 'id' => $container->handle(),
@@ -35,7 +34,7 @@ class AssetContainersController extends CpController
         }
 
         return view('statamic::assets.containers.index', [
-            'containers' => $containers,
+            'containers' => $containers->all(),
             'columns' => ['title'],
             'visibleColumns' => ['title'],
         ]);
@@ -68,13 +67,11 @@ class AssetContainersController extends CpController
 
         $this->authorize('update', $container, 'You are not authorized to edit asset containers.');
 
-        $validation = (new Validation)->fields(
-            $fields = $this->formBlueprint()->fields()->addValues($request->all())->process()
-        );
+        $fields = $this->formBlueprint()->fields()->addValues($request->all());
 
-        $request->validate($validation->rules());
+        $fields->validate();
 
-        $values = $fields->values();
+        $values = $fields->process()->values();
 
         $container
             ->title($values['title'])
@@ -99,7 +96,7 @@ class AssetContainersController extends CpController
             ->fields()
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = $fields->values()->merge([
             'disk' => $this->disks()->first(),
         ]);
 
@@ -114,13 +111,11 @@ class AssetContainersController extends CpController
     {
         $this->authorize('create', AssetContainerContract::class, 'You are not authorized to create asset containers.');
 
-        $validation = (new Validation)->fields(
-            $fields = $this->formBlueprint()->fields()->addValues($request->all())->process()
-        );
+        $fields = $this->formBlueprint()->fields()->addValues($request->all());
 
-        $request->validate($validation->rules());
+        $fields->validate();
 
-        $values = $fields->values();
+        $values = $fields->process()->values();
 
         if (AssetContainer::find($values['handle'])) {
             throw new \Exception('Asset container already exists');
@@ -164,54 +159,63 @@ class AssetContainersController extends CpController
         return Blueprint::makeFromFields([
             'title' => [
                 'type' => 'text',
+                'display' => __('Title'),
                 'validate' => 'required',
                 'width' => 50,
             ],
             'handle' => [
                 'type' => 'slug',
+                'display' => __('Slug'),
                 'validate' => 'required|alpha_dash',
                 'width' => 50,
             ],
             'disk' => [
                 'type' => 'select',
                 'display' => __('Disk'),
-                'instructions' => __('The filesystem disk this container will use.'),
+                'instructions' => __('statamic::messages.asset_container_disk_instructions'),
                 'options' => $this->disks()->all(),
                 'width' => 50,
+                'validate' => 'required',
             ],
             'blueprint' => [
                 'type' => 'blueprints',
-                'instructions' => __('The blueprint that assets in this container will use.'),
+                'display' => __('Blueprints'),
+                'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
                 'max_items' => 1,
                 'width' => 50,
             ],
             'allow_uploads' => [
                 'type' => 'toggle',
-                'instructions' => __('The ability to upload into this container.'),
+                'display' => __('Allow Uploads'),
+                'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
                 'default' => true,
                 'width' => 50,
             ],
             'create_folders' => [
                 'type' => 'toggle',
-                'instructions' => __('The ability to create folders in this container.'),
+                'display' => __('Create Folders'),
+                'instructions' => __('statamic::messages.asset_container_create_folder_instructions'),
                 'default' => true,
                 'width' => 50,
             ],
             'allow_renaming' => [
                 'type' => 'toggle',
-                'instructions' => __('The ability to rename files in this container.'),
+                'display' => __('Allow Renaming'),
+                'instructions' => __('statamic::messages.asset_container_rename_instructions'),
                 'default' => true,
                 'width' => 50,
             ],
             'allow_moving' => [
                 'type' => 'toggle',
-                'instructions' => __('The ability to move files around in this container.'),
+                'display' => __('Allow Moving'),
+                'instructions' => __('statamic::messages.asset_container_move_instructions'),
                 'default' => true,
                 'width' => 50,
             ],
             'allow_downloading' => [
                 'type' => 'toggle',
-                'instructions' => __('Enable the quick download button when editing files.'),
+                'display' => __('Allow Downloading'),
+                'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
                 'default' => true,
                 'width' => 50,
             ],

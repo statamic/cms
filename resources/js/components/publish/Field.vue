@@ -22,7 +22,7 @@
                 @click="$emit('desynced')"
             >
                 <svg-icon name="hyperlink" class="h-4 ml-sm w-4 text-grey-60"
-                    v-tooltip.top="__('Synced with origin. Click or edit the field to desync.')" />
+                    v-tooltip.top="__('messages.field_synced_with_origin')" />
             </button>
 
             <button
@@ -32,7 +32,7 @@
                 @click="$emit('synced')"
             >
                 <svg-icon name="hyperlink-broken" class="h-4 ml-sm w-4 text-grey-60"
-                    v-tooltip.top="__('Desynced from origin. Click to sync and revert to the origin\'s value.')" />
+                    v-tooltip.top="__('messages.field_desynced_from_origin')" />
             </button>
         </label>
 
@@ -44,13 +44,16 @@
         <loading-graphic v-if="loadingMeta" :size="16" :inline="true" />
 
         <slot name="fieldtype" v-if="!loadingMeta">
+            <div class="text-xs text-red" v-if="!fieldtypeComponentExists">Component <code v-text="fieldtypeComponent"></code> does not exist.</div>
             <component
+                v-else
                 :is="fieldtypeComponent"
                 :config="config"
                 :value="value"
                 :meta="meta"
                 :handle="config.handle"
                 :name-prefix="namePrefix"
+                :error-key-prefix="errorKeyPrefix"
                 :read-only="isReadOnly"
                 @input="$emit('input', $event)"
                 @meta-updated="$emit('meta-updated', $event)"
@@ -86,6 +89,7 @@ export default {
         readOnly: Boolean,
         syncable: Boolean,
         namePrefix: String,
+        errorKeyPrefix: String,
     },
 
     data() {
@@ -102,6 +106,10 @@ export default {
 
         fieldtypeComponent() {
             return `${this.config.component || this.config.type}-fieldtype`;
+        },
+
+        fieldtypeComponentExists() {
+            return Vue.options.components[this.fieldtypeComponent] !== undefined;
         },
 
         hasError() {

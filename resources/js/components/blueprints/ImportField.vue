@@ -5,13 +5,13 @@
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 pr-2 py-1 pl-1">
-                    <svg-icon class="text-grey-70 mr-1" name="paperclip" v-tooltip="__('linked fieldset')" />
+                    <svg-icon class="text-grey-70 mr-1" name="paperclip" v-tooltip="__('Linked fieldset')" />
                     <a @click="$emit('edit')">
                         <span v-text="__('Fieldset')" />
                         <span class="font-mono text-3xs text-grey-60">{{ field.fieldset }}</span>
                     </a>
                 </div>
-                <div class="pr-1">
+                <div class="pr-1 flex">
                     <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100"><svg-icon name="trash" /></button>
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings

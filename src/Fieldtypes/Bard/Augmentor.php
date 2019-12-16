@@ -24,6 +24,10 @@ class Augmentor
             return $value;
         }
 
+        if (! $this->fieldtype->config('sets')) {
+            return $this->convertToHtml($value);
+        }
+
         if (!$this->includeDisabledSets) {
             $value = $this->removeDisabledSets($value);
         }
@@ -107,7 +111,7 @@ class Augmentor
                 return $set;
             }
 
-            $values = (new Fields($config))->addValues($set)->augment()->values();
+            $values = (new Fields($config))->addValues($set)->augment()->values()->all();
 
             return array_merge($values, ['type' => $set['type']]);
         })->all();

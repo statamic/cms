@@ -2,9 +2,10 @@
 
 namespace Statamic\Filesystem;
 
-use Statamic\Support\FileCollection;
-use Illuminate\Support\Facades\Storage;
 use Illuminate\Contracts\Filesystem\Filesystem as FilesystemAdapter;
+use League\Flysystem\Adapter\Local;
+use Statamic\Facades\Path;
+use Statamic\Support\Str;
 
 class FlysystemAdapter extends AbstractAdapter
 {
@@ -15,13 +16,29 @@ class FlysystemAdapter extends AbstractAdapter
         $this->filesystem = $filesystem;
     }
 
-    protected function normalizePath($path)
+    public function normalizePath($path)
     {
-        if ($path === '/' || $path === '.') {
-            return null;
+        $path = Path::tidy($path);
+
+        if ($path === '' || $path === '/' || $path === '.') {
+            return '/';
         }
 
-        return $path;
+        if (Path::isAbsolute($path)) {
+            $adapter = $this->filesystem->getDriver()->getAdapter();
+
+            if (! $adapter instanceof Local) {
+                throw new \LogicException('Cannot use absolute paths on non-local adapters.');
+            }
+
+            if (! Str::startsWith($path, $root = Path::tidy($adapter->getPathPrefix()))) {
+                throw new \LogicException("Cannot reference path [{$path}] outside the root [{$root}]");
+            }
+
+            $path = Str::removeLeft($path, $root);
+        }
+
+        return Path::tidy($path);
     }
 
     public function exists($path = null)
@@ -86,5 +103,10 @@ class FlysystemAdapter extends AbstractAdapter
     public function path($path)
     {
         return $this->filesystem->path($path);
+    }
+
+    public function withAbsolutePaths()
+    {
+        throw new \LogicException('Cannot use absolute paths');
     }
 }

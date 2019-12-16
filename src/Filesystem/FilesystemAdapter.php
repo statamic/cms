@@ -3,6 +3,7 @@
 namespace Statamic\Filesystem;
 
 use Statamic\Support\Str;
+use Statamic\Facades\Path;
 use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
 
@@ -10,6 +11,7 @@ class FilesystemAdapter extends AbstractAdapter
 {
     protected $root;
     protected $filesystem;
+    protected $withAbsolutePaths = false;
 
     public function __construct(Filesystem $filesystem, $root)
     {
@@ -19,24 +21,39 @@ class FilesystemAdapter extends AbstractAdapter
 
     public function setRootDirectory($directory)
     {
-        $this->root = Str::ensureRight($directory, '/');
+        $this->root = rtrim($directory, '/\\');
 
         return $this;
     }
 
-    protected function normalizePath($path)
+    public function normalizePath($path)
     {
-        if ($path !== '/' && Str::startsWith($path, '/')) {
-            return $path;
+        // If given an absolute path, just tidy it (to adjust the slashes) and return it.
+        // Except for a single slash, because that means "the root of the configured
+        // filesystem", and not "the root of this entire computer".
+        if ($path !== '/' && Path::isAbsolute($path)) {
+            return Path::tidy($path);
         }
 
-        if ($path === '.') {
-            $path = '/';
-        }
+        $path = Path::tidy($this->root . '/' . $path);
 
-        $str = Str::ensureLeft($path, $this->root);
+        return $path;
+    }
 
-        return Str::trimRight($str, '/');
+    public function isWithinRoot($path)
+    {
+        $path = $this->normalizePath($path);
+
+        return Str::startsWith($path, Path::tidy($this->root));
+    }
+
+    protected function relativePath($path)
+    {
+        $root = Path::tidy($this->root);
+
+        $path = Path::tidy(Str::removeLeft($path, $root));
+
+        return ltrim($path, '/');
     }
 
     public function isDirectory($path)
@@ -54,8 +71,13 @@ class FilesystemAdapter extends AbstractAdapter
 
         $files = $this->filesystem->$method($this->normalizePath($path), true);
 
-        return $this->collection($files)->map(function ($file) {
-            return $this->relativePath($file->getPathname());
+        $inRoot = $this->isWithinRoot($path);
+
+        return $this->collection($files)->map(function ($file) use ($inRoot) {
+            $path = $file->getPathname();
+            return $inRoot && !$this->withAbsolutePaths
+                ? $this->relativePath($path)
+                : $this->normalizePath($path);
         });
     }
 
@@ -81,5 +103,12 @@ class FilesystemAdapter extends AbstractAdapter
     public function moveDirectory($src, $dest, $overwrite = false)
     {
         return $this->filesystem->moveDirectory($this->normalizePath($src), $this->normalizePath($dest), $overwrite);
+    }
+
+    public function withAbsolutePaths()
+    {
+        $this->withAbsolutePaths = true;
+
+        return $this;
     }
 }

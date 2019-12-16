@@ -2,20 +2,32 @@
 
 namespace Statamic\Actions;
 
-use Statamic\Facades\User;
+use Statamic\Contracts\Assets\Asset;
 
 class RenameAsset extends Action
 {
     protected static $title = 'Rename';
 
-    public function visibleTo($key, $context)
+    public function filter($item)
     {
-        return $key === 'asset-browser';
+        return $item instanceof Asset;
     }
 
-    public function authorize($asset)
+    public function authorize($user, $asset)
     {
-        return User::current()->can('rename', $asset);
+        return $user->can('rename', $asset);
+    }
+
+    public function buttonText()
+    {
+        /** @translation */
+        return 'Rename Asset|Rename :count Assets';
+    }
+
+    public function confirmationText()
+    {
+        /** @translation */
+        return 'Are you sure you want to rename this asset?|Are you sure you want to rename these :count assets?';
     }
 
     public function run($assets, $values)
@@ -29,6 +41,7 @@ class RenameAsset extends Action
             'filename' => [
                 'type' => 'text',
                 'validate' => 'required', // TODO: Better filename validation
+                'classes' => 'mousetrap'
             ]
         ];
     }

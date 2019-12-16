@@ -2,13 +2,13 @@
 
 namespace Statamic\Http\Controllers\CP\Structures;
 
+use Statamic\Support\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Structure;
 use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
-use Statamic\Fields\Validation;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Structures\Structure as StructureContract;
@@ -95,7 +95,7 @@ class StructuresController extends CpController
             'structure' => $structure,
             'pages' => $pages,
             'expectsRoot' => $structure->expectsRoot(),
-            'hasCollection' => $structure->collection() ? true : false,
+            'hasCollection' => $structure->isCollectionBased(),
             'collections' => $structure->collections()->map->handle()->all(),
             'localizations' => $structure->sites()->map(function ($handle) use ($structure, $tree) {
                 $localized = $structure->in($handle);
@@ -116,22 +116,22 @@ class StructuresController extends CpController
 
     public function update(Request $request, $structure)
     {
-        $validation = (new Validation)->fields(
-            $fields = $this->editFormBlueprint()->fields()->addValues($request->all())->process()
-        );
+        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 
-        $request->validate($validation->rules());
+        $fields->validate();
 
         $structure = Structure::find($structure);
 
         $this->authorize('update', $structure, 'You are not authorized to edit this structure.');
 
-        $values = $fields->values();
+        $expectedRoot = $structure->expectsRoot();
+
+        $values = $fields->process()->values()->all();
 
         $structure
             ->title($values['title'])
             ->handle($values['handle'])
-            ->expectsRoot($values['expects_root'])
+            ->expectsRoot($expectsRoot = $values['expects_root'])
             ->sites(collect($values['sites'])->filter->enabled->map->handle->values()->all());
 
         foreach ($values['sites'] as $site) {
@@ -164,6 +164,8 @@ class StructuresController extends CpController
             $structure->collections($values['collections']);
         }
 
+        $this->updateRootExpectations($structure, $expectedRoot, $expectsRoot);
+
         $structure->save();
 
         return [
@@ -188,6 +190,7 @@ class StructuresController extends CpController
             'collections' => 'array',
             'collection' => 'nullable',
             'max_depth' => 'nullable|integer',
+            'expects_root' => 'nullable',
             'route' => 'nullable', // todo: change to the structuresites fieldtype
         ]);
 
@@ -195,7 +198,8 @@ class StructuresController extends CpController
             ->title($values['title'])
             ->handle($values['handle'])
             ->collections($values['collections'] ?? [])
-            ->maxDepth($values['max_depth']);
+            ->maxDepth($values['max_depth'])
+            ->expectsRoot($values['expects_root']);
 
         $sites = [ // todo: change to the structuresites fieldtype
             ['handle' => Site::default()->handle(), 'route' => $values['route']],
@@ -215,6 +219,36 @@ class StructuresController extends CpController
         }
 
         return ['redirect' => $structure->showUrl()];
+    }
+
+    protected function updateRootExpectations($structure, $expected, $expecting)
+    {
+        if ($expected === $expecting) {
+            return;
+        }
+
+        $structure->trees()->each(function ($tree) use ($expecting) {
+            return $expecting
+                ? $this->moveFirstPageToRoot($tree)
+                : $this->moveRootToFirstPage($tree);
+        });
+    }
+
+    protected function moveFirstPageToRoot($tree)
+    {
+        $arr = $tree->tree();
+        $first = Arr::pull($arr, 0);
+        $tree
+            ->tree(array_values($arr))
+            ->root($first['entry']);
+    }
+
+    protected function moveRootToFirstPage($tree)
+    {
+        $root = $tree->root();
+        $arr = $tree->tree();
+        array_unshift($arr, ['entry' => $root]);
+        $tree->root(null)->tree($arr);
     }
 
     public function editFormBlueprint()

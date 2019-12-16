@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Fields\Value;
 use Statamic\Facades\Asset;
 use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
@@ -32,6 +33,14 @@ class Assets extends Tags
     {
         $value = Arr::get($this->context, $this->method);
 
+        if ($this->isAssetsFieldValue($value)) {
+            return $value->value();
+        }
+
+        if ($value instanceof Value) {
+            $value = $value->value();
+        }
+
         return $this->assets($value);
     }
 
@@ -47,7 +56,7 @@ class Assets extends Tags
      */
     public function index()
     {
-        $id = $this->get(['container', 'id']);
+        $id = $this->get(['container', 'handle', 'id']);
         $path = $this->get('path');
 
         if (!$id && !$path) {
@@ -107,7 +116,7 @@ class Assets extends Tags
         $this->sort();
         $this->limit();
 
-        return $this->parseLoop($this->assets);
+        return $this->assets;
     }
 
     private function sort()
@@ -129,5 +138,11 @@ class Assets extends Tags
         $offset = $this->getInt('offset');
 
         $this->assets = $this->assets->splice($offset, $limit);
+    }
+
+    private function isAssetsFieldValue($value)
+    {
+        return $value instanceof Value
+            && optional($value->fieldtype())->handle() === 'assets';
     }
 }

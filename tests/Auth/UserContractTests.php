@@ -14,7 +14,7 @@ trait UserContractTests
     function user()
     {
         return $this->makeUser()
-            ->id('123')
+            ->id(123)
             ->email('john@example.com')
             ->data([
                 'name' => 'John Smith',
@@ -35,9 +35,19 @@ trait UserContractTests
     }
 
     /** @test */
+    function gets_the_name()
+    {
+        $this->assertEquals('John', $this->makeUser()->set('name', 'John')->name());
+        $this->assertEquals('John Smith', $this->makeUser()->set('name', 'John Smith')->name());
+        $this->assertEquals('John', $this->makeUser()->data(['name' => null, 'first_name' => 'John'])->name());
+        $this->assertEquals('John Smith', $this->makeUser()->data(['name' => null, 'first_name' => 'John', 'last_name' => 'Smith'])->name());
+        $this->assertEquals('john@example.com', $this->makeUser()->remove('name')->email('john@example.com')->name());
+    }
+
+    /** @test */
     function it_gets_data()
     {
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             'name' => 'John Smith',
             'foo' => 'bar',
             'content' => 'Lorem Ipsum',
@@ -49,7 +59,12 @@ trait UserContractTests
                 'group_one',
                 'group_two',
             ]
-        ], $this->user()->data());
+        ], $this->additionalDataValues()), $this->user()->data()->all());
+    }
+
+    function additionalDataValues()
+    {
+        return [];
     }
 
     /** @test */
@@ -132,12 +147,12 @@ trait UserContractTests
     /** @test */
     function converts_to_array()
     {
-        $this->assertEquals([
+        $this->assertEquals(array_merge([
             'name' => 'John Smith',
             'foo' => 'bar',
             'content' => 'Lorem Ipsum',
             'email' => 'john@example.com',
-            'id' => '123',
+            'id' => 123,
             'roles' => [
                 'role_one',
                 'role_two'
@@ -150,16 +165,19 @@ trait UserContractTests
             'is_role_two' => true,
             'in_group_one' => true,
             'in_group_two' => true,
-            'preferences' => [],
             'supplemented' => 'qux',
             'avatar' => null,
             'initials' => 'JS',
             'is_user' => true,
             'title' => 'john@example.com',
             'edit_url' => 'http://localhost/cp/users/123/edit',
-            'permissions' => [],
             'last_login' => null,
-        ], $this->user()->toArray());
+        ], $this->additionalToArrayValues()), $this->user()->augmentedArrayData());
+    }
+
+    function additionalToArrayValues()
+    {
+        return [];
     }
 
     private function createRole($handle)

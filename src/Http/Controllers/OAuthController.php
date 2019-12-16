@@ -26,6 +26,8 @@ class OAuthController
 
         $user = OAuth::provider($provider)->findOrCreateUser($providerUser);
 
+        session()->put('oauth-provider', $provider);
+
         Auth::login($user, true);
 
         return redirect()->to($this->successRedirectUrl());

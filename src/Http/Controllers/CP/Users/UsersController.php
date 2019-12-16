@@ -2,27 +2,19 @@
 
 namespace Statamic\Http\Controllers\CP\Users;
 
-use Statamic\Facades\URL;
-use Statamic\Facades\User;
-use Statamic\Facades\Email;
-use Statamic\Facades\Scope;
+use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Action;
-use Statamic\Facades\Config;
-use Statamic\Facades\Helper;
-use Statamic\Facades\Fieldset;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Scope;
+use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
-use Illuminate\Http\Request;
-use Statamic\Fields\Validation;
-use Statamic\Auth\PasswordReset;
-use Illuminate\Notifications\Notifiable;
-use Statamic\Http\Requests\FilteredRequest;
-use Statamic\Notifications\ActivateAccount;
-use Illuminate\Http\Resources\Json\Resource;
-use Statamic\Notifications\NewUserInvitation;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Http\Requests\FilteredRequest;
+use Statamic\Http\Resources\CP\Users\Users;
+use Statamic\Notifications\ActivateAccount;
 
 class UsersController extends CpController
 {
@@ -56,28 +48,20 @@ class UsersController extends CpController
 
         $users = $query
             ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
-            ->paginate(request('perPage'))
-            ->supplement(function ($user) use ($request) {
-                return [
-                    'edit_url' => $user->editUrl(),
-                    'editable' => User::current()->can('edit', $user),
-                    'deleteable' => User::current()->can('delete', $user),
-                    'roles' => $user->isSuper() ? ['Super Admin'] : $user->roles()->map->title()->values(),
-                    'last_login' => optional($user->lastLogin())->diffForHumans() ?? __("Never"),
-                    'actions' => Action::for('users', [], $user),
-                ];
-            });
+            ->paginate(request('perPage'));
 
-        return Resource::collection($users)->additional(['meta' => [
-            'filters' => $request->filters,
-            'sortColumn' => $sort,
-            'columns' => [
-                Column::make('email'),
-                Column::make('name'),
-                Column::make('roles'),
-                Column::make('last_login'),
-            ],
-        ]]);
+        return (new Users($users))
+            ->blueprint(Blueprint::find('user'))
+            ->columns([
+                Column::make('email')->label(__('Email')),
+                Column::make('name')->label(__('Name')),
+                Column::make('roles')->label(__('Roles'))->fieldtype('relationship')->sortable(false),
+                Column::make('last_login')->label(__('Last Login'))->sortable(false),
+            ])
+            ->additional(['meta' => [
+                'filters' => $request->filters,
+                'sortColumn' => $sort,
+            ]]);
     }
 
     protected function filter($query, $filters)
@@ -104,7 +88,7 @@ class UsersController extends CpController
 
         $viewData = [
             'title' => __('Create'),
-            'values' => $fields->values(),
+            'values' => $fields->values()->all(),
             'meta' => $fields->meta(),
             'blueprint' => $blueprint->toPublishArray(),
             'actions' => [
@@ -125,23 +109,25 @@ class UsersController extends CpController
 
         $blueprint = Blueprint::find('user');
 
-        $fields = $blueprint->fields()->addValues($request->all())->process();
+        $fields = $blueprint->fields()->addValues($request->all());
 
-        $validation = (new Validation)->fields($fields)->withRules([
-            'email' => 'required', // TODO: Needs to be more clever re: different logic for email as login
-        ]);
+        $fields->validate(['email' => 'required|email|unique_user_value']);
 
-        $request->validate($validation->rules());
-
-        $values = array_except($fields->values(), ['email', 'groups', 'roles']);
+        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
         $user = User::make()
             ->email($request->email)
-            ->data($values)
-            ->roles($request->roles ?? [])
-            ->groups($request->groups ?? []);
+            ->data($values);
 
-        if ($request->super) {
+        if ($request->roles && User::current()->can('edit roles')) {
+            $user->roles($request->roles);
+        }
+
+        if ($request->groups && User::current()->can('edit user groups')) {
+            $user->groups($request->groups);
+        }
+
+        if ($request->super && User::current()->can('edit roles')) {
             $user->makeSuper();
         }
 
@@ -153,9 +139,10 @@ class UsersController extends CpController
             $user->generateTokenAndSendPasswordResetNotification();
         }
 
-        return array_merge($user->toArray(), [
+        return [
             'redirect' => $user->editUrl(),
-        ]);
+            'activationUrl' => $request->invitation['send'] ? null : $user->getPasswordResetUrl(),
+        ];
     }
 
     public function edit(Request $request, $id)
@@ -164,14 +151,24 @@ class UsersController extends CpController
 
         $this->authorize('edit', $user);
 
-        $fields = $user->blueprint()
+        $blueprint = $user->blueprint();
+
+        if (! User::current()->can('edit roles')) {
+            $blueprint->ensureField('roles', ['read_only' => true]);
+        }
+
+        if (! User::current()->can('edit user groups')) {
+            $blueprint->ensureField('groups', ['read_only' => true]);
+        }
+
+        $fields = $blueprint
             ->fields()
-            ->addValues(array_merge($user->data(), ['email' => $user->email()]))
+            ->addValues($user->data()->merge(['email' => $user->email()])->all())
             ->preProcess();
 
         $viewData = [
             'title' => $user->email(),
-            'values' => $fields->values(),
+            'values' => $fields->values()->all(),
             'meta' => $fields->meta(),
             'blueprint' => $user->blueprint()->toPublishArray(),
             'reference' => $user->reference(),
@@ -179,7 +176,7 @@ class UsersController extends CpController
                 'save' => $user->updateUrl(),
                 'password' => cp_route('users.password.update', $user->id()),
             ],
-            'canEditPassword' => $request->user()->can('editPassword', $user)
+            'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user)
         ];
 
         if ($request->wantsJson()) {
@@ -195,32 +192,28 @@ class UsersController extends CpController
 
         $this->authorize('edit', $user);
 
-        $fields = $user->blueprint()->fields()->addValues($request->all())->process();
+        $fields = $user->blueprint()->fields()->addValues($request->all());
 
-        $validation = (new Validation)->fields($fields)->withRules([
-            'email' => 'required', // TODO: Needs to be more clever re: different logic for username as login
-        ]);
+        $fields->validate(['email' => 'required|unique_user_value:'.$id]);
 
-        $request->validate($validation->rules());
-
-        $values = array_except($fields->values(), ['email', 'groups', 'roles']);
+        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
         foreach ($values as $key => $value) {
             $user->set($key, $value);
         }
         $user->email($request->email);
 
-        if ($request->roles) {
+        if ($request->roles && User::current()->can('edit roles')) {
             $user->roles($request->roles);
         }
 
-        if ($request->groups) {
+        if ($request->groups && User::current()->can('edit user groups')) {
             $user->groups($request->groups);
         }
 
         $user->save();
 
-        return $user->toArray();
+        return ['title' => $user->title()];
     }
 
     public function destroy($user)
@@ -234,41 +227,5 @@ class UsersController extends CpController
         $user->delete();
 
         return response('', 204);
-    }
-
-    public function getResetUrl($username)
-    {
-        $user = User::whereUsername($username);
-
-        // Users can reset their own password
-        if ($user !== User::current()) {
-            $this->authorize('super');
-        }
-
-        $resetter = new PasswordReset;
-
-        $resetter->user($user);
-
-        return [
-            'success' => true,
-            'url' => $resetter->url()
-        ];
-    }
-
-    public function sendResetEmail($username)
-    {
-        $user = User::whereUsername($username);
-
-        if (! $user->email()) {
-            return ['success' => false];
-        }
-
-        $resetter = new PasswordReset;
-
-        $resetter->user($user);
-
-        $resetter->send();
-
-        return ['success' => true];
     }
 }

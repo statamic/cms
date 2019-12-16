@@ -23,9 +23,7 @@
                 </template>
 
                 <template v-else>
-                    <a :href="toenail" class="zoom" v-if="isImage" :title="label">
-                        <img :src="thumbnail" />
-                    </a>
+                    <img :src="thumbnail" v-if="isImage" :title="label" />
 
                     <template v-else>
                         <div v-if="canShowSvg"
@@ -53,7 +51,6 @@
 
         <div class="asset-meta">
             <div class="asset-filename" :title="label">{{ label }}</div>
-            <div class="asset-filesize" v-if="! isInBardField">{{ asset.size }}</div>
         </div>
     </div>
 

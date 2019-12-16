@@ -13,6 +13,13 @@ class Repository
         })->values();
     }
 
+    public function find($key, $context = [])
+    {
+        if ($scope = app('statamic.scopes')->get($key)) {
+            return app($scope)->context($context);
+        }
+    }
+
     public function filters($key, $context = [])
     {
         return $this->all()

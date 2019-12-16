@@ -3,11 +3,12 @@
 namespace Statamic\Exceptions;
 
 use Exception;
-use Facade\IgnitionContracts\Solution;
-use Facade\IgnitionContracts\BaseSolution;
 use Facade\Ignition\Support\StringComparator;
+use Facade\IgnitionContracts\BaseSolution;
 use Facade\IgnitionContracts\ProvidesSolution;
+use Facade\IgnitionContracts\Solution;
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Statamic\Statamic;
 
 class FieldtypeNotFoundException extends Exception implements ProvidesSolution
 {
@@ -22,19 +23,27 @@ class FieldtypeNotFoundException extends Exception implements ProvidesSolution
 
     public function getSolution(): Solution
     {
+        $docs = ['Read the fieldtypes guide' => Statamic::docsUrl('fieldtypes')];
+
         $description = ($suggestedFieldtype = $this->getSuggestedFieldtype())
             ? "Did you mean `$suggestedFieldtype`?"
             : 'Are you sure the fieldtype exists?';
 
+        if ($suggestedFieldtype) {
+            $docs["Read the $suggestedFieldtype fieldtype guide"] = Statamic::docsUrl('fieldtypes/'.$suggestedFieldtype);
+        }
+
         return BaseSolution::create("The {$this->fieldtype} fieldtype was not found.")
             ->setSolutionDescription($description)
-            ->setDocumentationLinks([
-                'Read the fieldtypes guide' => 'https://docs.statamic.com/fieldtypes',
-            ]);
+            ->setDocumentationLinks($docs);
     }
 
     protected function getSuggestedFieldtype()
     {
+        if (in_array($this->fieldtype, ['relationship', 'collection'])) {
+            return 'entries';
+        }
+
         return StringComparator::findClosestMatch(
             FieldtypeRepository::handles()->all(),
             $this->fieldtype

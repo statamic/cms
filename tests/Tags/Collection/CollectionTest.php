@@ -13,6 +13,7 @@ use Statamic\Tags\Collection\Collection;
 use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Facades\Blueprint;
 
 class CollectionTest extends TestCase
 {
@@ -387,6 +388,32 @@ class CollectionTest extends TestCase
             ['Banana', 'Danish'],
             $this->collectionTag->previous()->map->get('title')->all()
         );
+    }
+
+    /** @test */
+    function it_adds_defaults_for_missing_items_based_on_blueprint()
+    {
+        $blueprint = Blueprint::make('test')->setContents(['fields' => [['handle' => 'title', 'field' => ['type' => 'text']]]]);
+        Blueprint::shouldReceive('find')->with('test')->andReturn($blueprint);
+        $this->foods->entryBlueprints(['test']);
+
+        $this->makeEntry($this->foods, 'a')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->save();
+        $this->makeEntry($this->foods, 'c')->set('title', null)->save();
+        $this->makeEntry($this->foods, 'd')->set('title', 'Banana')->save();
+
+        $this->setTagParameters(['in' => 'foods']);
+
+        $items = collect($this->collectionTag->index()->toAugmentedArray())->mapWithKeys(function ($item) {
+            return [$item['slug']->value() => $item['title']->value()];
+        })->all();
+
+        $this->assertEquals([
+            'a' => 'Apple',
+            'b' => null,
+            'c' => null,
+            'd' => 'Banana'
+        ], $items);
     }
 
     private function setTagParameters($parameters)

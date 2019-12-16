@@ -11,9 +11,19 @@ export default {
 
     mixins: [Fieldtype],
 
+    computed: {
+
+        replicatorPreview() {
+            return this.value
+                ? `<span class="little-dot" style="background-color:${this.value}"></span>`
+                : null;
+        }
+
+    },
+
     mounted() {
         const pickr = Pickr.create({
-            el: '.color-picker',
+            el: this.$el,
             disabled: this.isReadOnly,
             components: {
 
@@ -34,6 +44,7 @@ export default {
                     save: true
                 }
             },
+            outputPrecision: 1,
             strings: {
                 save: __('Save'),
                 clear: __('Clear')
@@ -53,7 +64,7 @@ export default {
             var rep = args[1].getColorRepresentation();
             if (args[0] && rep) {
                 // Dynamically call toHEX(), toRGBA(), etc
-                this.update(args[0]['to' + rep]().toString());
+                this.update(args[0]['to' + rep]().toString(0));
             } else {
                 // Color was manually cleared
                 this.update(null);

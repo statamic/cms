@@ -8,7 +8,7 @@
 
         <data-list
             v-if="!initializing"
-            :rows="itemsWithExclusions"
+            :rows="items"
             :columns="columns"
             :sort="false"
             :sort-column="sortColumn"
@@ -25,33 +25,19 @@
                             <data-list-search
                                 v-if="search"
                                 v-model="searchQuery"
-                                class="bg-transparent p-0" />
+                                ref="search"
+                                class="w-full bg-transparent p-0" />
                         </div>
 
-                        <button
-                            v-if="canCreate"
-                            type="button"
-                            class="ml-2 btn"
-                            @click="isCreating = true"
-                            v-text="`${__('Create')}...`" />
-
-                        <button
-                            type="button"
-                            class="btn btn-primary ml-2"
-                            @click="select"
-                            v-text="hasMaxSelections
-                                ? __n('Select (:count/:max)', selections, { max: maxSelections })
-                                : __n('Select (:count)', selections)" />
-
-                        <button
-                            type="button"
-                            class="btn-close"
-                            @click="close"
-                            v-html="'&times'" />
+                        <data-list-filters
+                            class="ml-1"
+                            :filters="filters"
+                            :active-filters="activeFilters"
+                            :active-count="activeFilterCount" />
                     </div>
                 </div>
 
-                <div class="flex-1 flex flex-col">
+                <div class="flex-1 flex flex-col min-h-0">
                     <div class="flex flex-col h-full justify-start">
                         <div class="flex-1 overflow-scroll">
                             <data-list-table
@@ -63,7 +49,7 @@
                             >
                                 <template slot="cell-title" slot-scope="{ row: entry }">
                                     <div class="flex items-center">
-                                        <div v-if="entry.published !== undefined" class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
+                                        <div v-if="entry.published !== undefined" class="little-dot mr-1" :class="getStatusClass(entry)" />
                                         {{ entry.title }}
                                     </div>
                                 </template>
@@ -74,18 +60,35 @@
                         </div>
 
                         <data-list-pagination
+                            v-if="meta.last_page > 1"
                             class="p-1 border-t shadow-lg"
                             :resource-meta="meta"
                             @page-selected="setPage" />
+
+                        <div class="p-2 border-t flex items-center justify-between bg-grey-20">
+                            <div class="text-sm text-grey-40"
+                                v-text="hasMaxSelections
+                                    ? __n(':count/:max selected', selections, { max: maxSelections })
+                                    : __n(':count selected', selections)" />
+
+                            <div>
+                                <button
+                                    type="button"
+                                    class="btn"
+                                    @click="close">
+                                    {{ __('Cancel') }}
+                                </button>
+
+                                <button
+                                    type="button"
+                                    class="btn btn-primary ml-1"
+                                    @click="select">
+                                    {{ __('Select') }}
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </div>
-
-                <inline-create-form
-                    v-if="isCreating"
-                    :site="site"
-                    @created="itemCreated"
-                    @closed="stopCreating"
-                />
 
             </div>
         </data-list>
@@ -95,13 +98,16 @@
 
 <script>
 import Popper from 'vue-popperjs';
-import InlineCreateForm from './InlineCreateForm.vue';
+import HasFilters from '../../data-list/HasFilters';
 
 export default {
 
+    mixins: [
+        HasFilters,
+    ],
+
     components: {
-        Popper,
-        InlineCreateForm
+        Popper
     },
 
     props: {
@@ -109,11 +115,9 @@ export default {
         initialSelections: Array,
         initialSortColumn: String,
         initialSortDirection: String,
-        initialColumns: Array,
         maxSelections: Number,
         site: String,
         search: Boolean,
-        canCreate: Boolean,
         exclusions: {
             type: Array,
             default: () => []
@@ -122,17 +126,18 @@ export default {
 
     data() {
         return {
+            source: null,
             initializing: true,
             loading: true,
             items: [],
             meta: {},
-            columns: this.initialColumns,
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             page: 1,
             searchQuery: '',
             selections: _.clone(this.initialSelections),
-            isCreating: false
+            columns: [],
+            filters: [],
         }
     },
 
@@ -143,33 +148,32 @@ export default {
                 sort: this.sortColumn,
                 order: this.sortDirection,
                 page: this.page,
-                search: this.searchQuery,
-                site: this.site
+                site: this.site,
+                exclusions: this.exclusions,
+                filters: btoa(JSON.stringify(this.activeFilters)),
             }
         },
 
         hasMaxSelections() {
             return (this.maxSelections === Infinity) ? false : Boolean(this.maxSelections);
-        },
-
-        itemsWithExclusions() {
-            return this.items.filter(item => !this.exclusions.includes(item.id));
         }
 
     },
 
-    created() {
-        this.request();
-    },
-
     mounted() {
-        this.$modal.show('item-selector');
+        this.request().then(() => {
+            if (this.search) this.$refs.search.focus();
+        });
     },
 
     watch: {
 
-        parameters() {
-            this.request();
+        parameters: {
+            deep: true,
+            handler(after, before) {
+                if (JSON.stringify(before) === JSON.stringify(after)) return;
+                this.request();
+            }
         },
 
         loading: {
@@ -177,6 +181,14 @@ export default {
             handler(loading) {
                 this.$progress.loading('relationship-selector-listing', loading);
             }
+        },
+
+        searchQuery(query) {
+            this.sortColumn = null;
+            this.sortDirection = null;
+            this.page = 1;
+
+            this.request();
         }
 
     },
@@ -186,12 +198,27 @@ export default {
         request() {
             this.loading = true;
 
-            return this.$axios.get(this.url, { params: this.parameters }).then(response => {
+            if (this.source) this.source.cancel();
+            this.source = this.$axios.CancelToken.source();
+
+            const params = {...this.parameters, ...{
+                search: this.searchQuery,
+            }};
+
+            return this.$axios.get(this.url, { params, cancelToken: this.source.token }).then(response => {
+                this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
                 this.items = response.data.data;
                 this.meta = response.data.meta;
+                this.filters = response.data.meta.filters;
+                this.activeFilters = {...response.data.meta.activeFilters};
                 this.loading = false;
                 this.initializing = false;
+            }).catch(e => {
+                if (this.$axios.isCancel(e)) return;
+                this.loading = false;
+                this.initializing = false;
+                this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { duration: null });
             });
         },
 
@@ -217,14 +244,14 @@ export default {
             this.selections = selections;
         },
 
-        itemCreated(item) {
-            this.request();
-            this.selections.push(item.id);
-            this.stopCreating();
-        },
-
-        stopCreating() {
-            this.isCreating = false;
+        getStatusClass(entry) {
+            if (entry.published && entry.private) {
+                return 'bg-transparent border border-grey-60';
+            } else if (entry.published) {
+                return 'bg-green';
+            } else {
+                return 'bg-grey-40';
+            }
         }
 
     }

@@ -18,28 +18,26 @@ class Locales extends Tags
 
     /**
      * The {{ locales }} tag.
-     *
-     * @return string
      */
     public function index()
     {
-        return $this->parseLoop($this->getLocales());
+        return $this->getLocales();
     }
 
     /**
      * The {{ locale:[key] }} tag.
-     *
-     * @param string $method  The locale key
-     * @param array  $args
-     * @return string
      */
-    public function __call($method, $args)
+    public function wildcard($key)
     {
-        $data = $this->getLocalizedData($key = $this->method);
+        if (! $site = Site::get($key)) {
+            throw new \Exception("Site [$key] does not exist.");
+        }
 
-        $data['locale'] = $this->getLocale($key);
+        $data = $this->getLocalizedData($key);
 
-        return $this->parse($data);
+        $data['locale'] = $this->getLocale($site);
+
+        return $data;
     }
 
     /**
@@ -55,7 +53,7 @@ class Locales extends Tags
             return $this->sort($locales);
         })->pipe(function ($locales) {
             return $this->addData($locales);
-        });
+        })->values();
     }
 
     /**
@@ -101,7 +99,7 @@ class Locales extends Tags
      */
     private function getLocalizedData($locale)
     {
-        return $this->getData()->in($locale)->toArray();
+        return $this->getData()->in($locale)->toAugmentedArray();
     }
 
     /**
@@ -115,7 +113,7 @@ class Locales extends Tags
             return $this->data;
         }
 
-        $id = $this->get('id', array_get($this->context, 'id')->value());
+        $id = $this->get('id', $this->context->get('id'));
 
         return $this->data = Entry::find($id);
     }

@@ -71,7 +71,7 @@ export default {
             this.loading = false;
             this.revisions = response.data.reverse();
         });
-        this.$mousetrap.bindGlobal(['esc'], e => {
+        this.$keys.bindGlobal(['esc'], e => {
             this.close();
         });
     },

@@ -1,30 +1,36 @@
 <template>
 
-    <ul class="list-reset">
-        <li v-for="permission in permissions" :key="permission.value">
-            <label class="flex mb-1" :class="{ 'text-grey-40': disabled, 'cursor-not-allowed': disabled }">
-                <div class="leading-normal">
-                    <input type="checkbox"
-                        v-model="permission.checked"
-                        :value="permission.value"
-                        :disabled="disabled"
-                        name="permissions[]"
-                        :class="{ 'cursor-not-allowed': disabled }"
-                    />
+    <div>
+        <div v-for="permission in permissions" :key="permission.value">
+            <label
+                class="flex items-center justify-between py-1 pr-2 border-b group hover:bg-grey-10"
+                :style="{ paddingLeft: `${16*depth}px` }"
+            >
+                <div class="flex" :class="{ 'text-grey-40': disabled, 'cursor-not-allowed': disabled }">
+                    <div class="leading-normal">
+                        <input type="checkbox"
+                            v-model="permission.checked"
+                            :value="permission.value"
+                            :disabled="disabled"
+                            name="permissions[]"
+                            :class="{ 'cursor-not-allowed': disabled }"
+                        />
+                    </div>
+                    <div class="pl-1">
+                        {{ permission.label }}
+                    </div>
                 </div>
-                <div class="pl-1">
-                    {{ permission.label }}
-                </div>
+                <div class="text-grey-50 text-xs opacity-0 group-hover:opacity-100" v-if="permission.description" v-text="permission.description" />
             </label>
 
             <role-permission-tree
                 v-if="permission.children.length"
-                class="ml-3"
+                :depth="depth+1"
                 :initial-permissions="permission.children"
                 :disabled="!permission.checked"
             />
-        </li>
-    </ul>
+        </div>
+    </div>
 
 </template>
 
@@ -33,7 +39,8 @@ export default {
 
     props: {
         initialPermissions: Array,
-        disabled: Boolean
+        disabled: Boolean,
+        depth: Number
     },
 
     data() {

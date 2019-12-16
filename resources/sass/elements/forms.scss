@@ -210,16 +210,6 @@ input.slug {
         font-weight: 500;
     }
 
-    .help-block {
-        @apply .block .mb-1 .text-grey-70 .text-xs;
-        a {
-            @apply .text-red;
-            &:hover {
-                @apply .text-grey-80;
-            }
-        }
-    }
-
     .input-with-loader + .help-block {
         margin-top: 0;
     }
@@ -243,6 +233,16 @@ input.slug {
     .form-group { flex-basis: auto; }
 
     .major { flex: 1; }
+}
+
+.help-block {
+    @apply .block .mb-1 .text-grey-70 .text-xs;
+    a {
+        @apply .text-red;
+        &:hover {
+            @apply .text-grey-80;
+        }
+    }
 }
 
 @screen md {

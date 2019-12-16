@@ -4,7 +4,7 @@
         v-if="blueprint"
         ref="container"
         name="collection"
-        :fieldset="blueprint"
+        :blueprint="blueprint"
         :values="values"
         reference="collection"
         :meta="meta"
@@ -72,9 +72,9 @@ export default {
                 const { message, errors } = e.response.data;
                 this.error = message;
                 this.errors = errors;
-                this.$notify.error(message);
+                this.$toast.error(message);
             } else {
-                this.$notify.error('Something went wrong');
+                this.$toast.error('Something went wrong');
             }
         },
 

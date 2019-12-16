@@ -35,7 +35,7 @@
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
                     <span v-text="__('Publish')" />
-                    <svg-icon name="chevron-down-xs" class="ml-1" />
+                    <svg-icon name="chevron-down-xs" class="ml-1 w-2" />
                 </button>
             </div>
 
@@ -46,7 +46,7 @@
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
-            :fieldset="fieldset"
+            :blueprint="fieldset"
             :values="values"
             :reference="initialReference"
             :meta="meta"
@@ -57,7 +57,7 @@
             @updated="values = $event"
         >
             <live-preview
-                slot-scope="{ container, components }"
+                slot-scope="{ container, components, setFieldMeta }"
                 :name="publishContainer"
                 :url="livePreviewUrl"
                 :previewing="isPreviewing"
@@ -82,6 +82,7 @@
                             :read-only="readOnly"
                             :syncable="hasOrigin"
                             @updated="setFieldValue"
+                            @meta-updated="setFieldMeta"
                             @synced="syncField"
                             @desynced="desyncField"
                             @focus="container.$emit('focus', $event)"
@@ -110,6 +111,8 @@
                                     </div>
                                 </div>
 
+                                <!--
+                                TODO
                                 <div class="flex items-center border-t justify-between px-2 py-1" v-if="!revisionsEnabled">
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
                                     <toggle-input v-model="published" />
@@ -145,6 +148,7 @@
                                             <span>{{ __('View History') }}</span>
                                         </button>
                                 </div>
+                                -->
 
                                 <div class="p-2 site-list border-t" v-if="localizations.length > 1">
                                     <label class="publish-field-label font-medium mb-1" v-text="__('Sites')" />
@@ -195,7 +199,7 @@
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
                 <span v-text="__('Publish')" />
-                <svg-icon name="chevron-down-xs" class="ml-1" />
+                <svg-icon name="chevron-down-xs" class="ml-1 w-2" />
             </button>
         </div>
 
@@ -372,10 +376,10 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
-                this.title = response.data.title;
-                this.permalink = response.data.permalink;
+                this.title = response.data.data.title;
+                this.permalink = response.data.data.permalink;
                 this.isWorkingCopy = true;
-                if (!this.isCreating) this.$notify.success('Saved');
+                if (!this.isCreating) this.$toast.success('Saved');
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => this.handleAxiosError(e));
@@ -393,9 +397,9 @@ export default {
                 const { message, errors } = e.response.data;
                 this.error = message;
                 this.errors = errors;
-                this.$notify.error(message);
+                this.$toast.error(message);
             } else {
-                this.$notify.error('Something went wrong');
+                this.$toast.error('Something went wrong');
             }
         },
 
@@ -439,7 +443,7 @@ export default {
                 this.isRoot = data.isRoot;
                 this.site = localization.handle;
                 this.localizing = false;
-                this.$nextTick(() => this.$refs.container.removeNavigationWarning());
+                this.$nextTick(() => this.$refs.container.clearDirtyState());
             })
         },
 
@@ -479,7 +483,7 @@ export default {
             if (published !== undefined) this.published = published;
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
-            this.permalink = response.data.permalink
+            this.permalink = response.data.data.permalink
             this.$nextTick(() => this.$emit('saved', response));
         },
 
@@ -510,7 +514,7 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bindGlobal(['command+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
             if (this.confirmingPublish) return;
             this.canPublish ? this.confirmPublish() : this.save();

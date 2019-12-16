@@ -12,23 +12,23 @@
         <!-- Step 1 -->
         <div v-show="currentStep === 0">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Create a new Collection</h1>
-                <p class="text-grey">A Collection is a group of entries that holds similar content and shares behavior and attributes, like URL patterns, ordering, and visibility.</p>
+                <h1 class="mb-3">{{ __('Create a new Collection') }}</h1>
+                <p class="text-grey" v-text="__('messages.collection_wizard_intro')" />
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Name of your Collection</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Title') }}</label>
                 <input type="text" v-model="collection.title" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Usually a plural noun, like "Articles", "Products", or "Breakfast Foods".
+                    {{ __('messages.collection_wizard_title_instructions') }}
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Handle</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Handle') }}</label>
                 <input type="text" v-model="collection.handle" class="input-text" tabindex="2">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    How you'll reference to this collection in your templates. Cannot easily be changed.
+                    {{ __('messages.collection_wizard_handle_instructions') }}
                 </div>
             </div>
         </div>
@@ -36,22 +36,22 @@
         <!-- Step 2 -->
         <div v-show="currentStep === 1">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Dates</h1>
-                <p class="text-grey">You can select different date behaviors.</p>
+                <h1 class="mb-3">{{ __('Dates') }}</h1>
+                <p class="text-grey" v-text="__('messages.collection_wizard_dates_intro')" />
             </div>
 
             <div class="max-w-md mx-auto px-2 pb-6">
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-4">
-                    <input type="radio" v-model="collection.dateBehavior" value="articles" />
-                    <p><strong class="text-md ml-2 font-bold">Articles</strong> &ndash; Entries with dates in the future will be private.</p>
+                    <input type="radio" v-model="collection.date_behavior" value="articles" />
+                    <p><strong class="text-md ml-2 font-bold">{{ __('Articles') }}</strong> &ndash; {{ __('messages.collection_wizard_articles_description') }}</p>
                 </label>
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-4">
-                    <input type="radio" v-model="collection.dateBehavior" value="events" />
-                    <p><strong class="text-md ml-2 font-bold">Events</strong> &ndash; Entries with dates in the past will be private.</p>
+                    <input type="radio" v-model="collection.date_behavior" value="events" />
+                    <p><strong class="text-md ml-2 font-bold">{{ __('Events') }}</strong> &ndash; {{ __('messages.collection_wizard_events_description') }}</p>
                 </label>
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-4">
-                    <input type="radio" v-model="collection.dateBehavior" :value="null" />
-                    <p><strong class="text-md ml-2 font-bold">No dates</strong> &ndash; Entries will not have any dates.</p>
+                    <input type="radio" v-model="collection.date_behavior" :value="null" />
+                    <p><strong class="text-md ml-2 font-bold">{{ __('No dates') }}</strong> &ndash; {{ __('messages.collection_wizard_no_dates_description') }}</p>
                 </label>
             </div>
         </div>
@@ -59,8 +59,8 @@
         <!-- Step 3 -->
         <div v-show="currentStep === 2">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Order</h1>
-                <p class="text-grey">Choose how you want your Collection to be ordered.</p>
+                <h1 class="mb-3">{{ __('Order') }}</h1>
+                <p class="text-grey" v-text="__('messages.collection_wizard_order_intro')" />
             </div>
             <div class="max-w-lg px-4 mx-auto pb-6 text-center">
                 <div class="-mx-2 flex flex-wrap justify-center">
@@ -69,12 +69,12 @@
                             <input id="order-date" class="absolute pin-t pin-r m-1" type="radio" v-model="collection.orderable" :value="false" />
                             <svg-icon name="calendar" class="w-8 h-8 mx-auto"></svg-icon>
                             <h3 class="my-2 font-bold">
-                                <template v-if="collection.dated">Date</template>
-                                <template v-else>Alphabetical</template>
+                                <template v-if="collection.dated">{{ __('Date') }}</template>
+                                <template v-else>{{ __('Alphabetical') }}</template>
                             </h3>
                             <p class="text-2xs text-grey">
-                                <template v-if="collection.dated">Entries are ordered by date.</template>
-                                <template v-else>Entries are ordered alphabetically by title.</template>
+                                <template v-if="collection.dated">{{ __('messages.collection_wizard_ordered_by_date_description') }}</template>
+                                <template v-else>{{ __('messages.collection_wizard_ordered_by_title_description') }}</template>
                             </p>
                         </label>
                     </div>
@@ -82,8 +82,8 @@
                         <label for="order-numerical" class="radio-box" :class="{selected: collection.orderable}">
                             <input id="order-numerical" class="absolute pin-t pin-r m-1" type="radio" v-model="collection.orderable" :value="true" />
                             <svg-icon name="arrange-number" class="w-8 h-8 mx-auto"></svg-icon>
-                            <h3 class="my-2 font-bold">Ordered</h3>
-                            <p class="text-2xs text-grey">Entries are ordered sequentially and can be manually reordered.</p>
+                            <h3 class="my-2 font-bold">{{ __('Ordered') }}</h3>
+                            <p class="text-2xs text-grey">{{ __('messages.collection_wizard_ordered_sequentially_description') }}</p>
                         </label>
                     </div>
                 </div>
@@ -91,30 +91,30 @@
 
             <div class="max-w-md mx-auto pb-4">
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="direction-desc">
-                    <input type="radio" v-model="collection.sortDirection" value="desc" id="direction-desc">
-                    <p><strong class="text-md ml-2 font-bold">Descending</strong> &ndash;
+                    <input type="radio" v-model="collection.sort_direction" value="desc" id="direction-desc">
+                    <p><strong class="text-md ml-2 font-bold">{{ __('Descending') }}</strong> &ndash;
                         <template v-if="collection.orderable">
-                            Entries will be sorted from highest to lowest.
+                            {{ __('messages.collection_wizard_ordered_sequentially_descending') }}
                         </template>
                         <template v-else-if="collection.dated">
-                            Entries will be sorted from newest to oldest.
+                            {{ __('messages.collection_wizard_ordered_date_descending') }}
                         </template>
                         <template v-else>
-                            Entries will be sorted from Z to A.
+                            {{ __('messages.collection_wizard_ordered_alpha_descending') }}
                         </template>
                     </p>
                 </label>
                 <label class="border-2 mt-4 cursor-pointer border-grey-30 p-2 rounded flex items-center" for="direction-asc">
-                    <input type="radio" v-model="collection.sortDirection" value="asc" id="direction-asc">
-                    <p><strong class="text-md ml-2 font-bold">Ascending</strong> &ndash;
+                    <input type="radio" v-model="collection.sort_direction" value="asc" id="direction-asc">
+                    <p><strong class="text-md ml-2 font-bold">{{ __('Ascending') }}</strong> &ndash;
                         <template v-if="collection.orderable">
-                            Entries will be sorted from lowest to highest.
+                            {{ __('messages.collection_wizard_ordered_sequentially_ascending') }}
                         </template>
                         <template v-else-if="collection.dated">
-                            Entries will be sorted from oldest to newest (unusual).
+                            {{ __('messages.collection_wizard_ordered_date_ascending') }}
                         </template>
                         <template v-else>
-                            Entries will be sorted from A to Z.
+                            {{ __('messages.collection_wizard_ordered_alpha_ascending') }}
                         </template>
                     </p>
                 </label>
@@ -123,11 +123,11 @@
 
         <div v-show="currentStep === 3">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Content Model</h1>
-                <p class="text-grey">Your content model determines what field and data are stored in this collection.</p>
+                <h1 class="mb-3">{{ __('Content Model') }}</h1>
+                <p class="text-grey" v-text="__('messages.collection_wizard_content_model_intro')" />
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Blueprints</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Blueprints') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'blueprints', type: 'blueprints' }"
                     :initial-value="collection.blueprints">
@@ -141,13 +141,13 @@
                             @input="collection.blueprints = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    If you choose multiple Blueprints, users will be able to select from one when creating entries. The first will be the default.
+                    {{ __('messages.collection_wizard_blueprints_instructions') }}
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Taxonomies</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Taxonomies') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'taxonomies', type: 'taxonomies' }"
                     :initial-value="collection.taxonomies">
@@ -161,13 +161,13 @@
                             @input="collection.taxonomies = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Entries in this collection may be related to terms in these taxonomies. Fields will be automatically added to publish forms.
+                    {{ __('messages.collection_wizard_taxonomies_instructions') }}
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Template</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Template') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'template', type: 'template' }"
                     :initial-value="collection.template">
@@ -180,13 +180,13 @@
                             @input="collection.template = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Set your default template.
+                    {{ __('messages.collection_wizard_template_instructions') }}
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Layout</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Layout') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'layout', type: 'template' }"
                     :initial-value="collection.layout">
@@ -199,31 +199,31 @@
                             @input="collection.layout = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Set your default layout.
+                    {{ __('messages.collection_wizard_layout_instructions') }}
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-6">
-                <label class="font-bold text-base mb-sm" for="defaultStatus">Default Status</label>
+                <label class="font-bold text-base mb-sm" for="default_publish_state">{{ __('Default Status') }}</label>
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center mb-2">
-                    <input type="radio" v-model="collection.defaultStatus" value="published" />
-                    <p><strong class="text-md ml-2 font-bold">Published</strong> &ndash; Entries will default to <span class="text-green">published</span> status.</p>
+                    <input type="radio" v-model="collection.default_publish_state" :value="true" />
+                    <p><strong class="text-md ml-2 font-bold">{{ __('Published') }}</strong> &ndash; <span v-html="__('messages.collection_wizard_default_status_published_description')" /></p>
                 </label>
                 <label class="border-2 cursor-pointer border-grey-30 p-2 rounded flex items-center">
-                    <input type="radio" v-model="collection.defaultStatus" value="draft" />
-                    <p><strong class="text-md ml-2 font-bold">Draft</strong> &ndash; Entries will default to <span class="text-grey-60">draft</span> status.</p>
+                    <input type="radio" v-model="collection.default_publish_state" :value="false" />
+                    <p><strong class="text-md ml-2 font-bold">Draft</strong> &ndash;  <span v-html="__('messages.collection_wizard_default_status_draft_description')" /></p>
                 </label>
             </div>
         </div>
 
         <div v-show="currentStep === 4">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">Routing</h1>
-                <p class="text-grey">Route rules determine the URL pattern of your collection's entries.</p>
+                <h1 class="mb-3">{{ __('Routing') }}</h1>
+                <p class="text-grey" v-text="__('messages.collection_wizard_routing_intro')" />
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="structure">Structure</label>
+                <label class="font-bold text-base mb-sm" for="structure">{{ __('Structure') }}</label>
                 <publish-field-meta
                     :config="{ handle: 'structure', type: 'structures', max_items: 1 }"
                     :initial-value="collection.structure ? [collection.structure] : []">
@@ -237,46 +237,46 @@
                             @input="collection.structure = $event[0]" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Choosing a structure will let your page hierarchy dictate its URLs.
+                    {{ __('messages.collection_wizard_structure_instructions') }}
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="mount">Mount to an Entry</label>
+                <label class="font-bold text-base mb-sm" for="mount">{{ __('Mount to an Entry') }}</label>
                 <publish-field-meta
-                    :config="{ handle: 'mount', type: 'relationship', max_items: 1 }"
+                    :config="{ handle: 'mount', type: 'entries', max_items: 1 }"
                     :initial-value="collection.mount ? [collection.mount] : []">
                     <div slot-scope="{ meta, value, loading }">
                         <relationship-fieldtype
                             v-if="!loading"
-                            :config="{ handle: 'mount', type: 'relationship', max_items: 1 }"
+                            :config="{ handle: 'mount', type: 'entries', max_items: 1 }"
                             :value="value"
                             :meta="meta"
                             handle="mount"
                             @input="collection.mount = $event[0]" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Add Structure shortcuts to this collection.
+                    {{ __('messages.collection_wizard_mount_instructions') }}
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Route Pattern</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Route Pattern') }}</label>
                 <input type="text" v-model="collection.route" class="input-text">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    <template v-if="collection.structure">A route is required when choosing a structure. You can also use `parent_uri` and `depth`.</template>
-                    <template v-else>Routes are optional. If you don't need a URL, you don't need a route.</template>
+                    <template v-if="collection.structure">{{ __('messages.collection_wizard_structure_route_instructions') }}</template>
+                    <template v-else>{{ __('messages.collection_wizard_route_instructions') }}</template>
                 </div>
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm">Accelerated Mobile Pages (AMP)</label>
-                <label><input type="checkbox" v-model="collection.amp" /> Enable AMP</label>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <label class="font-bold text-base mb-sm">{{ __('Accelerated Mobile Pages (AMP)') }}</label>
+                <label><input type="checkbox" v-model="collection.amp" /> {{ __('Enable AMP') }}</label>
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    AMP versions will be routed to <code>{site url}/amp/{entry url}</code>
+                    <span v-html="__('messages.collection_wizard_amp_instructions')" />
                 </div>
             </div>
         </div>
@@ -314,14 +314,14 @@ export default {
 
     data() {
         return {
-            steps: ['Naming', 'Dates', 'Order', 'Content Model', 'Routing'],
+            steps: [__('Naming'), __('Dates'), __('Order'), __('Content Model'), __('Routing')],
             collection: {
                 title: null,
                 handle: null,
                 orderable: false,
                 dated: true,
-                dateBehavior: 'articles',
-                sortDirection: 'desc',
+                date_behavior: 'articles',
+                sort_direction: 'desc',
                 blueprints: [],
                 taxonomies: [],
                 template: null,
@@ -330,7 +330,7 @@ export default {
                 amp: false,
                 structure: null,
                 mount: null,
-                defaultStatus: 'published',
+                default_publish_state: true,
             }
         }
     },
@@ -341,14 +341,14 @@ export default {
             this.collection.route = this.collection.handle + '/{slug}';
         },
 
-        'collection.dateBehavior': function (behavior) {
+        'collection.date_behavior': function (behavior) {
             this.collection.dated = behavior === null ? false : true;
         }
     },
 
     methods: {
         canGoToStep(step) {
-            if (step === 1) {
+            if (step >= 1) {
                 return Boolean(this.collection.title && this.collection.handle);
             }
 
@@ -358,17 +358,17 @@ export default {
             this.$axios.post(this.route, this.collection).then(response => {
                 window.location = response.data.redirect;
             }).catch(error => {
-                this.$notify.error(error.response.data.message);
+                this.$toast.error(error.response.data.message);
             });
         }
     },
 
     mounted() {
-        this.$mousetrap.bindGlobal(['command+return'], e => {
+        this.$keys.bindGlobal(['command+return'], e => {
             this.next();
         });
 
-        this.$mousetrap.bindGlobal(['command+delete'], e => {
+        this.$keys.bindGlobal(['command+delete'], e => {
             this.previous();
         });
     }

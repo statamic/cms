@@ -21,7 +21,9 @@ const Store = new Vuex.Store({
 });
 
 const Statamic = {
-    condition: (name, condition) => Store.commit('setCondition', {name, condition})
+    $conditions: {
+        add: (name, condition) => Store.commit('setCondition', {name, condition})
+    }
 };
 
 const Fields = new Vue({
@@ -252,7 +254,7 @@ test('it can call a custom logic function', () => {
         favorite_animals: ['cats', 'dogs'],
     });
 
-    Statamic.condition('reallyLovesAnimals', function (values) {
+    Statamic.$conditions.add('reallyLovesAnimals', function (values) {
         return values.favorite_animals.length > 3;
     });
 
@@ -265,7 +267,7 @@ test('it can call a custom logic function and has access to root values and extr
         favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
     });
 
-    Statamic.condition('reallyLovesFood', function (values, root, extra) {
+    Statamic.$conditions.add('reallyLovesFood', function (values, root, extra) {
         expect(extra.store).toBe(Store);
         expect(extra.storeName).toBe('base');
         return root.favorite_foods.length > 3;

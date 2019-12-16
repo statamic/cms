@@ -2,7 +2,7 @@
 
 namespace DummyNamespace;
 
-use Statamic\Extend\Modifier;
+use Statamic\Modifiers\Modifier;
 
 class DummyClass extends Modifier
 {

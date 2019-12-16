@@ -4,13 +4,13 @@
 
         <div class="flex items-center mb-3">
             <h1 class="flex-1">{{ initialTitle }}</h1>
-            <button type="submit" class="btn btn-primary" @click.prevent="save">Save</button>
+            <button type="submit" class="btn btn-primary" @click.prevent="save" v-text="__('Save')" />
         </div>
 
         <div class="publish-form card p-0">
             <div class="form-group">
                 <label class="block">{{ __('Title') }}</label>
-                <small class="help-block">{{ __('How this blueprint will be referenced throughout the Control Panel') }}</small>
+                <small class="help-block">{{ __('messages.blueprints_title_instructions') }}</small>
                 <div v-if="errors.title">
                     <small class="help-block text-red" v-for="(error, i) in errors.title" :key="i" v-text="error" />
                 </div>
@@ -19,8 +19,8 @@
         </div>
 
         <div class="content mt-5 mb-2">
-            <h2>Tab Sections</h2>
-            <p class="max-w-lg">The fields in each section will be grouped together into tabs. Create new fields, reuse existing fields, or import entire groups of fields from existing fieldsets.</p>
+            <h2>{{ __('Tab Sections') }}</h2>
+            <p class="max-w-lg">{{ __('messages.tab_sections_instructions') }}</p>
         </div>
 
         <sections
@@ -54,7 +54,7 @@ export default {
     },
 
     created() {
-        this.$mousetrap.bindGlobal(['command+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
             this.save();
         });
@@ -64,6 +64,13 @@ export default {
 
         sections(sections) {
             this.blueprint.sections = sections;
+        },
+
+        blueprint: {
+            deep: true,
+            handler() {
+                this.$dirty.add('blueprints');
+            }
         }
 
     },
@@ -79,14 +86,15 @@ export default {
             this.$axios['patch'](this.action, this.blueprint)
                 .then(response => this.saved(response))
                 .catch(e => {
-                    this.$notify.error(e.response.data.message);
+                    this.$toast.error(e.response.data.message);
                     this.errors = e.response.data.errors;
                 })
         },
 
         saved(response) {
-            this.$notify.success('Saved');
+            this.$toast.success('Saved');
             this.errors = {};
+            this.$dirty.remove('blueprints');
         }
 
     }

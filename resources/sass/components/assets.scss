@@ -85,69 +85,18 @@
 	position: relative;
 
     table {
-        @apply select-none;
+        @apply select-none border w-full rounded-b;
         margin: 0;
     }
 
-    thead {
-        border-top: 0;
-        th { background: #f4f5f5; }
-    }
-
     tbody tr {
-        cursor: pointer;
+        @apply border-b outline-none;
     }
 
-    thead tr:first-child {
-        border-top: 0;
+    tbody tr td {
+        @apply py-1 px-2;
     }
 
-    tr > td:first-child,
-    tr > th:first-child {
-        padding-left: 10px;
-        width: 1px;
-    }
-
-    tr > td:last-child,
-    tr > th:last-child {
-        padding-right: 15px;
-    }
-
-    tr.selected {
-        background: $brand-primary;
-        color: #fff;
-        border-color: transparent;
-    }
-
-    tr.selected + tr {
-        border-color: transparent;
-    }
-
-    tr.selected + tr.selected {
-        border-color: rgba(255, 255, 255, .25);
-    }
-
-
-    td.thumbnail-col {
-        padding-right: 5px;
-    }
-
-    .img, img {
-        width: 25px;
-        height: 25px;
-        border-radius: 2px;
-    }
-
-    .svg-img {
-        background-size: contain;
-        background-position: 50% 50%;
-        background-repeat: no-repeat;
-    }
-
-    .svg-icon, svg {
-        width: 100%;
-        height: 100%;
-    }
 }
 
 .asset-listing .actions {
@@ -352,14 +301,6 @@
 
     .meta-item {
 		@apply flex items-start flex-col border-l px-2 cursor-text h-full justify-center;
-
-        &.one-line {
-			@apply flex-row;
-        }
-
-        &:first-child {
-            @apply pl-2 items-center;
-        }
     }
 
     .meta-label {
@@ -368,12 +309,6 @@
 
 	.meta-value {
 		@apply block p-0 text-xs text-grey-60;
-    }
-
-    .file-icon {
-        width: 25px;
-        height: 25px;
-        margin-right: 10px;
     }
 }
 

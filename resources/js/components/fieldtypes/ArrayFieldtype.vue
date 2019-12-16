@@ -139,6 +139,14 @@ export default {
 
         valueHeader() {
             return __(this.config.value_header || 'Value');
+        },
+
+        replicatorPreview() {
+            return _.reduce(this.value, (carry, value, key) => {
+                let str = `${key}: ${value}`;
+                if (carry) str = carry + ', ' + str;
+                return str;
+            }, '');
         }
     },
 

@@ -15,7 +15,7 @@
                         <div class="text-lg font-medium mr-2">{{ __('Live Preview') }}</div>
                         <div class="flex items-center">
                             <label v-if="amp" class="mr-2"><input type="checkbox" v-model="previewAmp" /> AMP</label>
-                            <button v-if="!poppedOut" class="btn" @click="popout">{{ __('Pop out') }}</button>
+                            <button v-if="canPopOut && !poppedOut" class="btn" @click="popout">{{ __('Pop out') }}</button>
                             <button v-if="poppedOut" class="btn" @click="closePopout">{{ __('Pop in') }}</button>
                             <select-input :options="deviceSelectOptions" v-model="previewDevice" v-show="!poppedOut" class="ml-2" />
 
@@ -24,8 +24,11 @@
                                 :key="handle"
                                 :is="component"
                                 :value="extras[handle]"
+                                :loading="loading"
                                 @input="componentUpdated(handle, $event)"
                                 class="ml-2" />
+
+                            <slot name="buttons" />
 
                             <button
                                 type="button"
@@ -56,7 +59,7 @@
 
                     <transition name="live-preview-contents-slide">
                         <div v-show="panesVisible" ref="contents" class="live-preview-contents items-center justify-center overflow-auto" :class="{ 'pointer-events-none': editorResizing }">
-                            <iframe ref="iframe" frameborder="0" :class="previewDevice ? 'device' : 'responsive'" :style="{ width: `${previewDeviceWidth}px`, height: `${previewDeviceHeight}px` }" />
+                            <iframe ref="iframe" frameborder="0" :class="previewDevice ? 'device' : 'responsive'" :style="{ width: previewDeviceWidth, height: previewDeviceHeight }" />
                         </div>
                     </transition>
 
@@ -108,7 +111,9 @@ export default {
             poppedOut: false,
             popoutWindow: null,
             popoutResponded: false,
+            loading: true,
             extras: {},
+            keybinding: null,
         }
     },
 
@@ -133,13 +138,13 @@ export default {
 
         previewDeviceWidth() {
             if (this.previewDevice) {
-                return this.$config.get('livePreview.devices')[this.previewDevice].width;
+                return `${this.$config.get('livePreview.devices')[this.previewDevice].width}px`;
             }
         },
 
         previewDeviceHeight() {
             if (this.previewDevice) {
-                return this.$config.get('livePreview.devices')[this.previewDevice].height;
+                return `${this.$config.get('livePreview.devices')[this.previewDevice].height}px`;
             }
         },
 
@@ -149,6 +154,10 @@ export default {
 
         livePreviewFieldsPortal() {
             return `live-preview-fields-${this.storeName}`;
+        },
+
+        canPopOut() {
+            return typeof BroadcastChannel === 'function';
         }
 
     },
@@ -178,7 +187,7 @@ export default {
     created() {
         this.editorWidth = localStorage.getItem(widthLocalStorageKey) || 400
 
-        this.$mousetrap.bindGlobal('meta+shift+p', () => {
+        this.keybinding = this.$keys.bindGlobal('mod+shift+p', () => {
             this.previewing ? this.close() : this.$emit('opened-via-keyboard');
         });
     },
@@ -188,7 +197,7 @@ export default {
     },
 
     destroyed() {
-        this.$mousetrap.unbind('meta+shift+p');
+        this.keybinding.destroy();
     },
 
     methods: {
@@ -201,6 +210,8 @@ export default {
 
             if (source) source.cancel();
             source = this.$axios.CancelToken.source();
+
+            this.loading = true;
 
             this.$axios.post(this.url, this.payload, { cancelToken: source.token }).then(response => {
                 this.updateIframeContents(response.data);
@@ -220,6 +231,7 @@ export default {
             iframe.contentWindow.document.open();
             iframe.contentWindow.document.write(contents);
             iframe.contentWindow.document.close();
+            this.loading = false;
         },
 
         close() {
@@ -273,6 +285,12 @@ export default {
                         this.update();
                     case 'popout.pong':
                         this.popoutResponded = true;
+                        break;
+                    case 'popout.loading':
+                        this.loading = true;
+                        break;
+                    case 'popout.loaded':
+                        this.loading = false;
                         break;
                     default:
                         break;

@@ -11,7 +11,7 @@ dropdown-list {
 }
 
 .dropdown .dropdown-icon {
-    @apply text-grey;
+    @apply text-grey p-1;
     &:hover {
         @apply text-grey-90;
     }

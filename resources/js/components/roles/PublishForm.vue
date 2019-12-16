@@ -27,18 +27,24 @@
                 />
 
                 <div class="text-xs text-red p-3 pt-0" v-if="initialHandle && handle != initialHandle">
-                    {{ __('role_change_handle_warning') }}
+                    {{ __('messages.role_change_handle_warning') }}
                 </div>
+
+                <form-group
+                    fieldtype="toggle"
+                    handle="super"
+                    :display="__('permissions.super')"
+                    :instructions="__('permissions.super_desc')"
+                    v-model="isSuper"
+                />
 
             </div>
 
-            <div class="card">
-
-                <role-permissions
-                    :initial-super="isSuper"
-                    :initial-permissions="permissions"
-                ></role-permissions>
-
+            <div v-if="!isSuper">
+                <div class="mt-3" v-for="group in permissions" :key="group.handle">
+                    <h2 class="mt-4 mb-2 font-bold text-xl">{{ group.label }}</h2>
+                    <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
+                </div>
             </div>
 
         </div>
@@ -46,8 +52,6 @@
 
 
 <script>
-import RolePermissions from './Permissions.vue';
-
 const checked = function (permissions) {
     return permissions.reduce((carry, permission) => {
         if (! permission.checked) return carry;
@@ -56,10 +60,6 @@ const checked = function (permissions) {
 };
 
 export default {
-
-    components: {
-        RolePermissions
-    },
 
     props: {
         initialTitle: String,
@@ -103,7 +103,9 @@ export default {
         },
 
         checkedPermissions() {
-            return checked(this.permissions);
+            return this.permissions.reduce((carry, group) => {
+                return [...carry, ...checked(group.permissions)];
+            }, []);
         }
 
     },
@@ -119,7 +121,7 @@ export default {
             this.clearErrors();
 
             this.$axios[this.method](this.action, this.payload).then(response => {
-                this.$notify.success('Saved');
+                this.$toast.success('Saved');
                 if (!this.initialHandle || (this.initialHandle !== this.handle)) {
                     window.location = response.data.redirect;
                 }
@@ -128,9 +130,9 @@ export default {
                     const { message, errors } = e.response.data;
                     this.error = message;
                     this.errors = errors;
-                    this.$notify.error(message);
+                    this.$toast.error(message);
                 } else {
-                    this.$notify.error('Something went wrong');
+                    this.$toast.error('Something went wrong');
                 }
             });
         }
@@ -138,7 +140,7 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bindGlobal(['command+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
             this.save();
         });

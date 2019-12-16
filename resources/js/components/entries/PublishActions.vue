@@ -56,9 +56,7 @@
                         <div class="pt-px w-4 mr-1">
                             <svg-icon name="info-circle" class="pt-px" />
                         </div>
-                        <div class="flex-1">
-                            Since the current revision is published and you've selected a date in the future, once you submit, the revision will act like a draft until the selected date.
-                        </div>
+                        <div class="flex-1" v-text="__('messages.publish_actions_current_becomes_draft_because_scheduled')" />
                     </div>
 
                 </div>
@@ -91,28 +89,28 @@ export default {
 
         options() {
             let options = [
-                { value: 'publish', label: 'Publish Now', },
+                { value: 'publish', label: __('Publish Now'), },
             ];
 
             if (this.published) {
-                options.push({ value: 'unpublish', label: 'Unpublish' });
+                options.push({ value: 'unpublish', label: __('Unpublish') });
             }
 
             return options.concat([
-                { value: 'revision', label: 'Create Revision', },
+                { value: 'revision', label: __('Create Revision'), },
             ]);
         },
 
         actionInfoText() {
             switch (this.action) {
                 case 'publish':
-                    return `Changes to the working copy will applied to the entry and it will be published immediately.`;
+                    return __('messages.publish_actions_publish');
                 case 'schedule':
-                    return `Changes to the working copy will applied to the entry and it will be appear published on the selected date.`;
+                    return __('messages.publish_actions_schedule');
                 case 'unpublish':
-                    return `The current revision will be unpublished.`;
+                    return __('messages.publish_actions_unpublish');
                 case 'revision':
-                    return `A revision will be created based off the working copy. The current revision will not change.`;
+                    return __('messages.publish_actions_create_revision');
             }
         },
 
@@ -141,7 +139,7 @@ export default {
                 .then(this.performPublishRequest)
                 .catch(error => {
                     this.saving = false;
-                    this.$notify.error(error || 'Something went wrong');
+                    this.$toast.error(error || __('Something went wrong'));
                 });
         },
 
@@ -150,7 +148,7 @@ export default {
             this.$axios.post(this.actions.publish, payload)
                 .then(response => {
                     this.saving = false;
-                    this.$notify.success(__('Published'));
+                    this.$toast.success(__('Published'));
                     this.runAfterPublishHook(response);
                 }).catch(error => this.handleAxiosError(error));
         },
@@ -180,8 +178,8 @@ export default {
         submitUnpublish() {
             const payload = { message: this.revisionMessage };
 
-            this.$axios.delete(this.actions.publish, { data: payload }).then(response => {
-                this.$notify.success(__('Unpublished'));
+            this.$axios.post(this.actions.unpublish, { data: payload }).then(response => {
+                this.$toast.success(__('Unpublished'));
                 this.revisionMessage = null;
                 this.$emit('saved', { published: false, isWorkingCopy: false, response });
             }).catch(e => this.handleAxiosError(e));
@@ -191,7 +189,7 @@ export default {
             const payload = { message: this.revisionMessage };
 
             this.$axios.post(this.actions.createRevision, payload).then(response => {
-                this.$notify.success(__('Revision created'));
+                this.$toast.success(__('Revision created'));
                 this.revisionMessage = null;
                 this.$emit('saved', { isWorkingCopy: true, response });
             }).catch(e => this.handleAxiosError(e));
@@ -199,7 +197,7 @@ export default {
 
         handleAxiosError(e) {
             this.saving = false;
-            this.$notify.error(e || 'Something went wrong');
+            this.$toast.error(e || __('Something went wrong'));
         }
 
     }

@@ -2,15 +2,16 @@
 
 namespace Tests\Stache\Stores;
 
-use Statamic\Facades;
-use Tests\TestCase;
-use Statamic\Facades\File;
-use Statamic\Assets\Asset;
-use Statamic\Stache\Stache;
-use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
+use Illuminate\Filesystem\Filesystem;
+use Statamic\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
+use Statamic\Facades;
+use Statamic\Facades\File;
+use Statamic\Facades\Path;
+use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\AssetContainersStore;
+use Tests\TestCase;
 
 class AssetContainersStoreTest extends TestCase
 {
@@ -42,11 +43,12 @@ class AssetContainersStoreTest extends TestCase
 
         $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 
+        $dir = Path::tidy($this->tempDir);
         $this->assertEquals([
-            $this->tempDir.'/one.yaml' => 1234567890,
-            $this->tempDir.'/two.yaml' => 1234567890,
-            $this->tempDir.'/subdirectory/nested-one.yaml' => 1234567890,
-            $this->tempDir.'/subdirectory/nested-two.yaml' => 1234567890,
+            $dir.'/one.yaml' => 1234567890,
+            $dir.'/two.yaml' => 1234567890,
+            $dir.'/subdirectory/nested-one.yaml' => 1234567890,
+            $dir.'/subdirectory/nested-two.yaml' => 1234567890,
         ], $files->all());
 
         // Sanity check. Make sure the file is there but wasn't included.
@@ -83,7 +85,9 @@ EOL;
                 'nested/nested-b.txt' => ['title' => 'Nested File B'],
                 'nested/double-nested/double-nested-a.txt' => ['title' => 'Double Nested File A'],
                 'nested/double-nested/double-nested-b.txt' => ['title' => 'Double Nested File B'],
-            ], $assets->keyBy->path()->map->data()->all());
+            ], $assets->keyBy->path()->map(function ($item) {
+                return $item->data()->all();
+            })->all());
         });
     }
 
@@ -102,6 +106,9 @@ EOL;
         Facades\Stache::shouldReceive('store')
             ->with('asset-containers')
             ->andReturn($this->store);
+
+        Facades\Stache::shouldReceive('shouldUpdateIndexes')
+            ->andReturnTrue(); // irrelevant for this test but it gets called during saving
 
         $container = Facades\AssetContainer::make('new')
             ->title('New Container')

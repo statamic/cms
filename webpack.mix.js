@@ -4,6 +4,8 @@ const tailwindcss = require('tailwindcss');
 const src = 'resources';
 const dest = 'resources/dist';
 
+mix.setPublicPath('./resources/dist');
+
 mix.sass(`${src}/sass/cp.scss`, `${dest}/css`).options({
     processCssUrls: false,
     postCss: [
@@ -27,7 +29,6 @@ mix.extract([
     'marked-plaintext',
     'moment',
     'mousetrap',
-    'selectize',
     'sweetalert',
     '@shopify/draggable',
     'speakingurl',

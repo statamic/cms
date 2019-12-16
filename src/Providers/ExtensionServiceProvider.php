@@ -6,9 +6,9 @@ use Statamic\Tags;
 use Statamic\Actions;
 use Statamic\Fieldtypes;
 use Statamic\Query\Scopes;
-use Statamic\Extend\Modifier;
-use Statamic\View\BaseModifiers;
+use Statamic\Modifiers\Modifier;
 use Statamic\Extensions\FileStore;
+use Statamic\Modifiers\CoreModifiers;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
@@ -31,7 +31,6 @@ class ExtensionServiceProvider extends ServiceProvider
         '/' => 'divide',
         '%' => 'mod',
         '^' => 'exponent',
-        'dd' => 'dump',
         'ago' => 'relative',
         'until' => 'relative',
         'since' => 'relative',
@@ -49,7 +48,7 @@ class ExtensionServiceProvider extends ServiceProvider
         'tz' => 'timezone',
         'inFuture' => 'isFuture',
         'inPast' => 'isPast',
-        'as' => 'scopeAs',
+        'as' => 'alias',
     ];
 
     /**
@@ -65,7 +64,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Arr::class,
         Fieldtypes\AssetContainer::class,
         Fieldtypes\AssetFolder::class,
-        Fieldtypes\Assets::class,
+        Fieldtypes\Assets\Assets::class,
         Fieldtypes\Bard::class,
         Fieldtypes\Bard\Buttons::class,
         Fieldtypes\Blueprints::class,
@@ -74,6 +73,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Collections::class,
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
+        Fieldtypes\Entries::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Hidden::class,
         Fieldtypes\Integer::class,
@@ -82,7 +82,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\NestedFields::class,
         Fieldtypes\Radio::class,
         Fieldtypes\Range::class,
-        Fieldtypes\Relationship::class,
         Fieldtypes\Replicator::class,
         Fieldtypes\Revealer::class,
         Fieldtypes\Section::class,
@@ -114,6 +113,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Cache::class,
         Tags\Can::class,
         Tags\Collection\Collection::class,
+        Tags\Dd::class,
         Tags\Dump::class,
         Tags\Env::class,
         Tags\GetContent::class,
@@ -218,16 +218,16 @@ class ExtensionServiceProvider extends ServiceProvider
     protected function registerBundledModifiers($parent)
     {
         $methods = array_diff(
-            get_class_methods(BaseModifiers::class),
+            get_class_methods(CoreModifiers::class),
             get_class_methods(Modifier::class)
         );
 
         foreach ($methods as $method) {
-            $this->app[$parent][$method] = "Statamic\\View\\BaseModifiers@{$method}";
+            $this->app[$parent][$method] = "Statamic\\Modifiers\\CoreModifiers@{$method}";
         }
 
         foreach ($this->bundledModifierAliases as $alias => $actual) {
-            $this->app[$parent][$alias] = "Statamic\\View\\BaseModifiers@{$actual}";
+            $this->app[$parent][$alias] = "Statamic\\Modifiers\\CoreModifiers@{$actual}";
         }
     }
 
@@ -263,6 +263,7 @@ class ExtensionServiceProvider extends ServiceProvider
             Scopes\Filters\Site::class,
             Scopes\Filters\UserRole::class,
             Scopes\Filters\UserGroup::class,
+            Scopes\Filters\Collection::class,
         ];
 
         $this->registerParent($parent);
@@ -287,10 +288,9 @@ class ExtensionServiceProvider extends ServiceProvider
             Actions\Delete::class,
             Actions\Publish::class,
             Actions\Unpublish::class,
-            Actions\SendActivationEmail::class,
+            Actions\SendPasswordReset::class,
             Actions\MoveAsset::class,
             Actions\RenameAsset::class,
-            Actions\DeleteEntry::class,
         ];
 
         $this->registerParent($parent);

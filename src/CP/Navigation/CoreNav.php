@@ -4,9 +4,10 @@ namespace Statamic\CP\Navigation;
 
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Facades\Form as FormAPI;
 use Statamic\Facades\Role as RoleAPI;
-use Statamic\Contracts\Auth\User;
+use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
@@ -17,7 +18,9 @@ use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Structures\Structure;
+use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
+use Statamic\Facades\Utility;
 
 class CoreNav
 {
@@ -103,11 +106,12 @@ class CoreNav
         Nav::content('Assets')
             ->route('assets.index')
             ->icon('assets')
-            // ->can() // TODO: Permission to manage assets/containers?
+            ->can('index', AssetContainer::class)
             ->children(function () {
                 return AssetContainerAPI::all()->map(function ($assetContainer) {
                     return Nav::item($assetContainer->title())
-                        ->url($assetContainer->showUrl());
+                        ->url($assetContainer->showUrl())
+                        ->can('view', $assetContainer);
                 });
             });
 
@@ -146,22 +150,30 @@ class CoreNav
                 });
             });
 
-        Nav::tools('Updates')
-            ->route('updater')
-            ->icon('loading-bar')
-            ->view('statamic::nav.updates')
-            ->can('view updates');
+        // Nav::tools('Updates')
+        //     ->route('updater')
+        //     ->icon('loading-bar')
+        //     ->view('statamic::nav.updates')
+        //     ->can('view updates');
 
-        Nav::tools('Utilities')
-            ->route('utilities.index')
-            ->active('utilities*')
-            ->icon('settings-slider')
-            // ->can() // TODO: Permission to use utilities?
-            ->children([
-                Nav::item('Cache')->route('utilities.cache.index'),
-                Nav::item('PHP Info')->route('utilities.phpinfo'),
-                Nav::item('Search')->route('utilities.search'),
-            ]);
+        $this->makeUtilitiesSection();
+
+        return $this;
+    }
+
+    protected function makeUtilitiesSection()
+    {
+        $utilities = Utility::authorized()->map(function ($utility) {
+            return Nav::item($utility->navTitle())->url($utility->url());
+        });
+
+        if (count($utilities)) {
+            Nav::tools('Utilities')
+                ->route('utilities.index')
+                ->active('utilities*')
+                ->icon('settings-slider')
+                ->children($utilities);
+        }
 
         return $this;
     }
@@ -176,7 +188,7 @@ class CoreNav
         Nav::users('Users')
             ->route('users.index')
             ->icon('users-box')
-            ->can('index', User::class);
+            ->can('index', UserContract::class);
 
         Nav::users('Groups')
             ->route('user-groups.index')
@@ -210,21 +222,23 @@ class CoreNav
      */
     protected function makeSiteSection()
     {
-        Nav::site('Addons')
-            ->route('addons.index')
-            ->icon('addons');
+        // Nav::site('Addons')
+        //     ->route('addons.index')
+        //     ->icon('addons')
+        //     ->can('configure addons');
 
         Nav::site('Fields')
             ->route('fields.index')
             ->icon('wireframe')
+            ->can('configure fields')
             ->children([
                 Nav::item('Blueprints')->route('blueprints.index'),
                 Nav::item('Fieldsets')->route('fieldsets.index'),
             ]);
 
-        Nav::site('Preferences')
-            ->route('')
-            ->icon('hammer-wrench');
+        // Nav::site('Preferences')
+        //     ->route('')
+        //     ->icon('hammer-wrench');
 
         return $this;
     }

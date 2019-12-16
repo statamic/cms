@@ -3,6 +3,7 @@
 namespace Statamic\Stache;
 
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Facades\Path;
 
 class Traverser
 {
@@ -34,7 +35,7 @@ class Traverser
 
         return $files
             ->mapWithKeys(function ($file) {
-                return [$file->getPathname() => $file->getMTime()];
+                return [Path::tidy($file->getPathname()) => $file->getMTime()];
             })
             ->sortBy(function ($timestamp, $path) {
                 return [substr_count($path, '/'), $path];

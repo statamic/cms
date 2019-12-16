@@ -18,8 +18,6 @@ export default class SetNode extends Node {
                 enabled: { default: true },
                 values: {},
             },
-            group: 'block',
-            selectable: false,
             draggable: true,
             parseDOM: [{
                 tag: 'bard-set',
@@ -37,17 +35,6 @@ export default class SetNode extends Node {
             const transaction = state.tr.insert(position, node);
             dispatch(transaction);
         };
-    }
-
-    stopEvent(event) {
-        const draggable = !!this.schema.draggable
-        if (draggable && (event instanceof DragEvent)) {
-            return false
-        }
-
-        // Any other events (including pastes) should be stopped
-        // which will prevent Prosemirror from handling them.
-        return true
     }
 
 }

@@ -71,7 +71,7 @@
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
-            :fieldset="fieldset"
+            :blueprint="fieldset"
             :values="values"
             :reference="initialReference"
             :meta="meta"
@@ -80,7 +80,7 @@
             :localized-fields="localizedFields"
             @updated="values = $event"
         >
-            <div slot-scope="{ container, components }">
+            <div slot-scope="{ container, components, setFieldMeta }">
                 <component
                     v-for="component in components"
                     :key="component.name"
@@ -93,6 +93,7 @@
                     :syncable="hasOrigin"
                     :enable-sidebar="false"
                     @updated="setFieldValue"
+                    @meta-updated="setFieldMeta"
                     @synced="syncField"
                     @desynced="desyncField"
                     @focus="container.$emit('focus', $event)"
@@ -222,7 +223,7 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
-                if (!this.isCreating) this.$notify.success('Saved');
+                if (!this.isCreating) this.$toast.success('Saved');
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => this.handleAxiosError(e));
@@ -234,9 +235,9 @@ export default {
                 const { message, errors } = e.response.data;
                 this.error = message;
                 this.errors = errors;
-                this.$notify.error(message);
+                this.$toast.error(message);
             } else {
-                this.$notify.error('Something went wrong');
+                this.$toast.error('Something went wrong');
             }
         },
 
@@ -271,7 +272,7 @@ export default {
                 this.fieldset = data.blueprint;
                 this.site = localization.handle;
                 this.localizing = false;
-                this.$nextTick(() => this.$refs.container.removeNavigationWarning());
+                this.$nextTick(() => this.$refs.container.clearDirtyState());
             })
         },
 
@@ -324,7 +325,7 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bindGlobal(['command+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
             this.save();
         });

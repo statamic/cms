@@ -24,7 +24,7 @@ export default {
     methods: {
 
         saved(response) {
-            this.$emit('created', response.data);
+            this.$emit('created', response.data.data);
             this.$nextTick(() => this.close());
         }
 

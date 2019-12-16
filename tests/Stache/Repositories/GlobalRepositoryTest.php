@@ -96,7 +96,7 @@ class GlobalRepositoryTest extends TestCase
         $this->repo->save($global);
 
         $this->assertNotNull($item = $this->repo->find('id-new'));
-        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $item->in('en')->data());
+        $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $item->in('en')->data()->all());
         $this->assertFileExists($this->directory.'/new.yaml');
         @unlink($this->directory.'/new.yaml');
     }

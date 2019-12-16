@@ -3,11 +3,7 @@ export default {
 
     props: ['fields', 'rows', 'meta', 'name'],
 
-    data() {
-        return {
-            sortableRows: this.rows
-        }
-    },
+    inject: ['grid'],
 
     computed: {
 
@@ -17,6 +13,10 @@ export default {
 
         sortableHandleClass() {
             return `${this.name}-drag-handle`;
+        },
+
+        errorKeyPrefix() {
+            return this.grid.errorKeyPrefix || this.grid.handle;
         }
 
     },
@@ -27,14 +27,6 @@ export default {
             sortableHandleClass: this.sortableHandleClass
         }
     },
-
-    watch: {
-
-        sortableRows(rows) {
-            this.$emit('sorted', rows);
-        }
-
-    }
 
 }
 </script>

@@ -21,7 +21,7 @@ class Date extends Fieldtype
         'earliest_date' => [
             'type' => 'text',
             'default' => '1900-01-01',
-            'instructions' => 'Set the earliest date you would like selectable.'
+            'instructions' => 'Set the earliest selectable date.'
         ],
         'format' => [
             'type' => 'text',

@@ -8,7 +8,10 @@ class StartSession extends Middleware
 {
     protected function saveSession($request)
     {
-        if ($request->route()->named('statamic.cp.session.timeout')) {
+        if (
+            $request->route()->named('statamic.cp.session.timeout')
+            && $request->session()->has('last_activity')
+        ) {
             return;
         }
 

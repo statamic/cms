@@ -20,6 +20,11 @@ abstract class Action implements Arrayable
     protected $fields = [];
     protected $context = [];
 
+    public function filter($item)
+    {
+        return true;
+    }
+
     public function context($context)
     {
         $this->context = $context;
@@ -41,9 +46,21 @@ abstract class Action implements Arrayable
         return $this->fields;
     }
 
-    public function authorize($item)
+    public function authorize($user, $item)
     {
         return true;
+    }
+
+    public function buttonText()
+    {
+        /** @translation */
+        return 'Run action|Run action on :count items';
+    }
+
+    public function confirmationText()
+    {
+        /** @translation */
+        return 'Are you sure you want to run this action?|Are you sure you want to run this action on :count items?';
     }
 
     public function toArray()
@@ -52,6 +69,8 @@ abstract class Action implements Arrayable
             'handle' => $this->handle(),
             'title' => $this->title(),
             'confirm' => $this->confirm,
+            'buttonText' => $this->buttonText(),
+            'confirmationText' => $this->confirmationText(),
             'dangerous' => $this->dangerous,
             'fields' => $this->fields()->toPublishArray(),
             'meta' => $this->fields()->meta(),

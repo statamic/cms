@@ -3,10 +3,8 @@
    ========================================================================== */
 
 .stacks-on-stacks {
-    position: fixed;
-    top: 0; left: 0; right: 0; bottom: 0;
-    // padding-top: 48px;
-    z-index: 999; // arbitrary to make it sit on top of random stuff.
+    @apply fixed pin;
+    z-index: 10000;
 
     > .vue-portal-target {
         @apply absolute pin;
@@ -51,5 +49,11 @@
 
     .hovering .stack-content {
         transform: translateX(-16px);
+    }
+}
+
+@media all and (max-width: 980px) {
+    .stacks-on-stacks .stack-container {
+        left: 0 !important;
     }
 }

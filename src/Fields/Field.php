@@ -12,11 +12,17 @@ class Field implements Arrayable
     protected $handle;
     protected $config;
     protected $value;
+    protected $parent;
 
     public function __construct($handle, array $config)
     {
         $this->handle = $handle;
         $this->config = $config;
+    }
+
+    public function newInstance()
+    {
+        return (new static($this->handle, $this->config))->setValue($this->value);
     }
 
     public function setHandle(string $handle)
@@ -55,12 +61,12 @@ class Field implements Arrayable
     {
         $rules = [$this->handle => $this->addNullableRule(array_merge(
             $this->get('required') ? ['required'] : [],
-            Validation::explodeRules(array_get($this->config, 'validate')),
-            Validation::explodeRules($this->fieldtype()->rules())
+            Validator::explodeRules(array_get($this->config, 'validate')),
+            Validator::explodeRules($this->fieldtype()->rules())
         ))];
 
         $extra = collect($this->fieldtype()->extraRules())->map(function ($rules) {
-            return $this->addNullableRule(Validation::explodeRules($rules));
+            return $this->addNullableRule(Validator::explodeRules($rules));
         })->all();
 
         return array_merge($rules, $extra);
@@ -169,40 +175,65 @@ class Field implements Arrayable
         return $this->config['default'] ?? $this->fieldtype()->defaultValue();
     }
 
-    public function process()
+    public function validationValue()
     {
-        $this->value = $this->fieldtype()->process($this->value);
+        return $this->fieldtype()->validationValue($this->value);
+    }
+
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
 
         return $this;
+    }
+
+    public function parent()
+    {
+        return $this->parent;
+    }
+
+    public function process()
+    {
+        return $this->newInstance()->setValue(
+            $this->fieldtype()->process($this->value)
+        );
     }
 
     public function preProcess()
     {
         $value = $this->value ?? $this->defaultValue();
 
-        $this->value = $this->fieldtype()->preProcess($value);
+        $value = $this->fieldtype()->preProcess($value);
 
-        return $this;
+        return $this->newInstance()->setValue($value);
     }
 
     public function preProcessIndex()
     {
-        $this->value = $this->fieldtype()->preProcessIndex($this->value);
+        return $this->newInstance()->setValue(
+            $this->fieldtype()->preProcessIndex($this->value)
+        );
+    }
 
-        return $this;
+    public function preProcessValidatable()
+    {
+        return $this->newInstance()->setValue(
+            $this->fieldtype()->preProcessValidatable($this->value)
+        );
     }
 
     public function augment()
     {
-        $this->value = $this->fieldtype()->augment($this->value);
-
-        return $this;
+        return $this->newInstance()->setValue(
+            $this->fieldtype()->augment($this->value)
+        );
     }
 
     public function toArray()
     {
         return array_merge($this->config, [
-            'handle' => $this->handle
+            'handle' => $this->handle,
+            'width' => $this->config['width'] ?? 100
         ]);
     }
 
@@ -229,7 +260,7 @@ class Field implements Arrayable
 
         $fields = $fieldtype->configFields()->addValues($this->config);
 
-        return array_merge($this->config, $fields->preProcess()->values(), [
+        return array_merge($this->config, $fields->preProcess()->values()->all(), [
             'component' => $fieldtype->component(),
         ]);
     }

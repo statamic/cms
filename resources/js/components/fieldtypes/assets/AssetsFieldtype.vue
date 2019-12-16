@@ -1,12 +1,7 @@
 <template>
     <div>
 
-        <div v-if="!containerSpecified" class="error-container">
-            {{ __('No asset container specified') }}
-        </div>
-
         <uploader
-            v-if="containerSpecified"
             ref="uploader"
             :container="container"
             :enabled="config.allow_uploads"
@@ -21,7 +16,7 @@
                     <loading-graphic :inline="true" />
                 </div>
 
-                <div class="drag-notification" v-if="config.allow_uploads" v-show="containerSpecified && dragging && !showSelector">
+                <div class="drag-notification" v-if="config.allow_uploads" v-show="dragging && !showSelector">
                     <svg-icon name="upload" class="h-12 w-12 mb-2" />
                     {{ __('Drop File to Upload') }}
                 </div>
@@ -235,7 +230,7 @@ export default {
          * The initial container to be displayed in the selector.
          */
         container() {
-            return this.config.container;
+            return this.config.container || this.meta.container;
         },
 
         /**
@@ -243,13 +238,6 @@ export default {
          */
         folder() {
             return this.config.folder || '/';
-        },
-
-        /**
-         * If an asset container has been specified in the config.
-         */
-        containerSpecified() {
-            return this.config.container != null;
         },
 
         /**
@@ -322,6 +310,14 @@ export default {
 
                 vm = parent;
             }
+        },
+
+        replicatorPreview() {
+            return _.map(this.assets, (asset) => {
+                return asset.isImage ?
+                    `<img src="${asset.thumbnail}" width="20" height="20" title="${asset.basename}" />`
+                    : asset.basename;
+            }).join(', ');
         }
 
     },
@@ -430,7 +426,7 @@ export default {
          */
         uploadError(upload, uploads) {
             this.uploads = uploads;
-            this.$notify.error(upload.errorMessage);
+            this.$toast.error(upload.errorMessage);
         },
 
         /**

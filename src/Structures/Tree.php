@@ -4,7 +4,6 @@ namespace Statamic\Structures;
 
 use Statamic\Facades;
 use Statamic\Facades\Stache;
-use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Support\Traits\FluentlyGetsAndSets;

@@ -12,14 +12,13 @@ use Statamic\Facades\Stache;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Structure;
-use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Entries\Collection as Contract;
 
 class Collection implements Contract
 {
-    use ContainsData, FluentlyGetsAndSets, ExistsAsFile;
+    use FluentlyGetsAndSets, ExistsAsFile;
 
     protected $handle;
     protected $route;
@@ -28,7 +27,7 @@ class Collection implements Contract
     protected $title;
     protected $template;
     protected $layout;
-    protected $sites = [];
+    protected $sites;
     protected $blueprints = [];
     protected $searchIndex;
     protected $dated = false;
@@ -37,12 +36,18 @@ class Collection implements Contract
     protected $sortDirection;
     protected $ampable = false;
     protected $revisions = false;
-    protected $positions = [];
-    protected $defaultStatus = 'published';
+    protected $positions;
+    protected $defaultPublishState = true;
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
     protected $structure;
     protected $taxonomies = [];
+    protected $cascade;
+
+    public function __construct()
+    {
+        $this->cascade = collect();
+    }
 
     public function id()
     {
@@ -185,14 +190,14 @@ class Collection implements Contract
 
     public function fallbackEntryBlueprint()
     {
-        return Blueprint::find(config('statamic.theming.blueprints.default'));
+        return Blueprint::find('default');
     }
 
     public function ensureEntryBlueprintFields($blueprint)
     {
         $blueprint
             ->ensureFieldPrepended('title', ['type' => 'text', 'required' => true])
-            ->ensureField('slug', ['type' => 'slug', 'required' => true], 'sidebar');
+            ->ensureField('slug', ['type' => 'slug', 'required' => true, 'localizable' => true], 'sidebar');
 
         if ($this->dated()) {
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
@@ -200,9 +205,10 @@ class Collection implements Contract
 
         if ($this->hasStructure()) {
             $blueprint->ensureField('parent', [
-                'type' => 'relationship',
+                'type' => 'entries',
                 'collections' => [$this->handle()],
-                'max_items' => 1
+                'max_items' => 1,
+                'listable' => false,
             ], 'sidebar');
         }
 
@@ -223,7 +229,7 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                return collect($sites);
+                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
             })
             ->args(func_get_args());
     }
@@ -233,7 +239,7 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('template')
             ->getter(function ($template) {
-                return $template ?? config('statamic.theming.views.entry');
+                return $template ?? 'default';
             })
             ->args(func_get_args());
     }
@@ -243,7 +249,7 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('layout')
             ->getter(function ($layout) {
-                return $layout ?? config('statamic.theming.views.layout');
+                return $layout ?? 'layout';
             })
             ->args(func_get_args());
     }
@@ -289,54 +295,85 @@ class Collection implements Contract
 
     public function getEntryPositions()
     {
+        if ($this->positions) {
+            return $this->positions;
+        }
+
+        $this->positions = $this->queryEntries()->get()->mapWithKeys(function ($entry, $index) {
+            return [$index + 1 => $entry->id()];
+        });
+
         return $this->positions;
     }
 
     public function setEntryPositions($positions)
     {
-        $this->positions = $positions;
+        $this->positions = collect($positions);
 
         return $this;
     }
 
     public function setEntryPosition($id, $position)
     {
-        Arr::set($this->positions, $position, $id);
-        ksort($this->positions);
+        $positions = $this->getEntryPositions()->all();
+
+        Arr::set($positions, $position, $id);
+
+        ksort($positions);
+
+        $this->setEntryPositions($positions);
 
         return $this;
     }
 
     public function appendEntryPosition($id)
     {
-        $position = collect($this->positions)->keys()->sort()->last() + 1;
+        $position = $this->getEntryPositions()->keys()->sort()->last() + 1;
 
         return $this->setEntryPosition($id, $position);
     }
 
     public function removeEntryPosition($id)
     {
-        unset($this->positions[$this->getEntryPosition($id)]);
+        $positions = $this->getEntryPositions()->all();
+
+        unset($positions[$this->getEntryPosition($id)]);
+
+        $this->setEntryPositions($positions);
 
         return $this;
     }
 
     public function getEntryPosition($id)
     {
-        return array_flip($this->positions)[$id] ?? null;
+        return $this->getEntryPositions()->flip()->get($id);
     }
 
     public function getEntryOrder($id = null)
     {
-        $order = array_values($this->positions);
+        $order = $this->getEntryPositions()->values();
 
         if (func_num_args() === 0) {
             return $order;
         }
 
-        $index = array_flip($order)[$id] ?? null;
+        $index = $order->flip()->get($id);
 
         return $index === null ? null : $index + 1;
+    }
+
+    public function cascade($key = null, $default = null)
+    {
+        if (is_null($key)) {
+            return $this->cascade;
+        }
+
+        if (is_array($key)) {
+            $this->cascade = collect($key);
+            return $this;
+        }
+
+        return $this->cascade->get($key, $default);
     }
 
     public function fileData()
@@ -345,17 +382,18 @@ class Collection implements Contract
             'handle',
             'past_date_behavior',
             'future_date_behavior',
+            'default_publish_state',
             'dated',
         ]);
 
         $array = Arr::removeNullValues(array_merge($array, [
-            'entry_order' => $this->getEntryOrder(),
+            'entry_order' => $this->getEntryOrder()->all(),
             'amp' => $array['amp'] ?: null,
             'date' => $this->dated ?: null,
             'orderable' => $array['orderable'] ?: null,
             'sort_by' => $this->sortField,
             'sort_dir' => $this->sortDirection,
-            'default_status' => $this->defaultStatus,
+            'default_status' => $this->defaultPublishState === false ? 'draft' : null,
             'date_behavior' => [
                 'past' => $this->pastDateBehavior,
                 'future' => $this->futureDateBehavior,
@@ -369,6 +407,8 @@ class Collection implements Contract
         if ($array['date_behavior'] == ['past' => 'public', 'future' => 'public']) {
             unset($array['date_behavior']);
         }
+
+        $array['inject'] = Arr::pull($array, 'cascade');
 
         return $array;
     }
@@ -384,9 +424,14 @@ class Collection implements Contract
     }
 
 
-    public function defaultStatus($status = null)
+    public function defaultPublishState($state = null)
     {
-        return $this->fluentlyGetOrSet('defaultStatus')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('defaultPublishState')
+            ->getter(function ($state) {
+                return $this->revisionsEnabled() ? false : $state;
+            })
+            ->args(func_get_args());
     }
 
     public function toArray()
@@ -398,12 +443,12 @@ class Collection implements Contract
             'dated' => $this->dated,
             'past_date_behavior' => $this->pastDateBehavior(),
             'future_date_behavior' => $this->futureDateBehavior(),
-            'default_status' => $this->defaultStatus(),
+            'default_publish_state' => $this->defaultPublishState,
             'amp' => $this->ampable,
             'sites' => $this->sites,
             'template' => $this->template,
             'layout' => $this->layout,
-            'data' => $this->data,
+            'cascade' => $this->cascade->all(),
             'blueprints' => $this->blueprints,
             'search_index' => $this->searchIndex,
             'orderable' => $this->orderable,

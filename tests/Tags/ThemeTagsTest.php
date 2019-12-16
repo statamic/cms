@@ -3,8 +3,9 @@
 namespace Tests\Tags;
 
 use Statamic\Facades\File;
-use Tests\TestCase;
 use Statamic\Facades\Parse;
+use Statamic\Facades\Path;
+use Tests\TestCase;
 
 class ThemeTagsTest extends TestCase
 {
@@ -123,7 +124,9 @@ class ThemeTagsTest extends TestCase
     public function testAppendsTimestampForCacheBusting()
     {
         File::shouldReceive('lastModified')
-            ->with(public_path('/js/foo.js'))
+            ->withArgs(function ($arg) {
+                return Path::tidy(public_path('/js/foo.js')) === Path::tidy($arg);
+            })
             ->andReturn('12345');
 
         $this->assertEquals(

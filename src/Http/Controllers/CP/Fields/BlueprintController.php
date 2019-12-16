@@ -12,10 +12,13 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class BlueprintController extends CpController
 {
+    public function __construct()
+    {
+        $this->middleware('can:configure fields');
+    }
+
     public function index()
     {
-        $this->authorize('index', Blueprint::class, 'You are not authorized to access blueprints.');
-
         $blueprints = Facades\Blueprint::all()->map(function ($blueprint) {
             return [
                 'id' => $blueprint->handle(),
@@ -32,15 +35,11 @@ class BlueprintController extends CpController
 
     public function create()
     {
-        $this->authorize('create', Blueprint::class, 'You are not authorized to create blueprints.');
-
         return view('statamic::blueprints.create');
     }
 
     public function store(Request $request)
     {
-        $this->authorize('create', Blueprint::class, 'You are not authorized to create blueprints.');
-
         $request->validate([
             'title' => 'required'
         ]);
@@ -64,8 +63,6 @@ class BlueprintController extends CpController
     {
         $blueprint = Facades\Blueprint::find($blueprint);
 
-        $this->authorize('edit', $blueprint);
-
         return view('statamic::blueprints.edit', [
             'blueprint' => $blueprint,
             'blueprintVueObject' => $this->toVueObject($blueprint)
@@ -75,8 +72,6 @@ class BlueprintController extends CpController
     public function update(Request $request, $blueprint)
     {
         $blueprint = Facades\Blueprint::find($blueprint);
-
-        $this->authorize('edit', $blueprint);
 
         $request->validate([
             'title' => 'required',

@@ -40,7 +40,7 @@ class EditStructureTest extends TestCase
         Facades\Structure::shouldReceive('find')->andReturn($structure);
 
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = Facades\User::make()->assignRole('test');
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
 
         $response = $this
             ->from('/cp/original')

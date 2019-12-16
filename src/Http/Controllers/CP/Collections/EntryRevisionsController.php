@@ -2,9 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\Facades\Site;
 use Illuminate\Http\Request;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 
 class EntryRevisionsController extends CpController
 {
@@ -34,8 +36,10 @@ class EntryRevisionsController extends CpController
     {
         $entry->createRevision([
             'message' => $request->message,
-            'user' => $request->user(),
+            'user' => User::fromUser($request->user()),
         ]);
+
+        return new EntryResource($entry);
     }
 
     public function show(Request $request, $collection, $entry, $slug, $revision)
@@ -48,10 +52,10 @@ class EntryRevisionsController extends CpController
 
         $fields = $blueprint
             ->fields()
-            ->addValues($entry->data())
+            ->addValues($entry->data()->all())
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = array_merge($fields->values()->all(), [
             'title' => $entry->get('title'),
             'slug' => $entry->slug()
         ]);
@@ -68,6 +72,7 @@ class EntryRevisionsController extends CpController
             'actions' => [
                 'save' => $entry->updateUrl(),
                 'publish' => $entry->publishUrl(),
+                'unpublish' => $entry->unpublishUrl(),
                 'revisions' => $entry->revisionsUrl(),
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),

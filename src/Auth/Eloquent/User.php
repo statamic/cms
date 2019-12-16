@@ -2,6 +2,7 @@
 
 namespace Statamic\Auth\Eloquent;
 
+use Statamic\Support\Arr;
 use Statamic\Facades\Role;
 use Statamic\Facades\UserGroup;
 use Illuminate\Support\Carbon;
@@ -9,11 +10,12 @@ use Statamic\Data\ContainsSupplementalData;
 use Statamic\Auth\User as BaseUser;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Database\Eloquent\Model;
+use Statamic\Preferences\HasPreferences;
 use Statamic\Contracts\Auth\User as UserContract;
 
 class User extends BaseUser
 {
-    use ContainsSupplementalData;
+    use ContainsSupplementalData, HasPreferences;
 
     protected $model;
     protected $roles;
@@ -50,7 +52,7 @@ class User extends BaseUser
                 'roles' => $this->roles()->map->handle()->values()->all(),
                 'groups' => $this->groups()->map->handle()->values()->all(),
             ]);
-            return array_except($data, ['id', 'email']);
+            return collect(array_except($data, ['id', 'email']));
         }
 
         foreach ($data as $key => $value) {
@@ -223,23 +225,20 @@ class User extends BaseUser
 
     public function permissions()
     {
-        return $this->groups()->flatMap->roles()
+        $permissions = $this->groups()->flatMap->roles()
             ->merge($this->roles())
             ->flatMap->permissions();
+
+        if ($this->get('super', false)) {
+            $permissions[] = 'super';
+        }
+
+        return $permissions;
     }
 
     public function hasPermission($permission)
     {
         return $this->permissions()->contains($permission);
-    }
-
-    public function isSuper()
-    {
-        if ((bool) $this->model()->super) {
-            return true;
-        }
-
-        return $this->hasPermission('super');
     }
 
     public function makeSuper()
@@ -249,18 +248,13 @@ class User extends BaseUser
         return $this;
     }
 
-    public function save()
+    public function saveToDatabase()
     {
         $this->saveRoles();
+
         $this->saveGroups();
 
-        dd($this->model());
-
         $this->model()->save();
-
-        // event(new UserSaved($this, [])); // TODO
-
-        return $this;
     }
 
     public function delete()
@@ -352,8 +346,22 @@ class User extends BaseUser
         $model->save();
     }
 
-    public function preferences($preferences = null)
+    protected function getPreferences()
     {
-        return [];
+        if (! $preferences = $this->model()->preferences) {
+            return [];
+        }
+
+        return is_string($preferences) ? json_decode($preferences, true) : $preferences;
+    }
+
+    public function setPreferences($preferences)
+    {
+        $this->model()->preferences = $preferences;
+    }
+
+    public function mergePreferences($preferences)
+    {
+        $this->model()->preferences = array_merge($this->getPreferences(), Arr::wrap($preferences));
     }
 }

@@ -4,7 +4,7 @@ namespace Tests;
 
 use Illuminate\Foundation\Testing\Assert;
 
-class TestCase extends \Orchestra\Testbench\TestCase
+abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $shouldFakeVersion = true;
     protected $shouldPreventNavBeingBuilt = true;
@@ -60,7 +60,7 @@ class TestCase extends \Orchestra\Testbench\TestCase
 
         $configs = [
             'assets', 'cp', 'forms', 'routes', 'static_caching',
-            'sites', 'stache', 'system', 'theming', 'users'
+            'sites', 'stache', 'system', 'users'
         ];
 
         foreach ($configs as $config) {
@@ -146,5 +146,10 @@ class TestCase extends \Orchestra\Testbench\TestCase
     public static function assertArraySubset($subset, $array, bool $checkForObjectIdentity = false, string $message = ''): void
     {
         Assert::assertArraySubset($subset, $array, $checkForObjectIdentity, $message);
+    }
+
+    protected function isRunningWindows()
+    {
+        return DIRECTORY_SEPARATOR === '\\';
     }
 }

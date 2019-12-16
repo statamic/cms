@@ -22,6 +22,8 @@
 </template>
 
 <script>
+require('lazysizes')
+
 export default {
 
     props: {

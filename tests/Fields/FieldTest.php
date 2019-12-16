@@ -343,7 +343,10 @@ class FieldTest extends TestCase
 
         $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
 
-        $this->assertEquals('foo processed', $field->process()->value());
+        $processed = $field->process();
+
+        $this->assertNotSame($field, $processed);
+        $this->assertEquals('foo processed', $processed->value());
     }
 
     /** @test */
@@ -359,7 +362,10 @@ class FieldTest extends TestCase
 
         $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
 
-        $this->assertEquals('foo preprocessed', $field->preProcess()->value());
+        $preProcessed = $field->preProcess();
+
+        $this->assertNotSame($field, $preProcessed);
+        $this->assertEquals('foo preprocessed', $preProcessed->value());
     }
 
     /** @test */
@@ -375,7 +381,10 @@ class FieldTest extends TestCase
 
         $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
 
-        $this->assertEquals('foo preprocessed for index', $field->preProcessIndex()->value());
+        $preProcessed = $field->preProcessIndex();
+
+        $this->assertNotSame($field, $preProcessed);
+        $this->assertEquals('foo preprocessed for index', $preProcessed->value());
     }
 
     /** @test */
@@ -424,6 +433,7 @@ class FieldTest extends TestCase
         $this->assertEquals([
             'handle' => 'the_handle',
             'foo' => 'bar',
+            'width' => 100,
         ], $field->toArray());
     }
 
@@ -437,5 +447,38 @@ class FieldTest extends TestCase
 
         $this->assertEquals($field, $return);
         $this->assertEquals(['bar' => 'baz'], $field->config());
+    }
+
+    /** @test */
+    function it_makes_a_new_instance()
+    {
+        $field = new Field('test', ['foo' => 'bar']);
+        $field->setValue('the value');
+
+        $newField = $field->newInstance();
+
+        $this->assertNotSame($field, $newField);
+        $this->assertSame($field->handle(), $newField->handle());
+        $this->assertSame($field->config(), $newField->config());
+        $this->assertSame($field->value(), $newField->value());
+    }
+
+    /** @test */
+    function it_augments_the_value_through_its_fieldtype()
+    {
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn(new class extends Fieldtype {
+                public function augment($data) {
+                    return $data . ' augmented';
+                }
+            });
+
+        $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
+
+        $augmented = $field->augment();
+
+        $this->assertNotSame($field, $augmented);
+        $this->assertEquals('foo augmented', $augmented->value());
     }
 }

@@ -7,7 +7,6 @@ use Statamic\Facades\Helper;
 use Statamic\Facades\GlobalSet;
 use Illuminate\Http\Request;
 use Statamic\Facades\User;
-use Statamic\Fields\Validation;
 use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Contracts\Globals\GlobalSet as GlobalSetContract;
 
@@ -69,9 +68,9 @@ class GlobalsController extends CpController
             'values' => $values,
             'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => $request->user()->cant('edit', $set),
+            'readOnly' => User::fromUser($request->user())->cant('edit', $set),
             'locale' => $set->locale(),
-            'localizedFields' => array_keys($set->data()),
+            'localizedFields' => $set->data()->keys()->all(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
@@ -94,7 +93,7 @@ class GlobalsController extends CpController
         }
 
         if ($request->has('created')) {
-            session()->now('success', __('Globals created'));
+            session()->now('success', __('Global Set created'));
         }
 
         return view('statamic::globals.edit', array_merge($viewData, [
@@ -116,23 +115,21 @@ class GlobalsController extends CpController
 
         $this->authorize('edit', $set);
 
-        $fields = $set->blueprint()->fields()->addValues($request->all())->process();
+        $fields = $set->blueprint()->fields()->addValues($request->all());
 
-        $validation = (new Validation)->fields($fields);
+        $fields->validate();
 
-        $request->validate($validation->rules());
-
-        $values = $fields->values();
+        $values = $fields->process()->values();
 
         if ($set->hasOrigin()) {
-            $values = array_only($values, $request->input('_localized'));
+            $values = $values->only($request->input('_localized'));
         }
 
         $set->data($values);
 
         $set->save();
 
-        return $set->toArray();
+        return response('', 204);
     }
 
     public function updateMeta(Request $request, $set)
@@ -221,9 +218,9 @@ class GlobalsController extends CpController
     {
         $fields = $blueprint
             ->fields()
-            ->addValues($set->values())
+            ->addValues($set->values()->all())
             ->preProcess();
 
-        return [$fields->values(), $fields->meta()];
+        return [$fields->values()->all(), $fields->meta()];
     }
 }

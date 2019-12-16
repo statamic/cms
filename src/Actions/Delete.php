@@ -2,24 +2,30 @@
 
 namespace Statamic\Actions;
 
-use Statamic\Facades\User;
-
 class Delete extends Action
 {
     protected $dangerous = true;
 
-    public function visibleTo($key, $context)
+    public function filter($item)
     {
-        if ($key === 'entries') {
-            return false;
-        }
-
         return true;
     }
 
-    public function authorize($item)
+    public function authorize($user, $item)
     {
-        return User::current()->can('delete', $item);
+        return $user->can('delete', $item);
+    }
+
+    public function buttonText()
+    {
+        /** @translation */
+        return 'Delete|Delete :count items?';
+    }
+
+    public function confirmationText()
+    {
+        /** @translation */
+        return 'Are you sure you want to want to delete this?|Are you sure you want to delete these :count items?';
     }
 
     public function run($items)

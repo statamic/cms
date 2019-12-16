@@ -4,14 +4,14 @@
             <loading-graphic  />
         </div>
 
-        <data-list :columns="[]" :rows="rows" :visible-columns="[]" v-if="loaded">
+        <data-list :rows="rows" v-if="loaded">
             <div class="" slot-scope="{ rows: addons }">
                 <div class="data-list-header flex items-center card p-0">
                     <data-list-search class="flex-1" v-model="searchQuery"></data-list-search>
                     <div class="filter bg-white ml-3 mb-0">
-                        <a @click="filter = 'installable'" :class="{ active: filter == 'installable' }">Not Installed</a>
-                        <a @click="filter = 'installed'" :class="{ active: filter == 'installed' }">Installed</a>
-                        <a @click="filter = 'all'" :class="{ active: filter == 'all' }">All</a>
+                        <a @click="filter = 'installable'" :class="{ active: filter == 'installable' }" v-text="__('Not Installed')" />
+                        <a @click="filter = 'installed'" :class="{ active: filter == 'installed' }" v-text="__('Installed')" />
+                        <a @click="filter = 'all'" :class="{ active: filter == 'all' }" v-text="__('All')" />
                     </div>
                 </div>
                 <div class="addon-grid my-4">

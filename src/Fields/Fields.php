@@ -2,9 +2,10 @@
 
 namespace Statamic\Fields;
 
-use Illuminate\Support\Collection;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
+use Facades\Statamic\Fields\Validator;
+use Illuminate\Support\Collection;
 
 class Fields
 {
@@ -31,6 +32,13 @@ class Fields
         return $this;
     }
 
+    public function setFields($fields)
+    {
+        $this->fields = $fields;
+
+        return $this;
+    }
+
     public function items()
     {
         return $this->items;
@@ -41,25 +49,25 @@ class Fields
         return $this->fields;
     }
 
+    public function newInstance()
+    {
+        return (new static)
+            ->setItems($this->items)
+            ->setFields($this->fields);
+    }
+
     public function localizable()
     {
-        $this->fields = $this->fields->filter->isLocalizable();
-
-        return $this;
+        return $this->newInstance()->setFields(
+            $this->fields->filter->isLocalizable()
+        );
     }
 
     public function unlocalizable()
     {
-        $this->fields = $this->fields->reject->isLocalizable();
-
-        return $this;
-    }
-
-    public function merge($fields)
-    {
-        $items = $this->items->merge($fields->items());
-
-        return new static($items);
+        return $this->newInstance()->setFields(
+            $this->fields->reject->isLocalizable()
+        );
     }
 
     public function has($field)
@@ -79,39 +87,46 @@ class Fields
 
     public function addValues(array $values)
     {
-        $this->fields->each(function ($field) use ($values) {
-            return $field->setValue(array_get($values, $field->handle()));
+        $fields = $this->fields->map(function ($field) use ($values) {
+            return $field->newInstance()->setValue(array_get($values, $field->handle()));
         });
 
-        return $this;
+        return $this->newInstance()->setFields($fields);
     }
 
     public function values()
     {
         return $this->fields->mapWithKeys(function ($field) {
             return [$field->handle() => $field->value()];
-        })->all();
+        });
     }
 
     public function process()
     {
-        $this->fields->each->process();
-
-        return $this;
+        return $this->newInstance()->setFields(
+            $this->fields->map->process()
+        );
     }
 
     public function preProcess()
     {
-        $this->fields->each->preProcess();
+        return $this->newInstance()->setFields(
+            $this->fields->map->preProcess()
+        );
+    }
 
-        return $this;
+    public function preProcessValidatables()
+    {
+        return $this->newInstance()->setFields(
+            $this->fields->map->preProcessValidatable()
+        );
     }
 
     public function augment()
     {
-        $this->fields->each->augment();
-
-        return $this;
+        return $this->newInstance()->setFields(
+            $this->fields->map->augment()
+        );
     }
 
     public function createFields(array $config): array
@@ -172,5 +187,15 @@ class Fields
     public function meta()
     {
         return $this->fields->map->meta();
+    }
+
+    public function validator()
+    {
+        return Validator::make()->fields($this);
+    }
+
+    public function validate($extraRules = [])
+    {
+        return $this->validator()->withRules($extraRules)->validate();
     }
 }

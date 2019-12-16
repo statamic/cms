@@ -2,13 +2,14 @@
 
 namespace Tests\Stache\Stores;
 
-use Tests\TestCase;
-use Statamic\Stache\Stache;
-use Statamic\Facades\User as UserAPI;
-use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
-use Statamic\Stache\Stores\UsersStore;
+use Illuminate\Filesystem\Filesystem;
 use Statamic\Contracts\Auth\User;
+use Statamic\Facades\Path;
+use Statamic\Facades\User as UserAPI;
+use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\UsersStore;
+use Tests\TestCase;
 
 class UsersStoreTest extends TestCase
 {
@@ -41,15 +42,16 @@ class UsersStoreTest extends TestCase
 
         $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 
+        $dir = Path::tidy($this->tempDir);
         $this->assertEquals([
-            $this->tempDir.'/one.yaml' => 1234567890,
-            $this->tempDir.'/two.yaml' => 1234567890,
-            $this->tempDir.'/subdirectory/nested-one.yaml' => 1234567890,
-            $this->tempDir.'/subdirectory/nested-two.yaml' => 1234567890,
+            $dir.'/one.yaml' => 1234567890,
+            $dir.'/two.yaml' => 1234567890,
+            $dir.'/subdirectory/nested-one.yaml' => 1234567890,
+            $dir.'/subdirectory/nested-two.yaml' => 1234567890,
         ], $files->all());
 
         // Sanity check. Make sure the file is there but wasn't included.
-        $this->assertTrue(file_exists($this->tempDir.'/three.txt'));
+        $this->assertTrue(file_exists($dir.'/three.txt'));
     }
 
     /** @test */
@@ -61,7 +63,7 @@ class UsersStoreTest extends TestCase
         $this->assertEquals('123', $item->id());
         $this->assertEquals('john@example.com', $item->email());
         $this->assertEquals('John Doe', $item->get('name'));
-        $this->assertEquals(['name' => 'John Doe', 'email' => 'john@example.com'], $item->data());
+        $this->assertEquals(['name' => 'John Doe', 'email' => 'john@example.com'], $item->data()->all());
     }
 
     /** @test */

@@ -2,11 +2,12 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\Facades\Collection;
+use Statamic\Facades\Path;
 use Statamic\Facades\Site;
-use Statamic\Facades\YAML;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Structure;
-use Statamic\Facades\Collection;
+use Statamic\Facades\YAML;
 use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionsStore extends BasicStore
@@ -24,7 +25,7 @@ class CollectionsStore extends BasicStore
     public function getFileFilter(SplFileInfo $file)
     {
         $dir = str_finish($this->directory, '/');
-        $relative = str_after($file->getPathname(), $dir);
+        $relative = str_after(Path::tidy($file->getPathname()), $dir);
         return $file->getExtension() === 'yaml' && substr_count($relative, '/') === 0;
     }
 
@@ -44,11 +45,11 @@ class CollectionsStore extends BasicStore
             ->sites($sites)
             ->template(array_get($data, 'template'))
             ->layout(array_get($data, 'layout'))
-            ->data(array_get($data, 'data'))
+            ->cascade(array_get($data, 'inject', []))
             ->entryBlueprints(array_get($data, 'blueprints'))
             ->searchIndex(array_get($data, 'search_index'))
             ->revisionsEnabled(array_get($data, 'revisions', false))
-            ->defaultStatus(array_get($data, 'default_status'))
+            ->defaultPublishState($this->getDefaultPublishState($data))
             ->structure(array_get($data, 'structure'))
             ->orderable(array_get($data, 'orderable', false))
             ->sortField(array_get($data, 'sort_by'))
@@ -61,26 +62,42 @@ class CollectionsStore extends BasicStore
                 ->pastDateBehavior($dateBehavior['past'] ?? null);
         }
 
-        // $collection
-        //     ->setEntryPositions($this->getEntryPositions($data, $collection))
-        //     ->save();
+        $collection = $this->setPositions($collection, $data);
 
         return $collection;
     }
 
-    protected function getEntryPositions($data, $collection)
+    protected function getDefaultPublishState($data)
     {
-        if (! array_get($data, 'orderable', false)) {
-            return [];
+        $value = array_get($data, 'default_status', 'published');
+
+        if (! in_array($value, ['published', 'draft'])) {
+            throw new \Exception('Invalid collection default_status value. Must be "published" or "draft".');
         }
 
-        $positions = array_get($data, 'entry_order', function () use ($collection) {
-            return $collection->queryEntries()->get()->map->id()->all();
+        return $value === 'published';
+    }
+
+    protected function setPositions($collection, $data)
+    {
+        if (! $collection->orderable()) {
+            return $collection;
+        }
+
+        // If it's not set, it'll work out the order automatically by querying entries when it needs to.
+        if (! array_has($data, 'entry_order')) {
+            return $collection;
+        }
+
+        $order = array_get($data, 'entry_order');
+
+        // The entries are in the YAML as a simple zero-indexed array. The positions on the
+        // collection object expect the keys to be the actual positions (ie. starts with 1)
+        $positions = collect($order)->mapWithKeys(function ($entry, $index) {
+            return [$index + 1 => $entry];
         });
 
-        return collect($positions)->mapWithKeys(function ($id, $index) {
-            return [$index + 1 => $id];
-        })->all();
+        return $collection->setEntryPositions($positions);
     }
 
     public function updateEntryUris($collection)
@@ -101,5 +118,10 @@ class CollectionsStore extends BasicStore
 
         // TODO: only update structures for collections that were modified.
         Structure::all()->each->updateEntryUris();
+
+        // TODO: only update order indexes for collections that were modified.
+        Collection::all()->filter->orderable()->each(function ($collection) {
+            Stache::store('entries')->store($collection->handle())->index('order')->update();
+        });
     }
 }

@@ -28,6 +28,7 @@
                     :sortable-handle-class="sortableHandleClass"
                     :is-read-only="isReadOnly"
                     :collapsed="collapsed.includes(set._id)"
+                    :error-key-prefix="errorKeyPrefix || handle"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
                     @updated="updated"

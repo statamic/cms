@@ -79,7 +79,7 @@ class EntryRevisionsTest extends TestCase
             'foo' => 'foo modified in working copy',
             'updated_at' => $now->timestamp,
             'updated_by' => $user->id(),
-        ], $entry->data());
+        ], $entry->data()->all());
         $this->assertTrue($entry->published());
         $this->assertCount(1, $entry->revisions());
         $revision = $entry->latestRevision();
@@ -133,7 +133,7 @@ class EntryRevisionsTest extends TestCase
             'foo' => 'bar',
             'updated_at' => $now->timestamp,
             'updated_by' => $user->id(),
-        ], $entry->data());
+        ], $entry->data()->all());
         $this->assertFalse($entry->published());
         $this->assertCount(1, $entry->revisions());
         $revision = $entry->latestRevision();
@@ -188,7 +188,7 @@ class EntryRevisionsTest extends TestCase
             'blueprint' => 'test',
             'title' => 'Title',
             'foo' => 'bar',
-        ], $entry->data());
+        ], $entry->data()->all());
         $this->assertFalse($entry->published());
         $this->assertCount(1, $entry->revisions());
         $revision = $entry->latestRevision();
@@ -315,7 +315,7 @@ class EntryRevisionsTest extends TestCase
 
     private function unpublish($entry, $payload)
     {
-        return $this->delete($entry->publishUrl(), $payload);
+        return $this->post($entry->unpublishUrl(), $payload);
     }
 
     private function restore($entry, $payload)

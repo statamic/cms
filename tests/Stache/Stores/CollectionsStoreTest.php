@@ -2,13 +2,15 @@
 
 namespace Tests\Stache\Stores;
 
-use Tests\TestCase;
-use Statamic\Stache\Stache;
-use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
-use Statamic\Stache\Stores\CollectionsStore;
-use Statamic\Facades\Collection as CollectionAPI;
+use Illuminate\Filesystem\Filesystem;
 use Statamic\Contracts\Entries\Collection;
+use Statamic\Facades\Collection as CollectionAPI;
+use Statamic\Facades\Path;
+use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\CollectionsStore;
+use Statamic\Stache\Stores\EntriesStore;
+use Tests\TestCase;
 
 class CollectionsStoreTest extends TestCase
 {
@@ -20,6 +22,7 @@ class CollectionsStoreTest extends TestCase
 
         $stache = (new Stache)->sites(['en']);
         $this->app->instance(Stache::class, $stache);
+        $stache->registerStore((new EntriesStore)->directory($this->tempDir));
         $stache->registerStore($this->store = (new CollectionsStore($stache, app('files')))->directory($this->tempDir));
     }
 
@@ -42,9 +45,10 @@ class CollectionsStoreTest extends TestCase
 
         $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 
+        $dir = Path::tidy($this->tempDir);
         $this->assertEquals([
-            $this->tempDir.'/one.yaml' => 1234567890,
-            $this->tempDir.'/two.yaml' => 1234567890,
+            $dir.'/one.yaml' => 1234567890,
+            $dir.'/two.yaml' => 1234567890,
         ], $files->all());
 
         // Sanity check. Make sure the file is there but wasn't included.

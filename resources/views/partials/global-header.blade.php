@@ -8,7 +8,7 @@
         </a>
     </div>
 
-    <global-search class="pl-2" endpoint="{{ cp_route('search') }}" :limit="10" placeholder="{{ __('Search...') }}">
+    <global-search class="pl-2" endpoint="{{ cp_route('search') }}" placeholder="{{ __('Search...') }}">
     </global-search>
 
     <div class="head-link h-full md:pl-3 flex items-center">
@@ -19,10 +19,7 @@
             </site-selector>
         @endif
 
-        <favorite-creator
-            current-url="{{ request()->fullUrl() }}"
-            class="hidden md:block"
-        ></favorite-creator>
+        <favorite-creator class="hidden md:block"></favorite-creator>
 
         @if (config('telescope.enabled'))
             <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="/{{ config('telescope.path') }}" target="_blank" v-tooltip="'Laravel Telescope'">
@@ -36,12 +33,12 @@
                 </a>
             </template>
 
-            <dropdown-item redirect="https://docs.statamic.com" class="flex items-center">
+            <dropdown-item external-link="https://statamic.dev" class="flex items-center">
                 <span>{{__('Documentation')}}</span>
                 <i class="w-3 block ml-1">@svg('external-link')</i>
             </dropdown-item>
 
-            <dropdown-item redirect="https://statamic.com/forum" class="flex items-center">
+            <dropdown-item external-link="https://statamic.com/forum" class="flex items-center">
                 <span>{{__('Support')}}</span>
                 <i class="w-3 block ml-1">@svg('external-link')</i>
             </dropdown-item>
@@ -74,7 +71,7 @@
             <div class="divider"></div>
 
             <dropdown-item :text="__('Profile')" redirect="{{ route('statamic.cp.account') }}"></dropdown-item>
-            <dropdown-item :text="__('Logout')" redirect="{{ route('statamic.cp.logout') }}"></dropdown-item>
+            <dropdown-item :text="__('Log out')" redirect="{{ route('statamic.cp.logout') }}"></dropdown-item>
         </dropdown-list>
     </div>
 </div>

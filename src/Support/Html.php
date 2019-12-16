@@ -5,7 +5,6 @@ namespace Statamic\Support;
 use ParsedownExtra;
 use Michelf\SmartyPants;
 use Illuminate\Support\HtmlString;
-use Netcarver\Textile\Parser as Textile;
 
 class Html
 {
@@ -314,11 +313,6 @@ class Html
     public static function markdown($string)
     {
         return (new ParsedownExtra)->text($string);
-    }
-
-    public static function textile($string)
-    {
-        return (new Textile)->setDocumentType('html5')->parse($string);
     }
 
     public static function smartypants($string, $behavior = null)

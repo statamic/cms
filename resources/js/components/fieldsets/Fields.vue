@@ -10,7 +10,7 @@
 
             <data-list v-show="fields.length" :rows="fields" :columns="columns" :sort="false">
                 <div class="card p-0 mb-3" slot-scope="{}">
-                    <data-list-table>
+                    <data-list-table :reorderable="true" @reordered="$emit('updated', $event)">
                         <template slot="cell-display" slot-scope="{ row: field }">
                             <input
                                 type="text"
@@ -31,6 +31,9 @@
                                 <svg-icon :name="fieldtype(type).icon" class="w-4 h-4 mr-1" />
                                 <span v-text="fieldtype(type).title" />
                             </div>
+                        </template>
+                        <template slot="cell-width" slot-scope="{ row: field }">
+                            <width-selector v-model="field.width" />
                         </template>
                         <template slot="actions" slot-scope="{ row: field, index }">
                             <a class="mr-1 text-grey" @click.prevent="edit(field._id)"><span class="icon icon-pencil" /></a>
@@ -54,7 +57,7 @@
             <button class="btn btn-default" @click="addField">+ {{ __('Add Field') }}</button>
 
             <stack v-if="selectingFieldtype" name="fieldtype-selector" @closed="selectingFieldtype = false">
-                <fieldtype-selector @selected="fieldtypeSelected" />
+                <fieldtype-selector slot-scope="{ close }" @closed="close" @selected="fieldtypeSelected" />
             </stack>
 
         </template>
@@ -66,6 +69,7 @@
 <script>
 import uniqid from 'uniqid';
 import FieldSettings from '../fields/Settings.vue';
+import WidthSelector from '../fields/WidthSelector.vue';
 import ProvidesFieldtypes from '../fields/ProvidesFieldtypes';
 import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
 
@@ -74,6 +78,7 @@ export default {
     components: {
         FieldSettings,
         FieldtypeSelector,
+        WidthSelector,
      },
 
     mixins: [ProvidesFieldtypes],
@@ -95,6 +100,7 @@ export default {
                 { label: __('Display'), field: 'display' },
                 { label: __('Handle'), field: 'handle' },
                 { label: __('Type'), field: 'type' },
+                { label: __('Width'), field: 'width' },
             ]
         }
     },
@@ -136,11 +142,12 @@ export default {
 
         fieldtypeSelected(field) {
             const id = uniqid();
+            const handle = field.type;
             this.fields.push({
                 ...field,
                 _id: id,
-                handle: 'new_field',
-                display: 'New Field'
+                handle,
+                display: handle.substring(0, 1).toUpperCase() + handle.substr(1),
             });
             this.selectingFieldtype = false;
             this.edit(id);

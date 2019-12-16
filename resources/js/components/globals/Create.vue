@@ -12,7 +12,7 @@
             <form-group
                 handle="title"
                 :display="__('Title')"
-                :instructions="__('global_set_title_instructions')"
+                :instructions="__('messages.global_set_title_instructions')"
                 v-model="title"
                 :errors="errors.title"
                 width="50"
@@ -29,7 +29,7 @@
                     fieldtype="slug"
                     handle="handle"
                     :display="__('Handle')"
-                    :instructions="__('global_set_handle_instructions')"
+                    :instructions="__('messages.global_set_handle_instructions')"
                     :value="handle"
                     @input="handle = $event"
                     :config="{ generate: false }"
@@ -43,7 +43,7 @@
                 fieldtype="blueprints"
                 :config="{ component: 'relationship', max_items: 1 }"
                 :display="__('Blueprint')"
-                :instructions="__('global_set_blueprint_instructions')"
+                :instructions="__('messages.global_set_blueprint_instructions')"
                 v-model="blueprint"
                 :errors="errors.blueprint"
             />
@@ -104,9 +104,9 @@ export default {
                     const { message, errors } = e.response.data;
                     this.error = message;
                     this.errors = errors;
-                    this.$notify.error(message);
+                    this.$toast.error(message);
                 } else {
-                    this.$notify.error('Something went wrong');
+                    this.$toast.error('Something went wrong');
                 }
             })
         }

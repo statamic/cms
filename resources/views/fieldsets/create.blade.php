@@ -15,14 +15,14 @@
                 <form-group
                     handle="title"
                     :display="__('Title')"
-                    :instructions="__('Usually describes what fields will be inside, like Image Block')"
+                    :instructions="__('messages.fieldsets_title_instructions')"
                     autofocus />
             </div>
         </div>
 
         <div class="flex items-center">
             <button class="btn btn-primary">{{ __('Create') }}</button>
-            <p class="text-xs text-grey-60 ml-2">You will be able to customize your Fieldset once it's created.</p>
+            <p class="text-xs text-grey-60 ml-2">{{ __('messages.fieldsets_button_help_text') }}</p>
         </div>
 
     </form>

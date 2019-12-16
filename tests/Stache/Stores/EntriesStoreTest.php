@@ -2,17 +2,18 @@
 
 namespace Tests\Stache\Stores;
 
-use Mockery;
-use Statamic\Facades;
-use Tests\TestCase;
-use Statamic\Facades\Stache;
-use Statamic\Facades\Collection;
-use Illuminate\Support\Carbon;
 use Facades\Statamic\Stache\Traverser;
+use Illuminate\Support\Carbon;
+use Mockery;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Facades;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Path;
+use Statamic\Facades\Stache;
+use Statamic\Stache\Stores\CollectionEntriesStore;
 use Statamic\Stache\Stores\EntriesStore;
 use Tests\PreventSavingStacheItemsToDisk;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Stache\Stores\CollectionEntriesStore;
+use Tests\TestCase;
 
 class EntriesStoreTest extends TestCase
 {
@@ -34,45 +35,47 @@ class EntriesStoreTest extends TestCase
     /** @test */
     function it_gets_nested_files()
     {
-        tap($this->parent->store('alphabetical'), function ($store) {
+        $dir = Path::tidy($this->directory);
+
+        tap($this->parent->store('alphabetical'), function ($store) use ($dir) {
             $files = Traverser::filter([$store, 'getItemFilter'])->traverse($store);
 
             $this->assertEquals(collect([
-                $this->directory.'/alphabetical/alpha.md',
-                $this->directory.'/alphabetical/bravo.md',
-                $this->directory.'/alphabetical/zulu.md',
+                $dir.'/alphabetical/alpha.md',
+                $dir.'/alphabetical/bravo.md',
+                $dir.'/alphabetical/zulu.md',
             ])->sort()->values()->all(), $files->keys()->sort()->values()->all());
         });
 
-        tap($this->parent->store('blog'), function ($store) {
+        tap($this->parent->store('blog'), function ($store) use ($dir) {
             $files = Traverser::filter([$store, 'getItemFilter'])->traverse($store);
 
             $this->assertEquals(collect([
-                $this->directory.'/blog/2017-25-12.christmas.md',
-                $this->directory.'/blog/2018-07-04.fourth-of-july.md',
+                $dir.'/blog/2017-25-12.christmas.md',
+                $dir.'/blog/2018-07-04.fourth-of-july.md',
             ])->sort()->values()->all(), $files->keys()->sort()->values()->all());
         });
 
-        tap($this->parent->store('numeric'), function ($store) {
+        tap($this->parent->store('numeric'), function ($store) use ($dir) {
             $files = Traverser::filter([$store, 'getItemFilter'])->traverse($store);
 
             $this->assertEquals(collect([
-                $this->directory.'/numeric/1.one.md',
-                $this->directory.'/numeric/2.two.md',
-                $this->directory.'/numeric/3.three.md',
+                $dir.'/numeric/1.one.md',
+                $dir.'/numeric/2.two.md',
+                $dir.'/numeric/3.three.md',
             ])->sort()->values()->all(), $files->keys()->sort()->values()->all());
         });
 
-        tap($this->parent->store('pages'), function ($store) {
+        tap($this->parent->store('pages'), function ($store) use ($dir) {
             $files = Traverser::filter([$store, 'getItemFilter'])->traverse($store);
 
             $this->assertEquals(collect([
-                $this->directory.'/pages/about.md',
-                $this->directory.'/pages/about/board.md',
-                $this->directory.'/pages/about/directors.md',
-                $this->directory.'/pages/blog.md',
-                $this->directory.'/pages/contact.md',
-                $this->directory.'/pages/home.md',
+                $dir.'/pages/about.md',
+                $dir.'/pages/about/board.md',
+                $dir.'/pages/about/directors.md',
+                $dir.'/pages/blog.md',
+                $dir.'/pages/contact.md',
+                $dir.'/pages/home.md',
             ])->sort()->values()->all(), $files->keys()->sort()->values()->all());
         });
     }
@@ -85,14 +88,14 @@ class EntriesStoreTest extends TestCase
         );
 
         $item = $this->parent->store('blog')->makeItemFromFile(
-            $this->directory.'/blog/2017-01-02.my-post.md',
+            Path::tidy($this->directory).'/blog/2017-01-02.my-post.md',
             "id: 123\ntitle: Example\nfoo: bar"
         );
 
         $this->assertInstanceOf(Entry::class, $item);
         $this->assertEquals('123', $item->id());
         $this->assertEquals('Example', $item->get('title'));
-        $this->assertEquals(['title' => 'Example', 'foo' => 'bar'], $item->data());
+        $this->assertEquals(['title' => 'Example', 'foo' => 'bar'], $item->data()->all());
         $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2017-01-02 00:00')->eq($item->date()));
         $this->assertEquals('my-post', $item->slug());
         $this->assertTrue($item->published());

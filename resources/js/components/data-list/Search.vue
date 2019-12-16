@@ -1,6 +1,7 @@
 <template>
     <input
         type="text"
+        ref="input"
         class="data-list-search-input"
         placeholder="Search..."
         :value="value"
@@ -20,6 +21,10 @@ export default {
 
         reset() {
             this.$emit('input', '');
+        },
+
+        focus() {
+            this.$refs.input.focus();
         }
     },
 }

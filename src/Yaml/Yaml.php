@@ -28,6 +28,8 @@ class Yaml
      */
     public function parse($str = null)
     {
+        $originalStr = $str;
+
         if (func_num_args() === 0) {
             throw_if(!$this->file, new Exception('Cannot parse YAML without a file or string.'));
             $str = File::get($this->file);
@@ -36,6 +38,8 @@ class Yaml
         if (empty($str)) {
             return [];
         }
+
+        $content = null;
 
         if (Pattern::startsWith($str, '---')) {
             $split = preg_split("/\n---/", $str, 2, PREG_SPLIT_NO_EMPTY);
@@ -47,7 +51,9 @@ class Yaml
             $yaml = SymfonyYaml::parse($str);
         } catch (\Exception $e) {
             throw $this->viewException($e, $str);
-        };
+        }
+
+        $this->validateDocumentContent($yaml, $content, $originalStr);
 
         return isset($content)
             ? $yaml + ['content' => $content]
@@ -61,40 +67,44 @@ class Yaml
      * @param string|bool  $content
      * @return string
      */
-    public function dump($data, $content = false)
+    public function dump($data, $content = null)
     {
-        $yaml = SymfonyYaml::dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
-
         if ($content) {
-            $fenced = "---".PHP_EOL . $yaml . "---".PHP_EOL;
-            $yaml = $fenced . $content;
+            if (is_string($content)) {
+                return $this->dumpFrontMatter($data, $content);
+            }
+
+            $data['content'] = $content;
         }
 
-        return $yaml ?: '';
+        return SymfonyYaml::dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
     }
 
-        /**
-     * Dump some YAML
+    /**
+     * Dump some YAML with fenced front-matter
      *
      * @param array        $data
      * @param string|bool  $content
      * @return string
      */
-    public function dumpFrontMatter($data, $content = '')
+    public function dumpFrontMatter($data, $content = null)
     {
-        $yaml = SymfonyYaml::dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+        if ($content && !is_string($content)) {
+            $data['content'] = $content;
+            $content = '';
+        }
 
-        $yaml = "---".PHP_EOL . $yaml . "---".PHP_EOL . $content;
-
-        return $yaml ?: '';
+        return '---' . PHP_EOL . $this->dump($data) . '---' . PHP_EOL . $content;
     }
 
-    protected function viewException($e, $str)
+    protected function viewException($e, $str, $line = null)
     {
         $path = $this->file ?? $this->createTemporaryExceptionFile($str);
 
         $args = [
-            $e->getMessage(), 0, 1, $path, $e->getParsedLine(), $e
+            $e->getMessage(), 0, 1, $path,
+            $line ?? $e->getParsedLine(),
+            $e
         ];
 
         $exception = new StatamicParseException(...$args);
@@ -124,5 +134,23 @@ class Yaml
         });
 
         return $path;
+    }
+
+    protected function validateDocumentContent($yaml, $content, $str)
+    {
+        if (! $content || ! isset($yaml['content'])) {
+            return;
+        }
+
+        $e = new StatamicParseException('You cannot have a YAML variable named "content" while document content is present');
+
+        foreach (collect(explode("\n", $str))->reverse() as $i => $text) {
+            if ($text === '---') {
+                $line = $i + 2;
+                break;
+            }
+        }
+
+        throw $this->viewException($e, $str, $line);
     }
 }

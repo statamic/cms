@@ -10,10 +10,12 @@ use Statamic\Fields\Fieldset;
 use Statamic\Entries\Collection;
 use Tests\Fakes\FakeFieldsetRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class UpdateFieldsetTest extends TestCase
 {
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     protected function setUp(): void
     {
@@ -26,7 +28,7 @@ class UpdateFieldsetTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = Facades\User::make()->assignRole('test');
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
         $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -44,7 +46,7 @@ class UpdateFieldsetTest extends TestCase
     function fieldset_gets_saved()
     {
         $this->withoutExceptionHandling();
-        $user = Facades\User::make()->makeSuper();
+        $user = tap(Facades\User::make()->makeSuper())->save();
         $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
@@ -58,7 +60,8 @@ class UpdateFieldsetTest extends TestCase
                         'type' => 'textarea',
                         'display' => 'First Field',
                         'instructions' => 'First field instructions',
-                        'foo' => 'bar'
+                        'foo' => 'bar',
+                        'width' => 50,
                     ],
                     [
                         '_id' => 'id-two',
@@ -66,7 +69,8 @@ class UpdateFieldsetTest extends TestCase
                         'type' => 'text',
                         'display' => 'Second Field',
                         'instructions' => 'Second field instructions',
-                        'baz' => 'qux'
+                        'baz' => 'qux',
+                        'width' => 100,
                     ],
                 ]
             ])
@@ -79,7 +83,8 @@ class UpdateFieldsetTest extends TestCase
                     'type' => 'textarea',
                     'display' => 'First Field',
                     'instructions' => 'First field instructions',
-                    'foo' => 'bar'
+                    'foo' => 'bar',
+                    'width' => 50,
                 ],
                 'two' => [
                     'type' => 'text',
@@ -94,7 +99,7 @@ class UpdateFieldsetTest extends TestCase
     /** @test */
     function title_is_required()
     {
-        $user = Facades\User::make()->makeSuper();
+        $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
@@ -111,7 +116,7 @@ class UpdateFieldsetTest extends TestCase
     /** @test */
     function fields_are_required()
     {
-        $user = Facades\User::make()->makeSuper();
+        $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
@@ -131,7 +136,7 @@ class UpdateFieldsetTest extends TestCase
     /** @test */
     function fields_must_be_an_array()
     {
-        $user = Facades\User::make()->makeSuper();
+        $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',

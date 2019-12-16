@@ -2,10 +2,11 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\Facades\File;
-use Statamic\Stache\Indexes;
-use Illuminate\Support\Facades\Cache;
 use Facades\Statamic\Stache\Traverser;
+use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\File;
+use Statamic\Facades\Path;
+use Statamic\Stache\Indexes;
 
 abstract class Store
 {
@@ -26,7 +27,7 @@ abstract class Store
             return $this->directory;
         }
 
-        $this->directory = str_finish($directory, '/');
+        $this->directory = str_finish(Path::tidy($directory), '/');
 
         return $this;
     }
@@ -205,6 +206,9 @@ abstract class Store
             return;
         }
 
+        $modified = $this->adjustModifiedPaths($modified);
+        $deleted = $this->adjustDeletedPaths($deleted);
+
         // Get a path to key mapping, so we can easily get the keys of existing files.
         $pathMap = $this->paths()->flip();
 
@@ -242,15 +246,7 @@ abstract class Store
 
         // Get items from every file that was modified.
         $modified = $modified->map(function ($timestamp, $path) use ($pathMap) {
-            if ($key = $pathMap->get($path)) {
-                return $this->getItem($key);
-            }
-
-            $item = $this->makeItemFromFile($path, File::get($path));
-
-            $this->cacheItem($item);
-
-            return $item;
+            return $this->getItemFromModifiedPath($path, $pathMap);
         });
 
         // There may be duplicate items when we're dealing with items that are split across files.
@@ -275,6 +271,29 @@ abstract class Store
     protected function handleModifiedItem($item)
     {
         //
+    }
+
+    protected function adjustModifiedPaths($paths)
+    {
+        return $paths;
+    }
+
+    protected function adjustDeletedPaths($paths)
+    {
+        return $paths;
+    }
+
+    protected function getItemFromModifiedPath($path, $pathMap)
+    {
+        if ($key = $pathMap->get($path)) {
+            return $this->getItem($key);
+        }
+
+        $item = $this->makeItemFromFile($path, File::get($path));
+
+        $this->cacheItem($item);
+
+        return $item;
     }
 
     public function paths()

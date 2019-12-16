@@ -29,7 +29,7 @@ class ReorderEntriesTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = User::make()->assignRole('test');
+        $user = tap(User::make()->assignRole('test'))->save();
 
         $this
             ->from('/original')
@@ -43,7 +43,7 @@ class ReorderEntriesTest extends TestCase
     function it_denies_access_if_the_collection_is_not_orderable()
     {
         $this->setTestRoles(['test' => ['access cp', 'reorder test entries']]);
-        $user = User::make()->assignRole('test');
+        $user = tap(User::make()->assignRole('test'))->save();
 
         $this->collection->orderable(false)->save();
 
@@ -63,7 +63,7 @@ class ReorderEntriesTest extends TestCase
         EntryFactory::id('3')->slug('three')->collection('test')->order(3)->create();
 
         $this->setTestRoles(['test' => ['access cp', 'reorder test entries']]);
-        $user = User::make()->assignRole('test');
+        $user = tap(User::make()->assignRole('test'))->save();
 
         $this
             ->actingAs($user)
@@ -88,7 +88,7 @@ class ReorderEntriesTest extends TestCase
         EntryFactory::id('6')->slug('six')->collection('test')->order(6)->create();
 
         $this->setTestRoles(['test' => ['access cp', 'reorder test entries']]);
-        $user = User::make()->assignRole('test');
+        $user = tap(User::make()->assignRole('test'))->save();
 
         $this
             ->actingAs($user)

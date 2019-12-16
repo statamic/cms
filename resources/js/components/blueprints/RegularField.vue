@@ -5,12 +5,12 @@
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 pr-2 py-1 pl-1">
-                    <svg-icon class="text-grey-70 mr-1" :name="field.fieldtype" v-tooltip="field.fieldtype" />
+                    <svg-icon class="text-grey-70 mr-1" :name="field.fieldtype" v-tooltip="tooltipText" />
                     <a v-text="labelText" @click="$emit('edit')" />
                     <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
                 <div class="pr-1 flex">
-                    <width-selector v-model="width" class="mr-1" v-show="isSectionExpanded" />
+                    <width-selector v-model="width" class="mr-1" />
                     <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100"><svg-icon name="trash" /></button>
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
@@ -56,6 +56,10 @@ export default {
     },
 
     computed: {
+
+        tooltipText() {
+            return this.field.fieldtype;
+        },
 
         isReferenceField() {
             return this.field.hasOwnProperty('field_reference');

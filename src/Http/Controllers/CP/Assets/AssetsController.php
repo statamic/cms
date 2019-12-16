@@ -2,20 +2,29 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\Facades\Asset;
-use Statamic\Facades\Action;
 use Illuminate\Http\Request;
-use Statamic\Fields\Validation;
-use Statamic\Facades\AssetContainer;
-use Statamic\CP\Publish\ProcessesFields;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Assets\Asset as AssetContract;
+use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\Exceptions\AuthorizationException;
+use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
 
 class AssetsController extends CpController
 {
+    use RedirectsToFirstAssetContainer;
+
     public function index()
     {
-        return redirect()->cpRoute('assets.browse.index');
+        $this->redirectToFirstContainer();
+
+        if (User::current()->can('create', AssetContainerContract::class)) {
+            return view('statamic::assets.index');
+        }
+
+        throw new AuthorizationException;
     }
 
     public function show($asset)
@@ -24,50 +33,20 @@ class AssetsController extends CpController
 
         // TODO: Auth
 
-        $asset = $this->supplementAssetForEditing($asset);
-
-        $fields = $asset->blueprint()->fields()
-            ->addValues($asset->data())
-            ->preProcess();
-
-        return [
-            'asset' => $asset->toArray(),
-            'container' => $asset->container()->toArray(),
-            'values' => array_merge($asset->data(), $fields->values()),
-            'meta' => $fields->meta(),
-            'actionUrl' => cp_route('assets.actions'),
-            'actions' => Action::for('asset-browser', ['container' => $asset->container()->handle()], $asset),
-        ];
-    }
-
-    private function supplementAssetForEditing($asset)
-    {
-        if ($asset->isImage()) {
-            $asset->setSupplement('width', $asset->width());
-            $asset->setSupplement('height', $asset->height());
-
-            // Public asset containers can use their regular URLs.
-            // Private ones don't have URLs so we'll generate an actual-size "thumbnail".
-            $asset->setSupplement('preview', $asset->container()->accessible() ? $asset->url() : $this->thumbnail($asset));
-        }
-
-        $asset->setSupplement('last_modified_relative', $asset->lastModified()->diffForHumans());
-        $asset->setSupplement('download_url', cp_route('assets.download', base64_encode($asset->id())));
-
-        return $asset;
+        return new AssetResource($asset);
     }
 
     public function update(Request $request, $asset)
     {
         $asset = Asset::find(base64_decode($asset));
 
-        // TODO: Auth
+        $this->authorize('edit', $asset);
 
-        $fields = $asset->blueprint()->fields()->addValues($request->all())->process();
+        $fields = $asset->blueprint()->fields()->addValues($request->all());
 
-        $request->validate((new Validation)->fields($fields)->rules());
+        $fields->validate();
 
-        $values = array_merge($fields->values(), [
+        $values = $fields->process()->values()->merge([
             'focus' => $request->focus
         ]);
 
@@ -77,12 +56,7 @@ class AssetsController extends CpController
 
         $asset->save();
 
-        if ($asset->isImage()) {
-            $asset->setSupplement('thumbnail', $this->thumbnail($asset, 'small'));
-            $asset->setSupplement('toenail', $this->thumbnail($asset, 'large'));
-        }
-
-        return ['success' => true, 'message' => 'Asset updated', 'asset' => $asset->toArray()];
+        return ['success' => true, 'message' => 'Asset updated', 'asset' => new AssetResource($asset)];
     }
 
     public function store(Request $request)
@@ -103,12 +77,7 @@ class AssetsController extends CpController
 
         $asset = $container->makeAsset($path)->upload($file);
 
-        if ($asset->isImage()) {
-            $asset->setSupplement('thumbnail', $this->thumbnail($asset, 'small'));
-            $asset->setSupplement('toenail', $this->thumbnail($asset, 'large'));
-        }
-
-        return $asset;
+        return new AssetResource($asset);
     }
 
     public function download($asset)
@@ -140,10 +109,5 @@ class AssetsController extends CpController
         $asset->delete();
 
         return response('', 204);
-    }
-
-    private function thumbnail($asset, $preset = null)
-    {
-        return $asset->thumbnailUrl($preset);
     }
 }

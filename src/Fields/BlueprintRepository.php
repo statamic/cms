@@ -2,9 +2,10 @@
 
 namespace Statamic\Fields;
 
-use Statamic\Facades\YAML;
 use Illuminate\Support\Collection;
-use Illuminate\Filesystem\Filesystem;
+use Statamic\Facades\File;
+use Statamic\Facades\Path;
+use Statamic\Facades\YAML;
 
 class BlueprintRepository
 {
@@ -13,14 +14,9 @@ class BlueprintRepository
     protected $directory;
     protected $fallbackDirectory;
 
-    public function __construct(Filesystem $files)
-    {
-        $this->files = $files;
-    }
-
     public function setDirectory(string $directory)
     {
-        $this->directory = $directory;
+        $this->directory = Path::tidy($directory);
 
         return $this;
     }
@@ -42,15 +38,15 @@ class BlueprintRepository
             return $cached;
         }
 
-        if (! $this->files->exists($path = "{$this->directory}/{$handle}.yaml")) {
-            if (! $this->files->exists($path = "{$this->fallbackDirectory}/{$handle}.yaml")) {
+        if (! File::exists($path = "{$this->directory}/{$handle}.yaml")) {
+            if (! File::exists($path = "{$this->fallbackDirectory}/{$handle}.yaml")) {
                 return null;
             }
         }
 
         $blueprint = (new Blueprint)
             ->setHandle($handle)
-            ->setContents(YAML::parse($this->files->get($path)));
+            ->setContents(YAML::parse(File::get($path)));
 
         $this->blueprints[$handle] = $blueprint;
 
@@ -59,33 +55,31 @@ class BlueprintRepository
 
     public function all(): Collection
     {
-        if (! $this->files->exists($this->directory)) {
+        if (! File::exists($this->directory)) {
             return collect();
         }
 
-        return collect($this->files->allFiles($this->directory))
-            ->filter(function ($file) {
-                return $file->getExtension() === 'yaml';
-            })
+        return File::withAbsolutePaths()
+            ->getFilesByTypeRecursively($this->directory, 'yaml')
             ->map(function ($file) {
-                $basename = str_after($file->getPathname(), str_finish($this->directory, '/'));
+                $basename = str_after($file, str_finish($this->directory, '/'));
                 $handle = str_before($basename, '.yaml');
                 $handle = str_replace('/', '.', $handle);
 
                 return (new Blueprint)
                     ->setHandle($handle)
-                    ->setContents(YAML::parse($this->files->get($file->getPathname())));
+                    ->setContents(YAML::file($file)->parse());
             })
             ->keyBy->handle();
     }
 
     public function save(Blueprint $blueprint)
     {
-        if (! $this->files->exists($this->directory)) {
-            $this->files->makeDirectory($this->directory);
+        if (! File::exists($this->directory)) {
+            File::makeDirectory($this->directory);
         }
 
-        $this->files->put(
+        File::put(
             "{$this->directory}/{$blueprint->handle()}.yaml",
             YAML::dump($blueprint->contents())
         );
@@ -93,7 +87,18 @@ class BlueprintRepository
 
     public function delete(Blueprint $blueprint)
     {
-        $this->files->delete("{$this->directory}/{$blueprint->handle()}.yaml");
+        File::delete("{$this->directory}/{$blueprint->handle()}.yaml");
+    }
+
+    public function make($handle = null)
+    {
+        $blueprint = new Blueprint;
+
+        if ($handle) {
+            $blueprint->setHandle($handle);
+        }
+
+        return $blueprint;
     }
 
     public function makeFromFields($fields)

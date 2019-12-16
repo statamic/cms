@@ -4,6 +4,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Enable Routes
+    |--------------------------------------------------------------------------
+    |
+    | Statamic adds its own routes to the front-end of your site. You are
+    | free to disable this behavior.
+    |
+    | More info: https://docs.statamic.com/routing
+    |
+    */
+
+    'enabled' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Routes
     |--------------------------------------------------------------------------
     |
@@ -44,7 +58,7 @@ return [
     |
     */
 
-    'redirects' => [
+    'redirect' => [
         // '/here' => '/there',
     ],
 

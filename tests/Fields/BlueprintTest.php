@@ -170,15 +170,13 @@ class BlueprintTest extends TestCase
     /** @test */
     function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
-        $this->markTestSkipped('Needs to be updated to match newer blueprint schema.');
-
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_one')
             ->andReturn(new Field('field_one', [
                 'type' => 'text',
                 'display' => 'One',
                 'instructions' => 'One instructions',
-                'require' => true,
+                'validate' => 'required|min:2',
             ]));
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_two')
@@ -221,17 +219,16 @@ class BlueprintTest extends TestCase
                     'fields' => [
                         [
                             'handle' => 'one',
-                            'field' => [
-                                'type' => 'text',
-                                'display' => 'One',
-                                'instructions' => 'One instructions',
-                                'required' => true,
-                                'component' => 'text',
-                                'placeholder' => null,
-                                'character_limit' => 0,
-                                'prepend' => null,
-                                'append' => null,
-                            ]
+                            'type' => 'text',
+                            'display' => 'One',
+                            'instructions' => 'One instructions',
+                            'required' => true,
+                            'validate' => 'required|min:2',
+                            'component' => 'text',
+                            'placeholder' => null,
+                            'character_limit' => 0,
+                            'prepend' => null,
+                            'append' => null,
                         ]
                     ]
                 ],
@@ -241,19 +238,18 @@ class BlueprintTest extends TestCase
                     'fields' => [
                         [
                             'handle' => 'two',
-                            'field' => [
-                                'type' => 'textarea',
-                                'display' => 'Two',
-                                'instructions' => 'Two instructions',
-                                'required' => false,
-                                'validate' => 'min:2',
-                                'character_limit' => null,
-                                'component' => 'textarea',
-                            ]
+                            'type' => 'textarea',
+                            'display' => 'Two',
+                            'instructions' => 'Two instructions',
+                            'required' => false,
+                            'validate' => 'min:2',
+                            'character_limit' => null,
+                            'component' => 'textarea',
                         ]
                     ]
                 ]
-            ]
+            ],
+            'empty' => false,
         ], $blueprint->toPublishArray());
     }
 
@@ -289,15 +285,18 @@ class BlueprintTest extends TestCase
 
         $return = $blueprint
             ->ensureField('three', ['type' => 'textarea']) // field "three" doesnt exist, so it should get added.
-            ->ensureField('two', ['type' => 'textarea']);  // field "two" exists so the config is merged
+            ->ensureField('two', ['type' => 'textarea', 'foo' => 'bar']);  // field "two" exists so the config is merged
 
         $this->assertEquals($blueprint, $return);
         $this->assertTrue($blueprint->hasField('three'));
         tap($blueprint->fields()->all(), function ($items) {
             $this->assertCount(3, $items);
             $this->assertEveryItemIsInstanceOf(Field::class, $items);
-            $this->assertEquals(['one', 'three', 'two'], $items->map->handle()->values()->all());
-            $this->assertEquals(['text', 'textarea', 'textarea'], $items->map->type()->values()->all());
+            $this->assertEquals([
+                'one' => ['type' => 'text'],
+                'three' => ['type' => 'textarea'],
+                'two' => ['type' => 'text', 'foo' => 'bar'], // config gets merged, but keys in the blueprint win.
+            ], $items->map->config()->all());
         });
     }
 
@@ -347,7 +346,7 @@ class BlueprintTest extends TestCase
                 ],
                 'section_two' => [
                     'fields' => [
-                        ['handle' => 'two', 'field' => ['type' => 'text']]
+                        ['handle' => 'two', 'field' => ['type' => 'text', 'foo' => 'bar']]
                     ]
                 ]
             ]
@@ -367,8 +366,13 @@ class BlueprintTest extends TestCase
         tap($blueprint->fields()->all(), function ($items) {
             $this->assertCount(3, $items);
             $this->assertEveryItemIsInstanceOf(Field::class, $items);
-            $this->assertEquals(['one', 'two', 'three'], $items->map->handle()->values()->all());
-            $this->assertEquals(['text', 'textarea', 'textarea'], $items->map->type()->values()->all());
+            // $this->assertEquals(['one', 'two', 'three'], $items->map->handle()->values()->all());
+            // $this->assertEquals(['text', 'textarea', 'textarea'], $items->map->type()->values()->all());
+            $this->assertEquals([
+                'one' => ['type' => 'text'],
+                'three' => ['type' => 'textarea'],
+                'two' => ['type' => 'text', 'foo' => 'bar'], // config gets merged, but keys in the blueprint win.
+            ], $items->map->config()->all());
         });
     }
 

@@ -5,14 +5,15 @@ namespace Statamic\Auth\File;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Illuminate\Support\Collection;
+use Statamic\Auth\PermissionCache;
 use Statamic\Auth\Role as BaseRole;
-use Statamic\Preferences\HasPreferences;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\Role as RoleContract;
+use Statamic\Preferences\HasPreferencesInProperty;
 
 class Role extends BaseRole
 {
-    use HasPreferences;
+    use HasPreferencesInProperty;
 
     protected $title;
     protected $handle;
@@ -42,7 +43,7 @@ class Role extends BaseRole
 
     public function handle(string $handle = null)
     {
-        if (is_null($handle)) {
+        if (func_num_args() === 0) {
             return $this->handle;
         }
 
@@ -77,6 +78,8 @@ class Role extends BaseRole
             ->merge(Arr::wrap($permission))
             ->unique()
             ->values();
+
+        app(PermissionCache::class)->clear();
 
         return $this;
     }

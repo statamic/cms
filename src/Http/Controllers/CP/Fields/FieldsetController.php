@@ -11,10 +11,13 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class FieldsetController extends CpController
 {
+    public function __construct()
+    {
+        $this->middleware('can:configure fields');
+    }
+
     public function index(Request $request)
     {
-        $this->authorize('index', Fieldset::class, 'You are not authorized to access fieldsets.');
-
         $fieldsets = Facades\Fieldset::all()->map(function ($fieldset) {
             return [
                 'id' => $fieldset->handle(),
@@ -36,16 +39,12 @@ class FieldsetController extends CpController
     {
         $fieldset = Facades\Fieldset::find($fieldset);
 
-        $this->authorize('edit', $fieldset);
-
         return view('statamic::fieldsets.edit', compact('fieldset'));
     }
 
     public function update(Request $request, $fieldset)
     {
         $fieldset = Facades\Fieldset::find($fieldset);
-
-        $this->authorize('edit', $fieldset);
 
         $request->validate([
             'title' => 'required',
@@ -59,15 +58,11 @@ class FieldsetController extends CpController
 
     public function create()
     {
-        $this->authorize('create', Fieldset::class);
-
         return view('statamic::fieldsets.create');
     }
 
     public function store(Request $request)
     {
-        $this->authorize('create', Fieldset::class);
-
         $request->validate([
             'title' => 'required',
         ]);
@@ -119,6 +114,9 @@ class FieldsetController extends CpController
         $fields = collect($request->fields)->mapWithKeys(function ($field) {
             $field = Arr::removeNullValues($field);
             $field = Arr::except($field, ['_id', 'isNew']);
+            if (Arr::get($field, 'width') === 100) {
+                unset($field['width']);
+            }
             return [Arr::pull($field, 'handle') => $field];
         })->all();
 

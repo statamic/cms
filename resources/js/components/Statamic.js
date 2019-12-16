@@ -1,12 +1,16 @@
 import Vue from 'vue';
 import Echo from './Echo';
 import Bard from './Bard';
+import Keys from './keys/Keys';
 import Hooks from './Hooks';
 import Components from './Components';
+import FieldConditions from './FieldConditions';
 const echo = new Echo;
 const bard = new Bard;
+const keys = new Keys;
 const hooks = new Hooks;
 const components = new Components;
+const conditions = new FieldConditions;
 
 export default new Vue({
     data() {
@@ -37,6 +41,14 @@ export default new Vue({
 
         $hooks() {
             return hooks;
+        },
+
+        $conditions() {
+            return conditions;
+        },
+
+        $keys() {
+            return keys;
         },
 
         user() {
@@ -76,10 +88,6 @@ export default new Vue({
 
         component(name, component) {
             Vue.component(name, component);
-        },
-
-        condition(name, condition) {
-            this.$store.commit('statamic/condition', {name, condition});
         }
     }
 });

@@ -175,16 +175,16 @@ class FeatureTest extends TestCase
     {
         Collection::make('new')
             ->title('New Collection')
-            ->defaultStatus('published')
+            ->defaultPublishState(false)
             ->orderable(true)
             ->dated(true)
             ->revisionsEnabled(true)
-            ->data(['foo' => 'bar'])
+            ->cascade(['foo' => 'bar'])
             ->save();
 
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/collections/new.yaml',
-            "title: 'New Collection'\ndefault_status: published\ndata:\n  foo: bar\norderable: true\nrevisions: true\ndate: true\n"
+            "title: 'New Collection'\norderable: true\nrevisions: true\ndate: true\ndefault_status: draft\ninject:\n  foo: bar\n"
         );
         @unlink($path);
     }
@@ -238,19 +238,17 @@ class FeatureTest extends TestCase
     /** @test */
     function saving_an_entry_writes_it_to_file()
     {
-        Entry::make()
+        $entry = tap(Entry::make()
             ->locale('en')
             ->id('123')
             ->collection(Collection::findByHandle('blog'))
             ->slug('test-entry')
             ->date('2017-07-04')
             ->data(['title' => 'Test Entry', 'foo' => 'bar'])
-            ->save();
+        )->save();
 
-        $this->assertFileEqualsString(
-            $path = __DIR__.'/__fixtures__/content/collections/blog/2017-07-04.test-entry.md',
-            "---\ntitle: 'Test Entry'\nfoo: bar\nid: '123'\n---\n"
-        );
-        @unlink($path);
+        $this->assertFileExists(__DIR__.'/__fixtures__/content/collections/blog/2017-07-04.test-entry.md');
+
+        $entry->delete();
     }
 }

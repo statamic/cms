@@ -6,6 +6,7 @@ use Statamic\Facades\User;
 use Statamic\Policies;
 use Statamic\Auth\UserProvider;
 use Statamic\Contracts\Auth\Role;
+use Statamic\Auth\PermissionCache;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Contracts\Http\Kernel;
@@ -15,6 +16,7 @@ use Illuminate\Support\ServiceProvider;
 use Statamic\Auth\UserRepositoryManager;
 use Facades\Statamic\Auth\CorePermissions;
 use Statamic\Auth\Passwords\PasswordReset;
+use Statamic\Auth\Permissions;
 use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Contracts\Auth\RoleRepository;
 use Statamic\Contracts\Auth\UserRepository;
@@ -31,13 +33,16 @@ class AuthServiceProvider extends ServiceProvider
         \Statamic\Contracts\Structures\Structure::class => Policies\StructurePolicy::class,
         \Statamic\Contracts\Entries\Collection::class => Policies\CollectionPolicy::class,
         \Statamic\Contracts\Entries\Entry::class => Policies\EntryPolicy::class,
-        \Statamic\Contracts\Entries\LocalizedEntry::class => Policies\EntryPolicy::class,
+        \Statamic\Contracts\Taxonomies\Taxonomy::class => Policies\TaxonomyPolicy::class,
+        \Statamic\Contracts\Taxonomies\Term::class => Policies\TermPolicy::class,
         \Statamic\Contracts\Globals\GlobalSet::class => Policies\GlobalSetPolicy::class,
+        \Statamic\Contracts\Globals\Variables::class => Policies\GlobalSetVariablesPolicy::class,
         \Statamic\Contracts\Auth\User::class => Policies\UserPolicy::class,
         \Statamic\Contracts\Forms\Form::class => Policies\FormPolicy::class,
         \Statamic\Contracts\Forms\Submission::class => Policies\FormSubmissionPolicy::class,
         \Statamic\Contracts\Assets\Asset::class => Policies\AssetPolicy::class,
         \Statamic\Contracts\Assets\AssetFolder::class => Policies\AssetFolderPolicy::class,
+        \Statamic\Contracts\Assets\AssetContainer::class => Policies\AssetContainerPolicy::class,
     ];
 
     public function register()
@@ -61,6 +66,14 @@ class AuthServiceProvider extends ServiceProvider
         $this->app->singleton(ProtectorManager::class, function ($app) {
             return new ProtectorManager($app);
         });
+
+        $this->app->singleton(Permissions::class, function () {
+            return new Permissions;
+        });
+
+        $this->app->singleton(PermissionCache::class, function ($app) {
+            return new PermissionCache;
+        });
     }
 
     public function boot()
@@ -77,7 +90,9 @@ class AuthServiceProvider extends ServiceProvider
             return User::fromUser($user)->hasPermission($ability) === true ? true : null;
         });
 
-        CorePermissions::boot();
+        $this->app->booted(function () {
+            CorePermissions::boot();
+        });
 
         foreach ($this->policies as $key => $policy) {
             Gate::policy($key, $policy);

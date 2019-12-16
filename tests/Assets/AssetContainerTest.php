@@ -83,18 +83,49 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_whether_its_private()
+    function it_gets_the_url_from_the_disk_config()
     {
-        $container = new AssetContainer;
-        $this->assertFalse($container->private());
+        config(['filesystems.disks.test' => [
+            'driver' => 'local',
+            'root' => __DIR__.'/__fixtures__/container',
+            'url' => 'http://example.com/container',
+        ]]);
 
-        $return = $container->private(true);
+        $container = (new AssetContainer)->disk('test');
 
-        $this->assertEquals($container, $return);
+        $this->assertEquals('http://example.com/container', $container->url());
+        $this->assertEquals('http://example.com/container', $container->absoluteUrl());
+    }
+
+    /** @test */
+    function it_gets_the_url_from_the_disk_config_when_its_relative()
+    {
+        config(['filesystems.disks.test' => [
+            'driver' => 'local',
+            'root' => __DIR__.'/__fixtures__/container',
+            'url' => '/container',
+        ]]);
+
+        $container = (new AssetContainer)->disk('test');
+
+        $this->assertEquals('/container', $container->url());
+        $this->assertEquals('http://localhost/container', $container->absoluteUrl());
+    }
+
+    /** @test */
+    function its_private_if_the_disk_has_no_url()
+    {
+        config(['filesystems.disks.test' => [
+            'driver' => 'local',
+            'root' => __DIR__.'/__fixtures__/container',
+        ]]);
+
+        $container = (new AssetContainer)->disk('test');
         $this->assertTrue($container->private());
         $this->assertFalse($container->accessible());
 
-        $container->private(false);
+        config(['filesystems.disks.test.url' => '/url']);
+
         $this->assertFalse($container->private());
         $this->assertTrue($container->accessible());
     }
@@ -114,10 +145,8 @@ class AssetContainerTest extends TestCase
     /** @test */
     function it_gets_and_sets_blueprint()
     {
-        config(['statamic.theming.blueprints.asset' => 'default-asset']);
-
         BlueprintRepository::shouldReceive('find')
-            ->with('default-asset')
+            ->with('asset')
             ->andReturn($defaultBlueprint = new Blueprint);
 
         BlueprintRepository::shouldReceive('find')

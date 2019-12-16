@@ -55,7 +55,7 @@ class Path
      */
     public function isAbsolute($path)
     {
-        return $path[0] === DIRECTORY_SEPARATOR || preg_match('~\A[A-Z]:(?![^/\\\\])~i', $path) > 0;
+        return $path[0] === '/' || preg_match('~\A[A-Z]:(?![^/\\\\])~i', $path) > 0;
     }
 
     /**
@@ -136,7 +136,7 @@ class Path
             return null;
         }
 
-        return self::tidy(join($args, '/'));
+        return self::tidy(join('/', $args));
     }
 
     /**
@@ -222,12 +222,12 @@ class Path
      */
     public function tidy($path)
     {
-        // Remove occurrences of "//" in a $path (except when part of a protocol).
-        $path = preg_replace('#(^|[^:])//+#', '\\1/', $path);
-
         // Replace backslashes with forward slashes for consistency between platforms.
         // PHP is capable of understanding Windows paths that use forward slashes.
-        return str_replace('\\', '/', $path);
+        $path = str_replace('\\', '/', $path);
+
+        // Remove occurrences of "//" in a $path (except when part of a protocol).
+        return preg_replace('#(^|[^:])//+#', '\\1/', $path);
     }
 
     /**

@@ -9,11 +9,6 @@ class UserGroup extends BaseUserGroup
 {
     public function queryUsers()
     {
-        return User::query()->whereIn('id', $this->getUserIds());
-    }
-
-    protected function getUserIds()
-    {
-        return $this->users->keys()->all();
+        return User::query()->where('groups/'.$this->handle(), true);
     }
 }

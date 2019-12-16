@@ -6,17 +6,19 @@ use Statamic\Support\Arr;
 
 class Partial extends Tags
 {
-    public function __call($method, $arguments)
+    public function wildcard($tag)
     {
         // We pass the original non-studly case value in as
         // an argument, but fall back to the studly version just in case.
-        $partial = $this->get('src', Arr::get($arguments, 0, $this->method));
+        $partial = $this->get('src', $tag);
 
         $variables = array_merge($this->context->all(), $this->parameters->all(), [
             '__frontmatter' => $this->parameters->all()
         ]);
 
-        return view($this->viewName($partial), $variables)->render();
+        return view($this->viewName($partial), $variables)
+            ->withoutExtractions()
+            ->render();
     }
 
     protected function viewName($partial)

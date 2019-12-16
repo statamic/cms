@@ -31,7 +31,7 @@ array:
 
 EOT;
 
-        $this->assertEquals($expected, YAML::dump($array));
+        $this->assertEqualsIgnoringLineEndings($expected, YAML::dump($array));
     }
 
     /** @test */
@@ -44,7 +44,32 @@ foo: bar
 some content
 EOT;
 
-        $this->assertEquals($expected, YAML::dump(['foo' => 'bar'], 'some content'));
+        $this->assertEqualsIgnoringLineEndings($expected, YAML::dump(['foo' => 'bar'], 'some content'));
+    }
+
+    /** @test */
+    function it_dumps_without_front_matter_when_content_is_an_array()
+    {
+        $expected = <<<EOT
+foo: bar
+content:
+  baz: qux
+
+EOT;
+
+        $this->assertEqualsIgnoringLineEndings($expected, YAML::dump(['foo' => 'bar'], ['baz' => 'qux']));
+    }
+
+    /** @test */
+    function it_dumps_without_front_matter_when_content_is_null()
+    {
+        $expected = <<<EOT
+foo: bar
+
+EOT;
+
+        $this->assertEqualsIgnoringLineEndings($expected, YAML::dump(['foo' => 'bar'], null));
+        $this->assertEqualsIgnoringLineEndings($expected, YAML::dump(['foo' => 'bar']));
     }
 
     /** @test */
@@ -57,7 +82,7 @@ foo: bar
 
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
+        $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
     /** @test */
@@ -70,19 +95,48 @@ foo: bar
 some content
 EOT;
 
-        $this->assertEquals($expected, YAML::dumpFrontMatter(['foo' => 'bar'], 'some content'));
+        $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], 'some content'));
+    }
+
+    /** @test */
+    function it_explicitly_dumps_front_matter_including_content_when_its_an_array()
+    {
+        $expected = <<<EOT
+---
+foo: bar
+content:
+  baz: qux
+---
+
+EOT;
+
+        $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], ['baz' => 'qux']));
+    }
+
+    /** @test */
+    function it_explicitly_dumps_front_matter_without_content_when_its_null()
+    {
+        $expected = <<<EOT
+---
+foo: bar
+---
+
+EOT;
+
+        $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar'], null));
+        $this->assertEqualsIgnoringLineEndings($expected, YAML::dumpFrontMatter(['foo' => 'bar']));
     }
 
     /** @test */
     function it_parses_a_string_of_yaml()
     {
-        $this->assertEquals(['foo' => 'bar'], YAML::parse('foo: bar'));
+        $this->assertEqualsIgnoringLineEndings(['foo' => 'bar'], YAML::parse('foo: bar'));
     }
 
     /** @test */
     function it_parses_an_empty_string_of_yaml()
     {
-        $this->assertEquals([], YAML::parse(''));
+        $this->assertEqualsIgnoringLineEndings([], YAML::parse(''));
     }
 
     /** @test */
@@ -95,7 +149,35 @@ foo: bar
 some content
 EOT;
 
-        $this->assertEquals(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
+        $this->assertEqualsIgnoringLineEndings(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
+    }
+
+    /** @test */
+    function it_parses_with_content_when_its_in_the_front_matter()
+    {
+        $yaml = <<<EOT
+---
+foo: bar
+content: some content
+---
+EOT;
+
+        $this->assertEqualsIgnoringLineEndings(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
+    }
+
+    /** @test */
+    function it_throws_exception_when_there_is_a_content_var_and_a_content_area()
+    {
+        $yaml = <<<EOT
+---
+foo: bar
+content: some content
+---
+some text
+EOT;
+
+        $this->expectException(ParseException::class);
+        YAML::parse($yaml);
     }
 
     /** @test */
@@ -112,7 +194,7 @@ EOT;
         fwrite($fp, $yaml);
         $path = stream_get_meta_data($fp)['uri'];
 
-        $this->assertEquals(
+        $this->assertEqualsIgnoringLineEndings(
             ['foo' => 'bar', 'content' => 'some content'],
             YAML::file($path)->parse()
         );
@@ -172,5 +254,12 @@ EOT;
         }
 
         $this->fail('Exception was not thrown.');
+    }
+
+    protected function assertEqualsIgnoringLineEndings($expected, $actual)
+    {
+        $actual = str_replace("\r\n", "\n", $actual);
+
+        $this->assertEquals($expected, $actual);
     }
 }

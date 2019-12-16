@@ -85,7 +85,7 @@ export default {
         const state = this.$store.state.publish[this.storeName];
 
         return {
-            active: state.fieldset.sections[0].handle,
+            active: state.blueprint.sections[0].handle,
             containerWidth: null
         }
     },
@@ -97,14 +97,14 @@ export default {
         },
 
         sections() {
-            return this.state.fieldset.sections;
+            return this.state.blueprint.sections;
         },
 
         mainSections() {
             if (! this.shouldShowSidebar) return this.sections;
 
             if (this.active === "sidebar") {
-                this.active = this.state.fieldset.sections[0].handle
+                this.active = this.state.blueprint.sections[0].handle
             }
 
             return _.filter(this.sections, section => section.handle != 'sidebar');

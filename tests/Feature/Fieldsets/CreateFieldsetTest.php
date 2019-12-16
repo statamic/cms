@@ -5,16 +5,18 @@ namespace Tests\Feature\Fieldsets;
 use Statamic\Facades;
 use Tests\TestCase;
 use Tests\FakesRoles;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class CreateFieldsetTest extends TestCase
 {
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     /** @test */
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = Facades\User::make()->assignRole('test');
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
 
         $this
             ->from('/original')

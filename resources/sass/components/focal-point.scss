@@ -4,12 +4,13 @@
 
 .focal-point {
     position: fixed;
-    z-index: 1000;
+    z-index: 10000;
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
     border: 5px solid #394045;
+    @apply bg-grey-80;
 }
 
 .focal-point-toolbox {
@@ -17,39 +18,9 @@
     top: 20px;
     left: 20px;
     z-index: 120;
-    width: 360px;
-    padding: 15px;
+    width: 380px;
     overflow-y: auto;
     max-height: 95vh;
-
-    .form-group {
-        label {
-            display: block;
-            margin-bottom: 5px;
-        }
-    }
-}
-
-.focal-point-coordinates {
-    display: flex;
-    flex-direction: column;
-    font-family: $font_monospace;
-    @apply -mt-sm;
-
-    .pair {
-        display: flex;
-        align-items: center;
-    }
-    .axis {
-        font-weight: bold;
-        font-size: 12px;
-        margin-right: 5px;
-        color: $color_dark_blue;
-    }
-    .value {
-        display: block;
-        font-size: 14px;
-    }
 }
 
 .focal-point-image {

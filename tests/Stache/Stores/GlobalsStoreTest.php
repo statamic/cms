@@ -12,6 +12,7 @@ use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\GlobalsStore;
 use Statamic\Facades\GlobalSet as GlobalsAPI;
 use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Facades\Path;
 
 class GlobalsStoreTest extends TestCase
 {
@@ -44,27 +45,28 @@ class GlobalsStoreTest extends TestCase
 
         $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 
+        $dir = Path::tidy($this->tempDir);
         $this->assertEquals([
-            $this->tempDir.'/one.yaml' => 1234567890,
-            $this->tempDir.'/two.yaml' => 1234567890,
+            $dir.'/one.yaml' => 1234567890,
+            $dir.'/two.yaml' => 1234567890,
         ], $files->all());
 
         // Sanity check. Make sure the file is there but wasn't included.
-        $this->assertTrue(file_exists($this->tempDir.'/subdirectory/nested-one.yaml'));
-        $this->assertTrue(file_exists($this->tempDir.'/subdirectory/nested-two.yaml'));
-        $this->assertTrue(file_exists($this->tempDir.'/three.txt'));
+        $this->assertTrue(file_exists($dir.'/subdirectory/nested-one.yaml'));
+        $this->assertTrue(file_exists($dir.'/subdirectory/nested-two.yaml'));
+        $this->assertTrue(file_exists($dir.'/three.txt'));
     }
 
     /** @test */
     function it_makes_global_set_instances_from_files()
     {
-        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "id: globals-example\ntitle: Example\ndata:\n  foo: bar");
+        $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/example.yaml'), "id: globals-example\ntitle: Example\ndata:\n  foo: bar");
 
         $this->assertInstanceOf(GlobalSet::class, $item);
         $this->assertEquals('globals-example', $item->id());
         $this->assertEquals('example', $item->handle());
         $this->assertEquals('Example', $item->title());
-        $this->assertEquals(['foo' => 'bar'], $item->in('en')->data());
+        $this->assertEquals(['foo' => 'bar'], $item->in('en')->data()->all());
     }
 
     /** @test */

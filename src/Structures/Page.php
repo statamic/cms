@@ -139,8 +139,8 @@ class Page implements Entry, AugmentableContract, Responsable
 
     public function uri()
     {
-        if (! $this->reference || ! $this->referenceExists()) {
-            return;
+        if (! $this->reference) {
+            return optional($this->parent)->uri();
         }
 
         $uris = app(UriCache::class);
@@ -231,9 +231,9 @@ class Page implements Entry, AugmentableContract, Responsable
 
     // TODO: tests for these
 
-    public function toArray()
+    public function augmentedArrayData()
     {
-        $array = $this->reference && $this->referenceExists() ? $this->entry()->toArray() : [];
+        $array = $this->reference && $this->referenceExists() ? $this->entry()->augmentedArrayData() : [];
 
         return array_merge($array, [
             'title' => $this->title(),
@@ -296,7 +296,7 @@ class Page implements Entry, AugmentableContract, Responsable
 
     public function blueprint()
     {
-        return $this->entry()->blueprint();
+        return optional($this->entry())->blueprint();
     }
 
     public function collection()

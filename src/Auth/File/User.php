@@ -10,14 +10,12 @@ use Statamic\Data\Data;
 use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Auth\PermissionCache;
 use Statamic\Auth\User as BaseUser;
 use Illuminate\Support\Facades\Hash;
-use Illuminate\Support\Facades\Password;
-use Statamic\Preferences\HasPreferences;
-use Statamic\Notifications\PasswordReset;
-use Statamic\Notifications\ActivateAccount;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Auth\Role as RoleContract;
+use Statamic\Preferences\HasPreferencesInProperty;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 
 /**
@@ -25,13 +23,20 @@ use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
  */
 class User extends BaseUser
 {
-    use ExistsAsFile, FluentlyGetsAndSets, HasPreferences, ContainsData {
+    use ExistsAsFile, FluentlyGetsAndSets, HasPreferencesInProperty, ContainsData {
         data as traitData;
     }
 
     protected $id;
     protected $email;
     protected $password;
+    protected $permissions;
+
+    public function __construct()
+    {
+        $this->data = collect();
+        $this->supplements = collect();
+    }
 
     public function data($data = null)
     {
@@ -256,29 +261,32 @@ class User extends BaseUser
 
     public function permissions()
     {
-        return $this
+        $cache = app(PermissionCache::class);
+
+        if ($cached = $cache->get($this->id)) {
+            return $cached;
+        }
+
+        $permissions = $this
             ->groups()
             ->flatMap->roles()
             ->merge($this->roles())
-            ->flatMap->permissions()
-            ->unique()
-            ->values();
+            ->flatMap->permissions();
+
+        if ($this->get('super', false)) {
+            $permissions[] = 'super';
+        }
+
+        $permissions = $permissions->unique()->values();
+
+        $cache->put($this->id, $permissions);
+
+        return $permissions;
     }
 
     public function hasPermission($permission)
     {
         return $this->permissions()->contains($permission);
-    }
-
-    public function isSuper()
-    {
-        if ($this->get('super')) {
-            return true;
-        }
-
-        return null !== $this->groups()->flatMap->roles()
-            ->merge($this->roles())
-            ->first->isSuper();
     }
 
     public function makeSuper()
@@ -311,20 +319,6 @@ class User extends BaseUser
         $this->setMeta('last_login', $carbon->timestamp);
     }
 
-    public function sendPasswordResetNotification($token)
-    {
-        $notification = $this->password() ? new PasswordReset($token) : new ActivateAccount($token);
-
-        $this->notify($notification);
-    }
-
-    public function generateTokenAndSendPasswordResetNotification()
-    {
-        $token = Password::broker()->createToken($this);
-
-        $this->sendPasswordResetNotification($token);
-    }
-
     /**
      * Get a value from the user's meta YAML file
      *
@@ -339,7 +333,7 @@ class User extends BaseUser
         return array_get($yaml, $key, $default);
     }
 
-     /**
+    /**
      * Write to the user's meta YAML file
      *
      * @param  string $key
@@ -367,10 +361,10 @@ class User extends BaseUser
 
     public function fileData()
     {
-        return array_merge($this->data(), [
+        return $this->data()->merge([
             'id' => (string) $this->id(),
             'password_hash' => $this->password(),
             'preferences' => $this->preferences(),
-        ]);
+        ])->all();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
+use Statamic\Facades\User;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -13,7 +14,7 @@ class LocalizeEntryController extends CpController
 
         $localized = $entry->makeLocalization($site = $request->site);
 
-        $localized->store(['user' => $request->user()]);
+        $localized->store(['user' => User::fromUser($request->user())]);
 
         return [
             'handle' => $site,

@@ -4,7 +4,7 @@
         <label class="publish-field-label">{{ __('Validation Rules') }}</label>
         <div class="help-block -mt-1">
             <p>
-                {{ __("Has access to all of Laravel's validation rules.") }}
+                {{ __('messages.field_validation_instructions') }}
                 <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
             </p>
         </div>
@@ -59,6 +59,11 @@ export default {
 
         laravelDocsLink() {
             let version = new RegExp('([0-9]+\.[0-9])\.[0-9]+').exec(this.laravelVersion)[1];
+            let majorVersion = Number(version.split('.', 1)[0]);
+
+            if (majorVersion >= 6) {
+                version = `${majorVersion}.x`;
+            }
 
             return `https://laravel.com/docs/${version}/validation#available-validation-rules`;
         },

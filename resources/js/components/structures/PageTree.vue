@@ -4,7 +4,7 @@
         <div class="flex items-center mb-3">
             <slot name="header" />
 
-            <dropdown-list class="mr-2">
+            <dropdown-list class="mr-1">
                 <dropdown-item :text="__('Edit Structure Config')" :redirect="editUrl" />
             </dropdown-list>
 
@@ -51,9 +51,9 @@
         <div v-if="pages.length == 0" class="no-results border-dashed border-2 w-full flex items-center">
             <div class="text-center max-w-md mx-auto rounded-lg px-4 py-4">
                 <slot name="no-pages-svg" />
-                <h1 class="my-3" v-text="__('Create your first link now.')" />
+                <h1 class="my-3" v-text="__('Create your first link now')" />
                 <p class="text-grey mb-3">
-                    {{ __('Structures can contain links arranged into a heirarchy from which you can create URLs or navigation areas.') }}
+                    {{ __('messages.structures_empty') }}
                 </p>
                 <button class="btn btn-primary btn-lg" v-text="__('Create first page')" @click="makeFirstPage" />
             </div>
@@ -112,7 +112,7 @@
 <script>
 import * as th from 'tree-helper';
 import {Sortable, Plugins} from '@shopify/draggable';
-import {DraggableTree} from 'vue-draggable-nested-tree';
+import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
 import PageSelector from './PageSelector.vue';
 import PageEditor from './PageEditor.vue';
@@ -197,7 +197,7 @@ export default {
     created() {
         this.updateTreeData();
 
-        this.$mousetrap.bindGlobal(['command+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
             this.save();
         });
@@ -246,7 +246,7 @@ export default {
             this.$axios.post(this.submitUrl, payload).then(response => {
                 this.changed = false;
                 this.saving = false;
-                this.$notify.success(__('Saved'));
+                this.$toast.success(__('Saved'));
             });
         },
 

@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Statamic\Facades\Term;
 use Statamic\Facades\User;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
@@ -24,17 +25,29 @@ class Searchables
         if ($searchables->contains('all')) {
             return collect()
                 ->merge(Entry::all())
+                ->merge(Term::all())
                 ->merge(Asset::all())
                 ->merge(User::all());
         }
 
         return $searchables->flatMap(function ($item) {
             if (starts_with($item, 'collection:')) {
-                return Entry::whereCollection(str_after($item, 'collection:'));
+                $collection = str_after($item, 'collection:');
+                return $collection === '*' ? Entry::all() : Entry::whereCollection($collection);
+            }
+
+            if (starts_with($item, 'taxonomy:')) {
+                $taxonomy = str_after($item, 'taxonomy:');
+                return $taxonomy === '*' ? Term::all() : Term::whereTaxonomy($taxonomy);
             }
 
             if (starts_with($item, 'assets:')) {
-                return Asset::whereContainer(str_after($item, 'assets:'));
+                $container = str_after($item, 'assets:');
+                return $container === '*' ? Asset::all() : Asset::whereContainer($container);
+            }
+
+            if ($item === 'users') {
+                return User::all();
             }
 
             throw new \LogicException("Unknown searchable [$item].");

@@ -2,8 +2,9 @@
 
 namespace Statamic\Support;
 
-use Statamic\Data\DataCollection;
+use Exception;
 use Illuminate\Support\Arr as IlluminateArr;
+use Statamic\Data\DataCollection;
 
 class Arr extends IlluminateArr
 {
@@ -38,6 +39,24 @@ class Arr extends IlluminateArr
         }
 
         return parent::has($array, $key);
+    }
+
+    public static function addScope($array, $scope)
+    {
+        if (static::isAssoc($array)) {
+            $array[$scope] = $array;
+            return $array;
+        }
+
+        return collect($array)->map(function ($value) use ($scope) {
+            if (! is_array($value)) {
+                throw new Exception('Scopes can only be added to associative or multidimensional arrays.');
+            }
+
+            $value[$scope] = $value;
+
+            return $value;
+        })->all();
     }
 
     /**
@@ -97,7 +116,7 @@ class Arr extends IlluminateArr
      * @param bool $keyed  Are options keyed?
      * @return array
      */
-    public function explodeOptions($string, $keyed = false)
+    public static function explodeOptions($string, $keyed = false)
     {
         $options = explode('|', $string);
 
@@ -131,7 +150,7 @@ class Arr extends IlluminateArr
      * @param mixed  $value  Value to check
      * @return bool
      */
-    public function isEmpty($value)
+    public static function isEmpty($value)
     {
         if (is_array($value)) {
             foreach ($value as $subvalue) {
@@ -154,7 +173,7 @@ class Arr extends IlluminateArr
      * @param mixed
      * @return array
      */
-    public function normalizeArguments($args)
+    public static function normalizeArguments($args)
     {
         $output = [];
 
@@ -174,7 +193,7 @@ class Arr extends IlluminateArr
      *
      * @return mixed
      */
-    public function pick()
+    public static function pick()
     {
         $args = func_get_args();
 
@@ -212,36 +231,6 @@ class Arr extends IlluminateArr
         return $ordered + $array;
     }
 
-    public static function addScope($data, $scope)
-    {
-        if ($data instanceof DataCollection) {
-            $data = $data->toArray();
-        }
-
-        // If it's already an associative array, we can just grab
-        // the whole thing and duplicate it into its own scope.
-        if (self::assoc($data)) {
-            $data[$scope] = $data;
-            return $data;
-        }
-
-        $output = [];
-
-        foreach ($data as $i => $iteration) {
-            if (is_array($iteration)) {
-                foreach ($iteration as $key => $val) {
-                    $output[$i][$scope][$key] = $val;
-                    $output[$i][$key] = $val;
-                }
-            } else {
-                $output[$scope][$i] = $iteration;
-                $output[$i] = $iteration;
-            }
-        }
-
-        return $output;
-    }
-
     /**
      * Get rid of null values. (Empty arrays, literal null values, and empty strings)
      *
@@ -275,5 +264,16 @@ class Arr extends IlluminateArr
             ->first();
 
         return $value ?? $default;
+    }
+
+    public static function undot($dotted)
+    {
+        $array = [];
+
+        foreach ($dotted as $key => $value) {
+            static::set($array, $key, $value);
+        }
+
+        return $array;
     }
 }

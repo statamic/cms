@@ -1,17 +1,22 @@
 <template>
 
-    <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow"
-        @mousedown="parentMousedown"
-        @dragstart="parentDragStart"
-    >
-        <div class="replicator-set-header" :class="{'collapsed': collapsed}" @dblclick="toggleCollapsedState">
-            <div class="item-move sortable-handle" ref="dragHandle"></div>
-            <div class="flex-1 ml-1 flex items-center" @click="expand">
-                <label v-text="config.display" class="text-xs"/>
+    <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow" contenteditable="false" @paste.stop>
+        <div ref="content" hidden />
+        <div class="replicator-set-header" :class="{'collapsed': collapsed}">
+            <div class="item-move sortable-handle" data-drag-handle />
+            <div class="flex-1 p-1" :class="{'flex items-center': collapsed}" @dblclick="toggleCollapsedState">
+                <label v-text="config.display" class="text-xs whitespace-no-wrap mr-1"/>
                 <div
                     v-if="config.instructions"
+                    v-show="!collapsed"
                     v-html="instructions"
-                    class="help-block replicator-set-instructions" />
+                    class="help-block mt-1 -mb-1" />
+
+                <div v-show="collapsed" class="flex-1 min-w-0 w-1 pr-4">
+                    <div
+                        v-html="previewText"
+                        class="help-block mb-0 whitespace-no-wrap overflow-hidden text-overflow-ellipsis" />
+                </div>
             </div>
             <div class="replicator-set-controls">
                 <toggle-fieldtype
@@ -19,15 +24,15 @@
                     class="toggle-sm mr-2"
                     v-model="enabled"
                     v-tooltip.top="(enabled) ? __('Included in output') : __('Hidden from output')" />
-                <dropdown-list>
+                <dropdown-list class="-mt-sm">
                     <dropdown-item :text="__(collapsed ? 'Expand Set' : 'Collapse Set')" @click="toggleCollapsedState" />
                     <dropdown-item :text="__('Delete Set')" class="warning" @click="destroy" />
                 </dropdown-list>
             </div>
         </div>
-        <div class="replicator-set-body" v-show="!collapsed" v-if="index">
+        <div class="replicator-set-body" v-show="!collapsed" v-if="index !== undefined">
             <set-field
-                v-for="field in config.fields"
+                v-for="field in fields"
                 v-show="showField(field)"
                 :key="field.handle"
                 :field="field"
@@ -35,11 +40,12 @@
                 :meta="meta[field.handle]"
                 :parent-name="parentName"
                 :set-index="index"
-                :error-key="`${parentName}.${index}.attrs.values.${field.handle}`"
+                :error-key="errorKey(field)"
                 @updated="updated(field.handle, $event)"
                 @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="focused"
                 @blur="blurred"
+                @replicator-preview-updated="previews[field.handle] = $event"
             />
         </div>
     </div>
@@ -48,6 +54,7 @@
 
 <script>
 import SetField from '../replicator/Field.vue';
+import ManagesPreviewText from '../replicator/ManagesPreviewText';
 import { ValidatesFieldConditions } from '../../field-conditions/FieldConditions.js';
 
 export default {
@@ -64,17 +71,15 @@ export default {
 
     components: { SetField },
 
-    mixins: [ValidatesFieldConditions],
+    mixins: [ValidatesFieldConditions, ManagesPreviewText],
 
     inject: ['setConfigs'],
 
-    data() {
-        return {
-            lastClicked: null,
-        }
-    },
-
     computed: {
+
+        fields() {
+            return this.config.fields;
+        },
 
         values() {
             return this.node.attrs.values;
@@ -107,8 +112,16 @@ export default {
 
         index() {
             return this.options.bard.setIndexes[this.node.attrs.id];
-        }
+        },
 
+        instructions() {
+            return this.config.instructions ? markdown(this.config.instructions) : null;
+        },
+
+    },
+
+    created() {
+        this.initPreviews();
     },
 
     methods: {
@@ -131,20 +144,6 @@ export default {
             let pos = this.getPos();
             tr.delete(pos, pos + this.node.nodeSize);
             this.view.dispatch(tr);
-        },
-
-        parentMousedown(e) {
-            this.lastClicked = e.target;
-        },
-
-        parentDragStart(e) {
-            const handle = this.$refs.dragHandle;
-
-            if (this.lastClicked === handle || handle.contains(this.lastClicked)) {
-                return;
-            }
-
-            e.preventDefault();
         },
 
         focused() {
@@ -176,6 +175,11 @@ export default {
         expand() {
             // this.$events.$emit('expanded', this.node.attrs.id);
             this.options.bard.expandSet(this.node.attrs.id);
+        },
+
+        errorKey(field) {
+            let prefix = this.options.bard.errorKeyPrefix || this.options.bard.handle;
+            return `${prefix}.${this.index}.attrs.values.${field.handle}`;
         }
 
     }

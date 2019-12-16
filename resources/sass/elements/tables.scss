@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .data-list-header {
-    @apply py-1.5 pr-2 flex items-center border-b;
+    @apply py-1.5 pr-2 flex flex-wrap items-center border-b;
 }
 
 .data-list-search-input {
@@ -15,7 +15,9 @@
 }
 
 .data-table {
-    @apply w-full text-left text-grey outline-none;
+	@apply text-left text-grey outline-none max-w-full block;
+	overflow-x: auto;
+	width: fit-content;
 
     thead {
         @apply bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide outline-none;
@@ -29,7 +31,8 @@
             &:first-child { @apply .rounded-tl; }
             &:last-child { @apply .rounded-tr; }
         }
-    }
+	}
+
     tbody {
 		outline: none;
         tr {
@@ -49,10 +52,10 @@
             th {
                 @apply py-1 pr-2;
             }
-            
+
             td {
                 @apply py-1 px-2;
-                work-break: break-all;
+                word-break: break-all;
             }
         }
     }
@@ -84,7 +87,13 @@
 	}
 
 	.sortable-row.draggable-mirror {
-		@apply bg-white border-b;
+		display: none;
+	}
+}
+
+@screen md {
+	.data-table {
+		@apply w-full table;
 	}
 }
 

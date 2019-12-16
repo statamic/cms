@@ -63,12 +63,6 @@ abstract class Tags
     public $isPair;
 
     /**
-     * Whether to trim the whitespace from the content before parsing
-     * @var  bool
-     */
-    protected $trim = false;
-
-    /**
      * The parser instance that executed this tag.
      * @var \Statamic\View\Antlers\Parser
      */
@@ -146,39 +140,24 @@ abstract class Tags
     }
 
     /**
-     * Trim the content
-     *
-     * @param   bool    $trim  Whether to trim the content
-     * @return  $this
-     */
-    protected function trim($trim = true)
-    {
-        $this->trim = $trim;
-
-        return $this;
-    }
-
-    /**
-     * Parse the tag pair contents with scoped variables
+     * Parse the tag pair contents
      *
      * @param array $data     Data to be parsed into template
      * @return string
      */
     public function parse($data = [])
     {
-        if ($this->trim) {
-            $this->content = trim($this->content);
+        if ($scope = $this->get('scope')) {
+            $data = Arr::addScope($data, $scope);
         }
 
-        $variables = $this->addScope($data); // todo: get rid of scope, but its not under test yet.
-
-        return Antlers::usingParser($this->parser, function ($antlers) use ($variables) {
-            return $antlers->parse($this->content, $variables);
+        return Antlers::usingParser($this->parser, function ($antlers) use ($data) {
+            return $antlers->parse($this->content, array_merge($this->context->all(), $data));
         });
     }
 
     /**
-     * Iterate over the data and parse the tag pair contents for each, with scoped variables
+     * Iterate over the data and parse the tag pair contents for each
      *
      * @param array|\Statamic\Data\DataCollection $data        Data to iterate over
      * @param bool                                $supplement  Whether to supplement with contextual values
@@ -186,12 +165,16 @@ abstract class Tags
      */
     public function parseLoop($data, $supplement = true)
     {
-        if ($this->trim) {
-            $this->content = trim($this->content);
+        if ($as = $this->params->get('as')) {
+            return $this->parse([$as => $data]);
+        }
+
+        if ($scope = $this->get('scope')) {
+            $data = Arr::addScope($data, $scope);
         }
 
         return Antlers::usingParser($this->parser, function ($antlers) use ($data, $supplement) {
-            return $antlers->parseLoop($this->content, $this->addScope($data), $supplement);
+            return $antlers->parseLoop($this->content, $data, $supplement, $this->context->all());
         });
     }
 
@@ -207,25 +190,6 @@ abstract class Tags
             'no_results' => true,
             'total_results' => 0
         ]));
-    }
-
-    /**
-     * Add the provided $data to its own scope
-     *
-     * @param array|\Statamic\Data\DataCollection $data
-     * @return mixed
-     */
-    private function addScope($data)
-    {
-        if ($scope = $this->getParam('scope')) {
-            $data = Arr::addScope($data, $scope);
-        }
-
-        if ($data instanceof DataCollection) {
-            $data = $data->toArray();
-        }
-
-        return $data;
     }
 
     /**

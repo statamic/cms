@@ -28,13 +28,16 @@ class ConfigFieldsTest extends TestCase
             ['handle' => 'two', 'field' => ['type' => 'fieldtype']]
         ]);
 
-        $this->assertEquals(['one' => null, 'two' => null], $fields->values());
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
 
-        $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+        $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
+        $preProcessed = $fields->preProcess();
+
+        $this->assertNotSame($fields, $preProcessed);
         $this->assertEquals([
             'one' => 'foo preprocessed config',
             'two' => 'bar preprocessed config'
-        ], $fields->preProcess()->values());
+        ], $preProcessed->values()->all());
     }
 }

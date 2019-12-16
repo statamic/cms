@@ -4,7 +4,6 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
-use Statamic\Fields\Validation;
 use Statamic\CP\FieldtypeFactory;
 
 class Replicator extends Fieldtype
@@ -25,7 +24,7 @@ class Replicator extends Fieldtype
     {
         $row = array_except($row, '_id');
 
-        $fields = $this->fields($row['type'])->addValues($row)->process()->values();
+        $fields = $this->fields($row['type'])->addValues($row)->process()->values()->all();
 
         return array_merge($row, $fields);
     }
@@ -39,7 +38,7 @@ class Replicator extends Fieldtype
 
     protected function preProcessRow($row, $index)
     {
-        $fields = $this->fields($row['type'])->addValues($row)->preProcess()->values();
+        $fields = $this->fields($row['type'])->addValues($row)->preProcess()->values()->all();
 
         return array_merge($row, $fields, [
             '_id' => "set-$index",
@@ -63,7 +62,7 @@ class Replicator extends Fieldtype
 
     protected function setRules($handle, $data, $index)
     {
-        $rules = (new Validation)->fields($this->fields($handle))->rules();
+        $rules = $this->fields($handle)->addValues($data)->validator()->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
             return [$this->setRuleFieldKey($handle, $index) => $rules];
@@ -91,8 +90,8 @@ class Replicator extends Fieldtype
 
             $values = (new Fields($config))->addValues($set)->augment()->values();
 
-            return array_merge($values, ['type' => $set['type']]);
-        });
+            return $values->merge(['type' => $set['type']])->all();
+        })->all();
     }
 
     public function preload()

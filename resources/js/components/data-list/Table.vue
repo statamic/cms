@@ -22,11 +22,11 @@
             </tr>
         </thead>
         <sortable-list
-            v-model="rows"
+            :value="rows"
             :vertical="true"
             item-class="sortable-row"
             handle-class="table-drag-handle"
-            @sorted="$emit('reordered', rows)"
+            @input="$emit('reordered', $event)"
         >
         <tbody>
             <slot name="tbody-start" />

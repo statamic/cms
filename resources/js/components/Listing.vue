@@ -16,6 +16,7 @@ export default {
     props: {
         initialSortColumn: String,
         initialSortDirection: String,
+        filters: Array,
     },
 
     data() {
@@ -109,7 +110,7 @@ export default {
                 if (this.$axios.isCancel(e)) return;
                 this.loading = false;
                 this.initializing = false;
-                this.$notify.error(e.response ? e.response.data.message : __('Something went wrong'));
+                this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { duration: null });
             })
         },
 

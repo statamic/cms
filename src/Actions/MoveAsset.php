@@ -2,7 +2,6 @@
 
 namespace Statamic\Actions;
 
-use Statamic\Facades\User;
 use Statamic\Facades\AssetContainer;
 use Statamic\Contracts\Assets\Asset;
 
@@ -10,14 +9,26 @@ class MoveAsset extends Action
 {
     protected static $title = 'Move';
 
-    public function visibleTo($key, $context)
+    public function filter($item)
     {
-        return $key === 'asset-browser';
+        return $item instanceof Asset;
     }
 
-    public function authorize($asset)
+    public function authorize($user, $asset)
     {
-        return User::current()->can('move', $asset);
+        return $user->can('move', $asset);
+    }
+
+    public function buttonText()
+    {
+        /** @translation */
+        return 'Move Asset|Move :count Assets';
+    }
+
+    public function confirmationText()
+    {
+        /** @translation */
+        return 'Are you sure you want to move this asset?|Are you sure you want to move these :count assets?';
     }
 
     public function run($assets, $values)

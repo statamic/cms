@@ -114,4 +114,18 @@ return [
 
     'google_docs_viewer' => false,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Cache Metadata
+    |--------------------------------------------------------------------------
+    |
+    | Asset metadata (filesize, dimensions, custom data, etc) will get cached
+    | to optimize performance, so that it will not need to be constantly
+    | re-evaluated from disk. You may disable this option if you are
+    | planning to continually modify the same asset repeatedly.
+    |
+    */
+
+    'cache_meta' => true,
+
 ];

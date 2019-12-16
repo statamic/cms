@@ -3,22 +3,25 @@
 namespace Statamic\Auth;
 
 use ArrayAccess;
-use Statamic\Facades;
-use Statamic\Facades\URL;
-use Statamic\Support\Arr;
-use Statamic\Facades\Blueprint;
-use Statamic\Facades\Preference;
-use Statamic\Data\Augmentable;
-use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Auth\Passwords\CanResetPassword;
-use Statamic\Contracts\Auth\User as UserContract;
-use Illuminate\Foundation\Auth\Access\Authorizable;
-use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Foundation\Auth\Access\Authorizable;
+use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Facades\Password;
+use Statamic\Auth\Passwords\PasswordReset;
+use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Data\Augmentable;
+use Statamic\Facades;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\URL;
+use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
+use Statamic\Notifications\PasswordReset as PasswordResetNotification;
+use Statamic\Support\Arr;
+use Statamic\Fields\Value;
 
-abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, AugmentableContract, Arrayable, ArrayAccess
+abstract class User implements UserContract, Authenticatable, CanResetPasswordContract, AugmentableContract, ArrayAccess
 {
     use Authorizable, Notifiable, CanResetPassword, Augmentable;
 
@@ -52,20 +55,36 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         return strtoupper(substr($name, 0, 1) . substr($surname, 0, 1));
     }
 
-    protected function augmentedArrayData()
-    {
-        return $this->data();
-    }
-
     public function avatar($size = 64)
     {
-        if ($this->blueprint()->hasField('avatar') && $this->has('avatar') && $this->augment('avatar')->value()) {
-            return $this->augment('avatar')->value()->url();
+        if ($this->hasAvatarField()) {
+            return $this->avatarFieldUrl();
         }
 
         return config('statamic.users.avatars') === 'gravatar'
             ? URL::gravatar($this->email(), $size)
             : null;
+    }
+
+    protected function hasAvatarField()
+    {
+        return $this->has('avatar') && $this->blueprint()->hasField('avatar');
+    }
+
+    protected function avatarFieldUrl()
+    {
+        $value = (new Value($this->get('avatar'), 'avatar', $this->blueprint()->field('avatar')->fieldtype(), $this));
+
+        return $value->value()->url();
+    }
+
+    public function isSuper()
+    {
+        if ((bool) $this->get('super')) {
+            return true;
+        }
+
+        return $this->hasPermission('super');
     }
 
     public function isTaxonomizable()
@@ -83,39 +102,7 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         return cp_route('users.update', $this->id());
     }
 
-    /**
-     * Add supplemental data to the attributes
-     */
-    public function supplement()
-    {
-        $this->supplements['last_modified'] = $this->lastModified()->timestamp;
-        $this->supplements['email'] = $this->email();
-        $this->supplements['edit_url'] = $this->editUrl();
-
-        if ($first_name = $this->get('first_name')) {
-            $name = $first_name;
-
-            if ($last_name = $this->get('last_name')) {
-                $name .= ' ' . $last_name;
-            }
-
-            $this->supplements['name'] = $name;
-        }
-
-        foreach ($this->roles() as $role) {
-            $this->supplements['is_'.$role->handle()] = true;
-        }
-
-        foreach ($this->groups() as $group) {
-            $this->supplements['in_'.$group->handle()] = true;
-        }
-
-        if ($this->supplement_taxonomies) {
-            $this->addTaxonomySupplements();
-        }
-    }
-
-    public function toArray()
+    public function augmentedArrayData()
     {
         $roles = $this->roles()->mapWithKeys(function ($role) {
             return ["is_{$role->handle()}" => true];
@@ -125,23 +112,22 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
             return ["in_{$group->handle()}" => true];
         })->all();
 
-        return array_merge($this->data(), [
+        $data = $this->data()->merge([
+            'name' => $this->name(),
             'id' => $this->id(),
             'title' => $this->title(),
             'email' => $this->email(),
-            'avatar' => $this->avatar(),
             'initials' => $this->initials(),
-            'preferences' => Preference::all(), // Preference API respects fallbacks to role preferences!
-            'permissions' => $this->permissions()->all(),
             'edit_url' => $this->editUrl(),
             'is_user' => true,
             'last_login' => $this->lastLogin(),
-        ], $roles, $groups, $this->supplements);
-    }
+        ]);
 
-    public function toJavascriptArray()
-    {
-        return Arr::only($this->toArray(), ['id', 'email', 'avatar', 'initials', 'name', 'preferences', 'permissions']);
+        if (! $this->hasAvatarField()) {
+            $data['avatar'] = $this->avatar();
+        }
+
+        return $data->merge($roles)->merge($groups)->merge($this->supplements)->all();
     }
 
     public function getAuthIdentifierName()
@@ -202,6 +188,30 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
         return $this->email();
     }
 
+    public function sendPasswordResetNotification($token)
+    {
+        $notification = $this->password()
+            ? new PasswordResetNotification($token)
+            : new ActivateAccountNotification($token);
+
+        $this->notify($notification);
+    }
+
+    public function generateTokenAndSendPasswordResetNotification()
+    {
+        $this->sendPasswordResetNotification($this->generatePasswordResetToken());
+    }
+
+    public function getPasswordResetUrl()
+    {
+        return PasswordReset::url($this->generatePasswordResetToken());
+    }
+
+    public function generatePasswordResetToken()
+    {
+        return Password::broker()->createToken($this);
+    }
+
     public static function __callStatic($method, $parameters)
     {
         return Facades\User::{$method}(...$parameters);
@@ -225,5 +235,22 @@ abstract class User implements UserContract, Authenticatable, CanResetPasswordCo
     public function offsetUnset($key)
     {
         $this->remove($key);
+    }
+
+    public function name()
+    {
+        if ($name = $this->get('name')) {
+            return $name;
+        }
+
+        if ($name = $this->get('first_name')) {
+            if ($lastName = $this->get('last_name')) {
+                $name .= ' ' . $lastName;
+            }
+
+            return $name;
+        }
+
+        return $this->email();
     }
 }

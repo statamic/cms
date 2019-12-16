@@ -26,14 +26,14 @@ abstract class UserRepository implements RepositoryContract
     public function roleRepository()
     {
         return app($this->roleRepository)->path(
-            $this->config['paths']['roles'] ?? config_path('statamic/user_roles.yaml')
+            $this->config['paths']['roles'] ?? resource_path('users/roles.yaml')
         );
     }
 
     public function userGroupRepository()
     {
         return app($this->userGroupRepository)->path(
-            $this->config['paths']['groups'] ?? config_path('statamic/user_groups.yaml')
+            $this->config['paths']['groups'] ?? resource_path('users/groups.yaml')
         );
     }
 }

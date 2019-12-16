@@ -55,7 +55,7 @@ abstract class IteratorBuilder extends Builder
             $method = 'filterWhere'.$where['type'];
             $entries = $this->{$method}($entries, $where);
         }
-        return $entries;
+        return $entries->values();
     }
 
     protected function filterWhereIn($entries, $where)
@@ -66,6 +66,14 @@ abstract class IteratorBuilder extends Builder
         });
     }
 
+    protected function filterWhereNotIn($entries, $where)
+    {
+        return $entries->filter(function ($entry) use ($where) {
+            $value = $this->getFilterItemValue($entry, $where['column']);
+            return !in_array($value, $where['values']);
+        });
+    }
+
     protected function filterWhereBasic($entries, $where)
     {
         return $entries->filter(function ($entry) use ($where) {
@@ -73,6 +81,17 @@ abstract class IteratorBuilder extends Builder
             $method = 'filterTest' . $this->operators[$where['operator']];
             return $this->{$method}($value, $where['value']);
         });
+    }
+
+    protected function getFilterItemValue($item, $column)
+    {
+        if (is_array($item)) {
+            return $item[$column] ?? null;
+        }
+
+        return method_exists($item, $column)
+            ? $item->{$column}()
+            : $item->get($column);
     }
 
     abstract protected function getBaseItems();

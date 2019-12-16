@@ -10,7 +10,9 @@ class NotFoundHttpException extends SymfonyException
 {
     public function render()
     {
-        return response($this->contents(), 404);
+        if (view()->exists('errors.404')) {
+            return response($this->contents(), 404);
+        }
     }
 
     protected function contents()
@@ -25,7 +27,7 @@ class NotFoundHttpException extends SymfonyException
     {
         $layouts = collect([
             'errors.layout',
-            config('statamic.theming.views.layout'),
+            'layout',
             'statamic::blank'
         ]);
 

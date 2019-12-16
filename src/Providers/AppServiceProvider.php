@@ -12,10 +12,7 @@ use Illuminate\Support\Carbon;
 use Statamic\Exceptions\Handler;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Statamic\Ignition\SolutionProviders;
 use Illuminate\Contracts\Debug\ExceptionHandler;
-use Facade\IgnitionContracts\SolutionProviderRepository;
-use Illuminate\Contracts\Container\BindingResolutionException;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -23,13 +20,11 @@ class AppServiceProvider extends ServiceProvider
 
     protected $configFiles = [
         'amp', 'api', 'assets', 'cp', 'forms', 'live_preview', 'oauth', 'protect', 'revisions',
-        'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'theming', 'users'
+        'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'users'
     ];
 
     public function boot()
     {
-        $this->registerIgnitionSolutionProviders();
-
         $this->swapSessionMiddleware();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
@@ -49,8 +44,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->publishes([
-            "{$this->root}/config/user_roles.yaml" => config_path('statamic/user_roles.yaml'),
-            "{$this->root}/config/user_groups.yaml" => config_path('statamic/user_groups.yaml')
+            "{$this->root}/resources/users" => resource_path('users'),
         ], 'statamic');
 
         $this->publishes([
@@ -138,21 +132,9 @@ class AppServiceProvider extends ServiceProvider
 
     protected function swapSessionMiddleware()
     {
-        $middleware = version_compare($this->app->version(), '5.8.0', '<')
-            ? \Statamic\Http\Middleware\CP\StartSession57::class
-            : \Statamic\Http\Middleware\CP\StartSession::class;
-
-        $this->app->singleton(\Illuminate\Session\Middleware\StartSession::class, $middleware);
-    }
-
-    protected function registerIgnitionSolutionProviders()
-    {
-        try {
-            $this->app->make(SolutionProviderRepository::class)->registerSolutionProviders([
-                SolutionProviders\OAuthDisabled::class
-            ]);
-        } catch (BindingResolutionException $e) {
-            //
-        }
+        $this->app->singleton(
+            \Illuminate\Session\Middleware\StartSession::class,
+            \Statamic\Http\Middleware\CP\StartSession::class
+        );
     }
 }

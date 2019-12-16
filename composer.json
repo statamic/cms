@@ -1,33 +1,58 @@
 {
     "name": "statamic/cms",
-    "description": "Statamic CMS",
-    "keywords": ["statamic", "cms", "flat file", "laravel"],
+    "description": "The Statamic CMS Core Package",
+    "keywords": [
+        "statamic",
+        "cms",
+        "flat file",
+        "laravel"
+    ],
+    "license": "proprietary",
     "require": {
         "composer/composer": "^1.7",
-        "erusev/parsedown": "^1.7",
-        "erusev/parsedown-extra": "^0.7.1",
+        "erusev/parsedown": "^1.8@beta",
+        "erusev/parsedown-extra": "^0.8@beta",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
-        "laravel/framework": "5.6.*|5.7.*|5.8.*|6.0.*",
+        "laravel/framework": "5.6.* || 5.7.* || 5.8.* || ^6.0",
         "laravel/helpers": "^1.1",
         "league/csv": "^9.0",
         "league/glide": "^1.1",
         "michelf/php-smartypants": "^1.8",
-        "netcarver/textile": "3.6.*@dev",
-        "scrumpy/html-to-prosemirror": "dev-master",
-        "scrumpy/prosemirror-to-html": "dev-master",
+        "pixelfear/composer-dist-plugin": "^0.1.0",
+        "scrumpy/html-to-prosemirror": "^0.5.2",
+        "scrumpy/prosemirror-to-html": "^0.7.1",
         "statamic/stringy": "^3.1",
         "symfony/var-exporter": "^4.3",
         "symfony/yaml": "^4.1@dev",
         "twistor/flysystem-guzzle": "^6.0",
-        "webpatser/laravel-uuid": "1.*",
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
-        "codedungeon/phpunit-result-printer": "^0.26",
         "fzaninotto/faker": "~1.4",
+        "google/cloud-translate": "^1.6",
         "mockery/mockery": "~1.0",
-        "orchestra/testbench": "3.8|4.0"
+        "nunomaduro/collision": "^3.0",
+        "orchestra/testbench": "3.8 || 4.0"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": "dist",
+        "sort-packages": true
+    },
+    "extra": {
+        "download-dist": {
+            "url": "https://github.com/statamic/cms/releases/download/{$version}/dist.tar.gz",
+            "path": "resources/dist"
+        },
+        "laravel": {
+            "providers": [
+                "Statamic\\Providers\\StatamicServiceProvider"
+            ],
+            "aliases": {
+                "Statamic": "Statamic\\Statamic"
+            }
+        }
     },
     "autoload": {
         "psr-4": {
@@ -42,29 +67,5 @@
             "Tests\\": "tests",
             "Foo\\Bar\\": "tests/fixtures/Addon"
         }
-    },
-    "config": {
-        "preferred-install": "dist",
-        "sort-packages": true,
-        "optimize-autoloader": true
-    },
-    "extra": {
-        "laravel": {
-            "providers": [
-                "Statamic\\Providers\\StatamicServiceProvider"
-            ],
-            "aliases": {
-                "Statamic": "Statamic\\Statamic"
-            }
-        }
-    },
-    "repositories": [
-        {
-            "type": "path",
-            "url": "tests/Fakes/Composer/Package/test-package",
-            "options": {
-                "symlink": false
-            }
-        }
-    ]
+    }
 }

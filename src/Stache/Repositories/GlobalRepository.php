@@ -19,9 +19,9 @@ class GlobalRepository implements RepositoryContract
         $this->store = $stache->store('globals');
     }
 
-    public function make()
+    public function make($handle = null)
     {
-        return new \Statamic\Globals\GlobalSet;
+        return (new \Statamic\Globals\GlobalSet)->handle($handle);
     }
 
     public function all(): GlobalCollection

@@ -4,6 +4,7 @@ namespace Tests\Data\Entries;
 
 use Statamic\Facades;
 use Tests\TestCase;
+use Statamic\Facades\Site;
 use Statamic\Fields\Blueprint;
 use Statamic\Entries\Entry;
 use Statamic\Entries\Collection;
@@ -41,10 +42,8 @@ class CollectionTest extends TestCase
     /** @test */
     function it_gets_and_sets_the_template()
     {
-        config(['statamic.theming.views.entry' => 'post']);
-
         $collection = new Collection;
-        $this->assertEquals('post', $collection->template());
+        $this->assertEquals('default', $collection->template());
 
         $return = $collection->template('foo');
 
@@ -55,10 +54,8 @@ class CollectionTest extends TestCase
     /** @test */
     function it_gets_and_sets_the_layout()
     {
-        config(['statamic.theming.views.layout' => 'default']);
-
         $collection = new Collection;
-        $this->assertEquals('default', $collection->layout());
+        $this->assertEquals('layout', $collection->layout());
 
         $return = $collection->layout('foo');
 
@@ -79,41 +76,77 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_sites_it_can_be_used_in()
+    function it_gets_and_sets_the_sites_it_can_be_used_in_when_using_multiple_sites()
     {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+        ]]);
+
         $collection = new Collection;
-        $this->assertCount(0, $collection->sites());
+
+        $sites = $collection->sites();
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $sites);
+        $this->assertEquals([], $sites->all());
 
         $return = $collection->sites(['en', 'fr']);
 
         $this->assertEquals($collection, $return);
-        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->sites());
         $this->assertEquals(['en', 'fr'], $collection->sites()->all());
     }
 
     /** @test */
-    function it_sets_and_gets_data_values()
+    function it_gets_the_default_site_when_in_single_site_mode()
     {
         $collection = new Collection;
-        $this->assertNull($collection->get('foo'));
 
-        $return = $collection->set('foo', 'bar');
+        $sites = $collection->sites();
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $sites);
+        $this->assertEquals(['en'], $sites->all());
+
+        $return = $collection->sites(['en', 'fr']); // has no effect
 
         $this->assertEquals($collection, $return);
-        $this->assertTrue($collection->has('foo'));
-        $this->assertEquals('bar', $collection->get('foo'));
+        $this->assertEquals(['en'], $collection->sites()->all());
     }
 
     /** @test */
-    function it_gets_and_sets_all_data()
+    function it_stores_cascading_data_in_a_collection()
     {
         $collection = new Collection;
-        $this->assertEquals([], $collection->data());
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->cascade());
+        $this->assertTrue($collection->cascade()->isEmpty());
 
-        $return = $collection->data(['foo' => 'bar']);
+        $collection->cascade()->put('foo', 'bar');
 
+        $this->assertTrue($collection->cascade()->has('foo'));
+        $this->assertEquals('bar', $collection->cascade()->get('foo'));
+    }
+
+    /** @test */
+    function it_sets_all_the_cascade_data_when_passing_an_array()
+    {
+        $collection = new Collection;
+
+        $return = $collection->cascade($arr = ['foo' => 'bar', 'baz' => 'qux']);
         $this->assertEquals($collection, $return);
-        $this->assertEquals(['foo' => 'bar'], $collection->data());
+        $this->assertEquals($arr, $collection->cascade()->all());
+
+        // test that passing an empty array is not treated as passing null
+        $return = $collection->cascade([]);
+        $this->assertEquals($collection, $return);
+        $this->assertEquals([], $collection->cascade()->all());
+    }
+
+    /** @test */
+    function it_gets_values_from_the_cascade_with_fallbacks()
+    {
+        $collection = new Collection;
+        $collection->cascade(['foo' => 'bar']);
+
+        $this->assertEquals('bar', $collection->cascade('foo'));
+        $this->assertNull($collection->cascade('baz'));
+        $this->assertEquals('qux', $collection->cascade('baz', 'qux'));
     }
 
     /** @test */
@@ -178,26 +211,26 @@ class CollectionTest extends TestCase
 
         $return = $collection->setEntryPosition('one', 3);
         $this->assertEquals($collection, $return);
-        $this->assertSame([3 => 'one'], $collection->getEntryPositions());
-        $this->assertSame(['one'], $collection->getEntryOrder());
+        $this->assertSame([3 => 'one'], $collection->getEntryPositions()->all());
+        $this->assertSame(['one'], $collection->getEntryOrder()->all());
         $this->assertEquals(1, $collection->getEntryOrder('one'));
 
         $collection->setEntryPosition('two', 7);
-        $this->assertSame([3 => 'one', 7 => 'two'], $collection->getEntryPositions());
-        $this->assertSame(['one', 'two'], $collection->getEntryOrder());
+        $this->assertSame([3 => 'one', 7 => 'two'], $collection->getEntryPositions()->all());
+        $this->assertSame(['one', 'two'], $collection->getEntryOrder()->all());
         $this->assertEquals(1, $collection->getEntryOrder('one'));
         $this->assertEquals(2, $collection->getEntryOrder('two'));
 
         $collection->setEntryPosition('three', 5);
-        $this->assertSame([3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions());
-        $this->assertSame(['one', 'three', 'two'], $collection->getEntryOrder());
+        $this->assertSame([3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions()->all());
+        $this->assertSame(['one', 'three', 'two'], $collection->getEntryOrder()->all());
         $this->assertEquals(1, $collection->getEntryOrder('one'));
         $this->assertEquals(3, $collection->getEntryOrder('two'));
         $this->assertEquals(2, $collection->getEntryOrder('three'));
 
         $collection->setEntryPosition('four', 1);
-        $this->assertSame([1 => 'four', 3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions());
-        $this->assertSame(['four', 'one', 'three', 'two'], $collection->getEntryOrder());
+        $this->assertSame([1 => 'four', 3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions()->all());
+        $this->assertSame(['four', 'one', 'three', 'two'], $collection->getEntryOrder()->all());
         $this->assertEquals(2, $collection->getEntryOrder('one'));
         $this->assertEquals(4, $collection->getEntryOrder('two'));
         $this->assertEquals(3, $collection->getEntryOrder('three'));
@@ -235,5 +268,38 @@ class CollectionTest extends TestCase
         $return = $collection->pastDateBehavior(null);
         $this->assertEquals($collection, $return);
         $this->assertEquals('public', $collection->pastDateBehavior());
+    }
+
+    /** @test */
+    function it_gets_and_sets_the_default_publish_state()
+    {
+        $collection = (new Collection)->handle('test');
+        $this->assertTrue($collection->defaultPublishState());
+
+        $return = $collection->defaultPublishState(true);
+        $this->assertEquals($collection, $return);
+        $this->assertTrue($collection->defaultPublishState());
+
+        $return = $collection->defaultPublishState(false);
+        $this->assertEquals($collection, $return);
+        $this->assertFalse($collection->defaultPublishState());
+    }
+
+    /** @test */
+    function default_publish_state_is_always_false_when_using_revisions()
+    {
+        config(['statamic.revisions.enabled' => true]);
+
+        $collection = (new Collection)->handle('test');
+        $this->assertTrue($collection->defaultPublishState());
+
+        $collection->revisionsEnabled(true);
+        $this->assertFalse($collection->defaultPublishState());
+
+        $collection->defaultPublishState(true);
+        $this->assertFalse($collection->defaultPublishState());
+
+        $collection->defaultPublishState(false);
+        $this->assertFalse($collection->defaultPublishState());
     }
 }

@@ -45,4 +45,4 @@ Statamic::additionalWebRoutes();
  * All front-end website requests go through a single controller method.
  */
 Route::any('/{segments?}', 'FrontendController@index')->where('segments', '.*')->name('statamic.site')
-     ->middleware(\Statamic\StaticCaching\Middleware\Cache::class);
+     ->middleware(Statamic::webMiddleware());

@@ -3,6 +3,7 @@
 namespace Statamic\Filesystem;
 
 use Statamic\Support\Str;
+use Statamic\Facades\Path;
 use Statamic\Facades\Helper;
 use Statamic\Filesystem\Filesystem;
 use Statamic\Support\FileCollection;
@@ -188,10 +189,7 @@ abstract class AbstractAdapter implements Filesystem
         return $this->filesystem;
     }
 
-    protected function relativePath($path)
-    {
-        return Str::removeLeft($path, $this->root);
-    }
+    abstract public function normalizePath($path);
 
     public function collection($files = [])
     {

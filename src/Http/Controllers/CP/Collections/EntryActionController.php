@@ -9,8 +9,6 @@ use Statamic\Http\Controllers\CP\ActionController;
 
 class EntryActionController extends ActionController
 {
-    protected static $key = 'entries';
-
     protected function getSelectedItems($items, $context)
     {
         return $items->map(function ($item) {

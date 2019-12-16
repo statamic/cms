@@ -10,7 +10,7 @@
         <component
             :is="component"
             :fields="fields"
-            :rows="rows"
+            :rows="value"
             :meta="meta.existing"
             :name="name"
             @updated="updated"
@@ -25,7 +25,7 @@
         <button
             class="btn"
             v-if="canAddRows"
-            v-text="__('Add Row')"
+            v-text="addRowButtonLabel"
             @click.prevent="addRow" />
 
     </div>
@@ -53,7 +53,6 @@ export default {
 
     data() {
         return {
-            rows: this.value,
             containerWidth: null,
             focused: false,
         }
@@ -78,7 +77,11 @@ export default {
         },
 
         canAddRows() {
-            return !this.isReadOnly && this.rows.length < this.maxRows;
+            return !this.isReadOnly && this.value.length < this.maxRows;
+        },
+
+        addRowButtonLabel() {
+            return this.config.add_row || __('Add Row');
         },
 
         hasMaxRows() {
@@ -87,7 +90,7 @@ export default {
 
         hasExcessRows() {
             if (! this.hasMaxRows) return false;
-            return (this.rows.length - this.maxRows) > 0;
+            return (this.value.length - this.maxRows) > 0;
         },
 
         isReorderable() {
@@ -98,14 +101,10 @@ export default {
 
     reactiveProvide: {
         name: 'grid',
-        include: ['config', 'isReorderable', 'isReadOnly']
+        include: ['config', 'isReorderable', 'isReadOnly', 'handle', 'errorKeyPrefix']
     },
 
     watch: {
-
-        rows(rows) {
-            this.update(rows);
-        },
 
         isReorderable: {
             immediate: true,
@@ -141,30 +140,34 @@ export default {
             row._id = id;
 
             this.updateRowMeta(id, this.meta.new);
-            this.rows.push(row);
+            this.value.push(row);
+            this.update(this.value);
         },
 
         updated(index, row) {
-            this.rows.splice(index, 1, row);
+            this.value.splice(index, 1, row);
+            this.update(this.value);
         },
 
         removed(index) {
             if (confirm(__('Are you sure?'))) {
-                this.rows.splice(index, 1);
+                this.value.splice(index, 1);
+                this.update(this.value);
             }
         },
 
         duplicate(index) {
-            const row = _.clone(this.rows[index]);
+            const row = _.clone(this.value[index]);
             const old_id = row._id;
             row._id = uniqid();
 
             this.updateRowMeta(row._id, this.meta.existing[old_id]);
-            this.rows.push(row);
+            this.value.push(row);
+            this.update(this.value);
         },
 
         sorted(rows) {
-            this.rows = rows;
+            this.update(rows);
         },
 
         getReplicatorPreviewText() {

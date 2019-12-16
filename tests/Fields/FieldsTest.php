@@ -11,6 +11,7 @@ use Illuminate\Support\Collection;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Facades\Statamic\Fields\Validator;
 
 class FieldsTest extends TestCase
 {
@@ -216,43 +217,6 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_merges_with_other_fields()
-    {
-        FieldRepository::shouldReceive('find')
-            ->with('fieldset_one.field_one')
-            ->andReturnUsing(function () {
-                return new Field('field_one', ['type' => 'text']);
-            });
-
-        FieldRepository::shouldReceive('find')
-            ->with('fieldset_one.field_two')
-            ->andReturnUsing(function () {
-                return new Field('field_one', ['type' => 'textarea']);
-            });
-
-        $fields = new Fields([
-            [
-                'handle' => 'one',
-                'field' => 'fieldset_one.field_one'
-            ]
-        ]);
-
-        $second = new Fields([
-            [
-                'handle' => 'two',
-                'field' => 'fieldset_one.field_two'
-            ]
-        ]);
-
-        $merged = $fields->merge($second);
-
-        $this->assertCount(1, $fields->all());
-        $this->assertCount(2, $items = $merged->all());
-        $this->assertEquals(['one', 'two'], $items->map->handle()->values()->all());
-        $this->assertEquals(['text', 'textarea'], $items->map->type()->values()->all());
-    }
-
-    /** @test */
     function it_checks_if_a_given_field_exists()
     {
         $fields = new Fields([
@@ -360,12 +324,12 @@ class FieldsTest extends TestCase
             ['handle' => 'two', 'field' => 'two']
         ]);
 
-        $this->assertEquals(['one' => null, 'two' => null], $fields->values());
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
 
         $return = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
-        $this->assertEquals($fields, $return);
-        $this->assertEquals(['one' => 'foo', 'two' => 'bar'], $fields->values());
+        $this->assertNotSame($fields->get('one'), $return->get('one'));
+        $this->assertEquals(['one' => 'foo', 'two' => 'bar'], $return->values()->all());
     }
 
     /** @test */
@@ -389,14 +353,21 @@ class FieldsTest extends TestCase
             ['handle' => 'two', 'field' => 'two']
         ]);
 
-        $this->assertEquals(['one' => null, 'two' => null], $fields->values());
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
 
-        $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+        $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
+        $processed = $fields->process();
+
+        $this->assertNotSame($fields, $processed);
+        $this->assertEquals([
+            'one' => 'foo',
+            'two' => 'bar'
+        ], $fields->values()->all());
         $this->assertEquals([
             'one' => 'foo processed',
             'two' => 'bar processed'
-        ], $fields->process()->values());
+        ], $processed->values()->all());
     }
 
     /** @test */
@@ -420,14 +391,59 @@ class FieldsTest extends TestCase
             ['handle' => 'two', 'field' => 'two']
         ]);
 
-        $this->assertEquals(['one' => null, 'two' => null], $fields->values());
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
 
-        $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+        $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
+        $preProcessed = $fields->preProcess();
+
+        $this->assertNotSame($fields, $preProcessed);
+        $this->assertEquals([
+            'one' => 'foo',
+            'two' => 'bar'
+        ], $fields->values()->all());
         $this->assertEquals([
             'one' => 'foo preprocessed',
             'two' => 'bar preprocessed'
-        ], $fields->preProcess()->values());
+        ], $preProcessed->values()->all());
+    }
+
+    /** @test */
+    function it_augments_each_fields_values_by_its_fieldtype()
+    {
+        FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
+            public function augment($data) {
+                return $data . ' augmented';
+            }
+        });
+
+        FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
+            return new Field('one', ['type' => 'fieldtype']);
+        });
+        FieldRepository::shouldReceive('find')->with('two')->andReturnUsing(function () {
+            return new Field('two', ['type' => 'fieldtype']);
+        });
+
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => 'one'],
+            ['handle' => 'two', 'field' => 'two']
+        ]);
+
+        $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
+
+        $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
+
+        $augmented = $fields->augment();
+
+        $this->assertNotSame($fields, $augmented);
+        $this->assertEquals([
+            'one' => 'foo',
+            'two' => 'bar'
+        ], $fields->values()->all());
+        $this->assertEquals([
+            'one' => 'foo augmented',
+            'two' => 'bar augmented'
+        ], $augmented->values()->all());
     }
 
     /** @test */
@@ -460,20 +476,59 @@ class FieldsTest extends TestCase
     /** @test */
     function it_filters_down_to_localizable_fields()
     {
-        $items = [
+        $fields = new Fields([
             ['handle' => 'one', 'field' => ['type' => 'text', 'localizable' => false]],
             ['handle' => 'two', 'field' => ['type' => 'text', 'localizable' => false]],
             ['handle' => 'three', 'field' => ['type' => 'text', 'localizable' => true]],
-        ];
+        ]);
+
+        $this->assertEquals(
+            ['one', 'two', 'three'],
+            $fields->all()->keys()->all()
+        );
 
         $this->assertEquals(
             ['one', 'two'],
-            $fields = (new Fields($items))->unlocalizable()->all()->keys()->all()
+            $fields->unlocalizable()->all()->keys()->all()
         );
 
         $this->assertEquals(
             ['three'],
-            $fields = (new Fields($items))->localizable()->all()->keys()->all()
+            $fields->localizable()->all()->keys()->all()
         );
+    }
+
+    /** @test */
+    function it_gets_a_validator()
+    {
+        $fields = new Fields;
+        Validator::shouldReceive('make')->once()->andReturnSelf();
+        $mock = Validator::shouldReceive('fields')->once()->andReturnSelf()->getMock();
+
+        $this->assertEquals($mock, $fields->validator());
+    }
+
+    /** @test */
+    function it_validates_immediately()
+    {
+        $fields = new Fields;
+        Validator::shouldReceive('make')->once()->andReturnSelf();
+        Validator::shouldReceive('fields')->once()->andReturnSelf();
+        Validator::shouldReceive('withRules')->with([])->once()->andReturnSelf();
+        Validator::shouldReceive('validate')->once();
+
+        $fields->validate();
+    }
+
+    /** @test */
+    function it_validates_immediately_with_extra_rules()
+    {
+        $fields = new Fields;
+        Validator::shouldReceive('make')->once()->andReturnSelf();
+        Validator::shouldReceive('fields')->once()->andReturnSelf();
+        Validator::shouldReceive('withRules')->with(['foo' => 'bar'])->once()->andReturnSelf();
+        Validator::shouldReceive('validate')->once();
+
+        $fields->validate(['foo' => 'bar']);
     }
 }

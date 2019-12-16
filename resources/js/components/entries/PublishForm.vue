@@ -13,6 +13,10 @@
                 </div>
             </h1>
 
+            <dropdown-list class="mr-2">
+                <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+            </dropdown-list>
+
             <div class="pt-px text-2xs text-grey-60 flex mr-2" v-if="readOnly">
                 <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
             </div>
@@ -34,7 +38,7 @@
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
                     <span v-text="__('Publish')" />
-                    <svg-icon name="chevron-down-xs" class="ml-1" />
+                    <svg-icon name="chevron-down-xs" class="ml-1 w-2" />
                 </button>
             </div>
 
@@ -45,7 +49,7 @@
             v-if="fieldset"
             ref="container"
             :name="publishContainer"
-            :fieldset="fieldset"
+            :blueprint="fieldset"
             :values="values"
             :reference="initialReference"
             :meta="meta"
@@ -66,6 +70,7 @@
                 @opened-via-keyboard="openLivePreview"
                 @closed="closeLivePreview"
             >
+
                 <div>
                     <component
                         v-for="component in components"
@@ -122,21 +127,17 @@
                                         <span class="text-green w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('Entry has a published version')"></span>
                                     </div>
-                                    <div class="mb-sm flex items-center" v-else="published">
+                                    <div class="mb-sm flex items-center" v-else>
                                         <span class="text-orange w-6 text-center">!</span>
                                         <span class="text-2xs" v-text="__('Entry has not been published')"></span>
-                                    </div>
-                                    <div class="mb-sm flex items-center" v-if="isWorkingCopy && isDirty">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Working copy has unsaved changes')"></span>
-                                    </div>
-                                    <div class="mb-sm flex items-center" v-else-if="isWorkingCopy">
-                                        <span class="text-orange w-6 text-center">!</span>
-                                        <span class="text-2xs" v-text="__('Entry has unpublished changes')"></span>
                                     </div>
                                     <div class="mb-sm flex items-center" v-if="!isWorkingCopy && published">
                                         <span class="text-green w-6 text-center">&check;</span>
                                         <span class="text-2xs" v-text="__('This is the published version')"></span>
+                                    </div>
+                                    <div class="mb-sm flex items-center" v-if="isDirty">
+                                        <span class="text-orange w-6 text-center">!</span>
+                                        <span class="text-2xs" v-text="__('Unsaved changes')"></span>
                                     </div>
                                     <button
                                             class="flex items-center justify-center mt-2 btn-flat px-1 w-full"
@@ -175,6 +176,26 @@
                         </publish-sections>
                     </transition>
                 </div>
+                <template v-slot:buttons>
+                   <button
+                    v-if="!readOnly"
+                    class="btn ml-2"
+                    :class="{
+                        'btn-primary': isCreating || !revisionsEnabled,
+                    }"
+                    :disabled="!canSave"
+                    @click.prevent="save"
+                    v-text="saveText" />
+
+                    <button
+                        v-if="revisionsEnabled && !isCreating"
+                        class="ml-2 btn btn-primary flex items-center"
+                        :disabled="!canPublish"
+                        @click="confirmingPublish = true">
+                        <span v-text="__('Publish')" />
+                        <svg-icon name="chevron-down-xs" class="ml-1 w-2" />
+                    </button>
+                </template>
             </live-preview>
         </publish-container>
 
@@ -196,7 +217,7 @@
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
                 <span v-text="__('Publish')" />
-                <svg-icon name="chevron-down-xs" class="ml-1" />
+                <svg-icon name="chevron-down-xs" class="ml-1 w-2" />
             </button>
         </div>
 
@@ -255,7 +276,6 @@ export default {
         initialActions: Object,
         method: String,
         amp: Boolean,
-        initialPublished: Boolean,
         isCreating: Boolean,
         initialReadOnly: Boolean,
         initialIsRoot: Boolean,
@@ -287,11 +307,20 @@ export default {
             state: 'new',
             revisionMessage: null,
             showRevisionHistory: false,
-            published: this.initialPublished,
+
+            // The current value. What it will be when saving. User interaction updates this.
+            published: this.initialValues.published,
+
+            // Whether it was published the last time it was saved.
+            // Successful publish actions (if using revisions) or just saving (if not) will update this.
+            initialPublished: this.initialValues.published,
+
             confirmingPublish: false,
             readOnly: this.initialReadOnly,
             isRoot: this.initialIsRoot,
-            permalink: this.initialPermalink
+            permalink: this.initialPermalink,
+
+            saveKeyBinding: null,
         }
     },
 
@@ -306,17 +335,19 @@ export default {
         },
 
         canSave() {
-            return !this.readOnly && this.isDirty && !this.somethingIsLoading;
+            return !this.readOnly && !this.somethingIsLoading;
         },
 
         canPublish() {
             if (!this.revisionsEnabled) return false;
 
-            return !this.readOnly && !this.isCreating && !this.canSave && !this.somethingIsLoading && this.isWorkingCopy;
+            if (this.readOnly || this.isCreating || this.somethingIsLoading || this.isDirty) return false;
+
+            return true;
         },
 
         livePreviewUrl() {
-            return _.findWhere(this.localizations, { active: true }).url + '/preview';
+            return _.findWhere(this.localizations, { active: true }).livePreviewUrl;
         },
 
         isBase() {
@@ -345,12 +376,16 @@ export default {
 
     watch: {
 
-        published(published) {
-            this.$refs.container.dirty();
-        },
-
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
+        },
+
+        published(published) {
+            this.$refs.container.setFieldValue('published', published);
+        },
+
+        'values.published': function (published) {
+            this.published = published;
         }
 
     },
@@ -380,7 +415,7 @@ export default {
             .then(this.performSaveRequest)
             .catch(error => {
                 this.saving = false;
-                this.$notify.error(error || 'Something went wrong');
+                this.$toast.error(error || 'Something went wrong');
             });
         },
 
@@ -389,7 +424,6 @@ export default {
             // We build the payload here because the before hook may have modified values.
             const payload = { ...this.values, ...{
                 blueprint: this.fieldset.handle,
-                published: this.published,
                 _localized: this.localizedFields,
             }};
 
@@ -397,8 +431,8 @@ export default {
                 this.saving = false;
                 this.title = this.values.title;
                 this.isWorkingCopy = true;
-                if (!this.revisionsEnabled) this.permalink = response.data.permalink;
-                if (!this.isCreating) this.$notify.success('Saved');
+                if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
+                if (!this.isCreating) this.$toast.success('Saved');
                 this.$refs.container.saved();
                 this.runAfterSaveHook(response);
             }).catch(error => this.handleAxiosError(error));
@@ -414,6 +448,8 @@ export default {
                     response
                 })
                 .then(() => {
+                    if (! this.revisionsEnabled) this.initialPublished = response.data.published;
+
                     // Finally, we'll emit an event. We need to wait until after the hooks are resolved because
                     // if this form is being shown in a stack, we only want to close it once everything's done.
                     this.$nextTick(() => this.$emit('saved', response));
@@ -432,9 +468,11 @@ export default {
                 const { message, errors } = e.response.data;
                 this.error = message;
                 this.errors = errors;
-                this.$notify.error(message);
+                this.$toast.error(message);
+            } else if (e.response) {
+                this.$toast.error(e.response.data.message);
             } else {
-                this.$notify.error(e || 'Something went wrong');
+                this.$toast.error(e || 'Something went wrong');
             }
         },
 
@@ -478,7 +516,7 @@ export default {
                 this.isRoot = data.isRoot;
                 this.site = localization.handle;
                 this.localizing = false;
-                this.$nextTick(() => this.$refs.container.removeNavigationWarning());
+                this.$nextTick(() => this.$refs.container.clearDirtyState());
             })
         },
 
@@ -515,11 +553,11 @@ export default {
         publishActionCompleted({ published, isWorkingCopy, response }) {
             this.saving = false;
             this.$refs.container.saved();
-            if (published !== undefined) this.published = published;
+            if (published !== undefined) this.published = this.initialPublished = published;
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
-            this.title = response.data.title;
-            this.permalink = response.data.permalink
+            this.title = response.data.data.title;
+            this.permalink = response.data.data.permalink
             this.$nextTick(() => this.$emit('saved', response));
         },
 
@@ -550,10 +588,10 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bindGlobal(['command+s'], e => {
+        this.saveKeyBinding = this.$keys.bindGlobal('mod+s', e => {
             e.preventDefault();
             if (this.confirmingPublish) return;
-            this.canPublish ? this.confirmPublish() : this.save();
+            this.save();
         });
 
         this.$store.commit(`publish/${this.publishContainer}/setPreloadedAssets`, this.preloadedAssets);
@@ -561,6 +599,10 @@ export default {
 
     created() {
         window.history.replaceState({}, document.title, document.location.href.replace('created=true', ''));
+    },
+
+    destroyed() {
+        this.saveKeyBinding.destroy();
     }
 
 }

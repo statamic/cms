@@ -11,12 +11,10 @@ trait FakesViews
     {
         $this->fakeView = app(FakeViewEngine::class);
         $this->fakeViewFinder = new FakeViewFinder($this->app['files'], config('view.paths'));
+        $this->fakeViewFactory = new FakeViewFactory($this->app['view.engine.resolver'], $this->app['view.finder'], $this->app['events']);
         $this->app->instance('FakeViewEngine', $this->fakeView);
         $this->app->instance('view.finder', $this->fakeViewFinder);
-
-        $this->app->bind('view', function ($app) {
-            return new FakeViewFactory($app['view.engine.resolver'], $app['view.finder'], $app['events']);
-        });
+        $this->app->instance('view', $this->fakeViewFactory);
     }
 
     public function withStandardFakeViews()
@@ -35,24 +33,30 @@ trait FakesViews
         $this->viewShouldReturnRaw('errors.404', 'The 404 template.');
     }
 
-    public function viewShouldReturnRaw($view, $contents)
+    public function viewShouldReturnRaw($view, $contents, $extension = 'antlers.html')
     {
-        $this->fakeView->rawContents[$view] = $contents;
+        $this->fakeView->rawContents["$view.$extension"] = $contents;
         $this->fakeViewFinder->views[$view] = $view;
+        $this->fakeViewFactory->extensions[$view] = $extension;
     }
 
-    public function viewShouldReturnRendered($view, $contents)
+    public function viewShouldReturnRendered($view, $contents, $extension = 'antlers.html')
     {
-        $this->fakeView->renderedContents[$view] = $contents;
+        $this->fakeView->renderedContents["$view.$extension"] = $contents;
         $this->fakeViewFinder->views[$view] = $view;
+        $this->fakeViewFactory->extensions[$view] = $extension;
     }
 }
 
 class FakeViewFactory extends Factory
 {
+    public $extensions = [];
+
     public function make($view, $data = [], $mergeData = [])
     {
-        return new View($this, app('FakeViewEngine'), $view, $view, $data);
+        $engine = app('FakeViewEngine');
+        $ext = $this->extensions[$view] ?? 'antlers.html';
+        return new View($this, $engine, $view, "{$view}.{$ext}", $data);
     }
 
     public function exists($view)

@@ -133,7 +133,7 @@ export default {
             const payload = { message: this.revisionMessage };
 
             this.$axios.post(this.actions.publish, payload).then(response => {
-                this.$notify.success(__('Published'));
+                this.$toast.success(__('Published'));
                 this.revisionMessage = null;
                 this.$emit('saved', { published: true, isWorkingCopy: false, response });
             }).catch(e => this.handleAxiosError(e));
@@ -146,8 +146,8 @@ export default {
         submitUnpublish() {
             const payload = { message: this.revisionMessage };
 
-            this.$axios.delete(this.actions.publish, { data: payload }).then(response => {
-                this.$notify.success(__('Unpublished'));
+            this.$axios.post(this.actions.unpublish, { data: payload }).then(response => {
+                this.$toast.success(__('Unpublished'));
                 this.revisionMessage = null;
                 this.$emit('saved', { published: false, isWorkingCopy: false, response });
             }).catch(e => this.handleAxiosError(e));
@@ -157,7 +157,7 @@ export default {
             const payload = { message: this.revisionMessage };
 
             this.$axios.post(this.actions.createRevision, payload).then(response => {
-                this.$notify.success(__('Revision created'));
+                this.$toast.success(__('Revision created'));
                 this.revisionMessage = null;
                 this.$emit('saved', { isWorkingCopy: true, response });
             }).catch(e => this.handleAxiosError(e));
@@ -165,7 +165,7 @@ export default {
 
         handleAxiosError(e) {
             this.saving = false;
-            this.$notify.error('Something went wrong');
+            this.$toast.error('Something went wrong');
         }
 
     }

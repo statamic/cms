@@ -8,8 +8,6 @@ use Statamic\Support\Str;
 
 trait HasPreferences
 {
-    protected $preferences = [];
-
     /**
      * Get or set preferences.
      *
@@ -19,7 +17,7 @@ trait HasPreferences
     public function preferences($preferences = null)
     {
         if (is_null($preferences)) {
-            return $this->preferences;
+            return $this->getPreferences();
         }
 
         $this->setPreferences($preferences);
@@ -28,17 +26,27 @@ trait HasPreferences
     }
 
     /**
-     * Set/merge array of preferences.
+     * Get the preferences.
+     *
+     * @return array
+     */
+    abstract protected function getPreferences();
+
+    /**
+     * Set array of preferences.
      *
      * @param array $preferences
      * @return $this
      */
-    public function setPreferences($preferences)
-    {
-        $this->preferences = array_merge($this->preferences, Arr::wrap($preferences));
+    abstract public function setPreferences($preferences);
 
-        return $this;
-    }
+    /**
+     * Merge array of preferences.
+     *
+     * @param array $preferences
+     * @return $this
+     */
+    abstract public function mergePreferences($preferences);
 
     /**
      * Set preference (dot notation in key supported).
@@ -49,7 +57,11 @@ trait HasPreferences
      */
     public function setPreference($key, $value)
     {
-        Arr::set($this->preferences, $key, $value);
+        $prefs = $this->getPreferences();
+
+        Arr::set($prefs, $key, $value);
+
+        $this->setPreferences($prefs);
 
         return $this;
     }
@@ -65,7 +77,9 @@ trait HasPreferences
     public function removePreference($key, $value = null, $cleanup = true)
     {
         if (is_null($value)) {
-            Arr::pull($this->preferences, $key);
+            $prefs = $this->getPreferences();
+            Arr::forget($prefs, $key);
+            $this->setPreferences($prefs);
         } else {
             $this->removePreferenceValue($key, $value);
         }
@@ -104,7 +118,7 @@ trait HasPreferences
      */
     public function getPreference($key)
     {
-        return Arr::get($this->preferences, $key);
+        return Arr::get($this->getPreferences(), $key);
     }
 
     /**
@@ -115,7 +129,7 @@ trait HasPreferences
      */
     public function hasPreference($key)
     {
-        return Arr::has($this->preferences, $key);
+        return Arr::has($this->getPreferences(), $key);
     }
 
     /**
@@ -129,7 +143,11 @@ trait HasPreferences
     {
         $value = $this->getPreference($key);
 
-        Arr::set($this->preferences, $key, $callback($value));
+        $prefs = $this->getPreferences();
+
+        Arr::set($prefs, $key, $callback($value));
+
+        $this->setPreferences($prefs);
 
         return $this;
     }

@@ -7,10 +7,12 @@ use Tests\FakesRoles;
 use Statamic\Facades;
 use Tests\Fakes\FakeFieldsetRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
+use Tests\PreventSavingStacheItemsToDisk;
 
 class StoreFieldsetTest extends TestCase
 {
     use FakesRoles;
+    use PreventSavingStacheItemsToDisk;
 
     protected function setUp(): void
     {
@@ -23,7 +25,7 @@ class StoreFieldsetTest extends TestCase
     function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = Facades\User::make()->assignRole('test');
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
 
         $this
             ->from('/original')
@@ -42,7 +44,7 @@ class StoreFieldsetTest extends TestCase
     /** @test */
     function fieldset_gets_created()
     {
-        $user = Facades\User::make()->makeSuper();
+        $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Fieldset::all());
 
         $this
@@ -61,7 +63,7 @@ class StoreFieldsetTest extends TestCase
     /** @test */
     function title_is_required()
     {
-        $user = Facades\User::make()->makeSuper();
+        $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Fieldset::all());
 
         $this

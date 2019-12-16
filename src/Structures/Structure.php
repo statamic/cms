@@ -105,7 +105,7 @@ class Structure implements StructureContract
             'title' => $this->title,
             'collections' => $this->collections,
             'max_depth' => $this->maxDepth,
-            'expects_root' => $this->collection() ? $this->expectsRoot : null,
+            'expects_root' => $this->expectsRoot ?: null,
         ];
 
         if (Site::hasMultiple()) {
@@ -201,7 +201,7 @@ class Structure implements StructureContract
 
     public function isCollectionBased()
     {
-        return $this->collection();
+        return $this->collection() !== null;
     }
 
     public function maxDepth($maxDepth = null)

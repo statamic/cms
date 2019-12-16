@@ -32,8 +32,8 @@
                                 v-text="__('Reorder')"
                             />
                             <template v-if="reordering">
-                                <button class="btn btn-flat ml-1" @click="saveOrder">Save Order</button>
-                                <button class="btn btn-flat ml-1" @click="cancelReordering">Cancel</button>
+                                <button class="btn btn-flat ml-1" @click="saveOrder" v-text="__('Save Order')" />
+                                <button class="btn btn-flat ml-1" @click="cancelReordering" v-text="__('Cancel')" />
                             </template>
                             <data-list-filters
                                 class="ml-1"
@@ -59,8 +59,8 @@
                     >
                         <template slot="cell-title" slot-scope="{ row: entry }">
                             <div class="flex items-center">
-                                <div class="little-dot mr-1" :class="[entry.published ? 'bg-green' : 'bg-grey-40']" />
-                                <a @click.stop="redirect(entry.edit_url)">{{ entry.title }}</a>
+                                <div class="little-dot mr-1" :class="getStatusClass(entry)" />
+                                <a :href="entry.edit_url" @click.stop>{{ entry.title }}</a>
                             </div>
                         </template>
                         <template slot="cell-slug" slot-scope="{ row: entry }">
@@ -143,6 +143,16 @@ export default {
             if (this.reorderingRequested) this.reorder();
         },
 
+        getStatusClass(entry) {
+            if (entry.published && entry.private) {
+                return 'bg-transparent border border-grey-60';
+            } else if (entry.published) {
+                return 'bg-green';
+            } else {
+                return 'bg-grey-40';
+            }
+        },
+
         reorder() {
             if (this.structureUrl) {
                 window.location = this.structureUrl;
@@ -169,10 +179,10 @@ export default {
             this.$axios.post(this.reorderUrl, {ids})
                 .then(response => {
                     this.reordering = false;
-                    this.$notify.success(__('Entries successfully reordered'))
+                    this.$toast.success(__('Entries successfully reordered'))
                 })
                 .catch(e => {
-                    this.$notify.error('Something went wrong');
+                    this.$toast.error('Something went wrong');
                 });
         },
 
@@ -184,11 +194,6 @@ export default {
 
         reordered(items) {
             this.items = items;
-        },
-
-        redirect(url) {
-            location.href = url;
-            return;
         }
 
     }

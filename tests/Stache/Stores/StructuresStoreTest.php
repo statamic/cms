@@ -10,6 +10,7 @@ use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
 use Statamic\Stache\Stores\StructuresStore;
 use Statamic\Contracts\Structures\Structure;
+use Statamic\Facades\Path;
 
 class StructuresStoreTest extends TestCase
 {
@@ -44,15 +45,16 @@ class StructuresStoreTest extends TestCase
 
         $files = Traverser::filter([$this->store, 'getItemFilter'])->traverse($this->store);
 
+        $dir = Path::tidy($this->tempDir);
         $this->assertEquals([
-            $this->tempDir.'/one.yaml' => 1234567890,
-            $this->tempDir.'/two.yaml' => 1234567890,
+            $dir.'/one.yaml' => 1234567890,
+            $dir.'/two.yaml' => 1234567890,
         ], $files->all());
 
         // Sanity check. Make sure the file is there but wasn't included.
-        $this->assertTrue(file_exists($this->tempDir.'/subdirectory/nested-one.yaml'));
-        $this->assertTrue(file_exists($this->tempDir.'/subdirectory/nested-two.yaml'));
-        $this->assertTrue(file_exists($this->tempDir.'/top-level-non-yaml-file.md'));
+        $this->assertTrue(file_exists($dir.'/subdirectory/nested-one.yaml'));
+        $this->assertTrue(file_exists($dir.'/subdirectory/nested-two.yaml'));
+        $this->assertTrue(file_exists($dir.'/top-level-non-yaml-file.md'));
     }
 
     /** @test */
@@ -74,7 +76,7 @@ tree:
   -
     page: pages-blog # (/blog)
 EOT;
-        $item = $this->store->makeItemFromFile($this->tempDir.'/pages.yaml', $contents);
+        $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/pages.yaml'), $contents);
 
         $this->assertInstanceOf(Structure::class, $item);
         $this->assertEquals('pages', $item->handle());

@@ -98,10 +98,9 @@ interface AssetContainer
     public function accessible();
 
     /**
-     * Get or set whether the container's assets are private (non-web-accessible)
+     * Whether the container's assets are not web-accessible
      *
-     * @param bool|null $private  When setting, this is whether it should private or not.
      * @return bool
      */
-    public function private($private = null);
+    public function private();
 }

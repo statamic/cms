@@ -5,6 +5,7 @@ namespace Statamic\Fields;
 use ArrayIterator;
 use JsonSerializable;
 use IteratorAggregate;
+use JsonSerializable;
 use Statamic\View\Antlers\Parser;
 
 class Value implements IteratorAggregate, JsonSerializable
@@ -22,6 +23,10 @@ class Value implements IteratorAggregate, JsonSerializable
         $this->handle = $handle;
         $this->fieldtype = $fieldtype;
         $this->augmentable = $augmentable;
+
+        if ($fieldtype && $fieldtype->field()) {
+            $this->fieldtype->field()->setParent($augmentable);
+        }
     }
 
     public function raw()
@@ -35,7 +40,7 @@ class Value implements IteratorAggregate, JsonSerializable
             return $this->raw;
         }
 
-        $value = $this->fieldtype->augment($this->raw, $this->augmentable);
+        $value = $this->fieldtype->augment($this->raw);
 
         if ($this->shouldParse()) {
             $value = $this->parse($value);
@@ -47,6 +52,11 @@ class Value implements IteratorAggregate, JsonSerializable
     public function __toString()
     {
         return (string) $this->value();
+    }
+
+    public function jsonSerialize($options = 0)
+    {
+        return $this->value();
     }
 
     public function getIterator()

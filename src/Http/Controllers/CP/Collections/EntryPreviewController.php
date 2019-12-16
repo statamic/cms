@@ -12,6 +12,7 @@ use Statamic\Facades\Collection;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Http\Controllers\CP\CpController;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
 
@@ -24,14 +25,14 @@ class EntryPreviewController extends CpController
 
     public function edit(Request $request, $collection, $entry)
     {
-        $this->authorize('preview', $entry);
+        $this->authorize('view', $entry);
 
         $fields = $entry->blueprint()
             ->fields()
             ->addValues($request->input('preview', []))
             ->process();
 
-        foreach (array_except($fields->values(), ['slug']) as $key => $value) {
+        foreach (array_except($fields->values()->all(), ['slug']) as $key => $value) {
             $entry->setSupplement($key, $value);
         }
 
@@ -40,12 +41,14 @@ class EntryPreviewController extends CpController
 
     public function create(Request $request, $collection, $site)
     {
+        $this->authorize('create', [EntryContract::class, $collection]);
+
         $fields = Blueprint::find($request->blueprint)
             ->fields()
             ->addValues($preview = $request->preview)
             ->process();
 
-        $values = array_except($fields->values(), ['slug']);
+        $values = array_except($fields->values()->all(), ['slug']);
 
         $entry = Entry::make()
             ->slug($preview['slug'] ?? 'slug')
@@ -65,6 +68,8 @@ class EntryPreviewController extends CpController
         $url = $request->amp ? $entry->ampUrl() : $entry->absoluteUrl();
 
         $subrequest = Request::createFromBase(SymfonyRequest::create($url));
+
+        $subrequest->headers->set('X-Statamic-Live-Preview', true);
 
         app()->instance('request', $subrequest);
         Facade::clearResolvedInstance('request');

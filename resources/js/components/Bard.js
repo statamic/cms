@@ -1,3 +1,7 @@
+import * as core from 'tiptap';
+import * as commands from 'tiptap-commands';
+import * as utils from 'tiptap-utils';
+
 class Bard {
     constructor(instance) {
         this.instance = instance;
@@ -11,6 +15,10 @@ class Bard {
 
     buttons(callback) {
         this.buttonCallbacks.push(callback);
+    }
+
+    get tiptap() {
+        return { core, commands, utils };
     }
 }
 

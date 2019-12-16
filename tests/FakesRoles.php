@@ -5,7 +5,7 @@ namespace Tests;
 use Statamic\Facades\Role;
 use Statamic\Auth\File\Role as FileRole;
 use Illuminate\Support\Collection;
-use Statamic\Auth\RoleRepository;
+use Statamic\Auth\File\RoleRepository;
 use Statamic\Contracts\Auth\RoleRepository as RepositoryContract;
 
 trait FakesRoles

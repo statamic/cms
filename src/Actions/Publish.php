@@ -2,20 +2,31 @@
 
 namespace Statamic\Actions;
 
-use Statamic\Facades\User;
-use Statamic\Facades\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Facades\User;
 
 class Publish extends Action
 {
-    public function visibleTo($key, $context)
+    public function filter($item)
     {
-        return $key === 'entries';
+        return $item instanceof Entry;
     }
 
-    public function authorize($entry)
+    public function authorize($user, $entry)
     {
-        return User::current()->can('publish', [Entry::class, $entry->collection()]);
+        return $user->can('publish', $entry);
+    }
+
+    public function confirmationText()
+    {
+        /** @translation */
+        return 'Are you sure you want to publish this entry?|Are you sure you want to publish these :count entries?';
+    }
+
+    public function buttonText()
+    {
+        /** @translation */
+        return 'Publish Entry|Publish :count Entries';
     }
 
     public function run($entries)

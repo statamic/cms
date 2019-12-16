@@ -3,6 +3,9 @@
 
 @section('content')
 
+    <collection-edit-form>
+    </collection-edit-form>
+
     <user-group-publish-form
         action="{{ cp_route('user-groups.update', $group->handle()) }}"
         method="patch"
@@ -13,8 +16,9 @@
     >
 
         <h1 class="flex-1" slot="heading" slot-scope="{ title }">
-            <a href="{{ cp_route('user-groups.index') }}">{{ __('User Groups') }}</a>
-            @svg('chevron-right')
+            <div class="subhead">
+                <a href="{{ cp_route('user-groups.index') }}">{{ __('User Groups') }}</a>
+            </div>
             @{{ title }}
         </h1>
 
@@ -24,8 +28,7 @@
         listing-key="usergroup-users"
         group="{{ $group->id() }}"
         :filters="{{ $filters->toJson() }}"
-        :actions="{{ $actions->toJson() }}"
-        action-url="{{ cp_route('users.action') }}"
+        action-url="{{ cp_route('users.actions') }}"
     ></user-listing>
 
 @endsection

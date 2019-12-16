@@ -2,11 +2,11 @@
 
     <div class="focal-point">
         <div class="focal-point-toolbox card p-0">
-            <div class="form-group pb-0">
+            <div class="p-2">
                 <label>{{ __('Focal Point') }}</label>
-                <small class="help-block">{{ __('focal_point_instructions') }}</small>
+                <small class="help-block">{{ __('messages.focal_point_instructions') }}</small>
                 <div class="focal-point-image">
-                    <img ref="image" :src="image" @click="define" />
+                    <img ref="image" :src="image" @click="define" @load="setImageDimensions" />
                     <div class="focal-point-reticle" :class="{ zoomed: z > 1 }" :style="{
                         top: `${y}%`,
                         left: `${x}%`,
@@ -17,44 +17,47 @@
                     }"></div>
                 </div>
             </div>
-            <div class="flex items-center justify-between px-2">
-                <div>
-                    <div class="mb-2">
-                        <button type="button" class="btn" @click.prevent="close">{{ __('Cancel') }}</button>
-                        <button type="button" class="btn btn-default mx-1" @click.prevent="reset">{{ __('Reset') }}</button>
-                        <button type="button" class="btn btn-primary" @click="select">{{ __('Select') }}</button>
-                    </div>
-                    <div>
-                        <input type="range" v-model="z" min="1" max="10" step="0.1" class="w-full" />
-                    </div>
+            <div class="flex items-center text-sm justify-center mb-2">
+                <div class="flex items-center mx-2">
+                    <div class="mr-sm">X</div>
+                    <div class="value">{{ x }}<sup>%</sup></div>
                 </div>
-                <div class="focal-point-coordinates">
-                    <div class="pair">
-                        <div class="axis">X</div>
-                        <div class="value">{{ x }}<sup>%</sup></div>
-                    </div>
-                    <div class="pair">
-                        <div class="axis">Y</div>
-                        <div class="value">{{ y }}<sup>%</sup></div>
-                    </div>
-                    <div class="pair">
-                        <div class="axis">Z</div>
-                        <div class="value">{{ z }}</div>
-                    </div>
+                <div class="flex items-center mx-2">
+                    <div class="mr-sm">Y</div>
+                    <div class="value">{{ y }}<sup>%</sup></div>
+                </div>
+                <div class="flex items-center mx-2">
+                    <div class="mr-sm">Z</div>
+                    <div class="value">{{ z }}</div>
                 </div>
             </div>
-            <h6 class="p-2 text-center bg-grey-30 rounded-b">{{ __('Crop previews are for example only') }}</h6>
+            <div class="px-2">
+                <input type="range" v-model="z" min="1" max="10" step="0.1" class="w-full mb-2" />
+                <div class="mb-1 flex flex-wrap items-center justify-center">
+                    <button type="button" class="btn mb-1" @click.prevent="close">{{ __('Cancel') }}</button>
+                    <button type="button" class="btn mb-1 btn-default mx-1" @click.prevent="reset">{{ __('Reset') }}</button>
+                    <button type="button" class="btn mb-1 btn-primary" @click="select">{{ __('Finish') }}</button>
+                </div>
+            </div>
+            <h6 class="p-2 text-center bg-grey-30 rounded-b">{{ __('messages.focal_point_previews_are_examples') }}</h6>
         </div>
         <div v-for="n in 9" :key="n"
              :class="`frame frame-${n}`">
-            <div class="frame-image" :style="{ backgroundImage: 'url('+bgImage+')', backgroundPosition: bgPosition, transform: bgTransform, transformOrigin: bgPosition }" />
+            <focal-point-preview-frame v-if="imageDimensions" :x="x" :y="y" :z="z" :image-url="image" :image-dimensions="imageDimensions" />
         </div>
     </div>
 
 </template>
 
 <script>
+import FocalPointPreviewFrame from './FocalPointPreviewFrame.vue';
+
 export default {
+
+    components: {
+        FocalPointPreviewFrame,
+    },
+
 
     props: [
         'data',   // The initial focus point data stored in the asset, if applicable.
@@ -67,25 +70,8 @@ export default {
             x: 50,
             y: 50,
             z: 1,
-            reticleSize: 0,
+            imageDimensions: null,
         }
-    },
-
-
-    computed: {
-
-        bgPosition() {
-            return this.x + '% ' + this.y + '%';
-        },
-
-        bgImage() {
-            return encodeURI(this.image);
-        },
-
-        bgTransform() {
-            return `scale(${this.z})`;
-        }
-
     },
 
 
@@ -98,18 +84,22 @@ export default {
     },
 
 
-    watch: {
+    computed: {
 
-        z(z) {
-            const image = this.$refs.image;
-            const smaller = Math.min(image.clientWidth, image.clientHeight);
-            this.reticleSize = smaller / z;
-        }
+        reticleSize() {
+            if (!this.imageDimensions || !this.z) return 0;
+            const smaller = Math.min(this.imageDimensions.w, this.imageDimensions.h);
+            return smaller / this.z;
+        },
 
     },
 
 
     methods: {
+        setImageDimensions() {
+            const image = this.$refs.image;
+            this.imageDimensions = { w: image.clientWidth, h: image.clientHeight };
+        },
 
         define(e) {
             var $el = $(e.target);

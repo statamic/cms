@@ -53,8 +53,28 @@ class ViewTest extends TestCase
     }
 
     /** @test */
+    function a_non_antlers_template_will_not_attempt_to_load_the_layout()
+    {
+        Event::fake();
+        $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template.antlers.html'), 'blade.php');
+        $this->viewShouldReturnRaw('layout', file_get_contents(__DIR__.'/fixtures/layout.antlers.html'));
+
+        $view = (new View)
+            ->template('template')
+            ->layout('layout')
+            ->with(['foo' => 'bar']);
+
+        $this->assertEquals('Template: bar', $view->render());
+
+        Event::assertDispatched(ViewRendered::class, function ($event) use ($view) {
+            return $event->view === $view;
+        });
+    }
+
+    /** @test */
     function template_with_noparse_is_left_unparsed()
     {
+        $this->viewShouldReturnRaw('partial-with-noparse', file_get_contents(__DIR__.'/fixtures/partial-with-noparse.antlers.html'));
         $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template-with-noparse.antlers.html'));
         $this->viewShouldReturnRaw('layout', file_get_contents(__DIR__.'/fixtures/layout.antlers.html'));
 
@@ -63,7 +83,7 @@ class ViewTest extends TestCase
             ->layout('layout')
             ->with(['foo' => 'bar']);
 
-        $this->assertEquals('Layout: bar | Template: {{ foo }}', $view->render());
+        $this->assertEquals('Layout: bar | Template: {{ foo }} | Partial: {{ foo }}', $view->render());
     }
 
     /** @test */
@@ -83,6 +103,7 @@ class ViewTest extends TestCase
     /** @test */
     function layout_and_template_with_noparse_is_left_unparsed()
     {
+        $this->viewShouldReturnRaw('partial-with-noparse', file_get_contents(__DIR__.'/fixtures/partial-with-noparse.antlers.html'));
         $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template-with-noparse.antlers.html'));
         $this->viewShouldReturnRaw('layout', file_get_contents(__DIR__.'/fixtures/layout-with-noparse.antlers.html'));
 
@@ -91,7 +112,7 @@ class ViewTest extends TestCase
             ->layout('layout')
             ->with(['foo' => 'bar']);
 
-        $this->assertEquals('Layout: {{ foo }} | Template: {{ foo }}', $view->render());
+        $this->assertEquals('Layout: {{ foo }} | Template: {{ foo }} | Partial: {{ foo }}', $view->render());
     }
 
     /** @test */

@@ -1,12 +1,13 @@
 <template>
 
     <sortable-list
-        v-model="sortableRows"
+        :value="rows"
         :vertical="true"
         :item-class="sortableItemClass"
         :handle-class="sortableHandleClass"
         @dragstart="$emit('focus')"
         @dragend="$emit('blur')"
+        @input="(rows) => $emit('sorted', rows)"
     >
         <div class="grid-stacked" slot-scope="{}">
             <stacked-row
@@ -17,6 +18,7 @@
                 :values="row"
                 :meta="meta[row._id]"
                 :name="name"
+                :error-key-prefix="errorKeyPrefix"
                 @updated="(row, value) => $emit('updated', row, value)"
                 @meta-updated="$emit('meta-updated', row._id, $event)"
                 @removed="(row) => $emit('removed', row)"

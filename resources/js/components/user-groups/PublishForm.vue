@@ -27,16 +27,26 @@
                 />
 
                 <div class="text-xs text-red p-3 pt-0" v-if="initialHandle && handle != initialHandle">
-                    {{ __('role_change_handle_warning') }}
+                    {{ __('messages.role_change_handle_warning') }}
                 </div>
 
-                <form-group
-                    fieldtype="user_roles"
-                    :display="__('Roles')"
-                    handle="roles"
-                    :errors="errors.roles"
-                    v-model="roles"
-                />
+                <div class="form-group publish-field w-1/2">
+                    <label class="publish-field-label" v-text="__('Roles')" />
+                    <publish-field-meta
+                        :config="{ handle: 'roles', type: 'user_roles' }"
+                        :initial-value="roles">
+                        <div slot-scope="{ meta, value, loading }">
+                            <relationship-fieldtype
+                                v-if="!loading"
+                                :config="{ handle: 'roles', type: 'user_roles', mode: 'select' }"
+                                :value="value"
+                                :meta="meta"
+                                handle="roles"
+                                @input="roles = $event" />
+                        </div>
+                    </publish-field-meta>
+                    <small class="help-block text-red mt-1 mb-0" v-if="errors.roles" v-text="errors.roles[0]" />
+                </div>
 
             </div>
 
@@ -64,6 +74,12 @@ export default {
             handle: this.initialHandle,
             roles: this.initialRoles,
             users: this.initialUsers,
+        }
+    },
+
+    watch: {
+        'title': function(display) {
+            this.handle = this.$slugify(display, '_');
         }
     },
 
@@ -95,7 +111,7 @@ export default {
             this.clearErrors();
 
             this.$axios[this.method](this.action, this.payload).then(response => {
-                this.$notify.success('Saved');
+                this.$toast.success('Saved');
                 if (!this.initialHandle || (this.initialHandle !== this.handle)) {
                     window.location = response.data.redirect;
                 }
@@ -104,9 +120,9 @@ export default {
                     const { message, errors } = e.response.data;
                     this.error = message;
                     this.errors = errors;
-                    this.$notify.error(message);
+                    this.$toast.error(message);
                 } else {
-                    this.$notify.error('Something went wrong');
+                    this.$toast.error('Something went wrong');
                 }
             });
         }
@@ -114,7 +130,7 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bindGlobal(['command+s'], e => {
+        this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
             this.save();
         });

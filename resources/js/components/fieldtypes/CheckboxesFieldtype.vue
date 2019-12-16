@@ -29,17 +29,28 @@ export default {
     computed: {
         options() {
             return this.normalizeInputOptions(this.config.options);
-        }
+        },
+
+        replicatorPreview() {
+            return this.values.map(value => {
+                const option = _.findWhere(this.options, { value });
+                return option ? option.label : value;
+            }).join(', ');
+        },
     },
 
     watch: {
 
-        values(values) {
+        values(values, oldValues) {
+            values = this.sortValues(values);
+
+            if (JSON.stringify(values) === JSON.stringify(oldValues)) return;
+
             this.update(values);
         },
 
         value(value) {
-            this.values = value;
+            this.values = this.sortValues(value);
         }
 
     },
@@ -50,12 +61,13 @@ export default {
             document.getElementById(`${this.name}-0`).focus();
         },
 
-        getReplicatorPreviewText() {
-            return this.values.map(item => {
-                var option = _.findWhere(this.config.options, {value: item});
-                return (option) ? option.text : item;
-            }).join(', ');
-        },
+        sortValues(values) {
+            if (!values) return [];
+
+            return this.options
+                .filter(opt => values.includes(opt.value))
+                .map(opt => opt.value);
+        }
 
     }
 };

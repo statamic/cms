@@ -6,9 +6,9 @@
         <div class="ml-2">
             <h1 class="mb-sm">{{ __('Updates') }}</h1>
             @if ($count)
-                <p>{{ $count }} {{ __('updates available') }}</p>
+                <p>{{ trans_choice('statamic::messages.updates_available', $count) }}</p>
             @else
-                <p>{{ __('Everything is up to date.') }}</p>
+                <p>{{ __('Everything is up to date') }}</p>
             @endif
         </div>
     </div>

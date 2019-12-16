@@ -8,13 +8,14 @@
             :title="action.title"
             :danger="action.dangerous"
             :buttonText="runButtonText"
+            :bodyText="confirmationText"
             @confirm="confirm"
             @cancel="cancel"
         >
             <publish-container
                 v-if="action.fields.length"
                 name="confirm-action"
-                :fieldset="fieldset"
+                :blueprint="fieldset"
                 :values="values"
                 :meta="action.meta"
                 :errors="errors"
@@ -61,15 +62,11 @@ export default {
     computed: {
 
         confirmationText() {
-            return this.selections === 1
-                ? __('Are you sure you want to run this action?')
-                : __n('Are you sure you want to run this action on :count items?', this.selections);
+            return __n(this.action.confirmationText, this.selections);
         },
 
         runButtonText() {
-            return this.selections === 1
-                ? __('Run action')
-                : __n('Run action on :count items', this.selections);
+            return __n(this.action.buttonText, this.selections);
         }
 
     },

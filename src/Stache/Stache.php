@@ -16,6 +16,7 @@ class Stache
     protected $sites;
     protected $stores;
     protected $startTime;
+    protected $updateIndexes = true;
 
     public function __construct()
     {
@@ -159,5 +160,17 @@ class Stache
         };
 
         return Carbon::createFromTimestamp($cache['date']);
+    }
+
+    public function disableUpdatingIndexes()
+    {
+        $this->updateIndexes = false;
+
+        return $this;
+    }
+
+    public function shouldUpdateIndexes()
+    {
+        return $this->updateIndexes;
     }
 }

@@ -17,7 +17,7 @@ class Range extends Fieldtype
             'type' => 'integer',
             'default' => 100,
             'width' => 33,
-            'instructions' => 'The maxium, right-most value.'
+            'instructions' => 'The maximum, right-most value.'
         ],
         'step' => [
             'type' => 'integer',

@@ -2,7 +2,7 @@
 
     <relationship-input
         :name="name"
-        v-model="selections"
+        :value="value"
         :mode="config.mode"
         :can-edit="canEdit"
         :config="config"
@@ -24,6 +24,7 @@
         :taggable="taggable"
         @focus="$emit('focus')"
         @blur="$emit('blur')"
+        @input="update"
         @item-data-updated="itemDataUpdated"
     />
 
@@ -38,7 +39,6 @@ export default {
 
     data() {
         return {
-            selections: _.clone(this.value),
             initialData: this.meta.data
         }
     },
@@ -122,22 +122,17 @@ export default {
 
         taggable() {
             return this.meta.taggable;
-        }
-
-    },
-
-    watch: {
-
-        selections(selections) {
-            this.update(this.selections);
         },
 
-        value(value) {
-            if (JSON.stringify(value) == JSON.stringify(this.selections)) return;
-            this.selections = value;
+        replicatorPreview() {
+            return this.value.map(id => {
+                const item = _.findWhere(this.meta.data, { id });
+                return item ? item.title : id;
+            });
         }
 
     },
+
 
     methods: {
 

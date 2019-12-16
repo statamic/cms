@@ -3,24 +3,37 @@
 namespace Statamic;
 
 use Closure;
-use Statamic\Facades\URL;
+use Illuminate\Http\Request;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Facades\User;
+use Statamic\Http\Middleware\CP\Authorize;
+use Statamic\Http\Middleware\Localize as LocalizeFrontend;
+use Statamic\Http\Middleware\CP\Localize as LocalizeCp;
+use Statamic\StaticCaching\Middleware\Cache;
 use Stringy\StaticStringy;
-use Illuminate\Http\Request;
 
 class Statamic
 {
     const CORE_SLUG = 'statamic';
-    const CORE_REPO = 'statamic/definitely-not-v3'; // TODO: Change to `statamic/cms`
+    const CORE_REPO = 'statamic/cms';
 
     protected static $scripts = [];
+    protected static $externalScripts = [];
     protected static $styles = [];
     protected static $cpRoutes = [];
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
+    protected static $webMiddleware = [
+        LocalizeFrontend::class,
+        Cache::class,
+    ];
+    protected static $cpMiddleware = [
+        Authorize::class,
+        LocalizeCp::class,
+    ];
 
     public static function version()
     {
@@ -32,12 +45,24 @@ class Statamic
         return static::$scripts;
     }
 
-   public static function script($name, $path)
-   {
-       static::$scripts[$name] = str_finish($path, '.js');
+    public static function availableExternalScripts(Request $request)
+    {
+        return static::$externalScripts;
+    }
 
-       return new static;
-   }
+    public static function script($name, $path)
+    {
+        static::$scripts[$name] = str_finish($path, '.js');
+
+        return new static;
+    }
+
+    public static function externalScript($url)
+    {
+        static::$externalScripts[] = $url;
+
+        return new static;
+    }
 
     public static function availableStyles(Request $request)
     {
@@ -117,27 +142,7 @@ class Statamic
 
     public static function jsonVariables(Request $request)
     {
-        $defaults = [
-            'version' => static::version(),
-            'laravelVersion' => app()->version(),
-            'csrfToken' => csrf_token(),
-            'cpRoot' => str_start(config('statamic.cp.route'), '/'),
-            'urlPath' => '/' . request()->path(),
-            'resourceUrl' => Statamic::assetUrl(),
-            'locales' => \Statamic\Facades\Config::get('statamic.system.locales'),
-            'markdownHardWrap' => \Statamic\Facades\Config::get('statamic.theming.markdown_hard_wrap'),
-            'conditions' => [],
-            'MediumEditorExtensions' => [],
-            'flash' => static::flash(),
-            'ajaxTimeout' => config('statamic.system.ajax_timeout'),
-            'googleDocsViewer' => config('statamic.assets.google_docs_viewer'),
-            'user' => ($user = User::current()) ? $user->toJavascriptArray() : [],
-            'paginationSize' => config('statamic.cp.pagination_size'),
-        ];
-
-        $vars = array_merge($defaults, static::$jsonVariables);
-
-        return collect($vars)->map(function ($variable) use ($request) {
+        return collect(static::$jsonVariables)->map(function ($variable) use ($request) {
             return is_callable($variable) ? $variable($request) : $variable;
         })->all();
     }
@@ -156,14 +161,14 @@ class Statamic
         );
     }
 
-    public static function assetUrl($url = '/')
+    public static function vendorAssetUrl($url = '/')
     {
-        return static::url('vendor/statamic/cp/' . $url);
+        return asset(URL::tidy('vendor/' . $url));
     }
 
-    public static function url($url = '/')
+    public static function cpAssetUrl($url = '/')
     {
-        return URL::tidy(Site::default()->url() . '/' . $url);
+        return static::vendorAssetUrl('statamic/cp/' . $url);
     }
 
     public static function flash()
@@ -172,11 +177,40 @@ class Statamic
             $messages[] = ['type' => 'success', 'message' => $success];
         }
 
+        if ($error = session('error')) {
+            $messages[] = ['type' => 'error', 'message' => $error];
+        }
+
         return $messages ?? [];
     }
 
     public static function crumb(...$values)
     {
         return implode(' ‹ ', array_map("__", $values));
+    }
+
+    public static function cpMiddleware()
+    {
+        return static::$cpMiddleware;
+    }
+
+    public static function webMiddleware()
+    {
+        return static::$webMiddleware;
+    }
+
+    public static function pushCpMiddleware($middleware)
+    {
+        static::$cpMiddleware[] = $middleware;
+    }
+
+    public static function pushWebMiddleware($middleware)
+    {
+        static::$webMiddleware[] = $middleware;
+    }
+
+    public static function docsUrl($url)
+    {
+        return URL::tidy('https://statamic.dev/' . $url);
     }
 }

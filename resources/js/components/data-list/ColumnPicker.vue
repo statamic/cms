@@ -33,7 +33,7 @@
                     </sortable-list>
 
                     <div v-if="preferencesKey">
-                        <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
+                        <loading-graphic class="mt-3 ml-3" v-if="saving" :inline="true" :text="__('Saving')" />
                         <template v-else>
                             <div class="flex justify-center p-3">
                                 <button class="btn-flat w-full mr-sm block" @click="reset">{{ __('Reset') }}</button>
@@ -97,7 +97,7 @@ export default {
 
         save() {
             if (! this.selectedColumns.length) {
-                return this.$notify.error(__('At least 1 column is required'));
+                return this.$toast.error(__('At least 1 column is required'));
             }
 
             this.saving = true;
@@ -106,11 +106,11 @@ export default {
                 .then(response => {
                     this.saving = false;
                     this.customizing = false;
-                    this.$notify.success(__('Columns saved'));
+                    this.$toast.success(__('Columns saved'));
                 })
                 .catch(error => {
                     this.saving = false;
-                    this.$notify.error(__('Something went wrong'));
+                    this.$toast.error(__('Something went wrong'));
                 });
         },
 
@@ -123,17 +123,17 @@ export default {
                 .then(response => {
                     this.saving = false;
                     this.customizing = false;
-                    this.$notify.success(__('Columns reset'));
+                    this.$toast.success(__('Columns reset'));
                 })
                 .catch(error => {
                     this.saving = false;
-                    this.$notify.error(__('Something went wrong'));
+                    this.$toast.error(__('Something went wrong'));
                 });
         }
     },
 
     created() {
-        this.$mousetrap.bind('esc', this.dismiss)
+        this.$keys.bind('esc', this.dismiss)
     },
 }
 </script>

@@ -9,7 +9,6 @@ use Statamic\Assets\Dimensions;
 use Statamic\Facades\AssetContainer;
 use Illuminate\Http\UploadedFile;
 use Statamic\Imaging\ImageGenerator;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 
 class DimensionsTest extends TestCase
@@ -42,25 +41,6 @@ class DimensionsTest extends TestCase
     }
 
     /** @test */
-    function it_gets_cached_dimensions()
-    {
-        $asset = $this->mock(Asset::class);
-        $asset->shouldReceive('isImage')->andReturnTrue();
-        $asset->shouldReceive('containerId')->andReturn('test-container');
-        $asset->shouldReceive('path')->andReturn('path/to/asset.jpg');
-
-        Cache::shouldReceive('get')
-            ->with('assets.dimensions.test-container.path/to/asset.jpg')
-            ->andReturn([30, 60]);
-
-        $dimensions = $this->dimensions->asset($asset);
-
-        $this->assertEquals([30, 60], $dimensions->get());
-        $this->assertEquals(30, $dimensions->width());
-        $this->assertEquals(60, $dimensions->height());
-    }
-
-    /** @test */
     function it_gets_the_dimensions()
     {
         Carbon::setTestNow(now());
@@ -68,15 +48,6 @@ class DimensionsTest extends TestCase
         $asset = (new Asset)
             ->container(AssetContainer::make('test-container')->disk('test'))
             ->path('path/to/asset.jpg');
-
-        Cache::shouldReceive('get')
-            ->with($cacheKey = 'assets.dimensions.test-container.path/to/asset.jpg')
-            ->andReturnNull();
-
-        Cache::shouldReceive('put')
-            ->with($cacheKey, [30, 60], \Mockery::on(function ($arg) {
-                return $arg->eq(now()->addHour());
-            }));
 
         $file = UploadedFile::fake()->image('asset.jpg', 30, 60);
         Storage::disk('test')->putFileAs('path/to', $file, 'asset.jpg');

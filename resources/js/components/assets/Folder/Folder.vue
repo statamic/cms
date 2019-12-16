@@ -18,7 +18,7 @@
                 v-if="!initialDirectory"
                 handle="directory"
                 :display="__('Folder Name')"
-                :instructions="__('We recommend avoiding spaces and special characters to keep your URLs clean.')"
+                :instructions="__('messages.asset_folders_directory_instructions')"
                 :errors="errors.directory"
                 autofocus
                 v-model="directory"
@@ -65,10 +65,10 @@ export default {
             if (e.response && e.response.status === 422) {
                 const { message, errors } = e.response.data;
                 this.errors = errors;
-                this.$notify.error(message);
+                this.$toast.error(message);
                 this.saving = false;
             } else {
-                this.$notify.error(__('Something went wrong'));
+                this.$toast.error(__('Something went wrong'));
             }
         }
 
@@ -76,10 +76,12 @@ export default {
 
     created() {
         // Allow key commands with a focused input
-        this.$mousetrap.prototype.stopCallback = function () { return false; }
+        this.$keys.prototype.stopCallback = (e) => {
+            return ! ['enter', 'escape'].includes(e.code.toLowerCase());
+        }
 
-        this.$mousetrap.bind('enter', this.submit)
-        this.$mousetrap.bind('esc', this.cancel)
+        this.$keys.bind('enter', this.submit)
+        this.$keys.bind('esc', this.cancel)
     },
 
 }

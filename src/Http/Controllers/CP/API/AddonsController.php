@@ -10,6 +10,8 @@ class AddonsController extends CpController
 {
     public function index(Request $request)
     {
+        $this->authorize('configure addons');
+
         return Marketplace::query()
             ->filter($request->filter)
             ->search($request->q)

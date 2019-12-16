@@ -14,6 +14,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Facades\Image;
 use Statamic\Data\Data;
+use Statamic\Data\Augmentable;
 use Statamic\Facades\Blueprint;
 use Illuminate\Support\Carbon;
 use Statamic\Data\ContainsData;
@@ -22,16 +23,16 @@ use League\Flysystem\Adapter\Local;
 use Facades\Statamic\Assets\Dimensions;
 use Statamic\Events\Data\AssetReplaced;
 use Statamic\Events\Data\AssetUploaded;
-use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
-class Asset implements AssetContract, Arrayable, ArrayAccess
+class Asset implements AssetContract, ArrayAccess, AugmentableContract
 {
-    use FluentlyGetsAndSets, ContainsData {
+    use Augmentable, FluentlyGetsAndSets, ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
@@ -41,6 +42,12 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
     protected $container;
     protected $path;
     protected $meta;
+
+    public function __construct()
+    {
+        $this->data = collect();
+        $this->supplements = collect();
+    }
 
     public function id($id = null)
     {
@@ -88,7 +95,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
 
         $this->meta = $this->meta();
 
-        $this->data = $this->meta['data'];
+        $this->data = collect($this->meta['data']);
 
         return $this;
     }
@@ -114,8 +121,12 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
 
     public function meta()
     {
+        if (! config('statamic.assets.cache_meta')) {
+            return $this->generateMeta();
+        }
+
         if ($this->meta) {
-            return array_merge($this->meta, ['data' => $this->data]);
+            return array_merge($this->meta, ['data' => $this->data->all()]);
         }
 
         if ($this->disk()->exists($path = $this->metaPath())) {
@@ -129,7 +140,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
 
     public function generateMeta()
     {
-        $meta = ['data' => $this->data];
+        $meta = ['data' => $this->data->all()];
 
         if ($this->exists()) {
             $dimensions = Dimensions::asset($this)->get();
@@ -147,7 +158,9 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
 
     public function metaPath()
     {
-        return dirname($this->path()) . '/.meta/' . $this->basename() . '.yaml';
+        $path = dirname($this->path()) . '/.meta/' . $this->basename() . '.yaml';
+
+        return ltrim($path, '/');
     }
 
     public function writeMeta($meta)
@@ -238,6 +251,15 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
         return URL::assemble($this->container()->url(), $this->path());
     }
 
+    public function absoluteUrl()
+    {
+        if ($this->container()->private()) {
+            return null;
+        }
+
+        return URL::assemble($this->container()->absoluteUrl(), $this->path());
+    }
+
     public function thumbnailUrl($preset = null)
     {
         return cp_route('assets.thumbnails.show', [
@@ -297,7 +319,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
      */
     public function isImage()
     {
-        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif']);
+        return $this->extensionIsOneOf(['jpg', 'jpeg', 'png', 'gif', 'webp']);
     }
 
     /**
@@ -352,6 +374,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
     public function delete()
     {
         $this->disk()->delete($this->path());
+        $this->disk()->delete($this->metaPath());
 
         return $this;
     }
@@ -380,6 +403,16 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
     public function containerId()
     {
         return $this->container->id();
+    }
+
+    /**
+     * Get the container's handle
+     *
+     * @return string
+     */
+    public function containerHandle()
+    {
+        return $this->container->handle();
     }
 
     /**
@@ -505,11 +538,11 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
     }
 
     /**
-     * Convert to an array
+     * Get data for the augmented array
      *
      * @return array
      */
-    public function toArray()
+    public function augmentedArrayData()
     {
         $attributes = [
             'id'             => $this->id(),
@@ -528,6 +561,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
             'container'      => $this->container()->id(),
             'folder'         => $this->folder(),
             'url'            => $this->url(),
+            'permalink'      => $this->absoluteUrl(),
         ];
 
         if ($this->exists()) {
@@ -549,7 +583,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
                 'last_modified'  => (string) $this->lastModified(),
                 'last_modified_timestamp' => $this->lastModified()->timestamp,
                 'last_modified_instance'  => $this->lastModified(),
-                'focus_css' => \Statamic\View\Modify::value($this->get('focus'))->backgroundPosition()->fetch(),
+                'focus_css' => \Statamic\Modifiers\Modify::value($this->get('focus'))->backgroundPosition()->fetch(),
                 'height' => $this->height(),
                 'width' => $this->width(),
                 'orientation' => $this->orientation(),
@@ -557,7 +591,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
             ]);
         }
 
-        return array_merge($this->data(), $attributes, $this->supplements);
+        return $this->data()->merge($attributes)->merge($this->supplements)->all();
     }
 
     /**
@@ -575,6 +609,7 @@ class Asset implements AssetContract, Arrayable, ArrayAccess
         $directory = $this->folder();
         $directory = ($directory === '.') ? '/' : $directory;
         $path      = Path::tidy($directory . '/' . $filename . '.' . $ext);
+        $path      = ltrim($path, '/');
 
         // If the file exists, we'll append a timestamp to prevent overwriting.
         if ($this->disk()->exists($path)) {

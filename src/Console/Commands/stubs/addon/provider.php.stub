@@ -2,9 +2,9 @@
 
 namespace DummyNamespace;
 
-use Statamic\Extend\ServiceProvider as BaseProvider;
+use Statamic\Providers\AddonServiceProvider;
 
-class ServiceProvider extends BaseProvider
+class ServiceProvider extends AddonServiceProvider
 {
     //
 }

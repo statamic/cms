@@ -49,7 +49,6 @@
 
     .global-search-result-item {
         @apply border-t cursor-pointer;
-        padding: 8px 12px;
 
         &:first-child {
             @apply rounded-t border-none;
@@ -95,6 +94,10 @@
         font-size: 21px;
         left: -3px;
         position: relative;
+    }
+
+    kbd {
+        @apply font-sans rounded px-sm pb-px text-2xs border text-grey-50;
     }
 }
 

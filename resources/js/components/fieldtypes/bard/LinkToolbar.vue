@@ -25,13 +25,13 @@
             </div>
             <div class="bard-link-toolbar-buttons">
                 <button @click="edit" v-tooltip="__('Edit Link')" v-show="!isEditing">
-                    edit
+                    <span class="icon icon-pencil" />
                 </button>
                 <button @click="remove" v-tooltip="__('Remove Link')" v-show="hasLink && isEditing">
-                    remove
+                    <span class="icon icon-trash" />
                 </button>
                 <button @click="commit" v-tooltip="__('Done')" v-show="isEditing">
-                    <i class="fa fa-check"></i>
+                    <span class="icon icon-check" />
                 </button>
             </div>
         </div>
@@ -84,18 +84,20 @@ export default {
     },
 
     created() {
+        this.targetBlank = this.linkAttrs.href
+            ? this.linkAttrs.target == '_blank'
+            : this.config.target_blank;
+
         if (!this.linkAttrs.href) {
             this.edit();
         }
-
-        this.targetBlank = this.linkAttrs.target == '_blank' ? true : this.config.target_blank;
 
         this.bard.$on('link-selected', (selection) => {
             // This can't be a good way to do this.
             const attrs = selection.content().content.content[0].content.content[0].marks[0].attrs;
             this.linkAttrs = attrs;
             this.linkInput = attrs.href;
-            this.targetBlank = attrs.target == '_blank' ? true : this.config.target_blank;
+            this.targetBlank = attrs.target == '_blank';
         });
 
         this.bard.$on('link-deselected', () => this.$emit('deselected'));

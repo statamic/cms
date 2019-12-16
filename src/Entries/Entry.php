@@ -25,6 +25,7 @@ use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Data\HasOrigin;
 use Statamic\Contracts\Data\Localization;
+use Statamic\Data\Publishable;
 
 class Entry implements Contract, AugmentableContract, Responsable, Localization, ArrayAccess
 {
@@ -32,7 +33,12 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, Augmentable, FluentlyGetsAndSets, Revisable, HasOrigin;
+    use ContainsData, ExistsAsFile, Augmentable, FluentlyGetsAndSets, Revisable, Publishable;
+
+    use HasOrigin {
+        value as originValue;
+        values as originValues;
+    }
 
     protected $id;
     protected $collection;
@@ -40,6 +46,12 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
     protected $date;
     protected $locale;
     protected $localizations;
+
+    public function __construct()
+    {
+        $this->data = collect();
+        $this->supplements = collect();
+    }
 
     public function id($id = null)
     {
@@ -85,9 +97,9 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
         return $this->collection;
     }
 
-    public function toArray()
+    public function augmentedArrayData()
     {
-        return array_merge($this->values(), [
+        return $this->values()->merge([
             'id' => $this->id(),
             'slug' => $this->slug(),
             'uri' => $this->uri(),
@@ -96,13 +108,14 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
             'permalink' => $this->absoluteUrl(),
             'amp_url' => $this->ampUrl(),
             'published' => $this->published(),
+            'private' => $this->private(),
             'date' => $this->date(),
             'is_entry' => true,
             'collection' => $this->collectionHandle(),
             'last_modified' => $lastModified = $this->lastModified(),
             'updated_at' => $lastModified,
-            'updated_by' => optional($this->lastModifiedBy())->toArray(),
-        ], $this->supplements);
+            'updated_by' => optional($this->lastModifiedBy())->toAugmentedArray(),
+        ])->merge($this->supplements)->all();
     }
 
     public function toCacheableArray()
@@ -143,6 +156,11 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
         return $this->cpUrl('collections.entries.published.store');
     }
 
+    public function unpublishUrl()
+    {
+        return $this->cpUrl('collections.entries.published.destroy');
+    }
+
     public function revisionsUrl()
     {
         return $this->cpUrl('collections.entries.revisions.index');
@@ -156,6 +174,11 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
     public function restoreRevisionUrl()
     {
         return $this->cpUrl('collections.entries.restore-revision');
+    }
+
+    public function livePreviewUrl()
+    {
+        return $this->cpUrl('collections.entries.preview.edit');
     }
 
     protected function cpUrl($route)
@@ -301,7 +324,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
 
     public function fileData()
     {
-        $array = array_merge($this->data(), [
+        $array = $this->data()->merge([
             'id' => $this->id(),
             'origin' => optional($this->origin)->id(),
             'published' => $this->published === false ? false : null,
@@ -311,7 +334,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
             $array['blueprint'] = $this->blueprint;
         }
 
-        return $array;
+        return $array->all();
     }
 
     public function ampable()
@@ -334,7 +357,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
-            'data' => Arr::except($this->data(), ['updated_by', 'updated_at']),
+            'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
         ];
     }
 
@@ -476,7 +499,7 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
 
     public function routeData()
     {
-        $data = array_merge($this->values(), [
+        $data = $this->values()->merge([
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
@@ -484,14 +507,14 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
         ]);
 
         if ($this->hasDate()) {
-            $data = array_merge($data, [
+            $data = $data->merge([
                 'year' => $this->date()->format('Y'),
                 'month' => $this->date()->format('m'),
                 'day' => $this->date()->format('d'),
             ]);
         }
 
-        return $data;
+        return $data->all();
     }
 
     public function uri()
@@ -541,5 +564,15 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
     public function offsetUnset($key)
     {
         $this->remove($key);
+    }
+
+    public function value($key)
+    {
+        return $this->originValue($key) ?? $this->collection()->cascade($key);
+    }
+
+    public function values()
+    {
+        return $this->collection()->cascade()->merge($this->originValues());
     }
 }

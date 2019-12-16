@@ -5,6 +5,7 @@
             <input
                 ref="input"
                 class="input-text"
+                :class="classes"
                 :name="name"
                 :value="value"
                 :type="type"
@@ -32,16 +33,22 @@ export default {
     props: {
         name: {},
         disabled: { default: false },
+        classes: { default: null },
         isReadOnly: { type: Boolean, default: false },
         placeholder: { required: false },
         type: { default: "text" },
         value: { required: true },
         prepend: { default: null },
         append: { default: null },
-        autofocus: { type: Boolean }
+        autofocus: { type: Boolean },
+        autoselect: { type: Boolean }
     },
     mounted() {
-        if (this.autofocus) this.$refs.input.focus();
+        if (this.autoselect) {
+            this.$refs.input.select();
+        } else if (this.autofocus) {
+            this.$refs.input.focus();
+        }
     }
 }
 </script>

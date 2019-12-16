@@ -2,13 +2,14 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\User;
 use Statamic\CP\Column;
+use Statamic\Facades\User;
 
 class Users extends Relationship
 {
     protected $statusIcons = false;
     protected $formComponent = 'user-publish-form';
+    protected $canEdit = true;
 
     protected $formComponentProps = [
         'initialTitle' => 'title',
@@ -18,6 +19,23 @@ class Users extends Relationship
         'initialMeta' => 'meta',
         'actions' => 'actions',
         'canEditPassword' => 'canEditPassword',
+    ];
+
+    protected $configFields = [
+        'max_items' => [
+            'type' => 'integer',
+            'default' => 1,
+            'instructions' => 'Set a maximum number of selectable users',
+        ],
+        'mode' => [
+            'type' => 'radio',
+            'default' => 'select',
+            'options' => [
+                'default' => 'Stack Selector',
+                'select' => 'Select Dropdown',
+                'typeahead' => 'Typeahead Field',
+            ],
+        ],
     ];
 
     public function preProcess($data)
@@ -33,7 +51,7 @@ class Users extends Relationship
     {
         if ($user = User::find($id)) {
             return [
-                'title' => $user->email(),
+                'title' => $user->name(),
                 'id' => $id,
                 'edit_url' => $user->editUrl(),
             ];
@@ -47,7 +65,7 @@ class Users extends Relationship
         return User::all()->map(function ($user) {
             return [
                 'id' => $user->id(),
-                'name' => $user->get('name'),
+                'title' => $user->name(),
                 'email' => $user->email(),
             ];
         })->values();
@@ -56,14 +74,24 @@ class Users extends Relationship
     protected function getColumns()
     {
         return [
-            Column::make('name'),
+            Column::make('title')->label('Name'),
             Column::make('email'),
         ];
     }
 
     public function preProcessIndex($data)
     {
-        return $this->augment($data)->map(function ($user) use ($data) {
+        if (! $data) {
+            return collect();
+        }
+
+        $users = $this->augment($data);
+
+        if ($this->config('max_items') === 1) {
+            $users = collect([$users]);
+        }
+
+        return $users->map(function ($user) {
             return [
                 'id' => $user->id(),
                 'title' => $user->get('name', $user->email()),

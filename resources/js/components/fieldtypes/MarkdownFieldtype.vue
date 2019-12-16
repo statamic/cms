@@ -101,7 +101,8 @@
         </stack>
 
         <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
-            <div class="h-full overflow-auto p-3 bg-white">
+            <div class="h-full overflow-auto p-3 bg-white relative">
+                <button class="btn-close absolute pin-t pin-r mt-2 mr-4" @click="showCheatsheet = false">&times;</button>
                 <div class="max-w-md mx-auto my-4 clean-content">
                     <h2 v-text="__('Markdown Cheatsheet')"></h2>
                     <div v-html="__('markdown.cheatsheet')"></div>
@@ -131,14 +132,18 @@ require('codemirror/mode/php/php');
 require('codemirror/mode/yaml/yaml');
 require('codemirror/addon/edit/continuelist');
 
+import Selector from '../assets/Selector.vue';
+import Uploader from '../assets/Uploader.vue';
+import Uploads from '../assets/Uploads.vue';
+
 export default {
 
     mixins: [Fieldtype],
 
     components: {
-        selector: require('../assets/Selector.vue'),
-        Uploader: require('../assets/Uploader.vue'),
-        Uploads: require('../assets/Uploads.vue'),
+        Selector,
+        Uploader,
+        Uploads
     },
 
     data: function() {
@@ -472,11 +477,6 @@ export default {
             }
         },
 
-        getReplicatorPreviewText() {
-            return marked(this.data || '', { renderer: new PlainTextRenderer })
-                .replace(/<\/?[^>]+(>|$)/g, "");
-        },
-
         focus() {
             this.codemirror.focus();
         },
@@ -517,7 +517,12 @@ export default {
 
         markdownPreviewText() {
             return markdown(this.data);
-        }
+        },
+
+        replicatorPreview() {
+            return marked(this.data || '', { renderer: new PlainTextRenderer })
+                .replace(/<\/?[^>]+(>|$)/g, "");
+        },
     },
 
     mounted() {
@@ -554,7 +559,7 @@ export default {
             }
         });
 
-        this.$mousetrap.bind('esc', this.closeFullScreen)
+        this.$keys.bind('esc', this.closeFullScreen)
 
         this.trackHeightUpdates();
     }

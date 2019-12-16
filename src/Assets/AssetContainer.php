@@ -2,23 +2,25 @@
 
 namespace Statamic\Assets;
 
-use Statamic\Facades;
-use Statamic\Support\Str;
-use Statamic\Facades\File;
-use Statamic\Facades\YAML;
-use Statamic\Facades\Parse;
-use Statamic\Facades\Folder;
-use Statamic\Facades\Search;
-use Statamic\Facades\Stache;
-use Statamic\Facades\Blueprint;
-use Statamic\Data\ExistsAsFile;
-use Statamic\Facades\Asset as AssetAPI;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Events\Data\AssetContainerSaved;
-use Statamic\Events\Data\AssetContainerDeleted;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Data\ExistsAsFile;
+use Statamic\Events\Data\AssetContainerDeleted;
+use Statamic\Events\Data\AssetContainerSaved;
+use Statamic\Facades;
+use Statamic\Facades\Asset as AssetAPI;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\File;
+use Statamic\Facades\Folder;
+use Statamic\Facades\Parse;
+use Statamic\Facades\Search;
+use Statamic\Facades\Stache;
+use Statamic\Facades\URL;
+use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements AssetContainerContract, Augmentable
 {
@@ -71,13 +73,25 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Get the URL to this location
+     * Get the URL to this location.
      *
      * @return null|string
      */
     public function url()
     {
-        return rtrim($this->disk()->url('/'), '/');
+        $url = rtrim($this->disk()->url('/'), '/');
+
+        return ($url === '') ? '/' : $url;
+    }
+
+    /**
+     * Get the absolute URL to this location
+     *
+     * @return null|string
+     */
+    public function absoluteUrl()
+    {
+        return URL::makeAbsolute($this->url());
     }
 
     /**
@@ -147,8 +161,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $this
             ->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) {
-                return Blueprint::find($blueprint ?? config('statamic.theming.blueprints.asset'))
-                    ?? Blueprint::find('asset');
+                return Blueprint::find($blueprint ?? 'asset');
             })
             ->args(func_get_args());
     }
@@ -221,7 +234,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
         $files = $files->reject(function ($path) {
             return Str::startsWith($path, '.meta/')
                 || Str::contains($path, '/.meta/')
-                || Str::endsWith($path, ['.DS_Store']);
+                || Str::endsWith($path, ['.DS_Store', '.gitkeep', '.gitignore']);
         });
 
         return $files->values();
@@ -321,7 +334,11 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function assetFolder($path)
     {
-        $data = YAML::parse($this->disk()->get("{$path}/folder.yaml", ''));
+        $filePath = ltrim("{$path}/folder.yaml", '/');
+
+        $contents = $this->disk()->get($filePath, '');
+
+        $data = YAML::parse($contents);
 
         return (new AssetFolder)
             ->container($this)
@@ -336,17 +353,17 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function accessible()
     {
-        return ! $this->private();
+        return Arr::get($this->diskConfig(), 'url') !== null;
     }
 
-    public function private($private = null)
+    /**
+     * Whether the container's assets are not web-accessible
+     *
+     * @return bool
+     */
+    public function private()
     {
-        return $this
-            ->fluentlyGetOrSet('private')
-            ->getter(function ($private) {
-                return (bool) $private;
-            })
-            ->args(func_get_args());
+        return !$this->accessible();
     }
 
      /**

@@ -13,26 +13,26 @@
         <div v-if="currentStep === 0">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('Create a New Form') }}</h1>
-                <p class="text-grey">A Form is a group of fields used for collecting user input.</p>
+                <p class="text-grey" v-text="__('messages.form_wizard_intro')" />
             </div>
 
             <!-- Name -->
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Name of your Form</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Title') }}</label>
                 <input type="text" v-model="form.title" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Usually a call to action, like "Contact Us" or "Vote for Your Favorite Porg".
+                    {{ __('messages.form_wizard_title_instructions') }}
                 </div>
             </div>
 
             <!-- Handle -->
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Handle</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Handle') }}</label>
                 <input type="text" v-model="form.handle" class="input-text" tabindex="2">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    How you'll reference to this form in your templates. Cannot easily be changed.
+                    {{ __('messages.form_wizard_handle_instructions') }}
                 </div>
             </div>
         </div>
@@ -41,12 +41,12 @@
         <div v-if="currentStep === 1">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('Fields') }}</h1>
-                <p class="text-grey">Define fields for your formset.</p>
+                <p class="text-grey" v-text="__('messages.form_wizard_fields_intro')" />
             </div>
 
             <!-- Fields -->
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Blueprint</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Blueprint') }}</label>
                 <publish-field-meta
                     :config="blueprintFieldConfig"
                     :initial-value="form.blueprint">
@@ -60,9 +60,9 @@
                             @input="form.blueprint = $event" />
                     </div>
                 </publish-field-meta>
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    You can pick an existing Blueprint or create a new one.
+                    {{ __('messages.form_wizard_blueprint_instructions') }}
                 </div>
             </div>
         </div>
@@ -71,26 +71,26 @@
         <div v-if="currentStep === 2">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
                 <h1 class="mb-3">{{ __('Submissions') }}</h1>
-                <p class="text-grey">Choose how you would like to handle form submissions.</p>
+                <p class="text-grey" v-text="__('messages.form_wizard_submissions_intro')" />
             </div>
 
             <!-- Name -->
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Store Submissions</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Store Submissions') }}</label>
                 <toggle-input v-model="form.store" />
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Whether form submissions should be stored. Turn off if you only wish to get email notifications.
+                    {{ __('messages.form_wizard_store_submissions_instructions') }}
                 </div>
             </div>
 
             <!-- Email-->
             <div class="max-w-md mx-auto px-2 pb-7">
-                <label class="font-bold text-base mb-sm" for="name">Email Notifications</label>
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Email Notifications') }}</label>
                 <input type="email" v-model="form.email" class="input-text" autofocus tabindex="1">
-                <div class="text-2xs text-grey-50 mt-1 flex items-center">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    Be notified of submissions at this email address. You can further customize notification settings later.
+                    {{ __('messages.form_wizard_email_notifications_instructions') }}
                 </div>
             </div>
         </div>
@@ -130,7 +130,7 @@ export default {
     data() {
         return {
             currentStep: 0,
-            steps: ['Naming', 'Fields', 'Submissions'],
+            steps: [__('Naming'), __('Fields'), __('Submissions')],
             form: {
                 title: null,
                 handle: null,
@@ -157,7 +157,7 @@ export default {
 
     methods: {
         canGoToStep(step) {
-            if (step === 1) {
+            if (step >= 1) {
                 return Boolean(this.form.title && this.form.handle);
             }
 
@@ -168,7 +168,7 @@ export default {
             this.$axios.post(this.route, this.form).then(response => {
                 window.location = response.data.redirect;
             }).catch(error => {
-                this.$notify.error(error.response.data.message);
+                this.$toast.error(error.response.data.message);
             });
         }
     },
@@ -180,11 +180,11 @@ export default {
     },
 
     mounted() {
-        this.$mousetrap.bindGlobal(['command+return'], e => {
+        this.$keys.bindGlobal(['command+return'], e => {
             this.next();
         });
 
-        this.$mousetrap.bindGlobal(['command+delete'], e => {
+        this.$keys.bindGlobal(['command+delete'], e => {
             this.previous();
         });
     }

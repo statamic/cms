@@ -3,11 +3,12 @@
 namespace Statamic\Stache\Stores;
 
 use Statamic\Facades;
-use Statamic\Support\Str;
 use Statamic\Facades\File;
+use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes;
+use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class StructuresStore extends BasicStore
@@ -25,7 +26,7 @@ class StructuresStore extends BasicStore
     {
         // The structures themselves should only exist in the root
         // (ie. no slashes in the filename)
-        $filename = str_after($file->getPathName(), $this->directory);
+        $filename = str_after(Path::tidy($file->getPathName()), $this->directory);
         return substr_count($filename, '/') === 0 && $file->getExtension() === 'yaml';
     }
 

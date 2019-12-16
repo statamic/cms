@@ -26,7 +26,6 @@ class StoreAssetTest extends TestCase
 
         $this->container = (new AssetContainer)
             ->handle('test_container')
-            ->blueprint('test_blueprint')
             ->disk('test')
             ->save();
 
@@ -43,8 +42,10 @@ class StoreAssetTest extends TestCase
             ->submit()
             ->assertOk()
             ->assertJson([
-                'id' => 'test_container::path/to/test.jpg',
-                'path' => 'path/to/test.jpg',
+                'data' => [
+                    'id' => 'test_container::path/to/test.jpg',
+                    'path' => 'path/to/test.jpg',
+                ],
             ]);
 
         Storage::disk('test')->assertExists('path/to/test.jpg');
@@ -108,13 +109,13 @@ class StoreAssetTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp', 'upload test_container assets']]);
 
-        return Facades\User::make()->assignRole('test');
+        return tap(Facades\User::make()->assignRole('test'))->save();
     }
 
     private function userWithoutPermission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
 
-        return Facades\User::make()->assignRole('test');
+        return tap(Facades\User::make()->assignRole('test'))->save();
     }
 }

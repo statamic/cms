@@ -96,7 +96,7 @@ class EntryRepository implements RepositoryContract
         $entry->collection()->taxonomies()->each(function ($taxonomy) use ($entry) {
             $this->stache->store('terms')
                 ->store($taxonomy = $taxonomy->handle())
-                ->sync($entry->id(), $entry->value($taxonomy));
+                ->sync($entry, $entry->value($taxonomy));
         });
     }
 
@@ -112,5 +112,21 @@ class EntryRepository implements RepositoryContract
         if ($entry->collection()->getEntryPosition($entry->id())) {
             $entry->collection()->removeEntryPosition($entry->id())->save();
         }
+    }
+
+    public function createRules($collection, $site)
+    {
+        return [
+            'title' => 'required',
+            'slug' => 'required|unique_entry_value:'.$collection->handle().',null,'.$site->handle(),
+        ];
+    }
+
+    public function updateRules($collection, $entry)
+    {
+        return [
+            'title' => 'required',
+            'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id().','.$entry->locale(),
+        ];
     }
 }

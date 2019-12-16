@@ -18,7 +18,7 @@ export default {
             const url = cp_url(`asset-containers/${this.container.id}/folders/${this.path}/${this.directory}`);
 
             this.$axios.patch(url, { title: this.title }).then(response => {
-                this.$notify.success(__('Folder updated'));
+                this.$toast.success(__('Folder updated'));
                 this.$emit('updated', response.data);
             }).catch(e => {
                 this.handleErrors(e);

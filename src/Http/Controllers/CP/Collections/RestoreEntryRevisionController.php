@@ -22,6 +22,6 @@ class RestoreEntryRevisionController extends CpController
             $entry->makeFromRevision($target)->published(false)->save();
         }
 
-        session()->flash('success', __('Revision Restored'));
+        session()->flash('success', __('Revision restored'));
     }
 }

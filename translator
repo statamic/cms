@@ -1,0 +1,46 @@
+#!/usr/bin/env php
+<?php
+
+require __DIR__.'/vendor/autoload.php';
+
+$files = new Illuminate\Filesystem\Filesystem;
+$discovery = new Statamic\Translator\MethodDiscovery($files, [
+    __DIR__.'/src',
+    __DIR__.'/resources/js',
+    __DIR__.'/resources/views'
+]);
+
+// Translation strings starting with these substrings will be ignored.
+$ignoredSubstrings = [
+    'permissions.',
+    'statamic::permissions.',
+];
+
+// These files will not be generated from method discovery, but they will be
+// copied to the other languages from English.
+$manualFiles = [
+    'permissions',
+    'markdown',
+    'validation',
+];
+
+// Don't translate the following files.
+$dontTranslate = [
+    'markdown',
+];
+
+// Additional strings to be translated that aren't picked up by the scanner.
+// eg. When variables as passed into translation helpers, like nav items.
+$additionalStrings = [
+    'Content',
+    'Groups',
+    'Tools',
+];
+
+$app = new Symfony\Component\Console\Application('Statamic Translator');
+$app->add(new Statamic\Translator\Commands\Stats($discovery, $ignoredSubstrings));
+$app->add(new Statamic\Translator\Commands\Generate($discovery, $files, $manualFiles, $ignoredSubstrings, $additionalStrings));
+$app->add(new Statamic\Translator\Commands\Translate($files, $dontTranslate));
+$app->add(new Statamic\Translator\Commands\Review($files));
+
+$app->run();

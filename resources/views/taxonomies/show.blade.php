@@ -10,7 +10,7 @@
             </small>
             {{ $taxonomy->title() }}
         </h1>
-        <dropdown-list class="mr-2">
+        <dropdown-list class="mr-1">
             <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
             <dropdown-item :text="__('Delete Taxonomy')" class="warning"></dropdown-item>
         </dropdown-list>
@@ -29,7 +29,6 @@
             initial-sort-column="{{ $taxonomy->sortField() }}"
             initial-sort-direction="{{ $taxonomy->sortDirection() }}"
             :filters="{{ $filters->toJson() }}"
-            :actions="{{ $actions->toJson() }}"
             action-url="{{ cp_route('taxonomies.terms.actions', $taxonomy->handle()) }}"
         ></term-list>
 

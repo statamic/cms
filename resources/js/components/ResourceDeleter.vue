@@ -40,7 +40,7 @@ export default {
         },
 
         modalBody() {
-            return __('Are you sure you want to delete this') + ' ' + this.resourceTitle.toLowerCase();
+            return __('Are you sure you want to delete this item?');
         }
     },
 
@@ -55,7 +55,7 @@ export default {
                     this.success();
                 })
                 .catch(() => {
-                    this.$notify.error(__('Something went wrong'));
+                    this.$toast.error(__('Something went wrong'));
                 });
         },
 

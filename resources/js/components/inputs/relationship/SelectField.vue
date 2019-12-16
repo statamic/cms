@@ -8,7 +8,7 @@
             :disabled="readOnly"
             :multiple="multiple"
             :options="options"
-            :placeholder="config.placeholder"
+            :placeholder="config.placeholder || __('Choose...')"
             :searchable="true"
             :taggable="taggable"
             :value="items"

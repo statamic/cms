@@ -2,9 +2,11 @@
 
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
-use Statamic\Facades\Site;
 use Illuminate\Http\Request;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 
 class TermRevisionsController extends CpController
 {
@@ -34,8 +36,10 @@ class TermRevisionsController extends CpController
     {
         $term->createRevision([
             'message' => $request->message,
-            'user' => $request->user(),
+            'user' => User::fromUser($request->user()),
         ]);
+
+        return new TermResource($term);
     }
 
     public function show(Request $request, $taxonomy, $term, $site, $revision)
@@ -51,7 +55,7 @@ class TermRevisionsController extends CpController
             ->addValues($term->data())
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = array_merge($fields->values()->all(), [
             'title' => $term->get('title'),
             'slug' => $term->slug()
         ]);
@@ -62,6 +66,7 @@ class TermRevisionsController extends CpController
             'actions' => [
                 'save' => $term->updateUrl(),
                 'publish' => $term->publishUrl(),
+                'unpublish' => $term->unpublishUrl(),
                 'revisions' => $term->revisionsUrl(),
                 'restore' => $term->restoreRevisionUrl(),
                 'createRevision' => $term->createRevisionUrl(),
@@ -70,7 +75,7 @@ class TermRevisionsController extends CpController
             'meta' => $fields->meta(),
             'taxonomy' => $this->taxonomyToArray($term->taxonomy()),
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => $request->user()->cant('edit', $term),
+            'readOnly' => User::fromUser($request->user())->cant('edit', $term),
             'published' => $term->published(),
             'locale' => $term->locale(),
             'localizations' => $term->taxonomy()->sites()->map(function ($handle) use ($term) {

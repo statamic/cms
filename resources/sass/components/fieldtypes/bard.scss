@@ -11,35 +11,40 @@
 }
 
 .bard-editor .ProseMirror {
-    @apply p-3 min-h-48;
+    @apply p-1 min-h-48;
+}
+
+@screen md {
+    .bard-editor .ProseMirror { @apply p-3; }
 }
 
 .bard-fixed-toolbar {
-    @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between z-5;
+    @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between;
     position: sticky;
     top: 0;
     padding: 4px 8px;
+    z-index: 5;
 
-     button {
+    .bard-toolbar-button {
         @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center;
         height: 32px;
         width: 32px;
         margin: 0 2px;
     }
 
-    button:hover {
+    .bard-toolbar-button:hover {
         @apply bg-grey-20;
     }
 
-    button.active {
+    .bard-toolbar-button.active {
         @apply bg-grey-30 text-black;
     }
 
-    button:focus {
+    .bard-toolbar-button:focus {
         outline: none;
     }
 
-    button:disabled {
+    .bard-toolbar-button:disabled {
         @apply .opacity-50;
         &:hover {
             @apply .text-grey-80;
@@ -143,7 +148,7 @@
     position: absolute;
     left: -20px;
     margin-top: -6px;
-    z-index: 2;
+    z-index: 6;
     // transition: all .15s ease-in-out;
 
     .dropdown-menu {
@@ -347,6 +352,15 @@
         td, th {
             @apply border align-top relative py-sm px-1;
             min-width: 1em;
+        }
+
+        .selectedCell {
+            @apply relative;
+
+            &:after {
+                @apply bg-grey-40 absolute pin pointer-events-none opacity-25;
+                content: '';
+            }
         }
     }
 

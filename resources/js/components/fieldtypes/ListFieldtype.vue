@@ -72,24 +72,29 @@ export default {
             newItem: '',
             editing: null,
             focused: false,
+            mounted: false,
         }
     },
 
-    created() {
-        this.data = this.arrayToSortable(this.value || []);
+    mounted() {
+        this.$nextTick(() => this.mounted = true);
     },
 
     watch: {
         data: {
             deep: true,
-            handler (data) {
+            handler(data) {
+                if (!this.mounted) return;
                 this.update(this.sortableToArray(data));
             }
         },
 
-        value(value) {
-            if (JSON.stringify(value) == JSON.stringify(this.sortableToArray(this.data))) return;
-            this.data = this.arrayToSortable(value);
+        value: {
+            immediate: true,
+            handler(value) {
+                if (JSON.stringify(value) == JSON.stringify(this.sortableToArray(this.data))) return;
+                this.data = this.arrayToSortable(value);
+            }
         },
 
         focused(focused, oldFocused) {

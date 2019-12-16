@@ -48,7 +48,6 @@ class UserGroupsController extends CpController
             'group' => $group,
             'roles' => $group->roles()->map->handle()->values()->all(),
             'filters' => Scope::filters('usergroup-users'),
-            'actions' => Action::for('usergroup-users'),
         ]);
     }
 
@@ -92,7 +91,7 @@ class UserGroupsController extends CpController
             'roles' => 'required|array',
         ]);
 
-        $group = UserGroup::create()
+        $group = UserGroup::make()
             ->title($request->title)
             ->handle($request->handle ?: snake_case($request->title))
             ->roles($request->roles)

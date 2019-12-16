@@ -2,11 +2,12 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\Support\Arr;
 use Statamic\Facades\File;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
-use Statamic\Facades\GlobalSet;
+use Statamic\Support\Arr;
 use Symfony\Component\Finder\SplFileInfo;
 
 class GlobalsStore extends BasicStore
@@ -20,7 +21,7 @@ class GlobalsStore extends BasicStore
     {
         // The global sets themselves should only exist in the root
         // (ie. no slashes in the filename)
-        $filename = str_after($file->getPathName(), $this->directory);
+        $filename = str_after(Path::tidy($file->getPathName()), $this->directory);
         return substr_count($filename, '/') === 0 && $file->getExtension() === 'yaml';
     }
 

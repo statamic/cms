@@ -7,5 +7,13 @@
 <script>
 export default {
     mixins: [Fieldtype],
+
+    computed: {
+
+        replicatorPreview() {
+            return (this.value ? '✓' : '✗') + ' ' + this.config.display;
+        }
+
+    }
 };
 </script>

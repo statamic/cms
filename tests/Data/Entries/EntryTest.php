@@ -2,20 +2,21 @@
 
 namespace Tests\Data\Entries;
 
-use Statamic\Facades;
-use Tests\TestCase;
-use Statamic\Facades\User;
-use Statamic\Sites\Site;
+use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Carbon;
-use Statamic\Fields\Blueprint;
+use Illuminate\Support\Facades\Event;
+use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
 use Statamic\Events\Data\EntrySaved;
-use Illuminate\Support\Facades\Event;
 use Statamic\Events\Data\EntrySaving;
-use Statamic\Entries\Collection;
-use Tests\PreventSavingStacheItemsToDisk;
-use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Exceptions\InvalidLocalizationException;
+use Statamic\Facades;
+use Statamic\Facades\User;
+use Statamic\Fields\Blueprint;
+use Statamic\Sites\Site;
+use Statamic\Support\Arr;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class EntryTest extends TestCase
 {
@@ -70,6 +71,7 @@ class EntryTest extends TestCase
         $this->assertEquals($entry, $return);
         $this->assertTrue($entry->has('foo'));
         $this->assertEquals('bar', $entry->get('foo'));
+        $this->assertEquals('bar', $entry->value('foo'));
         $this->assertEquals('fallback', $entry->get('unknown', 'fallback'));
 
         $return = $entry->remove('foo');
@@ -93,7 +95,8 @@ class EntryTest extends TestCase
     /** @test */
     function it_gets_sets_and_removes_data_values_using_array_access()
     {
-        $entry = new Entry;
+        Collection::make('test')->save();
+        $entry = (new Entry)->collection('test');
         $this->assertNull($entry['foo']);
         $this->assertFalse(isset($entry['foo']));
 
@@ -114,12 +117,12 @@ class EntryTest extends TestCase
     function it_gets_and_sets_all_data()
     {
         $entry = new Entry;
-        $this->assertEquals([], $entry->data());
+        $this->assertEquals([], $entry->data()->all());
 
         $return = $entry->data(['foo' => 'bar']);
 
         $this->assertEquals($entry, $return);
-        $this->assertEquals(['foo' => 'bar'], $entry->data());
+        $this->assertEquals(['foo' => 'bar'], $entry->data()->all());
     }
 
     /** @test */
@@ -142,7 +145,48 @@ class EntryTest extends TestCase
             'bar' => 'merged bar',
             'baz' => 'qux',
             'qux' => 'merged qux',
-        ], $entry->data());
+        ], $entry->data()->all());
+    }
+
+    /** @test */
+    function values_fall_back_to_the_origin_then_the_collection()
+    {
+        $collection = tap(Collection::make('test'))->save();
+        $origin = (new Entry)->collection('test');
+        $entry = (new Entry)->origin($origin)->collection('test');
+
+        $this->assertNull($entry->value('test'));
+
+        $collection->cascade(['test' => 'from collection']);
+        $this->assertEquals('from collection', $entry->value('test'));
+
+        $origin->set('test', 'from origin');
+        $this->assertEquals('from origin', $entry->value('test'));
+    }
+
+    /** @test */
+    function it_gets_values_from_origin_and_collection()
+    {
+        tap(Collection::make('test')->cascade([
+            'one' => 'one in collection',
+            'two' => 'two in collection',
+            'three' => 'three in collection',
+        ]))->save();
+
+        $origin = (new Entry)->collection('test')->data([
+            'two' => 'two in origin',
+            'three' => 'three in origin',
+        ]);
+
+        $entry = (new Entry)->origin($origin)->collection('test')->data([
+            'three' => 'three in entry',
+        ]);
+
+        $this->assertEquals([
+            'one' => 'one in collection',
+            'two' => 'two in origin',
+            'three' => 'three in entry',
+        ], $entry->values()->all());
     }
 
     /** @test */
@@ -186,21 +230,22 @@ class EntryTest extends TestCase
     function it_gets_and_sets_supplemental_data()
     {
         $entry = new Entry;
-        $this->assertEquals([], $entry->supplements());
+        $this->assertEquals([], $entry->supplements()->all());
 
         $return = $entry->setSupplement('foo', 'bar');
 
         $this->assertEquals($entry, $return);
         $this->assertEquals('bar', $entry->getSupplement('foo'));
-        $this->assertEquals(['foo' => 'bar'], $entry->supplements());
+        $this->assertEquals(['foo' => 'bar'], $entry->supplements()->all());
     }
 
     /** @test */
-    function it_converts_to_array()
+    function it_compiles_augmented_array_data()
     {
         $user = tap(User::make()->id('user-1'))->save();
 
         $entry = (new Entry)
+            ->id('test-id')
             ->locale('en')
             ->slug('test')
             ->collection(Collection::make('blog')->save())
@@ -219,8 +264,8 @@ class EntryTest extends TestCase
             'baz' => 'qux',
             'last_modified' => $carbon = Carbon::createFromTimestamp($lastModified),
             'updated_at' => $carbon,
-            'updated_by' => $user->toArray(),
-        ], $entry->toArray());
+            'updated_by' => $user->toAugmentedArray(),
+        ], $entry->augmentedArrayData());
     }
 
     /** @test */
@@ -321,8 +366,8 @@ class EntryTest extends TestCase
         $one->order('3');
         $two->order('2');
 
-        $this->assertEquals([2 => 'two', 3 => 'one'], $collection->getEntryPositions());
-        $this->assertEquals(['two', 'one'], $collection->getEntryOrder());
+        $this->assertEquals([2 => 'two', 3 => 'one'], $collection->getEntryPositions()->all());
+        $this->assertEquals(['two', 'one'], $collection->getEntryOrder()->all());
 
         $this->assertEquals(2, $one->order());
         $this->assertEquals(1, $two->order());
@@ -472,31 +517,26 @@ class EntryTest extends TestCase
                 'content' => 'The content'
             ]);
 
-        $expected = <<<'EOT'
----
-title: 'The title'
-array:
-  - 'first one'
-  - 'second one'
-id: '123'
-published: false
----
-The content
-EOT;
-
-        $this->assertEquals($expected, $entry->fileContents());
+        $this->assertEquals([
+            'title' => 'The title',
+            'array' => [
+                'first one',
+                'second one',
+            ],
+            'id' => '123',
+            'published' => false,
+            'content' => 'The content',
+        ], Arr::removeNullValues($entry->fileData()));
     }
 
     /** @test */
     function it_gets_and_sets_the_template()
     {
-        config(['statamic.theming.views.entry' => 'post']);
-
         $collection = tap(Collection::make('test'))->save();
         $entry = (new Entry)->collection($collection);
 
-        // defaults to the configured
-        $this->assertEquals('post', $entry->template());
+        // defaults to default
+        $this->assertEquals('default', $entry->template());
 
         // collection level overrides the configured
         $collection->template('foo');
@@ -511,13 +551,11 @@ EOT;
     /** @test */
     function it_gets_and_sets_the_layout()
     {
-        config(['statamic.theming.views.layout' => 'default']);
-
         $collection = tap(Collection::make('test'))->save();
         $entry = (new Entry)->collection($collection);
 
-        // defaults to the configured
-        $this->assertEquals('default', $entry->layout());
+        // defaults to layout
+        $this->assertEquals('layout', $entry->layout());
 
         // collection level overrides the configured
         $collection->layout('foo');

@@ -8,9 +8,14 @@ use Statamic\Structures\TreeBuilder;
 
 class Structure extends Tags
 {
-    public function __call($method, $args)
+    public function wildcard($tag)
     {
-        return $this->structure($this->method);
+        return $this->structure($tag);
+    }
+
+    public function index()
+    {
+        return $this->structure($this->get('for'));
     }
 
     protected function structure($handle)
@@ -33,7 +38,11 @@ class Structure extends Tags
                 return null;
             }
 
-            $data = $page->toArray();
+            if (! $this->get('show_unpublished') && $page->entry() && !$page->entry()->published()) {
+                return null;
+            }
+
+            $data = $page->toAugmentedArray();
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data);
 
             return array_merge($data, [

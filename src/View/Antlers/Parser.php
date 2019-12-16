@@ -6,7 +6,7 @@ use Statamic\Support\Arr;
 use ReflectionProperty;
 use Statamic\Facades\Config;
 use Statamic\Facades\Helper;
-use Statamic\View\Modify;
+use Statamic\Modifiers\Modify;
 use Statamic\Fields\Value;
 use Statamic\Query\Builder;
 use Illuminate\Support\Str;
@@ -18,6 +18,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Facade\Ignition\Exceptions\ViewException;
 use Facade\IgnitionContracts\ProvidesSolution;
 use Statamic\Ignition\Value as IgnitionViewValue;
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Facade\Ignition\Exceptions\ViewExceptionWithSolution;
 
 class Parser
@@ -142,6 +143,10 @@ class Parser
     public function parse($text, $data = [])
     {
         $data = $this->normalizeData($data);
+
+        if (! empty($data) && ! Arr::assoc($data)) {
+            throw new \InvalidArgumentException('Expecting an associative array');
+        }
 
         // Save the original text coming in so that we can parse it recursively
         // later on without this needing to be within a callback
@@ -286,8 +291,8 @@ class Parser
             // so it can be parsed over like the other cases, and then we'll pick out the first one after.
             $value = ($associative = Arr::assoc($value)) ? [$value] : $this->addLoopIterationVariables($value);
 
-            $parses = collect($value)->map(function ($iteration) use ($contents) {
-                return $this->parseLoopInstance($contents, $iteration);
+            $parses = collect($value)->map(function ($iteration) use ($contents, $data) {
+                return $this->parseLoopInstance($contents, array_merge($data, $iteration));
             });
 
             // Again, associative arrays just need the single iteration, so we'll grab
@@ -307,8 +312,6 @@ class Parser
         $total = count($loop);
 
         foreach ($loop as $key => &$value) {
-            $index++;
-
             // If the value of the current iteration is *not* already an array (ie. we're
             // dealing with a super basic list like [one, two, three] then convert it
             // to one, where the value is stored in a key named "value".
@@ -317,13 +320,14 @@ class Parser
             }
 
             $value = array_merge($value, [
-                'key'           => $key,
+                'count'         => $index + 1,
                 'index'         => $index,
-                'zero_index'    => $index - 1,
                 'total_results' => $total,
-                'first'         => ($index === 1) ? true : false,
-                'last'          => ($index === $total) ? true : false,
+                'first'         => ($index === 0),
+                'last'          => ($index === $total-1),
             ]);
+
+            $index++;
         }
 
         return $loop;
@@ -1179,16 +1183,16 @@ class Parser
             return [true, Arr::get($context, $key)];
         }
 
-        // If there was no colon, there's nothing more we can check.
-        if (! str_contains($key, ':')) {
+        // If there was no scope glue, there's nothing more we can check.
+        if (! str_contains($key, [':', '.'])) {
             return [false, null];
         }
 
-        // If it didn't exist and the key contained a colon, we'll try again, but this
+        // If it didn't exist and the key contained a scope glue, we'll try again, but this
         // time using the first part of the key as the new context. For example, if
         // we had been given "foo:bar:baz" as the key, we'll try to get the "foo"
         // from the context and get the "bar:baz" from within within its value.
-        list($first, $rest) = explode(':', $key, 2);
+        list($first, $rest) = preg_split("/(\:|\.)/", $key, 2);
 
         if (! Arr::has($context, $first)) {
             // If it's not found in the context, we'll try looking for it in the cascade.
@@ -1211,6 +1215,10 @@ class Parser
 
         if ($context instanceof Value) {
             $context = $context->value();
+        }
+
+        if ($context instanceof Augmentable) {
+            $context = $context->toAugmentedArray();
         }
 
         // It will do this recursively until it's out of colon delimiters or values.
@@ -1386,6 +1394,11 @@ class Parser
     protected function viewException($e, $data)
     {
         if (! class_exists(ViewException::class)) {
+            return $e;
+        }
+
+        // Redirects etc should work instead of actually generating an exception.
+        if ($e instanceof HttpResponseException) {
             return $e;
         }
 

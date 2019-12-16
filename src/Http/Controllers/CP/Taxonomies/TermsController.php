@@ -13,17 +13,20 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
-use Statamic\Fields\Validation;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Events\Data\PublishBlueprintFound;
-use Statamic\Http\Requests\FilteredSiteRequest;
+use Statamic\Http\Requests\FilteredRequest;
+use Statamic\Http\Resources\CP\Taxonomies\Terms;
+use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 
 class TermsController extends CpController
 {
-    public function index(FilteredSiteRequest $request, $taxonomy)
+    public function index(FilteredRequest $request, $taxonomy)
     {
+        $this->authorize('view', $taxonomy);
+
         $query = $this->indexQuery($taxonomy);
 
         $this->filter($query, $request->filters);
@@ -40,27 +43,19 @@ class TermsController extends CpController
             $query->orderBy($sortField, $sortDirection);
         }
 
-        $paginator = $query->paginate(request('perPage'));
+        $terms = $query->paginate(request('perPage'));
 
-        $paginator->supplement(function ($term) {
-            return [
-                'viewable' => User::current()->can('view', $term),
-                'editable' => User::current()->can('edit', $term),
-                'actions' => Action::for('terms', [], $term),
-            ];
-        })->preProcessForIndex();
+        $terms->setCollection(
+            $terms->getCollection()->map->in(Site::selected()->handle())
+        );
 
-        $columns = $taxonomy->termBlueprint()
-            ->columns()
-            ->setPreferred("taxonomies.{$taxonomy->handle()}.columns")
-            ->rejectUnlisted()
-            ->values();
-
-        return Resource::collection($paginator)->additional(['meta' => [
-            'filters' => $request->filters,
-            'sortColumn' => $sortField,
-            'columns' => $columns,
-        ]]);
+        return (new Terms($terms))
+            ->blueprint($taxonomy->termBlueprint())
+            ->columnPreferenceKey("taxonomies.{$taxonomy->handle()}.columns")
+            ->additional(['meta' => [
+                'filters' => $request->filters,
+                'sortColumn' => $sortField,
+            ]]);
     }
 
     protected function filter($query, $filters)
@@ -110,6 +105,7 @@ class TermsController extends CpController
             'actions' => [
                 'save' => $term->updateUrl(),
                 'publish' => $term->publishUrl(),
+                'unpublish' => $term->unpublishUrl(),
                 'revisions' => $term->revisionsUrl(),
                 'restore' => $term->restoreRevisionUrl(),
                 'createRevision' => $term->createRevisionUrl(),
@@ -118,10 +114,10 @@ class TermsController extends CpController
             'meta' => $meta,
             'taxonomy' => $this->taxonomyToArray($taxonomy),
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => $request->user()->cant('edit', $term),
+            'readOnly' => User::fromUser($request->user())->cant('edit', $term),
             'published' => $term->published(),
             'locale' => $term->locale(),
-            'localizedFields' => array_keys($term->data()),
+            'localizedFields' => $term->data()->keys()->all(),
             'isRoot' => $term->isRoot(),
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
@@ -129,16 +125,16 @@ class TermsController extends CpController
             'permalink' => $term->absoluteUrl(),
             'localizations' => $taxonomy->sites()->map(function ($handle) use ($term) {
                 $localized = $term->in($handle);
-                $exists = $localized !== null;
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
                     'active' => $handle === $term->locale(),
-                    'exists' => $exists,
-                    'root' => $exists ? $localized->isRoot() : false,
-                    'origin' => $exists ? $localized->id() === optional($term->origin())->id() : null,
-                    'published' => $exists ? $localized->published() : false,
-                    'url' => $exists ? $localized->editUrl() : null,
+                    'exists' => true,
+                    'root' => $localized->isRoot(),
+                    'origin' => $localized->isRoot(),
+                    'published' => $localized->published(),
+                    'url' => $localized->editUrl(),
+                    'livePreviewUrl' => $localized->livePreviewUrl(),
                 ];
             })->all(),
             'hasWorkingCopy' => $term->hasWorkingCopy(),
@@ -161,35 +157,33 @@ class TermsController extends CpController
 
     public function update(Request $request, $taxonomy, $term, $site)
     {
-        $term = $term->in($site);
+        $term = $term->in($site->handle());
 
         $this->authorize('update', $term);
 
         $term = $term->fromWorkingCopy();
 
-        $fields = $term->blueprint()->fields()->addValues($request->except('id'))->process();
+        $fields = $term->blueprint()->fields()->addValues($request->except('id'));
 
-        $validation = (new Validation)->fields($fields)->withRules([
+        $fields->validate([
             'title' => 'required',
             'slug' => 'required|alpha_dash',
         ]);
 
-        $request->validate($validation->rules());
-
-        $values = array_except($fields->values(), ['slug', 'date']);
+        $values = $fields->process()->values()->except(['slug', 'date']);
 
         if ($term->hasOrigin()) {
-            $values = array_only($values, $request->input('_localized'));
+            $term->data($values->only($request->input('_localized')));
+        } else {
+            $term->merge($values);
         }
 
-        $term
-            ->merge($values)
-            ->slug($request->slug);
+        $term->slug($request->slug);
 
         if ($term->revisionsEnabled() && $term->published()) {
             $term
                 ->makeWorkingCopy()
-                ->user($request->user())
+                ->user(User::fromUser($request->user()))
                 ->save();
         } else {
             if (! $term->revisionsEnabled()) {
@@ -197,12 +191,12 @@ class TermsController extends CpController
             }
 
             $term
-                ->set('updated_by', $request->user()->id())
+                ->set('updated_by', User::fromUser($request->user())->id())
                 ->set('updated_at', now()->timestamp)
                 ->save();
         }
 
-        return $term->toArray();
+        return new TermResource($term);
     }
 
     public function create(Request $request, $taxonomy, $site)
@@ -221,9 +215,10 @@ class TermsController extends CpController
             ->fields()
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = $fields->values()->merge([
             'title' => null,
-            'slug' => null
+            'slug' => null,
+            'published' => $taxonomy->defaultPublishState()
         ]);
 
         $viewData = [
@@ -235,7 +230,7 @@ class TermsController extends CpController
             'meta' => $fields->meta(),
             'taxonomy' => $this->taxonomyToArray($taxonomy),
             'blueprint' => $blueprint->toPublishArray(),
-            'published' => $taxonomy->defaultStatus() === 'published',
+            'published' => $taxonomy->defaultPublishState(),
             'localizations' => $taxonomy->sites()->map(function ($handle) use ($taxonomy, $site) {
                 return [
                     'handle' => $handle,
@@ -244,6 +239,7 @@ class TermsController extends CpController
                     'exists' => false,
                     'published' => false,
                     'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $handle]),
+                    'livePreviewUrl' => cp_route('taxonomies.terms.preview.create', [$taxonomy->handle(), $handle]),
                 ];
             })->all()
         ];
@@ -263,40 +259,38 @@ class TermsController extends CpController
             Blueprint::find($request->blueprint)
         );
 
-        $fields = $blueprint->fields()->addValues($request->all())->process();
+        $fields = $blueprint->fields()->addValues($request->all());
 
-        $validation = (new Validation)->fields($fields)->withRules([
+        $fields->validate([
             'title' => 'required',
             'slug' => 'required',
         ]);
 
-        $request->validate($validation->rules());
-
-        $values = array_except($fields->values(), ['slug', 'blueprint']);
+        $values = $fields->process()->values()->except(['slug', 'blueprint']);
 
         $term = Term::make()
             ->taxonomy($taxonomy)
             ->blueprint($request->blueprint)
-            ->locale($site->handle())
-            ->published($request->get('published'))
+            ->in($site->handle());
+
+        $term
             ->slug($request->slug)
+            ->published($request->get('published')) // TODO
             ->data($values);
 
         if ($term->revisionsEnabled()) {
             $term->store([
                 'message' => $request->message,
-                'user' => $request->user(),
+                'user' => User::fromUser($request->user()),
             ]);
         } else {
             $term
-                ->set('updated_by', $request->user()->id())
+                ->set('updated_by', User::fromUser($request->user())->id())
                 ->set('updated_at', now()->timestamp)
                 ->save();
         }
 
-        return array_merge($term->toArray(), [
-            'redirect' => $term->editUrl(),
-        ]);
+        return ['data' => ['redirect' => $term->editUrl()]];
     }
 
     // TODO: Change to $taxonomy->toArray()
@@ -312,15 +306,15 @@ class TermsController extends CpController
     {
         $fields = $blueprint
             ->fields()
-            ->addValues($term->values())
+            ->addValues($term->values()->all())
             ->preProcess();
 
-        $values = array_merge($fields->values(), [
+        $values = $fields->values()->merge([
             'title' => $term->value('title'),
             'slug' => $term->slug()
         ]);
 
-        return [$values, $fields->meta()];
+        return [$values->all(), $fields->meta()];
     }
 
     protected function extractAssetsFromValues($values)
