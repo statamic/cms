@@ -363,6 +363,27 @@ class FrontendTest extends TestCase
         // the 'response_code' key var is 404
     }
 
+    /** @test */
+    function it_sets_the_translation_locale_based_on_site()
+    {
+        app('translator')->addNamespace('test', __DIR__.'/__fixtures__/lang');
+
+        Site::setConfig(['sites' => [
+            'english' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'french' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+        ]]);
+
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', '<p>{{ trans key="test::messages.hello" }}</p>');
+
+        $this->makeCollection()->save();
+        tap($this->makePage('about', ['with' => ['template' => 'some_template']])->locale('english'))->save();
+        tap($this->makePage('le-about', ['with' => ['template' => 'some_template']])->locale('french'))->save();
+
+        $this->get('/about')->assertSee('Hello');
+        $this->get('/fr/le-about')->assertSee('Bonjour');
+    }
+
     private function createPage($slug, $attributes = [])
     {
         $this->makeCollection()->save();

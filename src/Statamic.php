@@ -9,7 +9,8 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\Authorize;
-use Statamic\Http\Middleware\CP\Localize;
+use Statamic\Http\Middleware\Localize as LocalizeFrontend;
+use Statamic\Http\Middleware\CP\Localize as LocalizeCp;
 use Statamic\StaticCaching\Middleware\Cache;
 use Stringy\StaticStringy;
 
@@ -26,11 +27,12 @@ class Statamic
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
     protected static $webMiddleware = [
-        Cache::class
+        LocalizeFrontend::class,
+        Cache::class,
     ];
     protected static $cpMiddleware = [
         Authorize::class,
-        Localize::class,
+        LocalizeCp::class,
     ];
 
     public static function version()
