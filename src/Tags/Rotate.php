@@ -4,11 +4,11 @@ namespace Statamic\Tags;
 
 use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
-use Statamic\Facades\Helper;
 
 class Rotate extends Tags
 {
     protected static $aliases = ['switch'];
+    protected static $counts = [];
 
     /**
      * The {{ rotate }} tag
@@ -23,26 +23,25 @@ class Rotate extends Tags
         }
 
         // Expanded mode lets you set the number of times a value is repeated
-        $expanded_mode = strstr($between, ':');
+        $expanded = strstr($between, ':');
 
         // Create a unique hash based on the parameters to provide users
         // a method of using multiple switch tags in a single template.
-        $hash = md5(implode(',', $this->parameters));
+        $hash = md5(implode(',', $this->parameters->all()));
 
-        if (! $this->blink->exists($hash)) {
-            // Instance counter
-            $this->blink->put($hash, 0);
+        if (! isset(static::$counts[$hash])) {
+            static::$counts[$hash] = 0;
         }
 
-        $switch_vars = Arr::explodeOptions($between);
+        $vars = Arr::explodeOptions($between);
 
-        if ($expanded_mode) {
-            $switch_vars = $this->expand($switch_vars);
+        if ($expanded) {
+            $vars = $this->expand($vars);
         }
 
-        $switch = $switch_vars[($this->blink->get($hash)) % count($switch_vars)];
+        $switch = $vars[static::$counts[$hash] % count($vars)];
 
-        $this->blink->increment($hash);
+        static::$counts[$hash]++;
 
         return $switch;
     }
@@ -56,17 +55,17 @@ class Rotate extends Tags
      */
     private function expand($values)
     {
-        $switch_vars = [];
+        $vars = [];
 
-        foreach ($values as $key => $value) {
-            $repeating_values = explode(':', $value);
-            $repeat_count = array_get($repeating_values, 1, 1);
+        foreach ($values as $value) {
+            $repeatingValues = explode(':', $value);
+            $count = Arr::get($repeatingValues, 1, 1);
 
-            for ($i = 1; $i <= $repeat_count; $i++) {
-                $switch_vars[] = $repeating_values[0];
+            for ($i = 1; $i <= $count; $i++) {
+                $vars[] = $repeatingValues[0];
             }
         }
 
-        return $switch_vars;
+        return $vars;
     }
 }
