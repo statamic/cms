@@ -23,6 +23,11 @@ class CollectionEntriesController extends CpController
         return EntryResource::collection($paginator);
     }
 
+    public function show($collection, $entry)
+    {
+        return new EntryResource($entry);
+    }
+
     /**
      * Filters a query based on conditions in the filter parameter.
      *
