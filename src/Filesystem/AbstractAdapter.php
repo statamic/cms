@@ -108,7 +108,13 @@ abstract class AbstractAdapter implements Filesystem
 
     public function makeDirectory($path)
     {
-        return $this->filesystem->makeDirectory($this->normalizePath($path), 0755, true, true);
+        $path = $this->normalizePath($path);
+
+        if ($path === '/') {
+            return true;
+        }
+
+        return $this->filesystem->makeDirectory($path, 0755, true, true);
     }
 
     public function getFilesRecursively($path)
