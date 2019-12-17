@@ -27,13 +27,8 @@ class Resource
     public static function map($resources)
     {
         collect($resources)
-            ->filter(function ($class, $bindable) {
-                return in_array($bindable, static::STATAMIC_RESOURCES);
-            })
-            ->each(function ($class) {
-                if (! is_subclass_of($class, JsonResource::class)) {
-                    throw new JsonResourceException("[{$class}] must be a subclass of " . JsonResource::class);
-                }
+            ->each(function ($class, $bindable) {
+                static::validateBinding($bindable, $class);
             })
             ->each(function ($class, $bindable) {
                 app()->bind($bindable, function () use ($class) {
@@ -57,5 +52,23 @@ class Resource
             ->all();
 
         static::map($resources);
+    }
+
+    /**
+     * Validate binding.
+     *
+     * @param string $bindable
+     * @param string $class
+     * @throws JsonResourceException
+     */
+    protected static function validateBinding($bindable, $class)
+    {
+        if (! in_array($bindable, static::STATAMIC_RESOURCES)) {
+            throw new JsonResourceException("[{$bindable}] is not a valid Statamic API resource");
+        }
+
+        if (! is_subclass_of($class, JsonResource::class)) {
+            throw new JsonResourceException("[{$class}] must be a subclass of " . JsonResource::class);
+        }
     }
 }
