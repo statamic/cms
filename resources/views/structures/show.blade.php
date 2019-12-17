@@ -17,6 +17,7 @@
         :max-depth="{{ $structure->maxDepth() ?? 'Infinity' }}"
         :expects-root="{{ $str::bool($expectsRoot) }}"
         :has-collection="{{ $str::bool($hasCollection) }}"
+        :collection-blueprints="{{ $collectionBlueprints->toJson() }}"
     >
         <template slot="header">
             <h1 class="flex-1">

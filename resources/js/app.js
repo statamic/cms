@@ -108,7 +108,6 @@ Statamic.app({
         LoginModal: require('./components/login/LoginModal.vue').default,
         BaseEntryCreateForm: require('./components/entries/BaseCreateForm.vue').default,
         BaseTermCreateForm: require('./components/terms/BaseCreateForm.vue').default,
-        CreateEntryButton: require('./components/entries/CreateEntryButton.vue').default,
         CreateTermButton: require('./components/terms/CreateTermButton.vue').default,
         Importer: require('./components/importer/importer'),
         FieldsetListing: require('./components/fieldsets/Listing.vue').default,
