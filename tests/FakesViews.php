@@ -90,7 +90,7 @@ class FakeViewEngine extends \Statamic\View\Antlers\Engine
 
     public function exists($path)
     {
-        return isset($this->rawContents[$path]);
+        return app('view.finder')->exists($path);
     }
 }
 
@@ -105,5 +105,10 @@ class FakeViewFinder extends \Illuminate\View\FileViewFinder
         }
 
         return parent::find($view);
+    }
+
+    public function exists($path)
+    {
+        return isset($this->views[$path]);
     }
 }
