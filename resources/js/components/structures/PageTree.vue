@@ -87,6 +87,7 @@
                     :depth="vm.level"
                     :vm="vm"
                     :first-page-is-root="expectsRoot"
+                    :hasCollection="hasCollection"
                     @edit="editPage(page, vm)"
                     @updated="pageUpdated(tree)"
                     @removed="pageRemoved"
