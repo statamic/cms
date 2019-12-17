@@ -50,6 +50,13 @@ trait FilesystemAdapterTests
     }
 
     /** @test */
+    function puts_content_into_a_file_in_a_subdirectory()
+    {
+        $this->adapter->put('subdir/filename.txt', 'Hello World');
+        $this->assertStringEqualsFile($this->tempDir.'/subdir/filename.txt', 'Hello World');
+    }
+
+    /** @test */
     function deletes_files()
     {
         file_put_contents($this->tempDir.'/filename.txt', 'Hello World');
