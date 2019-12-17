@@ -15,6 +15,6 @@ class AssetsController extends CpController
     {
         $assets = static::paginate(Asset::all());
 
-        return AssetResource::collection($assets);
+        return app(AssetResource::class)::collection($assets);
     }
 }

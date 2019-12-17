@@ -15,6 +15,6 @@ class TaxonomyTermsController extends CpController
     {
         $terms = static::paginate(collect());
 
-        return TermResource::collection($terms);
+        return app(TermResource::class)::collection($terms);
     }
 }

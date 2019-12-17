@@ -20,12 +20,12 @@ class CollectionEntriesController extends CpController
         $this->sort($query, $request);
         $paginator = $this->paginate($query, $request);
 
-        return EntryResource::collection($paginator);
+        return app(EntryResource::class)::collection($paginator);
     }
 
     public function show($collection, $entry)
     {
-        return new EntryResource($entry);
+        return app(EntryResource::class)::make($entry);
     }
 
     /**

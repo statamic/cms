@@ -15,6 +15,6 @@ class UsersController extends CpController
     {
         $users = static::paginate(User::all()->values());
 
-        return UserResource::collection($users);
+        return app(UserResource::class)::collection($users);
     }
 }
