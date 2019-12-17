@@ -3,7 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use Statamic\Http\Resources\Resource;
+use Statamic\Http\Resources\API\Resource;
 
 class ApiServiceProvider extends ServiceProvider
 {

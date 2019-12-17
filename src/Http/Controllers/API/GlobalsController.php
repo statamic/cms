@@ -2,10 +2,9 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Statamic\Facades\Form;
 use Illuminate\Http\Request;
+use Statamic\Facades\Form;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Http\Resources\CollectionResource;
 
 class GlobalsController extends CpController
 {

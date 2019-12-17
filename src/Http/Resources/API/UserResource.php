@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\Resources;
+namespace Statamic\Http\Resources\API;
 
 use Illuminate\Http\Resources\Json\Resource;
 

@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Statamic\Support\Str;
 use Illuminate\Http\Request;
-use Statamic\Tags\Query\HasConditions;
-use Statamic\Http\Resources\EntryResource;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\API\EntryResource;
+use Statamic\Support\Str;
+use Statamic\Tags\Query\HasConditions;
 
 class CollectionEntriesController extends CpController
 {

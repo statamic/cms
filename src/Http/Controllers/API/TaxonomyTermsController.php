@@ -2,10 +2,10 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Statamic\Facades\Term;
 use Illuminate\Http\Request;
-use Statamic\Http\Resources\TermResource;
+use Statamic\Facades\Term;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\API\TermResource;
 
 class TaxonomyTermsController extends CpController
 {

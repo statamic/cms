@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Http\Resources;
+namespace Statamic\Http\Resources\API;
 
 use Illuminate\Http\Resources\Json\Resource;
 
-class TermResource extends Resource
+class AssetResource extends Resource
 {
     /**
      * Transform the resource into an array.
@@ -15,7 +15,7 @@ class TermResource extends Resource
     public function toArray($request)
     {
         return [
-            //
+            'id' => $this->resource->id(),
         ];
     }
 }
