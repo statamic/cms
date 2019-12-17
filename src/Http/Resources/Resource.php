@@ -2,6 +2,9 @@
 
 namespace Statamic\Http\Resources;
 
+use Illuminate\Http\Resources\Json\JsonResource;
+use Statamic\Exceptions\JsonResourceException;
+
 class Resource
 {
     /**
@@ -26,6 +29,11 @@ class Resource
         collect($resources)
             ->filter(function ($class, $bindable) {
                 return in_array($bindable, static::STATAMIC_RESOURCES);
+            })
+            ->each(function ($class) {
+                if (! is_subclass_of($class, JsonResource::class)) {
+                    throw new JsonResourceException("[{$class}] must be a subclass of " . JsonResource::class);
+                }
             })
             ->each(function ($class, $bindable) {
                 app()->bind($bindable, function () use ($class) {
