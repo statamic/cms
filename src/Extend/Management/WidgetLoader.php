@@ -2,14 +2,14 @@
 
 namespace Statamic\Extend\Management;
 
-use Statamic\Exceptions\ResourceNotFoundException;
+use Statamic\Widgets\WidgetNotFoundException;
 
 class WidgetLoader
 {
     public function load($name, $config)
     {
         if (! ($widgets = app('statamic.widgets'))->has($name)) {
-            throw new ResourceNotFoundException("Could not find files to load the `{$name}` widget.");
+            throw new WidgetNotFoundException($name);
         }
 
         return $this->init($widgets->get($name), $config);
