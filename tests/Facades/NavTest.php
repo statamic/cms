@@ -62,7 +62,6 @@ class NavTest extends TestCase
         $this->assertEquals('Utilities', $item->section());
         $this->assertEquals('Wordpress Importer', $item->name());
         $this->assertEquals(config('app.url').'/wordpress-importer', $item->url());
-        $this->assertEquals(config('app.url').'/wordpress-importer(/(.*)?|$)', $item->active());
         $this->assertEquals('up-arrow', $item->icon());
         $this->assertEquals('view updates', $item->authorization()->ability);
         $this->assertEquals('view updates', $item->can()->ability);
@@ -81,7 +80,7 @@ class NavTest extends TestCase
 
         $this->assertEquals('Droids', $item->section());
         $this->assertEquals('R2-D2', $item->name());
-        $this->assertEquals('/r2', $item->url());
+        $this->assertEquals('http://localhost/r2', $item->url());
     }
 
     /** @test */
@@ -99,7 +98,7 @@ class NavTest extends TestCase
 
         $this->assertEquals('Droids', $item->section());
         $this->assertEquals('C-3PO', $item->name());
-        $this->assertEquals('/human-cyborg-relations', $item->url());
+        $this->assertEquals('http://localhost/human-cyborg-relations', $item->url());
         $this->assertEquals('cp.nav.importer', $item->view());
         $this->assertEquals('threepio*', $item->active());
         $this->assertEquals('index', $item->authorization()->ability);
@@ -123,7 +122,7 @@ class NavTest extends TestCase
         $this->assertEquals('Droids', $item->section());
         $this->assertEquals('WAC-47', $item->name());
         $this->assertEquals('droid', $item->icon());
-        $this->assertEquals('/d-squad', $item->url());
+        $this->assertEquals('http://localhost/d-squad', $item->url());
     }
 
     /** @test */
@@ -319,5 +318,32 @@ class NavTest extends TestCase
         Request::swap(Request::create('http://localhost/cp/hello/test'));
         $this->assertTrue($hello->isActive());
         $this->assertFalse($hell->isActive());
+    }
+
+    /** @test */
+    function it_sets_the_url()
+    {
+        tap(Nav::create('absolute')->url('http://domain.com'), function ($nav) {
+            $this->assertEquals('http://domain.com', $nav->url());
+            $this->assertNull($nav->active());
+        });
+
+        tap(Nav::create('site-relative')->url('/foo/bar'), function ($nav) {
+            $this->assertEquals('http://localhost/foo/bar', $nav->url());
+            $this->assertNull($nav->active());
+        });
+
+        tap(Nav::create('cp-relative')->url('foo/bar'), function ($nav) {
+            $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
+            $this->assertEquals('foo/bar(/(.*)?|$)', $nav->active());
+        });
+    }
+
+    /** @test */
+    function it_does_not_automatically_add_an_active_pattern_when_setting_url_if_one_is_already_defined()
+    {
+        $nav = Nav::create('cp-relative')->active('foo.*')->url('foo/bar');
+        $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());
+        $this->assertEquals('foo.*', $nav->active());
     }
 }
