@@ -3,18 +3,18 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Statamic\Facades\User;
+use Statamic\Widgets\Loader;
 use Statamic\Facades\Preference;
-use Statamic\Extend\Management\WidgetLoader;
 
 class DashboardController extends CpController
 {
     /**
      * View for the CP dashboard
      *
-     * @param WidgetLoader $loader
+     * @param Loader $loader
      * @return mixed
      */
-    public function index(WidgetLoader $loader)
+    public function index(Loader $loader)
     {
         return view('statamic::dashboard', [
             'widgets' => $this->getDisplayableWidgets($loader)
@@ -24,7 +24,7 @@ class DashboardController extends CpController
     /**
      * Get displayable widgets.
      *
-     * @param WidgetLoader $loader
+     * @param Loader $loader
      * @return \Illuminate\Support\Collection
      */
     private function getDisplayableWidgets($loader)

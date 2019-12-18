@@ -4,8 +4,8 @@ namespace Statamic\Modifiers;
 
 use ArrayIterator;
 use Exception;
-use Statamic\Extend\Management\ModifierLoader;
 use Statamic\Facades\Helper;
+use Statamic\Modifiers\Loader;
 use Statamic\Modifiers\ModifierException;
 use Statamic\Modifiers\ModifierNotFoundException;
 use Statamic\Support\Arr;
@@ -24,11 +24,11 @@ class Modify implements \IteratorAggregate
     protected $context = [];
 
     /**
-     * @var \Statamic\Extend\Management\ModifierLoader
+     * @var Loader
      */
     private $loader;
 
-    public function __construct(ModifierLoader $loader)
+    public function __construct(Loader $loader)
     {
         $this->loader = $loader;
     }

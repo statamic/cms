@@ -12,7 +12,7 @@ use Facades\Statamic\View\Cascade;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Tags\TagNotFoundException;
 use Statamic\Contracts\Data\Augmentable;
-use Statamic\Extend\Management\TagLoader;
+use Statamic\Tags\Loader as TagLoader;
 use Illuminate\Contracts\View\Engine as EngineInterface;
 
 class Engine implements EngineInterface

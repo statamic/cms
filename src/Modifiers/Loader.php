@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Extend\Management;
+namespace Statamic\Modifiers;
 
 use Statamic\Support\Str;
 use Statamic\Modifiers\ModifierNotFoundException;
 
-class ModifierLoader
+class Loader
 {
     /**
      * Loads a modifier.

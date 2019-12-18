@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Extend\Management;
+namespace Statamic\Tags;
 
 use Statamic\Tags\TagNotFoundException;
 
-class TagLoader
+class Loader
 {
     public function load($name, $properties)
     {

@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Extend\Management;
+namespace Statamic\Widgets;
 
 use Statamic\Widgets\WidgetNotFoundException;
 
-class WidgetLoader
+class Loader
 {
     public function load($name, $config)
     {
