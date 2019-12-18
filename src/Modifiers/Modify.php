@@ -2,13 +2,14 @@
 
 namespace Statamic\Modifiers;
 
-use Exception;
 use ArrayIterator;
-use Statamic\Support\Arr;
-use Statamic\Support\Str;
+use Exception;
+use Statamic\Extend\Management\ModifierLoader;
 use Statamic\Facades\Helper;
 use Statamic\Modifiers\ModifierException;
-use Statamic\Extend\Management\ModifierLoader;
+use Statamic\Modifiers\ModifierNotFoundException;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Modify implements \IteratorAggregate
 {
@@ -158,6 +159,11 @@ class Modify implements \IteratorAggregate
             // been a ModifierException, so we'll just rethrow it since
             // we'll be catching it on the view side of things.
             $e->setModifier($modifier);
+            throw $e;
+
+        } catch (ModifierNotFoundException $e) {
+            // Modifiers that don't exist shouldn't fail silently.
+            // This exception will have a nice Ignition solution.
             throw $e;
 
         } catch (Exception $e) {

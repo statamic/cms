@@ -13,7 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
-use Statamic\Exceptions\ModifierException;
+use Statamic\Modifiers\ModifierException;
 use Illuminate\Contracts\Support\Arrayable;
 use Facade\Ignition\Exceptions\ViewException;
 use Facade\IgnitionContracts\ProvidesSolution;
@@ -1368,10 +1368,8 @@ class Parser
         try {
             return Modify::value($value)->context($context)->$modifier($parameters)->fetch();
         } catch (ModifierException $e) {
-            Log::notice(
-                sprintf('Error in [%s] modifier: %s', $e->getModifier(), $e->getMessage())
-            );
-
+            throw_if(config('app.debug'), $e);
+            Log::notice(sprintf('Error in [%s] modifier: %s', $e->getModifier(), $e->getMessage()));
             return $value;
         }
     }
