@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Extend\Management;
+namespace Statamic\Extend;
 
 use Facades\Statamic\Extend\Marketplace;
 use Illuminate\Filesystem\Filesystem;

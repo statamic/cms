@@ -12,7 +12,7 @@ use Statamic\Modifiers\CoreModifiers;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
-use Statamic\Extend\Management\Manifest;
+use Statamic\Extend\Manifest;
 use Illuminate\Console\DetectsApplicationNamespace;
 
 class ExtensionServiceProvider extends ServiceProvider

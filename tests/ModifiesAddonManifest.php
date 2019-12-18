@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Statamic\Extend\Management\Manifest;
+use Statamic\Extend\Manifest;
 
 trait ModifiesAddonManifest
 {
