@@ -187,23 +187,4 @@ class Modify implements \IteratorAggregate
 
         return $class->$method($this->value, $params, $this->context);
     }
-
-    /**
-     * Modify using third party addons
-     *
-     * @param string $modifier
-     * @param array  $params
-     * @return mixed
-     * @throws \Exception
-     */
-    protected function modifyThirdParty($modifier, $params)
-    {
-        $class = $this->loader->load($modifier);
-
-        if (! method_exists($class, 'index')) {
-            throw new Exception("Modifier [$modifier] is missing index method.");
-        }
-
-        return $class->index($this->value, $params, $this->context);
-    }
 }
