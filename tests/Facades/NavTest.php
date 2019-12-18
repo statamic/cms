@@ -7,6 +7,7 @@ use Statamic\Facades\Nav;
 use Tests\FakesRoles;
 use Statamic\Facades\User;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Request;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class NavTest extends TestCase
@@ -61,7 +62,7 @@ class NavTest extends TestCase
         $this->assertEquals('Utilities', $item->section());
         $this->assertEquals('Wordpress Importer', $item->name());
         $this->assertEquals(config('app.url').'/wordpress-importer', $item->url());
-        $this->assertEquals(config('app.url').'/wordpress-importer*', $item->active());
+        $this->assertEquals(config('app.url').'/wordpress-importer(/(.*)?|$)', $item->active());
         $this->assertEquals('up-arrow', $item->icon());
         $this->assertEquals('view updates', $item->authorization()->ability);
         $this->assertEquals('view updates', $item->can()->ability);
@@ -295,5 +296,28 @@ class NavTest extends TestCase
         });
 
         $this->assertNotContains('Collections', Nav::build()->get('Content')->map->name());
+    }
+
+    /** @test */
+    function it_checks_if_active()
+    {
+        $hello = Nav::create('hello')->url('http://localhost/cp/hello');
+        $hell = Nav::create('hell')->url('http://localhost/cp/hell');
+
+        Request::swap(Request::create('http://localhost/cp/hell'));
+        $this->assertFalse($hello->isActive());
+        $this->assertTrue($hell->isActive());
+
+        Request::swap(Request::create('http://localhost/cp/hello'));
+        $this->assertTrue($hello->isActive());
+        $this->assertFalse($hell->isActive());
+
+        Request::swap(Request::create('http://localhost/cp/hell/test'));
+        $this->assertFalse($hello->isActive());
+        $this->assertTrue($hell->isActive());
+
+        Request::swap(Request::create('http://localhost/cp/hello/test'));
+        $this->assertTrue($hello->isActive());
+        $this->assertFalse($hell->isActive());
     }
 }

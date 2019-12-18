@@ -66,7 +66,7 @@ class NavItem
             ->fluentlyGetOrSet('url')
             ->afterSetter(function ($url) {
                 if (! $this->active) {
-                    $this->active = str_replace(url('cp').'/', '', $url) . '*';
+                    $this->active = str_replace(url('cp').'/', '', $url) . '(/(.*)?|$)';
                 }
             })
             ->value($url);
@@ -166,7 +166,9 @@ class NavItem
      */
     public function isActive()
     {
-        return request()->is(config('statamic.cp.route') . '/' . $this->active);
+        $pattern = preg_quote(config('statamic.cp.route'), '#') . '/' . $this->active;
+
+        return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;
     }
 
     /**
