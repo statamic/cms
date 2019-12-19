@@ -3,9 +3,9 @@
     <dropdown-list class="inline-block" :show-dropdown-if="blueprints.length > 1">
         <template v-slot:trigger>
             <button
-                class="btn btn-primary"
+                :class="buttonClass"
                 @click="create"
-                v-text="__('Create Entry')" />
+                v-text="text" />
         </template>
 
         <div v-for="blueprint in blueprints" :key="blueprint.handle">
@@ -20,7 +20,9 @@ export default {
 
     props: {
         url: String,
-        blueprints: Array
+        blueprints: Array,
+        text: { type: String, default: () => __('Create Entry') },
+        buttonClass: { type: String, default: 'btn' }
     },
 
     methods: {

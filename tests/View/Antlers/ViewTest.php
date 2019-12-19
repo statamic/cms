@@ -41,6 +41,20 @@ class ViewTest extends TestCase
     }
 
     /** @test */
+    function a_layout_can_be_in_the_layouts_directory()
+    {
+        $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template.antlers.html'));
+        $this->viewShouldReturnRaw('layouts.test', file_get_contents(__DIR__.'/fixtures/layout.antlers.html'));
+
+        $view = (new View)
+            ->template('template')
+            ->layout('test')
+            ->with(['foo' => 'bar']);
+
+        $this->assertEquals('Layout: bar | Template: bar', $view->render());
+    }
+
+    /** @test */
     function template_is_rendered_alone_if_no_layout_is_provided()
     {
         $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template.antlers.html'));

@@ -29,7 +29,7 @@
                 <dropdown-list class="ml-2">
                     <dropdown-item :text="__('Add child link to URL')" @click="$emit('link-page')" />
                     <dropdown-item :text="__('Add child link to entry')" @click="$emit('link-entries')" />
-                    <dropdown-item :text="__('Create Entry')" @click="$emit('create-entry', page.id)" />
+                    <dropdown-item v-if="hasCollection" :text="__('Create Entry')" @click="$emit('create-entry', page.id)" />
                     <dropdown-item :text="__('Remove')" class="warning" @click="remove" />
                 </dropdown-list>
             </div>
@@ -62,6 +62,7 @@ export default {
         root: Boolean,
         vm: Object,
         firstPageIsRoot: Boolean,
+        hasCollection: Boolean,
     },
 
     data() {

@@ -90,6 +90,14 @@ class StructuresController extends CpController
             'site' => $site,
         ]);
 
+        $blueprints = $structure->isCollectionBased()
+            ? $structure->collection()->entryBlueprints()->map(function ($blueprint) {
+                return [
+                    'handle' => $blueprint->handle(),
+                    'title' => $blueprint->title(),
+                ];
+            }) : collect();
+
         return view('statamic::structures.show', [
             'site' => $site,
             'structure' => $structure,
@@ -97,6 +105,7 @@ class StructuresController extends CpController
             'expectsRoot' => $structure->expectsRoot(),
             'hasCollection' => $structure->isCollectionBased(),
             'collections' => $structure->collections()->map->handle()->all(),
+            'collectionBlueprints' => $blueprints,
             'localizations' => $structure->sites()->map(function ($handle) use ($structure, $tree) {
                 $localized = $structure->in($handle);
                 $exists = $localized !== null;

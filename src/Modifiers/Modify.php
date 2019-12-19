@@ -2,13 +2,14 @@
 
 namespace Statamic\Modifiers;
 
-use Exception;
 use ArrayIterator;
+use Exception;
+use Statamic\Facades\Helper;
+use Statamic\Modifiers\Loader;
+use Statamic\Modifiers\ModifierException;
+use Statamic\Modifiers\ModifierNotFoundException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Facades\Helper;
-use Statamic\Modifiers\ModifierException;
-use Statamic\Extend\Management\ModifierLoader;
 
 class Modify implements \IteratorAggregate
 {
@@ -23,11 +24,11 @@ class Modify implements \IteratorAggregate
     protected $context = [];
 
     /**
-     * @var \Statamic\Extend\Management\ModifierLoader
+     * @var Loader
      */
     private $loader;
 
-    public function __construct(ModifierLoader $loader)
+    public function __construct(Loader $loader)
     {
         $this->loader = $loader;
     }
@@ -160,6 +161,11 @@ class Modify implements \IteratorAggregate
             $e->setModifier($modifier);
             throw $e;
 
+        } catch (ModifierNotFoundException $e) {
+            // Modifiers that don't exist shouldn't fail silently.
+            // This exception will have a nice Ignition solution.
+            throw $e;
+
         } catch (Exception $e) {
             // If a modifier's code raised an exception, we'll just
             // catch it here and rethrow it as a ModifierException.
@@ -186,24 +192,5 @@ class Modify implements \IteratorAggregate
         list($class, $method) = $this->loader->load($modifier);
 
         return $class->$method($this->value, $params, $this->context);
-    }
-
-    /**
-     * Modify using third party addons
-     *
-     * @param string $modifier
-     * @param array  $params
-     * @return mixed
-     * @throws \Exception
-     */
-    protected function modifyThirdParty($modifier, $params)
-    {
-        $class = $this->loader->load($modifier);
-
-        if (! method_exists($class, 'index')) {
-            throw new Exception("Modifier [$modifier] is missing index method.");
-        }
-
-        return $class->index($this->value, $params, $this->context);
     }
 }

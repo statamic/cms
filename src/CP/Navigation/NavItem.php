@@ -64,9 +64,22 @@ class NavItem
     {
         return $this
             ->fluentlyGetOrSet('url')
+            ->setter(function ($url) {
+                if (Str::startsWith($url, ['http://', 'https://'])) {
+                    return $url;
+                }
+
+                if (Str::startsWith($url, '/')) {
+                    return url($url);
+                }
+
+                return url(config('statamic.cp.route') . '/' . $url);
+            })
             ->afterSetter(function ($url) {
-                if (! $this->active) {
-                    $this->active = str_replace(url('cp').'/', '', $url) . '*';
+                $cpUrl = url(config('statamic.cp.route')).'/';
+
+                if (! $this->active && Str::startsWith($url, $cpUrl)) {
+                    $this->active = str_replace($cpUrl, '', $url) . '(/(.*)?|$)';
                 }
             })
             ->value($url);
@@ -166,7 +179,9 @@ class NavItem
      */
     public function isActive()
     {
-        return request()->is(config('statamic.cp.route') . '/' . $this->active);
+        $pattern = preg_quote(config('statamic.cp.route'), '#') . '/' . $this->active;
+
+        return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;
     }
 
     /**

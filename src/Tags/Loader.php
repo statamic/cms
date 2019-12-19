@@ -1,15 +1,15 @@
 <?php
 
-namespace Statamic\Extend\Management;
+namespace Statamic\Tags;
 
-use Statamic\Exceptions\ResourceNotFoundException;
+use Statamic\Tags\TagNotFoundException;
 
-class TagLoader
+class Loader
 {
     public function load($name, $properties)
     {
         if (! ($tags = app('statamic.tags'))->has($name)) {
-            throw new ResourceNotFoundException("Could not find files to load the `{$name}` tag.");
+            throw new TagNotFoundException("Could not find files to load the `{$name}` tag.");
         }
 
         return $this->init($tags->get($name), $properties);

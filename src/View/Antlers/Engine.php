@@ -10,8 +10,9 @@ use Statamic\Exceptions;
 use Illuminate\Support\Collection;
 use Facades\Statamic\View\Cascade;
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Tags\TagNotFoundException;
 use Statamic\Contracts\Data\Augmentable;
-use Statamic\Extend\Management\TagLoader;
+use Statamic\Tags\Loader as TagLoader;
 use Illuminate\Contracts\View\Engine as EngineInterface;
 
 class Engine implements EngineInterface
@@ -168,8 +169,8 @@ class Engine implements EngineInterface
             }
 
             return $output;
-        } catch (Exceptions\ResourceNotFoundException $e) {
-            // do nothing, this is ok
+        } catch (TagNotFoundException $e) {
+            return;
         } catch (Exceptions\FatalException $e) {
             throw $e;
         } catch (\Exception $e) {
