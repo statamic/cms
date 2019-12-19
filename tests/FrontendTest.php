@@ -356,11 +356,13 @@ class FrontendTest extends TestCase
     /** @test */
     function the_404_page_is_treated_like_a_template()
     {
-        $this->markTestIncomplete();
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('errors.404', 'Not found {{ response_code }} {{ site }}');
 
-        // all the key variables from the cascade are available
-        // and they're in the debugbar
-        // the 'response_code' key var is 404
+        $this->get('unknown')->assertNotFound()->assertSee('Not found 404 en');
+
+        // todo: test cascade vars are in the debugbar
     }
 
     /** @test */
