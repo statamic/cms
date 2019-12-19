@@ -1,6 +1,6 @@
 <template>
 
-    <div class="blueprint-section" :class="{ 'w-full': isEditing }">
+    <div class="blueprint-section w-full md:w-1/2 2xl:w-1/3" :class="{ 'w-full': isEditing }">
         <div class="blueprint-section-card card p-0 h-full flex flex-col">
 
             <div class="bg-grey-20 border-b text-sm flex rounded-t;">
