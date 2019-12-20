@@ -14,6 +14,7 @@ class FolderAsset extends Resource
             'id' => $this->id(),
             'basename' => $this->basename(),
             'extension' => $this->extension(),
+            'url' => $this->absoluteUrl(),
 
             'size_formatted' => Str::fileSizeForHumans($this->size(), 0),
             'last_modified_relative' => $this->lastModified()->diffForHumans(),

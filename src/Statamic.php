@@ -9,7 +9,8 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Http\Middleware\CP\Authorize;
-use Statamic\Http\Middleware\CP\Localize;
+use Statamic\Http\Middleware\Localize as LocalizeFrontend;
+use Statamic\Http\Middleware\CP\Localize as LocalizeCp;
 use Statamic\StaticCaching\Middleware\Cache;
 use Stringy\StaticStringy;
 
@@ -19,17 +20,19 @@ class Statamic
     const CORE_REPO = 'statamic/cms';
 
     protected static $scripts = [];
+    protected static $externalScripts = [];
     protected static $styles = [];
     protected static $cpRoutes = [];
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
     protected static $webMiddleware = [
-        Cache::class
+        LocalizeFrontend::class,
+        Cache::class,
     ];
     protected static $cpMiddleware = [
         Authorize::class,
-        Localize::class,
+        LocalizeCp::class,
     ];
 
     public static function version()
@@ -42,12 +45,24 @@ class Statamic
         return static::$scripts;
     }
 
-   public static function script($name, $path)
-   {
-       static::$scripts[$name] = str_finish($path, '.js');
+    public static function availableExternalScripts(Request $request)
+    {
+        return static::$externalScripts;
+    }
 
-       return new static;
-   }
+    public static function script($name, $path)
+    {
+        static::$scripts[$name] = str_finish($path, '.js');
+
+        return new static;
+    }
+
+    public static function externalScript($url)
+    {
+        static::$externalScripts[] = $url;
+
+        return new static;
+    }
 
     public static function availableStyles(Request $request)
     {

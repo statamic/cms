@@ -2,6 +2,8 @@
 
 namespace Statamic\Stache\Indexes;
 
+use Statamic\Support\Str;
+
 class Value extends Index
 {
     public function getItems()
@@ -13,8 +15,10 @@ class Value extends Index
 
     public function getItemValue($item)
     {
-        return method_exists($item, $this->name)
-            ? $item->{$this->name}()
+        $method = Str::camel($this->name);
+
+        return method_exists($item, $method)
+            ? $item->{$method}()
             : $item->value($this->name);
     }
 }

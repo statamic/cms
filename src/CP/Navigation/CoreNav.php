@@ -170,7 +170,6 @@ class CoreNav
         if (count($utilities)) {
             Nav::tools('Utilities')
                 ->route('utilities.index')
-                ->active('utilities*')
                 ->icon('settings-slider')
                 ->children($utilities);
         }

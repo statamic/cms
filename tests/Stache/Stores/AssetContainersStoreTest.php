@@ -107,6 +107,9 @@ EOL;
             ->with('asset-containers')
             ->andReturn($this->store);
 
+        Facades\Stache::shouldReceive('shouldUpdateIndexes')
+            ->andReturnTrue(); // irrelevant for this test but it gets called during saving
+
         $container = Facades\AssetContainer::make('new')
             ->title('New Container')
             ->blueprint('foo');

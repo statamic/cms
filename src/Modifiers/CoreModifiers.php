@@ -3,6 +3,7 @@
 namespace Statamic\Modifiers;
 
 use Carbon\Carbon;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -370,9 +371,19 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      */
-    public function dump($value)
+    public function dd($value)
     {
         function_exists('ddd') ? ddd($value) : dd($value);
+    }
+
+    /**
+     * Dump a variable
+     *
+     * @param $value
+     */
+    public function dump($value)
+    {
+        dump($value);
     }
 
     /**
@@ -597,9 +608,11 @@ class CoreModifiers extends Modifier
             $value = Arr::get($value, 0);
         }
 
-        // If the requested value (it should be an ID) doesn't exist, we'll just
-        // spit the value back as-is. This seems like a sensible solution here.
-        if (! $item = Data::find($value)) {
+        // If it's not already an object, we'll assume we have an ID and get that.
+        $item = is_object($value) ? $value : Data::find($value);
+
+        // No item? We'll just spit the value back as-is. This seems like a sensible solution here.
+        if (! $item) {
             return $value;
         }
 
@@ -607,8 +620,10 @@ class CoreModifiers extends Modifier
         $var = Arr::get($params, 0);
 
         // Convert the item to an array, since we'll want access to all the
-        // supplemented data. Then grab the requested variable from there.
-        if ($arrayValue = Arr::get($item->toArray(), $var)) {
+        // available data. Then grab the requested variable from there.
+        $array = $item instanceof Augmentable ? $item->toAugmentedArray() : $item->toArray();
+
+        if ($arrayValue = Arr::get($array, $var)) {
             return $arrayValue;
         }
 

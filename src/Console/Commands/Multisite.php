@@ -27,6 +27,8 @@ class Multisite extends Command
 
     public function handle()
     {
+        Stache::disableUpdatingIndexes();
+
         $this->siteOne = Site::default()->handle();
 
         $this->validateRunningOfCommand();

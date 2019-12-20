@@ -8,8 +8,6 @@ class Dump extends Tags
 {
     public function index()
     {
-        $value = $this->context->all();
-
-        function_exists('ddd') ? ddd($value) : dd($value);
+        dump($this->context->all());
     }
 }

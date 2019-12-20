@@ -35,7 +35,7 @@ class View
 
     public function gatherData()
     {
-        return array_merge($this->data, $this->cascade());
+        return array_merge($this->cascade(), $this->data);
     }
 
     public function layout($layout = null)
@@ -70,7 +70,7 @@ class View
         $isAntlers = Str::endsWith($contents->getPath(), ['.antlers.html', '.antlers.php']);
 
         if ($this->layout && $isAntlers) {
-            $contents = view($this->layout, array_merge($cascade, [
+            $contents = view($this->layoutViewName(), array_merge($cascade, [
                 'template_content' => $contents->withoutExtractions()->render()
             ]));
         }
@@ -102,5 +102,16 @@ class View
     public function __toString()
     {
         return $this->render();
+    }
+
+    protected function layoutViewName()
+    {
+        $view = $this->layout;
+
+        if (view()->exists($subdirectoried = 'layouts.'.$view)) {
+            return $subdirectoried;
+        }
+
+        return $view;
     }
 }

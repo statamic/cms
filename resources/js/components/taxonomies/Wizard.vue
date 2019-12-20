@@ -36,8 +36,8 @@
         <!-- Step 2 -->
         <div v-show="currentStep === 1">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">{{ __('Content Model') }}</h1>
-                <p class="text-grey" v-text="__('messages.taxonomy_wizard_content_model_intro')" />
+                <h1 class="mb-3">{{ __('Fields') }}</h1>
+                <p class="text-grey" v-text="__('messages.taxonomy_wizard_fields_intro')" />
             </div>
             <div class="max-w-md mx-auto px-2 pb-7">
                 <label class="font-bold text-base mb-sm" for="name">{{ __('Blueprint') }}</label>
@@ -74,7 +74,7 @@
                     <div slot-scope="{ meta, value, loading }">
                         <relationship-fieldtype
                             v-if="!loading"
-                            :config="{ handle: 'collections', type: 'collections' }"
+                            :config="{ handle: 'collections', type: 'collections', mode: 'select' }"
                             :value="value"
                             :meta="meta"
                             handle="collections"
@@ -115,7 +115,7 @@ export default {
 
     data() {
         return {
-            steps: [__('Naming'), __('Content Model'), __('Collections')],
+            steps: [__('Name'), __('Fields'), __('Collections')],
             currentStep: 0,
             taxonomy: {
                 title: null,
@@ -185,7 +185,7 @@ export default {
     },
 
     mounted() {
-        this.$keys.bindGlobal(['command+return'], e => {
+        this.$keys.bindGlobal(['return'], e => {
             this.next();
         });
 

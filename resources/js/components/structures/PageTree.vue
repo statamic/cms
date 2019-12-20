@@ -18,7 +18,12 @@
                 <dropdown-item :text="__('Link to Entry')" @click="linkToEntries" />
             </dropdown-list>
 
-            <button v-if="hasCollection" class="btn ml-2" v-text="`${__('Create Page')}`" @click="createEntry(null)" />
+            <create-entry-button
+                v-if="hasCollection"
+                class="ml-2"
+                :url="createEntryUrl()"
+                :blueprints="collectionBlueprints"
+                :text="__('Create Page')" />
 
             <button
                 class="btn btn-primary ml-2"
@@ -55,7 +60,14 @@
                 <p class="text-grey mb-3">
                     {{ __('messages.structures_empty') }}
                 </p>
-                <button class="btn btn-primary btn-lg" v-text="__('Create first page')" @click="makeFirstPage" />
+                <button v-if="!hasCollection" class="btn btn-primary btn-lg" v-text="__('Create first page')" @click="openPageCreator" />
+
+                <create-entry-button
+                    v-if="hasCollection"
+                    button-class="btn btn-primary"
+                    :url="createEntryUrl()"
+                    :blueprints="collectionBlueprints"
+                    :text="__('Create first page')" />
             </div>
         </div>
 
@@ -75,6 +87,7 @@
                     :depth="vm.level"
                     :vm="vm"
                     :first-page-is-root="expectsRoot"
+                    :hasCollection="hasCollection"
                     @edit="editPage(page, vm)"
                     @updated="pageUpdated(tree)"
                     @removed="pageRemoved"
@@ -142,6 +155,7 @@ export default {
         },
         expectsRoot: Boolean,
         hasCollection: Boolean,
+        collectionBlueprints: Array,
     },
 
     data() {
@@ -330,9 +344,13 @@ export default {
         },
 
         createEntry(parent) {
+            window.location = this.createEntryUrl(parent);
+        },
+
+        createEntryUrl(parent) {
             let url = this.createUrl;
             if (parent) url += '?parent=' + parent;
-            window.location = url;
+            return url;
         },
 
         linkChildPage(vm) {

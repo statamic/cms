@@ -21,6 +21,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $commands = [];
     protected $stylesheets = [];
     protected $scripts = [];
+    protected $externalScripts = [];
     protected $publishables = [];
     protected $routes = [];
     protected $middleware = [];
@@ -120,6 +121,10 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         foreach ($this->scripts as $path) {
             $this->registerScript($path);
+        }
+
+        foreach ($this->externalScripts as $path) {
+            $this->registerExternalScript($path);
         }
 
         return $this;
@@ -275,6 +280,15 @@ abstract class AddonServiceProvider extends ServiceProvider
         ]);
 
         Statamic::script($name, $filename);
+    }
+
+    public function registerExternalScript(string $url)
+    {
+        if (! $this->addonDiscovered()) {
+            return;
+        }
+
+        Statamic::externalScript($url);
     }
 
     public function registerStylesheet(string $path)

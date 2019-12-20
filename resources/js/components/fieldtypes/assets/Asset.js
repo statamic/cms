@@ -1,9 +1,10 @@
 import Luminous from 'luminous-lightbox';
+import AssetEditor from '../../assets/Editor/Editor.vue';
 
 export default {
 
     components: {
-        AssetEditor: require('../../assets/Editor/Editor.vue')
+        AssetEditor
     },
 
     props: {
@@ -24,7 +25,7 @@ export default {
         },
 
         canShowSvg() {
-            return this.asset.extension === 'svg' && ! this.asset.url.includes(':');
+            return this.asset.extension === 'svg' && ! this.asset.url.includes('::');
         },
 
         thumbnail() {
