@@ -2,14 +2,15 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Facades\Form;
-use Statamic\Facades\Site;
-use Statamic\Facades\Term;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Taxonomy;
-use Statamic\Facades\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Form;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -34,11 +35,11 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindEntries()
     {
-        Route::bind('entry', function ($entry, $route) {
-            abort_if(
-                ! ($entry = Entry::find($entry))
-                || $entry->collection() !== $route->parameter('collection')
-            , 404);
+        Route::bind('entry', function ($handle, $route) {
+            throw_if(
+                ! ($entry = Entry::find($handle)) || $entry->collection() !== $route->parameter('collection'),
+                new NotFoundHttpException("Entry [$handle] not found.")
+            );
 
             return $entry;
         });
@@ -46,28 +47,37 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindCollections()
     {
-        Route::bind('collection', function ($collection) {
-            abort_unless($collection = Collection::findByHandle($collection), 404);
+        Route::bind('collection', function ($handle) {
+            throw_unless(
+                $collection = Collection::findByHandle($handle),
+                new NotFoundHttpException("Collection [$handle] not found.")
+            );
+
             return $collection;
         });
     }
 
     protected function bindTaxonomies()
     {
-        Route::bind('taxonomy', function ($taxonomy) {
-            abort_unless($taxonomy = Taxonomy::findByHandle($taxonomy), 404);
+        Route::bind('taxonomy', function ($handle) {
+            throw_unless(
+                $taxonomy = Taxonomy::findByHandle($handle),
+                new NotFoundHttpException("Taxonomy [$handle] not found.")
+            );
+
             return $taxonomy;
         });
     }
 
     protected function bindTerms()
     {
-        Route::bind('term', function ($term, $route) {
-            $id = $route->parameter('taxonomy')->handle() . '::' . $term;
-            abort_if(
-                ! ($term = Term::find($id)->in($route->parameter('site')))
-                || $term->taxonomy() !== $route->parameter('taxonomy')
-            , 404);
+        Route::bind('term', function ($handle, $route) {
+            $id = $route->parameter('taxonomy')->handle() . '::' . $handle;
+
+            throw_if(
+                ! ($term = Term::find($id)->in($route->parameter('site'))) || $term->taxonomy() !== $route->parameter('taxonomy'),
+                new NotFoundHttpException("Taxonomy [$handle] not found.")
+            );
 
             return $term;
         });
@@ -75,24 +85,31 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindSites()
     {
-        Route::bind('site', function ($site) {
-            abort_unless($site = Site::get($site), 404);
+        Route::bind('site', function ($handle) {
+            throw_unless(
+                $site = Site::get($handle),
+                new NotFoundHttpException("Site [$handle] not found.")
+            );
+
             return $site;
         });
     }
 
     protected function bindRevisions()
     {
-        Route::bind('revision', function ($revision, $route) {
+        Route::bind('revision', function ($reference, $route) {
             if ($route->hasParameter('entry')) {
                 $content = $route->parameter('entry');
             } elseif ($route->hasParameter('term')) {
                 $content = $route->parameter('term');
             } else {
-                abort(404);
+                throw new NotFoundHttpException;
             }
 
-            abort_unless($revision = $content->revision($revision), 404);
+            throw_unless(
+                $revision = $content->revision($reference),
+                new NotFoundHttpException("Revision [$reference] not found.")
+            );
 
             return $revision;
         });
@@ -100,8 +117,12 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindForms()
     {
-        Route::bind('form', function ($form) {
-            abort_unless($form = Form::find($form), 404);
+        Route::bind('form', function ($handle) {
+            throw_unless(
+                $form = Form::find($handle),
+                new NotFoundHttpException("Form [$form] not found.")
+            );
+
             return $form;
         });
     }

@@ -127,6 +127,15 @@ class Statamic
         return starts_with(request()->path(), config('statamic.cp.route'));
    }
 
+   public static function isApiRoute()
+   {
+       if (! config('statamic.api.enabled')) {
+           return false;
+       }
+
+        return starts_with(request()->path(), config('statamic.api.route'));
+   }
+
    public static function isAmpRequest()
    {
         if (! config('statamic.amp.enabled')) {
