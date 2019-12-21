@@ -69,7 +69,7 @@ return [
     'fields_display_instructions' => 'L\'etichetta del campo visualizzata nel Pannello di controllo.',
     'fields_fieldsets_description' => 'I set di campi sono raggruppamenti di campi semplici, flessibili e completamente opzionali che aiutano a organizzare campi riutilizzabili preconfigurati.',
     'fields_handle_instructions' => 'La variabile del modello del campo.',
-    'fields_instructions_instructions' => 'Mostrato sotto l\'etichetta di visualizzazione del campo, questo è molto simile al testo. Markdown è supportato.',
+    'fields_instructions_instructions' => 'Testo visualizzato sotto l\'etichetta del campo. Markdown è supportato.',
     'fieldset_import_fieldset_instructions' => 'Il fieldset da importare.',
     'fieldset_import_prefix_instructions' => 'Il prefisso che deve essere applicato a ciascun campo quando vengono importati. per esempio. eroe_',
     'fieldsets_button_help_text' => 'Sarai in grado di personalizzare il tuo Fieldset una volta creato.',
