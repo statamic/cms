@@ -2,39 +2,55 @@
 
 namespace Statamic\Tags;
 
+use Illuminate\Support\Facades\Cache as LaraCache;
 use Statamic\Facades\URL;
 use Statamic\Tags\Tags;
 
 class Cache extends Tags
 {
-    /**
-     * The {{ cache }} tag
-     *
-     * @return string
-     */
     public function index()
     {
-        // If disabled, do nothing.
         if (! $this->isEnabled()) {
-            return $this->parse([]);
+            return [];
         }
 
-        // Create a hash so we can identify it. Include the URL in the hash if this is scoped to the page.
-        $hash = ($this->get('scope', 'site') === 'page') ? md5(URL::getCurrent(), $this->content) : md5($this->content);
-
-        $path = 'troves:' . $hash;
-
-        if (! $this->cache->exists($path)) {
-            $html = $this->parse();
-
-            $this->cache->put($path, $html);
+        if ($cached = LaraCache::get($key = $this->getCacheKey())) {
+            return $cached;
         }
 
-        return $this->cache->get($path);
+        LaraCache::put($key, $html = $this->parse([]), $this->getCacheLength());
+
+        return $html;
     }
 
     private function isEnabled()
     {
-        return true;
+        // TODO: make a global config
+
+        // Only get requests. This disables the cache during live preview.
+        return request()->method() === 'GET';
+    }
+
+    private function getCacheKey()
+    {
+        $hash = [
+            'content' => $this->content,
+            'params' => $this->params->all(),
+        ];
+
+        if ($this->get('scope', 'site') === 'page') {
+            $hash['url'] = URL::makeAbsolute(URL::getCurrent());
+        }
+
+        return 'statamic.cache-tag.' . md5(json_encode($hash));
+    }
+
+    private function getCacheLength()
+    {
+        if (! $length = $this->get('for')) {
+            return null;
+        }
+
+        return now()->add('+' . $length);
     }
 }
