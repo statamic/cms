@@ -152,4 +152,27 @@ class ViewTest extends TestCase
 
         $this->assertEquals('foo', $view->layout());
     }
+
+    /** @test */
+    function view_data_can_be_accessed_from_template_and_layout()
+    {
+        $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template-with-front-matter.antlers.html'));
+        $this->viewShouldReturnRaw('layout', file_get_contents(__DIR__.'/fixtures/layout-with-front-matter.antlers.html'));
+
+        $view = (new View)
+            ->template('template')
+            ->layout('layout');
+
+        $expected = <<<EOT
+layout:
+layout-foo
+template-bar
+
+template:
+template-foo
+template-bar
+EOT;
+
+        $this->assertEquals($expected, trim($view->render()));
+    }
 }

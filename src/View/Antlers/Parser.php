@@ -1201,10 +1201,20 @@ class Parser
             }
 
             // If the first part of the variable is "view", we'll try to get the value from
-            // the front-matter, which is stored in the cascade organized by the view paths.
+            // values defined in any views' front-matter. They are stored in the cascade
+            // organized by the view paths. It should be able to get a value from any
+            // loaded view, but the current view should take precedence. (ie. if
+            // you define the same var in this view and another view, the one
+            // from this view should win.)
             if ($first == 'view') {
-                if ($cascading = $this->cascade->get('views')[$this->view] ?? null) {
-                    return $this->getVariableExistenceAndValue($rest, $cascading);
+                $views = collect($this->cascade->get('views'));
+                $thisView = $views->pull($this->view);
+                $views->prepend($thisView, $this->view);
+                foreach ($views as $viewData) {
+                    $viewExistAndVal = $this->getVariableExistenceAndValue($rest, $viewData);
+                    if ($viewExistAndVal[0]) {
+                        return $viewExistAndVal;
+                    }
                 }
             }
 
