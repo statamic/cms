@@ -622,12 +622,6 @@ class Parser
                 }
             }
 
-            // Variables within conditions can be parsed more than once. We can
-            // skip this block if it's already been run through $this->valueToLiteral
-            if ($inCondition && (substr($text, 0, 1) !== "'" && substr($text, -1, 1) !== "'")) {
-                $replacement = $this->valueToLiteral($replacement);
-            }
-
             $text = preg_replace('/' . preg_quote($tag, '/') . '/m', addcslashes($replacement, '\\$'), $text, 1);
             $text = $this->injectExtractions($text, 'nested_looped_tags');
         }
