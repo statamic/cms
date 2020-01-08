@@ -20,7 +20,6 @@
         "league/commonmark-ext-table": "^2.1",
         "league/csv": "^9.0",
         "league/glide": "^1.1",
-        "michelf/php-smartypants": "^1.8",
         "pixelfear/composer-dist-plugin": "^0.1.0",
         "scrumpy/html-to-prosemirror": "^0.5.2",
         "scrumpy/prosemirror-to-html": "^0.7.1",
