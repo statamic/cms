@@ -5,6 +5,7 @@ namespace Statamic\Markdown;
 use Closure;
 use InvalidArgumentException;
 use Statamic\Markdown\Parser;
+use UnexpectedValueException;
 
 class Manager
 {
@@ -45,6 +46,12 @@ class Manager
 
     public function extend(string $name, Closure $closure)
     {
-        $this->parsers[$name] = $closure($this->makeParser());
+        $parser = $closure($this->makeParser());
+
+        if (! $parser instanceof Parser) {
+            throw new UnexpectedValueException('A ' . Parser::class . ' instance is expected.');
+        }
+
+        $this->parsers[$name] = $parser;
     }
 }

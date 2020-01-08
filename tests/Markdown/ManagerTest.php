@@ -7,6 +7,7 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 use Statamic\Markdown\Manager;
 use Statamic\Markdown\Parser;
+use UnexpectedValueException;
 
 class ManagerTest extends TestCase
 {
@@ -60,5 +61,16 @@ class ManagerTest extends TestCase
 
         $this->assertSame($parserA, $manager->parser('a'));
         $this->assertNotSame($parserB, $manager->parser('a'));
+    }
+
+    /** @test */
+    function it_throws_an_exception_if_extending_without_returning_a_parser()
+    {
+        $this->expectException(UnexpectedValueException::class);
+        $this->expectExceptionMessage('A ' . Parser::class . ' instance is expected.');
+
+        (new Manager)->extend('a', function ($parser) {
+            //
+        });
     }
 }
