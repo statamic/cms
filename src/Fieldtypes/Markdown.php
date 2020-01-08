@@ -67,7 +67,7 @@ class Markdown extends Fieldtype
             $markdown = $markdown->withAutoLinks();
         }
 
-        $html = $markdown->parse($value);
+        $html = $markdown->parse((string) $value);
 
         if ($this->config('smartypants')) {
             $html = Html::smartypants($html);
