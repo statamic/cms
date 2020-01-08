@@ -35,10 +35,8 @@ class Parser
 
         $env->mergeConfig($this->config);
 
-        foreach ($this->extensions as $closure) {
-            foreach (Arr::wrap($closure()) as $ext) {
-                $env->addExtension($ext);
-            }
+        foreach ($this->extensions() as $ext) {
+            $env->addExtension($ext);
         }
 
         return $this->converter = new CommonMarkConverter([], $env);
@@ -63,37 +61,60 @@ class Parser
         return $this->addExtension($closure);
     }
 
+    public function extensions(): array
+    {
+        $exts = [];
+
+        foreach ($this->extensions as $closure) {
+            foreach (Arr::wrap($closure()) as $ext) {
+                $exts[] = $ext;
+            }
+        }
+
+        return $exts;
+    }
+
     public function withAutoLinks(): Parser
     {
-        $parser = new static;
-
-        return $parser->addExtension(function () {
+        return $this->newInstance()->addExtension(function () {
             return new AutolinkExtension;
         });
     }
 
     public function withAutoLineBreaks(): Parser
     {
-        return new self(array_replace_recursive($this->environment()->getConfig(), [
+        return $this->newInstance([
             'renderer' => [
                 'soft_break' => "<br />\n",
             ]
-        ]));
+        ]);
     }
 
     public function withMarkupEscaping(): Parser
     {
-        return new self(array_replace_recursive($this->environment()->getConfig(), [
-            'html_input' => 'escape'
-        ]));
+        return $this->newInstance(['html_input' => 'escape']);
     }
 
     public function withSmartPunctuation(): Parser
     {
-        $parser = new static;
-
-        return $parser->addExtension(function () {
+        return $this->newInstance()->addExtension(function () {
             return new SmartPunctExtension;
         });
+    }
+
+    public function config(): array
+    {
+        return $this->environment()->getConfig();
+    }
+
+    public function newInstance(array $config = [])
+    {
+        $parser = new self(array_replace_recursive($this->config(), $config));
+
+        foreach ($this->extensions as $ext) {
+            $parser->addExtensions($ext);
+        }
+
+        return $parser;
     }
 }

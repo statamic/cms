@@ -14,7 +14,7 @@ class ParserTest extends TestCase
 {
     function setUp() : void
     {
-        $this->parser = new Parser;
+        $this->parser = new Parser(['foo' => 'bar']);
     }
 
     /** @test */
@@ -45,6 +45,36 @@ class ParserTest extends TestCase
         });
 
         $this->assertEquals("<p>smile 😀 frown 🙁</p>\n", $this->parser->parse('smile :) frown :('));
+    }
+
+    /** @test */
+    function it_creates_a_new_instance_based_on_the_current_instance()
+    {
+        $this->parser->addExtension(function () {
+            return new SmileyExtension;
+        });
+
+        $config = $this->parser->config();
+        $this->assertEquals('bar', $config['foo']);
+        $this->assertArrayNotHasKey('hello', $config);
+        $this->assertCount(1, $this->parser->extensions());
+
+        $newParser = $this->parser->newInstance([
+            'foo' => 'baz',
+            'hello' => 'world',
+        ]);
+
+        $newParser->addExtension(function () {
+            return new FrownyExtension;
+        });
+
+        $this->assertNotSame($this->parser, $newParser);
+        $newConfig = $newParser->config();
+        $this->assertEquals('baz', $newConfig['foo']);
+        $this->assertEquals('world', $newConfig['hello']);
+        $this->assertArrayNotHasKey('hello', $this->parser->config());
+        $this->assertCount(2, $newParser->extensions());
+        $this->assertCount(1, $this->parser->extensions());
     }
 }
 
