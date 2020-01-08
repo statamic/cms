@@ -2,6 +2,7 @@
 
 namespace Statamic\Markdown;
 
+use Closure;
 use InvalidArgumentException;
 use Statamic\Markdown\Parser;
 
@@ -22,7 +23,7 @@ class Manager
     public function defaultParser()
     {
         if (! $this->hasParser('default')) {
-            $this->setParser('default', $this->makeParser());
+            $this->parsers['default'] = $this->makeParser();
         }
 
         return $this->parser('default');
@@ -37,13 +38,13 @@ class Manager
         return $this->parsers[$name];
     }
 
-    public function setParser(string $name, Parser $parser = null)
-    {
-        $this->parsers[$name] = $parser;
-    }
-
     public function hasParser(string $name): bool
     {
         return isset($this->parsers[$name]);
+    }
+
+    public function extend(string $name, Closure $closure)
+    {
+        $this->parsers[$name] = $closure($this->makeParser());
     }
 }

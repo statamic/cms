@@ -28,7 +28,7 @@ class ParserTest extends TestCase
     {
         $this->assertEquals("<p>smile :)</p>\n", $this->parser->parse('smile :)'));
 
-        $this->parser->extend(function () {
+        $this->parser->addExtension(function () {
             return new SmileyExtension;
         });
 
@@ -40,7 +40,7 @@ class ParserTest extends TestCase
     {
         $this->assertEquals("<p>smile :) frown :(</p>\n", $this->parser->parse('smile :) frown :('));
 
-        $this->parser->extend(function () {
+        $this->parser->addExtensions(function () {
             return [new SmileyExtension, new FrownyExtension];
         });
 

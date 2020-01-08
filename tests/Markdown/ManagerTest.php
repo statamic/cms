@@ -18,11 +18,10 @@ class ManagerTest extends TestCase
     /** @test */
     function it_forwards_calls_to_default_parser()
     {
-        $defaultParser = Mockery::mock(Parser::class);
-        $defaultParser->shouldReceive('foo')->once()->andReturn('bar');
-
         $manager = new Manager;
-        $manager->setParser('default', $defaultParser);
+        $manager->extend('default', function () {
+            return Mockery::mock(Parser::class)->shouldReceive('foo')->once()->andReturn('bar')->getMock();
+        });
 
         $this->assertEquals('bar', $manager->foo());
     }
@@ -31,12 +30,10 @@ class ManagerTest extends TestCase
     function it_makes_a_new_parser_instance()
     {
         $manager = new Manager;
-        $manager->setParser('default', $defaultParser = new Parser);
-
         $parser = $manager->makeParser($config = ['foo' => 'bar']);
 
         $this->assertInstanceOf(Parser::class, $parser);
-        $this->assertNotSame($parser, $defaultParser);
+        $this->assertNotSame($parser, $manager->defaultParser());
         $this->assertEquals('bar', $parser->environment()->getConfig('foo'));
     }
 
@@ -51,10 +48,15 @@ class ManagerTest extends TestCase
             $this->assertEquals('Markdown parser [a] is not defined.', $e->getMessage());
         }
 
-        $parserA = $manager->makeParser();
-        $parserB = $manager->makeParser();
+        $parserA = null;
+        $manager->extend('a', function ($parser) use (&$parserA) {
+            return $parserA = $parser;
+        });
 
-        $manager->setParser('a', $parserA);
+        $parserB = null;
+        $manager->extend('b', function ($parser) use (&$parserB) {
+            return $parserB = $parser;
+        });
 
         $this->assertSame($parserA, $manager->parser('a'));
         $this->assertNotSame($parserB, $manager->parser('a'));

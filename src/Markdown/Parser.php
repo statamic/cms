@@ -49,7 +49,7 @@ class Parser
         return $this->converter()->getEnvironment();
     }
 
-    public function extend(Closure $closure): self
+    public function addExtension(Closure $closure): self
     {
         $this->converter = null;
 
@@ -58,11 +58,16 @@ class Parser
         return $this;
     }
 
+    public function addExtensions(Closure $closure): self
+    {
+        return $this->addExtension($closure);
+    }
+
     public function withAutoLinks(): Parser
     {
         $parser = new static;
 
-        return $parser->extend(function () {
+        return $parser->addExtension(function () {
             return new AutolinkExtension;
         });
     }
@@ -87,7 +92,7 @@ class Parser
     {
         $parser = new static;
 
-        return $parser->extend(function () {
+        return $parser->addExtension(function () {
             return new SmartPunctExtension;
         });
     }

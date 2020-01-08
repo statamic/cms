@@ -20,7 +20,7 @@ class MarkdownServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        Markdown::extend(function () {
+        Markdown::addExtensions(function () {
             return [
                 new TableExtension,
                 new AttributesExtension,
