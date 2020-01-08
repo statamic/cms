@@ -48,12 +48,18 @@ class Markdown extends Fieldtype
             'instructions' => 'Automatically convert straight quotes into curly quotes, dashes into en/em-dashes, and other similar text transformations.',
             'width' => 50,
         ],
+        'parser' => [
+            'type' => 'text',
+            'instructions' => 'The name of a customized Markdown parser. Leave blank to use the default.',
+        ]
 
     ];
 
     public function augment($value)
     {
-        $markdown = \Statamic\Facades\Markdown::makeParser();
+        $markdown = \Statamic\Facades\Markdown::parser(
+            $this->config('parser', 'default')
+        );
 
         if ($this->config('automatic_line_breaks')) {
             $markdown = $markdown->withAutoLineBreaks();
