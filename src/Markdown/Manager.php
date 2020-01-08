@@ -13,7 +13,7 @@ class Manager
 
     public function __call($method, $args)
     {
-        return $this->defaultParser()->$method(...$args);
+        return $this->parser('default')->$method(...$args);
     }
 
     public function makeParser(array $config = []): Parser
@@ -21,17 +21,12 @@ class Manager
         return new Parser($config);
     }
 
-    public function defaultParser()
-    {
-        if (! $this->hasParser('default')) {
-            $this->parsers['default'] = $this->makeParser();
-        }
-
-        return $this->parser('default');
-    }
-
     public function parser(string $name)
     {
+        if ($name === 'default' && !$this->hasParser('default')) {
+            return $this->parsers['default'] = $this->makeParser();
+        }
+
         if (! $this->hasParser($name)) {
             throw new InvalidArgumentException("Markdown parser [$name] is not defined.");
         }
