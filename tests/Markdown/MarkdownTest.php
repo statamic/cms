@@ -123,7 +123,7 @@ EOT;
     }
 
     /** @test */
-    function it_does_not_automatically_convert_line_breaks()
+    function it_converts_line_breaks_on_demand()
     {
         $this->assertParses("<p>foo\nbar</p>", "foo\nbar");
 
@@ -134,7 +134,7 @@ EOT;
     }
 
     /** @test */
-    function it_escapes_markup()
+    function it_escapes_markup_on_demand()
     {
         $this->assertParses('<div></div>', '<div></div>');
 
