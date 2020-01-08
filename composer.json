@@ -17,6 +17,7 @@
         "league/commonmark": "^1.1",
         "league/commonmark-ext-autolink": "^1.0",
         "league/commonmark-ext-smartpunct": "^1.1",
+        "league/commonmark-ext-strikethrough": "^1.0",
         "league/commonmark-ext-table": "^2.1",
         "league/csv": "^9.0",
         "league/glide": "^1.1",

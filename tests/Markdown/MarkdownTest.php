@@ -19,6 +19,12 @@ class MarkdownTest extends TestCase
     }
 
     /** @test */
+    function it_parses_strikethrough()
+    {
+        $this->assertParses("<h1>Heading <del>One</del></h1>", '# Heading ~~One~~');
+    }
+
+    /** @test */
     function it_parses_markdown_inside_markup()
     {
         $markdown = <<<EOT

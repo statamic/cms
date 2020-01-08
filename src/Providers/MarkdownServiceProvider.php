@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use League\CommonMark\Ext\Strikethrough\StrikethroughExtension;
 use League\CommonMark\Ext\Table\TableExtension;
 use Statamic\Facades\Markdown;
 use Statamic\Markdown\Manager;
@@ -24,6 +25,7 @@ class MarkdownServiceProvider extends ServiceProvider
             return [
                 new TableExtension,
                 new AttributesExtension,
+                new StrikethroughExtension,
             ];
         });
     }
