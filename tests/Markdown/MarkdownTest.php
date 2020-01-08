@@ -143,4 +143,15 @@ EOT;
             rtrim(Markdown::withMarkupEscaping()->parse('<div></div>'))
         );
     }
+
+    /** @test */
+    function it_uses_smart_punctuation_on_demand()
+    {
+        $this->assertParses('<p>&quot;Foo&quot; -- Bar...</p>', '"Foo" -- Bar...');
+
+        $this->assertEquals(
+            '<p>“Foo” – Bar…</p>',
+            rtrim(Markdown::withSmartPunctuation()->parse('"Foo" -- Bar...'))
+        );
+    }
 }

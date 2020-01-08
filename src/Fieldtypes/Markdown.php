@@ -67,11 +67,11 @@ class Markdown extends Fieldtype
             $markdown = $markdown->withAutoLinks();
         }
 
-        $html = $markdown->parse((string) $value);
-
         if ($this->config('smartypants')) {
-            $html = Html::smartypants($html);
+            $markdown = $markdown->withSmartPunctuation();
         }
+
+        $html = $markdown->parse((string) $value);
 
         return $html;
     }

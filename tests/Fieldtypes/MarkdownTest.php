@@ -21,13 +21,13 @@ class MarkdownTest extends TestCase
     function it_augments_with_smartypants()
     {
         $default = $this->fieldtype();
-        $this->assertEqualsTrimmed('<p>Some "quoted" text.</p>', $default->augment('Some "quoted" text.'));
+        $this->assertEqualsTrimmed('<p>Some &quot;quoted&quot; text.</p>', $default->augment('Some "quoted" text.'));
 
         $enabled = $this->fieldtype(['smartypants' => true]);
-        $this->assertEqualsTrimmed('<p>Some &#8220;quoted&#8221; text.</p>', $enabled->augment('Some "quoted" text.'));
+        $this->assertEqualsTrimmed('<p>Some “quoted” text.</p>', $enabled->augment('Some "quoted" text.'));
 
         $disabled = $this->fieldtype(['smartypants' => false]);
-        $this->assertEqualsTrimmed('<p>Some "quoted" text.</p>', $disabled->augment('Some "quoted" text.'));
+        $this->assertEqualsTrimmed('<p>Some &quot;quoted&quot; text.</p>', $disabled->augment('Some "quoted" text.'));
     }
 
     /** @test */
@@ -47,7 +47,7 @@ EOT;
 
         $expected = <<<EOT
 <p>Paragraph with <code>some code</code>.</p>
-<p>Paragraph that hasn&#8217;t got any &#8220;code&#8221;.</p>
+<p>Paragraph that hasn’t got any “code”.</p>
 <pre><code class="language-js">code block
 </code></pre>
 EOT;

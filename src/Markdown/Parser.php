@@ -6,6 +6,7 @@ use Closure;
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Environment;
 use League\CommonMark\Ext\Autolink\AutolinkExtension;
+use League\CommonMark\Ext\SmartPunct\SmartPunctExtension;
 use Statamic\Support\Arr;
 
 class Parser
@@ -80,5 +81,14 @@ class Parser
         return new self(array_replace_recursive($this->environment()->getConfig(), [
             'html_input' => 'escape'
         ]));
+    }
+
+    public function withSmartPunctuation(): Parser
+    {
+        $parser = new static;
+
+        return $parser->extend(function () {
+            return new SmartPunctExtension;
+        });
     }
 }
