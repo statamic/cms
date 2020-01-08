@@ -3,12 +3,9 @@
 namespace Statamic\Providers;
 
 use Illuminate\Support\ServiceProvider;
-use League\CommonMark\Ext\Strikethrough\StrikethroughExtension;
-use League\CommonMark\Ext\Table\TableExtension;
 use Statamic\Facades\Markdown;
 use Statamic\Markdown\Manager;
 use Statamic\Markdown\Parser;
-use Webuni\CommonMark\AttributesExtension\AttributesExtension;
 
 class MarkdownServiceProvider extends ServiceProvider
 {
@@ -21,12 +18,8 @@ class MarkdownServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        Markdown::addExtensions(function () {
-            return [
-                new TableExtension,
-                new AttributesExtension,
-                new StrikethroughExtension,
-            ];
+        Markdown::extend('default', function ($parser) {
+            return $parser->withStatamicDefaults();
         });
     }
 }

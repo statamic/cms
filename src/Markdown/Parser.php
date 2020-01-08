@@ -74,6 +74,17 @@ class Parser
         return $exts;
     }
 
+    public function withStatamicDefaults()
+    {
+        return $this->newInstance()->addExtensions(function () {
+            return [
+                new \League\CommonMark\Ext\Table\TableExtension,
+                new \Webuni\CommonMark\AttributesExtension\AttributesExtension,
+                new \League\CommonMark\Ext\Strikethrough\StrikethroughExtension,
+            ];
+        });
+    }
+
     public function withAutoLinks(): Parser
     {
         return $this->newInstance()->addExtension(function () {
