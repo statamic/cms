@@ -11,7 +11,7 @@ class MarkdownTest extends TestCase
     /** @test */
     function it_augments_to_html()
     {
-        $this->assertEquals(
+        $this->assertEqualsTrimmed(
             '<p>Paragraph with <strong>bold</strong> and <em>italic</em> text.</p>',
             $this->fieldtype()->augment('Paragraph with **bold** and _italic_ text.')
         );
@@ -21,13 +21,13 @@ class MarkdownTest extends TestCase
     function it_augments_with_smartypants()
     {
         $default = $this->fieldtype();
-        $this->assertEquals('<p>Some "quoted" text.</p>', $default->augment('Some "quoted" text.'));
+        $this->assertEqualsTrimmed('<p>Some "quoted" text.</p>', $default->augment('Some "quoted" text.'));
 
         $enabled = $this->fieldtype(['smartypants' => true]);
-        $this->assertEquals('<p>Some &#8220;quoted&#8221; text.</p>', $enabled->augment('Some "quoted" text.'));
+        $this->assertEqualsTrimmed('<p>Some &#8220;quoted&#8221; text.</p>', $enabled->augment('Some "quoted" text.'));
 
         $disabled = $this->fieldtype(['smartypants' => false]);
-        $this->assertEquals('<p>Some "quoted" text.</p>', $disabled->augment('Some "quoted" text.'));
+        $this->assertEqualsTrimmed('<p>Some "quoted" text.</p>', $disabled->augment('Some "quoted" text.'));
     }
 
     /** @test */
@@ -48,10 +48,11 @@ EOT;
         $expected = <<<EOT
 <p>Paragraph with <code>some code</code>.</p>
 <p>Paragraph that hasn&#8217;t got any &#8220;code&#8221;.</p>
-<pre><code class="language-js">code block</code></pre>
+<pre><code class="language-js">code block
+</code></pre>
 EOT;
 
-        $this->assertEquals($expected, $md->augment($value));
+        $this->assertEqualsTrimmed($expected, $md->augment($value));
     }
 
     /** @test */
@@ -62,13 +63,13 @@ EOT;
         $unreplaced = '<p>before http://example.com after</p>';
 
         $default = $this->fieldtype();
-        $this->assertEquals($unreplaced, $default->augment($value));
+        $this->assertEqualsTrimmed($unreplaced, $default->augment($value));
 
         $enabled = $this->fieldtype(['automatic_links' => true]);
-        $this->assertEquals($replaced, $enabled->augment($value));
+        $this->assertEqualsTrimmed($replaced, $enabled->augment($value));
 
         $disabled = $this->fieldtype(['automatic_links' => false]);
-        $this->assertEquals($unreplaced, $disabled->augment($value));
+        $this->assertEqualsTrimmed($unreplaced, $disabled->augment($value));
     }
 
     /** @test */
@@ -79,13 +80,13 @@ EOT;
         $unescaped = '<p>before <div>in the div</div> after</p>';
 
         $default = $this->fieldtype();
-        $this->assertEquals($unescaped, $default->augment($value));
+        $this->assertEqualsTrimmed($unescaped, $default->augment($value));
 
         $enabled = $this->fieldtype(['escape_markup' => true]);
-        $this->assertEquals($escaped, $enabled->augment($value));
+        $this->assertEqualsTrimmed($escaped, $enabled->augment($value));
 
         $disabled = $this->fieldtype(['escape_markup' => false]);
-        $this->assertEquals($unescaped, $disabled->augment($value));
+        $this->assertEqualsTrimmed($unescaped, $disabled->augment($value));
     }
 
     /** @test */
@@ -107,17 +108,22 @@ second line</p>
 EOT;
 
         $default = $this->fieldtype();
-        $this->assertEquals($withoutBreaks, $default->augment($value));
+        $this->assertEqualsTrimmed($withoutBreaks, $default->augment($value));
 
         $enabled = $this->fieldtype(['automatic_line_breaks' => true]);
-        $this->assertEquals($withBreaks, $enabled->augment($value));
+        $this->assertEqualsTrimmed($withBreaks, $enabled->augment($value));
 
         $disabled = $this->fieldtype(['automatic_line_breaks' => false]);
-        $this->assertEquals($withoutBreaks, $disabled->augment($value));
+        $this->assertEqualsTrimmed($withoutBreaks, $disabled->augment($value));
     }
 
     private function fieldtype($config = [])
     {
         return (new Markdown)->setField(new Field('test', array_merge(['type' => 'markdown'], $config)));
+    }
+
+    private function assertEqualsTrimmed($expected, $actual)
+    {
+        $this->assertEquals($expected, rtrim($actual));
     }
 }
