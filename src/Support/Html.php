@@ -2,9 +2,9 @@
 
 namespace Statamic\Support;
 
-use ParsedownExtra;
 use Michelf\SmartyPants;
 use Illuminate\Support\HtmlString;
+use Statamic\Facades\Markdown;
 
 class Html
 {
@@ -312,7 +312,7 @@ class Html
 
     public static function markdown($string)
     {
-        return (new ParsedownExtra)->text($string);
+        return Markdown::parse($string);
     }
 
     public static function smartypants($string, $behavior = null)

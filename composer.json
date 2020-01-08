@@ -10,12 +10,13 @@
     "license": "proprietary",
     "require": {
         "composer/composer": "^1.7",
-        "erusev/parsedown": "^1.8@beta",
-        "erusev/parsedown-extra": "^0.8@beta",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "5.6.* || 5.7.* || 5.8.* || ^6.0",
         "laravel/helpers": "^1.1",
+        "league/commonmark": "^1.1",
+        "league/commonmark-ext-autolink": "^1.0",
+        "league/commonmark-ext-table": "^2.1",
         "league/csv": "^9.0",
         "league/glide": "^1.1",
         "michelf/php-smartypants": "^1.8",
@@ -26,6 +27,7 @@
         "symfony/var-exporter": "^4.3",
         "symfony/yaml": "^4.1@dev",
         "twistor/flysystem-guzzle": "^6.0",
+        "webuni/commonmark-attributes-extension": "^1.0",
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
