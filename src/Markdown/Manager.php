@@ -18,7 +18,7 @@ class Manager
         return $this->defaultParser->$method(...$args);
     }
 
-    public function newParser(array $config = []): Parser
+    public function makeParser(array $config = []): Parser
     {
         return new Parser($config);
     }

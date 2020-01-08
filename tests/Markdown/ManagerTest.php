@@ -32,7 +32,7 @@ class ManagerTest extends TestCase
 
         $config = ['foo' => 'bar'];
 
-        $parser = $manager->newParser($config);
+        $parser = $manager->makeParser($config);
 
         $this->assertInstanceOf(Parser::class, $parser);
         $this->assertNotSame($parser, $defaultParser);

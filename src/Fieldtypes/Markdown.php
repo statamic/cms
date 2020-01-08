@@ -53,7 +53,7 @@ class Markdown extends Fieldtype
 
     public function augment($value)
     {
-        $markdown = \Statamic\Facades\Markdown::newParser();
+        $markdown = \Statamic\Facades\Markdown::makeParser();
 
         if ($this->config('automatic_line_breaks')) {
             $markdown = $markdown->withAutoLineBreaks();
