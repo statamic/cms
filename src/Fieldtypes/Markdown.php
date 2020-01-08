@@ -51,6 +51,7 @@ class Markdown extends Fieldtype
         'parser' => [
             'type' => 'text',
             'instructions' => 'The name of a customized Markdown parser. Leave blank to use the default.',
+            'width' => 50,
         ]
 
     ];
