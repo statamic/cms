@@ -53,13 +53,21 @@ class Markdown extends Fieldtype
 
     public function augment($value)
     {
-        $markdown = new \ParsedownExtra();
+        $markdown = \Statamic\Facades\Markdown::newParser();
 
-        $html = $markdown
-                ->setBreaksEnabled($this->config('automatic_line_breaks'))
-                ->setMarkupEscaped($this->config('escape_markup'))
-                ->setUrlsLinked($this->config('automatic_links'))
-                ->text($value);
+        if ($this->config('automatic_line_breaks')) {
+            $markdown = $markdown->withAutoLineBreaks();
+        }
+
+        if ($this->config('escape_markup')) {
+            $markdown = $markdown->withMarkupEscaping();
+        }
+
+        if ($this->config('automatic_links')) {
+            $markdown = $markdown->withAutoLinks();
+        }
+
+        $html = $markdown->parse($value);
 
         if ($this->config('smartypants')) {
             $html = Html::smartypants($html);
