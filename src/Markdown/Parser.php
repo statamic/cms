@@ -19,7 +19,7 @@ class Parser
         $this->config = $config;
     }
 
-    public function parse($markdown): string
+    public function parse(string $markdown): string
     {
         return $this->converter()->convertToHtml($markdown);
     }
