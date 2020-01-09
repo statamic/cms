@@ -20,7 +20,7 @@ return [
     'collection_wizard_amp_instructions' => 'Les versions AMP seront acheminées vers <code>{site url}/amp/{entry url}</code>',
     'collection_wizard_articles_description' => 'Les entrées avec des dates dans le futur seront privées.',
     'collection_wizard_blueprints_instructions' => 'Si vous choisissez plusieurs Blueprints, les utilisateurs pourront en sélectionner un lors de la création des entrées. Le premier sera le défaut.',
-    'collection_wizard_fields_intro' => 'Votre modèle de contenu détermine le champ et les données stockés dans cette collection.',
+    'collection_wizard_content_model_intro' => 'Votre modèle de contenu détermine le champ et les données stockés dans cette collection.',
     'collection_wizard_dates_intro' => 'Vous pouvez sélectionner différents comportements de date.',
     'collection_wizard_default_status_draft_description' => 'Les entrées seront par défaut au statut <span class="text-grey-60">brouillon</span> .',
     'collection_wizard_default_status_published_description' => 'Les entrées seront par défaut au statut <span class="text-green">publié</span> .',

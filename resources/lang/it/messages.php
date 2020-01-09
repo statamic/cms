@@ -20,7 +20,7 @@ return [
     'collection_wizard_amp_instructions' => 'Le versioni AMP verranno indirizzate a <code>{site url}/amp/{entry url}</code>',
     'collection_wizard_articles_description' => 'Le iscrizioni con date future saranno private.',
     'collection_wizard_blueprints_instructions' => 'Se si scelgono più progetti, gli utenti saranno in grado di selezionarne uno durante la creazione di voci. Il primo sarà il valore predefinito.',
-    'collection_wizard_fields_intro' => 'Il tuo modello di contenuto determina quale campo e dati sono archiviati in questa raccolta.',
+    'collection_wizard_content_model_intro' => 'Il tuo modello di contenuto determina quale campo e dati sono archiviati in questa raccolta.',
     'collection_wizard_dates_intro' => 'È possibile selezionare diversi comportamenti di data.',
     'collection_wizard_default_status_draft_description' => 'Le iscrizioni saranno default stato <span class="text-grey-60">di bozza.</span>',
     'collection_wizard_default_status_published_description' => 'Le voci passeranno automaticamente allo stato <span class="text-green">pubblicato</span> .',

@@ -20,7 +20,7 @@ return [
     'collection_wizard_amp_instructions' => 'AMP versions will be routed to <code>{site url}/amp/{entry url}</code>',
     'collection_wizard_articles_description' => 'Entries with dates in the future will be private.',
     'collection_wizard_blueprints_instructions' => 'Choose from existing Blueprints or create a new one.',
-    'collection_wizard_fields_intro' => 'Collection entries can contain any number of fields by using Blueprints.',
+    'collection_wizard_content_model_intro' => 'Your content model determines what fields and behaviors define this collection.',
     'collection_wizard_dates_intro' => 'You can select different date behaviors.',
     'collection_wizard_default_status_draft_description' => 'Entries will default to <span class="text-grey-60">draft</span> status.',
     'collection_wizard_default_status_published_description' => 'Entries will default to <span class="text-green">published</span> status.',
