@@ -44,6 +44,9 @@
         "sort-packages": true
     },
     "extra": {
+        "branch-alias": {
+            "dev-master": "3.0.x-beta"
+        },
         "download-dist": {
             "url": "https://github.com/statamic/cms/releases/download/{$version}/dist.tar.gz",
             "path": "resources/dist"
