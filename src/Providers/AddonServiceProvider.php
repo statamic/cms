@@ -18,6 +18,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $tags = [];
     protected $fieldtypes = [];
     protected $modifiers = [];
+    protected $widgets = [];
     protected $commands = [];
     protected $stylesheets = [];
     protected $scripts = [];
@@ -37,6 +38,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             ->bootTags()
             ->bootFieldtypes()
             ->bootModifiers()
+            ->bootWidgets()
             ->bootCommands()
             ->bootSchedule()
             ->bootStylesheets()
@@ -82,6 +84,15 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function bootModifiers()
     {
         foreach ($this->modifiers as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootWidgets()
+    {
+        foreach ($this->widgets as $class) {
             $class::register();
         }
 
