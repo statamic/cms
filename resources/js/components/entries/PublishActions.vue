@@ -75,6 +75,7 @@ export default {
         published: Boolean,
         collection: String,
         reference: String,
+        publishContainer: String,
     },
 
     data() {
@@ -135,7 +136,7 @@ export default {
 
         runBeforePublishHook() {
             Statamic.$hooks
-                .run('entry.publishing', { collection: this.collection, message: this.revisionMessage })
+                .run('entry.publishing', { collection: this.collection, message: this.revisionMessage, storeName: this.publishContainer })
                 .then(this.performPublishRequest)
                 .catch(error => {
                     this.saving = false;

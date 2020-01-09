@@ -237,6 +237,7 @@
             :published="published"
             :collection="collectionHandle"
             :reference="initialReference"
+            :publish-container="publishContainer"
             @closed="confirmingPublish = false"
             @saving="saving = true"
             @saved="publishActionCompleted"
@@ -410,7 +411,8 @@ export default {
             Statamic.$hooks.run('entry.saving', {
                 collection: this.collectionHandle,
                 values: this.values,
-                container: this.$refs.container
+                container: this.$refs.container,
+                storeName: this.publishContainer,
             })
             .then(this.performSaveRequest)
             .catch(error => {
