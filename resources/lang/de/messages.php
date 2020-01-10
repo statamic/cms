@@ -20,7 +20,7 @@ return [
     'collection_wizard_amp_instructions' => 'AMP-Versionen werden an <code>{site url}/amp/{entry url}</code>',
     'collection_wizard_articles_description' => 'Einträge mit Daten in der Zukunft werden privat sein.',
     'collection_wizard_blueprints_instructions' => 'Wenn Sie mehrere Blaupausen auswählen, können Benutzer beim Erstellen von Einträgen aus einer auswählen. Die erste ist die Standardeinstellung.',
-    'collection_wizard_fields_intro' => 'Ihr Inhaltsmodell bestimmt, welche Felder und Daten in dieser Sammlung gespeichert werden.',
+    'collection_wizard_content_model_intro' => 'Ihr Inhaltsmodell bestimmt, welche Felder und Daten in dieser Sammlung gespeichert werden.',
     'collection_wizard_dates_intro' => 'Sie können verschiedene Datumsverhalten auswählen.',
     'collection_wizard_default_status_draft_description' => 'Einträge werden standardmäßig in den <span class="text-grey-60">Entwurfsstatus versetzt</span> .',
     'collection_wizard_default_status_published_description' => 'Einträge werden standardmäßig <span class="text-green">veröffentlicht</span> .',

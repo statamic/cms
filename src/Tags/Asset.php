@@ -40,8 +40,6 @@ class Asset extends Assets
      */
     public function index()
     {
-        $asset = AssetAPI::find($this->get(['url', 'src']));
-
-        return $asset ? $asset->toArray() : $asset;
+        return AssetAPI::find($this->get(['url', 'src']));
     }
 }

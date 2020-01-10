@@ -211,7 +211,7 @@ class FrontendTest extends TestCase
 
         $response = $this->get('about');
 
-        $this->assertEquals("<h1>Foo <em>Bar</em></h1># Foo *Bar*", trim($response->content()));
+        $this->assertEquals("<h1>Foo <em>Bar</em></h1>\n# Foo *Bar*", trim($response->content()));
     }
 
     /** @test */
