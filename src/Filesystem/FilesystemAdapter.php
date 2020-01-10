@@ -28,6 +28,10 @@ class FilesystemAdapter extends AbstractAdapter
 
     public function normalizePath($path)
     {
+        if (is_null($path)) {
+            $path = '/';
+        }
+
         // If given an absolute path, just tidy it (to adjust the slashes) and return it.
         // Except for a single slash, because that means "the root of the configured
         // filesystem", and not "the root of this entire computer".
