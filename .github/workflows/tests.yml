@@ -2,6 +2,7 @@ name: Run Tests
 
 on:
   push:
+  pull_request:
   schedule:
       - cron: '0 0 * * *'
 
