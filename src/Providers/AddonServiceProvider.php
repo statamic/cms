@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Gate;
 
 abstract class AddonServiceProvider extends ServiceProvider
 {
@@ -19,6 +20,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $fieldtypes = [];
     protected $modifiers = [];
     protected $widgets = [];
+    protected $policies = [];
     protected $commands = [];
     protected $stylesheets = [];
     protected $scripts = [];
@@ -96,6 +98,15 @@ abstract class AddonServiceProvider extends ServiceProvider
             $class::register();
         }
 
+        return $this;
+    }
+    
+    protected function bootPolicies()
+    {
+        foreach ($this->policies as $key => $value) {
+            Gate::policy($key, $value);   
+        }
+        
         return $this;
     }
 
