@@ -145,10 +145,10 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindUsers()
     {
-        Route::bind('user', function ($binding, $route) {
+        Route::bind('user', function ($handle, $route) {
             throw_unless(
-                $user = User::find($binding) ?? User::findByEmail($binding),
-                new NotFoundHttpException("User [$binding] not found.")
+                $user = User::find($handle),
+                new NotFoundHttpException("User [$handle] not found.")
             );
 
             return $user;
