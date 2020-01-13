@@ -1244,15 +1244,16 @@ class Parser
     }
 
     /**
-     * Splits a string into a modifier and its paraters
+     * Splits a string into a modifier and its parameters
      *
      * @param string $text Text to evaluate
      * @return array
      */
     protected function unpackModifier($modifier) {
         $parts = explode(':', $modifier);
+        $modifier = array_shift($parts);
 
-        return [array_get($parts, 0), array_get($parts, 1)];
+        return [$modifier, $parts];
     }
 
     /**
