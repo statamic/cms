@@ -260,7 +260,7 @@ export default {
             const content = this.valueToContent(value);
 
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                this.editor.setContent(content);
+                this.editor.setContent(content, true);
             }
         },
 
