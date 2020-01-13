@@ -11,6 +11,7 @@ use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
+use Statamic\Facades\User;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -31,6 +32,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->bindSites();
         $this->bindRevisions();
         $this->bindForms();
+        $this->bindUsers();
     }
 
     protected function bindEntries()
@@ -124,6 +126,18 @@ class RouteServiceProvider extends ServiceProvider
             );
 
             return $form;
+        });
+    }
+
+    protected function bindUsers()
+    {
+        Route::bind('user', function ($handle, $route) {
+            throw_unless(
+                $user = User::find($handle),
+                new NotFoundHttpException("User [$handle] not found.")
+            );
+
+            return $user;
         });
     }
 }
