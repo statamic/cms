@@ -4,17 +4,19 @@ namespace Statamic\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Statamic\Facades\User;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\API\UserResource;
 
-class UsersController extends CpController
+class UsersController extends ApiController
 {
-    use TemporaryResourcePagination;
-
     public function index(Request $request)
     {
-        $users = static::paginate(User::all()->values());
+        return app(UserResource::class)::collection(
+            $this->filterSortAndPaginate(User::query())
+        );
+    }
 
-        return app(UserResource::class)::collection($users);
+    public function show($user)
+    {
+        return app(UserResource::class)::make($user);
     }
 }
