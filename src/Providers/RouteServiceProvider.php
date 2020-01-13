@@ -8,6 +8,7 @@ use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
@@ -29,6 +30,7 @@ class RouteServiceProvider extends ServiceProvider
         $this->bindCollections();
         $this->bindTerms();
         $this->bindTaxonomies();
+        $this->bindGlobalSets();
         $this->bindSites();
         $this->bindRevisions();
         $this->bindForms();
@@ -82,6 +84,18 @@ class RouteServiceProvider extends ServiceProvider
             );
 
             return $term;
+        });
+    }
+
+    protected function bindGlobalSets()
+    {
+        Route::bind('global', function ($handle) {
+            throw_unless(
+                $globalSet = GlobalSet::findByHandle($handle),
+                new NotFoundHttpException("Global set [$handle] not found.")
+            );
+
+            return $globalSet;
         });
     }
 
