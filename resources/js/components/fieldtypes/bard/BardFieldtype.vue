@@ -116,7 +116,6 @@ import Link from './Link';
 import Image from './Image';
 import RemoveFormat from './RemoveFormat';
 import LinkToolbarButton from './LinkToolbarButton.vue';
-import ConfirmSetDelete from './ConfirmSetDelete';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
@@ -421,7 +420,6 @@ export default {
             let exts = [
                 new Doc(),
                 new Set({ bard: this }),
-                new ConfirmSetDelete(),
                 new HardBreak(),
                 new History()
             ];
