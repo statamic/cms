@@ -89,10 +89,10 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindGlobalSets()
     {
-        Route::bind('global', function ($handle) {
+        Route::bind('global', function ($binding) {
             throw_unless(
-                $globalSet = GlobalSet::findByHandle($handle),
-                new NotFoundHttpException("Global set [$handle] not found.")
+                $globalSet = GlobalSet::findByHandle($binding) ?? GlobalSet::find($binding),
+                new NotFoundHttpException("Global set [$binding] not found.")
             );
 
             return $globalSet;
