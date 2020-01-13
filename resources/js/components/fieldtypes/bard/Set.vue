@@ -1,6 +1,9 @@
 <template>
 
-    <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow" contenteditable="false" @copy.stop @paste.stop>
+    <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow"
+        :class="{ 'border-blue-lighter': selected }"
+        contenteditable="false" @copy.stop @paste.stop
+    >
         <div ref="content" hidden />
         <div class="replicator-set-header" :class="{'collapsed': collapsed}">
             <div class="item-move sortable-handle" data-drag-handle />
