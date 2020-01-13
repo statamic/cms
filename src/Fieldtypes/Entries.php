@@ -37,6 +37,7 @@ class Entries extends Relationship
         'initialReadOnly' => 'readOnly',
         'revisionsEnabled' => 'revisionsEnabled',
         'breadcrumbs' => 'breadcrumbs',
+        'collectionHandle' => 'collection',
     ];
 
     protected $extraConfigFields = [

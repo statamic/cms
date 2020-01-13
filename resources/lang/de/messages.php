@@ -138,7 +138,7 @@ return [
     'taxonomy_wizard_blueprint_instructions' => 'Sie können einen vorhandenen Entwurf auswählen oder einen neuen erstellen.',
     'taxonomy_wizard_collections_instructions' => 'Wenn eine Sammlung mit Kategorien verknüpft ist, werden ihren Formularen automatisch Felder hinzugefügt.',
     'taxonomy_wizard_collections_intro' => 'Erstellen Sie die Verknüpfungen zwischen Kategorien und Sammlung.',
-    'taxonomy_wizard_content_model_intro' => 'Ihr Inhaltsmodell bestimmt, welche Felder und Daten für diese Kategorien gespeichert werden.',
+    'taxonomy_wizard_fields_intro' => 'Ihr Inhaltsmodell bestimmt, welche Felder und Daten für diese Kategorien gespeichert werden.',
     'taxonomy_wizard_handle_instructions' => 'Wie Sie diese Kategorien in Ihren Vorlagen referenzieren. Kann nicht einfach geändert werden.',
     'taxonomy_wizard_intro' => 'Kategorien sind ein System zum Klassifizieren von Daten, z.B. anhand von Typ oder Farbe.',
     'taxonomy_wizard_title_instructions' => 'Normalerweise ein Substantiv wie "Schlagworte" oder "Tags".',

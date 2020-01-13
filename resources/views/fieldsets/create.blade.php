@@ -22,7 +22,7 @@
 
         <div class="flex items-center">
             <button class="btn btn-primary">{{ __('Create') }}</button>
-            <p class="text-xs text-grey-60 ml-2">{{ __('messages.fieldsets_button_help_text') }}</p>
+            <p class="text-xs text-grey-60 ml-2">{{ __('statamic::messages.fieldsets_button_help_text') }}</p>
         </div>
 
     </form>

@@ -28,6 +28,7 @@ class NotFoundHttpException extends SymfonyException
     {
         $layouts = collect([
             'errors.layout',
+            'layouts.layout',
             'layout',
             'statamic::blank'
         ]);

@@ -397,6 +397,10 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
             return false;
         }
 
+        if (!$this->hasDate()) {
+            return true;
+        }
+
         if ($collection->futureDateBehavior() === 'private' && $this->date()->isFuture()) {
             return true;
         }

@@ -138,7 +138,7 @@ return [
     'taxonomy_wizard_blueprint_instructions' => 'Vous pouvez choisir un Blueprint existant ou en créer un nouveau.',
     'taxonomy_wizard_collections_instructions' => 'Quand une collection est liée à une taxonomie, ses entrées obtiendront automatiquement des champs ajoutés à leurs formulaires.',
     'taxonomy_wizard_collections_intro' => 'Créez les liens entre taxonomie et collection.',
-    'taxonomy_wizard_content_model_intro' => 'Votre modèle de contenu détermine le champ et les données stockés dans cette taxonomie.',
+    'taxonomy_wizard_fields_intro' => 'Votre modèle de contenu détermine le champ et les données stockés dans cette taxonomie.',
     'taxonomy_wizard_handle_instructions' => 'Comment vous allez référencer cette taxonomie dans vos modèles. Ne peut pas être facilement changé.',
     'taxonomy_wizard_intro' => 'Une taxonomie est un système de classification des données autour d’un ensemble de caractéristiques uniques, telles que la catégorie ou la couleur.',
     'taxonomy_wizard_title_instructions' => 'Habituellement, un nom, comme "Catégories" ou "Etiquettes".',

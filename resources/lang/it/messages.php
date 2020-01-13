@@ -138,7 +138,7 @@ return [
     'taxonomy_wizard_blueprint_instructions' => 'Puoi scegliere un progetto esistente o crearne uno nuovo.',
     'taxonomy_wizard_collections_instructions' => 'Quando una raccolta è collegata a una tassonomia, alle sue voci verranno automaticamente aggiunti campi nei loro moduli.',
     'taxonomy_wizard_collections_intro' => 'Crea i collegamenti tra tassonomia e raccolta.',
-    'taxonomy_wizard_content_model_intro' => 'Il tuo modello di contenuto determina quale campo e dati sono memorizzati in questa tassonomia.',
+    'taxonomy_wizard_fields_intro' => 'Il tuo modello di contenuto determina quale campo e dati sono memorizzati in questa tassonomia.',
     'taxonomy_wizard_handle_instructions' => 'Come farai riferimento a questa tassonomia nei tuoi modelli. Non può essere facilmente modificato.',
     'taxonomy_wizard_intro' => 'Una tassonomia è un sistema di classificazione dei dati attorno a un insieme di caratteristiche uniche, come categoria o colore.',
     'taxonomy_wizard_title_instructions' => 'Di solito un sostantivo, come "Categorie" o "Tag".',

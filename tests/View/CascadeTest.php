@@ -406,7 +406,7 @@ class FakeSite extends \Statamic\Sites\Site
 {
     public function __construct()
     {
-        parent::__construct('en', config('statamic.sites.en'));
+        parent::__construct('en', config('statamic.sites.sites.en'));
     }
 }
 

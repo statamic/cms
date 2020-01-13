@@ -20,6 +20,7 @@ use Statamic\Facades\Theme;
 use Statamic\Facades\Config;
 use Statamic\Facades\Helper;
 use Statamic\Facades\Localization;
+use Statamic\Facades\Markdown;
 use Stringy\StaticStringy as Stringy;
 use Statamic\Modifiers\Modifier;
 
@@ -1099,9 +1100,15 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return mixed
      */
-    public function markdown($value)
+    public function markdown($value, $params)
     {
-        return Html::markdown($value);
+        $parser = $params[0] ?? 'default';
+
+        if (in_array($parser, [true, 'true', ''])) {
+            $parser = 'default';
+        }
+
+        return Markdown::parser($parser)->parse($value);
     }
 
     /**
@@ -1621,18 +1628,6 @@ class CoreModifiers extends Modifier
     public function slugify($value)
     {
         return Stringy::slugify($value);
-    }
-
-    /**
-     * Parse with SmartyPants. Aren't you fancy?
-     *
-     * @param $value
-     * @param $params
-     * @return string
-     */
-    public function smartypants($value, $params)
-    {
-        return Html::smartypants($value, Arr::get($params, 0 , 1));
     }
 
     /**

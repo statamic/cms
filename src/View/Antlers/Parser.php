@@ -720,7 +720,7 @@ class Parser
                     $bits = explode(' ??= ', $match[1]);
 
                     // Parse the condition side of the statement
-                    $condition = $this->processCondition($bits[0], $data);
+                    $condition = $this->processCondition($bits[0], $data, false);
 
                     // Grab the desired output if true
                     $if_true = trim($bits[1]);
@@ -741,7 +741,7 @@ class Parser
                     $bits = explode('? ', $match[1]);
 
                     // Parse the condition side of the statement
-                    $condition = $this->processCondition(trim($bits[0]), $data);
+                    $condition = $this->processCondition(trim($bits[0]), $data, false);
 
                     // Collect the rest of the data
                     list($if_true, $if_false) = explode(': ', $bits[1]);
@@ -768,7 +768,7 @@ class Parser
      * @param  mixed  $data       Data to use when executing conditionals
      * @return string
      */
-    public function processCondition($condition, $data)
+    public function processCondition($condition, $data, $isTagPair = true)
     {
         if (strpos($condition, ' | ') !== false) {
             $condition = str_replace(' | ', '|', $condition);
@@ -847,7 +847,11 @@ class Parser
             $condition = str_replace('__temp_replacement_' . $replace_key, $replace_value, $condition);
         }
 
-        $this->inCondition = true;
+        // Ternary statements are evaluated inline and this have no
+        // tag pair contents to process conditionally.
+        if ($isTagPair) {
+            $this->inCondition = true;
+        }
 
         // evaluate special comparisons
         if (strpos($condition, ' ~ ') !== false) {
@@ -1201,10 +1205,20 @@ class Parser
             }
 
             // If the first part of the variable is "view", we'll try to get the value from
-            // the front-matter, which is stored in the cascade organized by the view paths.
+            // values defined in any views' front-matter. They are stored in the cascade
+            // organized by the view paths. It should be able to get a value from any
+            // loaded view, but the current view should take precedence. (ie. if
+            // you define the same var in this view and another view, the one
+            // from this view should win.)
             if ($first == 'view') {
-                if ($cascading = $this->cascade->get('views')[$this->view] ?? null) {
-                    return $this->getVariableExistenceAndValue($rest, $cascading);
+                $views = collect($this->cascade->get('views'));
+                $thisView = $views->pull($this->view);
+                $views->prepend($thisView, $this->view);
+                foreach ($views as $viewData) {
+                    $viewExistAndVal = $this->getVariableExistenceAndValue($rest, $viewData);
+                    if ($viewExistAndVal[0]) {
+                        return $viewExistAndVal;
+                    }
                 }
             }
 
