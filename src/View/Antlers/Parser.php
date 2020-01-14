@@ -1427,9 +1427,16 @@ class Parser
             $exception->setSolution($e->getSolution());
         }
 
+        $trace = $exception->getPrevious()->getTrace();
+
+        array_unshift($trace, [
+            'file' => $e->getFile(),
+            'line' => $e->getLine(),
+        ]);
+
         $traceProperty = new ReflectionProperty('Exception', 'trace');
         $traceProperty->setAccessible(true);
-        $traceProperty->setValue($exception, $exception->getPrevious()->getTrace());
+        $traceProperty->setValue($exception, $trace);
 
         $exception->setView($this->view);
         $exception->setViewData($this->getViewDataForException($data));
