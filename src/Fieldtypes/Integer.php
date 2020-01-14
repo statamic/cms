@@ -8,6 +8,10 @@ class Integer extends Fieldtype
 {
     public function preProcess($data)
     {
+        if ($data === null) {
+            return null;
+        }
+
         return (int) $data;
     }
 
