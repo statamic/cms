@@ -21,6 +21,10 @@ class Locales extends Tags
      */
     public function index()
     {
+        if (! $this->getData()) {
+            return '';
+        }
+
         return $this->getLocales();
     }
 
