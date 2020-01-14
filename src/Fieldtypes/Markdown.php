@@ -38,7 +38,7 @@ class Markdown extends Fieldtype
         ],
         'escape_markup' => [
             'type' => 'toggle',
-            'default' => true,
+            'default' => false,
             'instructions' => 'Escapes inline HTML markup (e.g. `<div>` to `&lt;div&gt;`).',
             'width' => 50,
         ],
