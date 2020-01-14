@@ -260,7 +260,9 @@ class Arr extends IlluminateArr
             ->map(function ($key) use ($array) {
                 return static::get($array, $key);
             })
-            ->filter()
+            ->reject(function ($value) {
+                return $value === null;
+            })
             ->first();
 
         return $value ?? $default;

@@ -23,7 +23,7 @@ class ArrayAccessor extends Collection
 
     public function bool($key, $default = false)
     {
-        if (! $value = $this->get($key)) {
+        if (is_null($value = $this->get($key))) {
             return $default;
         }
 
