@@ -71,4 +71,23 @@ class ArrTest extends TestCase
 
         Arr::addScope(['one', 'two'], 'scope');
     }
+
+    /** @test */
+    function it_gets_the_first_non_null_value()
+    {
+        $this->assertEquals('one', Arr::getFirst([
+            'foo' => 'one',
+            'bar' => 'two',
+        ], ['foo', 'bar']));
+
+        $this->assertEquals('two', Arr::getFirst([
+            'foo' => null,
+            'bar' => 'two',
+        ], ['foo', 'bar']));
+
+        $this->assertEquals(false, Arr::getFirst([
+            'foo' => false,
+            'bar' => 'two',
+        ], ['foo', 'bar']));
+    }
 }
