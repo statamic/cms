@@ -6,10 +6,11 @@ use Statamic\Facades\URL;
 use Statamic\Facades\Site;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Config;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Http\Responses\DataResponse;
 use Illuminate\Contracts\Support\Responsable;
 
-class Route implements Responsable
+class Route implements Responsable, Augmentable
 {
     private $uri;
     private $data;
@@ -52,6 +53,11 @@ class Route implements Responsable
             'amp_url' => $this->ampUrl(),
             'permalink' => $this->absoluteUrl(),
         ]);
+    }
+
+    public function toAugmentedArray()
+    {
+        return $this->toArray();
     }
 
     public function loadedData()
