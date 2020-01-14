@@ -308,7 +308,8 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
         $route = '/' . str_replace('_', '-', $this->taxonomyHandle()) . '/{slug}';
 
         if ($this->collection()) {
-            $route = $this->collection()->url() . $route;
+            $collectionUrl = $this->collection()->url() ?? $this->collection()->handle();
+            $route = $collectionUrl . $route;
         }
 
         return $route;
