@@ -24,7 +24,7 @@ export default {
             const id = this.deletingRow.id;
             message = message || __('Deleted');
 
-            this.$axios.delete(`${resourceRoute}/${id}`)
+            this.$axios.delete(cp_url(`${resourceRoute}/${id}`))
                 .then(() => {
                     let i = _.indexOf(this.rows, _.findWhere(this.rows, { id }));
                     this.rows.splice(i, 1);

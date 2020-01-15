@@ -21,7 +21,7 @@
                         :bodyText="__('Are you sure you want to delete this form?')"
                         :buttonText="__('Delete')"
                         :danger="true"
-                        @confirm="deleteRow('/cp/forms')"
+                        @confirm="deleteRow('forms')"
                         @cancel="cancelDeleteRow"
                     >
                     </confirmation-modal>
