@@ -22,6 +22,10 @@ class Checkboxes extends Fieldtype
     {
         $augmented = [];
 
+        if (is_null($values)) {
+            return [];
+        }
+
         foreach ($values as $key => $value) {
             $augmented[$key] = ['value' => $value, 'label' => array_get($this->config('options'), $value)];
         }
