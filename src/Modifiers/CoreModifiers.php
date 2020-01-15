@@ -1386,8 +1386,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Format date in an easier for humans to read format.
-     * Send $params[1] as true to turn off modifiers "ago", "from now", etc.
+     * Alias of `diff_for_humans`.
      *
      * @param $value
      * @param $params
@@ -1395,9 +1394,35 @@ class CoreModifiers extends Modifier
      */
     public function relative($value, $params)
     {
+        return $this->diffForHumans($value, $params);
+    }
+
+    /**
+     * Format date in an easier for humans to read format.
+     * Send $params[1] as true to turn off modifiers "ago", "from now", etc.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function diffForHumans($value, $params)
+    {
         $remove_modifiers = Arr::get($params, 0, false);
 
         return $this->carbon($value)->diffForHumans(null, $remove_modifiers);
+    }
+
+    /**
+     * Format date in an easier for owls to read format.
+     * For whoever gives a hoot.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function diffForOwls($value, $params)
+    {
+        return strrev($this->diffForHumans($value, $params));
     }
 
     /**
