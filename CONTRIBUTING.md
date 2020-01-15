@@ -85,6 +85,6 @@ We welcome new translations and updates! Please follow [these instructions](http
 Pull requests should clearly describe the problem and solution. Include the relevant issue number if there is one. If the pull request fixes a bug, it should include a new test case that demonstrates the issue, if possible.
 
 <br>
-Thank you! Stay rad. If you're not already rad, tell us us and we will make it so.
+Thank you! Stay rad. If you're not already rad, tell us and we will make it so.
 
 :sparkles:
