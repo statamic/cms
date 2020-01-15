@@ -50,7 +50,7 @@ class EntriesTest extends TestCase
     {
         $params['from'] = 'test';
 
-        $params = new Parameters($params, new Context([], Antlers::parser()));
+        $params = new Parameters($params, new Context);
 
         return (new Entries($params))->get();
     }

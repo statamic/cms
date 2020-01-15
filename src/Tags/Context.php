@@ -9,11 +9,11 @@ class Context extends ArrayAccessor
 {
     protected $parser;
 
-    public function __construct($items, Parser $parser)
+    public function setParser(Parser $parser)
     {
         $this->parser = $parser;
 
-        parent::__construct($items);
+        return $this;
     }
 
     public function get($key, $default = null)

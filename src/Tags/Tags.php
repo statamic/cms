@@ -107,7 +107,7 @@ abstract class Tags
 
     public function setContext($context)
     {
-        $this->context = new Context($context, $this->parser);
+        $this->context = (new Context($context))->setParser($this->parser);
 
         return $this;
     }
