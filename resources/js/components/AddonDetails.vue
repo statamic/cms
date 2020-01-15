@@ -52,7 +52,7 @@
 
         methods: {
             install() {
-                this.$axios.post('/cp/addons/install', {'addon': this.package}, this.toEleven);
+                this.$axios.post(cp_url('addons/install'), {'addon': this.package}, this.toEleven);
 
                 this.waitingForRefresh = true;
 
@@ -66,7 +66,7 @@
             },
 
             uninstall() {
-                this.$axios.post('/cp/addons/uninstall', {'addon': this.package}, this.toEleven);
+                this.$axios.post(cp_url('addons/uninstall'), {'addon': this.package}, this.toEleven);
 
                 this.waitingForRefresh = true;
 

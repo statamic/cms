@@ -24,7 +24,7 @@
                         :bodyText="__('Are you sure you want to delete this structure?')"
                         :buttonText="__('Delete')"
                         :danger="true"
-                        @confirm="deleteRow('/cp/structures')"
+                        @confirm="deleteRow('structures')"
                         @cancel="cancelDeleteRow"
                     >
                     </confirmation-modal>
