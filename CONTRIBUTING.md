@@ -78,7 +78,7 @@ If you are submitting a change that will affect a compiled file, such as most of
 
 ### Control Panel Translations
 
-We welcome new translations and updates! Please follow [these instructions](https://github.com/statamic/cms/wiki/Translating-the-Control-Panel) on how to contribute to Statamic's translation files.
+We welcome new translations and updates! Please follow [these instructions](https://statamic.dev/cp-translations#contributing-a-new-translation) on how to contribute to Statamic's translation files.
 
 ### Pull Requests
 
