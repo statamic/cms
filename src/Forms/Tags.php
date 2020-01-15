@@ -49,7 +49,7 @@ class Tags extends BaseTags
     {
         $this->context['form'] = $this->getParam(static::HANDLE_PARAM);
 
-        return $this->parse($this->context);
+        return [];
     }
 
     /**
