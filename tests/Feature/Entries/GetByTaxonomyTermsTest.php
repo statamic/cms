@@ -46,5 +46,6 @@ class GetByTaxonomyTermsTest extends TestCase
         $this->assertEquals([1, 2, 3], Entry::query()->whereTaxonomyIn(['tags::rad', 'categories::events'])->get()->map->id()->all());
         $this->assertEquals([3], Entry::query()->whereTaxonomyIn(['tags::rad', 'tags::meh'])->whereTaxonomy('tags::awesome')->get()->map->id()->all());
         $this->assertEquals([2], Entry::query()->whereTaxonomyIn(['tags::meh', 'categories::events'])->whereTaxonomy('tags::awesome')->get()->map->id()->all());
+        $this->assertEquals([2], Entry::query()->whereTaxonomyIn(['tags::meh', 'categories::events'])->whereTaxonomyIn(['tags::awesome', 'tags::rad'])->get()->map->id()->all());
     }
 }
