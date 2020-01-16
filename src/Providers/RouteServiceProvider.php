@@ -26,27 +26,15 @@ class RouteServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->bindEntries();
         $this->bindCollections();
-        $this->bindTerms();
+        $this->bindEntries();
         $this->bindTaxonomies();
+        $this->bindTerms();
         $this->bindGlobalSets();
         $this->bindSites();
         $this->bindRevisions();
         $this->bindForms();
         $this->bindUsers();
-    }
-
-    protected function bindEntries()
-    {
-        Route::bind('entry', function ($handle, $route) {
-            throw_if(
-                ! ($entry = Entry::find($handle)) || $entry->collection() !== $route->parameter('collection'),
-                new NotFoundHttpException("Entry [$handle] not found.")
-            );
-
-            return $entry;
-        });
     }
 
     protected function bindCollections()
@@ -58,6 +46,18 @@ class RouteServiceProvider extends ServiceProvider
             );
 
             return $collection;
+        });
+    }
+
+    protected function bindEntries()
+    {
+        Route::bind('entry', function ($handle, $route) {
+            throw_if(
+                ! ($entry = Entry::find($handle)) || $entry->collection() !== $route->parameter('collection'),
+                new NotFoundHttpException("Entry [$handle] not found.")
+            );
+
+            return $entry;
         });
     }
 
