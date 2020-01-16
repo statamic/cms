@@ -5,6 +5,8 @@ namespace Statamic\Providers;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Form;
@@ -30,6 +32,8 @@ class RouteServiceProvider extends ServiceProvider
         $this->bindEntries();
         $this->bindTaxonomies();
         $this->bindTerms();
+        $this->bindAssetContainers();
+        $this->bindAssets();
         $this->bindGlobalSets();
         $this->bindSites();
         $this->bindRevisions();
@@ -80,10 +84,36 @@ class RouteServiceProvider extends ServiceProvider
 
             throw_if(
                 ! ($term = Term::find($id)->in($route->parameter('site'))) || $term->taxonomy() !== $route->parameter('taxonomy'),
-                new NotFoundHttpException("Taxonomy [$handle] not found.")
+                new NotFoundHttpException("Taxonomy term [$handle] not found.")
             );
 
             return $term;
+        });
+    }
+
+    protected function bindAssetContainers()
+    {
+        Route::bind('asset_container', function ($handle) {
+            throw_unless(
+                $container = AssetContainer::findByHandle($handle),
+                new NotFoundHttpException("Asset container [$handle] not found.")
+            );
+
+            return $container;
+        });
+    }
+
+    protected function bindAssets()
+    {
+        Route::bind('asset', function ($handle, $route) {
+            $id = $route->parameter('asset_container')->handle() . '::' . $handle;
+
+            throw_unless(
+                $asset = Asset::find($id),
+                new NotFoundHttpException("Asset [$handle] not found.")
+            );
+
+            return $asset;
         });
     }
 
