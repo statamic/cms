@@ -39,5 +39,7 @@ class GetByTaxonomyTermsTest extends TestCase
 
         $this->assertEquals(4, Entry::query()->count());
         $this->assertEquals(1, Entry::query()->whereTaxonomy('tags::rad')->whereTaxonomy('tags::awesome')->count());
+        $this->assertEquals(3, Entry::query()->whereTaxonomyIn(['tags::rad', 'tags::meh'])->count());
+        $this->assertEquals(1, Entry::query()->whereTaxonomyIn(['tags::rad', 'tags::meh'])->whereTaxonomy('tags::awesome')->count());
     }
 }
