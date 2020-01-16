@@ -278,9 +278,13 @@ class Bard extends Replicator
             return (new Fields($set['fields']))->addValues($defaults[$handle])->meta();
         })->toArray();
 
-        $collapsed = [];
-
-        return compact('existing', 'new', 'defaults', 'collapsed');
+        return [
+            'existing' => $existing,
+            'new' => $new,
+            'defaults' => $defaults,
+            'collapsed' => [],
+            '__collaboration' => ['existing'],
+        ];
     }
 
     public function preProcessValidatable($value)
