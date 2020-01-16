@@ -4,17 +4,19 @@ namespace Statamic\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Statamic\Facades\Term;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\API\TermResource;
 
-class TaxonomyTermsController extends CpController
+class TaxonomyTermsController extends ApiController
 {
-    use TemporaryResourcePagination;
-
-    public function index($collection, Request $request)
+    public function index($taxonomy, Request $request)
     {
-        $terms = static::paginate(collect());
+        return app(TermResource::class)::collection(
+            $this->filterSortAndPaginate($taxonomy->queryTerms())
+        );
+    }
 
-        return app(TermResource::class)::collection($terms);
+    public function show($collection, $term)
+    {
+        return app(TermResource::class)::make($term);
     }
 }
