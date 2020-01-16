@@ -14,8 +14,6 @@ class AssetResource extends Resource
      */
     public function toArray($request)
     {
-        return [
-            'id' => $this->resource->id(),
-        ];
+        return $this->resource->toAugmentedArray();
     }
 }

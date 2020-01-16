@@ -14,8 +14,6 @@ class TermResource extends Resource
      */
     public function toArray($request)
     {
-        return [
-            //
-        ];
+        return $this->toAugmentedArray();
     }
 }
