@@ -3,14 +3,15 @@
 namespace Statamic\Tags\Collection;
 
 use Closure;
-use Statamic\Facades;
-use Statamic\Support\Arr;
-use Statamic\Facades\Site;
-use Statamic\Facades\Entry;
-use Statamic\Tags\Query;
-use Statamic\Facades\Collection;
 use Illuminate\Support\Carbon;
+use InvalidArgumentException;
 use Statamic\Entries\EntryCollection;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
+use Statamic\Tags\Query;
 
 class Entries
 {
@@ -114,6 +115,7 @@ class Entries
         $this->queryPublished($query);
         $this->queryPastFuture($query);
         $this->querySinceUntil($query);
+        $this->queryTaxonomies($query);
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
@@ -246,5 +248,37 @@ class Entries
         return $this->collections->reject(function ($collection) use ($condition) {
             return $condition($collection);
         })->isEmpty();
+    }
+
+    protected function queryTaxonomies($query)
+    {
+        collect($this->parameters)->filter(function ($value, $key) {
+            return $key === 'taxonomy' || Str::startsWith($key, 'taxonomy:');
+        })->each(function ($values, $param) use ($query) {
+            $taxonomy = substr($param, 9);
+            [$taxonomy, $modifier] = array_pad(explode(':', $taxonomy), 2, 'any');
+
+            if (is_string($values)) {
+                $values = explode('|', $values);
+            }
+
+            $values = collect($values)->map(function ($term) use ($taxonomy) {
+                return Str::contains($term, '::') ? $term : $taxonomy . '::' . $term;
+            });
+
+            if ($modifier === 'all') {
+                $values->each(function ($value) use ($query) {
+                    $query->whereTaxonomy($value);
+                });
+
+            } elseif ($modifier === 'any') {
+                $query->whereTaxonomyIn($values->all());
+
+            } else {
+                throw new InvalidArgumentException(
+                    'Unknown taxonomy query modifier ['.$modifier.']. Valid values are "any" and "all".'
+                );
+            }
+        });
     }
 }
