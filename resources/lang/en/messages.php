@@ -42,7 +42,7 @@ return [
     'collection_wizard_ordered_sequentially_description' => 'Entries are ordered sequentially and can be manually reordered.',
     'collection_wizard_route_instructions' => 'Routes are optional. If you don\'t need a URL, you don\'t need a route.',
     'collection_wizard_routing_intro' => 'Route rules determine the URL pattern of your collection\'s entries.',
-    'collection_wizard_structured_instructions' => 'Enable hierarchial (parent/child) URLs.',
+    'collection_wizard_structure_instructions' => 'Enable hierarchial (parent/child) URLs.',
     'collection_wizard_structure_route_instructions' => 'A route is required when choosing a structure. You can also use `parent_uri` and `depth`.',
     'collection_wizard_taxonomies_instructions' => 'Allow taxonomy relationships to be defined on entries in this collection.',
     'collection_wizard_template_instructions' => 'Set this collection\'s default template.',
