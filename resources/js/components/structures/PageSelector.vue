@@ -4,10 +4,9 @@
             class="hidden"
             ref="input"
             name="entries"
-            v-model="selections"
+            :value="[]"
             :config="config"
             :site="site"
-            :initial-data="[]"
             :item-data-url="itemDataUrl"
             :selections-url="selectionsUrl"
             :exclusions="exclusions"
@@ -36,7 +35,6 @@ export default {
             config: {
                 type: 'entries',
             },
-            selections: [],
             columns: [
                 { label: __('Title'), field: 'title' },
                 { label: __('Slug'), field: 'slug' },
@@ -71,10 +69,8 @@ export default {
             this.$refs.input.$refs.existing.click();
         },
 
-        itemDataUpdated(itemData) {
-            if (this.selections.length === 0) return;
-            this.selections = [];
-            this.$emit('selected', itemData);
+        itemDataUpdated(data) {
+            if (data.length) this.$emit('selected', data);
         }
 
     }
