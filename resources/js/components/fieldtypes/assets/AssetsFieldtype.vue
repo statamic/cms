@@ -39,19 +39,18 @@
                             @keyup.space.enter="openSelector"
                             tabindex="0">
                             <svg-icon name="folder-image" class="w-6 h-6 text-grey-80"></svg-icon>
-                            {{ __('Assets') }}
+                            {{ __('Browse') }}
                         </button>
 
                         <p class="ml-2 text-xs text-grey-60" v-if="config.allow_uploads">
                             <button type="button" class="text-blue underline hover:text-blue-dark" @click.prevent="uploadFile">
-                                {{ __('Select file') }}
+                                {{ __('Upload new file') }}
                             </button>
-                            <span v-text="__('or drag & drop to upload.')"></span>
+                            <span class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
                         </p>
                         <p class="ml-2 text-xs text-grey-60" v-else>
                             {{ __('Uploads are disabled')}}
                         </p>
-
 
                         <button
                             type="button"
@@ -68,7 +67,7 @@
                         :uploads="uploads"
                     />
 
-                    <template v-if="expanded && ! soloAsset">
+                    <template v-if="expanded">
 
                         <sortable-list
                             v-if="displayMode === 'grid'"
@@ -119,7 +118,7 @@
 
                     </template>
 
-                    <div class="asset-solo-container" v-if="expanded && soloAsset" ref="assets">
+                    <div class="asset-solo-container" v-if="expanded && soloAsset && displayMode == 'grid'" ref="assets">
                         <asset-tile
                             v-for="asset in assets"
                             :key="asset.id"

@@ -7,7 +7,7 @@
 }
 
 .assets-fieldtype .assets-fieldtype-picker {
-    @apply flex items-center p-2 bg-grey-20 border rounded;
+    @apply flex items-center px-2 py-1 bg-grey-20 border rounded;
 
     &.is-expanded {
         @apply border-b-0 rounded-b-none;
@@ -114,8 +114,8 @@
 
 @element .assets-fieldtype and (max-width: 500px) {
     :self .assets-fieldtype-picker {
-        @apply block;
-        .btn { @apply w-full mb-1 justify-center }
+        @apply flex;
         p { @apply ml-0 text-center }
+        .drag-drop-text { display: none; }
     }
 }
