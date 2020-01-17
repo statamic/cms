@@ -44,6 +44,11 @@ class Select extends Fieldtype
             'default' => false,
             'instructions' => 'Add newly created tags to the options list.'
         ],
+        'cast_booleans' => [
+            'type' => 'toggle',
+            'default' => false,
+            'instructions' => 'Options with values of true and false will be saved as booleans.'
+        ]
     ];
 
     public function preProcessIndex($value)
@@ -58,5 +63,31 @@ class Select extends Fieldtype
     public function augment($value)
     {
         return array_get($this->config('options'), $value, $value);
+    }
+
+    public function preProcess($value)
+    {
+        if ($this->config('cast_booleans')) {
+            if ($value === true) {
+                return 'true';
+            } elseif ($value === false) {
+                return 'false';
+            }
+        }
+
+        return $value;
+    }
+
+    public function process($value)
+    {
+        if ($this->config('cast_booleans')) {
+            if ($value === 'true') {
+                return true;
+            } elseif ($value === 'false') {
+                return false;
+            }
+        }
+
+        return $value;
     }
 }
