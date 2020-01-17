@@ -42,8 +42,6 @@ class AssetContainersController extends CpController
 
     public function edit($container)
     {
-        $container = AssetContainer::find($container);
-
         $this->authorize('edit', $container, 'You are not authorized to edit asset containers.');
 
         $values = $container->toArray();
@@ -63,8 +61,6 @@ class AssetContainersController extends CpController
 
     public function update(Request $request, $container)
     {
-        $container = AssetContainer::find($container);
-
         $this->authorize('update', $container, 'You are not authorized to edit asset containers.');
 
         $fields = $this->formBlueprint()->fields()->addValues($request->all());
@@ -137,8 +133,6 @@ class AssetContainersController extends CpController
 
     public function destroy($container)
     {
-        $container = AssetContainer::find($container);
-
         // TODO: auth
 
         $container->delete();
