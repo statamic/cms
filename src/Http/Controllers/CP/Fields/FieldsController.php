@@ -70,6 +70,38 @@ class FieldsController extends CpController
 
     protected function blueprint($blueprint)
     {
-        return $blueprint->ensureField('listable', ['type' => 'select', 'cast_booleans' => true]);
+        $prepends = collect([
+            'display' => [
+                'type' => 'text',
+                'instructions' => __('statamic::messages.fields_display_instructions'),
+                'width' => 50,
+            ],
+            'handle' => [
+                'type' => 'text',
+                'instructions' => __('statamic::messages.fields_handle_instructions'),
+                'width' => 50,
+            ],
+            'instructions' => [
+                'type' => 'text',
+                'instructions' => __('statamic::messages.fields_instructions_instructions'),
+            ],
+            'listable' => [
+                'type' => 'select',
+                'instructions' => __('statamic::messages.fields_listable_instructions'),
+                'cast_booleans' => true,
+                'width' => 50,
+                'options' => [
+                    'hidden' => __('Hidden by default'),
+                    'true' => __('Yes'),
+                    'false' => __('No'),
+                ],
+            ]
+        ]);
+
+        foreach ($prepends->reverse() as $handle => $prepend) {
+            $blueprint->ensureFieldPrepended($handle, $prepend);
+        }
+
+        return $blueprint;
     }
 }

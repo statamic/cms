@@ -53,53 +53,14 @@
             >
                 <div class="publish-fields" v-show="activeTab === 'settings'" slot-scope="{ setFieldValue }">
 
-                    <form-group
-                        handle="display"
-                        :display="__('Display')"
-                        :instructions="__('messages.fields_display_instructions')"
-                        width="50"
-                        autoselect
-                        :value="values.display"
-                        @input="updateField('display', $event, setFieldValue)"
-                    />
-
-                    <form-group
-                        handle="handle"
-                        :display="__('Handle')"
-                        :instructions="__('messages.fields_handle_instructions')"
-                        width="50"
-                        :value="values.handle"
-                        @input="updateField('handle', $event, setFieldValue); isHandleModified = true"
-                    />
-
-                    <form-group
-                        fieldtype="text"
-                        handle="instructions"
-                        :display="__('Instructions')"
-                        :instructions="__('messages.fields_instructions_instructions')"
-                        :value="values.instructions"
-                        @input="updateField('instructions', $event, setFieldValue)"
-                    />
-
-                    <form-group
-                        fieldtype="select"
-                        handle="listable"
-                        :display="__('Listable')"
-                        :instructions="__('messages.fields_listable_instructions')"
-                        :config="{ options: {
-                            hidden: __('Hidden by default'),
-                            true: __('Yes'),
-                            false: __('No')
-                        }}"
-                        :value="values.listable"
-                        @input="updateField('listable', $event, setFieldValue)"
-                    />
-
                     <publish-fields
                         v-if="blueprint.sections.length"
                         class="w-full"
                         :fields="blueprint.sections[0].fields"
-                        @updated="(handle, value) => updateField(handle, value, setFieldValue)"
+                        @updated="(handle, value) => {
+                            updateField(handle, value, setFieldValue);
+                            if (handle === 'handle') isHandleModified = true
+                        }"
                     />
 
                 </div>
