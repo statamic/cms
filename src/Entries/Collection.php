@@ -387,7 +387,6 @@ class Collection implements Contract
         ]);
 
         $array = Arr::removeNullValues(array_merge($array, [
-            'entry_order' => $this->getEntryOrder()->all(),
             'amp' => $array['amp'] ?: null,
             'date' => $this->dated ?: null,
             'orderable' => $array['orderable'] ?: null,
@@ -399,6 +398,10 @@ class Collection implements Contract
                 'future' => $this->futureDateBehavior,
             ],
         ]));
+
+        if ($this->orderable()) {
+            $array['entry_order'] = $this->getEntryOrder()->all();
+        }
 
         if (! Site::hasMultiple()) {
             unset($array['sites']);

@@ -223,7 +223,7 @@ class Taxonomy implements Contract, Responsable
 
     public function template()
     {
-        return 'taxonomy'; // todo: get it from the collection
+        return $this->handle() . '.index';
     }
 
     public function layout()

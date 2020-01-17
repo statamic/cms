@@ -20,7 +20,7 @@ class ContextTest extends TestCase
             }
         };
 
-        $this->context = new Context([
+        $this->context = (new Context([
             'string' => 'hello',
             'array' => ['one', 'two'],
             'integer' => 7,
@@ -39,7 +39,7 @@ class ContextTest extends TestCase
                 'nonAntlersValue',
                 (clone $fieldtype)->setField(new Field('nonAntlersValue', ['antlers' => false]))
             ),
-        ], Antlers::parser());
+        ]))->setParser(Antlers::parser());
     }
 
     /** @test */

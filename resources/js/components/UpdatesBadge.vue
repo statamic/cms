@@ -24,7 +24,7 @@
             getCount(clearCache = true) {
                 let params = clearCache ? {'clearCache': clearCache} : {};
 
-                this.$axios.get('/cp/updater/count', params).then(response => {
+                this.$axios.get(cp_url('updater/count'), params).then(response => {
                     this.count = response.data;
                 });
             }

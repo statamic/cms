@@ -193,7 +193,7 @@ class ExtensionServiceProvider extends ServiceProvider
             $this->registerAliases($tag, $parent);
         }
 
-        $this->registerExtensionsInAppFolder('Tags', $parent);
+        $this->registerExtensionsInAppFolder('Tags', \Statamic\Tags\Tags::class);
     }
 
     /**
@@ -207,7 +207,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
         $this->registerParent($parent);
         $this->registerBundledModifiers($parent);
-        $this->registerExtensionsInAppFolder('Modifiers', $parent);
+        $this->registerExtensionsInAppFolder('Modifiers', \Statamic\Modifiers\Modifier::class);
     }
 
     /**
@@ -247,7 +247,7 @@ class ExtensionServiceProvider extends ServiceProvider
             $this->registerExtension($fieldtype, $parent);
         }
 
-        $this->registerExtensionsInAppFolder('Fieldtypes', $parent);
+        $this->registerExtensionsInAppFolder('Fieldtypes', \Statamic\Fields\Fieldtype::class);
     }
 
     /**
@@ -273,7 +273,7 @@ class ExtensionServiceProvider extends ServiceProvider
             $this->registerExtension($scope, $parent);
         }
 
-        $this->registerExtensionsInAppFolder('Scopes', $parent);
+        $this->registerExtensionsInAppFolder('Scopes', \Statamic\Query\Scopes\Scope::class);
     }
 
     /**
@@ -300,7 +300,7 @@ class ExtensionServiceProvider extends ServiceProvider
             $this->registerExtension($action, $parent);
         }
 
-        $this->registerExtensionsInAppFolder('Actions', $parent);
+        $this->registerExtensionsInAppFolder('Actions', \Statamic\Actions\Action::class);
     }
 
     /**
@@ -327,7 +327,7 @@ class ExtensionServiceProvider extends ServiceProvider
             $this->registerExtension($widget, $parent);
         }
 
-        $this->registerExtensionsInAppFolder('Widgets', $parent);
+        $this->registerExtensionsInAppFolder('Widgets', \Statamic\Widgets\Widget::class);
     }
 
     /**
@@ -373,10 +373,10 @@ class ExtensionServiceProvider extends ServiceProvider
      * This prevents requiring users to manually bind their extensions.
      *
      * @param string $folder
-     * @param string $parent
+     * @param string $requiredClass
      * @return void
      */
-    protected function registerExtensionsInAppFolder($folder, $parent)
+    protected function registerExtensionsInAppFolder($folder, $requiredClass)
     {
         if (! $this->app['files']->exists($path = app_path($folder))) {
             return;
@@ -385,7 +385,9 @@ class ExtensionServiceProvider extends ServiceProvider
         foreach ($this->app['files']->files($path) as $file) {
             $class = $file->getBasename('.php');
             $fqcn = $this->getAppNamespace() . "{$folder}\\{$class}";
-            $fqcn::register();
+            if (is_subclass_of($fqcn, $requiredClass)) {
+                $fqcn::register();
+            }
         }
     }
 }

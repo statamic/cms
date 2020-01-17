@@ -94,7 +94,7 @@ export default {
         name: String,
         value: { required: true },
         config: Object,
-        initialData: Array,
+        data: Array,
         maxItems: Number,
         itemComponent: {
             type: String,
@@ -143,7 +143,7 @@ export default {
 
         items() {
             return this.value.map(selection => {
-                const data = _.findWhere(this.itemData, { id: selection });
+                const data = _.findWhere(this.data, { id: selection });
 
                 if (! data) return { id: selection, title: selection };
 
@@ -213,11 +213,10 @@ export default {
         },
 
         initializeData() {
-            if (!this.initialData) {
+            if (!this.data) {
                 return this.getDataForSelections(this.selections);
             }
 
-            this.itemData = this.initialData;
             this.loading = false;
             return Promise.resolve();
         },
@@ -227,8 +226,9 @@ export default {
             const params = { site: this.site, selections };
 
             return this.$axios.get(this.itemDataUrl, { params }).then(response => {
+                    this.$emit('item-data-updated', response.data.data);
+                }).finally(() => {
                     this.loading = false;
-                    this.itemData = response.data.data;
                 });
         },
 
@@ -252,12 +252,12 @@ export default {
         },
 
         itemCreated(item) {
-            this.itemData.push(item);
+            this.$emit('item-data-updated', [...this.data, item]);
             this.update([...this.value, item.id]);
         },
 
         selectFieldSelected(selectedItemData) {
-            this.itemData = selectedItemData.map(item => ({ id: item.id, title: item.title }));
+            this.$emit('item-data-updated', selectedItemData.map(item => ({ id: item.id, title: item.title })));
             this.update(selectedItemData.map(item => item.id));
         }
 

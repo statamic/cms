@@ -2,17 +2,19 @@
 
 namespace Tests\Tags\Collection;
 
-use Statamic\Facades;
-use Tests\TestCase;
-use Statamic\Facades\Site;
-use Statamic\Facades\Antlers;
-use Statamic\Tags\Context;
-use Statamic\Tags\Parameters;
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use InvalidArgumentException;
+use Statamic\Facades;
+use Statamic\Facades\Antlers;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Tags\Collection\Entries;
-use Facades\Tests\Factories\EntryFactory;
+use Statamic\Tags\Context;
+use Statamic\Tags\Parameters;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class EntriesTest extends TestCase
 {
@@ -22,7 +24,9 @@ class EntriesTest extends TestCase
     {
         parent::setUp();
 
-        $this->collection = Facades\Collection::make('test')->save();
+        Taxonomy::make('tags')->save();
+        Taxonomy::make('categories')->save();
+        $this->collection = Facades\Collection::make('test')->taxonomies(['tags', 'categories'])->save();
 
         app('statamic.scopes')[PostType::handle()] = PostType::class;
         app('statamic.scopes')[PostAnimal::handle()] = PostAnimal::class;
@@ -50,7 +54,7 @@ class EntriesTest extends TestCase
     {
         $params['from'] = 'test';
 
-        $params = new Parameters($params, new Context([], Antlers::parser()));
+        $params = new Parameters($params, new Context);
 
         return (new Entries($params))->get();
     }
@@ -302,6 +306,45 @@ class EntriesTest extends TestCase
         }
 
         $this->assertTrue($orders->unique()->count() > 1);
+    }
+
+    /** @test */
+    function it_filters_by_a_single_taxonomy_term()
+    {
+        $this->makeEntry('1')->data(['tags' => ['rad']])->save();
+        $this->makeEntry('2')->data(['tags' => ['rad']])->save();
+        $this->makeEntry('3')->data(['tags' => ['meh']])->save();
+
+        $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags' => 'rad'])->map->slug()->all());
+    }
+
+    /** @test */
+    function it_filters_by_in_multiple_taxonomy_terms()
+    {
+        $this->makeEntry('1')->data(['tags' => ['rad'], 'categories' => ['news']])->save();
+        $this->makeEntry('2')->data(['tags' => ['awesome'], 'categories' => ['events']])->save();
+        $this->makeEntry('3')->data(['tags' => ['rad', 'awesome']])->save();
+        $this->makeEntry('4')->data(['tags' => ['meh']])->save();
+
+        $this->assertEquals([3], $this->getEntries(['taxonomy:tags:all' => 'rad|awesome'])->map->slug()->all());
+        $this->assertEquals([3], $this->getEntries(['taxonomy:tags:all' => ['rad', 'awesome']])->map->slug()->all());
+        $this->assertEquals([1], $this->getEntries(['taxonomy:tags' => 'rad', 'taxonomy:categories' => 'news'])->map->slug()->all());
+        $this->assertEquals(0, $this->getEntries(['taxonomy:tags' => 'rad', 'taxonomy:categories' => 'events'])->count());
+        $this->assertEquals([1, 3, 4], $this->getEntries(['taxonomy:tags' => 'rad|meh'])->map->slug()->all());
+        $this->assertEquals([1, 3, 4], $this->getEntries(['taxonomy:tags' => ['rad', 'meh']])->map->slug()->all());
+        $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy' => 'tags::rad|categories::events'])->map->slug()->all());
+        $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy' => ['tags::rad', 'categories::events']])->map->slug()->all());
+        $this->assertEquals([3], $this->getEntries(['taxonomy' => 'tags::rad|tags::meh', 'taxonomy:tags' => 'awesome'])->map->slug()->all());
+        $this->assertEquals([2], $this->getEntries(['taxonomy' => 'tags::meh|categories::events', 'taxonomy:tags' => 'awesome'])->map->slug()->all());
+    }
+
+    /** @test */
+    function it_throws_an_exception_when_using_an_unknown_taxonomy_query_modifier()
+    {
+        $this->expectException(InvalidArgumentException::class);
+        $this->expectExceptionMessage('Unknown taxonomy query modifier [xyz]. Valid values are "any" and "all".');
+
+        $this->getEntries(['taxonomy:tags:xyz' => 'test']);
     }
 }
 

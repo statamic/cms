@@ -157,6 +157,9 @@ export default {
                     setValues(context, payload) {
                         context.commit('setValues', payload);
                         vm.emitUpdatedEvent(context.state.values);
+                    },
+                    setMeta(context, payload) {
+                        context.commit('setMeta', payload);
                     }
                 }
             });

@@ -44,7 +44,6 @@ export default {
             columns: [
                 { label: __('Title'), field: 'title' },
                 { label: __('Handle'), field: 'handle' },
-                { label: __('Sections'), field: 'sections' },
                 { label: __('Fields'), field: 'fields' },
             ]
         }

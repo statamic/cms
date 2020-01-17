@@ -8,6 +8,6 @@ class Dump extends Tags
 {
     public function index()
     {
-        dump($this->context->all());
+        dump($this->context->except(['__env', 'app'])->all());
     }
 }

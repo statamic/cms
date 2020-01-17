@@ -21,7 +21,7 @@
                         :bodyText="__('Are you sure you want to delete this collection?')"
                         :buttonText="__('Delete')"
                         :danger="true"
-                        @confirm="deleteRow('/cp/collections')"
+                        @confirm="deleteRow('collections')"
                         @cancel="cancelDeleteRow"
                     >
                     </confirmation-modal>

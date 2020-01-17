@@ -70,6 +70,7 @@ return [
     'fields_fieldsets_description' => 'Los conjuntos de campos son agrupaciones de campos simples, flexibles y completamente opcionales que ayudan a organizar campos reutilizables y preconfigurados.',
     'fields_handle_instructions' => 'La variable de plantilla del campo.',
     'fields_instructions_instructions' => 'Se muestra debajo de la etiqueta de visualización del campo, como si fuera texto. Markdown es compatible.',
+    'fields_listable_instructions' => 'Si este campo debe estar disponible como una columna en los listados.',
     'fieldset_import_fieldset_instructions' => 'El conjunto de campos a importar.',
     'fieldset_import_prefix_instructions' => 'El prefijo que debe aplicarse a cada campo cuando se importan. p.ej. héroe_',
     'fieldsets_button_help_text' => 'Podrá personalizar su Fieldset una vez que se haya creado.',

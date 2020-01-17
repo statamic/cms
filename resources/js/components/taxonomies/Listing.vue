@@ -21,7 +21,7 @@
                         :bodyText="__('Are you sure you want to delete this taxonomy?')"
                         :buttonText="__('Delete')"
                         :danger="true"
-                        @confirm="deleteRow('/cp/taxonomies')"
+                        @confirm="deleteRow('taxonomies')"
                         @cancel="cancelDeleteRow"
                     >
                     </confirmation-modal>

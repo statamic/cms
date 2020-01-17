@@ -15,7 +15,7 @@ class ParametersTest extends TestCase
 
         $context = new Context([
             'foo' => 'bar'
-        ], Antlers::parser());
+        ]);
 
         $this->params = new Parameters([
             'string' => 'hello',

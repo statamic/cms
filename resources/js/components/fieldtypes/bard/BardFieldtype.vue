@@ -116,7 +116,6 @@ import Link from './Link';
 import Image from './Image';
 import RemoveFormat from './RemoveFormat';
 import LinkToolbarButton from './LinkToolbarButton.vue';
-import ConfirmSetDelete from './ConfirmSetDelete';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
 import { availableButtons, addButtonHtml } from '../bard/buttons';
 import readTimeEstimate from 'read-time-estimate';
@@ -260,7 +259,7 @@ export default {
             const content = this.valueToContent(value);
 
             if (JSON.stringify(content) !== JSON.stringify(oldContent)) {
-                this.editor.setContent(content);
+                this.editor.setContent(content, true);
             }
         },
 
@@ -421,7 +420,6 @@ export default {
             let exts = [
                 new Doc(),
                 new Set({ bard: this }),
-                new ConfirmSetDelete(),
                 new HardBreak(),
                 new History()
             ];

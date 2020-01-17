@@ -112,10 +112,10 @@ class Field implements Arrayable
     public function isVisible()
     {
         if (is_null($this->get('listable'))) {
-            return true;
+            return in_array($this->handle, ['title', 'slug', 'date', 'author']);
         }
 
-        return ! in_array($this->get('listable'), [false, 'hidden']);
+        return ! in_array($this->get('listable'), [false, 'hidden'], true);
     }
 
     public function isSortable()
