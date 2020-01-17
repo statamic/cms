@@ -175,7 +175,7 @@ Route::group([
         Route::get('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
     });
 
-    Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'API'], function () {
+    Route::group(['prefix' => 'api', 'as' => 'api.', 'namespace' => 'API'], function () {
         Route::resource('addons', 'AddonsController');
         Route::resource('templates', 'TemplatesController');
     });
