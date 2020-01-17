@@ -8,11 +8,7 @@
 .travis.yml export-ignore
 CONTRIBUTING.md export-ignore
 jest.config.js export-ignore
-package-lock.json export-ignore
-package.json export-ignore
 phpunit.bat export-ignore
 phpunit.xml.dist export-ignore
 SECURITY.md export-ignore
-tailwind.js export-ignore
 translator export-ignore
-webpack.mix.js export-ignore
