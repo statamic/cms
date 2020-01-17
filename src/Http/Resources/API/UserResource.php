@@ -3,6 +3,7 @@
 namespace Statamic\Http\Resources\API;
 
 use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Statamic;
 
 class UserResource extends Resource
 {
@@ -19,7 +20,7 @@ class UserResource extends Resource
             'email' => $this->resource->email(),
             'name' => $this->resource->get('name'),
             'is_super' => $this->resource->isSuper(),
-            'api_url' => api_route('users.show', $this->resource->id()),
+            'api_url' => Statamic::apiRoute('users.show', $this->resource->id()),
         ];
     }
 }

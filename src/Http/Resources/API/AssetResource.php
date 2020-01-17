@@ -3,6 +3,7 @@
 namespace Statamic\Http\Resources\API;
 
 use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Statamic;
 
 class AssetResource extends Resource
 {
@@ -14,7 +15,7 @@ class AssetResource extends Resource
      */
     public function toArray($request)
     {
-        $apiUrl = api_route('assets.show', [
+        $apiUrl = Statamic::apiRoute('assets.show', [
             $this->resource->container()->handle(),
             $this->resource->path(),
         ]);

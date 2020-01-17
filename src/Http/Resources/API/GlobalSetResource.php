@@ -3,6 +3,7 @@
 namespace Statamic\Http\Resources\API;
 
 use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Statamic;
 
 class GlobalSetResource extends Resource
 {
@@ -15,7 +16,7 @@ class GlobalSetResource extends Resource
     public function toArray($request)
     {
         return array_merge($this->resource->fileData(), [
-            'api_url' => api_route('globals.show', [$this->resource->handle()]),
+            'api_url' => Statamic::apiRoute('globals.show', [$this->resource->handle()]),
         ]);
     }
 }

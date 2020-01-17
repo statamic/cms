@@ -3,6 +3,7 @@
 namespace Statamic\Http\Resources\API;
 
 use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Statamic;
 
 class TermResource extends Resource
 {
@@ -14,7 +15,7 @@ class TermResource extends Resource
      */
     public function toArray($request)
     {
-        $apiUrl = api_route('taxonomies.terms.show', [
+        $apiUrl = Statamic::apiRoute('taxonomies.terms.show', [
             $this->resource->taxonomy()->handle(),
             $this->resource->slug(),
         ]);
