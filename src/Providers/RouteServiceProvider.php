@@ -81,9 +81,10 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::bind('term', function ($handle, $route) {
             $id = $route->parameter('taxonomy')->handle() . '::' . $handle;
+            $site = $route->parameter('site') ?? Site::default()->handle();
 
-            throw_if(
-                ! ($term = Term::find($id)->in($route->parameter('site'))) || $term->taxonomy() !== $route->parameter('taxonomy'),
+            throw_unless(
+                ($term = Term::find($id)->in($site)) && $term->taxonomy() === $route->parameter('taxonomy'),
                 new NotFoundHttpException("Taxonomy term [$handle] not found.")
             );
 
