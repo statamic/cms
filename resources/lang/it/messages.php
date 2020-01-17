@@ -42,7 +42,7 @@ return [
     'collection_wizard_ordered_sequentially_description' => 'Le voci sono ordinate in sequenza e possono essere riordinate manualmente.',
     'collection_wizard_route_instructions' => 'I percorsi sono opzionali. Se non hai bisogno di un URL, non hai bisogno di un percorso.',
     'collection_wizard_routing_intro' => 'Le regole di instradamento determinano il pattern URL delle voci della tua raccolta.',
-    'collection_wizard_structured_instructions' => 'Abilita URL gerarchici (padre / figlio).',
+    'collection_wizard_structure_instructions' => 'Abilita URL gerarchici (padre / figlio).',
     'collection_wizard_structure_route_instructions' => 'È necessario un percorso quando si sceglie una struttura. Puoi anche usare `parent_uri` e `depth`.',
     'collection_wizard_taxonomies_instructions' => 'Consenti alle relazioni di tassonomia di essere definite sulle voci in questa raccolta.',
     'collection_wizard_template_instructions' => 'Imposta il modello predefinito di questa raccolta.',

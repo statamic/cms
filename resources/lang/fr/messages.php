@@ -42,7 +42,7 @@ return [
     'collection_wizard_ordered_sequentially_description' => 'Les entrées sont classées séquentiellement et peuvent être réorganisées manuellement.',
     'collection_wizard_route_instructions' => 'Les routes sont facultatives. Si vous n’avez pas besoin d’une URL, vous n’avez pas besoin d’une route.',
     'collection_wizard_routing_intro' => 'Les règles de routage déterminent le modèle d’URL des entrées de votre collection.',
-    'collection_wizard_structured_instructions' => 'Active les URLs hiérarchiques (parent/enfant).',
+    'collection_wizard_structure_instructions' => 'Active les URLs hiérarchiques (parent/enfant).',
     'collection_wizard_structure_route_instructions' => 'Une route est requise pour choisir une structure. Vous pouvez également utiliser `parent_uri` et` depth`.',
     'collection_wizard_taxonomies_instructions' => 'Autorise la définition de relations de taxonomie sur les entrées de cette collection.',
     'collection_wizard_template_instructions' => 'Détermine le modèle par défaut pour cette collection.',
