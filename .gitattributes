@@ -1,5 +1,4 @@
 * text=auto
-/.circleci export-ignore
 /.github export-ignore
 /tests export-ignore
 .babelrc export-ignore
