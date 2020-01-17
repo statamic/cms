@@ -21,7 +21,7 @@ return [
     'collection_wizard_articles_description' => 'Les entrées avec des dates dans le futur seront privées.',
     'collection_wizard_blueprints_instructions' => 'Choisissez un Blueprint existant ou créez-en un nouveau.',
     'collection_wizard_content_model_intro' => 'Votre modèle de contenu détermine quels champs et comportement définissent cette collection.',
-   'collection_wizard_dates_intro' => 'Vous pouvez sélectionner différents comportements de date.',
+    'collection_wizard_dates_intro' => 'Vous pouvez sélectionner différents comportements de date.',
     'collection_wizard_default_status_draft_description' => 'Les entrées seront par défaut au statut <span class="text-grey-60">brouillon</span> .',
     'collection_wizard_default_status_published_description' => 'Les entrées seront par défaut au statut <span class="text-green">publié</span> .',
     'collection_wizard_events_description' => 'Les entrées avec des dates dans le passé seront privées.',
