@@ -127,6 +127,22 @@ class Statamic
         return starts_with(request()->path(), config('statamic.cp.route'));
    }
 
+    public static function cpRoute($route, $params = [])
+    {
+        if (! config('statamic.cp.enabled')) {
+            return null;
+        }
+
+        $route = route('statamic.cp.' . $route, $params);
+
+        // TODO: This is a temporary workaround to routes like
+        // `route('assets.browse.edit', 'some/image.jpg')` outputting two slashes.
+        // Can it be fixed with route regex, or is it a laravel bug?
+        $route = preg_replace('/(?<!:)\/\//', '/', $route);
+
+        return $route;
+    }
+
    public static function isApiRoute()
    {
        if (! config('statamic.api.enabled')) {
