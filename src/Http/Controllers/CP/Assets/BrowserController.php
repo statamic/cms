@@ -43,6 +43,8 @@ class BrowserController extends CpController
 
     public function edit($container, $path)
     {
+        $containerHandle = $container->handle();
+
         $asset = Asset::find("{$containerHandle}::{$path}");
 
         abort_unless($container && $asset, 404);
