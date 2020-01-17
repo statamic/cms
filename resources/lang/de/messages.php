@@ -70,6 +70,7 @@ return [
     'fields_fieldsets_description' => 'Feldsets sind einfache, flexible und vollständig optionale Gruppierungen von Feldern, mit deren Hilfe wiederverwendbare, vorkonfigurierte Felder organisiert werden können.',
     'fields_handle_instructions' => 'Die Vorlagenvariable des Felds.',
     'fields_instructions_instructions' => 'Wird unter der Beschriftung des Felds angezeigt und sieht wie Text aus. Abschriften werden unterstützt.',
+    'fields_listable_instructions' => 'Gibt an, ob dieses Feld in Listen als Spalte verfügbar sein soll.',
     'fieldset_import_fieldset_instructions' => 'Das zu importierende Feldset.',
     'fieldset_import_prefix_instructions' => 'Das Präfix, das auf jedes Feld angewendet werden soll, wenn sie importiert werden. z.B. Held_',
     'fieldsets_button_help_text' => 'Sie können Ihr Feldset anpassen, sobald es erstellt wurde.',
