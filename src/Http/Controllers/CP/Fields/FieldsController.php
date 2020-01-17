@@ -32,7 +32,7 @@ class FieldsController extends CpController
 
         $fieldtype = FieldtypeRepository::find($request->type);
 
-        $blueprint = $fieldtype->configBlueprint();
+        $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
         $fields = $blueprint
             ->fields()
@@ -56,13 +56,20 @@ class FieldsController extends CpController
 
         $fieldtype = FieldtypeRepository::find($request->type);
 
-        $blueprint = $fieldtype->configBlueprint();
+        $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
         $fields = $blueprint
             ->fields()
             ->addValues($request->values)
             ->process();
 
-        return array_merge($request->values, $fields->values()->all());
+        $values = array_merge($request->values, $fields->values()->all());
+
+        return $values;
+    }
+
+    protected function blueprint($blueprint)
+    {
+        return $blueprint->ensureField('listable', ['type' => 'select', 'cast_booleans' => true]);
     }
 }

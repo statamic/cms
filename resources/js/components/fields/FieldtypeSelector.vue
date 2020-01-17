@@ -195,6 +195,7 @@ export default {
                 instructions: null,
                 localizable: false,
                 width: 100,
+                listable: 'hidden',
                 isNew: true
             };
 

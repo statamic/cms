@@ -81,6 +81,20 @@
                         @input="updateField('instructions', $event, setFieldValue)"
                     />
 
+                    <form-group
+                        fieldtype="select"
+                        handle="listable"
+                        :display="__('Listable')"
+                        :instructions="__('messages.fields_listable_instructions')"
+                        :config="{ options: {
+                            hidden: __('Hidden by default'),
+                            true: __('Yes'),
+                            false: __('No')
+                        }}"
+                        :value="values.listable"
+                        @input="updateField('listable', $event, setFieldValue)"
+                    />
+
                     <publish-fields
                         v-if="blueprint.sections.length"
                         class="w-full"
