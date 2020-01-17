@@ -7,7 +7,11 @@ use Statamic\Tags\OutputsItems;
 
 class Query extends Tags
 {
-    use GetsResults, OutputsItems, HasConditions;
+    use GetsResults,
+        OutputsItems,
+        HasConditions,
+        HasOrderBys,
+        HasScopes;
 
     /**
      * {{ query builder="" }} ... {{ /query }}
@@ -25,10 +29,12 @@ class Query extends Tags
         return $this->evaluate($this->context->get($tag));
     }
 
-    protected function evaluate($builder)
+    protected function evaluate($query)
     {
-        $this->queryConditions($builder);
+        $this->queryConditions($query);
+        $this->queryScopes($query);
+        $this->queryOrderBys($query);
 
-        return $this->output($this->results($builder));
+        return $this->output($this->results($query));
     }
 }
