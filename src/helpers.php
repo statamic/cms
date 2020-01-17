@@ -1,6 +1,7 @@
 <?php
 
 use Statamic\Facades\Path;
+use Statamic\Statamic;
 
 function cp_route($route, $params = [])
 {
