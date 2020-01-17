@@ -14,6 +14,13 @@ class AssetResource extends Resource
      */
     public function toArray($request)
     {
-        return $this->resource->toAugmentedArray();
+        $apiUrl = api_route('assets.show', [
+            $this->resource->container()->handle(),
+            $this->resource->path(),
+        ]);
+
+        return array_merge($this->resource->toAugmentedArray(), [
+            'api_url' => $apiUrl,
+        ]);
     }
 }

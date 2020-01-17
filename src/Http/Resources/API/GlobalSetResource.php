@@ -14,6 +14,8 @@ class GlobalSetResource extends Resource
      */
     public function toArray($request)
     {
-        return $this->resource->fileData();
+        return array_merge($this->resource->fileData(), [
+            'api_url' => api_route('globals.show', [$this->resource->handle()]),
+        ]);
     }
 }

@@ -19,6 +19,7 @@ class UserResource extends Resource
             'email' => $this->resource->email(),
             'name' => $this->resource->get('name'),
             'is_super' => $this->resource->isSuper(),
+            'api_url' => api_route('users.show', $this->resource->id()),
         ];
     }
 }

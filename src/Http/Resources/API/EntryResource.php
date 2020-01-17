@@ -14,6 +14,13 @@ class EntryResource extends Resource
      */
     public function toArray($request)
     {
-        return $this->resource->toAugmentedArray();
+        $apiUrl = api_route('collections.entries.show', [
+            $this->resource->collection()->handle(),
+            $this->resource->id(),
+        ]);
+
+        return array_merge($this->resource->toAugmentedArray(), [
+            'api_url' => $apiUrl,
+        ]);
     }
 }

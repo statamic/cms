@@ -14,6 +14,13 @@ class TermResource extends Resource
      */
     public function toArray($request)
     {
-        return $this->resource->toAugmentedArray();
+        $apiUrl = api_route('taxonomies.terms.show', [
+            $this->resource->taxonomy()->handle(),
+            $this->resource->slug(),
+        ]);
+
+        return array_merge($this->resource->toAugmentedArray(), [
+            'api_url' => $apiUrl,
+        ]);
     }
 }
