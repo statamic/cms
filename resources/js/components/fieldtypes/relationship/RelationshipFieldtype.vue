@@ -9,7 +9,7 @@
         :can-create="canCreate"
         :can-reorder="canReorder"
         :site="site"
-        :initial-data="initialData"
+        :data="meta ? meta.data : []"
         :max-items="maxItems"
         :item-component="itemComponent"
         :item-data-url="itemDataUrl"
@@ -39,7 +39,7 @@ export default {
 
     data() {
         return {
-            initialData: this.meta.data
+            //
         }
     },
 
