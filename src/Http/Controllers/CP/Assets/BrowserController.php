@@ -27,12 +27,8 @@ class BrowserController extends CpController
         throw new AuthorizationException;
     }
 
-    public function show($containerHandle, $path = '/')
+    public function show($container, $path = '/')
     {
-        $container = AssetContainer::find($containerHandle);
-
-        abort_unless($container, 404);
-
         $this->authorize('view', $container);
 
         return view('statamic::assets.browse', [
@@ -45,9 +41,8 @@ class BrowserController extends CpController
         ]);
     }
 
-    public function edit($containerHandle, $path)
+    public function edit($container, $path)
     {
-        $container = AssetContainer::find($containerHandle);
         $asset = Asset::find("{$containerHandle}::{$path}");
 
         abort_unless($container && $asset, 404);
@@ -67,12 +62,6 @@ class BrowserController extends CpController
 
     public function folder(Request $request, $container, $path = '/')
     {
-        $container = AssetContainer::find($container);
-
-        if (! $container) {
-            return $this->pageNotFound();
-        }
-
         $this->authorize('view', $container);
 
         $folder = $container->assetFolder($path);
@@ -86,12 +75,6 @@ class BrowserController extends CpController
 
     public function search(Request $request, $container)
     {
-        $container = AssetContainer::find($container);
-
-        if (! $container) {
-            return $this->pageNotFound();
-        }
-
         $this->authorize('view', $container);
 
         $query = $container->hasSearchIndex()
