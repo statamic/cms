@@ -2,23 +2,31 @@
 
 namespace Statamic\Providers;
 
-use Facades\Statamic\Auth\CorePermissions;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Gate;
-use Illuminate\Support\ServiceProvider;
-use Statamic\Auth\Passwords\PasswordBrokerManager;
-use Statamic\Auth\PermissionCache;
-use Statamic\Auth\Permissions;
-use Statamic\Auth\Protect\ProtectorManager;
-use Statamic\Auth\UserProvider;
-use Statamic\Auth\UserRepositoryManager;
-use Statamic\Contracts\Auth\RoleRepository;
-use Statamic\Contracts\Auth\User as StatamicUser;
-use Statamic\Contracts\Auth\UserGroupRepository;
-use Statamic\Contracts\Auth\UserRepository;
-use Statamic\Contracts\Auth\UserStore;
 use Statamic\Facades\User;
 use Statamic\Policies;
+use Statamic\Auth\UserProvider;
+use Statamic\Contracts\Auth\Role;
+use Statamic\Auth\PermissionCache;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Gate;
+use Illuminate\Contracts\Http\Kernel;
+use Statamic\Contracts\Auth\UserGroup;
+use Statamic\Contracts\Auth\UserStore;
+use Illuminate\Support\ServiceProvider;
+use Statamic\Auth\UserRepositoryManager;
+use Facades\Statamic\Auth\CorePermissions;
+use Statamic\Auth\Passwords\PasswordReset;
+use Statamic\Auth\Permissions;
+use Statamic\Auth\Protect\ProtectorManager;
+use Statamic\Contracts\Auth\RoleRepository;
+use Statamic\Contracts\Auth\User as StatamicUser;
+use Statamic\Contracts\Auth\UserRepository;
+use Illuminate\Auth\Notifications\ResetPassword;
+use Statamic\Contracts\Auth\UserGroupRepository;
+use Illuminate\Notifications\Messages\MailMessage;
+use Statamic\Auth\Passwords\PasswordBrokerManager;
+use Statamic\Auth\Eloquent\UserRepository as EloquentUsers;
+use Statamic\Stache\Repositories\UserRepository as StacheUsers;
 
 class AuthServiceProvider extends ServiceProvider
 {
