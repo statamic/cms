@@ -22,7 +22,7 @@
                 :bodyText="__('Are you sure you want to delete this fieldset?')"
                 :buttonText="__('Delete')"
                 :danger="true"
-                @confirm="deleteRow(cp_url('fields/fieldsets'), __('Fieldset deleted'))"
+                @confirm="deleteRow('fields/fieldsets', __('Fieldset deleted'))"
                 @cancel="cancelDeleteRow"
             />
         </div>

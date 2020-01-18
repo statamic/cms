@@ -22,7 +22,7 @@
                 :bodyText="__('Are you sure you want to delete this blueprint?')"
                 :buttonText="__('Delete')"
                 :danger="true"
-                @confirm="deleteRow(cp_url('fields/blueprints'), __('Blueprint deleted'))"
+                @confirm="deleteRow('fields/blueprints', __('Blueprint deleted'))"
                 @cancel="cancelDeleteRow"
             />
         </div>
