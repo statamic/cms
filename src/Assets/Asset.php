@@ -30,7 +30,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 
-class Asset implements AssetContract, ArrayAccess, AugmentableContract
+class Asset implements AssetContract, ArrayAccess, AugmentableContract, \JsonSerializable
 {
     use Augmentable, FluentlyGetsAndSets, ContainsData {
         set as traitSet;
@@ -690,6 +690,11 @@ class Asset implements AssetContract, ArrayAccess, AugmentableContract
     public function __toString()
     {
         return $this->url() ?? $this->id();
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->augmentedArrayData();
     }
 
     /**
