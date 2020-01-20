@@ -70,7 +70,7 @@
                     <template v-if="expanded">
 
                         <sortable-list
-                            v-if="displayMode === 'grid'"
+                            v-if="displayMode === 'grid' && ! soloAsset"
                             v-model="assets"
                             item-class="asset-tile"
                             handle-class="asset-thumb-container"
