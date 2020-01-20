@@ -211,6 +211,8 @@ class TermsController extends CpController
             throw new \Exception('A valid blueprint is required.');
         }
 
+        event(new PublishBlueprintFound($blueprint, 'term', $term));
+        
         $fields = $blueprint
             ->fields()
             ->preProcess();
