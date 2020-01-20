@@ -147,7 +147,7 @@ return [
     'user_wizard_account_created' => 'The user account has been created.',
     'user_wizard_email_instructions' => 'The email address also serves as a username and must be unique.',
     'user_wizard_intro' => 'Users can be assigned to roles that customize their permissions, access, and abilities throughout the Control Panel.',
-    'user_wizard_invitation_body' => 'Activate your new Statamic account on :site to begin managing this website. For your security, the link below expires after 48 hours. After that, please contact the site administrator for a new password.',
+    'user_wizard_invitation_body' => 'Activate your new Statamic account on :site to begin managing this website. For your security, the link below expires after 1 hour. After that, please contact the site administrator for a new password.',
     'user_wizard_invitation_intro' => 'Send a welcome email with account activiation details to the new user.',
     'user_wizard_invitation_share' => 'Copy these credentials and share them with <code>:email</code> via your preferred method.',
     'user_wizard_invitation_share_before' => 'After you create the user, you\'ll be given details to share with <code>:email</code> via your preferred method.',
