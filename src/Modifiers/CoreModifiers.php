@@ -3,6 +3,7 @@
 namespace Statamic\Modifiers;
 
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
@@ -1840,7 +1841,7 @@ class CoreModifiers extends Modifier
     {
         $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : null;
 
-        if ($value instanceof Augmentable) {
+        if ($value instanceof Collection || $value instanceof Augmentable) {
             $value = $value->toAugmentedArray();
         }
 
