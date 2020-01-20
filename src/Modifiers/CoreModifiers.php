@@ -1840,6 +1840,10 @@ class CoreModifiers extends Modifier
     {
         $options = Arr::get($params, 0) === 'pretty' ? JSON_PRETTY_PRINT : null;
 
+        if ($value instanceof Augmentable) {
+            $value = $value->toAugmentedArray();
+        }
+
         return json_encode($value, $options);
     }
 
