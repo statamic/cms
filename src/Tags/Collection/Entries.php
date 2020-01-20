@@ -140,11 +140,17 @@ class Entries
         $from = Arr::getFirst($this->parameters, ['from', 'in', 'folder', 'use', 'collection']);
         $not = Arr::getFirst($this->parameters, ['not_from', 'not_in', 'not_folder', 'dont_use', 'not_collection']);
 
-        $collections = $from === '*'
-            ? collect(Collection::handles())
-            : collect(explode('|', $from));
+        if (is_string($from)) {
+            $from = explode('|', $from);
+        }
 
-        $excludedCollections = collect(explode('|', $not))->filter();
+        if (is_string($not)) {
+            $not = explode('|', $not);
+        }
+
+        $collections = $from === '*' ? collect(Collection::handles()) : collect($from);
+
+        $excludedCollections = collect($not)->filter();
 
         return $collections
             ->diff($excludedCollections)
