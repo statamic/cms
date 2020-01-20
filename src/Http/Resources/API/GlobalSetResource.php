@@ -15,7 +15,8 @@ class GlobalSetResource extends Resource
      */
     public function toArray($request)
     {
-        return array_merge($this->resource->fileData(), [
+        return array_merge($this->resource->toAugmentedArray(), [
+            'handle' => $this->resource->handle(),
             'api_url' => Statamic::apiRoute('globals.show', [$this->resource->handle()]),
         ]);
     }
