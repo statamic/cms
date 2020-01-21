@@ -94,6 +94,10 @@ class Assets extends Fieldtype
 
     public function preload()
     {
+        if (! $this->container()) {
+            throw new \Exception("There is no asset container named [{$this->config('container')}].");
+        }
+
         return [
             'data' => $this->getItemData($this->field->value() ?? $this->defaultValue),
             'container' => $this->container()->handle(),
