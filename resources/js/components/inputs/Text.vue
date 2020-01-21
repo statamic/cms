@@ -9,6 +9,7 @@
                 :name="name"
                 :value="value"
                 :type="type"
+                :step="step"
                 :disabled="disabled"
                 :readonly="isReadOnly"
                 :placeholder="placeholder"
@@ -37,6 +38,7 @@ export default {
         isReadOnly: { type: Boolean, default: false },
         placeholder: { required: false },
         type: { default: "text" },
+        step: {},
         value: { required: true },
         prepend: { default: null },
         append: { default: null },
