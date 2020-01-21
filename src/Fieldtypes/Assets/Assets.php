@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes\Assets;
 
 use Statamic\Assets\AssetCollection;
+use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Helper;
@@ -94,10 +95,6 @@ class Assets extends Fieldtype
 
     public function preload()
     {
-        if (! $this->container()) {
-            throw new \Exception("There is no asset container named [{$this->config('container')}].");
-        }
-
         return [
             'data' => $this->getItemData($this->field->value() ?? $this->defaultValue),
             'container' => $this->container()->handle(),
@@ -125,7 +122,11 @@ class Assets extends Fieldtype
     protected function container()
     {
         if ($configured = $this->config('container')) {
-            return AssetContainer::find($configured);
+            if ($container = AssetContainer::find($configured)) {
+                return $container;
+            }
+
+            throw new AssetContainerNotFoundException($configured);
         }
 
         if (($containers = AssetContainer::all())->count() === 1) {
