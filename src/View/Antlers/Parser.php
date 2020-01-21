@@ -988,7 +988,7 @@ class Parser
 
         // if the resulting value of a variable is a string that contains another variable,
         // let's find that variable's value as well
-        if (!is_array($value)) {
+        if (is_string($value)) {
             while (preg_match($this->variableTagRegex, $value, $matches)) {
                 $previous_value = $value;
                 $value = $this->parseVariables($value, $this->conditionalData);
@@ -1027,7 +1027,9 @@ class Parser
      */
     protected function valueToLiteral($value)
     {
-        if (is_object($value) and is_callable(array($value, '__toString'))) {
+        if ($value instanceof Builder) {
+            return $value->count();
+        } elseif (is_object($value) and is_callable(array($value, '__toString'))) {
             return var_export((string)$value, true);
         } elseif (is_array($value)) {
             return !empty($value) ? "true" : "false";
