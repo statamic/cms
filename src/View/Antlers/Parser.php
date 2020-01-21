@@ -567,9 +567,6 @@ class Parser
             // a callback. If it's a query builder instance, we want to use the Query tag's index
             // method to handle the logic. We'll pass the builder into the builder parameter.
             if (isset($data[$name])) {
-                if ($data[$name] instanceof Value) {
-                    $data[$name] = $data[$name]->raw();
-                }
                 if ($data[$name] instanceof Builder) {
                     $parameters['builder'] = $data[$name];
                     $name = 'query';

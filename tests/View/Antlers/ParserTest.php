@@ -1408,6 +1408,31 @@ EOT;
         $this->assertEquals('yup', Antlers::parse($template, ['entries' => Entry::query()->where('collection', 'blog')]));
         $this->assertEquals('nope', Antlers::parse($template, ['entries' => Entry::query()->where('collection', 'dunno')]));
     }
+
+    /** @test */
+    function modifiers_on_tag_pairs_receive_the_augmented_value()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($value)
+            {
+                $value[1]['type'] = 'yup';
+                return $value;
+            }
+        };
+
+        $value = new Value([
+            ['type' => 'yup', 'text' => '1'],
+            ['type' => 'nope', 'text' => '2'],
+            ['type' => 'yup', 'text' => '3'],
+        ], 'test', $fieldtype);
+
+        // unaugmented, the second item would be filtered out.
+        // augmenting changes the second item to a yup, so it should be included.
+        $this->assertEquals('123', Antlers::parse('{{ test where="type:yup" }}{{ text }}{{ /test }}', [
+            'test' => $value,
+            'hello' => 'there',
+        ]));
+    }
 }
 
 class NonArrayableObject
