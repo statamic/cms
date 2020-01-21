@@ -8,6 +8,8 @@ return [
     'group_cp' => 'Control Panel',
     'access_cp' => 'Access the Control Panel',
     'access_cp_desc' => 'Allows access into control panel, but doesn\'t guarantee anything can be done once inside.',
+    'configure_fields' => 'Configure Fields',
+    'configure_fields_desc' => 'Ability to edit blueprints, fieldsets, and their fields.',
 
     'group_collections' => 'Collections',
     'configure_collections' => 'Configure Collections',

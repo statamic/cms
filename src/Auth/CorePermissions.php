@@ -17,6 +17,7 @@ class CorePermissions
     {
         $this->group('cp', function () {
             $this->register('access cp');
+            $this->register('configure fields');
         });
 
         $this->group('collections', function () {
