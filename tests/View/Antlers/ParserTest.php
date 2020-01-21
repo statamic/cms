@@ -6,16 +6,21 @@ use Tests\TestCase;
 use Statamic\Tags\Tags;
 use Statamic\Facades\Antlers;
 use Statamic\Fields\Value;
+use Statamic\Facades\Entry;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Blueprint;
+use Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
+use Tests\PreventSavingStacheItemsToDisk;
 use Illuminate\Contracts\Support\Arrayable;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Data\Augmentable as AugmentableTrait;
 
 class ParserTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     private $variables;
 
     public function setUp(): void
@@ -1390,6 +1395,18 @@ after
 EOT;
 
         $this->assertEquals($expected, Antlers::parse($template));
+    }
+
+    /** @test */
+    function it_counts_query_builder_results_in_conditions()
+    {
+        EntryFactory::collection('blog')->create();
+
+        $template = '{{ if entries }}yup{{ else }}nope{{ /if }}';
+
+        $this->assertEquals('yup', Antlers::parse($template, ['entries' => Entry::query()]));
+        $this->assertEquals('yup', Antlers::parse($template, ['entries' => Entry::query()->where('collection', 'blog')]));
+        $this->assertEquals('nope', Antlers::parse($template, ['entries' => Entry::query()->where('collection', 'dunno')]));
     }
 }
 
