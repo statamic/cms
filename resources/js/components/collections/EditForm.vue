@@ -16,7 +16,7 @@
             <div class="flex items-center mb-3">
                 <h1 class="flex-1">
                     <small class="subhead block">
-                        <a :href="listingUrl" v-text="__('Collections')" />
+                        <a :href="listingUrl" v-text="parentTitle" />
                     </small>
 
                     {{ title }}
@@ -41,6 +41,7 @@ export default {
         initialValues: Object,
         meta: Object,
         initialTitle: String,
+        parentTitle: String,
         url: String,
         listingUrl: String,
     },
