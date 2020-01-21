@@ -3,8 +3,8 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
 use Illuminate\Foundation\Auth\ResetsPasswords;
+use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
 
 class ResetPasswordController extends Controller
