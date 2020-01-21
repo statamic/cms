@@ -96,12 +96,7 @@
 
 .grid-fieldtype .grid-table .markdown-fieldtype {
     .markdown-fieldtype-wrapper {
-        border: 0;
-        border-radius: 0;
-    }
-
-    .CodeMirror {
-        background: #fff;
+        @apply border rounded;
     }
 
     .markdown-preview {
