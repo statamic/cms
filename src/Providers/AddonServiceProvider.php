@@ -43,6 +43,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             ->bootWidgets()
             ->bootCommands()
             ->bootSchedule()
+            ->bootPolicies()
             ->bootStylesheets()
             ->bootScripts()
             ->bootPublishables()
