@@ -8,8 +8,13 @@ use Facade\IgnitionContracts\Solution;
 use LogicException;
 use Statamic\Statamic;
 
-class ContainerException extends LogicException implements ProvidesSolution
+class UndefinedContainerException extends LogicException implements ProvidesSolution
 {
+    public function __construct()
+    {
+        parent::__construct('An asset container has not been configured');
+    }
+
     public function getSolution(): Solution
     {
         return BaseSolution::create('Assets fieldtype is missing the "container" option.')

@@ -132,7 +132,7 @@ class Assets extends Fieldtype
             return $containers->first();
         }
 
-        throw new ContainerException('An asset container has not been configured');
+        throw new UndefinedContainerException;
     }
 
     public function rules(): array
