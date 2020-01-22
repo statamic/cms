@@ -19,7 +19,7 @@ class Marketplace
     /**
      * @var int
      */
-    const CACHE_FOR_MINUTES = 60;
+    const CACHE_FOR_SECONDS = 60 * 60;
 
     /**
      * @var string
@@ -73,11 +73,11 @@ class Marketplace
             return $this;
         }
 
-        $this->payload = Cache::rememberWithExpiration('marketplace-addons', function () {
+        $this->payload = Cache::remember('marketplace-addons', static::CACHE_FOR_SECONDS, function () {
             try {
-                return [static::CACHE_FOR_MINUTES => $this->apiRequest('addons')];
+                return $this->apiRequest('addons');
             } catch (RequestException $exception) {
-                return [5 => ['data' => []]];
+                return null;
             }
         });
 
@@ -155,11 +155,11 @@ class Marketplace
      */
     public function show($addon)
     {
-        return Cache::rememberWithExpiration("marketplace-addons/{$addon}", function () use ($addon) {
+        return Cache::remember("marketplace-addons/{$addon}", static::CACHE_FOR_SECONDS, function () use ($addon) {
             try {
-                return [static::CACHE_FOR_MINUTES => $this->apiRequest("addons/{$addon}")];
+                return $this->apiRequest("addons/{$addon}");
             } catch (RequestException $exception) {
-                return [5 => null];
+                return null;
             }
         });
     }
