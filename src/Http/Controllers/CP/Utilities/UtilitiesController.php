@@ -28,7 +28,7 @@ class UtilitiesController extends CpController
 
     private function getUtilityHandle($request)
     {
-        preg_match('/utilities\/([^\/]+)/', $request->url(), $matches);
+        preg_match('/\/utilities\/([^\/]+)/', $request->url(), $matches);
 
         return $matches[1];
     }
