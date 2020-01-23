@@ -100,13 +100,13 @@ abstract class AddonServiceProvider extends ServiceProvider
 
         return $this;
     }
-    
+
     protected function bootPolicies()
     {
         foreach ($this->policies as $key => $value) {
-            Gate::policy($key, $value);   
+            Gate::policy($key, $value);
         }
-        
+
         return $this;
     }
 
