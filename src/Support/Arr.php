@@ -147,7 +147,7 @@ class Arr extends IlluminateArr
     /**
      * Checks if $value is an "empty" array
      *
-     * It might have keys, but if those keys are all nulls or empty strings, it's empty.
+     * It might have keys, but if those keys are all empty strings, it's empty.
      *
      * @param mixed  $value  Value to check
      * @return bool
