@@ -2,8 +2,7 @@
 
 namespace Tests\Modifiers;
 
-use Statamic\Facades\Antlers;
-use Statamic\Support\Str;
+use Statamic\Modifiers\Modify;
 use Tests\TestCase;
 
 class IsEmptyTest extends TestCase
@@ -11,27 +10,27 @@ class IsEmptyTest extends TestCase
     /** @test */
     function it_checks_if_its_empty()
     {
-        $this->assertTrue($this->parse('')); // empty string is empty
-        $this->assertTrue($this->parse([])); // empty array is empty
+        $this->assertTrue($this->modify('')); // empty string is empty
+        $this->assertTrue($this->modify([])); // empty array is empty
 
-        $this->assertFalse($this->parse(['foo' => 'bar'])); // definitely not empty
+        $this->assertFalse($this->modify(['foo' => 'bar'])); // definitely not empty
 
-        $this->assertTrue($this->parse(['foo' => ''])); // just consists of empty strings
-        $this->assertTrue($this->parse(['foo' => '', 'bar' => '']));
+        $this->assertTrue($this->modify(['foo' => ''])); // just consists of empty strings
+        $this->assertTrue($this->modify(['foo' => '', 'bar' => '']));
 
-        $this->assertFalse($this->parse(null)); // nulls are not empty
-        $this->assertFalse($this->parse(['foo' => null])); // array of nulls are not empty
-        $this->assertFalse($this->parse(['foo' => '', 'bar' => null]));
+        $this->assertFalse($this->modify(null)); // nulls are not empty
+        $this->assertFalse($this->modify(['foo' => null])); // array of nulls are not empty
+        $this->assertFalse($this->modify(['foo' => '', 'bar' => null]));
 
-        $this->assertTrue($this->parse(['foo' => []])); // recursion
-        $this->assertTrue($this->parse(['foo' => ['bar' => []]]));
-        $this->assertTrue($this->parse(['foo' => ['bar' => ['baz' => '']]]));
-        $this->assertFalse($this->parse(['foo' => ['bar' => ['baz' => 'qux']]]));
-        $this->assertFalse($this->parse(['foo' => ['bar' => ['baz' => null]]]));
+        $this->assertTrue($this->modify(['foo' => []])); // recursion
+        $this->assertTrue($this->modify(['foo' => ['bar' => []]]));
+        $this->assertTrue($this->modify(['foo' => ['bar' => ['baz' => '']]]));
+        $this->assertFalse($this->modify(['foo' => ['bar' => ['baz' => 'qux']]]));
+        $this->assertFalse($this->modify(['foo' => ['bar' => ['baz' => null]]]));
     }
 
-    function parse($arr)
+    function modify($arr)
     {
-        return Str::toBool(Antlers::parse('{{ if arr|is_empty }}true{{ else }}false{{ /if }}', ['arr' => $arr]));
+        return Modify::value($arr)->isEmpty()->fetch();
     }
 }
