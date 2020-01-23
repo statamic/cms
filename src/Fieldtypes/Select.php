@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\LabeledValue;
 
 class Select extends Fieldtype
 {
@@ -62,7 +63,7 @@ class Select extends Fieldtype
 
     public function augment($value)
     {
-        return array_get($this->config('options'), $value, $value);
+        return new LabeledValue($value, array_get($this->config('options'), $value, $value));
     }
 
     public function preProcess($value)

@@ -1234,6 +1234,10 @@ class Parser
             $context = $context->toAugmentedArray();
         }
 
+        if ($context instanceof Arrayable) {
+            $context = $context->toArray();
+        }
+
         // It will do this recursively until it's out of colon delimiters or values.
         if (is_array($context)) {
             return $this->getVariableExistenceAndValue($rest, $context);

@@ -9,6 +9,7 @@ use Statamic\Fields\Value;
 use Statamic\Facades\Entry;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\LabeledValue;
 use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
 use Facades\Tests\Factories\EntryFactory;
@@ -1432,6 +1433,83 @@ EOT;
             'test' => $value,
             'hello' => 'there',
         ]));
+    }
+
+    /** @test */
+    function it_outputs_the_value_when_a_LabeledValue_object_is_used_as_string()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($value)
+            {
+                return new LabeledValue('world', 'World');
+            }
+        };
+
+        $value = new Value('world', 'hello', $fieldtype);
+
+        $this->assertEquals('world', Antlers::parse('{{ hello }}', [
+            'hello' => $value
+        ]));
+    }
+
+    /** @test */
+    function it_can_treat_a_LabeledValue_object_as_an_array()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($value)
+            {
+                return new LabeledValue('world', 'World');
+            }
+        };
+
+        $value = new Value('world', 'hello', $fieldtype);
+
+        $this->assertEquals(
+            'world, world, World',
+            Antlers::parse('{{ hello }}{{ key }}, {{ value }}, {{ label }}{{ /hello }}', [
+                'hello' => $value,
+            ])
+        );
+    }
+
+    /** @test */
+    function it_can_access_LabeledValue_properties_by_colon_notation()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($value)
+            {
+                return new LabeledValue('world', 'World');
+            }
+        };
+
+        $value = new Value('world', 'hello', $fieldtype);
+
+        $vars = ['hello' => $value];
+
+        $this->assertEquals('world', Antlers::parse('{{ hello:value }}', $vars));
+        $this->assertEquals('world', Antlers::parse('{{ hello:key }}', $vars));
+        $this->assertEquals('World', Antlers::parse('{{ hello:label }}', $vars));
+    }
+
+    /** @test */
+    function it_can_use_LabeledValue_objects_in_conditions()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($value)
+            {
+                return new LabeledValue('world', 'World');
+            }
+        };
+
+        $value = new Value('expected', 'test', $fieldtype);
+
+        $vars = ['hello' => $value];
+        $this->assertEquals('true', Antlers::parse('{{ if hello }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('true', Antlers::parse('{{ if hello == "world" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ if hello == "there" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('true', Antlers::parse('{{ hello ? "true" : "false" }}', $vars));
+        $this->assertEquals('true', Antlers::parse('{{ hello == "world" ? "true" : "false" }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ hello == "there" ? "true" : "false" }}', $vars));
     }
 }
 
