@@ -6,14 +6,13 @@ use Statamic\Support\Str;
 
 class Parameters extends ArrayAccessor
 {
-    public function __construct($parameters, $context)
+    public static function make($items = [], $context = null)
     {
-        parent::__construct($this->initialize($parameters, $context));
-    }
+        if (! $context) {
+            throw new \InvalidArgumentException('A Context object is expected.');
+        }
 
-    protected function initialize($parameters, $context)
-    {
-        return collect($parameters)->mapWithKeys(function ($value, $key) use ($context) {
+        $items = collect($items)->mapWithKeys(function ($value, $key) use ($context) {
             // Values in parameters prefixed with a colon should be treated as the corresponding
             // field's value in the context. If it doesn't exist, the value remains the literal.
             if (Str::startsWith($key, ':')) {
@@ -31,5 +30,7 @@ class Parameters extends ArrayAccessor
 
             return [$key => $value];
         })->all();
+
+        return parent::make($items);
     }
 }

@@ -114,7 +114,7 @@ abstract class Tags
 
     public function setParameters($parameters)
     {
-        $this->params = new Parameters($parameters, $this->context);
+        $this->params = Parameters::make($parameters, $this->context);
 
         // Temporary BC alias.
         // TODO: Remove with HasParameters trait
