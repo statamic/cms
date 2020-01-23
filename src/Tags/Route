@@ -1,0 +1,32 @@
+<?php
+
+namespace Statamic\Tags;
+
+use Statamic\Tags\Tags;
+
+class Route extends Tags
+{
+    /**
+     * The {{ route name="your.named.route" }} tag
+     *
+     * @return  string
+     */
+    public function index()
+    {
+        $name = $this->params->get('name');
+
+        return route($name);
+    }
+    
+    
+     /**
+     * The {{ route:cp name="your.named.route" }} tag
+     *
+     * @return  string
+     */
+    public function cp() {
+        $name = $this->params->get('name');
+
+        return cp_route($name);
+    }
+}
