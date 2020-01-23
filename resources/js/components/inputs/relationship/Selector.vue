@@ -80,6 +80,7 @@
                                 </button>
 
                                 <button
+                                    v-if="maxSelections > 1"
                                     type="button"
                                     class="btn btn-primary ml-1"
                                     @click="select">
@@ -189,7 +190,13 @@ export default {
             this.page = 1;
 
             this.request();
-        }
+        },
+
+        selections() {
+            if (this.maxSelections === 1 && this.selections.length === 1) {
+                this.select();
+            }
+        },
 
     },
 
