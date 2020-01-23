@@ -77,7 +77,7 @@ class Parser
         $this->variableTagRegex = '/{{\s*('.$this->looseVariableRegex.'(?:\s*or\s*(?:'.$this->looseVariableRegex.'|".*?"))*)\s*}}/m';
 
         // make the space-anything after the variable regex optional allowing {{tags}} and {{ tags }}
-        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')(\s.*?)?}}(.*?){{\s*\/\1\s*}}/ms';
+        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')([^?]*?)?}}(.*?){{\s*\/\1\s*}}/ms';
 
         $this->recursiveRegex = '/{{\s*\*recursive\s*('.$this->variableRegex.')\*\s*}}/ms';
 
