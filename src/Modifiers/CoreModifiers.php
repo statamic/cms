@@ -849,7 +849,17 @@ class CoreModifiers extends Modifier
      */
     public function isEmpty($value)
     {
-        return Arr::isEmpty($value);
+        if (is_array($value)) {
+            foreach ($value as $subvalue) {
+                if (!$this->isEmpty($subvalue)) {
+                    return false;
+                }
+            }
+        } elseif (!empty($value) || $value !== '') {
+            return false;
+        }
+
+        return true;
     }
 
     /**

@@ -90,24 +90,4 @@ class ArrTest extends TestCase
             'bar' => 'two',
         ], ['foo', 'bar']));
     }
-
-    /** @test */
-    function it_checks_if_its_empty()
-    {
-        $this->assertTrue(Arr::isEmpty([])); // completely empty array
-
-        $this->assertFalse(Arr::isEmpty(['foo' => 'bar'])); // definitely not empty
-
-        $this->assertTrue(Arr::isEmpty(['foo' => ''])); // just consists of empty strings
-        $this->assertTrue(Arr::isEmpty(['foo' => '', 'bar' => '']));
-
-        $this->assertFalse(Arr::isEmpty(['foo' => null])); // nulls are not empty
-        $this->assertFalse(Arr::isEmpty(['foo' => '', 'bar' => null]));
-
-        $this->assertTrue(Arr::isEmpty(['foo' => []])); // recursion
-        $this->assertTrue(Arr::isEmpty(['foo' => ['bar' => []]]));
-        $this->assertTrue(Arr::isEmpty(['foo' => ['bar' => ['baz' => '']]]));
-        $this->assertFalse(Arr::isEmpty(['foo' => ['bar' => ['baz' => 'qux']]]));
-        $this->assertFalse(Arr::isEmpty(['foo' => ['bar' => ['baz' => null]]]));
-    }
 }

@@ -145,29 +145,6 @@ class Arr extends IlluminateArr
     }
 
     /**
-     * Checks if $value is an "empty" array
-     *
-     * It might have keys, but if those keys are all empty strings, it's empty.
-     *
-     * @param mixed  $value  Value to check
-     * @return bool
-     */
-    public static function isEmpty($value)
-    {
-        if (is_array($value)) {
-            foreach ($value as $subvalue) {
-                if (!self::isEmpty($subvalue)) {
-                    return false;
-                }
-            }
-        } elseif (!empty($value) || $value !== '') {
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
      * Normalize arguments
      *
      * Ensures both ['one', 'two'] or 'one|two' ends up as the former
