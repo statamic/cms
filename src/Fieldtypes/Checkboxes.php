@@ -20,16 +20,16 @@ class Checkboxes extends Fieldtype
 
     public function augment($values)
     {
-        $augmented = [];
-
         if (is_null($values)) {
             return [];
         }
 
-        foreach ($values as $key => $value) {
-            $augmented[$key] = ['value' => $value, 'label' => array_get($this->config('options'), $value)];
-        }
-
-        return $augmented;
+        return collect($values)->map(function ($value) {
+            return [
+                'key' => $value,
+                'value' => $value,
+                'label' => array_get($this->config('options'), $value, $value)
+            ];
+        })->all();
     }
 }

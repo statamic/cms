@@ -17,6 +17,7 @@ class CorePermissions
     {
         $this->group('cp', function () {
             $this->register('access cp');
+            $this->register('configure fields');
         });
 
         $this->group('collections', function () {
@@ -207,6 +208,8 @@ class CorePermissions
 
         return $permission->label(
             __('statamic::permissions.'.str_replace(' ', '_', $permission->value()))
+        )->description(
+            __('statamic::permissions.'.str_replace(' ', '_', $permission->value().'_desc'))
         );
     }
 

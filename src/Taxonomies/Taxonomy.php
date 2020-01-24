@@ -77,6 +77,9 @@ class Taxonomy implements Contract, Responsable
                     return Blueprint::find($blueprint);
                 });
             })
+            ->setter(function ($blueprints) {
+                return empty($blueprints) ? null : $blueprints;
+            })
             ->args(func_get_args());
     }
 
@@ -223,7 +226,7 @@ class Taxonomy implements Contract, Responsable
 
     public function template()
     {
-        return 'taxonomy'; // todo: get it from the collection
+        return $this->handle() . '.index';
     }
 
     public function layout()

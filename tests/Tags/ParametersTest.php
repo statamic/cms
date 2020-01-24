@@ -17,7 +17,7 @@ class ParametersTest extends TestCase
             'foo' => 'bar'
         ]);
 
-        $this->params = new Parameters([
+        $this->params = Parameters::make([
             'string' => 'hello',
             'array' => ['one', 'two'],
             'integer' => 7,

@@ -17,12 +17,19 @@ class UtilitiesController extends CpController
 
     public function show(Request $request)
     {
-        $utility = Utility::find($request->segment(3));
+        $utility = Utility::find($this->getUtilityHandle($request));
 
         if ($view = $utility->view()) {
             return view($view, $utility->viewData($request));
         }
 
         throw new \Exception("Utility [{$utility->handle()}] has not been provided with an action or view.");
+    }
+
+    private function getUtilityHandle($request)
+    {
+        preg_match('/\/utilities\/([^\/]+)/', $request->url(), $matches);
+
+        return $matches[1];
     }
 }

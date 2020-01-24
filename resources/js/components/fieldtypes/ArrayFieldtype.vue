@@ -32,7 +32,7 @@
                     >
                         <tbody>
                             <tr class="sortable-row" v-for="(element, index) in data" :key="element._id">
-                                <td class="table-drag-handle" v-if="!isReadOnly"></td>
+                                <td class="sortable-handle table-drag-handle" v-if="!isReadOnly"></td>
                                 <td>
                                     <input type="text" class="input-text font-bold" v-model="element.key" :readonly="isReadOnly" />
                                 </td>

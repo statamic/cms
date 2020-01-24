@@ -77,7 +77,7 @@ class Parser
         $this->variableTagRegex = '/{{\s*('.$this->looseVariableRegex.'(?:\s*or\s*(?:'.$this->looseVariableRegex.'|".*?"))*)\s*}}/m';
 
         // make the space-anything after the variable regex optional allowing {{tags}} and {{ tags }}
-        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')(\s.*?)?}}(.*?){{\s*\/\1\s*}}/ms';
+        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')([^?]*?)?}}(.*?){{\s*\/\1\s*}}/ms';
 
         $this->recursiveRegex = '/{{\s*\*recursive\s*('.$this->variableRegex.')\*\s*}}/ms';
 
@@ -567,9 +567,6 @@ class Parser
             // a callback. If it's a query builder instance, we want to use the Query tag's index
             // method to handle the logic. We'll pass the builder into the builder parameter.
             if (isset($data[$name])) {
-                if ($data[$name] instanceof Value) {
-                    $data[$name] = $data[$name]->raw();
-                }
                 if ($data[$name] instanceof Builder) {
                     $parameters['builder'] = $data[$name];
                     $name = 'query';
@@ -988,7 +985,7 @@ class Parser
 
         // if the resulting value of a variable is a string that contains another variable,
         // let's find that variable's value as well
-        if (!is_array($value)) {
+        if (is_string($value)) {
             while (preg_match($this->variableTagRegex, $value, $matches)) {
                 $previous_value = $value;
                 $value = $this->parseVariables($value, $this->conditionalData);
@@ -1027,7 +1024,9 @@ class Parser
      */
     protected function valueToLiteral($value)
     {
-        if (is_object($value) and is_callable(array($value, '__toString'))) {
+        if ($value instanceof Builder) {
+            return $value->count();
+        } elseif (is_object($value) and is_callable(array($value, '__toString'))) {
             return var_export((string)$value, true);
         } elseif (is_array($value)) {
             return !empty($value) ? "true" : "false";
@@ -1233,6 +1232,10 @@ class Parser
 
         if ($context instanceof Augmentable) {
             $context = $context->toAugmentedArray();
+        }
+
+        if ($context instanceof Arrayable) {
+            $context = $context->toArray();
         }
 
         // It will do this recursively until it's out of colon delimiters or values.

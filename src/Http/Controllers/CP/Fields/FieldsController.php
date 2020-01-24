@@ -32,7 +32,7 @@ class FieldsController extends CpController
 
         $fieldtype = FieldtypeRepository::find($request->type);
 
-        $blueprint = $fieldtype->configBlueprint();
+        $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
         $fields = $blueprint
             ->fields()
@@ -56,13 +56,52 @@ class FieldsController extends CpController
 
         $fieldtype = FieldtypeRepository::find($request->type);
 
-        $blueprint = $fieldtype->configBlueprint();
+        $blueprint = $this->blueprint($fieldtype->configBlueprint());
 
         $fields = $blueprint
             ->fields()
             ->addValues($request->values)
             ->process();
 
-        return array_merge($request->values, $fields->values()->all());
+        $values = array_merge($request->values, $fields->values()->all());
+
+        return $values;
+    }
+
+    protected function blueprint($blueprint)
+    {
+        $prepends = collect([
+            'display' => [
+                'type' => 'text',
+                'instructions' => __('statamic::messages.fields_display_instructions'),
+                'width' => 50,
+            ],
+            'handle' => [
+                'type' => 'text',
+                'instructions' => __('statamic::messages.fields_handle_instructions'),
+                'width' => 50,
+            ],
+            'instructions' => [
+                'type' => 'text',
+                'instructions' => __('statamic::messages.fields_instructions_instructions'),
+            ],
+            'listable' => [
+                'type' => 'select',
+                'instructions' => __('statamic::messages.fields_listable_instructions'),
+                'cast_booleans' => true,
+                'width' => 50,
+                'options' => [
+                    'hidden' => __('Hidden by default'),
+                    'true' => __('Yes'),
+                    'false' => __('No'),
+                ],
+            ]
+        ]);
+
+        foreach ($prepends->reverse() as $handle => $prepend) {
+            $blueprint->ensureFieldPrepended($handle, $prepend);
+        }
+
+        return $blueprint;
     }
 }

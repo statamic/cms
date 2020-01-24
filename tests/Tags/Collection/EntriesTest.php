@@ -54,7 +54,7 @@ class EntriesTest extends TestCase
     {
         $params['from'] = 'test';
 
-        $params = new Parameters($params, new Context);
+        $params = Parameters::make($params, new Context);
 
         return (new Entries($params))->get();
     }

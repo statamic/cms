@@ -5,6 +5,7 @@ namespace Statamic\Fields;
 use ArrayIterator;
 use IteratorAggregate;
 use JsonSerializable;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\View\Antlers\Parser;
 
 class Value implements IteratorAggregate, JsonSerializable
@@ -55,7 +56,13 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function jsonSerialize($options = 0)
     {
-        return $this->value();
+        $value = $this->value();
+
+        if ($value instanceof Augmentable) {
+            $value = $value->toAugmentedArray();
+        }
+
+        return $value;
     }
 
     public function getIterator()
