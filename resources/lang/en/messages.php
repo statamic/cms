@@ -70,7 +70,7 @@ return [
     'fields_fieldsets_description' => 'Fieldsets are simple, flexible, and completely optional groupings of fields that help to organize reusable, pre-configured fields.',
     'fields_handle_instructions' => 'The field\'s template variable.',
     'fields_instructions_instructions' => 'Shown under the field\'s display label, like this very text. Markdown is supported.',
-    'fields_listable_instructions' => 'Whether this field should be available as a column in listings.',
+    'fields_listable_instructions' => 'Control the column visibility of this field.',
     'fieldset_import_fieldset_instructions' => 'The fieldset to be imported.',
     'fieldset_import_prefix_instructions' => 'The prefix that should be applied to each field when they are imported. eg. hero_',
     'fieldsets_button_help_text' => 'You will be able to customize your Fieldset once it\'s created.',

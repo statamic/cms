@@ -89,11 +89,12 @@ class FieldsController extends CpController
                 'type' => 'select',
                 'instructions' => __('statamic::messages.fields_listable_instructions'),
                 'cast_booleans' => true,
+                'default' => 'hidden',
                 'width' => 50,
                 'options' => [
                     'hidden' => __('Hidden by default'),
-                    'true' => __('Yes'),
-                    'false' => __('No'),
+                    'true' => __('Shown by default'),
+                    'false' => __('Not listable'),
                 ],
             ]
         ]);
