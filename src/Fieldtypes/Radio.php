@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\LabeledValue;
 
 class Radio extends Fieldtype
 {
@@ -17,4 +18,9 @@ class Radio extends Fieldtype
             'instructions' => 'Show the radio buttons in a row.'
         ]
     ];
+
+    public function augment($value)
+    {
+        return new LabeledValue($value, array_get($this->config('options'), $value, $value));
+    }
 }
