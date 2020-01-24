@@ -3,6 +3,7 @@
 namespace Statamic\Fields;
 
 use ArrayIterator;
+use Illuminate\Support\Collection;
 use IteratorAggregate;
 use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
@@ -58,7 +59,7 @@ class Value implements IteratorAggregate, JsonSerializable
     {
         $value = $this->value();
 
-        if ($value instanceof Augmentable) {
+        if ($value instanceof Augmentable || $value instanceof Collection) {
             $value = $value->toAugmentedArray();
         }
 
