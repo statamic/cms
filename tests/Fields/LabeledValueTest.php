@@ -22,6 +22,7 @@ class LabeledValueTest extends TestCase
     function it_converts_to_a_string()
     {
         $this->assertEquals('world', (string) new LabeledValue('world', 'World'));
+        $this->assertEquals('',  (string) new LabeledValue(null, null));
     }
 
     /** @test */
