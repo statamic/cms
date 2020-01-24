@@ -1511,6 +1511,14 @@ EOT;
         $this->assertEquals('true', Antlers::parse('{{ hello == "world" ? "true" : "false" }}', $vars));
         $this->assertEquals('false', Antlers::parse('{{ hello == "there" ? "true" : "false" }}', $vars));
     }
+
+    /** @test */
+    function empty_collections_are_considered_empty_in_conditions()
+    {
+        $template = '{{ if stuff }}yes{{ else }}no{{ /if }}';
+        $this->assertEquals('no', Antlers::parse($template, ['stuff' => collect()]));
+        $this->assertEquals('yes', Antlers::parse($template, ['stuff' => collect(['one'])]));
+    }
 }
 
 class NonArrayableObject

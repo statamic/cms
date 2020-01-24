@@ -997,6 +997,10 @@ class Parser
             }
         }
 
+        if ($value instanceof Collection && $value->isEmpty()) {
+            $value = false;
+        }
+
         if ($value === '__processConditionVar__') {
             return $this->inCondition ? $var : 'null';
         }
