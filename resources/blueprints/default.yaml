@@ -6,16 +6,3 @@ fields:
       type: markdown
       display: Content
       localizable: true
-  -
-    handle: author
-    field:
-      type: users
-      display: Author
-      localizable: true
-      max_items: 1
-  -
-    handle: template
-    field:
-      type: template
-      display: Template
-      localizable: true
