@@ -6,6 +6,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Events\Data\AssetContainerDeleted;
 use Statamic\Events\Data\AssetContainerSaved;
 use Statamic\Facades;
@@ -24,7 +25,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements AssetContainerContract, Augmentable
 {
-    use ExistsAsFile, FluentlyGetsAndSets;
+    use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
 
     protected $title;
     protected $handle;
@@ -122,7 +123,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $array;
     }
 
-    public function toAugmentedArray()
+    public function augmentedArrayData()
     {
         return array_merge($this->toArray(), [
             'handle' => $this->handle(),

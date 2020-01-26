@@ -9,9 +9,12 @@ use Statamic\Facades\Config;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Http\Responses\DataResponse;
 use Illuminate\Contracts\Support\Responsable;
+use Statamic\Data\HasAugmentedData;
 
 class Route implements Responsable, Augmentable
 {
+    use HasAugmentedData;
+
     private $uri;
     private $data;
 
@@ -55,7 +58,7 @@ class Route implements Responsable, Augmentable
         ]);
     }
 
-    public function toAugmentedArray()
+    public function augmentedArrayData()
     {
         return $this->toArray();
     }

@@ -12,7 +12,6 @@ use Statamic\Facades\Blueprint;
 use Statamic\Routing\Routable;
 use Statamic\Facades\Collection;
 use Illuminate\Support\Carbon;
-use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Revisions\Revisable;
@@ -22,18 +21,19 @@ use Statamic\Events\Data\EntrySaving;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Entries\Entry as Contract;
-use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasOrigin;
 use Statamic\Contracts\Data\Localization;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Data\Publishable;
 
-class Entry implements Contract, AugmentableContract, Responsable, Localization, ArrayAccess
+class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAccess
 {
     use Routable {
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, Augmentable, FluentlyGetsAndSets, Revisable, Publishable;
+    use ContainsData, ExistsAsFile, HasAugmentedData, FluentlyGetsAndSets, Revisable, Publishable;
 
     use HasOrigin {
         value as originValue;

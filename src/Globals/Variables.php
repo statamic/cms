@@ -6,17 +6,17 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\GlobalSet;
 use Statamic\Data\HasOrigin;
-use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Globals\Variables as Contract;
+use Statamic\Data\HasAugmentedData;
 
-class Variables implements Contract, Localization, AugmentableContract
+class Variables implements Contract, Localization, Augmentable
 {
-    use ExistsAsFile, ContainsData, Augmentable, HasOrigin, FluentlyGetsAndSets;
+    use ExistsAsFile, ContainsData, HasAugmentedData, HasOrigin, FluentlyGetsAndSets;
 
     protected $set;
     protected $locale;

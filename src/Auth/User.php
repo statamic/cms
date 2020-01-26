@@ -12,8 +12,8 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
-use Statamic\Contracts\Data\Augmentable as AugmentableContract;
-use Statamic\Data\Augmentable;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\URL;
@@ -22,15 +22,15 @@ use Statamic\Notifications\PasswordReset as PasswordResetNotification;
 use Statamic\Support\Arr;
 use Statamic\Fields\Value;
 
-abstract class User implements 
+abstract class User implements
     UserContract,
     Authenticatable,
     CanResetPasswordContract,
-    AugmentableContract,
+    Augmentable,
     ArrayAccess,
     AuthorizableContract
 {
-    use Authorizable, Notifiable, CanResetPassword, Augmentable;
+    use Authorizable, Notifiable, CanResetPassword, HasAugmentedData;
 
     abstract public function get($key, $fallback = null);
     abstract public function value($key);

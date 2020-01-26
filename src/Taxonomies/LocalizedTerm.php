@@ -7,7 +7,7 @@ use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Data\Augmentable as AugmentableTrait;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Data\Publishable;
 use Statamic\Facades\Site;
 use Statamic\Http\Responses\DataResponse;
@@ -16,7 +16,7 @@ use Statamic\Routing\Routable;
 
 class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
 {
-    use Revisable, Routable, Publishable, AugmentableTrait;
+    use Revisable, Routable, Publishable, HasAugmentedData;
 
     protected $locale;
     protected $term;
