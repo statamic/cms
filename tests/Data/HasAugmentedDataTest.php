@@ -52,11 +52,16 @@ class HasAugmentedDataTest extends TestCase
             $this->assertEquals($thing, $value->augmentable());
             $this->assertEquals($fieldtype, $value->fieldtype());
         });
+
+        $this->assertEquals('BAR', $thing->augmentedValue('bar'));
         $this->assertEquals('BAR', $thing->augmented()->get('bar'));
-        $this->assertEquals([
+
+        $expectedArr = [
             'foo' => new Value('FOO', 'foo', $fieldtype, $thing),
             'bar' => 'BAR',
             'baz' => new Value(null, 'baz', $fieldtype, $thing),
-        ], $thing->augmented()->all());
+        ];
+        $this->assertEquals($expectedArr, $thing->augmented()->all());
+        $this->assertEquals($expectedArr, $thing->toAugmentedArray());
     }
 }
