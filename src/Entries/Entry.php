@@ -24,7 +24,7 @@ use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasOrigin;
 use Statamic\Contracts\Data\Localization;
-use Statamic\Data\HasAugmentedData;
+use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
 
 class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAccess
@@ -33,7 +33,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, HasAugmentedData, FluentlyGetsAndSets, Revisable, Publishable;
+    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable;
 
     use HasOrigin {
         value as originValue;
@@ -97,25 +97,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         return $this->collection;
     }
 
-    public function augmentedArrayData()
+    public function newAugmentedInstance()
     {
-        return $this->values()->merge([
-            'id' => $this->id(),
-            'slug' => $this->slug(),
-            'uri' => $this->uri(),
-            'url' => $this->url(),
-            'edit_url' => $this->editUrl(),
-            'permalink' => $this->absoluteUrl(),
-            'amp_url' => $this->ampUrl(),
-            'published' => $this->published(),
-            'private' => $this->private(),
-            'date' => $this->date(),
-            'is_entry' => true,
-            'collection' => $this->collectionHandle(),
-            'last_modified' => $lastModified = $this->lastModified(),
-            'updated_at' => $lastModified,
-            'updated_by' => optional($this->lastModifiedBy())->toAugmentedArray(),
-        ])->merge($this->supplements)->all();
+        return new AugmentedEntry($this);
     }
 
     public function toCacheableArray()
