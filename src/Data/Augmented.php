@@ -42,7 +42,7 @@ abstract class Augmented
 
     public function get($handle)
     {
-        if (method_exists($this, $method = Str::camel($handle))) {
+        if (method_exists($this, $method = Str::camel($handle)) && !in_array($method, ['select', 'except'])) {
             return $this->$method();
         }
 

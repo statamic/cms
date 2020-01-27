@@ -165,6 +165,20 @@ class AugmentedTest extends TestCase
             'unused' => $unused,
         ], $augmented->except('hello'));
     }
+
+    /** @test */
+    function no_infinite_loop_when_getting_keys_that_match_methods()
+    {
+        $thing = new Thing([
+            'select' => 'selected',
+            'except' => 'excepted',
+        ]);
+
+        $augmented = new BaseAugmentedThing($thing);
+
+        $this->assertEquals('selected', $augmented->get('select'));
+        $this->assertEquals('excepted', $augmented->get('except'));
+    }
 }
 
 class Thing
