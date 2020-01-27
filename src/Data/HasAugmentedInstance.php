@@ -11,9 +11,9 @@ trait HasAugmentedInstance
         return $this->augmented()->get($key);
     }
 
-    public function toAugmentedArray()
+    public function toAugmentedArray($keys = null)
     {
-        return $this->augmented()->all();
+        return $this->augmented()->select($keys);
     }
 
     public function augmented()
