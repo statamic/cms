@@ -3,7 +3,7 @@
 namespace Tests;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
-use Statamic\Data\Augmented;
+use Statamic\Data\AbstractAugmented;
 use Statamic\Data\ContainsData;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fieldtype;
@@ -224,7 +224,7 @@ class BlueprintThing extends Thing
     }
 }
 
-class BaseAugmentedThing extends Augmented
+class BaseAugmentedThing extends AbstractAugmented
 {
     public function keys()
     {

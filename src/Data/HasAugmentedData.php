@@ -2,20 +2,13 @@
 
 namespace Statamic\Data;
 
-use Illuminate\Support\Collection;
-
 trait HasAugmentedData
 {
-    public function toAugmentedArray()
-    {
-        $arr = $this->augmentedArrayData();
+    use HasAugmentedInstance;
 
-        return $arr instanceof Collection ? $arr->all() : $arr;
-    }
-
-    public function augmentedValue($key)
+    public function newAugmentedInstance()
     {
-        return $this->toAugmentedArray()[$key];
+        return new AugmentedArray($this, $this->augmentedArrayData());
     }
 
     public function augmentedArrayData()

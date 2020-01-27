@@ -2,11 +2,12 @@
 
 namespace Statamic\Data;
 
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-abstract class Augmented
+abstract class AbstractAugmented implements Augmented
 {
     protected $data;
 
@@ -50,7 +51,12 @@ abstract class Augmented
             return $this->wrapValue($this->data->$method(), $handle);
         }
 
-        return $this->wrapValue($this->data->get($handle), $handle);
+        return $this->wrapValue($this->getFromData($handle), $handle);
+    }
+
+    protected function getFromData($handle)
+    {
+        return $this->data->get($handle);
     }
 
     private function wrapValue($value, $handle)
