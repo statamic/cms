@@ -152,10 +152,10 @@ class CollectionsServiceProvider extends ServiceProvider
 
     protected function toAugmentedArray()
     {
-        Collection::macro('toAugmentedArray', function () {
-            return array_map(function ($value) {
+        Collection::macro('toAugmentedArray', function ($keys = null) {
+            return array_map(function ($value) use ($keys) {
                 if ($value instanceof Augmentable) {
-                    return $value->toAugmentedArray();
+                    return $value->toAugmentedArray($keys);
                 }
                 return $value instanceof Arrayable ? $value->toArray() : $value;
             }, $this->items);
