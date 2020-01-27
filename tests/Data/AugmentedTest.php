@@ -140,6 +140,7 @@ class AugmentedTest extends TestCase
             'slug' => $slug = new Value('the-thing', 'slug', $fieldtype, $this->blueprintThing),
             'the_slug' => 'the-thing',
             'hello' => 'world',
+            'unused' => $unused = new Value(null, 'unused', $fieldtype, $this->blueprintThing),
         ], $augmented->all());
 
         $this->assertEquals([
@@ -154,12 +155,14 @@ class AugmentedTest extends TestCase
         $this->assertEquals([
             'foo' => $foo,
             'the_slug' => 'the-thing',
+            'unused' => $unused,
         ], $augmented->except(['slug', 'hello']));
 
         $this->assertEquals([
             'foo' => $foo,
             'slug' => $slug,
             'the_slug' => 'the-thing',
+            'unused' => $unused,
         ], $augmented->except('hello'));
     }
 }
@@ -196,6 +199,10 @@ class BlueprintThing extends Thing
                 ],
                 [
                     'handle' => 'slug',
+                    'field' => ['type' => 'test'],
+                ],
+                [
+                    'handle' => 'unused',
                     'field' => ['type' => 'test'],
                 ]
             ]

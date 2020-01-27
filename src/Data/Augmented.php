@@ -22,14 +22,14 @@ abstract class Augmented
 
     public function except($keys)
     {
-        return $this->select(array_diff($this->keys(), Arr::wrap($keys)));
+        return $this->select(array_diff($this->augmentableKeys(), Arr::wrap($keys)));
     }
 
     public function select($keys = null)
     {
         $arr = [];
 
-        $keys = Arr::wrap($keys ?: $this->keys());
+        $keys = Arr::wrap($keys ?: $this->augmentableKeys());
 
         foreach ($keys as $key) {
             $arr[$key] = $this->get($key);
@@ -47,16 +47,15 @@ abstract class Augmented
         }
 
         if (method_exists($this->data, $method = Str::camel($handle))) {
-            return $this->data->$method();
+            return $this->wrapValue($this->data->$method(), $handle);
         }
 
-        if (! $value = $this->data->get($handle)) {
-            return null;
-        }
+        return $this->wrapValue($this->data->get($handle), $handle);
+    }
 
-        $fields = (method_exists($this->data, 'blueprint') && $blueprint = $this->data->blueprint())
-            ? $blueprint->fields()->all()
-            : collect();
+    private function wrapValue($value, $handle)
+    {
+        $fields = $this->blueprintFields();
 
         if (! $fields->has($handle)) {
             return $value;
@@ -68,5 +67,17 @@ abstract class Augmented
             $fields->get($handle)->fieldtype(),
             $this->data
         );
+    }
+
+    private function blueprintFields()
+    {
+        return (method_exists($this->data, 'blueprint') && $blueprint = $this->data->blueprint())
+            ? $blueprint->fields()->all()
+            : collect();
+    }
+
+    protected function augmentableKeys()
+    {
+        return $this->blueprintFields()->keys()->merge($this->keys())->all();
     }
 }
