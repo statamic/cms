@@ -126,7 +126,7 @@ class AugmentedTest extends TestCase
         $augmented = new class($this->blueprintThing) extends BaseAugmentedThing {
             public function keys()
             {
-                return ['foo', 'slug', 'the_slug', 'hello'];
+                return ['foo', 'slug', 'the_slug', 'hello', 'supplemented'];
             }
 
             public function hello()
@@ -141,6 +141,7 @@ class AugmentedTest extends TestCase
             'the_slug' => 'the-thing',
             'hello' => 'world',
             'unused' => $unused = new Value(null, 'unused', $fieldtype, $this->blueprintThing),
+            'supplemented' => 'supplemented value',
         ], $augmented->all());
 
         $this->assertEquals([
@@ -156,6 +157,7 @@ class AugmentedTest extends TestCase
             'foo' => $foo,
             'the_slug' => 'the-thing',
             'unused' => $unused,
+            'supplemented' => 'supplemented value',
         ], $augmented->except(['slug', 'hello']));
 
         $this->assertEquals([
@@ -163,6 +165,7 @@ class AugmentedTest extends TestCase
             'slug' => $slug,
             'the_slug' => 'the-thing',
             'unused' => $unused,
+            'supplemented' => 'supplemented value',
         ], $augmented->except('hello'));
     }
 
@@ -188,6 +191,9 @@ class Thing
     function __construct($data)
     {
         $this->data = $data;
+        $this->supplements = [
+            'supplemented' => 'supplemented value',
+        ];
     }
 
     public function slug()

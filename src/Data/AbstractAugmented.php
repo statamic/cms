@@ -56,7 +56,13 @@ abstract class AbstractAugmented implements Augmented
 
     protected function getFromData($handle)
     {
-        return $this->data->get($handle);
+        $value = $this->data->get($handle);
+
+        if (method_exists($this->data, 'getSupplement')) {
+            $value = $this->data->getSupplement($handle) ?? $value;
+        }
+
+        return $value;
     }
 
     private function wrapValue($value, $handle)
