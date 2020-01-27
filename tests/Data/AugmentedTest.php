@@ -87,15 +87,26 @@ class AugmentedTest extends TestCase
             }
         };
 
-        $this->assertInstanceOf(Value::class, $value = $augmented->get('foo'));
-        $this->assertEquals('bar', $value->raw());
-        $this->assertEquals('AUGMENTED BAR', $value->value());
-        $this->assertEquals('foo', $value->handle());
-        $this->assertEquals($fieldtype, $value->fieldtype());
-        $this->assertEquals($this->blueprintThing, $value->augmentable());
+        tap($augmented->get('foo'), function ($value) use ($fieldtype) {
+            $this->assertInstanceOf(Value::class, $value);
+            $this->assertEquals('bar', $value->raw());
+            $this->assertEquals('AUGMENTED BAR', $value->value());
+            $this->assertEquals('foo', $value->handle());
+            $this->assertEquals($fieldtype, $value->fieldtype());
+            $this->assertEquals($this->blueprintThing, $value->augmentable());
+        });
+
+        tap($augmented->get('slug'), function ($value) use ($fieldtype) {
+            $this->assertInstanceOf(Value::class, $value);
+            $this->assertEquals('the-thing', $value->raw());
+            $this->assertEquals('AUGMENTED THE-THING', $value->value());
+            $this->assertEquals('slug', $value->handle());
+            $this->assertEquals($fieldtype, $value->fieldtype());
+            $this->assertEquals($this->blueprintThing, $value->augmentable());
+        });
 
         $this->assertEquals('qux', $augmented->get('baz'));
-        $this->assertEquals('the-thing', $augmented->get('slug'));
+        $this->assertEquals('the-thing', $augmented->get('the_slug'));
         $this->assertEquals('world', $augmented->get('hello'));
         $this->assertNull($augmented->get('unknown'));
     }
@@ -126,7 +137,7 @@ class AugmentedTest extends TestCase
 
         $this->assertEquals([
             'foo' => $foo = new Value('bar', 'foo', $fieldtype, $this->blueprintThing),
-            'slug' => 'the-thing',
+            'slug' => $slug = new Value('the-thing', 'slug', $fieldtype, $this->blueprintThing),
             'the_slug' => 'the-thing',
             'hello' => 'world',
         ], $augmented->all());
@@ -147,7 +158,7 @@ class AugmentedTest extends TestCase
 
         $this->assertEquals([
             'foo' => $foo,
-            'slug' => 'the-thing',
+            'slug' => $slug,
             'the_slug' => 'the-thing',
         ], $augmented->except('hello'));
     }
@@ -181,6 +192,10 @@ class BlueprintThing extends Thing
             'fields' => [
                 [
                     'handle' => 'foo',
+                    'field' => ['type' => 'test'],
+                ],
+                [
+                    'handle' => 'slug',
                     'field' => ['type' => 'test'],
                 ]
             ]
