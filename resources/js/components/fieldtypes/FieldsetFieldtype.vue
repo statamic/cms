@@ -103,7 +103,7 @@ export default {
                 this.storePending = false;
                 this.cancelAdd();
                 this.refresh();
-                this.$toast.success('Fieldset created');
+                this.$toast.success(__('Fieldset created'));
             });
         },
 

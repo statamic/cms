@@ -111,7 +111,7 @@ export default {
             this.clearErrors();
 
             this.$axios[this.method](this.action, this.payload).then(response => {
-                this.$toast.success('Saved');
+                this.$toast.success(__('Saved'));
                 if (!this.initialHandle || (this.initialHandle !== this.handle)) {
                     window.location = response.data.redirect;
                 }
@@ -122,7 +122,7 @@ export default {
                     this.errors = errors;
                     this.$toast.error(message);
                 } else {
-                    this.$toast.error('Something went wrong');
+                    this.$toast.error(__('Something went wrong'));
                 }
             });
         }

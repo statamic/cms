@@ -182,7 +182,7 @@ export default {
                     this.$toast.success(__('Entries successfully reordered'))
                 })
                 .catch(e => {
-                    this.$toast.error('Something went wrong');
+                    this.$toast.error(__('Something went wrong'));
                 });
         },
 

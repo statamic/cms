@@ -104,7 +104,7 @@ export default {
 
             this.$axios[this.method](this.actions.save, this.values).then(response => {
                 this.title = response.data.title;
-                if (!this.isCreating) this.$toast.success('Saved');
+                if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => {
@@ -114,7 +114,7 @@ export default {
                     this.errors = errors;
                     this.$toast.error(message);
                 } else {
-                    this.$toast.error('Something went wrong');
+                    this.$toast.error(__('Something went wrong'));
                 }
             });
         }

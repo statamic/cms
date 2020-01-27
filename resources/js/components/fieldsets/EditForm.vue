@@ -54,7 +54,7 @@ export default {
         save() {
             this.$axios[this.method](this.action, this.fieldset)
                 .then(response => {
-                    this.$toast.success('Saved');
+                    this.$toast.success(__('Saved'));
                     this.errors = {};
                 })
                 .catch(e => {
