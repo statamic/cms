@@ -159,7 +159,8 @@ Route::group([
         Route::get('account', 'AccountController')->name('account');
         Route::resource('user-groups', 'UserGroupsController');
         Route::resource('roles', 'RolesController');
-        Route::resource('preferences', 'PreferenceController');
+        Route::resource('preferences', 'PreferenceController')->except('destroy');
+        Route::post('preferences/{key}/delete', 'PreferenceController@destroy')->name('preferences.destroy');
     });
 
     Route::post('user-exists', 'Users\UserWizardController')->name('user.exists');
