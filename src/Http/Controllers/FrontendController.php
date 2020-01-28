@@ -34,8 +34,6 @@ class FrontendController extends Controller
             $url = str_after($url, '/' . config('statamic.amp.route'));
         }
 
-        $url = $this->removeIgnoredSegments($url);
-
         if (str_contains($url, '?')) {
             $url = substr($url, 0, strpos($url, '?'));
         }
@@ -45,14 +43,5 @@ class FrontendController extends Controller
         }
 
         throw new NotFoundHttpException;
-    }
-
-    public function removeIgnoredSegments($uri)
-    {
-        $ignore = config('statamic.routes.ignore', []);
-
-        return collect(explode('/', $uri))->reject(function ($segment) use ($ignore) {
-            return in_array($segment, $ignore);
-        })->implode('/');
     }
 }

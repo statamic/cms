@@ -3,9 +3,17 @@
 namespace Tests\Auth\Protect;
 
 use Facades\Statamic\Auth\Protect\Protectors\Password\Token;
+use Illuminate\Support\Facades\Route;
 
 class PasswordProtectionTest extends PageProtectionTestCase
 {
+    protected function resolveApplicationConfiguration($app)
+    {
+        parent::resolveApplicationConfiguration($app);
+
+        Route::view('/password-entry', 'password-entry');
+    }
+
     /** @test */
     function redirects_to_password_form_url_and_generates_token()
     {
@@ -78,10 +86,6 @@ class PasswordProtectionTest extends PageProtectionTestCase
     function custom_password_form_url_is_unprotected()
     {
         $this->viewShouldReturnRendered('password-entry', 'Password form template');
-
-        config(['statamic.routes.routes' => [
-            '/password-entry' => 'password-entry'
-        ]]);
 
         config(['statamic.protect.default' => 'password-scheme']);
         config(['statamic.protect.schemes.password-scheme' => [
