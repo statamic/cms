@@ -9,6 +9,7 @@ use Statamic\Statamic;
 use Statamic\Facades\Content;
 use Illuminate\Http\Request;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\View\View;
 
 /**
  * The front-end controller
@@ -43,5 +44,15 @@ class FrontendController extends Controller
         }
 
         throw new NotFoundHttpException;
+    }
+
+    public function route(...$args)
+    {
+        [$view, $data] = array_slice($args, -2);
+
+        return (new View)
+            ->template($view)
+            ->layout($data['layout'] ?? 'layout')
+            ->with($data);
     }
 }

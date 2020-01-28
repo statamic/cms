@@ -10,6 +10,7 @@ use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Http\Controllers\FrontendController;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -23,6 +24,12 @@ class RouteServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        Route::macro('statamic', function ($uri, $view, $data = []) {
+            return $this->get($uri, [FrontendController::class, 'route'])
+                ->defaults('view', $view)
+                ->defaults('data', $data);
+        });
+
         $this->bindEntries();
         $this->bindCollections();
         $this->bindTerms();
