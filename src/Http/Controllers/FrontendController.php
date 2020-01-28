@@ -2,13 +2,13 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\Facades\URL;
-use Statamic\Facades\Data;
-use Statamic\Facades\Site;
-use Statamic\Statamic;
-use Statamic\Facades\Content;
 use Illuminate\Http\Request;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Content;
+use Statamic\Facades\Data;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
+use Statamic\Statamic;
 use Statamic\View\View;
 
 /**
@@ -53,6 +53,22 @@ class FrontendController extends Controller
         return (new View)
             ->template($view)
             ->layout($data['layout'] ?? 'layout')
-            ->with($data);
+            ->with($data)
+            ->cascadeContent($this->getLoadedRouteItem($data));
+    }
+
+    private function getLoadedRouteItem($data)
+    {
+        if (! $item = $data['load'] ?? null) {
+            return null;
+        }
+
+        if ($data = Data::find($item)) {
+            return $data;
+        }
+
+        if ($data = Data::findByUri($item)) {
+            return $data;
+        }
     }
 }
