@@ -50,11 +50,33 @@ class FrontendController extends Controller
     {
         [$view, $data] = array_slice($args, -2);
 
+        $this->addViewPaths();
+
         return (new View)
             ->template($view)
             ->layout($data['layout'] ?? 'layout')
             ->with($data)
             ->cascadeContent($this->getLoadedRouteItem($data));
+    }
+
+    protected function addViewPaths()
+    {
+        $finder = view()->getFinder();
+        $amp = Statamic::isAmpRequest();
+        $site = Site::current()->handle();
+
+        $paths = collect($finder->getPaths())->flatMap(function ($path) use ($site, $amp) {
+            return [
+                $amp ? $path . '/' . $site . '/amp' : null,
+                $path . '/' . $site,
+                $amp ? $path . '/amp' : null,
+                $path,
+            ];
+        })->filter()->values()->all();
+
+        $finder->setPaths($paths);
+
+        return $this;
     }
 
     private function getLoadedRouteItem($data)

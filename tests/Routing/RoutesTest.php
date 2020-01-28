@@ -26,6 +26,8 @@ class RoutesTest extends TestCase
     {
         parent::resolveApplicationConfiguration($app);
 
+        $app['config']->set('statamic.amp.enabled', true);
+
         $app->booted(function () {
             Route::statamic('/basic-route-with-data', 'test', ['hello' => 'world']);
 
@@ -45,6 +47,10 @@ class RoutesTest extends TestCase
                 'hello' => 'world',
                 'load' => '/blog'
             ]);
+
+            Route::amp(function () {
+                Route::statamic('/route-with-amp', 'test');
+            });
         });
     }
 
@@ -107,5 +113,16 @@ class RoutesTest extends TestCase
         $this->get('/route-with-loaded-entry-by-uri')
             ->assertOk()
             ->assertSee('Hello world Blog pages-blog');
+    }
+
+    /** @test */
+    function it_loads_amp_route()
+    {
+        $this->viewShouldReturnRaw('layout', '');
+        $this->viewShouldReturnRaw('test', '');
+
+        $this->get('/route-with-amp')->assertOk();
+        $this->get('/amp/route-with-amp')->assertOk();
+        $this->get('/amp/basic-route-with-data')->assertNotFound();
     }
 }
