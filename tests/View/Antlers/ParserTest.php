@@ -324,6 +324,14 @@ EOT;
         $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
     }
 
+    public function testTernaryEscapesQuotesProperly()
+    {
+        $data = ['condition' => true, 'var' => '"Wow" said the man'];
+        $template = '{{ condition ? var : "nah" }}';
+
+        $this->assertEquals('"Wow" said the man', Antlers::parse($template, $data));
+    }
+
     public function testElvisCondition()
     {
         $template = '{{ string ?: "Pass" }}';

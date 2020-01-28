@@ -723,7 +723,7 @@ class Parser
                     $if_true = trim($bits[1]);
 
                     // Build a PHP string to evaluate
-                    $conditional = '<?php if (' .$condition. '): ?>' . $this->getVariable($if_true, $data) . '<?php endif ?>';
+                    $conditional = '<?php if (' .$condition. '): ?>' . addslashes($this->getVariable($if_true, $data)) . '<?php endif ?>';
 
                     // Do the evaluation
                     $output = $this->parsePhp($conditional);
@@ -744,7 +744,7 @@ class Parser
                     list($if_true, $if_false) = explode(': ', $bits[1]);
 
                     // Build a PHP string to evaluate
-                    $conditional = '<?php echo(' .$condition. ') ? "' . $this->getVariable(trim($if_true), $data) . '" : "' . $this->getVariable(trim($if_false), $data) . '"; ?>';
+                    $conditional = '<?php echo(' .$condition. ') ? "' . addslashes($this->getVariable(trim($if_true), $data)) . '" : "' . addslashes($this->getVariable(trim($if_false), $data)) . '"; ?>';
 
                     // Do the evaluation
                     $output = $this->parsePhp($conditional);
