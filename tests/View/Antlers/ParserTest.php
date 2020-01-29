@@ -1511,13 +1511,21 @@ EOT;
         };
 
         $vars = [
-            'string' => new Value('foo', 'string', $fieldtype)
+            'string' => new Value('foo', 'string', $fieldtype),
+            'nully' => new Value(null, 'nully', $fieldtype),
         ];
 
         $this->assertEquals('true', Antlers::parse('{{ if string }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ if nully }}true{{ else }}false{{ /if }}', $vars));
+
         $this->assertEquals('true', Antlers::parse('{{ if string == "foo" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ if nully == "foo" }}true{{ else }}false{{ /if }}', $vars));
         $this->assertEquals('false', Antlers::parse('{{ if string == "bar" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ if nully == "bar" }}true{{ else }}false{{ /if }}', $vars));
+
         $this->assertEquals('true', Antlers::parse('{{ string ? "true" : "false" }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ nully ? "true" : "false" }}', $vars));
+
         $this->assertEquals('true', Antlers::parse('{{ string == "foo" ? "true" : "false" }}', $vars));
         $this->assertEquals('false', Antlers::parse('{{ string == "bar" ? "true" : "false" }}', $vars));
     }
