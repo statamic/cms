@@ -1505,19 +1505,21 @@ EOT;
         $fieldtype = new class extends Fieldtype {
             public function augment($value)
             {
-                return new LabeledValue('world', 'World');
+                $label = is_null($value) ? null : strtoupper($value);
+                return new LabeledValue($value, $label);
             }
         };
 
-        $value = new Value('expected', 'test', $fieldtype);
+        $vars = [
+            'string' => new Value('foo', 'string', $fieldtype)
+        ];
 
-        $vars = ['hello' => $value];
-        $this->assertEquals('true', Antlers::parse('{{ if hello }}true{{ else }}false{{ /if }}', $vars));
-        $this->assertEquals('true', Antlers::parse('{{ if hello == "world" }}true{{ else }}false{{ /if }}', $vars));
-        $this->assertEquals('false', Antlers::parse('{{ if hello == "there" }}true{{ else }}false{{ /if }}', $vars));
-        $this->assertEquals('true', Antlers::parse('{{ hello ? "true" : "false" }}', $vars));
-        $this->assertEquals('true', Antlers::parse('{{ hello == "world" ? "true" : "false" }}', $vars));
-        $this->assertEquals('false', Antlers::parse('{{ hello == "there" ? "true" : "false" }}', $vars));
+        $this->assertEquals('true', Antlers::parse('{{ if string }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('true', Antlers::parse('{{ if string == "foo" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ if string == "bar" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('true', Antlers::parse('{{ string ? "true" : "false" }}', $vars));
+        $this->assertEquals('true', Antlers::parse('{{ string == "foo" ? "true" : "false" }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ string == "bar" ? "true" : "false" }}', $vars));
     }
 
     /** @test */
