@@ -232,9 +232,6 @@ class Parser
      */
     public function parseLoopVariables($text, $data)
     {
-        // Check for any vars flagged as noparse
-        $noparse = array_get($data, '_noparse', []);
-
         /**
          * $data_matches[][0][0] is the raw data loop tag
          * $data_matches[][0][1] is the offset of raw data loop tag
@@ -249,14 +246,6 @@ class Parser
 
         foreach ($data_matches as $match) {
             $contents = $match[2][0];
-
-            // Don't parse any variables in the noparse list.
-            $var_name = (strpos($match[1][0], '|') !== false) ? substr($match[1][0], 0, strpos($match[1][0], '|')) : $match[1][0];
-
-            if (in_array($var_name, $noparse)) {
-                $text = $this->createExtraction('noparse', $match[0][0], $match[2][0], $text);
-                continue;
-            }
 
             $value = $this->getVariable($var = trim($match[1][0]), $data);
 
@@ -355,9 +344,6 @@ class Parser
      */
     public function parseStringVariables($text, $data)
     {
-        // Check for any vars flagged as noparse
-        $noparse = array_get($data, '_noparse', []);
-
         /**
          * $data_matches[0] is the raw data tag
          * $data_matches[1] is the data variable (dot notated)
@@ -385,7 +371,6 @@ class Parser
                     // account for modifiers
                     $var      = trim($vars[$i]);
                     $var_pipe = strpos($var, '|');
-                    $var_name = ($var_pipe !== false) ? substr($var, 0, $var_pipe) : $var;
 
                     if (preg_match('/^(["\']).+\1$/', $var)) {
                         $text = str_replace($data_matches[0][$index], substr($var, 1, strlen($var) - 2), $text);
@@ -419,7 +404,7 @@ class Parser
                         }
 
                         // if variable is in the noparse list, extract it.
-                        if (($var_pipe !== false && in_array('noparse', array_slice(explode('|', $var), 1))) || in_array($var_name, $noparse)) {
+                        if (($var_pipe !== false && in_array('noparse', array_slice(explode('|', $var), 1)))) {
                             $text = $this->createExtraction('noparse', $data_matches[0][$index], $val, $text);
                         } else {
                             $text = str_replace($data_matches[0][$index], $val, $text);
