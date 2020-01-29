@@ -1528,6 +1528,21 @@ EOT;
 
         $this->assertEquals('true', Antlers::parse('{{ string == "foo" ? "true" : "false" }}', $vars));
         $this->assertEquals('false', Antlers::parse('{{ string == "bar" ? "true" : "false" }}', $vars));
+
+        $this->assertEquals('foo', Antlers::parse('{{ string or "fallback" }}', $vars));
+        $this->assertEquals('FOO', Antlers::parse('{{ string:label or "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ nully or "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ nully:label or "fallback" }}', $vars));
+
+        $this->assertEquals('foo', Antlers::parse('{{ string ?? "fallback" }}', $vars));
+        $this->assertEquals('FOO', Antlers::parse('{{ string:label ?? "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ nully ?? "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ nully:label ?? "fallback" }}', $vars));
+
+        $this->assertEquals('fallback', Antlers::parse('{{ string ??= "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ string:label ??= "fallback" }}', $vars));
+        $this->assertEquals('', Antlers::parse('{{ nully ??= "fallback" }}', $vars));
+        $this->assertEquals('', Antlers::parse('{{ nully:label ??= "fallback" }}', $vars));
     }
 
     /** @test */
