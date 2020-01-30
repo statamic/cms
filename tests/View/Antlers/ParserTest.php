@@ -332,22 +332,17 @@ EOT;
         $this->assertEquals('"Wow" said the man', Antlers::parse($template, $data));
     }
 
-    public function testElvisCondition()
-    {
-        $template = '{{ string ?: "Pass" }}';
-        $template2 = '{{ missing ?: "Pass" }}';
-
-        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
-        $this->assertEquals('Pass', Antlers::parse($template2, $this->variables));
-    }
-
     public function testNullCoalescence()
     {
-        $template = '{{ string ?? "Pass" }}';
-        $template2 = '{{ missing ?? "Pass" }}';
+        // or, ?:, and ?? are all aliases.
+        // while ?: and ?? have slightly different behaviors in php, they work the same in antlers.
 
-        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
-        $this->assertEquals('Pass', Antlers::parse($template2, $this->variables));
+        $this->assertEquals('Hello wilderness', Antlers::parse('{{ string or "Pass" }}', $this->variables));
+        $this->assertEquals('Hello wilderness', Antlers::parse('{{ string ?: "Pass" }}', $this->variables));
+        $this->assertEquals('Hello wilderness', Antlers::parse('{{ string ?? "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ missing or "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ missing ?: "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ missing ?? "Pass" }}', $this->variables));
     }
 
     public function testNullCoalescenceAssignment()
