@@ -609,6 +609,20 @@ EOT;
     }
 
     /** @test */
+    function it_doesnt_parse_data_in_noparse_modifiers_with_null_coalescence_and_requires_extractions_to_be_reinjected()
+    {
+        $parser = Antlers::parser();
+
+        $variables = [
+            'string' => 'hello',
+            'content' => 'before {{ string }} after',
+        ];
+        $parsed = $parser->parse('{{ missing or content | noparse }} {{ string }}', $variables);
+        $this->assertEquals('noparse_6d6accbda6a2c1f2e7dd3932dcc70012 hello', $parsed);
+        $this->assertEquals('before {{ string }} after hello', $parser->injectNoparse($parsed));
+    }
+
+    /** @test */
     function it_doesnt_parse_noparse_tags_inside_callbacks_and_requires_extractions_to_be_reinjected()
     {
         (new class extends Tags {
