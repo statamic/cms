@@ -2,13 +2,14 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\Facades\URL;
-use Statamic\Facades\Data;
-use Statamic\Facades\Site;
-use Statamic\Statamic;
-use Statamic\Facades\Content;
 use Illuminate\Http\Request;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Content;
+use Statamic\Facades\Data;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
+use Statamic\Statamic;
+use Statamic\View\View;
 
 /**
  * The front-end controller
@@ -34,8 +35,6 @@ class FrontendController extends Controller
             $url = str_after($url, '/' . config('statamic.amp.route'));
         }
 
-        $url = $this->removeIgnoredSegments($url);
-
         if (str_contains($url, '?')) {
             $url = substr($url, 0, strpos($url, '?'));
         }
@@ -47,12 +46,51 @@ class FrontendController extends Controller
         throw new NotFoundHttpException;
     }
 
-    public function removeIgnoredSegments($uri)
+    public function route(...$args)
     {
-        $ignore = config('statamic.routes.ignore', []);
+        [$view, $data] = array_slice($args, -2);
 
-        return collect(explode('/', $uri))->reject(function ($segment) use ($ignore) {
-            return in_array($segment, $ignore);
-        })->implode('/');
+        $this->addViewPaths();
+
+        return (new View)
+            ->template($view)
+            ->layout($data['layout'] ?? 'layout')
+            ->with($data)
+            ->cascadeContent($this->getLoadedRouteItem($data));
+    }
+
+    protected function addViewPaths()
+    {
+        $finder = view()->getFinder();
+        $amp = Statamic::isAmpRequest();
+        $site = Site::current()->handle();
+
+        $paths = collect($finder->getPaths())->flatMap(function ($path) use ($site, $amp) {
+            return [
+                $amp ? $path . '/' . $site . '/amp' : null,
+                $path . '/' . $site,
+                $amp ? $path . '/amp' : null,
+                $path,
+            ];
+        })->filter()->values()->all();
+
+        $finder->setPaths($paths);
+
+        return $this;
+    }
+
+    private function getLoadedRouteItem($data)
+    {
+        if (! $item = $data['load'] ?? null) {
+            return null;
+        }
+
+        if ($data = Data::find($item)) {
+            return $data;
+        }
+
+        if ($data = Data::findByUri($item)) {
+            return $data;
+        }
     }
 }

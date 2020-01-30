@@ -137,7 +137,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Relate::class,
         Tags\Rotate::class,
         Tags\Route::class,
-        Tags\Routes::class,
         Tags\Scope::class,
         Tags\Set::class,
         Tags\Section::class,
