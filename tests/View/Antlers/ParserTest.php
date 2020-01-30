@@ -351,6 +351,18 @@ EOT;
         $this->assertEquals('Pass', Antlers::parse('{{ associative:one ?= "Pass" }}', $this->variables));
         $this->assertEquals(null, Antlers::parse('{{ missing ?= "Pass" }}', $this->variables));
         $this->assertEquals(null, Antlers::parse('{{ missing:thing ?= "Pass" }}', $this->variables));
+
+        // Negating with !
+        $this->assertEquals(null, Antlers::parse('{{ !string ?= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ !associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ !missing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ !missing:thing ?= "Pass" }}', $this->variables));
+
+        // and with spaces
+        $this->assertEquals(null, Antlers::parse('{{ ! string ?= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ ! associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ ! missing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ ! missing:thing ?= "Pass" }}', $this->variables));
     }
 
     public function testMiniTernaryInsideLoop()
