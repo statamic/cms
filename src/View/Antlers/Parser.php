@@ -796,8 +796,6 @@ class Parser
             return $ref->processConditionVar($match);
         }, $condition);
 
-        // inject and parse any callbacks
-        $condition = $this->injectExtractions($condition, '__cond_callbacks');
         $condition = $this->parseCallbackTags($condition, $data);
 
         // Re-extract the strings that have may have been added.
@@ -971,6 +969,8 @@ class Parser
         ) {
             return $var;
         }
+
+        $var = $this->injectExtractions($var, '__cond_callbacks');
 
         $value = $this->getVariable($var, $this->conditionalData, '__processConditionVar__');
 

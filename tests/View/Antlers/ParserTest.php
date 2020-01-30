@@ -347,11 +347,10 @@ EOT;
 
     public function testNullCoalescenceAssignment()
     {
-        $template = '{{ string ??= "Pass" }}';
-        $template2 = '{{ missing ??= "Pass" }}';
-
-        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
-        $this->assertEquals(null, Antlers::parse($template2, $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ string ??= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ associative:one ??= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ missing ??= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ missing:thing ??= "Pass" }}', $this->variables));
     }
 
     public function testNullCoalescenceAssignmentInsideLoop()
