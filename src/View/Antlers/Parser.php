@@ -701,11 +701,12 @@ class Parser
      */
     public function parseTernaries($text, $data)
     {
-        if (preg_match_all('/{{\s*([^}]+[^}]\s(\?[^}]*\s\:|\?\?=).*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
+        if (preg_match_all('/{{\s*([^}]+[^}]\s(\?[^}]*\s\:|\?=).*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-                // Null coalescence assignment
-                if ($match[2] === '??=') {
-                    $bits = explode(' ??= ', $match[1]);
+                // Our made up mini ternary syntax.
+                // eg. {{ true ?= "foo" }} is shorthand for {{ if true }}foo{{ /if }}
+                if ($match[2] === '?=') {
+                    $bits = explode(' ?= ', $match[1]);
 
                     // Parse the condition side of the statement
                     $condition = $this->processCondition($bits[0], $data, false);

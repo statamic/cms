@@ -345,17 +345,17 @@ EOT;
         $this->assertEquals('Pass', Antlers::parse('{{ missing ?? "Pass" }}', $this->variables));
     }
 
-    public function testNullCoalescenceAssignment()
+    public function testMiniTernary()
     {
-        $this->assertEquals('Pass', Antlers::parse('{{ string ??= "Pass" }}', $this->variables));
-        $this->assertEquals('Pass', Antlers::parse('{{ associative:one ??= "Pass" }}', $this->variables));
-        $this->assertEquals(null, Antlers::parse('{{ missing ??= "Pass" }}', $this->variables));
-        $this->assertEquals(null, Antlers::parse('{{ missing:thing ??= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ string ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ missing ?= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ missing:thing ?= "Pass" }}', $this->variables));
     }
 
-    public function testNullCoalescenceAssignmentInsideLoop()
+    public function testMiniTernaryInsideLoop()
     {
-        $template = '{{ complex }}{{ first ??= "Pass" }}{{ /complex }}';
+        $template = '{{ complex }}{{ first ?= "Pass" }}{{ /complex }}';
 
         $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
     }
@@ -1547,10 +1547,10 @@ EOT;
         $this->assertEquals('fallback', Antlers::parse('{{ nully ?? "fallback" }}', $vars));
         $this->assertEquals('fallback', Antlers::parse('{{ nully:label ?? "fallback" }}', $vars));
 
-        $this->assertEquals('fallback', Antlers::parse('{{ string ??= "fallback" }}', $vars));
-        $this->assertEquals('fallback', Antlers::parse('{{ string:label ??= "fallback" }}', $vars));
-        $this->assertEquals('', Antlers::parse('{{ nully ??= "fallback" }}', $vars));
-        $this->assertEquals('', Antlers::parse('{{ nully:label ??= "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ string ?= "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ string:label ?= "fallback" }}', $vars));
+        $this->assertEquals('', Antlers::parse('{{ nully ?= "fallback" }}', $vars));
+        $this->assertEquals('', Antlers::parse('{{ nully:label ?= "fallback" }}', $vars));
     }
 
     /** @test */
