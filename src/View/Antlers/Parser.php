@@ -10,6 +10,7 @@ use Statamic\Modifiers\Modify;
 use Statamic\Fields\Value;
 use Statamic\Query\Builder;
 use Illuminate\Support\Str;
+use Statamic\Fields\LabeledValue;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
@@ -345,78 +346,83 @@ class Parser
     public function parseStringVariables($text, $data)
     {
         /**
-         * $data_matches[0] is the raw data tag
-         * $data_matches[1] is the data variable (dot notated)
+         * $matches[0] are the raw data tags (eg. [{{ string }}, {{ foo }}])
+         * $matches[1] are the data variables (eg. [string, foo])
          */
-        if (preg_match_all($this->variableTagRegex, $text, $data_matches)) {
+        if (! preg_match_all($this->variableTagRegex, $text, $matches)) {
+            return $text;
+        }
 
-            // add ability to specify `or` to find matches
-            foreach ($data_matches[1] as $index => $var) {
+        foreach ($matches[1] as $i => $var) {
+            $tagText = $this->parseStringVariableTag(trim($var), $matches[0][$i], $data);
 
-                // check for ` | ` modifier delimiter surrounded by spaces
-                if (strpos($var, ' | ') !== false) {
-                    $var = str_replace(' | ', '|', $var);
-                }
-
-                // Null coalescence through "or", "??" or "?:"
-                if (Str::contains($var, [' or ', ' ?? ', ' ?: ']) !== false) {
-                    $vars = preg_split('/(\s+or\s+|\s+\?\?\s+|\s+\?\:\s+)/ms', $var, null, PREG_SPLIT_NO_EMPTY);
-                } else {
-                    $vars = [$var];
-                }
-
-                $size = sizeof($vars);
-                for ($i = 0; $i < $size; $i++) {
-
-                    // account for modifiers
-                    $var      = trim($vars[$i]);
-                    $var_pipe = strpos($var, '|');
-
-                    if (preg_match('/^(["\']).+\1$/', $var)) {
-                        $text = str_replace($data_matches[0][$index], substr($var, 1, strlen($var) - 2), $text);
-                        break;
-                    }
-
-                    // retrieve the value of $var, otherwise, a no-value string
-                    $val = $this->getVariable($var, $data, '__lex_no_value__');
-
-                    // we only want to continue if:
-                    //   - $val has no value according to the parser
-                    //   - $val *does* have a value, it's falsey, there are multiple options, *and* we're not on the last one
-                    // a $val that's literally a zero should be considered a value.
-                    if ($val !== 0 && ($val == '__lex_no_value__' || (!$val && $size > 1 && $i < ($size - 1)))) {
-                        continue;
-                    } else {
-                        // prevent arrays trying to be printed as a string
-                        if (is_array($val)) {
-                            $val = null;
-                            Log::debug("Cannot render an array variable as a string: {{ $var }}");
-                        }
-
-                        // If an object can be cast to a string, great. If not, prevent it.
-                        if (is_object($val)) {
-                            if (method_exists($val, '__toString')) {
-                                $val = (string) $val;
-                            } else {
-                                $val = null;
-                                Log::debug("Cannot render an object variable as a string: {{ $var }}");
-                            }
-                        }
-
-                        // if variable is in the noparse list, extract it.
-                        if (($var_pipe !== false && in_array('noparse', array_slice(explode('|', $var), 1)))) {
-                            $text = $this->createExtraction('noparse', $data_matches[0][$index], $val, $text);
-                        } else {
-                            $text = str_replace($data_matches[0][$index], $val, $text);
-                        }
-
-                        break;
-                    }
-                }
+            // Prevent replacement if the variable value returned null. If we were to return an
+            // empty string, the tag would would have been replaced by nothingness. This allows
+            // it to stick around and be picked up in a moment when parsing callback tags.
+            if ($tagText === '__lex_no_value__') {
+                continue;
             }
+
+            $text = str_replace($matches[0][$i], $tagText, $text);
         }
 
         return $text;
+    }
+
+    /**
+     * Parse a single string variable tag
+     *
+     * @param  string       $var      The name of the variable. eg. foo
+     * @param  string       $text     The tag text.
+     *                                eg.
+     *                                {{ var }}
+     *                                {{ var | modifier }}
+     *                                {{ var or anothervar }}
+     *                                {{ var | modifier or anothervar }}
+     * @param  array|object $data     The data
+     * @return string
+     */
+    protected function parseStringVariableTag($var, $text, $data)
+    {
+        // Normalize loose modifiers into tight modifiers.
+        if (strpos($var, ' | ') !== false) {
+            $var = str_replace(' | ', '|', $var);
+        }
+
+        // Null coalescence through "or", "??" or "?:"
+        if (Str::contains($var, [' or ', ' ?? ', ' ?: '])) {
+            $isCoalesce = true;
+            $vars = preg_split('/(\s+or\s+|\s+\?\?\s+|\s+\?\:\s+)/ms', $var, null, PREG_SPLIT_NO_EMPTY);
+        } else {
+            $isCoalesce = false;
+            $vars = [$var];
+        }
+
+        foreach ($vars as $index => $var) {
+            if ($this->isLiteralString($var)) {
+                return $this->literalStringWithoutQuotes($var);
+            }
+
+            $val = $this->getVariable($var, $data, '__lex_no_value__');
+
+            // Non-coalescing tags could potentially be callback tags (eg. {{ foo }} or
+            // {{ foo:bar }}) If they have no value, we'll return a special string
+            // that prevents it from being replaced so they can be re-parsed as
+            // callback tags. Otherwise, just continue down the chain of vars.
+            $isLastVar = $index === count($vars)-1;
+            if ($isCoalesce && !$isLastVar && $this->isNullWhenUsedInStrings($val)) {
+                continue;
+            }
+
+            if (strpos($var, '|') !== -1) {
+                $modifiers = array_slice(explode('|', $var), 1);
+                if (in_array('noparse', $modifiers)) {
+                    return $this->createExtraction('noparse', $text, $val, $text);
+                }
+            }
+
+            return $this->getValueAsRenderableString($val, $var);
+        }
     }
 
     /**
@@ -1259,6 +1265,11 @@ class Parser
         return preg_match('/^(["\']).*\1$/m', $string);
     }
 
+    protected function literalStringWithoutQuotes($string)
+    {
+        return substr($string, 1, strlen($string) - 2);
+    }
+
     /**
      * Evaluates the PHP in the given string.
      *
@@ -1453,5 +1464,29 @@ class Parser
             })
             ->sortKeys()
             ->all();
+    }
+
+    protected function getValueAsRenderableString($value, $variable)
+    {
+        if (is_array($value)) {
+            $value = null;
+            Log::debug("Cannot render an array variable as a string: {{ $variable }}");
+        }
+
+        if (is_object($value) && !method_exists($value, '__toString')) {
+            $value = null;
+            Log::debug("Cannot render an object variable as a string: {{ $variable }}");
+        }
+
+        return (string) $value;
+    }
+
+    protected function isNullWhenUsedInStrings($value)
+    {
+        if ($value instanceof LabeledValue) {
+            $value = $value->value();
+        }
+
+        return is_null($value) || $value === '__lex_no_value__';
     }
 }
