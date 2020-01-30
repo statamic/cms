@@ -21,8 +21,9 @@ class LabeledValueTest extends TestCase
     /** @test */
     function it_converts_to_a_string()
     {
-        $this->assertEquals('world', (string) new LabeledValue('world', 'World'));
-        $this->assertEquals('',  (string) new LabeledValue(null, null));
+        $this->assertSame('world', (new LabeledValue('world', 'World'))->__toString());
+        $this->assertSame('',  (new LabeledValue(null, null))->__toString());
+        $this->assertSame('4',  (new LabeledValue(4, 'Four'))->__toString());
     }
 
     /** @test */
