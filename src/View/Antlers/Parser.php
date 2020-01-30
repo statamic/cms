@@ -703,7 +703,7 @@ class Parser
     {
         if (preg_match_all('/{{\s*([^}]+[^}]\s(\?[^}]*\s\:|\?=).*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-                // Our made up mini ternary syntax.
+                // Our made up "truth coalescing" syntax.
                 // eg. {{ true ?= "foo" }} is shorthand for {{ if true }}foo{{ /if }}
                 if ($match[2] === '?=') {
                     $bits = explode(' ?= ', $match[1]);

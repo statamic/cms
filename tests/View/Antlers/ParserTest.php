@@ -345,7 +345,7 @@ EOT;
         $this->assertEquals('Pass', Antlers::parse('{{ missing ?? "Pass" }}', $this->variables));
     }
 
-    public function testMiniTernary()
+    public function testTruthCoalescing()
     {
         $this->assertEquals('Pass', Antlers::parse('{{ string ?= "Pass" }}', $this->variables));
         $this->assertEquals('Pass', Antlers::parse('{{ associative:one ?= "Pass" }}', $this->variables));
@@ -365,7 +365,7 @@ EOT;
         $this->assertEquals('Pass', Antlers::parse('{{ ! missing:thing ?= "Pass" }}', $this->variables));
     }
 
-    public function testMiniTernaryInsideLoop()
+    public function testTruthCoalescingInsideLoop()
     {
         $template = '{{ complex }}{{ first ?= "Pass" }}{{ /complex }}';
 
