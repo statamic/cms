@@ -235,7 +235,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_next_in_asc_collection()
+    function it_can_get_previous_and_next_entries_in_a_dated_desc_collection()
     {
         $this->foods->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
@@ -250,25 +250,34 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->foods, 'h')->date('2019-03-10')->set('title', 'Hummus')->save();
         $this->makeEntry($this->foods, 'i')->date('2019-03-11')->set('title', 'Ice Cream')->save();
 
-        $currentId = Facades\Entry::all()->first(function ($entry) {
-            return $entry->get('title') === 'Egg';
-        })->id();
+        $currentId = $this->findEntryByTitle('Egg')->id();
 
-        $this->setTagParameters([
-            'in' => 'foods',
-            'current' => $currentId,
-            'order_by' => 'date|title:desc',
-            'limit' => 2
-        ]);
+        $orderBy = 'date:desc|title:asc';
+            // Grape
+            // Hummus
+            // Fig
+            // Egg (current)
+            // Danish
+            // Banana
+            // Carrot
 
-        $this->assertEquals(
-            ['Fig', 'Hummus'],
-            $this->collectionTag->next()->map->get('title')->all()
-        );
+        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
+
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('older')); // Alias of next when date:desc
+        $this->assertEquals(['Fig'], $this->runTagAndGetTitles('previous'));
+        $this->assertEquals(['Fig'], $this->runTagAndGetTitles('newer')); // Alias of previous when date:desc
+
+        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 3]);
+
+        $this->assertEquals(['Danish', 'Banana', 'Carrot'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Danish', 'Banana', 'Carrot'], $this->runTagAndGetTitles('older')); // Alias of next when date:desc
+        $this->assertEquals(['Grape', 'Hummus', 'Fig'], $this->runTagAndGetTitles('previous'));
+        $this->assertEquals(['Grape', 'Hummus', 'Fig'], $this->runTagAndGetTitles('newer')); // Alias of prev when date:desc
     }
 
     /** @test */
-    function it_can_get_next_in_desc_collection()
+    function it_can_get_previous_and_next_entries_in_a_dated_asc_collection()
     {
         $this->foods->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
@@ -283,111 +292,30 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->foods, 'h')->date('2019-03-10')->set('title', 'Hummus')->save();
         $this->makeEntry($this->foods, 'i')->date('2019-03-11')->set('title', 'Ice Cream')->save();
 
-        $currentId = Facades\Entry::all()->first(function ($entry) {
-            return $entry->get('title') === 'Egg';
-        })->id();
+        $currentId = $this->findEntryByTitle('Egg')->id();
 
-        $this->setTagParameters([
-            'in' => 'foods',
-            'current' => $currentId,
-            // 'order_by' => 'date:desc|title', // Should default to this if not explicitly set.
-            'limit' => 2
-        ]);
+        $orderBy = 'date:asc|title:desc';
+            // Carrot
+            // Banana
+            // Danish
+            // Egg (current)
+            // Fig
+            // Hummus
+            // Grape
 
-        $this->assertEquals(
-            ['Hummus', 'Fig'],
-            $this->collectionTag->next()->map->get('title')->all()
-        );
+        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
 
-        $this->setTagParameters([
-            'in' => 'foods',
-            'current' => $currentId,
-            'order_by' => 'date:asc|title:desc', // Intentionally reverse order.
-            'limit' => 2
-        ]);
+        $this->assertEquals(['Fig'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Fig'], $this->runTagAndGetTitles('newer')); // Alias of next when date:desc
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('previous'));
+        $this->assertEquals(['Danish'], $this->runTagAndGetTitles('older')); // Alias of previous when date:desc
 
-        $this->assertEquals(
-            ['Fig', 'Hummus'],
-            $this->collectionTag->next()->map->get('title')->all()
-        );
-    }
+        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 3]);
 
-    /** @test */
-    function it_can_get_previous_in_asc_collection()
-    {
-        $this->foods->dated(true)->save();
-        Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
-
-        $this->makeEntry($this->foods, 'a')->date('2019-02-01')->set('title', 'Apple')->save();
-        $this->makeEntry($this->foods, 'b')->date('2019-02-06')->set('title', 'Banana')->save();
-        $this->makeEntry($this->foods, 'c')->date('2019-02-06')->set('title', 'Carrot')->save();
-        $this->makeEntry($this->foods, 'd')->date('2019-03-02')->set('title', 'Danish')->save();
-        $this->makeEntry($this->foods, 'e')->date('2019-03-03')->set('title', 'Egg')->save();
-        $this->makeEntry($this->foods, 'f')->date('2019-03-04')->set('title', 'Fig')->save();
-        $this->makeEntry($this->foods, 'g')->date('2019-03-10')->set('title', 'Grape')->save();
-        $this->makeEntry($this->foods, 'h')->date('2019-03-10')->set('title', 'Hummus')->save();
-        $this->makeEntry($this->foods, 'i')->date('2019-03-11')->set('title', 'Ice Cream')->save();
-
-        $currentId = Facades\Entry::all()->first(function ($entry) {
-            return $entry->get('title') === 'Egg';
-        })->id();
-
-        $this->setTagParameters([
-            'in' => 'foods',
-            'current' => $currentId,
-            'order_by' => 'date|title:desc',
-            'limit' => 2
-        ]);
-
-        $this->assertEquals(
-            ['Banana', 'Danish'],
-            $this->collectionTag->previous()->map->get('title')->all()
-        );
-    }
-
-    /** @test */
-    function it_can_get_previous_in_desc_collection()
-    {
-        $this->foods->dated(true)->save();
-        Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
-
-        $this->makeEntry($this->foods, 'a')->date('2019-02-01')->set('title', 'Apple')->save();
-        $this->makeEntry($this->foods, 'b')->date('2019-02-06')->set('title', 'Banana')->save();
-        $this->makeEntry($this->foods, 'c')->date('2019-02-06')->set('title', 'Carrot')->save();
-        $this->makeEntry($this->foods, 'd')->date('2019-03-02')->set('title', 'Danish')->save();
-        $this->makeEntry($this->foods, 'e')->date('2019-03-03')->set('title', 'Egg')->save();
-        $this->makeEntry($this->foods, 'f')->date('2019-03-04')->set('title', 'Fig')->save();
-        $this->makeEntry($this->foods, 'g')->date('2019-03-10')->set('title', 'Grape')->save();
-        $this->makeEntry($this->foods, 'h')->date('2019-03-10')->set('title', 'Hummus')->save();
-        $this->makeEntry($this->foods, 'i')->date('2019-03-11')->set('title', 'Ice Cream')->save();
-
-        $currentId = Facades\Entry::all()->first(function ($entry) {
-            return $entry->get('title') === 'Egg';
-        })->id();
-
-        $this->setTagParameters([
-            'in' => 'foods',
-            'current' => $currentId,
-            // 'order_by' => 'date:desc|title', // Should default to this if not explicitly set.
-            'limit' => 2
-        ]);
-
-        $this->assertEquals(
-            ['Danish', 'Banana'],
-            $this->collectionTag->previous()->map->get('title')->all()
-        );
-
-        $this->setTagParameters([
-            'in' => 'foods',
-            'current' => $currentId,
-            'order_by' => 'date:asc|title:desc', // Intentionally reverse order.
-            'limit' => 2
-        ]);
-
-        $this->assertEquals(
-            ['Banana', 'Danish'],
-            $this->collectionTag->previous()->map->get('title')->all()
-        );
+        $this->assertEquals(['Fig', 'Hummus', 'Grape'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Fig', 'Hummus', 'Grape'], $this->runTagAndGetTitles('newer')); // Alias of next when date:desc
+        $this->assertEquals(['Carrot', 'Banana', 'Danish'], $this->runTagAndGetTitles('previous'));
+        $this->assertEquals(['Carrot', 'Banana', 'Danish'], $this->runTagAndGetTitles('older')); // Alias of prev when date:desc
     }
 
     /** @test */
@@ -419,5 +347,17 @@ class CollectionTest extends TestCase
     private function setTagParameters($parameters)
     {
         $this->collectionTag->setParameters($parameters);
+    }
+
+    public function findEntryByTitle($title)
+    {
+        return Facades\Entry::all()->first(function ($entry) use ($title) {
+            return $entry->get('title') === $title;
+        });
+    }
+
+    protected function runTagAndGetTitles($tagMethod)
+    {
+        return $this->collectionTag->{$tagMethod}()->map->get('title')->values()->all();
     }
 }
