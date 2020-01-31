@@ -63,21 +63,18 @@ class Entries
         $collection = $this->collections[0];
 
         if ($this->orderBys->first()->direction === 'desc') {
-            $this->orderBys = $this->orderBys->map->reverse();
-            $reversed = true;
+            $operator = '<';
         }
 
         if ($collection->orderable()) {
-            $query = $this->query()->where('order', '>', $currentEntry->order());
+            $query = $this->query()->where('order', $operator ?? '>', $currentEntry->order());
         } elseif ($collection->dated()) {
-            $query = $this->query()->where('date', '>', $currentEntry->date());
+            $query = $this->query()->where('date', $operator ?? '>', $currentEntry->date());
         } else {
             throw new \Exception('collection:next requires ordered or dated collection');
         }
 
-        return $reversed ?? false
-            ? $this->results($query)->reverse()->values()
-            : $this->results($query);
+        return $this->results($query);
     }
 
     public function previous($currentEntry)
@@ -88,22 +85,26 @@ class Entries
         // TODO: but only if all collections have the same configuration.
         $collection = $this->collections[0];
 
-        if ($this->orderBys->first()->direction === 'asc') {
-            $this->orderBys = $this->orderBys->map->reverse();
-            $reversed = true;
+        if ($this->orderBys->first()->direction === 'desc') {
+            $operator = '>';
         }
 
         if ($collection->orderable()) {
-            $query = $this->query()->where('order', '<', $currentEntry->order());
+            $query = $this->query()->where('order', $operator ?? '<', $currentEntry->order());
         } elseif ($collection->dated()) {
-            $query = $this->query()->where('date', '<', $currentEntry->date());
+            $query = $this->query()->where('date', $operator ?? '<', $currentEntry->date());
         } else {
             throw new \Exception('collection:previous requires ordered or dated collection');
         }
 
-        return $reversed ?? false
-            ? $this->results($query)->reverse()->values()
-            : $this->results($query);
+        $limit = $this->parameters['limit'] ?? false;
+        $count = $query->count();
+
+        if ($limit && $limit < $count) {
+            $this->parameters['offset'] = $count - $limit;
+        }
+
+        return $this->results($query);
     }
 
     protected function query()
