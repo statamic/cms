@@ -12,6 +12,7 @@
             :errors="errors[field.handle]"
             :read-only="readOnly"
             :syncable="syncable"
+            :not-in-group="noFormGroup"
             @input="$emit('updated', field.handle, $event)"
             @meta-updated="$emit('meta-updated', field.handle, $event)"
             @synced="$emit('synced', field.handle)"
@@ -43,6 +44,7 @@ export default {
         },
         readOnly: Boolean,
         syncable: Boolean,
+        noFormGroup: Boolean,
     },
 
     computed: {

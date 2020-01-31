@@ -1,5 +1,13 @@
 <template>
     <div>
+        <data-list-filter
+            v-for="filter in level1Filters"
+            :key="filter.handle"
+            class="mr-1 w-fit-content"
+            :filter="filter"
+            :values="activeFilters[filter.handle]"
+            :no-form-group="true"
+            @changed="filterChanged(filter.handle, $event)" />
         <button class="btn-flat btn-icon-only dropdown-toggle relative" @click="filtering = !filtering">
             <svg-icon name="filter-text" class="w-4 h-4 mr-1" />
             <span>{{ __('Filters') }}</span>
@@ -71,6 +79,9 @@ export default {
     },
 
     computed: {
+        level1Filters() {
+            return this.filters.filter(filter => filter.level1);
+        },
 
         standardFilters() {
             return this.filters.filter(filter => filter.handle !== 'fields');

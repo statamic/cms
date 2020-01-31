@@ -10,7 +10,11 @@
             :errors="errors"
             @updated="$emit('changed', $event)"
         >
-            <publish-fields slot-scope="{ setFieldValue }" :fields="filter.fields" @updated="setFieldValue" />
+            <publish-fields
+                slot-scope="{ setFieldValue }"
+                :fields="filter.fields"
+                :no-form-group="noFormGroup"
+                @updated="setFieldValue" />
         </publish-container>
     </div>
 
@@ -28,6 +32,7 @@ export default {
     props: {
         filter: Object,
         values: Object,
+        noFormGroup: Boolean,
     },
 
     data() {

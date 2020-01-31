@@ -7,7 +7,7 @@
     >
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <div class="field-inner">
-            <label class="publish-field-label" :class="{'font-bold': config.bold}">
+            <label v-if="!notInGroup" class="publish-field-label" :class="{'font-bold': config.bold}">
                 <span class="cursor-pointer" :class="{'font-mono bg-grey-20 py-px px-sm text-xs': showHandle}" v-text="labelText" @click="toggleLabel" />
                 <i class="required ml-sm" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
@@ -92,6 +92,7 @@ export default {
         syncable: Boolean,
         namePrefix: String,
         errorKeyPrefix: String,
+        notInGroup: Boolean,
     },
 
     data() {
@@ -126,7 +127,8 @@ export default {
 
         classes() {
             return [
-                'form-group publish-field',
+                this.notInGroup ? '' : 'form-group',
+                'publish-field',
                 `${this.config.component || this.config.type}-fieldtype`,
                 `field-${tailwind_width_class(this.config.width)}`,
                 this.isReadOnly ? 'read-only-field' : '',
