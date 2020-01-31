@@ -29,9 +29,9 @@ class Collection extends Tags
      */
     public function index()
     {
-        $entries = $this->entries()->get();
-
-        return $this->output($entries);
+        return $this->output(
+            $this->entries()->get()
+        );
     }
 
     /**
@@ -43,27 +43,27 @@ class Collection extends Tags
     }
 
     /**
-     * {{ collection:next from="" }} ... {{ /collection:next }}
+     * {{ collection:next }} ... {{ /collection:next }}
      */
     public function next()
     {
-        $this->parameters['from'] = $this->parameters['from'] ?? $this->currentEntry()->collection()->handle();
+        $this->parameters['from'] = $this->currentEntry()->collection()->handle();
 
-        $entries = $this->entries()->next($this->currentEntry());
-
-        return $this->output($entries);
+        return $this->output(
+            $this->entries()->next($this->currentEntry())
+        );
     }
 
     /**
-     * {{ collection:previous from="" }} ... {{ /collection:previous }}
+     * {{ collection:previous }} ... {{ /collection:previous }}
      */
     public function previous()
     {
-        $this->parameters['from'] = $this->parameters['from'] ?? $this->currentEntry()->collection()->handle();
+        $this->parameters['from'] = $this->currentEntry()->collection()->handle();
 
-        $entries = $this->entries()->previous($this->currentEntry());
-
-        return $this->output($entries);
+        return $this->output(
+            $this->entries()->previous($this->currentEntry())
+        );
     }
 
     protected function entries()
