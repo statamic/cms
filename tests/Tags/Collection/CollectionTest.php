@@ -319,6 +319,104 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    function it_can_get_previous_and_next_entries_in_an_orderable_asc_collection()
+    {
+        $this->foods->orderable(true)->save();
+
+        $this->makeEntry($this->foods, 'a')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->set('title', 'Danish')->save();
+        $this->makeEntry($this->foods, 'e')->set('title', 'Egg')->save();
+        $this->makeEntry($this->foods, 'f')->set('title', 'Fig')->save();
+        $this->makeEntry($this->foods, 'g')->set('title', 'Grape')->save();
+        $this->makeEntry($this->foods, 'h')->set('title', 'Hummus')->save();
+        $this->makeEntry($this->foods, 'i')->set('title', 'Ice Cream')->save();
+
+        $this->foods->setEntryPositions([
+            $this->findEntryByTitle('Carrot')->id(),
+            $this->findEntryByTitle('Hummus')->id(),
+            $this->findEntryByTitle('Apple')->id(),
+            $this->findEntryByTitle('Ice Cream')->id(),
+            $this->findEntryByTitle('Banana')->id(),
+            $this->findEntryByTitle('Fig')->id(),
+            $this->findEntryByTitle('Grape')->id(),
+            $this->findEntryByTitle('Egg')->id(),
+            $this->findEntryByTitle('Danish')->id(),
+        ])->save();
+
+        $currentId = $this->findEntryByTitle('Banana')->id();
+
+        $orderBy = 'order:asc';
+            // Hummus
+            // Apple
+            // Ice Cream
+            // Banana (current)
+            // Fig
+            // Grape
+            // Egg
+
+        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
+
+        $this->assertEquals(['Fig'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Ice Cream'], $this->runTagAndGetTitles('previous'));
+
+        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 3]);
+
+        $this->assertEquals(['Fig', 'Grape', 'Egg'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Hummus', 'Apple', 'Ice Cream'], $this->runTagAndGetTitles('previous'));
+    }
+
+    /** @test */
+    function it_can_get_previous_and_next_entries_in_an_orderable_desc_collection()
+    {
+        $this->foods->orderable(true)->save();
+
+        $this->makeEntry($this->foods, 'a')->set('title', 'Apple')->save();
+        $this->makeEntry($this->foods, 'b')->set('title', 'Banana')->save();
+        $this->makeEntry($this->foods, 'c')->set('title', 'Carrot')->save();
+        $this->makeEntry($this->foods, 'd')->set('title', 'Danish')->save();
+        $this->makeEntry($this->foods, 'e')->set('title', 'Egg')->save();
+        $this->makeEntry($this->foods, 'f')->set('title', 'Fig')->save();
+        $this->makeEntry($this->foods, 'g')->set('title', 'Grape')->save();
+        $this->makeEntry($this->foods, 'h')->set('title', 'Hummus')->save();
+        $this->makeEntry($this->foods, 'i')->set('title', 'Ice Cream')->save();
+
+        $this->foods->setEntryPositions([
+            $this->findEntryByTitle('Carrot')->id(),
+            $this->findEntryByTitle('Hummus')->id(),
+            $this->findEntryByTitle('Apple')->id(),
+            $this->findEntryByTitle('Ice Cream')->id(),
+            $this->findEntryByTitle('Banana')->id(),
+            $this->findEntryByTitle('Fig')->id(),
+            $this->findEntryByTitle('Grape')->id(),
+            $this->findEntryByTitle('Egg')->id(),
+            $this->findEntryByTitle('Danish')->id(),
+        ])->save();
+
+        $currentId = $this->findEntryByTitle('Banana')->id();
+
+        $orderBy = 'order:desc';
+            // Egg
+            // Grape
+            // Fig
+            // Banana (current)
+            // Ice Cream
+            // Apple
+            // Hummus
+
+        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
+
+        $this->assertEquals(['Ice Cream'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Fig'], $this->runTagAndGetTitles('previous'));
+
+        $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 3]);
+
+        $this->assertEquals(['Ice Cream', 'Apple', 'Hummus'], $this->runTagAndGetTitles('next'));
+        $this->assertEquals(['Egg', 'Grape', 'Fig'], $this->runTagAndGetTitles('previous'));
+    }
+
+    /** @test */
     function it_adds_defaults_for_missing_items_based_on_blueprint()
     {
         $blueprint = Blueprint::make('test')->setContents(['fields' => [['handle' => 'title', 'field' => ['type' => 'text']]]]);
