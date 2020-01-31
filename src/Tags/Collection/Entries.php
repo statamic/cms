@@ -109,6 +109,30 @@ class Entries
         return $this->results($query);
     }
 
+    public function older($currentEntry)
+    {
+        $collection = $this->collections->first();
+        $primaryOrderBy = $this->orderBys->first();
+
+        throw_unless($collection->dated(), new \Exception('collection:older requires a dated collection'));
+
+        return $primaryOrderBy->direction === 'asc'
+            ? $this->previous($currentEntry)
+            : $this->next($currentEntry);
+    }
+
+    public function newer($currentEntry)
+    {
+        $collection = $this->collections->first();
+        $primaryOrderBy = $this->orderBys->first();
+
+        throw_unless($collection->dated(), new \Exception('collection:newer requires a dated collection'));
+
+        return $primaryOrderBy->direction === 'asc'
+            ? $this->next($currentEntry)
+            : $this->previous($currentEntry);
+    }
+
     protected function query()
     {
         $query = Entry::query()

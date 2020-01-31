@@ -66,6 +66,30 @@ class Collection extends Tags
         );
     }
 
+    /**
+     * {{ collection:older }} ... {{ /collection:older }}
+     */
+    public function older()
+    {
+        $this->parameters['from'] = $this->currentEntry()->collection()->handle();
+
+        return $this->output(
+            $this->entries()->older($this->currentEntry())
+        );
+    }
+
+    /**
+     * {{ collection:newer }} ... {{ /collection:newer }}
+     */
+    public function newer()
+    {
+        $this->parameters['from'] = $this->currentEntry()->collection()->handle();
+
+        return $this->output(
+            $this->entries()->newer($this->currentEntry())
+        );
+    }
+
     protected function entries()
     {
         return new Entries($this->parameters);
