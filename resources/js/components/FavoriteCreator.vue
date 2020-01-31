@@ -1,6 +1,6 @@
 <template>
     <div>
-        <popper v-if="isNotYetFavorited" ref="popper" @show="highlight" trigger="click" :append-to-body="true" :options="{ placement: 'bottom' }">
+        <popper v-if="isNotYetFavorited" ref="popper" @show="shown" @hide="hidden" trigger="click" :append-to-body="true" :options="{ placement: 'bottom' }">
 
             <div class="card p-0 shadow-lg z-top">
                 <div class="flex justify-between text-center">
@@ -46,6 +46,7 @@ export default {
             name: document.title.replace(' ‹ Statamic', ''),
             currentUrl: this.$config.get('urlPath').substr(this.$config.get('cpRoot').length+1),
             showingPinTab: true,
+            escBinding: null,
         }
     },
 
@@ -69,6 +70,15 @@ export default {
     },
 
     methods: {
+        shown() {
+            this.escBinding = this.$keys.bindGlobal('esc', e => this.$refs.popper.doClose());
+            this.highlight();
+        },
+
+        hidden() {
+            this.escBinding.destroy();
+        },
+
         highlight() {
             setTimeout(() => this.$refs.fave.select(), 20);
         },
@@ -116,12 +126,6 @@ export default {
                 }
             });
         },
-    },
-
-    mounted() {
-        this.$keys.bindGlobal(['esc'], e => {
-            this.$refs.popper.doClose();
-        });
     }
 }
 </script>

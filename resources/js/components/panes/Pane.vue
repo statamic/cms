@@ -13,12 +13,20 @@
 <script>
 export default {
 
+    data() {
+        return {
+            escBinding: null,
+        }
+    },
+
     created() {
         this.$panes.open(this);
+        this.escBinding = this.$keys.bindGlobal('esc', this.close);
     },
 
     destroyed() {
         this.$panes.close(this);
+        this.escBinding.destroy();
     },
 
     methods: {
@@ -27,12 +35,6 @@ export default {
             this.$emit('closed');
         },
 
-    },
-
-    mounted() {
-        this.$keys.bindGlobal(['esc'], e => {
-            this.close();
-        });
     }
 
 }
