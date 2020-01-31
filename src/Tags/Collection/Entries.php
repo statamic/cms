@@ -58,17 +58,18 @@ class Entries
     {
         throw_if(Arr::has($this->parameters, 'paginate'), new \Exception('collection:next is not compatible with [paginate] parameter'));
         throw_if(Arr::has($this->parameters, 'offset'), new \Exception('collection:next is not compatible with [offset] parameter'));
+        throw_if($this->collections->count() > 1, new \Exception('collection:next is not compatible with multiple collections'));
 
-        // TODO: but only if all collections have the same configuration.
-        $collection = $this->collections[0];
+        $collection = $this->collections->first();
+        $primaryOrderBy = $this->orderBys->first();
 
-        if ($this->orderBys->first()->direction === 'desc') {
+        if ($primaryOrderBy->direction === 'desc') {
             $operator = '<';
         }
 
-        if ($collection->orderable()) {
+        if ($collection->orderable() && $primaryOrderBy->sort === 'order') {
             $query = $this->query()->where('order', $operator ?? '>', $currentEntry->order());
-        } elseif ($collection->dated()) {
+        } elseif ($collection->dated() && $primaryOrderBy->sort === 'date') {
             $query = $this->query()->where('date', $operator ?? '>', $currentEntry->date());
         } else {
             throw new \Exception('collection:next requires ordered or dated collection');
@@ -81,17 +82,18 @@ class Entries
     {
         throw_if(Arr::has($this->parameters, 'paginate'), new \Exception('collection:previous is not compatible with [paginate] parameter'));
         throw_if(Arr::has($this->parameters, 'offset'), new \Exception('collection:previous is not compatible with [offset] parameter'));
+        throw_if($this->collections->count() > 1, new \Exception('collection:previous is not compatible with multiple collections'));
 
-        // TODO: but only if all collections have the same configuration.
-        $collection = $this->collections[0];
+        $collection = $this->collections->first();
+        $primaryOrderBy = $this->orderBys->first();
 
-        if ($this->orderBys->first()->direction === 'desc') {
+        if ($primaryOrderBy->direction === 'desc') {
             $operator = '>';
         }
 
-        if ($collection->orderable()) {
+        if ($collection->orderable() && $primaryOrderBy->sort === 'order') {
             $query = $this->query()->where('order', $operator ?? '<', $currentEntry->order());
-        } elseif ($collection->dated()) {
+        } elseif ($collection->dated() && $primaryOrderBy->sort === 'date') {
             $query = $this->query()->where('date', $operator ?? '<', $currentEntry->date());
         } else {
             throw new \Exception('collection:previous requires ordered or dated collection');
