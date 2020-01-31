@@ -33,6 +33,10 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function boot()
     {
         $this->app->booted(function () {
+            if (! $this->getAddon()) {
+                return;
+            }
+
             $this
                 ->bootEvents()
                 ->bootTags()
