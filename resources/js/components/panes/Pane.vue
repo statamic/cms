@@ -27,6 +27,12 @@ export default {
             this.$emit('closed');
         },
 
+    },
+
+    mounted() {
+        this.$keys.bindGlobal(['esc'], e => {
+            this.close();
+        });
     }
 
 }
