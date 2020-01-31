@@ -28,7 +28,7 @@ class LabeledValue implements Arrayable
 
     public function __toString()
     {
-        return $this->value ?? '';
+        return (string) $this->value ?? '';
     }
 
     public function toArray()

@@ -38,6 +38,11 @@ class Color extends Fieldtype
             'type' => 'select',
             'default' => 'HEXA',
             'options' => ['HEXA', 'RGBA', 'HSLA', 'HSVA', 'CMYK'],
+        ],
+        'lock_opacity' => [
+            'instructions' => 'Disables the alpha slider, preventing adjustments to opacity.',
+            'type' => 'toggle',
+            'default' => false
         ]
     ];
 }

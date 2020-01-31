@@ -46,7 +46,8 @@ export default {
             depth: null,
             portal: null,
             visible: false,
-            isHovering: false
+            isHovering: false,
+            escBinding: null,
         }
     },
 
@@ -92,12 +93,14 @@ export default {
 
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseenter`, () => this.isHovering = true);
         this.$events.$on(`stacks.${this.depth}.hit-area-mouseout`, () => this.isHovering = false);
+        this.escBinding = this.$keys.bindGlobal('esc', this.close);
     },
 
     destroyed() {
         this.$stacks.remove(this);
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseenter`);
         this.$events.$off(`stacks.${this.depth}.hit-area-mouseout`);
+        this.escBinding.destroy();
     },
 
     methods: {
@@ -133,11 +136,9 @@ export default {
 
     mounted() {
         this.visible = true;
+    },
 
-        this.$keys.bindGlobal(['esc'], e => {
-            this.close();
-        });
-    }
+
 
 }
 </script>

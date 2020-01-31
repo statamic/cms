@@ -154,16 +154,6 @@ class Config
     }
 
     /**
-     * Get routes
-     *
-     * @return array
-     */
-    public function getRoutes()
-    {
-        return $this->get('statamic.routes');
-    }
-
-    /**
      * Get the image manipulation presets
      *
      * @return array

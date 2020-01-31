@@ -15,6 +15,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
+use Statamic\Mixins\Router;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -28,6 +29,8 @@ class RouteServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        Route::mixin(new Router);
+
         $this->bindCollections();
         $this->bindEntries();
         $this->bindTaxonomies();

@@ -361,6 +361,7 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
             'uri' => $this->uri(),
             'url' => $this->url(),
             'title' => $this->title(),
+            'is_term' => true,
             'entries' => $entryQuery = $this->queryEntries()->where('site', $this->locale),
             'entries_count' => $entryQuery->count(),
         ])->all();
