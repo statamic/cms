@@ -84,8 +84,8 @@ abstract class Tags
         $this->setContent($properties['content']);
         $this->setContext($properties['context']);
         $this->setParameters($properties['parameters']);
-        $this->tag         = array_get($properties, 'tag');
-        $this->method      = array_get($properties, 'tag_method');
+        $this->tag = array_get($properties, 'tag');
+        $this->method = array_get($properties, 'tag_method');
     }
 
     public function setParser($parser)
@@ -128,7 +128,7 @@ abstract class Tags
      */
     public function __call($method, $args)
     {
-        if ($this->wildcardHandled || ! method_exists($this, $this->wildcardMethod)) {
+        if ($this->wildcardHandled || !method_exists($this, $this->wildcardMethod)) {
             throw new \BadMethodCallException("Call to undefined method {$method}.");
         }
 
@@ -186,7 +186,7 @@ abstract class Tags
     {
         return $this->parse(array_merge($data, [
             'no_results' => true,
-            'total_results' => 0
+            'total_results' => 0,
         ]));
     }
 
@@ -196,7 +196,7 @@ abstract class Tags
      * @param  string $action
      * @return string
      */
-    protected function formOpen($action, $method = 'POST')
+    protected function formOpen($action, $method = null)
     {
         $attr_str = '';
         if ($attrs = $this->getList('attr')) {
@@ -218,12 +218,13 @@ abstract class Tags
             $attr_str .= 'enctype="multipart/form-data"';
         }
 
-        $html = '<form method="POST" action="' . $action . '" ' . $attr_str . '>' . csrf_field();
+        $method = is_null($method) ? 'POST' : strtoupper($method);
+        $formMethod = $method === 'GET' ? 'GET' : 'POST';
 
-        if (!in_array($method, ['POST', 'GET'])) {
+        $html = '<form method="' . $formMethod . '" action="' . $action . '" ' . $attr_str . '>' . csrf_field();
+
+        if (!in_array($method, ['GET', 'POST'])) {
             $html .= method_field($method);
         }
-
-        return $html;
     }
 }
