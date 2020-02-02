@@ -198,7 +198,7 @@ abstract class Tags
      * @param  string $action
      * @return string
      */
-    protected function formOpen($action)
+    protected function formOpen($action, $method = 'POST')
     {
         $attr_str = '';
         if ($attrs = $this->getList('attr')) {
@@ -220,7 +220,7 @@ abstract class Tags
             $attr_str .= 'enctype="multipart/form-data"';
         }
 
-        $html = '<form method="POST" action="'.$action.'" '.$attr_str.'>'.csrf_field();
+        $html = '<form method="' . $method . '" action="' . $action . '" ' . $attr_str . '>' . csrf_field();
 
         return $html;
     }
