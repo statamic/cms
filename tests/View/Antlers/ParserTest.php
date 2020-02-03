@@ -325,36 +325,50 @@ EOT;
         $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
     }
 
-    public function testElvisCondition()
+    public function testTernaryEscapesQuotesProperly()
     {
-        $template = '{{ string ?: "Pass" }}';
-        $template2 = '{{ missing ?: "Pass" }}';
+        $data = ['condition' => true, 'var' => '"Wow" said the man'];
+        $template = '{{ condition ? var : "nah" }}';
 
-        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
-        $this->assertEquals('Pass', Antlers::parse($template2, $this->variables));
+        $this->assertEquals('"Wow" said the man', Antlers::parse($template, $data));
     }
 
     public function testNullCoalescence()
     {
-        $template = '{{ string ?? "Pass" }}';
-        $template2 = '{{ missing ?? "Pass" }}';
+        // or, ?:, and ?? are all aliases.
+        // while ?: and ?? have slightly different behaviors in php, they work the same in antlers.
 
-        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
-        $this->assertEquals('Pass', Antlers::parse($template2, $this->variables));
+        $this->assertEquals('Hello wilderness', Antlers::parse('{{ string or "Pass" }}', $this->variables));
+        $this->assertEquals('Hello wilderness', Antlers::parse('{{ string ?: "Pass" }}', $this->variables));
+        $this->assertEquals('Hello wilderness', Antlers::parse('{{ string ?? "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ missing or "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ missing ?: "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ missing ?? "Pass" }}', $this->variables));
     }
 
-    public function testNullCoalescenceAssignment()
+    public function testTruthCoalescing()
     {
-        $template = '{{ string ??= "Pass" }}';
-        $template2 = '{{ missing ??= "Pass" }}';
+        $this->assertEquals('Pass', Antlers::parse('{{ string ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ missing ?= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ missing:thing ?= "Pass" }}', $this->variables));
 
-        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
-        $this->assertEquals(null, Antlers::parse($template2, $this->variables));
+        // Negating with !
+        $this->assertEquals(null, Antlers::parse('{{ !string ?= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ !associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ !missing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ !missing:thing ?= "Pass" }}', $this->variables));
+
+        // and with spaces
+        $this->assertEquals(null, Antlers::parse('{{ ! string ?= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ ! associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ ! missing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ ! missing:thing ?= "Pass" }}', $this->variables));
     }
 
-    public function testNullCoalescenceAssignmentInsideLoop()
+    public function testTruthCoalescingInsideLoop()
     {
-        $template = '{{ complex }}{{ first ??= "Pass" }}{{ /complex }}';
+        $template = '{{ complex }}{{ first ?= "Pass" }}{{ /complex }}';
 
         $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
     }
@@ -603,6 +617,20 @@ EOT;
 
         $this->assertEquals('noparse_6d6accbda6a2c1f2e7dd3932dcc70012 hello', $parsed);
 
+        $this->assertEquals('before {{ string }} after hello', $parser->injectNoparse($parsed));
+    }
+
+    /** @test */
+    function it_doesnt_parse_data_in_noparse_modifiers_with_null_coalescence_and_requires_extractions_to_be_reinjected()
+    {
+        $parser = Antlers::parser();
+
+        $variables = [
+            'string' => 'hello',
+            'content' => 'before {{ string }} after',
+        ];
+        $parsed = $parser->parse('{{ missing or content | noparse }} {{ string }}', $variables);
+        $this->assertEquals('noparse_6d6accbda6a2c1f2e7dd3932dcc70012 hello', $parsed);
         $this->assertEquals('before {{ string }} after hello', $parser->injectNoparse($parsed));
     }
 
@@ -1498,19 +1526,44 @@ EOT;
         $fieldtype = new class extends Fieldtype {
             public function augment($value)
             {
-                return new LabeledValue('world', 'World');
+                $label = is_null($value) ? null : strtoupper($value);
+                return new LabeledValue($value, $label);
             }
         };
 
-        $value = new Value('expected', 'test', $fieldtype);
+        $vars = [
+            'string' => new Value('foo', 'string', $fieldtype),
+            'nully' => new Value(null, 'nully', $fieldtype),
+        ];
 
-        $vars = ['hello' => $value];
-        $this->assertEquals('true', Antlers::parse('{{ if hello }}true{{ else }}false{{ /if }}', $vars));
-        $this->assertEquals('true', Antlers::parse('{{ if hello == "world" }}true{{ else }}false{{ /if }}', $vars));
-        $this->assertEquals('false', Antlers::parse('{{ if hello == "there" }}true{{ else }}false{{ /if }}', $vars));
-        $this->assertEquals('true', Antlers::parse('{{ hello ? "true" : "false" }}', $vars));
-        $this->assertEquals('true', Antlers::parse('{{ hello == "world" ? "true" : "false" }}', $vars));
-        $this->assertEquals('false', Antlers::parse('{{ hello == "there" ? "true" : "false" }}', $vars));
+        $this->assertEquals('true', Antlers::parse('{{ if string }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ if nully }}true{{ else }}false{{ /if }}', $vars));
+
+        $this->assertEquals('true', Antlers::parse('{{ if string == "foo" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ if nully == "foo" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ if string == "bar" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ if nully == "bar" }}true{{ else }}false{{ /if }}', $vars));
+
+        $this->assertEquals('true', Antlers::parse('{{ string ? "true" : "false" }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ nully ? "true" : "false" }}', $vars));
+
+        $this->assertEquals('true', Antlers::parse('{{ string == "foo" ? "true" : "false" }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ string == "bar" ? "true" : "false" }}', $vars));
+
+        $this->assertEquals('foo', Antlers::parse('{{ string or "fallback" }}', $vars));
+        $this->assertEquals('FOO', Antlers::parse('{{ string:label or "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ nully or "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ nully:label or "fallback" }}', $vars));
+
+        $this->assertEquals('foo', Antlers::parse('{{ string ?? "fallback" }}', $vars));
+        $this->assertEquals('FOO', Antlers::parse('{{ string:label ?? "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ nully ?? "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ nully:label ?? "fallback" }}', $vars));
+
+        $this->assertEquals('fallback', Antlers::parse('{{ string ?= "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ string:label ?= "fallback" }}', $vars));
+        $this->assertEquals('', Antlers::parse('{{ nully ?= "fallback" }}', $vars));
+        $this->assertEquals('', Antlers::parse('{{ nully:label ?= "fallback" }}', $vars));
     }
 
     /** @test */

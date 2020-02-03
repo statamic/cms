@@ -25,6 +25,7 @@ export default {
         const pickr = Pickr.create({
             el: this.$el,
             disabled: this.isReadOnly,
+            lockOpacity: this.config.lock_opacity,
             components: {
 
                 // Main components

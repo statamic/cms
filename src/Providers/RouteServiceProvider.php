@@ -6,6 +6,7 @@ use Statamic\Facades\Form;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
 use Statamic\Facades\Entry;
+use Statamic\Mixins\Router;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Collection;
 use Illuminate\Support\Facades\Route;
@@ -23,6 +24,8 @@ class RouteServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        Route::mixin(new Router);
+
         $this->bindEntries();
         $this->bindCollections();
         $this->bindTerms();

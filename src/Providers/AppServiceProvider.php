@@ -7,7 +7,6 @@ use Statamic\Statamic;
 use Statamic\Sites\Sites;
 use Stringy\StaticStringy;
 use Statamic\Facades\Preference;
-use Statamic\Routing\Router;
 use Illuminate\Support\Carbon;
 use Statamic\Exceptions\Handler;
 use Illuminate\Support\Facades\Blade;
@@ -28,8 +27,6 @@ class AppServiceProvider extends ServiceProvider
         $this->swapSessionMiddleware();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
-             ->pushMiddleware(\Statamic\Http\Middleware\PermanentRedirects::class)
-             ->pushMiddleware(\Statamic\Http\Middleware\VanityRedirects::class)
              ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class);
 
         $this->app->booted(function () {
@@ -85,10 +82,6 @@ class AppServiceProvider extends ServiceProvider
     {
         $this->app->singleton(ExceptionHandler::class, Handler::class);
 
-        $this->app->bind(Router::class, function () {
-            return new Router(config('statamic.routes.routes', []));
-        });
-
         $this->app->singleton(Sites::class, function () {
             return new Sites(config('statamic.sites'));
         });
@@ -109,7 +102,6 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->singleton(\Statamic\Contracts\Data\DataRepository::class, function ($app) {
             return (new \Statamic\Data\DataRepository)
-                ->setRepository('route', \Statamic\Routing\RouteRepository::class)
                 ->setRepository('entry', \Statamic\Contracts\Entries\EntryRepository::class)
                 ->setRepository('term', \Statamic\Contracts\Taxonomies\TermRepository::class)
                 ->setRepository('taxonomy', \Statamic\Contracts\Taxonomies\TaxonomyRepository::class)

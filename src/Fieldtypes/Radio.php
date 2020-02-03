@@ -21,6 +21,8 @@ class Radio extends Fieldtype
 
     public function augment($value)
     {
-        return new LabeledValue($value, array_get($this->config('options'), $value, $value));
+        $label = is_null($value) ? null : array_get($this->config('options'), $value, $value);
+
+        return new LabeledValue($value, $label);
     }
 }

@@ -21,7 +21,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | When a user logs into the Control Panel, they will be taken here.
-    | Supported: "dashboard" or "pages"
+    | For example: "dashboard", "collections/pages", etc.
     |
     */
 

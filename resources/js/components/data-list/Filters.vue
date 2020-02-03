@@ -124,11 +124,7 @@ export default {
                     this.$toast.error(__('Something went wrong'));
                 });
         }
-    },
-
-    created() {
-        this.$keys.bind('esc', this.dismiss)
-    },
+    }
 
 }
 </script>

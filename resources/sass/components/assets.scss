@@ -32,49 +32,11 @@
 }
 
 .drag-notification {
-    border: 1px dashed #ccc;
+    @apply text-lg absolute pin text-center rounded flex items-center justify-center;
+    border: 1px dashed config('colors.grey-60');
     pointer-events: none;
-    position: absolute;
-    top: 0;
-    right: 0;
-    left: 0;
-    bottom: 0;
     z-index: 1049;
     background: rgba(white, .9);
-    text-align: center;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-
-    div {
-        font-size: 24px;
-    }
-
-    .icon {
-        font-size: 60px;
-        color: #333;
-        border: 2px solid #333;
-        border-radius: 60px;
-        padding: 20px;
-        margin-bottom: 25px;
-        line-height: 48px;
-        -webkit-font-smoothing: antialiased;
-        &:before {
-            top: 0;
-        }
-    }
-
-    h3 {
-        font-weight: 400;
-        margin: 25px 0;
-        color: #333;
-        font-size: 21px;
-        max-width: 75%;
-        line-height: 1.5;
-        margin: 0 auto;
-        -webkit-font-smoothing: antialiased;
-    }
 }
 
 
