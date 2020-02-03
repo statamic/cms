@@ -13,7 +13,7 @@ trait HasAugmentedInstance
 
     public function toAugmentedArray($keys = null)
     {
-        return $this->augmented()->select($keys);
+        return $this->augmented()->select($keys ?? $this->defaultAugmentedArrayKeys());
     }
 
     public function augmented()
@@ -22,4 +22,9 @@ trait HasAugmentedInstance
     }
 
     abstract public function newAugmentedInstance(): Augmented;
+
+    protected function defaultAugmentedArrayKeys()
+    {
+        return null;
+    }
 }
