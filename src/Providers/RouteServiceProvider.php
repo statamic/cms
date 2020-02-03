@@ -40,7 +40,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::bind('entry', function ($entry, $route) {
             abort_if(
                 ! ($entry = Entry::find($entry))
-                || $entry->collection() !== $route->parameter('collection')
+                || $entry->collection()->id() !== $route->parameter('collection')->id()
             , 404);
 
             return $entry;
@@ -69,7 +69,7 @@ class RouteServiceProvider extends ServiceProvider
             $id = $route->parameter('taxonomy')->handle() . '::' . $term;
             abort_if(
                 ! ($term = Term::find($id)->in($route->parameter('site')))
-                || $term->taxonomy() !== $route->parameter('taxonomy')
+                || $term->taxonomy()->id() !== $route->parameter('taxonomy')->id()
             , 404);
 
             return $term;
