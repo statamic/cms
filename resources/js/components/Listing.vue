@@ -101,7 +101,7 @@ export default {
                 this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
                 this.activeFilters = {...response.data.meta.filters};
-                this.items = response.data.data;
+                this.items = Object.values(response.data.data);
                 this.meta = response.data.meta;
                 this.loading = false;
                 this.initializing = false;
