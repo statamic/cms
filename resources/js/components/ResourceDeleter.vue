@@ -15,17 +15,22 @@
 export default {
 
     props: {
-        resourceTitle: {
+        resourceType: {
             type: String,
             required: true
+        },
+        resource: {
+            type: Object
+        },
+        resourceTitle: {
+            type: String
         },
         route: {
             type: String,
-            required: true
         },
         redirect: {
             type: String
-        }
+        },
     },
 
     data() {
@@ -35,13 +40,23 @@ export default {
     },
 
     computed: {
+        title() {
+            return data_get(this.resource, 'title', this.resourceTitle);
+        },
+
         modalTitle() {
-            return __('Delete') + ' ' + this.resourceTitle;
+            return [__('Delete'), this.title, this.resourceType]
+                .filter(x => x)
+                .join(' ');
         },
 
         modalBody() {
             return __('Are you sure you want to delete this item?');
-        }
+        },
+
+        deleteUrl() {
+            return data_get(this.resource, 'delete_url', this.route);
+        },
     },
 
     methods: {
@@ -50,7 +65,7 @@ export default {
         },
 
         confirmed() {
-            this.$axios.delete(this.route)
+            this.$axios.delete(this.deleteUrl)
                 .then(() => {
                     this.success();
                 })
@@ -65,7 +80,12 @@ export default {
                 return;
             }
 
-            location.reload();
+            if (this.reload) {
+                location.reload();
+                return;
+            }
+
+            this.$emit('deleted');
         },
 
         cancel() {
