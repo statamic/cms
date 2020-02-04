@@ -233,7 +233,7 @@ class Page implements Entry, Augmentable, Responsable
 
     public function augmentedArrayData()
     {
-        $array = $this->reference && $this->referenceExists() ? $this->entry()->augmentedArrayData() : [];
+        $array = $this->reference && $this->referenceExists() ? $this->entry()->toAugmentedArray() : [];
 
         return array_merge($array, [
             'title' => $this->title(),
