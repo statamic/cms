@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Data\Data;
+use Statamic\Support\Arr;
 use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
@@ -31,6 +32,7 @@ class User extends BaseUser
     protected $email;
     protected $password;
     protected $permissions;
+    protected $selectedQueryKeys;
 
     public function __construct()
     {
@@ -366,5 +368,17 @@ class User extends BaseUser
             'password_hash' => $this->password(),
             'preferences' => $this->preferences(),
         ])->all();
+    }
+
+    public function defaultAugmentedArrayKeys()
+    {
+        return $this->selectQueryKeys;
+    }
+
+    public function setSelectQueryKeys($keys)
+    {
+        $keys = Arr::wrap($keys);
+
+        $this->selectQueryKeys = in_array('*', $keys) ? null : $keys;
     }
 }

@@ -46,6 +46,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
     protected $date;
     protected $locale;
     protected $localizations;
+    protected $selectQueryKeys;
 
     public function __construct()
     {
@@ -562,5 +563,17 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
     public function values()
     {
         return $this->collection()->cascade()->merge($this->originValues());
+    }
+
+    public function defaultAugmentedArrayKeys()
+    {
+        return $this->selectQueryKeys;
+    }
+
+    public function setSelectQueryKeys($keys)
+    {
+        $keys = Arr::wrap($keys);
+
+        $this->selectQueryKeys = in_array('*', $keys) ? null : $keys;
     }
 }

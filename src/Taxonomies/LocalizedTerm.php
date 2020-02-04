@@ -13,6 +13,7 @@ use Statamic\Facades\Site;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
+use Statamic\Support\Arr;
 
 class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
 {
@@ -20,6 +21,7 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
 
     protected $locale;
     protected $term;
+    protected $selectQueryKeys;
 
     public function __construct($term, $locale)
     {
@@ -385,5 +387,17 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
     public function path()
     {
         return $this->term->path();
+    }
+
+    public function defaultAugmentedArrayKeys()
+    {
+        return $this->selectQueryKeys;
+    }
+
+    public function setSelectQueryKeys($keys)
+    {
+        $keys = Arr::wrap($keys);
+
+        $this->selectQueryKeys = in_array('*', $keys) ? null : $keys;
     }
 }

@@ -269,6 +269,32 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    function setting_queried_keys_will_filter_the_arrayable_array()
+    {
+        $entry = (new Entry)
+            ->id('test-id')
+            ->locale('en')
+            ->slug('test')
+            ->set('foo', 'bar')
+            ->collection(Collection::make('blog')->save());
+
+        $arr = $entry->toAugmentedArray();
+        $this->assertTrue(count($arr) > 3);
+        $this->assertArraySubset([
+            'id' => 'test-id',
+            'foo' => 'bar',
+            'published' => true,
+        ], $arr);
+
+        $entry->setSelectQueryKeys(['id', 'foo']);
+
+        $this->assertEquals([
+            'id' => 'test-id',
+            'foo' => 'bar',
+        ], $entry->toAugmentedArray());
+    }
+
+    /** @test */
     function it_gets_and_sets_initial_path()
     {
         $entry = new Entry;

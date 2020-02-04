@@ -20,7 +20,7 @@ abstract class Builder extends BaseBuilder
         return $this->getFilteredAndLimitedKeys()->count();
     }
 
-    public function get()
+    public function get($columns = ['*'])
     {
         $keys = $this->getFilteredKeys();
 
@@ -29,6 +29,8 @@ abstract class Builder extends BaseBuilder
         $keys = $this->limitKeys($keys);
 
         $items = $this->getItems($keys);
+
+        $items->each->setSelectQueryKeys($columns);
 
         return $this->collect($items);
     }

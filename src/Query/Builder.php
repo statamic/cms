@@ -166,7 +166,7 @@ abstract class Builder
     }
 
     abstract public function count();
-    abstract public function get();
+    abstract public function get($columns = ['*']);
 
     protected function filterTestEquals($item, $value)
     {
