@@ -135,7 +135,7 @@ abstract class Builder
         return $this->get()->first();
     }
 
-    public function paginate($perPage = null)
+    public function paginate($perPage = null, $columns = ['*'])
     {
         $page = Paginator::resolveCurrentPage();
 
@@ -143,7 +143,7 @@ abstract class Builder
 
         $total = $this->getCountForPagination();
 
-        $results = $total ? $this->forPage($page, $perPage)->get() : $this->collect();
+        $results = $total ? $this->forPage($page, $perPage)->get($columns) : $this->collect();
 
         return $this->paginator($results, $total, $perPage, $page, [
             'path' => Paginator::resolveCurrentPath(),
