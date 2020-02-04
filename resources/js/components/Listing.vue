@@ -89,6 +89,11 @@ export default {
     methods: {
 
         request() {
+            if (! this.requestUrl) {
+                this.loading = false;
+                return;
+            }
+
             this.loading = true;
 
             if (this.source) this.source.cancel();
