@@ -31,6 +31,9 @@ export default {
         redirect: {
             type: String
         },
+        reload: {
+            type: Boolean
+        }
     },
 
     data() {
