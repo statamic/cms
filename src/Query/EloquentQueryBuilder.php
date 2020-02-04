@@ -20,9 +20,9 @@ abstract class EloquentQueryBuilder
         return $this;
     }
 
-    public function get()
+    public function get($columns = ['*'])
     {
-        return $this->transform($this->builder->get());
+        return $this->transform($this->builder->get($columns));
     }
 
     public function first()
@@ -30,9 +30,9 @@ abstract class EloquentQueryBuilder
         return $this->get()->first();
     }
 
-    public function paginate()
+    public function paginate($perPage, $columns = ['*'])
     {
-        $paginator = $this->builder->paginate();
+        $paginator = $this->builder->paginate($perPage, $columns);
 
         return $paginator->setCollection(
             $this->transform($paginator->getCollection())
