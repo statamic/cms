@@ -26,6 +26,7 @@ use Statamic\Data\HasOrigin;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
+use Statamic\Data\TracksQueriedColumns;
 
 class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAccess
 {
@@ -33,7 +34,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable;
+    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns;
 
     use HasOrigin {
         value as originValue;
@@ -46,7 +47,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
     protected $date;
     protected $locale;
     protected $localizations;
-    protected $selectQueryKeys;
 
     public function __construct()
     {
@@ -567,13 +567,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function defaultAugmentedArrayKeys()
     {
-        return $this->selectQueryKeys;
-    }
-
-    public function setSelectQueryKeys($keys)
-    {
-        $keys = Arr::wrap($keys);
-
-        $this->selectQueryKeys = in_array('*', $keys) ? null : $keys;
+        return $this->selectedQueryColumns;
     }
 }

@@ -286,8 +286,10 @@ class EntryTest extends TestCase
             'published' => true,
         ], $arr);
 
-        $entry->setSelectQueryKeys(['id', 'foo']);
+        $return = $entry->selectedQueryColumns(['id', 'foo']);
 
+        $this->assertEquals($entry, $return);
+        $this->assertEquals(['id', 'foo'], $entry->selectedQueryColumns());
         $this->assertEquals([
             'id' => 'test-id',
             'foo' => 'bar',

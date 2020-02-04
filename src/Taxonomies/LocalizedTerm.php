@@ -9,6 +9,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Data\Publishable;
+use Statamic\Data\TracksQueriedColumns;
 use Statamic\Facades\Site;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
@@ -17,11 +18,10 @@ use Statamic\Support\Arr;
 
 class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
 {
-    use Revisable, Routable, Publishable, HasAugmentedData;
+    use Revisable, Routable, Publishable, HasAugmentedData, TracksQueriedColumns;
 
     protected $locale;
     protected $term;
-    protected $selectQueryKeys;
 
     public function __construct($term, $locale)
     {
@@ -391,13 +391,6 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
 
     public function defaultAugmentedArrayKeys()
     {
-        return $this->selectQueryKeys;
-    }
-
-    public function setSelectQueryKeys($keys)
-    {
-        $keys = Arr::wrap($keys);
-
-        $this->selectQueryKeys = in_array('*', $keys) ? null : $keys;
+        return $this->selectedQueryColumns;
     }
 }

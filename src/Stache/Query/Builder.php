@@ -30,7 +30,7 @@ abstract class Builder extends BaseBuilder
 
         $items = $this->getItems($keys);
 
-        $items->each->setSelectQueryKeys($columns);
+        $items->each->selectedQueryColumns($columns);
 
         return $this->collect($items);
     }
