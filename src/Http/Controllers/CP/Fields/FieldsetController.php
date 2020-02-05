@@ -25,6 +25,7 @@ class FieldsetController extends CpController
                 'title' => $fieldset->title(),
                 'fields' => $fieldset->fields()->count(),
                 'edit_url' => $fieldset->editUrl(),
+                'delete_url' => $fieldset->deleteUrl(),
             ];
         })->values();
 

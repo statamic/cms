@@ -59,6 +59,11 @@ class Fieldset
         return cp_route('fieldsets.edit', $this->handle());
     }
 
+    public function deleteUrl()
+    {
+        return cp_route('fieldsets.destroy', $this->handle());
+    }
+
     public function save()
     {
         FieldsetRepository::save($this);
