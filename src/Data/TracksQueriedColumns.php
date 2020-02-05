@@ -20,4 +20,13 @@ trait TracksQueriedColumns
 
         return $this;
     }
+
+    public function hasQueriedColumn(string $column)
+    {
+        if ($this->selectedQueryColumns === null || in_array('*', $this->selectedQueryColumns)) {
+            return true;
+        }
+
+        return in_array($column, $this->selectedQueryColumns ?? []);
+    }
 }

@@ -13,7 +13,8 @@ use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
-use Statamic\Data\HasAugmentedData;
+use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\TracksQueriedColumns;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\URL;
@@ -30,7 +31,7 @@ abstract class User implements
     ArrayAccess,
     AuthorizableContract
 {
-    use Authorizable, Notifiable, CanResetPassword, HasAugmentedData;
+    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns;
 
     abstract public function get($key, $fallback = null);
     abstract public function value($key);
@@ -109,32 +110,9 @@ abstract class User implements
         return cp_route('users.update', $this->id());
     }
 
-    public function augmentedArrayData()
+    public function newAugmentedInstance()
     {
-        $roles = $this->roles()->mapWithKeys(function ($role) {
-            return ["is_{$role->handle()}" => true];
-        })->all();
-
-        $groups = $this->groups()->mapWithKeys(function ($group) {
-            return ["in_{$group->handle()}" => true];
-        })->all();
-
-        $data = $this->data()->merge([
-            'name' => $this->name(),
-            'id' => $this->id(),
-            'title' => $this->title(),
-            'email' => $this->email(),
-            'initials' => $this->initials(),
-            'edit_url' => $this->editUrl(),
-            'is_user' => true,
-            'last_login' => $this->lastLogin(),
-        ]);
-
-        if (! $this->hasAvatarField()) {
-            $data['avatar'] = $this->avatar();
-        }
-
-        return $data->merge($roles)->merge($groups)->merge($this->supplements)->all();
+        return new AugmentedUser($this);
     }
 
     public function getAuthIdentifierName()
@@ -259,5 +237,10 @@ abstract class User implements
         }
 
         return $this->email();
+    }
+
+    public function defaultAugmentedArrayKeys()
+    {
+        return $this->selectedQueryColumns;
     }
 }

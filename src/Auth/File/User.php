@@ -14,7 +14,6 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Auth\PermissionCache;
 use Statamic\Auth\User as BaseUser;
 use Illuminate\Support\Facades\Hash;
-use Statamic\Data\TracksQueriedColumns;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Preferences\HasPreferencesInProperty;
@@ -25,7 +24,7 @@ use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
  */
 class User extends BaseUser
 {
-    use ExistsAsFile, FluentlyGetsAndSets, HasPreferencesInProperty, TracksQueriedColumns, ContainsData {
+    use ExistsAsFile, FluentlyGetsAndSets, HasPreferencesInProperty, ContainsData {
         data as traitData;
     }
 
@@ -368,10 +367,5 @@ class User extends BaseUser
             'password_hash' => $this->password(),
             'preferences' => $this->preferences(),
         ])->all();
-    }
-
-    public function defaultAugmentedArrayKeys()
-    {
-        return $this->selectedQueryColumns;
     }
 }
