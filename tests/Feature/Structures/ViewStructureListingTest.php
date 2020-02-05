@@ -172,6 +172,7 @@ class ViewStructureListingTest extends TestCase
             $s->shouldReceive('handle')->andReturn($handle);
             $s->shouldReceive('collection')->andReturnFalse();
             $s->shouldReceive('editUrl')->andReturn('/structure-edit-url');
+            $s->shouldReceive('deleteUrl')->andReturn('/structure-delete-url');
         });
     }
 
