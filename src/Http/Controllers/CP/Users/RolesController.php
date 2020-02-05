@@ -20,7 +20,8 @@ class RolesController extends CpController
                 'title' => $role->title(),
                 'handle' => $role->handle(),
                 'permissions' => $role->isSuper() ? __('Super User') : $role->permissions()->count(),
-                'edit_url' => cp_route('roles.edit', $role->handle())
+                'edit_url' => $role->editUrl(),
+                'delete_url' => $role->deleteUrl(),
             ];
         })->values();
 
