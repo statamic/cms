@@ -27,6 +27,7 @@ class GlobalsController extends CpController
                 'title' => $set->title(),
                 'deleteable' => User::current()->can('delete', $set),
                 'edit_url' => $localized->editUrl(),
+                'delete_url' => $set->deleteUrl(),
             ];
         })->values();
 
