@@ -58,7 +58,9 @@ export default {
         },
 
         deleteUrl() {
-            return data_get(this.resource, 'delete_url', this.route);
+            let url = data_get(this.resource, 'delete_url', this.route);
+            if (! url) console.error('ResourceDeleter cannot find delete url');
+            return url;
         },
     },
 
