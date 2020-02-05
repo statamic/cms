@@ -62,6 +62,12 @@ export default {
             if (! url) console.error('ResourceDeleter cannot find delete url');
             return url;
         },
+
+        successMessage() {
+            return [this.resourceType, __('deleted')]
+                .filter(x => x)
+                .join(' ');
+        },
     },
 
     methods: {
@@ -90,6 +96,7 @@ export default {
                 return;
             }
 
+            this.$toast.success(this.successMessage);
             this.$emit('deleted');
         },
 
