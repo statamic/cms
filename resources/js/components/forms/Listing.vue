@@ -12,19 +12,16 @@
                             v-if="form.deleteable"
                             :text="__('Delete')"
                             class="warning"
-                            @click="confirmDeleteRow(form.id, index)" />
+                            @click="$refs[`deleter_${form.id}`].confirm()"
+                        >
+                            <resource-deleter
+                                :ref="`deleter_${form.id}`"
+                                :resource-type="__('Form')"
+                                :resource="form"
+                                @deleted="removeRow(form)">
+                            </resource-deleter>
+                        </dropdown-item>
                     </dropdown-list>
-
-                    <confirmation-modal
-                        v-if="deletingRow !== false"
-                        :title="deletingModalTitle"
-                        :bodyText="__('Are you sure you want to delete this form?')"
-                        :buttonText="__('Delete')"
-                        :danger="true"
-                        @confirm="deleteRow('forms')"
-                        @cancel="cancelDeleteRow"
-                    >
-                    </confirmation-modal>
                 </template>
             </data-list-table>
         </div>
@@ -32,11 +29,11 @@
 </template>
 
 <script>
-import DeletesListingRow from '../DeletesListingRow.js'
+import Listing from '../Listing.vue'
 
 export default {
 
-    mixins: [DeletesListingRow],
+    mixins: [Listing],
 
     props: ['forms'],
 
