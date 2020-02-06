@@ -45,11 +45,16 @@ class GlobalSetPolicy
 
     public function create($user)
     {
-        //
+        return $user->hasPermission('configure globals');
+    }
+
+    public function configure($user)
+    {
+        return $user->hasPermission('configure globals');
     }
 
     public function delete($user, $set)
     {
-        //
+        return $user->hasPermission('configure globals');
     }
 }
