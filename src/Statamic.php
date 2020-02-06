@@ -34,6 +34,7 @@ class Statamic
         Authorize::class,
         LocalizeCp::class,
     ];
+    protected static $shallowAugmentation = false;
 
     public static function version()
     {
@@ -212,5 +213,15 @@ class Statamic
     public static function docsUrl($url)
     {
         return URL::tidy('https://statamic.dev/' . $url);
+    }
+
+    public static function enableShallowAugmentation()
+    {
+        static::$shallowAugmentation = true;
+    }
+
+    public static function shallowAugmentationEnabled()
+    {
+        return static::$shallowAugmentation;
     }
 }
