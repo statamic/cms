@@ -72,6 +72,11 @@ class Structure implements StructureContract
         return cp_route('structures.edit', $this->handle());
     }
 
+    public function deleteUrl()
+    {
+        return cp_route('structures.destroy', $this->handle());
+    }
+
     public function save()
     {
         StructureAPI::save($this);

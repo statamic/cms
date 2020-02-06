@@ -27,6 +27,7 @@ class BlueprintController extends CpController
                 'sections' => $blueprint->sections()->count(),
                 'fields' => $blueprint->fields()->all()->count(),
                 'edit_url' => $blueprint->editUrl(),
+                'delete_url' => $blueprint->deleteUrl(),
             ];
         })->values();
 

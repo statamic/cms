@@ -197,6 +197,11 @@ class UserGroup implements UserGroupContract
         return cp_route('user-groups.edit', $this->handle());
     }
 
+    public function deleteUrl()
+    {
+        return cp_route('user-groups.destroy', $this->handle());
+    }
+
     public static function __callStatic($method, $parameters)
     {
         return Facades\UserGroup::{$method}(...$parameters);

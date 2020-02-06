@@ -165,6 +165,11 @@ class GlobalSet implements Contract
         return cp_route('globals.edit', [$this->id(), $this->handle()]);
     }
 
+    public function deleteUrl()
+    {
+        return cp_route('globals.destroy', $this->id());
+    }
+
     public static function __callStatic($method, $parameters)
     {
         return Facades\GlobalSet::{$method}(...$parameters);

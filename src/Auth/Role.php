@@ -12,6 +12,11 @@ abstract class Role implements RoleContract
         return cp_route('roles.edit', $this->handle());
     }
 
+    public function deleteUrl()
+    {
+        return cp_route('roles.destroy', $this->handle());
+    }
+
     public static function __callStatic($method, $parameters)
     {
         return Facades\Role::{$method}(...$parameters);

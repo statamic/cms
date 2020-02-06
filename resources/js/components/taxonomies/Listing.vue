@@ -2,29 +2,26 @@
     <data-list :columns="columns" :rows="rows">
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table :rows="rows">
-                <template slot="cell-title" slot-scope="{ row: taxonomies }">
-                    <a :href="taxonomies.terms_url">{{ taxonomies.title }}</a>
+                <template slot="cell-title" slot-scope="{ row: taxonomy }">
+                    <a :href="taxonomy.terms_url">{{ taxonomy.title }}</a>
                 </template>
-                <template slot="actions" slot-scope="{ row: taxonomies, index }">
+                <template slot="actions" slot-scope="{ row: taxonomy, index }">
                     <dropdown-list>
-                        <dropdown-item :text="__('Edit')" :redirect="taxonomies.edit_url" />
+                        <dropdown-item :text="__('Edit')" :redirect="taxonomy.edit_url" />
                         <dropdown-item
-                            v-if="taxonomies.deleteable"
+                            v-if="taxonomy.deleteable"
                             :text="__('Delete')"
                             class="warning"
-                            @click="confirmDeleteRow(taxonomies.id, index)" />
+                            @click="$refs[`deleter_${taxonomy.id}`].confirm()"
+                        >
+                            <resource-deleter
+                                :ref="`deleter_${taxonomy.id}`"
+                                :resource-type="__('Taxonomy')"
+                                :resource="taxonomy"
+                                @deleted="removeRow(taxonomy)">
+                            </resource-deleter>
+                        </dropdown-item>
                     </dropdown-list>
-
-                    <confirmation-modal
-                        v-if="deletingRow !== false"
-                        :title="deletingModalTitle"
-                        :bodyText="__('Are you sure you want to delete this taxonomy?')"
-                        :buttonText="__('Delete')"
-                        :danger="true"
-                        @confirm="deleteRow('taxonomies')"
-                        @cancel="cancelDeleteRow"
-                    >
-                    </confirmation-modal>
                 </template>
             </data-list-table>
         </div>
@@ -32,11 +29,11 @@
 </template>
 
 <script>
-import DeletesListingRow from '../DeletesListingRow.js'
+import Listing from '../Listing.vue'
 
 export default {
 
-    mixins: [DeletesListingRow],
+    mixins: [Listing],
 
     props: [
         'initial-rows',

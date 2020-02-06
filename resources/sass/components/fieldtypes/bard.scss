@@ -80,7 +80,7 @@
 }
 
 .bard-floating-toolbar {
-    @apply bg-black rounded-full absolute shadow-lg px-2 opacity-0 invisible;
+    @apply flex bg-black rounded-full absolute shadow-lg px-2 opacity-0 invisible;
     transform: translateX(-50%) translateY(-10px);
     white-space: nowrap;
     z-index: 1000;
@@ -100,7 +100,7 @@
     }
 
     button {
-        @apply text-grey-20 h-12 w-16 bg-black rounded-lg flex items-center;
+        @apply text-grey-20 h-12 w-10 text-center bg-black rounded-lg flex items-center justify-center;
         font-size: 16px;
         transition: all .1s ease-in-out;
     }

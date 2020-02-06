@@ -30,6 +30,7 @@ class StructuresController extends CpController
                 'purpose' => $structure->collection() ? 'collection' : 'navigation',
                 'show_url' => $tree->editUrl(),
                 'edit_url' => $structure->editUrl(),
+                'delete_url' => $structure->deleteUrl(),
                 'deleteable' => User::current()->can('delete', $structure)
             ];
         })->values();

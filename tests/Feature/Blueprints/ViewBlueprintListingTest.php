@@ -40,7 +40,8 @@ class ViewBlueprintListingTest extends TestCase
                     'title' => 'Foo',
                     'sections' => 0,
                     'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/fields/blueprints/foo/edit'
+                    'edit_url' => 'http://localhost/cp/fields/blueprints/foo/edit',
+                    'delete_url' => 'http://localhost/cp/fields/blueprints/foo',
                 ],
                 [
                     'id' => 'bar',
@@ -48,7 +49,8 @@ class ViewBlueprintListingTest extends TestCase
                     'title' => 'Bar',
                     'sections' => 0,
                     'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/fields/blueprints/bar/edit'
+                    'edit_url' => 'http://localhost/cp/fields/blueprints/bar/edit',
+                    'delete_url' => 'http://localhost/cp/fields/blueprints/bar',
                 ],
             ]))
             ->assertDontSee('no-results');

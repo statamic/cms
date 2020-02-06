@@ -11,7 +11,18 @@
                 <template slot="actions" slot-scope="{ row: group, index }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="group.edit_url" />
-                        <dropdown-item :text="__('Delete')" class="warning" @click="destroy(group.id, index)" />
+                        <dropdown-item
+                            :text="__('Delete')"
+                            class="warning"
+                            @click="$refs[`deleter_${group.id}`].confirm()"
+                        >
+                            <resource-deleter
+                                :ref="`deleter_${group.id}`"
+                                :resource-type="__('User Group')"
+                                :resource="group"
+                                @deleted="removeRow(group)">
+                            </resource-deleter>
+                        </dropdown-item>
                     </dropdown-list>
                 </template>
             </data-list-table>
@@ -20,7 +31,11 @@
 </template>
 
 <script>
+import Listing from '../Listing.vue'
+
 export default {
+
+    mixins: [Listing],
 
     props: {
         initialRows: Array,
@@ -36,20 +51,6 @@ export default {
                 { label: __('Roles'), field: 'roles' },
             ]
         }
-    },
-
-    methods: {
-
-        destroy(id, index) {
-            const url = cp_url(`user-groups/${id}`);
-            this.$axios.delete(url).then(response => {
-                this.rows.splice(index, 1);
-                this.$toast.success(__('User Group deleted'));
-            }).catch(error => {
-                this.$toast.error(error.response.data.message);
-            })
-        }
-
     }
 
 }
