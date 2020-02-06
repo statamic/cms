@@ -107,8 +107,10 @@ class ApiController extends Controller
      */
     protected function paginate($query)
     {
+        $columns = explode(',', $this->request->input('fields', '*'));
+
         return $query
-            ->paginate($this->request->input('limit', 25))
+            ->paginate($this->request->input('limit', 25), $columns)
             ->appends($this->request->only(['filter', 'limit', 'page']));
     }
 }
