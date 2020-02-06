@@ -84,15 +84,11 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::before(function ($user, $ability) {
-            if ($user instanceof StatamicUser) {
-                return User::fromUser($user)->isSuper() ? true : null;
-            }
+            return optional(User::fromUser($user))->isSuper() ? true : null;
         });
 
         Gate::after(function ($user, $ability) {
-            if ($user instanceof StatamicUser) {
-                return User::fromUser($user)->hasPermission($ability) === true ? true : null;
-            }
+            return optional(User::fromUser($user))->hasPermission($ability) === true ? true : null;
         });
 
         $this->app->booted(function () {

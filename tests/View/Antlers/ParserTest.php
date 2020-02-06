@@ -17,6 +17,7 @@ use Tests\PreventSavingStacheItemsToDisk;
 use Illuminate\Contracts\Support\Arrayable;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Data\Augmentable as AugmentableTrait;
+use Statamic\Data\HasAugmentedData;
 
 class ParserTest extends TestCase
 {
@@ -1592,7 +1593,7 @@ class ArrayableObject extends NonArrayableObject implements Arrayable
 
 class AugmentableObject extends ArrayableObject implements Augmentable
 {
-    use AugmentableTrait;
+    use HasAugmentedData;
 
     function augmentedArrayData()
     {

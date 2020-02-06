@@ -308,6 +308,16 @@ class Form implements FormContract
     }
 
     /**
+     * The URL to delete this in the CP.
+     *
+     * @return string
+     */
+    public function deleteUrl()
+    {
+        return cp_route('forms.destroy', $this->handle());
+    }
+
+    /**
      * Is a field an uploadable type?
      *
      * @param string $field

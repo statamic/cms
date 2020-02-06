@@ -103,4 +103,14 @@ class Value implements IteratorAggregate, JsonSerializable
     {
         return $this->fieldtype;
     }
+
+    public function augmentable()
+    {
+        return $this->augmentable;
+    }
+
+    public function handle()
+    {
+        return $this->handle;
+    }
 }

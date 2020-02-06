@@ -11,7 +11,18 @@
                 <template slot="actions" slot-scope="{ row: role, index }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="role.edit_url" />
-                        <dropdown-item :text="__('Delete')" class="warning" @click="destroy(role.id, index)" />
+                        <dropdown-item
+                            :text="__('Delete')"
+                            class="warning"
+                            @click="$refs[`deleter_${role.id}`].confirm()"
+                        >
+                            <resource-deleter
+                                :ref="`deleter_${role.id}`"
+                                :resource-type="__('Role')"
+                                :resource="role"
+                                @deleted="removeRow(role)">
+                            </resource-deleter>
+                        </dropdown-item>
                     </dropdown-list>
                 </template>
             </data-list-table>
@@ -20,7 +31,11 @@
 </template>
 
 <script>
+import Listing from '../Listing.vue'
+
 export default {
+
+    mixins: [Listing],
 
     props: [
         'initialRows',
@@ -31,20 +46,6 @@ export default {
         return {
             rows: this.initialRows,
         }
-    },
-
-    methods: {
-
-        destroy(id, index) {
-            const url = cp_url(`roles/${id}`);
-            this.$axios.delete(url).then(response => {
-                this.rows.splice(index, 1);
-                this.$toast.success(__('Role deleted'));
-            }).catch(error => {
-                this.$toast.error(error.response.data.message);
-            })
-        }
-
     }
 
 }

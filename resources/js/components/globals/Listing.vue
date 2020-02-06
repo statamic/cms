@@ -15,7 +15,15 @@
                             v-if="global.deleteable"
                             :text="__('Delete')"
                             class="warning"
-                            @click="destroy(global.id, index)" />
+                            @click="$refs[`deleter_${global.id}`].confirm()"
+                        >
+                            <resource-deleter
+                                :ref="`deleter_${global.id}`"
+                                :resource-type="__('Global Set')"
+                                :resource="global"
+                                @deleted="removeRow(global)">
+                            </resource-deleter>
+                        </dropdown-item>
                     </dropdown-list>
                 </template>
             </data-list-table>
@@ -24,7 +32,11 @@
 </template>
 
 <script>
+import Listing from '../Listing.vue'
+
 export default {
+
+    mixins: [Listing],
 
     props: ['globals'],
 
@@ -36,20 +48,7 @@ export default {
                 { label: __('Handle'), field: 'handle' },
             ]
         }
-    },
-
-    methods: {
-
-        destroy(id, index) {
-            const url = cp_url(`globals/${id}`);
-            this.$axios.delete(url).then(response => {
-                this.rows.splice(index, 1);
-                this.$toast.success(__('Global Set deleted'));
-            }).catch(error => {
-                this.$toast.error(error.response.data.message);
-            })
-        }
-
     }
+
 }
 </script>

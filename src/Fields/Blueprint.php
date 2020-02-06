@@ -128,6 +128,11 @@ class Blueprint
         return cp_route('blueprints.edit', $this->handle());
     }
 
+    public function deleteUrl()
+    {
+        return cp_route('blueprints.destroy', $this->handle());
+    }
+
     public function save()
     {
         BlueprintRepository::save($this);

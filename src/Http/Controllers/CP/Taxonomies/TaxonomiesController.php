@@ -27,6 +27,7 @@ class TaxonomiesController extends CpController
                 'title' => $taxonomy->title(),
                 'terms' => $taxonomy->queryTerms()->count(),
                 'edit_url' => $taxonomy->editUrl(),
+                'delete_url' => $taxonomy->deleteUrl(),
                 'terms_url' => cp_route('taxonomies.show', $taxonomy->handle()),
                 'deleteable' => User::current()->can('delete', $taxonomy)
             ];

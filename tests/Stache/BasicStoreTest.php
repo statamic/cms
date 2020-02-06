@@ -2,25 +2,49 @@
 
 namespace Tests\Stache;
 
-use Tests\TestCase;
-use Statamic\Stache\Stache;
+use Illuminate\Filesystem\Filesystem;
+use Statamic\Facades\YAML;
 use Statamic\Stache\Stores\BasicStore;
+use Statamic\Support\Str;
+use Tests\TestCase;
 
 class BasicStoreTest extends TestCase
 {
     public function setUp(): void
     {
         parent::setUp();
+        @mkdir($this->tempDir = __DIR__.'/tmp');
+        $this->store = (new TestBasicStore)->directory($this->tempDir);
+    }
 
-        $this->stache = (new Stache)->sites(['en', 'fr']);
-
-        $this->store = new TestBasicStore;
+    function tearDown(): void
+    {
+        parent::tearDown();
+        (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
     /** @test */
     function it_gets_an_item_by_key()
     {
-        $this->markTestIncomplete();
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+
+        $item = $this->store->getItem('foo');
+        $this->assertEquals('foo', $item->id());
+
+        $this->assertNull($this->store->getItem('unknown'));
+    }
+
+    /** @test */
+    function items_are_different_instances_every_time()
+    {
+        config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
+        \Illuminate\Support\Facades\Cache::clear();
+
+        file_put_contents($this->tempDir.'/foo.yaml', '');
+
+        $this->assertNotNull($one = $this->store->getItem('foo'));
+        $this->assertNotNull($two = $this->store->getItem('foo'));
+        $this->assertNotSame($one, $two);
     }
 
     /** @test */
@@ -51,6 +75,22 @@ class TestBasicStore extends BasicStore
 
     public function makeItemFromFile($path, $contents)
     {
+        $data = YAML::parse($contents);
+        $id = Str::after($path, __DIR__.'/tmp/');
+        $id = Str::before($id, '.yaml');
+        return new TestBasicStoreItem($id, $data);
+    }
+}
 
+class TestBasicStoreItem
+{
+    public function __construct($id, $data)
+    {
+        $this->id = $id;
+        $this->data = $data;
+    }
+    public function id()
+    {
+        return $this->id;
     }
 }

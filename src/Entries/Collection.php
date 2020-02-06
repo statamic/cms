@@ -153,6 +153,11 @@ class Collection implements Contract
         return cp_route('collections.edit', $this->handle());
     }
 
+    public function deleteUrl()
+    {
+        return cp_route('collections.destroy', $this->handle());
+    }
+
     public function createEntryUrl($site = null)
     {
         $site = $site ?? $this->sites()->first();

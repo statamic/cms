@@ -29,6 +29,7 @@ class CollectionsController extends CpController
                 'title' => $collection->title(),
                 'entries' => \Statamic\Facades\Entry::query()->where('collection', $collection->handle())->count(),
                 'edit_url' => $collection->editUrl(),
+                'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
                 'deleteable' => User::current()->can('delete', $collection)
             ];

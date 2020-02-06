@@ -265,7 +265,35 @@ class EntryTest extends TestCase
             'last_modified' => $carbon = Carbon::createFromTimestamp($lastModified),
             'updated_at' => $carbon,
             'updated_by' => $user->toAugmentedArray(),
-        ], $entry->augmentedArrayData());
+        ], $entry->toAugmentedArray());
+    }
+
+    /** @test */
+    function setting_queried_keys_will_filter_the_arrayable_array()
+    {
+        $entry = (new Entry)
+            ->id('test-id')
+            ->locale('en')
+            ->slug('test')
+            ->set('foo', 'bar')
+            ->collection(Collection::make('blog')->save());
+
+        $arr = $entry->toAugmentedArray();
+        $this->assertTrue(count($arr) > 3);
+        $this->assertArraySubset([
+            'id' => 'test-id',
+            'foo' => 'bar',
+            'published' => true,
+        ], $arr);
+
+        $return = $entry->selectedQueryColumns(['id', 'foo']);
+
+        $this->assertEquals($entry, $return);
+        $this->assertEquals(['id', 'foo'], $entry->selectedQueryColumns());
+        $this->assertEquals([
+            'id' => 'test-id',
+            'foo' => 'bar',
+        ], $entry->toAugmentedArray());
     }
 
     /** @test */

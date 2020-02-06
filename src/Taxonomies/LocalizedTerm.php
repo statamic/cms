@@ -7,16 +7,18 @@ use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Data\Augmentable as AugmentableTrait;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Data\Publishable;
+use Statamic\Data\TracksQueriedColumns;
 use Statamic\Facades\Site;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
+use Statamic\Support\Arr;
 
 class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
 {
-    use Revisable, Routable, Publishable, AugmentableTrait;
+    use Revisable, Routable, Publishable, HasAugmentedData, TracksQueriedColumns;
 
     protected $locale;
     protected $term;
@@ -385,5 +387,10 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
     public function path()
     {
         return $this->term->path();
+    }
+
+    public function defaultAugmentedArrayKeys()
+    {
+        return $this->selectedQueryColumns;
     }
 }

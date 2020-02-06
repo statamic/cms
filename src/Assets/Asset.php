@@ -14,7 +14,6 @@ use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Facades\Image;
 use Statamic\Data\Data;
-use Statamic\Data\Augmentable;
 use Statamic\Facades\Blueprint;
 use Illuminate\Support\Carbon;
 use Statamic\Data\ContainsData;
@@ -27,12 +26,13 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
+use Statamic\Data\HasAugmentedData;
 
-class Asset implements AssetContract, ArrayAccess, AugmentableContract
+class Asset implements AssetContract, ArrayAccess, Augmentable
 {
-    use Augmentable, FluentlyGetsAndSets, ContainsData {
+    use HasAugmentedData, FluentlyGetsAndSets, ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;

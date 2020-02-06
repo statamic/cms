@@ -7,10 +7,10 @@ use Statamic\Query\EloquentQueryBuilder;
 
 class UserQueryBuilder extends EloquentQueryBuilder
 {
-    protected function transform($items)
+    protected function transform($items, $columns = ['*'])
     {
         return UserCollection::make($items)->map(function ($model) {
             return User::fromModel($model);
-        });
+        })->each->selectedQueryColumns($columns);
     }
 }
