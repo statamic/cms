@@ -60,6 +60,8 @@ class GlobalsController extends CpController
             [$originValues, $originMeta] = $this->extractFromFields($set->origin(), $blueprint);
         }
 
+        $user = User::fromUser($request->user());
+
         $viewData = [
             'reference' => $set->reference(),
             'editing' => true,
@@ -69,7 +71,6 @@ class GlobalsController extends CpController
             'values' => $values,
             'meta' => $meta,
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => User::fromUser($request->user())->cant('edit', $set),
             'locale' => $set->locale(),
             'localizedFields' => $set->data()->keys()->all(),
             'hasOrigin' => $hasOrigin,
@@ -86,7 +87,9 @@ class GlobalsController extends CpController
                     'origin' => $exists ? !$localized->hasOrigin() : null,
                     'url' => $exists ? $localized->editUrl() : null,
                 ];
-            })->all()
+            })->all(),
+            'canEdit' => $user->can('edit', $set),
+            'canDelete' => $user->can('delete', $set),
         ];
 
         if ($request->wantsJson()) {

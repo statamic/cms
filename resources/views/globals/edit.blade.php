@@ -22,6 +22,8 @@
         :initial-origin-values="{{ json_encode($originValues) }}"
         initial-site="{{ $locale }}"
         configure-save-url="{{ cp_route('globals.update-meta', $set->id()) }}"
+        :can-edit="{{ json_encode($canEdit) }}"
+        :can-delete="{{ json_encode($canDelete) }}"
     ></global-publish-form>
 
 @endsection
