@@ -11,8 +11,10 @@
             {{ $taxonomy->title() }}
         </h1>
         <dropdown-list class="mr-1">
-            <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
             <dropdown-item :text="__('Delete Taxonomy')" class="warning"></dropdown-item>
+            @can('edit', $taxonomy)
+                <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
+            @endcan
         </dropdown-list>
         @can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
             <create-term-button
