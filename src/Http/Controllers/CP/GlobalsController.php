@@ -89,6 +89,7 @@ class GlobalsController extends CpController
                 ];
             })->all(),
             'canEdit' => $user->can('edit', $set),
+            'canConfigure' => $user->can('configure', $set),
             'canDelete' => $user->can('delete', $set),
         ];
 

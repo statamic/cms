@@ -16,10 +16,14 @@
             <configure-set
                 class="ml-2"
                 :save-url="configureSaveUrl"
+                :delete-url="deleteUrl"
+                :globals-url="globalsUrl"
                 :id="id"
                 :initial-title="initialTitle"
                 :initial-handle="initialHandle"
                 :initial-blueprint="initialBlueprintHandle"
+                :can-configure="canConfigure"
+                :can-delete="canDelete"
             ></configure-set>
 
             <v-select
@@ -136,7 +140,9 @@ export default {
         isCreating: Boolean,
         initialReadOnly: Boolean,
         configureSaveUrl: String,
+        deleteUrl: String,
         canEdit: Boolean,
+        canConfigure: Boolean,
         canDelete: Boolean,
     },
 
