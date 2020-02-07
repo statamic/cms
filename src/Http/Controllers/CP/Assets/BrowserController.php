@@ -35,7 +35,10 @@ class BrowserController extends CpController
             'container' => [
                 'id' => $container->id(),
                 'title' => $container->title(),
-                'edit_url' => $container->editUrl()
+                'edit_url' => $container->editUrl(),
+                'delete_url' => $container->deleteUrl(),
+                'can_edit' => User::current()->can('edit', $container),
+                'can_delete' => User::current()->can('delete', $container),
             ],
             'folder' => $path,
         ]);
@@ -55,7 +58,7 @@ class BrowserController extends CpController
             'container' => [
                 'id' => $container->id(),
                 'title' => $container->title(),
-                'edit_url' => $container->editUrl()
+                'edit_url' => $container->editUrl(),
             ],
             'folder' => $asset->folder(),
             'editing' => $asset->id(),

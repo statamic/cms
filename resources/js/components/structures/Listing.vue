@@ -19,7 +19,6 @@
                         >
                             <resource-deleter
                                 :ref="`deleter_${structure.id}`"
-                                :resource-type="__('Structure')"
                                 :resource="structure"
                                 @deleted="removeRow(structure)">
                             </resource-deleter>

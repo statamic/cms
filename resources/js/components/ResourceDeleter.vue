@@ -15,10 +15,6 @@
 export default {
 
     props: {
-        resourceType: {
-            type: String,
-            required: true
-        },
         resource: {
             type: Object
         },
@@ -39,6 +35,7 @@ export default {
     data() {
         return {
             deleting: false,
+            redirectFromServer: null,
         }
     },
 
@@ -48,9 +45,7 @@ export default {
         },
 
         modalTitle() {
-            return [__('Delete'), this.title, this.resourceType]
-                .filter(x => x)
-                .join(' ');
+            return __('Delete :resource', {resource: this.title});
         },
 
         modalBody() {
@@ -63,10 +58,8 @@ export default {
             return url;
         },
 
-        successMessage() {
-            return [this.resourceType, __('deleted')]
-                .filter(x => x)
-                .join(' ');
+        redirectUrl() {
+            return this.redirect || this.redirectFromServer;
         },
     },
 
@@ -77,7 +70,8 @@ export default {
 
         confirmed() {
             this.$axios.delete(this.deleteUrl)
-                .then(() => {
+                .then(response => {
+                    this.redirectFromServer = data_get(response, 'data.redirect');
                     this.success();
                 })
                 .catch(() => {
@@ -86,8 +80,8 @@ export default {
         },
 
         success() {
-            if (this.redirect) {
-                location.href = this.redirect;
+            if (this.redirectUrl) {
+                location.href = this.redirectUrl;
                 return;
             }
 
@@ -96,7 +90,7 @@ export default {
                 return;
             }
 
-            this.$toast.success(this.successMessage);
+            this.$toast.success(__('Deleted'));
             this.$emit('deleted');
         },
 

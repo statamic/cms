@@ -49,11 +49,26 @@
             </div>
         </stack>
 
-        <button
-            class="btn"
-            v-text="__('Edit')"
-            @click="editing = true"
-        />
+        <dropdown-list v-if="canConfigure || canDelete">
+            <dropdown-item
+                v-if="canConfigure"
+                v-text="__('Configure Global Set')"
+                @click="editing = true">
+            </dropdown-item>
+            <dropdown-item
+                v-if="canDelete"
+                v-text="__('Delete Global Set')"
+                class="warning"
+                @click="$refs.deleter.confirm()"
+            >
+                <resource-deleter
+                    ref="deleter"
+                    :resource-title="title"
+                    :route="deleteUrl"
+                    :redirect="globalsUrl">
+                </resource-deleter>
+            </dropdown-item>
+        </dropdown-list>
     </div>
 
 </template>
@@ -69,10 +84,14 @@ export default {
 
     props: {
         saveUrl: String,
+        deleteUrl: String,
+        globalsUrl: String,
         id: String,
         initialTitle: String,
         initialHandle: String,
-        initialBlueprint: String
+        initialBlueprint: String,
+        canConfigure: Boolean,
+        canDelete: Boolean,
     },
 
     data() {

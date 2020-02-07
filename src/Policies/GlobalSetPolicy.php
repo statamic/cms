@@ -29,6 +29,11 @@ class GlobalSetPolicy
         })->isEmpty();
     }
 
+    public function create($user)
+    {
+        // handled by before()
+    }
+
     public function view($user, $set)
     {
         $user = User::fromUser($user);
@@ -43,13 +48,13 @@ class GlobalSetPolicy
         return $user->hasPermission("edit {$set->handle()} globals");
     }
 
-    public function create($user)
+    public function configure($user, $set)
     {
-        //
+        // handled by before()
     }
 
     public function delete($user, $set)
     {
-        //
+        // handled by before()
     }
 }

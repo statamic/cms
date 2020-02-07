@@ -9,17 +9,21 @@
                 <div class="flex items-center" v-text="title" />
             </h1>
 
-            <div class="pt-px text-2xs text-grey-60 mr-2 flex" v-if="readOnly">
+            <div class="pt-px text-2xs text-grey-60 ml-2 flex" v-if="! canEdit">
                 <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
             </div>
 
             <configure-set
-                class="mr-2"
+                class="ml-2"
                 :save-url="configureSaveUrl"
+                :delete-url="deleteUrl"
+                :globals-url="globalsUrl"
                 :id="id"
                 :initial-title="initialTitle"
                 :initial-handle="initialHandle"
                 :initial-blueprint="initialBlueprintHandle"
+                :can-configure="canConfigure"
+                :can-delete="canDelete"
             ></configure-set>
 
             <v-select
@@ -31,7 +35,7 @@
                 :searchable="false"
                 :multiple="false"
                 @input="localizationSelected"
-                class="w-48 mr-2"
+                class="w-48 ml-2"
             >
                 <template slot="option" slot-scope="option">
                     <div class="flex items-center" v-tooltip="localizationStatusText(option)">
@@ -49,8 +53,8 @@
             </v-select>
 
             <button
-                v-if="!readOnly"
-                class="btn btn-primary min-w-100"
+                v-if="canEdit"
+                class="btn btn-primary min-w-100 ml-2"
                 :class="{ 'opacity-25': !canSave }"
                 :disabled="!canSave"
                 @click.prevent="save"
@@ -89,7 +93,7 @@
                     v-bind="component.props"
                 />
                 <publish-sections
-                    :read-only="readOnly"
+                    :read-only="! canEdit"
                     :syncable="hasOrigin"
                     :enable-sidebar="false"
                     @updated="setFieldValue"
@@ -136,6 +140,10 @@ export default {
         isCreating: Boolean,
         initialReadOnly: Boolean,
         configureSaveUrl: String,
+        deleteUrl: String,
+        canEdit: Boolean,
+        canConfigure: Boolean,
+        canDelete: Boolean,
     },
 
     data() {
@@ -155,7 +163,6 @@ export default {
             site: this.initialSite,
             error: null,
             errors: {},
-            readOnly: this.initialReadOnly,
         }
     },
 
@@ -170,7 +177,7 @@ export default {
         },
 
         canSave() {
-            return !this.readOnly && this.isDirty && !this.somethingIsLoading;
+            return this.canEdit && this.isDirty && !this.somethingIsLoading;
         },
 
         isBase() {

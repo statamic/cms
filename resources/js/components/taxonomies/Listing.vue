@@ -16,7 +16,6 @@
                         >
                             <resource-deleter
                                 :ref="`deleter_${taxonomy.id}`"
-                                :resource-type="__('Taxonomy')"
                                 :resource="taxonomy"
                                 @deleted="removeRow(taxonomy)">
                             </resource-deleter>

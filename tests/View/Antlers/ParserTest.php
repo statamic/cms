@@ -1573,6 +1573,12 @@ EOT;
         $this->assertEquals('no', Antlers::parse($template, ['stuff' => collect()]));
         $this->assertEquals('yes', Antlers::parse($template, ['stuff' => collect(['one'])]));
     }
+
+    /** @test */
+    function objects_are_considered_truthy()
+    {
+        $this->assertEquals('yes', Antlers::parse('{{ if object }}yes{{ else }}no{{ /if }}', ['object' => new \stdClass]));
+    }
 }
 
 class NonArrayableObject

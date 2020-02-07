@@ -10,6 +10,7 @@ use Statamic\Facades\Helper;
 use Statamic\Fields\Fieldtype;
 use Statamic\Support\Arr;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
+use Statamic\Statamic;
 
 class Assets extends Fieldtype
 {
@@ -115,6 +116,16 @@ class Assets extends Fieldtype
         $assets = collect($value)->map(function ($path) {
             return $this->container()->asset($path);
         })->filter()->values();
+
+        if (Statamic::shallowAugmentationEnabled()) {
+            $assets = $assets->map(function ($asset) {
+                return [
+                    'id' => $asset->id(),
+                    'url' => $asset->url(),
+                    'permalink' => $asset->absoluteUrl(),
+                ];
+            });
+        }
 
         return $this->config('max_files') === 1 ? $assets->first() : $assets;
     }

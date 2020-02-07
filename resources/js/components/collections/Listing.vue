@@ -16,7 +16,6 @@
                         >
                             <resource-deleter
                                 :ref="`deleter_${collection.id}`"
-                                :resource-type="__('Collection')"
                                 :resource="collection"
                                 @deleted="removeRow(collection)">
                             </resource-deleter>

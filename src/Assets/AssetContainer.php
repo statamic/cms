@@ -188,11 +188,11 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function delete()
     {
-        $path = "assets/{$this->id}.yaml";
+        Facades\AssetContainer::delete($this);
 
-        File::disk('content')->delete($path);
+        // event(new AssetContainerDeleted($id, $path));
 
-        event(new AssetContainerDeleted($this->id(), $path));
+        return true;
     }
 
     public function disk($disk = null)
@@ -208,11 +208,6 @@ class AssetContainer implements AssetContainerContract, Augmentable
     public function diskHandle()
     {
         return $this->disk;
-    }
-
-    public function diskConfig()
-    {
-        return config("filesystems.disks.{$this->disk}");
     }
 
     /**
@@ -354,7 +349,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function accessible()
     {
-        return Arr::get($this->diskConfig(), 'url') !== null;
+        return $this->disk()->filesystem()->getDriver()->getConfig()->get('url') !== null;
     }
 
     /**

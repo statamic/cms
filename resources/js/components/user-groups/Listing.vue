@@ -18,7 +18,6 @@
                         >
                             <resource-deleter
                                 :ref="`deleter_${group.id}`"
-                                :resource-type="__('User Group')"
                                 :resource="group"
                                 @deleted="removeRow(group)">
                             </resource-deleter>

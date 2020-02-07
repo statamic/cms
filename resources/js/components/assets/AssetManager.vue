@@ -2,10 +2,29 @@
 
     <div class="asset-manager">
 
-        <div class="flex mb-3">
+        <div class="flex items-center mb-3">
             <h1 class="flex-1">{{ container.title }}</h1>
 
-            <a :href="container.edit_url" class="btn">{{ __('Edit') }}</a>
+            <dropdown-list v-if="container.can_edit || container.can_delete" class="ml-2">
+                <dropdown-item
+                    v-if="container.can_edit"
+                    v-text="__('Edit Container')"
+                    :redirect="container.edit_url">
+                </dropdown-item>
+                <dropdown-item
+                    v-if="container.can_delete"
+                    v-text="__('Delete Container')"
+                    class="warning"
+                    @click="$refs.deleter.confirm()"
+                >
+                    <resource-deleter
+                        ref="deleter"
+                        :resource-title="title"
+                        :route="container.delete_url">
+                    </resource-deleter>
+                </dropdown-item>
+            </dropdown-list>
+
             <a :href="createContainerUrl" class="btn-primary ml-2" v-if="canCreateContainers">{{ __('Create Container') }}</a>
         </div>
 
