@@ -248,7 +248,7 @@ class EntryTest extends TestCase
             ->id('test-id')
             ->locale('en')
             ->slug('test')
-            ->collection(Collection::make('blog')->save())
+            ->collection(Collection::make('blog')->route('blog/{slug}')->save())
             ->data([
                 'foo' => 'bar',
                 'bar' => 'baz',
@@ -265,6 +265,8 @@ class EntryTest extends TestCase
             'last_modified' => $carbon = Carbon::createFromTimestamp($lastModified),
             'updated_at' => $carbon,
             'updated_by' => $user->toAugmentedArray(),
+            'url' => '/blog/test',
+            'permalink' => 'http://localhost/blog/test',
         ], $entry->toAugmentedArray());
     }
 

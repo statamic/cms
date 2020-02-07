@@ -43,4 +43,9 @@ class AugmentedEntry extends AbstractAugmented
     {
         return true;
     }
+
+    protected function permalink()
+    {
+        return $this->get('absolute_url');
+    }
 }
