@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Illuminate\Foundation\Testing\Assert;
+use Statamic\Statamic;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
@@ -40,6 +41,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         if (isset($uses[PreventSavingStacheItemsToDisk::class])) {
             $this->deleteFakeStacheDirectory();
         }
+
+        Statamic::disableShallowAugmentation();
 
         parent::tearDown();
     }

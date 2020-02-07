@@ -220,6 +220,11 @@ class Statamic
         static::$shallowAugmentation = true;
     }
 
+    public static function disableShallowAugmentation()
+    {
+        static::$shallowAugmentation = false;
+    }
+
     public static function shallowAugmentationEnabled()
     {
         return static::$shallowAugmentation;
