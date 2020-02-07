@@ -15,10 +15,6 @@
 export default {
 
     props: {
-        resourceType: {
-            type: String,
-            required: true
-        },
         resource: {
             type: Object
         },
@@ -49,9 +45,7 @@ export default {
         },
 
         modalTitle() {
-            return [__('Delete'), this.title, this.resourceType]
-                .filter(x => x)
-                .join(' ');
+            return __('Delete :resource', {resource: this.title});
         },
 
         modalBody() {
@@ -66,12 +60,6 @@ export default {
 
         redirectUrl() {
             return this.redirect || this.redirectFromServer;
-        },
-
-        successMessage() {
-            return [this.resourceType, __('deleted')]
-                .filter(x => x)
-                .join(' ');
         },
     },
 
@@ -102,7 +90,7 @@ export default {
                 return;
             }
 
-            this.$toast.success(this.successMessage);
+            this.$toast.success(__('Deleted'));
             this.$emit('deleted');
         },
 
