@@ -39,6 +39,7 @@ export default {
     data() {
         return {
             deleting: false,
+            redirectFromServer: null,
         }
     },
 
@@ -63,6 +64,10 @@ export default {
             return url;
         },
 
+        redirectUrl() {
+            return this.redirect || this.redirectFromServer;
+        },
+
         successMessage() {
             return [this.resourceType, __('deleted')]
                 .filter(x => x)
@@ -77,7 +82,8 @@ export default {
 
         confirmed() {
             this.$axios.delete(this.deleteUrl)
-                .then(() => {
+                .then(response => {
+                    this.redirectFromServer = data_get(response, 'data.redirect');
                     this.success();
                 })
                 .catch(() => {
@@ -86,8 +92,8 @@ export default {
         },
 
         success() {
-            if (this.redirect) {
-                location.href = this.redirect;
+            if (this.redirectUrl) {
+                location.href = this.redirectUrl;
                 return;
             }
 
