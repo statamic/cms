@@ -20,7 +20,7 @@ class AssetsTest extends TestCase
     {
         parent::setUp();
 
-        Storage::fake('test', ['url' => '/assets']);
+        tap(Storage::fake('test'))->getDriver()->getConfig()->set('url', '/assets');
         Storage::disk('test')->put('foo/one.txt', '');
         Storage::disk('test')->put('bar/two.txt', '');
         AssetContainer::make('test')->disk('test')->save();

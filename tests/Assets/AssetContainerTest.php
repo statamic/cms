@@ -122,7 +122,7 @@ class AssetContainerTest extends TestCase
         $this->assertTrue($container->private());
         $this->assertFalse($container->accessible());
 
-        Storage::fake('test', ['url' => '/url']);
+        Storage::disk('test')->getDriver()->getConfig()->set('url', '/url');
 
         $this->assertFalse($container->private());
         $this->assertTrue($container->accessible());
