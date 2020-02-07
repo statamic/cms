@@ -10,11 +10,11 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable;
-use Statamic\Data\HasAugmentedData;
+use Statamic\Data\HasAugmentedInstance;
 
 class Page implements Entry, Augmentable, Responsable
 {
-    use HasAugmentedData;
+    use HasAugmentedInstance;
 
     protected $tree;
     protected $reference;
@@ -229,18 +229,9 @@ class Page implements Entry, Augmentable, Responsable
         return $this->pages()->flattenedPages();
     }
 
-    // TODO: tests for these
-
-    public function augmentedArrayData()
+    public function newAugmentedInstance()
     {
-        $array = $this->reference && $this->referenceExists() ? $this->entry()->toAugmentedArray() : [];
-
-        return array_merge($array, [
-            'title' => $this->title(),
-            'url' => $this->url(),
-            'uri' => $this->uri(),
-            'permalink' => $this->absoluteUrl(),
-        ]);
+        return new AugmentedPage($this);
     }
 
     public function editUrl()
