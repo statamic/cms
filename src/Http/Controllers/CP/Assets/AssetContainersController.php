@@ -141,7 +141,7 @@ class AssetContainersController extends CpController
     {
         $container = AssetContainer::find($container);
 
-        // TODO: auth
+        $this->authorize('delete', $container, 'You are not authorized to delete asset containers.');
 
         $container->delete();
 
