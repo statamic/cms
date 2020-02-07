@@ -188,12 +188,11 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function delete()
     {
-        $id = $this->id();
-        $path = "assets/{$id}.yaml";
+        Facades\AssetContainer::delete($this);
 
-        File::disk('content')->delete($path);
+        // event(new AssetContainerDeleted($id, $path));
 
-        event(new AssetContainerDeleted($id, $path));
+        return true;
     }
 
     public function disk($disk = null)
