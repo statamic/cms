@@ -19,7 +19,6 @@
                 <dropdown-item :text="__('Delete Form')" class="warning" @click="$refs.deleter.confirm()">
                     <resource-deleter
                         ref="deleter"
-                        :resource-type="__('Form')"
                         resource-title="{{ $form->title() }}"
                         route="{{ $form->deleteUrl() }}"
                         redirect="{{ cp_route('forms.index') }}"

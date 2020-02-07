@@ -18,7 +18,6 @@
                 <dropdown-item :text="__('Delete Collection')" class="warning" @click="$refs.deleter.confirm()">
                     <resource-deleter
                         ref="deleter"
-                        :resource-type="__('Collection')"
                         resource-title="{{ $collection->title() }}"
                         route="{{ cp_route('collections.destroy', $collection->handle()) }}"
                         redirect="{{ cp_route('collections.index') }}"

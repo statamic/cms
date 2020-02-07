@@ -18,7 +18,6 @@
                         >
                             <resource-deleter
                                 :ref="`deleter_${role.id}`"
-                                :resource-type="__('Role')"
                                 :resource="role"
                                 @deleted="removeRow(role)">
                             </resource-deleter>

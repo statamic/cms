@@ -18,7 +18,6 @@
                         >
                             <resource-deleter
                                 :ref="`deleter_${fieldset.id}`"
-                                :resource-type="__('Fieldset')"
                                 :resource="fieldset"
                                 @deleted="removeRow(fieldset)">
                             </resource-deleter>

@@ -18,7 +18,6 @@
                 <dropdown-item :text="__('Delete Taxonomy')" class="warning" @click="$refs.deleter.confirm()">
                     <resource-deleter
                         ref="deleter"
-                        :resource-type="__('Taxonomy')"
                         resource-title="{{ $taxonomy->title() }}"
                         route="{{ cp_route('taxonomies.destroy', $taxonomy->handle()) }}"
                         redirect="{{ cp_route('taxonomies.index') }}"

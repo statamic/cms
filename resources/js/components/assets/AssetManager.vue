@@ -19,7 +19,6 @@
                 >
                     <resource-deleter
                         ref="deleter"
-                        :resource-type="__('Container')"
                         :resource-title="title"
                         :route="container.delete_url">
                     </resource-deleter>

@@ -63,7 +63,6 @@
             >
                 <resource-deleter
                     ref="deleter"
-                    :resource-type="__('Global Set')"
                     :resource-title="title"
                     :route="deleteUrl"
                     :redirect="globalsUrl">

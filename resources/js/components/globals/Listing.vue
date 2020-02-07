@@ -19,7 +19,6 @@
                         >
                             <resource-deleter
                                 :ref="`deleter_${global.id}`"
-                                :resource-type="__('Global Set')"
                                 :resource="global"
                                 @deleted="removeRow(global)">
                             </resource-deleter>

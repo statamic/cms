@@ -16,7 +16,6 @@
                         >
                             <resource-deleter
                                 :ref="`deleter_${form.id}`"
-                                :resource-type="__('Form')"
                                 :resource="form"
                                 @deleted="removeRow(form)">
                             </resource-deleter>
