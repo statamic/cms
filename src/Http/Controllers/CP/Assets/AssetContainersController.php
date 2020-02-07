@@ -147,7 +147,7 @@ class AssetContainersController extends CpController
 
         return [
             'message' => 'Container deleted',
-            'redirect' => cp_route('asset-containers.index')
+            'redirect' => cp_route('assets.index')
         ];
     }
 

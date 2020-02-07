@@ -21,8 +21,7 @@
                         ref="deleter"
                         :resource-type="__('Container')"
                         :resource-title="title"
-                        :route="container.delete_url"
-                        :redirect="assetsUrl">
+                        :route="container.delete_url">
                     </resource-deleter>
                 </dropdown-item>
             </dropdown-list>
