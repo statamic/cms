@@ -3,9 +3,11 @@
 namespace Tests\Fieldtypes;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Collection;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Taxonomy;
+use Statamic\Statamic;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -60,6 +62,47 @@ class TaxonomyTest extends TestCase
 
         $this->assertInstanceOf(LocalizedTerm::class, $augmented);
         $this->assertEquals('tags::one', $augmented->id());
+    }
+
+    /** @test */
+    function it_shallow_augments_slugs_to_a_collection_of_terms_when_using_a_single_taxonomy()
+    {
+        Statamic::enableShallowAugmentation();
+
+        $augmented = $this->fieldtype(['taxonomy' => 'tags'])->augment(['one', 'two']);
+
+        $this->assertInstanceOf(Collection::class, $augmented);
+        $this->assertNotInstanceOf(TermCollection::class, $augmented);
+        $this->assertCount(2, $augmented);
+        $this->assertEquals([
+            [
+                'id' => 'tags::one',
+                'slug' => 'one',
+                'url' => '/blog/tags/one',
+                'permalink' => 'http://localhost/blog/tags/one',
+            ],
+            [
+                'id' => 'tags::two',
+                'slug' => 'two',
+                'url' => '/blog/tags/two',
+                'permalink' => 'http://localhost/blog/tags/two',
+            ],
+        ], $augmented->all());
+    }
+
+    /** @test */
+    function it_shallow_augments_to_a_single_term_when_max_items_is_one()
+    {
+        Statamic::enableShallowAugmentation();
+
+        $augmented = $this->fieldtype(['taxonomy' => 'tags', 'max_items' => 1])->augment(['one']);
+
+        $this->assertEquals([
+            'id' => 'tags::one',
+            'slug' => 'one',
+            'url' => '/blog/tags/one',
+            'permalink' => 'http://localhost/blog/tags/one',
+        ], $augmented);
     }
 
     function fieldtype($config = [])
