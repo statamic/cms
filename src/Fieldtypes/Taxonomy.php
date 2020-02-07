@@ -55,6 +55,7 @@ class Taxonomy extends Relationship
                     'slug' => $term->slug(),
                     'url' => $term->url(),
                     'permalink' => $term->absoluteUrl(),
+                    'api_url' => $term->apiUrl(),
                 ];
             }));
         }

@@ -60,12 +60,14 @@ class AssetsTest extends TestCase
             [
                 'id' => 'test::foo/one.txt',
                 'url' => '/assets/foo/one.txt',
-                'permalink' => 'http://localhost/assets/foo/one.txt'
+                'permalink' => 'http://localhost/assets/foo/one.txt',
+                'api_url' => 'http://localhost/api/assets/test/foo/one.txt'
             ],
             [
                 'id' => 'test::bar/two.txt',
                 'url' => '/assets/bar/two.txt',
-                'permalink' => 'http://localhost/assets/bar/two.txt'
+                'permalink' => 'http://localhost/assets/bar/two.txt',
+                'api_url' => 'http://localhost/api/assets/test/bar/two.txt'
             ],
         ], $augmented->all());
     }
@@ -80,7 +82,8 @@ class AssetsTest extends TestCase
         $this->assertEquals([
             'id' => 'test::foo/one.txt',
             'url' => '/assets/foo/one.txt',
-            'permalink' => 'http://localhost/assets/foo/one.txt'
+            'permalink' => 'http://localhost/assets/foo/one.txt',
+            'api_url' => 'http://localhost/api/assets/test/foo/one.txt'
         ], $augmented);
     }
 

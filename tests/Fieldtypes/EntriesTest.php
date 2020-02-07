@@ -56,12 +56,14 @@ class EntriesTest extends TestCase
             [
                 'id' => '123',
                 'url' => '/blog/one',
-                'permalink' => 'http://localhost/blog/one'
+                'permalink' => 'http://localhost/blog/one',
+                'api_url' => 'http://localhost/api/collections/blog/entries/123',
             ],
             [
                 'id' => '456',
                 'url' => '/blog/two',
-                'permalink' => 'http://localhost/blog/two'
+                'permalink' => 'http://localhost/blog/two',
+                'api_url' => 'http://localhost/api/collections/blog/entries/456',
             ],
         ], $augmented->all());
     }
@@ -76,7 +78,8 @@ class EntriesTest extends TestCase
         $this->assertEquals([
             'id' => '123',
             'url' => '/blog/one',
-            'permalink' => 'http://localhost/blog/one'
+            'permalink' => 'http://localhost/blog/one',
+            'api_url' => 'http://localhost/api/collections/blog/entries/123',
         ], $augmented);
     }
 

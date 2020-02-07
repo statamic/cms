@@ -123,6 +123,7 @@ class Assets extends Fieldtype
                     'id' => $asset->id(),
                     'url' => $asset->url(),
                     'permalink' => $asset->absoluteUrl(),
+                    'api_url' => $asset->apiUrl(),
                 ];
             });
         }

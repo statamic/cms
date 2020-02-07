@@ -183,6 +183,7 @@ class Entries extends Relationship
             'id' => $value->id(),
             'url' => $value->url(),
             'permalink' => $value->absoluteUrl(),
+            'api_url' => $value->apiUrl(),
         ];
     }
 
