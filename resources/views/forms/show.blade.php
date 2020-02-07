@@ -3,7 +3,7 @@
 
 @section('content')
 
-    <div class="flex mb-3">
+    <div class="flex items-center mb-3">
         <h1 class="flex-1">
             <small class="subhead block">
                 <a href="{{ cp_route('forms.index')}}">{{ __('Forms') }}</a>
@@ -11,7 +11,23 @@
             {{ $form->title() }}
         </h1>
 
-        <a class="btn" href="{{ cp_route('forms.edit', $form->handle()) }}">{{ __('Edit Form') }}</a>
+        <dropdown-list class="mr-1">
+            @can('edit', $form)
+                <dropdown-item :text="__('Edit Form')" redirect="{{ $form->editUrl() }}"></dropdown-item>
+            @endcan
+            @can('delete', $form)
+                <dropdown-item :text="__('Delete Form')" class="warning" @click="$refs.deleter.confirm()">
+                    <resource-deleter
+                        ref="deleter"
+                        :resource-type="__('Form')"
+                        resource-title="{{ $form->title() }}"
+                        route="{{ $form->deleteUrl() }}"
+                        redirect="{{ cp_route('forms.index') }}"
+                    ></resource-deleter>
+                </dropdown-item>
+            @endcan
+        </dropdown-list>
+
         <dropdown-list class="ml-2">
             <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
             <dropdown-item :text="__('Export as CSV')" redirect="{{ cp_route('forms.export', ['type' => 'csv', 'form' => $form->handle()]) }}?download=true"></dropdown-item>
