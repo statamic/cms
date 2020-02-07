@@ -210,11 +210,6 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $this->disk;
     }
 
-    public function diskConfig()
-    {
-        return config("filesystems.disks.{$this->disk}");
-    }
-
     /**
      * Get all the asset files in this container
      *
@@ -354,7 +349,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function accessible()
     {
-        return Arr::get($this->diskConfig(), 'url') !== null;
+        return $this->disk()->filesystem()->getDriver()->getConfig()->get('url') !== null;
     }
 
     /**

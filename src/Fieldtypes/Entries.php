@@ -177,6 +177,15 @@ class Entries extends Relationship
         }
     }
 
+    protected function shallowAugmentValue($value)
+    {
+        return [
+            'id' => $value->id(),
+            'url' => $value->url(),
+            'permalink' => $value->absoluteUrl(),
+        ];
+    }
+
     protected function getSelectionFilters($request)
     {
         return Scope::filters('entries-fieldtype', $this->getSelectionFilterContext($request));
