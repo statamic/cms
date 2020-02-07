@@ -4,6 +4,7 @@ namespace Statamic\Entries;
 
 use ArrayAccess;
 use Statamic\Facades;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -169,6 +170,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
     protected function cpUrl($route)
     {
         return cp_route($route, [$this->collectionHandle(), $this->id(), $this->slug()]);
+    }
+
+    public function apiUrl()
+    {
+        return Statamic::apiRoute('collections.entries.show', [$this->collectionHandle(), $this->id()]);
     }
 
     public function reference()

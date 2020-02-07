@@ -14,6 +14,7 @@ use Statamic\Facades\Site;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 
 class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
@@ -283,6 +284,11 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
     protected function cpUrl($route)
     {
         return cp_route($route, [$this->taxonomyHandle(), $this->inDefaultLocale()->slug(), $this->locale()]);
+    }
+
+    public function apiUrl()
+    {
+        return Statamic::apiRoute('taxonomies.terms.show', [$this->taxonomyHandle(), $this->slug()]);
     }
 
     public function offsetExists($key)

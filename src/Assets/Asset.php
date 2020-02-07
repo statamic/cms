@@ -29,6 +29,7 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Statamic;
 
 class Asset implements AssetContract, ArrayAccess, Augmentable
 {
@@ -675,6 +676,11 @@ class Asset implements AssetContract, ArrayAccess, Augmentable
     public function editUrl()
     {
         return cp_route('assets.browse.edit', $this->container()->handle() . '/' . $this->path());
+    }
+
+    public function apiUrl()
+    {
+        return Statamic::apiRoute('assets.show', [$this->containerHandle(), $this->path()]);
     }
 
     /**

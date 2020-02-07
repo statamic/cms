@@ -3,7 +3,6 @@
 namespace Statamic\Http\Resources\API;
 
 use Illuminate\Http\Resources\Json\Resource;
-use Statamic\Statamic;
 
 class EntryResource extends Resource
 {
@@ -15,13 +14,8 @@ class EntryResource extends Resource
      */
     public function toArray($request)
     {
-        $apiUrl = Statamic::apiRoute('collections.entries.show', [
-            $this->resource->collection()->handle(),
-            $this->resource->id(),
-        ]);
-
         return array_merge($this->resource->toAugmentedArray(), [
-            'api_url' => $apiUrl,
+            'api_url' => $this->resource->apiUrl(),
         ]);
     }
 }
