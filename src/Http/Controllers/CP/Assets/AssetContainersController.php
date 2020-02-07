@@ -25,7 +25,9 @@ class AssetContainersController extends CpController
                 'allow_uploads' => $container->allowUploads(),
                 'create_folders' => $container->createFolders(),
                 'edit_url' => $container->editUrl(),
-                'delete_url' => $container->deleteUrl()
+                'delete_url' => $container->deleteUrl(),
+                'can_edit' => User::current()->can('edit', $container),
+                'can_delete' => User::current()->can('delete', $container),
             ];
         })->values();
 
