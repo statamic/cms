@@ -14,6 +14,9 @@
             @can('edit', $collection)
                 <dropdown-item :text="__('Edit Collection')" redirect="{{ $collection->editUrl() }}"></dropdown-item>
             @endcan
+            @can('edit', $collection)
+                <dropdown-item :text="__('Scaffold Resources')" redirect="{{ cp_route('collections.scaffold', $collection->handle()) }}"></dropdown-item>
+            @endcan
             @can('delete', $collection)
                 <dropdown-item :text="__('Delete Collection')" class="warning" @click="$refs.deleter.confirm()">
                     <resource-deleter
