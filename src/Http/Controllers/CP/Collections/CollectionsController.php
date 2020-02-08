@@ -48,6 +48,8 @@ class CollectionsController extends CpController
     {
         $this->authorize('view', $collection, 'You are not authorized to view this collection.');
 
+        $view = $collection->queryEntries()->count() ? 'show' : 'empty';
+
         $blueprints = $collection->entryBlueprints()->map(function ($blueprint) {
             return [
                 'handle' => $blueprint->handle(),
@@ -55,7 +57,7 @@ class CollectionsController extends CpController
             ];
         });
 
-        return view('statamic::collections.show', [
+        return view("statamic::collections.{$view}", [
             'collection' => $collection,
             'blueprints' => $blueprints,
             'site' => Site::selected(),
@@ -71,6 +73,13 @@ class CollectionsController extends CpController
         $this->authorize('create', CollectionContract::class, 'You are not authorized to create collections.');
 
         return view('statamic::collections.create');
+    }
+
+    public function fresh($collection)
+    {
+        $this->authorize('view', $collection, 'You are not authorized to view this collection.');
+
+        return view('statamic::collections.fresh');
     }
 
     public function edit($collection)
@@ -98,50 +107,27 @@ class CollectionsController extends CpController
 
         $data = $request->validate([
             'title' => 'required',
-            'handle' => 'nullable|alpha_dash',
-            'template' => 'nullable',
-            'layout' => 'nullable',
-            'blueprints' => 'array',
-            'route' => 'required_with:structure',
-            'orderable' => 'boolean',
-            'dated' => 'boolean',
-            'date_behavior' => 'nullable',
-            'sort_direction' => 'in:asc,desc',
-            'default_publish_state' => 'boolean',
-            'amp' => 'boolean',
-            'structure' => 'nullable',
-            'mount' => 'nullable',
-            'taxonomies' => 'array',
+            'handle' => 'nullable|alpha_dash'
         ]);
-
-        $data['structure'] = $this->ensureStructureExists($data['structure'] ?? null);
 
         $handle = $request->handle ?? snake_case($request->title);
 
-        $collection = $this->updateCollection(Collection::make($handle), $data);
-
-        switch ($data['date_behavior']) {
-            case 'articles':
-                $collection
-                    ->pastDateBehavior('public')
-                    ->futureDateBehavior('private');
-                break;
-
-            case 'events':
-                $collection
-                    ->pastDateBehavior('public')
-                    ->futureDateBehavior('private');
-                break;
+        if (Collection::find($handle)) {
+            throw new \Exception('Collection already exists');
         }
+
+        $collection = Collection::make($handle);
+
+        $collection->title($request->title)
+            ->pastDateBehavior('public')
+            ->futureDateBehavior('private');
 
         $collection->save();
 
         session()->flash('success', __('Collection created'));
 
         return [
-            'redirect' => $collection->hasStructure()
-                ? $collection->structure()->showUrl()
-                : $collection->showUrl()
+            'redirect' => route('statamic.cp.collections.show', $handle)
         ];
     }
 
