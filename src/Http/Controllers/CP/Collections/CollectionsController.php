@@ -31,6 +31,7 @@ class CollectionsController extends CpController
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
+                'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),
                 'deleteable' => User::current()->can('delete', $collection)
             ];
         })->values();
