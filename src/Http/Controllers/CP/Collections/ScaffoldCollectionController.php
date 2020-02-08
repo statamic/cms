@@ -79,5 +79,8 @@ class ScaffoldCollectionController extends CpController
         if (! File::get($file)) {
             File::put($file, '');
         }
+
+        // Set the template
+        $this->request->collection->template($filename)->save();
     }
 }
