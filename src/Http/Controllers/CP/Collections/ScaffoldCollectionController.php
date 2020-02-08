@@ -50,6 +50,10 @@ class ScaffoldCollectionController extends CpController
     {
         $handle = Str::snake($title);
 
+        // Set the blueprint
+        $this->request->collection->entryBlueprints($handle)->save();
+
+        // Don't overwrite existing
         if (Facades\Blueprint::find($handle)) {
             return;
         }
