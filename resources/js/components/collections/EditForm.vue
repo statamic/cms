@@ -18,7 +18,7 @@
                     <small class="subhead block">
                         <a :href="listingUrl" v-text="parentTitle" />
                         <span class="px-sm">›</span>
-                        <a href="editUrl" v-text="title" />
+                        <a :href="url" v-text="title" />
                     </small>
                 {{ __('Configure') }}
                 </h1>
