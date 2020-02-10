@@ -115,7 +115,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Collection\Collection::class,
         Tags\Dd::class,
         Tags\Dump::class,
-        Tags\Env::class,
         Tags\GetContent::class,
         Tags\GetFiles::class,
         Tags\Glide::class,
