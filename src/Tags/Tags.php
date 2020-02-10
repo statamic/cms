@@ -226,5 +226,7 @@ abstract class Tags
         if (!in_array($method, ['GET', 'POST'])) {
             $html .= method_field($method);
         }
+
+        return $html;
     }
 }
