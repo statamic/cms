@@ -67,6 +67,7 @@ class Section
     {
         return [
             'display' => $this->display(),
+            'instructions' => $this->instructions(),
             'handle' => $this->handle,
             'fields' => $this->fields()->toPublishArray()
         ];
@@ -75,5 +76,10 @@ class Section
     public function display()
     {
         return array_get($this->contents, 'display', Str::humanize($this->handle));
+    }
+
+    public function instructions()
+    {
+        return array_get($this->contents, 'instructions');
     }
 }
