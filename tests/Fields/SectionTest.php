@@ -116,6 +116,7 @@ class SectionTest extends TestCase
 
         $section = (new Section('test'))->setContents([
             'display' => 'Test Section',
+            'instructions' => 'Does stuff',
             'fields' => [
                 [
                     'handle' => 'one',
@@ -131,6 +132,7 @@ class SectionTest extends TestCase
         $this->assertEquals([
             'display' => 'Test Section',
             'handle' => 'test',
+            'instructions' => 'Does stuff',
             'fields' => [
                 [
                     'handle' => 'one',
