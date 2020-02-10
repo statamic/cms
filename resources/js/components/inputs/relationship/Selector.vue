@@ -80,7 +80,7 @@
                                 </button>
 
                                 <button
-                                    v-if="maxSelections > 1"
+                                    v-if="! hasMaxSelections || maxSelections > 1"
                                     type="button"
                                     class="btn btn-primary ml-1"
                                     @click="select">
