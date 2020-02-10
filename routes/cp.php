@@ -113,8 +113,8 @@ Route::group([
         Route::get('assets/browse/{asset_container}/{path?}', 'BrowserController@show')->where('path', '.*')->name('assets.browse.show');
         Route::get('assets-fieldtype', 'FieldtypeController@index');
         Route::resource('assets', 'AssetsController');
-        Route::get('assets/{asset}/download', 'AssetsController@download')->name('assets.download');
-        Route::get('thumbnails/{asset}/{size?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
+        Route::get('assets/{encoded_asset}/download', 'AssetsController@download')->name('assets.download');
+        Route::get('thumbnails/{encoded_asset}/{size?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
     });
 
     Route::group(['prefix' => 'fields', 'namespace' => 'Fields'], function () {
