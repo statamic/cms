@@ -196,7 +196,7 @@ abstract class Tags
      * @param  string $action
      * @return string
      */
-    protected function formOpen($action, $method = null)
+    protected function formOpen($action, $method = 'POST')
     {
         $attr_str = '';
         if ($attrs = $this->getList('attr')) {
@@ -218,7 +218,7 @@ abstract class Tags
             $attr_str .= 'enctype="multipart/form-data"';
         }
 
-        $method = is_null($method) ? 'POST' : strtoupper($method);
+        $method = strtoupper($method);
         $formMethod = $method === 'GET' ? 'GET' : 'POST';
 
         $html = '<form method="' . $formMethod . '" action="' . $action . '" ' . $attr_str . '>' . csrf_field();
