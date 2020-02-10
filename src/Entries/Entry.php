@@ -169,7 +169,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     protected function cpUrl($route)
     {
-        return cp_route($route, [$this->collectionHandle(), $this->id(), $this->slug()]);
+        if (! $id = $this->id()) {
+            return null;
+        }
+
+        return cp_route($route, [$this->collectionHandle(), $id, $this->slug()]);
     }
 
     public function apiUrl()
@@ -484,7 +488,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
             return null;
         }
 
-        return $this->structure()->in($this->locale())->page($this->id())->parent();
+        if (! $id = $this->id()) {
+            return null;
+        }
+
+        return $this->structure()->in($this->locale())->page($id)->parent();
     }
 
     public function route()
