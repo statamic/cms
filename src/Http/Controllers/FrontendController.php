@@ -9,6 +9,7 @@ use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\View\View;
 
 /**
@@ -54,7 +55,7 @@ class FrontendController extends Controller
 
         return (new View)
             ->template($view)
-            ->layout($data['layout'] ?? 'layout')
+            ->layout(Arr::get($data, 'layout', 'layout'))
             ->with($data)
             ->cascadeContent($this->getLoadedRouteItem($data));
     }
