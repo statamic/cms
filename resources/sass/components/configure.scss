@@ -1,0 +1,24 @@
+/* ==========================================================================
+   CONFIGURE COMPONENT: A variation of the publish component
+   ========================================================================== */
+
+   .configure-section {
+       .publish-fields .form-group:not(:last-child) {
+           @apply border-b;
+       }
+
+       label {
+           @apply text-base;
+       }
+
+       // Push toggle off to the right
+       .toggle-fieldtype {
+           @apply flex justify-between;
+           .help-block, .help-block p { @apply mb-0; }
+           .field-inner { @apply pr-4; }
+       }
+
+       .v-select, .input-group {
+           @apply max-w-md;
+       }
+   }

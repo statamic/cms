@@ -202,105 +202,117 @@ class CollectionsController extends CpController
 
     protected function editFormBlueprint()
     {
-        return Blueprint::makeFromFields([
-            'title' => [
-                'type' => 'text',
-                'validate' => 'required',
-                'width' => 50,
+        return Blueprint::makeFromSections([
+            'name' => [
+                'display' => __('Collection Name'),
+                'fields' => [
+                    'title' => [
+                        'type' => 'text',
+                        'instructions' => __('statamic::messages.collection_configure_title_instructions'),
+                        'validate' => 'required',
+                    ],
+                    'handle' => [
+                        'type' => 'text',
+                        'display' => __('Collection Handle'),
+                        'instructions' => __('statamic::messages.collection_configure_handle_instructions'),
+                        'validate' => 'required|alpha_dash',
+                    ],
+                ]
             ],
-            'handle' => [
-                'type' => 'text',
-                'validate' => 'required|alpha_dash',
-                'width' => 50,
-            ],
-            'dates' => ['type' => 'section'],
-            'dated' => ['type' => 'toggle'],
-            'past_date_behavior' => [
-                'type' => 'select',
-                'display' => __('Past Date Behavior'),
-                'instructions' => __('statamic::messages.collections_past_date_behavior_instructions'),
-                'width' => 50,
-                'options' => [
-                    'public' => 'Public - Always visible',
-                    'unlisted' => 'Unlisted - Hidden from listings, URLs visible',
-                    'private' => 'Private - Hidden from listings, URLs 404'
+            'dates' => [
+                'display' => __('Dates & Behaviors'),
+                'fields' => [
+                    'dated' => [
+                        'type' => 'toggle',
+                        'display' => __('Enable Publish Dates'),
+                        'instructions' => 'Publish dates can be used to schedule and expire content.'
+                    ],
+                    'past_date_behavior' => [
+                        'type' => 'select',
+                        'display' => __('Past Date Behavior'),
+                        'instructions' => __('statamic::messages.collections_past_date_behavior_instructions'),
+                        'options' => [
+                            'public' => 'Public - Always visible',
+                            'unlisted' => 'Unlisted - Hidden from listings, URLs visible',
+                            'private' => 'Private - Hidden from listings, URLs 404'
+                        ],
+                    ],
+                    'future_date_behavior' => [
+                        'type' => 'select',
+                        'display' => __('Future Date Behavior'),
+                        'instructions' => __('statamic::messages.collections_future_date_behavior_instructions'),
+                        'options' => [
+                            'public' => 'Public - Always visible',
+                            'unlisted' => 'Unlisted - Hidden from listings, URLs visible',
+                            'private' => 'Private - Hidden from listings, URLs 404'
+                        ],
+                    ],
                 ],
             ],
-            'future_date_behavior' => [
-                'type' => 'select',
-                'display' => __('Future Date Behavior'),
-                'instructions' => __('statamic::messages.collections_future_date_behavior_instructions'),
-                'width' => 50,
-                'options' => [
-                    'public' => 'Public - Always visible',
-                    'unlisted' => 'Unlisted - Hidden from listings, URLs visible',
-                    'private' => 'Private - Hidden from listings, URLs 404'
+            'ordering' => [
+                'fields' => [
+                    'orderable' => [
+                        'type' => 'toggle',
+                        'instructions' => __('statamic::messages.collections_orderable_instructions'),
+                        'if' => ['structure' => 'empty']
+                    ],
+                    'sort_direction' => [
+                        'type' => 'select',
+                        'instructions' => __('statamic::messages.collections_sort_direction_instructions'),
+                        'options' => [
+                            'asc' => 'Ascending',
+                            'desc' => 'Descending'
+                        ],
+                        'if' => ['structure' => 'empty']
+                    ],
+                    'structure' => [
+                        'type' => 'structures',
+                        'max_items' => 1,
+                        'instructions' => __('statamic::messages.collections_structure_instructions'),
+                    ],
                 ],
             ],
-
-            'ordering' => ['type' => 'section'],
-            'orderable' => [
-                'type' => 'toggle',
-                'instructions' => __('statamic::messages.collections_orderable_instructions'),
-                'width' => 50,
-                'if' => ['structure' => 'empty']
+            'content_model' => [
+                'display' => 'Content Model',
+                'fields' => [
+                    'blueprints' => [
+                        'type' => 'blueprints',
+                        'instructions' => __('statamic::messages.collections_blueprint_instructions'),
+                        'validate' => 'array',
+                    ],
+                    'taxonomies' => [
+                        'type' => 'taxonomies',
+                        'instructions' => __('statamic::messages.collections_taxonomies_instructions'),
+                    ],
+                    'default_publish_state' => [
+                        'display' => __('Publish by Default'),
+                        'type' => 'toggle',
+                        'instructions' => __('statamic::messages.collections_default_publish_state_instructions'),
+                    ],
+                    'template' => [
+                        'type' => 'template',
+                        'instructions' => __('statamic::messages.collection_configure_template_instructions'),
+                    ],
+                    'layout' => [
+                        'type' => 'template',
+                        'instructions' => __('statamic::messages.collection_configure_layout_instructions'),
+                    ],
+                ]
             ],
-            'sort_direction' => [
-                'type' => 'select',
-                'instructions' => __('statamic::messages.collections_sort_direction_instructions'),
-                'width' => 50,
-                'options' => [
-                    'asc' => 'Ascending',
-                    'desc' => 'Descending'
-                ],
-                'if' => ['structure' => 'empty']
-            ],
-            'structure' => [
-                'type' => 'structures',
-                'max_items' => 1,
-                'instructions' => __('statamic::messages.collections_structure_instructions'),
-            ],
-
-            'content_model' => ['type' => 'section'],
-            'blueprints' => [
-                'type' => 'blueprints',
-                'instructions' => __('statamic::messages.collections_blueprint_instructions'),
-                'validate' => 'array',
-            ],
-            'taxonomies' => [
-                'type' => 'taxonomies',
-                'instructions' => __('statamic::messages.collections_taxonomies_instructions'),
-            ],
-            'template' => [
-                'type' => 'text',
-                'instructions' => __('statamic::messages.collections_template_instructions'),
-                'width' => 50
-            ],
-            'layout' => [
-                'type' => 'text',
-                'instructions' => __('statamic::messages.collections_layout_instructions'),
-                'width' => 50
-            ],
-            'default_publish_state' => [
-                'type' => 'toggle',
-                'instructions' => __('statamic::messages.collections_default_publish_state_instructions'),
-            ],
-
-            'routing' => ['type' => 'section'],
-            'route' => [
-                'type' => 'text',
-                'instructions' => __('statamic::messages.collections_route_instructions'),
-            ],
-            'mount' => [
-                'type' => 'entries',
-                'max_items' => 1,
-                'instructions' => __('statamic::messages.collections_mount_instructions'),
-            ],
-            'amp' => [
-                'type' => 'toggle',
-                'display' => __('Accelerated Mobile Pages (AMP)'),
-                'instructions' => __('Enable AMP'),
-            ],
+            'routing' => [
+                'display' => 'Routing & URLs',
+                'fields' => [
+                    'route' => [
+                        'type' => 'text',
+                        'instructions' => __('statamic::messages.collections_route_instructions'),
+                    ],
+                    'amp' => [
+                        'type' => 'toggle',
+                        'display' => __('Enable AMP'),
+                        'instructions' => __('Enable Accelerated Mobile Pages (AMP). Automatically adds routes and URL for entries in this collection. Learn more in the [documentation](https://statamic.dev/amp).'),
+                    ],
+                ]
+            ]
         ]);
     }
 }

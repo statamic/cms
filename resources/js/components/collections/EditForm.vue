@@ -4,9 +4,9 @@
         v-if="blueprint"
         ref="container"
         name="collection"
+        reference="collection"
         :blueprint="blueprint"
         :values="values"
-        reference="collection"
         :meta="meta"
         :errors="errors"
         @updated="values = $event"
@@ -17,14 +17,15 @@
                 <h1 class="flex-1">
                     <small class="subhead block">
                         <a :href="listingUrl" v-text="parentTitle" />
+                        <span class="px-sm">›</span>
+                        <a href="editUrl" v-text="title" />
                     </small>
-
-                    {{ title }}
+                {{ __('Configure') }}
                 </h1>
                 <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
-            <publish-sections
+            <configure-sections
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
                 :enable-sidebar="false"/>
