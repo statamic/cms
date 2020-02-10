@@ -191,6 +191,7 @@ class BlueprintTest extends TestCase
             'title' => 'Test',
             'sections' => [
                 'section_one' => [
+                    'instructions' => 'Does stuff',
                     'fields' => [
                         [
                             'handle' => 'one',
@@ -216,6 +217,7 @@ class BlueprintTest extends TestCase
                 [
                     'display' => 'Section one',
                     'handle' => 'section_one',
+                    'instructions' => 'Does stuff',
                     'fields' => [
                         [
                             'handle' => 'one',
@@ -235,6 +237,7 @@ class BlueprintTest extends TestCase
                 [
                     'display' => 'Section two',
                     'handle' => 'section_two',
+                    'instructions' => null,
                     'fields' => [
                         [
                             'handle' => 'two',
