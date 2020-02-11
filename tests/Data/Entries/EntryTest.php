@@ -421,8 +421,7 @@ class EntryTest extends TestCase
         $collection = tap(Collection::make('dated')->dated(true)->futureDateBehavior('private'))->save();
         $entry = (new Entry)->collection($collection);
 
-        // Entries with no date are considered private
-        $this->assertTrue($entry->private());
+        $this->assertFalse($entry->private());
 
         $entry->date('2018-01-01');
         $this->assertFalse($entry->private());
@@ -438,7 +437,6 @@ class EntryTest extends TestCase
         $collection = tap(Collection::make('dated')->dated(true)->pastDateBehavior('private'))->save();
         $entry = (new Entry)->collection($collection);
 
-        // Entries with no date are considered private
         $this->assertTrue($entry->private());
 
         $entry->date('2019-01-02');
