@@ -172,7 +172,7 @@ class RouteServiceProvider extends ServiceProvider
         Route::bind('form', function ($handle) {
             throw_unless(
                 $form = Form::find($handle),
-                new NotFoundHttpException("Form [$form] not found.")
+                new NotFoundHttpException("Form [$handle] not found.")
             );
 
             return $form;
