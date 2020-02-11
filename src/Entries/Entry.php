@@ -289,6 +289,9 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
     {
         return $this
             ->fluentlyGetOrSet('date')
+            ->getter(function ($date) {
+                return $date ?? $this->lastModified();
+            })
             ->setter(function ($date) {
                 if ($date === null) {
                     return null;
