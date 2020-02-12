@@ -97,7 +97,7 @@ class UserTags extends Tags
             $data = ['errors' => session('errors')->all()];
         }
 
-        $html = $this->formOpen('login');
+        $html = $this->formOpen(route('statamic.login'));
 
         if ($redirect = $this->getRedirectUrl()) {
             $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
@@ -125,7 +125,7 @@ class UserTags extends Tags
             $data = ['errors' => session('errors')->all()];
         }
 
-        $html = $this->formOpen('register');
+        $html = $this->formOpen(route('statamic.register'));
 
         if ($redirect = $this->getRedirectUrl()) {
             $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
