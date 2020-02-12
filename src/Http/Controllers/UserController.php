@@ -40,14 +40,16 @@ class UserController extends Controller
 
     public function register(Request $request)
     {
-        $request->validate([
-            'email' => 'required|email|unique_user_value',
-            'password' => 'required|confirmed',
-        ]);
-
         $blueprint = Blueprint::find('user');
 
         $fields = $blueprint->fields()->addValues($request->all());
+
+        $fieldRules = $fields->validator()->withRules([
+            'email' => 'required|email|unique_user_value',
+            'password' => 'required|confirmed',
+        ])->rules();
+
+        $request->validate($fieldRules);
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
