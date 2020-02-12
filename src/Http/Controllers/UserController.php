@@ -13,32 +13,21 @@ class UserController extends Controller
 {
     private $request;
 
-    public function login()
+    public function login(Request $request)
     {
-        $validator = \Validator::make(request()->all(), [
-            'username' => 'required',
+        $request->validate([
+            'email' => 'required',
             'password' => 'required'
-        ], [], [
-            'username' => 'username field',
-            'password' => 'password field',
         ]);
 
-        if ($validator->fails()) {
-            return back()->withInput()->withErrors($validator);
-        }
-
-        $logged_in = Auth::attempt(
-            request()->only('username', 'password'),
-            request()->has('remember')
+        $loggedIn = Auth::attempt(
+            $request->only('email', 'password'),
+            $request->has('remember')
         );
 
-        if (! $logged_in) {
-            return back()->withInput()->withErrors('Invalid credentials.');
-        }
-
-        $redirect = request()->input('redirect', '/');
-
-        return redirect($redirect);
+        return $loggedIn
+            ? redirect($request->input('referer', '/'))
+            : back()->withInput()->withErrors(__('Invalid credentials.'));
     }
 
     public function logout()
