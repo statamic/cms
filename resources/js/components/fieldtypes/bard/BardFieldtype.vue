@@ -3,7 +3,7 @@
     <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }">
 
         <editor-menu-bar :editor="editor" v-if="!readOnly">
-            <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar">
+            <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar" v-if="showFixedToolbar">
                 <div class="flex flex-wrap items-center no-select" v-if="toolbarIsFixed">
                     <component
                         v-for="button in visibleButtons(buttons, isActive)"
@@ -31,7 +31,7 @@
             </div>
         </editor-menu-bar>
 
-        <div class="bard-editor" :class="{ 'bg-grey-30 text-grey-70': readOnly }" tabindex="0">
+        <div class="bard-editor" :class="{ 'mode:read-only': readOnly, 'mode:minimal': ! showFixedToolbar }" tabindex="0">
             <editor-menu-bubble :editor="editor" v-if="toolbarIsFloating && !readOnly">
                 <div
                     slot-scope="{ commands, isActive, menu }"
@@ -172,6 +172,10 @@ export default {
 
         toolbarIsFloating() {
             return this.config.toolbar_mode === 'floating';
+        },
+
+        showFixedToolbar() {
+            return this.toolbarIsFixed && (this.allowSource || this.hasExtraButtons)
         },
 
         hasExtraButtons() {
