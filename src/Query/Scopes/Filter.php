@@ -21,7 +21,7 @@ abstract class Filter extends Scope implements Arrayable
         return false;
     }
 
-    public function level1()
+    public function promoted()
     {
         return false;
     }
@@ -70,7 +70,7 @@ abstract class Filter extends Scope implements Arrayable
             'title' => $this->title(),
             'extra' => $this->extra(),
             'required' => $this->required(),
-            'level1' => $this->level1(),
+            'promoted' => $this->promoted(),
             'fields' => $this->fields()->toPublishArray(),
             'meta' => $this->fields()->meta(),
             'values' => $this->fields()->all()->map->defaultValue(),

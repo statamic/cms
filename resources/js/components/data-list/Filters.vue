@@ -1,7 +1,7 @@
 <template>
     <div>
         <data-list-filter
-            v-for="filter in level1Filters"
+            v-for="filter in promotedFilters"
             :key="filter.handle"
             class="mr-1 w-fit-content"
             :filter="filter"
@@ -79,8 +79,8 @@ export default {
     },
 
     computed: {
-        level1Filters() {
-            return this.filters.filter(filter => filter.level1);
+        promotedFilters() {
+            return this.filters.filter(filter => filter.promoted);
         },
 
         standardFilters() {
