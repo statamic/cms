@@ -100,7 +100,7 @@ class UserTags extends Tags
         $html = $this->formOpen(route('statamic.login'));
 
         if ($redirect = $this->getRedirectUrl()) {
-            $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
+            $html .= '<input type="hidden" name="referer" value="'.$redirect.'" />';
         }
 
         $html .= $this->parse($data);
@@ -128,7 +128,7 @@ class UserTags extends Tags
         $html = $this->formOpen(route('statamic.register'));
 
         if ($redirect = $this->getRedirectUrl()) {
-            $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
+            $html .= '<input type="hidden" name="referer" value="'.$redirect.'" />';
         }
 
         $html .= $this->parse($data);
