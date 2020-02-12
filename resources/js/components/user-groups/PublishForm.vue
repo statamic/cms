@@ -1,10 +1,14 @@
 <template>
 
         <div>
-            <div class="flex items-center mb-3">
-                <slot name="heading" :title="initialTitle" />
-                <button type="submit" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</button>
-            </div>
+            <header class="mb-3">
+                <breadcrumb :url="breadcrumbUrl" :title="__('User Groups')" />
+
+                <div class="flex items-center justify-between">
+                    <h1 v-text="initialTitle || __('Create User Group')" />
+                    <button type="submit" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</button>
+                </div>
+            </header>
 
             <div class="card p-0 mb-3 publish-fields">
 
@@ -63,7 +67,8 @@ export default {
         initialRoles: Array,
         initialUsers: Array,
         action: String,
-        method: String
+        method: String,
+        breadcrumbUrl: String
     },
 
     data() {

@@ -2,10 +2,14 @@
 
     <div class="blueprint-builder">
 
-        <div class="flex items-center mb-3">
-            <h1 class="flex-1">{{ initialTitle }}</h1>
-            <button type="submit" class="btn btn-primary" @click.prevent="save" v-text="__('Save')" />
-        </div>
+        <header class="mb-3">
+            <breadcrumb :url="breadcrumbUrl" :title="__('Blueprints')" />
+
+            <div class="flex items-center justify-between">
+                <h1>{{ initialTitle }}</h1>
+                <button type="submit" class="btn btn-primary" @click.prevent="save" v-text="__('Save')" />
+            </div>
+        </header>
 
         <div class="publish-form card p-0">
             <div class="form-group">
@@ -42,7 +46,7 @@ export default {
         Sections,
     },
 
-    props: ['action', 'initialBlueprint'],
+    props: ['action', 'initialBlueprint', 'breadcrumbUrl'],
 
     data() {
         return {

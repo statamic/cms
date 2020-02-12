@@ -1,6 +1,6 @@
 <div class="global-header">
-    <div class="md:w-56 pl-4 h-full flex items-center">
-        <button class="nav-toggle" @click="toggleNav">@svg('burger')</button>
+    <div class="md:w-56 pl-3 h-full flex items-center">
+        <button class="nav-toggle ml-sm" @click="toggleNav">@svg('burger')</button>
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
             <div v-tooltip="version" class="hidden md:block">
                 @svg('statamic-wordmark')
@@ -8,7 +8,7 @@
         </a>
     </div>
 
-    <div class="max-w-xl px-4 w-full mx-auto">
+    <div class="px-4 w-full flex-1 mx-auto @yield('wrapper_class', 'max-w-xl')">
         <global-search endpoint="{{ cp_route('search') }}" placeholder="{{ __('Search...') }}">
         </global-search>
     </div>

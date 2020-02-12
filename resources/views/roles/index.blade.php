@@ -5,12 +5,10 @@
 
     @unless($roles->isEmpty())
 
-        <div class="flex mb-3">
-            <h1 class="flex-1">
-                {{ __('Roles & Permissions') }}
-            </h1>
+        <header class="flex items-center justify-between mb-3">
+            <h1>{{ __('Roles & Permissions') }}</h1>
             <a href="{{ cp_route('roles.create') }}" class="btn btn-primary">{{ __('Create Role') }}</a>
-        </div>
+        </header>
 
         <role-listing
             :initial-rows="{{ json_encode($roles) }}"

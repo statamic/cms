@@ -3,21 +3,25 @@
 
 @section('content')
 
-    <div class="flex mb-3">
-        <h1 class="flex-1">
-            <small class="subhead block">
-                <a href="{{ cp_route('forms.index')}}">{{ __('Forms') }}</a>
-            </small>
-            {{ $form->title() }}
-        </h1>
+    <header class="mb-3">
+        @include('statamic::partials.breadcrumb', [
+            'url' => cp_route('forms.index'),
+            'title' => __('Forms')
+        ])
+        <div class="flex items-center">
+            <h1 class="flex-1">
+                {{ $form->title() }}
+            </h1>
 
-        <a class="btn" href="{{ cp_route('forms.edit', $form->handle()) }}">{{ __('Edit Form') }}</a>
-        <dropdown-list class="ml-2">
-            <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
-            <dropdown-item :text="__('Export as CSV')" redirect="{{ cp_route('forms.export', ['type' => 'csv', 'form' => $form->handle()]) }}?download=true"></dropdown-item>
-            <dropdown-item :text="__('Export as JSON')" redirect="{{ cp_route('forms.export', ['type' => 'json', 'form' => $form->handle()]) }}?download=true"></dropdown-item>
-        </dropdown-list>
-    </div>
+            <a class="btn" href="{{ cp_route('forms.edit', $form->handle()) }}">{{ __('Edit Form') }}</a>
+
+            <dropdown-list class="ml-2">
+                <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
+                <dropdown-item :text="__('Export as CSV')" redirect="{{ cp_route('forms.export', ['type' => 'csv', 'form' => $form->handle()]) }}?download=true"></dropdown-item>
+                <dropdown-item :text="__('Export as JSON')" redirect="{{ cp_route('forms.export', ['type' => 'json', 'form' => $form->handle()]) }}?download=true"></dropdown-item>
+            </dropdown-list>
+        </div>
+    </header>
 
     @if (! empty($form->metrics()))
     <div class="metrics mb-3">

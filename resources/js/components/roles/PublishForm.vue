@@ -1,10 +1,14 @@
 <template>
 
         <div>
-            <div class="flex items-center mb-3">
-                <slot name="heading" :title="initialTitle" />
-                <button type="submit" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</button>
-            </div>
+            <header class="mb-3">
+                <breadcrumb :url="breadcrumbUrl" :title="__('Roles & Permissions')" />
+
+                <div class="flex items-center justify-between">
+                    <h1 v-text="initialTitle || __('Create Role')" />
+                    <button type="submit" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</button>
+                </div>
+            </header>
 
             <div class="card p-0 mb-3 publish-fields">
 
@@ -42,7 +46,7 @@
 
             <div v-if="!isSuper">
                 <div class="mt-3" v-for="group in permissions" :key="group.handle">
-                    <h2 class="mt-4 mb-2 font-bold text-xl">{{ group.label }}</h2>
+                    <h2 class="mt-5 mb-1 font-bold text-lg">{{ group.label }}</h2>
                     <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
                 </div>
             </div>
@@ -67,7 +71,8 @@ export default {
         initialPermissions: Array,
         initialSuper: Boolean,
         action: String,
-        method: String
+        method: String,
+        breadcrumbUrl: String
     },
 
     data() {

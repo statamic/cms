@@ -2,18 +2,18 @@
 @section('title', Statamic::crumb($collection->title(), 'Collections'))
 
 @section('content')
-<h1 class="flex-1 mb-3">
-    <small class="subhead block">
-        <a href="{{ cp_route('collections.index')}}">{{ __('Collections') }}</a>
-        <span class="px-sm">›</span>
-        <a href="{{ cp_route('collections.show', $collection->handle()) }}">{{ $collection->title() }}</a>
-    </small>
-    {{ __('Next Steps') }}
-</h1>
+
+<header class="mb-3">
+    @include('statamic::partials.breadcrumb', [
+        'url' => cp_route('collections.index'),
+        'title' => __('Collections')
+    ])
+    <h1>{{ $collection->title() }}</h1>
+</header>
 
 <div class="card p-0 content">
     <div class="flex flex-wrap">
-        <a href="{{ cp_route('collections.edit', $collection->handle()) }}" class="w-full lg:w-1/2 p-3 border-t lg:border-r md:flex items-start hover:bg-grey-10 group">
+        <a href="{{ cp_route('collections.edit', $collection->handle()) }}" class="w-full lg:w-1/2 p-3 lg:border-r md:flex items-start hover:bg-grey-10 group">
             <div class="h-8 w-8 mr-2 hidden md:block text-grey-80">
                 @svg('hammer-wrench')
             </div>
@@ -22,7 +22,7 @@
                 <p>{{ __('statamic::messages.collection_next_steps_configure_description') }}</p>
             </div>
         </a>
-        <a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site->handle()]) }}" class="w-full lg:w-1/2 p-3 border-t lg:border-r md:flex items-start hover:bg-grey-10 group">
+        <a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site->handle()]) }}" class="w-full lg:w-1/2 p-3 border-t lg:border-none md:flex items-start hover:bg-grey-10 group">
             <div class="h-8 w-8 mr-2 hidden md:block text-grey-80">
                 @svg('content-writing')
             </div>
@@ -40,7 +40,7 @@
                 <p>{{ __('statamic::messages.collection_next_steps_scaffold_description') }}</p>
             </div>
         </a>
-        <a href="{{ Statamic::docsUrl('collections') }}" target="_blank" class="w-full lg:w-1/2 p-3 border-t lg:border-r md:flex items-start hover:bg-grey-10 group">
+        <a href="{{ Statamic::docsUrl('collections') }}" target="_blank" class="w-full lg:w-1/2 p-3 border-t md:flex items-start hover:bg-grey-10 group">
             <div class="h-8 w-8 mr-2 hidden md:block text-grey-80">
                 @svg('book-pages')
             </div>

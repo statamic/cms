@@ -61,6 +61,7 @@ Vue.component('validation-errors', require('../components/ValidationErrors').def
 Vue.component('slugify', require('../components/Slugify.vue').default);
 Vue.component('element-container', require('../components/ElementContainer.vue').default);
 Vue.component('avatar', require('../components/Avatar.vue').default);
+Vue.component('breadcrumb', require('../components/Breadcrumb.vue').default);
 Vue.component('breadcrumbs', require('../components/Breadcrumbs.vue').default);
 Vue.component('create-entry-button', require('../components/entries/CreateEntryButton.vue').default);
 

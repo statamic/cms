@@ -14,10 +14,7 @@
         <div slot-scope="{ setFieldValue, setFieldMeta }" class="mac-w-">
 
             <header class="mb-3">
-                <a :href="url" class="flex p-1 -m-1 items-center text-xs text-grey-70 hover:text-grey-90">
-                    <svg-icon name="chevron-right" class="h-6 rotate-180" />
-                    <span v-text="title" />
-                </a>
+                <breadcrumb :url="url" :title="title" />
                 <h1 class="">{{ __('Configure Collection') }}</h1>
             </header>
 

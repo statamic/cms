@@ -1,9 +1,8 @@
 <template>
 
     <div>
-        <div class="subhead">
-            <a :href="taxonomyUrl" v-text="taxonomyTitle" class="font-bold hover:text-blue" />
-        </div>
+        <breadcrumb :url="taxonomyUrl" :title="taxonomyTitle" />
+
         <div class="flex items-center mb-3">
             <h1 class="flex-1">
                 <div class="flex items-center">

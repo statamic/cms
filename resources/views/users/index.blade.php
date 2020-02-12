@@ -1,9 +1,10 @@
 @extends('statamic::layout')
 @section('title', __('Users'))
+@section('wrapper_class', 'max-w-full')
 
 @section('content')
 
-    <div class="flex mb-3">
+    <header class="flex mb-3">
         <h1 class="flex-1">
             {{ __('Users') }}
         </h1>
@@ -11,7 +12,7 @@
         @can('create', 'Statamic\Contracts\Auth\User')
             <a href="{{ cp_route('users.create') }}" class="btn btn-primary">{{ __('Create User') }}</a>
         @endcan
-    </div>
+    </header>
 
     <user-listing
         listing-key="users"

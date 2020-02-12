@@ -5,8 +5,8 @@
 
     @unless($collections->isEmpty())
 
-        <div class="flex mb-3">
-            <h1 class="flex-1">{{ __('Collections') }}</h1>
+        <div class="flex items-center justify-between mb-3">
+            <h1>{{ __('Collections') }}</h1>
 
             @can('create', 'Statamic\Contracts\Entries\Collection')
                 <a href="{{ cp_route('collections.create') }}" class="btn-primary">{{ __('Create Collection') }}</a>

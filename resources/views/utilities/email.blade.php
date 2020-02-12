@@ -3,14 +3,15 @@
 
 @section('content')
 
-    <h1>
-        <small class="subhead block">
-            <a href="{{ cp_route('utilities.index')}}">{{ __('Utilities') }}</a>
-        </small>
-        {{ __('Email') }}
-    </h1>
+    <header class="mb-3">
+        @include('statamic::partials.breadcrumb', [
+            'url' => cp_route('utilities.index'),
+            'title' => __('Utilities')
+        ])
+        <h1>{{ __('Email') }}</h1>
+    </header>
 
-    <div class="mt-4 p-3 rounded shadow bg-white">
+    <div class="card">
         <form method="POST" action="{{ cp_route('utilities.email') }}">
             @csrf
 
@@ -24,7 +25,7 @@
         </form>
     </div>
 
-    <h2 class="mt-4 mb-1 font-bold text-xl">{{ __('Configuration') }}</h2>
+    <h2 class="mt-5 mb-1 font-bold text-lg">{{ __('Configuration') }}</h2>
     <p class="text-sm text-grey mb-2">{!! __('statamic::messages.email_utility_configuration_description', ['path' => config_path('mail.php')]) !!}</p>
     <div class="card p-0">
         <table class="data-table">

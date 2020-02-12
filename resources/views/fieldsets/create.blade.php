@@ -6,9 +6,13 @@
     <form action="{{ cp_route('fieldsets.store') }}" method="POST">
         @csrf
 
-        <div class="flex mb-3">
+        <header class="mb-3">
+            @include('statamic::partials.breadcrumb', [
+                'url' => cp_route('fieldsets.index'),
+                'title' => __('Fieldsets')
+            ])
             <h1 class="flex-1">{{ __('Create Fieldset') }}</h1>
-        </div>
+        </header>
 
         <div class="card p-0 mb-3">
             <div class="publish-fields">

@@ -5,13 +5,13 @@
 
     @unless($structures->isEmpty())
 
-        <div class="flex mb-3">
-            <h1 class="flex-1">{{ __('Structures') }}</h1>
+        <header class="flex items-center justify-between mb-3">
+            <h1>{{ __('Structures') }}</h1>
 
             @can('create', 'Statamic\Contracts\Structures\Structure')
                 <a href="{{ cp_route('structures.create') }}" class="btn-primary">{{ __('Create Structure') }}</a>
             @endcan
-        </div>
+        </header>
 
         <structure-listing
             :initial-rows="{{ json_encode($structures) }}">

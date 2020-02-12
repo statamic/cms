@@ -5,6 +5,8 @@
 @section('content')
 
     <page-tree
+        title="{{ $structure->title() }}"
+        breadcrumb-url="{{ cp_route('structures.index') }}"
         :initial-pages="{{ json_encode($pages) }}"
         pages-url="{{ cp_route('structures.pages.index', $structure->handle()) }}"
         submit-url="{{ cp_route('structures.pages.store', $structure->handle()) }}"
@@ -20,12 +22,15 @@
         :collection-blueprints="{{ $collectionBlueprints->toJson() }}"
     >
         <template slot="header">
-            <h1 class="flex-1">
-                <small class="subhead block">
-                    <a href="{{ cp_route('structures.index')}}">{{ __('Structures') }}</a>
-                </small>
-                {{ $structure->title() }}
-            </h1>
+            <div>
+                @include('statamic::partials.breadcrumb', [
+                    'url' => cp_route('structures.index'),
+                    'title' => __('Structures')
+                ])
+                <h1 class="flex-1">
+                    {{ $structure->title() }}
+                </h1>
+            </div>
         </template>
 
         <template slot="no-pages-svg">
