@@ -63,7 +63,7 @@ class UserGroupsController extends CpController
         $request->validate([
             'title' => 'required',
             'handle' => 'alpha_dash',
-            'roles' => 'required|array',
+            'roles' => 'array',
         ]);
 
         $group
@@ -89,7 +89,7 @@ class UserGroupsController extends CpController
         $request->validate([
             'title' => 'required',
             'handle' => 'alpha_dash',
-            'roles' => 'required|array',
+            'roles' => 'array',
         ]);
 
         $group = UserGroup::make()
