@@ -39,7 +39,7 @@ class Collection extends Widget
     }
 
     /**
-     * Parse collection sort column and direction, similar to sorting works on collection tag.
+     * Parse sort column and direction, similar to how sorting works on collection tag.
      *
      * @param \Statamic\Entries\Collection $collection
      * @return array
