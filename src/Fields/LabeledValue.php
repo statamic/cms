@@ -2,10 +2,10 @@
 
 namespace Statamic\Fields;
 
-use ArrayAccess;
 use Illuminate\Contracts\Support\Arrayable;
+use JsonSerializable;
 
-class LabeledValue implements Arrayable
+class LabeledValue implements Arrayable, JsonSerializable
 {
     protected $value;
     protected $label;
@@ -38,5 +38,10 @@ class LabeledValue implements Arrayable
             'value' => $this->value,
             'label' => $this->label,
         ];
+    }
+
+    public function jsonSerialize()
+    {
+        return $this->toArray();
     }
 }
