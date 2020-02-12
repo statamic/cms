@@ -1,5 +1,6 @@
 @extends('statamic::layout')
 @section('title', Statamic::crumb('Create Term', $taxonomy['title']))
+@section('wrapper_class', 'max-w-2xl')
 
 @section('content')
     <base-term-create-form

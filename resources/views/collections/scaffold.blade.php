@@ -2,14 +2,13 @@
 @section('title', __('Scaffold Collection'))
 
 @section('content')
-    <h1 class="flex-1 mb-3">
-        <small class="subhead block">
-            <a href="{{ cp_route('collections.index')}}">{{ __('Collections') }}</a>
-            <span class="px-sm">›</span>
-            <a href="{{ cp_route('collections.show', $collection->handle()) }}">{{ $collection->title() }}</a>
-        </small>
-        {{ __('Scaffold Resources') }}
-    </h1>
+    <header class="mb-3">
+        @include('statamic::partials.breadcrumb', [
+            'url' => cp_route('collections.show', $collection->handle()),
+            'title' => $collection->title()
+        ])
+        <h1> {{ __('Scaffold Resources') }}</h1>
+    </header>
 
     <collection-scaffolder
         title="{{ $collection->title() }}"
