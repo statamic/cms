@@ -2,12 +2,13 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\Facades\User;
-use Statamic\Auth\PasswordReset;
-use Statamic\Auth\UserRegistrar;
-use Illuminate\Support\MessageBag;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\MessageBag;
+use Statamic\Auth\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\User;
 
 class UserController extends Controller
 {
@@ -37,35 +38,33 @@ class UserController extends Controller
         return redirect(request()->get('redirect', '/'));
     }
 
-    public function register()
+    public function register(Request $request)
     {
-        $registrar = new UserRegistrar(request());
+        $request->validate([
+            'email' => 'required|email|unique_user_value',
+            'password' => 'required|confirmed',
+        ]);
 
-        $validator = $registrar->validator();
+        $blueprint = Blueprint::find('user');
 
-        if ($validator->fails()) {
-            return back()->withInput()->withErrors($validator);
-        }
+        $fields = $blueprint->fields()->addValues($request->all());
 
-        $user = $registrar->create();
+        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
-        // Allow addons to prevent the submission of the form, return
-        // their own errors, and modify the user.
-        $errors = $this->runRegisteringEvent($user);
+        $user = User::make()
+            ->email($request->email)
+            ->password($request->password)
+            ->data($values);
 
-        if (! $errors->isEmpty()) {
-            return back()->withInput()->withErrors($errors);
-        }
+        // TODO: Registering event
 
         $user->save();
 
-        event('user.registered', $user);
+        // TODO: Registered event
 
         Auth::login($user);
 
-        $redirect = request()->input('redirect', '/');
-
-        return redirect($redirect);
+        return redirect($request->input('referer', '/'));
     }
 
     /**
