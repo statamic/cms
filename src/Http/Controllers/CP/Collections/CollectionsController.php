@@ -204,7 +204,7 @@ class CollectionsController extends CpController
     {
         return Blueprint::makeFromSections([
             'name' => [
-                'display' => __('Collection Name'),
+                'display' => __('Name'),
                 'fields' => [
                     'title' => [
                         'type' => 'text',

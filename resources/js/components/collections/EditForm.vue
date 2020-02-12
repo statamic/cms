@@ -11,24 +11,25 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }">
+        <div slot-scope="{ setFieldValue, setFieldMeta }" class="mac-w-">
 
-            <div class="flex items-center mb-3">
-                <h1 class="flex-1">
-                    <small class="subhead block">
-                        <a :href="listingUrl" v-text="parentTitle" />
-                        <span class="px-sm">›</span>
-                        <a :href="url" v-text="title" />
-                    </small>
-                {{ __('Configure') }}
-                </h1>
-                <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
-            </div>
+            <header class="mb-3">
+                <a :href="url" class="flex p-1 -m-1 items-center text-xs text-grey-70 hover:text-grey-90">
+                    <svg-icon name="chevron-right" class="h-6 rotate-180" />
+                    <span v-text="title" />
+                </a>
+                <h1 class="">{{ __('Configure Collection') }}</h1>
+            </header>
 
             <configure-sections
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
                 :enable-sidebar="false"/>
+
+            <div class="py-2 border-t flex justify-between">
+                <a :href="url" class="btn" v-text="__('Cancel') "/>
+                <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
+            </div>
         </div>
     </publish-container>
 

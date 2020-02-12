@@ -7,7 +7,7 @@ button, .btn, .btn-* {
 
 .btn,
 .btn-default {
-    @include button(#fff, $color_gray_dark);
+    @include button(linear-gradient(180deg,#fff,#f9fafb), $color_gray_dark);
     @apply shadow-button;
 
     &:focus {

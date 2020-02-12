@@ -17,8 +17,4 @@
            .help-block, .help-block p { @apply mb-0; }
            .field-inner { @apply pr-4; }
        }
-
-       .v-select, .input-group {
-           @apply max-w-md;
-       }
    }

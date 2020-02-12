@@ -1,34 +1,29 @@
 <template>
-
     <element-container @resized="containerWidth = $event.width">
-        <!-- do i need this element container? -->
-    <div>
+        <div>
+            <div v-for="section in mainSections" :key="section.handle">
+                <div class="mb-1 content">
+                    <h2 v-text="section.display" class="text-base" />
+                    <p v-html="section.instructions" />
+                </div>
+                <div class="card p-0 mb-5 configure-section">
+                    <publish-fields
+                        :fields="section.fields"
+                        :read-only="readOnly"
+                        :syncable="syncable"
+                        @updated="(handle, value) => $emit('updated', handle, value)"
+                        @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
+                        @synced="$emit('synced', $event)"
+                        @desynced="$emit('desynced', $event)"
+                        @focus="$emit('focus', $event)"
+                        @blur="$emit('blur', $event)"
+                    />
+                </div>
+            </div>
 
-        <div v-for="section in mainSections" :key="section.handle">
-            <div class="mb-2 content">
-                <h2 v-text="section.display" />
-                <p v-html="section.instructions" />
-            </div>
-            <div class="card p-0 mb-6 configure-section">
-                <publish-fields
-                    :fields="section.fields"
-                    :read-only="readOnly"
-                    :syncable="syncable"
-                    @updated="(handle, value) => $emit('updated', handle, value)"
-                    @meta-updated="(handle, value) => $emit('meta-updated', handle, value)"
-                    @synced="$emit('synced', $event)"
-                    @desynced="$emit('desynced', $event)"
-                    @focus="$emit('focus', $event)"
-                    @blur="$emit('blur', $event)"
-                />
-            </div>
+            <portal-target :name="actionsPortal" class="publish-section publish-section-actions-footer" />
         </div>
-
-        <portal-target :name="actionsPortal" class="publish-section publish-section-actions-footer" />
-
-    </div>
     </element-container>
-
 </template>
 
 <script>
