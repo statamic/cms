@@ -26,10 +26,32 @@ class Collection extends Widget
             return;
         }
 
-        $title = $this->config('title', $collection->title());
-        $button = __('New :thing', ['thing' => $collection->entryBlueprint()->title()]);
-        $limit = $this->config('limit', 5);
+        [$sortColumn, $sortDirection] = $this->parseSort($collection);
 
-        return view('statamic::widgets.collection', compact('collection', 'title', 'button', 'limit'));
+        return view('statamic::widgets.collection', [
+            'collection' => $collection,
+            'title' => $this->config('title', $collection->title()),
+            'button' => __('New :thing', ['thing' => $collection->entryBlueprint()->title()]),
+            'limit' => $this->config('limit', 5),
+            'sortColumn' => $sortColumn,
+            'sortDirection' => $sortDirection,
+        ]);
+    }
+
+    /**
+     * Parse collection sort column and direction, similar to sorting works on collection tag.
+     *
+     * @param \Statamic\Entries\Collection $collection
+     * @return array
+     */
+    protected function parseSort($collection)
+    {
+        $default = $collection->dated() ? 'date:desc' : 'title:asc';
+        $sort = $this->config('order_by') ?? $this->config('sort') ?? $default;
+        $exploded = explode(':', $sort);
+        $column = $exploded[0];
+        $direction = $exploded[1] ?? 'asc';
+
+        return [$column, $direction];
     }
 }
