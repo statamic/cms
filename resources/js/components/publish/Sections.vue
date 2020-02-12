@@ -115,7 +115,7 @@ export default {
         },
 
         shouldShowSidebar() {
-            return this.enableSidebar && this.containerWidth > 1000;
+            return this.enableSidebar && this.containerWidth > 920;
         },
 
         errors() {

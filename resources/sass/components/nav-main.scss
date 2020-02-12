@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .nav-main {
-    @apply select-none bg-white shadow h-screen p-2 absolute pin-l overflow-scroll w-full;
+    @apply select-none bg-white shadow h-screen absolute pin-l overflow-scroll w-full;
     transition: all .3s;
     z-index: 9998;
 
@@ -25,7 +25,7 @@
         }
 
         i {
-            @apply block h-6 p-sm w-6 mr-1.5 rounded-full;
+            @apply block h-7 p-sm w-7 mr-1 rounded-full;
         }
     }
 
@@ -38,7 +38,7 @@
     }
 
     li ul {
-        @apply mt-1 mb-2;
+        @apply mb-1;
         margin-left: 1.5rem;
 
         li {
@@ -62,13 +62,16 @@
 
 @screen md {
     .nav-main {
-        @apply flex bg-transparent shadow-none h-full min-h-full pt-5 pl-4 pb-3 overflow-auto w-56 border-r;
+        @apply flex bg-transparent shadow-none h-full min-h-full overflow-auto w-56 border-r;
         z-index: 1;
     }
 }
 
-.nav-main-wrapper {
-    margin-top: -6px;
+.nav-main-inner {
+    @apply pl-3 pb-3 pr-2;
+
+    // Get that perfect alignment with .page-wrapper
+    padding-top: 28px;
 }
 
 .nav-toggle {
@@ -85,12 +88,8 @@
 /* Responsive Wangjangling
   ========================================================================== */
 
-@media (min-height: 720px) {
-    .nav-main-wrapper {
-        position: sticky;
-    }
-}
-
-@media (max-width: 980px) and (min-width: 768px ) {
-    .nav-main .version { display: none; }
-}
+// @media (min-height: 720px) {
+//     .nav-main-wrapper {
+//         position: fixed;
+//     }
+// }

@@ -17,7 +17,7 @@ a {
 
 #main .workspace {
     transition: padding .3s;
-    @apply w-full pt-2;
+    @apply w-full;
 }
 
 @screen md {
@@ -28,7 +28,6 @@ a {
 
     #main .workspace {
         padding-left: 14rem;
-        @apply pt-5;
     }
 
     #main.nav-closed {
@@ -69,7 +68,7 @@ a {
 /* Page Wrapper
   ========================================================================== */
 .page-wrapper {
-    @apply p-1.5 pt-0;
+    @apply p-1.5 pt-4;
 }
 
 @screen md {
