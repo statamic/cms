@@ -91,11 +91,7 @@ class UserTags extends Tags
      */
     public function loginForm()
     {
-        $data = [];
-
-        if (session('errors')) {
-            $data = ['errors' => session('errors')->all()];
-        }
+        $data = $this->setSessionData([]);
 
         $html = $this->formOpen(route('statamic.login'));
 
@@ -119,11 +115,9 @@ class UserTags extends Tags
      */
     public function registerForm()
     {
-        $data = [];
+        $data = $this->setSessionData([]);
 
-        if (session('errors')) {
-            $data = ['errors' => session('errors')->all()];
-        }
+        $data['fields'] = $this->getRegistrationFields();
 
         $html = $this->formOpen(route('statamic.register'));
 
@@ -414,7 +408,7 @@ class UserTags extends Tags
      *
      * @return string
      */
-    private function getRedirectUrl()
+    protected function getRedirectUrl()
     {
         $return = $this->get('redirect');
 
@@ -423,5 +417,24 @@ class UserTags extends Tags
         }
 
         return $return;
+    }
+
+    /**
+     * Set session data.
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function setSessionData($data)
+    {
+        if ($errors = session('errors')) {
+            $data['errors'] = $errors->all();
+        }
+
+        if ($success = session('success')) {
+            $data['success'] = $success;
+        }
+
+        return $data;
     }
 }
