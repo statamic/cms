@@ -63,7 +63,7 @@
                 >
                     <dropdown-list ref="setSelectorDropdown">
                         <template v-slot:trigger>
-                            <button type="button" class="btn btn-round">
+                            <button type="button" class="btn-round">
                                 <span class="icon icon-plus text-grey-80 antialiased"></span>
                             </button>
                         </template>

@@ -109,15 +109,26 @@
 /* Shape Variations
   ========================================================================== */
 
-.btn.round {
+.btn-round {
+    @apply rounded-full flex items-center text-center p-0;
+    background: linear-gradient(180deg, #fff, #f9fafb);
+    border: 1px solid #c4cdd6;
+    box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
+    height: 32px;
     width: 32px;
-}
 
-.btn-circle {
-    svg path, svg circle {
-        fill: #2d393c;
+    &:hover:not(:disabled), &:active:not(:disabled) {
+        background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+        border-color: #c4cdd5;
+    }
+
+    span {
+        font-size: 18px;
+        line-height: 32px;
+        width: 32px;
     }
 }
+
 
 /* Button Group
   ========================================================================== */
@@ -127,7 +138,7 @@
     height: 38px;
 
     button {
-        @apply text-grey-80 bg-grey-30 flex items-center h-full;
+        @apply text-grey-80 bg-grey-30 flex items-center h-full px-2 rounded;
 
         &:hover, &.active, &:focus {
             @apply bg-grey-40 text-grey-80;
@@ -162,24 +173,11 @@
     color: #fff;
 }
 
-.btn-round {
-    height: 32px;
-    width: 32px;
-    border-radius: 9999px;
-    display: flex;
-    align-items: center;
-    text-align: center;
-    padding: 0;
-    span {
-        font-size: 18px;
-        line-height: 34px;
-        width: 32px;
-    }
-}
 
 .btn-icon-small,
 td .btn-icon {
     @extend .btn-icon;
+
     height: 24px;
     line-height: 24px;
     padding: 1px 5px;
@@ -193,6 +191,7 @@ td .btn-icon {
 
 .btn-with-icon {
     @apply .flex .items-center;
+
     svg {
         margin: 0 8px 0 -4px;
         height: 16px;
@@ -203,6 +202,7 @@ td .btn-icon {
 
 .btn-icon-only {
     @apply .flex .items-center;
+
     padding: 0 12px;
     svg {
         margin: 0;
@@ -283,9 +283,11 @@ td .btn-icon {
     line-height: 32px;
     flex-shrink: 0;
     outline: none;
+
     &:hover {
         background: rgba(0,0,0,.05);
     }
+
     &:active, &:focus:hover {
         outline: none;
         background: rgba(0,0,0,.075);
