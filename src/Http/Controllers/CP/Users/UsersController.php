@@ -145,10 +145,8 @@ class UsersController extends CpController
         ];
     }
 
-    public function edit(Request $request, $id)
+    public function edit(Request $request, $user)
     {
-        $user = User::find($id);
-
         $this->authorize('edit', $user);
 
         $blueprint = $user->blueprint();
