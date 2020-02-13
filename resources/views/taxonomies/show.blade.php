@@ -13,8 +13,19 @@
             <h1 class="flex-1">{{ $taxonomy->title() }}</h1>
 
             <dropdown-list class="mr-1">
-                <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
-                <dropdown-item :text="__('Delete Taxonomy')" class="warning"></dropdown-item>
+                @can('edit', $taxonomy)
+                    <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
+                @endcan
+                @can('delete', $taxonomy)
+                    <dropdown-item :text="__('Delete Taxonomy')" class="warning" @click="$refs.deleter.confirm()">
+                        <resource-deleter
+                            ref="deleter"
+                            resource-title="{{ $taxonomy->title() }}"
+                            route="{{ cp_route('taxonomies.destroy', $taxonomy->handle()) }}"
+                            redirect="{{ cp_route('taxonomies.index') }}"
+                        ></resource-deleter>
+                    </dropdown-item>
+                @endcan
             </dropdown-list>
 
             @can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
