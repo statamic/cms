@@ -14,6 +14,7 @@ class Text extends Fieldtype
         ],
         'html_type' => [
             'type' => 'select',
+            'default' => 'text',
             'instructions' => 'Set the HTML5 input type',
             'width' => 50,
             'options' => [
