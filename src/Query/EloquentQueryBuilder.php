@@ -20,9 +20,11 @@ abstract class EloquentQueryBuilder
         return $this;
     }
 
-    public function get()
+    public function get($columns = ['*'])
     {
-        return $this->transform($this->builder->get());
+        $items = $this->builder->get($this->selectableColumns($columns));
+
+        return $this->transform($items, $columns);
     }
 
     public function first()
@@ -30,12 +32,12 @@ abstract class EloquentQueryBuilder
         return $this->get()->first();
     }
 
-    public function paginate()
+    public function paginate($perPage, $columns = ['*'])
     {
-        $paginator = $this->builder->paginate();
+        $paginator = $this->builder->paginate($perPage, $this->selectableColumns($columns));
 
         return $paginator->setCollection(
-            $this->transform($paginator->getCollection())
+            $this->transform($paginator->getCollection(), $columns)
         );
     }
 
@@ -63,5 +65,20 @@ abstract class EloquentQueryBuilder
         return $column;
     }
 
-    abstract protected function transform($items);
+    abstract protected function transform($items, $columns = ['*']);
+
+    protected function selectableColumns($columns = ['*'])
+    {
+        if (! in_array('*', $columns)) {
+            // Any requested columns that aren't actually columns should just be
+            // ignored. In actual Laravel Query Builder, you'd get a database
+            // exception. Stripping out invalid columns is fine here. They
+            // will still be sent through and used for augmentation.
+            $model = $this->builder->getModel();
+            $schema = $model->getConnection()->getSchemaBuilder()->getColumnListing($model->getTable());
+            $selected = array_intersect($schema, $columns);
+        }
+
+        return empty($selected) ? ['*'] : $selected;
+    }
 }

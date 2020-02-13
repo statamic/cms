@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\LabeledValue;
+use Statamic\Support\Arr;
 
 class Select extends Fieldtype
 {
@@ -52,13 +53,17 @@ class Select extends Fieldtype
         ]
     ];
 
+    protected $indexComponent = 'tags';
+
     public function preProcessIndex($value)
     {
         if (! $value) {
-            return null;
+            return [];
         }
 
-        return array_get($this->field->get('options'), $value, $value);
+        return collect(Arr::wrap($value))->map(function ($value) {
+            return array_get($this->field->get('options'), $value, $value);
+        })->all();
     }
 
     public function augment($value)

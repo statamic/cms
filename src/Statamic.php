@@ -34,6 +34,7 @@ class Statamic
         Authorize::class,
         LocalizeCp::class,
     ];
+    protected static $shallowAugmentation = false;
 
     public static function version()
     {
@@ -69,66 +70,107 @@ class Statamic
         return static::$styles;
     }
 
-   public static function style($name, $path)
-   {
-       static::$styles[$name] = str_finish($path, '.css');
+    public static function style($name, $path)
+    {
+        static::$styles[$name] = str_finish($path, '.css');
 
-       return new static;
-   }
+        return new static;
+    }
 
-   public static function pushWebRoutes(Closure $routes)
-   {
+    public static function pushWebRoutes(Closure $routes)
+    {
         static::$webRoutes[] = $routes;
 
         return new static;
-   }
+    }
 
-   public static function pushCpRoutes(Closure $routes)
-   {
+    public static function pushCpRoutes(Closure $routes)
+    {
         static::$cpRoutes[] = $routes;
 
         return new static;
-   }
+    }
 
-   public static function pushActionRoutes(Closure $routes)
-   {
+    public static function pushActionRoutes(Closure $routes)
+    {
         static::$actionRoutes[] = $routes;
 
         return new static;
-   }
+    }
 
-   public static function additionalCpRoutes()
-   {
+    public static function additionalCpRoutes()
+    {
         foreach (static::$cpRoutes as $routes) {
             $routes();
         }
-   }
+    }
 
-   public static function additionalWebRoutes()
-   {
+    public static function additionalWebRoutes()
+    {
         foreach (static::$webRoutes as $routes) {
             $routes();
         }
-   }
+    }
 
-   public static function additionalActionRoutes()
-   {
+    public static function additionalActionRoutes()
+    {
         foreach (static::$actionRoutes as $routes) {
             $routes();
         }
-   }
+    }
 
-   public static function isCpRoute()
-   {
-       if (! config('statamic.cp.enabled')) {
-           return false;
-       }
+    public static function isCpRoute()
+    {
+        if (! config('statamic.cp.enabled')) {
+            return false;
+        }
 
         return starts_with(request()->path(), config('statamic.cp.route'));
-   }
+    }
 
-   public static function isAmpRequest()
-   {
+    public static function cpRoute($route, $params = [])
+    {
+        if (! config('statamic.cp.enabled')) {
+            return null;
+        }
+
+        $route = route('statamic.cp.' . $route, $params);
+
+        // TODO: This is a temporary workaround to routes like
+        // `route('assets.browse.edit', 'some/image.jpg')` outputting two slashes.
+        // Can it be fixed with route regex, or is it a laravel bug?
+        $route = preg_replace('/(?<!:)\/\//', '/', $route);
+
+        return $route;
+    }
+
+    public static function isApiRoute()
+    {
+        if (! config('statamic.api.enabled')) {
+            return false;
+        }
+
+        return starts_with(request()->path(), config('statamic.api.route'));
+    }
+
+    public static function apiRoute($route, $params = [])
+    {
+        if (! config('statamic.api.enabled')) {
+            return null;
+        }
+
+        $route = route('statamic.api.' . $route, $params);
+
+        // TODO: This is a temporary workaround to routes like
+        // `route('assets.browse.edit', 'some/image.jpg')` outputting two slashes.
+        // Can it be fixed with route regex, or is it a laravel bug?
+        $route = preg_replace('/(?<!:)\/\//', '/', $route);
+
+        return $route;
+    }
+
+    public static function isAmpRequest()
+    {
         if (! config('statamic.amp.enabled')) {
             return false;
         }
@@ -138,7 +180,7 @@ class Statamic
         );
 
         return starts_with($url, '/' . config('statamic.amp.route'));
-   }
+    }
 
     public static function jsonVariables(Request $request)
     {
@@ -218,5 +260,20 @@ class Statamic
     public static function docsUrl($url)
     {
         return URL::tidy('https://statamic.dev/' . $url);
+    }
+
+    public static function enableShallowAugmentation()
+    {
+        static::$shallowAugmentation = true;
+    }
+
+    public static function disableShallowAugmentation()
+    {
+        static::$shallowAugmentation = false;
+    }
+
+    public static function shallowAugmentationEnabled()
+    {
+        return static::$shallowAugmentation;
     }
 }

@@ -25,7 +25,7 @@ class AssetContainerPolicy
 
     public function create($user)
     {
-        return User::fromUser($user)->hasPermission('configure asset containers');
+        // handled by before()
     }
 
     public function view($user, $container)
@@ -35,11 +35,16 @@ class AssetContainerPolicy
 
     public function edit($user, $container)
     {
-        // handled by 'before'
+        // handled by before()
     }
 
     public function update($user, $container)
     {
-        return $this->edit($user, $container);
+        // handled by before()
+    }
+
+    public function delete($user, $container)
+    {
+        // handled by before()
     }
 }

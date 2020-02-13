@@ -14,7 +14,9 @@
         :multiple="config.multiple"
         :reset-on-options-change="resetOnOptionsChange"
         :close-on-select="!config.taggable"
-        :value="value" />
+        :value="value"
+        @search:focus="$emit('focus')"
+        @search:blur="$emit('blur')" />
 </template>
 
 <script>

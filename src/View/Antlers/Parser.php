@@ -989,10 +989,6 @@ class Parser
             }
         }
 
-        if ($value instanceof Collection && $value->isEmpty()) {
-            $value = false;
-        }
-
         if ($value === '__processConditionVar__') {
             return $this->inCondition ? $var : 'null';
         }
@@ -1022,10 +1018,14 @@ class Parser
     {
         if ($value instanceof Builder) {
             return $value->count();
-        } elseif (is_object($value) and is_callable(array($value, '__toString'))) {
-            return var_export((string)$value, true);
+        } elseif ($value instanceof Collection) {
+            return $value->isEmpty() ? 'false' : 'true';
         } elseif (is_array($value)) {
             return !empty($value) ? "true" : "false";
+        } elseif (is_object($value) and is_callable(array($value, '__toString'))) {
+            return var_export((string)$value, true);
+        } elseif (is_object($value)) {
+            return 'true';
         } else {
             return var_export($value, true);
         }

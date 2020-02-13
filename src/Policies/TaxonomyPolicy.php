@@ -31,9 +31,7 @@ class TaxonomyPolicy
 
     public function create($user)
     {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission('configure taxonomies');
+        // handled by before()
     }
 
     public function store($user)
@@ -50,21 +48,17 @@ class TaxonomyPolicy
 
     public function edit($user, $taxonomy)
     {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission('configure taxonomies');
+        // handled by before()
     }
 
     public function update($user, $taxonomy)
     {
-        return $this->edit($user, $taxonomy);
+        // handled by before()
     }
 
     public function delete($user, $taxonomy)
     {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission('configure taxonomies');
+        // handled by before()
     }
 
     public function reorder($user, $taxonomy)

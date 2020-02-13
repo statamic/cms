@@ -2,18 +2,24 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Statamic\Facades\Form;
 use Illuminate\Http\Request;
-use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Http\Resources\CollectionResource;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Site;
+use Statamic\Http\Resources\API\GlobalSetResource;
 
-class GlobalsController extends CpController
+class GlobalsController extends ApiController
 {
-    use TemporaryResourcePagination;
-
     public function index(Request $request)
     {
-        // TODO: Need to think this one through more.
-        return [];
+        $site = Site::default()->handle();
+
+        return app(GlobalSetResource::class)::collection(
+            GlobalSet::all()->map->in($site)
+        );
+    }
+
+    public function show($globalSet)
+    {
+        return app(GlobalSetResource::class)::make($globalSet);
     }
 }

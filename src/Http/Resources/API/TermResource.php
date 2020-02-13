@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Http\Resources;
+namespace Statamic\Http\Resources\API;
 
 use Illuminate\Http\Resources\Json\Resource;
 
-class EntryResource extends Resource
+class TermResource extends Resource
 {
     /**
      * Transform the resource into an array.
@@ -14,8 +14,8 @@ class EntryResource extends Resource
      */
     public function toArray($request)
     {
-        return [
-            'title' => $this->resource->get('title'),
-        ];
+        return array_merge($this->resource->toAugmentedArray(), [
+            'api_url' => $this->resource->apiUrl(),
+        ]);
     }
 }

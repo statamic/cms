@@ -18,7 +18,6 @@
                         >
                             <resource-deleter
                                 :ref="`deleter_${blueprint.id}`"
-                                :resource-type="__('Blueprint')"
                                 :resource="blueprint"
                                 @deleted="removeRow(blueprint)">
                             </resource-deleter>

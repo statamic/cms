@@ -8,7 +8,9 @@ use Statamic\Facades\Content;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Http\Responses\DataResponse;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\View\View;
 
 /**
@@ -52,11 +54,16 @@ class FrontendController extends Controller
 
         $this->addViewPaths();
 
-        return (new View)
+        $contents = (new View)
             ->template($view)
-            ->layout($data['layout'] ?? 'layout')
+            ->layout(Arr::get($data, 'layout', 'layout'))
             ->with($data)
-            ->cascadeContent($this->getLoadedRouteItem($data));
+            ->cascadeContent($this->getLoadedRouteItem($data))
+            ->render();
+
+        return response($contents, 200, [
+            'Content-Type' => DataResponse::contentType($data['content_type'] ?? 'html')
+        ]);
     }
 
     protected function addViewPaths()

@@ -18,7 +18,6 @@
                         >
                             <resource-deleter
                                 :ref="`deleter_${role.id}`"
-                                :resource-type="__('Role')"
                                 :resource="role"
                                 @deleted="removeRow(role)">
                             </resource-deleter>
@@ -39,12 +38,13 @@ export default {
 
     props: [
         'initialRows',
-        'columns',
+        'initialColumns',
     ],
 
     data() {
         return {
             rows: this.initialRows,
+            columns: this.initialColumns
         }
     }
 

@@ -2,19 +2,20 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Statamic\Facades\Asset;
 use Illuminate\Http\Request;
-use Statamic\Http\Resources\AssetResource;
-use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\API\AssetResource;
 
-class AssetsController extends CpController
+class AssetsController extends ApiController
 {
-    use TemporaryResourcePagination;
-
-    public function index(Request $request)
+    public function index($assetContainer, Request $request)
     {
-        $assets = static::paginate(Asset::all());
+        return app(AssetResource::class)::collection(
+            $this->filterSortAndPaginate($assetContainer->queryAssets())
+        );
+    }
 
-        return AssetResource::collection($assets);
+    public function show($assetContainer, $asset)
+    {
+        return app(AssetResource::class)::make($asset);
     }
 }

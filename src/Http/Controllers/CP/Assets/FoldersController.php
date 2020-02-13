@@ -12,8 +12,6 @@ class FoldersController extends CpController
 {
     public function store(Request $request, $container)
     {
-        $container = AssetContainer::find($container);
-
         abort_unless($container->createFolders(), 403);
 
         $request->validate([
@@ -36,8 +34,6 @@ class FoldersController extends CpController
 
     public function update(Request $request, $container, $folder)
     {
-        $container = AssetContainer::find($container);
-
         return $container->assetFolder($folder)->save();
     }
 }

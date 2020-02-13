@@ -17,7 +17,6 @@
                         >
                             <resource-deleter
                                 :ref="`deleter_${collection.id}`"
-                                :resource-type="__('Collection')"
                                 :resource="collection"
                                 @deleted="removeRow(collection)">
                             </resource-deleter>
@@ -38,12 +37,13 @@ export default {
 
     props: [
         'initial-rows',
-        'columns',
+        'initial-columns',
     ],
 
     data() {
         return {
-            rows: this.initialRows
+            rows: this.initialRows,
+            columns: this.initialColumns
         }
     }
 

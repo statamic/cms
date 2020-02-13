@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Http\Resources;
+namespace Statamic\Http\Resources\API;
 
 use Illuminate\Http\Resources\Json\Resource;
 
@@ -14,8 +14,8 @@ class AssetResource extends Resource
      */
     public function toArray($request)
     {
-        return [
-            'id' => $this->resource->id(),
-        ];
+        return array_merge($this->resource->toAugmentedArray(), [
+            'api_url' => $this->resource->apiUrl(),
+        ]);
     }
 }

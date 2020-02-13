@@ -65,7 +65,7 @@ class JavascriptComposer
             return [];
         }
 
-        return array_merge($user->augmentedArrayData(), [
+        return array_merge($user->toAugmentedArray(), [
             'preferences' => Preference::all(),
             'permissions' => $user->permissions()->all(),
         ]);

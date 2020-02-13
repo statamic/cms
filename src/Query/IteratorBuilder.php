@@ -16,7 +16,7 @@ abstract class IteratorBuilder extends Builder
         return $this->getFilteredItems()->count();
     }
 
-    public function get()
+    public function get($columns = ['*'])
     {
         $items = $this->getFilteredItems();
 

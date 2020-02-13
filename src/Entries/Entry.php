@@ -4,6 +4,7 @@ namespace Statamic\Entries;
 
 use ArrayAccess;
 use Statamic\Facades;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -12,7 +13,6 @@ use Statamic\Facades\Blueprint;
 use Statamic\Routing\Routable;
 use Statamic\Facades\Collection;
 use Illuminate\Support\Carbon;
-use Statamic\Data\Augmentable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Revisions\Revisable;
@@ -22,18 +22,20 @@ use Statamic\Events\Data\EntrySaving;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Entries\Entry as Contract;
-use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasOrigin;
 use Statamic\Contracts\Data\Localization;
+use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
+use Statamic\Data\TracksQueriedColumns;
 
-class Entry implements Contract, AugmentableContract, Responsable, Localization, ArrayAccess
+class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAccess
 {
     use Routable {
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, Augmentable, FluentlyGetsAndSets, Revisable, Publishable;
+    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns;
 
     use HasOrigin {
         value as originValue;
@@ -97,25 +99,9 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
         return $this->collection;
     }
 
-    public function augmentedArrayData()
+    public function newAugmentedInstance()
     {
-        return $this->values()->merge([
-            'id' => $this->id(),
-            'slug' => $this->slug(),
-            'uri' => $this->uri(),
-            'url' => $this->url(),
-            'edit_url' => $this->editUrl(),
-            'permalink' => $this->absoluteUrl(),
-            'amp_url' => $this->ampUrl(),
-            'published' => $this->published(),
-            'private' => $this->private(),
-            'date' => $this->date(),
-            'is_entry' => true,
-            'collection' => $this->collectionHandle(),
-            'last_modified' => $lastModified = $this->lastModified(),
-            'updated_at' => $lastModified,
-            'updated_by' => optional($this->lastModifiedBy())->toAugmentedArray(),
-        ])->merge($this->supplements)->all();
+        return new AugmentedEntry($this);
     }
 
     public function toCacheableArray()
@@ -183,7 +169,16 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
 
     protected function cpUrl($route)
     {
-        return cp_route($route, [$this->collectionHandle(), $this->id(), $this->slug()]);
+        if (! $id = $this->id()) {
+            return null;
+        }
+
+        return cp_route($route, [$this->collectionHandle(), $id, $this->slug()]);
+    }
+
+    public function apiUrl()
+    {
+        return Statamic::apiRoute('collections.entries.show', [$this->collectionHandle(), $this->id()]);
     }
 
     public function reference()
@@ -492,7 +487,11 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
             return null;
         }
 
-        return $this->structure()->in($this->locale())->page($this->id())->parent();
+        if (! $id = $this->id()) {
+            return null;
+        }
+
+        return $this->structure()->in($this->locale())->page($id)->parent();
     }
 
     public function route()
@@ -577,5 +576,10 @@ class Entry implements Contract, AugmentableContract, Responsable, Localization,
     public function values()
     {
         return $this->collection()->cascade()->merge($this->originValues());
+    }
+
+    public function defaultAugmentedArrayKeys()
+    {
+        return $this->selectedQueryColumns;
     }
 }

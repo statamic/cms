@@ -16,7 +16,6 @@
                         >
                             <resource-deleter
                                 :ref="`deleter_${taxonomy.id}`"
-                                :resource-type="__('Taxonomy')"
                                 :resource="taxonomy"
                                 @deleted="removeRow(taxonomy)">
                             </resource-deleter>
@@ -37,12 +36,13 @@ export default {
 
     props: [
         'initial-rows',
-        'columns',
+        'initial-columns',
     ],
 
     data() {
         return {
-            rows: this.initialRows
+            rows: this.initialRows,
+            columns: this.initialColumns
         }
     }
 

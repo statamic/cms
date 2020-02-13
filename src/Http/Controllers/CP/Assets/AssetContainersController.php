@@ -25,7 +25,9 @@ class AssetContainersController extends CpController
                 'allow_uploads' => $container->allowUploads(),
                 'create_folders' => $container->createFolders(),
                 'edit_url' => $container->editUrl(),
-                'delete_url' => $container->deleteUrl()
+                'delete_url' => $container->deleteUrl(),
+                'can_edit' => User::current()->can('edit', $container),
+                'can_delete' => User::current()->can('delete', $container),
             ];
         })->values();
 
@@ -42,8 +44,6 @@ class AssetContainersController extends CpController
 
     public function edit($container)
     {
-        $container = AssetContainer::find($container);
-
         $this->authorize('edit', $container, 'You are not authorized to edit asset containers.');
 
         $values = $container->toArray();
@@ -63,8 +63,6 @@ class AssetContainersController extends CpController
 
     public function update(Request $request, $container)
     {
-        $container = AssetContainer::find($container);
-
         $this->authorize('update', $container, 'You are not authorized to edit asset containers.');
 
         $fields = $this->formBlueprint()->fields()->addValues($request->all());
@@ -137,15 +135,13 @@ class AssetContainersController extends CpController
 
     public function destroy($container)
     {
-        $container = AssetContainer::find($container);
-
-        // TODO: auth
+        $this->authorize('delete', $container, 'You are not authorized to delete asset containers.');
 
         $container->delete();
 
         return [
             'message' => 'Container deleted',
-            'redirect' => cp_route('asset-containers.index')
+            'redirect' => cp_route('assets.index')
         ];
     }
 

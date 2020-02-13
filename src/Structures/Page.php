@@ -5,16 +5,16 @@ namespace Statamic\Structures;
 use Statamic\Facades\URL;
 use Statamic\Facades\Site;
 use Statamic\Facades\Collection;
-use Statamic\Data\Augmentable;
 use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Illuminate\Contracts\Support\Responsable;
-use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Data\HasAugmentedInstance;
 
-class Page implements Entry, AugmentableContract, Responsable
+class Page implements Entry, Augmentable, Responsable
 {
-    use Augmentable;
+    use HasAugmentedInstance;
 
     protected $tree;
     protected $reference;
@@ -229,18 +229,9 @@ class Page implements Entry, AugmentableContract, Responsable
         return $this->pages()->flattenedPages();
     }
 
-    // TODO: tests for these
-
-    public function augmentedArrayData()
+    public function newAugmentedInstance()
     {
-        $array = $this->reference && $this->referenceExists() ? $this->entry()->augmentedArrayData() : [];
-
-        return array_merge($array, [
-            'title' => $this->title(),
-            'url' => $this->url(),
-            'uri' => $this->uri(),
-            'permalink' => $this->absoluteUrl(),
-        ]);
+        return new AugmentedPage($this);
     }
 
     public function editUrl()

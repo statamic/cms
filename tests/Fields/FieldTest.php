@@ -4,6 +4,7 @@ namespace Tests\Fields;
 
 use Tests\TestCase;
 use Statamic\Fields\Field;
+use Statamic\Fields\Value;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Illuminate\Support\Collection;
@@ -466,19 +467,26 @@ class FieldTest extends TestCase
     /** @test */
     function it_augments_the_value_through_its_fieldtype()
     {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($data) {
+                return $data . ' augmented';
+            }
+        };
+
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
-            ->andReturn(new class extends Fieldtype {
-                public function augment($data) {
-                    return $data . ' augmented';
-                }
-            });
+            ->andReturn($fieldtype);
 
         $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
 
         $augmented = $field->augment();
 
         $this->assertNotSame($field, $augmented);
-        $this->assertEquals('foo augmented', $augmented->value());
+        $value = $augmented->value();
+        $this->assertInstanceOf(Value::class, $value);
+        $this->assertEquals($fieldtype, $value->fieldtype());
+        $this->assertEquals('test', $value->handle());
+        $this->assertEquals('foo', $value->raw());
+        $this->assertEquals('foo augmented', $value->value());
     }
 }

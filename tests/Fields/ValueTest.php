@@ -81,7 +81,7 @@ class ValueTest extends TestCase
 
 class DummyAugmentable implements \Statamic\Contracts\Data\Augmentable
 {
-    use \Statamic\Data\Augmentable;
+    use \Statamic\Data\HasAugmentedData;
 
     public function __construct($id)
     {
