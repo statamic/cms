@@ -14,7 +14,7 @@
 
         <role-listing
             :initial-rows="{{ json_encode($roles) }}"
-            :columns="{{ json_encode($columns) }}">
+            :initial-columns="{{ json_encode($columns) }}">
         </role-listing>
 
     @else
