@@ -21,7 +21,7 @@ class PageTest extends TestCase
     function it_gets_and_sets_the_entry()
     {
         $page = new Page;
-        $entry = new Entry;
+        $entry = (new Entry)->id('123');
         $this->assertNull($page->entry());
 
         $return = $page->setEntry($entry);
@@ -134,7 +134,7 @@ class PageTest extends TestCase
 
         $page = (new Page)
             ->setTree($tree)
-            ->setEntry(new Entry)
+            ->setEntry((new Entry)->id('123'))
             ->setRoute('')
             ->setChildren([
                 ['entry' => 'one'],
