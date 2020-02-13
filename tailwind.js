@@ -22,6 +22,12 @@ var colors = {
     'blue':             'hsl(200, 80%, 50%)',
     'blue-dark':        'hsl(200, 75%, 45%)', //#4990bb
     'blue-darker':      'hsl(200, 75%, 40%)',
+    'blue-300':         '#6dbcff',
+    'blue-400':         '#43a9ff',
+    'blue-500':         '#2e9fff',
+    'blue-600':         '#298fe6',
+    'blue-700':         '#257fcc',
+    'blue-800':         '#206fb3',
     'red-dark':         'hsl(2, 57%, 53%)',
     'red':              'hsl(2, 76%, 60%)',
     'red-light':        'hsl(2, 76%, 70%)',
