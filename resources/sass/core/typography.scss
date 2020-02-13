@@ -40,7 +40,7 @@ h6 {
     @apply text-3xs font-bold uppercase tracking-wide;
 }
 
-a {
+a:not([class*="btn"]) {
     @apply .text-grey-80 .cursor-pointer;
 
     &:hover {
