@@ -11,9 +11,6 @@ button, .btn, [class*="btn"] {
     height: 2.375rem; // 38px
     letter-spacing: -0.01em;
     padding: .475rem 1.25rem;
-    transition-property: background, border, box-shadow;
-    transition-timing-function: cubic-bezier(0.64, 0, 0.35, 1);
-    transition-duration: 200ms;
 
     &:focus {
         @apply focus-outline;
@@ -31,7 +28,7 @@ button, .btn, [class*="btn"] {
 
     background: linear-gradient(180deg, #fff, #f9fafb);
     border: 1px solid #c4cdd6;
-    box-shadow: 0 1px 0 0 rgba(22,29,37,.05);
+    box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
 
     &:hover:not(:disabled), &:active:not(:disabled) {
         background: linear-gradient(180deg, #f9fafb, #f4f6f8);
@@ -44,12 +41,12 @@ button, .btn, [class*="btn"] {
     @apply text-white;
     background: linear-gradient(to bottom, config('colors.blue-500'), config('colors.blue-600'));
     border: 1px solid config('colors.blue-700');
-    box-shadow: inset 0 1px 0 0 config('colors.blue-400'), 0 1px 0 0 rgba(22,29,37,.05), 0 0 0 0 transparent;
+    box-shadow: inset 0 1px 0 0 config('colors.blue-400'), 0 1px 0 0 rgba(25,30,35,.05), 0 0 0 0 transparent;
 
     &:hover:not(:disabled), :active:not(:disabled) {
         background: linear-gradient(to bottom, config('colors.blue-600'), config('colors.blue-700'));
         border: 1px solid #config('colors.blue-800');
-        box-shadow: inset 0 1px 0 0 config('colors.blue-500'), 0 1px 0 0 rgba(22,29,37,.05), 0 0 0 0 transparent;
+        box-shadow: inset 0 1px 0 0 config('colors.blue-500'), 0 1px 0 0 rgba(25,30,35,.05), 0 0 0 0 transparent;
     }
 }
 
@@ -57,7 +54,7 @@ button, .btn, [class*="btn"] {
 .btn-danger {
     background: linear-gradient(180deg, #e53e3e, #c53030);
     border: 1px solid #9b2c2c;
-    box-shadow: inset 0 1px 0 0 #f56565, 0 1px 0 0 rgba(22,29,37,.05), 0 0 0 0 transparent;
+    box-shadow: inset 0 1px 0 0 #f56565, 0 1px 0 0 rgba(25,30,35,.05), 0 0 0 0 transparent;
     color: white;
 
     &:hover:not(:disabled), &:active:not(:disabled) {
