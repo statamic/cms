@@ -201,7 +201,7 @@ class Tags extends BaseTags
     {
         return Form::find($this->getForm())->fields()
             ->map(function ($field) {
-                return $this->getField($field);
+                return $this->getRenderableField($field);
             })
             ->values()
             ->all();
@@ -213,7 +213,7 @@ class Tags extends BaseTags
      * @param \Statamic\Fields\Field $field
      * @return array
      */
-    protected function getField($field)
+    protected function getRenderableField($field)
     {
         $errors = $this->hasErrors() ? $this->getErrors() : [];
 
