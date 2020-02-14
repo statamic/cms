@@ -10,7 +10,7 @@
         </h1>
 
         @can('create', 'Statamic\Contracts\Auth\User')
-            <a href="{{ cp_route('users.create') }}" class="btn btn-primary">{{ __('Create User') }}</a>
+            <a href="{{ cp_route('users.create') }}" class="btn-primary">{{ __('Create User') }}</a>
         @endcan
     </header>
 

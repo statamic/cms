@@ -6,7 +6,7 @@
             <breadcrumb :url="breadcrumbUrl" :title="__('Fieldsets')" />
             <div class="flex items-center justify-between">
                 <h1>{{ initialTitle }}</h1>
-                <button type="submit" class="btn btn-primary" @click.prevent="save" v-text="__('Save')" />
+                <button type="submit" class="btn-primary" @click.prevent="save" v-text="__('Save')" />
             </div>
         </header>
 

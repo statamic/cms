@@ -27,7 +27,7 @@
 
             <div class="px-3 pb-3">
                 <button
-                    class="btn btn-primary"
+                    class="btn-primary"
                     @click.prevent="submit"
                     v-text="buttonText"
                 />

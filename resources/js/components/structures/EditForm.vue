@@ -18,7 +18,7 @@
                     <h1 class="flex-1">
                         {{ title }}
                     </h1>
-                <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
+                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
             </header>
 

@@ -82,7 +82,7 @@
                                 <button
                                     v-if="! hasMaxSelections || maxSelections > 1"
                                     type="button"
-                                    class="btn btn-primary ml-1"
+                                    class="btn-primary ml-1"
                                     @click="select">
                                     {{ __('Select') }}
                                 </button>

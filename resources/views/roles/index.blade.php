@@ -7,7 +7,7 @@
 
         <header class="flex items-center justify-between mb-3">
             <h1>{{ __('Roles & Permissions') }}</h1>
-            <a href="{{ cp_route('roles.create') }}" class="btn btn-primary">{{ __('Create Role') }}</a>
+            <a href="{{ cp_route('roles.create') }}" class="btn-primary">{{ __('Create Role') }}</a>
         </header>
 
         <role-listing

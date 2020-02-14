@@ -29,7 +29,7 @@
                     :text="__('Create Page')" />
 
                 <button
-                    class="btn btn-primary ml-2"
+                    class="btn-primary ml-2"
                     :class="{ 'disabled': !changed }"
                     :disabled="!changed"
                     @click="save"
@@ -64,11 +64,11 @@
                 <p class="text-grey mb-3">
                     {{ __('messages.structures_empty') }}
                 </p>
-                <button v-if="!hasCollection" class="btn btn-primary btn-lg" v-text="__('Create first page')" @click="openPageCreator" />
+                <button v-if="!hasCollection" class="btn-primary btn-lg" v-text="__('Create first page')" @click="openPageCreator" />
 
                 <create-entry-button
                     v-if="hasCollection"
-                    button-class="btn btn-primary"
+                    button-class="btn-primary"
                     :url="createEntryUrl()"
                     :blueprints="collectionBlueprints"
                     :text="__('Create first page')" />

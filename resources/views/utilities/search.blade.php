@@ -26,7 +26,7 @@
                 </label>
             @endforeach
 
-            <button type="submit" class="btn btn-primary mt-1">{{ __('Update') }}</button>
+            <button type="submit" class="btn-primary mt-1">{{ __('Update') }}</button>
         </form>
     </div>
 

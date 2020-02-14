@@ -63,7 +63,7 @@
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
                 <h3 class="mb-0">__('Explore the Addon Marketplace') }}</h3>
                 <p>{{ __('statamic::messages.getting_started_widget_addons') }}</p>
-                <a href="{{ cp_route('addons.index') }}" class="btn btn-primary min-w-xs block">
+                <a href="{{ cp_route('addons.index') }}" class="btn-primary min-w-xs block">
              __('Explore Addons') }}
             </a>
             </div>

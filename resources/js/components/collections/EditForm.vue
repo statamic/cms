@@ -25,7 +25,7 @@
 
             <div class="py-2 border-t flex justify-between">
                 <a :href="url" class="btn" v-text="__('Cancel') "/>
-                <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
+                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
         </div>
     </publish-container>

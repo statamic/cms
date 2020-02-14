@@ -52,7 +52,7 @@
 
                 <button
                     v-if="canEdit"
-                    class="btn btn-primary min-w-100 ml-2"
+                    class="btn-primary min-w-100 ml-2"
                     :class="{ 'opacity-25': !canSave }"
                     :disabled="!canSave"
                     @click.prevent="save"

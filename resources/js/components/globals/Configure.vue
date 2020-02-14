@@ -13,7 +13,7 @@
                         {{ __('Edit Global Set') }}
                     </h1>
                     <button class="btn mr-2" @click="editing = false" v-text="__('Cancel')" />
-                    <button class="btn btn-primary" @click="save" v-text="__('Save')" />
+                    <button class="btn-primary" @click="save" v-text="__('Save')" />
                 </div>
 
                 <div class="card publish-fields">

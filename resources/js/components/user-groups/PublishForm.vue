@@ -6,7 +6,7 @@
 
                 <div class="flex items-center justify-between">
                     <h1 v-text="initialTitle || __('Create User Group')" />
-                    <button type="submit" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</button>
+                    <button type="submit" class="btn-primary" @click.prevent="save">{{ __('Save') }}</button>
                 </div>
             </header>
 

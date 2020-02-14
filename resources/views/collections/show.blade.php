@@ -30,7 +30,7 @@
             </dropdown-list>
             @can('create', ['Statamic\Contracts\Entries\Entry', $collection])
                 <create-entry-button
-                    button-class="btn btn-primary"
+                    button-class="btn-primary"
                     url="{{ cp_route('collections.entries.create', [$collection->handle(), $site->handle()]) }}"
                     :blueprints="{{ $blueprints->toJson() }}">
                 </create-entry-button>

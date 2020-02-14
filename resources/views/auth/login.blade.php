@@ -50,7 +50,7 @@
                     <input type="checkbox" name="remember" id="remember_me">
                     <span class="ml-1">{{ __('Remember me') }}</span>
                 </label>
-                <button type="submit" class="btn btn-primary">{{ __('Log in') }}</button>
+                <button type="submit" class="btn-primary">{{ __('Log in') }}</button>
             </div>
         </form>
     </div>

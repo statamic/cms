@@ -13,7 +13,7 @@
                     />
 
                     <button
-                        class="btn btn-primary"
+                        class="btn-primary"
                         @click.prevent="save"
                         v-text="__('Save')" />
 

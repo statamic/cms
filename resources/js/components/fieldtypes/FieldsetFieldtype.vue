@@ -16,8 +16,8 @@
                        @keydown.esc="cancelAdd"
                 />
                 <div class="flex">
-                    <button class="btn btn-primary ml-1" @click.prevent="create" :disabled="storePending">{{ __('Create') }}</button>
-                    <button class="btn btn-default ml-1" @click.prevent="cancelAdd">{{ __('Cancel') }}</button>
+                    <button class="btn-primary ml-1" @click.prevent="create" :disabled="storePending">{{ __('Create') }}</button>
+                    <button class="btn-default ml-1" @click.prevent="cancelAdd">{{ __('Cancel') }}</button>
                 </div>
             </div>
 

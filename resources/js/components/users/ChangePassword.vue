@@ -24,7 +24,7 @@
                     />
                 </div>
                 <div class="flex items-center">
-                    <button class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</button>
+                    <button class="btn-primary" @click.prevent="save">{{ __('Save') }}</button>
                     <label class="ml-2">
                         <input type="checkbox" v-model="reveal" />
                         {{ __('Reveal Password') }}

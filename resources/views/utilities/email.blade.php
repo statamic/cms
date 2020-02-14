@@ -17,7 +17,7 @@
 
             <div class="flex items-center">
                 <input class="input-text mr-2" type="text" name="email" value="{{ old('email', $user->email()) }}" />
-                <button type="submit" class="btn btn-primary">{{ __('Send Test Email') }}</button>
+                <button type="submit" class="btn-primary">{{ __('Send Test Email') }}</button>
             </div>
             @if ($errors->has('email'))
                 <p class="mt-1"><small class="help-block text-red">{{ $errors->first('email') }}</small></p>
