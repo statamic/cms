@@ -195,6 +195,7 @@ class Blueprint
             $fields->push($field);
         }
 
+        // Set fields back into blueprint contents.
         $this->contents['sections'][$section]['fields'] = $fields->all();
 
         return $this->resetFieldsCache();
@@ -203,6 +204,44 @@ class Blueprint
     public function ensureFieldPrepended($handle, $field, $section = null)
     {
         return $this->ensureField($handle, $field, $section, true);
+    }
+
+    public function removeField($handle, $section = null)
+    {
+        if (! $this->hasField($handle)) {
+            return $this;
+        }
+
+        // If a section is specified, only remove from that specific section.
+        if ($section) {
+            return $this->removeFieldFromSection($handle, $section);
+        }
+
+        // Otherwise remove from any section.
+        foreach ($this->sections()->keys() as $sectionKey) {
+            if ($this->hasFieldInSection($handle, $sectionKey)) {
+                return $this->removeFieldFromSection($handle, $sectionKey);
+            }
+        }
+    }
+
+    public function removeFieldFromSection($handle, $section)
+    {
+        $fields = collect($this->contents['sections'][$section]['fields'] ?? []);
+
+        // See if field already exists in section.
+        if ($this->hasFieldInSection($handle, $section)) {
+            $fieldKey = $fields->search(function ($field) use ($handle) {
+                return Arr::get($field, 'handle') === $handle;
+            });
+        } else {
+            return $this;
+        }
+
+        // Pull it out.
+        Arr::pull($this->contents['sections'][$section]['fields'], $fieldKey);
+
+        return $this->resetFieldsCache();
     }
 
     protected function validateUniqueHandles()
