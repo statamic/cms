@@ -114,7 +114,7 @@ Route::group([
         Route::get('assets/browse/{asset_container}/{path?}/edit', 'BrowserController@edit')->where('path', '.*')->name('assets.browse.edit');
         Route::get('assets/browse/{asset_container}/{path?}', 'BrowserController@show')->where('path', '.*')->name('assets.browse.show');
         Route::get('assets-fieldtype', 'FieldtypeController@index');
-        Route::resource('assets', 'AssetsController');
+        Route::resource('assets', 'AssetsController')->parameters(['assets' => 'encoded_asset']);
         Route::get('assets/{encoded_asset}/download', 'AssetsController@download')->name('assets.download');
         Route::get('thumbnails/{encoded_asset}/{size?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
     });
