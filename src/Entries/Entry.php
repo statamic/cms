@@ -8,6 +8,7 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Blueprint;
 use Statamic\Routing\Routable;
@@ -78,7 +79,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
                 return $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
             })
             ->getter(function ($collection) {
-                return $collection ? Collection::findByHandle($collection) : null;
+                return $collection ? Blink::once("collection-{$collection}", function () use ($collection) {
+                    return Collection::findByHandle($collection);
+                }) : null;
             })
             ->args(func_get_args());
     }
@@ -204,6 +207,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         }
 
         Facades\Entry::save($this);
+
+        if ($this->id()) {
+            Blink::store('structure-page-entries')->forget($this->id());
+        }
 
         $this->taxonomize();
 

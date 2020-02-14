@@ -518,9 +518,12 @@ class EntryTest extends TestCase
     function it_saves_through_the_api()
     {
         Event::fake();
-        $entry = (new Entry)->collection(new Collection);
+        $entry = (new Entry)->id('a')->collection(new Collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
+
+        $blinkStore = $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock();
+        Facades\Blink::shouldReceive('store')->with('structure-page-entries')->once()->andReturn($blinkStore);
 
         $return = $entry->save();
 
