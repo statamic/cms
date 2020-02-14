@@ -19,7 +19,7 @@
                 >
                     <resource-deleter
                         ref="deleter"
-                        :resource-title="title"
+                        :resource-title="container.title"
                         :route="container.delete_url">
                     </resource-deleter>
                 </dropdown-item>
