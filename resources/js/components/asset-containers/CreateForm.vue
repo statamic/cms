@@ -20,7 +20,7 @@
                     </small>
                     {{ title }}
                 </h1>
-                <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
+                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
             <publish-sections @updated="setFieldValue" :enable-sidebar="false"/>
@@ -74,7 +74,7 @@ export default {
                 this.errors = errors;
                 this.$toast.error(message);
             } else {
-                this.$toast.error('Something went wrong');
+                this.$toast.error(__('Something went wrong'));
             }
         },
 

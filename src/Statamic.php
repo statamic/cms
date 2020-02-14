@@ -196,11 +196,17 @@ class Statamic
         return new static;
     }
 
-    public static function svg($name)
+    public static function svg($name, $attrs = null)
     {
-        return StaticStringy::collapseWhitespace(
+        if ($attrs) {
+            $attrs = " class=\"{$attrs}\"";
+        }
+
+        $svg = StaticStringy::collapseWhitespace(
             File::get(statamic_path("resources/dist/svg/{$name}.svg"))
         );
+
+        return str_replace('<svg', sprintf('<svg%s', $attrs), $svg);
     }
 
     public static function vendorAssetUrl($url = '/')

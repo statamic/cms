@@ -13,7 +13,7 @@
                         {{ __('Edit Global Set') }}
                     </h1>
                     <button class="btn mr-2" @click="editing = false" v-text="__('Cancel')" />
-                    <button class="btn btn-primary" @click="save" v-text="__('Save')" />
+                    <button class="btn-primary" @click="save" v-text="__('Save')" />
                 </div>
 
                 <div class="card publish-fields">
@@ -143,7 +143,7 @@ export default {
                     this.$toast.error(message);
                     this.saving = false;
                 } else {
-                    this.$toast.error('Something went wrong');
+                    this.$toast.error(__('Something went wrong'));
                 }
             })
         }

@@ -3,7 +3,7 @@
     <dropdown-list class="inline-block" :show-dropdown-if="blueprints.length > 1">
         <template v-slot:trigger>
             <button
-                class="btn btn-primary"
+                class="btn-primary"
                 @click="create"
                 v-text="__('Create Term')" />
         </template>

@@ -7,10 +7,11 @@
                 </template>
                 <template slot="actions" slot-scope="{ row: collection, index }">
                     <dropdown-list>
-                        <dropdown-item :text="__('Edit')" :redirect="collection.edit_url" />
+                        <dropdown-item :text="__('Edit Collection')" :redirect="collection.edit_url" />
+                        <dropdown-item :text="__('Scaffold Resrouces')" :redirect="collection.scaffold_url" />
                         <dropdown-item
                             v-if="collection.deleteable"
-                            :text="__('Delete')"
+                            :text="__('Delete Collection')"
                             class="warning"
                             @click="$refs[`deleter_${collection.id}`].confirm()"
                         >

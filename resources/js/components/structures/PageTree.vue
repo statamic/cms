@@ -1,37 +1,41 @@
 <template>
     <div class="page-tree">
 
-        <div class="flex items-center mb-3">
-            <slot name="header" />
+        <header class="mb-3">
+            <breadcrumb :url="breadcrumbUrl" :title="__('Structures')" />
 
-            <dropdown-list class="mr-1">
-                <dropdown-item :text="__('Edit Structure Config')" :redirect="editUrl" />
-            </dropdown-list>
+            <div class="flex items-center">
+                <h1 class="flex-1" v-text="title" />
 
-            <a @click="cancel" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
+                <dropdown-list class="mr-1">
+                    <dropdown-item :text="__('Edit Structure Config')" :redirect="editUrl" />
+                </dropdown-list>
 
-            <dropdown-list>
-                <template #trigger>
-                    <button class="btn" v-text="`${__('Add Link')}`" />
-                </template>
-                <dropdown-item :text="__('Link to URL')" @click="linkPage" />
-                <dropdown-item :text="__('Link to Entry')" @click="linkToEntries" />
-            </dropdown-list>
+                <a @click="cancel" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
 
-            <create-entry-button
-                v-if="hasCollection"
-                class="ml-2"
-                :url="createEntryUrl()"
-                :blueprints="collectionBlueprints"
-                :text="__('Create Page')" />
+                <dropdown-list>
+                    <template #trigger>
+                        <button class="btn" v-text="`${__('Add Link')}`" />
+                    </template>
+                    <dropdown-item :text="__('Link to URL')" @click="linkPage" />
+                    <dropdown-item :text="__('Link to Entry')" @click="linkToEntries" />
+                </dropdown-list>
 
-            <button
-                class="btn btn-primary ml-2"
-                :class="{ 'disabled': !changed }"
-                :disabled="!changed"
-                @click="save"
-                v-text="__('Save Changes')" />
-        </div>
+                <create-entry-button
+                    v-if="hasCollection"
+                    class="ml-2"
+                    :url="createEntryUrl()"
+                    :blueprints="collectionBlueprints"
+                    :text="__('Create Page')" />
+
+                <button
+                    class="btn-primary ml-2"
+                    :class="{ 'disabled': !changed }"
+                    :disabled="!changed"
+                    @click="save"
+                    v-text="__('Save Changes')" />
+            </div>
+        </header>
 
         <loading-graphic v-if="loading"></loading-graphic>
 
@@ -60,11 +64,11 @@
                 <p class="text-grey mb-3">
                     {{ __('messages.structures_empty') }}
                 </p>
-                <button v-if="!hasCollection" class="btn btn-primary btn-lg" v-text="__('Create first page')" @click="openPageCreator" />
+                <button v-if="!hasCollection" class="btn-primary btn-lg" v-text="__('Create first page')" @click="openPageCreator" />
 
                 <create-entry-button
                     v-if="hasCollection"
-                    button-class="btn btn-primary"
+                    button-class="btn-primary"
                     :url="createEntryUrl()"
                     :blueprints="collectionBlueprints"
                     :text="__('Create first page')" />
@@ -140,6 +144,8 @@ export default {
     },
 
     props: {
+        title: String,
+        breadcrumbUrl: String,
         initialPages: Array,
         pagesUrl: String,
         submitUrl: String,

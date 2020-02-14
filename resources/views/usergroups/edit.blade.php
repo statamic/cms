@@ -13,16 +13,7 @@
         initial-handle="{{ $group->handle() }}"
         :initial-roles="{{ json_encode($roles) }}"
         v-cloak
-    >
-
-        <h1 class="flex-1" slot="heading" slot-scope="{ title }">
-            <div class="subhead">
-                <a href="{{ cp_route('user-groups.index') }}">{{ __('User Groups') }}</a>
-            </div>
-            @{{ title }}
-        </h1>
-
-    </user-group-publish-form>
+    ></user-group-publish-form>
 
     <user-listing
         listing-key="usergroup-users"

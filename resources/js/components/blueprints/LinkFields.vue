@@ -40,7 +40,7 @@
                             </template>
                         </v-select>
                         <button
-                            class="btn btn-primary w-full mt-3"
+                            class="btn-primary w-full mt-3"
                             :class="{ 'opacity-50': !reference }"
                             :disabled="!reference"
                             @click="linkField"
@@ -67,7 +67,7 @@
                         <p class="text-2xs text-grey mb-1">Every field in the linked fieldset will be prefixed with this. Useful if you want to import the same fields multiple times.</p>
                         <text-input v-model="importPrefix" placeholder="eg. hero_" />
                         <button
-                            class="btn btn-primary w-full mt-3"
+                            class="btn-primary w-full mt-3"
                             :class="{ 'opacity-50': !fieldset }"
                             :disabled="!fieldset"
                             @click="linkFieldset"

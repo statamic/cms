@@ -50,7 +50,7 @@
             </div>
 
             <!-- Super Admin -->
-             <div class="pb-5">
+             <div class="pb-5" v-if="canCreateSupers">
                 <div class="flex items-center">
                     <toggle-input v-model="user.super" />
                     <label class="font-bold ml-1">{{ __('Super Admin') }}</label>
@@ -188,7 +188,8 @@ export default {
     props: {
         route: { type: String },
         usersCreateUrl: { type: String },
-        usersIndexUrl: { type: String }
+        usersIndexUrl: { type: String },
+        canCreateSupers: { type: Boolean }
     },
 
     data() {
@@ -196,7 +197,7 @@ export default {
             steps: [__('User Information'), __('Roles & Groups'), __('Customize Invitation')],
             user: {
                 email: null,
-                super: true,
+                super: this.canCreateSupers,
                 roles: [],
                 groups: []
             },

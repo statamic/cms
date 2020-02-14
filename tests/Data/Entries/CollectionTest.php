@@ -195,9 +195,11 @@ class CollectionTest extends TestCase
     /** @test */
     function it_saves_the_collection_through_the_api()
     {
-        $collection = new Collection;
+        $collection = (new Collection)->handle('test');
 
         Facades\Collection::shouldReceive('save')->with($collection)->once();
+        Facades\Blink::shouldReceive('flush')->with('collection-handles')->once();
+        Facades\Blink::shouldReceive('flushStartingWith')->with('collection-test')->once();
 
         $return = $collection->save();
 

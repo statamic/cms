@@ -3,6 +3,7 @@
 namespace Statamic\Stache\Repositories;
 
 use Statamic\Stache\Stache;
+use Statamic\Facades\Blink;
 use Statamic\Entries\Collection;
 use Statamic\Events\Data\CollectionSaved;
 use Statamic\Events\Data\CollectionDeleted;
@@ -55,7 +56,9 @@ class CollectionRepository implements RepositoryContract
 
     public function handles(): IlluminateCollection
     {
-        return $this->all()->map->handle();
+        return Blink::once('collection-handles', function () {
+            return $this->all()->map->handle();
+        });
     }
 
     public function handleExists(string $handle): bool
