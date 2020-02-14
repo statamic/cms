@@ -2,18 +2,18 @@
 
 namespace Statamic\Fields;
 
-use Statamic\Facades;
-use Statamic\Support\Str;
+use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
-use Illuminate\Support\Collection;
-use Facades\Statamic\Fields\BlueprintRepository;
+use Statamic\Facades;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Blueprint
 {
     protected $handle;
     protected $contents = [];
-    protected $extraFields = [];
     protected $fieldsCache;
 
     public function setHandle(string $handle)
@@ -48,20 +48,9 @@ class Blueprint
 
     public function sections(): Collection
     {
-        $sections = array_get($this->contents, 'sections', []);
-        $extra = $this->extraFields ?? [];
-
-        $sections = collect($sections)->map(function ($contents, $handle) use (&$extra) {
-            return (new Section($handle))
-                ->setContents($contents)
-                ->extraFields(array_pull($extra, $handle) ?? []);
+        return collect(Arr::get($this->contents, 'sections', []))->map(function ($contents, $handle) {
+            return (new Section($handle))->setContents($contents);
         });
-
-        foreach ($extra as $section => $fields) {
-            $sections->put($section, (new Section($section))->extraFields($fields));
-        }
-
-        return $sections;
     }
 
     public function fields(): Fields
@@ -156,30 +145,57 @@ class Blueprint
         return true;
     }
 
-    public function ensureField($handle, $field, $section = null, $prepend = false)
+    public function ensureField($handle, $fieldConfig, $section = null, $prepend = false)
     {
+        // If blueprint has field, look through sections first.
         if ($this->hasField($handle)) {
-            // Loop through all sections looking for the handle so we can ensure the required config
-            foreach($this->contents['sections'] ?? [] as $section_key => $blueprint_section) {
-                foreach ($blueprint_section['fields'] as $field_key => $blueprint_field) {
-                    if (array_get($blueprint_field, 'handle') == $handle) {
-                        $this->contents['sections'][$section_key]['fields'][$field_key]['field'] = array_merge(
-                            $field,
-                            $this->contents['sections'][$section_key]['fields'][$field_key]['field']
-                        );
-
-                        return $this->resetFieldsCache();
-                    }
+            foreach ($this->sections()->keys() as $sectionKey) {
+                if ($this->hasFieldInSection($handle, $sectionKey)) {
+                    return $this->ensureFieldInSection($handle, $fieldConfig, $sectionKey);
                 }
             }
         }
 
-        // If a section hasn't been provided we'll just use the first section.
-        if (! $section) {
-            $section = array_keys($this->contents['sections'] ?? [])[0] ?? 'main';
+        // If a section hasn't been provided we'll just use the first section, or default.
+        $section = $section ?? $this->sections()->keys()->first() ?? 'main';
+
+        return $this->ensureFieldInSection($handle, $fieldConfig, $section, $prepend);
+    }
+
+    public function ensureFieldInSection($handle, $fieldConfig, $section, $prepend = false)
+    {
+        $fields = collect($this->contents['sections'][$section]['fields'] ?? []);
+
+        // See if field already exists in section.
+        if ($exists = $this->hasFieldInSection($handle, $section)) {
+            $fieldKey = $fields->search(function ($field) use ($handle) {
+                return Arr::get($field, 'handle') === $handle;
+            });
         }
 
-        $this->extraFields[$section][$handle] = compact('prepend', 'field');
+        // If it already exists, merge field config.
+        if ($exists) {
+            $fieldConfig = array_merge($fieldConfig, $fields->get($fieldKey)['field']);
+        }
+
+        // Combine handle and field config.
+        $field = [
+            'handle' => $handle,
+            'field' => $fieldConfig,
+        ];
+
+        // Set the field config in it's proper place.
+        if ($prepend && $exists) {
+            $fields->forget($fieldKey)->prepend($field);
+        } elseif ($prepend && ! $exists) {
+            $fields->prepend($field);
+        } elseif ($exists) {
+            $fields->put($fieldKey, $field);
+        } else {
+            $fields->push($field);
+        }
+
+        $this->contents['sections'][$section]['fields'] = $fields->all();
 
         return $this->resetFieldsCache();
     }
