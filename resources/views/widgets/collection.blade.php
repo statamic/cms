@@ -5,8 +5,8 @@
     </div>
     <collection-widget
         collection="{{ $collection->handle() }}"
-        initial-sort-column="title"
-        initial-sort-direction="asc"
+        initial-sort-column="{{ $sortColumn }}"
+        initial-sort-direction="{{ $sortDirection }}"
         :initial-per-page="{{ $limit }}"
     ></collection-widget>
 </div>
