@@ -46,15 +46,18 @@ export default {
     data() {
         return {
             components: [], // extra components to be injected
+            managesVuexModule: true,
         }
     },
 
     created() {
-        this.registerVuexModule();
+        this.managesVuexModule = this.registerVuexModule();
+        if (!this.managesVuexModule) return;
         this.$events.$emit('publish-container-created', this);
     },
 
     destroyed() {
+        if (!this.managesVuexModule) return;
         this.removeVuexModule();
         this.clearDirtyState();
         this.$events.$emit('publish-container-destroyed', this);
@@ -84,7 +87,7 @@ export default {
             if (this.$store.state.hasOwnProperty('publish')
             && this.$store.state.publish.hasOwnProperty(this.name)) {
                 this.$store.commit(`publish/${this.name}/initialize`, initial);
-                return;
+                return false;
             }
 
             this.$store.registerModule(['publish', this.name], {
@@ -163,6 +166,8 @@ export default {
                     }
                 }
             });
+
+            return true;
         },
 
         removeVuexModule() {
