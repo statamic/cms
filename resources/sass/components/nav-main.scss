@@ -64,15 +64,12 @@
     .nav-main {
         @apply flex bg-transparent shadow-none overflow-auto w-56 border-r;
         z-index: 1;
-        height: calc(100% - 48px);
+        height: calc(100% - 52px);
     }
 }
 
 .nav-main-inner {
-    @apply pl-3 pr-2;
-
-    // Get that perfect alignment with .page-wrapper
-    padding-top: 28px;
+    @apply pl-3 pr-2 pt-2;
 }
 
 .nav-toggle {
