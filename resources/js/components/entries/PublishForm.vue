@@ -13,7 +13,7 @@
                 </div>
             </h1>
 
-            <dropdown-list class="mr-2">
+            <dropdown-list class="mr-2" v-if="canEditBlueprint">
                 <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
             </dropdown-list>
 
@@ -285,6 +285,7 @@ export default {
         initialPermalink: String,
         revisionsEnabled: Boolean,
         preloadedAssets: Array,
+        canEditBlueprint: Boolean
     },
 
     data() {
