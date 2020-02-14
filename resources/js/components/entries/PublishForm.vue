@@ -590,7 +590,7 @@ export default {
     },
 
     mounted() {
-        this.saveKeyBinding = this.$keys.bindGlobal('mod+s', e => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s', 'mod+return'], e => {
             e.preventDefault();
             if (this.confirmingPublish) return;
             this.save();
