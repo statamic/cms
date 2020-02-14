@@ -24,8 +24,9 @@
             <div class="hidden md:flex items-center">
                 <button
                     v-if="!readOnly"
-                    class="btn"
+                    class="btn-primary"
                     :class="{
+                        'btn': revisionsEnabled,
                         'btn-primary': isCreating || !revisionsEnabled,
                     }"
                     :disabled="!canSave"
@@ -179,9 +180,10 @@
                 <template v-slot:buttons>
                    <button
                     v-if="!readOnly"
-                    class="btn ml-2"
+                    class="ml-2"
                     :class="{
-                        'btn-primary': isCreating || !revisionsEnabled,
+                        'btn': ! isCreating || revisionsEnabled,
+                        'btn-primary': isCreating || !revisionsEnabled
                     }"
                     :disabled="!canSave"
                     @click.prevent="save"
@@ -202,10 +204,10 @@
         <div class="md:hidden mt-3 flex items-center">
             <button
                 v-if="!readOnly"
-                class="btn btn-lg"
+                class="btn-lg"
                 :class="{
                     'btn-primary w-full': ! revisionsEnabled,
-                    'w-1/2 mr-2': revisionsEnabled,
+                    'btn w-1/2 mr-2': revisionsEnabled,
                 }"
                 :disabled="!canSave"
                 @click.prevent="save"

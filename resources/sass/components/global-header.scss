@@ -3,8 +3,8 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white shadow h-12 items-center flex justify-between relative w-full;
-    z-index: 9999;
+    @apply bg-white shadow h-13 items-center flex justify-between relative w-full;
+    z-index: 997; // Let Live Preview stack on top
 }
 
 /* Responsive Wangjangling

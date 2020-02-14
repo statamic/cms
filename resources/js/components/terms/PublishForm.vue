@@ -20,8 +20,8 @@
             <div class="hidden md:flex items-center">
                 <button
                     v-if="!readOnly"
-                    class="btn"
                     :class="{
+                        'btn': revisionsEnabled,
                         'btn-primary': ! revisionsEnabled,
                     }"
                     :disabled="!canSave"
@@ -183,10 +183,10 @@
         <div class="md:hidden mt-3 flex items-center">
             <button
                 v-if="!readOnly"
-                class="btn btn-lg"
+                class="btn-lg"
                 :class="{
                     'btn-primary w-full': ! revisionsEnabled,
-                    'w-1/2 mr-2': revisionsEnabled,
+                    'btn w-1/2 mr-2': revisionsEnabled,
                 }"
                 :disabled="!canSave"
                 @click.prevent="save"
@@ -194,7 +194,7 @@
 
             <button
                 v-if="revisionsEnabled"
-                class="ml-1 btn btn-lg justify-center btn-primary flex items-center w-1/2"
+                class="ml-1 btn-primary btn-lg justify-center flex items-center w-1/2"
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
                 <span v-text="__('Publish')" />
