@@ -74,7 +74,7 @@ export default {
                 this.errors = errors;
                 this.$toast.error(message);
             } else {
-                this.$toast.error('Something went wrong');
+                this.$toast.error(__('Something went wrong'));
             }
         },
 

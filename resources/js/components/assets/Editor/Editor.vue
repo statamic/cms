@@ -314,7 +314,7 @@ export default {
 
             this.$axios.patch(url, this.values).then(response => {
                 this.$emit('saved', response.data.asset);
-                this.$toast.success('Saved');
+                this.$toast.success(__('Saved'));
                 this.saving = false;
                 this.clearErrors();
             }).catch(e => {

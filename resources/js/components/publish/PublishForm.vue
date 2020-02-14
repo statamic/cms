@@ -65,7 +65,7 @@ export default {
 
             this.$axios[this.method](this.action, this.currentValues).then(response => {
                 this.saving = false;
-                this.$toast.success('Saved');
+                this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.$emit('saved', response);
             }).catch(e => this.handleAxiosError(e));

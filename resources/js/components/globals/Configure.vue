@@ -143,7 +143,7 @@ export default {
                     this.$toast.error(message);
                     this.saving = false;
                 } else {
-                    this.$toast.error('Something went wrong');
+                    this.$toast.error(__('Something went wrong'));
                 }
             })
         }

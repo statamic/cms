@@ -436,7 +436,7 @@ export default {
                 this.title = this.values.title;
                 this.isWorkingCopy = true;
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                if (!this.isCreating) this.$toast.success('Saved');
+                if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.runAfterSaveHook(response);
             }).catch(error => this.handleAxiosError(error));

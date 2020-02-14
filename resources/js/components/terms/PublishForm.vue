@@ -378,7 +378,7 @@ export default {
                 this.title = response.data.data.title;
                 this.permalink = response.data.data.permalink;
                 this.isWorkingCopy = true;
-                if (!this.isCreating) this.$toast.success('Saved');
+                if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => this.handleAxiosError(e));
@@ -398,7 +398,7 @@ export default {
                 this.errors = errors;
                 this.$toast.error(message);
             } else {
-                this.$toast.error('Something went wrong');
+                this.$toast.error(__('Something went wrong'));
             }
         },
 

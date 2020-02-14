@@ -165,7 +165,7 @@ export default {
 
         handleAxiosError(e) {
             this.saving = false;
-            this.$toast.error('Something went wrong');
+            this.$toast.error(__('Something went wrong'));
         }
 
     }

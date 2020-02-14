@@ -65,7 +65,7 @@ export default {
             this.$axios.patch(this.url, this.values).then(response => {
                 this.saving = false;
                 this.title = response.data.title;
-                this.$toast.success('Saved');
+                this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
             }).catch(e => this.handleAxiosError(e));
         },
@@ -78,7 +78,7 @@ export default {
                 this.errors = errors;
                 this.$toast.error(message);
             } else {
-                this.$toast.error('Something went wrong');
+                this.$toast.error(__('Something went wrong'));
             }
         },
 

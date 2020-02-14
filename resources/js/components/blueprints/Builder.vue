@@ -96,7 +96,7 @@ export default {
         },
 
         saved(response) {
-            this.$toast.success('Saved');
+            this.$toast.success(__('Saved'));
             this.errors = {};
             this.$dirty.remove('blueprints');
         }
