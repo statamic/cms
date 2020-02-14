@@ -8,34 +8,52 @@ use Statamic\Fields\Fieldtype;
 class Date extends Fieldtype
 {
     protected $configFields = [
+        // @TODO hook up multiple mode
+        'mode' => [
+            'type' => 'select',
+            'default' => 'single',
+            'instructions' => 'Choose between single or range mode (range disables time picker).',
+            'width' => 50,
+            'options' => [
+                'single' => 'Single',
+                // 'multiple' => 'Multiple',
+                'range' => 'Range',
+            ]
+        ],
         'time_enabled'  => [
             'type' => 'toggle',
             'default' => false,
-            'instructions' => 'Enable the timepicker.'
+            'instructions' => 'Enable the timepicker.',
+            'width' => 50,
         ],
         'time_required' => [
             'type' => 'toggle',
             'default' => false,
-            'instructions' => 'Require time in addition to date.'
+            'instructions' => 'Require time in addition to date.',
+            'width' => 50,
         ],
         'earliest_date' => [
             'type' => 'text',
             'default' => '1900-01-01',
-            'instructions' => 'Set the earliest selectable date.'
+            'instructions' => 'Set the earliest selectable date.',
+            'width' => 50,
         ],
         'format' => [
             'type' => 'text',
-            'instructions' => 'Optionally format the date string using moment.js. See the [formatting arguments](https://momentjs.com/docs/#/displaying/format/).'
+            'instructions' => 'Optionally format the date string using [moment.js](https://momentjs.com/docs/#/displaying/format/).',
+            'width' => 50,
         ],
         'full_width' => [
             'type' => 'toggle',
             'default' => false,
-            'instructions' => 'Stretch the calender to use up the full width.'
+            'instructions' => 'Stretch the calender to use up the full width.',
+            'width' => 50,
         ],
         'inline' => [
             'type' => 'toggle',
             'default' => false,
-            'instructions' => 'Skip the dropdown input field and show the calendar directly.'
+            'instructions' => 'Skip the dropdown input field and show the calendar directly.',
+            'width' => 50,
         ],
         'columns' => [
             'type' => 'integer',
@@ -49,17 +67,6 @@ class Date extends Fieldtype
             'instructions' => 'Show multiple months at one time, in rows and columns',
             'width' => 50,
         ],
-        // @TODO hook up multiple mode
-        'mode' => [
-            'type' => 'select',
-            'default' => 'single',
-            'instructions' => 'Choose a single date or range of dates. Note: Ranges disable the time picker.',
-            'options' => [
-                'single' => 'Single',
-                // 'multiple' => 'Multiple',
-                'range' => 'Range',
-            ]
-        ]
     ];
 
     protected $queryOperators = [
@@ -96,6 +103,8 @@ class Date extends Fieldtype
 
     public function process($data)
     {
+        if (is_null($data)) return $data;
+
         if ($this->config('mode') === "range") {
             return [
                 'start' => Carbon::parse($data['start'])->format('Y-m-d'),
