@@ -160,6 +160,8 @@ class UsersController extends CpController
         }
 
         $fields = $blueprint
+            ->removeField('password')
+            ->removeField('password_confirmation')
             ->fields()
             ->addValues($user->data()->merge(['email' => $user->email()])->all())
             ->preProcess();
