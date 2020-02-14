@@ -35,7 +35,7 @@
     }
 
     .global-search-results {
-        @apply shadow-lg absolute p-0 w-full bg-white rounded border w-128;
+        @apply shadow-lg absolute p-0 w-full bg-white rounded border border-grey-50 w-128;
         top: 36px;
         left: -1px; // border offset
         z-index: 999;
