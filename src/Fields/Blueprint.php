@@ -147,7 +147,7 @@ class Blueprint
 
     public function ensureField($handle, $fieldConfig, $section = null, $prepend = false)
     {
-        // If blueprint has field, look through sections first.
+        // If blueprint already has field, merge it's config in the field's current section.
         if ($this->hasField($handle)) {
             foreach ($this->sections()->keys() as $sectionKey) {
                 if ($this->hasFieldInSection($handle, $sectionKey)) {
