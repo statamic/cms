@@ -342,25 +342,34 @@ class EntryTest extends TestCase
     /** @test */
     function it_gets_and_sets_the_date()
     {
+        Carbon::setTestNow(Carbon::parse('2015-09-24'));
+
         $entry = new Entry;
-        $this->assertNull($entry->date());
+
+        // Without explicitly having the date set, it falls back to the last modified date (which if there's no file, is Carbon::now())
+        $this->assertInstanceOf(Carbon::class, $entry->date());
+        $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-09-24 00:00')->eq($entry->date()));
+        $this->assertFalse($entry->hasDate());
 
         // Date can be provided as string without time
         $return = $entry->date('2015-03-05');
         $this->assertEquals($entry, $return);
         $this->assertInstanceOf(Carbon::class, $entry->date());
         $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-03-05 00:00')->eq($entry->date()));
+        $this->assertTrue($entry->hasDate());
 
         // Date can be provided as string with time
         $entry->date('2015-03-05-1325');
         $this->assertInstanceOf(Carbon::class, $entry->date());
         $this->assertTrue(Carbon::createFromFormat('Y-m-d H:i', '2015-03-05 13:25')->eq($entry->date()));
+        $this->assertTrue($entry->hasDate());
 
         // Date can be provided as carbon instance
         $carbon = Carbon::createFromFormat('Y-m-d H:i', '2018-05-02 17:32');
         $entry->date($carbon);
         $this->assertInstanceOf(Carbon::class, $entry->date());
         $this->assertTrue($carbon->eq($entry->date()));
+        $this->assertTrue($entry->hasDate());
     }
 
     /** @test */
@@ -406,6 +415,8 @@ class EntryTest extends TestCase
     /** @test */
     function it_gets_and_sets_the_date_for_date_collections()
     {
+        Carbon::setTestNow(Carbon::parse('2015-09-24'));
+
         $dateEntry = with('', function() {
             $collection = tap(Collection::make('dated')->dated(true))->save();
             return (new Entry)->collection($collection);
@@ -421,11 +432,15 @@ class EntryTest extends TestCase
         $numberEntry->order('2017-01-02');
 
         $this->assertEquals('2017-01-02 12:00am', $dateEntry->date()->format('Y-m-d h:ia'));
+        $this->assertTrue($dateEntry->hasDate());
         $this->assertFalse($dateEntry->hasTime());
-        $this->assertNull($numberEntry->date());
+
+        $this->assertEquals('2015-09-24 12:00am', $numberEntry->date()->format('Y-m-d h:ia'));
+        $this->assertFalse($numberEntry->hasDate());
 
         $dateEntry->date('2017-01-02-1523');
         $this->assertEquals('2017-01-02 03:23pm', $dateEntry->date()->format('Y-m-d h:ia'));
+        $this->assertTrue($dateEntry->hasDate());
         $this->assertTrue($dateEntry->hasTime());
     }
 
@@ -436,8 +451,7 @@ class EntryTest extends TestCase
         $collection = tap(Collection::make('dated')->dated(true)->futureDateBehavior('private'))->save();
         $entry = (new Entry)->collection($collection);
 
-        // Entries with no date are considered private
-        $this->assertTrue($entry->private());
+        $this->assertFalse($entry->private());
 
         $entry->date('2018-01-01');
         $this->assertFalse($entry->private());
@@ -453,7 +467,6 @@ class EntryTest extends TestCase
         $collection = tap(Collection::make('dated')->dated(true)->pastDateBehavior('private'))->save();
         $entry = (new Entry)->collection($collection);
 
-        // Entries with no date are considered private
         $this->assertTrue($entry->private());
 
         $entry->date('2019-01-02');
@@ -505,9 +518,12 @@ class EntryTest extends TestCase
     function it_saves_through_the_api()
     {
         Event::fake();
-        $entry = (new Entry)->collection(new Collection);
+        $entry = (new Entry)->id('a')->collection(new Collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
+
+        $blinkStore = $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock();
+        Facades\Blink::shouldReceive('store')->with('structure-page-entries')->once()->andReturn($blinkStore);
 
         $return = $entry->save();
 

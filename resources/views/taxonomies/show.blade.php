@@ -1,37 +1,41 @@
 @extends('statamic::layout')
 @section('title', Statamic::crumb($taxonomy->title(), 'Taxonomies'))
+@section('wrapper_class', 'max-w-full')
 
 @section('content')
 
-    <div class="flex items-center mb-3">
-        <h1 class="flex-1">
-            <small class="subhead block">
-                <a href="{{ cp_route('taxonomies.index')}}">{{ __('Taxonomies') }}</a>
-            </small>
-            {{ $taxonomy->title() }}
-        </h1>
-        <dropdown-list class="mr-1">
-            @can('edit', $taxonomy)
-                <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
+    <header class="mb-3">
+        @include('statamic::partials.breadcrumb', [
+            'url' => cp_route('taxonomies.index'),
+            'title' => __('Taxonomies')
+        ])
+        <div class="flex items-center">
+            <h1 class="flex-1">{{ $taxonomy->title() }}</h1>
+
+            <dropdown-list class="mr-1">
+                @can('edit', $taxonomy)
+                    <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
+                @endcan
+                @can('delete', $taxonomy)
+                    <dropdown-item :text="__('Delete Taxonomy')" class="warning" @click="$refs.deleter.confirm()">
+                        <resource-deleter
+                            ref="deleter"
+                            resource-title="{{ $taxonomy->title() }}"
+                            route="{{ cp_route('taxonomies.destroy', $taxonomy->handle()) }}"
+                            redirect="{{ cp_route('taxonomies.index') }}"
+                        ></resource-deleter>
+                    </dropdown-item>
+                @endcan
+            </dropdown-list>
+
+            @can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
+                <create-term-button
+                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]) }}"
+                    :blueprints="{{ $blueprints->toJson() }}">
+                </create-term-button>
             @endcan
-            @can('delete', $taxonomy)
-                <dropdown-item :text="__('Delete Taxonomy')" class="warning" @click="$refs.deleter.confirm()">
-                    <resource-deleter
-                        ref="deleter"
-                        resource-title="{{ $taxonomy->title() }}"
-                        route="{{ cp_route('taxonomies.destroy', $taxonomy->handle()) }}"
-                        redirect="{{ cp_route('taxonomies.index') }}"
-                    ></resource-deleter>
-                </dropdown-item>
-            @endcan
-        </dropdown-list>
-        @can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
-            <create-term-button
-                url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]) }}"
-                :blueprints="{{ $blueprints->toJson() }}">
-            </create-term-button>
-        @endcan
-    </div>
+        </div>
+    </header>
 
     @if ($hasTerms)
 

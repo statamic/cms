@@ -1,6 +1,7 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
-@section('title', $breadcrumbs->title('Edit Entry'))
+@section('title', $breadcrumbs->title($title))
+@section('wrapper_class', 'max-w-2xl')
 
 @section('content')
 
@@ -28,6 +29,7 @@
         :initial-read-only="{{ $str::bool($readOnly) }}"
         :preloaded-assets="{{ json_encode($preloadedAssets) }}"
         :breadcrumbs="{{ $breadcrumbs->toJson() }}"
+        :can-edit-blueprint="{{ $str::bool($user->can('configure fields')) }}"
     ></entry-publish-form>
 
 @endsection

@@ -6,16 +6,8 @@
     <user-group-publish-form
         action="{{ cp_route('user-groups.store') }}"
         method="post"
+        breadcrumb-url="{{ cp_route('user-groups.index') }}"
         v-cloak
-    >
-
-        <h1 class="flex-1" slot="heading" slot-scope="{ title }">
-            <div class="subhead">
-                <a href="{{ cp_route('user-groups.index') }}">{{ __('User Groups') }}</a>
-            </div>
-            {{ __('Create User Group') }}
-        </h1>
-
-    </user-group-publish-form>
+    ></user-group-publish-form>
 
 @endsection

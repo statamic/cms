@@ -7,7 +7,7 @@ use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Data\HasAugmentedData;
+use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Facades\Site;
@@ -19,7 +19,7 @@ use Statamic\Support\Arr;
 
 class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
 {
-    use Revisable, Routable, Publishable, HasAugmentedData, TracksQueriedColumns;
+    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns;
 
     protected $locale;
     protected $term;
@@ -361,19 +361,24 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
         return $this->set('layout', $layout);
     }
 
-    public function augmentedArrayData()
+    public function newAugmentedInstance()
     {
-        return $this->values()->merge([
-            'id' => $this->id(),
-            'slug' => $this->slug(),
-            'uri' => $this->uri(),
-            'url' => $this->url(),
-            'title' => $this->title(),
-            'is_term' => true,
-            'entries' => $entryQuery = $this->queryEntries()->where('site', $this->locale),
-            'entries_count' => $entryQuery->count(),
-        ])->all();
+        return new AugmentedTerm($this);
     }
+
+    // public function augmentedArrayData()
+    // {
+    //     return $this->values()->merge([
+    //         'id' => $this->id(),
+    //         'slug' => $this->slug(),
+    //         'uri' => $this->uri(),
+    //         'url' => $this->url(),
+    //         'title' => $this->title(),
+    //         'is_term' => true,
+    //         'entries' => $entryQuery = $this->queryEntries()->where('site', $this->locale),
+    //         'entries_count' => $entryQuery->count(),
+    //     ])->all();
+    // }
 
     public function save()
     {

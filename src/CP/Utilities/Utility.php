@@ -12,6 +12,7 @@ class Utility
     use FluentlyGetsAndSets;
 
     protected $handle;
+    protected $icon;
     protected $action;
     protected $view;
     protected $viewData;
@@ -24,6 +25,11 @@ class Utility
     public function handle($handle = null)
     {
         return $this->fluentlyGetOrSet('handle')->args(func_get_args());
+    }
+
+    public function icon($icon = null)
+    {
+        return $this->fluentlyGetOrSet('icon')->args(func_get_args());
     }
 
     public function slug()

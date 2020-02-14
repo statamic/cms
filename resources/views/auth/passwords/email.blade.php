@@ -28,7 +28,7 @@
                 @endif
                 <input id="email" type="text" class="input-text input-text" name="email" value="{{ old('email') }}" >
             </div>
-            <button type="submit" class="btn btn-primary">
+            <button type="submit" class="btn-primary">
                 {{ __('Submit') }}
             </button>
         </form>

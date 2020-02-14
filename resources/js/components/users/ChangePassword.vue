@@ -24,7 +24,7 @@
                     />
                 </div>
                 <div class="flex items-center">
-                    <button class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</button>
+                    <button class="btn-primary" @click.prevent="save">{{ __('Save') }}</button>
                     <label class="ml-2">
                         <input type="checkbox" v-model="reveal" />
                         {{ __('Reveal Password') }}
@@ -106,7 +106,7 @@ export default {
                     this.$toast.error(message);
                     this.saving = false;
                 } else {
-                    this.$toast.error('Something went wrong');
+                    this.$toast.error(__('Something went wrong'));
                 }
             })
         }

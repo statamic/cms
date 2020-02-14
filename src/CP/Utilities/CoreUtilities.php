@@ -16,6 +16,7 @@ class CoreUtilities
         Utility::make('cache')
             ->action([CacheController::class, 'index'])
             ->title(__('Cache Manager'))
+            ->icon('cache')
             ->navTitle(__('Cache'))
             ->description(__('statamic::messages.cache_utility_description'))
             ->docsUrl(Statamic::docsUrl('utilities/cache-manager'))
@@ -27,6 +28,7 @@ class CoreUtilities
         Utility::make('phpinfo')
             ->action(PhpInfoController::class)
             ->title(__('PHP Info'))
+            ->icon('php')
             ->description(__('statamic::messages.phpinfo_utility_description'))
             ->docsUrl(Statamic::docsUrl('utilities/phpinfo'))
             ->register();
@@ -34,6 +36,7 @@ class CoreUtilities
         Utility::make('search')
             ->view('statamic::utilities.search')
             ->title(__('Search'))
+            ->icon('search-utility')
             ->description(__('statamic::messages.search_utility_description'))
             ->docsUrl(Statamic::docsUrl('utilities/search'))
             ->routes(function ($router) {
@@ -44,6 +47,7 @@ class CoreUtilities
         Utility::make('email')
             ->view('statamic::utilities.email')
             ->title(__('Email'))
+            ->icon('email-utility')
             ->description(__('statamic::messages.email_utility_description'))
             ->docsUrl(Statamic::docsUrl('utilities/email'))
             ->routes(function ($router) {

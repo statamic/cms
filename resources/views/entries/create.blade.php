@@ -1,5 +1,6 @@
 @extends('statamic::layout')
 @section('title', $breadcrumbs->title('Create Entry'))
+@section('wrapper_class', 'max-w-2xl')
 
 @section('content')
     <base-entry-create-form
