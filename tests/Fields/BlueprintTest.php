@@ -113,6 +113,35 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    function it_can_check_if_has_field()
+    {
+        $blueprint = (new Blueprint)->setHandle('sectioned')->setContents($contents = [
+            'title' => 'Test',
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                    ]
+                ],
+                'section_two' => [
+                    'fields' => [
+                        ['handle' => 'two', 'field' => ['type' => 'text']]
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->assertTrue($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two'));
+        $this->assertFalse($blueprint->hasField('three'));
+
+        $this->assertTrue($blueprint->hasFieldInSection('one', 'section_one'));
+        $this->assertTrue($blueprint->hasFieldInSection('two', 'section_two'));
+        $this->assertFalse($blueprint->hasFieldInSection('three', 'section_two'));
+        $this->assertFalse($blueprint->hasFieldInSection('one', 'section_two'));
+    }
+
+    /** @test */
     function it_gets_fields()
     {
         $blueprint = new Blueprint;

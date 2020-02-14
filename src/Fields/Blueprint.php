@@ -84,6 +84,15 @@ class Blueprint
         return $this->fields()->has($field);
     }
 
+    public function hasFieldInSection($field, $section)
+    {
+        if ($section = $this->sections()->get($section)) {
+            return $section->fields()->has($field);
+        }
+
+        return false;
+    }
+
     public function field($field)
     {
         return $this->fields()->get($field);
