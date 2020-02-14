@@ -259,22 +259,8 @@ td .btn-icon {
 }
 
 
-/* Specialty Buttons
+/* Close button. For closing things.
   ========================================================================== */
-
-.btn-more,
-.btn-more:active {
-    background: none;
-    box-shadow: none;
-    border: none;
-    cursor: pointer;
-    display: inline-block;
-    padding: 0;
-    position: relative;
-    transition: all .2s ease;
-}
-
-.btn-more:before { line-height: 0; }
 
 .btn-close {
     @apply ml-2 p-0 text-xl text-grey-60 rounded-full;
