@@ -433,9 +433,12 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('two'));
         $this->assertTrue($blueprint->hasField('three'));
 
-        $blueprint->removeField('one');
-        $blueprint->removeField('three');
-        $blueprint->removeField('four'); // Ensure it doesn't error when field handle not found
+        $return = $blueprint
+            ->removeField('one')
+            ->removeField('three')
+            ->removeField('four'); // Ensure it doesn't error when field handle not found
+
+        $this->assertEquals($blueprint, $return);
 
         $this->assertFalse($blueprint->hasField('one'));
         $this->assertTrue($blueprint->hasField('two')); // Was never removed
@@ -468,12 +471,15 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('three'));
         $this->assertTrue($blueprint->hasField('four'));
 
-        $blueprint->removeField('one', 'section_one');
-        $blueprint->removeField('four', 'section_one'); // Doesn't exist in section one, so it won't be removed.
-        $blueprint->removeFieldFromSection('three', 'section_two');
-        $blueprint->removeFieldFromSection('two', 'section_two'); // Don't exist in section two, so it won't be removed.
-        $blueprint->removeField('seven', 'section_one'); // Ensure it doesn't error when field doesn't exist at all.
-        $blueprint->removeFieldFromSection('eight', 'section_one'); // Ensure it doesn't error when field doesn't exist at all.
+        $return = $blueprint
+            ->removeField('one', 'section_one')
+            ->removeField('four', 'section_one') // Doesn't exist in section one, so it won't be removed.
+            ->removeFieldFromSection('three', 'section_two')
+            ->removeFieldFromSection('two', 'section_two') // Don't exist in section two, so it won't be removed.
+            ->removeField('seven', 'section_one') // Ensure it doesn't error when field doesn't exist at all.
+            ->removeFieldFromSection('eight', 'section_one'); // Ensure it doesn't error when field doesn't exist at all.
+
+        $this->assertEquals($blueprint, $return);
 
         $this->assertFalse($blueprint->hasField('one'));
         $this->assertTrue($blueprint->hasField('two'));
