@@ -50,6 +50,10 @@
     .hovering .stack-content {
         transform: translateX(-16px);
     }
+
+    .breadcrumb .svg-icon {
+        display: none !important;
+    }
 }
 
 @media all and (max-width: 980px) {

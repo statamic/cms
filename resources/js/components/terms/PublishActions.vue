@@ -40,7 +40,7 @@
                         autofocus />
 
                     <button
-                        class="btn btn-primary w-full mb-3"
+                        class="btn-primary w-full mb-3"
                         v-text="submitButtonText"
                         @click="submit"
                     />

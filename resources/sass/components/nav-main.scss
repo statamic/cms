@@ -3,10 +3,9 @@
    ========================================================================== */
 
 .nav-main {
-    @apply select-none bg-white shadow h-screen p-2 absolute pin-l overflow-scroll w-full;
+    @apply select-none bg-white shadow h-screen fixed pin-l overflow-scroll w-full;
     transition: all .3s;
     z-index: 9998;
-
 
     ul {
         @apply list-reset mt-0 mb-3;
@@ -26,7 +25,7 @@
         }
 
         i {
-            @apply block h-6 p-sm w-6 mr-1.5 rounded-full;
+            @apply block h-7 p-sm w-7 mr-1 rounded-full;
         }
     }
 
@@ -39,7 +38,7 @@
     }
 
     li ul {
-        @apply mt-1 mb-2;
+        @apply mb-1;
         margin-left: 1.5rem;
 
         li {
@@ -55,13 +54,22 @@
     .nav-closed & {
         left: -110%;
     }
+
+    ul.section-top-level {
+        @apply font-medium text-grey-90;
+    }
 }
 
 @screen md {
     .nav-main {
-        @apply flex bg-transparent shadow-none h-auto pt-0 pl-4 pb-3 overflow-auto w-54;
+        @apply flex bg-transparent shadow-none overflow-auto w-56 border-r;
         z-index: 1;
+        height: calc(100% - 52px);
     }
+}
+
+.nav-main-inner {
+    @apply pl-3 pr-2 pt-2;
 }
 
 .nav-toggle {
@@ -77,13 +85,3 @@
 
 /* Responsive Wangjangling
   ========================================================================== */
-
-@media (min-height: 720px) {
-    .nav-main-wrapper {
-        position: sticky;
-    }
-}
-
-@media (max-width: 980px) and (min-width: 768px ) {
-    .nav-main .version { display: none; }
-}

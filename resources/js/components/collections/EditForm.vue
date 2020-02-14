@@ -4,30 +4,29 @@
         v-if="blueprint"
         ref="container"
         name="collection"
+        reference="collection"
         :blueprint="blueprint"
         :values="values"
-        reference="collection"
         :meta="meta"
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }">
+        <div slot-scope="{ setFieldValue, setFieldMeta }" class="mac-w-">
 
-            <div class="flex items-center mb-3">
-                <h1 class="flex-1">
-                    <small class="subhead block">
-                        <a :href="listingUrl" v-text="parentTitle" />
-                    </small>
+            <header class="mb-3">
+                <breadcrumb :url="url" :title="title" />
+                <h1 class="">{{ __('Configure Collection') }}</h1>
+            </header>
 
-                    {{ title }}
-                </h1>
-                <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
-            </div>
-
-            <publish-sections
+            <configure-sections
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
                 :enable-sidebar="false"/>
+
+            <div class="py-2 border-t flex justify-between">
+                <a :href="url" class="btn" v-text="__('Cancel') "/>
+                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
+            </div>
         </div>
     </publish-container>
 

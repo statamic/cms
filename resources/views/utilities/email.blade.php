@@ -3,20 +3,21 @@
 
 @section('content')
 
-    <h1>
-        <small class="subhead block">
-            <a href="{{ cp_route('utilities.index')}}">{{ __('Utilities') }}</a>
-        </small>
-        {{ __('Email') }}
-    </h1>
+    <header class="mb-3">
+        @include('statamic::partials.breadcrumb', [
+            'url' => cp_route('utilities.index'),
+            'title' => __('Utilities')
+        ])
+        <h1>{{ __('Email') }}</h1>
+    </header>
 
-    <div class="mt-4 p-3 rounded shadow bg-white">
+    <div class="card">
         <form method="POST" action="{{ cp_route('utilities.email') }}">
             @csrf
 
             <div class="flex items-center">
                 <input class="input-text mr-2" type="text" name="email" value="{{ old('email', $user->email()) }}" />
-                <button type="submit" class="btn btn-primary">{{ __('Send Test Email') }}</button>
+                <button type="submit" class="btn-primary">{{ __('Send Test Email') }}</button>
             </div>
             @if ($errors->has('email'))
                 <p class="mt-1"><small class="help-block text-red">{{ $errors->first('email') }}</small></p>
@@ -24,7 +25,7 @@
         </form>
     </div>
 
-    <h2 class="mt-4 mb-1 font-bold text-xl">{{ __('Configuration') }}</h2>
+    <h2 class="mt-5 mb-1 font-bold text-lg">{{ __('Configuration') }}</h2>
     <p class="text-sm text-grey mb-2">{!! __('statamic::messages.email_utility_configuration_description', ['path' => config_path('mail.php')]) !!}</p>
     <div class="card p-0">
         <table class="data-table">

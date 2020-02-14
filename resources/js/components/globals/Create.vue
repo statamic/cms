@@ -4,7 +4,7 @@
 
         <div class="flex items-center mb-3">
             <slot name="header" />
-            <button type="submit" class="btn btn-primary" @click="save">{{ __('Save') }}</button>
+            <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
         </div>
 
         <div class="card publish-fields p-0">

@@ -2,30 +2,24 @@
 
     <div>
 
-        <div class="subhead">
-            <a :href="cp_url('users')" v-text="__('Users')" class="font-bold hover:text-blue" />
-        </div>
+        <header class="mb-3">
+            <breadcrumb :url="cp_url('users')" :title="__('Users')" />
+            <div class="flex items-center">
+                <h1 class="flex-1" v-text="title" />
+                    <change-password
+                        v-if="canEditPassword"
+                        :save-url="actions.password"
+                        class="mr-2"
+                    />
 
-        <div class="flex items-center mb-3">
-            <h1 class="flex-1">
-                <div class="flex items-center" v-text="title" />
-            </h1>
+                    <button
+                        class="btn-primary"
+                        @click.prevent="save"
+                        v-text="__('Save')" />
 
-            <div class="hidden md:flex items-center">
-                <change-password
-                    v-if="canEditPassword"
-                    :save-url="actions.password"
-                    class="mr-2"
-                />
-
-                <button
-                    class="btn btn-primary"
-                    @click.prevent="save"
-                    v-text="__('Save')" />
+                <slot name="action-buttons-right" />
             </div>
-
-            <slot name="action-buttons-right" />
-        </div>
+        </header>
 
         <publish-container
             v-if="fieldset"

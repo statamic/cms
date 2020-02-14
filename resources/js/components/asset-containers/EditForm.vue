@@ -21,7 +21,7 @@
 
                     {{ title }}
                 </h1>
-                <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
+                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
             <publish-sections @updated="setFieldValue" :enable-sidebar="false"/>

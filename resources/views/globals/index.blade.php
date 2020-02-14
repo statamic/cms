@@ -8,7 +8,7 @@
         <div class="flex items-center mb-3">
             <h1 class="flex-1">{{ __('Globals') }}</h1>
             @can('create', 'Statamic\Contracts\Globals\GlobalSet')
-                <a href="{{ cp_route('globals.create') }}" class="btn btn-primary">{{ __('Create Global Set') }}</a>
+                <a href="{{ cp_route('globals.create') }}" class="btn-primary">{{ __('Create Global Set') }}</a>
             @endcan
         </div>
 

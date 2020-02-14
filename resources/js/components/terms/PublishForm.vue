@@ -1,9 +1,8 @@
 <template>
 
     <div>
-        <div class="subhead">
-            <a :href="taxonomyUrl" v-text="taxonomyTitle" class="font-bold hover:text-blue" />
-        </div>
+        <breadcrumb :url="taxonomyUrl" :title="taxonomyTitle" />
+
         <div class="flex items-center mb-3">
             <h1 class="flex-1">
                 <div class="flex items-center">
@@ -21,8 +20,8 @@
             <div class="hidden md:flex items-center">
                 <button
                     v-if="!readOnly"
-                    class="btn"
                     :class="{
+                        'btn': revisionsEnabled,
                         'btn-primary': ! revisionsEnabled,
                     }"
                     :disabled="!canSave"
@@ -31,7 +30,7 @@
 
                 <button
                     v-if="revisionsEnabled"
-                    class="ml-2 btn btn-primary flex items-center"
+                    class="ml-2 btn-primary flex items-center"
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
                     <span v-text="__('Publish')" />
@@ -184,10 +183,10 @@
         <div class="md:hidden mt-3 flex items-center">
             <button
                 v-if="!readOnly"
-                class="btn btn-lg"
+                class="btn-lg"
                 :class="{
                     'btn-primary w-full': ! revisionsEnabled,
-                    'w-1/2 mr-2': revisionsEnabled,
+                    'btn w-1/2 mr-2': revisionsEnabled,
                 }"
                 :disabled="!canSave"
                 @click.prevent="save"
@@ -195,7 +194,7 @@
 
             <button
                 v-if="revisionsEnabled"
-                class="ml-1 btn btn-lg justify-center btn-primary flex items-center w-1/2"
+                class="ml-1 btn-primary btn-lg justify-center flex items-center w-1/2"
                 :disabled="!canPublish"
                 @click="confirmingPublish = true">
                 <span v-text="__('Publish')" />

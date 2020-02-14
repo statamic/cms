@@ -9,21 +9,25 @@
 }
 
 .toasted-container .toasted.statamic {
-    @apply bg-grey-90 text-white px-2 mt-2 rounded shadow;
+    @apply bg-white text-grey-80 mt-2 text-base rounded shadow p-0;
+    height: 48px;
 
-    &.success {
-        @apply bg-green;
+    i {
+        @apply flex items-center rounded-l mr-2 h-full px-2 text-white;
     }
 
-    &.error {
+    &.success i {
+        @apply bg-green-light;
+    }
+
+    &.error i {
         @apply bg-red;
     }
 
     .action {
-        @apply font-normal text-lg;
-        color: rgba(255,255,255,.5);
+        @apply font-normal text-xl px-2 h-full text-grey-60 m-0 ml-1 flex items-center;
         &:hover {
-            @apply no-underline text-white;
+            @apply no-underline text-grey-90;
         }
     }
 }

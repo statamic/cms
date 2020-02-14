@@ -284,6 +284,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
     {
         return $this
             ->fluentlyGetOrSet('date')
+            ->getter(function ($date) {
+                return $date ?? $this->lastModified();
+            })
             ->setter(function ($date) {
                 if ($date === null) {
                     return null;
@@ -392,15 +395,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
             return false;
         }
 
-        if (!$this->hasDate()) {
-            return true;
-        }
-
         if ($collection->futureDateBehavior() === 'private' && $this->date()->isFuture()) {
             return true;
         }
 
-        if ($collection->pastDateBehavior() === 'private' && $this->date()->isPast()) {
+        if ($collection->pastDateBehavior() === 'private' && $this->date()->lte(now())) {
             return true;
         }
 

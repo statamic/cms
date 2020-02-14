@@ -3,18 +3,13 @@
 
 @section('content')
 
-    <div class="flex mb-3">
-        <h1>
-            <small class="subhead block">
-                <a href="{{ cp_route('forms.index')}}">{{ __('Forms') }}</a>
-            </small>
-            <a href="{{ cp_route('forms.show', $submission->form->handle()) }}">
-                {{ $submission->form->title() }}
-            </a>
-            @svg('chevron-right')
-            {{ $submission->date()->format('M j, Y @ h:m') }}
-        </h1>
-    </div>
+    <header class="mb-3">
+        @include('statamic::partials.breadcrumb', [
+            'url' => cp_route('forms.show', $submission->form->handle()),
+            'title' =>  $submission->form->title()
+        ])
+        <h1>{{ $submission->date()->format('M j, Y @ h:m') }}</h1>
+    </header>
 
     <div class="card" v-pre>
         <table class="data-table mt-0">

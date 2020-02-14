@@ -15,7 +15,7 @@
                 </div>
             </template>
             <template slot="footer">
-                <button @click.prevent="submit" class="btn btn-primary">{{ __('Submit') }}</button>
+                <button @click.prevent="submit" class="btn-primary">{{ __('Submit') }}</button>
             </template>
         </modal>
 
