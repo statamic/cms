@@ -11,6 +11,7 @@ use Statamic\Contracts\Routing\UrlBuilder;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Facades\Blink;
 
 class Page implements Entry, Augmentable, Responsable
 {
@@ -25,8 +26,6 @@ class Page implements Entry, Augmentable, Responsable
     protected $url;
     protected $title;
     protected $depth;
-
-    protected static $entries = [];
 
     public function setUrl($url)
     {
@@ -82,7 +81,7 @@ class Page implements Entry, Augmentable, Responsable
 
         if (! is_string($reference)) {
             throw_unless($id = $reference->id(), new \Exception('Cannot set an entry without an ID'));
-            static::$entries[$id] = $reference;
+            Blink::store('structure-page-entries')->put($id, $reference);
             $reference = $id;
         }
 
@@ -97,7 +96,9 @@ class Page implements Entry, Augmentable, Responsable
             return null;
         }
 
-        return static::$entries[$this->reference] = static::$entries[$this->reference] ?? EntryAPI::find($this->reference);
+        return Blink::store('structure-page-entries')->once($this->reference, function () {
+            return EntryAPI::find($this->reference);
+        });
     }
 
     public function reference()
