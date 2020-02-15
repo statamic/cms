@@ -1,5 +1,5 @@
 <?php
 
 return [
-    'cheatsheet' => '',
+    'cheatsheet' => 'guía',
 ];
