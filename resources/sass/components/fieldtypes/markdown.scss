@@ -3,7 +3,6 @@
    ========================================================================== */
 
 .markdown-fieldtype-wrapper {
-
     @apply border rounded overflow-hidden relative;
 
     &:focus-within {
@@ -11,9 +10,6 @@
     }
 
     .markdown-toolbar {
-        // @apply bg-white shadow-none border-b text-sm p-1 flex items-center justify-between;
-        // padding: 8px 12px;
-
         @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between;
         padding: 4px 8px;
     }
@@ -37,7 +33,7 @@
     }
 
     .markdown-buttons button:focus {
-        outline: none;
+        @apply focus-outline;
     }
 
     .markdown-buttons button:disabled {
@@ -46,7 +42,6 @@
             @apply .text-grey-80;
         }
     }
-
 
     .markdown-modes {
         @apply ml-1 flex items-center h-full;
@@ -61,6 +56,10 @@
 
             &.active {
                 @apply text-grey-80;
+            }
+
+            &:focus {
+                @apply focus-outline;
             }
         }
     }

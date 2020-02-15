@@ -51,7 +51,7 @@
     }
 
     .bard-toolbar-button:focus {
-        outline: none;
+        @apply focus-outline;
     }
 
     .bard-toolbar-button:disabled {
