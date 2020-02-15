@@ -140,6 +140,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Scope::class,
         Tags\Set::class,
         Tags\Section::class,
+        Tags\Session::class,
         Tags\Structure::class,
         Tags\Svg::class,
         Tags\Taxonomy\Taxonomy::class,
