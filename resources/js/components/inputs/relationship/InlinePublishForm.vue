@@ -12,7 +12,7 @@
         </div>
 
         <component
-            class="max-w-2xl mx-auto"
+            class="max-w-3xl mx-auto"
             :is="component"
             v-if="!loading"
             v-bind="componentPropValues"
