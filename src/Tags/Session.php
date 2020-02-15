@@ -6,7 +6,7 @@ class Session extends Tags
 {
     public function index()
     {
-        return session()->all();
+        return $this->returnableSession();
     }
 
     public function dump()
@@ -20,7 +20,7 @@ class Session extends Tags
             session()->put($key, $value);
         }
 
-        return session()->all();
+        return $this->returnableSession();
     }
 
     public function flash()
@@ -29,7 +29,7 @@ class Session extends Tags
             session()->flash($key, $value);
         }
 
-        return session()->all();
+        return $this->returnableSession();
     }
 
     public function flush()
@@ -41,6 +41,17 @@ class Session extends Tags
     {
         foreach ($this->params as $key => $value) {
             session()->forget($key);
+        }
+
+        return $this->returnableSession();
+    }
+
+    protected function returnableSession()
+    {
+        if (! $this->isPair) return;
+
+        if ($as = $this->get('as')) {
+            return [$as => session()->all()];
         }
 
         return session()->all();
