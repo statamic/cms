@@ -63,13 +63,13 @@
                         <div class="helpers">
                             <!-- TODO: Fix modal -->
                             <div class="markdown-cheatsheet-helper">
-                                <button class="btn-link" @click="showCheatsheet = true">
+                                <button class="text-link" @click="showCheatsheet = true">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="208" height="128" viewBox="0 0 208 128"><mask id="a"><rect width="100%" height="100%" fill="#fff"/><path d="M30 98v-68h20l20 25 20-25h20v68h-20v-39l-20 25-20-25v39zM155 98l-30-33h20v-35h20v35h20z"/></mask><rect width="100%" height="100%" ry="15" fill="currentColor" mask="url(#a)"/></svg>
                                     <span>{{ __('Markdown Cheatsheet') }}</span>
                                 </button>
                             </div>
                             <div class="markdown-asset-helper flex items-center" v-if="assetsEnabled">
-                                <button class="btn-link flex items-center mr-1" @click.prevent="addAsset">
+                                <button class="text-link flex items-center mr-1" @click.prevent="addAsset">
                                     <svg-icon name="folder-image" class='w-4 h-4 mr-sm' />
                                     {{ __('Insert Asset') }}
                                 </button>

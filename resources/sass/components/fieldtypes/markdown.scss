@@ -63,7 +63,11 @@
     }
 
     .helpers {
-        @apply border-t text-xs text-grey flex items-center;
+        @apply border-t text-xs text-grey-80 flex items-center;
+
+        button:hover {
+            @apply text-blue;
+        }
     }
 
     .markdown-cheatsheet-helper {
