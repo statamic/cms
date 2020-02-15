@@ -184,10 +184,8 @@ class UsersController extends CpController
         return view('statamic::users.edit', $viewData);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $user)
     {
-        $user = User::find($id);
-
         $this->authorize('edit', $user);
 
         $fields = $user->blueprint()->fields()->addValues($request->all());
