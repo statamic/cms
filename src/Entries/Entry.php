@@ -88,15 +88,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function blueprint()
     {
-        return Blink::once("entry-blueprint-{$this->id()}", function () {
-            return $this->fluentlyGetOrSet('blueprint')
-                ->getter(function ($blueprint) {
-                    return $blueprint
-                        ? $this->collection()->ensureEntryBlueprintFields(Blueprint::find($blueprint))
-                        : $this->defaultBlueprint();
-                })
-                ->args(func_get_args());
-        });
+        return $this->fluentlyGetOrSet('blueprint')
+            ->getter(function ($blueprint) {
+                return $blueprint
+                    ? $this->collection()->ensureEntryBlueprintFields(Blueprint::find($blueprint))
+                    : $this->defaultBlueprint();
+            })
+            ->args(func_get_args());
     }
 
     public function collectionHandle()
@@ -193,13 +191,15 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function defaultBlueprint()
     {
-        if ($blueprint = $this->value('blueprint')) {
-            return $this->collection()->ensureEntryBlueprintFields(
-                Blueprint::find($blueprint)
-            );
-        }
+        return Blink::once("entry-defaultblueprint-{$this->id()}", function () {
+            if ($blueprint = $this->value('blueprint')) {
+                return $this->collection()->ensureEntryBlueprintFields(
+                    Blueprint::find($blueprint)
+                );
+            }
 
-        return $this->collection()->entryBlueprint();
+            return $this->collection()->entryBlueprint();
+        });
     }
 
     public function save()
