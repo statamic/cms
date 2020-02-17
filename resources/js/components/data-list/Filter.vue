@@ -8,6 +8,7 @@
             :values="values || defaultValues"
             :meta="filter.meta"
             :errors="errors"
+            :track-dirty-state="false"
             @updated="$emit('changed', $event)"
         >
             <publish-fields

@@ -40,26 +40,28 @@ export default {
         },
         isRoot: {
             // intentionally not a boolean. we rely on it being undefined in places.
+        },
+        trackDirtyState: {
+            type: Boolean,
+            default: () => false
         }
     },
 
     data() {
         return {
             components: [], // extra components to be injected
-            managesVuexModule: true,
+            managesVuexModule: true // false when the Vuex module already exists, i.e. some other container created it before us
         }
     },
 
     created() {
         this.managesVuexModule = this.registerVuexModule();
-        if (!this.managesVuexModule) return;
         this.$events.$emit('publish-container-created', this);
     },
 
     destroyed() {
-        if (!this.managesVuexModule) return;
-        this.removeVuexModule();
-        this.clearDirtyState();
+        if (this.trackDirtyState) this.clearDirtyState();
+        if (this.managesVuexModule) this.removeVuexModule();
         this.$events.$emit('publish-container-destroyed', this);
     },
 
@@ -176,11 +178,11 @@ export default {
 
         emitUpdatedEvent(values) {
             this.$emit('updated', values);
-            this.dirty();
+            if (this.trackDirtyState) this.dirty();
         },
 
         saved() {
-            this.clearDirtyState();
+            if (this.trackDirtyState) this.clearDirtyState();
         },
 
         clearDirtyState() {
