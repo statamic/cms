@@ -173,7 +173,7 @@
 
 .bard-fieldtype .bard-fullscreen {
     @apply .fixed .bg-grey-20 .pin .min-h-screen .overflow-scroll rounded-none;
-    z-index: 11; // to appear over the top of the rest of the stuff on the page.
+    z-index: 998; // to appear over the top of the rest of the stuff on the page.
                 // too high and it'll be over the top of stacks, etc.
 
     .bard-editor {
