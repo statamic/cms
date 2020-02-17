@@ -4,6 +4,7 @@ namespace Tests\Fields;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
+use Facades\Statamic\Fields\FieldsetRepository;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Field as FieldAPI;
 use Statamic\Fields\Blueprint;
@@ -117,16 +118,13 @@ class BlueprintTest extends TestCase
     /** @test */
     function it_can_check_if_has_field()
     {
-        $partial = (new Fieldset)->setHandle('partial')->setContents([
-            'title' => 'Partial',
-            'fields' => [
-                'three' => ['type' => 'text'],
-            ],
-        ]);
-
-        $this->mock(FieldsetRepository::class)
-            ->shouldReceive('find')
-            ->andReturn($partial);
+        FieldsetRepository::shouldReceive('find')
+            ->andReturn((new Fieldset)->setHandle('partial')->setContents([
+                'title' => 'Partial',
+                'fields' => [
+                    'three' => ['type' => 'text'],
+                ],
+            ]));
 
         $blueprint = (new Blueprint)->setHandle('sectioned')->setContents($contents = [
             'title' => 'Test',
