@@ -43,8 +43,8 @@ EOT;
         $this->assertInstanceOf(Fieldset::class, $fieldset);
         $this->assertEquals('Test Fieldset', $fieldset->title());
         $this->assertEquals('test', $fieldset->handle());
-        $this->assertEquals(['one', 'two'], $fieldset->fields()->map->handle()->values()->all());
-        $this->assertEquals(['First Field', 'Second Field'], $fieldset->fields()->map->display()->values()->all());
+        $this->assertEquals(['one', 'two'], $fieldset->fields()->all()->map->handle()->values()->all());
+        $this->assertEquals(['First Field', 'Second Field'], $fieldset->fields()->all()->map->display()->values()->all());
     }
 
     /** @test */

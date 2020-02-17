@@ -2,15 +2,17 @@
 
 namespace Tests\Fields;
 
-use Tests\TestCase;
-use Statamic\Fields\Field;
-use Statamic\Fields\Fields;
-use Statamic\Fields\Section;
-use Statamic\Fields\Blueprint;
+use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Statamic\Fields\FieldRepository;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Field as FieldAPI;
-use Facades\Statamic\Fields\FieldRepository;
-use Facades\Statamic\Fields\BlueprintRepository;
+use Statamic\Fields\Blueprint;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
+use Statamic\Fields\Fieldset;
+use Statamic\Fields\FieldsetRepository;
+use Statamic\Fields\Section;
+use Tests\TestCase;
 
 class BlueprintTest extends TestCase
 {
@@ -115,6 +117,17 @@ class BlueprintTest extends TestCase
     /** @test */
     function it_can_check_if_has_field()
     {
+        $partial = (new Fieldset)->setHandle('partial')->setContents([
+            'title' => 'Partial',
+            'fields' => [
+                'three' => ['type' => 'text'],
+            ],
+        ]);
+
+        $this->mock(FieldsetRepository::class)
+            ->shouldReceive('find')
+            ->andReturn($partial);
+
         $blueprint = (new Blueprint)->setHandle('sectioned')->setContents($contents = [
             'title' => 'Test',
             'sections' => [
@@ -125,7 +138,8 @@ class BlueprintTest extends TestCase
                 ],
                 'section_two' => [
                     'fields' => [
-                        ['handle' => 'two', 'field' => ['type' => 'text']]
+                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                        ['import' => 'partial'],
                     ]
                 ]
             ]
@@ -133,12 +147,15 @@ class BlueprintTest extends TestCase
 
         $this->assertTrue($blueprint->hasField('one'));
         $this->assertTrue($blueprint->hasField('two'));
-        $this->assertFalse($blueprint->hasField('three'));
+        $this->assertTrue($blueprint->hasField('three'));
+        $this->assertFalse($blueprint->hasField('four')); // Doesnt exist
 
         $this->assertTrue($blueprint->hasFieldInSection('one', 'section_one'));
         $this->assertTrue($blueprint->hasFieldInSection('two', 'section_two'));
-        $this->assertFalse($blueprint->hasFieldInSection('three', 'section_two'));
-        $this->assertFalse($blueprint->hasFieldInSection('one', 'section_two'));
+        $this->assertTrue($blueprint->hasFieldInSection('three', 'section_two'));
+        $this->assertFalse($blueprint->hasFieldInSection('one', 'section_two')); // In section one
+        $this->assertFalse($blueprint->hasFieldInSection('three', 'section_one')); // In section two
+        $this->assertFalse($blueprint->hasFieldInSection('four', 'section_two')); // Doesnt exist
     }
 
     /** @test */
