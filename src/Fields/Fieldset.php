@@ -40,13 +40,15 @@ class Fieldset
         return array_get($this->contents, 'title', Str::humanize($this->handle));
     }
 
-    public function fields()
+    public function fields(): Fields
     {
         $fields = array_get($this->contents, 'fields', []);
 
-        return collect($fields)->map(function ($config, $handle) {
-            return new Field($handle, $config);
-        });
+        $fields = collect($fields)->map(function ($field, $handle) {
+            return compact('handle', 'field');
+        })->values();
+
+        return new Fields($fields->all());
     }
 
     public function field(string $handle): ?Field

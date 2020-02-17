@@ -4,13 +4,13 @@ namespace Statamic\Fields;
 
 use Illuminate\Support\Collection;
 use Statamic\Facades\Field as FieldAPI;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Section
 {
     protected $handle;
     protected $contents = [];
-    protected $extraFields = [];
 
     public function __construct($handle)
     {
@@ -36,31 +36,7 @@ class Section
 
     public function fields(): Fields
     {
-        $fields = array_get($this->contents, 'fields', []);
-
-        if (! empty($this->extraFields)) {
-            foreach ($this->extraFields as $handle => $extra) {
-                $new = [
-                    'handle' => $handle,
-                    'field' => $extra['field']
-                ];
-
-                if ($extra['prepend']) {
-                    array_unshift($fields, $new);
-                } else {
-                    $fields[] = $new;
-                }
-            }
-        }
-
-        return new Fields($fields);
-    }
-
-    public function extraFields(array $fields)
-    {
-        $this->extraFields = $fields;
-
-        return $this;
+        return new Fields(Arr::get($this->contents, 'fields', []));
     }
 
     public function toPublishArray()
