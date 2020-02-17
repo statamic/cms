@@ -113,7 +113,9 @@ class DataResponse implements Responsable
             throw new NotFoundHttpException;
         }
 
-        $this->headers['X-Statamic-Draft'] = true;
+        if ($this->isLivePreview()) {
+            $this->headers['X-Statamic-Draft'] = true;
+        }
 
         return $this;
     }
