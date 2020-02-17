@@ -4,6 +4,11 @@ namespace Statamic\Tags;
 
 class Session extends Tags
 {
+    public function wildcard($tag)
+    {
+        return session()->get($tag, $this->params->get('default'));
+    }
+
     public function index()
     {
         return $this->returnableSession();
@@ -39,7 +44,7 @@ class Session extends Tags
 
     public function forget()
     {
-        foreach ($this->params as $key => $value) {
+        foreach ($this->params->explode('keys') as $key) {
             session()->forget($key);
         }
 
@@ -50,7 +55,7 @@ class Session extends Tags
     {
         if (! $this->isPair) return;
 
-        if ($as = $this->get('as')) {
+        if ($as = $this->params->get('as')) {
             return [$as => session()->all()];
         }
 
