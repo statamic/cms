@@ -15,7 +15,7 @@ class AddRequestMessage
      */
     public function handle(ViewRendered $event)
     {
-        if (! app()->bound('debugbar') || ! app('debugbar')->isEnabled()) {
+        if (! debugbar()->isEnabled()) {
             return;
         }
 
