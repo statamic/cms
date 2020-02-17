@@ -1,7 +1,7 @@
 <template>
 
     <th>
-        <div class="flex items-center justify-between">
+        <div v-if="field.type != 'hidden'" class="flex items-center justify-between">
             <div>{{ field.display || field.handle }}</div>
             <div
                 v-if="field.instructions"
