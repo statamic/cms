@@ -191,13 +191,15 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function defaultBlueprint()
     {
-        if ($blueprint = $this->value('blueprint')) {
-            return $this->collection()->ensureEntryBlueprintFields(
-                Blueprint::find($blueprint)
-            );
-        }
+        return Blink::once("entry-defaultblueprint-{$this->id()}", function () {
+            if ($blueprint = $this->value('blueprint')) {
+                return $this->collection()->ensureEntryBlueprintFields(
+                    Blueprint::find($blueprint)
+                );
+            }
 
-        return $this->collection()->entryBlueprint();
+            return $this->collection()->entryBlueprint();
+        });
     }
 
     public function save()
