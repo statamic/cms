@@ -164,18 +164,22 @@ class Blueprint
 
     public function ensureFieldInSection($handle, $fieldConfig, $section, $prepend = false)
     {
-        $fields = collect($this->contents['sections'][$section]['fields'] ?? []);
-
-        // See if field already exists in section.
-        if ($exists = $this->hasFieldInSection($handle, $section)) {
-            $fieldKey = $fields->search(function ($field) use ($handle) {
-                return Arr::get($field, 'handle') === $handle;
-            });
+        // Ensure section exists.
+        if (! isset($this->contents['sections'][$section])) {
+            $this->contents['sections'][$section] = [];
         }
 
+        // Get fields from section, including imported fields.
+        $fields = $this->sections()->get($section)->fields()->all()->map(function ($field, $handle) {
+            return [
+                'handle' => $handle,
+                'field' => $field->config(),
+            ];
+        });
+
         // If it already exists, merge field config.
-        if ($exists) {
-            $fieldConfig = array_merge($fieldConfig, $fields->get($fieldKey)['field']);
+        if ($exists = $this->hasFieldInSection($handle, $section)) {
+            $fieldConfig = array_merge($fieldConfig, $fields[$handle]['field']);
         }
 
         // Combine handle and field config.
@@ -186,17 +190,17 @@ class Blueprint
 
         // Set the field config in it's proper place.
         if ($prepend && $exists) {
-            $fields->forget($fieldKey)->prepend($field);
+            $fields->forget($handle)->prepend($field);
         } elseif ($prepend && ! $exists) {
             $fields->prepend($field);
         } elseif ($exists) {
-            $fields->put($fieldKey, $field);
+            $fields->put($handle, $field);
         } else {
             $fields->push($field);
         }
 
         // Set fields back into blueprint contents.
-        $this->contents['sections'][$section]['fields'] = $fields->all();
+        $this->contents['sections'][$section]['fields'] = $fields->values()->all();
 
         return $this->resetFieldsCache();
     }

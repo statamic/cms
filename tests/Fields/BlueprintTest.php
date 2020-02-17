@@ -11,7 +11,6 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;
-use Statamic\Fields\FieldsetRepository;
 use Statamic\Fields\Section;
 use Tests\TestCase;
 
@@ -314,6 +313,14 @@ class BlueprintTest extends TestCase
     /** @test */
     function it_ensures_a_field_exists_if_it_doesnt()
     {
+        FieldsetRepository::shouldReceive('find')
+            ->andReturn((new Fieldset)->setHandle('partial')->setContents([
+                'title' => 'Partial',
+                'fields' => [
+                    'three' => ['type' => 'text'],
+                ],
+            ]));
+
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
             'title' => 'Test',
             'sections' => [
@@ -324,26 +331,29 @@ class BlueprintTest extends TestCase
                 ],
                 'section_two' => [
                     'fields' => [
-                        ['handle' => 'two', 'field' => ['type' => 'text']]
+                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                        ['import' => 'partial'],
                     ]
                 ]
             ]
         ]);
-        $this->assertFalse($blueprint->hasField('three'));
+        $this->assertFalse($blueprint->hasField('four'));
 
         $return = $blueprint
-            ->ensureField('three', ['type' => 'textarea']) // field "three" doesnt exist, so it should get added.
-            ->ensureField('two', ['type' => 'textarea', 'foo' => 'bar']);  // field "two" exists so the config is merged
+            ->ensureField('four', ['type' => 'textarea']) // field "four" doesnt exist.
+            ->ensureField('two', ['type' => 'textarea', 'foo' => 'bar'])  // field "two" exists in blueprint.
+            ->ensureField('three', ['type' => 'textarea', 'foo' => 'baz']); // field "three" exists in partial.
 
         $this->assertEquals($blueprint, $return);
-        $this->assertTrue($blueprint->hasField('three'));
+        $this->assertTrue($blueprint->hasField('four'));
         tap($blueprint->fields()->all(), function ($items) {
-            $this->assertCount(3, $items);
+            $this->assertCount(4, $items);
             $this->assertEveryItemIsInstanceOf(Field::class, $items);
             $this->assertEquals([
                 'one' => ['type' => 'text'],
-                'three' => ['type' => 'textarea'],
                 'two' => ['type' => 'text', 'foo' => 'bar'], // config gets merged, but keys in the blueprint win.
+                'three' => ['type' => 'text', 'foo' => 'baz'], // config gets merged, but keys in partial win.
+                'four' => ['type' => 'textarea'], // field gets added.
             ], $items->map->config()->all());
         });
     }
