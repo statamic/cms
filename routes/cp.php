@@ -31,8 +31,6 @@ Route::group([
         Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
     });
 
-    Route::get('structures/{collection}/entries/{entry}/{slug}', 'Collections\EntriesController@edit')->name('structures.entries.edit');
-
     Route::group(['namespace' => 'Collections'], function () {
         Route::resource('collections', 'CollectionsController');
         Route::get('collections/{collection}/scaffold', 'ScaffoldCollectionController@index')->name('collections.scaffold');

@@ -79,10 +79,6 @@ class EntriesController extends CpController
 
     public function edit(Request $request, $collection, $entry)
     {
-        if ($collection->hasStructure() && $request->route()->getName() === 'statamic.cp.collections.entries.edit') {
-            return redirect()->to(cp_route('structures.entries.edit', [$collection->handle(), $entry->id(), $entry->slug()]));
-        }
-
         $this->authorize('view', $entry);
 
         $entry = $entry->fromWorkingCopy();

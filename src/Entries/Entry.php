@@ -130,9 +130,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function editUrl()
     {
-        return $this->hasStructure()
-            ? $this->cpUrl('structures.entries.edit')
-            : $this->cpUrl('collections.entries.edit');
+        return $this->cpUrl('collections.entries.edit');
     }
 
     public function updateUrl()
