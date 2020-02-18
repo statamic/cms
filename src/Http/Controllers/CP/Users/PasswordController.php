@@ -10,8 +10,6 @@ class PasswordController extends CpController
 {
     public function update(Request $request, $user)
     {
-        $user = User::find($user);
-
         $this->authorize('editPassword', $user);
 
         $request->validate([
