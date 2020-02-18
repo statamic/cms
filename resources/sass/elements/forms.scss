@@ -27,7 +27,7 @@ select {
   ========================================================================== */
 
 .input-text {
-    @apply appearance-none bg-grey-10 text-grey-80 w-full border p-1 rounded shadow-inner;
+    @apply appearance-none bg-grey-10 text-grey-80 max-w-full w-full border p-1 rounded shadow-inner;
     height: 38px;
     transition: border-color .15s ease-in-out,
                 box-shadow .15s ease-in-out;
