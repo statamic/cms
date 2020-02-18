@@ -20,7 +20,7 @@ class StructuresController extends CpController
         $this->authorize('index', StructureContract::class, 'You are not authorized to view any structures.');
 
         $structures = Structure::all()->filter(function ($structure) {
-            return User::current()->can('view', $structure);
+            return !$structure->isCollectionBased() && User::current()->can('view', $structure);
         })->map(function ($structure) {
             $tree = $structure->in(Site::selected()->handle());
 
@@ -41,6 +41,8 @@ class StructuresController extends CpController
     public function edit($structure)
     {
         $structure = Structure::find($structure);
+
+        abort_if($structure->isCollectionBased(), 404);
 
         $this->authorize('edit', $structure, 'You are not authorized to edit this structure.');
 
@@ -79,6 +81,9 @@ class StructuresController extends CpController
     public function show(Request $request, $structure)
     {
         $structure = Structure::find($structure);
+
+        abort_if($structure->isCollectionBased(), 404);
+
         $site = $request->site ?? Site::selected()->handle();
 
         if (! $structure || ! $tree = $structure->in($site)) {
@@ -131,6 +136,8 @@ class StructuresController extends CpController
         $fields->validate();
 
         $structure = Structure::find($structure);
+
+        abort_if($structure->isCollectionBased(), 404);
 
         $this->authorize('update', $structure, 'You are not authorized to edit this structure.');
 
@@ -312,6 +319,8 @@ class StructuresController extends CpController
     public function destroy($structure)
     {
         $structure = Structure::findByHandle($structure);
+
+        abort_if($structure->isCollectionBased(), 404);
 
         $this->authorize('delete', $structure, 'You are not authorized to delete this structure.');
 
