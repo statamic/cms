@@ -3,11 +3,16 @@
    ========================================================================== */
 
 .data-list-header {
-    @apply py-1.5 pr-2 flex flex-wrap items-center border-b;
+    @apply p-2 flex flex-wrap items-center;
 }
 
 .data-list-search-input {
-    @apply text-sm px-2 py-1 outline-none flex-1;
+	// @apply text-sm px-2 py-1 flex-1 rounded border;
+	@apply bg-white;
+
+	&:focus {
+		@apply focus-outline;
+	}
 }
 
 .data-list-footer {
@@ -20,16 +25,20 @@
 	width: fit-content;
 
     thead {
-        @apply bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide outline-none;
+		// @apply bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide outline-none;
+		@apply text-sm text-grey-70 text-grey-90;
 
 		tr {
 			@apply border-b;
 		}
 
         th {
-            @apply font-medium px-2 py-1.5;
+            @apply font-medium px-2 pt-2 pb-1;
             &:first-child { @apply .rounded-tl; }
-            &:last-child { @apply .rounded-tr; }
+			&:last-child { @apply .rounded-tr; }
+			&:hover {
+				@apply text-grey-90;
+			}
         }
 	}
 
@@ -68,7 +77,8 @@
         @apply cursor-pointer select-none;
 
         &:hover {
-            @apply bg-grey-30;
+			// @apply bg-grey-30;
+			@apply text-blue-500;
         }
 
         &.current-column {
@@ -77,7 +87,7 @@
         }
 
         svg {
-            transition: all 150ms ease;
+            // transition: all 150ms ease;
             opacity: 0;
         }
 

@@ -1,12 +1,12 @@
 <template>
 
-    <div class="p-3">
+    <div>
 
         <div v-if="hasFilters" v-for="(filter, index) in filters">
-            <div class="flex items-center mb-3">
+            <div class="flex flex-col mb-1">
 
                 <select-input
-                    class="mr-2"
+                    class="mb-1"
                     name="fieldHandle"
                     :options="fieldOptions(filter)"
                     :value="filter.fieldHandle"
@@ -19,16 +19,17 @@
                     class="flex-1"
                     @updated="filterUpdated(index, $event)" />
 
-                <button @click="remove(index)" class="btn-close ml-1 group">
+                <!-- <button @click="remove(index)" class="btn-close ml-1 group">
                     <svg-icon name="trash" class="w-auto group-hover:text-red" />
-                </button>
+                </button> -->
 
             </div>
         </div>
-        <div :class="{ 'border-t': hasFilters, 'pt-3': hasFilters }">
+        <!-- TODO: This button should apply the current filter (or at least just close the popper) -->
+        <div class="mt-1">
             <button
                 v-text="__('Add Filter')"
-                class="btn"
+                class="btn btn-sm"
                 :disabled="! canAdd"
                 @click="add()" />
         </div>

@@ -1,26 +1,18 @@
 <template>
 
-    <div>
+    <div class="flex flex-col items-center text-sm">
+        <select-input
+            class="w-full mb-1"
+            name="operator"
+            :value="filter.operator"
+            placeholder=""
+            :options="operatorOptions"
+            @input="onOperatorUpdated" />
 
-        <div class="flex items-center text-sm">
-
-            <select-input
-                class="w-1/3 mr-2"
-                name="operator"
-                :value="filter.operator"
-                placeholder=""
-                :options="operatorOptions"
-                @input="onOperatorUpdated" />
-
-            <div class="flex-1">
-                <text-input
-                    name="value"
-                    :value="filter.value"
-                    @input="onValueUpdated" />
-            </div>
-
-        </div>
-
+        <text-input
+            name="value"
+            :value="filter.value"
+            @input="onValueUpdated" />
     </div>
 
 </template>

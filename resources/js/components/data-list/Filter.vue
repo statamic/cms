@@ -1,6 +1,6 @@
 <template>
 
-    <div>
+    <div class="w-full">
         <publish-container
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"

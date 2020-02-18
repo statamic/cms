@@ -35,7 +35,7 @@ dropdown-list {
 }
 
 .dropdown-menu {
-    @apply bg-white shadow-lg absolute block float-left list-reset p-1 rounded-md text-left;
+    @apply bg-white shadow-popover absolute block float-left list-reset p-1 rounded-md text-left;
     top: 100%;
     left: auto;
     right: -5px;
@@ -53,7 +53,7 @@ dropdown-list {
     text-shadow: none;
 
     button {
-        @apply block w-full text-left rounded text-xs font-normal px-1 py-sm text-grey-80;
+        @apply block w-full text-left rounded-sm text-xs font-normal px-1 py-sm text-grey-80;
         line-height: 1.4;
         white-space: nowrap;
 

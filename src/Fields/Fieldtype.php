@@ -32,7 +32,7 @@ abstract class Fieldtype implements Arrayable
     protected $queryOperators = [
         '=' => 'Equal to',
         '<>' => 'Not equal to',
-        'like' => 'Like',
+        'like' => 'Contains',
     ];
 
     public function setField(Field $field)

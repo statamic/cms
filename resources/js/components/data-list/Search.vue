@@ -1,13 +1,13 @@
 <template>
-    <input
-        type="text"
-        ref="input"
-        class="data-list-search-input"
-        placeholder="Search..."
-        :value="value"
-        @input="emitEvent"
-        @keyup.esc="reset"
-    >
+        <input
+            type="text"
+            ref="input"
+            placeholder="Search..."
+            :value="value"
+            @input="emitEvent"
+            @keyup.esc="reset"
+            class="input-text flex-1 bg-white text-sm">
+    </div>
 </template>
 
 <script>

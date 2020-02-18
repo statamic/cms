@@ -83,16 +83,34 @@ input.input-text-minimal:read-only,
         @apply rounded-r-none border-r-0;
     }
 
-    .input-group-prepend {
-        @apply rounded-l bg-grey-30 px-1 border border-grey-50 text-sm;
+    .input-group-prepend, .input-group-append {
+        @apply rounded-l px-1 border text-sm text-grey-80 select-none;
+        background: linear-gradient(180deg, #fff, #f9fafb);
+        border: 1px solid #c4cdd6;
+        box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
         height: 38px;
         line-height: 36px;
+
+        &:focus {
+            @apply focus-none;
+        }
+
+        &button {
+            @apply cursor-pointer;
+        }
     }
 
+    button.input-group-prepend:hover:not(:disabled),
+        button.input-group-prepend:active:not(:disabled),
+        button.input-group-append:hover:not(:disabled),
+        button.input-group-append:active:not(:disabled) {
+            background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+            border-color: #c4cdd5;
+        }
+
     .input-group-append {
-        @apply rounded-r bg-grey-30 px-1 border border-grey-50 text-sm;
-        height: 38px;
-        line-height: 36px;
+        @apply rounded-l-none border-r-0; // Rounded on the other side
+        &:last-child { @apply rounded-r border-r; }
     }
 }
 
@@ -133,24 +151,39 @@ input.input-text-minimal:read-only,
 /* Select Fields
   ========================================================================== */
   .select-input-container {
-      @apply rounded relative;
+    @apply rounded relative;
 
-      &:focus, &:focus-within {
-          @apply focus-outline;
-      }
+    &:focus, &:focus-within {
+        @apply focus-outline;
+    }
 
-      select {
-          @include button(#fff, config('colors.grey-80'));
-          @apply block appearance-none pl-1.5 text-left pr-4 bg-white cursor-pointer w-full h-full relative shadow-button;
-      }
+    select {
+        @apply text-sm text-grey-80 shadow-button cursor-pointer block w-full h-full text-left relative max-w-full;
+        @apply select-none rounded leading-normal align-middle whitespace-no-wrap appearance-none subpixel-antialiased;
 
-      .select-input-toggle {
-          @apply pointer-events-none absolute pin-y pin-r flex items-center px-1 text-grey-90;
+        background: linear-gradient(180deg, #fff, #f9fafb);
+        border: 1px solid #c4cdd6;
+        height: 2.375rem; // 38px
+        letter-spacing: -0.01em;
+        padding: .475rem 1.25rem .475rem .75rem;
 
-          svg {
-              @apply fill-current h-4 w-4;
-          }
-      }
+        &:focus {
+            @apply focus-outline;
+        }
+
+        &:hover:not(:disabled), &:active:not(:disabled) {
+            background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+            border-color: #c4cdd5;
+        }
+    }
+
+    .select-input-toggle {
+        @apply pointer-events-none absolute pin-y pin-r flex items-center px-1 text-grey-90;
+
+        svg {
+            @apply fill-current h-4 w-4;
+        }
+    }
   }
 
 

@@ -2,7 +2,9 @@
     <table class="data-table" :class="{ 'opacity-50': loading }">
         <thead v-if="visibleColumns.length > 1">
             <tr>
-                <th class="checkbox-column" v-if="allowBulkActions || reorderable"></th>
+                <th class="checkbox-column" v-if="allowBulkActions || reorderable">
+                    <data-list-toggle-all ref="toggleAll" v-tooltip="__('Select All')"/>
+                </th>
                 <th
                     v-for="column in visibleColumns"
                     :key="column.field"
@@ -15,10 +17,14 @@
                 >
                     <span v-text="column.label" />
                     <svg v-if="sharedState.sortColumn === column.field" :class="sharedState.sortDirection" height="8" width="8" viewBox="0 0 10 6.5">
-                        <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z"/>
+                        <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor"/>
                     </svg>
                 </th>
-                <th class="actions-column"></th>
+                <th class="actions-column text-right">
+                    <button class="btn btn-sm px-sm py-sm -ml-sm cursor-pointer" v-tooltip="__('Customize Columns')">
+                        <svg-icon name="settings-horizontal" class="w-4" />
+                    </button>
+                </th>
             </tr>
         </thead>
         <sortable-list

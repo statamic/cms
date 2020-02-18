@@ -17,9 +17,14 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0">
-                    <div class="data-list-header min-h-16">
-                        <data-list-toggle-all ref="toggleAll" />
-                        <data-list-search v-model="searchQuery" />
+                    <div class="data-list-header">
+                        <data-list-filters
+                            :filters="filters"
+                            :active-filters="activeFilters"
+                            :active-count="activeFilterCount"
+                            :search-query="searchQuery"
+                            :preferences-key="preferencesKey('filters')" />
+
                         <data-list-bulk-actions
                             :url="actionUrl"
                             @started="actionStarted"
@@ -35,13 +40,7 @@
                                 <button class="btn-flat ml-1" @click="saveOrder" v-text="__('Save Order')" />
                                 <button class="btn-flat ml-1" @click="cancelReordering" v-text="__('Cancel')" />
                             </template>
-                            <data-list-filters
-                                class="ml-1"
-                                :filters="filters"
-                                :active-filters="activeFilters"
-                                :active-count="activeFilterCount"
-                                :preferences-key="preferencesKey('filters')" />
-                            <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" />
+                            <!-- <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" /> -->
                         </template>
                     </div>
 

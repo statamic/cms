@@ -1,7 +1,7 @@
 <template>
-    <div class="px-2 w-4">
-        <input type="checkbox" @change="toggle" :checked="allItemsChecked">
-    </div>
+    <label for="checkerOfAllBoxes" class="btn btn-sm px-sm py-sm -ml-sm cursor-pointer">
+        <input type="checkbox" @change="toggle" :checked="allItemsChecked" id="checkerOfAllBoxes">
+    </label>
 </template>
 
 <script>
