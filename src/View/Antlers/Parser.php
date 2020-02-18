@@ -1525,10 +1525,6 @@ class Parser
             return;
         }
 
-        $message = array_flip(array_filter(get_defined_constants(true)['pcre'], function ($value) {
-            return substr($value, -6) === '_ERROR';
-        }, ARRAY_FILTER_USE_KEY))[preg_last_error()];
-
-        throw new \Exception($message);
+        throw new RegexError(preg_last_error(), $this->view);
     }
 }
