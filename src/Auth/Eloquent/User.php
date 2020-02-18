@@ -250,11 +250,11 @@ class User extends BaseUser
 
     public function saveToDatabase()
     {
+        $this->model()->save();
+
         $this->saveRoles();
 
         $this->saveGroups();
-
-        $this->model()->save();
     }
 
     public function delete()
