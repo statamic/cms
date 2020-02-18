@@ -18,6 +18,6 @@ class UniqueUserValue
             return true;
         }
 
-        return $except === $existing->id();
+        return $except == $existing->id();
     }
 }
