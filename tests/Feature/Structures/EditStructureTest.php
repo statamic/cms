@@ -14,11 +14,12 @@ class EditStructureTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+    use MocksStructures;
 
     /** @test */
     function it_shows_the_edit_form_if_user_has_edit_permission()
     {
-        $structure = $this->createStructure('foo');
+        $structure = $this->createNavStructure('foo');
         Facades\Structure::shouldReceive('all')->andReturn(collect([$structure]));
         Facades\Structure::shouldReceive('find')->andReturn($structure);
 
@@ -35,7 +36,7 @@ class EditStructureTest extends TestCase
     /** @test */
     function it_denies_access_if_user_doesnt_have_edit_permission()
     {
-        $structure = $this->createStructure('foo');
+        $structure = $this->createNavStructure('foo');
         Facades\Structure::shouldReceive('all')->andReturn(collect([$structure]));
         Facades\Structure::shouldReceive('find')->andReturn($structure);
 
@@ -50,25 +51,19 @@ class EditStructureTest extends TestCase
             ->assertSessionHas('error');
     }
 
-    private function createStructure($handle)
+    /** @test */
+    function attempting_to_edit_a_collection_based_structure_should_404()
     {
-        return tap(Mockery::mock(Structure::class), function ($s) use ($handle) {
-            $s->shouldReceive('in')->andReturn($this->createStructureTree($handle));
-            $s->shouldReceive('title')->andReturn($handle);
-            $s->shouldReceive('handle')->andReturn($handle);
-            $s->shouldReceive('uris')->andReturn(collect());
-            $s->shouldReceive('collection')->andReturnFalse();
-            $s->shouldReceive('collections')->andReturn(collect());
-            $s->shouldReceive('expectsRoot')->andReturnTrue();
-            $s->shouldReceive('flattenedPages')->andReturn(collect());
-        });
-    }
+        $structure = $this->createCollectionStructure('foo');
+        Facades\Structure::shouldReceive('all')->andReturn(collect([$structure]));
+        Facades\Structure::shouldReceive('find')->andReturn($structure);
 
-    private function createStructureTree($handle)
-    {
-        return tap(Mockery::mock(Tree::class), function ($s) use ($handle) {
-            $s->shouldReceive('editUrl')->andReturn('/tree-edit-url');
-            $s->shouldReceive('route')->andReturn('/route');
-        });
+        $this->setTestRoles(['test' => ['access cp', 'edit foo structure']]);
+        $user = Facades\User::make()->assignRole('test')->save();
+
+        $response = $this
+            ->actingAs($user)
+            ->get(route('statamic.cp.structures.edit', $structure->handle()))
+            ->assertNotFound();
     }
 }

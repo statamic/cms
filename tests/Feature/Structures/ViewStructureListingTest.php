@@ -9,17 +9,19 @@ use Statamic\Auth\User;
 use Statamic\Structures\Tree;
 use Statamic\Structures\Structure;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\Feature\Structures\MocksStructures;
 
 class ViewStructureListingTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use PreventSavingStacheItemsToDisk, MocksStructures;
 
     /** @test */
-    function it_shows_a_list_of_structures()
+    function it_shows_a_list_of_nav_structures()
     {
         Facades\Structure::shouldReceive('all')->andReturn(collect([
-            'foo' => $structureA = $this->createStructure('foo'),
-            'bar' => $structureB = $this->createStructure('bar')
+            'foo' => $structureA = $this->createNavStructure('foo'),
+            'bar' => $structureB = $this->createNavStructure('bar'),
+            'baz' => $structureC = $this->createCollectionStructure('baz'),
         ]));
 
         $user = Facades\User::make()->makeSuper()->save();
@@ -52,8 +54,8 @@ class ViewStructureListingTest extends TestCase
     {
         $this->withoutExceptionHandling();
         Facades\Structure::shouldReceive('all')->andReturn(collect([
-            'foo' => $structureA = $this->createStructure('foo'),
-            'bar' => $structureB = $this->createStructure('bar')
+            'foo' => $structureA = $this->createNavStructure('foo'),
+            'bar' => $structureB = $this->createNavStructure('bar')
         ]));
         $this->setTestRoles(['test' => ['access cp', 'view bar structure']]);
         $user = Facades\User::make()->assignRole('test')->save();
@@ -72,8 +74,8 @@ class ViewStructureListingTest extends TestCase
     function it_doesnt_filter_out_structures_if_they_have_permission_to_configure()
     {
         Facades\Structure::shouldReceive('all')->andReturn(collect([
-            'foo' => $structureA = $this->createStructure('foo'),
-            'bar' => $structureB = $this->createStructure('bar')
+            'foo' => $structureA = $this->createNavStructure('foo'),
+            'bar' => $structureB = $this->createNavStructure('bar')
         ]));
         $this->setTestRoles(['test' => ['access cp', 'configure structures', 'view bar structure']]);
         $user = Facades\User::make()->assignRole('test')->save();
@@ -92,8 +94,8 @@ class ViewStructureListingTest extends TestCase
     function it_denies_access_when_there_are_no_permitted_structures()
     {
         Facades\Structure::shouldReceive('all')->andReturn(collect([
-            'foo' => $structureA = $this->createStructure('foo'),
-            'bar' => $structureB = $this->createStructure('bar')
+            'foo' => $structureA = $this->createNavStructure('foo'),
+            'bar' => $structureB = $this->createNavStructure('bar')
         ]));
 
         $this->setTestRoles(['test' => ['access cp']]);
@@ -134,7 +136,7 @@ class ViewStructureListingTest extends TestCase
     function delete_button_is_visible_with_permission_to_configure()
     {
         Facades\Structure::shouldReceive('all')->andReturn(collect([
-            'foo' => $this->createStructure('foo'),
+            'foo' => $this->createNavStructure('foo'),
         ]));
 
         $this->setTestRoles(['test' => ['access cp', 'configure structures']]);
@@ -152,7 +154,7 @@ class ViewStructureListingTest extends TestCase
         $this->markTestIncomplete();
 
         Facades\Structure::shouldReceive('all')->andReturn(collect([
-            'foo' => $this->createStructure('foo'),
+            'foo' => $this->createNavStructure('foo'),
         ]));
 
         $this->setTestRoles(['test' => ['access cp', 'view foo structure']]);
@@ -162,25 +164,6 @@ class ViewStructureListingTest extends TestCase
             ->actingAs($user)
             ->get(route('statamic.cp.structures.index'))
             ->assertDontSee('Delete');
-    }
-
-    private function createStructure($handle)
-    {
-        return tap(Mockery::mock(Structure::class), function ($s) use ($handle) {
-            $s->shouldReceive('in')->andReturn($this->createStructureTree($handle));
-            $s->shouldReceive('title')->andReturn($handle);
-            $s->shouldReceive('handle')->andReturn($handle);
-            $s->shouldReceive('collection')->andReturnFalse();
-            $s->shouldReceive('editUrl')->andReturn('/structure-edit-url');
-            $s->shouldReceive('deleteUrl')->andReturn('/structure-delete-url');
-        });
-    }
-
-    private function createStructureTree($handle)
-    {
-        return tap(Mockery::mock(Tree::class), function ($s) use ($handle) {
-            $s->shouldReceive('editUrl')->andReturn('/tree-edit-url');
-        });
     }
 
     private function setTestRoles($roles)
