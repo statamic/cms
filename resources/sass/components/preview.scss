@@ -40,6 +40,7 @@
 }
 
 .live-preview-contents iframe {
+    @apply bg-white;
     &.responsive { @apply h-full w-full; }
     &.device { @apply mt-2 shadow-lg rounded; }
 }
