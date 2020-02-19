@@ -58,6 +58,10 @@ class UserController extends Controller
             ->password($request->password)
             ->data($values);
 
+        if ($roles = config('statamic.users.new_user_roles')) {
+            $user->roles($roles);
+        }
+
         // TODO: Registering event
 
         $user->save();
