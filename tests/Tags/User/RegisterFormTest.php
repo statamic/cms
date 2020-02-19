@@ -105,7 +105,8 @@ EOT
             ->assertSessionHasErrors([
                 'email',
                 'password',
-            ]);
+            ])
+            ->assertLocation('/');
 
         $this->assertNull(User::findByEmail('san@holo.com'));
         $this->assertFalse(auth()->check());
@@ -150,7 +151,8 @@ EOT
             ->assertSessionHasErrors([
                 'password', // Should fail now because we've defined `min:8` as a rule.
                 'age', // An extra `required` field that we added.
-            ]);
+            ])
+            ->assertLocation('/');
 
         $this->assertNull(User::findByEmail('san@holo.com'));
         $this->assertFalse(auth()->check());
@@ -190,7 +192,46 @@ EOT
                 'password' => 'chewy',
                 'password_confirmation' => 'chewy',
             ])
-            ->assertSessionHasNoErrors();
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $this->assertNotNull(User::findByEmail('san@holo.com'));
+        $this->assertTrue(auth()->check());
+        $this->assertEquals('san@holo.com', auth()->user()->email());
+
+        $output = $this->tag(<<<EOT
+{{ user:register_form }}
+    {{ errors }}
+        <p class="error">{{ value }}</p>
+    {{ /errors }}
+    <p class="success">{{ success }}</p>
+{{ /user:register_form }}
+EOT
+        );
+
+        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+
+        $this->assertEmpty($errors[1]);
+        $this->assertEquals(['Registration successful.'], $success[1]);
+    }
+
+    /** @test */
+    function it_will_register_user_and_follow_custom_redirect_with_success()
+    {
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
+
+        $this
+            ->post('/!/auth/register', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'chewy',
+                'password_confirmation' => 'chewy',
+                'referer' => '/registration-successful',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/registration-successful');
 
         $this->assertNotNull(User::findByEmail('san@holo.com'));
         $this->assertTrue(auth()->check());
