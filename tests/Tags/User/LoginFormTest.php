@@ -144,4 +144,20 @@ EOT
         $this->assertEmpty($errors[1]);
         $this->assertEquals(['Login successful.'], $success[1]);
     }
+
+    /** @test */
+    function it_will_use_redirect_query_param_off_url()
+    {
+        $this->get('/?redirect=login-successful');
+
+        $expected = '<input type="hidden" name="referer" value="login-successful" />';
+
+        $output = $this->tag('{{ user:login_form }}{{ /user:login_form }}');
+
+        $this->assertStringNotContainsString($expected, $output);
+
+        $output = $this->tag('{{ user:login_form allow_request_redirect="true" }}{{ /user:login_form }}');
+
+        $this->assertStringContainsString($expected, $output);
+    }
 }
