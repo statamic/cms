@@ -5,7 +5,6 @@ namespace Statamic\Entries;
 use ArrayAccess;
 use Statamic\Facades;
 use Statamic\Statamic;
-use Statamic\Support\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Facades\Blink;
@@ -497,6 +496,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         }
 
         if (! $id = $this->id()) {
+            return null;
+        }
+
+        if (! $this->structure()->in($this->locale())->page($id)) {
             return null;
         }
 

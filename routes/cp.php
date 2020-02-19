@@ -32,6 +32,7 @@ Route::group([
     });
 
     Route::get('structures/{collection}/entries/{entry}/{slug}', 'Collections\EntriesController@edit')->name('structures.entries.edit');
+    Route::post('structures/{collection}/entries/{entry}/{slug}/localize', 'Collections\LocalizeEntryController')->name('structures.entries.localize');
 
     Route::group(['namespace' => 'Collections'], function () {
         Route::resource('collections', 'CollectionsController');
