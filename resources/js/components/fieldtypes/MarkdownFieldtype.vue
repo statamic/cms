@@ -21,9 +21,11 @@
                         <button @click="italic" v-tooltip="__('Italic')"><i class="fa fa-italic"></i></button>
                         <button @click="insertLink('')" v-tooltip="__('Insert Link')"><i class="fa fa-link"></i></button>
                         <button @click="insertImage('')" v-tooltip="__('Insert Image')"><i class="fa fa-picture-o"></i></button>
-                        <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen Mode')">
-                            <svg-icon name="shrink-all" class="w-4 h-4" v-if="fullScreenMode" />
-                            <svg-icon name="expand" class="w-4 h-4" v-else />
+                        <button @click="openFullScreen" v-tooltip="__('Fullscreen Mode')" v-if="! fullScreenMode">
+                            <svg-icon name="expand" class="w-4 h-4" />
+                        </button>
+                        <button @click="closeFullScreen" v-tooltip="__('Close Fullscreen Mode')" v-if="fullScreenMode">
+                            <svg-icon name="shrink-all" class="w-4 h-4" />
                         </button>
                     </div>
                 </div>
@@ -163,7 +165,8 @@ export default {
             fullScreenMode: false,
             codemirror: null,       // The CodeMirror instance
             uploads: [],
-            count: {}
+            count: {},
+            escBinding: null,
         };
     },
 
@@ -188,13 +191,16 @@ export default {
 
     methods: {
 
-        toggleFullScreen() {
-            this.fullScreenMode = ! this.fullScreenMode;
+        closeFullScreen() {
+            this.fullScreenMode = false;
+            this.escBinding.destroy();
             this.trackHeightUpdates();
         },
 
-        closeFullScreen() {
-            this.fullScreenMode = false;
+        openFullScreen() {
+            this.fullScreenMode = true;
+            this.escBinding = this.$keys.bindGlobal('esc', this.closeFullScreen);
+            this.trackHeightUpdates();
         },
 
         /**
@@ -572,6 +578,7 @@ export default {
         this.$keys.bind('esc', this.closeFullScreen)
 
         this.trackHeightUpdates();
+
     }
 
 };
