@@ -136,6 +136,9 @@ import Uploader from '../assets/Uploader.vue';
 import Uploads from '../assets/Uploads.vue';
 import VueCountable from 'vue-countable'
 
+// Keymaps
+import 'codemirror/keymap/sublime'
+
 export default {
 
     mixins: [Fieldtype],
@@ -538,6 +541,7 @@ export default {
             value: self.data,
             mode: 'gfm',
             dragDrop: false,
+            keyMap: 'sublime',
             lineWrapping: true,
             viewportMargin: Infinity,
             tabindex: 0,
