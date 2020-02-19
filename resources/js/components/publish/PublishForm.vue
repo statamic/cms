@@ -15,7 +15,7 @@
 
             <div class="flex items-center mb-3">
                 <h1 class="flex-1">{{ title }}</h1>
-                <button v-if="action" type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
+                <button v-if="action" type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
             <publish-sections
@@ -65,7 +65,7 @@ export default {
 
             this.$axios[this.method](this.action, this.currentValues).then(response => {
                 this.saving = false;
-                this.$toast.success('Saved');
+                this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.$emit('saved', response);
             }).catch(e => this.handleAxiosError(e));

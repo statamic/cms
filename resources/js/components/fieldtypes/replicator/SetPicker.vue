@@ -3,7 +3,7 @@
     <div class="replicator-set-picker">
         <dropdown-list ref="setSelectorDropdown" class="align-left inline-block">
             <template v-slot:trigger>
-                <button v-if="last" class="btn btn-round">
+                <button v-if="last" class="btn-round">
                     <span class="icon icon-plus text-grey-80 antialiased"></span>
                 </button>
                 <button v-else class="dropdown-icon" >

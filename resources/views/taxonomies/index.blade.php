@@ -15,7 +15,7 @@
 
         <taxonomy-list
             :initial-rows="{{ json_encode($taxonomies) }}"
-            :columns="{{ json_encode($columns) }}"
+            :initial-columns="{{ json_encode($columns) }}"
             :endpoints="{}">
         </taxonomy-list>
 

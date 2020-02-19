@@ -66,30 +66,34 @@
     <h2 class="mb-1">Buttons</h2>
     <div class="shadow bg-white p-4 rounded-lg overflow-hidden mb-6">
         <h6 class="mb-2">Flavors</h6>
-        <div class="mb-4">
-            <button class="btn mr-2">Default Button</button>
-            <button class="btn btn-primary mr-2">Primary Button</button>
-            <button class="btn btn-danger mr-2">Danger Button</button>
+        <div class="mb-4 flex">
+            <button class="mr-2 btn">Default Button</button>
+            <button class="mr-2 btn-primary">Primary Button</button>
+            <button class="mr-2 btn-danger">Danger Button</button>
+            <button class="btn-flat">Flat Button</button>
         </div>
         <h6 class="mb-2">Disabled States</h6>
-        <div class="mb-4">
-            <button disabled class="btn disabled mr-2">Default Button</button>
-            <button disabled class="btn btn-primary disabled mr-2">Primary Button</button>
-            <button disabled class="btn btn-danger disabled mr-2">Danger Button</button>
+        <div class="mb-4 flex">
+            <button disabled class="mr-2 btn disabled">Default Button</button>
+            <button disabled class="mr-2 btn-primary disabled">Primary Button</button>
+            <button disabled class="mr-2 btn-danger disabled">Danger Button</button>
+            <button disabled class="btn-flat disabled">Flat Button</button>
         </div>
 
-        <h6 class="mb-2">Small Variation</h6>
-        <div class="mb-4">
-            <button class="btn btn-sm mr-2">Default Button</button>
-            <button class="btn btn-primary btn-sm mr-2">Primary Button</button>
-            <button class="btn btn-danger btn-sm mr-2">Danger Button</button>
+        <h6 class="mb-2">Large</h6>
+        <div class="mb-4 flex">
+            <button class="mr-2 btn btn-lg">Default Button</button>
+            <button class="mr-2 btn-primary btn-lg">Primary Button</button>
+            <button class="mr-2 btn-danger btn-lg">Danger Button</button>
+            <button class="btn-flat btn-lg">Flat Button</button>
         </div>
 
-        <h6 class="mb-2">Large Variation</h6>
-        <div>
-            <button class="btn btn-lg mr-2">Default Button</button>
-            <button class="btn btn-primary btn-lg mr-2">Primary Button</button>
-            <button class="btn btn-danger btn-lg mr-2">Danger Button</button>
+        <h6 class="mb-2">Small</h6>
+        <div class="flex">
+            <button class="mr-2 btn btn-sm">Default Button</button>
+            <button class="mr-2 btn-primary btn-sm">Primary Button</button>
+            <button class="mr-2 btn-danger btn-sm">Danger Button</button>
+            <button class="btn-flat btn-sm">Flat Button</button>
         </div>
     </div>
 

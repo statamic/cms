@@ -145,10 +145,8 @@ class UsersController extends CpController
         ];
     }
 
-    public function edit(Request $request, $id)
+    public function edit(Request $request, $user)
     {
-        $user = User::find($id);
-
         $this->authorize('edit', $user);
 
         $blueprint = $user->blueprint();
@@ -162,6 +160,8 @@ class UsersController extends CpController
         }
 
         $fields = $blueprint
+            ->removeField('password')
+            ->removeField('password_confirmation')
             ->fields()
             ->addValues($user->data()->merge(['email' => $user->email()])->all())
             ->preProcess();
@@ -186,15 +186,13 @@ class UsersController extends CpController
         return view('statamic::users.edit', $viewData);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $user)
     {
-        $user = User::find($id);
-
         $this->authorize('edit', $user);
 
         $fields = $user->blueprint()->fields()->addValues($request->all());
 
-        $fields->validate(['email' => 'required|unique_user_value:'.$id]);
+        $fields->validate(['email' => 'required|unique_user_value:'.$user->id()]);
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 

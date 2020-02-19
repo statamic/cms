@@ -3,8 +3,8 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white shadow h-12 items-center flex justify-between relative w-full px-2;
-    z-index: 9999;
+    @apply bg-white shadow h-13 items-center flex justify-between relative w-full;
+    z-index: 997; // Let Live Preview stack on top
 }
 
 /* Responsive Wangjangling
@@ -15,7 +15,7 @@
 }
 
 @screen md {
-    .global-header { z-index: 1; }
+    .global-header { @apply px-0 fixed; }
 }
 
 /* Search
@@ -25,18 +25,17 @@
     transition: .12s ease-out;
 
     .search-input {
-        @apply .text-sm .w-full;
+        @apply .text-sm .w-full max-w-full;
         padding-left: 5px;
         padding-right: 20px;
         height: 32px;
-        max-width: 400px;
 		&:focus {
 			outline: 0;
 		}
     }
 
     .global-search-results {
-        @apply shadow-lg absolute p-0 w-full bg-white rounded border w-96;
+        @apply shadow-lg absolute p-0 w-full bg-white rounded border border-grey-50 w-128;
         top: 36px;
         left: -1px; // border offset
         z-index: 999;
@@ -102,7 +101,7 @@
 }
 
 @screen md {
-    .global-search { @apply w-96 }
+    .global-search { @apply w-128 max-w-full; }
 }
 
 .site-selector {

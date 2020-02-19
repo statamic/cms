@@ -38,4 +38,12 @@ class LabeledValueTest extends TestCase
             'label' => 'World'
         ], $val->toArray());
     }
+
+    /** @test */
+    function it_converts_to_json()
+    {
+        $val = new LabeledValue('world', 'World');
+
+        $this->assertSame(json_encode($val->toArray()), json_encode($val));
+    }
 }

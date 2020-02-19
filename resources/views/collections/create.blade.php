@@ -2,7 +2,7 @@
 @section('title', __('Create Collection'))
 
 @section('content')
-    <collection-wizard
+    <collection-create-form
         route="{{ cp_route('collections.store') }}">
-    </collection-wizard>
+    </collection-create-form>
 @stop

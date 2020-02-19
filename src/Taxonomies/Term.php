@@ -6,6 +6,7 @@ use Statamic\Facades;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Facades\Path;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Stache;
 use Statamic\Data\ExistsAsFile;
@@ -48,7 +49,9 @@ class Term implements TermContract
                 return $taxonomy instanceof \Statamic\Contracts\Taxonomies\Taxonomy ? $taxonomy->handle() : $taxonomy;
             })
             ->getter(function ($taxonomy) {
-                return $taxonomy ? Taxonomy::findByHandle($taxonomy) : null;
+                return $taxonomy ? Blink::once("taxonomy-{$taxonomy}", function () use ($taxonomy) {
+                    return Taxonomy::findByHandle($taxonomy);
+                }) : null;
             })
             ->args(func_get_args());
     }

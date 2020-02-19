@@ -2,18 +2,18 @@
 
 namespace Statamic\Fields;
 
-use Statamic\Facades;
-use Statamic\Support\Str;
+use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Support\Collection;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
-use Illuminate\Support\Collection;
-use Facades\Statamic\Fields\BlueprintRepository;
+use Statamic\Facades;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Blueprint
 {
     protected $handle;
     protected $contents = [];
-    protected $extraFields = [];
     protected $fieldsCache;
 
     public function setHandle(string $handle)
@@ -48,20 +48,9 @@ class Blueprint
 
     public function sections(): Collection
     {
-        $sections = array_get($this->contents, 'sections', []);
-        $extra = $this->extraFields ?? [];
-
-        $sections = collect($sections)->map(function ($contents, $handle) use (&$extra) {
-            return (new Section($handle))
-                ->setContents($contents)
-                ->extraFields(array_pull($extra, $handle) ?? []);
+        return collect(Arr::get($this->contents, 'sections', []))->map(function ($contents, $handle) {
+            return (new Section($handle))->setContents($contents);
         });
-
-        foreach ($extra as $section => $fields) {
-            $sections->put($section, (new Section($section))->extraFields($fields));
-        }
-
-        return $sections;
     }
 
     public function fields(): Fields
@@ -82,6 +71,15 @@ class Blueprint
     public function hasField($field)
     {
         return $this->fields()->has($field);
+    }
+
+    public function hasFieldInSection($field, $section)
+    {
+        if ($section = $this->sections()->get($section)) {
+            return $section->fields()->has($field);
+        }
+
+        return false;
     }
 
     public function field($field)
@@ -147,30 +145,62 @@ class Blueprint
         return true;
     }
 
-    public function ensureField($handle, $field, $section = null, $prepend = false)
+    public function ensureField($handle, $fieldConfig, $section = null, $prepend = false)
     {
+        // If blueprint already has field, merge it's config in the field's current section.
         if ($this->hasField($handle)) {
-            // Loop through all sections looking for the handle so we can ensure the required config
-            foreach($this->contents['sections'] ?? [] as $section_key => $blueprint_section) {
-                foreach ($blueprint_section['fields'] as $field_key => $blueprint_field) {
-                    if (array_get($blueprint_field, 'handle') == $handle) {
-                        $this->contents['sections'][$section_key]['fields'][$field_key]['field'] = array_merge(
-                            $field,
-                            $this->contents['sections'][$section_key]['fields'][$field_key]['field']
-                        );
-
-                        return $this->resetFieldsCache();
-                    }
+            foreach ($this->sections()->keys() as $sectionKey) {
+                if ($this->hasFieldInSection($handle, $sectionKey)) {
+                    return $this->ensureFieldInSection($handle, $fieldConfig, $sectionKey);
                 }
             }
         }
 
-        // If a section hasn't been provided we'll just use the first section.
-        if (! $section) {
-            $section = array_keys($this->contents['sections'] ?? [])[0] ?? 'main';
+        // If a section hasn't been provided we'll just use the first section, or default.
+        $section = $section ?? $this->sections()->keys()->first() ?? 'main';
+
+        return $this->ensureFieldInSection($handle, $fieldConfig, $section, $prepend);
+    }
+
+    public function ensureFieldInSection($handle, $fieldConfig, $section, $prepend = false)
+    {
+        // Ensure section exists.
+        if (! isset($this->contents['sections'][$section])) {
+            $this->contents['sections'][$section] = [];
         }
 
-        $this->extraFields[$section][$handle] = compact('prepend', 'field');
+        // Get fields from section, including imported fields.
+        $fields = $this->sections()->get($section)->fields()->all()->map(function ($field, $handle) {
+            return [
+                'handle' => $handle,
+                'field' => $field->config(),
+            ];
+        });
+
+        // If it already exists, merge field config.
+        if ($exists = $this->hasFieldInSection($handle, $section)) {
+            $fieldConfig = array_merge($fieldConfig, $fields[$handle]['field']);
+        }
+
+        // Combine handle and field config.
+        $field = [
+            'handle' => $handle,
+            'field' => $fieldConfig,
+        ];
+
+        // Set the field config in it's proper place.
+        if ($prepend && $exists) {
+            $fields->forget($handle)->prepend($field);
+        } elseif ($prepend && ! $exists) {
+            $fields->prepend($field);
+        } elseif ($exists) {
+            $fields->put($handle, $field);
+        } else {
+            $fields->push($field);
+        }
+
+        // Set fields back into blueprint contents.
+        $this->contents['sections'][$section]['fields'] = $fields->values()->all();
 
         return $this->resetFieldsCache();
     }
@@ -178,6 +208,44 @@ class Blueprint
     public function ensureFieldPrepended($handle, $field, $section = null)
     {
         return $this->ensureField($handle, $field, $section, true);
+    }
+
+    public function removeField($handle, $section = null)
+    {
+        if (! $this->hasField($handle)) {
+            return $this;
+        }
+
+        // If a section is specified, only remove from that specific section.
+        if ($section) {
+            return $this->removeFieldFromSection($handle, $section);
+        }
+
+        // Otherwise remove from any section.
+        foreach ($this->sections()->keys() as $sectionKey) {
+            if ($this->hasFieldInSection($handle, $sectionKey)) {
+                return $this->removeFieldFromSection($handle, $sectionKey);
+            }
+        }
+    }
+
+    public function removeFieldFromSection($handle, $section)
+    {
+        $fields = collect($this->contents['sections'][$section]['fields'] ?? []);
+
+        // See if field already exists in section.
+        if ($this->hasFieldInSection($handle, $section)) {
+            $fieldKey = $fields->search(function ($field) use ($handle) {
+                return Arr::get($field, 'handle') === $handle;
+            });
+        } else {
+            return $this;
+        }
+
+        // Pull it out.
+        Arr::pull($this->contents['sections'][$section]['fields'], $fieldKey);
+
+        return $this->resetFieldsCache();
     }
 
     protected function validateUniqueHandles()

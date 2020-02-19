@@ -173,8 +173,8 @@ class FieldsTest extends TestCase
 
         $this->assertTrue(is_array($fields));
         $this->assertCount(2, $fields);
-        $this->assertEquals('one', $fields[0]->handle());
-        $this->assertEquals('two', $fields[1]->handle());
+        $this->assertEquals('one', $fields['one']->handle());
+        $this->assertEquals('two', $fields['two']->handle());
     }
 
     /** @test */
@@ -200,8 +200,8 @@ class FieldsTest extends TestCase
 
         $this->assertTrue(is_array($fields));
         $this->assertCount(2, $fields);
-        $this->assertEquals('test_one', $fields[0]->handle());
-        $this->assertEquals('test_two', $fields[1]->handle());
+        $this->assertEquals('test_one', $fields['test_one']->handle());
+        $this->assertEquals('test_two', $fields['test_two']->handle());
     }
 
     /** @test */
@@ -292,6 +292,7 @@ class FieldsTest extends TestCase
                 'component' => 'text',
                 'placeholder' => null,
                 'character_limit' => 0,
+                'html_type' => 'text',
                 'prepend' => null,
                 'append' => null,
             ],

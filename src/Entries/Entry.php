@@ -8,6 +8,7 @@ use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Blueprint;
 use Statamic\Routing\Routable;
@@ -78,7 +79,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
                 return $collection instanceof \Statamic\Contracts\Entries\Collection ? $collection->handle() : $collection;
             })
             ->getter(function ($collection) {
-                return $collection ? Collection::findByHandle($collection) : null;
+                return $collection ? Blink::once("collection-{$collection}", function () use ($collection) {
+                    return Collection::findByHandle($collection);
+                }) : null;
             })
             ->args(func_get_args());
     }
@@ -188,13 +191,15 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function defaultBlueprint()
     {
-        if ($blueprint = $this->value('blueprint')) {
-            return $this->collection()->ensureEntryBlueprintFields(
-                Blueprint::find($blueprint)
-            );
-        }
+        return Blink::once("entry-{$this->id()}-default-blueprint", function () {
+            if ($blueprint = $this->value('blueprint')) {
+                return $this->collection()->ensureEntryBlueprintFields(
+                    Blueprint::find($blueprint)
+                );
+            }
 
-        return $this->collection()->entryBlueprint();
+            return $this->collection()->entryBlueprint();
+        });
     }
 
     public function save()
@@ -204,6 +209,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         }
 
         Facades\Entry::save($this);
+
+        if ($this->id()) {
+            Blink::store('structure-page-entries')->forget($this->id());
+        }
 
         $this->taxonomize();
 
@@ -284,6 +293,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
     {
         return $this
             ->fluentlyGetOrSet('date')
+            ->getter(function ($date) {
+                return $date ?? $this->lastModified();
+            })
             ->setter(function ($date) {
                 if ($date === null) {
                     return null;
@@ -392,15 +404,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
             return false;
         }
 
-        if (!$this->hasDate()) {
-            return true;
-        }
-
         if ($collection->futureDateBehavior() === 'private' && $this->date()->isFuture()) {
             return true;
         }
 
-        if ($collection->pastDateBehavior() === 'private' && $this->date()->isPast()) {
+        if ($collection->pastDateBehavior() === 'private' && $this->date()->lte(now())) {
             return true;
         }
 

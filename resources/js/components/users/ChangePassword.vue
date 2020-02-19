@@ -13,18 +13,18 @@
                         v-model="password"
                         :errors="errors.password"
                         class="p-0 mb-3"
-                        :config="{ input: this.inputType }"
+                        :config="{ html_type: this.inputType }"
                     />
                     <form-group
                         handle="confirmation"
                         :display="__('Password Confirmation')"
                         v-model="confirmation"
                         class="p-0 mb-3"
-                        :config="{ input: this.inputType }"
+                        :config="{ html_type: this.inputType }"
                     />
                 </div>
                 <div class="flex items-center">
-                    <button class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</button>
+                    <button class="btn-primary" @click.prevent="save">{{ __('Save') }}</button>
                     <label class="ml-2">
                         <input type="checkbox" v-model="reveal" />
                         {{ __('Reveal Password') }}
@@ -106,7 +106,7 @@ export default {
                     this.$toast.error(message);
                     this.saving = false;
                 } else {
-                    this.$toast.error('Something went wrong');
+                    this.$toast.error(__('Something went wrong'));
                 }
             })
         }

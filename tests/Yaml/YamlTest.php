@@ -256,6 +256,28 @@ EOT;
         $this->fail('Exception was not thrown.');
     }
 
+    /** @test */
+    function it_throws_an_exception_when_an_array_cannot_be_returned()
+    {
+        $string = <<<EOT
+<<< HEAD
+An example when this happens
+===
+Is in a merge conflict
+>>> BRANCH
+EOT;
+
+        try {
+            YAML::parse($string);
+        } catch (Exception $e) {
+            $this->assertInstanceOf(ParseException::class, $e);
+            $this->assertEquals('Unable to parse (near "<<< HEAD").', $e->getMessage());
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
     protected function assertEqualsIgnoringLineEndings($expected, $actual)
     {
         $actual = str_replace("\r\n", "\n", $actual);

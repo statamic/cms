@@ -1,6 +1,6 @@
 <div class="global-header">
-    <div class="md:w-54 flex items-center">
-        <button class="nav-toggle" @click="toggleNav">@svg('burger')</button>
+    <div class="md:w-56 pl-3 h-full flex items-center">
+        <button class="nav-toggle ml-sm" @click="toggleNav">@svg('burger')</button>
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
             <div v-tooltip="version" class="hidden md:block">
                 @svg('statamic-wordmark')
@@ -8,10 +8,12 @@
         </a>
     </div>
 
-    <global-search class="pl-2" endpoint="{{ cp_route('search') }}" placeholder="{{ __('Search...') }}">
-    </global-search>
+    <div class="px-4 w-full flex-1 mx-auto @yield('wrapper_class', 'max-w-xl')">
+        <global-search endpoint="{{ cp_route('search') }}" placeholder="{{ __('Search...') }}">
+        </global-search>
+    </div>
 
-    <div class="head-link h-full md:pl-3 flex items-center">
+    <div class="absolute pin-t pin-r head-link h-full md:pr-3 flex items-center">
 
         @if (Statamic\Facades\Site::hasMultiple())
             <site-selector>

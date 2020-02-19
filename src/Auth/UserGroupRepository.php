@@ -33,7 +33,7 @@ class UserGroupRepository implements RepositoryContract
                 ->handle($handle)
                 ->title(array_get($data, 'title'));
 
-            foreach ($data['roles'] as $role) {
+            foreach ($data['roles'] ?? [] as $role) {
                 if ($role = Facades\Role::find($role)) {
                     $group->assignRole($role);
                 }
@@ -60,10 +60,10 @@ class UserGroupRepository implements RepositoryContract
     {
         $groups = $this->raw();
 
-        $groups->put($group->handle(), [
+        $groups->put($group->handle(), array_filter([
             'title' => $group->title(),
             'roles' => $group->roles()->map->handle()->values()->all()
-        ]);
+        ]));
 
         if ($group->handle() !== $group->originalHandle()) {
             $groups->forget($group->originalHandle());

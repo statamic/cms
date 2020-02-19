@@ -109,4 +109,20 @@ class BlueprintRepository
 
         return (new Blueprint)->setContents(['fields' => $fields]);
     }
+
+    public function makeFromSections($sections)
+    {
+        $sections = collect($sections)->map(function ($section, $section_handle) {
+
+            $fields = collect($section['fields'])->map(function ($field, $handle) {
+                return compact('handle', 'field');
+            });
+
+            $section['fields'] = $fields;
+
+            return $section;
+        })->all();
+
+        return (new Blueprint)->setContents(compact('sections'));
+    }
 }

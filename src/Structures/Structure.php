@@ -13,6 +13,7 @@ use Illuminate\Support\Traits\Tappable;
 use Statamic\Facades\Structure as StructureAPI;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Structures\Structure as StructureContract;
+use Statamic\Facades\Blink;
 
 class Structure implements StructureContract
 {
@@ -25,7 +26,6 @@ class Structure implements StructureContract
     protected $collections;
     protected $maxDepth;
     protected $expectsRoot = false;
-    protected $collection;
 
     public function id()
     {
@@ -183,25 +183,11 @@ class Structure implements StructureContract
 
     public function collection()
     {
-        if ($this->collection === false) {
-            return null;
-        }
-
-        if (is_string($this->collection)) {
-            return Collection::findByHandle($this->collection);
-        }
-
-        $collection = Collection::all()->first(function ($collection) {
-            return $collection->structureHandle() === $this->handle();
+        return Blink::once('structure-collection-'.$this->handle, function () {
+            return Collection::all()->first(function ($collection) {
+                return $collection->structureHandle() === $this->handle();
+            });
         });
-
-        $this->collection = optional($collection)->handle() ?: false;
-
-        if ($collection) {
-            return Collection::findByHandle($this->collection);
-        }
-
-        return null;
     }
 
     public function isCollectionBased()

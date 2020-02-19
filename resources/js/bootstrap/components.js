@@ -16,6 +16,7 @@ Vue.component('publish-container', require('../components/publish/Container.vue'
 Vue.component('publish-form', require('../components/publish/PublishForm.vue').default);
 Vue.component('publish-fields', require('../components/publish/Fields.vue').default);
 Vue.component('publish-field-meta', require('../components/publish/FieldMeta.vue').default);
+Vue.component('configure-sections', require('../components/configure/Sections.vue').default);
 Vue.component('publish-sections', require('../components/publish/Sections.vue').default);
 Vue.component('publish-validation-errors', require('../components/publish/ValidationErrors').default);
 Vue.component('form-group', require('../components/publish/FormGroup.vue').default);
@@ -60,6 +61,7 @@ Vue.component('validation-errors', require('../components/ValidationErrors').def
 Vue.component('slugify', require('../components/Slugify.vue').default);
 Vue.component('element-container', require('../components/ElementContainer.vue').default);
 Vue.component('avatar', require('../components/Avatar.vue').default);
+Vue.component('breadcrumb', require('../components/Breadcrumb.vue').default);
 Vue.component('breadcrumbs', require('../components/Breadcrumbs.vue').default);
 Vue.component('create-entry-button', require('../components/entries/CreateEntryButton.vue').default);
 

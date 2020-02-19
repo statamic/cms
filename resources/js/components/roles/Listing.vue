@@ -38,12 +38,13 @@ export default {
 
     props: [
         'initialRows',
-        'columns',
+        'initialColumns',
     ],
 
     data() {
         return {
             rows: this.initialRows,
+            columns: this.initialColumns
         }
     }
 
