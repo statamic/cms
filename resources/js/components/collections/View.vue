@@ -87,15 +87,11 @@
 </template>
 
 <script>
-import ListView from './ListView.vue';
-import TreeView from './TreeView.vue';
 import PageTree from '../structures/PageTree.vue';
 
 export default {
 
     components: {
-        ListView,
-        TreeView,
         PageTree,
     },
 
