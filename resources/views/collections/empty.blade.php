@@ -22,7 +22,7 @@
                 <p>{{ __('statamic::messages.collection_next_steps_configure_description') }}</p>
             </div>
         </a>
-        <a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site->handle()]) }}" class="w-full lg:w-1/2 p-3 border-t lg:border-none md:flex items-start hover:bg-grey-10 group">
+        <a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site]) }}" class="w-full lg:w-1/2 p-3 border-t lg:border-none md:flex items-start hover:bg-grey-10 group">
             <div class="h-8 w-8 mr-2 hidden md:block text-grey-80">
                 @svg('content-writing')
             </div>
@@ -53,25 +53,3 @@
 </div>
 
 @stop
-
-
-@section('xcontent')
-
-    <div class="max-w-lg mt-2 mx-auto">
-        <div class="rounded p-3 shadow bg-white">
-            <header class="border-b-2 border-grey-20 mb-3 pb-2">
-                <h1>Next steps for {{ $collection->title() }}</h1>
-            </header>
-            <div class="">
-                <p class="text-grey-70">By default, collections don't have defined URLs, blueprints, or dates.
-                Configure your collection to set these and other options.</p>
-            </div>
-        </div>
-    </div>
-
-    <create-entry-button
-        url="{{ cp_route('collections.entries.create', [$collection->handle(), $site->handle()]) }}"
-        :blueprints="{{ $blueprints->toJson() }}">
-    </create-entry-button>
-
-@endsection

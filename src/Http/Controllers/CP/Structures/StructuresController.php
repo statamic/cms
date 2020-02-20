@@ -90,12 +90,6 @@ class StructuresController extends CpController
             return abort(404);
         }
 
-        $pages = (new TreeBuilder)->buildForController([
-            'structure' => $structure->handle(),
-            'include_home' => true,
-            'site' => $site,
-        ]);
-
         $blueprints = $structure->isCollectionBased()
             ? $structure->collection()->entryBlueprints()->map(function ($blueprint) {
                 return [
@@ -107,7 +101,6 @@ class StructuresController extends CpController
         return view('statamic::structures.show', [
             'site' => $site,
             'structure' => $structure,
-            'pages' => $pages,
             'expectsRoot' => $structure->expectsRoot(),
             'hasCollection' => $structure->isCollectionBased(),
             'collections' => $structure->collections()->map->handle()->all(),

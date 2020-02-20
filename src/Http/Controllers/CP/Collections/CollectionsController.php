@@ -45,11 +45,9 @@ class CollectionsController extends CpController
         ]);
     }
 
-    public function show($collection)
+    public function show(Request $request, $collection)
     {
         $this->authorize('view', $collection, 'You are not authorized to view this collection.');
-
-        $view = $collection->queryEntries()->count() ? 'show' : 'empty';
 
         $blueprints = $collection->entryBlueprints()->map(function ($blueprint) {
             return [
@@ -58,15 +56,47 @@ class CollectionsController extends CpController
             ];
         });
 
-        return view("statamic::collections.{$view}", [
+        $site = $request->site ? Site::get($request->site) : Site::selected();
+
+        $viewData = [
             'collection' => $collection,
             'blueprints' => $blueprints,
-            'site' => Site::selected(),
+            'site' => $site->handle(),
             'filters' => Scope::filters('entries', [
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-        ]);
+        ];
+
+        if ($collection->queryEntries()->count() === 0) {
+            return view('statamic::collections.empty', $viewData);
+        }
+
+        if (! $collection->hasStructure()) {
+            return view('statamic::collections.show', $viewData);
+        }
+
+        $structure = $collection->structure();
+        $tree = $structure->in($site->handle());
+
+        return view('statamic::collections.show', array_merge($viewData, [
+            'structure' => $structure,
+            'expectsRoot' => $structure->expectsRoot(),
+            'localizations' => $structure->sites()->map(function ($handle) use ($structure, $tree) {
+                $localized = $structure->in($handle);
+                $exists = $localized !== null;
+                if (!$exists) {
+                    return null;
+                }
+                return [
+                    'handle' => $handle,
+                    'name' => Site::get($handle)->name(),
+                    'active' => $handle === $tree->locale(),
+                    'exists' => $exists,
+                    'url' => $exists ? $localized->editUrl() : null,
+                ];
+            })->filter()->all()
+        ]));
     }
 
     public function create()

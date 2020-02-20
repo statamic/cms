@@ -10,7 +10,7 @@ use Statamic\Contracts\Auth\RoleRepository as RepositoryContract;
 
 trait FakesRoles
 {
-    private function setTestRoles($roles)
+    protected function setTestRoles($roles)
     {
         $roles = collect($roles)
             ->map(function ($permissions, $handle) {

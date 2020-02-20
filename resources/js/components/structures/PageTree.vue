@@ -1,65 +1,13 @@
 <template>
-    <div class="page-tree">
+    <div>
 
-        <header class="mb-3">
-            <breadcrumb :url="breadcrumbUrl" :title="__('Structures')" />
-
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
-
-                <dropdown-list class="mr-1">
-                    <dropdown-item :text="__('Edit Structure Config')" :redirect="editUrl" />
-                </dropdown-list>
-
-                <a @click="cancel" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
-
-                <dropdown-list>
-                    <template #trigger>
-                        <button class="btn" v-text="`${__('Add Link')}`" />
-                    </template>
-                    <dropdown-item :text="__('Link to URL')" @click="linkPage" />
-                    <dropdown-item :text="__('Link to Entry')" @click="linkToEntries" />
-                </dropdown-list>
-
-                <create-entry-button
-                    v-if="hasCollection"
-                    class="ml-2"
-                    :url="createEntryUrl()"
-                    :blueprints="collectionBlueprints"
-                    :text="__('Create Page')" />
-
-                <button
-                    class="btn-primary ml-2"
-                    :class="{ 'disabled': !changed }"
-                    :disabled="!changed"
-                    @click="save"
-                    v-text="__('Save Changes')" />
-            </div>
-        </header>
-
-        <loading-graphic v-if="loading"></loading-graphic>
-
-        <div class="" v-if="localizations.length > 1">
-            <div
-                v-for="option in localizations"
-                :key="option.handle"
-                class="revision-item flex items-center border-grey-30"
-                :class="{ 'opacity-50': !option.active }"
-                @click="localizationSelected(option)"
-            >
-                <div class="flex-1 flex items-center">
-                    <span class="little-dot mr-1 bg-green" />
-                    {{ option.name }}
-                </div>
-                <div class="badge bg-orange" v-if="option.origin" v-text="__('Origin')" />
-                <div class="badge bg-blue" v-if="option.active" v-text="__('Active')" />
-                <div class="badge bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
-            </div>
+        <div class="loading card" v-if="loading">
+            <loading-graphic />
         </div>
 
-        <div v-if="pages.length == 0" class="no-results border-dashed border-2 w-full flex items-center">
+        <div v-if="!loading && pages.length == 0" class="no-results border-dashed border-2 w-full flex items-center">
             <div class="text-center max-w-md mx-auto rounded-lg px-4 py-4">
-                <slot name="no-pages-svg" />
+                <svg-icon name="empty/structure" class="w-24 h-auto mx-auto" />
                 <h1 class="my-3" v-text="__('Create your first link now')" />
                 <p class="text-grey mb-3">
                     {{ __('messages.structures_empty') }}
@@ -75,7 +23,7 @@
             </div>
         </div>
 
-        <div class="page-tree w-full" v-show="pages.length">
+        <div class="page-tree w-full">
             <draggable-tree
                 draggable
                 ref="tree"
@@ -144,37 +92,28 @@ export default {
     },
 
     props: {
-        title: String,
-        breadcrumbUrl: String,
-        initialPages: Array,
-        pagesUrl: String,
-        submitUrl: String,
-        editUrl: String,
-        createUrl: String,
-        soundDropUrl: String,
-        site: String,
-        localizations: Array,
-        collections: Array,
-        maxDepth: {
-            type: Number,
-            default: Infinity,
-        },
-        expectsRoot: Boolean,
-        hasCollection: Boolean,
-        collectionBlueprints: Array,
+        pagesUrl: { type: String, required: true },
+        submitUrl: { type: String, required: true },
+        createUrl: { type: String },
+        site: { type: String, required: true },
+        localizations: { type: Array },
+        collections: { type: Array, default: () => [] },
+        maxDepth: { type: Number, default: Infinity, },
+        expectsRoot: { type: Boolean, required: true },
+        hasCollection: { type: Boolean, required: true },
     },
 
     data() {
         return {
             loading: false,
             saving: false,
-            changed: false,
-            pages: this.initialPages,
+            pages: [],
             treeData: [],
             pageIds: [],
             parentPageForAdding: null,
             targetPage: null,
             creatingPage: false,
+            soundDropUrl: this.$config.get('resourceUrl') + '/audio/click.mp3',
         }
     },
 
@@ -182,10 +121,6 @@ export default {
 
         activeLocalization() {
             return _.findWhere(this.localizations, { active: true });
-        },
-
-        isDirty() {
-            return this.$dirty.has('page-tree');
         },
 
         exclusions() {
@@ -196,16 +131,7 @@ export default {
 
     watch: {
 
-        changed(changed) {
-            this.$dirty.state('page-tree', changed);
-        },
-
-        expectsRoot(value) {
-            this.changed = true;
-        },
-
         pages: {
-            immediate: true,
             deep: true,
             handler(pages) {
                 this.pageIds = this.getPageIds(pages);
@@ -215,7 +141,9 @@ export default {
     },
 
     created() {
-        this.updateTreeData();
+        this.getPages().then(() => {
+            this.initialPages = this.pages;
+        })
 
         this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
@@ -229,7 +157,7 @@ export default {
             this.loading = true;
             const url = this.pagesUrl;
 
-            this.$axios.get(url).then(response => {
+            return this.$axios.get(url).then(response => {
                 this.pages = response.data.pages;
                 this.updateTreeData();
                 this.loading = false;
@@ -256,7 +184,7 @@ export default {
 
             this.pages = tree.getPureData();
             this.$refs.soundDrop.play();
-            this.changed = true;
+            this.$emit('changed');
         },
 
         save() {
@@ -264,9 +192,10 @@ export default {
             const payload = { pages: this.pages, site: this.site, expectsRoot: this.expectsRoot };
 
             this.$axios.post(this.submitUrl, payload).then(response => {
-                this.changed = false;
+                this.$emit('saved');
                 this.saving = false;
                 this.$toast.success(__('Saved'));
+                this.initialPages = this.pages;
             });
         },
 
@@ -296,7 +225,7 @@ export default {
 
         pageRemoved(tree) {
             this.pages = tree.getPureData();
-            this.changed = true;
+            this.$emit('changed');
         },
 
         localizationSelected(localization) {
@@ -318,12 +247,11 @@ export default {
         },
 
         cancel() {
-            if (!this.isDirty) return;
             if (! confirm('Are you sure?')) return;
 
             this.pages = this.initialPages;
             this.updateTreeData();
-            this.changed = false;
+            this.$emit('canceled');
         },
 
         treeDragstart(node) {
@@ -396,7 +324,7 @@ export default {
 
         pageUpdated(tree) {
             this.pages = tree.getPureData();
-            this.changed = true;
+            this.$emit('changed');
         },
 
         makeFirstPage() {

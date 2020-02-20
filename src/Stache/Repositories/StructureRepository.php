@@ -62,9 +62,9 @@ class StructureRepository implements RepositoryContract
         $this->store->delete($structure);
     }
 
-    public function make()
+    public function make(string $handle = null): Structure
     {
-        return new \Statamic\Structures\Structure;
+        return (new \Statamic\Structures\Structure)->handle($handle);
     }
 
     public function updateEntryUris(Structure $structure)

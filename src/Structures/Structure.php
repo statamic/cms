@@ -34,7 +34,7 @@ class Structure implements StructureContract
 
     public function handle($handle = null)
     {
-        if (is_null($handle)) {
+        if (func_num_args() === 0) {
             return $this->handle;
         }
 
