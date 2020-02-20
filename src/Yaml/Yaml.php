@@ -3,6 +3,7 @@
 namespace Statamic\Yaml;
 
 use Exception;
+use Statamic\Support\Str;
 use Statamic\Facades\File;
 use ReflectionProperty;
 use Statamic\Facades\Pattern;
@@ -53,6 +54,7 @@ class Yaml
             throw $this->viewException($e, $str);
         }
 
+        $this->validateString($yaml, $str);
         $this->validateDocumentContent($yaml, $content, $originalStr);
 
         return isset($content)
@@ -152,5 +154,18 @@ class Yaml
         }
 
         throw $this->viewException($e, $str, $line);
+    }
+
+    protected function validateString($parsed, $string)
+    {
+        if (! is_string($parsed)) {
+            return;
+        }
+
+        $snippet = Str::before($string, "\n");
+
+        $exception = new \Exception("Unable to parse (near \"$snippet\").");
+
+        throw $this->viewException($exception, $string, 1);
     }
 }
