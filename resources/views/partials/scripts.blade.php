@@ -11,7 +11,9 @@
 @endforeach
 
 <script>
-    Statamic.config(@json(Statamic::jsonVariables(request())));
+    Statamic.config(@json(array_merge(Statamic::jsonVariables(request()), [
+        'wrapperClass' => $__env->getSection('wrapper_class')
+    ])));
     Statamic.start();
 </script>
 

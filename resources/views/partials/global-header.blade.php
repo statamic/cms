@@ -8,7 +8,7 @@
         </a>
     </div>
 
-    <div class="px-4 w-full flex-1 mx-auto @yield('wrapper_class', 'max-w-xl')">
+    <div class="px-4 w-full flex-1 mx-auto" :class="wrapperClass">
         <global-search endpoint="{{ cp_route('search') }}" placeholder="{{ __('Search...') }}">
         </global-search>
     </div>

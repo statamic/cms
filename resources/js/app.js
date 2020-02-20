@@ -163,6 +163,10 @@ Statamic.app({
 
         stackCount() {
             return this.$stacks.count();
+        },
+
+        wrapperClass() {
+            return this.$config.get('wrapperClass', 'max-w-xl');
         }
 
     },
