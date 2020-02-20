@@ -1,6 +1,6 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::layout')
-@section('title', Statamic::crumb($structure->title(), 'Structures'))
+@section('title', Statamic::crumb($structure->title(), 'Navigation'))
 
 @section('content')
 

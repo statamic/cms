@@ -79,7 +79,7 @@ class CoreNav
                 });
             });
 
-        Nav::content('Structures')
+        Nav::content('Navigation')
             ->route('structures.index')
             ->icon('hierarchy-files')
             ->can('index', Structure::class)

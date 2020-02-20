@@ -1,15 +1,15 @@
 @extends('statamic::layout')
-@section('title', __('Structures'))
+@section('title', __('Navigation'))
 
 @section('content')
 
     @unless($structures->isEmpty())
 
         <header class="flex items-center justify-between mb-3">
-            <h1>{{ __('Structures') }}</h1>
+            <h1>{{ __('Navigation') }}</h1>
 
             @can('create', 'Statamic\Contracts\Structures\Structure')
-                <a href="{{ cp_route('structures.create') }}" class="btn-primary">{{ __('Create Structure') }}</a>
+                <a href="{{ cp_route('structures.create') }}" class="btn-primary">{{ __('Create Navigation') }}</a>
             @endcan
         </header>
 

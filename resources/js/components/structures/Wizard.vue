@@ -12,7 +12,7 @@
         <!-- Step 1 -->
         <div v-if="currentStep === 0">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3" v-text="__('Structures')" />
+                <h1 class="mb-3" v-text="__('Navigation')" />
                 <p class="text-grey">
                     {{ __('messages.structure_wizard_description') }}
                 </p>

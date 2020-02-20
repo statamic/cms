@@ -13,7 +13,7 @@
     >
         <div slot-scope="{ setFieldValue }">
             <header class="mb-3">
-                <breadcrumb :url="listingUrl" :title="__('Structures')" />
+                <breadcrumb :url="listingUrl" :title="__('Navigation')" />
                 <div class="flex items-center">
                     <h1 class="flex-1">
                         {{ title }}
