@@ -6,16 +6,23 @@ use Tests\TestCase;
 use Statamic\Tags\Tags;
 use Statamic\Facades\Antlers;
 use Statamic\Fields\Value;
+use Statamic\Facades\Entry;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\LabeledValue;
 use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
+use Facades\Tests\Factories\EntryFactory;
+use Tests\PreventSavingStacheItemsToDisk;
 use Illuminate\Contracts\Support\Arrayable;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Data\Augmentable as AugmentableTrait;
+use Statamic\Data\HasAugmentedData;
 
 class ParserTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     private $variables;
 
     public function setUp(): void
@@ -318,36 +325,50 @@ EOT;
         $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
     }
 
-    public function testElvisCondition()
+    public function testTernaryEscapesQuotesProperly()
     {
-        $template = '{{ string ?: "Pass" }}';
-        $template2 = '{{ missing ?: "Pass" }}';
+        $data = ['condition' => true, 'var' => '"Wow" said the man'];
+        $template = '{{ condition ? var : "nah" }}';
 
-        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
-        $this->assertEquals('Pass', Antlers::parse($template2, $this->variables));
+        $this->assertEquals('"Wow" said the man', Antlers::parse($template, $data));
     }
 
     public function testNullCoalescence()
     {
-        $template = '{{ string ?? "Pass" }}';
-        $template2 = '{{ missing ?? "Pass" }}';
+        // or, ?:, and ?? are all aliases.
+        // while ?: and ?? have slightly different behaviors in php, they work the same in antlers.
 
-        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
-        $this->assertEquals('Pass', Antlers::parse($template2, $this->variables));
+        $this->assertEquals('Hello wilderness', Antlers::parse('{{ string or "Pass" }}', $this->variables));
+        $this->assertEquals('Hello wilderness', Antlers::parse('{{ string ?: "Pass" }}', $this->variables));
+        $this->assertEquals('Hello wilderness', Antlers::parse('{{ string ?? "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ missing or "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ missing ?: "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ missing ?? "Pass" }}', $this->variables));
     }
 
-    public function testNullCoalescenceAssignment()
+    public function testTruthCoalescing()
     {
-        $template = '{{ string ??= "Pass" }}';
-        $template2 = '{{ missing ??= "Pass" }}';
+        $this->assertEquals('Pass', Antlers::parse('{{ string ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ missing ?= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ missing:thing ?= "Pass" }}', $this->variables));
 
-        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
-        $this->assertEquals(null, Antlers::parse($template2, $this->variables));
+        // Negating with !
+        $this->assertEquals(null, Antlers::parse('{{ !string ?= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ !associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ !missing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ !missing:thing ?= "Pass" }}', $this->variables));
+
+        // and with spaces
+        $this->assertEquals(null, Antlers::parse('{{ ! string ?= "Pass" }}', $this->variables));
+        $this->assertEquals(null, Antlers::parse('{{ ! associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ ! missing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ ! missing:thing ?= "Pass" }}', $this->variables));
     }
 
-    public function testNullCoalescenceAssignmentInsideLoop()
+    public function testTruthCoalescingInsideLoop()
     {
-        $template = '{{ complex }}{{ first ??= "Pass" }}{{ /complex }}';
+        $template = '{{ complex }}{{ first ?= "Pass" }}{{ /complex }}';
 
         $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
     }
@@ -596,6 +617,20 @@ EOT;
 
         $this->assertEquals('noparse_6d6accbda6a2c1f2e7dd3932dcc70012 hello', $parsed);
 
+        $this->assertEquals('before {{ string }} after hello', $parser->injectNoparse($parsed));
+    }
+
+    /** @test */
+    function it_doesnt_parse_data_in_noparse_modifiers_with_null_coalescence_and_requires_extractions_to_be_reinjected()
+    {
+        $parser = Antlers::parser();
+
+        $variables = [
+            'string' => 'hello',
+            'content' => 'before {{ string }} after',
+        ];
+        $parsed = $parser->parse('{{ missing or content | noparse }} {{ string }}', $variables);
+        $this->assertEquals('noparse_6d6accbda6a2c1f2e7dd3932dcc70012 hello', $parsed);
         $this->assertEquals('before {{ string }} after hello', $parser->injectNoparse($parsed));
     }
 
@@ -1391,6 +1426,159 @@ EOT;
 
         $this->assertEquals($expected, Antlers::parse($template));
     }
+
+    /** @test */
+    function it_counts_query_builder_results_in_conditions()
+    {
+        EntryFactory::collection('blog')->create();
+
+        $template = '{{ if entries }}yup{{ else }}nope{{ /if }}';
+
+        $this->assertEquals('yup', Antlers::parse($template, ['entries' => Entry::query()]));
+        $this->assertEquals('yup', Antlers::parse($template, ['entries' => Entry::query()->where('collection', 'blog')]));
+        $this->assertEquals('nope', Antlers::parse($template, ['entries' => Entry::query()->where('collection', 'dunno')]));
+    }
+
+    /** @test */
+    function modifiers_on_tag_pairs_receive_the_augmented_value()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($value)
+            {
+                $value[1]['type'] = 'yup';
+                return $value;
+            }
+        };
+
+        $value = new Value([
+            ['type' => 'yup', 'text' => '1'],
+            ['type' => 'nope', 'text' => '2'],
+            ['type' => 'yup', 'text' => '3'],
+        ], 'test', $fieldtype);
+
+        // unaugmented, the second item would be filtered out.
+        // augmenting changes the second item to a yup, so it should be included.
+        $this->assertEquals('123', Antlers::parse('{{ test where="type:yup" }}{{ text }}{{ /test }}', [
+            'test' => $value,
+            'hello' => 'there',
+        ]));
+    }
+
+    /** @test */
+    function it_outputs_the_value_when_a_LabeledValue_object_is_used_as_string()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($value)
+            {
+                return new LabeledValue('world', 'World');
+            }
+        };
+
+        $value = new Value('world', 'hello', $fieldtype);
+
+        $this->assertEquals('world', Antlers::parse('{{ hello }}', [
+            'hello' => $value
+        ]));
+    }
+
+    /** @test */
+    function it_can_treat_a_LabeledValue_object_as_an_array()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($value)
+            {
+                return new LabeledValue('world', 'World');
+            }
+        };
+
+        $value = new Value('world', 'hello', $fieldtype);
+
+        $this->assertEquals(
+            'world, world, World',
+            Antlers::parse('{{ hello }}{{ key }}, {{ value }}, {{ label }}{{ /hello }}', [
+                'hello' => $value,
+            ])
+        );
+    }
+
+    /** @test */
+    function it_can_access_LabeledValue_properties_by_colon_notation()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($value)
+            {
+                return new LabeledValue('world', 'World');
+            }
+        };
+
+        $value = new Value('world', 'hello', $fieldtype);
+
+        $vars = ['hello' => $value];
+
+        $this->assertEquals('world', Antlers::parse('{{ hello:value }}', $vars));
+        $this->assertEquals('world', Antlers::parse('{{ hello:key }}', $vars));
+        $this->assertEquals('World', Antlers::parse('{{ hello:label }}', $vars));
+    }
+
+    /** @test */
+    function it_can_use_LabeledValue_objects_in_conditions()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($value)
+            {
+                $label = is_null($value) ? null : strtoupper($value);
+                return new LabeledValue($value, $label);
+            }
+        };
+
+        $vars = [
+            'string' => new Value('foo', 'string', $fieldtype),
+            'nully' => new Value(null, 'nully', $fieldtype),
+        ];
+
+        $this->assertEquals('true', Antlers::parse('{{ if string }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ if nully }}true{{ else }}false{{ /if }}', $vars));
+
+        $this->assertEquals('true', Antlers::parse('{{ if string == "foo" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ if nully == "foo" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ if string == "bar" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ if nully == "bar" }}true{{ else }}false{{ /if }}', $vars));
+
+        $this->assertEquals('true', Antlers::parse('{{ string ? "true" : "false" }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ nully ? "true" : "false" }}', $vars));
+
+        $this->assertEquals('true', Antlers::parse('{{ string == "foo" ? "true" : "false" }}', $vars));
+        $this->assertEquals('false', Antlers::parse('{{ string == "bar" ? "true" : "false" }}', $vars));
+
+        $this->assertEquals('foo', Antlers::parse('{{ string or "fallback" }}', $vars));
+        $this->assertEquals('FOO', Antlers::parse('{{ string:label or "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ nully or "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ nully:label or "fallback" }}', $vars));
+
+        $this->assertEquals('foo', Antlers::parse('{{ string ?? "fallback" }}', $vars));
+        $this->assertEquals('FOO', Antlers::parse('{{ string:label ?? "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ nully ?? "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ nully:label ?? "fallback" }}', $vars));
+
+        $this->assertEquals('fallback', Antlers::parse('{{ string ?= "fallback" }}', $vars));
+        $this->assertEquals('fallback', Antlers::parse('{{ string:label ?= "fallback" }}', $vars));
+        $this->assertEquals('', Antlers::parse('{{ nully ?= "fallback" }}', $vars));
+        $this->assertEquals('', Antlers::parse('{{ nully:label ?= "fallback" }}', $vars));
+    }
+
+    /** @test */
+    function empty_collections_are_considered_empty_in_conditions()
+    {
+        $template = '{{ if stuff }}yes{{ else }}no{{ /if }}';
+        $this->assertEquals('no', Antlers::parse($template, ['stuff' => collect()]));
+        $this->assertEquals('yes', Antlers::parse($template, ['stuff' => collect(['one'])]));
+    }
+
+    /** @test */
+    function objects_are_considered_truthy()
+    {
+        $this->assertEquals('yes', Antlers::parse('{{ if object }}yes{{ else }}no{{ /if }}', ['object' => new \stdClass]));
+    }
 }
 
 class NonArrayableObject
@@ -1411,7 +1599,7 @@ class ArrayableObject extends NonArrayableObject implements Arrayable
 
 class AugmentableObject extends ArrayableObject implements Augmentable
 {
-    use AugmentableTrait;
+    use HasAugmentedData;
 
     function augmentedArrayData()
     {

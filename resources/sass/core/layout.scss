@@ -17,21 +17,22 @@ a {
 
 #main .workspace {
     transition: padding .3s;
-    @apply w-full pt-2;
+    @apply w-full;
 }
 
 @screen md {
+
     #main {
-        @apply pt-3;
+        padding-top: 52px;
     }
+
     #main .workspace {
-        padding-left: 13rem;
-        @apply pt-0;
+        padding-left: 14rem;
     }
 
     #main.nav-closed {
         .nav-main {
-            left: -13rem;
+            left: -14rem;
         }
 
         .workspace {
@@ -67,12 +68,12 @@ a {
 /* Page Wrapper
   ========================================================================== */
 .page-wrapper {
-    @apply p-1.5 pt-0 .w-full;
+    @apply p-1.5 pt-3;
 }
 
 @screen md {
     .page-wrapper {
-        @apply px-4;
+        @apply px-4 max-w-xl mx-auto;
     }
 }
 

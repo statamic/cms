@@ -11,30 +11,30 @@
                 <template slot="actions" slot-scope="{ row: blueprint, index }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit')" :redirect="blueprint.edit_url" />
-                        <dropdown-item :text="__('Delete')" class="warning" @click="confirmDeleteRow(blueprint.id, index)" />
+                        <dropdown-item
+                            :text="__('Delete')"
+                            class="warning"
+                            @click="$refs[`deleter_${blueprint.id}`].confirm()"
+                        >
+                            <resource-deleter
+                                :ref="`deleter_${blueprint.id}`"
+                                :resource="blueprint"
+                                @deleted="removeRow(blueprint)">
+                            </resource-deleter>
+                        </dropdown-item>
                     </dropdown-list>
                 </template>
             </data-list-table>
-
-            <confirmation-modal
-                v-if="deletingRow !== false"
-                :title="deletingModalTitle"
-                :bodyText="__('Are you sure you want to delete this blueprint?')"
-                :buttonText="__('Delete')"
-                :danger="true"
-                @confirm="deleteRow(cp_url('fields/blueprints'), __('Blueprint deleted'))"
-                @cancel="cancelDeleteRow"
-            />
         </div>
     </data-list>
 </template>
 
 <script>
-import DeletesListingRow from '../DeletesListingRow';
+import Listing from '../Listing.vue';
 
 export default {
 
-    mixins: [DeletesListingRow],
+    mixins: [Listing],
 
     props: ['initialRows'],
 

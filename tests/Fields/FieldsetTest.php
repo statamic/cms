@@ -79,8 +79,8 @@ class FieldsetTest extends TestCase
 
         $fields = $fieldset->fields();
 
-        $this->assertInstanceOf(Collection::class, $fields);
-        $this->assertEveryItemIsInstanceOf(Field::class, $fields);
+        $this->assertInstanceOf(Fields::class, $fields);
+        $this->assertEveryItemIsInstanceOf(Field::class, $fields = $fields->all());
         $this->assertEquals(['one', 'two'], $fields->map->handle()->values()->all());
         $this->assertEquals(['text', 'textarea'], $fields->map->type()->values()->all());
     }

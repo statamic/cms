@@ -16,7 +16,7 @@
                 v-text="__('Cancel')"
             ></button>
             <button
-                class="btn btn-primary"
+                class="btn-primary"
                 @click.prevent="commit"
                 v-text="__('Finish')"
             ></button>

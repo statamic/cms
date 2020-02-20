@@ -3,12 +3,10 @@
 namespace Statamic\Tags;
 
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Antlers;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasAliases;
-use Statamic\Data\DataCollection;
 use Statamic\Extend\HasParameters;
 use Statamic\Extend\RegistersItself;
 
@@ -86,8 +84,8 @@ abstract class Tags
         $this->setContent($properties['content']);
         $this->setContext($properties['context']);
         $this->setParameters($properties['parameters']);
-        $this->tag         = array_get($properties, 'tag');
-        $this->method      = array_get($properties, 'tag_method');
+        $this->tag = array_get($properties, 'tag');
+        $this->method = array_get($properties, 'tag_method');
     }
 
     public function setParser($parser)
@@ -114,7 +112,7 @@ abstract class Tags
 
     public function setParameters($parameters)
     {
-        $this->params = new Parameters($parameters, $this->context);
+        $this->params = Parameters::make($parameters, $this->context);
 
         // Temporary BC alias.
         // TODO: Remove with HasParameters trait
@@ -130,7 +128,7 @@ abstract class Tags
      */
     public function __call($method, $args)
     {
-        if ($this->wildcardHandled || ! method_exists($this, $this->wildcardMethod)) {
+        if ($this->wildcardHandled || !method_exists($this, $this->wildcardMethod)) {
             throw new \BadMethodCallException("Call to undefined method {$method}.");
         }
 
@@ -188,7 +186,7 @@ abstract class Tags
     {
         return $this->parse(array_merge($data, [
             'no_results' => true,
-            'total_results' => 0
+            'total_results' => 0,
         ]));
     }
 
@@ -198,7 +196,7 @@ abstract class Tags
      * @param  string $action
      * @return string
      */
-    protected function formOpen($action)
+    protected function formOpen($action, $method = 'POST')
     {
         $attr_str = '';
         if ($attrs = $this->getList('attr')) {
@@ -220,7 +218,14 @@ abstract class Tags
             $attr_str .= 'enctype="multipart/form-data"';
         }
 
-        $html = '<form method="POST" action="'.$action.'" '.$attr_str.'>'.csrf_field();
+        $method = strtoupper($method);
+        $formMethod = $method === 'GET' ? 'GET' : 'POST';
+
+        $html = '<form method="' . $formMethod . '" action="' . $action . '" ' . $attr_str . '>' . csrf_field();
+
+        if (!in_array($method, ['GET', 'POST'])) {
+            $html .= method_field($method);
+        }
 
         return $html;
     }

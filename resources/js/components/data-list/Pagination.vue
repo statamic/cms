@@ -76,13 +76,15 @@ export default {
         pages() {
             const els = this.elements;
 
-            return [
+            let pages = [
                 els.first,
                 els.slider ? 'separator' : null,
                 els.slider,
                 els.last ? 'separator': null,
                 els.last
-            ].filter(i => i !== null).flat();
+            ].filter(i => i !== null);
+
+            return _.flatten(pages);
         },
 
         elements() {

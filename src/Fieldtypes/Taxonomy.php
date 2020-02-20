@@ -9,6 +9,7 @@ use Statamic\Facades\Term;
 use Statamic\CP\Column;
 use Statamic\Taxonomies\TermCollection;
 use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
+use Statamic\Statamic;
 
 class Taxonomy extends Relationship
 {
@@ -46,6 +47,18 @@ class Taxonomy extends Relationship
                     ->collection($entry->collection())
                     ->in($entry->locale());
             });
+
+        if (Statamic::shallowAugmentationEnabled()) {
+            $terms = collect($terms->map(function ($term) {
+                return [
+                    'id' => $term->id(),
+                    'slug' => $term->slug(),
+                    'url' => $term->url(),
+                    'permalink' => $term->absoluteUrl(),
+                    'api_url' => $term->apiUrl(),
+                ];
+            }));
+        }
 
         return $this->config('max_items') === 1 ? $terms->first() : $terms;
     }

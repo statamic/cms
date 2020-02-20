@@ -10,6 +10,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
+use Illuminate\Support\Facades\Gate;
+use Statamic\Exceptions\NotBootedException;
 
 abstract class AddonServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $fieldtypes = [];
     protected $modifiers = [];
     protected $widgets = [];
+    protected $policies = [];
     protected $commands = [];
     protected $stylesheets = [];
     protected $scripts = [];
@@ -29,23 +32,26 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        if (! $this->addonDiscovered()) {
-            return;
-        }
+        $this->app->booted(function () {
+            if (! $this->getAddon()) {
+                return;
+            }
 
-        $this
-            ->bootEvents()
-            ->bootTags()
-            ->bootFieldtypes()
-            ->bootModifiers()
-            ->bootWidgets()
-            ->bootCommands()
-            ->bootSchedule()
-            ->bootStylesheets()
-            ->bootScripts()
-            ->bootPublishables()
-            ->bootRoutes()
-            ->bootMiddleware();
+            $this
+                ->bootEvents()
+                ->bootTags()
+                ->bootFieldtypes()
+                ->bootModifiers()
+                ->bootWidgets()
+                ->bootCommands()
+                ->bootSchedule()
+                ->bootPolicies()
+                ->bootStylesheets()
+                ->bootScripts()
+                ->bootPublishables()
+                ->bootRoutes()
+                ->bootMiddleware();
+        });
     }
 
     public function bootEvents()
@@ -94,6 +100,15 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         foreach ($this->widgets as $class) {
             $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootPolicies()
+    {
+        foreach ($this->policies as $key => $value) {
+            Gate::policy($key, $value);
         }
 
         return $this;
@@ -157,10 +172,6 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootRoutes()
     {
-        if (! $this->addonDiscovered()) {
-            return;
-        }
-
         if ($web = array_get($this->routes, 'web')) {
             $this->registerWebRoutes($web);
         }
@@ -184,10 +195,6 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     public function registerWebRoutes($routes)
     {
-        if (! $this->addonDiscovered()) {
-            return;
-        }
-
         Statamic::pushWebRoutes(function () use ($routes) {
             Route::namespace('\\'.$this->namespace())->group($routes);
         });
@@ -201,10 +208,6 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     public function registerCpRoutes($routes)
     {
-        if (! $this->addonDiscovered()) {
-            return;
-        }
-
         Statamic::pushCpRoutes(function () use ($routes) {
             Route::namespace('\\'.$this->namespace())->group($routes);
         });
@@ -218,10 +221,6 @@ abstract class AddonServiceProvider extends ServiceProvider
      */
     public function registerActionRoutes($routes)
     {
-        if (! $this->addonDiscovered()) {
-            return;
-        }
-
         Statamic::pushActionRoutes(function () use ($routes) {
             Route::namespace('\\'.$this->namespace())
                 ->prefix($this->getAddon()->slug())
@@ -264,10 +263,6 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootMiddleware()
     {
-        if (! $this->addonDiscovered()) {
-            return;
-        }
-
         foreach (array_get($this->middleware, 'web', []) as $middleware) {
             Statamic::pushWebMiddleware($middleware);
         }
@@ -279,10 +274,6 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function registerScript(string $path)
     {
-        if (! $this->addonDiscovered()) {
-            return;
-        }
-
         $name = $this->getAddon()->id();
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
@@ -295,19 +286,11 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function registerExternalScript(string $url)
     {
-        if (! $this->addonDiscovered()) {
-            return;
-        }
-
         Statamic::externalScript($url);
     }
 
     public function registerStylesheet(string $path)
     {
-        if (! $this->addonDiscovered()) {
-            return;
-        }
-
         $name = $this->getAddon()->id();
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
@@ -330,15 +313,12 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     private function getAddon()
     {
+        throw_unless($this->app->isBooted(), new NotBootedException);
+
         $class = get_class($this);
 
         return Addon::all()->first(function ($addon) use ($class) {
             return Str::startsWith($class, $addon->namespace());
         });
-    }
-
-    private function addonDiscovered()
-    {
-        return $this->getAddon() !== null;
     }
 }

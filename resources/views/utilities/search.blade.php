@@ -3,9 +3,15 @@
 
 @section('content')
 
-    <h1>{{ __('Update Search Indexes') }}</h1>
+    <header class="mb-3">
+        @include('statamic::partials.breadcrumb', [
+            'url' => cp_route('utilities.index'),
+            'title' => __('Utilities')
+        ])
+        <h1>{{ __('Update Search Indexes') }}</h1>
+    </header>
 
-    <div class="mt-4 p-3 rounded shadow bg-white">
+    <div class="card">
         <form method="POST" action="{{ cp_route('utilities.search') }}">
             @csrf
 
@@ -20,7 +26,7 @@
                 </label>
             @endforeach
 
-            <button type="submit" class="btn btn-primary mt-1">{{ __('Update') }}</button>
+            <button type="submit" class="btn-primary mt-1">{{ __('Update') }}</button>
         </form>
     </div>
 

@@ -66,9 +66,10 @@ class AssetContainerTest extends TestCase
     /** @test */
     function it_gets_and_sets_the_disk()
     {
-        config(['filesystems.disks.test' => $diskConfig = [
+        config(['filesystems.disks.test' => [
             'driver' => 'local',
             'root' => __DIR__.'/__fixtures__/container',
+            'url' => '/the-url',
         ]]);
 
         $container = new AssetContainer;
@@ -79,7 +80,7 @@ class AssetContainerTest extends TestCase
         $this->assertEquals($container, $return);
         $this->assertInstanceOf(FlysystemAdapter::class, $container->disk());
         $this->assertEquals('test', $container->diskHandle());
-        $this->assertEquals($diskConfig, $container->diskConfig());
+        $this->assertEquals('/the-url', $container->disk()->filesystem()->getDriver()->getConfig()->get('url'));
     }
 
     /** @test */
@@ -115,16 +116,13 @@ class AssetContainerTest extends TestCase
     /** @test */
     function its_private_if_the_disk_has_no_url()
     {
-        config(['filesystems.disks.test' => [
-            'driver' => 'local',
-            'root' => __DIR__.'/__fixtures__/container',
-        ]]);
+        Storage::fake('test');
 
         $container = (new AssetContainer)->disk('test');
         $this->assertTrue($container->private());
         $this->assertFalse($container->accessible());
 
-        config(['filesystems.disks.test.url' => '/url']);
+        Storage::disk('test')->getDriver()->getConfig()->set('url', '/url');
 
         $this->assertFalse($container->private());
         $this->assertTrue($container->accessible());

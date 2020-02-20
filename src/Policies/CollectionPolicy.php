@@ -31,14 +31,12 @@ class CollectionPolicy
 
     public function create($user)
     {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission('configure collections');
+        // handled by before()
     }
 
     public function store($user)
     {
-        return $this->create($user);
+        // handled by before()
     }
 
     public function view($user, $collection)
@@ -50,21 +48,17 @@ class CollectionPolicy
 
     public function edit($user, $collection)
     {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission('configure collections');
+        // handled by before()
     }
 
     public function update($user, $collection)
     {
-        return $this->edit($user, $collection);
+        // handled by before()
     }
 
     public function delete($user, $collection)
     {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission('configure collections');
+        // handled by before()
     }
 
     public function reorder($user, $collection)

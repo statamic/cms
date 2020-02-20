@@ -88,8 +88,9 @@ code.parent-url {
 }
 
 .publish-sidebar {
-    @apply ml-3 flex-no-shrink;
-    min-width: 240px;
+    @apply flex-no-shrink;
+    margin-left: 20px;
+
     max-width: 300px;
 
     .publish-section-actions {

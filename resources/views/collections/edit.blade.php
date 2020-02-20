@@ -1,10 +1,11 @@
 @extends('statamic::layout')
-@section('title', __('Edit Collection'))
+@section('title', __('Configure Collection'))
 
 @section('content')
 
     <collection-edit-form
         initial-title="{{ $collection->title() }}"
+        parent-title="{{ __('Collections') }}"
         :blueprint="{{ json_encode($blueprint) }}"
         :initial-values="{{ json_encode($values) }}"
         :meta="{{ json_encode($meta) }}"

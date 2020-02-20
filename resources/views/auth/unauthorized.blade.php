@@ -10,7 +10,7 @@
 <div class="card auth-card mx-auto text-center text-grey-70">
     <div class="mb-3">{{ __('Unauthorized') }}</div>
 
-    <a class="btn btn-primary" href="{{ cp_route('logout') }}?redirect={{ cp_route('login') }}">{{ __('Log out') }}</a>
+    <a class="btn-primary" href="{{ cp_route('logout') }}?redirect={{ cp_route('login') }}">{{ __('Log out') }}</a>
 </div>
 
 @endsection

@@ -59,6 +59,8 @@ class ListAssetContainersTest extends TestCase
                 'create_folders' => true,
                 'edit_url' => 'http://localhost/cp/asset-containers/two/edit',
                 'delete_url' => 'http://localhost/cp/asset-containers/two',
+                'can_edit' => false,
+                'can_delete' => false,
             ],
             [
                 'id' => 'three',
@@ -70,6 +72,8 @@ class ListAssetContainersTest extends TestCase
                 'create_folders' => true,
                 'edit_url' => 'http://localhost/cp/asset-containers/three/edit',
                 'delete_url' => 'http://localhost/cp/asset-containers/three',
+                'can_edit' => false,
+                'can_delete' => false,
             ],
         ];
     }

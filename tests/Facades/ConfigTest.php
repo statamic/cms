@@ -141,19 +141,6 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function gets_routes()
-    {
-        $routes = [
-            'collection' => ['blog' => '/blog/{slug}'],
-            'routes' => ['/foo' => 'bar']
-        ];
-
-        config(['statamic.routes' => $routes]);
-
-        $this->assertEquals($routes, Config::getRoutes());
-    }
-
-    /** @test */
     function gets_image_manipulation_presets()
     {
         $presets = [

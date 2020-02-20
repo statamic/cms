@@ -74,8 +74,12 @@ class UserRepository extends BaseRepository
         );
     }
 
-    public function fromUser($user): User
+    public function fromUser($user): ?User
     {
-        return $user;
+        if ($user instanceof User) {
+            return $user;
+        }
+
+        return null;
     }
 }

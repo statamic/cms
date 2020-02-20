@@ -54,7 +54,7 @@ class EntriesTest extends TestCase
     {
         $params['from'] = 'test';
 
-        $params = new Parameters($params, new Context);
+        $params = Parameters::make($params, new Context);
 
         return (new Entries($params))->get();
     }
@@ -232,13 +232,13 @@ class EntriesTest extends TestCase
         $this->makeEntry('d')->set('title', 'Tiger Tales')->save();
 
         $this->assertCount(4, $this->getEntries());
-        $this->assertCount(2, $this->getEntries(['query-scope' => 'post_type', 'post_type' => 'stories']));
+        $this->assertCount(2, $this->getEntries(['query_scope' => 'post_type', 'post_type' => 'stories']));
         $this->assertCount(2, $this->getEntries(['filter' => 'post_type', 'post_type' => 'stories']));
-        $this->assertCount(3, $this->getEntries(['query-scope' => 'post_animal', 'post_animal' => 'tiger']));
+        $this->assertCount(3, $this->getEntries(['query_scope' => 'post_animal', 'post_animal' => 'tiger']));
         $this->assertCount(3, $this->getEntries(['filter' => 'post_animal', 'post_animal' => 'tiger']));
 
         $this->assertCount(1, $this->getEntries([
-            'query-scope' => 'post_type|post_animal',
+            'query_scope' => 'post_type|post_animal',
             'post_type' => 'stories',
             'post_animal' => 'tiger'
         ]));

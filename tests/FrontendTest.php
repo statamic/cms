@@ -30,22 +30,6 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
-    function vanity_routes_get_redirected()
-    {
-        config(['statamic.routes.vanity' => ['/foo' => '/foobar']]);
-
-        $this->get('/foo')->assertStatus(302)->assertRedirect('/foobar');
-    }
-
-    /** @test */
-    function permanent_redirects_get_redirected()
-    {
-        config(['statamic.routes.redirect' => ['/foo' => '/foobar']]);
-
-        $this->get('/foo')->assertStatus(301)->assertRedirect('/foobar');
-    }
-
-    /** @test */
     function page_is_displayed()
     {
         $this->withoutExceptionHandling();
@@ -61,7 +45,9 @@ class FrontendTest extends TestCase
             ]
         ]);
 
-        $response = $this->get('/about')->assertStatus(200);
+        $response = $this->get('/about')
+            ->assertStatus(200)
+            ->assertHeaderMissing('X-Statamic-Draft');
 
         $this->assertEquals('<h1>The About Page</h1> <p>This is the about page.</p>', trim($response->content()));
     }
@@ -295,20 +281,6 @@ class FrontendTest extends TestCase
             return $event->response instanceof Response
                 && $event->response->headers->has('X-Foo');
         });
-    }
-
-    /** @test */
-    function ignored_segments_are_removed_from_url()
-    {
-        $class = app(\Statamic\Http\Controllers\FrontendController::class);
-
-        config(['statamic.routes.ignore' => ['bar', 'qux']]);
-
-        $this->assertEquals('/foo', $class->removeIgnoredSegments('/foo'));
-        $this->assertEquals('/foo', $class->removeIgnoredSegments('/foo/bar'));
-        $this->assertEquals('/foo/baz', $class->removeIgnoredSegments('/foo/bar/baz'));
-        $this->assertEquals('/foo/baz', $class->removeIgnoredSegments('/foo/bar/baz/qux'));
-        $this->assertEquals('/foo/baz/flux', $class->removeIgnoredSegments('/foo/bar/baz/qux/flux'));
     }
 
     /** @test */

@@ -29,6 +29,11 @@ class FormPolicy
         })->isEmpty();
     }
 
+    public function create($user)
+    {
+        // handled by before()
+    }
+
     public function view($user, $form)
     {
         $user = User::fromUser($user);
@@ -38,16 +43,11 @@ class FormPolicy
 
     public function edit($user, $form)
     {
-        //
-    }
-
-    public function create($user)
-    {
-        //
+        // handled by before()
     }
 
     public function delete($user, $form)
     {
-        //
+        // handled by before()
     }
 }

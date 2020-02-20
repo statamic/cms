@@ -10,6 +10,7 @@ use Statamic\Tags\Tags;
 use League\Glide\Server;
 use Statamic\Facades\Config;
 use Statamic\Imaging\ImageGenerator;
+use Statamic\Contracts\Data\Augmentable;
 
 class Glide extends Tags
 {
@@ -89,19 +90,27 @@ class Glide extends Tags
      *
      * @return string
      */
-    public function generate($item = null)
+    public function generate($items = null)
     {
-        $item = $item ?? $this->get(['src', 'id', 'path']);
+        $items = $items ?? $this->get(['src', 'id', 'path']);
 
-        $url = $this->generateGlideUrl($item);
+        $items = is_iterable($items) ? collect($items) : collect([$items]);
 
-        $path = $this->generateImage($item);
+        return $items->map(function ($item) {
+            $url = $this->generateGlideUrl($item);
 
-        list($width, $height) = getimagesize($this->getServer()->getCache()->getAdapter()->getPathPrefix().$path);
+            $path = $this->generateImage($item);
 
-        return $this->parse(
-            compact('url', 'width', 'height')
-        );
+            list($width, $height) = getimagesize($this->getServer()->getCache()->getAdapter()->getPathPrefix().$path);
+
+            $data = compact('url', 'width', 'height');
+
+            if ($item instanceof Augmentable) {
+                $data = array_merge($item->toAugmentedArray(), $data);
+            }
+
+            return $data;
+        })->all();
     }
 
     /**

@@ -26,6 +26,27 @@ class Tags extends BaseTags
             ->offset($this->get('offset'))
             ->get();
 
+        $results = $this->addResultTypes($results);
+
         return $this->output($results);
+    }
+
+    protected function addResultTypes($results)
+    {
+        return $results->map(function ($result) {
+            $type = null;
+
+            if ($result instanceof \Statamic\Contracts\Entries\Entry) {
+                $type = 'entry';
+            } elseif ($result instanceof \Statamic\Contracts\Taxonomies\Term) {
+                $type = 'term';
+            } elseif ($result instanceof \Statamic\Contracts\Assets\Asset) {
+                $type = 'asset';
+            }
+
+            $result->set('result_type', $type);
+
+            return $result;
+        });
     }
 }

@@ -29,12 +29,23 @@ export default {
 
     mounted() {
         this.$axios.get(cp_url('api/templates')).then(response => {
+
+            var templates = response.data;
+
+            // Filter out partials
+            if (this.config.hide_partials) {
+                templates = _.reject(templates, function(template) {
+                    return template.match(/(^_.*|\/_.*|._.*)/g);
+                });
+            }
+
+            // Set default
             var options = [{
                 label: __('Inherit (Default)'),
                 value: null
             }];
 
-            _.each(response.data, function(template) {
+            _.each(templates, function(template) {
                 options.push({
                     label: template,
                     value: template

@@ -15,19 +15,15 @@
                             v-if="structure.deleteable"
                             :text="__('Delete')"
                             class="warning"
-                            @click="confirmDeleteRow(structure.id, index)" />
+                            @click="$refs[`deleter_${structure.id}`].confirm()"
+                        >
+                            <resource-deleter
+                                :ref="`deleter_${structure.id}`"
+                                :resource="structure"
+                                @deleted="removeRow(structure)">
+                            </resource-deleter>
+                        </dropdown-item>
                     </dropdown-list>
-
-                    <confirmation-modal
-                        v-if="deletingRow !== false"
-                        :title="deletingModalTitle"
-                        :bodyText="__('Are you sure you want to delete this structure?')"
-                        :buttonText="__('Delete')"
-                        :danger="true"
-                        @confirm="deleteRow('structures')"
-                        @cancel="cancelDeleteRow"
-                    >
-                    </confirmation-modal>
                 </template>
             </data-list-table>
         </div>
@@ -35,11 +31,11 @@
 </template>
 
 <script>
-import DeletesListingRow from '../DeletesListingRow.js'
+import Listing from '../Listing.vue';
 
 export default {
 
-    mixins: [DeletesListingRow],
+    mixins: [Listing],
 
     props: [
         'initialRows',

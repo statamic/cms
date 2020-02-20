@@ -147,6 +147,24 @@ trait UserContractTests
     /** @test */
     function converts_to_array()
     {
+        Role::shouldReceive('all')->andReturn(collect([
+            $this->createRole('role_one'),
+            $this->createRole('role_two'),
+            $this->createRole('role_three'),
+        ]));
+
+        UserGroup::shouldReceive('all')->andReturn(collect([
+            $this->createGroup('group_one'),
+            $this->createGroup('group_two'),
+            $this->createGroup('group_three'),
+        ]));
+
+        $arr = $this->user()->toAugmentedArray();
+
+        $arr = array_map(function ($item) {
+            return $item instanceof \Statamic\Fields\Value ? $item->value() : $item;
+        }, $arr);
+
         $this->assertEquals(array_merge([
             'name' => 'John Smith',
             'foo' => 'bar',
@@ -163,8 +181,10 @@ trait UserContractTests
             ],
             'is_role_one' => true,
             'is_role_two' => true,
+            'is_role_three' => false,
             'in_group_one' => true,
             'in_group_two' => true,
+            'in_group_three' => false,
             'supplemented' => 'qux',
             'avatar' => null,
             'initials' => 'JS',
@@ -172,7 +192,7 @@ trait UserContractTests
             'title' => 'john@example.com',
             'edit_url' => 'http://localhost/cp/users/123/edit',
             'last_login' => null,
-        ], $this->additionalToArrayValues()), $this->user()->augmentedArrayData());
+        ], $this->additionalToArrayValues()), $arr);
     }
 
     function additionalToArrayValues()

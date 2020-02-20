@@ -19,6 +19,7 @@ use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\Permissions;
 use Statamic\Auth\Protect\ProtectorManager;
 use Statamic\Contracts\Auth\RoleRepository;
+use Statamic\Contracts\Auth\User as StatamicUser;
 use Statamic\Contracts\Auth\UserRepository;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Statamic\Contracts\Auth\UserGroupRepository;
@@ -83,11 +84,11 @@ class AuthServiceProvider extends ServiceProvider
         });
 
         Gate::before(function ($user, $ability) {
-            return User::fromUser($user)->isSuper() ? true : null;
+            return optional(User::fromUser($user))->isSuper() ? true : null;
         });
 
         Gate::after(function ($user, $ability) {
-            return User::fromUser($user)->hasPermission($ability) === true ? true : null;
+            return optional(User::fromUser($user))->hasPermission($ability) === true ? true : null;
         });
 
         $this->app->booted(function () {

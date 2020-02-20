@@ -35,7 +35,9 @@ class CpServiceProvider extends ServiceProvider
         });
 
         $this->app->extend('translator', function ($translator, $app) {
-            return new Translator($app['files'], $translator->getLoader(), $translator->getLocale());
+            $extended = new Translator($app['files'], $translator->getLoader(), $translator->getLocale());
+            $extended->setFallback($translator->getFallback());
+            return $extended;
         });
 
         $this->app->singleton(UtilityRepository::class, function () {

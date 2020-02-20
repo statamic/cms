@@ -147,7 +147,7 @@ return [
     'user_wizard_account_created' => 'L\'account utente è stato creato.',
     'user_wizard_email_instructions' => 'L\'indirizzo e-mail funge anche da nome utente e deve essere univoco.',
     'user_wizard_intro' => 'Gli utenti possono essere assegnati a ruoli che personalizzano le loro autorizzazioni, accesso e capacità in tutto il Pannello di controllo.',
-    'user_wizard_invitation_body' => 'Attiva il tuo nuovo account Statamic su :site per iniziare a gestire questo sito web. Per motivi di sicurezza, il link seguente scade dopo 48 ore. Successivamente, contatta l\'amministratore del sito per una nuova password.',
+    'user_wizard_invitation_body' => 'Attiva il tuo nuovo account Statamic su :site per iniziare a gestire questo sito web. Per motivi di sicurezza, il link seguente scade dopo 1 ora. Successivamente, contatta l\'amministratore del sito per una nuova password.',
     'user_wizard_invitation_intro' => 'Invia una e-mail di benvenuto con i dettagli di attivazione dell\'account al nuovo utente.',
     'user_wizard_invitation_share' => 'Copia queste credenziali e condividile con <code>:email</code> tramite il tuo metodo preferito.',
     'user_wizard_invitation_share_before' => 'Dopo aver creato l\'utente, ti verranno dati i dettagli con cui condividere <code>:email</code> - <code>:email</code> tramite il tuo metodo preferito.',

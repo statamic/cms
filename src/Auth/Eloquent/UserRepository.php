@@ -88,14 +88,20 @@ class UserRepository extends BaseRepository
         // todo
     }
 
-    public function fromUser($user): UserContract
+    public function fromUser($user): ?UserContract
     {
         if ($user instanceof UserContract) {
             return $user;
         }
 
-        return method_exists($user, 'toStatamicUser')
-            ? $user->toStatamicUser()
-            : User::fromModel($user);
+        if (method_exists($user, 'toStatamicUser')) {
+            return $user->toStatamicUser();
+        }
+
+        if ($user instanceof Model) {
+            return User::fromModel($user);
+        }
+
+        return null;
     }
 }

@@ -33,6 +33,7 @@ class ListedUser extends Resource
             $this->merge($this->values(['email' => $this->email()])),
             'super' => $this->isSuper(),
             'edit_url' => $this->editUrl(),
+            'avatar' => $this->avatar(),
             'initials' => $this->initials(),
             'editable' => User::current()->can('edit', $this->resource),
             'deleteable' => User::current()->can('delete', $this->resource),

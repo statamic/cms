@@ -6,6 +6,7 @@ use Illuminate\Support\Arr;
 use Statamic\CP\Column;
 use Statamic\Fields\Fieldtype;
 use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Statamic;
 
 abstract class Relationship extends Fieldtype
 {
@@ -214,10 +215,21 @@ abstract class Relationship extends Fieldtype
             return $this->augmentValue($value);
         });
 
+        if (Statamic::shallowAugmentationEnabled()) {
+            $values = $values->map(function ($value) {
+                return $this->shallowAugmentValue($value);
+            });
+        }
+
         return $this->config('max_items') === 1 ? $values->first() : $values;
     }
 
     protected function augmentValue($value)
+    {
+        return $value;
+    }
+
+    protected function shallowAugmentValue($value)
     {
         return $value;
     }

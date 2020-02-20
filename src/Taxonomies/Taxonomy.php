@@ -56,6 +56,11 @@ class Taxonomy implements Contract, Responsable
         return cp_route('taxonomies.edit', $this->handle());
     }
 
+    public function deleteUrl()
+    {
+        return cp_route('taxonomies.destroy', $this->handle());
+    }
+
     public function path()
     {
         return vsprintf('%s/%s.yaml', [
@@ -76,6 +81,9 @@ class Taxonomy implements Contract, Responsable
                 return collect($blueprints)->map(function ($blueprint) {
                     return Blueprint::find($blueprint);
                 });
+            })
+            ->setter(function ($blueprints) {
+                return empty($blueprints) ? null : $blueprints;
             })
             ->args(func_get_args());
     }

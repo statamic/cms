@@ -5,8 +5,8 @@ namespace Statamic\Markdown;
 use Closure;
 use League\CommonMark\CommonMarkConverter;
 use League\CommonMark\Environment;
-use League\CommonMark\Ext\Autolink\AutolinkExtension;
-use League\CommonMark\Ext\SmartPunct\SmartPunctExtension;
+use League\CommonMark\Extension\Autolink\AutolinkExtension;
+use League\CommonMark\Extension\SmartPunct\SmartPunctExtension;
 use Statamic\Support\Arr;
 
 class Parser
@@ -78,9 +78,9 @@ class Parser
     {
         return $this->newInstance()->addExtensions(function () {
             return [
-                new \League\CommonMark\Ext\Table\TableExtension,
+                new \League\CommonMark\Extension\Table\TableExtension,
                 new \Webuni\CommonMark\AttributesExtension\AttributesExtension,
-                new \League\CommonMark\Ext\Strikethrough\StrikethroughExtension,
+                new \League\CommonMark\Extension\Strikethrough\StrikethroughExtension,
             ];
         });
     }

@@ -15,33 +15,52 @@
 export default {
 
     props: {
+        resource: {
+            type: Object
+        },
         resourceTitle: {
-            type: String,
-            required: true
+            type: String
         },
         route: {
             type: String,
-            required: true
         },
         redirect: {
             type: String
+        },
+        reload: {
+            type: Boolean
         }
     },
 
     data() {
         return {
             deleting: false,
+            redirectFromServer: null,
         }
     },
 
     computed: {
+        title() {
+            return data_get(this.resource, 'title', this.resourceTitle);
+        },
+
         modalTitle() {
-            return __('Delete') + ' ' + this.resourceTitle;
+            return __('Delete :resource', {resource: this.title});
         },
 
         modalBody() {
             return __('Are you sure you want to delete this item?');
-        }
+        },
+
+        deleteUrl() {
+            let url = data_get(this.resource, 'delete_url', this.route);
+            if (! url) console.error('ResourceDeleter cannot find delete url');
+            return url;
+        },
+
+        redirectUrl() {
+            return this.redirect || this.redirectFromServer;
+        },
     },
 
     methods: {
@@ -50,8 +69,9 @@ export default {
         },
 
         confirmed() {
-            this.$axios.delete(this.route)
-                .then(() => {
+            this.$axios.delete(this.deleteUrl)
+                .then(response => {
+                    this.redirectFromServer = data_get(response, 'data.redirect');
                     this.success();
                 })
                 .catch(() => {
@@ -60,12 +80,18 @@ export default {
         },
 
         success() {
-            if (this.redirect) {
-                location.href = this.redirect;
+            if (this.redirectUrl) {
+                location.href = this.redirectUrl;
                 return;
             }
 
-            location.reload();
+            if (this.reload) {
+                location.reload();
+                return;
+            }
+
+            this.$toast.success(__('Deleted'));
+            this.$emit('deleted');
         },
 
         cancel() {

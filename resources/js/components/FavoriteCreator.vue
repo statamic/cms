@@ -1,12 +1,22 @@
 <template>
     <div>
-        <popper v-if="isNotYetFavorited" ref="popper" @show="highlight" trigger="click" :append-to-body="true" :options="{ placement: 'bottom' }">
+        <popper v-if="isNotYetFavorited" ref="popper" @show="shown" @hide="hidden" trigger="click" :append-to-body="true" :options="{ placement: 'bottom' }">
 
             <div class="card p-0 shadow-lg z-top">
-                <h6 class="text-center p-1 border-b">{{ __('Pin to Favorites') }}</h6>
-                <div class="p-2 flex items-center">
+                <div class="flex justify-between text-center">
+                    <h6 class="whitespace-no-wrap w-40 cursor-pointer p-1 border-r" :class="{'border-b bg-grey-10': ! showingPinTab }" @click="showingPinTab = true">
+                        {{ __('Pin to Favorites') }}
+                    </h6>
+                    <h6 class="whitespace-no-wrap w-40 cursor-pointer p-1" :class="{'border-b bg-grey-10': showingPinTab }" @click="showingPinTab = false">
+                        {{ __('Make Start Page') }}
+                    </h6>
+                </div>
+                <div class="p-2 flex items-center" v-if="showingPinTab">
                     <input type="text" class="input-text" autofocus ref="fave" v-model="name" @keydown.enter="save">
                     <button @click="save" class="btn-primary ml-1">{{ __('Save') }}</button>
+                </div>
+                <div class="p-2" v-else>
+                    <button @click="makeStartPage" class="btn block w-full">{{ __('Start here when you sign in') }}</button>
                 </div>
             </div>
 
@@ -33,8 +43,10 @@ export default {
 
     data() {
         return {
-            name: document.title.substr(0, '‹ Statamic'.length+1),
-            currentUrl: this.$config.get('urlPath').substr(this.$config.get('cpRoot').length+1)
+            name: document.title.replace(' ‹ Statamic', ''),
+            currentUrl: this.$config.get('urlPath').substr(this.$config.get('cpRoot').length+1),
+            showingPinTab: true,
+            escBinding: null,
         }
     },
 
@@ -58,8 +70,21 @@ export default {
     },
 
     methods: {
+        shown() {
+            this.escBinding = this.$keys.bindGlobal('esc', e => this.$refs.popper.doClose());
+            this.highlight();
+        },
+
+        hidden() {
+            this.escBinding.destroy();
+        },
+
         highlight() {
             setTimeout(() => this.$refs.fave.select(), 20);
+        },
+
+        toggleTab() {
+            this.showingPinTab = ! this.showingPinTab;
         },
 
         save() {
@@ -83,13 +108,24 @@ export default {
             this.$preferences.remove('favorites', this.persistedFavorite).then(response => {
                 this.$toast.success(__('Favorite removed'));
             });
-        }
-    },
+        },
 
-    mounted() {
-        this.$keys.bindGlobal(['esc'], e => {
-            this.$refs.popper.doClose();
-        });
+        makeStartPage() {
+            this.saving = true;
+            this.$preferences.set('start_page', this.currentUrl).then(response => {
+                this.saving = false;
+                this.$toast.success(__('This is now your start page.'));
+                this.$refs.popper.doClose();
+                this.$events.$emit('start_page.saved');
+            }).catch(e => {
+                this.saving = false;
+                if (e.response) {
+                    this.$toast.error(e.response.data.message);
+                } else {
+                    this.$toast.error(__('Something went wrong'));
+                }
+            });
+        },
     }
 }
 </script>

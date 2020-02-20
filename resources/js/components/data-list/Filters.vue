@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button class="btn btn-flat btn-icon-only dropdown-toggle relative" @click="filtering = !filtering">
+        <button class="btn-flat btn-icon-only dropdown-toggle relative" @click="filtering = !filtering">
             <svg-icon name="filter-text" class="w-4 h-4 mr-1" />
             <span>{{ __('Filters') }}</span>
             <div v-if="activeCount" class="badge ml-1 bg-grey-40" v-text="activeCount" />
@@ -124,11 +124,7 @@ export default {
                     this.$toast.error(__('Something went wrong'));
                 });
         }
-    },
-
-    created() {
-        this.$keys.bind('esc', this.dismiss)
-    },
+    }
 
 }
 </script>

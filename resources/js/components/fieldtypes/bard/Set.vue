@@ -2,7 +2,7 @@
 
     <div class="bard-set whitespace-normal my-3 rounded bg-white border shadow"
         :class="{ 'border-blue-lighter': selected }"
-        contenteditable="false" @copy.stop @paste.stop
+        contenteditable="false" @copy.stop @paste.stop @cut.stop
     >
         <div ref="content" hidden />
         <div class="replicator-set-header" :class="{'collapsed': collapsed}">

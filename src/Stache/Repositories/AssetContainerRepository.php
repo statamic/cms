@@ -43,4 +43,9 @@ class AssetContainerRepository implements RepositoryContract
     {
         $this->store->save($container);
     }
+
+    public function delete($container)
+    {
+        $this->store->delete($container);
+    }
 }

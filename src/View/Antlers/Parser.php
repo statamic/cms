@@ -10,6 +10,7 @@ use Statamic\Modifiers\Modify;
 use Statamic\Fields\Value;
 use Statamic\Query\Builder;
 use Illuminate\Support\Str;
+use Statamic\Fields\LabeledValue;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Statamic\Contracts\Data\Augmentable;
@@ -77,7 +78,7 @@ class Parser
         $this->variableTagRegex = '/{{\s*('.$this->looseVariableRegex.'(?:\s*or\s*(?:'.$this->looseVariableRegex.'|".*?"))*)\s*}}/m';
 
         // make the space-anything after the variable regex optional allowing {{tags}} and {{ tags }}
-        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')(\s.*?)?}}(.*?){{\s*\/\1\s*}}/ms';
+        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')([^?]*?)?}}(.*?){{\s*\/\1\s*}}/ms';
 
         $this->recursiveRegex = '/{{\s*\*recursive\s*('.$this->variableRegex.')\*\s*}}/ms';
 
@@ -204,7 +205,7 @@ class Parser
      */
     public function stripComments($text)
     {
-        return preg_replace('/{{#.*?#}}/s', '', $text);
+        return $this->preg_replace('/{{#.*?#}}/s', '', $text);
     }
 
     /**
@@ -232,9 +233,6 @@ class Parser
      */
     public function parseLoopVariables($text, $data)
     {
-        // Check for any vars flagged as noparse
-        $noparse = array_get($data, '_noparse', []);
-
         /**
          * $data_matches[][0][0] is the raw data loop tag
          * $data_matches[][0][1] is the offset of raw data loop tag
@@ -243,20 +241,12 @@ class Parser
          * $data_matches[][2][0] is the content to be looped over
          * $data_matches[][2][1] is the offset of content to be looped over
          */
-        if (! preg_match_all($this->variableLoopRegex, $text, $data_matches, PREG_SET_ORDER + PREG_OFFSET_CAPTURE)) {
+        if (! $this->preg_match_all($this->variableLoopRegex, $text, $data_matches, PREG_SET_ORDER + PREG_OFFSET_CAPTURE)) {
             return $text;
         }
 
         foreach ($data_matches as $match) {
             $contents = $match[2][0];
-
-            // Don't parse any variables in the noparse list.
-            $var_name = (strpos($match[1][0], '|') !== false) ? substr($match[1][0], 0, strpos($match[1][0], '|')) : $match[1][0];
-
-            if (in_array($var_name, $noparse)) {
-                $text = $this->createExtraction('noparse', $match[0][0], $match[2][0], $text);
-                continue;
-            }
 
             $value = $this->getVariable($var = trim($match[1][0]), $data);
 
@@ -300,7 +290,7 @@ class Parser
             $loopedText = $associative ? $parses->first() : $parses->implode('');
 
             // Replace the contents of the tag pair in the original text with the parsed versions of all the loops.
-            $text = preg_replace('/' . preg_quote($match[0][0], '/') . '/m', addcslashes($loopedText, '\\$'), $text, 1);
+            $text = $this->preg_replace('/' . preg_quote($match[0][0], '/') . '/m', addcslashes($loopedText, '\\$'), $text, 1);
         }
 
         return $text;
@@ -355,83 +345,84 @@ class Parser
      */
     public function parseStringVariables($text, $data)
     {
-        // Check for any vars flagged as noparse
-        $noparse = array_get($data, '_noparse', []);
-
         /**
-         * $data_matches[0] is the raw data tag
-         * $data_matches[1] is the data variable (dot notated)
+         * $matches[0] are the raw data tags (eg. [{{ string }}, {{ foo }}])
+         * $matches[1] are the data variables (eg. [string, foo])
          */
-        if (preg_match_all($this->variableTagRegex, $text, $data_matches)) {
+        if (! $this->preg_match_all($this->variableTagRegex, $text, $matches)) {
+            return $text;
+        }
 
-            // add ability to specify `or` to find matches
-            foreach ($data_matches[1] as $index => $var) {
+        foreach ($matches[1] as $i => $var) {
+            $tagText = $this->parseStringVariableTag(trim($var), $matches[0][$i], $data);
 
-                // check for ` | ` modifier delimiter surrounded by spaces
-                if (strpos($var, ' | ') !== false) {
-                    $var = str_replace(' | ', '|', $var);
-                }
-
-                // Null coalescence through "or", "??" or "?:"
-                if (Str::contains($var, [' or ', ' ?? ', ' ?: ']) !== false) {
-                    $vars = preg_split('/(\s+or\s+|\s+\?\?\s+|\s+\?\:\s+)/ms', $var, null, PREG_SPLIT_NO_EMPTY);
-                } else {
-                    $vars = [$var];
-                }
-
-                $size = sizeof($vars);
-                for ($i = 0; $i < $size; $i++) {
-
-                    // account for modifiers
-                    $var      = trim($vars[$i]);
-                    $var_pipe = strpos($var, '|');
-                    $var_name = ($var_pipe !== false) ? substr($var, 0, $var_pipe) : $var;
-
-                    if (preg_match('/^(["\']).+\1$/', $var)) {
-                        $text = str_replace($data_matches[0][$index], substr($var, 1, strlen($var) - 2), $text);
-                        break;
-                    }
-
-                    // retrieve the value of $var, otherwise, a no-value string
-                    $val = $this->getVariable($var, $data, '__lex_no_value__');
-
-                    // we only want to continue if:
-                    //   - $val has no value according to the parser
-                    //   - $val *does* have a value, it's falsey, there are multiple options, *and* we're not on the last one
-                    // a $val that's literally a zero should be considered a value.
-                    if ($val !== 0 && ($val == '__lex_no_value__' || (!$val && $size > 1 && $i < ($size - 1)))) {
-                        continue;
-                    } else {
-                        // prevent arrays trying to be printed as a string
-                        if (is_array($val)) {
-                            $val = null;
-                            Log::debug("Cannot render an array variable as a string: {{ $var }}");
-                        }
-
-                        // If an object can be cast to a string, great. If not, prevent it.
-                        if (is_object($val)) {
-                            if (method_exists($val, '__toString')) {
-                                $val = (string) $val;
-                            } else {
-                                $val = null;
-                                Log::debug("Cannot render an object variable as a string: {{ $var }}");
-                            }
-                        }
-
-                        // if variable is in the noparse list, extract it.
-                        if (($var_pipe !== false && in_array('noparse', array_slice(explode('|', $var), 1))) || in_array($var_name, $noparse)) {
-                            $text = $this->createExtraction('noparse', $data_matches[0][$index], $val, $text);
-                        } else {
-                            $text = str_replace($data_matches[0][$index], $val, $text);
-                        }
-
-                        break;
-                    }
-                }
+            // Prevent replacement if the variable value returned null. If we were to return an
+            // empty string, the tag would would have been replaced by nothingness. This allows
+            // it to stick around and be picked up in a moment when parsing callback tags.
+            if ($tagText === '__lex_no_value__') {
+                continue;
             }
+
+            $text = str_replace($matches[0][$i], $tagText, $text);
         }
 
         return $text;
+    }
+
+    /**
+     * Parse a single string variable tag
+     *
+     * @param  string       $var      The name of the variable. eg. foo
+     * @param  string       $text     The tag text.
+     *                                eg.
+     *                                {{ var }}
+     *                                {{ var | modifier }}
+     *                                {{ var or anothervar }}
+     *                                {{ var | modifier or anothervar }}
+     * @param  array|object $data     The data
+     * @return string
+     */
+    protected function parseStringVariableTag($var, $text, $data)
+    {
+        // Normalize loose modifiers into tight modifiers.
+        if (strpos($var, ' | ') !== false) {
+            $var = str_replace(' | ', '|', $var);
+        }
+
+        // Null coalescence through "or", "??" or "?:"
+        if (Str::contains($var, [' or ', ' ?? ', ' ?: '])) {
+            $isCoalesce = true;
+            $vars = preg_split('/(\s+or\s+|\s+\?\?\s+|\s+\?\:\s+)/ms', $var, null, PREG_SPLIT_NO_EMPTY);
+        } else {
+            $isCoalesce = false;
+            $vars = [$var];
+        }
+
+        foreach ($vars as $index => $var) {
+            if ($this->isLiteralString($var)) {
+                return $this->literalStringWithoutQuotes($var);
+            }
+
+            $val = $this->getVariable($var, $data, '__lex_no_value__');
+
+            // Non-coalescing tags could potentially be callback tags (eg. {{ foo }} or
+            // {{ foo:bar }}) If they have no value, we'll return a special string
+            // that prevents it from being replaced so they can be re-parsed as
+            // callback tags. Otherwise, just continue down the chain of vars.
+            $isLastVar = $index === count($vars)-1;
+            if ($isCoalesce && !$isLastVar && $this->isNullWhenUsedInStrings($val)) {
+                continue;
+            }
+
+            if (strpos($var, '|') !== -1) {
+                $modifiers = array_slice(explode('|', $var), 1);
+                if (in_array('noparse', $modifiers)) {
+                    return $this->createExtraction('noparse', $text, $val, $text);
+                }
+            }
+
+            return $this->getValueAsRenderableString($val, $var);
+        }
     }
 
     /**
@@ -446,7 +437,7 @@ class Parser
     {
         $regex = '/{{\s*(' . $this->looseVariableRegex . ')(\s+.*?)?\s*}}/ms';
 
-        if (preg_match_all($regex, $text, $data_matches, PREG_SET_ORDER + PREG_OFFSET_CAPTURE)) {
+        if ($this->preg_match_all($regex, $text, $data_matches, PREG_SET_ORDER + PREG_OFFSET_CAPTURE)) {
             foreach ($data_matches as $match) {
                 // grab some starting values & init variables
                 $parameters = [];
@@ -529,7 +520,7 @@ class Parser
          * $match[3][0] is the self closure
          * $match[3][1] is the offset of closure
          */
-        while (preg_match($regex, $text, $match, PREG_OFFSET_CAPTURE)) {
+        while ($this->preg_match($regex, $text, $match, PREG_OFFSET_CAPTURE)) {
             // update the collective data if it's different
             if (! empty($this->callbackData)) {
                 $cb_data = $data + $this->callbackData;
@@ -549,14 +540,14 @@ class Parser
                 $parameters = $this->parseVariablesInsideParameters($parameters, $data);
             }
 
-            if (preg_match('/{{\s*\/' . preg_quote($name, '/') . '\s*}}/m', $text_subselection, $match, PREG_OFFSET_CAPTURE) && !$selfClosed) {
+            if ($this->preg_match('/{{\s*\/' . preg_quote($name, '/') . '\s*}}/m', $text_subselection, $match, PREG_OFFSET_CAPTURE) && !$selfClosed) {
                 $content = substr($text_subselection, 0, $match[0][1]);
                 $tag .= $content . $match[0][0];
 
                 // Is there a nested block under this one existing with the same name?
                 $nested_regex = '/{{\s*(' . preg_quote($name, '/') . ')(\s.*?)}}(.*?){{\s*\/\1\s*}}/ms';
-                if (preg_match($nested_regex, $content . $match[0][0], $nested_matches)) {
-                    $nested_content = preg_replace('/{{\s*\/' . preg_quote($name, '/') . '\s*}}/m', '', $nested_matches[0]);
+                if ($this->preg_match($nested_regex, $content . $match[0][0], $nested_matches)) {
+                    $nested_content = $this->preg_replace('/{{\s*\/' . preg_quote($name, '/') . '\s*}}/m', '', $nested_matches[0]);
                     $content = $this->createExtraction('nested_looped_tags', $nested_content, $nested_content, $content);
                 }
             }
@@ -567,9 +558,6 @@ class Parser
             // a callback. If it's a query builder instance, we want to use the Query tag's index
             // method to handle the logic. We'll pass the builder into the builder parameter.
             if (isset($data[$name])) {
-                if ($data[$name] instanceof Value) {
-                    $data[$name] = $data[$name]->raw();
-                }
                 if ($data[$name] instanceof Builder) {
                     $parameters['builder'] = $data[$name];
                     $name = 'query';
@@ -628,7 +616,7 @@ class Parser
                 $replacement = $this->valueToLiteral($replacement);
             }
 
-            $text = preg_replace('/' . preg_quote($tag, '/') . '/m', addcslashes($replacement, '\\$'), $text, 1);
+            $text = $this->preg_replace('/' . preg_quote($tag, '/') . '/m', addcslashes($replacement, '\\$'), $text, 1);
             $text = $this->injectExtractions($text, 'nested_looped_tags');
         }
 
@@ -648,7 +636,7 @@ class Parser
     public function parseVariablesInsideParameters($parameters, $data)
     {
         return collect($parameters)->map(function ($value) use ($data) {
-            preg_match_all('/(\{\s*' . $this->variableRegex . '\s*\})/', $value, $matches);
+            $this->preg_match_all('/(\{\s*' . $this->variableRegex . '\s*\})/', $value, $matches);
 
             $value = str_replace(['{', '}'], ['{{', '}}'], $value);
             $value = $this->parseVariables($value, $data);
@@ -666,7 +654,7 @@ class Parser
      */
     public function parseConditionPairs($text, $data)
     {
-        preg_match_all($this->conditionalRegex, $text, $matches, PREG_SET_ORDER);
+        $this->preg_match_all($this->conditionalRegex, $text, $matches, PREG_SET_ORDER);
 
         $this->conditionalData = $data;
 
@@ -692,11 +680,11 @@ class Parser
 
             $conditional .= ': ?>';
 
-            $text = preg_replace('/' . preg_quote($match[0], '/') . '/m', addcslashes($conditional, '\\$'), $text, 1);
+            $text = $this->preg_replace('/' . preg_quote($match[0], '/') . '/m', addcslashes($conditional, '\\$'), $text, 1);
         }
 
-        $text = preg_replace($this->conditionalElseRegex, '<?php else: ?>', $text);
-        $text = preg_replace($this->conditionalEndRegex, '<?php endif; ?>', $text);
+        $text = $this->preg_replace($this->conditionalElseRegex, '<?php else: ?>', $text);
+        $text = $this->preg_replace($this->conditionalEndRegex, '<?php endif; ?>', $text);
 
         $text = $this->parsePhp($text);
         $this->inCondition = false;
@@ -713,11 +701,12 @@ class Parser
      */
     public function parseTernaries($text, $data)
     {
-        if (preg_match_all('/{{\s*([^}]+[^}]\s(\?[^}]*\s\:|\?\?=).*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
+        if ($this->preg_match_all('/{{\s*([^}]+[^}]\s(\?[^}]*\s\:|\?=).*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-                // Null coalescence assignment
-                if ($match[2] === '??=') {
-                    $bits = explode(' ??= ', $match[1]);
+                // Our made up "truth coalescing" syntax.
+                // eg. {{ true ?= "foo" }} is shorthand for {{ if true }}foo{{ /if }}
+                if ($match[2] === '?=') {
+                    $bits = explode(' ?= ', $match[1]);
 
                     // Parse the condition side of the statement
                     $condition = $this->processCondition($bits[0], $data, false);
@@ -726,7 +715,7 @@ class Parser
                     $if_true = trim($bits[1]);
 
                     // Build a PHP string to evaluate
-                    $conditional = '<?php if (' .$condition. '): ?>' . $this->getVariable($if_true, $data) . '<?php endif ?>';
+                    $conditional = '<?php if (' .$condition. '): ?>' . addslashes($this->getVariable($if_true, $data)) . '<?php endif ?>';
 
                     // Do the evaluation
                     $output = $this->parsePhp($conditional);
@@ -747,7 +736,7 @@ class Parser
                     list($if_true, $if_false) = explode(': ', $bits[1]);
 
                     // Build a PHP string to evaluate
-                    $conditional = '<?php echo(' .$condition. ') ? "' . $this->getVariable(trim($if_true), $data) . '" : "' . $this->getVariable(trim($if_false), $data) . '"; ?>';
+                    $conditional = '<?php echo(' .$condition. ') ? "' . addslashes($this->getVariable(trim($if_true), $data)) . '" : "' . addslashes($this->getVariable(trim($if_false), $data)) . '"; ?>';
 
                     // Do the evaluation
                     $output = $this->parsePhp($conditional);
@@ -775,22 +764,22 @@ class Parser
         }
 
         // check for and extract callbacks
-        if (preg_match_all('/\b(?!\{\s*)(' . $this->callbackNameRegex . ')(?!\s+.*?\s*\})\b/', $condition, $cb_matches)) {
+        if ($this->preg_match_all('/\b(?!\{\s*)(' . $this->callbackNameRegex . ')(?!\s+.*?\s*\})\b/', $condition, $cb_matches)) {
             foreach ($cb_matches[0] as $m) {
                 $condition = $this->createExtraction('__cond_callbacks', $m, "{$m}", $condition);
             }
         }
 
         // Extract all literal strings in the conditional to simplify
-        if (preg_match_all('/(["\']).*?(?<!\\\\)\1/', $condition, $str_matches)) {
+        if ($this->preg_match_all('/(["\']).*?(?<!\\\\)\1/', $condition, $str_matches)) {
             foreach ($str_matches[0] as $m) {
                 $condition = $this->createExtraction('__cond_str', $m, $m, $condition);
             }
         }
 
-        $condition = preg_replace($this->conditionalNotRegex, '$1!$2', $condition);
+        $condition = $this->preg_replace($this->conditionalNotRegex, '$1!$2', $condition);
 
-        if (preg_match_all($this->conditionalExistsRegex, $condition, $existsMatches, PREG_SET_ORDER)) {
+        if ($this->preg_match_all($this->conditionalExistsRegex, $condition, $existsMatches, PREG_SET_ORDER)) {
             foreach ($existsMatches as $m) {
                 $exists = 'true';
                 if ($this->getVariable($m[2], $data, '__doesnt_exist__') === '__doesnt_exist__') {
@@ -804,16 +793,14 @@ class Parser
         // also pass in the current callback (for later processing callback tags); also setting
         // $ref so that we can use it within the anonymous function
         $ref = $this;
-        $condition = preg_replace_callback('/\b(' . $this->variableRegex . ')\b/', function ($match) use ($ref) {
+        $condition = $this->preg_replace_callback('/\b(' . $this->variableRegex . ')\b/', function ($match) use ($ref) {
             return $ref->processConditionVar($match);
         }, $condition);
 
-        // inject and parse any callbacks
-        $condition = $this->injectExtractions($condition, '__cond_callbacks');
         $condition = $this->parseCallbackTags($condition, $data);
 
         // Re-extract the strings that have may have been added.
-        if (preg_match_all('/(["\']).*?(?<!\\\\)\1/s', $condition, $str_matches)) {
+        if ($this->preg_match_all('/(["\']).*?(?<!\\\\)\1/s', $condition, $str_matches)) {
             foreach ($str_matches[0] as $m) {
                 $condition = $this->createExtraction('__cond_str', $m, $m, $condition);
             }
@@ -822,14 +809,14 @@ class Parser
         // Re-process variables by tricking processConditionVar
         $this->inCondition = false;
 
-        // replacements -- the preg_replace_callback below is using word boundaries, which
+        // replacements -- the $this->preg_replace_callback below is using word boundaries, which
         // will break when one of your original variables gets replaced with a URL path
         // (because word boundaries think slashes are boundaries) -- to fix this, we replace
         // all instances of a literal string in single quotes with a temporary replacement
         $replacements = [];
 
         // Literally replace literal strings
-        while (preg_match("/('[^']+'|\"[^\"]+\")/", $condition, $replacement_matches)) {
+        while ($this->preg_match("/('[^']+'|\"[^\"]+\")/", $condition, $replacement_matches)) {
             $replacement_match = $replacement_matches[1];
             $replacement_hash = md5($replacement_match);
 
@@ -840,7 +827,7 @@ class Parser
         // next, the original re-processing callback
         $correct_regex = (strpos($condition, '(') === 0) ? $this->looseVariableRegex : $this->variableRegex;
 
-        $condition = preg_replace_callback('/\b(' . $correct_regex . ')\b/', [$this, 'processConditionVar'], $condition);
+        $condition = $this->preg_replace_callback('/\b(' . $correct_regex . ')\b/', [$this, 'processConditionVar'], $condition);
 
         // finally, replacing our placeholders with the original values
         foreach ($replacements as $replace_key => $replace_value) {
@@ -855,8 +842,8 @@ class Parser
 
         // evaluate special comparisons
         if (strpos($condition, ' ~ ') !== false) {
-            $new_condition = preg_replace_callback('/(.*?)\s*~\s*(__cond_str_[a-f0-9]{32})/', function ($cond_matches) {
-                return 'preg_match(' . $cond_matches[2] . ', ' . $cond_matches[1] . ', $temp_matches)';
+            $new_condition = $this->preg_replace_callback('/(.*?)\s*~\s*(__cond_str_[a-f0-9]{32})/', function ($cond_matches) {
+                return '$this->preg_match(' . $cond_matches[2] . ', ' . $cond_matches[1] . ', $temp_matches)';
             }, $condition);
 
             if ($new_condition !== false) {
@@ -881,7 +868,7 @@ class Parser
     public function parseRecursives($text, $orig_text, $data)
     {
         // Is there a {{ *recursive [array_key]* }} tag here, let's loop through it.
-        if (preg_match($this->recursiveRegex, $text, $match)) {
+        if ($this->preg_match($this->recursiveRegex, $text, $match)) {
             $tag = $match[0];
             $array_key = $match[1];
 
@@ -965,7 +952,7 @@ class Parser
      * This is used as a callback for the conditional parser.  It takes a variable
      * and returns the value of it, properly formatted.
      *
-     * @param  array    $match    A match from preg_replace_callback
+     * @param  array    $match    A match from $this->preg_replace_callback
      * @return string
      */
     public function processConditionVar($match)
@@ -984,12 +971,14 @@ class Parser
             return $var;
         }
 
+        $var = $this->injectExtractions($var, '__cond_callbacks');
+
         $value = $this->getVariable($var, $this->conditionalData, '__processConditionVar__');
 
         // if the resulting value of a variable is a string that contains another variable,
         // let's find that variable's value as well
-        if (!is_array($value)) {
-            while (preg_match($this->variableTagRegex, $value, $matches)) {
+        if (is_string($value)) {
+            while ($this->preg_match($this->variableTagRegex, $value, $matches)) {
                 $previous_value = $value;
                 $value = $this->parseVariables($value, $this->conditionalData);
 
@@ -1011,7 +1000,7 @@ class Parser
      * This is used as a callback for the conditional parser.  It takes a variable
      * and returns the value of it, properly formatted.
      *
-     * @param  array $match A match from preg_replace_callback
+     * @param  array $match A match from $this->preg_replace_callback
      * @return string
      */
     protected function processParamVar($match)
@@ -1027,10 +1016,16 @@ class Parser
      */
     protected function valueToLiteral($value)
     {
-        if (is_object($value) and is_callable(array($value, '__toString'))) {
-            return var_export((string)$value, true);
+        if ($value instanceof Builder) {
+            return $value->count();
+        } elseif ($value instanceof Collection) {
+            return $value->isEmpty() ? 'false' : 'true';
         } elseif (is_array($value)) {
             return !empty($value) ? "true" : "false";
+        } elseif (is_object($value) and is_callable(array($value, '__toString'))) {
+            return var_export((string)$value, true);
+        } elseif (is_object($value)) {
+            return 'true';
         } else {
             return var_export($value, true);
         }
@@ -1045,7 +1040,7 @@ class Parser
     protected function extractNoparse($text)
     {
         // Ignore @{{ tags }} so we don't have to write JavaScript like animals.
-        if (preg_match_all($this->ignoreRegex, $text, $matches, PREG_SET_ORDER)) {
+        if ($this->preg_match_all($this->ignoreRegex, $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $text = $this->createExtraction('noparse', $match[0], ltrim($match[0], '@'), $text);
             }
@@ -1055,7 +1050,7 @@ class Parser
          * $matches[][0] is the raw noparse match
          * $matches[][1] is the noparse contents
          */
-        if (preg_match_all($this->noparseRegex, $text, $matches, PREG_SET_ORDER)) {
+        if ($this->preg_match_all($this->noparseRegex, $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 $text = $this->createExtraction('noparse', $match[0], $match[1], $text);
             }
@@ -1076,7 +1071,7 @@ class Parser
         /**
          * $matches[][0] is the raw match
          */
-        if (preg_match_all($this->callbackBlockRegex, $text, $matches, PREG_SET_ORDER)) {
+        if ($this->preg_match_all($this->callbackBlockRegex, $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
 
                 // Allow {{ /if }} to close if statements
@@ -1235,6 +1230,10 @@ class Parser
             $context = $context->toAugmentedArray();
         }
 
+        if ($context instanceof Arrayable) {
+            $context = $context->toArray();
+        }
+
         // It will do this recursively until it's out of colon delimiters or values.
         if (is_array($context)) {
             return $this->getVariableExistenceAndValue($rest, $context);
@@ -1264,7 +1263,12 @@ class Parser
      */
     protected function isLiteralString($string)
     {
-        return preg_match('/^(["\']).*\1$/m', $string);
+        return $this->preg_match('/^(["\']).*\1$/m', $string);
+    }
+
+    protected function literalStringWithoutQuotes($string)
+    {
+        return substr($string, 1, strlen($string) - 2);
     }
 
     /**
@@ -1300,26 +1304,26 @@ class Parser
         $this->inCondition = true;
 
         // Extract all literal strings in the conditional to simplify
-        if (preg_match_all('/(["\']).*?(?<!\\\\)\1/', $parameters, $str_matches)) {
+        if ($this->preg_match_all('/(["\']).*?(?<!\\\\)\1/', $parameters, $str_matches)) {
             foreach ($str_matches[0] as $m) {
                 $parameters = $this->createExtraction('__param_str', $m, $m, $parameters);
             }
         }
 
-        $parameters = preg_replace_callback(
+        $parameters = $this->preg_replace_callback(
             '/(.*?\s*=\s*(?!__))('.$this->variableRegex.')/is',
             [$this, 'processParamVar'],
             $parameters
         );
 
-        $parameters = preg_replace('/(.*?\s*=\s*(?!\{\s*)(?!__))('.$this->callbackNameRegex.')(?!\s*\})\b/', '$1{$2}', $parameters);
+        $parameters = $this->preg_replace('/(.*?\s*=\s*(?!\{\s*)(?!__))('.$this->callbackNameRegex.')(?!\s*\})\b/', '$1{$2}', $parameters);
         $parameters = $this->parseCallbackTags($parameters, $data);
 
         // Re-inject extracted strings
         $parameters = $this->injectExtractions($parameters, '__param_str');
         $this->inCondition = false;
 
-        if (preg_match_all('/(.*?)\s*=\s*(\'|"|&#?\w+;)(.*?)(?<!\\\\)\2/s', trim($parameters), $matches)) {
+        if ($this->preg_match_all('/(.*?)\s*=\s*(\'|"|&#?\w+;)(.*?)(?<!\\\\)\2/s', trim($parameters), $matches)) {
             $return = [];
 
             foreach ($matches[1] as $i => $attr) {
@@ -1461,5 +1465,66 @@ class Parser
             })
             ->sortKeys()
             ->all();
+    }
+
+    protected function getValueAsRenderableString($value, $variable)
+    {
+        if (is_array($value)) {
+            $value = null;
+            Log::debug("Cannot render an array variable as a string: {{ $variable }}");
+        }
+
+        if (is_object($value) && !method_exists($value, '__toString')) {
+            $value = null;
+            Log::debug("Cannot render an object variable as a string: {{ $variable }}");
+        }
+
+        return (string) $value;
+    }
+
+    protected function isNullWhenUsedInStrings($value)
+    {
+        if ($value instanceof LabeledValue) {
+            $value = $value->value();
+        }
+
+        return is_null($value) || $value === '__lex_no_value__';
+    }
+
+    protected function preg_match($pattern, $subject, &$matches = [], $flags = 0, $offset = 0)
+    {
+        $return = preg_match($pattern, $subject, $matches, $flags, $offset);
+        $this->handleRegexError();
+        return $return;
+    }
+
+    protected function preg_match_all($pattern, $subject, &$matches = [], $flags = 0, $offset = 0)
+    {
+        $return = preg_match_all($pattern, $subject, $matches, $flags, $offset);
+        $this->handleRegexError();
+        return $return;
+    }
+
+    protected function preg_replace(...$args)
+    {
+        $return = preg_replace(...$args);
+        $this->handleRegexError();
+        return $return;
+    }
+
+    protected function preg_replace_callback(...$args)
+    {
+        $return = preg_replace_callback(...$args);
+        $this->handleRegexError();
+        return $return;
+    }
+
+    protected function handleRegexError()
+    {
+        if (! preg_last_error()) {
+            return;
+        }
+
+        throw new RegexError(preg_last_error(), $this->view);
     }
 }

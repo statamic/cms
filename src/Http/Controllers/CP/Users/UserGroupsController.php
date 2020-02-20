@@ -23,7 +23,8 @@ class UserGroupsController extends CpController
                 'handle' => $group->handle(),
                 'users' => $group->users()->count(),
                 'roles' => $group->roles()->count(),
-                'edit_url' => cp_route('user-groups.edit', $group->handle())
+                'edit_url' => $group->editUrl(),
+                'delete_url' => $group->deleteUrl(),
             ];
         })->values();
 
@@ -62,7 +63,7 @@ class UserGroupsController extends CpController
         $request->validate([
             'title' => 'required',
             'handle' => 'alpha_dash',
-            'roles' => 'required|array',
+            'roles' => 'array',
         ]);
 
         $group
@@ -88,7 +89,7 @@ class UserGroupsController extends CpController
         $request->validate([
             'title' => 'required',
             'handle' => 'alpha_dash',
-            'roles' => 'required|array',
+            'roles' => 'array',
         ]);
 
         $group = UserGroup::make()

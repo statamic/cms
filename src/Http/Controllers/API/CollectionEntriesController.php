@@ -2,19 +2,20 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Statamic\Facades\Entry;
 use Illuminate\Http\Request;
-use Statamic\Http\Resources\EntryResource;
-use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\API\EntryResource;
 
-class CollectionEntriesController extends CpController
+class CollectionEntriesController extends ApiController
 {
-    use TemporaryResourcePagination;
-
     public function index($collection, Request $request)
     {
-        $entries = static::paginate(Entry::whereCollection($collection->handle()));
+        return app(EntryResource::class)::collection(
+            $this->filterSortAndPaginate($collection->queryEntries())
+        );
+    }
 
-        return EntryResource::collection($entries);
+    public function show($collection, $entry)
+    {
+        return app(EntryResource::class)::make($entry);
     }
 }
