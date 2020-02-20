@@ -49,8 +49,6 @@ class StructuresController extends CpController
         $values = [
             'title' => $structure->title(),
             'handle' => $structure->handle(),
-            'purpose' => $structure->collection() ? 'collection' : 'navigation',
-            'collection' => optional($structure->collection())->handle(),
             'collections' => $structure->collections()->map->handle()->all(),
             'expects_root' => $structure->expectsRoot(),
             'sites' => Site::all()->map(function ($site) use ($structure) {
@@ -142,9 +140,15 @@ class StructuresController extends CpController
             ->title($values['title'])
             ->handle($values['handle'])
             ->expectsRoot($expectsRoot = $values['expects_root'])
-            ->sites(collect($values['sites'])->filter->enabled->map->handle->values()->all());
+            ->collections($values['collections']);
 
-        foreach ($values['sites'] as $site) {
+        $sites = $values['sites'] ?? [];
+
+        if (!empty($sites)) {
+            $structure->sites($sites->filter->enabled->map->handle->values()->all());
+        }
+
+        foreach ($sites as $site) {
             $tree = $structure->in($site['handle']);
 
             if ($tree && !$site['enabled']) {
@@ -160,18 +164,6 @@ class StructuresController extends CpController
             }
 
             $structure->addTree($tree);
-        }
-
-        if ($values['purpose'] === 'collection') {
-            $routes = collect($values['sites'])->mapWithKeys(function ($site) {
-                return [$site['handle'] => $site['route']];
-            });
-
-            Collection::findByHandle($values['collection'])
-                ->route(Site::hasMultiple() ? $routes->all() : $routes->first())
-                ->save();
-        } else {
-            $structure->collections($values['collections']);
         }
 
         $this->updateRootExpectations($structure, $expectedRoot, $expectsRoot);
@@ -263,50 +255,45 @@ class StructuresController extends CpController
 
     public function editFormBlueprint()
     {
-        return Blueprint::makeFromFields([
-            'title' => [
-                'type' => 'text',
-                'validate' => 'required',
-                'width' => 50,
+        $contents = [
+            'name' => [
+                'display' => 'Name',
+                'fields' => [
+                    'title' => [
+                        'type' => 'text',
+                        'validate' => 'required',
+                    ],
+                    'handle' => [
+                        'type' => 'slug',
+                        'read_only' => true,
+                    ],
+                ],
             ],
-            'handle' => [
-                'type' => 'slug',
-                'width' => 50,
-                'read_only' => true,
+            'options' => [
+                'display' => 'Options',
+                'fields' => [
+                    'collections' => [
+                        'type' => 'collections',
+                        'display' => 'Collections',
+                        'instructions' => 'You will be able to add links to entries from these collections.',
+                    ],
+                    'expects_root' => [
+                        'type' => 'toggle',
+                        'display' => 'Expect a root page',
+                        'instructions' => 'The first page in the tree should be considered the "root" or "home" page.',
+                    ],
+                ],
             ],
-            'purpose' => [
-                'type' => 'radio',
-                'instructions' => 'You can use this structure to define the URLs for a collection, you can use it to build an arbitrary navigation.',
-                'options' => [
-                    'collection' => 'Manage a Collection',
-                    'navigation' => 'Build a Navigation',
-                ]
-            ],
-            'collections' => [
-                'type' => 'collections',
-                'display' => 'Collections',
-                'instructions' => 'You will be able to add links to entries from these collections.',
-                'if' => ['purpose' => 'navigation'],
-            ],
-            'collection' => [
-                'type' => 'collections',
-                'max_items' => 1,
-                'display' => 'Collection',
-                'instructions' => 'The collection this structure will be managing.',
-                'if' => ['purpose' => 'collection'],
-                'validate' => 'required_if:purpose,collection'
-            ],
-            'expects_root' => [
-                'type' => 'toggle',
-                'display' => 'Expect a root page',
-                'instructions' => 'The first page in the tree should be considered the "root" or "home" page.',
-                'if' => ['purpose' => 'collection'],
-            ],
-            'sites' => [
+        ];
+
+        if (Site::hasMultiple()) {
+            $contents['options']['fields']['sites'] = [
                 'type' => 'structure_sites',
-                'display' => Site::hasMultiple() ? __('Sites') : __('Route'),
-            ]
-        ]);
+                'display' => __('Sites'),
+            ];
+        };
+
+        return Blueprint::makeFromSections($contents);
     }
 
     public function destroy($structure)

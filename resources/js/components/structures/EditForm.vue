@@ -22,7 +22,7 @@
             </div>
             </header>
 
-            <publish-sections @updated="setFieldValue" :enable-sidebar="false" />
+            <configure-sections @updated="setFieldValue" :enable-sidebar="false" />
         </div>
     </publish-container>
 
