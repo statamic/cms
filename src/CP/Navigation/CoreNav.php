@@ -84,7 +84,9 @@ class CoreNav
             ->icon('hierarchy-files')
             ->can('index', Structure::class)
             ->children(function () {
-                return StructureAPI::all()->map(function ($structure) {
+                return StructureAPI::all()->reject(function ($structure) {
+                    return $structure->isCollectionBased();
+                })->map(function ($structure) {
                     return Nav::item($structure->title())
                               ->url($structure->showUrl())
                               ->can('view', $structure);
