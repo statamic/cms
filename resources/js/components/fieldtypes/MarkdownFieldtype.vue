@@ -22,9 +22,11 @@
                         <button @click="insertLink('')" v-tooltip="__('Insert Link')"><i class="fa fa-link"></i></button>
                         <button @click="addAsset" v-tooltip="__('Insert Asset')" v-if="assetsEnabled"><i class="fa fa-picture-o"></i></button>
                         <button @click="insertImage('')" v-tooltip="__('Insert Image')" v-else><i class="fa fa-picture-o"></i></button>
-                        <button @click="toggleFullScreen" v-tooltip="__('Toggle Fullscreen Mode')">
-                            <svg-icon name="shrink-all" class="w-4 h-4" v-if="fullScreenMode" />
-                            <svg-icon name="expand" class="w-4 h-4" v-else />
+                        <button @click="openFullScreen" v-tooltip="__('Fullscreen Mode')" v-if="! fullScreenMode">
+                            <svg-icon name="expand" class="w-4 h-4" />
+                        </button>
+                        <button @click="closeFullScreen" v-tooltip="__('Close Fullscreen Mode')" v-if="fullScreenMode">
+                            <svg-icon name="shrink-all" class="w-4 h-4" />
                         </button>
                     </div>
                 </div>
