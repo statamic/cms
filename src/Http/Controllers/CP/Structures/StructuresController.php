@@ -189,36 +189,15 @@ class StructuresController extends CpController
         $values = $request->validate([
             'title' => 'required',
             'handle' => 'required|alpha_dash',
-            'collections' => 'array',
-            'collection' => 'nullable',
-            'max_depth' => 'nullable|integer',
-            'expects_root' => 'nullable',
-            'route' => 'nullable', // todo: change to the structuresites fieldtype
         ]);
 
         $structure = Structure::make()
             ->title($values['title'])
-            ->handle($values['handle'])
-            ->collections($values['collections'] ?? [])
-            ->maxDepth($values['max_depth'])
-            ->expectsRoot($values['expects_root']);
+            ->handle($values['handle']);
 
-        $sites = [ // todo: change to the structuresites fieldtype
-            ['handle' => Site::default()->handle(), 'route' => $values['route']],
-        ];
-
-        foreach ($sites as $site) {
-            $tree = $structure->makeTree($site['handle']);
-            $tree->route($site['route']);
-            $structure->addTree($tree);
-        }
+        $structure->addTree($structure->makeTree(Site::default()->handle()));
 
         $structure->save();
-
-        if ($values['collection']) {
-            Collection::findByHandle($values['collection'])->structure($structure->handle())->save();
-            // todo: add all the collection's entries to the tree.
-        }
 
         return ['redirect' => $structure->showUrl()];
     }

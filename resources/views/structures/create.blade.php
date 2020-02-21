@@ -1,8 +1,8 @@
 @extends('statamic::layout')
-@section('title', __('Create Structure'))
+@section('title', __('Create Navigation'))
 
 @section('content')
-    <structure-wizard
+    <structure-create-form
         route="{{ cp_route('structures.store') }}">
-    </structure-wizard>
+    </structure-create-form>
 @stop
