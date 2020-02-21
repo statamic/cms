@@ -3,10 +3,7 @@
         <div class="card p-0" slot-scope="{ filteredRows: rows }">
             <data-list-table :rows="rows">
                 <template slot="cell-title" slot-scope="{ row: structure }">
-                    <a :href="structure.show_url" class="flex items-center">
-                        <svg-icon :name="structure.purpose === 'collection' ? 'list-bullets' : 'hierarchy-files'" class="w-4 h-4 text-grey-60 inline-block mr-2" />
-                        {{ structure.title }}
-                    </a>
+                    <a :href="structure.show_url" class="flex items-center" v-text="structure.title" />
                 </template>
                 <template slot="actions" slot-scope="{ row: structure, index }">
                     <dropdown-list>
