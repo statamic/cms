@@ -13,13 +13,11 @@
     >
         <div slot-scope="{ setFieldValue }">
             <header class="mb-3">
-                <breadcrumb :url="listingUrl" :title="__('Navigation')" />
+                <breadcrumb :url="listingUrl" :title="title" />
                 <div class="flex items-center">
-                    <h1 class="flex-1">
-                        {{ title }}
-                    </h1>
-                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
-            </div>
+                    <h1 class="flex-1" v-text="__('Configure Navigation')" />
+                    <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
+                </div>
             </header>
 
             <configure-sections @updated="setFieldValue" :enable-sidebar="false" />
