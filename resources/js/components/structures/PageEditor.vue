@@ -16,14 +16,14 @@
 
                 <div class="publish-fields">
                     <form-group
-                        display="Title"
+                        display="__('Title')"
                         handle="title"
-                        instructions="The link display text. Leave blank to use the URL."
+                        instructions="__('messages.structure_add_link_title_instructions')"
                         v-model="title"
                     />
                     <form-group
-                        display="URL"
-                        instructions="Enter any internal or external URL, or leave blank for a text-only item."
+                        display="__('URL')"
+                        instructions="__('messages.structure_add_link_url_instructions')"
                         handle="url"
                         v-model="url"
                     />
