@@ -127,6 +127,8 @@ return [
     'session_expiry_logged_out_for_inactivity' => 'You have been logged out because you\'ve been inactive for a while.',
     'session_expiry_logging_out_in_seconds' => 'You have been inactive for a while and will be logged out in :seconds seconds. Click to extend your session.',
     'session_expiry_new_window' => 'Opens in a new window. Come back once you\'ve logged in.',
+    'structure_add_link_title_instructions' => 'The link display text. Leave blank to use the URL.',
+    'structure_add_link_url_instructions' => 'Enter any internal or external URL, or leave blank for a text-only item.',
     'structure_wizard_collection_instructions' => 'If the collection you intend to use does not exist yet, choose <b>this structure</b> later while creating it.',
     'structure_wizard_collections_instructions' => 'Entries from selected collections will be available to choose from when building the page tree.',
     'structure_wizard_description' => 'Structures are link trees most often used to create nav bars and other forms of site navigation.',
