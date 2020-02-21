@@ -14,12 +14,12 @@
 
                 <a @click="$refs.tree.cancel" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
 
-                <dropdown-list>
+                <dropdown-list :show-dropdown-if="collections.length > 0">
                     <template #trigger>
-                        <button class="btn" v-text="`${__('Add Link')}`" />
+                        <button class="btn" v-text="__('Add Link')" @click="addLink" />
                     </template>
-                    <dropdown-item :text="__('Link to URL')" @click="$refs.tree.linkPage" />
-                    <dropdown-item :text="__('Link to Entry')" @click="$refs.tree.linkToEntries" />
+                    <dropdown-item :text="__('Link to URL')" @click="linkPage" />
+                    <dropdown-item :text="__('Link to Entry')" @click="linkEntries" />
                 </dropdown-list>
 
                 <button
@@ -95,6 +95,22 @@ export default {
 
     mounted() {
         this.mounted = true;
+    },
+
+    methods: {
+
+        addLink() {
+            if (this.collections.length === 0) this.linkPage();
+        },
+
+        linkPage() {
+            this.$refs.tree.linkPage();
+        },
+
+        linkEntries() {
+            this.$refs.tree.linkToEntries();
+        }
+
     }
 
 }
