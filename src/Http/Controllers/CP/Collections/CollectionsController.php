@@ -309,10 +309,12 @@ class CollectionsController extends CpController
                         'type' => 'blueprints',
                         'instructions' => __('statamic::messages.collections_blueprint_instructions'),
                         'validate' => 'array',
+                        'mode' => 'select',
                     ],
                     'taxonomies' => [
                         'type' => 'taxonomies',
                         'instructions' => __('statamic::messages.collections_taxonomies_instructions'),
+                        'mode' => 'select',
                     ],
                     'default_publish_state' => [
                         'display' => __('Publish by Default'),
