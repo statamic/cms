@@ -140,7 +140,8 @@ class StructuresController extends CpController
             ->title($values['title'])
             ->handle($values['handle'])
             ->expectsRoot($expectsRoot = $values['expects_root'])
-            ->collections($values['collections']);
+            ->collections($values['collections'])
+            ->maxDepth($values['max_depth']);
 
         $sites = $values['sites'] ?? [];
 
@@ -260,6 +261,12 @@ class StructuresController extends CpController
                         'type' => 'toggle',
                         'display' => 'Expect a root page',
                         'instructions' => 'The first page in the tree should be considered the "root" or "home" page.',
+                    ],
+                    'max_depth' => [
+                        'type' => 'integer',
+                        'display' => 'Max depth',
+                        'instructions' => 'The maximum number of levels deep a page may be nested. Leave blank for no limit.',
+                        'validate' => 'min:0',
                     ],
                 ],
             ],
