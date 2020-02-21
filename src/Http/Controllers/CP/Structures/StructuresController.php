@@ -256,6 +256,7 @@ class StructuresController extends CpController
                         'type' => 'collections',
                         'display' => 'Collections',
                         'instructions' => 'You will be able to add links to entries from these collections.',
+                        'mode' => 'select',
                     ],
                     'expects_root' => [
                         'type' => 'toggle',
