@@ -147,6 +147,11 @@
     @apply bg-grey-30;
 }
 
+.vs__dropdown-option--selected {
+	opacity: .25;
+	cursor: text;
+}
+
 
 .v-select:not(.vs--single) .vs__selected {
 	@include clickable;
