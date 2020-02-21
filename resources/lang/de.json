@@ -95,7 +95,7 @@
     "Content Model": "Inhaltsmodell",
     "Content Stache": "Content Stache",
     "Create": "Erstellen",
-    "Create & Link Item": "Eintrag erstellen und verknüpfen",
+    "Create & Item": "Eintrag erstellen und verknüpfen",
     "Create a new Collection": "Neue Sammlung erstellen",
     "Create a New Form": "Neues Formular erstellen",
     "Create a new Taxonomy": "Neue Kategorie erstellen",
@@ -256,11 +256,11 @@
     "Layout": "Layout",
     "Learn more": "Erfahre mehr",
     "Link": "Link",
-    "Link Existing": "Linke Vorhandene",
+    "Link Existing": "Link Vorhanden",
     "Link Existing Item": "Bestehenden Eintrag verknüpfen",
     "Link Fields": "Felder verlinken",
-    "Link to Entry": "Linke zu Eintrag",
-    "Link to URL": "Linke zu URL",
+    "Link to Entry": "Eintrag verlinken",
+    "Link to URL": "URL verlinken",
     "Linked fieldset": "Verknüpfte Eingabemaske",
     "Listable": "Auflistbar",
     "Live Preview": "Live Vorschau",
@@ -478,5 +478,5 @@
     "Working copy has unsaved changes": "Die Arbeitskopie enthält nicht gespeicherte Änderungen",
     "Write": "Schreiben",
     "Yes": "Ja",
-    "Your Favorites": "Ihre Favoriten"
+    "Your Favorites": "Deine Favoriten"
 }
