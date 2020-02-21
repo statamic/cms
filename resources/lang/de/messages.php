@@ -122,6 +122,8 @@ return [
     'session_expiry_logged_out_for_inactivity' => 'Sie wurden abgemeldet, weil Sie eine Weile inaktiv waren.',
     'session_expiry_logging_out_in_seconds' => 'Sie waren eine Weile inaktiv und werden abgemeldet in: :seconds Sekunden. Klicken Sie hier, um Ihre Sitzung zu verlängern.',
     'session_expiry_new_window' => 'Wird in einem neuen Fenster geöffnet. Komm zurück, sobald du dich eingeloggt hast.',
+    'structure_add_link_title_instructions' => 'Der anzeigende Name für den Link. Leer lassen um automatisch die URL zu verwenden.',
+    'structure_add_link_url_instructions' => 'Gebe eine interne oder externe ULR ein. Leer lassen für ein reines Textelement.',
     'structure_wizard_collection_instructions' => 'Wenn die Sammlung, die Sie verwenden möchten, noch nicht vorhanden ist, wählen Sie <b>diese Struktur</b> später beim Erstellen aus.',
     'structure_wizard_collections_instructions' => 'Einträge aus ausgewählten Sammlungen können beim Erstellen des Seitenbaums ausgewählt werden.',
     'structure_wizard_description' => 'Strukturen sind Verknüpfsbäume, die am häufigsten zum Erstellen von Navigationsleisten oder ähnlichem verwendet werden.',
