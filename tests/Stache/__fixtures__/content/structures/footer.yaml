@@ -1,6 +1,5 @@
 title: Footer
 root: pages-home
-route: '{slug}'
 tree:
   -
     entry: pages-about
