@@ -31,14 +31,11 @@ class TreeTest extends TestCase
     /** @test */
     function it_gets_the_route_from_the_collection()
     {
-        $collection = tap(Collection::make('test-collection')
-            ->structure('test-structure')
-            ->route('the-uri/{slug}')
-        )->save();
+        $collection = tap(Collection::make('test-collection')->route('the-uri/{slug}'))->save();
 
         $this->unlinkAfter($collection->path());
 
-        $structure = (new Structure)->handle('test-structure');
+        $structure = (new Structure)->handle('test-structure')->collection($collection);
         $tree = (new Tree)->structure($structure);
 
         $this->assertEquals('the-uri/{slug}', $tree->route());

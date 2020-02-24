@@ -153,15 +153,22 @@ class FeatureTest extends TestCase
     /** @test */
     function it_gets_a_structure()
     {
-        $structure = Structure::find('pages');
-        $this->assertEquals('pages', $structure->handle());
+        $structure = Structure::find('footer');
+        $this->assertEquals('footer', $structure->handle());
         // TODO: Some more assertions
+    }
+
+    /** @test */
+    function it_gets_a_collection_structure()
+    {
+        $structure = Structure::find('collection::pages');
+        $this->assertEquals('collection::pages', $structure->handle());
     }
 
     /** @test */
     function it_saves_structures()
     {
-        $structure = Structure::find('pages');
+        $structure = Structure::find('footer');
 
         $repo = Mockery::mock(StructureRepository::class);
         $repo->shouldReceive('save')->with($structure);

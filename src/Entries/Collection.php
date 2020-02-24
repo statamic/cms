@@ -41,6 +41,7 @@ class Collection implements Contract
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
     protected $structure;
+    protected $structureContents;
     protected $taxonomies = [];
     protected $cascade;
 
@@ -502,12 +503,41 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('structure')
             ->getter(function ($structure) {
-                $key = "collection-{$this->id()}-structure-{$structure}";
-                return is_string($structure) ? Blink::once($key, function () use ($structure) {
-                    return Structure::findByHandle($structure);
-                }) : $structure;
+                if (! $structure && $this->structureContents) {
+                    $structure = $this->structure = $this->makeStructureFromContents();
+                }
+                return $structure;
+            })
+            ->setter(function ($structure) {
+                return $structure
+                    ->handle('collection::'.$this->handle)
+                    ->title($this->title());
             })
             ->args(func_get_args());
+    }
+
+    public function structureContents(array $contents = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('structureContents')
+            ->args(func_get_args());
+    }
+
+    protected function makeStructureFromContents()
+    {
+        $structure = Structure::make('collection::'.$this->handle)
+            ->collection($this)
+            ->title($this->title());
+
+        $trees = $this->structureContents['trees']
+            ?? [Site::default()->handle() => $this->structureContents['tree']];
+
+        foreach ($trees as $site => $contents) {
+            $tree = $structure->makeTree($site)->tree($contents);
+            $structure->addTree($tree);
+        }
+
+        return $structure;
     }
 
     public function structureHandle()
@@ -516,12 +546,12 @@ class Collection implements Contract
             return null;
         }
 
-        return is_string($this->structure) ? $this->structure : $this->structure->handle();
+        return $this->structure()->handle();
     }
 
     public function hasStructure()
     {
-        return $this->structure !== null;
+        return $this->structure !== null || $this->structureContents !== null;
     }
 
     public function delete()

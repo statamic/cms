@@ -2,12 +2,14 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\Stache\Stache;
 use Illuminate\Support\Collection;
-use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Structures\Structure;
 use Statamic\Contracts\Structures\StructureRepository as RepositoryContract;
+use Statamic\Facades;
+use Statamic\Stache\Stache;
+use Statamic\Support\Str;
+use Statamic\Support\Arr;
 
 class StructureRepository implements RepositoryContract
 {
@@ -24,7 +26,9 @@ class StructureRepository implements RepositoryContract
     {
         $keys = $this->store->paths()->keys();
 
-        return $this->store->getItems($keys);
+        return $this->store->getItems($keys)->merge(
+            Facades\Collection::all()->filter->hasStructure()->map->structure()
+        );
     }
 
     public function find($id): ?Structure
@@ -34,6 +38,10 @@ class StructureRepository implements RepositoryContract
 
     public function findByHandle($handle): ?Structure
     {
+        if (Str::startsWith($handle, 'collection::')) {
+            return Facades\Collection::find(Str::after($handle, 'collection::'))->structure();
+        }
+
         return $this->store->getItem($handle);
     }
 
@@ -47,9 +55,9 @@ class StructureRepository implements RepositoryContract
             return null;
         }
 
-        [$handle, $id] = explode('::', $key);
+        [$collection, $id] = explode('::', $key);
 
-        return $this->find($handle)->in($site)->page($id);
+        return $this->find('collection::'.$collection)->in($site)->page($id);
     }
 
     public function save(Structure $structure)

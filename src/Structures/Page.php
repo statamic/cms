@@ -123,7 +123,7 @@ class Page implements Entry, Augmentable, Responsable
         return $this;
     }
 
-    public function setRoute(string $route): self
+    public function setRoute(?string $route): self
     {
         $this->route = $route;
 

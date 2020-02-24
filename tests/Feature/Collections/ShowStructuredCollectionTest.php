@@ -14,11 +14,11 @@ class ShowStructuredCollectionTest extends ShowCollectionTest
 
     function createCollection($handle)
     {
-        tap(Structure::make('test'), function ($s) {
+        $structure = Structure::make()->tap(function ($s) {
             $s->addTree($s->makeTree('en'));
-        })->save();
+        });
 
-        return tap(Collection::make('test')->structure('test'))->save();
+        return tap(Collection::make('test')->structure($structure))->save();
     }
 
     /** @test */

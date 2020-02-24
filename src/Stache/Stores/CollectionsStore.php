@@ -50,7 +50,7 @@ class CollectionsStore extends BasicStore
             ->searchIndex(array_get($data, 'search_index'))
             ->revisionsEnabled(array_get($data, 'revisions', false))
             ->defaultPublishState($this->getDefaultPublishState($data))
-            ->structure(array_get($data, 'structure'))
+            ->structureContents(array_get($data, 'structure'))
             ->orderable(array_get($data, 'orderable', false))
             ->sortField(array_get($data, 'sort_by'))
             ->sortDirection(array_get($data, 'sort_dir'))

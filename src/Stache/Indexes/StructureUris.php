@@ -26,12 +26,13 @@ class StructureUris extends Index
     protected function referencedPageUris($tree)
     {
         $site = $tree->locale();
+        $collection = $tree->structure()->collection()->handle();
 
         return $tree->flattenedPages()->filter(function ($page) {
             return $page->reference() && $page->referenceExists();
-        })->mapWithKeys(function ($page) use ($tree, $site) {
+        })->mapWithKeys(function ($page) use ($collection, $site) {
             $key = $site . '::' . $page->uri();
-            $value = $tree->handle() . '::' . $page->reference();
+            $value = $collection . '::' . $page->reference();
             return [$key => $value];
         });
     }

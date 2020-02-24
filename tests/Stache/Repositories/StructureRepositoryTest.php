@@ -39,16 +39,16 @@ class StuctureRepositoryTest extends TestCase
         $this->assertEveryItemIsInstanceOf(Structure::class, $structures);
 
         $ordered = $structures->sortBy->handle()->values();
-        $this->assertEquals(['footer', 'pages'], $ordered->map->handle()->all());
-        $this->assertEquals(['Footer', 'Pages'], $ordered->map->title()->all());
+        $this->assertEquals(['collection::pages', 'footer'], $ordered->map->handle()->all());
+        $this->assertEquals(['Pages', 'Footer'], $ordered->map->title()->all());
     }
 
     /** @test */
     function it_gets_a_structure_by_handle()
     {
-        tap($this->repo->findByHandle('pages'), function ($structure) {
+        tap($this->repo->findByHandle('collection::pages'), function ($structure) {
             $this->assertInstanceOf(Structure::class, $structure);
-            $this->assertEquals('pages', $structure->handle());
+            $this->assertEquals('collection::pages', $structure->handle());
             $this->assertEquals('Pages', $structure->title());
         });
 

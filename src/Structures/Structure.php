@@ -23,6 +23,7 @@ class Structure implements StructureContract
     protected $handle;
     protected $sites;
     protected $trees;
+    protected $collection;
     protected $collections;
     protected $maxDepth;
     protected $expectsRoot = false;
@@ -181,13 +182,11 @@ class Structure implements StructureContract
             ->args(func_get_args());
     }
 
-    public function collection()
+    public function collection($collection = null)
     {
-        return Blink::once('structure-collection-'.$this->handle, function () {
-            return Collection::all()->first(function ($collection) {
-                return $collection->structureHandle() === $this->handle();
-            });
-        });
+        return $this
+            ->fluentlyGetOrSet('collection')
+            ->args(func_get_args());
     }
 
     public function isCollectionBased()

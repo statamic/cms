@@ -2,14 +2,17 @@
 
 namespace Tests\Data\Entries;
 
-use Statamic\Facades;
-use Tests\TestCase;
-use Statamic\Facades\Site;
-use Statamic\Fields\Blueprint;
-use Statamic\Entries\Entry;
-use Statamic\Entries\Collection;
-use Tests\PreventSavingStacheItemsToDisk;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
+use Statamic\Contracts\Structures\Structure as StructureContract;
+use Statamic\Entries\Collection;
+use Statamic\Entries\Entry;
+use Statamic\Facades;
+use Statamic\Facades\Site;
+use Statamic\Facades\Structure;
+use Statamic\Fields\Blueprint;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class CollectionTest extends TestCase
 {
@@ -303,5 +306,58 @@ class CollectionTest extends TestCase
 
         $collection->defaultPublishState(false);
         $this->assertFalse($collection->defaultPublishState());
+    }
+
+    /** @test */
+    function it_sets_and_gets_structure()
+    {
+        $structure = Structure::make();
+        $collection = (new Collection)->handle('test');
+        $this->assertFalse($collection->hasStructure());
+        $this->assertNull($collection->structure());
+        $this->assertNull($structure->handle());
+
+        $collection->structure($structure);
+
+        $this->assertTrue($collection->hasStructure());
+        $this->assertSame($structure, $collection->structure());
+        $this->assertEquals('collection::test', $structure->handle());
+        $this->assertEquals('Test', $structure->title());
+    }
+
+    /** @test */
+    function it_sets_the_structure_inline()
+    {
+        // This applies to a file-based approach.
+
+        $collection = (new Collection)->handle('test');
+        $this->assertFalse($collection->hasStructure());
+        $this->assertNull($collection->structure());
+
+        EntryFactory::id('123')->collection('test')->create();
+        EntryFactory::id('456')->collection('test')->create();
+        EntryFactory::id('789')->collection('test')->create();
+
+        $return = $collection->structureContents($contents = [
+            'max_depth' => 2,
+            'expects_root' => true,
+            'tree' => [
+                ['entry' => '123', 'children' => [
+                    ['entry' => '789']
+                ]],
+                ['entry' => '456'],
+            ]
+        ]);
+
+        $this->assertEquals($collection, $return);
+        $this->assertEquals($contents, $collection->structureContents());
+        $this->assertTrue($collection->hasStructure());
+        $structure = $collection->structure();
+        $this->assertInstanceOf(StructureContract::class, $structure);
+        $this->assertEquals('collection::test', $structure->handle());
+        $this->assertTrue($structure->isCollectionBased());
+        $this->assertSame($collection, $structure->collection());
+        $this->assertEquals(2, $structure->in('en')->pages()->all()->count());
+        $this->assertEquals(3, $structure->in('en')->flattenedPages()->count());
     }
 }
