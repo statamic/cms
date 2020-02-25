@@ -5,8 +5,8 @@
             <div>{{ field.display || field.handle }}</div>
             <div
                 v-if="field.instructions"
-                class="icon icon-help-with-circle opacity-50 fs-12"
-                :title="$options.filters.markdown(field.instructions)"
+                class="icon icon-help-with-circle opacity-50 text-xs"
+                v-tooltip="$options.filters.markdown(field.instructions)"
             />
         </div>
     </th>
