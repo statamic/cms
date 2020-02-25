@@ -9,7 +9,7 @@ fields:
     handle: email
     field:
       type: text
-      input: email
+      input_type: email
       display: Email Address
   -
     handle: roles
