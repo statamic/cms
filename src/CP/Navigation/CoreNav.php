@@ -2,7 +2,7 @@
 
 namespace Statamic\CP\Navigation;
 
-use Statamic\Facades\Nav;
+use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Facades\Form as FormAPI;

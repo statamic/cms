@@ -29,7 +29,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         if ($this->shouldPreventNavBeingBuilt) {
-            \Statamic\Facades\Nav::shouldReceive('build')->andReturn([]);
+            \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn([]);
             $this->addToAssertionCount(-1); // Dont want to assert this
         }
     }

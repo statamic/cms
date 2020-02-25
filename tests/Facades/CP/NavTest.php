@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\Facades;
+namespace Tests\Facades\CP;
 
 use Tests\TestCase;
-use Statamic\Facades\Nav;
+use Statamic\Facades\CP\Nav;
 use Tests\FakesRoles;
 use Statamic\Facades\User;
 use Illuminate\Support\Facades\Route;
