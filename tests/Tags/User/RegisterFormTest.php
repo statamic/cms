@@ -285,7 +285,7 @@ EOT
                     'handle' => 'password', // Field already exists, but we're defining custom validation rules.
                     'field' => [
                         'type' => 'text',
-                        'input' => 'password',
+                        'input_type' => 'password',
                         'display' => 'Password',
                         'validate' => 'min:8',
                     ]

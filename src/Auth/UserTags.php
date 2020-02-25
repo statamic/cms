@@ -469,17 +469,17 @@ class UserTags extends Tags
         return collect()
             ->put('email', new Field('email', [
                 'type' => 'text',
-                'input' => 'email',
+                'input_type' => 'email',
                 'display' => __('Email Address'),
             ]))
             ->put('password', new Field('password', [
                 'type' => 'text',
-                'input' => 'password',
+                'input_type' => 'password',
                 'display' => __('Password'),
             ]))
             ->put('password_confirmation', new Field('password_confirmation', [
                 'type' => 'text',
-                'input' => 'password',
+                'input_type' => 'password',
                 'display' => __('Password Confirmation'),
             ]))
             ->merge($blueprintFields)
