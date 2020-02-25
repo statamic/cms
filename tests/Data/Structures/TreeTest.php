@@ -87,6 +87,9 @@ class TreeTest extends TestCase
 
         $this->assertEquals([
             [
+                'entry' => 'pages-home',
+            ],
+            [
                 'entry' => 'pages-about',
                 'children' => [
                     [
@@ -117,6 +120,9 @@ class TreeTest extends TestCase
 
         $this->assertEquals([
             [
+                'entry' => 'pages-home',
+            ],
+            [
                 'entry' => 'pages-about',
                 'children' => [
                     [
@@ -145,12 +151,15 @@ class TreeTest extends TestCase
 
         // Add [foo=>bar] to the directors page, just so we can test the whole array gets moved.
         $treeContent = $tree->tree();
-        $treeContent[0]['children'][0]['children'][0]['foo'] = 'bar';
+        $treeContent[1]['children'][0]['children'][0]['foo'] = 'bar';
         $tree->tree($treeContent);
 
         $tree->move('pages-directors', 'pages-about');
 
         $this->assertEquals([
+            [
+                'entry' => 'pages-home',
+            ],
             [
                 'entry' => 'pages-about',
                 'children' => [
@@ -173,6 +182,9 @@ class TreeTest extends TestCase
     function it_doesnt_get_moved_if_its_already_in_the_target()
     {
         $tree = $this->tree()->tree($arr = [
+            [
+                'entry' => 'pages-home',
+            ],
             [
                 'entry' => 'pages-about',
                 'children' => [
@@ -199,6 +211,9 @@ class TreeTest extends TestCase
     {
         $tree = $this->tree()->tree([
             [
+                'entry' => 'pages-home',
+            ],
+            [
                 'entry' => 'pages-blog',
             ],
             [
@@ -216,6 +231,9 @@ class TreeTest extends TestCase
         // If the indexes hadn't been fixed, we'd have an array starting with 1.
         $this->assertEquals([
             [
+                'entry' => 'pages-home',
+            ],
+            [
                 'entry' => 'pages-about',
                 'children' => [
                     [
@@ -229,12 +247,84 @@ class TreeTest extends TestCase
         ], $tree->tree());
     }
 
+    /** @test */
+    function the_root_must_be_an_entry_when_expecting_root()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Root page must be an entry');
+
+        (new Tree)
+            ->structure((new Structure)->expectsRoot(true))
+            ->tree([
+                [
+                    'title' => 'Not an entry',
+                    'url' => '/test',
+                ]
+            ]);
+    }
+
+    /** @test **/
+    function the_root_doesnt_need_to_be_an_entry_when_not_expecting_root()
+    {
+        $tree = (new Tree)
+            ->structure((new Structure)->expectsRoot(false))
+            ->tree($contents = [
+                [
+                    'title' => 'Not an entry',
+                    'url' => '/test',
+                ]
+            ]);
+
+        $this->assertSame($contents, $tree->tree());
+    }
+
+    /** @test */
+    function the_root_cannot_have_children_when_expecting_root()
+    {
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Root page cannot have children');
+
+        (new Tree)
+            ->structure((new Structure)->expectsRoot(true))
+            ->tree([
+                [
+                    'entry' => '123',
+                    'children' => [
+                        [
+                            'entry' => '456'
+                        ]
+                    ]
+                ]
+            ]);
+    }
+
+    /** @test */
+    function the_root_can_have_children_when_not_expecting_root()
+    {
+        $tree = (new Tree)
+            ->structure((new Structure)->expectsRoot(false))
+            ->tree($contents = [
+                [
+                    'entry' => '123',
+                    'children' => [
+                        [
+                            'entry' => '456'
+                        ]
+                    ]
+                ]
+            ]);
+
+        $this->assertSame($contents, $tree->tree());
+    }
+
     protected function tree()
     {
         return (new Tree)
-            ->structure(new Structure)
-            ->root('pages-home')
+            ->structure((new Structure)->expectsRoot(true))
             ->tree([
+                [
+                    'entry' => 'pages-home',
+                ],
                 [
                     'entry' => 'pages-about',
                     'children' => [

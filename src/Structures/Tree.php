@@ -2,10 +2,10 @@
 
 namespace Statamic\Structures;
 
+use Statamic\Contracts\Data\Localization;
+use Statamic\Data\ExistsAsFile;
 use Statamic\Facades;
 use Statamic\Facades\Stache;
-use Statamic\Data\ExistsAsFile;
-use Statamic\Contracts\Data\Localization;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Tree implements Localization
@@ -13,7 +13,6 @@ class Tree implements Localization
     use ExistsAsFile, FluentlyGetsAndSets;
 
     protected $locale;
-    protected $root;
     protected $tree = [];
     protected $structure;
     protected $cachedFlattenedPages;
@@ -37,13 +36,13 @@ class Tree implements Localization
             ->args(func_get_args());
     }
 
-    public function root($root = null)
+    public function root()
     {
-        return $this->fluentlyGetOrSet('root')
-            ->setter(function ($root) {
-                return $this->validateRoot($root);
-            })
-            ->args(func_get_args());
+        if (! $this->structure()->expectsRoot()) {
+            return null;
+        }
+
+        return $this->tree[0]['entry'];
     }
 
     public function sites()
@@ -78,13 +77,13 @@ class Tree implements Localization
 
     public function parent()
     {
-        if (!$this->root) {
+        if (!$this->root()) {
             return null;
         }
 
         return (new Page)
             ->setTree($this)
-            ->setEntry($this->root)
+            ->setEntry($this->root())
             ->setRoute($this->route())
             ->setDepth(1)
             ->setRoot(true);
@@ -92,9 +91,15 @@ class Tree implements Localization
 
     public function pages()
     {
+        $pages = $this->tree;
+
+        if ($this->root()) {
+            $pages = array_slice($pages, 1);
+        }
+
         $pages = (new Pages)
             ->setTree($this)
-            ->setPages($this->tree)
+            ->setPages($pages)
             ->setParent($this->parent())
             ->setDepth(1);
 
@@ -138,7 +143,6 @@ class Tree implements Localization
     public function fileData()
     {
         return [
-            'root' => $this->root,
             'tree' => $this->removeEmptyChildren($this->tree),
         ];
     }
@@ -159,15 +163,6 @@ class Tree implements Localization
     public function editUrl()
     {
         return cp_route('structures.show', ['structure' => $this->handle(), 'site' => $this->locale()]);
-    }
-
-    public function toCacheableArray()
-    {
-        return [
-            'path' => $this->initialPath() ?? $this->path(),
-            'root' => $this->root,
-            'tree' => $this->tree,
-        ];
     }
 
     public function append($entry)
@@ -255,30 +250,18 @@ class Tree implements Localization
         return [$match, array_values($branches)];
     }
 
-    protected function validateRoot($root)
-    {
-        if (! $this->structure->isCollectionBased()) {
-            return $root;
-        }
-
-        if ($entryId = $this->getEntryIdsFromTree($this->tree)->duplicates()->first()) {
-            $this->throwDuplicateEntryException($entryId);
-        }
-
-        return $root;
-    }
-
     protected function validateTree($tree)
     {
+        if ($this->structure->expectsRoot()) {
+            throw_unless(isset($tree[0]['entry']), new \Exception('Root page must be an entry'));
+            throw_if(isset($tree[0]['children']), new \Exception('Root page cannot have children'));
+        }
+
         if (! $this->structure->isCollectionBased()) {
             return $tree;
         }
 
         $entryIds = $this->getEntryIdsFromTree($tree);
-
-        if ($this->root) {
-            $entryIds->push($this->root);
-        }
 
         if ($entryId = $entryIds->duplicates()->first()) {
             $this->throwDuplicateEntryException($entryId);
