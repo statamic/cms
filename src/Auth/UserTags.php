@@ -2,11 +2,13 @@
 
 namespace Statamic\Auth;
 
-use Statamic\Support\Arr;
+use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
+use Statamic\Fields\Field;
+use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
-use Statamic\Contracts\Auth\User as UserContract;
 
 class UserTags extends Tags
 {
@@ -91,16 +93,12 @@ class UserTags extends Tags
      */
     public function loginForm()
     {
-        $data = [];
+        $data = $this->setSessionData([]);
 
-        if (session('errors')) {
-            $data = ['errors' => session('errors')->all()];
-        }
-
-        $html = $this->formOpen('login');
+        $html = $this->formOpen(route('statamic.login'));
 
         if ($redirect = $this->getRedirectUrl()) {
-            $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
+            $html .= '<input type="hidden" name="referer" value="'.$redirect.'" />';
         }
 
         $html .= $this->parse($data);
@@ -119,16 +117,14 @@ class UserTags extends Tags
      */
     public function registerForm()
     {
-        $data = [];
+        $data = $this->setSessionData([]);
 
-        if (session('errors')) {
-            $data = ['errors' => session('errors')->all()];
-        }
+        $data['fields'] = $this->getRegistrationFields();
 
-        $html = $this->formOpen('register');
+        $html = $this->formOpen(route('statamic.register'));
 
         if ($redirect = $this->getRedirectUrl()) {
-            $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
+            $html .= '<input type="hidden" name="referer" value="'.$redirect.'" />';
         }
 
         $html .= $this->parse($data);
@@ -414,7 +410,7 @@ class UserTags extends Tags
      *
      * @return string
      */
-    private function getRedirectUrl()
+    protected function getRedirectUrl()
     {
         $return = $this->get('redirect');
 
@@ -423,5 +419,112 @@ class UserTags extends Tags
         }
 
         return $return;
+    }
+
+    /**
+     * Set session data.
+     *
+     * @param array $data
+     * @return array
+     */
+    protected function setSessionData($data)
+    {
+        if ($errors = session('errors')) {
+            $data['errors'] = $errors->all();
+        }
+
+        if ($success = session('success')) {
+            $data['success'] = $success;
+        }
+
+        return $data;
+    }
+
+    /**
+     * Get fields with extra data for looping over and rendering.
+     *
+     * @return array
+     */
+    protected function getRegistrationFields()
+    {
+        return array_merge(
+            $this->getRequiredRegistrationFields(),
+            $this->getAdditionalRegistrationFields()
+        );
+    }
+
+    /**
+     * Get additional registration fields from the user blueprint.
+     *
+     * @return array
+     */
+    protected function getRequiredRegistrationFields()
+    {
+        $blueprintFields = Blueprint::find('user')->fields()->all()
+            ->keyBy->handle()
+            ->filter(function ($field, $handle) {
+                return in_array($handle, ['email', 'password']);
+            });
+
+        return collect()
+            ->put('email', new Field('email', [
+                'type' => 'text',
+                'input' => 'email',
+                'display' => __('Email Address'),
+            ]))
+            ->put('password', new Field('password', [
+                'type' => 'text',
+                'input' => 'password',
+                'display' => __('Password'),
+            ]))
+            ->put('password_confirmation', new Field('password_confirmation', [
+                'type' => 'text',
+                'input' => 'password',
+                'display' => __('Password Confirmation'),
+            ]))
+            ->merge($blueprintFields)
+            ->map(function ($field) {
+                return $this->getRenderableField($field);
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Get additional registration fields from the user blueprint.
+     *
+     * @return array
+     */
+    protected function getAdditionalRegistrationFields()
+    {
+        return Blueprint::find('user')->fields()->all()
+            ->reject(function ($field) {
+                return in_array($field->handle(), ['email', 'password', 'password_confirmation', 'roles', 'groups']);
+            })
+            ->map(function ($field) {
+                return $this->getRenderableField($field);
+            })
+            ->values()
+            ->all();
+    }
+
+    /**
+     * Get field with extra data for rendering.
+     *
+     * @param \Statamic\Fields\Field $field
+     * @return array
+     */
+    protected function getRenderableField($field)
+    {
+        $errors = session('errors') ? session('errors')->all() : [];
+
+        $data = array_merge($field->toArray(), [
+            'error' => $errors[$field->handle()] ?? null,
+            'old' => old($field->handle()),
+        ]);
+
+        $data['field'] = view($field->fieldtype()->view(), $data);
+
+        return $data;
     }
 }
