@@ -292,7 +292,7 @@ class FieldsTest extends TestCase
                 'component' => 'text',
                 'placeholder' => null,
                 'character_limit' => 0,
-                'html_type' => 'text',
+                'input_type' => 'text',
                 'prepend' => null,
                 'append' => null,
             ],

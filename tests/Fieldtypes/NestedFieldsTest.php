@@ -131,7 +131,7 @@ class NestedFieldsTest extends TestCase
                 'field_reference' => 'test.bar',
                 'config' => [
                     'placeholder' => null,
-                    'html_type' => 'text',
+                    'input_type' => 'text',
                     'character_limit' => 0,
                     'prepend' => null,
                     'append' => null,
