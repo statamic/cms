@@ -80,7 +80,25 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
                 'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/',]
             ]
         ]);
-
+        $app['config']->set('statamic.cp.guard', 'statamic');
+        $app['config']->set('auth.guards', array_merge(
+            $app['config']->get('auth.guards'),
+            [
+                'statamic' => [
+                    'driver' => 'session',
+                    'provider' => 'statamic-users',
+                ]
+            ]
+        ));
+        $app['config']->set('auth.providers', array_merge(
+            $app['config']->get('auth.providers'),
+            [
+                'statamic-users' => [
+                    'driver' => 'statamic',
+                    'provider' => 'App\User',
+                ]
+            ]
+        ));
         $app['config']->set('auth.providers.users.driver', 'statamic');
         $app['config']->set('statamic.stache.watcher', false);
         $app['config']->set('statamic.users.repository', 'file');

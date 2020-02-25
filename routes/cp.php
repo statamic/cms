@@ -1,6 +1,8 @@
 <?php
 
+use Statamic\Statamic;
 use Statamic\Facades\Utility;
+use Illuminate\Support\Facades\Route;
 
 Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
     Route::get('login', 'LoginController@showLoginForm')->name('login');
@@ -16,9 +18,7 @@ Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
     Route::get('unauthorized', 'UnauthorizedController')->name('unauthorized');
 });
 
-Route::group([
-    'middleware' => Statamic::cpMiddleware()
-], function () {
+Route::middleware(Statamic::cpMiddleware())->group(function () {
     Statamic::additionalCpRoutes();
 
     Route::get('/', 'StartPageController')->name('index');

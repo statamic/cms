@@ -7,11 +7,6 @@ use Illuminate\Http\Request;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
-use Statamic\Facades\User;
-use Statamic\Http\Middleware\CP\Authorize;
-use Statamic\Http\Middleware\Localize as LocalizeFrontend;
-use Statamic\Http\Middleware\CP\Localize as LocalizeCp;
-use Statamic\StaticCaching\Middleware\Cache;
 use Stringy\StaticStringy;
 
 class Statamic
@@ -27,12 +22,12 @@ class Statamic
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
     protected static $webMiddleware = [
-        LocalizeFrontend::class,
-        Cache::class,
+        \Statamic\Http\Middleware\Localize::class,
+        \Statamic\StaticCaching\Middleware\Cache::class,
     ];
     protected static $cpMiddleware = [
-        Authorize::class,
-        LocalizeCp::class,
+        \Statamic\Http\Middleware\CP\Authorize::class,
+        \Statamic\Http\Middleware\CP\Localize::class,
     ];
     protected static $shallowAugmentation = false;
 

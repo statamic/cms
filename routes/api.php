@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 Route::resource('collections.entries', 'CollectionEntriesController');
 Route::resource('taxonomies.terms', 'TaxonomyTermsController');
 Route::resource('globals', 'GlobalsController');

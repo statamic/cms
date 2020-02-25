@@ -17,6 +17,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Auth Guard
+    |--------------------------------------------------------------------------
+    |
+    | Statamic uses by default your deposited auth guard. If you want to
+    | change this behavior, choose here which guard should be used
+    | to authenticate users inside the Control Panel Statamic.
+    |
+    */
+
+    'guard' => env('CP_GUARD', null),
+
+    /*
+    |--------------------------------------------------------------------------
     | Start Page
     |--------------------------------------------------------------------------
     |
