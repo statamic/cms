@@ -1,6 +1,6 @@
 <template>
     <text-input
-        html_type="number"
+        type="number"
         tabindex="0"
         :name="name"
         :autofocus="autofocus"
