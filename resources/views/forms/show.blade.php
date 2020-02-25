@@ -29,7 +29,7 @@
                 @endcan
             </dropdown-list>
 
-            <dropdown-list class="ml-2">
+            <dropdown-list>
                 <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
                 <dropdown-item :text="__('Export as CSV')" redirect="{{ cp_route('forms.export', ['type' => 'csv', 'form' => $form->handle()]) }}?download=true"></dropdown-item>
                 <dropdown-item :text="__('Export as JSON')" redirect="{{ cp_route('forms.export', ['type' => 'json', 'form' => $form->handle()]) }}?download=true"></dropdown-item>

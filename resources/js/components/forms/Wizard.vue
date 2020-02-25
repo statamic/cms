@@ -22,7 +22,7 @@
                 <input type="text" v-model="form.title" class="input-text" autofocus tabindex="1">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    {{ __('messages.form_wizard_title_instructions') }}
+                    {{ __('messages.form_configure_title_instructions') }}
                 </div>
             </div>
 
@@ -32,7 +32,7 @@
                 <input type="text" v-model="form.handle" class="input-text" tabindex="2">
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    {{ __('messages.form_wizard_handle_instructions') }}
+                    {{ __('messages.form_configure_handle_instructions') }}
                 </div>
             </div>
         </div>

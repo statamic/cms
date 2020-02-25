@@ -11,13 +11,7 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }" class="mac-w-">
-
-            <header class="mb-3">
-                <breadcrumb :url="url" :title="title" />
-                <h1 class="">{{ __('Configure Collection') }}</h1>
-            </header>
-
+        <div slot-scope="{ setFieldValue, setFieldMeta }" class="">
             <configure-sections
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
@@ -40,7 +34,6 @@ export default {
         initialValues: Object,
         meta: Object,
         initialTitle: String,
-        parentTitle: String,
         url: String,
         listingUrl: String,
     },
