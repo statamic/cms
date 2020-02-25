@@ -5,7 +5,7 @@
         :classes="config.classes"
         :autofocus="config.autofocus"
         :autoselect="config.autoselect"
-        :html_type="config.html_type"
+        :type="config.input_type"
         :isReadOnly="isReadOnly"
         :prepend="config.prepend"
         :append="config.append"

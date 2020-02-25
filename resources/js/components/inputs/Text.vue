@@ -8,7 +8,7 @@
                 :class="classes"
                 :name="name"
                 :value="value"
-                :type="html_type"
+                :type="type"
                 :step="step"
                 :disabled="disabled"
                 :readonly="isReadOnly"
@@ -37,7 +37,7 @@ export default {
         classes: { default: null },
         isReadOnly: { type: Boolean, default: false },
         placeholder: { required: false },
-        html_type: { default: "text" },
+        type: { default: "text" },
         step: {},
         value: { required: true },
         prepend: { default: null },

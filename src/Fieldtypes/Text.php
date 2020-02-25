@@ -12,21 +12,22 @@ class Text extends Fieldtype
             'instructions' => 'Set default placeholder text.',
             'width' => 50,
         ],
-        'html_type' => [
+        'input_type' => [
             'type' => 'select',
             'default' => 'text',
-            'instructions' => 'Set the HTML5 input type',
+            'instructions' => 'Set the HTML5 input type.',
             'width' => 50,
             'options' => [
                 'color',
                 'email',
                 'month',
                 'number',
+                'password',
                 'tel',
                 'text',
                 'time',
                 'url',
-                'week'
+                'week',
             ]
         ],
         'character_limit' => [
