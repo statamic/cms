@@ -23,8 +23,8 @@ class RegisterFormTest extends TestCase
         $output = $this->tag('{{ user:register_form }}{{ /user:register_form }}');
         $aliased = $this->tag('{{ user:registration_form }}{{ /user:registration_form }}');
 
-        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/register" >', $output);
-        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/register" >', $aliased);
+        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/register">', $output);
+        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/register">', $aliased);
         $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $aliased);
         $this->assertStringEndsWith('</form>', $output);
@@ -36,7 +36,7 @@ class RegisterFormTest extends TestCase
     {
         $output = $this->tag('{{ user:register_form redirect="/registered" attr="class:form|id:form" }}{{ /user:register_form }}');
 
-        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/register" class="form" id="form" >', $output);
+        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/register" class="form" id="form">', $output);
         $this->assertStringContainsString('<input type="hidden" name="referer" value="/registered" />', $output);
     }
 

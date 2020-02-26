@@ -21,7 +21,7 @@ class LoginFormTest extends TestCase
     {
         $output = $this->tag('{{ user:login_form }}{{ /user:login_form }}');
 
-        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/login" >', $output);
+        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/login">', $output);
         $this->assertStringContainsString('<input type="hidden" name="_token" value="">', $output);
         $this->assertStringEndsWith('</form>', $output);
     }
@@ -31,7 +31,7 @@ class LoginFormTest extends TestCase
     {
         $output = $this->tag('{{ user:login_form redirect="/logged-in" attr="class:form|id:form" }}{{ /user:login_form }}');
 
-        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/login" class="form" id="form" >', $output);
+        $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/login" class="form" id="form">', $output);
         $this->assertStringContainsString('<input type="hidden" name="referer" value="/logged-in" />', $output);
     }
 
