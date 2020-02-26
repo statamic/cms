@@ -2,17 +2,18 @@
 
 namespace Statamic\Forms;
 
-use Statamic\Facades\URL;
-use Statamic\Facades\Form;
+use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
+use Illuminate\Support\Facades\Crypt;
+use Statamic\Facades\Form;
+use Statamic\Facades\URL;
 use Statamic\Tags\OutputsItems;
 use Statamic\Tags\Tags as BaseTags;
-use Illuminate\Support\Facades\Crypt;
-use DebugBar\DataCollector\ConfigCollector;
+use Statamic\Tags\Traits\RendersForms;
 
 class Tags extends BaseTags
 {
-    use OutputsItems;
+    use OutputsItems, RendersForms;
 
     const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
 
@@ -95,7 +96,7 @@ class Tags extends BaseTags
 
         $html .= $this->parse($data);
 
-        $html .= '</form>';
+        $html .= $this->formClose();
 
         return $html;
     }

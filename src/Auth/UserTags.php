@@ -9,9 +9,12 @@ use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
+use Statamic\Tags\Traits\RendersForms;
 
 class UserTags extends Tags
 {
+    use RendersForms;
+
     protected static $handle = 'user';
 
     /**
@@ -103,7 +106,7 @@ class UserTags extends Tags
 
         $html .= $this->parse($data);
 
-        $html .= '</form>';
+        $html .= $this->formClose();
 
         return $html;
     }
@@ -129,7 +132,7 @@ class UserTags extends Tags
 
         $html .= $this->parse($data);
 
-        $html .= '</form>';
+        $html .= $this->formClose();
 
         return $html;
     }
@@ -207,7 +210,7 @@ class UserTags extends Tags
 
         $html .= $this->parse($data);
 
-        $html .= '</form>';
+        $html .= $this->formClose();
 
         return $html;
     }
@@ -243,7 +246,7 @@ class UserTags extends Tags
 
         $html .= $this->parse($data);
 
-        $html .= '</form>';
+        $html .= $this->formClose();
 
         return $html;
     }

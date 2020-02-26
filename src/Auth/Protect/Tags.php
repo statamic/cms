@@ -2,11 +2,14 @@
 
 namespace Statamic\Auth\Protect;
 
-use Statamic\Tags\Tags as BaseTags;
 use Illuminate\Support\ViewErrorBag;
+use Statamic\Tags\Tags as BaseTags;
+use Statamic\Tags\Traits\RendersForms;
 
 class Tags extends BaseTags
 {
+    use RendersForms;
+
     protected static $handle = 'protect';
 
     public function passwordForm()
@@ -29,7 +32,7 @@ class Tags extends BaseTags
             'error' => $errors->first()
         ]);
 
-        $html .= '</form>';
+        $html .= $this->formClose();
 
         return $html;
     }
