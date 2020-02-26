@@ -8,11 +8,11 @@ use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
-use Statamic\Stache\Stores\StructuresStore;
+use Statamic\Stache\Stores\NavigationStore;
 use Statamic\Contracts\Structures\Structure;
 use Statamic\Facades\Path;
 
-class StructuresStoreTest extends TestCase
+class NavigationStoreTest extends TestCase
 {
     function setUp(): void
     {
@@ -21,7 +21,7 @@ class StructuresStoreTest extends TestCase
         mkdir($this->tempDir = __DIR__.'/tmp');
 
         $stache = (new Stache)->sites(['en']);
-        $this->store = (new StructuresStore($stache, app('files')))->directory($this->tempDir);
+        $this->store = (new NavigationStore($stache, app('files')))->directory($this->tempDir);
 
         Facades\Stache::registerStore($this->store);
     }
@@ -63,18 +63,19 @@ class StructuresStoreTest extends TestCase
         $contents = <<<'EOT'
 title: Pages
 route: '{parent_uri}/{slug}'
-root: pages-home
 tree:
   -
-    page: pages-about
+    entry: pages-home
+  -
+    entry: pages-about
     children:
       -
-        page: pages-board
+        entry: pages-board
         children:
           -
-            page: pages-directors
+            entry: pages-directors
   -
-    page: pages-blog # (/blog)
+    entry: pages-blog # (/blog)
 EOT;
         $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/pages.yaml'), $contents);
 

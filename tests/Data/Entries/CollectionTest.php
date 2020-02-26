@@ -340,7 +340,6 @@ class CollectionTest extends TestCase
 
         $return = $collection->structureContents($contents = [
             'max_depth' => 2,
-            'expects_root' => true,
             'tree' => [
                 ['entry' => '123', 'children' => [
                     ['entry' => '789']

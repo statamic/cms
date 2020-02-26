@@ -14,4 +14,5 @@ interface CollectionRepository
     public function make(string $handle = null): Collection;
     public function handles(): IlluminateCollection;
     public function handleExists(string $handle): bool;
+    public function whereStructured(): IlluminateCollection;
 }

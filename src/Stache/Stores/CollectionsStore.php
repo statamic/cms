@@ -116,8 +116,8 @@ class CollectionsStore extends BasicStore
 
         parent::handleFileChanges();
 
-        // TODO: only update structures for collections that were modified.
-        Structure::all()->each->updateEntryUris();
+        // TODO: only update urls for structured collection that were modified.
+        Collection::all()->each->updateEntryUris();
 
         // TODO: only update order indexes for collections that were modified.
         Collection::all()->filter->orderable()->each(function ($collection) {

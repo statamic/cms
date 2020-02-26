@@ -7,19 +7,14 @@ use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
-use Statamic\Stache\Indexes;
 use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
-class StructuresStore extends BasicStore
+class NavigationStore extends BasicStore
 {
-    protected $storeIndexes = [
-        'uri' => Indexes\StructureUris::class,
-    ];
-
     public function key()
     {
-        return 'structures';
+        return 'navigation';
     }
 
     public function getItemFilter(SplFileInfo $file)
@@ -63,7 +58,6 @@ class StructuresStore extends BasicStore
         return $structure->addTree(
             $structure
                 ->makeTree($site)
-                ->root($data['root'] ?? null)
                 ->tree($data['tree'] ?? [])
         );
     }
@@ -89,7 +83,7 @@ class StructuresStore extends BasicStore
             ->sites($data['sites'] ?? null)
             ->maxDepth($data['max_depth'] ?? null)
             ->collections($data['collections'] ?? null)
-            ->expectsRoot($data['expects_root'] ?? false)
+            ->expectsRoot($data['root'] ?? false)
             ->initialPath($path);
     }
 

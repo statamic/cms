@@ -3,10 +3,9 @@
 namespace Statamic\Contracts\Structures;
 
 use Illuminate\Support\Collection;
-use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Structures\Structure;
 
-interface StructureRepository
+interface NavigationRepository
 {
     public function all(): Collection;
     public function find($id): ?Structure;

@@ -2,12 +2,12 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\Stache\Stache;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Entries\EntryCollection;
-use Statamic\Stache\Query\EntryQueryBuilder;
-use Statamic\Contracts\Structures\StructureRepository;
 use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
+use Statamic\Entries\EntryCollection;
+use Statamic\Facades\Collection;
+use Statamic\Stache\Query\EntryQueryBuilder;
+use Statamic\Stache\Stache;
 
 class EntryRepository implements RepositoryContract
 {
@@ -52,11 +52,18 @@ class EntryRepository implements RepositoryContract
     {
         $site = $site ?? $this->stache->sites()->first();
 
-        return app(StructureRepository::class)->findEntryByUri($uri, $site)
-            ?? $this->query()
+        $entry = $this->query()
                 ->where('uri', $uri)
                 ->where('site', $site)
                 ->first();
+
+        if (! $entry) {
+            return null;
+        }
+
+        return $entry->hasStructure()
+            ? $entry->structure()->in($site)->page($entry->id())
+            : $entry;
     }
 
     public function save($entry)

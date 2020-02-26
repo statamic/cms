@@ -48,9 +48,9 @@ return [
             'directory' => base_path('content/collections'),
         ],
 
-        'structures' => [
-            'class' => Stores\StructuresStore::class,
-            'directory' => base_path('content/structures'),
+        'navigation' => [
+            'class' => Stores\NavigationStore::class,
+            'directory' => base_path('content/navigation'),
         ],
 
         'globals' => [

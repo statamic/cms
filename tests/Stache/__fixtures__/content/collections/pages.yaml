@@ -1,8 +1,10 @@
 title: Pages
 route: '{parent_uri}/{slug}'
 structure:
-  root: pages-home
+  root: true
   tree:
+    -
+      entry: pages-home
     -
       entry: pages-about
       children:

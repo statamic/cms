@@ -89,7 +89,7 @@ class Structure implements StructureContract
             'title' => $this->title,
             'handle' => $this->handle,
             'sites' => $this->sites,
-            'expects_root' => $this->expectsRoot,
+            'root' => $this->expectsRoot,
             'path' => $this->initialPath() ?? $this->path(),
             'max_depth' => $this->maxDepth,
             'collections' => $this->collections,
@@ -100,7 +100,7 @@ class Structure implements StructureContract
     public function path()
     {
         return vsprintf('%s/%s.yaml', [
-            rtrim(Stache::store('structures')->directory(), '/'),
+            rtrim(Stache::store('navigation')->directory(), '/'),
             $this->handle
         ]);
     }
@@ -111,7 +111,7 @@ class Structure implements StructureContract
             'title' => $this->title,
             'collections' => $this->collections,
             'max_depth' => $this->maxDepth,
-            'expects_root' => $this->expectsRoot ?: null,
+            'root' => $this->expectsRoot ?: null,
         ];
 
         if (Site::hasMultiple()) {
@@ -218,13 +218,6 @@ class Structure implements StructureContract
             ->get($entry->id());
 
         return optional($page)->uri();
-    }
-
-    public function updateEntryUris()
-    {
-        StructureAPI::updateEntryUris($this);
-
-        return $this;
     }
 
     public static function __callStatic($method, $parameters)

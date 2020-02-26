@@ -270,7 +270,9 @@ class Collection implements Contract
         Blink::flush('collection-handles');
         Blink::flushStartingWith("collection-{$this->id()}");
 
-        optional($this->structure())->updateEntryUris();
+        if ($this->hasStructure()) { // todo: only if the structure changed.
+            $this->updateEntryUris();
+        }
 
         return $this;
     }
@@ -527,7 +529,8 @@ class Collection implements Contract
     {
         $structure = Structure::make('collection::'.$this->handle)
             ->collection($this)
-            ->title($this->title());
+            ->title($this->title())
+            ->expectsRoot($this->structureContents['root'] ?? false);
 
         $trees = $this->structureContents['trees']
             ?? [Site::default()->handle() => $this->structureContents['tree']];
