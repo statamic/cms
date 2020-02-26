@@ -11,7 +11,7 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }" class="">
+        <div slot-scope="{ setFieldValue, setFieldMeta }">
             <configure-sections
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
