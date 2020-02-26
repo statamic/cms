@@ -10,7 +10,7 @@ use Tests\FakesUserGroups;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class RegisterFormTest extends TestCase
+class UserTagsTest extends TestCase
 {
     use FakesRoles,
         FakesUserGroups,
