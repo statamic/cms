@@ -13,6 +13,8 @@ return [
 
     'enabled' => env('CP_ENABLED', true),
 
+    'domain' => env('CP_DOMAIN', null),
+
     'route' => env('CP_ROUTE', 'cp'),
 
     /*
