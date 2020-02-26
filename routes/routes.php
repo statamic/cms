@@ -3,6 +3,7 @@
 if (config('statamic.api.enabled')) {
     Route::middleware(config('statamic.api.middleware'))
         ->name('statamic.api.')
+        ->domain(config('statamic.api.domain'))
         ->prefix(config('statamic.api.route'))
         ->namespace('Statamic\Http\Controllers\API')
         ->group(__DIR__.'/api.php');
@@ -11,6 +12,7 @@ if (config('statamic.api.enabled')) {
 if (config('statamic.cp.enabled')) {
     Route::middleware('web')
         ->name('statamic.cp.')
+        ->domain(config('statamic.cp.domain'))
         ->prefix(config('statamic.cp.route'))
         ->namespace('Statamic\Http\Controllers\CP')
         ->group(__DIR__.'/cp.php');
