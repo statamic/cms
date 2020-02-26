@@ -261,6 +261,21 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
+    function it_gets_only_specific_fields()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['display' => 'First']],
+            ['handle' => 'two', 'field' => ['display' => 'Second']],
+            ['handle' => 'three', 'field' => ['display' => 'Third']],
+        ]);
+
+        $this->assertInstanceOf(Fields::class, $fields->only('two'));
+        $this->assertEquals(['two'], $fields->only('two')->all()->keys()->all());
+        $this->assertEquals(['two', 'three'], $fields->only('two', 'three')->all()->keys()->all());
+        $this->assertEquals(['one', 'two'], $fields->only(['one', 'two'])->all()->keys()->all());
+    }
+
+    /** @test */
     function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
         FieldRepository::shouldReceive('find')
