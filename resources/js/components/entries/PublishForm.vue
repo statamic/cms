@@ -180,11 +180,7 @@
                 <template v-slot:buttons>
                    <button
                     v-if="!readOnly"
-                    class="ml-2"
-                    :class="{
-                        'btn': ! isCreating || revisionsEnabled,
-                        'btn-primary': isCreating || !revisionsEnabled
-                    }"
+                    class="ml-2 btn-primary"
                     :disabled="!canSave"
                     @click.prevent="save"
                     v-text="saveText" />
