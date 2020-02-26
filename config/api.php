@@ -13,8 +13,6 @@ return [
 
     'enabled' => env('STATAMIC_API_ENABLED', false),
 
-    'domain' => env('STATAMIC_API_DOMAIN', null),
-
     'route' => env('STATAMIC_API_ROUTE', 'api'),
 
     /*
