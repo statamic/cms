@@ -69,4 +69,28 @@ class RegisterFormTest extends TestCase
         $this->assertEquals('yes', $this->tag('{{ user:is role="webmaster|admin" }}yes{{ /user:is }}'));
         $this->assertEquals('', $this->tag('{{ user:isnt role="webmaster|admin" }}yes{{ /user:isnt }}'));
     }
+
+    /** @test */
+    function it_renders_user_in_tag_content()
+    {
+        $this->setTestRoles([
+            'webmaster' => ['super'],
+        ]);
+
+        $this->setTestUserGroups([
+            'favourite' => ['webmaster'], // Though super users have permission to do everything, they do not inherit all groups
+            'non_favourite',
+        ]);
+
+        $this->actingAs(User::make()->addToGroup('favourite')->save());
+
+        $this->assertEquals('yes', $this->tag('{{ user:in group="favourite" }}yes{{ /user:in }}'));
+        $this->assertEquals('', $this->tag('{{ user:in group="non_favourite" }}yes{{ /user:in }}'));
+        $this->assertEquals('', $this->tag('{{ user:not_in group="favourite" }}yes{{ /user:not_in }}'));
+        $this->assertEquals('yes', $this->tag('{{ user:not_in group="non_favourite" }}yes{{ /user:not_in }}'));
+
+        // Test if user is in any of these groups
+        $this->assertEquals('yes', $this->tag('{{ user:in group="favourite|non_favourite" }}yes{{ /user:in }}'));
+        $this->assertEquals('', $this->tag('{{ user:not_in group="favourite|non_favourite" }}yes{{ /user:not_in }}'));
+    }
 }
