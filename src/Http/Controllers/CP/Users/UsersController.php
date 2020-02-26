@@ -190,7 +190,7 @@ class UsersController extends CpController
     {
         $this->authorize('edit', $user);
 
-        $fields = $user->blueprint()->fields()->addValues($request->all());
+        $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->all());
 
         $fields->validate(['email' => 'required|unique_user_value:'.$user->id()]);
 
