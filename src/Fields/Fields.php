@@ -49,6 +49,11 @@ class Fields
         return $this->fields;
     }
 
+    public function except(...$keys): self
+    {
+        return tap(new static)->setFields($this->fields->except(...$keys));
+    }
+
     public function newInstance()
     {
         return (new static)

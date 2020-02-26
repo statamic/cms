@@ -109,7 +109,7 @@ class UsersController extends CpController
 
         $blueprint = Blueprint::find('user');
 
-        $fields = $blueprint->fields()->addValues($request->all());
+        $fields = $blueprint->fields()->except('password')->addValues($request->all());
 
         $fields->validate(['email' => 'required|email|unique_user_value']);
 
