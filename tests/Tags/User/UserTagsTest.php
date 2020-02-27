@@ -2,6 +2,7 @@
 
 namespace Tests\Tags\User;
 
+use Illuminate\Http\Exceptions\HttpResponseException;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
@@ -92,5 +93,39 @@ class UserTagsTest extends TestCase
         // Test if user is in any of these groups
         $this->assertEquals('yes', $this->tag('{{ user:in group="favourite|non_favourite" }}yes{{ /user:in }}'));
         $this->assertEquals('', $this->tag('{{ user:not_in group="favourite|non_favourite" }}yes{{ /user:not_in }}'));
+    }
+
+    /** @test */
+    function it_can_logout_user()
+    {
+        $this->actingAs(User::make()->save());
+
+        $this->assertTrue(auth()->check());
+
+        try {
+            $this->tag('{{ user:logout }}');
+        } catch (HttpResponseException $exception) {
+            //
+        }
+
+        $this->assertFalse(auth()->check());
+        $this->assertEquals(url('/'), $exception->getResponse()->getTargetUrl());
+    }
+
+    /** @test */
+    function it_can_logout_user_with_custom_redirect()
+    {
+        $this->actingAs(User::make()->save());
+
+        $this->assertTrue(auth()->check());
+
+        try {
+            $this->tag('{{ user:logout redirect="home" }}');
+        } catch (HttpResponseException $exception) {
+            //
+        }
+
+        $this->assertFalse(auth()->check());
+        $this->assertEquals(url('home'), $exception->getResponse()->getTargetUrl());
     }
 }

@@ -172,7 +172,7 @@ class UserTags extends Tags
      */
     public function logout()
     {
-        \Auth::logout();
+        auth()->logout();
 
         abort(redirect($this->get('redirect', '/'), $this->get('response', 302)));
     }
