@@ -131,10 +131,7 @@ export default {
             this.clearErrors();
 
             this.$axios[this.method](this.action, this.payload).then(response => {
-                this.$toast.success(__('Saved'));
-                if (!this.initialHandle || (this.initialHandle !== this.handle)) {
-                    window.location = response.data.redirect;
-                }
+                window.location = response.data.redirect;
             }).catch(e => {
                 if (e.response && e.response.status === 422) {
                     const { message, errors } = e.response.data;
@@ -142,7 +139,7 @@ export default {
                     this.errors = errors;
                     this.$toast.error(message);
                 } else {
-                    this.$toast.error(__('Something went wrong'));
+                    this.$toast.error(__('Unable to save role'));
                 }
             });
         }
