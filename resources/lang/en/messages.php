@@ -121,6 +121,8 @@ return [
     'reset_password_notification_no_action' => 'If you did not request a password reset, no further action is required.',
     'reset_password_notification_subject' => 'Reset Password Notification',
     'role_change_handle_warning' => 'Changing the handle will not update references to it in users and groups.',
+    'role_handle_instructions' => 'Handles are used to reference this role on the frontend. Cannot be easily changed.',
+    'role_title_instructions' => 'Usually a singular noun, like Editor or Admin.',
     'search_utility_description' => 'Manage and view important information about Statamic\'s search indexes.',
     'session_expiry_enter_password' => 'Enter your password to continue where you left off',
     'session_expiry_logged_out_for_inactivity' => 'You have been logged out because you\'ve been inactive for a while.',
