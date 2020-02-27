@@ -156,13 +156,13 @@ class UserTags extends Tags
      */
     public function logoutUrl()
     {
-        $url = 'logout';
+        $queryParams = [];
 
         if ($redirect = $this->get('redirect')) {
-            $url .= '?redirect='.$redirect;
+            $queryParams['redirect'] = $redirect;
         }
 
-        return route('statamic.logout');
+        return route('statamic.logout', $queryParams);
     }
 
     /**

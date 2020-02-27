@@ -128,4 +128,12 @@ class UserTagsTest extends TestCase
         $this->assertFalse(auth()->check());
         $this->assertEquals(url('home'), $exception->getResponse()->getTargetUrl());
     }
+
+    /** @test */
+    function it_can_render_logout_url()
+    {
+        $this->assertEquals(route('statamic.logout'), $this->tag('{{ user:logout_url }}'));
+
+        $this->assertEquals(route('statamic.logout', ['redirect' => 'home']), $this->tag('{{ user:logout_url redirect="home" }}'));
+    }
 }
