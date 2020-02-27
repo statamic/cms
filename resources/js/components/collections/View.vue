@@ -13,7 +13,7 @@
                     <slot name="twirldown" />
                 </dropdown-list>
 
-                <div class="btn-group-flat mr-2" v-if="structured">
+                <div class="btn-group-flat mr-2" v-if="canUseStructureTree">
                     <button @click="view = 'tree'" :class="{'active': view === 'tree'}">
                         <svg-icon name="structures" class="h-4 w-4"/>
                     </button>
@@ -68,10 +68,11 @@
         />
 
         <page-tree
-            v-if="structured"
+            v-if="canUseStructureTree"
             v-show="view === 'tree'"
             ref="tree"
             :has-collection="true"
+            :collections="[handle]"
             :pages-url="structurePagesUrl"
             :submit-url="structureSubmitUrl"
             :max-depth="structureMaxDepth"
@@ -102,12 +103,11 @@ export default {
         createUrl: { type: String, required: true },
         blueprints: { type: Array, required: true },
         breadcrumbUrl: { type: String, required: true },
-        structured: { type: Boolean, required: true },
+        structured: { type: Boolean, default: false },
         sortColumn: { type: String, required: true },
         sortDirection: { type: String, required: true },
         filters: { type: Array, required: true },
         actionUrl: { type: String, required: true },
-        reorderable: { type: Boolean, required: true },
         reorderUrl: { type: String, required: true },
         blueprints: { type: Array, required: true },
         site: { type: String, required: true },
@@ -128,7 +128,15 @@ export default {
 
         treeIsDirty() {
             return this.$dirty.has('page-tree');
-        }
+        },
+
+        canUseStructureTree() {
+            return this.structured && this.structureMaxDepth !== 1;
+        },
+
+        reorderable() {
+            return this.structured && this.structureMaxDepth === 1;
+        },
 
     },
 
@@ -176,9 +184,9 @@ export default {
         },
 
         initialView() {
-            if (!this.structured) return 'list';
+            if (!this.canUseStructureTree) return 'list';
 
-            const fallback = this.structured ? 'tree' : 'list';
+            const fallback = this.canUseStructureTree ? 'tree' : 'list';
 
             return localStorage.getItem('statamic.collection-view.'+this.handle) || fallback;
         }
