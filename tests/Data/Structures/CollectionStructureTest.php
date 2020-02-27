@@ -130,4 +130,16 @@ class CollectionStructureTest extends StructureTestCase
                 ]
             ]);
     }
+
+    /** @test */
+    function it_saves_through_the_collection()
+    {
+        $structure = $this->structure();
+        $collection = $this->mock(Collection::class);
+        $collection->shouldReceive('structure')->with($structure)->once()->ordered()->andReturnSelf();
+        $collection->shouldReceive('save')->once()->ordered()->andReturnTrue();
+        $structure->collection($collection);
+
+        $this->assertTrue($structure->save());
+    }
 }

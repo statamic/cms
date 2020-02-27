@@ -76,4 +76,11 @@ class CollectionStructure extends Structure
             ->flatten()
             ->filter();
     }
+
+    public function save()
+    {
+        $this->collection()->structure($this)->save();
+
+        return true;
+    }
 }

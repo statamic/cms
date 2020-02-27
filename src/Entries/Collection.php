@@ -399,6 +399,7 @@ class Collection implements Contract
             'future_date_behavior',
             'default_publish_state',
             'dated',
+            'structured',
         ]);
 
         $array = Arr::removeNullValues(array_merge($array, [
@@ -427,6 +428,19 @@ class Collection implements Contract
         }
 
         $array['inject'] = Arr::pull($array, 'cascade');
+
+        if ($this->hasStructure()) {
+            $array['structure'] = Arr::removeNullValues([
+                'root' => $this->structure()->expectsRoot(),
+                'tree' => $this->structure()->trees()->map(function ($tree) {
+                    return $tree->fileData()['tree'];
+                })->all()
+            ]);
+
+            if (!Site::hasMultiple()) {
+                $array['structure']['tree'] = $array['structure']['tree'][Site::default()->handle()];
+            }
+        }
 
         return $array;
     }
@@ -470,7 +484,7 @@ class Collection implements Contract
             'blueprints' => $this->blueprints,
             'search_index' => $this->searchIndex,
             'orderable' => $this->orderable,
-            'structure' => $this->structure,
+            'structured' => $this->hasStructure(),
             'mount' => $this->mount,
             'taxonomies' => $this->taxonomies,
             'revisions' => $this->revisions,
