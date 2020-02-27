@@ -542,7 +542,8 @@ class Collection implements Contract
     {
         $structure = (new CollectionStructure)
             ->collection($this)
-            ->expectsRoot($this->structureContents['root'] ?? false);
+            ->expectsRoot($this->structureContents['root'] ?? false)
+            ->maxDepth($this->structureContents['max_depth'] ?? null);
 
         $trees = $this->structureContents['trees']
             ?? [Site::default()->handle() => $this->structureContents['tree']];

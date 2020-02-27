@@ -357,5 +357,6 @@ class CollectionTest extends TestCase
         $this->assertSame($collection, $structure->collection());
         $this->assertEquals(2, $structure->in('en')->pages()->all()->count());
         $this->assertEquals(3, $structure->in('en')->flattenedPages()->count());
+        $this->assertEquals(2, $structure->maxDepth());
     }
 }
