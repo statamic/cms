@@ -33,11 +33,11 @@ return [
     'publish_{taxonomy}_terms' => 'Manage publish state',
     'reorder_{taxonomy}_terms' => 'Reorder terms',
 
-    'group_structures' => 'Structures',
-    'configure_structures' => 'Configure Structures',
-    'configure_structures_desc' => 'Grants access to all structure related permissions',
-    'view_{structure}_structure' => 'View :structure structure',
-    'edit_{structure}_structure' => 'Edit structure',
+    'group_navigation' => 'Navigation',
+    'configure_navs' => 'Configure Navigation',
+    'configure_navs_desc' => 'Grants access to all navigation related permissions',
+    'view_{nav}_nav' => 'View :nav navigation',
+    'edit_{nav}_nav' => 'Edit navigation',
 
     'group_globals' => 'Globals',
     'configure_globals' => 'Configure Globals',
