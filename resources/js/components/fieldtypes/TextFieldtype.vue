@@ -3,7 +3,7 @@
         ref="input"
         :value="value"
         :classes="config.classes"
-        :autofocus="config.autofocus"
+        :focus="config.focus || name === 'title'"
         :autoselect="config.autoselect"
         :type="config.input_type"
         :isReadOnly="isReadOnly"

@@ -15,7 +15,7 @@
                     :errors="errors.title"
                     :instructions="__('messages.role_title_instructions')"
                     v-model="title"
-                    autofocus
+                    :focus="true"
                 />
 
                 <form-group

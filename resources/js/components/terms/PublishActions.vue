@@ -37,7 +37,7 @@
                         v-model="revisionMessage"
                         :placeholder="__('Notes about this revision')"
                         @keydown.enter="submit"
-                        autofocus />
+                        :focus="true" />
 
                     <button
                         class="btn-primary w-full mb-3"

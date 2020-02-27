@@ -18,11 +18,11 @@
                 v-if="!initialDirectory"
                 handle="directory"
                 :display="__('Folder Name')"
-                :instructions="__('messages.asset_folders_directory_instructions')"
                 :errors="errors.directory"
-                autofocus
-                v-model="directory"
+                :instructions="__('messages.asset_folders_directory_instructions')"
+                :focus="true"
                 :required="true"
+                v-model="directory"
             />
 
             <div class="px-3 pb-3">

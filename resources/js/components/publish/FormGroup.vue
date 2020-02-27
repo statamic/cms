@@ -43,7 +43,7 @@ export default {
             default: 100
         },
 
-        autofocus: {
+        focus: {
             type: Boolean
         },
 
@@ -76,7 +76,7 @@ export default {
                 display: this.display,
                 instructions: this.instructions,
                 width: this.width,
-                autofocus: this.autofocus,
+                focus: this.focus,
                 autoselect: this.autoselect,
             };
         },

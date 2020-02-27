@@ -16,7 +16,7 @@
                     handle="title"
                     :display="__('Title')"
                     :instructions="__('messages.blueprints_title_instructions')"
-                    autofocus />
+                    :focus="true" />
             </div>
         </div>
 

@@ -6,6 +6,7 @@
             :disabled="disabled"
             :readonly="isReadOnly"
             :placeholder="placeholder"
+            :autofocus="focus"
             @input="$emit('input', $event.target.value)"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
@@ -28,6 +29,7 @@ export default {
         isReadOnly: { type: Boolean, default: false },
         placeholder: { required: false },
         value: { required: true },
+        focus: { type: Boolean, default: false }
     }
 }
 </script>

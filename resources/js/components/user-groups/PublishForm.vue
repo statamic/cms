@@ -9,7 +9,7 @@
                     :errors="errors.title"
                     :instructions="__('messages.user_groups_title_instructions')"
                     v-model="title"
-                    autofocus
+                    :focus="true"
                 />
 
                 <form-group
