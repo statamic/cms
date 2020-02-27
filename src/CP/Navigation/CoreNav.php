@@ -11,7 +11,7 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
-use Statamic\Facades\Structure as StructureAPI;
+use Statamic\Facades\Nav as NavAPI;
 use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Contracts\Globals\GlobalSet;
@@ -80,13 +80,11 @@ class CoreNav
             });
 
         Nav::content('Navigation')
-            ->route('structures.index')
+            ->route('navigation.index')
             ->icon('hierarchy-files')
             ->can('index', Structure::class)
             ->children(function () {
-                return StructureAPI::all()->reject(function ($structure) {
-                    return $structure->isCollectionBased();
-                })->map(function ($structure) {
+                return NavAPI::all()->map(function ($structure) {
                     return Nav::item($structure->title())
                               ->url($structure->showUrl())
                               ->can('view', $structure);

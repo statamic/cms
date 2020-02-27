@@ -156,7 +156,7 @@ class Page implements Entry, Augmentable, Responsable
             return $cached;
         }
 
-        if (! $this->structure()->collection()) {
+        if (! $this->structure() instanceof CollectionStructure) {
             return $uris[$this->reference] = $this->entry()->uri();
         }
 

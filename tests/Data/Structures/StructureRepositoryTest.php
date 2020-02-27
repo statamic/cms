@@ -5,6 +5,7 @@ namespace Tests\Data\Structures;
 use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
+use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\Structure;
 use Statamic\Structures\StructureRepository;
 use Tests\TestCase;
@@ -21,15 +22,16 @@ class StuctureRepositoryTest extends TestCase
     /** @test */
     function it_gets_all_structures()
     {
-        Nav::shouldReceive('all')->andReturn(collect([
-            (new Structure)->handle('nav-a'),
-            (new Structure)->handle('nav-b'),
-            (new Structure)->handle('nav-c'),
-        ]));
+        $navs = collect([
+            Nav::make('nav-a'),
+            Nav::make('nav-b'),
+            Nav::make('nav-c'),
+        ]);
+        Nav::shouldReceive('all')->andReturn($navs);
 
         $collections = collect([
-            Collection::make('collection-structure-a')->structure(new Structure),
-            Collection::make('collection-structure-b')->structure(new Structure),
+            Collection::make('collection-structure-a')->structure(new CollectionStructure),
+            Collection::make('collection-structure-b')->structure(new CollectionStructure),
         ]);
         Collection::shouldReceive('whereStructured')->andReturn($collections);
 
@@ -50,16 +52,17 @@ class StuctureRepositoryTest extends TestCase
     /** @test */
     function it_gets_a_nav_structure_by_handle()
     {
-        Nav::shouldReceive('find')->with('test')->once()->andReturn($structure = new Structure);
+        $nav = Nav::make();
+        Nav::shouldReceive('find')->with('test')->once()->andReturn($nav);
         Collection::shouldReceive('find')->never();
 
-        $this->assertSame($structure, $this->repo->find('test'));
+        $this->assertSame($nav, $this->repo->find('test'));
     }
 
     /** @test */
     function it_gets_a_collection_structure_by_handle()
     {
-        $structure = new Structure;
+        $structure = new CollectionStructure;
         $collection = Collection::make()->structure($structure);
         Collection::shouldReceive('find')->with('test')->once()->andReturn($collection);
         Nav::shouldReceive('find')->never();

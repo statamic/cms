@@ -77,7 +77,7 @@ class NavigationStore extends BasicStore
 
     protected function makeBaseStructureFromFile($handle, $path, $data)
     {
-        return Facades\Structure::make()
+        return Facades\Nav::make()
             ->handle($handle)
             ->title($data['title'] ?? null)
             ->sites($data['sites'] ?? null)

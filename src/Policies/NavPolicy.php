@@ -2,16 +2,16 @@
 
 namespace Statamic\Policies;
 
+use Statamic\Facades\Nav;
 use Statamic\Facades\User;
-use Statamic\Facades\Structure;
 
-class StructurePolicy
+class NavPolicy
 {
     public function before($user, $ability)
     {
         $user = User::fromUser($user);
 
-        if ($user->hasPermission('configure structures')) {
+        if ($user->hasPermission('configure navs')) {
             return true;
         }
     }
@@ -24,8 +24,8 @@ class StructurePolicy
             return true;
         }
 
-        return ! Structure::all()->filter(function ($structure) use ($user) {
-            return $this->view($user, $structure);
+        return ! Nav::all()->filter(function ($nav) use ($user) {
+            return $this->view($user, $nav);
         })->isEmpty();
     }
 
@@ -39,28 +39,28 @@ class StructurePolicy
         // handled by before()
     }
 
-    public function view($user, $structure)
+    public function view($user, $nav)
     {
         $user = User::fromUser($user);
 
-        return $user->hasPermission("view {$structure->handle()} structure");
+        return $user->hasPermission("view {$nav->handle()} nav");
     }
 
-    public function edit($user, $structure)
+    public function edit($user, $nav)
     {
         $user = User::fromUser($user);
 
-        return $user->hasPermission("edit {$structure->handle()} structure");
+        return $user->hasPermission("edit {$nav->handle()} nav");
     }
 
-    public function update($user, $structure)
+    public function update($user, $nav)
     {
         $user = User::fromUser($user);
 
-        return $this->edit($user, $structure);
+        return $this->edit($user, $nav);
     }
 
-    public function delete($user, $structure)
+    public function delete($user, $nav)
     {
         // handled by before()
     }

@@ -14,6 +14,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Structure;
 use Statamic\Facades\Taxonomy;
+use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -511,9 +512,7 @@ class Collection implements Contract
                 return $structure;
             })
             ->setter(function ($structure) {
-                return $structure
-                    ->handle('collection::'.$this->handle)
-                    ->title($this->title());
+                return $structure->collection($this);
             })
             ->args(func_get_args());
     }
@@ -527,9 +526,8 @@ class Collection implements Contract
 
     protected function makeStructureFromContents()
     {
-        $structure = Structure::make('collection::'.$this->handle)
+        $structure = (new CollectionStructure)
             ->collection($this)
-            ->title($this->title())
             ->expectsRoot($this->structureContents['root'] ?? false);
 
         $trees = $this->structureContents['trees']

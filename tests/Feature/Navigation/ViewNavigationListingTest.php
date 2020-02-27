@@ -1,37 +1,37 @@
 <?php
 
-namespace Tests\Feature\Structures;
+namespace Tests\Feature\Navigation;
 
 use Mockery;
-use Statamic\Facades;
-use Tests\TestCase;
 use Statamic\Auth\User;
-use Statamic\Structures\Tree;
+use Statamic\Contracts\Structures\Nav;
+use Statamic\Facades;
 use Statamic\Structures\Structure;
+use Statamic\Structures\Tree;
 use Tests\PreventSavingStacheItemsToDisk;
-use Tests\Feature\Structures\MocksStructures;
+use Tests\TestCase;
 
-class ViewStructureListingTest extends TestCase
+class ViewNavigationListingTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk, MocksStructures;
+    use PreventSavingStacheItemsToDisk;
+    use MocksStructures;
 
     /** @test */
     function it_shows_a_list_of_nav_structures()
     {
-        Facades\Structure::shouldReceive('all')->andReturn(collect([
-            'foo' => $structureA = $this->createNavStructure('foo'),
-            'bar' => $structureB = $this->createNavStructure('bar'),
-            'baz' => $structureC = $this->createCollectionStructure('baz'),
+        Facades\Nav::shouldReceive('all')->andReturn(collect([
+            'foo' => $structureA = $this->createNav('foo'),
+            'bar' => $structureB = $this->createNav('bar'),
         ]));
 
         $user = Facades\User::make()->makeSuper()->save();
 
-        $response = $this
+        $this
             ->actingAs($user)
-            ->get(route('statamic.cp.structures.index'))
+            ->visitIndex()
             ->assertSuccessful()
-            ->assertViewHas('structures', function ($structures) {
-                return $structures->map->id->all() === ['foo', 'bar'];
+            ->assertViewHas('navs', function ($navs) {
+                return $navs->map->id->all() === ['foo', 'bar'];
             })
             ->assertDontSee('no-results');
     }
@@ -39,33 +39,32 @@ class ViewStructureListingTest extends TestCase
     /** @test */
     function it_shows_no_results_when_there_are_no_structures()
     {
-        $user = Facades\User::make()->makeSuper()->save();
+        $user = tap(Facades\User::make()->makeSuper())->save();
 
-        $response = $this
+        $this
             ->actingAs($user)
-            ->get(route('statamic.cp.structures.index'))
+            ->visitIndex()
             ->assertSuccessful()
-            ->assertViewHas('structures', collect([]))
+            ->assertViewHas('navs', collect([]))
             ->assertSee('no-results');
     }
 
     /** @test */
     function it_filters_out_structures_the_user_cannot_access()
     {
-        $this->withoutExceptionHandling();
-        Facades\Structure::shouldReceive('all')->andReturn(collect([
-            'foo' => $structureA = $this->createNavStructure('foo'),
-            'bar' => $structureB = $this->createNavStructure('bar')
+        Facades\Nav::shouldReceive('all')->andReturn(collect([
+            'foo' => $this->createNav('foo'),
+            'bar' => $this->createNav('bar')
         ]));
-        $this->setTestRoles(['test' => ['access cp', 'view bar structure']]);
+        $this->setTestRoles(['test' => ['access cp', 'view bar nav']]);
         $user = Facades\User::make()->assignRole('test')->save();
 
-        $response = $this
+        $this
             ->actingAs($user)
-            ->get(route('statamic.cp.structures.index'))
+            ->visitIndex()
             ->assertSuccessful()
-            ->assertViewHas('structures', function ($structures) {
-                return $structures->map->id->all() === ['bar'];
+            ->assertViewHas('navs', function ($navs) {
+                return $navs->map->id->all() === ['bar'];
             })
             ->assertDontSee('no-results');
     }
@@ -73,19 +72,19 @@ class ViewStructureListingTest extends TestCase
     /** @test */
     function it_doesnt_filter_out_structures_if_they_have_permission_to_configure()
     {
-        Facades\Structure::shouldReceive('all')->andReturn(collect([
-            'foo' => $structureA = $this->createNavStructure('foo'),
-            'bar' => $structureB = $this->createNavStructure('bar')
+        Facades\Nav::shouldReceive('all')->andReturn(collect([
+            'foo' => $this->createNav('foo'),
+            'bar' => $this->createNav('bar')
         ]));
-        $this->setTestRoles(['test' => ['access cp', 'configure structures', 'view bar structure']]);
+        $this->setTestRoles(['test' => ['access cp', 'configure navs', 'view bar nav']]);
         $user = Facades\User::make()->assignRole('test')->save();
 
-        $response = $this
+        $this
             ->actingAs($user)
-            ->get(route('statamic.cp.structures.index'))
+            ->visitIndex()
             ->assertSuccessful()
-            ->assertViewHas('structures', function ($structures) {
-                return $structures->map->id->all() === ['foo', 'bar'];
+            ->assertViewHas('navs', function ($navs) {
+                return $navs->map->id->all() === ['foo', 'bar'];
             })
             ->assertDontSee('no-results');
     }
@@ -94,8 +93,8 @@ class ViewStructureListingTest extends TestCase
     function it_denies_access_when_there_are_no_permitted_structures()
     {
         Facades\Structure::shouldReceive('all')->andReturn(collect([
-            'foo' => $structureA = $this->createNavStructure('foo'),
-            'bar' => $structureB = $this->createNavStructure('bar')
+            'foo' => $this->createNav('foo'),
+            'bar' => $this->createNav('bar')
         ]));
 
         $this->setTestRoles(['test' => ['access cp']]);
@@ -104,20 +103,20 @@ class ViewStructureListingTest extends TestCase
         $response = $this
             ->from('/cp/original')
             ->actingAs($user)
-            ->get(route('statamic.cp.structures.index'))
+            ->visitIndex()
             ->assertRedirect('/cp/original');
     }
 
     /** @test */
     function create_structure_button_is_visible_with_permission_to_configure()
     {
-        $this->setTestRoles(['test' => ['access cp', 'configure structures']]);
+        $this->setTestRoles(['test' => ['access cp', 'configure navs']]);
         $user = Facades\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)
-            ->get(route('statamic.cp.structures.index'))
-            ->assertSee('Create Structure');
+            ->visitIndex()
+            ->assertSee('Create Navigation');
     }
 
     /** @test */
@@ -128,23 +127,23 @@ class ViewStructureListingTest extends TestCase
 
         $response = $this
             ->actingAs($user)
-            ->get(route('statamic.cp.structures.index'))
-            ->assertDontSee('Create Structure');
+            ->visitIndex()
+            ->assertDontSee('Create Navigation');
     }
 
     /** @test */
     function delete_button_is_visible_with_permission_to_configure()
     {
         Facades\Structure::shouldReceive('all')->andReturn(collect([
-            'foo' => $this->createNavStructure('foo'),
+            'foo' => $this->createNav('foo'),
         ]));
 
-        $this->setTestRoles(['test' => ['access cp', 'configure structures']]);
+        $this->setTestRoles(['test' => ['access cp', 'configure navs']]);
         $user = Facades\User::make()->assignRole('test')->save();
 
         $response = $this
             ->actingAs($user)
-            ->get(route('statamic.cp.structures.index'))
+            ->visitIndex()
             ->assertSee('Delete');
     }
 
@@ -153,16 +152,16 @@ class ViewStructureListingTest extends TestCase
     {
         $this->markTestIncomplete();
 
-        Facades\Structure::shouldReceive('all')->andReturn(collect([
-            'foo' => $this->createNavStructure('foo'),
+        Facades\Nav::shouldReceive('all')->andReturn(collect([
+            'foo' => $this->createNav('foo'),
         ]));
 
-        $this->setTestRoles(['test' => ['access cp', 'view foo structure']]);
+        $this->setTestRoles(['test' => ['access cp', 'view foo nav']]);
         $user = Facades\User::make()->assignRole('test');
 
         $response = $this
             ->actingAs($user)
-            ->get(route('statamic.cp.structures.index'))
+            ->visitIndex()
             ->assertDontSee('Delete');
     }
 
@@ -186,5 +185,10 @@ class ViewStructureListingTest extends TestCase
 
         app()->instance(\Statamic\Contracts\Auth\RoleRepository::class, $fake);
         Facades\Role::swap($fake);
+    }
+
+    private function visitIndex()
+    {
+        return $this->get(route('statamic.cp.navigation.index'));
     }
 }

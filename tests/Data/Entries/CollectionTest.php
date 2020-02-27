@@ -4,13 +4,13 @@ namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
-use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\Structure;
 use Statamic\Fields\Blueprint;
+use Statamic\Structures\CollectionStructure;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -311,7 +311,7 @@ class CollectionTest extends TestCase
     /** @test */
     function it_sets_and_gets_structure()
     {
-        $structure = Structure::make();
+        $structure = new CollectionStructure;
         $collection = (new Collection)->handle('test');
         $this->assertFalse($collection->hasStructure());
         $this->assertNull($collection->structure());
@@ -352,9 +352,8 @@ class CollectionTest extends TestCase
         $this->assertEquals($contents, $collection->structureContents());
         $this->assertTrue($collection->hasStructure());
         $structure = $collection->structure();
-        $this->assertInstanceOf(StructureContract::class, $structure);
+        $this->assertInstanceOf(CollectionStructure::class, $structure);
         $this->assertEquals('collection::test', $structure->handle());
-        $this->assertTrue($structure->isCollectionBased());
         $this->assertSame($collection, $structure->collection());
         $this->assertEquals(2, $structure->in('en')->pages()->all()->count());
         $this->assertEquals(3, $structure->in('en')->flattenedPages()->count());

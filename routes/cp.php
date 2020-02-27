@@ -27,7 +27,7 @@ Route::group([
     Route::get('select-site/{handle}', 'SelectSiteController@select');
 
     Route::group(['namespace' => 'Structures'], function () {
-        Route::resource('structures', 'StructuresController');
+        Route::resource('navigation', 'NavigationController');
         Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
     });
 

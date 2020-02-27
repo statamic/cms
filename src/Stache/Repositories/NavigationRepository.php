@@ -4,7 +4,7 @@ namespace Statamic\Stache\Repositories;
 
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Structures\Structure;
+use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Structures\NavigationRepository as RepositoryContract;
 use Statamic\Facades;
 use Statamic\Stache\Stache;
@@ -29,33 +29,33 @@ class NavigationRepository implements RepositoryContract
         return $this->store->getItems($keys);
     }
 
-    public function find($id): ?Structure
+    public function find($id): ?Nav
     {
         return $this->findByHandle($id);
     }
 
-    public function findByHandle($handle): ?Structure
+    public function findByHandle($handle): ?Nav
     {
         return $this->store->getItem($handle);
     }
 
-    public function save(Structure $structure)
+    public function save(Nav $nav)
     {
-        $this->store->save($structure);
+        $this->store->save($nav);
     }
 
-    public function delete(Structure $structure)
+    public function delete(Nav $nav)
     {
-        $this->store->delete($structure);
+        $this->store->delete($nav);
     }
 
-    public function make(string $handle = null): Structure
+    public function make(string $handle = null): Nav
     {
-        return (new \Statamic\Structures\Structure)->handle($handle);
+        return (new \Statamic\Structures\Nav)->handle($handle);
     }
 
-    public function updateEntryUris(Structure $structure)
+    public function updateEntryUris(Nav $nav)
     {
-        $this->store->index('uri')->updateItem($structure);
+        $this->store->index('uri')->updateItem($nav);
     }
 }

@@ -2,16 +2,18 @@
 
 namespace Tests\Data\Structures;
 
-use Mockery;
-use Tests\TestCase;
-use Statamic\Entries\Entry;
 use Illuminate\Support\Collection;
-use Statamic\Structures\Page;
-use Statamic\Structures\Tree;
+use Mockery;
+use Statamic\Contracts\Structures\Nav;
+use Statamic\Entries\Entry;
 use Statamic\Facades\Entry as EntryAPI;
+use Statamic\Structures\CollectionStructure;
+use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
 use Statamic\Structures\Structure;
+use Statamic\Structures\Tree;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class PageTest extends TestCase
 {
@@ -83,7 +85,7 @@ class PageTest extends TestCase
                 return 'entry-slug';
             }
         };
-        \Statamic\Facades\Collection::make('test')->save();
+        $collection = tap(\Statamic\Facades\Collection::make('test'))->save();
         $entry->collection('test');
 
         $parent = Mockery::mock(Page::class);
@@ -92,7 +94,7 @@ class PageTest extends TestCase
         $parent->shouldReceive('isRoot')->andReturnFalse();
 
         $tree = (new Tree)->structure(
-            $this->mock(Structure::class)->shouldReceive('collection')->andReturnTrue()->getMock()
+            $this->mock(CollectionStructure::class)->shouldReceive('collection')->andReturn($collection)->getMock()
         );
 
         $page = (new Page)
@@ -117,7 +119,7 @@ class PageTest extends TestCase
         };
 
         $tree = (new Tree)->structure(
-            $this->mock(Structure::class)->shouldReceive('collection')->andReturnFalse()->getMock()
+            $this->mock(Nav::class)
         );
 
         $page = (new Page)

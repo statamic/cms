@@ -64,7 +64,7 @@ class NavigationRepositoryTest extends TestCase
     /** @test */
     function it_saves_a_nav_to_the_stache_and_to_a_file()
     {
-        $structure = (new \Statamic\Structures\Structure)->handle('new');
+        $structure = (new \Statamic\Structures\Nav)->handle('new');
         $structure->addTree($structure->makeTree('en'));
 
         $this->assertNull($this->repo->findByHandle('new'));

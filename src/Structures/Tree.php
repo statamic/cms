@@ -5,6 +5,7 @@ namespace Statamic\Structures;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Facades;
+use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -31,7 +32,8 @@ class Tree implements Localization
     {
         return $this->fluentlyGetOrSet('tree')
             ->setter(function ($tree) {
-                return $this->validateTree($tree);
+                $this->structure->validateTree($tree);
+                return $tree;
             })
             ->args(func_get_args());
     }
@@ -57,13 +59,7 @@ class Tree implements Localization
 
     public function route()
     {
-        if (! $collection = $this->structure->collection()) {
-            return null;
-        }
-
-        return is_array($route = $collection->route())
-            ? $route[$this->locale()]
-            : $route;
+        return $this->structure->route($this->locale());
     }
 
     public function path()
@@ -160,9 +156,25 @@ class Tree implements Localization
         })->all();
     }
 
+    public function showUrl()
+    {
+        $params = [];
+
+        if (Site::hasMultiple()) {
+            $params['site'] = $this->locale();
+        }
+
+        return $this->structure->showUrl($params);
+    }
+
     public function editUrl()
     {
-        return cp_route('structures.show', ['structure' => $this->handle(), 'site' => $this->locale()]);
+        return $this->structure->editUrl();
+    }
+
+    public function deleteUrl()
+    {
+        return $this->structure->deleteUrl();
     }
 
     public function append($entry)
@@ -248,43 +260,5 @@ class Tree implements Localization
         }
 
         return [$match, array_values($branches)];
-    }
-
-    protected function validateTree($tree)
-    {
-        if ($this->structure->expectsRoot()) {
-            throw_unless(isset($tree[0]['entry']), new \Exception('Root page must be an entry'));
-            throw_if(isset($tree[0]['children']), new \Exception('Root page cannot have children'));
-        }
-
-        if (! $this->structure->isCollectionBased()) {
-            return $tree;
-        }
-
-        $entryIds = $this->getEntryIdsFromTree($tree);
-
-        if ($entryId = $entryIds->duplicates()->first()) {
-            $this->throwDuplicateEntryException($entryId);
-        }
-
-        return $tree;
-    }
-
-    private function throwDuplicateEntryException($id)
-    {
-        throw new \Exception("Duplicate entry [{$id}] in [{$this->structure->handle()}] structure.");
-    }
-
-    protected function getEntryIdsFromTree($tree)
-    {
-        return collect($tree)
-            ->map(function ($item) {
-                return [
-                    'entry' => $item['entry'] ?? null,
-                    'children' => isset($item['children']) ? $this->getEntryIdsFromTree($item['children']) : null
-                ];
-            })
-            ->flatten()
-            ->filter();
     }
 }

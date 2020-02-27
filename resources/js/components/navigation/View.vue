@@ -50,7 +50,7 @@
 </template>
 
 <script>
-import PageTree from './PageTree.vue';
+import PageTree from '../structures/PageTree.vue';
 
 export default {
 

@@ -2,15 +2,16 @@
 
 namespace Tests\Stache\Stores;
 
-use Mockery;
-use Statamic\Facades;
-use Tests\TestCase;
-use Statamic\Stache\Stache;
-use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
-use Statamic\Stache\Stores\NavigationStore;
+use Illuminate\Filesystem\Filesystem;
+use Mockery;
+use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Structures\Structure;
+use Statamic\Facades;
 use Statamic\Facades\Path;
+use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\NavigationStore;
+use Tests\TestCase;
 
 class NavigationStoreTest extends TestCase
 {
@@ -79,7 +80,7 @@ tree:
 EOT;
         $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/pages.yaml'), $contents);
 
-        $this->assertInstanceOf(Structure::class, $item);
+        $this->assertInstanceOf(Nav::class, $item);
         $this->assertEquals('pages', $item->handle());
         $this->assertEquals('Pages', $item->title());
         // TODO: Some more assertions
@@ -90,14 +91,14 @@ EOT;
     {
         $this->assertEquals(
             'test',
-            $this->store->getItemKey(Facades\Structure::make()->handle('test'))
+            $this->store->getItemKey(Facades\Nav::make()->handle('test'))
         );
     }
 
     /** @test */
     function it_saves_to_disk()
     {
-        $structure = Facades\Structure::make()->handle('pages');
+        $structure = Facades\Nav::make()->handle('pages');
         $structure->addTree($structure->makeTree('en'));
 
         $this->store->save($structure);
