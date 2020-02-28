@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Tags;
+namespace Statamic\Tags\Concerns;
 
 use Illuminate\Contracts\Pagination\Paginator;
 

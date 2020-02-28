@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Tags\Traits;
+namespace Statamic\Tags\Concerns;
 
 use Statamic\Extend\HasParameters;
 

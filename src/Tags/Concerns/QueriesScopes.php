@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Tags\Query;
+namespace Statamic\Tags\Concerns;
 
 use Statamic\Support\Arr;
 
-trait HasScopes
+trait QueriesScopes
 {
     public function queryScopes($query)
     {

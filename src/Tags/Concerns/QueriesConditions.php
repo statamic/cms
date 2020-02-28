@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Tags\Query;
+namespace Statamic\Tags\Concerns;
 
 use Statamic\Support\Str;
 use Carbon\Carbon;
 
-trait HasConditions
+trait QueriesConditions
 {
     protected function queryConditions($query)
     {
