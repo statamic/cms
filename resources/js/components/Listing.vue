@@ -35,13 +35,10 @@ export default {
 
     computed: {
 
-        parameters() {
+        userOnlyParameters() { // must never be set from server response
             return Object.assign({
-                sort: this.sortColumn,
-                order: this.sortDirection,
                 page: this.page,
                 perPage: this.perPage,
-                search: this.searchQuery,
                 filters: btoa(JSON.stringify(this.activeFilters)),
             }, this.additionalParameters);
         },
@@ -58,13 +55,9 @@ export default {
 
     watch: {
 
-        parameters: {
+        userOnlyParameters: {
             deep: true,
             handler(after, before) {
-                // A change to the search query would trigger both watchers.
-                // We only want the searchQuery one to kick in.
-                if (before.search !== after.search) return;
-
                 if (JSON.stringify(before) === JSON.stringify(after)) return;
                 this.request();
             }
@@ -100,7 +93,12 @@ export default {
             this.source = this.$axios.CancelToken.source();
 
             this.$axios.get(this.requestUrl, {
-                params: this.parameters,
+                params: {
+                    ...this.userOnlyParameters,
+                    search: this.searchQuery,
+                    sort: this.sortColumn,
+                    order: this.sortDirection,
+                },
                 cancelToken: this.source.token
             }).then(response => {
                 this.columns = response.data.meta.columns;
@@ -125,8 +123,11 @@ export default {
         },
 
         sorted(column, direction) {
+            if (column === this.sortColumn && direction === this.sortDirection) return;
             this.sortColumn = column;
             this.sortDirection = direction;
+            this.pageReset();
+            this.request();
         },
 
         removeRow(row) {
