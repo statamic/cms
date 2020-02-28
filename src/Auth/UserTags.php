@@ -53,13 +53,6 @@ class UserTags extends Tags
             }
         }
 
-        // Get a user by username, if the `username` parameter was used.
-        if ($username = $this->get('username')) {
-            if (! $user = User::whereUsername($username)) {
-                return $this->parseNoResults();
-            }
-        }
-
         // Get a user by email, if the `email` parameter was used.
         if ($email = $this->get('email')) {
             if (! $user = User::whereEmail($email)) {
