@@ -50,6 +50,7 @@ class EntriesController extends CpController
             ->additional(['meta' => [
                 'filters' => $request->filters,
                 'sortColumn' => $sortField,
+                'sortDirection' => $sortDirection,
             ]]);
     }
 

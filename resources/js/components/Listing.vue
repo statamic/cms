@@ -105,6 +105,7 @@ export default {
             }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
+                this.sortDirection = response.data.meta.sortDirection;
                 this.activeFilters = {...response.data.meta.filters};
                 this.items = Object.values(response.data.data);
                 this.meta = response.data.meta;
