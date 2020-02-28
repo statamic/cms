@@ -1,17 +1,17 @@
 <?php
 
-namespace Statamic\Tags\Query;
+namespace Statamic\Tags;
 
+use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
-use Statamic\Tags\OutputsItems;
 
 class Query extends Tags
 {
-    use GetsResults,
-        OutputsItems,
-        HasConditions,
-        HasOrderBys,
-        HasScopes;
+    use Concerns\QueriesConditions,
+        Concerns\QueriesScopes,
+        Concerns\QueriesOrderBys,
+        Concerns\GetsQueryResults,
+        Concerns\OutputsItems;
 
     /**
      * {{ query builder="" }} ... {{ /query }}
