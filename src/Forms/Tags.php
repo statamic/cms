@@ -7,13 +7,13 @@ use DebugBar\DebugBarException;
 use Illuminate\Support\Facades\Crypt;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
-use Statamic\Tags\OutputsItems;
+use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
-use Statamic\Tags\Traits\RendersForms;
 
 class Tags extends BaseTags
 {
-    use OutputsItems, RendersForms;
+    use Concerns\OutputsItems,
+        Concerns\RendersForms;
 
     const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
 

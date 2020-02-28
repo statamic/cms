@@ -10,14 +10,14 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Support\Str;
-use Statamic\Tags\Query;
+use Statamic\Tags\Concerns;
 
 class Entries
 {
-    use Query\HasConditions,
-        Query\HasScopes,
-        Query\HasOrderBys,
-        Query\GetsResults;
+    use Concerns\QueriesConditions,
+        Concerns\QueriesScopes,
+        Concerns\QueriesOrderBys,
+        Concerns\GetsQueryResults;
 
     protected $ignoredParams = ['as'];
     protected $parameters;

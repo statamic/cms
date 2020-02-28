@@ -9,11 +9,11 @@ use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
-use Statamic\Tags\Traits\RendersForms;
+use Statamic\Tags\Concerns;
 
 class UserTags extends Tags
 {
-    use RendersForms;
+    use Concerns\RendersForms;
 
     protected static $handle = 'user';
 
