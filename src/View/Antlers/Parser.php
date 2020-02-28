@@ -91,9 +91,6 @@ class Parser
         $this->conditionalEndRegex = '/{{\s*(?:endif|\/if|\/unless)\s*}}/ms';
         $this->conditionalExistsRegex = '/(\s+|^)exists\s+('.$this->variableRegex.')(\s+|$)/ms';
         $this->conditionalNotRegex = '/(\s+|^)not(\s+|$)/ms';
-
-        // Large strings can spawn many backtrack attempts. Let's crank this sucker up.
-        ini_set('pcre.backtrack_limit', Config::get('parser_backtrack_limit', 1000000));
     }
 
     public function allowPhp($allow = true)
