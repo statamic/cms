@@ -90,15 +90,6 @@ class CollectionEntriesStore extends ChildStore
     protected function handleModifiedItem($item)
     {
         $item->taxonomize();
-
-        if ($item->collection()->hasStructure()) {
-            $tree = $item->collection()->structure()->in($item->locale());
-            $pages = $tree->flattenedPages()->keyBy->id();
-
-            if (! $pages->has($item->id())) {
-                $tree->append($item)->save();
-            }
-        }
     }
 
     protected function storeIndexes()
