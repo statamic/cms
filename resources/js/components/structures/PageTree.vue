@@ -12,14 +12,7 @@
                 <p class="text-grey mb-3">
                     {{ __('messages.structures_empty') }}
                 </p>
-                <button v-if="!hasCollection" class="btn-primary btn-lg" v-text="__('Create first link')" @click="openPageCreator" />
-
-                <create-entry-button
-                    v-if="hasCollection"
-                    button-class="btn-primary"
-                    :url="createEntryUrl()"
-                    :blueprints="collectionBlueprints"
-                    :text="__('Create first link')" />
+                <button class="btn-primary btn-lg" v-text="__('Create first link')" @click="openPageCreator" />
             </div>
         </div>
 
