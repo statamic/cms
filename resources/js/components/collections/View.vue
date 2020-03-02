@@ -121,7 +121,7 @@ export default {
     data() {
         return {
             mounted: false,
-            view: this.initialView(),
+            view: null,
         }
     },
 
@@ -143,18 +143,16 @@ export default {
 
     watch: {
 
-        view: {
-            immediate: true,
-            handler(view) {
-                this.$config.set('wrapperClass', view === 'tree' ? undefined : 'max-w-full');
+        view(view) {
+            this.$config.set('wrapperClass', view === 'tree' ? undefined : 'max-w-full');
 
-                localStorage.setItem('statamic.collection-view.'+this.handle, view);
-            }
+            localStorage.setItem('statamic.collection-view.'+this.handle, view);
         }
 
     },
 
     mounted() {
+        this.view = this.initialView();
         this.mounted = true;
     },
 
