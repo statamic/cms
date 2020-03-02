@@ -399,12 +399,12 @@ class EntriesController extends CpController
     {
         return new Breadcrumbs([
             [
-                'text' => $collection->hasStructure() ? __('Structures') : __('Collections'),
-                'url' => $collection->hasStructure() ? cp_route('structures.index') : cp_route('collections.index'),
+                'text' => __('Collections'),
+                'url' => cp_route('collections.index'),
             ],
             [
                 'text' => $collection->title(),
-                'url' => $collection->hasStructure() ? $collection->structure()->showUrl() : $collection->showUrl(),
+                'url' => $collection->showUrl(),
             ]
         ]);
     }
