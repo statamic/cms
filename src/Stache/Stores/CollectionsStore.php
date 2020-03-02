@@ -51,7 +51,6 @@ class CollectionsStore extends BasicStore
             ->revisionsEnabled(array_get($data, 'revisions', false))
             ->defaultPublishState($this->getDefaultPublishState($data))
             ->structureContents(array_get($data, 'structure'))
-            ->orderable(array_get($data, 'orderable', false))
             ->sortField(array_get($data, 'sort_by'))
             ->sortDirection(array_get($data, 'sort_dir'))
             ->taxonomies(array_get($data, 'taxonomies'));
@@ -61,8 +60,6 @@ class CollectionsStore extends BasicStore
                 ->futureDateBehavior($dateBehavior['future'] ?? null)
                 ->pastDateBehavior($dateBehavior['past'] ?? null);
         }
-
-        $collection = $this->setPositions($collection, $data);
 
         return $collection;
     }
@@ -76,28 +73,6 @@ class CollectionsStore extends BasicStore
         }
 
         return $value === 'published';
-    }
-
-    protected function setPositions($collection, $data)
-    {
-        if (! $collection->orderable()) {
-            return $collection;
-        }
-
-        // If it's not set, it'll work out the order automatically by querying entries when it needs to.
-        if (! array_has($data, 'entry_order')) {
-            return $collection;
-        }
-
-        $order = array_get($data, 'entry_order');
-
-        // The entries are in the YAML as a simple zero-indexed array. The positions on the
-        // collection object expect the keys to be the actual positions (ie. starts with 1)
-        $positions = collect($order)->mapWithKeys(function ($entry, $index) {
-            return [$index + 1 => $entry];
-        });
-
-        return $collection->setEntryPositions($positions);
     }
 
     public function updateEntryUris($collection)

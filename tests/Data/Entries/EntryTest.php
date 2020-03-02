@@ -373,43 +373,20 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_order()
+    function it_gets_the_order_from_the_collections_structure()
     {
-        $collection = tap(Collection::make('ordered'))->save();
-        $one = (new Entry)->id('one')->collection($collection);
-        $this->assertNull($one->order());
+        $collection = tap(Collection::make('ordered')->structureContents([
+            'max_depth' => 1,
+            'tree' => [
+                ['entry' => 'three'],
+                ['entry' => 'one'],
+                ['entry' => 'two'],
+            ]
+        ]))->save();
 
-        $return = $one->order(5);
-        $this->assertEquals($one, $return);
-        $this->assertEquals(1, $one->order());
-
-        $two = (new Entry)->id('two')->collection($collection);
-        $two->order(10);
-        $this->assertEquals(1, $one->order());
-        $this->assertEquals(2, $two->order());
-
-        $three = (new Entry)->id('three')->collection($collection);
-        $three->order(2);
-        $this->assertEquals(2, $one->order());
-        $this->assertEquals(3, $two->order());
-        $this->assertEquals(1, $three->order());
-    }
-
-    /** @test */
-    function it_sets_the_order_on_the_collection_when_dealing_with_numeric_collections()
-    {
-        $collection = tap(Collection::make('ordered')->orderable(true))->save();
-        $one = (new Entry)->id('one')->collection($collection);
-        $two = (new Entry)->id('two')->collection($collection);
-
-        $one->order('3');
-        $two->order('2');
-
-        $this->assertEquals([2 => 'two', 3 => 'one'], $collection->getEntryPositions()->all());
-        $this->assertEquals(['two', 'one'], $collection->getEntryOrder()->all());
-
-        $this->assertEquals(2, $one->order());
-        $this->assertEquals(1, $two->order());
+        $this->assertEquals(2, (new Entry)->locale('en')->id('one')->collection($collection)->order());
+        $this->assertEquals(3, (new Entry)->locale('en')->id('two')->collection($collection)->order());
+        $this->assertEquals(1, (new Entry)->locale('en')->id('three')->collection($collection)->order());
     }
 
     /** @test */
@@ -421,15 +398,13 @@ class EntryTest extends TestCase
             $collection = tap(Collection::make('dated')->dated(true))->save();
             return (new Entry)->collection($collection);
         });
+
         $numberEntry = with('', function() {
-            $collection = tap(Collection::make('ordered')->orderable(true))->save();
+            $collection = tap(Collection::make('ordered')->structureContents(['max_depth' => 1, 'tree' => []]))->save();
             return (new Entry)->collection($collection);
         });
-        $this->assertNull($dateEntry->order());
-        $this->assertNull($numberEntry->order());
 
         $dateEntry->date('2017-01-02');
-        $numberEntry->order('2017-01-02');
 
         $this->assertEquals('2017-01-02 12:00am', $dateEntry->date()->format('Y-m-d h:ia'));
         $this->assertTrue($dateEntry->hasDate());

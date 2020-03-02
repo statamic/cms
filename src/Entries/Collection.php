@@ -32,7 +32,6 @@ class Collection implements Contract
     protected $blueprints = [];
     protected $searchIndex;
     protected $dated = false;
-    protected $orderable = false;
     protected $sortField;
     protected $sortDirection;
     protected $ampable = false;
@@ -71,9 +70,9 @@ class Collection implements Contract
         return $this->fluentlyGetOrSet('dated')->args(func_get_args());
     }
 
-    public function orderable($orderable = null)
+    public function orderable()
     {
-        return $this->fluentlyGetOrSet('orderable')->args(func_get_args());
+        return optional($this->structure())->maxDepth() === 1;
     }
 
     public function sortField($field = null)
@@ -308,75 +307,6 @@ class Collection implements Contract
         return $this->searchIndex() !== null;
     }
 
-    public function getEntryPositions()
-    {
-        if ($this->positions) {
-            return $this->positions;
-        }
-
-        $this->positions = $this->queryEntries()->get()->mapWithKeys(function ($entry, $index) {
-            return [$index + 1 => $entry->id()];
-        });
-
-        return $this->positions;
-    }
-
-    public function setEntryPositions($positions)
-    {
-        $this->positions = collect($positions);
-
-        return $this;
-    }
-
-    public function setEntryPosition($id, $position)
-    {
-        $positions = $this->getEntryPositions()->all();
-
-        Arr::set($positions, $position, $id);
-
-        ksort($positions);
-
-        $this->setEntryPositions($positions);
-
-        return $this;
-    }
-
-    public function appendEntryPosition($id)
-    {
-        $position = $this->getEntryPositions()->keys()->sort()->last() + 1;
-
-        return $this->setEntryPosition($id, $position);
-    }
-
-    public function removeEntryPosition($id)
-    {
-        $positions = $this->getEntryPositions()->all();
-
-        unset($positions[$this->getEntryPosition($id)]);
-
-        $this->setEntryPositions($positions);
-
-        return $this;
-    }
-
-    public function getEntryPosition($id)
-    {
-        return $this->getEntryPositions()->flip()->get($id);
-    }
-
-    public function getEntryOrder($id = null)
-    {
-        $order = $this->getEntryPositions()->values();
-
-        if (func_num_args() === 0) {
-            return $order;
-        }
-
-        $index = $order->flip()->get($id);
-
-        return $index === null ? null : $index + 1;
-    }
-
     public function cascade($key = null, $default = null)
     {
         if (is_null($key)) {
@@ -400,12 +330,12 @@ class Collection implements Contract
             'default_publish_state',
             'dated',
             'structured',
+            'orderable',
         ]);
 
         $array = Arr::removeNullValues(array_merge($array, [
             'amp' => $array['amp'] ?: null,
             'date' => $this->dated ?: null,
-            'orderable' => $array['orderable'] ?: null,
             'sort_by' => $this->sortField,
             'sort_dir' => $this->sortDirection,
             'default_status' => $this->defaultPublishState === false ? 'draft' : null,
@@ -414,10 +344,6 @@ class Collection implements Contract
                 'future' => $this->futureDateBehavior,
             ],
         ]));
-
-        if ($this->orderable()) {
-            $array['entry_order'] = $this->getEntryOrder()->all();
-        }
 
         if (! Site::hasMultiple()) {
             unset($array['sites']);
@@ -432,6 +358,7 @@ class Collection implements Contract
         if ($this->hasStructure()) {
             $array['structure'] = Arr::removeNullValues([
                 'root' => $this->structure()->expectsRoot(),
+                'max_depth' => $this->structure()->maxDepth(),
                 'tree' => $this->structure()->trees()->map(function ($tree) {
                     return $tree->fileData()['tree'];
                 })->all()
@@ -483,7 +410,7 @@ class Collection implements Contract
             'cascade' => $this->cascade->all(),
             'blueprints' => $this->blueprints,
             'search_index' => $this->searchIndex,
-            'orderable' => $this->orderable,
+            'orderable' => $this->orderable(),
             'structured' => $this->hasStructure(),
             'mount' => $this->mount,
             'taxonomies' => $this->taxonomies,
@@ -526,7 +453,12 @@ class Collection implements Contract
                 return $structure;
             })
             ->setter(function ($structure) {
-                return $structure->collection($this);
+                if ($structure) {
+                    $structure->collection($this);
+                } else {
+                    $this->structureContents = null;
+                }
+                return $structure;
             })
             ->args(func_get_args());
     }

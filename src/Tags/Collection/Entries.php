@@ -17,8 +17,11 @@ class Entries
 {
     use Query\HasConditions,
         Query\HasScopes,
-        Query\HasOrderBys,
         Query\GetsResults;
+
+    use Query\HasOrderBys {
+        queryOrderBys as traitQueryOrderBys;
+    }
 
     protected $ignoredParams = ['as'];
     protected $parameters;
@@ -311,5 +314,21 @@ class Entries
                 );
             }
         });
+    }
+
+    protected function queryOrderBys($query)
+    {
+        $isSortingByOrder = null !== $this->orderBys->first(function ($orderBy) {
+            return $orderBy->sort === 'order';
+        });
+
+        if ($isSortingByOrder) {
+            $nonOrderableCollections = $this->collections->reject->orderable();
+            if ($nonOrderableCollections->isNotEmpty()) {
+                throw new \LogicException('Cannot sort a nested collection by order.');
+            }
+        }
+
+        return $this->traitQueryOrderBys($query);
     }
 }

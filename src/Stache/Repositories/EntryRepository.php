@@ -72,19 +72,11 @@ class EntryRepository implements RepositoryContract
             $entry->id($this->stache->generateId());
         }
 
-        if ($entry->collection()->orderable()) {
-            $this->ensureEntryPosition($entry);
-        }
-
         $this->store->store($entry->collectionHandle())->save($entry);
     }
 
     public function delete($entry)
     {
-        if ($entry->collection()->orderable()) {
-            $this->removeEntryPosition($entry);
-        }
-
         $this->store->store($entry->collectionHandle())->delete($entry);
     }
 
@@ -105,20 +97,6 @@ class EntryRepository implements RepositoryContract
                 ->store($taxonomy = $taxonomy->handle())
                 ->sync($entry, $entry->value($taxonomy));
         });
-    }
-
-    protected function ensureEntryPosition($entry)
-    {
-        if (! $entry->collection()->getEntryPosition($entry->id())) {
-            $entry->collection()->appendEntryPosition($entry->id())->save();
-        }
-    }
-
-    protected function removeEntryPosition($entry)
-    {
-        if ($entry->collection()->getEntryPosition($entry->id())) {
-            $entry->collection()->removeEntryPosition($entry->id())->save();
-        }
     }
 
     public function createRules($collection, $site)

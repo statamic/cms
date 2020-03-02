@@ -184,13 +184,22 @@ class CollectionTest extends TestCase
         $this->assertEquals('date', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
-        $ordered = (new Collection)->orderable(true);
+        $structureWithMaxDepthOfOne = $this->makeStructure()->maxDepth(1);
+        $ordered = (new Collection)->structure($structureWithMaxDepthOfOne);
         $this->assertEquals('order', $ordered->sortField());
         $this->assertEquals('asc', $ordered->sortDirection());
 
-        $datedAndOrdered = (new Collection)->dated(true)->orderable(true);
+        $datedAndOrdered = (new Collection)->dated(true)->structure($structureWithMaxDepthOfOne);
         $this->assertEquals('order', $datedAndOrdered->sortField());
         $this->assertEquals('asc', $datedAndOrdered->sortDirection());
+
+        $structure = $this->makeStructure();
+        $alpha->structure($structure);
+        $this->assertEquals('title', $alpha->sortField());
+        $this->assertEquals('asc', $alpha->sortDirection());
+        $dated->structure($structure);
+        $this->assertEquals('date', $dated->sortField());
+        $this->assertEquals('desc', $dated->sortDirection());
 
         // TODO: Ability to control sort direction
     }
@@ -207,42 +216,6 @@ class CollectionTest extends TestCase
         $return = $collection->save();
 
         $this->assertEquals($collection, $return);
-    }
-
-    /** @test */
-    function entry_can_be_ordered()
-    {
-        $collection = (new Collection)->handle('test')->setEntryPositions([]);
-
-        $return = $collection->setEntryPosition('one', 3);
-        $this->assertEquals($collection, $return);
-        $this->assertSame([3 => 'one'], $collection->getEntryPositions()->all());
-        $this->assertSame(['one'], $collection->getEntryOrder()->all());
-        $this->assertEquals(1, $collection->getEntryOrder('one'));
-
-        $collection->setEntryPosition('two', 7);
-        $this->assertSame([3 => 'one', 7 => 'two'], $collection->getEntryPositions()->all());
-        $this->assertSame(['one', 'two'], $collection->getEntryOrder()->all());
-        $this->assertEquals(1, $collection->getEntryOrder('one'));
-        $this->assertEquals(2, $collection->getEntryOrder('two'));
-
-        $collection->setEntryPosition('three', 5);
-        $this->assertSame([3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions()->all());
-        $this->assertSame(['one', 'three', 'two'], $collection->getEntryOrder()->all());
-        $this->assertEquals(1, $collection->getEntryOrder('one'));
-        $this->assertEquals(3, $collection->getEntryOrder('two'));
-        $this->assertEquals(2, $collection->getEntryOrder('three'));
-
-        $collection->setEntryPosition('four', 1);
-        $this->assertSame([1 => 'four', 3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions()->all());
-        $this->assertSame(['four', 'one', 'three', 'two'], $collection->getEntryOrder()->all());
-        $this->assertEquals(2, $collection->getEntryOrder('one'));
-        $this->assertEquals(4, $collection->getEntryOrder('two'));
-        $this->assertEquals(3, $collection->getEntryOrder('three'));
-        $this->assertEquals(1, $collection->getEntryOrder('four'));
-
-        $this->assertNull($collection->getEntryPosition('unknown'));
-        $this->assertNull($collection->getEntryOrder('unknown'));
     }
 
     /** @test */
@@ -358,5 +331,12 @@ class CollectionTest extends TestCase
         $this->assertEquals(2, $structure->in('en')->pages()->all()->count());
         $this->assertEquals(3, $structure->in('en')->flattenedPages()->count());
         $this->assertEquals(2, $structure->maxDepth());
+    }
+
+    private function makeStructure()
+    {
+        return (new CollectionStructure)->tap(function ($s) {
+            $s->addTree($s->makeTree('en'));
+        });
     }
 }

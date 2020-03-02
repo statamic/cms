@@ -206,7 +206,6 @@ class FeatureTest extends TestCase
         Collection::make('new')
             ->title('New Collection')
             ->defaultPublishState(false)
-            ->orderable(true)
             ->dated(true)
             ->revisionsEnabled(true)
             ->cascade(['foo' => 'bar'])
@@ -214,7 +213,7 @@ class FeatureTest extends TestCase
 
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/collections/new.yaml',
-            "title: 'New Collection'\norderable: true\nrevisions: true\ndate: true\ndefault_status: draft\ninject:\n  foo: bar\n"
+            "title: 'New Collection'\nrevisions: true\ndate: true\ndefault_status: draft\ninject:\n  foo: bar\n"
         );
         @unlink($path);
     }

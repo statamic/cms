@@ -14,6 +14,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Blueprint;
+use Statamic\Structures\CollectionStructure;
 
 class CollectionTest extends TestCase
 {
@@ -35,7 +36,7 @@ class CollectionTest extends TestCase
 
     protected function makeEntry($collection, $slug)
     {
-        return EntryFactory::collection($collection)->slug($slug)->make();
+        return EntryFactory::id($slug)->collection($collection)->slug($slug)->make();
     }
 
     protected function makePosts()
@@ -321,7 +322,19 @@ class CollectionTest extends TestCase
     /** @test */
     function it_can_get_previous_and_next_entries_in_an_orderable_asc_collection()
     {
-        $this->foods->orderable(true)->save();
+        $structure = $this->makeStructure([
+            ['entry' => 'c'], // Carrot
+            ['entry' => 'h'], // Hummus
+            ['entry' => 'a'], // Apple
+            ['entry' => 'i'], // Ice Cream
+            ['entry' => 'b'], // Banana
+            ['entry' => 'f'], // Fig
+            ['entry' => 'g'], // Grape
+            ['entry' => 'e'], // Egg
+            ['entry' => 'd'], // Danish
+        ])->maxDepth(1);
+
+        $this->foods->structure($structure)->save();
 
         $this->makeEntry($this->foods, 'a')->set('title', 'Apple')->save();
         $this->makeEntry($this->foods, 'b')->set('title', 'Banana')->save();
@@ -332,18 +345,6 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->foods, 'g')->set('title', 'Grape')->save();
         $this->makeEntry($this->foods, 'h')->set('title', 'Hummus')->save();
         $this->makeEntry($this->foods, 'i')->set('title', 'Ice Cream')->save();
-
-        $this->foods->setEntryPositions([
-            $this->findEntryByTitle('Carrot')->id(),
-            $this->findEntryByTitle('Hummus')->id(),
-            $this->findEntryByTitle('Apple')->id(),
-            $this->findEntryByTitle('Ice Cream')->id(),
-            $this->findEntryByTitle('Banana')->id(),
-            $this->findEntryByTitle('Fig')->id(),
-            $this->findEntryByTitle('Grape')->id(),
-            $this->findEntryByTitle('Egg')->id(),
-            $this->findEntryByTitle('Danish')->id(),
-        ])->save();
 
         $currentId = $this->findEntryByTitle('Banana')->id();
 
@@ -370,7 +371,19 @@ class CollectionTest extends TestCase
     /** @test */
     function it_can_get_previous_and_next_entries_in_an_orderable_desc_collection()
     {
-        $this->foods->orderable(true)->save();
+        $structure = $this->makeStructure([
+            ['entry' => 'c'], // Carrot
+            ['entry' => 'h'], // Hummus
+            ['entry' => 'a'], // Apple
+            ['entry' => 'i'], // Ice Cream
+            ['entry' => 'b'], // Banana
+            ['entry' => 'f'], // Fig
+            ['entry' => 'g'], // Grape
+            ['entry' => 'e'], // Egg
+            ['entry' => 'd'], // Danish
+        ])->maxDepth(1);
+
+        $this->foods->structure($structure)->save();
 
         $this->makeEntry($this->foods, 'a')->set('title', 'Apple')->save();
         $this->makeEntry($this->foods, 'b')->set('title', 'Banana')->save();
@@ -381,18 +394,6 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->foods, 'g')->set('title', 'Grape')->save();
         $this->makeEntry($this->foods, 'h')->set('title', 'Hummus')->save();
         $this->makeEntry($this->foods, 'i')->set('title', 'Ice Cream')->save();
-
-        $this->foods->setEntryPositions([
-            $this->findEntryByTitle('Carrot')->id(),
-            $this->findEntryByTitle('Hummus')->id(),
-            $this->findEntryByTitle('Apple')->id(),
-            $this->findEntryByTitle('Ice Cream')->id(),
-            $this->findEntryByTitle('Banana')->id(),
-            $this->findEntryByTitle('Fig')->id(),
-            $this->findEntryByTitle('Grape')->id(),
-            $this->findEntryByTitle('Egg')->id(),
-            $this->findEntryByTitle('Danish')->id(),
-        ])->save();
 
         $currentId = $this->findEntryByTitle('Banana')->id();
 
@@ -457,5 +458,12 @@ class CollectionTest extends TestCase
     protected function runTagAndGetTitles($tagMethod)
     {
         return $this->collectionTag->{$tagMethod}()->map->get('title')->values()->all();
+    }
+
+    protected function makeStructure($tree = [])
+    {
+        return (new CollectionStructure)->tap(function ($s) use ($tree) {
+            $s->addTree($s->makeTree('en')->tree($tree));
+        });
     }
 }

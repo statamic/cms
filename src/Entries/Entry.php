@@ -244,15 +244,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         ]);
     }
 
-    public function order($order = null)
+    public function order()
     {
-        if (func_num_args() === 0) {
-            return $this->collection()->getEntryOrder($this->id());
+        if (! $this->collection()->orderable()) {
+            return null;
         }
 
-        $this->collection()->setEntryPosition($this->id(), $order)->save();
-
-        return $this;
+        return $this->structure()->in($this->locale)
+            ->flattenedPages()
+            ->map->reference()
+            ->flip()->get($this->id) + 1;
     }
 
     public function template($template = null)
