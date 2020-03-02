@@ -3,28 +3,45 @@
 namespace Tests\Data\Structures;
 
 use Statamic\Contracts\Entries\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Structures\CollectionStructure;
 
 class CollectionStructureTest extends StructureTestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->entryQueryBuilder = $this->mock(EntryQueryBuilder::class);
+        $this->entryQueryBuilder->shouldReceive('get')->andReturnUsing(function () {
+            return $this->queryBuilderGetReturnValue();
+        });
+
+        $this->collection = $this->mock(Collection::class);
+        $this->collection->shouldReceive('queryEntries')->andReturn($this->entryQueryBuilder);
+    }
+
     function structure($handle = null)
     {
         if ($handle !== null) {
             throw new \Exception('Handle should not be set in the test');
         }
 
-        return new CollectionStructure;
+        return (new CollectionStructure)->collection($this->collection);
+    }
+
+    function queryBuilderGetReturnValue()
+    {
+        return $this->queryBuilderGetReturnValue ?? collect();
     }
 
     /** @test */
     function the_handle_comes_from_the_collection()
     {
-        $collection = $this->mock(Collection::class);
-        $collection->shouldReceive('handle')->once()->andReturn('test');
+        $this->collection->shouldReceive('handle')->once()->andReturn('test');
 
-        $structure = $this->structure()->collection($collection);
-
-        $this->assertEquals('collection::test', $structure->collection($collection)->handle());
+        $this->assertEquals('collection::test', $this->structure()->handle());
     }
 
     /** @test */
@@ -110,12 +127,9 @@ class CollectionStructureTest extends StructureTestCase
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Duplicate entry [123] in [test] collection\'s structure.');
-
-        $collection = $this->mock(Collection::class);
-        $collection->shouldReceive('handle')->once()->andReturn('test');
+        $this->collection->shouldReceive('handle')->once()->andReturn('test');
 
         $this->structure()
-            ->collection($collection)
             ->validateTree([
                 [
                     'entry' => '123',
@@ -129,6 +143,77 @@ class CollectionStructureTest extends StructureTestCase
                     ]
                 ]
             ]);
+    }
+
+    /** @test */
+    function the_tree_root_can_have_children_when_not_expecting_root()
+    {
+        $this->queryBuilderGetReturnValue = collect([
+            Entry::make()->id('123'),
+            Entry::make()->id('456'),
+        ]);
+
+        parent::the_tree_root_can_have_children_when_not_expecting_root();
+    }
+
+    /** @test */
+    function only_entries_belonging_to_the_associated_collection_may_be_in_the_tree()
+    {
+        $this->collection->shouldReceive('handle')->once()->andReturn('test');
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Only entries from the [test] collection may be in its structure. Encountered ID of [3]');
+
+        $this->queryBuilderGetReturnValue = collect([
+            Entry::make()->id('1'),
+            Entry::make()->id('2'),
+        ]);
+
+        $this->structure()->validateTree([
+            [
+                'entry' => '1',
+                'children' => [
+                    ['entry' => '2']
+                ]
+            ],
+            ['entry' => '3'],
+        ]);
+    }
+
+    /** @test */
+    function entries_not_explicitly_in_the_tree_should_be_appended_to_the_end_of_the_tree()
+    {
+        $this->queryBuilderGetReturnValue = collect([
+            Entry::make()->id('1'),
+            Entry::make()->id('2'),
+            Entry::make()->id('3'),
+            Entry::make()->id('4'),
+            Entry::make()->id('5'),
+        ]);
+
+        $actual = $this->structure()->validateTree([
+            [
+                'entry' => '1',
+                'children' => [
+                    ['entry' => '2']
+                ]
+            ],
+            ['entry' => '3'],
+        ]);
+
+        $expected = [
+            [
+                'entry' => '1',
+                'children' => [
+                    ['entry' => '2']
+                ]
+            ],
+            ['entry' => '3'],
+            ['entry' => '4'],
+            ['entry' => '5'],
+        ];
+
+        $this->assertEquals($expected, $actual);
     }
 
     /** @test */

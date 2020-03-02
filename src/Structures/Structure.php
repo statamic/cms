@@ -114,10 +114,10 @@ abstract class Structure implements StructureContract
             })->args(func_get_args());
     }
 
-    public function validateTree(array $tree): void
+    public function validateTree(array $tree): array
     {
         if (! $this->expectsRoot()) {
-            return;
+            return $tree;
         }
 
         if (!empty($tree) && !isset($tree[0]['entry'])) {
@@ -125,6 +125,8 @@ abstract class Structure implements StructureContract
         }
 
         throw_if(isset($tree[0]['children']), new \Exception('Root page cannot have children'));
+
+        return $tree;
     }
 
     public function route(string $site): ?string

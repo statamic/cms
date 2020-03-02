@@ -375,18 +375,28 @@ class EntryTest extends TestCase
     /** @test */
     function it_gets_the_order_from_the_collections_structure()
     {
-        $collection = tap(Collection::make('ordered')->structureContents([
+        $collection = tap(Collection::make('ordered'))->save();
+
+        $one = tap((new Entry)->locale('en')->id('one')->collection($collection))->save();
+        $two = tap((new Entry)->locale('en')->id('two')->collection($collection))->save();
+        $three = tap((new Entry)->locale('en')->id('three')->collection($collection))->save();
+
+        $this->assertNull($one->order());
+        $this->assertNull($one->order());
+        $this->assertNull($one->order());
+
+        $collection->structureContents([
             'max_depth' => 1,
             'tree' => [
                 ['entry' => 'three'],
                 ['entry' => 'one'],
                 ['entry' => 'two'],
             ]
-        ]))->save();
+        ])->save();
 
-        $this->assertEquals(2, (new Entry)->locale('en')->id('one')->collection($collection)->order());
-        $this->assertEquals(3, (new Entry)->locale('en')->id('two')->collection($collection)->order());
-        $this->assertEquals(1, (new Entry)->locale('en')->id('three')->collection($collection)->order());
+        $this->assertEquals(2, $one->order());
+        $this->assertEquals(3, $two->order());
+        $this->assertEquals(1, $three->order());
     }
 
     /** @test */

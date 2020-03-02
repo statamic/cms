@@ -297,7 +297,7 @@ class TreeTest extends TestCase
 
         $treeContents = ['the' => 'tree'];
 
-        $structure->shouldReceive('validateTree')->with($treeContents)->once()->andReturnNull();
+        $structure->shouldReceive('validateTree')->with($treeContents)->once()->andReturn($treeContents);
 
         $tree = (new Tree)->structure($structure);
 

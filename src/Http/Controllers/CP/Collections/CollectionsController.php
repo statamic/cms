@@ -225,7 +225,7 @@ class CollectionsController extends CpController
     protected function makeStructure($collection, $maxDepth, $expectsRoot)
     {
         if (! $structure = $collection->structure()) {
-            $structure = new CollectionStructure;
+            $structure = (new CollectionStructure)->collection($collection);
 
             // todo: make multiple trees based on the existing multisite nature of the collection
             $trees = [

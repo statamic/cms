@@ -32,8 +32,7 @@ class Tree implements Localization
     {
         return $this->fluentlyGetOrSet('tree')
             ->setter(function ($tree) {
-                $this->structure->validateTree($tree);
-                return $tree;
+                return $this->structure->validateTree($tree);
             })
             ->args(func_get_args());
     }

@@ -35,7 +35,7 @@ abstract class StructureTestCase extends TestCase
     /** @test */
     function the_tree_root_can_have_children_when_not_expecting_root()
     {
-        $this->assertNull($this->structure()->expectsRoot(false)->validateTree([
+        $tree = [
             [
                 'entry' => '123',
                 'children' => [
@@ -44,7 +44,9 @@ abstract class StructureTestCase extends TestCase
                     ]
                 ]
             ]
-        ]));
+        ];
+
+        $this->assertEquals($tree, $this->structure()->expectsRoot(false)->validateTree($tree));
     }
 
     /** @test */
@@ -64,17 +66,19 @@ abstract class StructureTestCase extends TestCase
     /** @test */
     function the_root_doesnt_need_to_be_an_entry_if_the_tree_is_empty()
     {
-        $this->assertNull($this->structure()->expectsRoot(true)->validateTree([]));
+        $this->assertEquals([], $this->structure()->expectsRoot(true)->validateTree([]));
     }
 
     /** @test **/
     function the_root_doesnt_need_to_be_an_entry_when_not_expecting_root()
     {
-        $this->assertNull($this->structure()->expectsRoot(false)->validateTree([
+        $tree = [
             [
                 'title' => 'Not an entry',
                 'url' => '/test',
             ]
-        ]));
+        ];
+
+        $this->assertEquals($tree, $this->structure()->expectsRoot(false)->validateTree($tree));
     }
 }

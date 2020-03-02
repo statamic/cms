@@ -63,15 +63,15 @@ class ReorderEntriesTest extends TestCase
     /** @test */
     function it_reorders_entries()
     {
+        EntryFactory::id('1')->slug('one')->collection('test')->create();
+        EntryFactory::id('2')->slug('two')->collection('test')->create();
+        EntryFactory::id('3')->slug('three')->collection('test')->create();
+
         $this->structure->in('en')->tree([
             ['entry' => '1'],
             ['entry' => '2'],
             ['entry' => '3'],
         ])->save();
-
-        EntryFactory::id('1')->slug('one')->collection('test')->create();
-        EntryFactory::id('2')->slug('two')->collection('test')->create();
-        EntryFactory::id('3')->slug('three')->collection('test')->create();
 
         $this->setTestRoles(['test' => ['access cp', 'reorder test entries']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -94,16 +94,6 @@ class ReorderEntriesTest extends TestCase
     /** @test */
     function it_reorders_paginated_entries()
     {
-        $this->structure->in('en')->tree([
-            ['entry' => '1'],
-            ['entry' => '2'],
-            ['entry' => '3'],
-            ['entry' => '4'],
-            ['entry' => '5'],
-            ['entry' => '6'],
-            ['entry' => '7'],
-        ])->save();
-
         EntryFactory::id('1')->slug('one')->collection('test')->create();
         EntryFactory::id('2')->slug('two')->collection('test')->create();
         EntryFactory::id('3')->slug('three')->collection('test')->create();
@@ -113,6 +103,16 @@ class ReorderEntriesTest extends TestCase
         EntryFactory::id('6')->slug('six')->collection('test')->create();
         // ends here
         EntryFactory::id('7')->slug('seven')->collection('test')->create();
+
+        $this->structure->in('en')->tree([
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '3'],
+            ['entry' => '4'],
+            ['entry' => '5'],
+            ['entry' => '6'],
+            ['entry' => '7'],
+        ])->save();
 
         $this->setTestRoles(['test' => ['access cp', 'reorder test entries']]);
         $user = tap(User::make()->assignRole('test'))->save();

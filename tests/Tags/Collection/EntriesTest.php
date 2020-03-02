@@ -328,7 +328,7 @@ class EntriesTest extends TestCase
         $this->makeEntry('b')->save();
         $this->makeEntry('c')->save();
 
-        $structure = (new CollectionStructure)->maxDepth(1)->tap(function ($s) {
+        $structure = (new CollectionStructure)->collection($this->collection)->maxDepth(1)->tap(function ($s) {
             $s->addTree($s->makeTree('en')->tree([
                 ['entry' => 'b'],
                 ['entry' => 'c'],

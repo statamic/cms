@@ -53,7 +53,7 @@ class CollectionStructure extends Structure
             : $route;
     }
 
-    public function validateTree(array $tree): void
+    public function validateTree(array $tree): array
     {
         parent::validateTree($tree);
 
@@ -62,6 +62,20 @@ class CollectionStructure extends Structure
         if ($entryId = $entryIds->duplicates()->first()) {
             throw new \Exception("Duplicate entry [{$entryId}] in [{$this->collection->handle()}] collection's structure.");
         }
+
+        $thisCollectionsEntries = $this->collection->queryEntries()->get('id')->map->id();
+
+        $otherCollectionEntries = $entryIds->diff($thisCollectionsEntries);
+
+        if ($otherCollectionEntries->isNotEmpty()) {
+            throw new \Exception("Only entries from the [{$this->collection->handle()}] collection may be in its structure. Encountered ID of [{$otherCollectionEntries->first()}]");
+        }
+
+        $missingEntries = $thisCollectionsEntries->diff($entryIds)->map(function ($id) {
+            return ['entry' => $id];
+        })->values()->all();
+
+        return array_merge($tree, $missingEntries);
     }
 
     protected function getEntryIdsFromTree($tree)
