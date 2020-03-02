@@ -65,6 +65,7 @@
             :action-url="actionUrl"
             :reorderable="reorderable"
             :reorder-url="reorderUrl"
+            :site="site"
         />
 
         <page-tree

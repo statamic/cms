@@ -4,7 +4,6 @@
 
 @section('content')
     <collection-view
-        :structured="{{ Statamic\Support\Str::bool($collection->hasStructure()) }}"
         title="{{ $collection->title() }}"
         handle="{{ $collection->handle() }}"
         breadcrumb-url="{{ cp_route('collections.index') }}"
@@ -15,11 +14,11 @@
         sort-direction="{{ $collection->sortDirection() }}"
         :filters="{{ $filters->toJson() }}"
         action-url="{{ cp_route('collections.entries.actions', $collection->handle()) }}"
-        :reorderable="{{ Statamic\Support\Str::bool($collection->orderable() && $user->can('reorder', $collection)) }}"
         reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
         site="{{ $site }}"
 
         @if ($collection->hasStructure())
+        :structured="{{ Statamic\Support\Str::bool($user->can('reorder', $collection)) }}"
         structure-pages-url="{{ cp_route('structures.pages.index', $structure->handle()) }}"
         structure-submit-url="{{ cp_route('structures.pages.store', $structure->handle()) }}"
         :structure-max-depth="{{ $structure->maxDepth() ?? 'Infinity' }}"

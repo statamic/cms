@@ -130,6 +130,8 @@ class Tree implements Localization
 
     public function save()
     {
+        $this->cachedFlattenedPages = null;
+
         $this
             ->structure()
             ->addTree($this)

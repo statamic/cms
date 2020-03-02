@@ -107,6 +107,7 @@ export default {
         reorderable: Boolean,
         reorderUrl: String,
         structureUrl: String,
+        site: String
     },
 
     data() {
@@ -174,9 +175,14 @@ export default {
         },
 
         saveOrder() {
-            let ids = this.items.map(item => item.id);
+            const payload = {
+                ids: this.items.map(item => item.id),
+                page: this.page,
+                perPage: this.perPage,
+                site: this.site
+            };
 
-            this.$axios.post(this.reorderUrl, {ids})
+            this.$axios.post(this.reorderUrl, payload)
                 .then(response => {
                     this.reordering = false;
                     this.$toast.success(__('Entries successfully reordered'))
