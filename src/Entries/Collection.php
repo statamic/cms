@@ -447,10 +447,12 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('structure')
             ->getter(function ($structure) {
-                if (! $structure && $this->structureContents) {
-                    $structure = $this->structure = $this->makeStructureFromContents();
-                }
-                return $structure;
+                return Blink::once("collection-{$this->id()}-structure", function () use ($structure) {
+                    if (! $structure && $this->structureContents) {
+                        $structure = $this->structure = $this->makeStructureFromContents();
+                    }
+                    return $structure;
+                });
             })
             ->setter(function ($structure) {
                 if ($structure) {
@@ -458,6 +460,7 @@ class Collection implements Contract
                 } else {
                     $this->structureContents = null;
                 }
+                Blink::forget("collection-{$this->id()}-structure");
                 return $structure;
             })
             ->args(func_get_args());
@@ -467,6 +470,10 @@ class Collection implements Contract
     {
         return $this
             ->fluentlyGetOrSet('structureContents')
+            ->setter(function ($contents) {
+                Blink::forget("collection-{$this->id()}-structure");
+                return $contents;
+            })
             ->args(func_get_args());
     }
 
