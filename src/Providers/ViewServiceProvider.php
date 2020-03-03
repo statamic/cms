@@ -55,8 +55,6 @@ class ViewServiceProvider extends ServiceProvider
             $view->addExtension('antlers.php', 'antlers', $resolver);
         });
 
-        if ($backtrackLimit = config('statamic.system.pcre_backtrack_limit')) {
-            ini_set('pcre.backtrack_limit', $backtrackLimit);
-        }
+        ini_set('pcre.backtrack_limit', config('statamic.system.pcre_backtrack_limit', -1));
     }
 }
