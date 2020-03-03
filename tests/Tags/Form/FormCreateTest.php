@@ -60,6 +60,7 @@ class FormCreateTest extends TestCase
                     'handle' => 'email',
                     'field' => [
                         'type' => 'text',
+                        'input_type' => 'email',
                         'display' => 'Email Address',
                         'validate' => 'required|email',
                     ]
@@ -67,7 +68,7 @@ class FormCreateTest extends TestCase
                 [
                     'handle' => 'message',
                     'field' => [
-                        'type' => 'text',
+                        'type' => 'textarea',
                         'display' => 'Message',
                         'validate' => 'required',
                     ]
