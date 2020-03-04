@@ -4,9 +4,10 @@ namespace Tests\Routing;
 
 use Mockery;
 use PHPUnit\Framework\TestCase;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Routing\ResolveRedirect;
 use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
-use Statamic\Routing\ResolveRedirect;
 
 class ResolveRedirectTest extends TestCase
 {
@@ -62,12 +63,35 @@ class ResolveRedirectTest extends TestCase
     }
 
     /** @test */
+    function it_resolves_first_child_through_an_entry()
+    {
+        $resolver = new ResolveRedirect;
+
+        $child = Mockery::mock(Page::class);
+        $child->shouldReceive('url')->andReturn('/parent/first-child');
+
+        $children = Mockery::mock(Pages::class);
+        $children->shouldReceive('all')->andReturn(collect([$child]));
+
+        $parentPage = Mockery::mock(Page::class);
+        $parentPage->shouldReceive('pages')->andReturn($children);
+
+        $parent = Mockery::mock(Entry::class);
+        $parent->shouldReceive('page')->andReturn($parentPage);
+
+        $this->assertEquals('/parent/first-child', $resolver('@child', $parent));
+    }
+
+    /** @test */
     function a_parent_without_a_child_resolves_to_a_404()
     {
         $resolver = new ResolveRedirect;
 
+        $pages = Mockery::mock(Pages::class);
+        $pages->shouldReceive('all')->andReturn(collect([]));
+
         $parent = Mockery::mock(Page::class);
-        $parent->shouldReceive('pages')->andReturn(collect([]));
+        $parent->shouldReceive('pages')->andReturn($pages);
 
         $this->assertEquals('404', $resolver('@child', $parent));
     }

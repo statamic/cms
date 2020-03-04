@@ -2,6 +2,7 @@
 
 namespace Statamic\Routing;
 
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Structures\Page;
 
 class ResolveRedirect
@@ -17,13 +18,17 @@ class ResolveRedirect
 
     private function firstChildUrl($parent)
     {
-        if (!$parent || !$parent instanceof Page) {
+        if (!$parent || !$parent instanceof Entry) {
             throw new \Exception("Cannot resolve a page's child redirect without providing a page.");
+        }
+
+        if (!$parent instanceof Page && $parent instanceof Entry) {
+            $parent = $parent->page();
         }
 
         $children = $parent->pages()->all();
 
-        if (empty($children)) {
+        if ($children->isEmpty()) {
             return '404';
         }
 
