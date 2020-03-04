@@ -128,7 +128,9 @@ class CollectionsController extends CpController
             'sort_direction' => $collection->sortDirection(),
             'max_depth' => optional($collection->structure())->maxDepth(),
             'expects_root' => optional($collection->structure())->expectsRoot(),
-            'blueprints' => $collection->entryBlueprints()->map->handle()->all(),
+            'blueprints' => $collection->entryBlueprints()->map->handle()->reject(function ($handle) {
+                return $handle == 'entry_link';
+            })->all(),
             'taxonomies' => $collection->taxonomies()->map->handle()->all(),
             'default_publish_state' => $collection->defaultPublishState(),
             'template' => $collection->template(),

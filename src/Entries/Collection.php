@@ -176,8 +176,10 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('blueprints')
             ->getter(function ($blueprints) {
-                if (is_null($blueprints)) {
-                    return collect([$this->fallbackEntryBlueprint()]);
+                $blueprints = $blueprints ?? [$this->fallbackEntryBlueprint()];
+
+                if ($this->hasStructure()) {
+                    $blueprints[] = 'entry_link';
                 }
 
                 return collect($blueprints)->map(function ($blueprint) {
