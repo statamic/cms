@@ -66,8 +66,8 @@ export default {
             loading: true,
             submissions: [],
             columns: [],
-            sortColumn: null,
-            sortDirection: 'asc',
+            sortColumn: 'date',
+            sortDirection: 'desc',
             preferencesPrefix: `forms.${this.form}.submissions`,
         }
     },
