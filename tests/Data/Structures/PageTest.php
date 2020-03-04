@@ -205,4 +205,17 @@ class PageTest extends TestCase
         $this->assertEveryItemIsInstanceOf(Page::class, $flattened);
         $this->assertEquals(['one', 'two', 'three', 'four'], $flattened->map->reference()->all());
     }
+
+    /** @test */
+    function it_forwards_calls_to_the_entry()
+    {
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('id')->andReturn('1');
+        $entry->shouldReceive('testing')->with('123')->once()->andReturn('hello');
+
+        $page = new Page;
+        $page->setEntry($entry);
+
+        $this->assertEquals('hello', $page->testing('123'));
+    }
 }
