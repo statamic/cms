@@ -1,6 +1,6 @@
 <template>
     <div class="flex items-center">
-        <div class="mr-2">
+        <div class="mr-2" v-if="!config.required">
             <toggle-fieldtype handle="enabled" v-model="enabled" />
         </div>
         <div class="w-32 mr-2">
@@ -57,6 +57,10 @@ export default {
     created() {
         if (this.value === '@child') {
             this.option = 'first-child';
+        }
+
+        if (this.config.required) {
+            this.enabled = true;
         }
     }
 
