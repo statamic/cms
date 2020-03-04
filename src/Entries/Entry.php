@@ -491,6 +491,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function parent()
     {
+        return optional($this->page())->parent();
+    }
+
+    public function page()
+    {
         if (! $this->hasStructure()) {
             return null;
         }
@@ -499,7 +504,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
             return null;
         }
 
-        return $this->structure()->in($this->locale())->page($id)->parent();
+        return $this->structure()->in($this->locale())->page($id);
     }
 
     public function route()
