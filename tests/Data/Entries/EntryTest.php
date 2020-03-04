@@ -673,7 +673,7 @@ class EntryTest extends TestCase
         $parentPage = $this->mock(Page::class);
         $page = $this->mock(Page::class);
         $page->shouldReceive('parent')->andReturn($parentPage);
-        $tree = $this->partialMock(Tree::class);
+        $tree = \Mockery::mock(Tree::class)->makePartial();
         $tree->locale('en');
         $tree->shouldReceive('page')->with('entry-id')->andReturn($page);
 
