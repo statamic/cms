@@ -37,6 +37,7 @@ Vue.component('list-fieldtype', require('../components/fieldtypes/ListFieldtype.
 Vue.component('markdown-fieldtype', require('../components/fieldtypes/MarkdownFieldtype.vue').default);
 Vue.component('radio-fieldtype', require('../components/fieldtypes/RadioFieldtype.vue').default);
 Vue.component('range-fieldtype', require('../components/fieldtypes/RangeFieldtype.vue').default);
+Vue.component('redirect-fieldtype', require('../components/fieldtypes/RedirectFieldtype.vue').default);
 Vue.component('relationship-fieldtype', require('../components/fieldtypes/relationship/RelationshipFieldtype.vue').default);
 Vue.component('relationship-fieldtype-index', require('../components/fieldtypes/relationship/RelationshipIndexFieldtype.vue').default);
 Vue.component('replicator-fieldtype', require('../components/fieldtypes/replicator/Replicator.vue').default);

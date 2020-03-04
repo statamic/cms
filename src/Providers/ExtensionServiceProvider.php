@@ -82,6 +82,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\NestedFields::class,
         Fieldtypes\Radio::class,
         Fieldtypes\Range::class,
+        Fieldtypes\Redirect::class,
         Fieldtypes\Replicator::class,
         Fieldtypes\Revealer::class,
         Fieldtypes\Section::class,
