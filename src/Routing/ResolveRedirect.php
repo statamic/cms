@@ -10,10 +10,10 @@ class ResolveRedirect
     public function __invoke($redirect, $parent = null)
     {
         if ($redirect === '@child') {
-            return $this->firstChildUrl($parent);
+            $redirect = $this->firstChildUrl($parent);
         }
 
-        return $redirect;
+        return is_numeric($redirect) ? (int) $redirect : $redirect;
     }
 
     private function firstChildUrl($parent)
@@ -29,7 +29,7 @@ class ResolveRedirect
         $children = $parent->pages()->all();
 
         if ($children->isEmpty()) {
-            return '404';
+            return 404;
         }
 
         return $children->first()->url();

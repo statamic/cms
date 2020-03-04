@@ -20,7 +20,10 @@ class ResolveRedirectTest extends TestCase
         $this->assertEquals('https://test.com', $resolver('https://test.com'));
         $this->assertEquals('/test', $resolver('/test'));
         $this->assertEquals('test', $resolver('test'));
-        $this->assertEquals('404', $resolver('404'));
+        $this->assertSame(404, $resolver('404'));
+        $this->assertSame(404, $resolver(404));
+        $this->assertSame('4-oh-4', $resolver('4-oh-4')); // strings with numbers won't become ints
+        $this->assertNull($resolver(null));
     }
 
     /** @test */
