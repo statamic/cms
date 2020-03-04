@@ -30,7 +30,7 @@ trait RendersForms
         $attrs = collect($defaultAttrs)
             ->merge($this->getList('attr'))
             ->mapWithKeys(function ($attr) {
-                $bits = preg_split('/:(?!\/{2})/', $attr);
+                $bits = explode(':', $attr, 2);
                 return [$bits[0] => $bits[1] ?? null];
             })
             ->map(function ($value, $attr) {
