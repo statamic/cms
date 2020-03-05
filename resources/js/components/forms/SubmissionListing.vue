@@ -18,7 +18,13 @@
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0">
                     <div class="data-list-header min-h-16">
+                        <data-list-toggle-all ref="toggleAll" />
                         <data-list-search v-model="searchQuery" />
+                        <data-list-bulk-actions
+                            :url="actionUrl"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                        />
                         <template v-if="!hasSelections">
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" />
                         </template>
@@ -28,6 +34,7 @@
 
                     <data-list-table
                         v-if="items.length"
+                        :allow-bulk-actions="true"
                         @sorted="sorted"
                     >
                         <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
@@ -36,11 +43,13 @@
                         <template slot="actions" slot-scope="{ row: submission, index }">
                             <dropdown-list>
                                 <dropdown-item :text="__('View')" :redirect="submission.url" />
-                                <dropdown-item
-                                    v-if="submission.deleteable"
-                                    :text="__('Delete')"
-                                    class="warning"
-                                    @click="destroy(submission.id, index)" />
+                                <data-list-inline-actions
+                                    :item="submission.id"
+                                    :url="actionUrl"
+                                    :actions="submission.actions"
+                                    @started="actionStarted"
+                                    @completed="actionCompleted"
+                                />
                             </dropdown-list>
                         </template>
                     </data-list-table>
