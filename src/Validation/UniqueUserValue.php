@@ -14,10 +14,10 @@ class UniqueUserValue
             ->where($attribute, $value)
             ->first();
 
-        if (! $existing) {
+        if (!$existing) {
             return true;
         }
 
-        return $except === $existing->id();
+        return (string) $except === (string) $existing->id();
     }
 }
