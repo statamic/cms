@@ -659,7 +659,7 @@ class EntryTest extends TestCase
     function it_deletes_through_the_api()
     {
         Event::fake();
-        $entry = new Entry;
+        $entry = (new Entry)->collection(tap(Collection::make('test'))->save());
         Facades\Entry::shouldReceive('delete')->with($entry);
 
         $return = $entry->delete();
