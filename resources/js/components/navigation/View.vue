@@ -33,16 +33,57 @@
 
         <page-tree
             ref="tree"
-            :collections="collections"
             :has-collection="false"
             :pages-url="pagesUrl"
             :submit-url="submitUrl"
             :max-depth="maxDepth"
             :expects-root="expectsRoot"
             :site="site"
-            @changed="changed = true"
+            @edit-page="editPage"
+            @changed="changed = true; targetParent = null;"
             @saved="changed = false"
             @canceled="changed = false"
+        >
+            <template #branch-icon="{ branch }">
+                <svg-icon v-if="isEntryBranch(branch)" class="inline-block w-4 h-4 text-grey-50" name="hyperlink" v-tooltip="__('Entry link')" />
+                <svg-icon v-if="isLinkBranch(branch)" class="inline-block w-4 h-4 text-grey-50" name="external-link" v-tooltip="__('External link')" />
+                <svg-icon v-if="isTextBranch(branch)" class="inline-block w-4 h-4 text-grey-50" name="file-text" v-tooltip="__('Text')" />
+            </template>
+
+            <template #branch-options="{ branch, removeBranch, vm }">
+                <dropdown-item
+                    :text="__('Add child link to URL')"
+                    @click="linkPage(vm)" />
+                <dropdown-item
+                    :text="__('Add child link to entry')"
+                    @click="linkEntries(vm)" />
+                <dropdown-item
+                    :text="__('Remove')"
+                    class="warning"
+                    @click="remove(removeBranch)" />
+            </template>
+        </page-tree>
+
+        <page-selector
+            v-if="collections.length && $refs.tree"
+            ref="selector"
+            :site="site"
+            :collections="collections"
+            @selected="entriesSelected"
+        />
+
+        <page-editor
+            v-if="editingPage"
+            :initial-title="editingPage.page.title"
+            :initial-url="editingPage.page.url"
+            @closed="closePageEditor"
+            @submitted="updatePage"
+        />
+
+        <page-editor
+            v-if="creatingPage"
+            @closed="closePageCreator"
+            @submitted="pageCreated"
         />
 
     </div>
@@ -51,11 +92,15 @@
 
 <script>
 import PageTree from '../structures/PageTree.vue';
+import PageEditor from '../structures/PageEditor.vue';
+import PageSelector from '../structures/PageSelector.vue';
 
 export default {
 
     components: {
-        PageTree
+        PageTree,
+        PageEditor,
+        PageSelector
     },
 
     props: {
@@ -74,6 +119,9 @@ export default {
         return {
             mounted: false,
             changed: false,
+            creatingPage: false,
+            editingPage: false,
+            targetParent: null
         }
     },
 
@@ -103,12 +151,76 @@ export default {
             if (this.collections.length === 0) this.linkPage();
         },
 
-        linkPage() {
-            this.$refs.tree.linkPage();
+        linkPage(vm) {
+            this.targetParent = vm;
+            this.openPageCreator();
         },
 
-        linkEntries() {
-            this.$refs.tree.linkToEntries();
+        linkEntries(vm) {
+            this.targetParent = vm;
+            this.$refs.selector.linkExistingItem();
+        },
+
+        entriesSelected(pages) {
+            this.$refs.tree.addPages(pages, this.targetParent);
+        },
+
+        isEntryBranch(branch) {
+            return !!branch.id;
+        },
+
+        isLinkBranch(branch) {
+            return !this.isEntryBranch(branch) && branch.url;
+        },
+
+        isTextBranch(branch) {
+            return !this.isEntryBranch(branch) && !this.isLinkBranch(branch);
+        },
+
+        editPage(page, vm, store) {
+            if (page.id) {
+                window.location = page.edit_url;
+                return;
+            }
+
+            this.editingPage = { page, vm, store };
+        },
+
+        updatePage(page) {
+            this.editingPage.page.url = page.url;
+            this.editingPage.page.title = page.title;
+            this.$refs.tree.pageUpdated(this.editingPage.store);
+
+            this.editingPage = false;
+        },
+
+        closePageEditor() {
+            this.editingPage = false;
+        },
+
+        openPageCreator() {
+            this.creatingPage = true;
+        },
+
+        closePageCreator() {
+            this.creatingPage = false;
+        },
+
+        pageCreated(page) {
+            this.closePageCreator();
+            this.$refs.tree.addPages([{
+                title: page.title,
+                url: page.url,
+                children: []
+            }], this.targetParent);
+        },
+
+        remove(removeBranch) {
+            let message = 'This will only remove the references (and any children) from the tree. No entries will be deleted.';
+
+            if (! confirm(message)) return;
+
+            removeBranch();
         }
 
     }

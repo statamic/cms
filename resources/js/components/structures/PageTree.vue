@@ -27,37 +27,26 @@
                 @drag="treeDragstart"
             >
                 <tree-branch
-                    slot-scope="{ data: page, store: tree, vm }"
+                    slot-scope="{ data: page, store, vm }"
                     :page="page"
                     :depth="vm.level"
                     :vm="vm"
                     :first-page-is-root="expectsRoot"
                     :hasCollection="hasCollection"
-                    @edit="editPage(page, vm)"
-                    @updated="pageUpdated(tree)"
+                    @edit="$emit('edit-page', page, vm, store)"
                     @removed="pageRemoved"
-                    @link-page="linkChildPage(vm)"
-                    @link-entries="linkChildEntries(vm)"
-                    @create-entry="createEntry"
-                />
+                >
+                    <template #branch-icon="props">
+                        <slot name="branch-icon" v-bind="{ ...props, vm }" />
+                    </template>
+
+                    <template #branch-options="props">
+                        <slot name="branch-options" v-bind="{ ...props, vm }" />
+                    </template>
+                </tree-branch>
             </draggable-tree>
 
         </div>
-
-        <page-selector
-            v-if="collections.length"
-            ref="selector"
-            :site="site"
-            :collections="collections"
-            :exclusions="exclusions"
-            @selected="pagesSelected"
-        />
-
-        <page-editor
-            v-if="creatingPage"
-            @closed="closePageCreator"
-            @submitted="pageCreated"
-        />
 
         <audio ref="soundDrop">
             <source :src="soundDropUrl" type="audio/mp3">
@@ -72,16 +61,12 @@ import * as th from 'tree-helper';
 import {Sortable, Plugins} from '@shopify/draggable';
 import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
-import PageSelector from './PageSelector.vue';
-import PageEditor from './PageEditor.vue';
 
 export default {
 
     components: {
         DraggableTree,
         TreeBranch,
-        PageSelector,
-        PageEditor,
     },
 
     props: {
@@ -90,7 +75,6 @@ export default {
         createUrl: { type: String },
         site: { type: String, required: true },
         localizations: { type: Array },
-        collections: { type: Array, default: () => [] },
         maxDepth: { type: Number, default: Infinity, },
         expectsRoot: { type: Boolean, required: true },
         hasCollection: { type: Boolean, required: true },
@@ -104,8 +88,6 @@ export default {
             treeData: [],
             pageIds: [],
             parentPageForAdding: null,
-            targetPage: null,
-            creatingPage: false,
             soundDropUrl: this.$config.get('resourceUrl') + '/audio/click.mp3',
         }
     },
@@ -129,8 +111,11 @@ export default {
             handler(pages) {
                 this.pageIds = this.getPageIds(pages);
             }
-        }
+        },
 
+        pageIds(ids) {
+            this.$emit('page-ids-updated', ids);
+        }
     },
 
     created() {
@@ -192,12 +177,12 @@ export default {
             });
         },
 
-        pagesSelected(selections) {
-            const parent = this.parentPageForAdding
-                ? this.parentPageForAdding.data.children
+        addPages(pages, targetParent) {
+            const parent = targetParent
+                ? targetParent.data.children
                 : this.treeData;
 
-            selections.forEach(selection => {
+            pages.forEach(selection => {
                 parent.push({
                     id: selection.id,
                     title: selection.title,
@@ -208,7 +193,6 @@ export default {
                 });
             });
 
-            this.parentPageForAdding = null;
             this.treeUpdated();
         },
 
@@ -270,49 +254,9 @@ export default {
             });
         },
 
-        createEntry(parent) {
-            window.location = this.createEntryUrl(parent);
-        },
-
-        createEntryUrl(parent) {
-            let url = this.createUrl;
-            if (parent) url += '?parent=' + parent;
-            return url;
-        },
-
         linkChildPage(vm) {
             this.parentPageForAdding = vm;
             this.openPageCreator();
-        },
-
-        linkChildEntries(vm) {
-            this.parentPageForAdding = vm;
-            this.linkToEntries();
-        },
-
-        linkPage() {
-            this.openPageCreator();
-        },
-
-        linkToEntries() {
-            this.$refs.selector.linkExistingItem();
-        },
-
-        openPageCreator() {
-            this.creatingPage = true;
-        },
-
-        closePageCreator() {
-            this.creatingPage = false;
-        },
-
-        pageCreated(page) {
-            this.closePageCreator();
-            this.pagesSelected([{
-                title: page.title,
-                url: page.url,
-                children: []
-            }]);
         },
 
         pageUpdated(tree) {

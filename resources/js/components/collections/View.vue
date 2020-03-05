@@ -31,14 +31,6 @@
                         @click="cancelTreeProgress"
                     />
 
-                    <dropdown-list>
-                        <template #trigger>
-                            <button class="btn" v-text="`${__('Add Link')}`" />
-                        </template>
-                        <dropdown-item :text="__('Link to URL')" @click="linkTreePage" />
-                        <dropdown-item :text="__('Link to Entry')" @click="linkTreeEntries" />
-                    </dropdown-list>
-
                     <button
                         class="btn mx-2"
                         :class="{ 'disabled': !treeIsDirty }"
@@ -74,6 +66,7 @@
             ref="tree"
             :has-collection="true"
             :collections="[handle]"
+            :create-url="createUrl"
             :pages-url="structurePagesUrl"
             :submit-url="structureSubmitUrl"
             :max-depth="structureMaxDepth"
@@ -82,7 +75,23 @@
             @changed="markTreeDirty"
             @saved="markTreeClean"
             @canceled="markTreeClean"
-        />
+        >
+            <template #branch-icon="{ branch }">
+                <svg-icon v-if="isRedirectBranch(branch)"
+                    class="inline-block w-4 h-4 text-grey-50"
+                    name="external-link"
+                    v-tooltip="__('Redirect')" />
+            </template>
+
+            <template #branch-options="{ branch, removeBranch }">
+                <dropdown-item
+                    v-for="blueprint in blueprints"
+                    :key="blueprint.handle"
+                    @click="createEntry(blueprint.handle, branch.id)"
+                    v-text="__('New :thing', { thing: blueprint.title })" />
+                <dropdown-item :text="__('Delete')" class="warning" @click="deleteTreeBranch(branch, removeBranch)" />
+            </template>
+        </page-tree>
 
     </div>
 
@@ -162,14 +171,6 @@ export default {
             this.$refs.tree.cancel();
         },
 
-        linkTreePage() {
-            this.$refs.tree.linkPage();
-        },
-
-        linkTreeEntries() {
-            this.$refs.tree.linkToEntries();
-        },
-
         saveTree() {
             this.$refs.tree.save();
         },
@@ -188,7 +189,34 @@ export default {
             const fallback = this.canUseStructureTree ? 'tree' : 'list';
 
             return localStorage.getItem('statamic.collection-view.'+this.handle) || fallback;
-        }
+        },
+
+        deleteTreeBranch(branch, removeFromUi) {
+            // todo: use the delete "action" in a more reusable way
+            let message = 'This will remove the entry from the tree, and delete the entry itself.';
+
+            if (! confirm(message)) return;
+
+            this.$axios.post(this.actionUrl, {
+                action: 'delete',
+                context: { collection: this.handle },
+                selections: [branch.id],
+                values: {}
+            }).then(() => {
+                this.$toast.success(__('Action completed'))
+                removeFromUi();
+            })
+        },
+
+        isRedirectBranch(branch) {
+            return branch.redirect != null;
+        },
+
+        createEntry(blueprint, parent) {
+            let url = `${this.createUrl}?blueprint=${blueprint}`;
+            if (parent) url += '&parent=' + parent;
+            window.location = url;
+        },
 
     }
 

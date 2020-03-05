@@ -8,8 +8,10 @@
             <div class="flex items-center flex-1">
                 <i v-if="isRoot" class="icon icon-home mr-1 opacity-25" />
 
-                <a v-if="!page.id" @click="edit" :class="{ 'text-sm font-medium': isTopLevel }">{{ page.title || page.url }}</a>
-                <a v-else :href="page.edit_url" :class="{ 'text-sm font-medium': isTopLevel }">{{ page.title || page.url }}</a>
+                <a
+                    @click="$emit('edit')"
+                    :class="{ 'text-sm font-medium': isTopLevel }"
+                    v-text="page.title || page.url" />
 
                 <div v-if="page.collection" class="ml-2 flex items-center">
                     <svg-icon name="content-writing" class="w-4 h-4" />
@@ -22,39 +24,20 @@
             </div>
 
             <div class="pr-1 flex items-center">
-                <svg-icon v-if="isEntry" class="inline-block w-4 h-4 text-grey-50" name="hyperlink" v-tooltip="__('Entry link')" />
-                <svg-icon v-if="isLink" class="inline-block w-4 h-4 text-grey-50" name="external-link" v-tooltip="__('External link')" />
-                <svg-icon v-if="isText" class="inline-block w-4 h-4 text-grey-50" name="file-text" v-tooltip="__('Text')" />
+                <slot name="branch-icon" :branch="page" />
 
                 <dropdown-list class="ml-2">
-                    <dropdown-item :text="__('Add child link to URL')" @click="$emit('link-page')" />
-                    <dropdown-item :text="__('Add child link to entry')" @click="$emit('link-entries')" />
-                    <dropdown-item v-if="hasCollection" :text="__('Create Entry')" @click="$emit('create-entry', page.id)" />
-                    <dropdown-item :text="__('Remove')" class="warning" @click="remove" />
+                    <slot name="branch-options" :branch="page" :remove-branch="remove" />
                 </dropdown-list>
             </div>
 
         </div>
-
-        <page-editor
-            v-if="editing"
-            :initial-title="page.title"
-            :initial-url="page.url"
-            @closed="closeEditor"
-            @submitted="updatePage"
-        />
     </div>
 
 </template>
 
 <script>
-import PageEditor from './PageEditor.vue';
-
 export default {
-
-    components: {
-        PageEditor,
-    },
 
     props: {
         page: Object,
@@ -102,28 +85,9 @@ export default {
     methods: {
 
         remove() {
-            let message = 'This will only remove the references (and any children) from the tree. No entries will be deleted.';
-
-            if (! confirm(message)) return;
-
             const store = this.page._vm.store;
             store.deleteNode(this.page);
             this.$emit('removed', store);
-        },
-
-        edit() {
-            this.editing = true;
-        },
-
-        closeEditor() {
-            this.editing = false;
-        },
-
-        updatePage(page) {
-            this.page.url = page.url;
-            this.page.title = page.title;
-            this.$emit('updated');
-            this.closeEditor();
         }
 
 
