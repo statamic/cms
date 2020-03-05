@@ -100,6 +100,8 @@ export default {
 
     created() {
         this.setInitialSortColumn();
+
+        this.$events.$on('clear-selections', this.clearSelections);
     },
 
     methods: {
@@ -140,6 +142,10 @@ export default {
             }
 
             return rows;
+        },
+
+        clearSelections() {
+            this.sharedState.selections = [];
         },
 
     },

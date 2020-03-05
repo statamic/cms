@@ -189,44 +189,4 @@ abstract class Tags
             'total_results' => 0,
         ]));
     }
-
-    /**
-     * Open a form tag
-     *
-     * @param  string $action
-     * @return string
-     */
-    protected function formOpen($action, $method = 'POST')
-    {
-        $attr_str = '';
-        if ($attrs = $this->getList('attr')) {
-            foreach ($attrs as $attr) {
-                $bits = explode(':', $attr);
-
-                $param = array_get($bits, 0);
-                $value = array_get($bits, 1);
-
-                $attr_str .= $param;
-
-                if ($value) {
-                    $attr_str .= '="' . $value . '" ';
-                }
-            }
-        }
-
-        if ($this->getBool('files')) {
-            $attr_str .= 'enctype="multipart/form-data"';
-        }
-
-        $method = strtoupper($method);
-        $formMethod = $method === 'GET' ? 'GET' : 'POST';
-
-        $html = '<form method="' . $formMethod . '" action="' . $action . '" ' . $attr_str . '>' . csrf_field();
-
-        if (!in_array($method, ['GET', 'POST'])) {
-            $html .= method_field($method);
-        }
-
-        return $html;
-    }
 }

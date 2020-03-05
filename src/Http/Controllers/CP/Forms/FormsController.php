@@ -187,91 +187,100 @@ class FormsController extends CpController
 
     protected function editFormBlueprint()
     {
-        return Blueprint::makeFromFields([
-            'title' => [
-                'type' => 'text',
-                'validate' => 'required',
-                'width' => 50,
-                'instructions' => __('statamic::messages.forms_title_instructions'),
+        return Blueprint::makeFromSections([
+            'name' => [
+                'display' => __('Name'),
+                'fields' => [
+                    'title' => [
+                        'type' => 'text',
+                        'validate' => 'required',
+                        'instructions' => __('statamic::messages.form_configure_title_instructions'),
+                    ],
+                    'handle' => [
+                        'type' => 'text',
+                        'validate' => 'required|alpha_dash',
+                        'instructions' => __('statamic::messages.form_configure_handle_instructions'),
+                    ],
+                ],
             ],
-            'handle' => [
-                'type' => 'text',
-                'validate' => 'required|alpha_dash',
-                'width' => 50,
-                'instructions' => 'How you\'ll reference to this form in your templates. Cannot easily be changed.'
+            'fields' => [
+                'display' => __('Fields'),
+                'fields' => [
+                    'blueprint' => [
+                        'type' => 'blueprints',
+                        'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
+                        'validate' => 'min:1',
+                        'max_items' => 1,
+                    ],
+                    'honeypot' => [
+                        'type' => 'text',
+                        'instructions' => __('statamic::messages.form_configure_honeypot_instructions'),
+                    ],
+                ],
             ],
-            'fields' => ['type' => 'section'],
-            'blueprint' => [
-                'type' => 'blueprints',
-                'instructions' => __('statamic::messages.forms_blueprint_instructions'),
-                'validate' => 'min:1',
-                'max_items' => 1,
-                'width' => 50,
-            ],
-            'honeypot' => [
-                'type' => 'text',
-                'width' => 50,
-                'instructions' => __('statamic::messages.forms_honeypot_instructions'),
-            ],
-            'submissions' => ['type' => 'section'],
-            'store' => [
-                'display' => __('Store Submissions'),
-                'type' => 'toggle',
-                'width' => 100,
-                'instructions' => __('statamic::messages.forms_store_instructions'),
+            'submissions' => [
+                'display' => __('Submissions'),
+                'fields' => [
+                    'store' => [
+                        'display' => __('Store Submissions'),
+                        'type' => 'toggle',
+                        'instructions' => __('statamic::messages.form_configure_store_instructions'),
+                    ],
+                ],
             ],
             'email' => [
-                'type' => 'grid',
-                'mode' => 'stacked',
-                'instructions' => __('statamic::messages.forms_email_instructions'),
+                'display' => __('Email'),
                 'fields' => [
-                    [
-                        'handle' => 'to',
-                        'field' => [
-                            'type' => 'text',
-                            'display' => __('Recipient (To)'),
-                            'width' => 50,
-                            'validate' => [
-                                'required',
+                    'email' => [
+                        'type' => 'grid',
+                        'mode' => 'stacked',
+                        'add_row' => 'Add Email',
+                        'instructions' => __('statamic::messages.form_configure_email_instructions'),
+                        'fields' => [
+                            [
+                                'handle' => 'to',
+                                'field' => [
+                                    'type' => 'text',
+                                    'display' => __('Recipient (To)'),
+                                    'validate' => [
+                                        'required',
+                                    ],
+                                    'instructions' => __('statamic::messages.form_configure_email_to_instructions'),
+                                ]
                             ],
-                            'instructions' => __('statamic::messages.forms_email_to_instructions'),
+                            [
+                                'handle' => 'from',
+                                'field' => [
+                                    'type' => 'text',
+                                    'display' => __('Sender (From)'),
+                                    'instructions' => __('statamic::messages.form_configure_email_from_instructions') . ' (' . config('mail.from.address') . ').',
+                                ]
+                            ],
+                            [
+                                'handle' => 'reply_to',
+                                'field' => [
+                                    'type' => 'text',
+                                    'display' => __('Reply To'),
+                                    'instructions' => __('statamic::messages.form_configure_email_reply_to_instructions'),
+                                ]
+                            ],
+                            [
+                                'handle' => 'subject',
+                                'field' => [
+                                    'type' => 'text',
+                                    'instructions' => __('statamic::messages.form_configure_email_subject_instructions'),
+                                ]
+                            ],
+                            [
+                                'handle' => 'template',
+                                'field' => [
+                                    'type' => 'template',
+                                    'instructions' => __('statamic::messages.form_configure_email_template_instructions'),
+                                ]
+                            ],
                         ]
                     ],
-                    [
-                        'handle' => 'from',
-                        'field' => [
-                            'type' => 'text',
-                            'display' => __('Sender (From)'),
-                            'width' => 50,
-                            'instructions' => __('statamic::messages.forms_email_from_instructions'),
-                        ]
-                    ],
-                    [
-                        'handle' => 'reply_to',
-                        'field' => [
-                            'type' => 'text',
-                            'display' => __('Reply To'),
-                            'width' => 50,
-                            'instructions' => __('statamic::messages.forms_email_reply_to_instructions'),
-                        ]
-                    ],
-                    [
-                        'handle' => 'subject',
-                        'field' => [
-                            'type' => 'text',
-                            'width' => 100,
-                            'instructions' => __('statamic::messages.forms_email_subject_instructions'),
-                        ]
-                    ],
-                    [
-                        'handle' => 'template',
-                        'field' => [
-                            'type' => 'text',
-                            'width' => 100,
-                            'instructions' => __('statamic::messages.forms_email_template_instructions'),
-                        ]
-                    ],
-                ]
+                ],
             ],
 
 

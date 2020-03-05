@@ -172,9 +172,11 @@ class Entries extends Relationship
 
     protected function augmentValue($value)
     {
-        if ($entry = Entry::find($value)) {
-            return $entry;
+        if (is_string($value)) {
+            $value = Entry::find($value);
         }
+
+        return $value;
     }
 
     protected function shallowAugmentValue($value)

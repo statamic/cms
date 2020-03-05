@@ -123,7 +123,31 @@
 }
 
 
-/* Markdown Preview typography
+/* Writing Mode Typography
+  ========================================================================== */
+
+.markdown-fieldtype .cm-header {
+    @apply text-grey-80;
+
+    &.cm-header-1 {
+        @apply text-lg;
+    }
+
+    &.cm-header-2 {
+        @apply text-base;
+    }
+
+    &.cm-header-3 {
+        @apply text-sm;
+    }
+}
+
+.markdown-fieldtype .cm-quote {
+    @apply text-grey-80 italic text-sm;
+}
+
+
+/* Preview Mode Typography
   ========================================================================== */
 
 .markdown-preview {

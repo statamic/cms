@@ -13,14 +13,14 @@
                         v-model="password"
                         :errors="errors.password"
                         class="p-0 mb-3"
-                        :config="{ html_type: this.inputType }"
+                        :config="{ input_type: this.inputType }"
                     />
                     <form-group
                         handle="confirmation"
                         :display="__('Password Confirmation')"
                         v-model="confirmation"
                         class="p-0 mb-3"
-                        :config="{ html_type: this.inputType }"
+                        :config="{ input_type: this.inputType }"
                     />
                 </div>
                 <div class="flex items-center">

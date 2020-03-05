@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Tags\Query;
+namespace Statamic\Tags\Concerns;
 
 use Statamic\Support\Arr;
 
-trait GetsResults
+trait GetsQueryResults
 {
     protected function results($query)
     {

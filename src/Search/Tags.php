@@ -3,12 +3,12 @@
 namespace Statamic\Search;
 
 use Statamic\Facades\Search;
-use Statamic\Tags\OutputsItems;
+use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
 class Tags extends BaseTags
 {
-    use OutputsItems;
+    use Concerns\OutputsItems;
 
     protected static $handle = 'search';
 

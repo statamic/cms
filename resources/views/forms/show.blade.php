@@ -29,7 +29,7 @@
                 @endcan
             </dropdown-list>
 
-            <dropdown-list class="ml-2">
+            <dropdown-list>
                 <button class="btn" slot="trigger">{{ __('Export Submissions') }}</button>
                 <dropdown-item :text="__('Export as CSV')" redirect="{{ cp_route('forms.export', ['type' => 'csv', 'form' => $form->handle()]) }}?download=true"></dropdown-item>
                 <dropdown-item :text="__('Export as JSON')" redirect="{{ cp_route('forms.export', ['type' => 'json', 'form' => $form->handle()]) }}?download=true"></dropdown-item>
@@ -48,15 +48,19 @@
     </div>
     @endif
 
-    <form-submission-listing form="{{ $form->handle() }}" v-cloak>
-
+    <form-submission-listing
+        form="{{ $form->handle() }}"
+        action-url="{{ cp_route('forms.submissions.actions', $form->handle()) }}"
+        initial-sort-column="datestamp"
+        initial-sort-direction="desc"
+        v-cloak
+    >
         <div slot="no-results" class="text-center border-2 border-dashed rounded-lg">
             <div class="max-w-md mx-auto px-4 py-8">
                 @svg('empty/form')
                 <h1 class="my-3">{{ __('No submissions') }}</h1>
             </div>
         </div>
-
     </form-submission-listing>
 
 @endsection

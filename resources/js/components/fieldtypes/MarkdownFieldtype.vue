@@ -569,8 +569,6 @@ export default {
             }
         });
 
-        this.$keys.bind('esc', this.closeFullScreen)
-
         this.trackHeightUpdates();
 
     }
