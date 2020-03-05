@@ -4,12 +4,12 @@ namespace Statamic\Tags\Taxonomy;
 
 use Statamic\Facades\Site;
 use Statamic\Support\Arr;
-use Statamic\Tags\OutputsItems;
+use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
 
 class Taxonomy extends Tags
 {
-    use OutputsItems;
+    use Concerns\OutputsItems;
 
     protected $defaultAsKey = 'terms';
 

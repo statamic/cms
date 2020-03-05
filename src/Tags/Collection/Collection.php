@@ -2,15 +2,15 @@
 
 namespace Statamic\Tags\Collection;
 
-use Statamic\Facades\URL;
-use Statamic\Facades\Entry;
-use Statamic\Tags\Tags;
-use Statamic\Tags\OutputsItems;
 use Statamic\Entries\EntryCollection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\URL;
+use Statamic\Tags\Concerns;
+use Statamic\Tags\Tags;
 
 class Collection extends Tags
 {
-    use OutputsItems;
+    use Concerns\OutputsItems;
 
     protected $defaultAsKey = 'entries';
 

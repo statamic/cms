@@ -6,11 +6,11 @@ use Illuminate\Http\Request;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Statamic;
 use Statamic\Support\Str;
-use Statamic\Tags\Query\HasConditions;
+use Statamic\Tags\Concerns\QueriesConditions;
 
 class ApiController extends Controller
 {
-    use HasConditions;
+    use QueriesConditions;
 
     /**
      * @var \Illuminate\Http\Request

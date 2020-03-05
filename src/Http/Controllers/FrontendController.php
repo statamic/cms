@@ -48,9 +48,12 @@ class FrontendController extends Controller
         throw new NotFoundHttpException;
     }
 
-    public function route(...$args)
+    public function route(Request $request, ...$args)
     {
-        [$view, $data] = array_slice($args, -2);
+        $params = $request->route()->parameters();
+        $view = Arr::pull($params, 'view');
+        $data = Arr::pull($params, 'data');
+        $data = array_merge($params, $data);
 
         $this->addViewPaths();
 

@@ -20,7 +20,7 @@
                     handle="title"
                     :display="__('Title')"
                     :instructions="__('messages.fieldsets_title_instructions')"
-                    autofocus />
+                    :focus="true" />
             </div>
         </div>
 

@@ -3,7 +3,7 @@
 return [
 
     'super' => 'Super User',
-    'super_desc' => 'This grants the user unrestricted access to everything. Use caution.',
+    'super_desc' => 'Super admins have complete control and access to everything in the control panel. Grant this role wisely.',
 
     'group_cp' => 'Control Panel',
     'access_cp' => 'Access the Control Panel',

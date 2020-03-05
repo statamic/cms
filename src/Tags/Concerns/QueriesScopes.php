@@ -1,10 +1,10 @@
 <?php
 
-namespace Statamic\Tags\Query;
+namespace Statamic\Tags\Concerns;
 
 use Statamic\Support\Arr;
 
-trait HasScopes
+trait QueriesScopes
 {
     public function queryScopes($query)
     {
@@ -21,7 +21,7 @@ trait HasScopes
 
     protected function parseQueryScopes()
     {
-        $scopes = Arr::getFirst($this->parameters, ['query-scope', 'filter']);
+        $scopes = Arr::getFirst($this->parameters, ['query_scope', 'filter']);
 
         return collect(explode('|', $scopes));
     }

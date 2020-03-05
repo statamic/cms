@@ -1,34 +1,55 @@
 <template>
     <div>
 
-        <div v-if="loading" class="card loading">
+        <div v-if="initializing" class="card loading">
             <loading-graphic />
         </div>
 
-        <slot name="no-results" v-if="!loading && submissions.length === 0" />
+        <slot name="no-results" v-if="!loading && !searchQuery && items.length === 0" />
 
         <data-list
-            v-if="!loading"
+            v-else-if="!initializing"
             :columns="columns"
-            :rows="submissions"
+            :rows="items"
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
         >
-            <div slot-scope="{ }">
+            <div slot-scope="{ hasSelections }">
                 <div class="card p-0">
-                    <data-list-table v-if="submissions.length" @sorted="sorted">
+                    <div class="data-list-header min-h-16">
+                        <data-list-toggle-all ref="toggleAll" />
+                        <data-list-search v-model="searchQuery" />
+                        <data-list-bulk-actions
+                            :url="actionUrl"
+                            @started="actionStarted"
+                            @completed="actionCompleted"
+                        />
+                        <template v-if="!hasSelections">
+                            <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" />
+                        </template>
+                    </div>
+
+                    <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
+
+                    <data-list-table
+                        v-if="items.length"
+                        :allow-bulk-actions="true"
+                        @sorted="sorted"
+                    >
                         <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
                             <a :href="submission.url" class="text-blue">{{ value }}</a>
                         </template>
                         <template slot="actions" slot-scope="{ row: submission, index }">
                             <dropdown-list>
                                 <dropdown-item :text="__('View')" :redirect="submission.url" />
-                                <dropdown-item
-                                    v-if="submission.deleteable"
-                                    :text="__('Delete')"
-                                    class="warning"
-                                    @click="destroy(submission.id, index)" />
+                                <data-list-inline-actions
+                                    :item="submission.id"
+                                    :url="actionUrl"
+                                    :actions="submission.actions"
+                                    @started="actionStarted"
+                                    @completed="actionCompleted"
+                                />
                             </dropdown-list>
                         </template>
                     </data-list-table>
@@ -47,15 +68,11 @@
 </template>
 
 <script>
-import HasPagination from '../data-list/HasPagination';
-import HasPreferences from '../data-list/HasPreferences';
+import Listing from '../Listing.vue';
 
 export default {
 
-    mixins: [
-        HasPagination,
-        HasPreferences,
-    ],
+    mixins: [Listing],
 
     props: {
         form: String
@@ -63,71 +80,11 @@ export default {
 
     data() {
         return {
-            loading: true,
-            submissions: [],
-            columns: [],
-            sortColumn: null,
-            sortDirection: 'asc',
-            preferencesPrefix: `forms.${this.form}.submissions`,
+            listingKey: 'submissions',
+            preferencesPrefix: `forms.${this.form}`,
+            requestUrl: cp_url(`forms/${this.form}/submissions`),
         }
     },
-
-    computed: {
-
-        parameters() {
-            return {
-                sort: this.sortColumn,
-                order: this.sortDirection,
-                page: this.page,
-                perPage: this.perPage,
-            }
-        }
-
-    },
-
-    created() {
-        this.request();
-    },
-
-    watch: {
-
-        parameters() {
-            this.request();
-        }
-
-    },
-
-    methods: {
-
-        request() {
-            this.loading = true;
-            const url = cp_url(`forms/${this.form}/submissions`);
-
-            this.$axios.get(url, { params: this.parameters }).then(response => {
-                this.columns = response.data.meta.columns;
-                this.sortColumn = response.data.meta.sortColumn;
-                this.submissions = response.data.data;
-                this.meta = response.data.meta;
-                this.loading = false;
-            });
-        },
-
-        sorted(column, direction) {
-            this.sortColumn = column;
-            this.sortDirection = direction;
-        },
-
-        destroy(id, index) {
-            const url = cp_url(`forms/${this.form}/submissions/${id}`);
-            this.$axios.delete(url).then(response => {
-                this.submissions.splice(index, 1);
-                this.$toast.success(__('Submission deleted'));
-            }).catch(error => {
-                this.$toast.error(error.response.data.message);
-            })
-        },
-
-    }
 
 }
 </script>

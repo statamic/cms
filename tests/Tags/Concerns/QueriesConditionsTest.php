@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Tags\Query;
+namespace Tests\Tags\Concerns;
 
 use Statamic\Facades;
 use Tests\TestCase;
@@ -11,7 +11,7 @@ use Illuminate\Support\Carbon;
 use Statamic\Tags\Collection\Entries;
 use Tests\PreventSavingStacheItemsToDisk;
 
-class HasConditionsTest extends TestCase
+class QueriesConditionsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 

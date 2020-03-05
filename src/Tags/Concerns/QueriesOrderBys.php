@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Tags\Query;
+namespace Statamic\Tags\Concerns;
 
 use Statamic\Support\Arr;
 use Statamic\Query\OrderBy;
 
-trait HasOrderBys
+trait QueriesOrderBys
 {
     protected $orderBys;
 

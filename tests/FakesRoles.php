@@ -13,6 +13,11 @@ trait FakesRoles
     protected function setTestRoles($roles)
     {
         $roles = collect($roles)
+            ->mapWithKeys(function ($permissions, $handle) {
+                $handle = is_string($permissions) ? $permissions : $handle;
+                $permissions = is_string($permissions) ? [] : $permissions;
+                return [$handle => $permissions];
+            })
             ->map(function ($permissions, $handle) {
                 return $permissions instanceof FileRole
                     ? $permissions->handle($handle)
