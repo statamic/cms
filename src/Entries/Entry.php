@@ -123,6 +123,12 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function delete()
     {
+        if ($this->hasStructure()) {
+            tap($this->structure(), function ($structure) {
+                $structure->trees()->each->remove($this);
+            })->save();
+        }
+
         Facades\Entry::delete($this);
 
         return true;

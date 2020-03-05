@@ -236,6 +236,15 @@ class Tree implements Localization
         return $this->appendTo($target, $match);
     }
 
+    public function remove($entry)
+    {
+        [, $branches] = $this->removeFromInBranches($entry->id(), $this->tree);
+
+        $this->tree = $branches;
+
+        return $this;
+    }
+
     private function removeFromInBranches($entry, $branches)
     {
         $match = null;
