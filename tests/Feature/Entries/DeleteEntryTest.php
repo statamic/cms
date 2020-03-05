@@ -10,7 +10,7 @@ use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class EditEntryTest extends TestCase
+class DeleteEntryTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
