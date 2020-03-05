@@ -51,6 +51,8 @@
     <form-submission-listing
         form="{{ $form->handle() }}"
         action-url="{{ cp_route('forms.submissions.actions', $form->handle()) }}"
+        initial-sort-column="datestamp"
+        initial-sort-direction="desc"
         v-cloak
     >
         <div slot="no-results" class="text-center border-2 border-dashed rounded-lg">
