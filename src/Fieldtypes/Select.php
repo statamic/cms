@@ -76,6 +76,16 @@ class Select extends Fieldtype
 
     public function augment($value)
     {
+        if ($this->config('multiple')) {
+            return collect($value)->map(function ($value) {
+                return [
+                    'key' => $value,
+                    'value' => $value,
+                    'label' => array_get($this->config('options'), $value, $value)
+                ];
+            })->all();
+        }
+
         $label = is_null($value) ? null : array_get($this->config('options'), $value, $value);
 
         return new LabeledValue($value, $label);
