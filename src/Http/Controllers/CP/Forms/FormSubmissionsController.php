@@ -29,6 +29,11 @@ class FormSubmissionsController extends CpController
             $this->sanitizeSubmission($submission);
         })->values();
 
+        // Search submissions.
+        if ($search = $this->request->search) {
+            $submissions = $this->searchSubmissions($submissions);
+        }
+
         // Sort submissions.
         $sort = $this->request->sort ?? 'datestamp';
         $order = $this->request->order ?? ($sort === 'datestamp' ? 'desc' : 'asc');
@@ -76,6 +81,20 @@ class FormSubmissionsController extends CpController
         }
 
         return ($is_arr) ? $values : $values[0];
+    }
+
+    private function searchSubmissions($submissions)
+    {
+        return $submissions->filter(function ($submission) {
+            return collect($submission->data())
+                ->filter(function ($value) {
+                    return $value && is_string($value);
+                })
+                ->filter(function ($value) {
+                    return Str::contains(strtolower($value), strtolower($this->request->search));
+                })
+                ->isNotEmpty();
+        })->values();
     }
 
     private function sortSubmissions($submissions, $sortBy, $sortOrder)
