@@ -13,7 +13,7 @@
                     <slot name="twirldown" />
                 </dropdown-list>
 
-                <div class="btn-group-flat mr-2" v-if="canUseStructureTree">
+                <div class="btn-group-flat mr-2" v-if="canUseStructureTree && !treeIsDirty">
                     <button @click="view = 'tree'" :class="{'active': view === 'tree'}">
                         <svg-icon name="structures" class="h-4 w-4"/>
                     </button>
@@ -33,10 +33,11 @@
 
                     <button
                         class="btn mx-2"
-                        :class="{ 'disabled': !treeIsDirty }"
+                        :class="{ 'disabled': !treeIsDirty, 'btn-danger': deletedEntries.length }"
                         :disabled="!treeIsDirty"
                         @click="saveTree"
-                        v-text="__('Save Changes')" />
+                        v-text="__('Save Changes')"
+                        v-tooltip="deletedEntries.length ? __n('An entry will be deleted|:count entries will be deleted', deletedEntries.length) : null" />
 
                 </template>
 
@@ -69,6 +70,7 @@
             :create-url="createUrl"
             :pages-url="structurePagesUrl"
             :submit-url="structureSubmitUrl"
+            :submit-parameters="{ deletedEntries }"
             :max-depth="structureMaxDepth"
             :expects-root="structureExpectsRoot"
             :site="site"
@@ -131,6 +133,7 @@ export default {
         return {
             mounted: false,
             view: null,
+            deletedEntries: []
         }
     },
 
@@ -169,10 +172,12 @@ export default {
 
         cancelTreeProgress() {
             this.$refs.tree.cancel();
+            this.deletedEntries = [];
         },
 
         saveTree() {
             this.$refs.tree.save();
+            this.deletedEntries = [];
         },
 
         markTreeDirty() {
@@ -192,20 +197,13 @@ export default {
         },
 
         deleteTreeBranch(branch, removeFromUi) {
-            // todo: use the delete "action" in a more reusable way
-            let message = 'This will remove the entry from the tree, and delete the entry itself.';
+            // todo: children?
 
-            if (! confirm(message)) return;
+            const message = 'Are you sure? The entry will be deleted when you save changes.';
+            if (!confirm(message)) return;
+            this.deletedEntries.push(branch.id);
 
-            this.$axios.post(this.actionUrl, {
-                action: 'delete',
-                context: { collection: this.handle },
-                selections: [branch.id],
-                values: {}
-            }).then(() => {
-                this.$toast.success(__('Action completed'))
-                removeFromUi();
-            })
+            removeFromUi();
         },
 
         isRedirectBranch(branch) {

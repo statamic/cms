@@ -33,6 +33,7 @@ Route::group([
 
     Route::group(['namespace' => 'Collections'], function () {
         Route::resource('collections', 'CollectionsController');
+        Route::post('collections/{collection}/structure', 'CollectionStructureController@update')->name('collections.structure.update');
         Route::get('collections/{collection}/scaffold', 'ScaffoldCollectionController@index')->name('collections.scaffold');
         Route::post('collections/{collection}/scaffold', 'ScaffoldCollectionController@create')->name('collections.scaffold.create');
 

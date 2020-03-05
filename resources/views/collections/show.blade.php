@@ -20,7 +20,7 @@
         @if ($collection->hasStructure())
         :structured="{{ Statamic\Support\Str::bool($user->can('reorder', $collection)) }}"
         structure-pages-url="{{ cp_route('structures.pages.index', $structure->handle()) }}"
-        structure-submit-url="{{ cp_route('structures.pages.store', $structure->handle()) }}"
+        structure-submit-url="{{ cp_route('collections.structure.update', $collection->handle()) }}"
         :structure-max-depth="{{ $structure->maxDepth() ?? 'Infinity' }}"
         :structure-expects-root="{{ Statamic\Support\Str::bool($structure->expectsRoot()) }}"
         @endif

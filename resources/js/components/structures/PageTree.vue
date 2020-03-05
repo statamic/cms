@@ -72,6 +72,7 @@ export default {
     props: {
         pagesUrl: { type: String, required: true },
         submitUrl: { type: String, required: true },
+        submitParameters: { type: Object, default: () => ({}) },
         createUrl: { type: String },
         site: { type: String, required: true },
         localizations: { type: Array },
@@ -167,7 +168,7 @@ export default {
 
         save() {
             this.saving = true;
-            const payload = { pages: this.pages, site: this.site, expectsRoot: this.expectsRoot };
+            const payload = { pages: this.pages, site: this.site, expectsRoot: this.expectsRoot, ...this.submitParameters };
 
             this.$axios.post(this.submitUrl, payload).then(response => {
                 this.$emit('saved');
