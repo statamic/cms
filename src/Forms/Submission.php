@@ -2,18 +2,20 @@
 
 namespace Statamic\Forms;
 
+use ArrayAccess;
 use Carbon\Carbon;
-use Statamic\Facades\File;
-use Statamic\Facades\YAML;
-use Statamic\Facades\Helper;
-use Statamic\Exceptions\PublishException;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
+use Statamic\Data\ContainsData;
+use Statamic\Exceptions\PublishException;
+use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\File;
+use Statamic\Facades\Helper;
+use Statamic\Facades\YAML;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Submission implements SubmissionContract
+class Submission implements SubmissionContract, ArrayAccess
 {
-    use FluentlyGetsAndSets;
+    use ContainsData, FluentlyGetsAndSets;
 
     /**
      * @var bool
@@ -29,11 +31,6 @@ class Submission implements SubmissionContract
      * @var Form
      */
     public $form;
-
-    /**
-     * @var array
-     */
-    private $data = [];
 
     /**
      * Get or set the ID
@@ -303,5 +300,25 @@ class Submission implements SubmissionContract
                 'date' => $this->date(),
             ])
             ->all();
+    }
+
+    public function offsetExists($key)
+    {
+        return $this->has($key);
+    }
+
+    public function offsetGet($key)
+    {
+        return $this->get($key);
+    }
+
+    public function offsetSet($key, $value)
+    {
+        $this->set($key, $value);
+    }
+
+    public function offsetUnset($key)
+    {
+        $this->remove($key);
     }
 }
