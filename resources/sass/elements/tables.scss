@@ -70,14 +70,14 @@
     }
 
     .checkbox-column {
-        @apply .w-4 .pr-0;
+		@apply .w-4 .pr-0;
+		padding-left: 20px;
     }
 
     .sortable-column {
         @apply cursor-pointer select-none;
 
         &:hover {
-			// @apply bg-grey-30;
 			@apply text-blue-500;
         }
 
