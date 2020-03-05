@@ -16,6 +16,14 @@ label {
 
 input[type="checkbox"] {
     font-size: 18px;
+    position: relative;
+    top: -1px;
+}
+
+input[type="radio"] {
+    font-size: 18px;
+    position: relative;
+    top: -1px;
 }
 
 select {
@@ -126,11 +134,11 @@ input.input-text-minimal:read-only,
     @apply mb-1 flex items-center;
 
     input {
-        @apply leading-normal;
+        @apply leading-normal relative;
     }
 
     label {
-        @apply .font-normal .ml-1 .mt-sm leading-normal;
+        @apply font-normal leading-none ml-1 block;
     }
 }
 
