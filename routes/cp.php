@@ -151,6 +151,7 @@ Route::group([
     Route::group(['namespace' => 'Forms'], function () {
         Route::resource('forms', 'FormsController');
         Route::resource('forms.submissions', 'FormSubmissionsController');
+        Route::post('forms/{form}/submissions/actions', 'SubmissionActionController')->name('forms.submissions.actions');
         Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
     });
 
