@@ -108,7 +108,7 @@ class FieldTransformer
         }
 
         $fields = Fieldset::all()->flatMap(function ($fieldset) {
-            return collect($fieldset->fields())->mapWithKeys(function ($field, $handle) use ($fieldset) {
+            return collect($fieldset->fields()->all())->mapWithKeys(function ($field, $handle) use ($fieldset) {
                 return [$fieldset->handle().'.'.$field->handle() => array_merge($field->toBlueprintArray(), [
                     'fieldset' => [
                         'handle' => $fieldset->handle(),

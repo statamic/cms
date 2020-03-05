@@ -8,7 +8,9 @@ use Statamic\Facades\Content;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Http\Responses\DataResponse;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\View\View;
 
 /**
@@ -46,17 +48,25 @@ class FrontendController extends Controller
         throw new NotFoundHttpException;
     }
 
-    public function route(...$args)
+    public function route(Request $request, ...$args)
     {
-        [$view, $data] = array_slice($args, -2);
+        $params = $request->route()->parameters();
+        $view = Arr::pull($params, 'view');
+        $data = Arr::pull($params, 'data');
+        $data = array_merge($params, $data);
 
         $this->addViewPaths();
 
-        return (new View)
+        $contents = (new View)
             ->template($view)
-            ->layout($data['layout'] ?? 'layout')
+            ->layout(Arr::get($data, 'layout', 'layout'))
             ->with($data)
-            ->cascadeContent($this->getLoadedRouteItem($data));
+            ->cascadeContent($this->getLoadedRouteItem($data))
+            ->render();
+
+        return response($contents, 200, [
+            'Content-Type' => DataResponse::contentType($data['content_type'] ?? 'html')
+        ]);
     }
 
     protected function addViewPaths()

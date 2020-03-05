@@ -10,7 +10,7 @@
             </div>
 
             <div v-if="isUsingOauth" class="p-3">
-                <a :href="oauthProvider.loginUrl" target="_blank" class="btn btn-primary">
+                <a :href="oauthProvider.loginUrl" target="_blank" class="btn-primary">
                     {{ __('Log in with :provider', {provider: oauthProvider.label}) }}
                 </a>
                 <div class="text-2xs text-grey mt-2">
@@ -38,7 +38,7 @@
                             tabindex="1"
                             autofocus
                             @keydown.enter.prevent="submit" />
-                        <button @click="submit" class="btn btn-primary ml-1" v-text="__('Log in')" />
+                        <button @click="submit" class="btn-primary ml-1" v-text="__('Log in')" />
                     </div>
                 </div>
             </div>

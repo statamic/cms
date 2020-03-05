@@ -11,31 +11,24 @@
         >
             <div slot-scope="{ dragging }">
                 <div class="markdown-toolbar">
-                    <ul class="markdown-modes">
-                        <li :class="{ 'active': mode == 'write' }">
-                            <a href="" @click.prevent="mode = 'write'" tabindex="-1">{{ __('Write') }}</a>
-                        </li>
-                        <li :class="{ 'active': mode == 'preview' }">
-                            <a href="" @click.prevent="mode = 'preview'" tabindex="-1">{{ __('Preview') }}</a>
-                        </li>
-                    </ul>
+                    <div class="markdown-modes">
+                        <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" />
+                        <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" />
+                    </div>
 
-                    <ul class="markdown-buttons" v-if="! isReadOnly">
-                        <li><a @click="bold" tabindex="-1"><b>B</b></a></li>
-                        <li><a @click="italic" tabindex="-1"><i>i</i></a></li>
-                        <li><a @click="insertLink('')" tabindex="-1">
-                            <span class="icon icon-link"></span>
-                        </a></li>
-                        <li><a @click="insertImage('')" tabindex="-1">
-                            <span class="icon icon-image"></span>
-                        </a></li>
-                        <li><a @click="toggleFullScreen" tabindex="-1">
-                            <span class="icon" :class="{
-                                'icon-resize-full-screen' : ! fullScreenMode,
-                                'icon-resize-100' : fullScreenMode
-                                }"></span>
-                        </a></li>
-                    </ul>
+                    <div class="markdown-buttons" v-if="! isReadOnly">
+                        <button @click="bold" v-tooltip="__('Bold')"><i class="fa fa-bold"></i></button>
+                        <button @click="italic" v-tooltip="__('Italic')"><i class="fa fa-italic"></i></button>
+                        <button @click="insertLink('')" v-tooltip="__('Insert Link')"><i class="fa fa-link"></i></button>
+                        <button @click="addAsset" v-tooltip="__('Insert Asset')" v-if="assetsEnabled"><i class="fa fa-picture-o"></i></button>
+                        <button @click="insertImage('')" v-tooltip="__('Insert Image')" v-else><i class="fa fa-picture-o"></i></button>
+                        <button @click="openFullScreen" v-tooltip="__('Fullscreen Mode')" v-if="! fullScreenMode">
+                            <svg-icon name="expand" class="w-4 h-4" />
+                        </button>
+                        <button @click="closeFullScreen" v-tooltip="__('Close Fullscreen Mode')" v-if="fullScreenMode">
+                            <svg-icon name="shrink-all" class="w-4 h-4" />
+                        </button>
+                    </div>
                 </div>
 
                 <div class="drag-notification" v-show="dragging">
@@ -61,21 +54,21 @@
                         <div class="editor" ref="codemirror"></div>
 
                         <div class="helpers">
-                            <!-- TODO: Fix modal -->
-                            <div class="markdown-cheatsheet-helper">
-                                <button class="btn-link" @click="showCheatsheet = true">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="208" height="128" viewBox="0 0 208 128"><mask id="a"><rect width="100%" height="100%" fill="#fff"/><path d="M30 98v-68h20l20 25 20-25h20v68h-20v-39l-20 25-20-25v39zM155 98l-30-33h20v-35h20v35h20z"/></mask><rect width="100%" height="100%" ry="15" fill="currentColor" mask="url(#a)"/></svg>
-                                    <span>{{ __('Markdown Cheatsheet') }}</span>
-                                </button>
+                            <div class="flex w-full">
+                                <div class="markdown-cheatsheet-helper">
+                                    <button class="text-link flex items-center" @click="showCheatsheet = true">
+                                        <svg-icon name="markdown-icon" class="w-6 items-start mr-px" />
+                                        <span>{{ __('Markdown Cheatsheet') }}</span>
+                                    </button>
+                                </div>
                             </div>
-                            <div class="markdown-asset-helper flex items-center" v-if="assetsEnabled">
-                                <button class="btn-link flex items-center mr-1" @click.prevent="addAsset">
-                                    <svg-icon name="folder-image" class='w-4 h-4 mr-sm' />
-                                    {{ __('Insert Asset') }}
-                                </button>
-                                <span class="text-2xs text-grey-60">(or drag &amp; drop)</span>
+                            <div v-if="fullScreenMode" class="flex items-center pr-1">
+                                <div class="whitespace-no-wrap mr-2"><span v-text="count.words" /> {{ __('Words') }}</div>
+                                <div class="whitespace-no-wrap"><span v-text="count.characters" /> {{ __('Characters') }}</div>
                             </div>
                         </div>
+
+
 
                         <div class="drag-notification" v-if="assetsEnabled && draggingFile">
                             <svg-icon name="upload" class="h-12 w-12 mb-2" />
@@ -110,6 +103,8 @@
             </div>
         </stack>
 
+        <vue-countable :text="data" :elementId="'myId'" @change="change"></vue-countable>
+
     </div>
 </template>
 
@@ -135,6 +130,10 @@ require('codemirror/addon/edit/continuelist');
 import Selector from '../assets/Selector.vue';
 import Uploader from '../assets/Uploader.vue';
 import Uploads from '../assets/Uploads.vue';
+import VueCountable from 'vue-countable'
+
+// Keymaps
+import 'codemirror/keymap/sublime'
 
 export default {
 
@@ -143,7 +142,8 @@ export default {
     components: {
         Selector,
         Uploader,
-        Uploads
+        Uploads,
+        VueCountable
     },
 
     data: function() {
@@ -159,6 +159,8 @@ export default {
             fullScreenMode: false,
             codemirror: null,       // The CodeMirror instance
             uploads: [],
+            count: {},
+            escBinding: null,
         };
     },
 
@@ -183,13 +185,16 @@ export default {
 
     methods: {
 
-        toggleFullScreen() {
-            this.fullScreenMode = ! this.fullScreenMode;
+        closeFullScreen() {
+            this.fullScreenMode = false;
+            this.escBinding.destroy();
             this.trackHeightUpdates();
         },
 
-        closeFullScreen() {
-            this.fullScreenMode = false;
+        openFullScreen() {
+            this.fullScreenMode = true;
+            this.escBinding = this.$keys.bindGlobal('esc', this.closeFullScreen);
+            this.trackHeightUpdates();
         },
 
         /**
@@ -224,8 +229,8 @@ export default {
 
             // Replace the string
             var str = '![' + selection + ']('+ url +')';
-            cm.replaceSelection(str, 'start');
 
+            cm.replaceSelection(str, 'start');
             // Select the text
             var line = cm.getCursor().line;
             var start = cm.getCursor().ch + 2; // move past the ![
@@ -444,9 +449,9 @@ export default {
 
             this.$axios.get(cp_url('assets-fieldtype'), { params: { assets } }).then(response => {
                 _(response.data).each((asset) => {
-                    var alt = asset.alt || '';
+                    var alt = asset.values.alt || '';
                     var url = encodeURI(asset.url);
-                    if (asset.is_image) {
+                    if (asset.isImage) {
                         this[method+'Image'](url, alt);
                     } else {
                         this[method+'Link'](url, alt);
@@ -479,6 +484,10 @@ export default {
 
         focus() {
             this.codemirror.focus();
+        },
+
+        change(event) {
+            this.count = event;
         },
 
         trackHeightUpdates() {
@@ -532,6 +541,7 @@ export default {
             value: self.data,
             mode: 'gfm',
             dragDrop: false,
+            keyMap: 'sublime',
             lineWrapping: true,
             viewportMargin: Infinity,
             tabindex: 0,
@@ -559,9 +569,8 @@ export default {
             }
         });
 
-        this.$keys.bind('esc', this.closeFullScreen)
-
         this.trackHeightUpdates();
+
     }
 
 };

@@ -33,6 +33,8 @@ class RoutesTest extends TestCase
 
             Route::statamic('/basic-route-without-data', 'test');
 
+            Route::statamic('/route/with/placeholders/{foo}/{bar}/{baz}', 'test');
+
             Route::statamic('/route-with-custom-layout', 'test', [
                 'layout' => 'custom-layout',
                 'hello' => 'world'
@@ -46,6 +48,11 @@ class RoutesTest extends TestCase
             Route::statamic('/route-with-loaded-entry-by-uri', 'test', [
                 'hello' => 'world',
                 'load' => '/blog'
+            ]);
+
+            Route::statamic('/route-with-custom-content-type', 'test', [
+                'hello' => 'world',
+                'content_type' => 'json'
             ]);
 
             Route::amp(function () {
@@ -74,6 +81,17 @@ class RoutesTest extends TestCase
         $this->get('/basic-route-without-data')
             ->assertOk()
             ->assertSee('Hello ');
+    }
+
+    /** @test */
+    function it_renders_a_view_with_placeholders()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ foo }} {{ bar }} {{ baz }}');
+
+        $this->get('/route/with/placeholders/one/two/three')
+            ->assertOk()
+            ->assertSee('Hello one two three');
     }
 
     /** @test */
@@ -124,5 +142,18 @@ class RoutesTest extends TestCase
         $this->get('/route-with-amp')->assertOk();
         $this->get('/amp/route-with-amp')->assertOk();
         $this->get('/amp/basic-route-with-data')->assertNotFound();
+    }
+
+    /** @test */
+    function it_renders_a_view_with_custom_content_type()
+    {
+        $this->withoutExceptionHandling();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', '{"hello":"{{ hello }}"}');
+
+        $this->get('/route-with-custom-content-type')
+            ->assertOk()
+            ->assertHeader('Content-Type', 'application/json')
+            ->assertExactJson(['hello' => 'world']);
     }
 }

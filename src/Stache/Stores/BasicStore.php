@@ -8,8 +8,6 @@ use Symfony\Component\Finder\SplFileInfo;
 
 abstract class BasicStore extends Store
 {
-    protected $items = [];
-
     public function getFileFilter(SplFileInfo $file)
     {
         return $file->getExtension() === 'yaml';
@@ -50,11 +48,7 @@ abstract class BasicStore extends Store
     {
         $cacheKey = $this->getItemCacheKey($key);
 
-        if ($cached = $this->items[$key] ?? null) {
-            return $cached;
-        }
-
-        return $this->items[$key] = Cache::get($cacheKey);
+        return Cache::get($cacheKey);
     }
 
     protected function cacheItem($item)
@@ -63,15 +57,11 @@ abstract class BasicStore extends Store
 
         $cacheKey = $this->getItemCacheKey($key);
 
-        $this->items[$key] = $item;
-
         Cache::forever($cacheKey, $item);
     }
 
     public function forgetItem($key)
     {
-        unset($this->items[$key]);
-
         Cache::forget($this->getItemCacheKey($key));
     }
 

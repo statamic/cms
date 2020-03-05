@@ -23,7 +23,8 @@ class UserGroupsController extends CpController
                 'handle' => $group->handle(),
                 'users' => $group->users()->count(),
                 'roles' => $group->roles()->count(),
-                'edit_url' => cp_route('user-groups.edit', $group->handle())
+                'edit_url' => $group->editUrl(),
+                'delete_url' => $group->deleteUrl(),
             ];
         })->values();
 
@@ -33,6 +34,20 @@ class UserGroupsController extends CpController
 
         return view('statamic::usergroups.index', [
             'groups' => $groups
+        ]);
+    }
+
+    public function show($group)
+    {
+        $this->authorize('edit user groups');
+
+        if (! $group = UserGroup::find($group)) {
+            return $this->pageNotFound();
+        }
+
+        return view('statamic::usergroups.show', [
+            'group' => $group,
+            'filters' => Scope::filters('usergroup-users'),
         ]);
     }
 
@@ -62,7 +77,7 @@ class UserGroupsController extends CpController
         $request->validate([
             'title' => 'required',
             'handle' => 'alpha_dash',
-            'roles' => 'required|array',
+            'roles' => 'array',
         ]);
 
         $group
@@ -71,7 +86,9 @@ class UserGroupsController extends CpController
             ->roles($request->roles)
             ->save();
 
-        return ['redirect' => cp_route('user-groups.edit', $group->handle())];
+        session()->flash('success', 'User group updated');
+
+        return ['redirect' => cp_route('user-groups.show', $group->handle())];
     }
 
     public function create()
@@ -88,7 +105,7 @@ class UserGroupsController extends CpController
         $request->validate([
             'title' => 'required',
             'handle' => 'alpha_dash',
-            'roles' => 'required|array',
+            'roles' => 'array',
         ]);
 
         $group = UserGroup::make()
@@ -97,7 +114,9 @@ class UserGroupsController extends CpController
             ->roles($request->roles)
             ->save();
 
-        return ['redirect' => cp_route('user-groups.edit', $group->handle())];
+        session()->flash('success', 'User group created');
+
+        return ['redirect' => cp_route('user-groups.show', $group->handle())];
     }
 
     public function destroy($group)

@@ -21,7 +21,7 @@ class PageTest extends TestCase
     function it_gets_and_sets_the_entry()
     {
         $page = new Page;
-        $entry = new Entry;
+        $entry = (new Entry)->id('a');
         $this->assertNull($page->entry());
 
         $return = $page->setEntry($entry);
@@ -77,7 +77,7 @@ class PageTest extends TestCase
     {
         $entry = new class extends Entry {
             public function id($id = null) {
-                return '1';
+                return 'a';
             }
             public function slug($slug = null) {
                 return 'entry-slug';
@@ -109,7 +109,7 @@ class PageTest extends TestCase
     {
         $entry = new class extends Entry {
             public function id($id = null) {
-                return '1';
+                return 'a';
             }
             public function uri() {
                 return '/the/actual/entry/uri';
@@ -134,7 +134,7 @@ class PageTest extends TestCase
 
         $page = (new Page)
             ->setTree($tree)
-            ->setEntry(new Entry)
+            ->setEntry((new Entry)->id('123'))
             ->setRoute('')
             ->setChildren([
                 ['entry' => 'one'],

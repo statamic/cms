@@ -50,8 +50,8 @@ class EloquentUserTest extends TestCase
     function additionalToArrayValues()
     {
         return [
-            'created_at' => '2019-11-21 23:39:29',
-            'updated_at' => '2019-11-21 23:39:29',
+            'created_at' => Carbon::parse('2019-11-21 23:39:29'),
+            'updated_at' => Carbon::parse('2019-11-21 23:39:29'),
         ];
     }
 

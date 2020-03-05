@@ -1,63 +1,66 @@
 <template>
 
     <div>
-        <div class="flex items-center mb-3">
-            <h1 class="flex-1">
-                <small class="subhead block">
-                    <a :href="globalsUrl" v-text="__('Globals')" class="text-grey hover:text-blue" />
-                </small>
-                <div class="flex items-center" v-text="title" />
-            </h1>
+        <header class="mb-3">
+            <breadcrumb :url="globalsUrl" :title="__('Globals')" />
 
-            <div class="pt-px text-2xs text-grey-60 mr-2 flex" v-if="readOnly">
-                <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
+            <div class="flex items-center">
+                <h1 class="flex-1" v-text="title" />
+
+                <div class="pt-px text-2xs text-grey-60 ml-2 flex" v-if="! canEdit">
+                    <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
+                </div>
+
+                <configure-set
+                    class="ml-2"
+                    :save-url="configureSaveUrl"
+                    :delete-url="deleteUrl"
+                    :globals-url="globalsUrl"
+                    :id="id"
+                    :initial-title="initialTitle"
+                    :initial-handle="initialHandle"
+                    :initial-blueprint="initialBlueprintHandle"
+                    :can-configure="canConfigure"
+                    :can-delete="canDelete"
+                ></configure-set>
+
+                <v-select
+                    v-if="localizations.length > 1"
+                    :value="activeLocalization"
+                    label="name"
+                    :clearable="false"
+                    :options="localizations"
+                    :searchable="false"
+                    :multiple="false"
+                    @input="localizationSelected"
+                    class="w-48 ml-2"
+                >
+                    <template slot="option" slot-scope="option">
+                        <div class="flex items-center" v-tooltip="localizationStatusText(option)">
+                            <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === option.handle" />
+                            <span class="little-dot mr-1" :class="{
+                                'bg-green': option.published,
+                                'bg-grey-50': !option.published,
+                                'bg-red': !option.exists
+                            }" />
+                            {{ option.name }}
+                            <svg-icon name="flag" class="h-3 w-3 ml-sm text-grey" v-if="option.origin" />
+                            <svg-icon name="check" class="h-3 w-3 ml-sm text-grey" v-if="option.active" />
+                        </div>
+                    </template>
+                </v-select>
+
+                <button
+                    v-if="canEdit"
+                    class="btn-primary min-w-100 ml-2"
+                    :class="{ 'opacity-25': !canSave }"
+                    :disabled="!canSave"
+                    @click.prevent="save"
+                    v-text="__('Save')" />
+
+                <slot name="action-buttons-right" />
             </div>
-
-            <configure-set
-                class="mr-2"
-                :save-url="configureSaveUrl"
-                :id="id"
-                :initial-title="initialTitle"
-                :initial-handle="initialHandle"
-                :initial-blueprint="initialBlueprintHandle"
-            ></configure-set>
-
-            <v-select
-                v-if="localizations.length > 1"
-                :value="activeLocalization"
-                label="name"
-                :clearable="false"
-                :options="localizations"
-                :searchable="false"
-                :multiple="false"
-                @input="localizationSelected"
-                class="w-48 mr-2"
-            >
-                <template slot="option" slot-scope="option">
-                    <div class="flex items-center" v-tooltip="localizationStatusText(option)">
-                        <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === option.handle" />
-                        <span class="little-dot mr-1" :class="{
-                            'bg-green': option.published,
-                            'bg-grey-50': !option.published,
-                            'bg-red': !option.exists
-                        }" />
-                        {{ option.name }}
-                        <svg-icon name="flag" class="h-3 w-3 ml-sm text-grey" v-if="option.origin" />
-                        <svg-icon name="check" class="h-3 w-3 ml-sm text-grey" v-if="option.active" />
-                    </div>
-                </template>
-            </v-select>
-
-            <button
-                v-if="!readOnly"
-                class="btn btn-primary min-w-100"
-                :class="{ 'opacity-25': !canSave }"
-                :disabled="!canSave"
-                @click.prevent="save"
-                v-text="__('Save')" />
-
-            <slot name="action-buttons-right" />
-        </div>
+        </header>
 
         <div v-if="fieldset.empty" class="text-center mt-5 border-2 border-dashed rounded-lg px-4 py-8">
             <div class="max-w-md mx-auto opacity-50">
@@ -89,7 +92,7 @@
                     v-bind="component.props"
                 />
                 <publish-sections
-                    :read-only="readOnly"
+                    :read-only="! canEdit"
                     :syncable="hasOrigin"
                     :enable-sidebar="false"
                     @updated="setFieldValue"
@@ -136,6 +139,10 @@ export default {
         isCreating: Boolean,
         initialReadOnly: Boolean,
         configureSaveUrl: String,
+        deleteUrl: String,
+        canEdit: Boolean,
+        canConfigure: Boolean,
+        canDelete: Boolean,
     },
 
     data() {
@@ -155,7 +162,6 @@ export default {
             site: this.initialSite,
             error: null,
             errors: {},
-            readOnly: this.initialReadOnly,
         }
     },
 
@@ -170,7 +176,7 @@ export default {
         },
 
         canSave() {
-            return !this.readOnly && this.isDirty && !this.somethingIsLoading;
+            return this.canEdit && this.isDirty && !this.somethingIsLoading;
         },
 
         isBase() {
@@ -223,7 +229,7 @@ export default {
 
             this.$axios[this.method](this.actions.save, payload).then(response => {
                 this.saving = false;
-                if (!this.isCreating) this.$toast.success('Saved');
+                if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.$nextTick(() => this.$emit('saved', response));
             }).catch(e => this.handleAxiosError(e));
@@ -237,7 +243,7 @@ export default {
                 this.errors = errors;
                 this.$toast.error(message);
             } else {
-                this.$toast.error('Something went wrong');
+                this.$toast.error(__('Something went wrong'));
             }
         },
 

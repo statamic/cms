@@ -225,7 +225,7 @@ class Field implements Arrayable
     public function augment()
     {
         return $this->newInstance()->setValue(
-            $this->fieldtype()->augment($this->value)
+            new Value($this->value, $this->handle, $this->fieldtype(), $this->parent)
         );
     }
 

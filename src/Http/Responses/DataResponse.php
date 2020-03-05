@@ -113,7 +113,9 @@ class DataResponse implements Responsable
             throw new NotFoundHttpException;
         }
 
-        $this->headers['X-Statamic-Draft'] = true;
+        if ($this->isLivePreview()) {
+            $this->headers['X-Statamic-Draft'] = true;
+        }
 
         return $this;
     }
@@ -148,30 +150,9 @@ class DataResponse implements Responsable
     {
         $contentType = $this->data->get('content_type', 'html');
 
-        // If it's html, we don't need to continue.
-        if ($contentType === 'html') {
-            return $this;
+        if ($contentType !== 'html') {
+            $this->headers['Content-Type'] = self::contentType($contentType);
         }
-
-        // Translate simple content types to actual ones
-        switch ($contentType) {
-            case 'xml':
-                $contentType = 'text/xml';
-                break;
-            case 'rss':
-                $contentType = 'application/rss+xml';
-                break;
-            case 'atom':
-                $contentType = 'application/atom+xml; charset=UTF-8';
-                break;
-            case 'json':
-                $contentType = 'application/json';
-                break;
-            case 'text':
-                $contentType = 'text/plain';
-        }
-
-        $this->headers['Content-Type'] = $contentType;
 
         return $this;
     }
@@ -195,5 +176,25 @@ class DataResponse implements Responsable
     protected function isLivePreview()
     {
         return $this->request->headers->get('X-Statamic-Live-Preview');
+    }
+
+    public static function contentType($type)
+    {
+        switch ($type) {
+            case 'html':
+                return 'text/html; charset=UTF-8';
+            case 'xml':
+                return 'text/xml';
+            case 'rss':
+                return 'application/rss+xml';
+            case 'atom':
+                return 'application/atom+xml; charset=UTF-8';
+            case 'json':
+                return 'application/json';
+            case 'text':
+                return 'text/plain';
+            default:
+                return $type;
+        }
     }
 }

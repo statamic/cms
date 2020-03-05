@@ -13,6 +13,7 @@
                 :disabled="disabled"
                 :readonly="isReadOnly"
                 :placeholder="placeholder"
+                :autofocus="focus"
                 @input="$emit('input', $event.target.value)"
                 @keydown="$emit('keydown', $event)"
                 @focus="$emit('focus')"
@@ -42,7 +43,7 @@ export default {
         value: { required: true },
         prepend: { default: null },
         append: { default: null },
-        autofocus: { type: Boolean },
+        focus: { type: Boolean },
         autoselect: { type: Boolean }
     },
     mounted() {

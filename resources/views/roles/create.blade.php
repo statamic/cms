@@ -7,16 +7,9 @@
         action="{{ cp_route('roles.store') }}"
         method="post"
         :initial-permissions="{{ json_encode($permissions) }}"
+        breadcrumb-url="{{ cp_route('roles.index') }}"
+        index-url="{{ cp_route('roles.index') }}"
         v-cloak
-    >
-
-        <h1 class="flex-1" slot="heading" slot-scope="{ title }">
-            <div class="subhead">
-                <a href="{{ cp_route('roles.index') }}">{{ __('Roles & Permissions') }}</a>
-            </div>
-            {{ __('Create Role') }}
-        </h1>
-
-    </role-publish-form>
+    ></role-publish-form>
 
 @endsection

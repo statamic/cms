@@ -2,15 +2,20 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Facades\Form;
-use Statamic\Facades\Site;
-use Statamic\Facades\Term;
-use Statamic\Facades\Entry;
-use Statamic\Mixins\Router;
-use Statamic\Facades\Taxonomy;
-use Statamic\Facades\Collection;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Form;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
+use Statamic\Facades\User;
+use Statamic\Mixins\Router;
 
 class RouteServiceProvider extends ServiceProvider
 {
@@ -26,76 +31,137 @@ class RouteServiceProvider extends ServiceProvider
     {
         Route::mixin(new Router);
 
-        $this->bindEntries();
         $this->bindCollections();
-        $this->bindTerms();
+        $this->bindEntries();
         $this->bindTaxonomies();
+        $this->bindTerms();
+        $this->bindAssetContainers();
+        $this->bindAssets();
+        $this->bindGlobalSets();
         $this->bindSites();
         $this->bindRevisions();
         $this->bindForms();
+        $this->bindUsers();
+    }
+
+    protected function bindCollections()
+    {
+        Route::bind('collection', function ($handle) {
+            throw_unless(
+                $collection = Collection::findByHandle($handle),
+                new NotFoundHttpException("Collection [$handle] not found.")
+            );
+
+            return $collection;
+        });
     }
 
     protected function bindEntries()
     {
-        Route::bind('entry', function ($entry, $route) {
-            abort_if(
-                ! ($entry = Entry::find($entry))
-                || $entry->collection() !== $route->parameter('collection')
-            , 404);
+        Route::bind('entry', function ($handle, $route) {
+            throw_if(
+                ! ($entry = Entry::find($handle)) || $entry->collection()->id() !== $route->parameter('collection')->id(),
+                new NotFoundHttpException("Entry [$handle] not found.")
+            );
 
             return $entry;
         });
     }
 
-    protected function bindCollections()
-    {
-        Route::bind('collection', function ($collection) {
-            abort_unless($collection = Collection::findByHandle($collection), 404);
-            return $collection;
-        });
-    }
-
     protected function bindTaxonomies()
     {
-        Route::bind('taxonomy', function ($taxonomy) {
-            abort_unless($taxonomy = Taxonomy::findByHandle($taxonomy), 404);
+        Route::bind('taxonomy', function ($handle) {
+            throw_unless(
+                $taxonomy = Taxonomy::findByHandle($handle),
+                new NotFoundHttpException("Taxonomy [$handle] not found.")
+            );
+
             return $taxonomy;
         });
     }
 
     protected function bindTerms()
     {
-        Route::bind('term', function ($term, $route) {
-            $id = $route->parameter('taxonomy')->handle() . '::' . $term;
-            abort_if(
-                ! ($term = Term::find($id)->in($route->parameter('site')))
-                || $term->taxonomy() !== $route->parameter('taxonomy')
-            , 404);
+        Route::bind('term', function ($handle, $route) {
+            $id = $route->parameter('taxonomy')->handle() . '::' . $handle;
+            $site = $route->parameter('site') ?? Site::default()->handle();
+
+            throw_unless(
+                ($term = Term::find($id)->in($site)) && $term->taxonomy()->id() === $route->parameter('taxonomy')->id(),
+                new NotFoundHttpException("Taxonomy term [$handle] not found.")
+            );
 
             return $term;
         });
     }
 
+    protected function bindAssetContainers()
+    {
+        Route::bind('asset_container', function ($handle) {
+            throw_unless(
+                $container = AssetContainer::findByHandle($handle),
+                new NotFoundHttpException("Asset container [$handle] not found.")
+            );
+
+            return $container;
+        });
+    }
+
+    protected function bindAssets()
+    {
+        Route::bind('asset', function ($handle, $route) {
+            $id = $route->parameter('asset_container')->handle() . '::' . $handle;
+
+            throw_unless(
+                $asset = Asset::find($id),
+                new NotFoundHttpException("Asset [$handle] not found.")
+            );
+
+            return $asset;
+        });
+    }
+
+    protected function bindGlobalSets()
+    {
+        Route::bind('global', function ($handle) {
+            $site = Site::default()->handle();
+
+            throw_unless(
+                $globalSet = GlobalSet::findByHandle($handle)->in($site),
+                new NotFoundHttpException("Global set [$handle] not found.")
+            );
+
+            return $globalSet;
+        });
+    }
+
     protected function bindSites()
     {
-        Route::bind('site', function ($site) {
-            abort_unless($site = Site::get($site), 404);
+        Route::bind('site', function ($handle) {
+            throw_unless(
+                $site = Site::get($handle),
+                new NotFoundHttpException("Site [$handle] not found.")
+            );
+
             return $site;
         });
     }
 
     protected function bindRevisions()
     {
-        Route::bind('revision', function ($revision, $route) {
+        Route::bind('revision', function ($reference, $route) {
             if ($route->hasParameter('entry')) {
                 $content = $route->parameter('entry');
             } elseif ($route->hasParameter('term')) {
                 $content = $route->parameter('term');
             } else {
-                abort(404);
+                throw new NotFoundHttpException;
             }
 
-            abort_unless($revision = $content->revision($revision), 404);
+            throw_unless(
+                $revision = $content->revision($reference),
+                new NotFoundHttpException("Revision [$reference] not found.")
+            );
 
             return $revision;
         });
@@ -103,9 +169,25 @@ class RouteServiceProvider extends ServiceProvider
 
     protected function bindForms()
     {
-        Route::bind('form', function ($form) {
-            abort_unless($form = Form::find($form), 404);
+        Route::bind('form', function ($handle) {
+            throw_unless(
+                $form = Form::find($handle),
+                new NotFoundHttpException("Form [$handle] not found.")
+            );
+
             return $form;
+        });
+    }
+
+    protected function bindUsers()
+    {
+        Route::bind('user', function ($handle, $route) {
+            throw_unless(
+                $user = User::find($handle),
+                new NotFoundHttpException("User [$handle] not found.")
+            );
+
+            return $user;
         });
     }
 }

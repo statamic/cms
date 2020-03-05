@@ -16,12 +16,12 @@
                     handle="title"
                     :display="__('Title')"
                     :instructions="__('messages.blueprints_title_instructions')"
-                    autofocus />
+                    :focus="true" />
             </div>
         </div>
 
         <div class="flex items-center">
-            <button class="btn btn-primary">{{ __('Create') }}</button>
+            <button class="btn-primary">{{ __('Create') }}</button>
             <p class="text-xs text-grey-60 ml-2">{{ __('statamic::messages.blueprints_button_help_text') }}</p>
         </div>
 

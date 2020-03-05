@@ -6,6 +6,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Events\Data\AssetContainerDeleted;
 use Statamic\Events\Data\AssetContainerSaved;
 use Statamic\Facades;
@@ -24,7 +25,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements AssetContainerContract, Augmentable
 {
-    use ExistsAsFile, FluentlyGetsAndSets;
+    use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
 
     protected $title;
     protected $handle;
@@ -122,7 +123,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $array;
     }
 
-    public function toAugmentedArray()
+    public function augmentedArrayData()
     {
         return array_merge($this->toArray(), [
             'handle' => $this->handle(),
@@ -187,11 +188,11 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function delete()
     {
-        $path = "assets/{$this->id}.yaml";
+        Facades\AssetContainer::delete($this);
 
-        File::disk('content')->delete($path);
+        // event(new AssetContainerDeleted($id, $path));
 
-        event(new AssetContainerDeleted($this->id(), $path));
+        return true;
     }
 
     public function disk($disk = null)
@@ -207,11 +208,6 @@ class AssetContainer implements AssetContainerContract, Augmentable
     public function diskHandle()
     {
         return $this->disk;
-    }
-
-    public function diskConfig()
-    {
-        return config("filesystems.disks.{$this->disk}");
     }
 
     /**
@@ -353,7 +349,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function accessible()
     {
-        return Arr::get($this->diskConfig(), 'url') !== null;
+        return $this->disk()->filesystem()->getDriver()->getConfig()->get('url') !== null;
     }
 
     /**

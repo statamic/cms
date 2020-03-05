@@ -3,12 +3,10 @@
 namespace Statamic\Tags;
 
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Antlers;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasAliases;
-use Statamic\Data\DataCollection;
 use Statamic\Extend\HasParameters;
 use Statamic\Extend\RegistersItself;
 
@@ -86,8 +84,8 @@ abstract class Tags
         $this->setContent($properties['content']);
         $this->setContext($properties['context']);
         $this->setParameters($properties['parameters']);
-        $this->tag         = array_get($properties, 'tag');
-        $this->method      = array_get($properties, 'tag_method');
+        $this->tag = array_get($properties, 'tag');
+        $this->method = array_get($properties, 'tag_method');
     }
 
     public function setParser($parser)
@@ -130,7 +128,7 @@ abstract class Tags
      */
     public function __call($method, $args)
     {
-        if ($this->wildcardHandled || ! method_exists($this, $this->wildcardMethod)) {
+        if ($this->wildcardHandled || !method_exists($this, $this->wildcardMethod)) {
             throw new \BadMethodCallException("Call to undefined method {$method}.");
         }
 
@@ -188,40 +186,7 @@ abstract class Tags
     {
         return $this->parse(array_merge($data, [
             'no_results' => true,
-            'total_results' => 0
+            'total_results' => 0,
         ]));
-    }
-
-    /**
-     * Open a form tag
-     *
-     * @param  string $action
-     * @return string
-     */
-    protected function formOpen($action, $method = 'POST')
-    {
-        $attr_str = '';
-        if ($attrs = $this->getList('attr')) {
-            foreach ($attrs as $attr) {
-                $bits = explode(':', $attr);
-
-                $param = array_get($bits, 0);
-                $value = array_get($bits, 1);
-
-                $attr_str .= $param;
-
-                if ($value) {
-                    $attr_str .= '="' . $value . '" ';
-                }
-            }
-        }
-
-        if ($this->getBool('files')) {
-            $attr_str .= 'enctype="multipart/form-data"';
-        }
-
-        $html = '<form method="' . $method . '" action="' . $action . '" ' . $attr_str . '>' . csrf_field();
-
-        return $html;
     }
 }

@@ -49,6 +49,16 @@ class Fields
         return $this->fields;
     }
 
+    public function except(...$keys): self
+    {
+        return tap(new static)->setFields($this->fields->except(...$keys));
+    }
+
+    public function only(...$keys): self
+    {
+        return tap(new static)->setFields($this->fields->only(...$keys));
+    }
+
     public function newInstance()
     {
         return (new static)
@@ -173,15 +183,16 @@ class Fields
             throw new \Exception("Fieldset {$config['import']} not found.");
         }
 
-        $fields = $fieldset->fields();
+        $fields = $fieldset->fields()->all();
 
         if ($prefix = array_get($config, 'prefix')) {
-            $fields = $fields->map(function ($field) use ($prefix) {
-                return $field->setHandle($prefix . $field->handle());
+            $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
+                $handle = $prefix . $field->handle();
+                return [$handle => $field->setHandle($handle)];
             });
         }
 
-        return $fields->values()->all();
+        return $fields->all();
     }
 
     public function meta()

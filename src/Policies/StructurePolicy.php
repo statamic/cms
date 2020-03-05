@@ -31,16 +31,12 @@ class StructurePolicy
 
     public function create($user)
     {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission("configure structures");
+        // handled by before()
     }
 
     public function store($user)
     {
-        $user = User::fromUser($user);
-
-        return $this->create($user);
+        // handled by before()
     }
 
     public function view($user, $structure)
@@ -66,8 +62,6 @@ class StructurePolicy
 
     public function delete($user, $structure)
     {
-        $user = User::fromUser($user);
-
-        return $user->hasPermission("configure structures");
+        // handled by before()
     }
 }

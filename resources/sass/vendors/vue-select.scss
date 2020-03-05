@@ -1,4 +1,5 @@
 .v-select {
+	@apply rounded;
 	position: relative;
 	font-family: inherit
 }
@@ -41,35 +42,43 @@
 }
 
 .vs__dropdown-toggle {
-    @include button(#fff, config('colors.grey-80'));
-    @apply block appearance-none bg-white shadow-button flex h-auto;
-	min-height: 37px;
-	line-height: 1;
-    padding: 0 4px 4px;
-	white-space: normal;
+	@apply appearance-none text-grey-80 w-full p-0 rounded flex items-center;
+    height: 2.375rem;
+    transition: border-color .15s ease-in-out,
+                box-shadow .15s ease-in-out;
 
-    &:active, &:focus:active {
-        bottom: 0px;
-	}
+    &:focus, &:focus-within {
+        @apply focus-outline;
+    }
 
 	.vs--disabled & {
 		@apply bg-grey-20;
 	}
 }
 
-.vs__selected-options {
-	display: flex;
-	flex-basis: 100%;
-	flex-grow: 1;
-	flex-wrap: wrap;
-	padding: 0 2px;
-	position: relative
+.v-select:not(.vs--unsearchable) .vs__selected-options {
+	@apply appearance-none text-grey-80 w-full shadow-inner;
+	@apply flex flex-wrap flex-1 border border-grey-50 border-r-0 rounded-l relative h-full;
+	padding: 5px 8px;
+
+    transition: border-color .15s ease-in-out,
+                box-shadow .15s ease-in-out;
 }
 
+.vs--single .vs__selected-options {
+	padding: 8px 12px !important;
+}
+
+.vs--single.vs--unsearchable .vs__selected-options {
+	@include clickable;
+	@apply flex w-full rounded-l relative h-full border-r-0;
+}
+
+
 .vs__actions {
-	display: flex;
-	align-items: center;
-	padding: 4px 6px 0 3px
+	@include clickable;
+	@apply flex items-center rounded-r px-1 text-sm;
+	height: 2.375rem;
 }
 
 .vs--searchable .vs__dropdown-toggle {
@@ -78,12 +87,6 @@
 
 .vs--unsearchable .vs__dropdown-toggle {
 	cursor: pointer
-}
-
-.vs--open .vs__dropdown-toggle {
-	border-bottom-color: transparent;
-	border-bottom-left-radius: 0;
-	border-bottom-right-radius: 0
 }
 
 .vs__open-indicator {
@@ -119,24 +122,16 @@
 }
 
 .vs__dropdown-menu {
-	display: block;
-	position: absolute;
-	top: calc(100% - 1px);
+	@apply block absolute z-top m-0 w-full;
+	@apply bg-white flex flex-col shadow-popover block p-2 rounded-md text-left;
+	top: 46px;
 	left: 0;
-	z-index: 1000;
-	padding: 5px 0;
-	margin: 0;
-	width: 100%;
+	padding: 0;
 	max-height: 350px;
 	min-width: 160px;
 	overflow-y: auto;
-	box-shadow: 0 3px 6px 0 rgba(0, 0, 0, .15);
-	border: 1px solid rgba(60, 60, 60, .26);
-	border-top-style: none;
-	border-radius: 0 0 4px 4px;
 	text-align: left;
 	list-style: none;
-	background: #fff
 }
 
 .vs__no-options {
@@ -144,26 +139,23 @@
 }
 
 .vs__dropdown-option {
-    @apply block text-sm text-grey-80;
-	line-height: 1.42857143;
-	padding: 4px 10px;
-	clear: both;
-	white-space: nowrap
-}
-
-.vs__dropdown-option:hover {
-	cursor: pointer
+    @apply block text-sm text-grey-80 cursor-pointer;
+	padding: 6px 12px;
 }
 
 .vs__dropdown-option--highlight {
-    @apply bg-blue text-white;
+    @apply bg-grey-30;
 }
 
-.vs__selected {
-    @apply flex items-center text-grey-80 rounded bg-grey-20 border border-grey-40;
-	line-height: 1.4;
-	margin: 6px 2px 2px;
-	padding: 0 .5em;
+.vs__dropdown-option--selected {
+	opacity: .25;
+	cursor: text;
+}
+
+
+.v-select:not(.vs--single) .vs__selected {
+	@include clickable;
+	@apply flex items-center text-sm rounded py-0 px-1 mr-1;
 }
 
 .vs__deselect {
@@ -181,14 +173,12 @@
 .vs--single .vs__selected {
 	background-color: transparent;
 	border-color: transparent;
-	padding: 0 .25em;
-	margin: 4px 2px 0;
+	padding: 0;
+	margin: 0;
 }
 
 .vs--single.vs--open .vs__selected {
-    position: absolute;
-    top: 5px;
-	opacity: .4;
+	opacity: .75;
 }
 
 .vs--single.vs--searching .vs__selected {
@@ -205,20 +195,11 @@
 
 .vs__search,
 .vs__search:focus {
-	-webkit-appearance: none;
-	-moz-appearance: none;
-	appearance: none;
+	@apply appearance-none text-base text-grey-80 px-1 border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
 	line-height: 1.4;
-	font-size: 1em;
-	border: 1px solid transparent;
 	border-left: none;
-	outline: none;
-	margin: 4px 0 0;
-	padding: 0 7px;
-	background: none;
 	box-shadow: none;
 	width: 0;
-	max-width: 100%;
 	flex-grow: 1
 }
 
@@ -277,7 +258,6 @@
 }
 
 // Animation
-
 @-webkit-keyframes vSelectSpinner {
 	0% {
 		-webkit-transform: rotate(0deg);

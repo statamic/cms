@@ -3,10 +3,10 @@
     <div class="replicator-set-picker">
         <dropdown-list ref="setSelectorDropdown" class="align-left inline-block">
             <template v-slot:trigger>
-                <button v-if="last" class="btn btn-round">
+                <button v-if="last" class="btn-round" v-tooltip.right="__('Add Set')">
                     <span class="icon icon-plus text-grey-80 antialiased"></span>
                 </button>
-                <button v-else class="dropdown-icon" >
+                <button v-else class="dropdown-icon" v-tooltip.right="__('Add Set')">
                     <span class="icon icon-plus text-grey-50 antialiased" />
                 </button>
             </template>

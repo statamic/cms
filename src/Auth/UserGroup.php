@@ -122,13 +122,13 @@ class UserGroup implements UserGroupContract
 
     public function roles($roles = null)
     {
-        if (is_null($roles)) {
+        if (func_num_args() === 0) {
             return $this->roles;
         }
 
         $this->roles = collect();
 
-        foreach ($roles as $role) {
+        foreach ($roles ?? [] as $role) {
             $this->assignRole($role);
         }
 
@@ -195,6 +195,11 @@ class UserGroup implements UserGroupContract
     public function editUrl()
     {
         return cp_route('user-groups.edit', $this->handle());
+    }
+
+    public function deleteUrl()
+    {
+        return cp_route('user-groups.destroy', $this->handle());
     }
 
     public static function __callStatic($method, $parameters)

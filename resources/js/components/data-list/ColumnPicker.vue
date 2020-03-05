@@ -1,6 +1,6 @@
 <template>
     <div>
-        <button class="btn btn-flat btn-icon-only dropdown-toggle" @click="customizing = !customizing">
+        <button class="btn-flat btn-icon-only dropdown-toggle" @click="customizing = !customizing">
             <svg-icon name="settings-vertical" class="w-4 h-4 mr-1" />
             <span>{{ __('Columns') }}</span>
         </button>

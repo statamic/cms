@@ -22,6 +22,18 @@ class UserRoles extends Relationship
         return $this->invalidItemArray($id);
     }
 
+    public function preProcessIndex($data)
+    {
+        $roles = collect($data)
+            ->filter(function ($id) {
+                return Role::exists($id);
+            })
+            ->values()
+            ->all();
+
+        return parent::preProcessIndex($roles);
+    }
+
     public function getIndexItems($request)
     {
         return Role::all()->map(function ($role) {

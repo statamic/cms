@@ -89,6 +89,11 @@ export default {
     methods: {
 
         request() {
+            if (! this.requestUrl) {
+                this.loading = false;
+                return;
+            }
+
             this.loading = true;
 
             if (this.source) this.source.cancel();
@@ -121,7 +126,14 @@ export default {
         sorted(column, direction) {
             this.sortColumn = column;
             this.sortDirection = direction;
-        }
+        },
+
+        removeRow(row) {
+            let id = row.id;
+            let i = _.indexOf(this.rows, _.findWhere(this.rows, { id }));
+            this.rows.splice(i, 1);
+            if (this.rows.length === 0) location.reload();
+        },
 
     }
 

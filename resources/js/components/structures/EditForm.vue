@@ -12,15 +12,15 @@
         @updated="values = $event"
     >
         <div slot-scope="{ setFieldValue }">
-            <div class="flex items-center mb-3">
-                <h1 class="flex-1">
-                    <small class="subhead block">
-                        <a :href="listingUrl" v-text="__('Structures')" />
-                    </small>
-                    {{ title }}
-                </h1>
-                <button type="submit" class="btn btn-primary" @click="submit">{{ __('Save') }}</button>
+            <header class="mb-3">
+                <breadcrumb :url="listingUrl" :title="__('Structures')" />
+                <div class="flex items-center">
+                    <h1 class="flex-1">
+                        {{ title }}
+                    </h1>
+                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
+            </header>
 
             <publish-sections @updated="setFieldValue" :enable-sidebar="false" />
         </div>
@@ -63,7 +63,7 @@ export default {
             this.$axios.patch(this.url, this.values).then(response => {
                 this.saving = false;
                 this.title = response.data.title;
-                this.$toast.success('Saved');
+                this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
             }).catch(e => this.handleAxiosError(e));
         },
@@ -76,7 +76,7 @@ export default {
                 this.errors = errors;
                 this.$toast.error(message);
             } else {
-                this.$toast.error('Something went wrong');
+                this.$toast.error(__('Something went wrong'));
             }
         },
 

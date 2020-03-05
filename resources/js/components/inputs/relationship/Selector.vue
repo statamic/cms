@@ -66,7 +66,7 @@
                             @page-selected="setPage" />
 
                         <div class="p-2 border-t flex items-center justify-between bg-grey-20">
-                            <div class="text-sm text-grey-40"
+                            <div class="text-sm text-grey-70"
                                 v-text="hasMaxSelections
                                     ? __n(':count/:max selected', selections, { max: maxSelections })
                                     : __n(':count selected', selections)" />
@@ -80,9 +80,9 @@
                                 </button>
 
                                 <button
-                                    v-if="maxSelections > 1"
+                                    v-if="! hasMaxSelections || maxSelections > 1"
                                     type="button"
-                                    class="btn btn-primary ml-1"
+                                    class="btn-primary ml-1"
                                     @click="select">
                                     {{ __('Select') }}
                                 </button>

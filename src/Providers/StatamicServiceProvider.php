@@ -34,5 +34,6 @@ class StatamicServiceProvider extends AggregateServiceProvider
         ValidationServiceProvider::class,
         RouteServiceProvider::class,
         BroadcastServiceProvider::class,
+        ApiServiceProvider::class,
     ];
 }

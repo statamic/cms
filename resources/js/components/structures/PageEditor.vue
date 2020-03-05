@@ -31,7 +31,7 @@
                 </div>
 
                 <div class="p-3">
-                    <button @click="submit" class="btn btn-primary w-full">{{ __('Submit') }}</button>
+                    <button @click="submit" class="btn-primary w-full">{{ __('Submit') }}</button>
                 </div>
 
             </div>

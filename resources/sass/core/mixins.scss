@@ -7,7 +7,7 @@
     background: $background;
     color: $text;
     height: 37px;
-    padding: 0 16px;
+    padding: 0 20px;
     line-height: 38px;
 
     &:hover, &:active, &:focus, &:active:focus {
@@ -38,6 +38,18 @@
     &:disabled {
         @apply opacity-50;
         cursor: not-allowed;
+    }
+}
+
+@mixin clickable() {
+    @apply text-grey-80 select-none cursor-pointer border;
+    border: 1px solid #c4cdd6;
+    background: linear-gradient(180deg, #fff, #f9fafb);
+    box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
+
+    &:hover {
+        background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+        border-color: #c4cdd5;
     }
 }
 

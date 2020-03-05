@@ -7,6 +7,7 @@ use Carbon\Carbon;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Data\Data;
+use Statamic\Support\Arr;
 use Statamic\Facades\Stache;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
@@ -328,7 +329,7 @@ class User extends BaseUser
      */
     public function getMeta($key, $default = null)
     {
-        $yaml = YAML::parse(File::get($this->metaPath(), ''));
+        $yaml = YAML::file($this->metaPath())->parse();
 
         return array_get($yaml, $key, $default);
     }
@@ -342,7 +343,7 @@ class User extends BaseUser
      */
     public function setMeta($key, $value)
     {
-        $yaml = YAML::parse(File::get($this->metaPath(), ''));
+        $yaml = YAML::file($this->metaPath())->parse();
 
         $yaml[$key] = $value;
 

@@ -45,7 +45,9 @@ class FrontendTest extends TestCase
             ]
         ]);
 
-        $response = $this->get('/about')->assertStatus(200);
+        $response = $this->get('/about')
+            ->assertStatus(200)
+            ->assertHeaderMissing('X-Statamic-Draft');
 
         $this->assertEquals('<h1>The About Page</h1> <p>This is the about page.</p>', trim($response->content()));
     }

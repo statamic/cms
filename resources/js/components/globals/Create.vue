@@ -4,7 +4,7 @@
 
         <div class="flex items-center mb-3">
             <slot name="header" />
-            <button type="submit" class="btn btn-primary" @click="save">{{ __('Save') }}</button>
+            <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
         </div>
 
         <div class="card publish-fields p-0">
@@ -16,7 +16,7 @@
                 v-model="title"
                 :errors="errors.title"
                 width="50"
-                autofocus
+                :focus="true"
             />
 
             <slugify
@@ -106,7 +106,7 @@ export default {
                     this.errors = errors;
                     this.$toast.error(message);
                 } else {
-                    this.$toast.error('Something went wrong');
+                    this.$toast.error(__('Something went wrong'));
                 }
             })
         }

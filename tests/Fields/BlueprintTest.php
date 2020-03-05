@@ -2,15 +2,17 @@
 
 namespace Tests\Fields;
 
-use Tests\TestCase;
-use Statamic\Fields\Field;
-use Statamic\Fields\Fields;
-use Statamic\Fields\Section;
-use Statamic\Fields\Blueprint;
+use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Statamic\Fields\FieldRepository;
+use Facades\Statamic\Fields\FieldsetRepository;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Field as FieldAPI;
-use Facades\Statamic\Fields\FieldRepository;
-use Facades\Statamic\Fields\BlueprintRepository;
+use Statamic\Fields\Blueprint;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
+use Statamic\Fields\Fieldset;
+use Statamic\Fields\Section;
+use Tests\TestCase;
 
 class BlueprintTest extends TestCase
 {
@@ -113,6 +115,47 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    function it_can_check_if_has_field()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->andReturn((new Fieldset)->setHandle('partial')->setContents([
+                'title' => 'Partial',
+                'fields' => [
+                    'three' => ['type' => 'text'],
+                ],
+            ]));
+
+        $blueprint = (new Blueprint)->setHandle('sectioned')->setContents($contents = [
+            'title' => 'Test',
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                    ]
+                ],
+                'section_two' => [
+                    'fields' => [
+                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                        ['import' => 'partial'],
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->assertTrue($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two'));
+        $this->assertTrue($blueprint->hasField('three'));
+        $this->assertFalse($blueprint->hasField('four')); // Doesnt exist
+
+        $this->assertTrue($blueprint->hasFieldInSection('one', 'section_one'));
+        $this->assertTrue($blueprint->hasFieldInSection('two', 'section_two'));
+        $this->assertTrue($blueprint->hasFieldInSection('three', 'section_two'));
+        $this->assertFalse($blueprint->hasFieldInSection('one', 'section_two')); // In section one
+        $this->assertFalse($blueprint->hasFieldInSection('three', 'section_one')); // In section two
+        $this->assertFalse($blueprint->hasFieldInSection('four', 'section_two')); // Doesnt exist
+    }
+
+    /** @test */
     function it_gets_fields()
     {
         $blueprint = new Blueprint;
@@ -191,6 +234,7 @@ class BlueprintTest extends TestCase
             'title' => 'Test',
             'sections' => [
                 'section_one' => [
+                    'instructions' => 'Does stuff',
                     'fields' => [
                         [
                             'handle' => 'one',
@@ -216,6 +260,7 @@ class BlueprintTest extends TestCase
                 [
                     'display' => 'Section one',
                     'handle' => 'section_one',
+                    'instructions' => 'Does stuff',
                     'fields' => [
                         [
                             'handle' => 'one',
@@ -227,6 +272,7 @@ class BlueprintTest extends TestCase
                             'component' => 'text',
                             'placeholder' => null,
                             'character_limit' => 0,
+                            'input_type' => 'text',
                             'prepend' => null,
                             'append' => null,
                         ]
@@ -235,6 +281,7 @@ class BlueprintTest extends TestCase
                 [
                     'display' => 'Section two',
                     'handle' => 'section_two',
+                    'instructions' => null,
                     'fields' => [
                         [
                             'handle' => 'two',
@@ -266,6 +313,14 @@ class BlueprintTest extends TestCase
     /** @test */
     function it_ensures_a_field_exists_if_it_doesnt()
     {
+        FieldsetRepository::shouldReceive('find')
+            ->andReturn((new Fieldset)->setHandle('partial')->setContents([
+                'title' => 'Partial',
+                'fields' => [
+                    'three' => ['type' => 'text'],
+                ],
+            ]));
+
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
             'title' => 'Test',
             'sections' => [
@@ -276,26 +331,29 @@ class BlueprintTest extends TestCase
                 ],
                 'section_two' => [
                     'fields' => [
-                        ['handle' => 'two', 'field' => ['type' => 'text']]
+                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                        ['import' => 'partial'],
                     ]
                 ]
             ]
         ]);
-        $this->assertFalse($blueprint->hasField('three'));
+        $this->assertFalse($blueprint->hasField('four'));
 
         $return = $blueprint
-            ->ensureField('three', ['type' => 'textarea']) // field "three" doesnt exist, so it should get added.
-            ->ensureField('two', ['type' => 'textarea', 'foo' => 'bar']);  // field "two" exists so the config is merged
+            ->ensureField('four', ['type' => 'textarea']) // field "four" doesnt exist.
+            ->ensureField('two', ['type' => 'textarea', 'foo' => 'bar'])  // field "two" exists in blueprint.
+            ->ensureField('three', ['type' => 'textarea', 'foo' => 'baz']); // field "three" exists in partial.
 
         $this->assertEquals($blueprint, $return);
-        $this->assertTrue($blueprint->hasField('three'));
+        $this->assertTrue($blueprint->hasField('four'));
         tap($blueprint->fields()->all(), function ($items) {
-            $this->assertCount(3, $items);
+            $this->assertCount(4, $items);
             $this->assertEveryItemIsInstanceOf(Field::class, $items);
             $this->assertEquals([
                 'one' => ['type' => 'text'],
-                'three' => ['type' => 'textarea'],
                 'two' => ['type' => 'text', 'foo' => 'bar'], // config gets merged, but keys in the blueprint win.
+                'three' => ['type' => 'text', 'foo' => 'baz'], // config gets merged, but keys in partial win.
+                'four' => ['type' => 'textarea'], // field gets added.
             ], $items->map->config()->all());
         });
     }
@@ -374,6 +432,84 @@ class BlueprintTest extends TestCase
                 'two' => ['type' => 'text', 'foo' => 'bar'], // config gets merged, but keys in the blueprint win.
             ], $items->map->config()->all());
         });
+    }
+
+    /** @test */
+    function it_removes_a_field()
+    {
+        $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
+            'title' => 'Test',
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']]
+                    ]
+                ],
+                'section_two' => [
+                    'fields' => [
+                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                        ['handle' => 'three', 'field' => ['type' => 'text']]
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->assertTrue($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two'));
+        $this->assertTrue($blueprint->hasField('three'));
+
+        $return = $blueprint
+            ->removeField('one')
+            ->removeField('three')
+            ->removeField('four'); // Ensure it doesn't error when field handle not found
+
+        $this->assertEquals($blueprint, $return);
+
+        $this->assertFalse($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two')); // Was never removed
+        $this->assertFalse($blueprint->hasField('three'));
+    }
+
+    /** @test */
+    function it_removes_a_field_from_a_specific_section()
+    {
+        $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
+            'title' => 'Test',
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                    ]
+                ],
+                'section_two' => [
+                    'fields' => [
+                        ['handle' => 'three', 'field' => ['type' => 'text']],
+                        ['handle' => 'four', 'field' => ['type' => 'text']],
+                    ]
+                ]
+            ]
+        ]);
+
+        $this->assertTrue($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two'));
+        $this->assertTrue($blueprint->hasField('three'));
+        $this->assertTrue($blueprint->hasField('four'));
+
+        $return = $blueprint
+            ->removeField('one', 'section_one')
+            ->removeField('four', 'section_one') // Doesn't exist in section one, so it won't be removed.
+            ->removeFieldFromSection('three', 'section_two')
+            ->removeFieldFromSection('two', 'section_two') // Don't exist in section two, so it won't be removed.
+            ->removeField('seven', 'section_one') // Ensure it doesn't error when field doesn't exist at all.
+            ->removeFieldFromSection('eight', 'section_one'); // Ensure it doesn't error when field doesn't exist at all.
+
+        $this->assertEquals($blueprint, $return);
+
+        $this->assertFalse($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two'));
+        $this->assertFalse($blueprint->hasField('three'));
+        $this->assertTrue($blueprint->hasField('four'));
     }
 
     /** @test */

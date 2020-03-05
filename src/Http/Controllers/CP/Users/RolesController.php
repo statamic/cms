@@ -20,7 +20,8 @@ class RolesController extends CpController
                 'title' => $role->title(),
                 'handle' => $role->handle(),
                 'permissions' => $role->isSuper() ? __('Super User') : $role->permissions()->count(),
-                'edit_url' => cp_route('roles.edit', $role->handle())
+                'edit_url' => $role->editUrl(),
+                'delete_url' => $role->deleteUrl(),
             ];
         })->values();
 
@@ -64,6 +65,8 @@ class RolesController extends CpController
             ->permissions($request->super ? ['super'] : $request->permissions)
             ->save();
 
+        session()->flash('success', 'Role created');
+
         return ['redirect' => cp_route('roles.index', $role->handle())];
     }
 
@@ -102,6 +105,8 @@ class RolesController extends CpController
             ->handle($request->handle ?: snake_case($request->title))
             ->permissions($request->super ? ['super'] : $request->permissions)
             ->save();
+
+        session()->flash('success', 'Role updated');
 
         return ['redirect' => cp_route('roles.index', $role->handle())];
     }

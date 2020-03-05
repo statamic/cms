@@ -14,16 +14,26 @@
     @apply p-1 min-h-48;
 }
 
+// Modes
+.bard-editor.mode\:read-only .ProseMirror {
+    @apply bg-grey-30 text-grey-70;
+}
+
+.bard-editor.mode\:minimal .ProseMirror {
+    min-height: 80px;
+}
+
+// Responise Wangjangling
 @screen md {
-    .bard-editor .ProseMirror { @apply p-3; }
+    .bard-editor .ProseMirror { @apply p-2; }
 }
 
 .bard-fixed-toolbar {
     @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between;
     position: sticky;
-    top: 0;
     padding: 4px 8px;
     z-index: 5;
+    top: 52px; // below global nav
 
     .bard-toolbar-button {
         @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center;
@@ -41,7 +51,7 @@
     }
 
     .bard-toolbar-button:focus {
-        outline: none;
+        @apply focus-outline;
     }
 
     .bard-toolbar-button:disabled {
@@ -80,7 +90,7 @@
 }
 
 .bard-floating-toolbar {
-    @apply bg-black rounded-full absolute shadow-lg px-2 opacity-0 invisible;
+    @apply flex bg-black rounded-full absolute shadow-lg px-0 opacity-0 invisible;
     transform: translateX(-50%) translateY(-10px);
     white-space: nowrap;
     z-index: 1000;
@@ -100,7 +110,7 @@
     }
 
     button {
-        @apply text-grey-20 h-12 w-16 bg-black rounded-lg flex items-center;
+        @apply text-grey-20 h-10 w-10 text-center bg-black rounded-lg flex items-center justify-center;
         font-size: 16px;
         transition: all .1s ease-in-out;
     }
@@ -163,7 +173,7 @@
 
 .bard-fieldtype .bard-fullscreen {
     @apply .fixed .bg-grey-20 .pin .min-h-screen .overflow-scroll rounded-none;
-    z-index: 11; // to appear over the top of the rest of the stuff on the page.
+    z-index: 998; // to appear over the top of the rest of the stuff on the page.
                 // too high and it'll be over the top of stacks, etc.
 
     .bard-editor {
@@ -437,4 +447,14 @@
     &:hover {
         cursor: grab;
     }
+}
+
+
+/* Bard inside a set
+  ========================================================================== */
+
+.replicator-set-body .bard-fixed-toolbar {
+    top: 0;
+    position: relative;
+    z-index: 1;
 }

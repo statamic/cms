@@ -1,27 +1,22 @@
 <template>
 
         <div>
-            <div class="flex items-center mb-3">
-                <slot name="heading" :title="initialTitle" />
-                <button type="submit" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</button>
-            </div>
-
             <div class="card p-0 mb-3 publish-fields">
 
                 <form-group
                     :display="__('Title')"
                     handle="title"
-                    width="50"
                     :errors="errors.title"
+                    :instructions="__('messages.user_groups_title_instructions')"
                     v-model="title"
-                    autofocus
+                    :focus="true"
                 />
 
                 <form-group
                     fieldtype="slug"
                     :display="__('Handle')"
                     handle="handle"
-                    width="50"
+                    :instructions="__('messages.user_groups_handle_instructions')"
                     :errors="errors.title"
                     v-model="handle"
                 />
@@ -30,8 +25,13 @@
                     {{ __('messages.role_change_handle_warning') }}
                 </div>
 
-                <div class="form-group publish-field w-1/2">
-                    <label class="publish-field-label" v-text="__('Roles')" />
+                <div class="form-group publish-field w-full">
+                    <div class="field-inner">
+                        <label class="publish-field-label" v-text="__('Roles')" />
+                        <div class="help-block -mt-1">
+                            <p>{{ __('messages.user_groups_role_instructions') }}</p>
+                        </div>
+                    </div>
                     <publish-field-meta
                         :config="{ handle: 'roles', type: 'user_roles' }"
                         :initial-value="roles">
@@ -49,7 +49,10 @@
                 </div>
 
             </div>
-
+            <div class="py-2 border-t flex justify-between">
+                <a :href="action" class="btn" v-text="__('Cancel') "/>
+                <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
+            </div>
         </div>
 </template>
 
@@ -63,7 +66,8 @@ export default {
         initialRoles: Array,
         initialUsers: Array,
         action: String,
-        method: String
+        method: String,
+        creating: Boolean
     },
 
     data() {
@@ -79,7 +83,9 @@ export default {
 
     watch: {
         'title': function(display) {
-            this.handle = this.$slugify(display, '_');
+            if (this.creating) {
+                this.handle = this.$slugify(display, '_');
+            }
         }
     },
 
@@ -111,10 +117,7 @@ export default {
             this.clearErrors();
 
             this.$axios[this.method](this.action, this.payload).then(response => {
-                this.$toast.success('Saved');
-                if (!this.initialHandle || (this.initialHandle !== this.handle)) {
-                    window.location = response.data.redirect;
-                }
+                window.location = response.data.redirect;
             }).catch(e => {
                 if (e.response && e.response.status === 422) {
                     const { message, errors } = e.response.data;
@@ -122,7 +125,7 @@ export default {
                     this.errors = errors;
                     this.$toast.error(message);
                 } else {
-                    this.$toast.error('Something went wrong');
+                    this.$toast.error(__('Unable to save user group'));
                 }
             });
         }

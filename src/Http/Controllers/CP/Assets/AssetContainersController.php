@@ -25,7 +25,9 @@ class AssetContainersController extends CpController
                 'allow_uploads' => $container->allowUploads(),
                 'create_folders' => $container->createFolders(),
                 'edit_url' => $container->editUrl(),
-                'delete_url' => $container->deleteUrl()
+                'delete_url' => $container->deleteUrl(),
+                'can_edit' => User::current()->can('edit', $container),
+                'can_delete' => User::current()->can('delete', $container),
             ];
         })->values();
 
@@ -42,8 +44,6 @@ class AssetContainersController extends CpController
 
     public function edit($container)
     {
-        $container = AssetContainer::find($container);
-
         $this->authorize('edit', $container, 'You are not authorized to edit asset containers.');
 
         $values = $container->toArray();
@@ -63,8 +63,6 @@ class AssetContainersController extends CpController
 
     public function update(Request $request, $container)
     {
-        $container = AssetContainer::find($container);
-
         $this->authorize('update', $container, 'You are not authorized to edit asset containers.');
 
         $fields = $this->formBlueprint()->fields()->addValues($request->all());
@@ -85,7 +83,11 @@ class AssetContainersController extends CpController
 
         $container->save();
 
-        return $container->toArray();
+        // return $container->toArray();
+
+        session()->flash('success', 'Asset container updated');
+
+        return ['redirect' => $container->showUrl()];
     }
 
     public function create()
@@ -137,15 +139,13 @@ class AssetContainersController extends CpController
 
     public function destroy($container)
     {
-        $container = AssetContainer::find($container);
-
-        // TODO: auth
+        $this->authorize('delete', $container, 'You are not authorized to delete asset containers.');
 
         $container->delete();
 
         return [
             'message' => 'Container deleted',
-            'redirect' => cp_route('asset-containers.index')
+            'redirect' => cp_route('assets.index')
         ];
     }
 
@@ -156,69 +156,83 @@ class AssetContainersController extends CpController
 
     protected function formBlueprint()
     {
-        return Blueprint::makeFromFields([
-            'title' => [
-                'type' => 'text',
-                'display' => __('Title'),
-                'validate' => 'required',
-                'width' => 50,
+        return Blueprint::makeFromSections([
+            'name' => [
+                'display' => __('Name'),
+                'fields' => [
+                    'title' => [
+                        'type' => 'text',
+                        'display' => __('Title'),
+                        'instructions' => __('statamic::messages.asset_container_title_instructions'),
+                        'validate' => 'required',
+                    ],
+                    'handle' => [
+                        'type' => 'slug',
+                        'display' => __('Handle'),
+                        'validate' => 'required|alpha_dash',
+                        'instructions' => __('statamic::messages.asset_container_handle_instructions'),
+                    ],
+                ],
             ],
-            'handle' => [
-                'type' => 'slug',
-                'display' => __('Slug'),
-                'validate' => 'required|alpha_dash',
-                'width' => 50,
+            'filesystem' => [
+                'display' => __('File Driver'),
+                'fields' => [
+                    'disk' => [
+                        'type' => 'select',
+                        'display' => __('Disk'),
+                        'instructions' => __('statamic::messages.asset_container_disk_instructions'),
+                        'options' => $this->disks()->all(),
+                        'validate' => 'required',
+                    ],
+                ],
             ],
-            'disk' => [
-                'type' => 'select',
-                'display' => __('Disk'),
-                'instructions' => __('statamic::messages.asset_container_disk_instructions'),
-                'options' => $this->disks()->all(),
-                'width' => 50,
-                'validate' => 'required',
+            'fields' => [
+                'display' => __('Fields'),
+                'fields' => [
+                    'blueprint' => [
+                        'type' => 'blueprints',
+                        'display' => __('Blueprint'),
+                        'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
+                        'mode' => 'select',
+                        'max_items' => 1,
+                    ],
+                ]
             ],
-            'blueprint' => [
-                'type' => 'blueprints',
-                'display' => __('Blueprints'),
-                'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
-                'max_items' => 1,
-                'width' => 50,
-            ],
-            'allow_uploads' => [
-                'type' => 'toggle',
-                'display' => __('Allow Uploads'),
-                'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
-                'default' => true,
-                'width' => 50,
-            ],
-            'create_folders' => [
-                'type' => 'toggle',
-                'display' => __('Create Folders'),
-                'instructions' => __('statamic::messages.asset_container_create_folder_instructions'),
-                'default' => true,
-                'width' => 50,
-            ],
-            'allow_renaming' => [
-                'type' => 'toggle',
-                'display' => __('Allow Renaming'),
-                'instructions' => __('statamic::messages.asset_container_rename_instructions'),
-                'default' => true,
-                'width' => 50,
-            ],
-            'allow_moving' => [
-                'type' => 'toggle',
-                'display' => __('Allow Moving'),
-                'instructions' => __('statamic::messages.asset_container_move_instructions'),
-                'default' => true,
-                'width' => 50,
-            ],
-            'allow_downloading' => [
-                'type' => 'toggle',
-                'display' => __('Allow Downloading'),
-                'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
-                'default' => true,
-                'width' => 50,
-            ],
+            'settings' => [
+                'display' => __('Settings'),
+                'fields' => [
+                    'allow_uploads' => [
+                        'type' => 'toggle',
+                        'display' => __('Allow Uploads'),
+                        'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
+                        'default' => true,
+                    ],
+                    'create_folders' => [
+                        'type' => 'toggle',
+                        'display' => __('Create Folders'),
+                        'instructions' => __('statamic::messages.asset_container_create_folder_instructions'),
+                        'default' => true,
+                    ],
+                    'allow_renaming' => [
+                        'type' => 'toggle',
+                        'display' => __('Allow Renaming'),
+                        'instructions' => __('statamic::messages.asset_container_rename_instructions'),
+                        'default' => true,
+                    ],
+                    'allow_moving' => [
+                        'type' => 'toggle',
+                        'display' => __('Allow Moving'),
+                        'instructions' => __('statamic::messages.asset_container_move_instructions'),
+                        'default' => true,
+                    ],
+                    'allow_downloading' => [
+                        'type' => 'toggle',
+                        'display' => __('Allow Downloading'),
+                        'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
+                        'default' => true,
+                    ],
+                ]
+            ]
         ]);
     }
 }

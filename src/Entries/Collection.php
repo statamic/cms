@@ -2,19 +2,20 @@
 
 namespace Statamic\Entries;
 
-use Statamic\Facades;
-use Statamic\Support\Arr;
-use Statamic\Facades\File;
-use Statamic\Facades\Site;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Search;
-use Statamic\Facades\Stache;
-use Statamic\Facades\Taxonomy;
-use Statamic\Facades\Blueprint;
-use Statamic\Facades\Structure;
-use Statamic\Data\ExistsAsFile;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Entries\Collection as Contract;
+use Statamic\Data\ExistsAsFile;
+use Statamic\Facades;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Entry;
+use Statamic\Facades\File;
+use Statamic\Facades\Search;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Facades\Structure;
+use Statamic\Facades\Taxonomy;
+use Statamic\Support\Arr;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Collection implements Contract
 {
@@ -23,7 +24,6 @@ class Collection implements Contract
     protected $handle;
     protected $route;
     protected $mount;
-    protected $mountedEntry;
     protected $title;
     protected $template;
     protected $layout;
@@ -153,6 +153,11 @@ class Collection implements Contract
         return cp_route('collections.edit', $this->handle());
     }
 
+    public function deleteUrl()
+    {
+        return cp_route('collections.destroy', $this->handle());
+    }
+
     public function createEntryUrl($site = null)
     {
         $site = $site ?? $this->sites()->first();
@@ -260,6 +265,9 @@ class Collection implements Contract
     public function save()
     {
         Facades\Collection::save($this);
+
+        Blink::flush('collection-handles');
+        Blink::flushStartingWith("collection-{$this->id()}");
 
         optional($this->structure())->updateEntryUris();
 
@@ -494,7 +502,10 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('structure')
             ->getter(function ($structure) {
-                return is_string($structure) ? Structure::findByHandle($structure) : $structure;
+                $key = "collection-{$this->id()}-structure-{$structure}";
+                return is_string($structure) ? Blink::once($key, function () use ($structure) {
+                    return Structure::findByHandle($structure);
+                }) : $structure;
             })
             ->args(func_get_args());
     }
@@ -527,7 +538,9 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('mount')
             ->getter(function ($mount) {
-                return $this->mountedEntry = $this->mountedEntry ?? Entry::find($mount);
+                return Blink::once("collection-{$this->id()}-mount-{$mount}", function () use ($mount) {
+                    return Entry::find($mount);
+                });
             })
             ->args(func_get_args());
     }
@@ -537,9 +550,12 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('taxonomies')
             ->getter(function ($taxonomies) {
-                return collect($taxonomies)->map(function ($taxonomy) {
-                    return Taxonomy::findByHandle($taxonomy);
-                })->filter();
+                $key = "collection-{$this->id()}-taxonomies-".md5(json_encode($taxonomies));
+                return Blink::once($key, function () use ($taxonomies) {
+                    return collect($taxonomies)->map(function ($taxonomy) {
+                        return Taxonomy::findByHandle($taxonomy);
+                    })->filter();
+                });
             })
             ->args(func_get_args());
     }

@@ -20,6 +20,6 @@ trait ContainsSupplementalData
 
     public function getSupplement($key)
     {
-        return $this->supplements[$key];
+        return $this->supplements[$key] ?? null;
     }
 }

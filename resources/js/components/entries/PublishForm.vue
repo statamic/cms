@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <breadcrumbs :crumbs="breadcrumbs" />
+        <breadcrumb :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
 
         <div class="flex items-center mb-3">
             <h1 class="flex-1">
@@ -13,7 +13,7 @@
                 </div>
             </h1>
 
-            <dropdown-list class="mr-2">
+            <dropdown-list class="mr-2" v-if="canEditBlueprint">
                 <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
             </dropdown-list>
 
@@ -24,8 +24,9 @@
             <div class="hidden md:flex items-center">
                 <button
                     v-if="!readOnly"
-                    class="btn"
+                    class="btn-primary"
                     :class="{
+                        'btn': revisionsEnabled,
                         'btn-primary': isCreating || !revisionsEnabled,
                     }"
                     :disabled="!canSave"
@@ -34,7 +35,7 @@
 
                 <button
                     v-if="revisionsEnabled && !isCreating"
-                    class="ml-2 btn btn-primary flex items-center"
+                    class="ml-2 btn-primary flex items-center"
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
                     <span v-text="__('Publish')" />
@@ -179,17 +180,14 @@
                 <template v-slot:buttons>
                    <button
                     v-if="!readOnly"
-                    class="btn ml-2"
-                    :class="{
-                        'btn-primary': isCreating || !revisionsEnabled,
-                    }"
+                    class="ml-2 btn-primary"
                     :disabled="!canSave"
                     @click.prevent="save"
                     v-text="saveText" />
 
                     <button
                         v-if="revisionsEnabled && !isCreating"
-                        class="ml-2 btn btn-primary flex items-center"
+                        class="ml-2 btn-primary flex items-center"
                         :disabled="!canPublish"
                         @click="confirmingPublish = true">
                         <span v-text="__('Publish')" />
@@ -202,10 +200,10 @@
         <div class="md:hidden mt-3 flex items-center">
             <button
                 v-if="!readOnly"
-                class="btn btn-lg"
+                class="btn-lg"
                 :class="{
                     'btn-primary w-full': ! revisionsEnabled,
-                    'w-1/2 mr-2': revisionsEnabled,
+                    'btn w-1/2 mr-2': revisionsEnabled,
                 }"
                 :disabled="!canSave"
                 @click.prevent="save"
@@ -283,6 +281,7 @@ export default {
         initialPermalink: String,
         revisionsEnabled: Boolean,
         preloadedAssets: Array,
+        canEditBlueprint: Boolean
     },
 
     data() {
@@ -434,7 +433,7 @@ export default {
                 this.title = this.values.title;
                 this.isWorkingCopy = true;
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
-                if (!this.isCreating) this.$toast.success('Saved');
+                if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
                 this.runAfterSaveHook(response);
             }).catch(error => this.handleAxiosError(error));
@@ -590,7 +589,7 @@ export default {
     },
 
     mounted() {
-        this.saveKeyBinding = this.$keys.bindGlobal('mod+s', e => {
+        this.saveKeyBinding = this.$keys.bindGlobal(['mod+s', 'mod+return'], e => {
             e.preventDefault();
             if (this.confirmingPublish) return;
             this.save();

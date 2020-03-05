@@ -173,8 +173,8 @@ class FieldsTest extends TestCase
 
         $this->assertTrue(is_array($fields));
         $this->assertCount(2, $fields);
-        $this->assertEquals('one', $fields[0]->handle());
-        $this->assertEquals('two', $fields[1]->handle());
+        $this->assertEquals('one', $fields['one']->handle());
+        $this->assertEquals('two', $fields['two']->handle());
     }
 
     /** @test */
@@ -200,8 +200,8 @@ class FieldsTest extends TestCase
 
         $this->assertTrue(is_array($fields));
         $this->assertCount(2, $fields);
-        $this->assertEquals('test_one', $fields[0]->handle());
-        $this->assertEquals('test_two', $fields[1]->handle());
+        $this->assertEquals('test_one', $fields['test_one']->handle());
+        $this->assertEquals('test_two', $fields['test_two']->handle());
     }
 
     /** @test */
@@ -243,6 +243,36 @@ class FieldsTest extends TestCase
         $this->assertInstanceOf(Field::class, $field = $fields->get('one'));
         $this->assertEquals('First', $field->display());
         $this->assertNull($fields->get('two'));
+    }
+
+    /** @test */
+    function it_gets_all_fields_except()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['display' => 'First']],
+            ['handle' => 'two', 'field' => ['display' => 'Second']],
+            ['handle' => 'three', 'field' => ['display' => 'Third']],
+        ]);
+
+        $this->assertInstanceOf(Fields::class, $fields->except('two'));
+        $this->assertEquals(['one', 'three'], $fields->except('two')->all()->keys()->all());
+        $this->assertEquals(['one'], $fields->except('two', 'three')->all()->keys()->all());
+        $this->assertEquals(['three'], $fields->except(['one', 'two'])->all()->keys()->all());
+    }
+
+    /** @test */
+    function it_gets_only_specific_fields()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['display' => 'First']],
+            ['handle' => 'two', 'field' => ['display' => 'Second']],
+            ['handle' => 'three', 'field' => ['display' => 'Third']],
+        ]);
+
+        $this->assertInstanceOf(Fields::class, $fields->only('two'));
+        $this->assertEquals(['two'], $fields->only('two')->all()->keys()->all());
+        $this->assertEquals(['two', 'three'], $fields->only('two', 'three')->all()->keys()->all());
+        $this->assertEquals(['one', 'two'], $fields->only(['one', 'two'])->all()->keys()->all());
     }
 
     /** @test */
@@ -292,6 +322,7 @@ class FieldsTest extends TestCase
                 'component' => 'text',
                 'placeholder' => null,
                 'character_limit' => 0,
+                'input_type' => 'text',
                 'prepend' => null,
                 'append' => null,
             ],

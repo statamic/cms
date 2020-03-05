@@ -1031,7 +1031,13 @@ class CoreModifiers extends Modifier
      */
     public function limit($value, $params)
     {
-        return array_slice($value, 0, Arr::get($params, 0, 0));
+        $limit = Arr::get($params, 0, 0);
+
+        if ($value instanceof Collection) {
+            return $value->take($limit);
+        }
+
+        return array_slice($value, 0, $limit);
     }
 
     /**

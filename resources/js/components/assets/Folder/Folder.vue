@@ -18,16 +18,16 @@
                 v-if="!initialDirectory"
                 handle="directory"
                 :display="__('Folder Name')"
-                :instructions="__('messages.asset_folders_directory_instructions')"
                 :errors="errors.directory"
-                autofocus
-                v-model="directory"
+                :instructions="__('messages.asset_folders_directory_instructions')"
+                :focus="true"
                 :required="true"
+                v-model="directory"
             />
 
             <div class="px-3 pb-3">
                 <button
-                    class="btn btn-primary"
+                    class="btn-primary"
                     @click.prevent="submit"
                     v-text="buttonText"
                 />

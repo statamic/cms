@@ -35,6 +35,8 @@ Route::group([
 
     Route::group(['namespace' => 'Collections'], function () {
         Route::resource('collections', 'CollectionsController');
+        Route::get('collections/{collection}/scaffold', 'ScaffoldCollectionController@index')->name('collections.scaffold');
+        Route::post('collections/{collection}/scaffold', 'ScaffoldCollectionController@create')->name('collections.scaffold.create');
 
         Route::group(['prefix' => 'collections/{collection}/entries'], function () {
             Route::get('/', 'EntriesController@index')->name('collections.entries.index');
@@ -102,19 +104,19 @@ Route::group([
 
     Route::group(['namespace' => 'Assets'], function () {
         Route::resource('asset-containers', 'AssetContainersController');
-        Route::post('asset-containers/{container}/folders', 'FoldersController@store');
-        Route::patch('asset-containers/{container}/folders/{path}', 'FoldersController@update')->where('path', '.*');
+        Route::post('asset-containers/{asset_container}/folders', 'FoldersController@store');
+        Route::patch('asset-containers/{asset_container}/folders/{path}', 'FoldersController@update')->where('path', '.*');
         Route::post('assets/actions', 'ActionController')->name('assets.actions');
         Route::get('assets/browse', 'BrowserController@index')->name('assets.browse.index');
-        Route::get('assets/browse/search/{container}', 'BrowserController@search');
-        Route::post('assets/browse/folders/{container}/actions', 'FolderActionController')->name('assets.folders.actions');
-        Route::get('assets/browse/folders/{container}/{path?}', 'BrowserController@folder')->where('path', '.*');
-        Route::get('assets/browse/{container}/{path?}/edit', 'BrowserController@edit')->where('path', '.*')->name('assets.browse.edit');
-        Route::get('assets/browse/{container}/{path?}', 'BrowserController@show')->where('path', '.*')->name('assets.browse.show');
+        Route::get('assets/browse/search/{asset_container}', 'BrowserController@search');
+        Route::post('assets/browse/folders/{asset_container}/actions', 'FolderActionController')->name('assets.folders.actions');
+        Route::get('assets/browse/folders/{asset_container}/{path?}', 'BrowserController@folder')->where('path', '.*');
+        Route::get('assets/browse/{asset_container}/{path?}/edit', 'BrowserController@edit')->where('path', '.*')->name('assets.browse.edit');
+        Route::get('assets/browse/{asset_container}/{path?}', 'BrowserController@show')->where('path', '.*')->name('assets.browse.show');
         Route::get('assets-fieldtype', 'FieldtypeController@index');
-        Route::resource('assets', 'AssetsController');
-        Route::get('assets/{asset}/download', 'AssetsController@download')->name('assets.download');
-        Route::get('thumbnails/{asset}/{size?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
+        Route::resource('assets', 'AssetsController')->parameters(['assets' => 'encoded_asset']);
+        Route::get('assets/{encoded_asset}/download', 'AssetsController@download')->name('assets.download');
+        Route::get('thumbnails/{encoded_asset}/{size?}', 'ThumbnailController@show')->name('assets.thumbnails.show');
     });
 
     Route::group(['prefix' => 'fields', 'namespace' => 'Fields'], function () {
@@ -175,7 +177,7 @@ Route::group([
         Route::get('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
     });
 
-    Route::group(['prefix' => 'api', 'as' => 'api', 'namespace' => 'API'], function () {
+    Route::group(['prefix' => 'api', 'as' => 'api.', 'namespace' => 'API'], function () {
         Route::resource('addons', 'AddonsController');
         Route::resource('templates', 'TemplatesController');
     });

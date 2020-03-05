@@ -1,27 +1,29 @@
 <template>
 
         <div>
-            <div class="flex items-center mb-3">
-                <slot name="heading" :title="initialTitle" />
-                <button type="submit" class="btn btn-primary" @click.prevent="save">{{ __('Save') }}</button>
-            </div>
+            <header class="mb-3">
+                <breadcrumb :url="breadcrumbUrl" :title="__('Roles & Permissions')" />
+                <h1 v-text="initialTitle || __('Create Role')" />
+            </header>
 
-            <div class="card p-0 mb-3 publish-fields">
+            <div class="card p-0 mb-3 publish-fields configure-section">
 
                 <form-group
-                    :display="__('Title')"
                     handle="title"
-                    width="50"
+                    class="border-b"
+                    :display="__('Title')"
                     :errors="errors.title"
+                    :instructions="__('messages.role_title_instructions')"
                     v-model="title"
-                    autofocus
+                    :focus="true"
                 />
 
                 <form-group
+                    class="border-b"
                     fieldtype="slug"
-                    :display="__('Handle')"
                     handle="handle"
-                    width="50"
+                    :display="__('Handle')"
+                    :instructions="__('messages.role_handle_instructions')"
                     :errors="errors.title"
                     v-model="handle"
                 />
@@ -31,6 +33,7 @@
                 </div>
 
                 <form-group
+                    class="toggle-fieldtype"
                     fieldtype="toggle"
                     handle="super"
                     :display="__('permissions.super')"
@@ -41,10 +44,15 @@
             </div>
 
             <div v-if="!isSuper">
-                <div class="mt-3" v-for="group in permissions" :key="group.handle">
-                    <h2 class="mt-4 mb-2 font-bold text-xl">{{ group.label }}</h2>
+                <div class="mt-3 content" v-for="group in permissions" :key="group.handle">
+                    <h2 class="mt-5 text-base mb-1">{{ group.label }}</h2>
                     <role-permission-tree class="card p-0" :depth="1" :initial-permissions="group.permissions" />
                 </div>
+            </div>
+
+            <div class="py-2 mt-3 border-t flex justify-between">
+                <a :href="indexUrl" class="btn" v-text="__('Cancel') "/>
+                <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
             </div>
 
         </div>
@@ -67,7 +75,9 @@ export default {
         initialPermissions: Array,
         initialSuper: Boolean,
         action: String,
-        method: String
+        method: String,
+        breadcrumbUrl: String,
+        indexUrl: String
     },
 
     data() {
@@ -121,10 +131,7 @@ export default {
             this.clearErrors();
 
             this.$axios[this.method](this.action, this.payload).then(response => {
-                this.$toast.success('Saved');
-                if (!this.initialHandle || (this.initialHandle !== this.handle)) {
-                    window.location = response.data.redirect;
-                }
+                window.location = response.data.redirect;
             }).catch(e => {
                 if (e.response && e.response.status === 422) {
                     const { message, errors } = e.response.data;
@@ -132,7 +139,7 @@ export default {
                     this.errors = errors;
                     this.$toast.error(message);
                 } else {
-                    this.$toast.error('Something went wrong');
+                    this.$toast.error(__('Unable to save role'));
                 }
             });
         }
