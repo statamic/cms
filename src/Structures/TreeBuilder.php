@@ -58,6 +58,7 @@ class TreeBuilder
                 'url'         => $page->url(),
                 'edit_url'    => $page->editUrl(),
                 'slug'        => $page->slug(),
+                'redirect'    => $page->reference() ? $page->entry()->get('redirect') : null,
                 'collection'  => !$collection ? null : [
                     'handle' => $collection->handle(),
                     'title' => $collection->title(),

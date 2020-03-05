@@ -9,14 +9,13 @@ use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Illuminate\Contracts\Support\Responsable;
-use Illuminate\Support\Traits\ForwardsCalls;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Facades\Blink;
 
 class Page implements Entry, Augmentable, Responsable
 {
-    use HasAugmentedInstance, ForwardsCalls;
+    use HasAugmentedInstance;
 
     protected $tree;
     protected $reference;
@@ -297,10 +296,5 @@ class Page implements Entry, Augmentable, Responsable
     public function collection()
     {
         return Collection::findByMount($this);
-    }
-
-    public function __call($method, $args)
-    {
-        return $this->forwardCallTo($this->entry(), $method, $args);
     }
 }
