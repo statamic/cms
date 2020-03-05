@@ -17,6 +17,11 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0">
+                    <div class="border-b px-2 text-sm">
+                        <button class="data-list-filter-link active px-1.5">All</button>
+                        <button class="data-list-filter-link">Puddings</button>
+                        <button class="data-list-filter-link">Animal Milk</button>
+                    </div>
                     <div class="data-list-header">
                         <data-list-filters
                             :filters="filters"
