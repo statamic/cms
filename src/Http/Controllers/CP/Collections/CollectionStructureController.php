@@ -11,6 +11,8 @@ class CollectionStructureController extends CpController
 {
     public function update(Request $request, $collection)
     {
+        $this->authorize('reorder', $collection);
+
         $tree = $this->toTree($request->pages);
 
         collect($request->deletedEntries ?? [])
