@@ -126,9 +126,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         if ($this->hasStructure()) {
             tap($this->structure(), function ($structure) {
                 $structure->trees()->each(function ($tree) {
-                    // Ugly, but it's moving all the child pages to the top level. TODO: Tidy.
-                    $this->page()->pages()->all()->each(function ($child) use ($tree) {
-                        $tree->move($child->id(), null);
+                    // Ugly, but it's moving all the child pages to the parent. TODO: Tidy.
+                    $parent = $this->parent();
+                    if (optional($parent)->isRoot()) {
+                        $parent = null;
+                    }
+                    $this->page()->pages()->all()->each(function ($child) use ($tree, $parent) {
+                        $tree->move($child->id(), optional($parent)->id());
                     });
                     $tree->remove($this);
                 });

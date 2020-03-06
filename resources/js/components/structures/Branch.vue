@@ -103,7 +103,7 @@ export default {
             for (let index = 0; index < length; index++) {
                 // As the item is moved out, the rest of the items are moved up an index.
                 // We always just want to move the first item.
-                th.appendTo(children[0], store.rootData);
+                th.appendTo(children[0], this.vm.data.parent);
             }
 
             this.$emit('children-orphaned', store);

@@ -35,7 +35,7 @@ class DeleteEntryTest extends TestCase
     }
 
     /** @test */
-    function entries_get_removed_from_the_structure_and_child_pages_are_moved_to_the_top()
+    function entries_get_removed_from_the_structure_and_child_pages_are_moved_to_the_parent()
     {
         // We need to confirm that the structure actually gets saved, which would mean it becomes a new object.
         // When using the array cache driver, the same instance would always be returned.
@@ -50,6 +50,9 @@ class DeleteEntryTest extends TestCase
         EntryFactory::id('4')->slug('four')->collection('test')->create();
         EntryFactory::id('5')->slug('five')->collection('test')->create();
         EntryFactory::id('6')->slug('six')->collection('test')->create();
+        EntryFactory::id('7')->slug('six')->collection('test')->create();
+        EntryFactory::id('8')->slug('six')->collection('test')->create();
+        EntryFactory::id('9')->slug('six')->collection('test')->create();
 
         $collection = tap(Collection::findByHandle('test')->structureContents([
             'tree' => [
@@ -60,28 +63,68 @@ class DeleteEntryTest extends TestCase
                     ]],
                 ]],
                 ['entry' => '2'],
-                ['entry' => '3'],
+                ['entry' => '3', 'children' => [
+                    ['entry' => '7', 'children' => [
+                        ['entry' => '8', 'children' => [
+                            ['entry' => '9']
+                        ]],
+                    ]]
+                ]],
             ]
         ]))->save();
         $originalStructure = $collection->structure();
 
-        $this->assertCount(6, Entry::all());
+        $this->assertCount(9, Entry::all());
 
         $this
             ->actingAs($user)
-            ->deleteEntries(['1', '3'])
+            ->deleteEntries(['1', '2', '7'])
             ->assertOk();
 
         $updatedCollection = Collection::findByHandle('test');
         $updatedStructure = $updatedCollection->structure();
+        $updatedTree = $updatedStructure->in('en')->tree();
+
+        // TODO: Ideally, the order would be maintained and the assertion in the following test could
+        // go right here and pass.
+        //
+        // However, it's currently rearranging the tree items as the entries are deleted, in the order
+        // they are submitted. These assertions are proving that the items are *structured* correctly
+        // (ie. they'd result in the same urls, minus the parent slug) but not necessarily in the same order.
+        $this->assertEquals(['entry' => '4'], collect($updatedTree)->first(fn($item) => $item['entry'] == '4'));
         $this->assertEquals([
-            ['entry' => '2'],
-            ['entry' => '4'],
-            ['entry' => '5', 'children' => [
+            'entry' => '3', 'children' => [
+                ['entry' => '8', 'children' => [
+                    ['entry' => '9']
+                ]]
+            ]
+        ], collect($updatedTree)->first(fn($item) => $item['entry'] == '3'));
+        $this->assertEquals([
+            'entry' => '5', 'children' => [
                 ['entry' => '6']
-            ]],
-        ], $updatedStructure->in('en')->tree());
+            ]
+        ], collect($updatedTree)->first(fn($item) => $item['entry'] == '5'));
+
         $this->assertNotSame($originalStructure, $updatedStructure);
+    }
+
+    /** @test */
+    function entries_get_removed_from_the_structure_and_child_pages_are_moved_to_the_parent_and_maintain_order()
+    {
+        // TODO: This is a reminder that the previous test needs to have the following assertion swapped in.
+        $this->markTestIncomplete();
+
+        // $this->assertEquals([
+        //     ['entry' => '4'],
+        //     ['entry' => '5', 'children' => [
+        //         ['entry' => '6']
+        //     ]],
+        //     ['entry' => '3', 'children' => [
+        //         ['entry' => '8', 'children' => [
+        //             ['entry' => '9']
+        //         ]],
+        //     ]],
+        // ], $updatedTree);
     }
 
     function deleteEntries($ids)
