@@ -20,7 +20,7 @@
                         <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor"/>
                     </svg>
                 </th>
-                <th class="actions-column text-right">
+                <th class="actions-column">
                     <button class="btn btn-sm px-sm py-sm -ml-sm cursor-pointer" v-tooltip="__('Customize Columns')">
                         <svg-icon name="settings-horizontal" class="w-4" />
                     </button>
@@ -36,7 +36,7 @@
         >
         <tbody>
             <slot name="tbody-start" />
-            <tr v-for="(row, index) in rows" :key="row.id" @click="rowClicked(row)" class="sortable-row outline-none">
+            <tr v-for="(row, index) in rows" :key="row.id" class="sortable-row outline-none">
                 <td class="table-drag-handle" v-if="reorderable"></td>
                 <td class="checkbox-column" v-if="allowBulkActions && !reorderable">
                     <input
@@ -48,7 +48,7 @@
                         :id="`checkbox-${row.id}`"
                     />
                 </td>
-                <td v-for="column in visibleColumns" :key="column.field">
+                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row)">
                     <slot
                         :name="`cell-${column.field}`"
                         :value="row[column.value || column.field]"
@@ -61,7 +61,7 @@
                         <table-field :handle="column.field" :value="row[column.value || column.field]" :values="row" :fieldtype="column.fieldtype" :key="column.field" />
                     </slot>
                 </td>
-                <td class="text-right">
+                <td class="actions-column">
                     <slot
                         name="actions"
                         :row="row"

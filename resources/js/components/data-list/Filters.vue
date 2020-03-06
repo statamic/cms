@@ -1,14 +1,14 @@
 <template>
     <div class="w-full">
         <div class="input-group">
-            <popper
-                trigger="click"
-                :options="{
-                    placement: 'bottom-end',
-                    modifiers: { offset: { offset: '0,10px' } }
-                }">
-
-                <div class="bg-white flex flex-col shadow-popover block p-2 rounded-md text-left z-max">
+            <popover>
+                <template slot="trigger">
+                    <button class="input-group-prepend outline-none cursor-pointer px-2">
+                        {{ __('Filter') }}
+                        <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
+                    </button>
+                </template>
+                <div class="flex flex-col p-2 text-left w-64">
                     <p class="text-xs mb-1">Show all entries where:</p>
                     <field-filters
                         v-if="fieldsFilter"
@@ -17,11 +17,8 @@
                         @changed="filterChanged('fields', $event)"
                     />
                 </div>
-                <button class="input-group-prepend outline-none cursor-pointer px-2" slot="reference">
-                    {{ __('Filter') }}
-                    <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
-                </button>
-            </popper>
+            </popover>
+
 
             <!-- <data-list-filter
                 v-for="filter in standardFilters"
@@ -45,26 +42,28 @@
 
             <!-- @TODO: Need to create actual child components for these native "pinned" filters.
                 We'll need date, status, and author to ship with, plus any custom "promoted" filters. -->
-            <popper trigger="click" :options="{ placement: 'bottom-end', modifiers: { offset: { offset: '0,10px' } }}">
-                <div class="bg-white flex flex-col shadow-popover block px-2 py-1 rounded-md text-left z-max">
-                    <div class="mb-1">
-                        <label for="published" class="mb-sm">
-                            <input type="checkbox" class="mr-sm" name="published" id="published"> Published
-                        </label>
-                        <label for="scheduled" class="mb-sm">
-                            <input type="checkbox" class="mr-sm" name="scheduled" id="scheduled"> Scheduled
-                        </label>
-                        <label for="draft" class="mb-sm">
-                            <input type="checkbox" class="mr-sm" name="draft" id="draft"> Draft
-                        </label>
-                    </div>
-                    <a class="text-grey-60 hover:text-grey-90 text-sm">Clear</a>
-                </div>
-                <button class="input-group-append px-1.5" slot="reference">
-                    {{ __('Status') }}
+            <popover>
+                <template slot="trigger">
+                    <button class="input-group-append px-1.5" slot="reference">
+                    {{ __('Status!') }}
                     <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                 </button>
-            </popper>
+                </template>
+                <div class="px-2 py-1">
+                    <label for="published" class="mb-sm">
+                        <input type="checkbox" class="mr-sm" name="published" id="published"> Published
+                    </label>
+                    <label for="scheduled" class="mb-sm">
+                        <input type="checkbox" class="mr-sm" name="scheduled" id="scheduled"> Scheduled
+                    </label>
+                    <label for="draft" class="mb-sm">
+                        <input type="checkbox" class="mr-sm" name="draft" id="draft"> Draft
+                    </label>
+                    <div class="mt-1">
+                        <a class="text-grey-60 hover:text-grey-90 text-sm">Clear</a>
+                    </div>
+                </div>
+            </popover>
 
             <!-- Saving filters stores a single, default filter state.
             This should create multiple filter states you can pick from. -->
@@ -94,14 +93,12 @@
 <script>
 import DataListFilter from './Filter.vue';
 import FieldFilters from './FieldFilters.vue';
-import Popper from 'vue-popperjs';
 
 export default {
 
     components: {
         DataListFilter,
-        FieldFilters,
-        Popper
+        FieldFilters
     },
 
     props: {

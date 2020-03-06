@@ -64,6 +64,7 @@ Vue.component('avatar', require('../components/Avatar.vue').default);
 Vue.component('breadcrumb', require('../components/Breadcrumb.vue').default);
 Vue.component('breadcrumbs', require('../components/Breadcrumbs.vue').default);
 Vue.component('create-entry-button', require('../components/entries/CreateEntryButton.vue').default);
+Vue.component('popover', require('../components/Popover.vue').default);
 
 // Recursive
 Vue.component('role-permission-tree', require('../components/roles/PermissionTree.vue').default);

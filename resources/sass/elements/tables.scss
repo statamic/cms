@@ -39,7 +39,11 @@
 			&:hover {
 				@apply text-grey-90;
 			}
-        }
+		}
+		.actions-column {
+			@apply p-0 pr-2 text-right;
+			width: 24px;
+		}
 	}
 
     tbody {
@@ -66,7 +70,14 @@
                 @apply py-1 px-2;
                 word-break: break-all;
             }
-        }
+		}
+		.actions-column {
+			@apply p-0 text-right;
+			width: 24px;
+			.rotating-dots-button {
+				margin-right: 18px;
+			}
+		}
     }
 
     .checkbox-column {

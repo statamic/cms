@@ -10,7 +10,7 @@
         ])
         <div class="flex items-center">
             <h1 class="flex-1">{{ $collection->title() }}</h1>
-            <dropdown-list class="mr-1">
+            <dropdown-list class="mr-2">
                 @can('edit', $collection)
                     <dropdown-item :text="__('Edit Collection')" redirect="{{ $collection->editUrl() }}"></dropdown-item>
                 @endcan

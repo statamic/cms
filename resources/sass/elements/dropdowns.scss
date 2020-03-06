@@ -2,55 +2,8 @@
    DROPDOWNS
    ========================================================================== */
 
-dropdown-list {
-    display: none;
-}
-
-.dropdown {
-   position: relative;
-}
-
-.dropdown .dropdown-icon {
-    @apply text-grey p-1;
-    &:hover {
-        @apply text-grey-90;
-    }
-}
-
-.dropdown .rotating-dots {
-    position: relative;
-    transition: .12s ease-out;
-    top: 1px;
-}
-
-.dropdown.open .rotating-dots {
-    transform: rotate(90deg);
-}
-
-.open > .dropdown-menu {
-    transform: scale(1);
-    opacity: 1;
-    z-index: 9999;
-    pointer-events: auto;
-}
-
-.dropdown-menu {
-    @apply bg-white shadow-popover absolute block float-left list-reset p-1 rounded-md text-left;
-    top: 100%;
-    left: auto;
-    right: -5px;
-    z-index: 9999;
-    margin: 6px 0 0;
-    pointer-events: none;
-    min-width: 180px;
-    transform-origin: 50% 10%;
-    animation-fill-mode: forwards;
-    opacity: 0;
-    transform: scale(.8);
-    transition: all .08s ease-in;
-    will-change: transform, opacity;
-    background-clip: padding-box;
-    text-shadow: none;
+.dropdown-list .popover-content {
+    @apply p-1;
 
     button {
         @apply block w-full text-left rounded-sm text-xs font-normal px-1 py-sm text-grey-80;
@@ -94,17 +47,5 @@ dropdown-list {
 
     .align-left & {
         right: auto;
-    }
-}
-
-.dropdown-menu-checkboxes {
-    @apply text-xs font-normal;
-
-    input[type=checkbox] {
-        @apply mr-1;
-    }
-
-    li {
-        @apply .mt-sm;
     }
 }

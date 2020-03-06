@@ -16,28 +16,29 @@ mix.sass(`${src}/sass/cp.scss`, `${dest}/css`).options({
 
 mix.js(`${src}/js/app.js`, `${dest}/js`);
 mix.extract([
+    '@popperjs/core',
+    '@shopify/draggable',
     'autosize',
     'axios',
     'codemirror',
     'cookies-js',
     'dmuploader',
-    'jquery',
     'jquery-ui',
+    'jquery',
     'lazysizes',
     'luminous-lightbox',
-    'marked',
     'marked-plaintext',
+    'marked',
     'moment',
     'mousetrap',
-    'sweetalert',
-    '@shopify/draggable',
     'speakingurl',
+    'sweetalert',
     'underscore',
     'v-calendar',
-    'vue',
     'vue-clickaway',
     'vue-js-modal',
     'vue-js-popover',
+    'vue'
 ]);
 
 mix.copyDirectory(`${src}/img`, `${dest}/img`);

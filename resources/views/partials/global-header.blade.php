@@ -28,7 +28,7 @@
                 @svg('telescope')
             </a>
         @endif
-        <dropdown-list>
+        <dropdown-list v-cloak>
             <template v-slot:trigger>
                 <a class="hidden md:block h-6 w-6 ml-2 p-sm text-grey hover:text-grey-80" v-tooltip="__('Useful Links')">
                     @svg('book-open')
@@ -53,7 +53,7 @@
         <a class="hidden md:block h-6 w-6 p-sm text-grey ml-2 hover:text-grey-80" href="{{ route('statamic.site') }}" target="_blank" v-tooltip="'{{ __('View Site') }}'">
             @svg('browser-com')
         </a>
-        <dropdown-list>
+        <dropdown-list v-cloak>
             <template v-slot:trigger>
                 <a class="dropdown-toggle items-center ml-2 hide md:flex">
                     @if ($user->avatar())
