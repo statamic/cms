@@ -1,6 +1,6 @@
 <template>
     <div>
-        <popover v-if="isNotYetFavorited" placement="bottom" :offset="[-28, 10]">
+        <popover v-if="isNotYetFavorited" placement="bottom-end" :offset="[28, 10]">
             <template slot="trigger">
                 <button slot="reference" class="h-6 w-6 block outline-none p-sm text-grey hover:text-grey-80" v-tooltip="__('Pin to Favorites')">
                     <svg-icon name="pin"></svg-icon>
@@ -8,10 +8,10 @@
             </template>
             <div>
                 <div class="flex justify-between text-center">
-                    <h6 class="whitespace-no-wrap w-40 cursor-pointer p-1 border-r" :class="{'border-b bg-grey-10': ! showingPinTab }" @click="showingPinTab = true">
+                    <h6 class="whitespace-no-wrap cursor-pointer py-1 px-2 border-r" :class="{'border-b bg-grey-10': ! showingPinTab }" @click="showingPinTab = true">
                         {{ __('Pin to Favorites') }}
                     </h6>
-                    <h6 class="whitespace-no-wrap w-40 cursor-pointer p-1" :class="{'border-b bg-grey-10': showingPinTab }" @click="showingPinTab = false">
+                    <h6 class="whitespace-no-wrap cursor-pointer py-1 px-2 rounded-tr" :class="{'border-b bg-grey-10': showingPinTab }" @click="showingPinTab = false">
                         {{ __('Make Start Page') }}
                     </h6>
                 </div>
