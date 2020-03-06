@@ -35,6 +35,7 @@
                     :hasCollection="hasCollection"
                     @edit="$emit('edit-page', page, vm, store)"
                     @removed="pageRemoved"
+                    @children-orphaned="childrenOrphaned"
                 >
                     <template #branch-icon="props">
                         <slot name="branch-icon" v-bind="{ ...props, vm }" />
@@ -202,6 +203,11 @@ export default {
         },
 
         pageRemoved(tree) {
+            this.pages = tree.getPureData();
+            this.$emit('changed');
+        },
+
+        childrenOrphaned(tree) {
             this.pages = tree.getPureData();
             this.$emit('changed');
         },

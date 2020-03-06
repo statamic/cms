@@ -85,15 +85,24 @@
                     v-tooltip="__('Redirect')" />
             </template>
 
-            <template #branch-options="{ branch, removeBranch }">
+            <template #branch-options="{ branch, removeBranch, orphanChildren }">
                 <dropdown-item
                     v-for="blueprint in blueprints"
                     :key="blueprint.handle"
                     @click="createEntry(blueprint.handle, branch.id)"
                     v-text="__('New :thing', { thing: blueprint.title })" />
-                <dropdown-item :text="__('Delete')" class="warning" @click="deleteTreeBranch(branch, removeBranch)" />
+                <dropdown-item
+                    :text="__('Delete')"
+                    class="warning"
+                    @click="deleteTreeBranch(branch, removeBranch, orphanChildren)" />
             </template>
         </page-tree>
+
+        <delete-entry-confirmation
+            v-if="showEntryDeletionConfirmation"
+            @confirm="entryDeletionConfirmCallback"
+            @cancel="showEntryDeletionConfirmation = false"
+        />
 
     </div>
 
@@ -101,11 +110,13 @@
 
 <script>
 import PageTree from '../structures/PageTree.vue';
+import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
 
 export default {
 
     components: {
         PageTree,
+        DeleteEntryConfirmation
     },
 
     props: {
@@ -133,7 +144,9 @@ export default {
         return {
             mounted: false,
             view: null,
-            deletedEntries: []
+            deletedEntries: [],
+            showEntryDeletionConfirmation: false,
+            entryDeletionConfirmCallback: null,
         }
     },
 
@@ -196,14 +209,24 @@ export default {
             return localStorage.getItem('statamic.collection-view.'+this.handle) || fallback;
         },
 
-        deleteTreeBranch(branch, removeFromUi) {
-            // todo: children?
-
-            const message = 'Are you sure? The entry will be deleted when you save changes.';
-            if (!confirm(message)) return;
-            this.deletedEntries.push(branch.id);
-
-            removeFromUi();
+        deleteTreeBranch(branch, removeFromUi, orphanChildren) {
+            this.showEntryDeletionConfirmation = true;
+            this.entryDeletionConfirmCallback = (shouldDeleteChildren) => {
+                this.deletedEntries.push(branch.id);
+                if (shouldDeleteChildren) {
+                    const addDeletableChildren = (branch) => {
+                        branch.children.forEach(child => {
+                            this.deletedEntries.push(child.id);
+                            addDeletableChildren(child);
+                        });
+                    };
+                    addDeletableChildren(branch);
+                } else {
+                    orphanChildren();
+                }
+                removeFromUi();
+                this.showEntryDeletionConfirmation = false;
+            }
         },
 
         isRedirectBranch(branch) {

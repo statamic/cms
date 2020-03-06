@@ -1,0 +1,38 @@
+<template>
+
+    <modal name="delete-entry-confirmation" :pivotY="0.1" :overflow="false">
+        <div class="confirmation-modal flex flex-col h-full">
+            <div class="text-lg font-medium p-2 pb-0">
+                {{ __('Delete Entry') }}
+            </div>
+            <div class="flex-1 px-2 py-3 text-grey">
+                <p class="mb-2">Are you sure you want to delete this entry?</p>
+                <label class="flex items-center">
+                    <input type="checkbox" class="mr-1" v-model="shouldDeleteChildren" />
+                    Delete child pages
+                </label>
+            </div>
+            <div class="p-2 bg-grey-20 border-t flex items-center justify-end text-sm">
+                <button class="text-grey hover:text-grey-90"
+                    @click="$emit('cancel')"
+                    v-text="__('Cancel')" />
+                <button class="btn ml-2 btn-danger"
+                    @click="$emit('confirm', shouldDeleteChildren)"
+                    v-text="__('Delete')" />
+            </div>
+        </div>
+    </modal>
+
+</template>
+
+<script>
+export default {
+
+    data() {
+        return {
+            shouldDeleteChildren: false
+        }
+    }
+
+}
+</script>

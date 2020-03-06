@@ -27,7 +27,11 @@
                 <slot name="branch-icon" :branch="page" />
 
                 <dropdown-list class="ml-2">
-                    <slot name="branch-options" :branch="page" :remove-branch="remove" />
+                    <slot name="branch-options"
+                        :branch="page"
+                        :remove-branch="remove"
+                        :orphan-children="orphanChildren"
+                    />
                 </dropdown-list>
             </div>
 
@@ -37,6 +41,8 @@
 </template>
 
 <script>
+import * as th from 'tree-helper';
+
 export default {
 
     props: {
@@ -88,8 +94,20 @@ export default {
             const store = this.page._vm.store;
             store.deleteNode(this.page);
             this.$emit('removed', store);
-        }
+        },
 
+        orphanChildren() {
+            const store = this.page._vm.store;
+            let children = this.vm.data.children;
+            let length = children.length;
+            for (let index = 0; index < length; index++) {
+                // As the item is moved out, the rest of the items are moved up an index.
+                // We always just want to move the first item.
+                th.appendTo(children[0], store.rootData);
+            }
+
+            this.$emit('children-orphaned', store);
+        }
 
     }
 
