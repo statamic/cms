@@ -50,7 +50,7 @@
                 <svg-icon v-if="isTextBranch(branch)" class="inline-block w-4 h-4 text-grey-50" name="file-text" v-tooltip="__('Text')" />
             </template>
 
-            <template #branch-options="{ branch, removeBranch, vm }">
+            <template #branch-options="{ branch, removeBranch, orphanChildren, vm }">
                 <dropdown-item
                     :text="__('Add child link to URL')"
                     @click="linkPage(vm)" />
@@ -60,7 +60,7 @@
                 <dropdown-item
                     :text="__('Remove')"
                     class="warning"
-                    @click="remove(removeBranch)" />
+                    @click="deleteTreeBranch(branch, removeBranch, orphanChildren)" />
             </template>
         </page-tree>
 
@@ -86,6 +86,13 @@
             @submitted="pageCreated"
         />
 
+        <remove-page-confirmation
+            v-if="showPageDeletionConfirmation"
+            :children="numberOfChildrenToBeDeleted"
+            @confirm="pageDeletionConfirmCallback"
+            @cancel="showPageDeletionConfirmation = false; pageBeingDeleted = null;"
+        />
+
     </div>
 
 </template>
@@ -94,13 +101,15 @@
 import PageTree from '../structures/PageTree.vue';
 import PageEditor from '../structures/PageEditor.vue';
 import PageSelector from '../structures/PageSelector.vue';
+import RemovePageConfirmation from './RemovePageConfirmation.vue';
 
 export default {
 
     components: {
         PageTree,
         PageEditor,
-        PageSelector
+        PageSelector,
+        RemovePageConfirmation
     },
 
     props: {
@@ -121,7 +130,10 @@ export default {
             changed: false,
             creatingPage: false,
             editingPage: false,
-            targetParent: null
+            targetParent: null,
+            showPageDeletionConfirmation: false,
+            pageBeingDeleted: null,
+            pageDeletionConfirmCallback: null,
         }
     },
 
@@ -129,6 +141,18 @@ export default {
 
         isDirty() {
             return this.$dirty.has('page-tree');
+        },
+
+        numberOfChildrenToBeDeleted() {
+            let children = 0;
+            const countChildren = (page) => {
+                page.children.forEach(child => {
+                    children++;
+                    countChildren(child);
+                });
+            }
+            countChildren(this.pageBeingDeleted);
+            return children;
         }
 
     },
@@ -215,13 +239,16 @@ export default {
             }], this.targetParent);
         },
 
-        remove(removeBranch) {
-            let message = 'This will only remove the references (and any children) from the tree. No entries will be deleted.';
-
-            if (! confirm(message)) return;
-
-            removeBranch();
-        }
+        deleteTreeBranch(branch, removeFromUi, orphanChildren) {
+            this.showPageDeletionConfirmation = true;
+            this.pageBeingDeleted = branch;
+            this.pageDeletionConfirmCallback = (shouldDeleteChildren) => {
+                if (!shouldDeleteChildren) orphanChildren();
+                removeFromUi();
+                this.showPageDeletionConfirmation = false;
+                this.pageBeingDeleted = branch;
+            }
+        },
 
     }
 
