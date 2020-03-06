@@ -187,7 +187,7 @@ class Tree implements Localization
 
     public function appendTo($parent, $page)
     {
-        if (! $this->page($parent)) {
+        if ($parent && !$this->page($parent)) {
             throw new \Exception("Page [{$parent}] does not exist in this structure");
         }
 
@@ -197,7 +197,11 @@ class Tree implements Localization
             $page = ['entry' => $page->id()];
         }
 
-        $this->tree = $this->appendToInBranches($parent, $page, $this->tree);
+        if ($parent) {
+            $this->tree = $this->appendToInBranches($parent, $page, $this->tree);
+        } else {
+            $this->tree[] = $page;
+        }
 
         return $this;
     }

@@ -35,7 +35,7 @@ class DeleteEntryTest extends TestCase
     }
 
     /** @test */
-    function entries_get_removed_from_the_structure()
+    function entries_get_removed_from_the_structure_and_child_pages_are_moved_to_the_top()
     {
         // We need to confirm that the structure actually gets saved, which would mean it becomes a new object.
         // When using the array cache driver, the same instance would always be returned.
@@ -47,17 +47,25 @@ class DeleteEntryTest extends TestCase
         EntryFactory::id('1')->slug('one')->collection('test')->create();
         EntryFactory::id('2')->slug('two')->collection('test')->create();
         EntryFactory::id('3')->slug('three')->collection('test')->create();
+        EntryFactory::id('4')->slug('four')->collection('test')->create();
+        EntryFactory::id('5')->slug('five')->collection('test')->create();
+        EntryFactory::id('6')->slug('six')->collection('test')->create();
 
         $collection = tap(Collection::findByHandle('test')->structureContents([
             'tree' => [
-                ['entry' => '1'],
+                ['entry' => '1', 'children' => [
+                    ['entry' => '4'],
+                    ['entry' => '5', 'children' => [
+                        ['entry' => '6']
+                    ]],
+                ]],
                 ['entry' => '2'],
                 ['entry' => '3'],
             ]
         ]))->save();
         $originalStructure = $collection->structure();
 
-        $this->assertCount(3, Entry::all());
+        $this->assertCount(6, Entry::all());
 
         $this
             ->actingAs($user)
@@ -67,7 +75,11 @@ class DeleteEntryTest extends TestCase
         $updatedCollection = Collection::findByHandle('test');
         $updatedStructure = $updatedCollection->structure();
         $this->assertEquals([
-            ['entry' => '2']
+            ['entry' => '2'],
+            ['entry' => '4'],
+            ['entry' => '5', 'children' => [
+                ['entry' => '6']
+            ]],
         ], $updatedStructure->in('en')->tree());
         $this->assertNotSame($originalStructure, $updatedStructure);
     }
