@@ -213,20 +213,21 @@ export default {
             this.showEntryDeletionConfirmation = true;
             this.entryDeletionConfirmCallback = (shouldDeleteChildren) => {
                 this.deletedEntries.push(branch.id);
-                if (shouldDeleteChildren) {
-                    const addDeletableChildren = (branch) => {
-                        branch.children.forEach(child => {
-                            this.deletedEntries.push(child.id);
-                            addDeletableChildren(child);
-                        });
-                    };
-                    addDeletableChildren(branch);
-                } else {
-                    orphanChildren();
-                }
+                shouldDeleteChildren ? this.markEntriesForDeletion(branch) : orphanChildren();
                 removeFromUi();
                 this.showEntryDeletionConfirmation = false;
             }
+        },
+
+        markEntriesForDeletion(branch) {
+            const addDeletableChildren = (branch) => {
+                branch.children.forEach(child => {
+                    this.deletedEntries.push(child.id);
+                    addDeletableChildren(child);
+                });
+            };
+
+            addDeletableChildren(branch);
         },
 
         isRedirectBranch(branch) {
