@@ -91,19 +91,27 @@ class DeleteEntryTest extends TestCase
         // However, it's currently rearranging the tree items as the entries are deleted, in the order
         // they are submitted. These assertions are proving that the items are *structured* correctly
         // (ie. they'd result in the same urls, minus the parent slug) but not necessarily in the same order.
-        $this->assertEquals(['entry' => '4'], collect($updatedTree)->first(fn($item) => $item['entry'] == '4'));
+        $this->assertEquals(['entry' => '4'], collect($updatedTree)->first(function ($item) {
+            return $item['entry'] == '4';
+        }));
+
         $this->assertEquals([
             'entry' => '3', 'children' => [
                 ['entry' => '8', 'children' => [
                     ['entry' => '9']
                 ]]
             ]
-        ], collect($updatedTree)->first(fn($item) => $item['entry'] == '3'));
+        ], collect($updatedTree)->first(function ($item) {
+            return $item['entry'] == '3';
+        }));
+
         $this->assertEquals([
             'entry' => '5', 'children' => [
                 ['entry' => '6']
             ]
-        ], collect($updatedTree)->first(fn($item) => $item['entry'] == '5'));
+        ], collect($updatedTree)->first(function ($item) {
+            return $item['entry'] == '5';
+        }));
 
         $this->assertNotSame($originalStructure, $updatedStructure);
     }
