@@ -50,7 +50,7 @@
         </header>
 
         <entry-list
-            v-show="view === 'list'"
+            v-if="view === 'list'"
             :collection="handle"
             :initial-sort-column="sortColumn"
             :initial-sort-direction="sortDirection"
@@ -62,8 +62,7 @@
         />
 
         <page-tree
-            v-if="canUseStructureTree"
-            v-show="view === 'tree'"
+            v-if="canUseStructureTree && view === 'tree'"
             ref="tree"
             :has-collection="true"
             :collections="[handle]"
