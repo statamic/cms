@@ -7,9 +7,9 @@
             </div>
             <div class="flex-1 px-2 py-3 text-grey">
                 <p class="mb-2">Are you sure you want to delete this entry?</p>
-                <label class="flex items-center">
+                <label class="flex items-center" v-if="children">
                     <input type="checkbox" class="mr-1" v-model="shouldDeleteChildren" />
-                    Delete child pages
+                    {{ __n('Delete child entry|Delete :count child entries', children) }}
                 </label>
             </div>
             <div class="p-2 bg-grey-20 border-t flex items-center justify-end text-sm">
@@ -27,6 +27,10 @@
 
 <script>
 export default {
+
+    props: {
+        children: Number
+    },
 
     data() {
         return {

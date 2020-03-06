@@ -99,8 +99,9 @@
 
         <delete-entry-confirmation
             v-if="showEntryDeletionConfirmation"
+            :children="numberOfChildrenToBeDeleted"
             @confirm="entryDeletionConfirmCallback"
-            @cancel="showEntryDeletionConfirmation = false"
+            @cancel="showEntryDeletionConfirmation = false; entryBeingDeleted = null;"
         />
 
     </div>
@@ -145,6 +146,7 @@ export default {
             view: null,
             deletedEntries: [],
             showEntryDeletionConfirmation: false,
+            entryBeingDeleted: null,
             entryDeletionConfirmCallback: null,
         }
     },
@@ -162,6 +164,18 @@ export default {
         reorderable() {
             return this.structured && this.structureMaxDepth === 1;
         },
+
+        numberOfChildrenToBeDeleted() {
+            let children = 0;
+            const countChildren = (entry) => {
+                entry.children.forEach(child => {
+                    children++;
+                    countChildren(child);
+                });
+            }
+            countChildren(this.entryBeingDeleted);
+            return children;
+        }
 
     },
 
@@ -210,11 +224,13 @@ export default {
 
         deleteTreeBranch(branch, removeFromUi, orphanChildren) {
             this.showEntryDeletionConfirmation = true;
+            this.entryBeingDeleted = branch;
             this.entryDeletionConfirmCallback = (shouldDeleteChildren) => {
                 this.deletedEntries.push(branch.id);
                 shouldDeleteChildren ? this.markEntriesForDeletion(branch) : orphanChildren();
                 removeFromUi();
                 this.showEntryDeletionConfirmation = false;
+                this.entryBeingDeleted = false;
             }
         },
 
