@@ -1381,6 +1381,13 @@ class Parser
 
         $value = $data->parseUsing($this, $context)->value();
 
+        if (Str::startsWith($modifier, ':')) {
+            $parameters = array_map(function ($param) use ($context) {
+                return $context[$param] ?? null;
+            }, $parameters);
+            $modifier = substr($modifier, 1);
+        }
+
         try {
             return Modify::value($value)->context($context)->$modifier($parameters)->fetch();
         } catch (ModifierException $e) {
