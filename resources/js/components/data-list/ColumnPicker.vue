@@ -12,21 +12,21 @@
 
         <div class="column-picker p-2">
             <sortable-list
-                v-model="columns"
+                v-model="selectedColumns"
                 :vertical="true"
                 item-class="column-picker-item"
                 handle-class="column-picker-item"
             >
                 <div>
                     <div class="column-picker-item sortable" v-for="column in selectedColumns" :key="column.field">
-                        <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
+                        <label><input type="checkbox" v-model="column.visible" @change="columnToggled(column)" /> {{ column.label }}</label>
                     </div>
                 </div>
             </sortable-list>
 
             <div v-if="hiddenColumns.length" class="mt-1">
                 <div class="column-picker-item" v-for="column in hiddenColumns" :key="column.field">
-                    <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
+                    <label><input type="checkbox" v-model="column.visible" @change="columnToggled(column) "/> {{ column.label }}</label>
                 </div>
             </div>
         </div>
@@ -54,37 +54,52 @@ export default {
         preferencesKey: String
     },
 
+    inject: ['sharedState'],
+
     data() {
         return {
-            customizing: false,
             saving: false,
+            selectedColumns: [],
+            hiddenColumns: [],
         }
     },
 
-    computed: {
-
-        columns: {
-            get() {
-                return this.sharedState.columns;
-            },
-            set(columns) {
-                this.sharedState.columns = columns;
-            }
-        },
-
-        selectedColumns() {
-            return this.sharedState.columns.filter(column => column.visible);
-        },
-
-        hiddenColumns() {
-            return this.sharedState.columns.filter(column => ! column.visible);
-        },
-
+    created() {
+        this.setLocalColumns();
     },
 
-    inject: ['sharedState'],
+
+    watch: {
+        selectedColumns: {
+            deep: true,
+            handler() {
+                this.setSharedStateColumns();
+            }
+        }
+    },
 
     methods: {
+
+        setLocalColumns() {
+            this.selectedColumns = this.sharedState.columns.filter(column => column.visible);
+            this.hiddenColumns = this.sharedState.columns.filter(column => ! column.visible);
+        },
+
+        setSharedStateColumns() {
+            this.sharedState.columns = [
+                ...this.selectedColumns,
+                ...this.hiddenColumns,
+            ];
+        },
+
+        columnToggled(column) {
+            let fromArray = column.visible ? this.hiddenColumns : this.selectedColumns;
+            let toArray = column.visible ? this.selectedColumns : this.hiddenColumns;
+            let currentIndex = _.findIndex(fromArray, { field: column.field });
+
+            toArray.push(fromArray[currentIndex]);
+            fromArray.splice(currentIndex, 1);
+        },
 
         save() {
             if (! this.selectedColumns.length) {
@@ -96,7 +111,6 @@ export default {
             this.$preferences.set(this.preferencesKey, this.selectedColumns.map(column => column.field))
                 .then(response => {
                     this.saving = false;
-                    this.customizing = false;
                     this.$toast.success(__('Columns saved'));
                 })
                 .catch(error => {
@@ -107,20 +121,21 @@ export default {
 
         reset() {
             this.sharedState.columns.forEach(column => column.visible = column.visibleDefault);
+            this.setLocalColumns();
 
             this.saving = true;
 
             this.$preferences.remove(this.preferencesKey)
                 .then(response => {
                     this.saving = false;
-                    this.customizing = false;
                     this.$toast.success(__('Columns reset'));
                 })
                 .catch(error => {
                     this.saving = false;
                     this.$toast.error(__('Something went wrong'));
                 });
-        }
+        },
+
     }
 }
 </script>
