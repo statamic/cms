@@ -10,8 +10,7 @@
             </button>
         </template>
 
-        <div class="p-2">
-
+        <div class="column-picker p-2">
             <sortable-list
                 v-model="columns"
                 :vertical="true"
@@ -19,28 +18,24 @@
                 handle-class="column-picker-item"
             >
                 <div>
-                    <div class="column-picker-item draggable-item column" v-for="column in selectedColumns" :key="column.field">
+                    <div class="column-picker-item sortable" v-for="column in selectedColumns" :key="column.field">
                         <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
                     </div>
                 </div>
             </sortable-list>
 
             <div v-if="hiddenColumns.length" class="mt-1">
-                <div class="column-picker-item column" v-for="column in hiddenColumns" :key="column.field">
+                <div class="column-picker-item" v-for="column in hiddenColumns" :key="column.field">
                     <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
                 </div>
             </div>
+        </div>
 
-            <div v-if="preferencesKey">
-                <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
-                <template v-else>
-                    <div class="flex justify-left mt-2">
-                        <button class="btn btn-sm" @click="reset">{{ __('Reset') }}</button>
-                        <button class="btn btn-sm ml-1" @click="save">{{ __('Save') }}</button>
-                    </div>
-                </template>
+        <div v-if="preferencesKey" class="p-2 pt-0">
+            <div class="flex justify-left">
+                <button class="btn btn-sm btn-primary" @click="save" :disabled="saving">{{ __('Save') }}</button>
+                <button class="btn btn-sm ml-1" @click="reset" :disabled="saving">{{ __('Reset') }}</button>
             </div>
-
         </div>
 
     </popover>

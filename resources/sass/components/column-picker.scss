@@ -1,18 +1,13 @@
+.column-picker {
+    margin: -3px -8px;
+}
+
 .column-picker-item {
-    @apply text-sm outline-none flex items-center rounded select-none -mx-1 px-1;
+    @apply text-sm outline-none flex items-center rounded select-none;
     transition: all .08s ease-in-out;
-    padding-top: 3px;
-    padding-bottom: 3px;
+    padding: 3px 8px;
 
-    &:first-child {
-        margin-top: -3px;
-    }
-
-    &:last-child {
-        margin-bottom: -3px;
-    }
-
-    &.draggable-item {
+    &.sortable {
         cursor: grab;
 
         label {
@@ -22,11 +17,11 @@
         &:hover  {
             @apply bg-grey-20;
         }
-    }
 
-    // Drag interaction
-    &.draggable-mirror,
-    &.draggable-source--is-dragging {
-        @apply shadow;
+        // Drag interaction
+        &.draggable-mirror,
+        &.draggable-source--is-dragging {
+            @apply shadow;
+        }
     }
 }
