@@ -4,7 +4,6 @@
 
 .column-picker-item {
     @apply text-sm outline-none flex items-center rounded select-none;
-    transition: all .08s ease-in-out;
     padding: 3px 8px;
 
     &.sortable {
