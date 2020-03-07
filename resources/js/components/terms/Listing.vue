@@ -9,8 +9,6 @@
             v-if="!initializing"
             :rows="items"
             :columns="columns"
-            :search="false"
-            :search-query="searchQuery"
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"

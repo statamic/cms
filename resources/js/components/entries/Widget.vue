@@ -8,8 +8,6 @@
             v-if="!initializing"
             :rows="items"
             :columns="cols"
-            :search="false"
-            :search-query="searchQuery"
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
