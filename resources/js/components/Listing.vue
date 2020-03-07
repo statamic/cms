@@ -54,6 +54,8 @@ export default {
 
     created() {
         this.request();
+
+        this.$events.$on('search-query-changed', query => this.searchQuery = query);
     },
 
     watch: {
