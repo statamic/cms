@@ -33,12 +33,7 @@
                 <button class="btn-primary" @click="save">{{ __('Save Filters') }}</button>
             </div> -->
 
-            <!-- @TODO Search isn't wired up correctly. -->
-            <data-list-search v-model="sharedState.searchQuery" />
-
-            <button class="input-group-append px-1.5" v-if="sharedState.searchQuery">
-                {{ __('Save Search') }}
-            </button>
+            <data-list-search @input="input => $emit('search-query-changed', input)" />
 
             <!-- @TODO: Need to create actual child components for these native "pinned" filters.
                 We'll need date, status, and author to ship with, plus any custom "promoted" filters. -->
