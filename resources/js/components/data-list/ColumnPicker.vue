@@ -1,51 +1,49 @@
 <template>
-    <div>
-        <button class="btn-flat btn-icon-only dropdown-toggle" @click="customizing = !customizing">
-            <svg-icon name="settings-vertical" class="w-4 h-4 mr-1" />
-            <span>{{ __('Columns') }}</span>
-        </button>
+    <popover>
 
-        <pane name="columns" v-if="customizing" @closed="dismiss">
-            <div class="flex flex-col h-full">
+        <template slot="trigger">
+            <button
+                v-tooltip="__('Customize Columns')"
+                class="btn btn-sm px-sm py-sm -ml-sm cursor-pointer"
+            >
+                <svg-icon name="settings-horizontal" class="w-4" />
+            </button>
+        </template>
 
-                <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
-                    {{ __('Columns') }}
-                    <button
-                        type="button"
-                        class="btn-close"
-                        @click="dismiss"
-                        v-html="'&times'" />
-                </div>
+        <div class="p-2">
 
-                <div class="pt-2 overflow-y-auto">
-
-                    <sortable-list
-                        v-model="columns"
-                        :vertical="true"
-                        item-class="column-picker-item"
-                        handle-class="column-picker-item"
-                    >
-                        <div>
-                            <div class="column-picker-item column px-3" v-for="column in sharedState.columns" :key="column.field">
-                                <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
-                            </div>
-                        </div>
-                    </sortable-list>
-
-                    <div v-if="preferencesKey">
-                        <loading-graphic class="mt-3 ml-3" v-if="saving" :inline="true" :text="__('Saving')" />
-                        <template v-else>
-                            <div class="flex justify-center p-3">
-                                <button class="btn-flat w-full mr-sm block" @click="reset">{{ __('Reset') }}</button>
-                                <button class="btn-flat w-full ml-sm block" @click="save">{{ __('Save') }}</button>
-                            </div>
-                        </template>
+            <sortable-list
+                v-model="columns"
+                :vertical="true"
+                item-class="column-picker-item"
+                handle-class="column-picker-item"
+            >
+                <div>
+                    <div class="column-picker-item draggable-item column" v-for="column in selectedColumns" :key="column.field">
+                        <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
                     </div>
+                </div>
+            </sortable-list>
 
+            <div v-if="hiddenColumns.length" class="mt-1">
+                <div class="column-picker-item column" v-for="column in hiddenColumns" :key="column.field">
+                    <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
                 </div>
             </div>
-        </pane>
-    </div>
+
+            <div v-if="preferencesKey">
+                <loading-graphic v-if="saving" :inline="true" :text="__('Saving')" />
+                <template v-else>
+                    <div class="flex justify-left mt-2">
+                        <button class="btn btn-sm" @click="reset">{{ __('Reset') }}</button>
+                        <button class="btn btn-sm ml-1" @click="save">{{ __('Save') }}</button>
+                    </div>
+                </template>
+            </div>
+
+        </div>
+
+    </popover>
 </template>
 
 <script>
@@ -80,20 +78,18 @@ export default {
         },
 
         selectedColumns() {
-            return this.sharedState.columns
-                .filter(column => column.visible)
-                .map(column => column.field);
-        }
+            return this.sharedState.columns.filter(column => column.visible);
+        },
+
+        hiddenColumns() {
+            return this.sharedState.columns.filter(column => ! column.visible);
+        },
 
     },
 
     inject: ['sharedState'],
 
     methods: {
-
-        dismiss() {
-            this.customizing = false
-        },
 
         save() {
             if (! this.selectedColumns.length) {
@@ -102,7 +98,7 @@ export default {
 
             this.saving = true;
 
-            this.$preferences.set(this.preferencesKey, this.selectedColumns)
+            this.$preferences.set(this.preferencesKey, this.selectedColumns.map(column => column.field))
                 .then(response => {
                     this.saving = false;
                     this.customizing = false;
