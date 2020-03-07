@@ -43,7 +43,6 @@
                                 <button class="btn-flat ml-1" @click="saveOrder" v-text="__('Save Order')" />
                                 <button class="btn-flat ml-1" @click="cancelReordering" v-text="__('Cancel')" />
                             </template>
-                            <!-- <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" /> -->
                         </template>
                     </div>
 
@@ -56,6 +55,7 @@
                         :reorderable="reordering"
                         :sortable="!reordering"
                         :toggle-selection-on-row-click="true"
+                        :column-preferences-key="preferencesKey('columns')"
                         @sorted="sorted"
                         @reordered="reordered"
                     >
