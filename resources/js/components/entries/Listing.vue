@@ -55,6 +55,7 @@
                         :reorderable="reordering"
                         :sortable="!reordering"
                         :toggle-selection-on-row-click="true"
+                        :allow-column-picker="true"
                         :column-preferences-key="preferencesKey('columns')"
                         @sorted="sorted"
                         @reordered="reordered"
