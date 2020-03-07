@@ -1,6 +1,6 @@
 <template>
     <table class="data-table" :class="{ 'opacity-50': loading }">
-        <thead v-if="visibleColumns.length > 1">
+        <thead v-if="allowBulkActions || allowColumnPicker || visibleColumns.length > 1">
             <tr>
                 <th class="checkbox-column" v-if="allowBulkActions || reorderable">
                     <data-list-toggle-all ref="toggleAll" v-tooltip="__('Select All')"/>
@@ -21,9 +21,7 @@
                     </svg>
                 </th>
                 <th class="actions-column">
-                    <button class="btn btn-sm px-sm py-sm -ml-sm cursor-pointer" v-tooltip="__('Customize Columns')">
-                        <svg-icon name="settings-horizontal" class="w-4" />
-                    </button>
+                    <data-list-column-picker :preferences-key="columnPreferencesKey" v-if="allowColumnPicker" />
                 </th>
             </tr>
         </thead>
@@ -106,6 +104,13 @@ export default {
         reorderable: {
             type: Boolean,
             default: false
+        },
+        allowColumnPicker: {
+            type: Boolean,
+            default: false
+        },
+        columnPreferencesKey: {
+            type: String,
         },
     },
 
