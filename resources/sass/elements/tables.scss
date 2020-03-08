@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .data-list-header {
-    @apply p-2 flex flex-wrap items-center;
+    @apply p-2 pb-1 flex flex-wrap items-center;
 }
 
 .data-list-search-input {
@@ -13,6 +13,11 @@
 	&:focus {
 		@apply focus-outline;
 	}
+}
+
+.data-list-bulk-actions {
+	@apply bg-white absolute w-full pt-2;
+	padding-left: 56px;
 }
 
 .data-list-footer {

@@ -94,7 +94,7 @@ input.input-text-minimal:read-only,
         @apply rounded-r-none border-r-0;
     }
 
-    .input-group-prepend, .input-group-append {
+    .input-group-prepend, .input-group-append, .input-group-item {
         @apply rounded-l px-1 border text-sm text-grey-80 select-none;
         background: linear-gradient(180deg, #fff, #f9fafb);
         border: 1px solid #c4cdd6;
@@ -111,17 +111,33 @@ input.input-text-minimal:read-only,
         }
     }
 
+    .input-group-item {
+        @apply rounded-l-none border-l-0;
+    }
+
+    button.input-group-item:hover:not(:disabled),
+    button.input-group-item:active:not(:disabled),
     button.input-group-prepend:hover:not(:disabled),
-        button.input-group-prepend:active:not(:disabled),
-        button.input-group-append:hover:not(:disabled),
-        button.input-group-append:active:not(:disabled) {
-            background: linear-gradient(180deg, #f9fafb, #f4f6f8);
-            border-color: #c4cdd5;
-        }
+    button.input-group-prepend:active:not(:disabled),
+    button.input-group-append:hover:not(:disabled),
+    button.input-group-append:active:not(:disabled) {
+        background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+        border-color: #c4cdd5;
+    }
 
     .input-group-append {
         @apply rounded-l-none border-r-0; // Rounded on the other side
         &:last-child { @apply rounded-r border-r; }
+    }
+}
+
+.input-group.input-group-sm {
+    height: 1.625rem;
+    .input-group-prepend, .input-group-append, .input-group-item {
+        @apply text-xs;
+        height: 1.625rem;
+        line-height: 25px;
+        padding: 0 12px;
     }
 }
 

@@ -4,7 +4,7 @@
         <template slot="trigger">
             <button
                 v-tooltip="__('Customize Columns')"
-                class="btn btn-sm px-sm py-sm -ml-sm cursor-pointer"
+                class="btn btn-sm px-sm mt-1 py-sm -ml-sm cursor-pointer"
             >
                 <svg-icon name="settings-horizontal" class="w-4" />
             </button>

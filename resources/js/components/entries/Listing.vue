@@ -14,7 +14,7 @@
             :sort-direction="sortDirection"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0">
+                <div class="card p-0 relative">
                     <div class="border-b px-2 text-sm">
                         <button class="data-list-filter-link active px-1.5">All</button>
                         <button class="data-list-filter-link">Puddings</button>
@@ -28,11 +28,6 @@
                             :search-query="searchQuery"
                             :preferences-key="preferencesKey('filters')" />
 
-                        <data-list-bulk-actions
-                            :url="actionUrl"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
-                        />
                         <template v-if="!hasSelections">
                             <button class="btn-flat ml-1"
                                 v-if="showReorderButton"
@@ -47,6 +42,12 @@
                     </div>
 
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
+
+                    <data-list-bulk-actions
+                        :url="actionUrl"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                    />
 
                     <data-list-table
                         v-show="items.length"

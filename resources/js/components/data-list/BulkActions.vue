@@ -1,12 +1,14 @@
 <template>
 
-    <div v-if="hasSelections" class="flex items-center">
-
-        <div class="text-grey text-2xs mr-1"
-            v-text="__n(`:count selected`, selections.length)" />
+    <div v-if="hasSelections" class="data-list-bulk-actions">
+        <div class="input-group input-group-sm">
+            <div class="input-group-prepend">
+                <div class="text-grey-50"
+                    v-text="__n(`:count selected`, selections.length)" />
+            </div>
 
             <data-list-action
-                v-for="action in sortedActions"
+                v-for="(action, index) in sortedActions"
                 :key="action.handle"
                 :action="action"
                 :selections="selections.length"
@@ -14,12 +16,12 @@
             >
                 <button
                     slot-scope="{ action, select }"
-                    class="btn-flat ml-1"
-                    :class="{'text-red': action.dangerous}"
+                    class="input-group-item"
+                    :class="{'text-red': action.dangerous, 'rounded-r': index + 1 === sortedActions.length }"
                     @click="select"
                     v-text="__(action.title)" />
             </data-list-action>
-
+        </div>
     </div>
 
 </template>
