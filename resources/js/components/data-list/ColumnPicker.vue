@@ -68,7 +68,6 @@ export default {
         this.setLocalColumns();
     },
 
-
     watch: {
         selectedColumns: {
             deep: true,
@@ -121,6 +120,7 @@ export default {
 
         reset() {
             this.sharedState.columns.forEach(column => column.visible = column.defaultVisibility);
+            this.sharedState.columns = _.sortBy(this.sharedState.columns, column => column.defaultOrder);
             this.setLocalColumns();
 
             this.saving = true;
