@@ -54,7 +54,11 @@
     tbody {
 		outline: none;
         tr {
-            @apply border-b text-sm;
+			@apply border-b text-sm;
+
+			&.row-selected {
+				@apply bg-grey-20;
+			}
 
 			&:last-child {
 				@apply border-none;
