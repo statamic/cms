@@ -1,6 +1,6 @@
 <template>
 
-    <dropdown-list class="inline-block" :show-dropdown-if="blueprints.length > 1">
+    <dropdown-list :disabled="blueprints.length <= 1">
         <template v-slot:trigger>
             <button
                 :class="buttonClass"

@@ -1,5 +1,5 @@
 <template>
-    <popover class="dropdown-list">
+    <popover class="dropdown-list" :disabled="disabled">
         <template #trigger>
             <slot name="trigger">
                 <button class="rotating-dots-button">
@@ -10,3 +10,14 @@
         <slot />
     </popover>
 </template>
+
+<script>
+export default {
+    props: {
+        disabled: {
+            type: Boolean,
+            default: false
+        }
+    }
+}
+</script>

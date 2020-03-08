@@ -3,7 +3,7 @@
         <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$slots.default">
             <slot name="trigger"></slot>
         </div>
-        <div ref="popover" class="popover">
+        <div ref="popover" class="popover" v-if="!disabled">
             <div class="popover-content bg-white shadow-popover rounded-md">
                 <slot></slot>
             </div>
@@ -20,6 +20,10 @@ export default {
     mixins: [ clickaway ],
 
     props: {
+        disabled: {
+            type: Boolean,
+            default: false
+        },
         placement: {
             type: String,
             default: 'bottom-start',
@@ -37,22 +41,24 @@ export default {
     },
 
     mounted() {
-        createPopper(this.$refs.trigger, this.$refs.popover, {
-            placement: this.placement,
-            modifiers: [
-                {
-                    name: 'offset',
-                    options: {
-                        offset: this.offset
-                    }
-                }
-            ]
-        })
-
-
+        console.log(this.disabled);
+        if (! this.disabled) this.bindPopper()
     },
 
     methods: {
+        bindPopper() {
+            createPopper(this.$refs.trigger, this.$refs.popover, {
+                placement: this.placement,
+                modifiers: [
+                    {
+                        name: 'offset',
+                        options: {
+                            offset: this.offset
+                        }
+                    }
+                ]
+            })
+        },
         toggle() {
             this.isOpen ? this.close() : this.open();
         },
