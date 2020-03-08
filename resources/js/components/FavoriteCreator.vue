@@ -20,13 +20,13 @@
                     <button @click="save" class="btn-primary ml-1">{{ __('Save') }}</button>
                 </div>
                 <div class="p-2" v-else>
-                    <button @click="makeStartPage" class="btn block w-full">{{ __('Start here when you sign in') }}</button>
+                    <button @click="makeStartPage" class="btn block w-full">{{ __('Start here on sign in') }}</button>
                 </div>
             </div>
         </popover>
         <div v-else>
             <button @click="remove" class="h-6 w-6 block outline-none p-sm text-grey hover:text-grey-80" v-tooltip="__('Unpin from Favorites')">
-                <svg-icon name="pin"></svg-icon>
+                <svg-icon name="pin" class="text-green"></svg-icon>
             </button>
         </div>
     </div>
