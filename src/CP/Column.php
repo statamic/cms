@@ -14,7 +14,7 @@ class Column
     public $label;
     public $listable = true;
     public $defaultOrder;
-    public $visibleDefault = true;
+    public $defaultVisibility = true;
     public $visible = true;
     public $sortable = true;
     public $value;
@@ -107,14 +107,14 @@ class Column
     }
 
     /**
-     * Get or set visibility default, for resetting user preferences, etc.
+     * Get or set default visibility, for resetting user preferences, etc.
      *
-     * @param null|bool $visibleDefault
+     * @param null|bool $visible
      * @return mixed
      */
-    public function visibleDefault($visible = null)
+    public function defaultVisibility($visible = null)
     {
-        return $this->fluentlyGetOrSet('visibleDefault')->value($visible);
+        return $this->fluentlyGetOrSet('defaultVisibility')->value($visible);
     }
 
     /**

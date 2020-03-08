@@ -98,7 +98,7 @@ class Blueprint
                     ->fieldtype($field->fieldtype()->indexComponent())
                     ->label(__($field->display()))
                     ->listable($field->isListable())
-                    ->visibleDefault($field->isVisible())
+                    ->defaultVisibility($field->isVisible())
                     ->visible($field->isVisible())
                     ->sortable($field->isSortable())
                     ->defaultOrder($index + 1);

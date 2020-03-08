@@ -25,7 +25,7 @@ class ColumnTest extends TestCase
             ->fieldtype('grass')
             ->label('Ripped')
             ->visible(false)
-            ->visibleDefault(true)
+            ->defaultVisibility(true)
             ->defaultOrder(2);
 
         $json = json_decode(json_encode($column));
@@ -34,7 +34,7 @@ class ColumnTest extends TestCase
         $this->assertEquals('grass', $json->fieldtype);
         $this->assertEquals('Ripped', $json->label);
         $this->assertFalse($json->visible);
-        $this->assertTrue($json->visibleDefault);
+        $this->assertTrue($json->defaultVisibility);
         $this->assertEquals(2, $json->defaultOrder);
     }
 

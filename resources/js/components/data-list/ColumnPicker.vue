@@ -120,7 +120,7 @@ export default {
         },
 
         reset() {
-            this.sharedState.columns.forEach(column => column.visible = column.visibleDefault);
+            this.sharedState.columns.forEach(column => column.visible = column.defaultVisibility);
             this.setLocalColumns();
 
             this.saving = true;
