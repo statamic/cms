@@ -1,10 +1,11 @@
 .column-picker {
-    margin: -3px -8px;
+
 }
 
 .column-picker-item {
-    @apply text-sm outline-none flex items-center rounded select-none;
-    padding: 3px 8px;
+    @apply bg-white text-sm outline-none flex items-center rounded select-none;
+    padding: 4px 8px;
+    margin: -1px 0;
 
     &.sortable {
         cursor: grab;
@@ -20,7 +21,12 @@
         // Drag interaction
         &.draggable-mirror,
         &.draggable-source--is-dragging {
-            @apply shadow;
+            // @apply bg-white;
+            cursor: grabbing;
         }
     }
+}
+
+.draggable--is-dragging {
+    cursor: grabbing;
 }

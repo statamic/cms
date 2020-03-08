@@ -10,31 +10,39 @@
             </button>
         </template>
 
-        <div class="column-picker p-2">
+        <div class="column-picker">
             <sortable-list
                 v-model="selectedColumns"
                 :vertical="true"
                 item-class="column-picker-item"
                 handle-class="column-picker-item"
             >
-                <div>
+                <div class="outline-none text-left px-1 py-1">
+                    <h6 v-text="__('Displayed Columns')" class="p-1"/>
                     <div class="column-picker-item sortable" v-for="column in selectedColumns" :key="column.field">
-                        <label><input type="checkbox" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" /> {{ column.label }}</label>
+                        <label>
+                            <input type="checkbox" class="mr-1" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" />
+                            {{ column.label }}
+                        </label>
                     </div>
                 </div>
             </sortable-list>
 
-            <div v-if="hiddenColumns.length" class="mt-1">
+            <div v-if="hiddenColumns.length" class="outline-none text-left px-1 pb-1">
+                <h6 v-text="__('Available Columns')" class="px-1 pb-1"/>
                 <div class="column-picker-item" v-for="column in hiddenColumns" :key="column.field">
-                    <label><input type="checkbox" v-model="column.visible" @change="columnToggled(column) "/> {{ column.label }}</label>
+                    <label class="cursor-pointer">
+                        <input type="checkbox" class="mr-1" v-model="column.visible" @change="columnToggled(column) "/>
+                        {{ column.label }}
+                    </label>
                 </div>
             </div>
         </div>
 
-        <div v-if="preferencesKey" class="p-2 pt-0">
-            <div class="flex justify-left">
-                <button class="btn btn-sm btn-primary" @click="save" :disabled="saving">{{ __('Save') }}</button>
-                <button class="btn btn-sm ml-1" @click="reset" :disabled="saving">{{ __('Reset') }}</button>
+        <div v-if="preferencesKey" class="px-2 py-1 border-t bg-grey-10 rounded-b">
+            <div class="flex">
+                <button class="btn btn-sm mr-sm flex-1" @click="reset" :disabled="saving">{{ __('Reset') }}</button>
+                <button class="btn-primary flex-1 ml-sm btn-sm" @click="save" :disabled="saving">{{ __('Save') }}</button>
             </div>
         </div>
 
