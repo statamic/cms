@@ -1,6 +1,6 @@
 <template>
     <div>
-        <popover v-if="isNotYetFavorited" placement="bottom-end" :offset="[28, 10]">
+        <popover v-if="isNotYetFavorited" ref="popper" placement="bottom-end" :offset="[28, 10]">
             <template slot="trigger">
                 <button slot="reference" class="h-6 w-6 block outline-none p-sm text-grey hover:text-grey-80" v-tooltip="__('Pin to Favorites')">
                     <svg-icon name="pin"></svg-icon>
@@ -40,8 +40,7 @@ export default {
         return {
             name: document.title.replace(' ‹ Statamic', ''),
             currentUrl: this.$config.get('urlPath').substr(this.$config.get('cpRoot').length+1),
-            showingPinTab: true,
-            escBinding: null,
+            showingPinTab: true
         }
     },
 
@@ -66,12 +65,7 @@ export default {
 
     methods: {
         shown() {
-            this.escBinding = this.$keys.bindGlobal('esc', e => this.$refs.popper.close());
             this.highlight();
-        },
-
-        hidden() {
-            this.escBinding.destroy();
         },
 
         highlight() {

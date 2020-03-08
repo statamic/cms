@@ -32,7 +32,7 @@ export default {
 
     data() {
         return {
-            isOpen: false,
+            isOpen: false
         }
     },
 
@@ -48,17 +48,20 @@ export default {
                 }
             ]
         })
+
+
     },
 
     methods: {
         toggle() {
-            this.isOpen = ! this.isOpen;
+            this.isOpen ? this.close() : this.open();
         },
         open() {
-            this.isOpen = true
+            this.isOpen = true;
+            this.$keys.bind('esc', e => this.close())
         },
         close() {
-            this.isOpen = false
+            this.isOpen = false;
         }
     }
 }
