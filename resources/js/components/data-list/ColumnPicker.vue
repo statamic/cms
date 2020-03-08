@@ -111,10 +111,6 @@ export default {
         },
 
         save() {
-            if (! this.selectedColumns.length) {
-                return this.$toast.error(__('At least 1 column is required'));
-            }
-
             this.saving = true;
 
             this.$preferences.set(this.preferencesKey, this.selectedColumns.map(column => column.field))
