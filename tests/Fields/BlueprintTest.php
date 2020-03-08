@@ -6,6 +6,8 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
 use Illuminate\Support\Collection;
+use Statamic\CP\Column;
+use Statamic\CP\Columns;
 use Statamic\Facades\Field as FieldAPI;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
@@ -206,6 +208,50 @@ class BlueprintTest extends TestCase
                 $this->assertEveryItemIsInstanceOf(Field::class, $items);
                 $this->assertEquals(['one', 'two'], $items->map->handle()->values()->all());
                 $this->assertEquals(['text', 'textarea'], $items->map->type()->values()->all());
+            });
+        });
+    }
+
+    /** @test */
+    function it_gets_columns()
+    {
+        $blueprint = new Blueprint;
+
+        FieldRepository::shouldReceive('find')
+            ->with('fieldset_one.field_one')
+            ->andReturn(new Field('field_one', ['type' => 'text']));
+        FieldRepository::shouldReceive('find')
+            ->with('fieldset_one.field_two')
+            ->andReturn(new Field('field_one', ['type' => 'textarea']));
+
+        $blueprint->setContents($contents = [
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        [
+                            'handle' => 'one',
+                            'field' => 'fieldset_one.field_one'
+                        ]
+                    ]
+                ],
+                'section_two' => [
+                    'fields' => [
+                        [
+                            'handle' => 'two',
+                            'field' => 'fieldset_one.field_two'
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+        tap($blueprint->columns(), function ($columns) {
+            $this->assertInstanceOf(Columns::class, $columns);
+            tap($columns, function ($items) {
+                $this->assertCount(2, $items);
+                $this->assertEveryItemIsInstanceOf(Column::class, $items);
+                $this->assertEquals(['one', 'two'], $items->map->field()->values()->all());
+                $this->assertEquals([1, 2], $items->map->defaultOrder()->values()->all());
             });
         });
     }

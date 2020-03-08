@@ -13,10 +13,11 @@ class Column
     public $fieldtype;
     public $label;
     public $listable = true;
+    public $defaultOrder;
     public $visibleDefault = true;
     public $visible = true;
     public $sortable = true;
-    public $value = null;
+    public $value;
 
     /**
      * Make new column instance.
@@ -92,6 +93,17 @@ class Column
     public function listable($listable = null)
     {
         return $this->fluentlyGetOrSet('listable')->value($listable);
+    }
+
+    /**
+     * Get or set default order, for resetting user preferences, etc.
+     *
+     * @param null|int $order
+     * @return mixed
+     */
+    public function defaultOrder($order = null)
+    {
+        return $this->fluentlyGetOrSet('defaultOrder')->value($order);
     }
 
     /**
