@@ -19,7 +19,7 @@
             >
                 <div>
                     <div class="column-picker-item sortable" v-for="column in selectedColumns" :key="column.field">
-                        <label><input type="checkbox" v-model="column.visible" @change="columnToggled(column)" /> {{ column.label }}</label>
+                        <label><input type="checkbox" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" /> {{ column.label }}</label>
                     </div>
                 </div>
             </sortable-list>
