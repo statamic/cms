@@ -145,6 +145,7 @@ class Entries
         $this->queryPastFuture($query);
         $this->querySinceUntil($query);
         $this->queryTaxonomies($query);
+        $this->queryRedirects($query);
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
@@ -330,5 +331,20 @@ class Entries
         }
 
         return $this->traitQueryOrderBys($query);
+    }
+
+    protected function queryRedirects($query)
+    {
+        $isQueryingRedirect = $this->parameters->first(function ($v, $k) {
+            return Str::startsWith($k, 'redirect:');
+        });
+
+        if ($isQueryingRedirect) {
+            return;
+        }
+
+        if (! $this->parameters->bool(['redirects', 'links'], false)) {
+            $query->where('redirect', '=', null);
+        }
     }
 }

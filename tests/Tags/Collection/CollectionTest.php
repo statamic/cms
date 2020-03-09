@@ -2,19 +2,20 @@
 
 namespace Tests\Tags\Collection;
 
+use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Carbon;
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
-use Tests\TestCase;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Entry;
+use Statamic\Structures\CollectionStructure;
+use Statamic\Tags\Collection\Collection;
+use Statamic\Tags\Collection\Entries;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
-use Illuminate\Support\Carbon;
-use Statamic\Tags\Collection\Entries;
-use Statamic\Tags\Collection\Collection;
-use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
-use Statamic\Exceptions\CollectionNotFoundException;
-use Statamic\Facades\Blueprint;
-use Statamic\Structures\CollectionStructure;
+use Tests\TestCase;
 
 class CollectionTest extends TestCase
 {
@@ -190,6 +191,30 @@ class CollectionTest extends TestCase
         $this->assertCount(2, $this->collectionTag->index());
 
         $this->setTagParameters(['collection' => '*', 'not_collection' => 'art|music', 'title:contains' => 'love']);
+        $this->assertCount(2, $this->collectionTag->index());
+    }
+
+    /** @test */
+    function it_filters_out_redirects()
+    {
+        $this->makePosts();
+        Entry::find('c')->set('redirect', 'http://example.com')->save();
+        Entry::find('d')->set('redirect', 'http://example.com')->save();
+
+        // Redirects get filtered out by default.
+        $this->setTagParameters(['collection' => '*']);
+        $this->assertCount(7, $this->collectionTag->index());
+
+        // Marking as true will include them.
+        $this->setTagParameters(['collection' => '*', 'redirects' => true]);
+        $this->assertCount(9, $this->collectionTag->index());
+
+        // Aliased to links
+        $this->setTagParameters(['collection' => '*', 'links' => true]);
+        $this->assertCount(9, $this->collectionTag->index());
+
+        // Shorthand param doesn't exist to get *only* redirects. Users can do it manually with a condition.
+        $this->setTagParameters(['collection' => '*', 'redirect:exists' => true]);
         $this->assertCount(2, $this->collectionTag->index());
     }
 
