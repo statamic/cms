@@ -10,6 +10,7 @@ use Statamic\Facades\Collection;
 use Statamic\Stache\Indexes;
 use Symfony\Component\Finder\SplFileInfo;
 use Statamic\Entries\GetDateFromPath;
+use Statamic\Structures\CollectionStructure;
 
 class CollectionEntriesStore extends ChildStore
 {
@@ -30,18 +31,7 @@ class CollectionEntriesStore extends ChildStore
 
     public function makeItemFromFile($path, $contents)
     {
-        $site = Site::default()->handle();
-        $collection = pathinfo($path, PATHINFO_DIRNAME);
-        $collection = str_after($collection, $this->parent->directory());
-
-        if (Site::hasMultiple()) {
-            list($collection, $site) = explode('/', $collection);
-        }
-
-        // Support entries within subdirectories at any level.
-        if (str_contains($collection, '/')) {
-            $collection = str_before($collection, '/');
-        }
+        [$collection, $site] = $this->extractAttributesFromPath($path);
 
         $data = YAML::file($path)->parse($contents);
 
@@ -87,9 +77,63 @@ class CollectionEntriesStore extends ChildStore
         return $entry;
     }
 
+    protected function extractAttributesFromPath($path)
+    {
+        $site = Site::default()->handle();
+        $collection = pathinfo($path, PATHINFO_DIRNAME);
+        $collection = str_after($collection, $this->parent->directory());
+
+        if (Site::hasMultiple()) {
+            list($collection, $site) = explode('/', $collection);
+        }
+
+        // Support entries within subdirectories at any level.
+        if (str_contains($collection, '/')) {
+            $collection = str_before($collection, '/');
+        }
+
+        return [$collection, $site];
+    }
+
     protected function handleModifiedItem($item)
     {
         $item->taxonomize();
+    }
+
+    protected function handleDeletedItem($path, $id)
+    {
+        [$collection, $site] = $this->extractAttributesFromPath($path);
+
+        $collection = Collection::findByHandle($collection);
+
+        $this->removeEntryFromStructure($collection, $id);
+    }
+
+    protected function removeEntryFromStructure($collection, $id)
+    {
+        if (! $collection->hasStructure()) {
+            return;
+        }
+
+        $contents = $collection->structureContents();
+
+        $trees = $contents['trees'] ?? [Site::default()->handle() => $contents['tree']];
+        unset($contents['tree']);
+        $contents['trees'] = $trees;
+
+        $structure = (new CollectionStructure)->collection($collection);
+
+        $tempStructure = new class extends \Statamic\Structures\Structure {
+            public function collections($collections = null) { return collect(); }
+        };
+
+        foreach ($trees as $site => $treeContents) {
+            $tempTree = $tempStructure->makeTree($site);
+            $tempTree->tree($treeContents)->remove($id);
+            $structure->addTree($tempTree);
+        }
+
+        $collection->structure($structure)->save();
     }
 
     protected function storeIndexes()

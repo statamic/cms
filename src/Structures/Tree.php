@@ -242,7 +242,9 @@ class Tree implements Localization
 
     public function remove($entry)
     {
-        [, $branches] = $this->removeFromInBranches($entry->id(), $this->tree);
+        $id = is_string($entry) ? $entry : $entry->id();
+
+        [, $branches] = $this->removeFromInBranches($id, $this->tree);
 
         $this->tree = $branches;
 
