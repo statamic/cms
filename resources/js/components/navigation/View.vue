@@ -202,11 +202,6 @@ export default {
         },
 
         editPage(page, vm, store) {
-            if (page.id) {
-                window.location = page.edit_url;
-                return;
-            }
-
             this.editingPage = { page, vm, store };
         },
 

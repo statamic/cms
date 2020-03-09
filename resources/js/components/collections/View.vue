@@ -73,6 +73,7 @@
             :max-depth="structureMaxDepth"
             :expects-root="structureExpectsRoot"
             :site="site"
+            @edit-page="editPage"
             @changed="markTreeDirty"
             @saved="markTreeClean"
             @canceled="markTreeClean"
@@ -254,6 +255,10 @@ export default {
             if (parent) url += '&parent=' + parent;
             window.location = url;
         },
+
+        editPage(page, vm, store) {
+            window.location = page.edit_url;
+        }
 
     }
 
