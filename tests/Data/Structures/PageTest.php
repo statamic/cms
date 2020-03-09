@@ -109,14 +109,11 @@ class PageTest extends TestCase
     /** @test */
     function it_gets_the_entrys_uri_when_the_structure_does_not_have_a_collection()
     {
-        $entry = new class extends Entry {
-            public function id($id = null) {
-                return 'a';
-            }
-            public function uri() {
-                return '/the/actual/entry/uri';
-            }
-        };
+        $entry = $this->partialMock(Entry::class);
+        $entry->shouldReceive('id')->andReturn('test');
+        $entry->shouldReceive('locale')->andReturn('en');
+        $entry->shouldReceive('uri')->andReturn('/the/actual/entry/uri');
+        $entry->shouldReceive('value')->with('redirect')->andReturnNull();
 
         $tree = (new Tree)->structure(
             $this->mock(Nav::class)
@@ -127,6 +124,31 @@ class PageTest extends TestCase
             ->setEntry($entry);
 
         $this->assertEquals('/the/actual/entry/uri', $page->uri());
+        $this->assertEquals('/the/actual/entry/uri', $page->url());
+        $this->assertEquals('http://localhost/the/actual/entry/uri', $page->absoluteUrl());
+        $this->assertFalse($page->isRedirect());
+    }
+
+    /** @test */
+    function it_gets_the_uri_of_a_redirect_entry()
+    {
+        $entry = $this->partialMock(Entry::class);
+        $entry->shouldReceive('id')->andReturn('test');
+        $entry->shouldReceive('locale')->andReturn('en');
+        $entry->shouldReceive('value')->with('redirect')->andReturn('http://example.com/page');
+
+        $tree = (new Tree)->structure(
+            $this->mock(Nav::class)
+        );
+
+        $page = (new Page)
+            ->setTree($tree)
+            ->setEntry($entry);
+
+        $this->assertNull($page->uri());
+        $this->assertEquals('http://example.com/page', $page->url());
+        $this->assertEquals('http://example.com/page', $page->absoluteUrl());
+        $this->assertTrue($page->isRedirect());
     }
 
     /** @test */

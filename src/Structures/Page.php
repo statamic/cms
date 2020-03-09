@@ -41,6 +41,10 @@ class Page implements Entry, Augmentable, Responsable
             return $this->url;
         }
 
+        if ($this->isRedirect()) {
+            return $this->redirectUrl();
+        }
+
         if ($this->reference && $this->referenceExists()) {
             return URL::makeRelative($this->absoluteUrl());
         }
@@ -147,6 +151,10 @@ class Page implements Entry, Augmentable, Responsable
             return optional($this->parent)->uri();
         }
 
+        if ($this->isRedirect()) {
+            return null;
+        }
+
         $uris = app(UriCache::class);
 
         if ($cached = $uris[$this->reference] ?? null) {
@@ -176,6 +184,10 @@ class Page implements Entry, Augmentable, Responsable
     {
         if ($this->url) {
             return $this->url;
+        }
+
+        if ($this->isRedirect()) {
+            return $this->redirectUrl();
         }
 
         if ($this->reference && $this->referenceExists()) {
