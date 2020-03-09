@@ -213,21 +213,31 @@ class EntryTest extends TestCase
         $entryEn = (new Entry)->collection($collection)->locale('en')->slug('foo');
         $entryFr = (new Entry)->collection($collection)->locale('fr')->slug('le-foo');
         $entryDe = (new Entry)->collection($collection)->locale('de')->slug('das-foo');
+        $redirectEntry = (new Entry)->collection($collection)->locale('en')->slug('redirected')->set('redirect', 'http://example.com/page');
 
         $this->assertEquals('/blog/foo', $entryEn->uri());
         $this->assertEquals('/blog/foo', $entryEn->url());
         $this->assertEquals('http://domain.com/blog/foo', $entryEn->absoluteUrl());
         $this->assertEquals('http://domain.com/amp/blog/foo', $entryEn->ampUrl());
+        $this->assertNull($entryEn->redirectUrl());
 
         $this->assertEquals('/le-blog/le-foo', $entryFr->uri());
         $this->assertEquals('/fr/le-blog/le-foo', $entryFr->url());
         $this->assertEquals('http://domain.com/fr/le-blog/le-foo', $entryFr->absoluteUrl());
         $this->assertEquals('http://domain.com/fr/amp/le-blog/le-foo', $entryFr->ampUrl());
+        $this->assertNull($entryFr->redirectUrl());
 
         $this->assertEquals('/das-blog/das-foo', $entryDe->uri());
         $this->assertEquals('/das-blog/das-foo', $entryDe->url());
         $this->assertEquals('http://domain.de/das-blog/das-foo', $entryDe->absoluteUrl());
         $this->assertEquals('http://domain.de/amp/das-blog/das-foo', $entryDe->ampUrl());
+        $this->assertNull($entryDe->redirectUrl());
+
+        $this->assertNull($redirectEntry->uri());
+        $this->assertEquals('http://example.com/page', $redirectEntry->url());
+        $this->assertEquals('http://example.com/page', $redirectEntry->absoluteUrl());
+        $this->assertNull($redirectEntry->ampUrl());
+        $this->assertEquals('http://example.com/page', $redirectEntry->redirectUrl());
     }
 
     /** @test */
