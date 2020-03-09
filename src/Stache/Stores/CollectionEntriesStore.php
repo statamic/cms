@@ -121,7 +121,10 @@ class CollectionEntriesStore extends ChildStore
         unset($contents['tree']);
         $contents['trees'] = $trees;
 
-        $structure = (new CollectionStructure)->collection($collection);
+        $structure = (new CollectionStructure)
+            ->collection($collection)
+            ->expectsRoot($contents['root'] ?? false)
+            ->maxDepth($contents['max_depth'] ?? null);
 
         $tempStructure = new class extends \Statamic\Structures\Structure {
             public function collections($collections = null) { return collect(); }
