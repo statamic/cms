@@ -117,11 +117,11 @@ export default {
                 .then(response => {
                     this.saving = false;
                     this.$refs.popover.close();
-                    this.$toast.success(__('Columns saved'));
+                    this.$toast.success(__('These are now your default columns.'));
                 })
                 .catch(error => {
                     this.saving = false;
-                    this.$toast.error(__('Something went wrong'));
+                    this.$toast.error(__('Unable to save column preferences.'));
                 });
         },
 
@@ -136,11 +136,11 @@ export default {
                 .then(response => {
                     this.saving = false;
                     this.$refs.popover.close();
-                    this.$toast.success(__('Columns reset'));
+                    this.$toast.success(__('Columns have been reset to their defaults.'));
                 })
                 .catch(error => {
                     this.saving = false;
-                    this.$toast.error(__('Something went wrong'));
+                    this.$toast.error(__('Unable to save column preferences.'));
                 });
         },
 
