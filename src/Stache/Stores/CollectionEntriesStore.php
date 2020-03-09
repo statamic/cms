@@ -128,9 +128,9 @@ class CollectionEntriesStore extends ChildStore
         };
 
         foreach ($trees as $site => $treeContents) {
-            $tempTree = $tempStructure->makeTree($site);
-            $tempTree->tree($treeContents)->remove($id);
-            $structure->addTree($tempTree);
+            $structure->addTree(
+                $tempStructure->makeTree($site)->tree($treeContents)->remove($id)
+            );
         }
 
         $collection->structure($structure)->save();
