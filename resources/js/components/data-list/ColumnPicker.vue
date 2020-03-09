@@ -1,5 +1,5 @@
 <template>
-    <popover>
+    <popover ref="popover">
 
         <template slot="trigger">
             <button
@@ -116,6 +116,7 @@ export default {
             this.$preferences.set(this.preferencesKey, this.selectedColumns.map(column => column.field))
                 .then(response => {
                     this.saving = false;
+                    this.$refs.popover.close();
                     this.$toast.success(__('Columns saved'));
                 })
                 .catch(error => {
@@ -134,6 +135,7 @@ export default {
             this.$preferences.remove(this.preferencesKey)
                 .then(response => {
                     this.saving = false;
+                    this.$refs.popover.close();
                     this.$toast.success(__('Columns reset'));
                 })
                 .catch(error => {
