@@ -41,7 +41,6 @@ export default {
     },
 
     mounted() {
-        console.log(this.disabled);
         if (! this.disabled) this.bindPopper()
     },
 
