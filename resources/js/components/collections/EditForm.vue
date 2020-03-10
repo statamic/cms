@@ -33,14 +33,11 @@ export default {
         blueprint: Object,
         initialValues: Object,
         meta: Object,
-        initialTitle: String,
-        url: String,
-        listingUrl: String,
+        url: String
     },
 
     data() {
         return {
-            title: this.initialTitle,
             values: this.initialValues,
             error: null,
             errors: {},
@@ -60,7 +57,6 @@ export default {
 
             this.$axios.patch(this.url, this.values).then(response => {
                 this.saving = false;
-                this.title = response.data.title;
                 this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
             }).catch(e => this.handleAxiosError(e));
