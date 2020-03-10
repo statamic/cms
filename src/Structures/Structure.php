@@ -19,7 +19,6 @@ abstract class Structure implements StructureContract
 
     protected $title;
     protected $handle;
-    protected $sites;
     protected $trees;
     protected $collection;
     protected $maxDepth;
@@ -48,16 +47,6 @@ abstract class Structure implements StructureContract
             ->getter(function ($title) {
                 return $title ?: Str::humanize($this->handle());
             })->args(func_get_args());
-    }
-
-    public function sites($sites = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('sites')
-            ->getter(function ($sites) {
-                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
-            })
-            ->args(func_get_args());
     }
 
     public function expectsRoot($expectsRoot = null)

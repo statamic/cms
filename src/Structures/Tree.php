@@ -46,11 +46,6 @@ class Tree implements Localization
         return $this->tree[0]['entry'];
     }
 
-    public function sites()
-    {
-        $this->structure->sites();
-    }
-
     public function handle()
     {
         return $this->structure->handle();

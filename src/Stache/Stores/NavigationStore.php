@@ -51,13 +51,12 @@ class NavigationStore extends BasicStore
     {
         $structure = $this
             ->makeBaseStructureFromFile($handle, $path, $data)
-            ->sites([$site = Site::default()->handle()])
             ->maxDepth($data['max_depth'] ?? null)
             ->collections($data['collections'] ?? null);
 
         return $structure->addTree(
             $structure
-                ->makeTree($site)
+                ->makeTree(Site::default()->handle())
                 ->tree($data['tree'] ?? [])
         );
     }
@@ -66,11 +65,9 @@ class NavigationStore extends BasicStore
     {
         $structure = $this->makeBaseStructureFromFile($handle, $path, $data);
 
-        $structure->sites(Site::all()->filter(function ($site) use ($handle) {
+        Site::all()->filter(function ($site) use ($handle) {
             return File::exists($this->directory . $site->handle() . '/' . $handle . '.yaml');
-        })->map->handle()->values()->all());
-
-        $structure->sites()->map(function ($site) use ($structure) {
+        })->map->handle()->map(function ($site) use ($structure) {
             return $this->makeTree($structure, $site);
         })->filter()->each(function ($variables) use ($structure) {
             $structure->addTree($variables);
@@ -124,12 +121,15 @@ class NavigationStore extends BasicStore
         return $file->getExtension() === 'yaml';
     }
 
-    public function save($structure)
+    public function save($nav)
     {
-        parent::save($structure);
+        parent::save($nav);
 
         if (Site::hasMultiple()) {
-            $structure->trees()->each->writeFile();
+            Site::all()->each(function ($site) use ($nav) {
+                $site = $site->handle();
+                $nav->existsIn($site) ? $nav->in($site)->writeFile() : $nav->makeTree($site)->deleteFile();
+            });
         }
     }
 }

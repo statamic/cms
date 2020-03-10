@@ -46,9 +46,7 @@ class Nav extends Structure implements Contract
             'root' => $this->expectsRoot ?: null,
         ];
 
-        if (Site::hasMultiple()) {
-            $data['sites'] = $this->sites;
-        } else {
+        if (! Site::hasMultiple()) {
             $data = array_merge($data, $this->in(Site::default()->handle())->fileData());
         }
 
