@@ -50,6 +50,11 @@ class Page implements Entry, Augmentable, Responsable
         }
     }
 
+    public function isRedirect()
+    {
+        return optional($this->entry())->isRedirect();
+    }
+
     public function setDepth($depth)
     {
         $this->depth = $depth;
