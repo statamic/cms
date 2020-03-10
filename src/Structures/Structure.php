@@ -134,12 +134,12 @@ abstract class Structure implements StructureContract
         return null;
     }
 
-    public function showUrl()
+    public function showUrl($params = [])
     {
         //
     }
 
-    public function editUrl($params = [])
+    public function editUrl()
     {
         //
     }
