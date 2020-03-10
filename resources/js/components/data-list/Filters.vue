@@ -33,7 +33,7 @@
                 <button class="btn-primary" @click="save">{{ __('Save Filters') }}</button>
             </div> -->
 
-            <data-list-search @input="input => $emit('search-query-changed', input)" />
+            <data-list-search />
 
             <!-- @TODO: Need to create actual child components for these native "pinned" filters.
                 We'll need date, status, and author to ship with, plus any custom "promoted" filters. -->
