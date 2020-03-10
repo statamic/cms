@@ -14,6 +14,12 @@
 
                 <a @click="$refs.tree.cancel" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
 
+                <site-selector
+                    :sites="sites"
+                    :value="site"
+                    @input="siteSelected"
+                />
+
                 <dropdown-list :show-dropdown-if="collections.length > 0">
                     <template #trigger>
                         <button class="btn" v-text="__('Add Link')" @click="addLink" />
@@ -102,6 +108,7 @@ import PageTree from '../structures/PageTree.vue';
 import PageEditor from '../structures/PageEditor.vue';
 import PageSelector from '../structures/PageSelector.vue';
 import RemovePageConfirmation from './RemovePageConfirmation.vue';
+import SiteSelector from './SiteSelector.vue';
 
 export default {
 
@@ -109,7 +116,8 @@ export default {
         PageTree,
         PageEditor,
         PageSelector,
-        RemovePageConfirmation
+        RemovePageConfirmation,
+        SiteSelector
     },
 
     props: {
@@ -122,6 +130,7 @@ export default {
         maxDepth: { type: Number, default: Infinity, },
         expectsRoot: { type: Boolean, required: true },
         site: { type: String, required: true },
+        sites: { type: Array, required: true }
     },
 
     data() {
@@ -244,6 +253,10 @@ export default {
                 this.pageBeingDeleted = branch;
             }
         },
+
+        siteSelected(site) {
+            window.location = site.url;
+        }
 
     }
 

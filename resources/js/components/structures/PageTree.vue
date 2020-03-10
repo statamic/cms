@@ -135,7 +135,7 @@ export default {
 
         getPages() {
             this.loading = true;
-            const url = this.pagesUrl;
+            const url = `${this.pagesUrl}?site=${this.site}`;
 
             return this.$axios.get(url).then(response => {
                 this.pages = response.data.pages;

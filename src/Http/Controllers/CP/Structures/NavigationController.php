@@ -90,20 +90,13 @@ class NavigationController extends CpController
             'nav' => $nav,
             'expectsRoot' => $nav->expectsRoot(),
             'collections' => $nav->collections()->map->handle()->all(),
-            'localizations' => $nav->sites()->map(function ($handle) use ($nav, $tree) {
-                $localized = $nav->in($handle);
-                $exists = $localized !== null;
-                if (!$exists) {
-                    return null;
-                }
+            'sites' => $nav->sites()->map(function ($handle) use ($nav) {
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
-                    'active' => $handle === $tree->locale(),
-                    'exists' => $exists,
-                    'url' => $exists ? $localized->editUrl() : null,
+                    'url' => $nav->in($handle)->showUrl(),
                 ];
-            })->filter()->all()
+            })->all()
         ]);
     }
 
