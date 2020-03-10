@@ -66,6 +66,10 @@ class NavigationStore extends BasicStore
     {
         $structure = $this->makeBaseStructureFromFile($handle, $path, $data);
 
+        $structure->sites(Site::all()->filter(function ($site) use ($handle) {
+            return File::exists($this->directory . $site->handle() . '/' . $handle . '.yaml');
+        })->map->handle()->values()->all());
+
         $structure->sites()->map(function ($site) use ($structure) {
             return $this->makeTree($structure, $site);
         })->filter()->each(function ($variables) use ($structure) {
@@ -80,7 +84,6 @@ class NavigationStore extends BasicStore
         return Facades\Nav::make()
             ->handle($handle)
             ->title($data['title'] ?? null)
-            ->sites($data['sites'] ?? null)
             ->maxDepth($data['max_depth'] ?? null)
             ->collections($data['collections'] ?? null)
             ->expectsRoot($data['root'] ?? false)
