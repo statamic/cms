@@ -76,7 +76,9 @@ Vue.component('keyboard-shortcuts-modal', require('../components/modals/Keyboard
 Vue.component('resource-deleter', require('../components/ResourceDeleter.vue').default);
 // Vue.component('modal-dialog', require('../components/ModalDialog.vue').default);
 
+// Charts
+Vue.component('sparkline-chart', require('../components/charts/SparklineChart.vue').default);
+
 Vue.component('stack', require('../components/stacks/Stack.vue').default);
 Vue.component('stack-test', require('../components/stacks/StackTest.vue').default);
-
 Vue.component('pane', require('../components/panes/Pane.vue').default);

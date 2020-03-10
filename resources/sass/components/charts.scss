@@ -1,0 +1,16 @@
+.ct-chart .ct-bar,
+.ct-chart .ct-line,
+.ct-chart .ct-point {
+  stroke: config('colors.blue-500');
+  stroke-width: 2px;
+}
+
+.ct-chart .ct-area,
+.ct-chart .ct-slice-pie {
+  fill: config('colors.blue-300');
+}
+
+.ct-point {
+  stroke: config('colors.blue-500');
+  stroke-width: 6px !important;
+}
