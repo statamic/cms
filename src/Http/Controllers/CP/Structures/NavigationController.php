@@ -50,16 +50,7 @@ class NavigationController extends CpController
             'handle' => $nav->handle(),
             'collections' => $nav->collections()->map->handle()->all(),
             'root' => $nav->expectsRoot(),
-            'sites' => Site::all()->map(function ($site) use ($nav) {
-                $tree = $nav->in($site->handle());
-                return [
-                    'name' => $site->name(),
-                    'handle' => $site->handle(),
-                    'enabled' => $enabled = $tree !== null,
-                    'route' => $enabled ? $tree->route() : null,
-                    'inherit' => false,
-                ];
-            })->values()->all()
+            'sites' => $nav->trees()->keys()->all(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($nav))
@@ -77,12 +68,12 @@ class NavigationController extends CpController
 
     public function show(Request $request, $nav)
     {
-        $nav = Nav::find($nav);
+        abort_if(! $nav = Nav::find($nav), 404);
 
         $site = $request->site ?? Site::selected()->handle();
 
-        if (! $nav || ! $tree = $nav->in($site)) {
-            return abort(404);
+        if (! $nav->existsIn($site)) {
+            return redirect($nav->trees()->first()->showUrl());
         }
 
         return view('statamic::navigation.show', [
@@ -90,13 +81,13 @@ class NavigationController extends CpController
             'nav' => $nav,
             'expectsRoot' => $nav->expectsRoot(),
             'collections' => $nav->collections()->map->handle()->all(),
-            'sites' => $nav->sites()->map(function ($handle) use ($nav) {
+            'sites' => $nav->trees()->map(function ($tree) use ($nav) {
                 return [
-                    'handle' => $handle,
-                    'name' => Site::get($handle)->name(),
-                    'url' => $nav->in($handle)->showUrl(),
+                    'handle' => $tree->locale(),
+                    'name' => $tree->site()->name(),
+                    'url' => $tree->showUrl(),
                 ];
-            })->all()
+            })->values()->all()
         ]);
     }
 
@@ -118,28 +109,17 @@ class NavigationController extends CpController
             ->collections($values['collections'])
             ->maxDepth($values['max_depth']);
 
-        $sites = $values['sites'] ?? [];
+        $existingSites = $nav->trees()->keys()->all();
 
-        if (!empty($sites)) {
-            $nav->sites($sites->filter->enabled->map->handle->values()->all());
-        }
-
-        foreach ($sites as $site) {
-            $tree = $nav->in($site['handle']);
-
-            if ($tree && !$site['enabled']) {
-                $nav->removeTree($tree);
+        if ($sites = Arr::get($values, 'sites')) {
+            foreach ($sites as $site) {
+                $tree = $nav->in($site) ?? $nav->makeTree($site);
+                $nav->addTree($tree);
             }
 
-            if (!$tree && $site['enabled']) {
-                $tree = $nav->makeTree($site['handle']);
+            foreach (array_diff($existingSites, $sites) as $site) {
+                $nav->removeTree($nav->in($site));
             }
-
-            if (!$site['enabled']) {
-                continue;
-            }
-
-            $nav->addTree($tree);
         }
 
         $nav->save();
@@ -218,8 +198,10 @@ class NavigationController extends CpController
 
         if (Site::hasMultiple()) {
             $contents['options']['fields']['sites'] = [
-                'type' => 'structure_sites',
+                'type' => 'sites',
                 'display' => __('Sites'),
+                'mode' => 'select',
+                'required' => true,
             ];
         };
 

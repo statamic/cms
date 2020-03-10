@@ -6,6 +6,7 @@ use Illuminate\Support\Facades\Event;
 use Statamic\Events\Data\CollectionSaved;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\Structures\NavigationController;
 use Tests\FakesRoles;
@@ -47,6 +48,37 @@ class UpdateNavigationTest extends TestCase
         $this->assertEquals('Updated', $updated->title());
         $this->assertEquals(2, $updated->maxDepth());
         $this->assertTrue($updated->expectsRoot());
+    }
+
+    /** @test */
+    function it_updates_a_nav_with_multiple_sites()
+    {
+
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
+            'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
+            'de' => ['url' => 'http://localhost/de/', 'locale' => 'de'],
+        ]]);
+
+        $nav = $this->createNav();
+        $nav->addTree($nav->makeTree('de'));
+        $this->assertCount(1, Nav::all());
+        $this->assertEquals(['en', 'de'], Nav::all()->first()->trees()->keys()->all());
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->submit($nav, $this->validParams(['sites' => [
+                'en', 'fr' // starts with en+de, but should remove de and add fr, ending with en+fr
+            ]]))
+            ->assertOk()
+            ->assertJson(['title' => 'Updated']);
+
+        $this->assertCount(1, Nav::all());
+        $updated = Nav::all()->first();
+        $this->assertEquals('Updated', $updated->title());
+        $this->assertEquals(2, $updated->maxDepth());
+        $this->assertTrue($updated->expectsRoot());
+        $this->assertEquals(['en', 'fr'], $updated->trees()->keys()->all());
     }
 
     /** @test */

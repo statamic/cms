@@ -11,7 +11,8 @@ trait MocksStructures
     private function createNav($handle)
     {
         return tap(Mockery::mock(Nav::class), function ($s) use ($handle) {
-            $s->shouldReceive('in')->andReturn($this->createStructureTree($handle));
+            $s->shouldReceive('in')->andReturn($tree = $this->createStructureTree($handle));
+            $s->shouldReceive('trees')->andReturn(collect([$tree]));
             $s->shouldReceive('title')->andReturn($handle);
             $s->shouldReceive('handle')->andReturn($handle);
             $s->shouldReceive('showUrl')->andReturn('/nav-show-url');

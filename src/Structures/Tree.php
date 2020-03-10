@@ -23,6 +23,11 @@ class Tree implements Localization
         return $this->fluentlyGetOrSet('locale')->args(func_get_args());
     }
 
+    public function site()
+    {
+        return Site::get($this->locale());
+    }
+
     public function structure($structure = null)
     {
         return $this->fluentlyGetOrSet('structure')->args(func_get_args());
