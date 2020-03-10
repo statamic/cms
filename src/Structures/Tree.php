@@ -64,7 +64,7 @@ class Tree implements Localization
     public function path()
     {
         return vsprintf('%s/%s/%s.yaml', [
-            rtrim(Stache::store('structures')->directory(), '/'),
+            rtrim(Stache::store('navigation')->directory(), '/'),
             $this->locale(),
             $this->handle()
         ]);
