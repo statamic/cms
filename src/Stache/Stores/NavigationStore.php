@@ -99,7 +99,6 @@ class NavigationStore extends BasicStore
 
         return $tree
             ->initialPath($path)
-            ->root($data['root'] ?? null)
             ->tree($data['tree'] ?? []);
     }
 
