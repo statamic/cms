@@ -2,17 +2,17 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Facades\File;
-use Statamic\Facades\Site;
-use Statamic\Facades\YAML;
-use Statamic\Facades\Stache;
 use Illuminate\Console\Command;
-use Statamic\Facades\GlobalSet;
-use Statamic\Facades\Structure;
-use Statamic\Facades\Collection;
-use Statamic\Console\RunsInPlease;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Console\EnhancesCommands;
+use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Collection;
+use Statamic\Facades\File;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Nav;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Facades\YAML;
 use Symfony\Component\VarExporter\VarExporter;
 
 class Multisite extends Command
@@ -55,9 +55,9 @@ class Multisite extends Command
             $this->checkLine("Global [<comment>{$set->handle()}</comment>] updated.");
         });
 
-        Structure::all()->each(function ($structure) {
-            $this->moveStructure($structure);
-            $this->checkLine("Structure [<comment>{$structure->handle()}</comment>] updated.");
+        Nav::all()->each(function ($nav) {
+            $this->moveNav($nav);
+            $this->checkLine("Nav [<comment>{$nav->handle()}</comment>] updated.");
         });
 
         Cache::clear();
@@ -115,16 +115,15 @@ class Multisite extends Command
             ->save();
     }
 
-    protected function moveStructure($structure)
+    protected function moveNav($nav)
     {
-        $yaml = YAML::file($structure->path())->parse();
+        $yaml = YAML::file($nav->path())->parse();
         $tree = $yaml['tree'] ?? [];
-        $root = $yaml['root'] ?? null;
 
-        $structure
+        $nav
             ->sites([$this->siteOne, $this->siteTwo])
-            ->addTree($structure->makeTree($this->siteOne)->tree($tree)->root($root))
-            ->addTree($structure->makeTree($this->siteTwo)->tree($tree)->root($root))
+            ->addTree($nav->makeTree($this->siteOne)->tree($tree))
+            ->addTree($nav->makeTree($this->siteTwo)->tree($tree))
             ->save();
     }
 
@@ -143,7 +142,7 @@ class Multisite extends Command
     {
         return $this->collectionsHaveBeenMoved()
             || $this->globalsHaveBeenMoved()
-            || $this->structuresHaveBeenMoved();
+            || $this->navsHaveBeenMoved();
     }
 
     protected function collectionsHaveBeenMoved()
@@ -160,8 +159,8 @@ class Multisite extends Command
         return File::isDirectory("content/globals/{$this->siteOne}");
     }
 
-    protected function structuresHaveBeenMoved()
+    protected function navsHaveBeenMoved()
     {
-        return File::isDirectory("content/structures/{$this->siteOne}");
+        return File::isDirectory("content/navigation/{$this->siteOne}");
     }
 }
