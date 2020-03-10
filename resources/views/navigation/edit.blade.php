@@ -3,13 +3,19 @@
 
 @section('content')
 
+    <header class="mb-3">
+        @include('statamic::partials.breadcrumb', [
+            'url' => cp_route('navigation.show', $nav->handle()),
+            'title' => $nav->title()
+        ])
+        <h1>@yield('title')</h1>
+    </header>
+
     <navigation-edit-form
-        initial-title="{{ $nav->title() }}"
         :blueprint="{{ json_encode($blueprint) }}"
         :initial-values="{{ json_encode($values) }}"
         :meta="{{ json_encode($meta) }}"
         url="{{ $nav->showUrl() }}"
-        listing-url="{{ cp_route('navigation.index') }}"
     ></navigation-edit-form>
 
 @endsection

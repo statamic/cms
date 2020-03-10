@@ -11,16 +11,16 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setFieldValue }">
-            <header class="mb-3">
-                <breadcrumb :url="listingUrl" :title="title" />
-                <div class="flex items-center">
-                    <h1 class="flex-1" v-text="__('Configure Navigation')" />
-                    <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
-                </div>
-            </header>
+        <div slot-scope="{ setFieldValue, setFieldMeta }">
+            <configure-sections
+                @updated="setFieldValue"
+                @meta-updated="setFieldMeta"
+                :enable-sidebar="false" />
 
-            <configure-sections @updated="setFieldValue" :enable-sidebar="false" />
+            <div class="py-2 border-t flex justify-between">
+                <a :href="url" class="btn" v-text="__('Cancel') "/>
+                <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
+            </div>
         </div>
     </publish-container>
 
@@ -33,14 +33,11 @@ export default {
         blueprint: Object,
         initialValues: Object,
         meta: Object,
-        initialTitle: String,
-        url: String,
-        listingUrl: String,
+        url: String
     },
 
     data() {
         return {
-            title: this.initialTitle,
             values: this.initialValues,
             error: null,
             errors: {},
@@ -60,7 +57,6 @@ export default {
 
             this.$axios.patch(this.url, this.values).then(response => {
                 this.saving = false;
-                this.title = response.data.title;
                 this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
             }).catch(e => this.handleAxiosError(e));
