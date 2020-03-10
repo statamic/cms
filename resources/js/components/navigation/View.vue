@@ -15,6 +15,7 @@
                 <a @click="$refs.tree.cancel" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
 
                 <site-selector
+                    v-if="sites.length > 1"
                     :sites="sites"
                     :value="site"
                     @input="siteSelected"
