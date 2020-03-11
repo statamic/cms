@@ -291,17 +291,34 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function the_structure_validates_the_tree_when_setting_it()
+    function the_structure_validates_the_tree_when_getting_it_the_first_time()
     {
         $structure = $this->mock(Structure::class);
+        $structure->shouldReceive('handle')->andReturn('test');
 
-        $treeContents = ['the' => 'tree'];
+        $firstContents = ['first' => 'time'];
+        $secondContents = ['second' => 'time'];
 
-        $structure->shouldReceive('validateTree')->with($treeContents)->once()->andReturn($treeContents);
+        $structure->shouldReceive('validateTree')->with($firstContents, 'the-locale')->once()->andReturn($firstContents);
+        $structure->shouldReceive('validateTree')->with($secondContents, 'the-locale')->once()->andReturn($secondContents);
 
-        $tree = (new Tree)->structure($structure);
+        $tree = (new Tree)->structure($structure)->locale('the-locale');
 
-        $tree->tree($treeContents);
+        // Calling tree multiple times doesn't re-validate
+        $tree->tree($firstContents);
+        $tree->tree();
+        $tree->tree();
+
+        // Re-setting the tree exactly the same also won't re-validate
+        $tree->tree($firstContents);
+        $tree->tree();
+
+        // Using different contents will re-validate.
+        $tree->tree($secondContents);
+        $tree->tree();
+        $tree->tree($secondContents);
+        $tree->tree();
+        $tree->tree();
     }
 
     protected function tree()

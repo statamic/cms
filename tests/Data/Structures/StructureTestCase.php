@@ -29,7 +29,7 @@ abstract class StructureTestCase extends TestCase
                     ]
                 ]
             ]
-        ]);
+        ], 'en');
     }
 
     /** @test */
@@ -46,7 +46,7 @@ abstract class StructureTestCase extends TestCase
             ]
         ];
 
-        $this->assertEquals($tree, $this->structure()->expectsRoot(false)->validateTree($tree));
+        $this->assertEquals($tree, $this->structure()->expectsRoot(false)->validateTree($tree, 'en'));
     }
 
     /** @test */
@@ -60,13 +60,13 @@ abstract class StructureTestCase extends TestCase
                 'title' => 'Not an entry',
                 'url' => '/test',
             ]
-        ]);
+        ], 'en');
     }
 
     /** @test */
     function the_root_doesnt_need_to_be_an_entry_if_the_tree_is_empty()
     {
-        $this->assertEquals([], $this->structure()->expectsRoot(true)->validateTree([]));
+        $this->assertEquals([], $this->structure()->expectsRoot(true)->validateTree([], 'en'));
     }
 
     /** @test **/
@@ -79,6 +79,6 @@ abstract class StructureTestCase extends TestCase
             ]
         ];
 
-        $this->assertEquals($tree, $this->structure()->expectsRoot(false)->validateTree($tree));
+        $this->assertEquals($tree, $this->structure()->expectsRoot(false)->validateTree($tree, 'en'));
     }
 }

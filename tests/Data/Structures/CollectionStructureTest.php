@@ -14,6 +14,7 @@ class CollectionStructureTest extends StructureTestCase
         parent::setUp();
 
         $this->entryQueryBuilder = $this->mock(EntryQueryBuilder::class);
+        $this->entryQueryBuilder->shouldReceive('where')->with('site', 'en')->andReturnSelf();
         $this->entryQueryBuilder->shouldReceive('get')->andReturnUsing(function () {
             return $this->queryBuilderGetReturnValue();
         });
@@ -141,7 +142,7 @@ class CollectionStructureTest extends StructureTestCase
                         ]
                     ]
                 ]
-            ]);
+            ], 'en');
     }
 
     /** @test */
@@ -176,7 +177,7 @@ class CollectionStructureTest extends StructureTestCase
                 ]
             ],
             ['entry' => '3'],
-        ]);
+        ], 'en');
     }
 
     /** @test */
@@ -198,7 +199,7 @@ class CollectionStructureTest extends StructureTestCase
                 ]
             ],
             ['entry' => '3'],
-        ]);
+        ], 'en');
 
         $expected = [
             [

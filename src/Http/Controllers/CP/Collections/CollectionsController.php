@@ -211,29 +211,35 @@ class CollectionsController extends CpController
         if (! $values['structured']) {
             $collection->structure(null);
         } else {
-            $collection->structure($this->makeStructure($collection, $values['max_depth'], $values['expects_root']));
+            $collection->structure($this->makeStructure($collection, $values['max_depth'], $values['expects_root'], $values['sites']));
         }
+
+        // TODO: Temporary fix for if you add a site to a collection, and there are already entries
+        // in that site, when the stache index tries to update, it'll find those entries and
+        // throw an error because it wouldn't be in the entry store's paths array yet.
+        \Statamic\Facades\Stache::clear();
 
         $collection->save();
 
         return $collection->toArray();
     }
 
-    protected function makeStructure($collection, $maxDepth, $expectsRoot)
+    protected function makeStructure($collection, $maxDepth, $expectsRoot, $sites)
     {
         if (! $structure = $collection->structure()) {
             $structure = (new CollectionStructure)->collection($collection);
+        }
 
-            // todo: make multiple trees based on the existing multisite nature of the collection
-            $trees = [
-                Site::default()->handle() => $collection->queryEntries()->get('id')->map(function ($entry) {
-                    return ['entry' => $entry->id()];
-                })->all()
-            ];
+        foreach (Site::all() as $site) {
+            $site = $site->handle();
+            $shouldExist = in_array($site, $sites);
 
-            foreach ($trees as $site => $contents) {
-                $tree = $structure->makeTree($site)->tree($contents);
-                $structure->addTree($tree);
+            if ($shouldExist && !$structure->existsIn($site)) {
+                $structure->addTree($structure->makeTree($site));
+            }
+
+            if (!$shouldExist && $structure->existsIn($site)) {
+                $structure->removeTree($structure->in($site));
             }
         }
 

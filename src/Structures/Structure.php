@@ -103,7 +103,7 @@ abstract class Structure implements StructureContract
             })->args(func_get_args());
     }
 
-    public function validateTree(array $tree): array
+    public function validateTree(array $tree, string $locale): array
     {
         if (! $this->expectsRoot()) {
             return $tree;

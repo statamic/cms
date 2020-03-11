@@ -51,9 +51,9 @@ class CollectionStructure extends Structure
         return $this->collection->route($site);
     }
 
-    public function validateTree(array $tree): array
+    public function validateTree(array $tree, string $locale): array
     {
-        parent::validateTree($tree);
+        parent::validateTree($tree, $locale);
 
         $entryIds = $this->getEntryIdsFromTree($tree);
 
@@ -61,7 +61,10 @@ class CollectionStructure extends Structure
             throw new \Exception("Duplicate entry [{$entryId}] in [{$this->collection->handle()}] collection's structure.");
         }
 
-        $thisCollectionsEntries = $this->collection->queryEntries()->get('id')->map->id();
+        $thisCollectionsEntries = $this->collection->queryEntries()
+            ->where('site', $locale)
+            ->get(['id', 'site'])
+            ->map->id();
 
         $otherCollectionEntries = $entryIds->diff($thisCollectionsEntries);
 
@@ -94,5 +97,21 @@ class CollectionStructure extends Structure
         $this->collection()->structure($this)->save();
 
         return true;
+    }
+
+    public function in($site)
+    {
+        if ($tree = parent::in($site)) {
+            return $tree;
+        }
+
+        if ($this->existsIn($site)) {
+            return $this->makeTree($site)->tree([]);
+        }
+    }
+
+    public function existsIn($site)
+    {
+        return $this->collection()->sites()->contains($site);
     }
 }

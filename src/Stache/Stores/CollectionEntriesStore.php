@@ -14,12 +14,26 @@ use Statamic\Structures\CollectionStructure;
 
 class CollectionEntriesStore extends ChildStore
 {
+    protected $collection;
+
+    protected function collection()
+    {
+        return $this->collection ?? Collection::findByHandle($this->childKey);
+    }
+
     public function getFileFilter(SplFileInfo $file) {
         $dir = str_finish($this->directory(), '/');
         $relative = $file->getPathname();
 
         if (substr($relative, 0, strlen($dir)) == $dir) {
             $relative = substr($relative, strlen($dir));
+        }
+
+        if (Site::hasMultiple()) {
+            [$site, $relative] = explode('/', $relative, 2);
+            if (! $this->collection()->sites()->contains($site)) {
+                return false;
+            }
         }
 
         // if (! Collection::findByHandle(explode('/', $relative)[0])) {
@@ -117,9 +131,9 @@ class CollectionEntriesStore extends ChildStore
 
         $contents = $collection->structureContents();
 
-        $trees = $contents['trees'] ?? [Site::default()->handle() => $contents['tree']];
+        $trees = $contents['tree'] ?? [Site::default()->handle() => $contents['tree']];
         unset($contents['tree']);
-        $contents['trees'] = $trees;
+        $contents['tree'] = $trees;
 
         $structure = (new CollectionStructure)
             ->collection($collection)

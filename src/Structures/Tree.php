@@ -5,6 +5,7 @@ namespace Statamic\Structures;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -36,8 +37,11 @@ class Tree implements Localization
     public function tree($tree = null)
     {
         return $this->fluentlyGetOrSet('tree')
-            ->setter(function ($tree) {
-                return $this->structure->validateTree($tree);
+            ->getter(function ($tree)  {
+                $key = "structure-{$this->structure->handle()}-{$this->locale()}-" . md5(json_encode($tree));
+                return Blink::once($key, function () use ($tree) {
+                    return $this->structure->validateTree($tree, $this->locale());
+                });
             })
             ->args(func_get_args());
     }
@@ -48,7 +52,7 @@ class Tree implements Localization
             return null;
         }
 
-        return $this->tree[0]['entry'];
+        return $this->tree()[0]['entry'];
     }
 
     public function handle()
@@ -86,7 +90,7 @@ class Tree implements Localization
 
     public function pages()
     {
-        $pages = $this->tree;
+        $pages = $this->tree();
 
         if ($this->root()) {
             $pages = array_slice($pages, 1);
