@@ -23,7 +23,6 @@ export default {
     created() {
         this.$events.$on('per-page-changed', this.perPageChanged);
         this.$events.$on('filter-changed', this.pageReset);
-        this.$events.$on('search-query-changed', this.pageReset);
     },
 
     methods: {

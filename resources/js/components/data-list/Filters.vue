@@ -156,7 +156,6 @@ export default {
 
         reset() {
             this.$emit('reset');
-            this.$events.$emit('search-query-changed', '');
         },
 
         // remove() {
