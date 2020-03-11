@@ -134,7 +134,7 @@
 }
 
 .data-list-filter-link {
-	@apply border-grey-40 text-grey-60 mr-1 pt-1.5 pb-1 px-sm;
+	@apply border-grey-40 text-grey-60 mr-1 p-1.5 pb-1;
 
 	&:hover {
 		@apply border-b-3 text-grey-70;
