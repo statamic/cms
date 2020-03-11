@@ -112,7 +112,7 @@ input.input-text-minimal:read-only,
     }
 
     .input-group-item {
-        @apply rounded-l-none border-l-0;
+        @apply rounded-l-none -mx-px;
     }
 
     button.input-group-item:hover:not(:disabled),

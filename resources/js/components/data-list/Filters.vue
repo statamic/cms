@@ -22,14 +22,17 @@
             <template v-if="isFiltering">
                 <popover v-if="canSave" placement="bottom-end" ref="savePopover">
                     <template slot="trigger">
-                        <button class="input-group-append rounded-l-0 px-1.5">{{ __('Save Filters') }}</button>
+                        <button class="input-group-item px-1.5">{{ __('Save Filters') }}</button>
                     </template>
-                    <div class="p-1 flex items-center">
-                        <input class="input-text" type="text" v-model="presetName" @keydown.enter="save" autofocus>
-                        <button class="btn-primary m-1" @click="save" :disabled="! presetName">Save</button>
+                    <div class="p-2 w-96">
+                        <h6 v-text="__('Saved filter name')" class="mb-1" />
+                        <div class="flex items-center">
+                            <input class="input-text border-r rounded-r" type="text" v-model="presetName" @keydown.enter="save" ref="savedFilterName">
+                            <button class="btn-primary ml-1" @click="save" :disabled="! presetName">Save</button>
+                        </div>
                     </div>
                 </popover>
-                <button class="input-group-append rounded-l-0 px-1.5" @click="reset">{{ __('Reset') }}</button>
+                <button class="input-group-append px-1.5" @click="reset">{{ __('Reset') }}</button>
             </template>
         </div>
 
