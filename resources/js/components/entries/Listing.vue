@@ -135,10 +135,6 @@ export default {
         }
     },
 
-    created() {
-        this.filtersChanged(this.$preferences.get(this.preferencesKey('filters')));
-    },
-
     methods: {
 
         afterRequestCompleted(response) {
