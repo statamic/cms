@@ -112,17 +112,16 @@ code.parent-url {
     z-index: 1000;
 }
 
-.publish-fields .publish-field { width: 100%; }
+.field-w-1\/4 { @apply w-1/4; }
+.field-w-1\/3 { @apply w-1/3; }
+.field-w-1\/2 { @apply w-1/2; }
+.field-w-2\/3 { @apply w-2/3; }
+.field-w-3\/4 { @apply w-3/4; }
+.field-w-full { @apply w-full; }
 
-@screen md {
-    .publish-fields {
-        .field-w-1\/4 { @apply w-1/4; }
-        .field-w-1\/3 { @apply w-1/3; }
-        .field-w-1\/2 { @apply w-1/2; }
-        .field-w-2\/3 { @apply w-2/3; }
-        .field-w-3\/4 { @apply w-3/4; }
-        .field-w-full { @apply w-full; }
-    }
+// When the wrapper gets narrow enough, the fields should all become full width.
+@element .publish-fields and (max-width: 600px) {
+    :self .publish-field { width: 100%; }
 }
 
 .publish-section:not(:empty) {
