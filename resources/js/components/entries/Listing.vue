@@ -22,7 +22,10 @@
                             :active-filters="activeFilters"
                             :active-count="activeFilterCount"
                             :search-query="searchQuery"
-                            :preferences-key="preferencesKey('filters')" />
+                            :saves-presets="true"
+                            :preferences-prefix="preferencesPrefix"
+                            :pinned="['status']"
+                        />
 
                         <template v-if="!hasSelections">
                             <button class="btn-flat ml-1"
