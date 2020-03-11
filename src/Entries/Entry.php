@@ -525,7 +525,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function route()
     {
-        return $this->collection()->route();
+        return $this->collection()->route($this->locale());
     }
 
     public function routeData()

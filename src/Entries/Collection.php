@@ -23,7 +23,7 @@ class Collection implements Contract
     use FluentlyGetsAndSets, ExistsAsFile;
 
     protected $handle;
-    protected $route;
+    protected $routes = [];
     protected $mount;
     protected $title;
     protected $template;
@@ -60,9 +60,22 @@ class Collection implements Contract
         return $this->fluentlyGetOrSet('handle')->args(func_get_args());
     }
 
-    public function route($route = null)
+    public function routes($routes = null)
     {
-        return $this->fluentlyGetOrSet('route')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('routes')
+            ->getter(function ($routes) {
+                return $this->sites()->mapWithKeys(function ($site) use ($routes) {
+                    $siteRoute = is_string($routes) ? $routes : ($routes[$site] ?? null);
+                    return [$site => $siteRoute];
+                });
+            })
+            ->args(func_get_args());
+    }
+
+    public function route($site)
+    {
+        return $this->routes()->get($site);
     }
 
     public function dated($dated = null)
@@ -240,7 +253,11 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
+                if (! Site::hasMultiple() || ! $sites) {
+                    $sites = [Site::default()->handle()];
+                }
+
+                return collect($sites);
             })
             ->args(func_get_args());
     }
@@ -333,9 +350,13 @@ class Collection implements Contract
             'dated',
             'structured',
             'orderable',
+            'routes'
         ]);
 
+        $route = is_string($this->routes) ? $this->routes : $this->routes()->filter()->all();
+
         $array = Arr::removeNullValues(array_merge($array, [
+            'route' => $route,
             'amp' => $array['amp'] ?: null,
             'date' => $this->dated ?: null,
             'sort_by' => $this->sortField,
@@ -400,7 +421,7 @@ class Collection implements Contract
         return [
             'title' => $this->title,
             'handle' => $this->handle,
-            'route' => $this->route,
+            'routes' => $this->routes,
             'dated' => $this->dated,
             'past_date_behavior' => $this->pastDateBehavior(),
             'future_date_behavior' => $this->futureDateBehavior(),

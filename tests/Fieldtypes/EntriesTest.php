@@ -20,7 +20,7 @@ class EntriesTest extends TestCase
     {
         parent::setUp();
 
-        $collection = tap(Facades\Collection::make('blog')->route('blog/{slug}'))->save();
+        $collection = tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
         EntryFactory::id('123')->collection($collection)->slug('one')->create();
         EntryFactory::id('456')->collection($collection)->slug('two')->create();
     }

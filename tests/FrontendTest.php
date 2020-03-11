@@ -350,7 +350,7 @@ class FrontendTest extends TestCase
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('some_template', '<p>{{ trans key="test::messages.hello" }}</p>');
 
-        $this->makeCollection()->save();
+        $this->makeCollection()->sites(['english', 'french'])->save();
         tap($this->makePage('about', ['with' => ['template' => 'some_template']])->locale('english'))->save();
         tap($this->makePage('le-about', ['with' => ['template' => 'some_template']])->locale('french'))->save();
 
@@ -377,7 +377,7 @@ class FrontendTest extends TestCase
     private function makeCollection()
     {
         return Collection::make('pages')
-            ->route('{slug}')
+            ->routes('{slug}')
             ->template('default')
             ->entryBlueprints(['empty']);
     }

@@ -48,9 +48,7 @@ class CollectionStructure extends Structure
 
     public function route(string $site): ?string
     {
-        return is_array($route = $this->collection->route())
-            ? ($route[$site] ?? null)
-            : $route;
+        return $this->collection->route($site);
     }
 
     public function validateTree(array $tree): array

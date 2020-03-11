@@ -31,15 +31,69 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_route()
+    function it_gets_and_sets_the_routes()
     {
-        $collection = new Collection;
-        $this->assertNull($collection->route());
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.com/de/'],
+        ]]);
 
-        $return = $collection->route('{slug}');
+        // A collection with no sites uses the default site.
+        $collection = new Collection;
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->routes());
+        $this->assertEquals(['en' => null], $collection->routes()->all());
+
+        $return = $collection->routes([
+            'en' => 'blog/{slug}',
+            'fr' => 'le-blog/{slug}',
+            'de' => 'das-blog/{slug}'
+        ]);
 
         $this->assertEquals($collection, $return);
-        $this->assertEquals('{slug}', $collection->route());
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->routes());
+
+        // Only routes corresponding to the collection's sites will be returned.
+        $this->assertEquals(['en' => 'blog/{slug}'], $collection->routes()->all());
+        $this->assertEquals('blog/{slug}', $collection->route('en'));
+        $this->assertNull($collection->route('fr'));
+        $this->assertNull($collection->route('de'));
+        $this->assertNull($collection->route('unknown'));
+
+        $collection->sites(['en', 'fr']);
+
+        $this->assertEquals([
+            'en' => 'blog/{slug}',
+            'fr' => 'le-blog/{slug}'
+        ], $collection->routes()->all());
+        $this->assertEquals('blog/{slug}', $collection->route('en'));
+        $this->assertEquals('le-blog/{slug}', $collection->route('fr'));
+        $this->assertNull($collection->route('de'));
+        $this->assertNull($collection->route('unknown'));
+    }
+
+    /** @test */
+    function it_sets_all_the_routes_identically()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.com/de/'],
+        ]]);
+
+        $collection = (new Collection)->sites(['en', 'fr']);
+
+        $return = $collection->routes('{slug}');
+
+        $this->assertEquals($collection, $return);
+        $this->assertEquals([
+            'en' => '{slug}',
+            'fr' => '{slug}'
+        ], $collection->routes()->all());
+        $this->assertEquals('{slug}', $collection->route('en'));
+        $this->assertEquals('{slug}', $collection->route('fr'));
+        $this->assertNull($collection->route('de'));
+        $this->assertNull($collection->route('unknown'));
     }
 
     /** @test */
@@ -90,7 +144,7 @@ class CollectionTest extends TestCase
 
         $sites = $collection->sites();
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $sites);
-        $this->assertEquals([], $sites->all());
+        $this->assertEquals(['en'], $sites->all()); // collection with no sites will resolve to the default site.
 
         $return = $collection->sites(['en', 'fr']);
 

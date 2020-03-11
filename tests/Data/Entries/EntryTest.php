@@ -204,7 +204,7 @@ class EntryTest extends TestCase
             'de' => ['url' => 'http://domain.de/'],
         ]]);
 
-        $collection = (new Collection)->handle('blog')->ampable(true)->route([
+        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->ampable(true)->routes([
             'en' => 'blog/{slug}',
             'fr' => 'le-blog/{slug}',
             'de' => 'das-blog/{slug}',
@@ -262,7 +262,7 @@ class EntryTest extends TestCase
             ->id('test-id')
             ->locale('en')
             ->slug('test')
-            ->collection(Collection::make('blog')->route('blog/{slug}')->save())
+            ->collection(Collection::make('blog')->routes('blog/{slug}')->save())
             ->data([
                 'foo' => 'bar',
                 'bar' => 'baz',

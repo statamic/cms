@@ -110,10 +110,9 @@ class CollectionStructureTest extends StructureTestCase
     function it_gets_the_route_from_the_collection_when_it_has_multiple()
     {
         $collection = $this->mock(Collection::class);
-        $collection->shouldReceive('route')->times(3)->andReturn([
-            'en' => '/en-route',
-            'fr' => '/fr-route',
-        ]);
+        $collection->shouldReceive('route')->with('en')->once()->andReturn('/en-route');
+        $collection->shouldReceive('route')->with('fr')->once()->andReturn('/fr-route');
+        $collection->shouldReceive('route')->with('de')->once()->andReturnNull();
 
         $structure = $this->structure()->collection($collection);
 
