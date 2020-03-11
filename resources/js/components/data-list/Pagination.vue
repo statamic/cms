@@ -34,7 +34,7 @@
                 :placeholder="__('Per Page')"
                 :options="perPageOptions"
                 :value="perPage"
-                @input="$events.$emit('per-page-changed', $event)" />
+                @input="$emit('per-page-changed', $event)" />
         </div>
 
     </div>

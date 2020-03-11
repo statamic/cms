@@ -64,7 +64,8 @@
                     class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
-                    @page-selected="page = $event"
+                    @page-selected="selectPage"
+                    @per-page-changed="changePerPage"
                 />
             </div>
         </data-list>

@@ -29,8 +29,7 @@
                                 :filters="filters"
                                 :active-filters="activeFilters"
                                 :per-page="perPage"
-                                :preferences-key="preferencesKey('filters')"
-                                @per-page-changed="perPageChanged" />
+                                :preferences-key="preferencesKey('filters')" />
                             <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" />
                         </template>
                     </div>
@@ -70,7 +69,8 @@
                 <data-list-pagination
                     class="mt-3"
                     :resource-meta="meta"
-                    @page-selected="page = $event"
+                    @page-selected="selectPage"
+                    @per-page-changed="changePerPage"
                 />
             </div>
         </data-list>

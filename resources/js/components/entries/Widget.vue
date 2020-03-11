@@ -25,7 +25,7 @@
                     v-if="meta.last_page != 1"
                     class="py-1 border-t bg-grey-20 rounded-b-lg text-sm"
                     :resource-meta="meta"
-                    @page-selected="page = $event"
+                    @page-selected="selectPage"
                 />
             </div>
         </data-list>
