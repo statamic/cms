@@ -135,8 +135,9 @@ class CollectionsController extends CpController
             'default_publish_state' => $collection->defaultPublishState(),
             'template' => $collection->template(),
             'layout' => $collection->layout(),
-            'route' => $collection->route(),
             'amp' => $collection->ampable(),
+            'sites' => $collection->sites()->all(),
+            'routes' => $collection->routes()->all(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint())
@@ -194,7 +195,8 @@ class CollectionsController extends CpController
 
         $collection
             ->title($values['title'])
-            ->route($values['route'])
+            ->sites($values['sites'])
+            ->routes($values['routes'])
             ->dated($values['dated'])
             ->template($values['template'])
             ->layout($values['layout'])
@@ -256,7 +258,7 @@ class CollectionsController extends CpController
 
     protected function editFormBlueprint()
     {
-        return Blueprint::makeFromSections([
+        $fields = [
             'name' => [
                 'display' => __('Name'),
                 'fields' => [
@@ -356,11 +358,28 @@ class CollectionsController extends CpController
                     ],
                 ]
             ],
+        ];
+
+        if (Site::hasMultiple()) {
+            $fields['sites'] = [
+                'display' => __('Sites'),
+                'fields' => [
+                    'sites' => [
+                        'type' => 'sites',
+                        'mode' => 'select',
+                        'required' => true,
+                    ]
+                ]
+            ];
+        }
+
+        $fields = array_merge($fields, [
             'routing' => [
                 'display' => 'Routing & URLs',
                 'fields' => [
-                    'route' => [
-                        'type' => 'text',
+                    'routes' => [
+                        'display' => __('Route'),
+                        'type' => 'collection_routes',
                         'instructions' => __('statamic::messages.collections_route_instructions'),
                     ],
                     'amp' => [
@@ -371,5 +390,7 @@ class CollectionsController extends CpController
                 ]
             ]
         ]);
+
+        return Blueprint::makeFromSections($fields);
     }
 }

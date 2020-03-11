@@ -70,6 +70,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Blueprints::class,
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
+        Fieldtypes\CollectionRoutes::class,
         Fieldtypes\Collections::class,
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,

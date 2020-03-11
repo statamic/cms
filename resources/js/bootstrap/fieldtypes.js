@@ -25,6 +25,7 @@ Vue.component('bard-fieldtype', require('../components/fieldtypes/bard/BardField
 Vue.component('bard_buttons_setting-fieldtype', require('../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue').default);
 Vue.component('checkboxes-fieldtype', require('../components/fieldtypes/CheckboxesFieldtype.vue').default);
 Vue.component('code-fieldtype', require('../components/fieldtypes/CodeFieldtype.vue').default);
+Vue.component('collection_routes-fieldtype', require('../components/collections/Routes.vue').default);
 Vue.component('color-fieldtype', require('../components/fieldtypes/ColorFieldtype.vue').default);
 Vue.component('date-fieldtype', require('../components/fieldtypes/DateFieldtype.vue').default);
 Vue.component('fieldset-fieldtype', FieldsetFieldtype);
