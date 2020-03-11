@@ -13,7 +13,7 @@
                 </div>
             </popover>
 
-            <data-list-search :value="searchQuery" />
+            <data-list-search :value="searchQuery" @input="$emit('search-changed', $event)" />
 
             <!-- TODO: Use Filter.vue for pinned filters? -->
 
