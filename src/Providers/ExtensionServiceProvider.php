@@ -91,7 +91,6 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Sets::class,
         Fieldtypes\Sites::class,
         Fieldtypes\Structures::class,
-        Fieldtypes\StructureSites::class,
         Fieldtypes\Slug::class,
         Fieldtypes\Table::class,
         Fieldtypes\Tags::class,
