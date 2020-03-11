@@ -20,6 +20,12 @@ export default {
         }
     },
 
+    watch: {
+        value(value) {
+            this.searchQuery = value;
+        }
+    },
+
     methods: {
         emitEvent: _.debounce(function (event) {
             this.$emit('input', event.target.value);
