@@ -15,9 +15,7 @@
 
             <data-list-search :value="searchQuery" />
 
-            <template v-for="slug in pinned">
-                <component :is="pinnedComponent(slug)" />
-            </template>
+            <!-- TODO: Use Filter.vue for pinned filters? -->
 
             <template v-if="isFiltering">
                 <popover v-if="canSave" placement="bottom-end" ref="savePopover">
@@ -68,7 +66,6 @@ export default {
         searchQuery: String,
         savesPresets: Boolean,
         preferencesPrefix: String,
-        pinned: Array,
     },
 
     data() {

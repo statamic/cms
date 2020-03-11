@@ -29,7 +29,6 @@
                             :search-query="searchQuery"
                             :saves-presets="true"
                             :preferences-prefix="preferencesPrefix"
-                            :pinned="['status']"
                             @changed="filterChanged"
                             @reset="$refs.presets.viewAll()"
                             @saved="$refs.presets.setPreset($event)"
