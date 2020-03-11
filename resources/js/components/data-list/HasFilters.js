@@ -25,8 +25,7 @@ export default {
     },
 
     created() {
-        this.$events.$on('filter-changed', this.filterChanged);
-        this.$events.$on('filters-reset', this.filtersReset);
+        this.$on('filters-reset', this.filtersReset);
     },
 
     methods: {
@@ -56,16 +55,21 @@ export default {
         },
 
         filtersReset() {
-            this.filters.forEach(filter => {
-                Vue.set(this.activeFilters, filter.handle, filter.values);
-            });
+            this.searchQuery = '';
+            this.activeFilters = {};
         },
 
         unselectAllItems() {
             if (this.$refs.toggleAll) {
                 this.$refs.toggleAll.uncheckAllItems();
             }
-        }
+        },
+
+        selectPreset(preset)  {
+            this.searchQuery = preset.query;
+
+            this.filtersChanged(preset.filters);
+        },
 
     }
 

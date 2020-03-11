@@ -15,7 +15,12 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0 relative">
-                    <data-list-filter-presets :preferences-prefix="preferencesPrefix"></data-list-filter-presets>
+                    <data-list-filter-presets
+                        ref="presets"
+                        :preferences-prefix="preferencesPrefix"
+                        @selected="selectPreset"
+                        @reset="filtersReset"
+                    />
                     <div class="data-list-header">
                         <data-list-filters
                             :filters="filters"
@@ -24,6 +29,9 @@
                             :search-query="searchQuery"
                             :saves-presets="true"
                             :preferences-prefix="preferencesPrefix"
+                            :pinned="['status']"
+                            @changed="filterChanged"
+                            @reset="$refs.presets.viewAll()"
                         />
 
                         <template v-if="!hasSelections">
@@ -192,7 +200,7 @@ export default {
 
         reordered(items) {
             this.items = items;
-        }
+        },
 
     }
 

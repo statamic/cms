@@ -38,7 +38,6 @@ export default {
         }
 
         this.$events.$on('filter-preset-saved', this.setPreset);
-        this.$events.$on('filters-reset', this.viewAll);
     },
 
     methods: {
@@ -55,20 +54,13 @@ export default {
         viewAll() {
             this.active = null;
 
-            this.$events.$emit('search-query-changed', '');
-            this.$events.$emit('filters-reset');
+            this.$emit('reset');
         },
 
         viewPreset(slug) {
             this.active = slug;
 
-            this.$events.$emit('search-query-changed', this.presets[slug].query);
-
-            // TODO: Dynamically get all filter types...
-            this.$events.$emit('filter-changed', {
-                handle: 'fields',
-                value: this.presets[slug].fields
-            });
+            this.$emit('selected', this.presets[slug]);
         },
     },
 

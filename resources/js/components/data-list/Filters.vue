@@ -118,7 +118,7 @@ export default {
             };
 
             if (this.searchQuery) payload.query = this.searchQuery;
-            if (this.activeCount) payload = Object.assign(payload, clone(this.activeFilters));
+            if (this.activeCount) payload.filters = clone(this.activeFilters);
 
             return payload;
         },
@@ -136,7 +136,7 @@ export default {
         },
 
         filterChanged(handle, values) {
-            this.$events.$emit('filter-changed', { handle, values });
+            this.$emit('changed', { handle, values });
         },
 
         save() {
@@ -158,7 +158,7 @@ export default {
         },
 
         reset() {
-            this.$events.$emit('filters-reset');
+            this.$emit('reset');
             this.$events.$emit('search-query-changed', '');
         },
 

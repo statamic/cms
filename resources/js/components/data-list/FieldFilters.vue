@@ -110,10 +110,6 @@ export default {
 
     },
 
-    created() {
-        this.$events.$on('filters-reset', this.resetAll);
-    },
-
     methods: {
 
         fieldOptions(filter) {
