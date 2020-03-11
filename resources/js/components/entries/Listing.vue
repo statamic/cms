@@ -32,6 +32,7 @@
                             :pinned="['status']"
                             @changed="filterChanged"
                             @reset="$refs.presets.viewAll()"
+                            @saved="$refs.presets.setPreset($event)"
                         />
 
                         <template v-if="!hasSelections">

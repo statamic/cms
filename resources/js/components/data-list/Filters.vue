@@ -148,7 +148,7 @@ export default {
                 .then(response => {
                     this.saving = false;
                     this.$refs.savePopover.close();
-                    this.$events.$emit('filter-preset-saved', this.presetSlug);
+                    this.$emit('saved', this.presetSlug);
                     this.$toast.success(__('Filter preset saved'));
                 })
                 .catch(error => {

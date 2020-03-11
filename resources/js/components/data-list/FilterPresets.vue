@@ -36,8 +36,6 @@ export default {
         if (this.preferencesKey) {
             this.getPresets();
         }
-
-        this.$events.$on('filter-preset-saved', this.setPreset);
     },
 
     methods: {
