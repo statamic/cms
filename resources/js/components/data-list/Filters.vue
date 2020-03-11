@@ -19,55 +19,24 @@
                 </div>
             </popover>
 
+            <data-list-search :value="searchQuery" />
 
-            <!-- <data-list-filter
-                v-for="filter in standardFilters"
-                :key="filter.handle"
-                :filter="filter"
-                :values="activeFilters[filter.handle]"
-                @changed="filterChanged(filter.handle, $event)"
-            /> -->
+            <template v-for="slug in pinned">
+                <component :is="pinnedComponent(slug)" />
+            </template>
 
-            <!-- <div v-if="preferencesKey">
-                <button class="btn mr-2" @click="reset">{{ __('Reset All') }}</button>
-                <button class="btn-primary" @click="save">{{ __('Save Filters') }}</button>
-            </div> -->
-
-            <data-list-search />
-
-            <!-- @TODO: Need to create actual child components for these native "pinned" filters.
-                We'll need date, status, and author to ship with, plus any custom "promoted" filters. -->
-            <popover>
-                <template slot="trigger">
-                    <button class="input-group-append px-1.5" slot="reference">
-                    {{ __('Status!') }}
-                    <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
-                </button>
-                </template>
-                <div class="px-2 py-1">
-                    <label for="published" class="mb-sm">
-                        <input type="checkbox" class="mr-sm" name="published" id="published"> Published
-                    </label>
-                    <label for="scheduled" class="mb-sm">
-                        <input type="checkbox" class="mr-sm" name="scheduled" id="scheduled"> Scheduled
-                    </label>
-                    <label for="draft" class="mb-sm">
-                        <input type="checkbox" class="mr-sm" name="draft" id="draft"> Draft
-                    </label>
-                    <div class="mt-1">
-                        <a class="text-grey-60 hover:text-grey-90 text-sm">Clear</a>
+            <template v-if="isFiltering">
+                <popover v-if="canSave" placement="bottom-end" ref="savePopover">
+                    <template slot="trigger">
+                        <button class="input-group-append rounded-l-0 px-1.5">{{ __('Save Filters') }}</button>
+                    </template>
+                    <div class="p-1 flex items-center">
+                        <input class="input-text" type="text" v-model="presetName" @keydown.enter="save" autofocus>
+                        <button class="btn-primary m-1" @click="save" :disabled="! presetName">Save</button>
                     </div>
-                </div>
-            </popover>
-
-            <!-- Saving filters stores a single, default filter state.
-            This should create multiple filter states you can pick from. -->
-            <button class="input-group-append rounded-l-0 px-1.5" v-if="activeFilters.fields" @click="save">
-                {{ __('Save filters') }}
-            </button>
-            <button class="input-group-append rounded-l-0 px-1.5" v-if="activeFilters.fields" @click="reset">
-                {{ __('Reset') }}
-            </button>
+                </popover>
+                <button class="input-group-append rounded-l-0 px-1.5" @click="reset">{{ __('Reset') }}</button>
+            </template>
         </div>
 
         <div class="flex flex-wrap mt-1" v-if="activeFilters.fields">
@@ -77,8 +46,7 @@
                 <span>
                     {{ field }} {{ filter.operator }} "{{ filter.value }}"
                 </span>
-                <!-- @TODO: Need a @click="deleteFilter" here -->
-                <button>&times;</button>
+                <button @click="removeFilter(field)">&times;</button>
             </div>
         </div>
     </div>
@@ -90,8 +58,8 @@ import DataListFilter from './Filter.vue';
 import FieldFilters from './FieldFilters.vue';
 
 export default {
-
     components: {
+
         DataListFilter,
         FieldFilters
     },
@@ -100,13 +68,18 @@ export default {
         filters: Array,
         activeFilters: Object,
         activeCount: Number,
-        preferencesKey: String
+        searchQuery: String,
+        savesPresets: Boolean,
+        preferencesPrefix: String,
+        pinned: Array,
     },
 
     data() {
         return {
             filtering: false,
             saving: false, // dummy var to stub out Add Filter button
+            presetName: null,
+            presets: [],
         }
     },
 
@@ -122,9 +95,40 @@ export default {
             return this.filters.find(filter => filter.handle === 'fields');
         },
 
+        isFiltering() {
+            return ! _.isEmpty(this.activeFilters) || this.searchQuery;
+        },
+
+        isDirty() {
+            return true;
+        },
+
+        presetSlug() {
+            return this.$slugify(this.presetName, '_');
+        },
+
+        preferencesKey() {
+            if (! this.preferencesPrefix || ! this.presetName) return null;
+
+            return `${this.preferencesPrefix}.filters.${this.presetSlug}`;
+        },
+
         preferencesPayload() {
-            return this.activeCount ? clone(this.activeFilters) : {};
-        }
+            if (! this.presetName) return null;
+
+            let payload = {
+                display: this.presetName
+            };
+
+            if (this.searchQuery) payload.query = this.searchQuery;
+            if (this.activeCount) payload = Object.assign(payload, clone(this.activeFilters));
+
+            return payload;
+        },
+
+        canSave() {
+            return this.savesPresets && this.isDirty && this.preferencesPrefix;
+        },
 
     },
 
@@ -139,33 +143,47 @@ export default {
         },
 
         save() {
+            if (! this.canSave || ! this.preferencesPayload) return;
+
             this.saving = true;
 
             this.$preferences.set(this.preferencesKey, this.preferencesPayload)
                 .then(response => {
                     this.saving = false;
-                    this.$toast.success(__('Filters saved'));
+                    this.$refs.savePopover.close();
+                    this.$events.$emit('filter-preset-saved', this.presetSlug);
+                    this.$toast.success(__('Filter preset saved'));
                 })
                 .catch(error => {
                     this.saving = false;
-                    this.$toast.error(__('Unable to save filters'));
+                    this.$toast.error(__('Unable to save filter preset'));
                 });
         },
 
         reset() {
-            this.saving = true;
+            this.$events.$emit('filters-reset');
+            this.$events.$emit('search-query-changed', '');
+        },
 
-            this.$preferences.remove(this.preferencesKey)
-                .then(response => {
-                    this.saving = false;
-                    this.$events.$emit('filters-reset');
-                    this.$toast.success(__('Filters reset'));
-                })
-                .catch(error => {
-                    this.saving = false;
-                    this.$toast.error(__('Unable to reset filters'));
-                });
-        }
+        // remove() {
+        //     this.saving = true;
+
+        //     this.$preferences.remove(this.preferencesKey)
+        //         .then(response => {
+        //             this.saving = false;
+        //             this.$events.$emit('filters-reset');
+        //             this.$toast.success(__('Filters reset'));
+        //         })
+        //         .catch(error => {
+        //             this.saving = false;
+        //             this.$toast.error(__('Unable to reset filters'));
+        //         });
+        // }
+
+        pinnedComponent(slug) {
+            return `data-list-filter-${slug}`;
+        },
+
     }
 
 }
