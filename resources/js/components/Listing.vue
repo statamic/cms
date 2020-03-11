@@ -29,7 +29,6 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             meta: null,
-            searchQuery: '',
         }
     },
 

@@ -2,6 +2,7 @@ export default {
 
     data() {
         return {
+            searchQuery: '',
             activeFilters: {},
         }
     },
