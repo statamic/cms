@@ -30,7 +30,7 @@ export default {
             this.perPage = this.getPreference('per_page') || this.initialPerPage;
         },
 
-        perPageChanged(perPage) {
+        changePerPage(perPage) {
             perPage = parseInt(perPage);
 
             let promise = this.hasPreferences
@@ -39,13 +39,18 @@ export default {
 
             promise.then(response => {
                 this.perPage = perPage;
-                this.pageReset();
+                this.resetPage();
             });
         },
 
-        pageReset() {
+        selectPage(page) {
+            this.page = page;
+        },
+
+        resetPage() {
+            console.log('hello?');
             this.page = 1;
-        }
+        },
 
     }
 
