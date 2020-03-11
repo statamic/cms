@@ -119,8 +119,3 @@
 @element .live-preview-fields and (max-width: 1000px) {
     :self .publish-section { @apply shadow-none }
 }
-
-// When the wrapper gets narrow enough, the fields should all become full width.
-@element .live-preview-fields and (max-width: 600px) {
-    :self .publish-field { width: 100%; }
-}
