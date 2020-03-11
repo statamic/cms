@@ -30,6 +30,7 @@
                             :saves-presets="true"
                             :preferences-prefix="preferencesPrefix"
                             @changed="filterChanged"
+                            @search-changed="searchChanged"
                             @reset="$refs.presets.viewAll()"
                             @saved="$refs.presets.setPreset($event)"
                         />

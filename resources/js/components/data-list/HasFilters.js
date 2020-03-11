@@ -31,6 +31,10 @@ export default {
 
     methods: {
 
+        searchChanged(query) {
+            this.searchQuery = query;
+        },
+
         hasFields(values) {
             for (const fieldHandle in values) {
                 if (values[fieldHandle]) return true;
