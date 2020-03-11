@@ -79,6 +79,7 @@ export default {
         searchQuery(query) {
             this.sortColumn = null;
             this.sortDirection = null;
+            this.pageReset();
             this.request();
         }
 
