@@ -16,7 +16,7 @@
             </div>
         </div>
 
-        <div class="page-tree w-full">
+        <div v-if="!loading" class="page-tree w-full">
             <draggable-tree
                 draggable
                 ref="tree"
@@ -117,6 +117,10 @@ export default {
 
         pageIds(ids) {
             this.$emit('page-ids-updated', ids);
+        },
+
+        site(site) {
+            this.getPages();
         }
     },
 

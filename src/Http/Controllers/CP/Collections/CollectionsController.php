@@ -83,20 +83,13 @@ class CollectionsController extends CpController
         return view('statamic::collections.show', array_merge($viewData, [
             'structure' => $structure,
             'expectsRoot' => $structure->expectsRoot(),
-            'localizations' => $structure->sites()->map(function ($handle) use ($structure, $tree) {
-                $localized = $structure->in($handle);
-                $exists = $localized !== null;
-                if (!$exists) {
-                    return null;
-                }
+            'structureSites' => $structure->trees()->map(function ($tree) {
                 return [
-                    'handle' => $handle,
-                    'name' => Site::get($handle)->name(),
-                    'active' => $handle === $tree->locale(),
-                    'exists' => $exists,
-                    'url' => $exists ? $localized->editUrl() : null,
+                    'handle' => $tree->locale(),
+                    'name' => $tree->site()->name(),
+                    'url' => $tree->showUrl(),
                 ];
-            })->filter()->all()
+            })->values()->all()
         ]));
     }
 

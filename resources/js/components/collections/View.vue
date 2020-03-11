@@ -31,6 +31,13 @@
                         @click="cancelTreeProgress"
                     />
 
+                    <site-selector
+                        v-if="structureSites.length > 1"
+                        :sites="structureSites"
+                        :value="treeSite"
+                        @input="treeSite = $event.handle"
+                    />
+
                     <button
                         class="btn mx-2"
                         :class="{ 'disabled': !treeIsDirty, 'btn-danger': deletedEntries.length }"
@@ -72,7 +79,7 @@
             :submit-parameters="{ deletedEntries }"
             :max-depth="structureMaxDepth"
             :expects-root="structureExpectsRoot"
-            :site="site"
+            :site="treeSite"
             @edit-page="editPage"
             @changed="markTreeDirty"
             @saved="markTreeClean"
@@ -112,12 +119,14 @@
 <script>
 import PageTree from '../structures/PageTree.vue';
 import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
+import SiteSelector from '../structures/SiteSelector.vue';
 
 export default {
 
     components: {
         PageTree,
-        DeleteEntryConfirmation
+        DeleteEntryConfirmation,
+        SiteSelector
     },
 
     props: {
@@ -139,6 +148,7 @@ export default {
         structureSubmitUrl: { type: String },
         structureMaxDepth: { type: Number, default: Infinity },
         structureExpectsRoot: { type: Boolean },
+        structureSites: { type: Array },
     },
 
     data() {
@@ -149,6 +159,7 @@ export default {
             showEntryDeletionConfirmation: false,
             entryBeingDeleted: null,
             entryDeletionConfirmCallback: null,
+            treeSite: this.site,
         }
     },
 

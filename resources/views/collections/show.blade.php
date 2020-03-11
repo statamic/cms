@@ -23,6 +23,7 @@
         structure-submit-url="{{ cp_route('collections.structure.update', $collection->handle()) }}"
         :structure-max-depth="{{ $structure->maxDepth() ?? 'Infinity' }}"
         :structure-expects-root="{{ Statamic\Support\Str::bool($structure->expectsRoot()) }}"
+        :structure-sites="{{ json_encode($structureSites) }}"
         @endif
     >
         <template #twirldown>

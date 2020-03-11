@@ -109,7 +109,7 @@ import PageTree from '../structures/PageTree.vue';
 import PageEditor from '../structures/PageEditor.vue';
 import PageSelector from '../structures/PageSelector.vue';
 import RemovePageConfirmation from './RemovePageConfirmation.vue';
-import SiteSelector from './SiteSelector.vue';
+import SiteSelector from '../structures/SiteSelector.vue';
 
 export default {
 
