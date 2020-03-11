@@ -81,7 +81,7 @@ class NavigationController extends CpController
             'nav' => $nav,
             'expectsRoot' => $nav->expectsRoot(),
             'collections' => $nav->collections()->map->handle()->all(),
-            'sites' => $nav->trees()->map(function ($tree) use ($nav) {
+            'sites' => $nav->trees()->map(function ($tree) {
                 return [
                     'handle' => $tree->locale(),
                     'name' => $tree->site()->name(),
