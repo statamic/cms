@@ -24,7 +24,6 @@
                             :search-query="searchQuery"
                             :saves-presets="true"
                             :preferences-prefix="preferencesPrefix"
-                            :pinned="['status']"
                         />
 
                         <template v-if="!hasSelections">

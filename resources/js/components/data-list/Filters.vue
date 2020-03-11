@@ -9,13 +9,7 @@
                     </button>
                 </template>
                 <div class="flex flex-col p-2 text-left w-64">
-                    <p class="text-xs mb-1">Show all entries where:</p>
-                    <field-filters
-                        v-if="fieldsFilter"
-                        :config="fieldsFilter"
-                        :filters="activeFilters['fields']"
-                        @changed="filterChanged('fields', $event)"
-                    />
+                    WIP
                 </div>
             </popover>
 
