@@ -18,7 +18,7 @@
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0">
                     <div class="data-list-header min-h-16">
-                        <data-list-search />
+                        <data-list-search v-model="searchQuery" />
                         <data-list-bulk-actions
                             :url="actionUrl"
                             @started="actionStarted"
