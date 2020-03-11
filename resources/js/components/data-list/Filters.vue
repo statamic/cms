@@ -9,7 +9,12 @@
                     </button>
                 </template>
                 <div class="flex flex-col p-2 text-left w-64">
-                    WIP
+                    <field-filters
+                        v-if="fieldsFilter"
+                        :config="fieldsFilter"
+                        :filters="activeFilters['fields']"
+                        @changed="$emit('filter-changed', $event)"
+                    />
                 </div>
             </popover>
 
@@ -130,10 +135,6 @@ export default {
 
         dismiss() {
             this.filtering = false
-        },
-
-        filterChanged(handle, values) {
-            this.$emit('changed', { handle, values });
         },
 
         save() {

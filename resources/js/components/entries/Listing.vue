@@ -29,7 +29,7 @@
                             :search-query="searchQuery"
                             :saves-presets="true"
                             :preferences-prefix="preferencesPrefix"
-                            @changed="filterChanged"
+                            @filter-changed="filterChanged"
                             @search-changed="searchChanged"
                             @reset="$refs.presets.viewAll()"
                             @saved="$refs.presets.setPreset($event)"
