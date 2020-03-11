@@ -154,8 +154,16 @@ export default {
                 return;
             }
 
+            // If sorting by the same column, flip the direction
+            if (this.sharedState.sortColumn === column) {
+                this.swapSortDirection();
+
+            // Always start sorting by asc unless column is a date field
+            } else if (this.getFieldtype(column) !== 'date') {
+                this.sharedState.sortDirection = 'asc'
+            }
+
             this.sharedState.currentPage = 1;
-            if (this.sharedState.sortColumn === column) this.swapSortDirection();
             this.sharedState.sortColumn = column;
             this.$emit('sorted', this.sharedState.sortColumn, this.sharedState.sortDirection);
         },
@@ -163,6 +171,14 @@ export default {
         swapSortDirection() {
             this.sharedState.currentPage = 1;
             this.sharedState.sortDirection = this.sharedState.sortDirection === 'asc' ? 'desc' : 'asc';
+        },
+
+        getFieldtype(columnName) {
+            let field = _.find(this.sharedState.columns, function(field) {
+                return columnName === field.field
+            })
+
+            return field.fieldtype
         },
 
         actualIndex(row) {
