@@ -20,10 +20,6 @@ export default {
         this.setInitialPerPage();
     },
 
-    created() {
-        this.$events.$on('per-page-changed', this.perPageChanged);
-    },
-
     methods: {
 
         setInitialPerPage() {
