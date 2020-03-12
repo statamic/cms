@@ -1,10 +1,10 @@
 <template>
     <div v-if="presets" class="border-b px-2 text-sm">
 
-        <button class="data-list-filter-link" :class="{ active: ! active }" @click="viewAll">All</button>
+        <button class="data-list-filter-link" :class="{ active: ! activePreset }" @click="viewAll">All</button>
 
         <template v-for="(preset, handle) in presets">
-            <button class="data-list-filter-link" :class="{ active: handle === active }" @click="viewPreset(handle)">
+            <button class="data-list-filter-link" :class="{ active: handle === activePreset }" @click="viewPreset(handle)">
                 {{ preset.display }}
             </button>
         </template>
@@ -16,12 +16,12 @@
 export default {
 
     props: {
+        activePreset: String,
         preferencesPrefix: String,
     },
 
     data() {
         return {
-            active: null,
             presets: [],
         }
     },
@@ -54,14 +54,10 @@ export default {
         },
 
         viewAll() {
-            this.active = null;
-
             this.$emit('reset');
         },
 
         viewPreset(handle) {
-            this.active = handle;
-
             this.$emit('selected', handle, this.presets[handle]);
         },
     },

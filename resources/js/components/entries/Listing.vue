@@ -17,6 +17,7 @@
                 <div class="card p-0 relative">
                     <data-list-filter-presets
                         ref="presets"
+                        :active-preset="activePreset"
                         :preferences-prefix="preferencesPrefix"
                         @selected="selectPreset"
                         @reset="filtersReset"
