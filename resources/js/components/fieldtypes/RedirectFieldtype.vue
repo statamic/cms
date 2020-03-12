@@ -20,6 +20,7 @@
 
             <relationship-fieldtype
                 v-if="enabled && option === 'entry'"
+                ref="entries"
                 handle="entry"
                 :value="entriesValue"
                 :config="meta.entry.config"
@@ -58,6 +59,10 @@ export default {
             if (oldOption === 'entry') {
                 this.entriesValue = [];
                 this.update(null);
+            }
+
+            if (option === 'entry') {
+                setTimeout(() => this.$refs.entries.linkExistingItem(), 100);
             }
         },
 
