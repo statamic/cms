@@ -15,11 +15,7 @@ abstract class Filter extends Scope implements Arrayable
     protected $context = [];
     protected $field;
     protected $fields = [];
-
-    public function required()
-    {
-        return false;
-    }
+    protected $required = false;
     protected $pinned = false;
 
     public function visibleTo($key)
