@@ -27,10 +27,6 @@ export default {
 
     },
 
-    created() {
-        this.$on('filters-reset', this.filtersReset);
-    },
-
     methods: {
 
         searchChanged(query) {
