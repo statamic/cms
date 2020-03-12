@@ -24,12 +24,10 @@ class NavigationController extends CpController
         $navs = Nav::all()->filter(function ($nav) {
             return User::current()->can('view', $nav);
         })->map(function ($structure) {
-            $tree = $structure->in(Site::selected()->handle());
-
             return [
                 'id' => $structure->handle(),
                 'title' => $structure->title(),
-                'show_url' => $tree->showUrl(),
+                'show_url' => $structure->showUrl(),
                 'edit_url' => $structure->editUrl(),
                 'delete_url' => $structure->deleteUrl(),
                 'deleteable' => User::current()->can('delete', $structure)
