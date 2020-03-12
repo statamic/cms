@@ -95,7 +95,7 @@ export default {
 
         entriesSelected(entries) {
             this.entriesValue = entries;
-            this.update('entry::' + entries[0]);
+            this.update(entries.length ? 'entry::' + entries[0] : null);
         }
 
     }
