@@ -54,6 +54,11 @@ export default {
             if (option === 'first-child') {
                 this.update('@child');
             }
+
+            if (oldOption === 'entry') {
+                this.entriesValue = [];
+                this.update(null);
+            }
         },
 
         enabled(enabled) {
