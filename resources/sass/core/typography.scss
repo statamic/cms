@@ -5,7 +5,8 @@
 body {
     @apply .font-sans .text-grey-90 .text-base .tracking-normal;
     font-variant: common-ligatures tabular-nums;
-    font-feature-settings: "zero", "ss01";
+    font-feature-settings: "zero", "ss01", "calt" off;
+
 }
 
 h1, h2, h3, h4, h5, h6 {
