@@ -28,6 +28,7 @@ class Structure extends Tags
             'structure' => $handle,
             'include_home' => $this->get('include_home'),
             'site' => $this->get('site', Site::current()->handle()),
+            'from' => $this->get('from'),
         ]);
 
         return $this->toArray($tree);

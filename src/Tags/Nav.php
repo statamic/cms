@@ -6,6 +6,6 @@ class Nav extends Structure
 {
     public function index()
     {
-        return $this->structure($this->get('from', 'collection::pages'));
+        return $this->structure($this->get('handle', 'collection::pages'));
     }
 }
