@@ -3,7 +3,7 @@ export default {
     data() {
         return {
             activePreset: null,
-            activePresetPayload: null,
+            activePresetPayload: {},
             searchQuery: '',
             activeFilters: {},
         }
@@ -63,6 +63,7 @@ export default {
 
         filtersReset() {
             this.activePreset = null;
+            this.activePresetPayload = {};
             this.searchQuery = '';
             this.activeFilters = {};
         },
