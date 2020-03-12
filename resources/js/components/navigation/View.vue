@@ -51,6 +51,17 @@
             @saved="changed = false"
             @canceled="changed = false"
         >
+            <template #empty>
+                <div class="text-center max-w-md mx-auto rounded-lg px-4 py-4">
+                    <svg-icon name="empty/structure" class="w-24 h-auto mx-auto" />
+                    <h1 class="my-3" v-text="__('Create your first link now')" />
+                    <p class="text-grey mb-3">
+                        {{ __('messages.structures_empty') }}
+                    </p>
+                    <button class="btn-primary btn-lg" v-text="__('Create first link')" @click="openPageCreator" />
+                </div>
+            </template>
+
             <template #branch-icon="{ branch }">
                 <svg-icon v-if="isEntryBranch(branch)" class="inline-block w-4 h-4 text-grey-50" name="hyperlink" v-tooltip="__('Entry link')" />
                 <svg-icon v-if="isLinkBranch(branch)" class="inline-block w-4 h-4 text-grey-50" name="external-link" v-tooltip="__('External link')" />

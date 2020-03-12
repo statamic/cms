@@ -6,14 +6,7 @@
         </div>
 
         <div v-if="!loading && pages.length == 0" class="no-results border-dashed border-2 w-full flex items-center">
-            <div class="text-center max-w-md mx-auto rounded-lg px-4 py-4">
-                <svg-icon name="empty/structure" class="w-24 h-auto mx-auto" />
-                <h1 class="my-3" v-text="__('Create your first link now')" />
-                <p class="text-grey mb-3">
-                    {{ __('messages.structures_empty') }}
-                </p>
-                <button class="btn-primary btn-lg" v-text="__('Create first link')" @click="openPageCreator" />
-            </div>
+            <slot name="empty" />
         </div>
 
         <div v-if="!loading" class="page-tree w-full">
