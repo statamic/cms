@@ -13,7 +13,7 @@
                         v-if="fieldsFilter"
                         :config="fieldsFilter"
                         :filters="activeFilters['fields']"
-                        @changed="$emit('filter-changed', $event)"
+                        @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
                     />
                 </div>
             </popover>
