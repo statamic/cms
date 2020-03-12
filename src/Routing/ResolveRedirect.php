@@ -3,7 +3,9 @@
 namespace Statamic\Routing;
 
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Facades;
 use Statamic\Structures\Page;
+use Statamic\Support\Str;
 
 class ResolveRedirect
 {
@@ -11,6 +13,11 @@ class ResolveRedirect
     {
         if ($redirect === '@child') {
             $redirect = $this->firstChildUrl($parent);
+        }
+
+        if (Str::startsWith($redirect, 'entry::')) {
+            $id = Str::after($redirect, 'entry::');
+            $redirect = Facades\Entry::find($id)->url();
         }
 
         return is_numeric($redirect) ? (int) $redirect : $redirect;

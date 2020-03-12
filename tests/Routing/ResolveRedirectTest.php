@@ -6,6 +6,7 @@ use Mockery;
 use PHPUnit\Framework\TestCase;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Routing\ResolveRedirect;
+use Statamic\Facades;
 use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
 
@@ -97,5 +98,16 @@ class ResolveRedirectTest extends TestCase
         $parent->shouldReceive('pages')->andReturn($pages);
 
         $this->assertEquals('404', $resolver('@child', $parent));
+    }
+
+    /** @test */
+    function it_resolves_references_to_entries()
+    {
+        $resolver = new ResolveRedirect;
+
+        $entry = Mockery::mock(Entry::class)->shouldReceive('url')->once()->andReturn('/the-entry')->getMock();
+        Facades\Entry::shouldReceive('find')->with('123')->once()->andReturn($entry);
+
+        $this->assertEquals('/the-entry', $resolver('entry::123'));
     }
 }

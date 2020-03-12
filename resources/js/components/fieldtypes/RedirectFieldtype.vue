@@ -17,6 +17,16 @@
                 v-if="enabled && option === 'url'"
                 :value="value"
                 @input="update($event)" />
+
+            <relationship-fieldtype
+                v-if="enabled && option === 'entry'"
+                handle="entry"
+                :value="entriesValue"
+                :config="meta.entry.config"
+                :meta="meta.entry.meta"
+                @input="entriesSelected"
+            />
+
         </div>
     </div>
 </template>
@@ -33,7 +43,9 @@ export default {
             options: [
                 {label: 'URL', value: 'url'},
                 {label: 'First Child', value: 'first-child'},
-            ]
+                {label: 'Entry', value: 'entry'}
+            ],
+            entriesValue: [],
         }
     },
 
@@ -59,9 +71,23 @@ export default {
             this.option = 'first-child';
         }
 
+        if (this.value && this.value.startsWith('entry::')) {
+            this.option = 'entry';
+            this.entriesValue = [this.value.substr(7)];
+        }
+
         if (this.config.required) {
             this.enabled = true;
         }
+    },
+
+    methods: {
+
+        entriesSelected(entries) {
+            this.entriesValue = entries;
+            this.update('entry::' + entries[0]);
+        }
+
     }
 
 }
