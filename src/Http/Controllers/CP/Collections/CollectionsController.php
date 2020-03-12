@@ -214,11 +214,6 @@ class CollectionsController extends CpController
             $collection->structure($this->makeStructure($collection, $values['max_depth'], $values['expects_root'], $values['sites']));
         }
 
-        // TODO: Temporary fix for if you add a site to a collection, and there are already entries
-        // in that site, when the stache index tries to update, it'll find those entries and
-        // throw an error because it wouldn't be in the entry store's paths array yet.
-        \Statamic\Facades\Stache::clear();
-
         $collection->save();
 
         return $collection->toArray();
