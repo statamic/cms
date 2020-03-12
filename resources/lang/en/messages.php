@@ -94,7 +94,7 @@ return [
     'form_configure_email_to_instructions' => 'Email address of the recipient.',
     'form_configure_handle_instructions' => 'Used to reference this form on the frontend. It\'s non-trivial to change later.',
     'form_configure_honeypot_instructions' => 'Field name to use as a honeypot. Honeypots are special fields used to reduce botspam.',
-    'form_configure_store_instructions' => 'Disable if you wish submissions to be sent as only email notifications.',
+    'form_configure_store_instructions' => 'Disable if you wish submissions to only fire events and send email notifications.',
     'form_configure_title_instructions' => 'Usually a call to action, like "Contact Us".',
     'form_wizard_blueprint_instructions' => 'Choose from existing Blueprints or create a new one.',
     'form_wizard_email_notifications_instructions' => 'Be notified of submissions at this email address. You can further customize notification settings later.',

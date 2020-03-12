@@ -80,7 +80,7 @@
                 <toggle-input v-model="form.store" />
                 <div class="text-2xs text-grey-60 mt-1 flex items-center">
                     <svg-icon name="info-circle" class="mr-sm flex items-center mb-px"></svg-icon>
-                    {{ __('messages.form_wizard_store_submissions_instructions') }}
+                    {{ __('messages.form_configure_store_instructions') }}
                 </div>
             </div>
 
