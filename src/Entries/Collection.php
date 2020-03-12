@@ -480,9 +480,8 @@ class Collection implements Contract
             ->setter(function ($structure) {
                 if ($structure) {
                     $structure->collection($this);
-                } else {
-                    $this->structureContents = null;
                 }
+                $this->structureContents = null;
                 Blink::forget("collection-{$this->id()}-structure");
                 return $structure;
             })
@@ -495,6 +494,7 @@ class Collection implements Contract
             ->fluentlyGetOrSet('structureContents')
             ->setter(function ($contents) {
                 Blink::forget("collection-{$this->id()}-structure");
+                $this->structure = null;
                 return $contents;
             })
             ->args(func_get_args());

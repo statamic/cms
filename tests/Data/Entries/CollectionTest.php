@@ -387,6 +387,33 @@ class CollectionTest extends TestCase
         $this->assertEquals(2, $structure->maxDepth());
     }
 
+    /** @test */
+    function setting_a_structure_removes_the_existing_inline_structure()
+    {
+        $collection = (new Collection)->handle('test');
+        $collection->structureContents($contents = ['tree' => []]);
+        $this->assertSame($contents, $collection->structureContents());
+
+        $collection->structure(new CollectionStructure);
+
+        $this->assertNull($collection->structureContents());
+    }
+
+    /** @test */
+    function setting_an_inline_structure_removes_the_existing_structure()
+    {
+        $collection = (new Collection)->handle('test');
+        $collection->structure($structure = (new CollectionStructure)->maxDepth(2));
+        $this->assertSame($structure, $collection->structure());
+        $this->assertEquals(2, $collection->structure()->maxDepth());
+        $this->assertNull($collection->structureContents());
+
+        $collection->structureContents(['max_depth' => 13, 'tree' => []]);
+
+        $this->assertNotSame($structure, $collection->structure());
+        $this->assertEquals(13, $collection->structure()->maxDepth());
+    }
+
     private function makeStructure()
     {
         return (new CollectionStructure)->tap(function ($s) {
