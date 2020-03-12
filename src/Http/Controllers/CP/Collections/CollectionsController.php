@@ -78,12 +78,12 @@ class CollectionsController extends CpController
         }
 
         $structure = $collection->structure();
-        $tree = $structure->in($site->handle());
 
         return view('statamic::collections.show', array_merge($viewData, [
             'structure' => $structure,
             'expectsRoot' => $structure->expectsRoot(),
-            'structureSites' => $structure->trees()->map(function ($tree) {
+            'structureSites' => $collection->sites()->map(function ($site) use ($structure) {
+                $tree = $structure->in($site);
                 return [
                     'handle' => $tree->locale(),
                     'name' => $tree->site()->name(),
