@@ -48,7 +48,6 @@ export default {
         },
 
         resetPage() {
-            console.log('hello?');
             this.page = 1;
         },
 
