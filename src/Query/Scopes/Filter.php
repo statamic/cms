@@ -20,6 +20,7 @@ abstract class Filter extends Scope implements Arrayable
     {
         return false;
     }
+    protected $pinned = false;
 
     public function visibleTo($key)
     {
@@ -65,9 +66,15 @@ abstract class Filter extends Scope implements Arrayable
             'title' => $this->title(),
             'extra' => $this->extra(),
             'required' => $this->required(),
+            'pinned' => $this->pinned(),
             'fields' => $this->fields()->toPublishArray(),
             'meta' => $this->fields()->meta(),
             'values' => $this->fields()->all()->map->defaultValue(),
         ];
+    }
+
+    public function __call($method, $args)
+    {
+        return $this->{$method};
     }
 }
