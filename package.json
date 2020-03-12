@@ -61,7 +61,7 @@
     "vue-js-popover": "^1.1.8",
     "vue-popperjs": "^1.6.3",
     "vue-reactive-provide": "^0.3.0",
-    "vue-select": "^3.4.0",
+    "vue-select": "^3.8.1",
     "vue-toasted": "^1.1.27",
     "vuex": "^3.1.2"
   },

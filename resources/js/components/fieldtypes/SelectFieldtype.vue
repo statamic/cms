@@ -16,7 +16,28 @@
         :close-on-select="!config.taggable"
         :value="value"
         @search:focus="$emit('focus')"
-        @search:blur="$emit('blur')" />
+        @search:blur="$emit('blur')">
+            <template #selected-option-container v-if="config.multiple"><i class="hidden"></i></template>
+            <template #search="{ events, attributes }" v-if="config.multiple">
+                <input
+                    :placeholder="config.placeholder"
+                    class="vs__search"
+                    type="search"
+                    v-on="events"
+                    v-bind="attributes"
+                >
+            </template>
+            <template #footer="{ deselect }" v-if="config.multiple">
+                <div class="vs__selected-options-outside flex flex-wrap">
+                    <span v-for="option in value" class="vs__selected mt-1">
+                        {{ getLabel(option) }}
+                        <button @click="deselect(getOption(option))" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
+                            <span>×</span>
+                        </button>
+                    </span>
+                </div>
+            </template>
+    </v-select>
 </template>
 
 <script>
@@ -45,17 +66,17 @@ export default {
     },
 
     methods: {
-        handleUpdate(value) {
-            this.update(value.value)
-        },
-
         focus() {
             this.$refs.input.focus();
         },
 
-        getReplicatorPreviewText() {
-            // @TODO
+        getOption(value) {
+            return _.findWhere(this.options, {value});
         },
+
+        getLabel(handle) {
+            return this.getOption(handle).label;
+        }
     }
 };
 </script>

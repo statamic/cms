@@ -3,7 +3,7 @@
    ========================================================================== */
 
 // Base button styles that shouldn't need overriding
-.btn, [class*="btn"] {
+[class*="btn"] {
     @apply cursor-pointer select-none h-auto rounded relative;
     @apply leading-normal inline-block align-middle whitespace-no-wrap;
     @apply text-center text-sm subpixel-antialiased;
@@ -68,7 +68,7 @@
     @apply text-white text-grey-80 bg-grey-30;
     position: inherit;
 
-    &:hover:not(:disabled), &:active:not(:disabled) {
+    &:hover:not(:disabled), &:active:not(:disabled), &.active {
         @apply bg-grey-40;
     }
 
@@ -125,32 +125,21 @@
 /* Button Group
   ========================================================================== */
 
-.btn-group-flat {
+.btn-group {
     @apply flex items-center p-0;
-    height: 38px;
-
-    button {
-        @apply text-grey-80 bg-grey-30 flex items-center h-full px-2 rounded;
-
-        &:hover, &.active, &:focus {
-            @apply bg-grey-40 text-grey-80;
-            bottom: 0;
-        }
-
-        &:active, &:active:focus {
-            @apply bg-grey-50;
-            bottom: 0;
-        }
-    }
+    height: 2.375rem;
 
     button:first-child {
-        @apply rounded-r-none;
+        @apply border-r rounded-r-none;
     }
 
     button:last-child {
-        @apply rounded-l-none;
+        @apply rounded-l-none rounded-r border-l-0;
+        padding: .475rem .5rem;
+        &.btn-flat { @apply border-r-0; }
     }
 }
+
 
 /* With Icons
   ========================================================================== */

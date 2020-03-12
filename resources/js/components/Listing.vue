@@ -48,7 +48,16 @@ export default {
 
         additionalParameters() {
             return {};
-        }
+        },
+
+        shouldRequestFirstPage() {
+            if (this.page > 1 && this.items.length === 0) {
+                this.page = 1;
+                return true;
+            }
+
+            return false;
+        },
 
     },
 
@@ -108,6 +117,7 @@ export default {
                 this.activeFilters = {...response.data.meta.filters};
                 this.items = Object.values(response.data.data);
                 this.meta = response.data.meta;
+                if (this.shouldRequestFirstPage) return this.request();
                 this.loading = false;
                 this.initializing = false;
                 this.afterRequestCompleted();
