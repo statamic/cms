@@ -7,6 +7,8 @@ use Statamic\Query\Scopes\Filter;
 
 class Site extends Filter
 {
+    public $required = true;
+
     public function fieldItems()
     {
         $options = Facades\Site::all()->mapWithKeys(function ($site) {
@@ -25,11 +27,6 @@ class Site extends Filter
     public function apply($query, $values)
     {
         $query->where('site', $values['value']);
-    }
-
-    public function required()
-    {
-        return true;
     }
 
     public function visibleTo($key)
