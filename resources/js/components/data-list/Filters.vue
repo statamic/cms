@@ -30,12 +30,24 @@
                     <div class="p-2 w-96">
                         <h6 v-text="__('Saved filter name')" class="mb-1" />
                         <div class="flex items-center">
-                            <input class="input-text border-r rounded-r" type="text" v-model="presetName" @keydown.enter="save" ref="savedFilterName">
-                            <button class="btn-primary ml-1" @click="save" :disabled="! presetName">Save</button>
+                            <input class="input-text border-r rounded-r" type="text" v-model="newPresetName" @keydown.enter="save" ref="savedFilterName">
+                            <button class="btn-primary ml-1" @click="save" :disabled="! newPresetName">Save</button>
                         </div>
                     </div>
                 </popover>
-                <button class="input-group-append px-1.5" @click="reset">{{ __('Reset') }}</button>
+                <button class="input-group-append px-1.5" @click="deleting = true">
+                    <svg-icon name="trash" />
+                </button>
+
+                <confirmation-modal
+                    v-if="deleting"
+                    :title="__('Delete Preset')"
+                    :bodyText="__('Are you sure you want to delete this preset?')"
+                    :buttonText="__('Delete')"
+                    :danger="true"
+                    @confirm="remove"
+                    @cancel="deleting = false"
+                />
             </template>
         </div>
 
@@ -66,6 +78,7 @@ export default {
 
     props: {
         filters: Array,
+        activePreset: String,
         activeFilters: Object,
         activeCount: Number,
         searchQuery: String,
@@ -77,7 +90,8 @@ export default {
         return {
             filtering: false,
             saving: false, // dummy var to stub out Add Filter button
-            presetName: null,
+            deleting: false,
+            newPresetName: null,
             presets: [],
         }
     },
@@ -102,21 +116,23 @@ export default {
             return true;
         },
 
-        presetSlug() {
-            return this.$slugify(this.presetName, '_');
+        newPresetHandle() {
+            return this.$slugify(this.newPresetName, '_');
         },
 
         preferencesKey() {
-            if (! this.preferencesPrefix || ! this.presetName) return null;
+            let handle = this.newPresetHandle || this.activePreset;
 
-            return `${this.preferencesPrefix}.filters.${this.presetSlug}`;
+            if (! this.preferencesPrefix || ! handle) return null;
+
+            return `${this.preferencesPrefix}.filters.${handle}`;
         },
 
         preferencesPayload() {
-            if (! this.presetName) return null;
+            if (! this.newPresetName) return null;
 
             let payload = {
-                display: this.presetName
+                display: this.newPresetName
             };
 
             if (this.searchQuery) payload.query = this.searchQuery;
@@ -144,38 +160,29 @@ export default {
 
             this.$preferences.set(this.preferencesKey, this.preferencesPayload)
                 .then(response => {
-                    this.saving = false;
                     this.$refs.savePopover.close();
-                    this.$emit('saved', this.presetSlug);
+                    this.$emit('saved', this.newPresetHandle);
                     this.$toast.success(__('Filter preset saved'));
+                    this.newPresetName = null;
+                    this.saving = false;
                 })
                 .catch(error => {
-                    this.saving = false;
                     this.$toast.error(__('Unable to save filter preset'));
+                    this.saving = false;
                 });
         },
 
-        reset() {
-            this.$emit('reset');
-        },
-
-        // remove() {
-        //     this.saving = true;
-
-        //     this.$preferences.remove(this.preferencesKey)
-        //         .then(response => {
-        //             this.saving = false;
-        //             this.$events.$emit('filters-reset');
-        //             this.$toast.success(__('Filters reset'));
-        //         })
-        //         .catch(error => {
-        //             this.saving = false;
-        //             this.$toast.error(__('Unable to reset filters'));
-        //         });
-        // }
-
-        pinnedComponent(slug) {
-            return `data-list-filter-${slug}`;
+        remove() {
+            this.$preferences.remove(this.preferencesKey)
+                .then(response => {
+                    this.deleting = false;
+                    this.$emit('deleted', this.activePreset);
+                    this.$toast.success(__('Filter preset deleted'));
+                })
+                .catch(error => {
+                    this.deleting = false;
+                    this.$toast.error(__('Unable to delete filter preset'));
+                });
         },
 
     }

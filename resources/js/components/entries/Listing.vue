@@ -24,6 +24,7 @@
                     <div class="data-list-header">
                         <data-list-filters
                             :filters="filters"
+                            :active-preset="activePreset"
                             :active-filters="activeFilters"
                             :active-count="activeFilterCount"
                             :search-query="searchQuery"
@@ -31,8 +32,8 @@
                             :preferences-prefix="preferencesPrefix"
                             @filter-changed="filterChanged"
                             @search-changed="searchChanged"
-                            @reset="$refs.presets.viewAll()"
                             @saved="$refs.presets.setPreset($event)"
+                            @deleted="$refs.presets.refreshPresets()"
                         />
 
                         <template v-if="!hasSelections">
