@@ -68,11 +68,11 @@
                                     </button>
                                 </template>
 
-                                <div class="btn-group-flat ml-2">
-                                    <button @click="setMode('grid')" :class="{'active': mode === 'grid'}">
+                                <div class="btn-group ml-2">
+                                    <button class="btn-flat px-2" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                         <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                     </button>
-                                    <button @click="setMode('table')" :class="{'active': mode === 'table'}">
+                                    <button class="btn-flat px-2" @click="setMode('table')" :class="{'active': mode === 'table'}">
                                         <svg-icon name="assets-mode-table" class="h-4 w-4" />
                                     </button>
                                 </div>
