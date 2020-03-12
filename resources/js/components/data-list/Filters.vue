@@ -1,5 +1,5 @@
 <template>
-    <div>
+    <div class="flex">
         <data-list-filter
             v-for="filter in promotedFilters"
             :key="filter.handle"
