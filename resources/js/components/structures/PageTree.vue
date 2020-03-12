@@ -82,7 +82,6 @@ export default {
             pages: [],
             treeData: [],
             pageIds: [],
-            parentPageForAdding: null,
             soundDropUrl: this.$config.get('resourceUrl') + '/audio/click.mp3',
         }
     },
@@ -258,22 +257,9 @@ export default {
             });
         },
 
-        linkChildPage(vm) {
-            this.parentPageForAdding = vm;
-            this.openPageCreator();
-        },
-
         pageUpdated(tree) {
             this.pages = tree.getPureData();
             this.$emit('changed');
-        },
-
-        makeFirstPage() {
-            if (this.hasCollection) {
-                return window.location = this.createUrl
-            } else {
-                this.openPageCreator()
-            }
         }
 
     }
