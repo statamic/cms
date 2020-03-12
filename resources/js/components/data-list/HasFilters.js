@@ -50,10 +50,15 @@ export default {
         },
 
         filtersChanged(filters) {
+            if (! filters) {
+                this.activeFilters = {};
+            }
+
             for (const handle in filters) {
                 const values = filters[handle];
                 this.filterChanged({ handle, values }, false);
             }
+
             this.unselectAllItems();
         },
 
