@@ -102,7 +102,7 @@ return [
     'getting_started_widget_docs' => 'Apprenez à connaître Statamic pour bien comprendre ses capacités.',
     'getting_started_widget_header' => 'Débuter avec Statamic',
     'getting_started_widget_intro' => 'Pour commencer à construire votre nouveau site Statamic, nous vous recommandons de commencer par ces étapes.',
-    'getting_started_widget_structures' => 'Les structures établissent la hiérarchie de vos pages et vous aident à gérer la navigation de votre site.',
+    'getting_started_widget_navigation' => '',
     'global_search_open_using_slash' => 'Vous pouvez ouvrir la recherche globale en utilisant la touche <kbd>/</kbd>',
     'global_set_blueprint_instructions' => 'Définit la disposition du champ lors de la modification de ce jeu de globales.',
     'global_set_handle_instructions' => 'Comment vous allez référencer ce jeu de globales dans les modèles, etc.',

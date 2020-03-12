@@ -39,9 +39,9 @@
             <div class="h-8 w-8 mr-2 hidden md:block text-blue">
                 @svg('structures')
             </div>
-            <a href="{{ cp_route('structures.create') }}" class="flex-1 mb-2 md:mb-0 md:mr-3">
-                <h3 class="mb-1 text-blue group-hover:text-grey-80">{{ __('Create a Structure') }} &rarr;</h3>
-                <p>{{ __('statamic::messages.getting_started_widget_structures') }}</p>
+            <a href="{{ cp_route('navigation.create') }}" class="flex-1 mb-2 md:mb-0 md:mr-3">
+                <h3 class="mb-1 text-blue group-hover:text-grey-80">{{ __('Create a Navigation') }} &rarr;</h3>
+                <p>{{ __('statamic::messages.getting_started_widget_navigation') }}</p>
             </a>
         </div>
     </div>
