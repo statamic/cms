@@ -3,12 +3,12 @@
 namespace Tests\Routing;
 
 use Mockery;
-use PHPUnit\Framework\TestCase;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Routing\ResolveRedirect;
 use Statamic\Facades;
+use Statamic\Routing\ResolveRedirect;
 use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
+use Tests\TestCase;
 
 class ResolveRedirectTest extends TestCase
 {
