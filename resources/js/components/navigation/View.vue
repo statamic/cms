@@ -18,7 +18,7 @@
                     v-if="sites.length > 1"
                     :sites="sites"
                     :value="site"
-                    @input="window.location = $event.url"
+                    @input="siteSelected"
                 />
 
                 <dropdown-list :show-dropdown-if="collections.length > 0">
@@ -253,6 +253,10 @@ export default {
                 this.showPageDeletionConfirmation = false;
                 this.pageBeingDeleted = branch;
             }
+        },
+
+        siteSelected(site) {
+            window.location = site.url;
         }
 
     }
