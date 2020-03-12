@@ -26,6 +26,7 @@
                         <data-list-filters
                             :filters="filters"
                             :active-preset="activePreset"
+                            :active-preset-payload="activePresetPayload"
                             :active-filters="activeFilters"
                             :active-count="activeFilterCount"
                             :search-query="searchQuery"

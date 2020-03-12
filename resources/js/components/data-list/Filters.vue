@@ -77,6 +77,7 @@ export default {
     props: {
         filters: Array,
         activePreset: String,
+        activePresetPayload: Object,
         activeFilters: Object,
         activeCount: Number,
         searchQuery: String,
@@ -111,6 +112,13 @@ export default {
         },
 
         isDirty() {
+            if (! this.isFiltering) return false;
+
+            if (this.activePreset) {
+                return this.activePresetPayload.query != this.searchQuery
+                    || ! _.isEqual(this.activePresetPayload.filters || {}, this.activeFilters);
+            }
+
             return true;
         },
 
