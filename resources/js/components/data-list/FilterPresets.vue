@@ -3,8 +3,8 @@
 
         <button class="data-list-filter-link" :class="{ active: ! active }" @click="viewAll">All</button>
 
-        <template v-for="(preset, slug) in presets">
-            <button class="data-list-filter-link" :class="{ active: slug === active }" @click="viewPreset(slug)">
+        <template v-for="(preset, handle) in presets">
+            <button class="data-list-filter-link" :class="{ active: handle === active }" @click="viewPreset(handle)">
                 {{ preset.display }}
             </button>
         </template>
@@ -43,10 +43,14 @@ export default {
             this.presets = this.$preferences.get(this.preferencesKey);
         },
 
-        setPreset(slug) {
-            this.active = slug;
-
+        setPreset(handle) {
             this.getPresets();
+            this.viewPreset(handle)
+        },
+
+        refreshPresets() {
+            this.getPresets();
+            this.viewAll();
         },
 
         viewAll() {
@@ -55,10 +59,10 @@ export default {
             this.$emit('reset');
         },
 
-        viewPreset(slug) {
-            this.active = slug;
+        viewPreset(handle) {
+            this.active = handle;
 
-            this.$emit('selected', this.presets[slug]);
+            this.$emit('selected', handle, this.presets[handle]);
         },
     },
 

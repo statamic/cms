@@ -2,6 +2,7 @@ export default {
 
     data() {
         return {
+            activePreset: null,
             searchQuery: '',
             activeFilters: {},
         }
@@ -60,6 +61,7 @@ export default {
         },
 
         filtersReset() {
+            this.activePreset = null;
             this.searchQuery = '';
             this.activeFilters = {};
         },
@@ -70,7 +72,8 @@ export default {
             }
         },
 
-        selectPreset(preset)  {
+        selectPreset(handle, preset)  {
+            this.activePreset = handle;
             this.searchQuery = preset.query;
 
             this.filtersChanged(preset.filters);
