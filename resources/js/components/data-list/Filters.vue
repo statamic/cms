@@ -50,13 +50,13 @@
         </div>
 
         <div class="flex flex-wrap mt-1" v-if="activeFilters.fields">
-            <div class="filter-badge mr-1" v-for="(filter, field) in activeFilters.fields">
+            <div class="filter-badge mr-1" v-for="(filter, handle) in activeFilters.fields">
                 <!-- @TODO: Need a way to control the grammar in a nice way. For example,
                 it would read better to say 'Field Name is value' instead of 'field_name = "value"' -->
                 <span>
-                    {{ field }} {{ filter.operator }} "{{ filter.value }}"
+                    {{ handle }} {{ filter.operator }} "{{ filter.value }}"
                 </span>
-                <button @click="removeFilter(field)">&times;</button>
+                <button @click="removeFieldFilter(handle)">&times;</button>
             </div>
         </div>
     </div>
@@ -157,6 +157,14 @@ export default {
 
         dismiss() {
             this.filtering = false
+        },
+
+        removeFieldFilter(handle) {
+            let fields = clone(this.activeFilters.fields);
+
+            delete fields[handle];
+
+            this.$emit('filter-changed', {handle: 'fields', values: fields});
         },
 
         save() {
