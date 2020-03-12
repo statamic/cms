@@ -25,7 +25,7 @@
             <template v-if="isFiltering">
                 <popover v-if="canSave" placement="bottom-end" ref="savePopover">
                     <template slot="trigger">
-                        <button class="input-group-item px-1.5">{{ __('Save Filters') }}</button>
+                        <button class="input-group-item px-1.5">{{ __('Save') }}</button>
                     </template>
                     <div class="p-2 w-96">
                         <h6 v-text="__('Saved filter name')" class="mb-1" />
@@ -35,10 +35,8 @@
                         </div>
                     </div>
                 </popover>
-                <button class="input-group-append px-1.5" @click="deleting = true">
-                    <svg-icon name="trash" />
-                </button>
-
+                <button v-if="isDirty" class="input-group-append px-1.5" @click="reset">{{ __('Reset') }}</button>
+                <button v-if="activePreset" class="input-group-append px-1.5" @click="deleting = true"><svg-icon name="trash" /></button>
                 <confirmation-modal
                     v-if="deleting"
                     :title="__('Delete Preset')"
@@ -109,11 +107,15 @@ export default {
         },
 
         isFiltering() {
-            return ! _.isEmpty(this.activeFilters) || this.searchQuery;
+            return ! _.isEmpty(this.activeFilters) || this.searchQuery || this.activePreset;
         },
 
         isDirty() {
             return true;
+        },
+
+        canSave() {
+            return this.savesPresets && this.isDirty && this.preferencesPrefix;
         },
 
         newPresetHandle() {
@@ -141,10 +143,6 @@ export default {
             return payload;
         },
 
-        canSave() {
-            return this.savesPresets && this.isDirty && this.preferencesPrefix;
-        },
-
     },
 
     methods: {
@@ -170,6 +168,12 @@ export default {
                     this.$toast.error(__('Unable to save filter preset'));
                     this.saving = false;
                 });
+        },
+
+        reset() {
+            return this.activePreset
+                ? this.$emit('restore-preset', this.activePreset)
+                : this.$emit('reset');
         },
 
         remove() {

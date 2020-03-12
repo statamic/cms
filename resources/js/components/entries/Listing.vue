@@ -35,6 +35,8 @@
                             @search-changed="searchChanged"
                             @saved="$refs.presets.setPreset($event)"
                             @deleted="$refs.presets.refreshPresets()"
+                            @restore-preset="$refs.presets.viewPreset($event)"
+                            @reset="filtersReset"
                         />
 
                         <template v-if="!hasSelections">
