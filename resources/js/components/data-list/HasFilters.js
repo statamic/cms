@@ -3,6 +3,7 @@ export default {
     data() {
         return {
             activePreset: null,
+            activePresetPayload: null,
             searchQuery: '',
             activeFilters: {},
         }
@@ -74,6 +75,7 @@ export default {
 
         selectPreset(handle, preset)  {
             this.activePreset = handle;
+            this.activePresetPayload = preset;
             this.searchQuery = preset.query;
 
             this.filtersChanged(preset.filters);
