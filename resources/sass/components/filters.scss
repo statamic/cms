@@ -42,7 +42,7 @@
         @apply p-2;
     }
 
-    .form-group:first-of-type .field-inner {
+    &.single-field .form-group .field-inner {
         @apply hidden;
     }
 }

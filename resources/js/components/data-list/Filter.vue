@@ -1,6 +1,6 @@
 <template>
 
-    <div class="w-full filter-fields">
+    <div class="w-full filter-fields" :class="{ 'single-field': hasOnlyOneField }">
         <publish-container
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"
@@ -28,6 +28,12 @@ export default {
     props: {
         filter: Object,
         values: Object,
+    },
+
+    computed: {
+        hasOnlyOneField() {
+            return this.filter.fields.length === 1;
+        }
     },
 
     data() {
