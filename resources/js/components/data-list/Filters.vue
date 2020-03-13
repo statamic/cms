@@ -72,11 +72,6 @@
                     :values="activeFilters[filter.handle]"
                     @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
                 />
-                <button
-                    class="outline-none ml-2 mb-2 text-xs text-blue hover:text-grey-80"
-                    v-text="__('Clear')"
-                    @click="removeStandardFilter(filter.handle)"
-                />
             </popover>
 
         </div>

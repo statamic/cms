@@ -12,6 +12,12 @@
         >
             <publish-fields slot-scope="{ setFieldValue }" :fields="filter.fields" @updated="setFieldValue" />
         </publish-container>
+
+        <button
+            class="outline-none ml-2 mb-2 text-xs text-blue hover:text-grey-80"
+            v-text="__('Clear')"
+            @click="$emit('changed', null)"
+        />
     </div>
 
 </template>
