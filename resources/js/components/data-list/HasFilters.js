@@ -15,7 +15,7 @@ export default {
             let count = Object.keys(this.activeFilters).length;
 
             if (this.activeFilters.hasOwnProperty('fields')) {
-                count = count + Object.keys(this.activeFilters.fields).length - 1;
+                count = count + Object.keys(this.activeFilters.fields).filter(field => field != 'badge').length - 1;
             }
 
             return count;
