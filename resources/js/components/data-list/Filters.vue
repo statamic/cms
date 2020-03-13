@@ -59,7 +59,7 @@
                 />
             </template>
 
-            <popover v-if="pinnedFilters.length" v-for="filter in pinnedFilters" :key="filter.handle">
+            <popover v-if="pinnedFilters.length" v-for="filter in pinnedFilters" :key="filter.handle" placement="bottom-end">
                 <template slot="trigger">
                     <button class="input-group-append px-1.5">
                         {{ filter.title }}
@@ -72,8 +72,11 @@
                     :values="activeFilters[filter.handle]"
                     @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
                 />
-                <button class="outline-none ml-2 mb-2 text-xs text-blue hover:text-grey-80"
-                    @click="removeStandardFilter(filter.handle)" v-text="__('Clear')" />
+                <button
+                    class="outline-none ml-2 mb-2 text-xs text-blue hover:text-grey-80"
+                    v-text="__('Clear')"
+                    @click="removeStandardFilter(filter.handle)"
+                />
             </popover>
 
         </div>
