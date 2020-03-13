@@ -19,16 +19,21 @@ use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Http\Requests\FilteredSiteRequest;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class EntriesController extends CpController
 {
+    use QueriesFilters;
+
     public function index(FilteredSiteRequest $request, $collection)
     {
         $this->authorize('view', $collection);
 
         $query = $this->indexQuery($collection);
 
-        $this->filter($query, $request->filters);
+        $filters = $this->queryFilters($query, $request->filters, [
+            'collection' => $collection->handle(),
+        ]);
 
         $sortField = request('sort');
         $sortDirection = request('order', 'asc');
@@ -48,18 +53,9 @@ class EntriesController extends CpController
             ->blueprint($collection->entryBlueprint())
             ->columnPreferenceKey("collections.{$collection->handle()}.columns")
             ->additional(['meta' => [
-                'filters' => $request->filters,
+                'filters' => $filters,
                 'sortColumn' => $sortField,
             ]]);
-    }
-
-    protected function filter($query, $filters)
-    {
-        foreach ($filters as $handle => $values) {
-            $class = app('statamic.scopes')->get($handle);
-            $filter = app($class);
-            $filter->apply($query, $values);
-        }
     }
 
     protected function indexQuery($collection)
