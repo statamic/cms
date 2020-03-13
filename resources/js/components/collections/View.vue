@@ -13,11 +13,11 @@
                     <slot name="twirldown" />
                 </dropdown-list>
 
-                <div class="btn-group-flat mr-2" v-if="canUseStructureTree && !treeIsDirty">
-                    <button @click="view = 'tree'" :class="{'active': view === 'tree'}">
+                <div class="btn-group mr-2" v-if="canUseStructureTree && !treeIsDirty">
+                    <button class="btn-flat" @click="view = 'tree'" :class="{'active': view === 'tree'}">
                         <svg-icon name="structures" class="h-4 w-4"/>
                     </button>
-                    <button @click="view = 'list'" :class="{'active': view === 'list'}">
+                    <button class="btn-flat" @click="view = 'list'" :class="{'active': view === 'list'}">
                         <svg-icon name="assets-mode-table" class="h-4 w-4" />
                     </button>
                 </div>
