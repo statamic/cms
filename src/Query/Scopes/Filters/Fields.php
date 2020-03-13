@@ -42,6 +42,11 @@ class Fields extends Filter
             });
     }
 
+    public function badge($values)
+    {
+        return null;
+    }
+
     protected function normalizeWhere($where)
     {
         if ($where['operator'] === 'like') {
