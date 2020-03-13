@@ -20,7 +20,20 @@
 
             <data-list-search :value="searchQuery" @input="$emit('search-changed', $event)" />
 
-            <!-- TODO: Use Filter.vue for pinned filters? -->
+            <popover v-if="pinnedFilters.length" v-for="filter in pinnedFilters" :key="filter.handle">
+                <template slot="trigger">
+                    <button class="input-group-append px-1.5">
+                        {{ filter.title }}
+                        <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
+                    </button>
+                </template>
+                <data-list-filter
+                    :key="filter.handle"
+                    :filter="filter"
+                    :values="activeFilters[filter.handle]"
+                    @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
+                />
+            </popover>
 
             <template v-if="isFiltering">
                 <popover v-if="canSave" placement="bottom-end" ref="savePopover">
@@ -105,6 +118,10 @@ export default {
 
         fieldsFilter() {
             return this.filters.find(filter => filter.handle === 'fields');
+        },
+
+        pinnedFilters() {
+            return this.filters.filter(filter => filter.pinned);
         },
 
         isFiltering() {
