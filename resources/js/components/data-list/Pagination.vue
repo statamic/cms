@@ -2,9 +2,10 @@
 
     <div class="w-full flex">
 
-        <div class="flex-1"></div>
+        <div class="flex-1" v-if="! inline"></div>
 
-        <ul v-if="hasMultiplePages" class="pagination">
+        <ul v-if="hasMultiplePages" class="pagination" :class="{'pagination-inline': inline}">
+
             <li v-if="hasPrevious">
                 <a @click="selectPreviousPage"><span class="text-xs">&larr;</span></a>
             </li>
@@ -50,12 +51,16 @@ export default {
     mixins: [HasInputOptions],
 
     props: {
-        resourceMeta: {
-            type: Object,
-            required: true
+        inline: {
+            type: Boolean,
+            default: false
         },
         perPage: {
             type: Number
+        },
+        resourceMeta: {
+            type: Object,
+            required: true
         }
     },
 

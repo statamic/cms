@@ -29,3 +29,7 @@
 		@apply bg-grey-10 text-blue shadow-inner;
 	}
 }
+
+.pagination.pagination-inline {
+	@apply shadow-none rounded-none;
+}

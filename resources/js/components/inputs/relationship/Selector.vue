@@ -61,8 +61,9 @@
 
                         <data-list-pagination
                             v-if="meta.last_page > 1"
-                            class="p-1 border-t shadow-lg"
+                            class="border-t shadow-lg"
                             :resource-meta="meta"
+                            :inline="true"
                             @page-selected="setPage" />
 
                         <div class="p-2 border-t flex items-center justify-between bg-grey-20">
