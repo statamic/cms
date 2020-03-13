@@ -62,15 +62,24 @@
             </template>
         </div>
 
-        <div class="flex flex-wrap mt-1" v-if="activeFilters.fields">
-            <div class="filter-badge mr-1" v-for="(filter, handle) in activeFilters.fields">
-                <!-- @TODO: Need a way to control the grammar in a nice way. For example,
-                it would read better to say 'Field Name is value' instead of 'field_name = "value"' -->
-                <span>
-                    {{ handle }} {{ filter.operator }} "{{ filter.value }}"
-                </span>
-                <button @click="removeFieldFilter(handle)">&times;</button>
+        <div class="flex flex-wrap mt-1" v-if="activeCount">
+
+            <!-- @TODO: Need a way to control the grammar in a nice way. For example,
+            it would read better to say 'Field Name is value' instead of 'field_name = "value"' -->
+            <template v-for="(filter, handle) in activeFilters.fields">
+                <div class="filter-badge mr-1" v-if="handle != 'badge'">
+                    <span>
+                        {{ handle }} {{ filter.operator }} "{{ filter.value }}"
+                    </span>
+                    <button @click="removeFieldFilter(handle)">&times;</button>
+                </div>
+            </template>
+
+            <div class="filter-badge mr-1" v-for="(badge, handle) in standardBadges">
+                <span>{{ badge }}</span>
+                <button @click="removeStandardFilter(handle)">&times;</button>
             </div>
+
         </div>
     </div>
 
@@ -122,6 +131,18 @@ export default {
 
         pinnedFilters() {
             return this.filters.filter(filter => filter.pinned);
+        },
+
+        badges() {
+            return _.mapObject(this.activeFilters, filter => filter.badge);
+        },
+
+        standardBadges() {
+            let badges = this.badges;
+
+            delete badges.fields;
+
+            return badges;
         },
 
         isFiltering() {
