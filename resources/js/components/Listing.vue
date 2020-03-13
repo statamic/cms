@@ -16,7 +16,6 @@ export default {
     props: {
         initialSortColumn: String,
         initialSortDirection: String,
-        filters: Array,
     },
 
     data() {

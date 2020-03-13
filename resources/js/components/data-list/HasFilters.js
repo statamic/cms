@@ -1,5 +1,9 @@
 export default {
 
+    props: {
+        filters: Array,
+    },
+
     data() {
         return {
             activePreset: null,
