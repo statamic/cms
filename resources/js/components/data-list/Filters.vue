@@ -148,14 +148,6 @@ export default {
 
     computed: {
 
-        filterTypeOptions() {
-            let options = {};
-
-            this.filters.forEach(filter => options[filter.handle] = filter.title);
-
-            return this.normalizeInputOptions(options);
-        },
-
         fieldsFilter() {
             return this.filters.find(filter => filter.handle === 'fields');
         },
@@ -166,6 +158,18 @@ export default {
 
         pinnedFilters() {
             return this.filters.filter(filter => filter.pinned);
+        },
+
+        unpinnedFilters() {
+            return this.filters.filter(filter => ! filter.pinned);
+        },
+
+        filterTypeOptions() {
+            let options = {};
+
+            this.unpinnedFilters.forEach(filter => options[filter.handle] = filter.title);
+
+            return this.normalizeInputOptions(options);
         },
 
         badges() {
