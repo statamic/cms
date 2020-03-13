@@ -107,10 +107,10 @@ export default {
                 mutations: {
                     setFieldValue(state, payload) {
                         const { handle, value } = payload;
-                        state.values[handle] = clone(value);
+                        state.values[handle] = value;
                     },
                     setValues(state, values) {
-                        state.values = clone(values);
+                        state.values = values;
                     },
                     setMeta(state, meta) {
                         state.meta = meta;

@@ -5,7 +5,7 @@
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"
             :blueprint="fieldset"
-            :values="values || defaultValues"
+            :values="containerValues"
             :meta="filter.meta"
             :errors="errors"
             :track-dirty-state="false"
@@ -38,6 +38,10 @@ export default {
     },
 
     computed: {
+        containerValues() {
+            return clone(this.values || this.defaultValues);
+        },
+
         hasOnlyOneField() {
             return this.filter.fields.length === 1;
         }
