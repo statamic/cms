@@ -13,7 +13,6 @@ Vue.component('slug-fieldtype', require('../components/fieldtypes/SlugFieldtype.
 // Fieldtypes
 import FieldsetFieldtype from '../components/fieldtypes/FieldsetFieldtype.vue'
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
-import RoutesFieldtype from '../components/fieldtypes/RoutesFieldtype.vue'
 import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
 import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
 
@@ -44,7 +43,6 @@ Vue.component('relationship-fieldtype-index', require('../components/fieldtypes/
 Vue.component('replicator-fieldtype', require('../components/fieldtypes/replicator/Replicator.vue').default);
 Vue.component('replicator-fieldtype-index', require('../components/fieldtypes/replicator/ReplicatorIndex.vue').default);
 Vue.component('revealer-fieldtype', RevealerFieldtype);
-Vue.component('routes-fieldtype', RoutesFieldtype);
 Vue.component('section-fieldtype', require('../components/fieldtypes/SectionFieldtype.vue').default);
 Vue.component('select-fieldtype', require('../components/fieldtypes/SelectFieldtype.vue').default);
 Vue.component('sets-fieldtype', require('../components/fieldtypes/replicator/SetsFieldtype.vue').default);
