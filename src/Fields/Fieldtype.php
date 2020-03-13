@@ -29,12 +29,6 @@ abstract class Fieldtype implements Arrayable
     protected $icon;
     protected $view;
 
-    protected $queryOperators = [
-        '=' => 'Equal to',
-        '<>' => 'Not equal to',
-        'like' => 'Contains',
-    ];
-
     public function setField(Field $field)
     {
         $this->field = $field;
@@ -89,7 +83,13 @@ abstract class Fieldtype implements Arrayable
 
     public function queryOperators(): array
     {
-        return $this->queryOperators;
+        $default = [
+            '=' => __('Is'),
+            '<>' => __('Isn\'t'),
+            'like' => __('Contains'),
+        ];
+
+        return $this->queryOperators ?? $default;
     }
 
     public function rules(): array
