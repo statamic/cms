@@ -57,7 +57,11 @@ abstract class Filter extends Scope implements Arrayable
 
     public function badge($values)
     {
-        return collect($values)->first();
+        $valuesSummary = collect($values)
+            ->filter()
+            ->implode(', ');
+
+        return strtolower($this->title()) . ': ' . $valuesSummary;
     }
 
     public function toArray()
