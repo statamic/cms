@@ -11,7 +11,12 @@
             :track-dirty-state="false"
             @updated="$emit('changed', $event)"
         >
-            <publish-fields slot-scope="{ setFieldValue }" :fields="filter.fields" @updated="setFieldValue" />
+            <publish-fields
+                slot-scope="{ setFieldValue }"
+                :fields="filter.fields"
+                :name-prefix="`filter-${filter.handle}`"
+                @updated="setFieldValue"
+            />
         </publish-container>
 
         <button
