@@ -24,7 +24,7 @@ class Status extends Filter
 
         return [
             'status' => [
-                'type' => 'select',
+                'type' => 'radio',
                 'options' => $options->all(),
                 'placeholder' => __('Status'),
             ],

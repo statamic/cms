@@ -147,7 +147,10 @@ input.input-text-minimal:read-only,
 
 .radio-fieldtype .option,
 .checkboxes-fieldtype .option {
-    @apply mb-1 flex items-center;
+    @apply mb-1.5 flex items-center;
+    &:last-child {
+        @apply mb-0;
+    }
 
     input {
         @apply leading-normal relative;

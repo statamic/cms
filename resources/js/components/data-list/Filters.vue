@@ -46,8 +46,8 @@
                         </div>
                     </div>
                 </popover>
-                <button v-if="isDirty" class="input-group-append px-1.5" @click="reset">{{ __('Reset') }}</button>
-                <button v-if="activePreset" class="input-group-append px-1.5" @click="deleting = true"><svg-icon name="trash" /></button>
+                <button v-if="isDirty" class="input-group-item px-1.5" @click="reset">{{ __('Reset') }}</button>
+                <button v-if="activePreset" class="input-group-item px-1.5" @click="deleting = true"><svg-icon name="trash" /></button>
                 <confirmation-modal
                     v-if="deleting"
                     :title="__('Delete Preset')"
@@ -72,6 +72,8 @@
                     :values="activeFilters[filter.handle]"
                     @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
                 />
+                <button class="outline-none ml-2 mb-2 text-xs text-blue hover:text-grey-80"
+                    @click="removeStandardFilter(filter.handle)" v-text="__('Clear')" />
             </popover>
 
         </div>

@@ -36,3 +36,13 @@
         top: 2px;
     }
 }
+
+.filter-fields {
+    .form-group {
+        @apply p-2;
+    }
+
+    .form-group:first-of-type .field-inner {
+        @apply hidden;
+    }
+}
