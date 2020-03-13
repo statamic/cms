@@ -41,8 +41,17 @@ export default {
                 page: this.page,
                 perPage: this.perPage,
                 search: this.searchQuery,
-                filters: btoa(JSON.stringify(this.activeFilters)),
+                filters: this.activeFilterParameters,
             }, this.additionalParameters);
+        },
+
+        activeFilterParameters() {
+            let filters = _.mapObject(clone(this.activeFilters), filter => {
+                delete filter.badge;
+                return filter;
+            });
+
+            return btoa(JSON.stringify(filters));
         },
 
         additionalParameters() {
