@@ -26,9 +26,12 @@ trait QueriesFilters
                 $operation->filter->apply($query, $operation->values);
             })
             ->map(function ($operation) {
-                return array_merge($operation->values, [
-                    'badge' => $operation->filter->badge($operation->values)
-                ]);
+                return collect($operation->values)
+                    ->merge(['badge' => $operation->filter->badge($operation->values)])
+                    ->filter(function ($value, $key) {
+                        return $key === 'badge' ? $value : true;
+                    })
+                    ->all();
             });
     }
 }
