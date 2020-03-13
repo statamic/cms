@@ -245,11 +245,7 @@ export default {
         },
 
         removeStandardFilter(handle) {
-            let filters = clone(this.activeFilters);
-
-            delete filters[handle];
-
-            this.$emit('filter-changed', {handle: handle, value: filters[handle]});
+            this.$emit('filter-changed', {handle: handle, values: null});
         },
 
         save() {
