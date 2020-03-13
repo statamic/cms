@@ -188,7 +188,6 @@ class CollectionsController extends CpController
 
         $collection
             ->title($values['title'])
-            ->sites($values['sites'])
             ->routes($values['routes'])
             ->dated($values['dated'])
             ->template($values['template'])
@@ -199,6 +198,10 @@ class CollectionsController extends CpController
             ->entryBlueprints($values['blueprints'])
             ->mount($values['mount'] ?? null)
             ->taxonomies($values['taxonomies'] ?? []);
+
+        if ($sites = array_get($values, 'sites')) {
+            $collection->sites($sites);
+        }
 
         if ($futureDateBehavior = array_get($values, 'future_date_behavior')) {
             $collection->futureDateBehavior($futureDateBehavior);
@@ -211,7 +214,7 @@ class CollectionsController extends CpController
         if (! $values['structured']) {
             $collection->structure(null);
         } else {
-            $collection->structure($this->makeStructure($collection, $values['max_depth'], $values['expects_root'], $values['sites']));
+            $collection->structure($this->makeStructure($collection, $values['max_depth'], $values['expects_root'], $values['sites'] ?? null));
         }
 
         $collection->save();
@@ -223,6 +226,10 @@ class CollectionsController extends CpController
     {
         if (! $structure = $collection->structure()) {
             $structure = (new CollectionStructure)->collection($collection);
+        }
+
+        if (! $sites) {
+            $sites = [Site::default()->handle()];
         }
 
         foreach (Site::all() as $site) {
