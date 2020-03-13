@@ -41,6 +41,23 @@ class Status extends Filter
         }
     }
 
+    public function badge($values)
+    {
+        if ($values['status'] === 'published') {
+            $status = __('published');
+        } elseif ($values['status'] === 'scheduled') {
+            $status = __('scheduled');
+        } elseif ($values['status'] === 'draft') {
+            $status = __('draft');
+        }
+
+        $title = optional($this->collection())->title();
+
+        return collect([$status, strtolower($title)])
+            ->filter()
+            ->implode(' ');
+    }
+
     public function visibleTo($key)
     {
         return $key === 'entries';
@@ -48,6 +65,6 @@ class Status extends Filter
 
     protected function collection()
     {
-        return Collection::findByHandle($this->context['collection']);
+        return Collection::findByHandle($this->context['collection'] ?? null);
     }
 }
