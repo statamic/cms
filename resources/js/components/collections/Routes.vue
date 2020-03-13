@@ -62,6 +62,8 @@ export default {
         sites() {
             let state = this.$store.state.publish[this.storeName];
 
+            if (!state.values.sites) return [];
+
             return state.values.sites.map((handle, i) => {
                 return {
                     handle,
