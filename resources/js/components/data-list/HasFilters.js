@@ -50,9 +50,7 @@ export default {
         },
 
         filtersChanged(filters) {
-            if (! filters) {
-                this.activeFilters = {};
-            }
+            this.activeFilters = {};
 
             for (const handle in filters) {
                 const values = filters[handle];
