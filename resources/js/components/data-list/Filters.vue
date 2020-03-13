@@ -1,26 +1,32 @@
 <template>
     <div class="w-full">
         <div class="input-group">
+
             <popover>
                 <template slot="trigger">
-                    <button class="input-group-prepend outline-none cursor-pointer px-2">
+                    <button class="input-group-prepend outline-none cursor-pointer px-2" @click="resetFilterPopover">
                         {{ __('Filter') }}
                         <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                     </button>
                 </template>
                 <div class="flex flex-col p-2 text-left w-64">
-
                     <select-input
+                        v-if="! creating"
                         v-model="creating"
-                        :placeholder="__('Filter Type')"
                         :options="filterTypeOptions"
+                        :placeholder="__('Filter Type')"
                     />
-
                     <field-filters
-                        v-if="fieldsFilter"
+                        v-if="fieldsFilter && creating === 'fields'"
                         :config="fieldsFilter"
-                        :filters="activeFilters['fields']"
                         @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
+                    />
+                    <data-list-filter
+                        v-for="filter in standardFilters"
+                        v-if="creating === filter.handle"
+                        :key="filter.handle"
+                        :filter="filter"
+                        @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
                     />
                 </div>
             </popover>
@@ -104,7 +110,7 @@ export default {
 
     components: {
         DataListFilter,
-        FieldFilters
+        FieldFilters,
     },
 
     props: {
@@ -213,8 +219,8 @@ export default {
 
     methods: {
 
-        dismiss() {
-            this.filtering = false
+        resetFilterPopover() {
+            this.creating = false;
         },
 
         removeFieldFilter(handle) {

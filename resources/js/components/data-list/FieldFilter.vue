@@ -1,6 +1,6 @@
 <template>
 
-    <div class="flex flex-col items-center text-sm">
+    <div class="">
         <select-input
             class="w-full mb-1"
             name="operator"
@@ -10,6 +10,7 @@
             @input="onOperatorUpdated" />
 
         <text-input
+            class="w-full"
             name="value"
             :value="filter.value"
             @input="onValueUpdated" />
