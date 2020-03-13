@@ -39,10 +39,10 @@
                         <button class="input-group-append px-1.5">{{ __('Save') }}</button>
                     </template>
                     <div class="p-2 w-96">
-                        <h6 v-text="__('Saved filter name')" class="mb-1" />
+                        <h6 v-text="__('Filter preset name')" class="mb-1" />
                         <div class="flex items-center">
-                            <input class="input-text border-r rounded-r" type="text" v-model="newPresetName" @keydown.enter="save" ref="savedFilterName">
-                            <button class="btn-primary ml-1" @click="save" :disabled="! newPresetName">Save</button>
+                            <input class="input-text border-r rounded-r" type="text" v-model="savingPresetName" @keydown.enter="save" ref="savedFilterName">
+                            <button class="btn-primary ml-1" @click="save" :disabled="saving || ! savingPresetName">Save</button>
                         </div>
                     </div>
                 </popover>
@@ -133,14 +133,23 @@ export default {
         return {
             filtering: false,
             creating: false,
-            saving: false, // dummy var to stub out Add Filter button
+            saving: false,
             deleting: false,
-            newPresetName: null,
+            savingPresetName: null,
             presets: [],
         }
     },
 
     inject: ['sharedState'],
+
+    watch: {
+        activePresetPayload: {
+            deep: true,
+            handler(preset) {
+                this.savingPresetName = preset.display || null;
+            }
+        }
+    },
 
     computed: {
 
@@ -195,12 +204,16 @@ export default {
             return this.savesPresets && this.isDirty && this.preferencesPrefix;
         },
 
-        newPresetHandle() {
-            return this.$slugify(this.newPresetName, '_');
+        savingPresetHandle() {
+            return this.$slugify(this.savingPresetName, '_');
+        },
+
+        isUpdatingPreset() {
+            return this.savingPresetHandle === this.activePreset;
         },
 
         preferencesKey() {
-            let handle = this.newPresetHandle || this.activePreset;
+            let handle = this.savingPresetHandle || this.activePreset;
 
             if (! this.preferencesPrefix || ! handle) return null;
 
@@ -208,10 +221,10 @@ export default {
         },
 
         preferencesPayload() {
-            if (! this.newPresetName) return null;
+            if (! this.savingPresetName) return null;
 
             let payload = {
-                display: this.newPresetName
+                display: this.savingPresetName
             };
 
             if (this.searchQuery) payload.query = this.searchQuery;
@@ -252,13 +265,13 @@ export default {
             this.$preferences.set(this.preferencesKey, this.preferencesPayload)
                 .then(response => {
                     this.$refs.savePopover.close();
-                    this.$emit('saved', this.newPresetHandle);
-                    this.$toast.success(__('Filter preset saved'));
-                    this.newPresetName = null;
+                    this.$emit('saved', this.savingPresetHandle);
+                    this.$toast.success(this.isUpdatingPreset ? __('Filter preset updated') : __('Filter preset saved'));
+                    this.savingPresetName = null;
                     this.saving = false;
                 })
                 .catch(error => {
-                    this.$toast.error(__('Unable to save filter preset'));
+                    this.$toast.error(this.isUpdatingPreset ? __('Unable to update filter preset') : __('Unable to save filter preset'));
                     this.saving = false;
                 });
         },
@@ -272,13 +285,13 @@ export default {
         remove() {
             this.$preferences.remove(this.preferencesKey)
                 .then(response => {
-                    this.deleting = false;
                     this.$emit('deleted', this.activePreset);
                     this.$toast.success(__('Filter preset deleted'));
+                    this.deleting = false;
                 })
                 .catch(error => {
-                    this.deleting = false;
                     this.$toast.error(__('Unable to delete filter preset'));
+                    this.deleting = false;
                 });
         },
 
