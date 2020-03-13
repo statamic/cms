@@ -38,7 +38,7 @@
             <template v-if="isFiltering">
                 <popover v-if="canSave" placement="bottom-end" ref="savePopover">
                     <template slot="trigger">
-                        <button class="input-group-item px-1.5">{{ __('Save') }}</button>
+                        <button class="input-group-append px-1.5">{{ __('Save') }}</button>
                     </template>
                     <div class="p-2 w-96">
                         <h6 v-text="__('Saved filter name')" class="mb-1" />
@@ -60,6 +60,7 @@
                     @cancel="deleting = false"
                 />
             </template>
+
         </div>
 
         <div class="flex flex-wrap mt-1" v-if="activeCount">
@@ -121,12 +122,12 @@ export default {
 
     computed: {
 
-        standardFilters() {
-            return this.filters.filter(filter => filter.handle !== 'fields');
-        },
-
         fieldsFilter() {
             return this.filters.find(filter => filter.handle === 'fields');
+        },
+
+        standardFilters() {
+            return this.filters.filter(filter => filter.handle !== 'fields');
         },
 
         pinnedFilters() {
