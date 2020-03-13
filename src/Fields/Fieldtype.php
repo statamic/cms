@@ -83,13 +83,11 @@ abstract class Fieldtype implements Arrayable
 
     public function queryOperators(): array
     {
-        $default = [
+        return [
             '=' => __('Is'),
             '<>' => __('Isn\'t'),
             'like' => __('Contains'),
         ];
-
-        return $this->queryOperators ?? $default;
     }
 
     public function rules(): array
