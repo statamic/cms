@@ -9,6 +9,13 @@
                     </button>
                 </template>
                 <div class="flex flex-col p-2 text-left w-64">
+
+                    <select-input
+                        v-model="creating"
+                        :placeholder="__('Filter Type')"
+                        :options="filterTypeOptions"
+                    />
+
                     <field-filters
                         v-if="fieldsFilter"
                         :config="fieldsFilter"
@@ -89,10 +96,13 @@
 <script>
 import DataListFilter from './Filter.vue';
 import FieldFilters from './FieldFilters.vue';
+import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 
 export default {
-    components: {
 
+    mixins: [HasInputOptions],
+
+    components: {
         DataListFilter,
         FieldFilters
     },
@@ -111,6 +121,7 @@ export default {
     data() {
         return {
             filtering: false,
+            creating: false,
             saving: false, // dummy var to stub out Add Filter button
             deleting: false,
             newPresetName: null,
@@ -121,6 +132,14 @@ export default {
     inject: ['sharedState'],
 
     computed: {
+
+        filterTypeOptions() {
+            let options = {};
+
+            this.filters.forEach(filter => options[filter.handle] = filter.title);
+
+            return this.normalizeInputOptions(options);
+        },
 
         fieldsFilter() {
             return this.filters.find(filter => filter.handle === 'fields');
