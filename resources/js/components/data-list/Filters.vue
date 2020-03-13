@@ -184,6 +184,14 @@ export default {
             this.$emit('filter-changed', {handle: 'fields', values: fields});
         },
 
+        removeStandardFilter(handle) {
+            let values = clone(this.activeFilters);
+
+            delete values[handle];
+
+            this.$emit('filter-changed', {handle, values});
+        },
+
         save() {
             if (! this.canSave || ! this.preferencesPayload) return;
 
