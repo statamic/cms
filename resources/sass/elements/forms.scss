@@ -158,11 +158,11 @@ input.input-text-minimal:read-only,
     }
 
     input {
-        @apply leading-normal relative;
+        @apply leading-normal mr-1 relative;
     }
 
     label {
-        @apply font-normal leading-none ml-1 block;
+        @apply font-normal leading-none block;
     }
 }
 

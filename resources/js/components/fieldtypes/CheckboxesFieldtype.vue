@@ -1,14 +1,16 @@
 <template>
     <div class="checkboxes-fieldtype-wrapper"  :class="{'inline-mode': config.inline}">
         <div class="option" v-for="(option, $index) in options" :key="$index">
-            <input type="checkbox"
-                   :name="name + '[]'"
-                   :id="name + $index"
-                   :value="option.value"
-                   :disabled="isReadOnly"
-                   v-model="values"
-            />
-            <label :for="name + $index">{{ option.label || option.value }}</label>
+            <label>
+                <input type="checkbox"
+                       ref="checkbox"
+                       :name="name + '[]'"
+                       :value="option.value"
+                       :disabled="isReadOnly"
+                       v-model="values"
+                />
+                {{ option.label || option.value }}
+            </label>
         </div>
     </div>
 </template>
@@ -58,7 +60,7 @@ export default {
     methods: {
 
         focus() {
-            document.getElementById(`${this.name}-0`).focus();
+            this.$refs.checkbox[0].focus();
         },
 
         sortValues(values) {
