@@ -71,7 +71,7 @@ class RouteServiceProvider extends ServiceProvider
                 ->first();
 
             throw_if(
-                ! $entry || $entry->collection()->id() !== $route->parameter('collection')->id(),
+                ! $entry,
                 new NotFoundHttpException("Entry [$handle] not found.")
             );
 
