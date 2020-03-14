@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Str;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
@@ -59,8 +60,18 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindEntries()
     {
         Route::bind('entry', function ($handle, $route) {
+            $identifier = config('statamic.api.entry_route_identifier');
+            if (! Str::startsWith($route->uri(), config('statamic.api.route')) || ! $identifier) {
+                $identifier = 'id';
+            }
+
+            $entry = Entry::query()
+                ->where($identifier, $handle)
+                ->where('collection', $route->parameter('collection')->handle())
+                ->first();
+
             throw_if(
-                ! ($entry = Entry::find($handle)) || $entry->collection()->id() !== $route->parameter('collection')->id(),
+                ! $entry || $entry->collection()->id() !== $route->parameter('collection')->id(),
                 new NotFoundHttpException("Entry [$handle] not found.")
             );
 

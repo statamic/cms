@@ -39,4 +39,16 @@ return [
 
     'pagination_size' => 50,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Entry Route Model Bindings
+    |--------------------------------------------------------------------------
+    |
+    | The properties used to identify entries.
+    |
+    */
+
+    'entry_route_identifier' => env('STATAMIC_API_ENTRY_ROUTE_IDENTIFIER', 'id'),
+
+
 ];
