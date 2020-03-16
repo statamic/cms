@@ -17,8 +17,7 @@
     }
 
     &:disabled {
-        @apply opacity-50;
-        cursor: not-allowed;
+        @apply cursor-default;
     }
 }
 
@@ -33,6 +32,11 @@
     &:hover:not(:disabled), &:active:not(:disabled) {
         background: linear-gradient(180deg, #f9fafb, #f4f6f8);
         border-color: #c4cdd5;
+    }
+
+    &:disabled {
+        @apply text-grey-70;
+        background: config('colors.grey-30') !important;
     }
 }
 

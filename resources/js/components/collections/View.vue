@@ -14,10 +14,10 @@
                 </dropdown-list>
 
                 <div class="btn-group mr-2" v-if="canUseStructureTree && !treeIsDirty">
-                    <button class="btn-flat px-2" @click="view = 'tree'" :class="{'active': view === 'tree'}">
+                    <button class="btn px-2" @click="view = 'tree'" :disabled="view === 'tree'">
                         <svg-icon name="structures" class="h-4 w-4"/>
                     </button>
-                    <button class="btn-flat px-2" @click="view = 'list'" :class="{'active': view === 'list'}">
+                    <button class="btn px-2" @click="view = 'list'" :disabled="view === 'list'">
                         <svg-icon name="assets-mode-table" class="h-4 w-4" />
                     </button>
                 </div>
