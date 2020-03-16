@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Routing\ResolveRedirect;
+use Statamic\Support\Str;
 
 class Redirect extends Fieldtype
 {
@@ -15,11 +16,19 @@ class Redirect extends Fieldtype
 
     public function preload()
     {
-        $entryFieldtype = (new Field('entry', [
+        $value = $this->field->value();
+
+        $entryField = (new Field('entry', [
             'type' => 'entries',
             'max_items' => 1,
             'create' => false,
-        ]))->fieldtype();
+        ]));
+
+        if (Str::startsWith($value, 'entry::')) {
+            $entryField->setValue(Str::after($value, 'entry::'));
+        }
+
+        $entryFieldtype = $entryField->fieldtype();
 
         return [
             'entry' => [
