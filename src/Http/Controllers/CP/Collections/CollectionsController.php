@@ -264,6 +264,9 @@ class CollectionsController extends CpController
                             'unlisted' => 'Unlisted - Hidden from listings, URLs visible',
                             'private' => 'Private - Hidden from listings, URLs 404'
                         ],
+                        'if' => [
+                            'dated' => true
+                        ]
                     ],
                     'future_date_behavior' => [
                         'type' => 'select',
@@ -274,6 +277,9 @@ class CollectionsController extends CpController
                             'unlisted' => 'Unlisted - Hidden from listings, URLs visible',
                             'private' => 'Private - Hidden from listings, URLs 404'
                         ],
+                        'if' => [
+                            'dated' => true
+                        ]
                     ],
                 ],
             ],
