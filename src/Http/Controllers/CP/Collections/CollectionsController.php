@@ -197,18 +197,12 @@ class CollectionsController extends CpController
             ->ampable($values['amp'])
             ->entryBlueprints($values['blueprints'])
             ->mount($values['mount'] ?? null)
-            ->taxonomies($values['taxonomies'] ?? []);
+            ->taxonomies($values['taxonomies'] ?? [])
+            ->futureDateBehavior(array_get($values, 'future_date_behavior'))
+            ->pastDateBehavior(array_get($values, 'past_date_behavior'));
 
         if ($sites = array_get($values, 'sites')) {
             $collection->sites($sites);
-        }
-
-        if ($futureDateBehavior = array_get($values, 'future_date_behavior')) {
-            $collection->futureDateBehavior($futureDateBehavior);
-        }
-
-        if ($pastDateBehavior = array_get($values, 'past_date_behavior')) {
-            $collection->pastDateBehavior($pastDateBehavior);
         }
 
         if (! $values['structured']) {
