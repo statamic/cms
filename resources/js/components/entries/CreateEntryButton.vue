@@ -1,11 +1,14 @@
 <template>
 
-    <dropdown-list class="inline-block" :show-dropdown-if="blueprints.length > 1">
+    <dropdown-list class="inline-block" :show-dropdown-if="hasMultipleBlueprints">
         <template v-slot:trigger>
             <button
-                :class="buttonClass"
+                :class="[buttonClass, {'flex items-center pr-2': hasMultipleBlueprints }]"
                 @click="create"
-                v-text="text" />
+            >
+                {{ text }}
+                <svg-icon name="chevron-down-xs" class="w-2 ml-2" v-if="hasMultipleBlueprints" />
+            </button>
         </template>
 
         <div v-for="blueprint in blueprints" :key="blueprint.handle">
@@ -23,6 +26,14 @@ export default {
         blueprints: Array,
         text: { type: String, default: () => __('Create Entry') },
         buttonClass: { type: String, default: 'btn' }
+    },
+
+    computed: {
+
+        hasMultipleBlueprints() {
+            return this.blueprints.length > 1;
+        }
+
     },
 
     methods: {
