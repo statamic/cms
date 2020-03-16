@@ -23,7 +23,10 @@
 
                 <dropdown-list :show-dropdown-if="collections.length > 0">
                     <template #trigger>
-                        <button class="btn" v-text="__('Add Link')" @click="addLink" />
+                        <button class="btn flex items-center pr-2" @click="addLink">
+                            {{ __('Add Link') }}
+                            <svg-icon name="chevron-down-xs" class="w-2 ml-2" />
+                        </button>
                     </template>
                     <dropdown-item :text="__('Link to URL')" @click="linkPage" />
                     <dropdown-item :text="__('Link to Entry')" @click="linkEntries" />
