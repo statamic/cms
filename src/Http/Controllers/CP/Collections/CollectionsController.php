@@ -228,23 +228,6 @@ class CollectionsController extends CpController
             $structure = (new CollectionStructure)->collection($collection);
         }
 
-        if (! $sites) {
-            $sites = [Site::default()->handle()];
-        }
-
-        foreach (Site::all() as $site) {
-            $site = $site->handle();
-            $shouldExist = in_array($site, $sites);
-
-            if ($shouldExist && !$structure->existsIn($site)) {
-                $structure->addTree($structure->makeTree($site));
-            }
-
-            if (!$shouldExist && $structure->existsIn($site)) {
-                $structure->removeTree($structure->in($site));
-            }
-        }
-
         return $structure
             ->maxDepth($maxDepth)
             ->expectsRoot($expectsRoot);

@@ -6,6 +6,7 @@ use Statamic\Contracts\Entries\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Structures\CollectionStructure;
+use Statamic\Structures\Tree;
 
 class CollectionStructureTest extends StructureTestCase
 {
@@ -15,6 +16,7 @@ class CollectionStructureTest extends StructureTestCase
 
         $this->entryQueryBuilder = $this->mock(EntryQueryBuilder::class);
         $this->entryQueryBuilder->shouldReceive('where')->with('site', 'en')->andReturnSelf();
+        $this->entryQueryBuilder->shouldReceive('where')->with('site', 'fr')->andReturnSelf();
         $this->entryQueryBuilder->shouldReceive('get')->andReturnUsing(function () {
             return $this->queryBuilderGetReturnValue();
         });
@@ -72,6 +74,26 @@ class CollectionStructureTest extends StructureTestCase
         $this->expectExceptionMessage('Title cannot be set.');
 
         $this->structure()->title('test');
+    }
+
+    /** @test */
+    function trees_exist_based_on_whether_the_site_is_enabled_on_the_collection()
+    {
+        $this->collection->shouldReceive('handle')->andReturn('test');
+        $this->collection->shouldReceive('sites')->andReturn(collect(['en', 'fr']));
+
+        $structure = $this->structure();
+        $structure->addTree($structure->makeTree('en')->tree(['foo' => 'bar']));
+
+        $trees = $structure->trees();
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $trees);
+        $this->assertCount(2, $trees);
+        $this->assertEveryItemIsInstanceOf(Tree::class, $trees);
+        $this->assertTrue($structure->existsIn('en'));
+        $this->assertTrue($structure->existsIn('fr'));
+        $this->assertFalse($structure->existsIn('de'));
+        $this->assertEquals(['foo' => 'bar'], $structure->in('en')->tree()); // manually added tree is maintained
+        $this->assertEquals([], $structure->in('fr')->tree());
     }
 
     /** @test */

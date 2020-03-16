@@ -99,6 +99,13 @@ class CollectionStructure extends Structure
         return true;
     }
 
+    public function trees()
+    {
+        return $this->collection()->sites()->mapWithKeys(function ($site) {
+            return [$site => $this->in($site)];
+        });
+    }
+
     public function in($site)
     {
         if ($tree = parent::in($site)) {
