@@ -26,6 +26,7 @@
                 :config="meta.entry.config"
                 :meta="meta.entry.meta"
                 @input="entriesSelected"
+                @meta-updated="meta.entry.meta = $event"
             />
 
         </div>
