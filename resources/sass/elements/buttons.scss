@@ -129,7 +129,7 @@
     @apply flex items-center p-0;
     height: 2.375rem;
 
-    button:first-child {
+    > button:first-child {
         @apply border-r rounded-r-none;
     }
 
