@@ -3,7 +3,7 @@
         <div class="mr-2" v-if="!config.required">
             <toggle-fieldtype handle="enabled" v-model="enabled" />
         </div>
-        <div class="w-32 mr-2">
+        <div class="w-48 mr-2">
             <v-select
                 v-if="enabled"
                 v-model="option"
