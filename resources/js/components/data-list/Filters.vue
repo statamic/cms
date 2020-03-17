@@ -20,6 +20,7 @@
                     <div class="filter-fields">
                         <field-filter
                             v-if="showFieldFilter"
+                            ref="fieldFilter"
                             :config="fieldFilter"
                             :values="activeFilters.fields || {}"
                             @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
@@ -249,6 +250,8 @@ export default {
 
         resetFilterPopover() {
             this.creating = false;
+
+            this.$refs.fieldFilter.reset();
         },
 
         fieldFilterBadge(handle, filter) {
