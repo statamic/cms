@@ -92,12 +92,14 @@
                     v-tooltip="__('Redirect')" />
             </template>
 
-            <template #branch-options="{ branch, removeBranch, orphanChildren }">
-                <dropdown-item
-                    v-for="blueprint in blueprints"
-                    :key="blueprint.handle"
-                    @click="createEntry(blueprint.handle, branch.id)"
-                    v-text="__('New :thing', { thing: blueprint.title })" />
+            <template #branch-options="{ branch, removeBranch, orphanChildren, depth }">
+                <template v-if="depth < structureMaxDepth">
+                    <dropdown-item
+                        v-for="blueprint in blueprints"
+                        :key="blueprint.handle"
+                        @click="createEntry(blueprint.handle, branch.id)"
+                        v-text="__('New :thing', { thing: blueprint.title })" />
+                </template>
                 <dropdown-item
                     :text="__('Delete')"
                     class="warning"

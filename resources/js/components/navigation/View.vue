@@ -71,11 +71,13 @@
                 <svg-icon v-if="isTextBranch(branch)" class="inline-block w-4 h-4 text-grey-50" name="file-text" v-tooltip="__('Text')" />
             </template>
 
-            <template #branch-options="{ branch, removeBranch, orphanChildren, vm }">
+            <template #branch-options="{ branch, removeBranch, orphanChildren, vm, depth }">
                 <dropdown-item
+                    v-if="depth < maxDepth"
                     :text="__('Add child link to URL')"
                     @click="linkPage(vm)" />
                 <dropdown-item
+                    v-if="depth < maxDepth"
                     :text="__('Add child link to entry')"
                     @click="linkEntries(vm)" />
                 <dropdown-item

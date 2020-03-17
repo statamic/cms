@@ -29,6 +29,7 @@
                 <dropdown-list class="ml-2">
                     <slot name="branch-options"
                         :branch="page"
+                        :depth="depth"
                         :remove-branch="remove"
                         :orphan-children="orphanChildren"
                     />
