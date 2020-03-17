@@ -10,6 +10,7 @@
                 <svg-icon name="chevron-down-xs" class="w-2 ml-1" v-if="hasMultipleBlueprints" />
             </button>
         </template>
+        <h6 v-text="__('Choose Blueprint')" class="p-1" />
 
         <div v-for="blueprint in blueprints" :key="blueprint.handle">
             <dropdown-item :text="blueprint.title" @click="select(blueprint.handle)" />
