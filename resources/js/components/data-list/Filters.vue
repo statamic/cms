@@ -11,14 +11,16 @@
                 </template>
                 <div class="flex flex-col p-2 text-left w-64">
                     <select-input
-                        v-if="! creating"
+                        v-if="showFilterSelect"
                         v-model="creating"
                         :options="filterTypeOptions"
                         :placeholder="__('Filter Type')"
                     />
-                    <field-filters
-                        v-if="fieldsFilter && creating === 'fields'"
-                        :config="fieldsFilter"
+                    <field-filter
+                        v-if="showFieldFilter"
+                        ref="fieldFilter"
+                        :config="fieldFilter"
+                        :values="activeFilters.fields || {}"
                         @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
                     />
                     <data-list-filter
@@ -101,7 +103,7 @@
 
 <script>
 import DataListFilter from './Filter.vue';
-import FieldFilters from './FieldFilters.vue';
+import FieldFilter from './FieldFilter.vue';
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 
 export default {
@@ -110,7 +112,7 @@ export default {
 
     components: {
         DataListFilter,
-        FieldFilters,
+        FieldFilter,
     },
 
     props: {
@@ -148,7 +150,7 @@ export default {
 
     computed: {
 
-        fieldsFilter() {
+        fieldFilter() {
             return this.filters.find(filter => filter.handle === 'fields');
         },
 
@@ -162,6 +164,18 @@ export default {
 
         unpinnedFilters() {
             return this.filters.filter(filter => ! filter.pinned);
+        },
+
+        showFilterSelect() {
+            if (this.fieldFilter && this.unpinnedFilters.length === 1) return false;
+
+            return ! this.creating;
+        },
+
+        showFieldFilter() {
+            if (this.fieldFilter && this.unpinnedFilters.length === 1) return true;
+
+            return this.creating === 'fields';
         },
 
         filterTypeOptions() {
@@ -238,6 +252,8 @@ export default {
 
         resetFilterPopover() {
             this.creating = false;
+
+            this.$refs.fieldFilter.reset();
         },
 
         removeFieldFilter(handle) {
