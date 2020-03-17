@@ -84,9 +84,7 @@
             it would read better to say 'Field Name is value' instead of 'field_name = "value"' -->
             <template v-for="(filter, handle) in activeFilters.fields">
                 <div class="filter-badge mr-1" v-if="handle != 'badge'">
-                    <span>
-                        {{ handle }} {{ filter.operator }} "{{ filter.value }}"
-                    </span>
+                    <span>{{ fieldFilterBadge(handle, filter) }}</span>
                     <button @click="removeFieldFilter(handle)">&times;</button>
                 </div>
             </template>
@@ -254,6 +252,14 @@ export default {
             this.creating = false;
 
             this.$refs.fieldFilter.reset();
+        },
+
+        fieldFilterBadge(handle, filter) {
+            let meta = _.find(this.fieldFilter.extra, filter => filter.handle === handle);
+            let field = meta.display.toLowerCase();
+            let operator = meta.operators[filter.operator].toLowerCase();
+
+            return `${field} ${operator} ${filter.value}`;
         },
 
         removeFieldFilter(handle) {
