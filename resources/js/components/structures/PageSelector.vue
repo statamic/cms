@@ -9,7 +9,6 @@
             :site="site"
             :item-data-url="itemDataUrl"
             :selections-url="selectionsUrl"
-            :exclusions="exclusions"
             :search="true"
             :columns="columns"
             :can-create="false"
@@ -27,7 +26,6 @@ export default {
     props: {
         site: String,
         collections: Array,
-        exclusions: Array,
     },
 
     data() {
