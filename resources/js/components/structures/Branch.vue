@@ -9,7 +9,7 @@
                 <i v-if="isRoot" class="icon icon-home mr-1 opacity-25" />
 
                 <a
-                    @click="$emit('edit')"
+                    @click="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium': isTopLevel }"
                     v-text="page.title || page.url" />
 

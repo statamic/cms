@@ -26,7 +26,7 @@
                     :vm="vm"
                     :first-page-is-root="expectsRoot"
                     :hasCollection="hasCollection"
-                    @edit="$emit('edit-page', page, vm, store)"
+                    @edit="$emit('edit-page', page, vm, store, $event)"
                     @removed="pageRemoved"
                     @children-orphaned="childrenOrphaned"
                 >

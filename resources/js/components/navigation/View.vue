@@ -235,8 +235,13 @@ export default {
             return !this.isEntryBranch(branch) && !this.isLinkBranch(branch);
         },
 
-        editPage(page, vm, store) {
-            this.editingPage = { page, vm, store };
+        editPage(page, vm, store, $event) {
+            if (page.id) {
+                const url = page.edit_url;
+                $event.metaKey ? window.open(url) : window.location = url;
+            } else {
+                this.editingPage = { page, vm, store };
+            }
         },
 
         updatePage(page) {
