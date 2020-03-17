@@ -72,7 +72,7 @@ class Date extends Fieldtype
     public function queryOperators(): array
     {
         return [
-            '<' => __('Beforeee'),
+            '<' => __('Before'),
             '>' => __('After'),
         ];
     }
