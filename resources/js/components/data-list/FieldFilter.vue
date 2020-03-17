@@ -146,9 +146,10 @@ export default {
         updateOperator(operator) {
             this.operator = operator;
 
-            this.$nextTick(() => {
-                this.$refs.valueField.focus();
-            });
+            // TODO: When fieldtype has a reliable `.focus()` method...
+            // this.$nextTick(() => {
+            //     this.$refs.valueField.focus();
+            // });
         },
 
         updateValue: _.debounce(function (value) {
