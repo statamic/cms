@@ -14,6 +14,7 @@ class Fields extends Filter
             ->map(function ($blueprint) {
                 return Blueprint::find($blueprint);
             })
+            // TODO: Reject unqueryable fields (ie. bard)
             ->mapWithKeys(function ($blueprint) {
                 return $blueprint->fields()->all()->filter->isFilterable()->map(function ($field) {
                     return [
@@ -30,8 +31,14 @@ class Fields extends Filter
 
     public function valueFieldConfig($field)
     {
+        // TODO: Implement a cleaner way to configure how field gets rendered from the fieldtype itself
+
+        $toText = ['markdown', 'textarea', 'bard', 'replicator', 'grid'];
+
         if ($field->type() === 'date') {
             $field->setConfig(array_merge($field->config(), ['required' => true]));
+        } elseif (in_array($field->type(), $toText)) {
+            $field->setConfig(array_merge($field->config(), ['type' => 'text']));
         }
 
         return $field->toPublishArray();
