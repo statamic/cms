@@ -32,6 +32,7 @@ export default {
         return {
             config: {
                 type: 'entries',
+                collections: this.collections,
             },
             columns: [
                 { label: __('Title'), field: 'title' },
