@@ -20,6 +20,7 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Taxonomies\Terms;
 use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Contracts\Taxonomies\Term as TermContract;
 
 class TermsController extends CpController
 {
