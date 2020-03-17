@@ -39,7 +39,7 @@
                     />
 
                     <button
-                        class="btn mx-2"
+                        class="btn mr-2"
                         :class="{ 'disabled': !treeIsDirty, 'btn-danger': deletedEntries.length }"
                         :disabled="!treeIsDirty"
                         @click="saveTree"

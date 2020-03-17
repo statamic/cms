@@ -7,7 +7,7 @@
                 @click="create"
             >
                 {{ text }}
-                <svg-icon name="chevron-down-xs" class="w-2 ml-2" v-if="hasMultipleBlueprints" />
+                <svg-icon name="chevron-down-xs" class="w-2 ml-1" v-if="hasMultipleBlueprints" />
             </button>
         </template>
 
