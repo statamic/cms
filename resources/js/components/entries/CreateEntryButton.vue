@@ -13,7 +13,7 @@
         <h6 v-text="__('Choose Blueprint')" class="p-1" />
 
         <div v-for="blueprint in blueprints" :key="blueprint.handle">
-            <dropdown-item :text="blueprint.title" @click="select(blueprint.handle)" />
+            <dropdown-item :text="blueprint.title" @click="select(blueprint.handle, $event)" />
         </div>
     </dropdown-list>
 
@@ -43,14 +43,14 @@ export default {
             if (this.blueprints.length === 1) this.select();
         },
 
-        select(blueprint) {
+        select(blueprint, $event) {
             let url = this.url;
 
             if (blueprint) {
                 url = url += `?blueprint=${blueprint}`;
             }
 
-            window.location = url;
+            $event.metaKey ? window.open(url) : window.location = url;
         }
 
     }
