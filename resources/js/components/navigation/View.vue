@@ -59,7 +59,7 @@
                     <svg-icon name="empty/structure" class="w-24 h-auto mx-auto" />
                     <h1 class="my-3" v-text="__('Create your first link now')" />
                     <p class="text-grey mb-3">
-                        {{ __('messages.structures_empty') }}
+                        {{ __('messages.navigation_configure_intro') }}
                     </p>
                     <button class="btn-primary btn-lg" v-text="__('Create first link')" @click="openPageCreator" />
                 </div>
