@@ -79,21 +79,16 @@
         </div>
 
         <div class="flex flex-wrap mt-1" v-if="activeCount">
-
-            <!-- @TODO: Need a way to control the grammar in a nice way. For example,
-            it would read better to say 'Field Name is value' instead of 'field_name = "value"' -->
             <template v-for="(filter, handle) in activeFilters.fields">
                 <div class="filter-badge mr-1" v-if="handle != 'badge'">
                     <span>{{ fieldFilterBadge(handle, filter) }}</span>
                     <button @click="removeFieldFilter(handle)">&times;</button>
                 </div>
             </template>
-
             <div class="filter-badge mr-1" v-for="(badge, handle) in standardBadges">
                 <span>{{ badge }}</span>
                 <button @click="removeStandardFilter(handle)">&times;</button>
             </div>
-
         </div>
     </div>
 
