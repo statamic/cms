@@ -76,10 +76,10 @@ export default {
             const vm = this;
 
             const initial = {
-                blueprint: clone(this.blueprint),
-                values: clone(this.values),
-                meta: clone(this.meta),
-                localizedFields: clone(this.localizedFields),
+                blueprint: _.clone(this.blueprint),
+                values: _.clone(this.values),
+                meta: _.clone(this.meta),
+                localizedFields: _.clone(this.localizedFields),
                 site: this.site,
                 isRoot: this.isRoot,
             };
