@@ -69,7 +69,7 @@ class CollectionStructure extends Structure
         $otherCollectionEntries = $entryIds->diff($thisCollectionsEntries);
 
         if ($otherCollectionEntries->isNotEmpty()) {
-            throw new \Exception("Only entries from the [{$this->collection->handle()}] collection may be in its structure. Encountered ID of [{$otherCollectionEntries->first()}]");
+            $tree = $this->removeEntryReferencesFromTree($tree, $otherCollectionEntries);
         }
 
         $missingEntries = $thisCollectionsEntries->diff($entryIds)->map(function ($id) {
@@ -90,6 +90,21 @@ class CollectionStructure extends Structure
             })
             ->flatten()
             ->filter();
+    }
+
+    protected function removeEntryReferencesFromTree($tree, $entries)
+    {
+        return collect($tree)
+            ->reject(function ($branch) use ($entries) {
+                return $entries->contains($branch['entry']);
+            })
+            ->map(function ($branch) use ($entries) {
+                if (isset($branch['children'])) {
+                    $branch['children'] = $this->removeEntryReferencesFromTree($branch['children'], $entries);
+                }
+                return $branch;
+            })
+            ->all();
     }
 
     public function save()

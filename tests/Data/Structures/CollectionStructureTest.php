@@ -181,25 +181,30 @@ class CollectionStructureTest extends StructureTestCase
     /** @test */
     function only_entries_belonging_to_the_associated_collection_may_be_in_the_tree()
     {
-        $this->collection->shouldReceive('handle')->once()->andReturn('test');
-
-        $this->expectException(\Exception::class);
-        $this->expectExceptionMessage('Only entries from the [test] collection may be in its structure. Encountered ID of [3]');
-
         $this->queryBuilderGetReturnValue = collect([
             Entry::make()->id('1'),
             Entry::make()->id('2'),
         ]);
 
-        $this->structure()->validateTree([
+        $validated = $this->structure()->validateTree([
+            [
+                'entry' => '1',
+                'children' => [
+                    ['entry' => '2'],
+                    ['entry' => '4']
+                ]
+            ],
+            ['entry' => '3'],
+        ], 'en');
+
+        $this->assertEquals([
             [
                 'entry' => '1',
                 'children' => [
                     ['entry' => '2']
                 ]
-            ],
-            ['entry' => '3'],
-        ], 'en');
+            ]
+        ], $validated);
     }
 
     /** @test */
