@@ -21,11 +21,15 @@
                     @input="siteSelected"
                 />
 
-                <dropdown-list :show-dropdown-if="collections.length > 0">
+                <dropdown-list :show-dropdown-if="hasCollections">
                     <template #trigger>
-                        <button class="btn flex items-center pr-2" @click="addLink">
+                        <button
+                            class="btn"
+                            :class="{ 'flex items-center pr-2': hasCollections }"
+                            @click="addLink"
+                        >
                             {{ __('Add Link') }}
-                            <svg-icon name="chevron-down-xs" class="w-2 ml-2" />
+                            <svg-icon name="chevron-down-xs" class="w-2 ml-2" v-if="hasCollections" />
                         </button>
                     </template>
                     <dropdown-item :text="__('Link to URL')" @click="linkPage" />
@@ -88,7 +92,7 @@
         </page-tree>
 
         <page-selector
-            v-if="collections.length && $refs.tree"
+            v-if="hasCollections && $refs.tree"
             ref="selector"
             :site="site"
             :collections="collections"
@@ -179,6 +183,10 @@ export default {
             }
             countChildren(this.pageBeingDeleted);
             return children;
+        },
+
+        hasCollections() {
+            return this.collections.length > 0;
         }
 
     },
@@ -198,7 +206,7 @@ export default {
     methods: {
 
         addLink() {
-            if (this.collections.length === 0) this.linkPage();
+            if (!this.hasCollections) this.linkPage();
         },
 
         linkPage(vm) {
