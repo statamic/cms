@@ -45,12 +45,6 @@ class EntryFactory
         return $this;
     }
 
-    public function order($order)
-    {
-        $this->order = $order;
-        return $this;
-    }
-
     public function locale($locale)
     {
         $this->locale = $locale;
@@ -69,10 +63,6 @@ class EntryFactory
 
         if ($this->id) {
             $entry->id($this->id);
-        }
-
-        if ($this->order) {
-            $entry->order($this->order);
         }
 
         return $entry;

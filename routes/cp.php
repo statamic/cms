@@ -27,14 +27,13 @@ Route::group([
     Route::get('select-site/{handle}', 'SelectSiteController@select');
 
     Route::group(['namespace' => 'Structures'], function () {
-        Route::resource('structures', 'StructuresController');
+        Route::resource('navigation', 'NavigationController');
         Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
     });
 
-    Route::get('structures/{collection}/entries/{entry}/{slug}', 'Collections\EntriesController@edit')->name('structures.entries.edit');
-
     Route::group(['namespace' => 'Collections'], function () {
         Route::resource('collections', 'CollectionsController');
+        Route::post('collections/{collection}/structure', 'CollectionStructureController@update')->name('collections.structure.update');
         Route::get('collections/{collection}/scaffold', 'ScaffoldCollectionController@index')->name('collections.scaffold');
         Route::post('collections/{collection}/scaffold', 'ScaffoldCollectionController@create')->name('collections.scaffold.create');
 

@@ -33,14 +33,15 @@
                 <p>{{ __('statamic::messages.getting_started_widget_blueprints') }}</p>
             </div>
         </a>
-        <a href="{{ cp_route('structures.create') }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+        <a href="{{ cp_route('navigation.create') }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
                 @svg('structures')
             </div>
             <div class="flex-1">
-                <h3 class="mb-1 text-blue">{{ __('Create a Structure') }}</h3>
-                <p>{{ __('statamic::messages.getting_started_widget_structures') }}</p>
+                <h3 class="mb-1 text-blue">{{ __('Create a Navigation') }}</h3>
+                <p>{{ __('statamic::messages.getting_started_widget_navigation') }}</p>
             </div>
+
         </a>
     </div>
 </div>

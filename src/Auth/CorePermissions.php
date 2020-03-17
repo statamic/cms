@@ -6,8 +6,8 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Nav;
 use Statamic\Facades\Permission;
-use Statamic\Facades\Structure;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Utility;
 
@@ -24,8 +24,8 @@ class CorePermissions
             $this->registerCollections();
         });
 
-        $this->group('structures', function () {
-            $this->registerStructures();
+        $this->group('navigation', function () {
+            $this->registerNavigation();
         });
 
         $this->group('globals', function () {
@@ -77,16 +77,16 @@ class CorePermissions
         });
     }
 
-    protected function registerStructures()
+    protected function registerNavigation()
     {
-        $this->register('configure structures');
+        $this->register('configure navs');
 
-        $this->register('view {structure} structure', function ($permission) {
+        $this->register('view {nav} nav', function ($permission) {
             $this->permission($permission)->children([
-                $this->permission('edit {structure} structure')
-            ])->replacements('structure', function () {
-                return Structure::all()->map(function ($structure) {
-                    return ['value' => $structure->handle(), 'label' => $structure->title()];
+                $this->permission('edit {nav} nav')
+            ])->replacements('nav', function () {
+                return Nav::all()->map(function ($nav) {
+                    return ['value' => $nav->handle(), 'label' => $nav->title()];
                 });
             });
         });

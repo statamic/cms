@@ -22,7 +22,7 @@
                 <p>{{ __('statamic::messages.collection_next_steps_configure_description') }}</p>
             </div>
         </a>
-        <a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site->handle()]) }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+        <a href="{{ cp_route('collections.entries.create', [$collection->handle(), $site]) }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
                 @svg('content-writing')
             </div>

@@ -1,15 +1,19 @@
 <template>
 
-    <dropdown-list :disabled="blueprints.length <= 1">
+    <dropdown-list class="inline-block" :show-dropdown-if="hasMultipleBlueprints">
         <template v-slot:trigger>
             <button
-                :class="buttonClass"
+                :class="[buttonClass, {'flex items-center pr-2': hasMultipleBlueprints }]"
                 @click="create"
-                v-text="text" />
+            >
+                {{ text }}
+                <svg-icon name="chevron-down-xs" class="w-2 ml-1" v-if="hasMultipleBlueprints" />
+            </button>
         </template>
+        <h6 v-text="__('Choose Blueprint')" class="p-1" />
 
         <div v-for="blueprint in blueprints" :key="blueprint.handle">
-            <dropdown-item :text="blueprint.title" @click="select(blueprint.handle)" />
+            <dropdown-item :text="blueprint.title" @click="select(blueprint.handle, $event)" />
         </div>
     </dropdown-list>
 
@@ -25,20 +29,28 @@ export default {
         buttonClass: { type: String, default: 'btn' }
     },
 
+    computed: {
+
+        hasMultipleBlueprints() {
+            return this.blueprints.length > 1;
+        }
+
+    },
+
     methods: {
 
         create() {
             if (this.blueprints.length === 1) this.select();
         },
 
-        select(blueprint) {
+        select(blueprint, $event) {
             let url = this.url;
 
             if (blueprint) {
                 url = url += `?blueprint=${blueprint}`;
             }
 
-            window.location = url;
+            $event.metaKey ? window.open(url) : window.location = url;
         }
 
     }

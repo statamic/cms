@@ -12,7 +12,7 @@ export default {
     props: ['text', 'redirect', 'externalLink'],
 
     methods: {
-        selectAndClose() {
+        selectAndClose($event) {
             if (this.redirect) {
                 location.href = this.redirect;
                 return;
@@ -23,7 +23,7 @@ export default {
                 return;
             }
 
-            this.$emit('click');
+            this.$emit('click', $event);
 
             this.$parent.close();
         }

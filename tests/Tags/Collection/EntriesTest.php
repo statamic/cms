@@ -10,6 +10,7 @@ use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Query\Scopes\Scope;
+use Statamic\Structures\CollectionStructure;
 use Statamic\Tags\Collection\Entries;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
@@ -47,7 +48,7 @@ class EntriesTest extends TestCase
 
     protected function makeEntry($slug)
     {
-        return EntryFactory::slug($slug)->collection($this->collection)->make();
+        return EntryFactory::id($slug)->slug($slug)->collection($this->collection)->make();
     }
 
     protected function getEntries($params = [])
@@ -306,6 +307,39 @@ class EntriesTest extends TestCase
         }
 
         $this->assertTrue($orders->unique()->count() > 1);
+    }
+
+    /** @test */
+    function it_cannot_sort_a_nested_structured_collection()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot sort a nested collection by order.');
+
+        $structure = (new CollectionStructure)->maxDepth(2);
+        $this->collection->structure($structure)->save();
+
+        $this->getEntries(['sort' => 'order|title']);
+    }
+
+    /** @test */
+    function it_can_sort_a_linear_structured_collection()
+    {
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+
+        $structure = (new CollectionStructure)->collection($this->collection)->maxDepth(1)->tap(function ($s) {
+            $s->addTree($s->makeTree('en')->tree([
+                ['entry' => 'b'],
+                ['entry' => 'c'],
+                ['entry' => 'a'],
+            ]));
+        });
+
+        $this->collection->structure($structure)->save();
+
+        $this->assertEquals(['a', 'b', 'c'], $this->getEntries(['sort' => 'id'])->map->id()->all());
+        $this->assertEquals(['b', 'c', 'a'], $this->getEntries(['sort' => 'order|title'])->map->id()->all());
     }
 
     /** @test */

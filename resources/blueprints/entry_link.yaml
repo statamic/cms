@@ -1,0 +1,11 @@
+title: Link
+fields:
+  -
+    handle: title
+    field:
+      type: text
+  -
+    handle: redirect
+    field:
+      type: redirect
+      required: true

@@ -22,6 +22,10 @@ trait Routable
 
     public function uri()
     {
+        if ($this->isRedirect()) {
+            return null;
+        }
+
         if (! $route = $this->route()) {
             return null;
         }
@@ -31,19 +35,43 @@ trait Routable
 
     public function url()
     {
+        if ($this->isRedirect()) {
+            return $this->redirectUrl();
+        }
+
         return URL::makeRelative($this->absoluteUrl());
     }
 
     public function absoluteUrl()
     {
+        if ($this->isRedirect()) {
+            return $this->redirectUrl();
+        }
+
         return vsprintf('%s/%s', [
             rtrim($this->site()->absoluteUrl(), '/'),
             ltrim($this->uri(), '/')
         ]);
     }
 
+    public function isRedirect()
+    {
+        return (bool) $this->value('redirect');
+    }
+
+    public function redirectUrl()
+    {
+        if ($redirect = $this->value('redirect')) {
+            return (new \Statamic\Routing\ResolveRedirect)($redirect);
+        }
+    }
+
     public function ampUrl()
     {
+        if ($this->isRedirect()) {
+            return null;
+        }
+
         return !$this->ampable() ? null : vsprintf('%s/%s/%s', [
             rtrim($this->site()->absoluteUrl(), '/'),
             config('statamic.amp.route'),

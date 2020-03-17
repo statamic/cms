@@ -16,8 +16,11 @@ class Entries
 {
     use Concerns\QueriesConditions,
         Concerns\QueriesScopes,
-        Concerns\QueriesOrderBys,
         Concerns\GetsQueryResults;
+
+    use Concerns\QueriesOrderBys {
+        queryOrderBys as traitQueryOrderBys;
+    }
 
     protected $ignoredParams = ['as'];
     protected $parameters;
@@ -142,6 +145,7 @@ class Entries
         $this->queryPastFuture($query);
         $this->querySinceUntil($query);
         $this->queryTaxonomies($query);
+        $this->queryRedirects($query);
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
@@ -311,5 +315,36 @@ class Entries
                 );
             }
         });
+    }
+
+    protected function queryOrderBys($query)
+    {
+        $isSortingByOrder = null !== $this->orderBys->first(function ($orderBy) {
+            return $orderBy->sort === 'order';
+        });
+
+        if ($isSortingByOrder) {
+            $nonOrderableCollections = $this->collections->reject->orderable();
+            if ($nonOrderableCollections->isNotEmpty()) {
+                throw new \LogicException('Cannot sort a nested collection by order.');
+            }
+        }
+
+        return $this->traitQueryOrderBys($query);
+    }
+
+    protected function queryRedirects($query)
+    {
+        $isQueryingRedirect = $this->parameters->first(function ($v, $k) {
+            return Str::startsWith($k, 'redirect:');
+        });
+
+        if ($isQueryingRedirect) {
+            return;
+        }
+
+        if (! $this->parameters->bool(['redirects', 'links'], false)) {
+            $query->where('redirect', '=', null);
+        }
     }
 }

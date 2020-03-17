@@ -3,12 +3,12 @@
 namespace Statamic\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Statamic\CP\Navigation\Nav as Navigation;
+use Statamic\Contracts\Structures\NavigationRepository;
 
 class Nav extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return Navigation::class;
+        return NavigationRepository::class;
     }
 }

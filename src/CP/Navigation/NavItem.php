@@ -3,7 +3,7 @@
 namespace Statamic\CP\Navigation;
 
 use Exception;
-use Statamic\Facades\Nav;
+use Statamic\Facades\CP\Nav;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 

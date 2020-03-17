@@ -75,10 +75,6 @@ class EntriesController extends CpController
 
     public function edit(Request $request, $collection, $entry)
     {
-        if ($collection->hasStructure() && $request->route()->getName() === 'statamic.cp.collections.entries.edit') {
-            return redirect()->to(cp_route('structures.entries.edit', [$collection->handle(), $entry->id(), $entry->slug()]));
-        }
-
         $this->authorize('view', $entry);
 
         $entry = $entry->fromWorkingCopy();
@@ -399,12 +395,12 @@ class EntriesController extends CpController
     {
         return new Breadcrumbs([
             [
-                'text' => $collection->hasStructure() ? __('Structures') : __('Collections'),
-                'url' => $collection->hasStructure() ? cp_route('structures.index') : cp_route('collections.index'),
+                'text' => __('Collections'),
+                'url' => cp_route('collections.index'),
             ],
             [
                 'text' => $collection->title(),
-                'url' => $collection->hasStructure() ? $collection->structure()->showUrl() : $collection->showUrl(),
+                'url' => $collection->showUrl(),
             ]
         ]);
     }

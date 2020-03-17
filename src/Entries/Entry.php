@@ -123,6 +123,22 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function delete()
     {
+        if ($this->hasStructure()) {
+            tap($this->structure(), function ($structure) {
+                $structure->trees()->each(function ($tree) {
+                    // Ugly, but it's moving all the child pages to the parent. TODO: Tidy.
+                    $parent = $this->parent();
+                    if (optional($parent)->isRoot()) {
+                        $parent = null;
+                    }
+                    $this->page()->pages()->all()->each(function ($child) use ($tree, $parent) {
+                        $tree->move($child->id(), optional($parent)->id());
+                    });
+                    $tree->remove($this);
+                });
+            })->save();
+        }
+
         Facades\Entry::delete($this);
 
         return true;
@@ -130,9 +146,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function editUrl()
     {
-        return $this->hasStructure()
-            ? $this->cpUrl('structures.entries.edit')
-            : $this->cpUrl('collections.entries.edit');
+        return $this->cpUrl('collections.entries.edit');
     }
 
     public function updateUrl()
@@ -246,15 +260,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         ]);
     }
 
-    public function order($order = null)
+    public function order()
     {
-        if (func_num_args() === 0) {
-            return $this->collection()->getEntryOrder($this->id());
+        if (! $this->collection()->orderable()) {
+            return null;
         }
 
-        $this->collection()->setEntryPosition($this->id(), $order)->save();
-
-        return $this;
+        return $this->structure()->in($this->locale)
+            ->flattenedPages()
+            ->map->reference()
+            ->flip()->get($this->id) + 1;
     }
 
     public function template($template = null)
@@ -492,6 +507,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function parent()
     {
+        return optional($this->page())->parent();
+    }
+
+    public function page()
+    {
         if (! $this->hasStructure()) {
             return null;
         }
@@ -500,12 +520,12 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
             return null;
         }
 
-        return $this->structure()->in($this->locale())->page($id)->parent();
+        return $this->structure()->in($this->locale())->page($id);
     }
 
     public function route()
     {
-        return $this->collection()->route();
+        return $this->collection()->route($this->locale());
     }
 
     public function routeData()

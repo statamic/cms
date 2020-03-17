@@ -2,7 +2,7 @@
 
 namespace Statamic\CP\Navigation;
 
-use Statamic\Facades\Nav;
+use Statamic\Facades\CP\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Facades\Form as FormAPI;
@@ -11,7 +11,7 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
-use Statamic\Facades\Structure as StructureAPI;
+use Statamic\Facades\Nav as NavAPI;
 use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Contracts\Globals\GlobalSet;
@@ -79,12 +79,12 @@ class CoreNav
                 });
             });
 
-        Nav::content('Structures')
-            ->route('structures.index')
+        Nav::content('Navigation')
+            ->route('navigation.index')
             ->icon('hierarchy-files')
             ->can('index', Structure::class)
             ->children(function () {
-                return StructureAPI::all()->map(function ($structure) {
+                return NavAPI::all()->map(function ($structure) {
                     return Nav::item($structure->title())
                               ->url($structure->showUrl())
                               ->can('view', $structure);
