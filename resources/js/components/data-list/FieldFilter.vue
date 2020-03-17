@@ -2,37 +2,51 @@
     <div>
         <div v-if="hasAvailableFilters">
             <div class="flex flex-col">
-                <select-input
-                    name="fieldHandle"
+                <v-select
+                    ref="fieldSelect"
                     :placeholder="__('Select Field')"
                     :options="fieldOptions"
+                    :reduce="option => option.value"
                     :value="field"
                     @input="createFilter"
                 />
-                <select-input
-                    v-if="operatorOptions"
+                <v-select
+                    v-show="operatorOptions.length"
+                    ref="operatorSelect"
                     class="w-full mt-1"
                     :placeholder="__('Select Operator')"
                     :options="operatorOptions"
-                    v-model="operator"
+                    :reduce="option => option.value"
+                    :value="operator"
+                    @input="updateOperator"
                 />
-                <text-input
-                    v-if="operator"
-                    class="w-full mt-1"
-                    :value="value"
-                    @input="updateValue"
-                />
+                <div class="single-field">
+                    <publish-field
+                        v-if="operator"
+                        ref="valueField"
+                        :config="filter.config"
+                        :handle="field"
+                        name-prefix="field-filter"
+                        :name="field"
+                        class="single-field w-full mt-1"
+                        :value="value"
+                        @input="updateValue"
+                    />
+                </div>
             </div>
         </div>
     </div>
 </template>
 
 <script>
+import PublishField from '../publish/Field.vue';
 import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 
 export default {
 
     mixins: [HasInputOptions],
+
+    components: { PublishField },
 
     props: {
         config: Object,
@@ -69,7 +83,7 @@ export default {
         },
 
         operatorOptions() {
-            if (! this.filter) return false;
+            if (! this.filter) return [];
 
             return this.normalizeInputOptions(this.filter.operators);
         },
@@ -101,6 +115,12 @@ export default {
         value: 'update',
     },
 
+    mounted() {
+        this.reset();
+
+        this.$refs.fieldSelect.$refs.search.focus();
+    },
+
     methods: {
 
         reset() {
@@ -117,6 +137,18 @@ export default {
             this.reset();
             this.filter = _.find(this.availableFilters, filter => filter.handle === field);
             this.field = field;
+
+            this.$nextTick(() => {
+                this.$refs.operatorSelect.$refs.search.focus();
+            });
+        },
+
+        updateOperator(operator) {
+            this.operator = operator;
+
+            this.$nextTick(() => {
+                this.$refs.valueField.focus();
+            });
         },
 
         updateValue: _.debounce(function (value) {

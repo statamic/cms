@@ -10,26 +10,28 @@
                     </button>
                 </template>
                 <div class="flex flex-col p-2 text-left w-64">
-                    <select-input
+                    <v-select
                         v-if="showFilterSelect"
                         v-model="creating"
+                        :reduce="option => option.value"
                         :options="filterTypeOptions"
                         :placeholder="__('Filter Type')"
                     />
-                    <field-filter
-                        v-if="showFieldFilter"
-                        ref="fieldFilter"
-                        :config="fieldFilter"
-                        :values="activeFilters.fields || {}"
-                        @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
-                    />
-                    <data-list-filter
-                        v-for="filter in standardFilters"
-                        v-if="creating === filter.handle"
-                        :key="filter.handle"
-                        :filter="filter"
-                        @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
-                    />
+                    <div class="filter-fields">
+                        <field-filter
+                            v-if="showFieldFilter"
+                            :config="fieldFilter"
+                            :values="activeFilters.fields || {}"
+                            @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
+                        />
+                        <data-list-filter
+                            v-for="filter in standardFilters"
+                            v-if="creating === filter.handle"
+                            :key="filter.handle"
+                            :filter="filter"
+                            @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
+                        />
+                    </div>
                 </div>
             </popover>
 
@@ -68,12 +70,14 @@
                         <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                     </button>
                 </template>
-                <data-list-filter
-                    :key="filter.handle"
-                    :filter="filter"
-                    :values="activeFilters[filter.handle]"
-                    @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
-                />
+                <div class="filter-fields p-2">
+                    <data-list-filter
+                        :key="filter.handle"
+                        :filter="filter"
+                        :values="activeFilters[filter.handle]"
+                        @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
+                    />
+                </div>
             </popover>
 
         </div>
@@ -245,8 +249,6 @@ export default {
 
         resetFilterPopover() {
             this.creating = false;
-
-            this.$refs.fieldFilter.reset();
         },
 
         fieldFilterBadge(handle, filter) {

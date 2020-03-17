@@ -1,6 +1,6 @@
 <template>
 
-    <div class="w-full filter-fields" :class="{ 'single-field': hasOnlyOneField }">
+    <div class="w-full" :class="{ 'single-field': hasOnlyOneField }">
         <publish-container
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"
@@ -20,7 +20,7 @@
         </publish-container>
 
         <button
-            class="outline-none ml-2 mb-2 text-xs text-blue hover:text-grey-80"
+            class="outline-none mt-2 text-xs text-blue hover:text-grey-80"
             v-text="__('Clear')"
             @click="$emit('changed', null)"
         />

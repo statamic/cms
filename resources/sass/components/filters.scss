@@ -39,10 +39,14 @@
 
 .filter-fields {
     .form-group {
-        @apply p-2;
+        @apply p-0 pb-2;
+
+        &:last-child {
+            @apply p-0;
+        }
     }
 
-    &.single-field .form-group .field-inner {
+    .single-field .form-group .field-inner {
         @apply hidden;
     }
 }

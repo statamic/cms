@@ -19,13 +19,22 @@ class Fields extends Filter
                     return [
                         'handle' => $field->handle(),
                         'display' => $field->display(),
-                        'type' => $field->type(),
+                        'config' => $this->valueFieldConfig($field),
                         'operators' => $field->fieldtype()->queryOperators(),
                     ];
                 });
             })
             ->values()
             ->all();
+    }
+
+    public function valueFieldConfig($field)
+    {
+        if ($field->type() === 'date') {
+            $field->setConfig(array_merge($field->config(), ['required' => true]));
+        }
+
+        return $field->toPublishArray();
     }
 
     public function apply($query, $values)
