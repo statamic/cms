@@ -106,7 +106,7 @@ return [
     'getting_started_widget_docs' => 'Get to know Statamic by understanding its capabilities the right way.',
     'getting_started_widget_header' => 'Getting Started with Statamic 3',
     'getting_started_widget_intro' => 'To begin building your new Statamic 3 site, we recommend starting with these steps.',
-    'getting_started_widget_navigation' => '',
+    'getting_started_widget_navigation' => 'Create multi-level lists of links that can be used to render navbars, footers, and so on.',
     'global_search_open_using_slash' => 'You can open global search using the <kbd>/</kbd> key',
     'global_set_blueprint_instructions' => 'Defines the field layout when editing this global set.',
     'global_set_handle_instructions' => 'How you will reference this global set in templates, etc.',
