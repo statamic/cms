@@ -13,7 +13,7 @@ class RendersAttributesTest extends TestCase
     {
         parent::setUp();
 
-        $this->tag = new FakeTag;
+        $this->tag = new FakeTagWithRendersAttributes;
     }
 
     /** @test */
@@ -72,7 +72,7 @@ class RendersAttributesTest extends TestCase
     }
 }
 
-class FakeTag extends Tags
+class FakeTagWithRendersAttributes extends Tags
 {
     use Concerns\RendersAttributes;
 

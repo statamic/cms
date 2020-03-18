@@ -13,7 +13,7 @@ class RendersFormsTest extends TestCase
     {
         parent::setUp();
 
-        $this->tag = new FakeTag;
+        $this->tag = new FakeTagWithRendersForms;
     }
 
     /** @test */
@@ -60,7 +60,7 @@ class RendersFormsTest extends TestCase
     }
 }
 
-class FakeTag extends Tags
+class FakeTagWithRendersForms extends Tags
 {
     use Concerns\RendersForms;
 
