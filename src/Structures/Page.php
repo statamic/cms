@@ -156,10 +156,6 @@ class Page implements Entry, Augmentable, Responsable
             return optional($this->parent)->uri();
         }
 
-        if ($this->isRedirect()) {
-            return null;
-        }
-
         $uris = app(UriCache::class);
 
         if ($cached = $uris[$this->reference] ?? null) {

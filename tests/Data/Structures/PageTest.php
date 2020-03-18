@@ -135,6 +135,7 @@ class PageTest extends TestCase
         $entry = $this->partialMock(Entry::class);
         $entry->shouldReceive('id')->andReturn('test');
         $entry->shouldReceive('locale')->andReturn('en');
+        $entry->shouldReceive('uri')->andReturn('/the/actual/entry/uri');
         $entry->shouldReceive('value')->with('redirect')->andReturn('http://example.com/page');
 
         $tree = (new Tree)->structure(
@@ -145,7 +146,7 @@ class PageTest extends TestCase
             ->setTree($tree)
             ->setEntry($entry);
 
-        $this->assertNull($page->uri());
+        $this->assertEquals('/the/actual/entry/uri', $page->uri());
         $this->assertEquals('http://example.com/page', $page->url());
         $this->assertEquals('http://example.com/page', $page->absoluteUrl());
         $this->assertTrue($page->isRedirect());
