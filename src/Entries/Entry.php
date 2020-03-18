@@ -49,6 +49,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
     protected $date;
     protected $locale;
     protected $localizations;
+    protected $afterSaveCallbacks = [];
 
     public function __construct()
     {
@@ -216,8 +217,18 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         });
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
     public function save()
     {
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
         if (EntrySaving::dispatch($this) === false) {
             return false;
         }
@@ -231,6 +242,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         $this->taxonomize();
 
         optional(Collection::findByMount($this))->updateEntryUris();
+
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
 
         EntrySaved::dispatch($this, []);  // TODO: Fix test
 

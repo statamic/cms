@@ -581,6 +581,37 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    function it_performs_callbacks_after_saving_but_before_the_saved_event_and_only_once()
+    {
+        Event::fake();
+        $entry = (new Entry)->id('a')->collection(new Collection);
+        Facades\Entry::shouldReceive('save')->with($entry);
+        Facades\Entry::shouldReceive('taxonomize')->with($entry);
+        $callbackOneRan = 0;
+        $callbackTwoRan = 0;
+
+        $return = $entry->afterSave(function ($arg) use (&$callbackOneRan, $entry) {
+            $this->assertSame($entry, $arg);
+            $arg['result'] = 'one';
+            $callbackOneRan++;
+        });
+        $entry->afterSave(function ($arg) use (&$callbackTwoRan, $entry) {
+            $this->assertSame($entry, $arg);
+            $arg['result'] = 'two';
+            $callbackTwoRan++;
+        });
+
+        $entry->save();
+        $entry->save(); // save twice to show that the callbacks only get run the first time.
+
+        $this->assertEquals($entry, $return);
+        $this->assertEquals(1, $callbackOneRan);
+        $this->assertEquals(1, $callbackTwoRan);
+
+        // TODO: How to test that the callbacks are run *before* the EntrySaved event?
+    }
+
+    /** @test */
     function if_saving_event_returns_false_the_entry_doesnt_save()
     {
         Facades\Entry::spy();
