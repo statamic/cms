@@ -28,6 +28,10 @@ export default class Binding {
         });
     }
 
+    stop(callback) {
+        mousetrap.prototype.stopCallback = callback;
+    }
+
     bindMousetrap(binding, callback) {
         mousetrap.bind(binding, callback);
     }

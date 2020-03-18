@@ -76,9 +76,9 @@ export default {
 
     created() {
         // Allow key commands with a focused input
-        this.$keys.prototype.stopCallback = (e) => {
-            return ! ['enter', 'escape'].includes(e.code.toLowerCase());
-        }
+        this.$keys.stop(e => {
+            return ! ['enter', 'escape'].includes(e.code.toLowerCase())
+        })
 
         this.$keys.bind('enter', this.submit)
         this.$keys.bind('esc', this.cancel)
