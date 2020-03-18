@@ -17,9 +17,10 @@
 
     @else
 
-        @include('statamic::partials.create-first', [
+        @include('statamic::partials.empty-state', [
             'resource' => 'Form',
-            'description' => 'Forms are used to collect information from your visitors and dispatch notifications to you and your team of new submissions',
+            'description' => __('statamic::messages.form_wizard_intro'),
+            'docs_link' => Statamic::docsUrl('forms'),
             'svg' => 'empty/form',
             'route' => cp_route('forms.create')
         ])

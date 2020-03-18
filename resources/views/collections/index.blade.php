@@ -21,10 +21,11 @@
 
     @else
 
-        @include('statamic::partials.create-first', [
+        @include('statamic::partials.empty-state', [
             'resource' => 'Collection',
-            'description' => 'Collections are groups of entries that hold similar content and share behaviors and attributes.',
-            'svg' => 'empty/collection',
+            'description' => __('statamic::messages.collection_configure_intro'),
+            'docs_link' => Statamic::docsUrl('collections-and-entries'),
+            'svg' => 'empty/content',
             'route' => cp_route('collections.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Entries\Collection')
         ])
