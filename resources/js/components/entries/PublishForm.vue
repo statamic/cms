@@ -24,7 +24,6 @@
             <div class="hidden md:flex items-center">
                 <button
                     v-if="!readOnly"
-                    class="btn-primary"
                     :class="{
                         'btn': revisionsEnabled,
                         'btn-primary': isCreating || !revisionsEnabled,
@@ -180,7 +179,11 @@
                 <template v-slot:buttons>
                    <button
                     v-if="!readOnly"
-                    class="ml-2 btn-primary"
+                    class="ml-2"
+                    :class="{
+                        'btn': revisionsEnabled,
+                        'btn-primary': isCreating || !revisionsEnabled,
+                    }"
                     :disabled="!canSave"
                     @click.prevent="save"
                     v-text="saveText" />
