@@ -25,7 +25,7 @@
             'resource' => 'Taxonomy',
             'description' => __('statamic::messages.taxonomy_wizard_intro'),
             'docs_link' => Statamic::docsUrl('taxonomies'),
-            'svg' => 'empty/content',
+            'svg' => 'empty/taxonomy',
             'route' => cp_route('taxonomies.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')
         ])
