@@ -65,7 +65,9 @@ class Tags extends BaseTags
         $this->formHandle = $this->getForm();
         $this->errorBag = $this->getErrorBag();
 
-        $html = $this->formOpen(route('statamic.forms.store'));
+        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect']);
+
+        $html = $this->formOpen(route('statamic.forms.store'), 'POST', $knownParams);
 
         if ($this->hasErrors()) {
             $data['error']  = $this->getErrors();
