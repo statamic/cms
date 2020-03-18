@@ -2,12 +2,8 @@
 
 namespace Statamic\Tags\Concerns;
 
-use Statamic\Extend\HasParameters;
-
 trait RendersAttributes
 {
-    use HasParameters;
-
     /**
      * Render HTML attributes.
      *
