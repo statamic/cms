@@ -2,8 +2,11 @@
 
 namespace Statamic\Tags\Concerns;
 
-use Statamic\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Fields\Value;
+use Statamic\Support\Str;
 
 trait QueriesConditions
 {
@@ -12,9 +15,9 @@ trait QueriesConditions
         foreach ($this->parameters as $param => $value) {
             $this->queryCondition(
                 $query,
-                explode(':', $param)[0],
+                $field = explode(':', $param)[0],
                 explode(':', $param)[1] ?? false,
-                $value
+                $this->getQueryConditionValue($value, $field)
             );
         }
     }
@@ -267,5 +270,32 @@ trait QueriesConditions
     protected function removeRegexDelimitersAndModifiers($pattern)
     {
         return preg_replace(['/^\//', '/\/\w*$/'], ['', ''], $pattern);
+    }
+
+    protected function getQueryConditionValue($value, $field)
+    {
+        if ($value instanceof Value) {
+            $value = $value->value();
+        }
+
+        if (is_array($value)) {
+            $value = collect($value);
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->map(function ($value) use ($field) {
+                return $this->getQueryConditionValue($value, $field);
+            })->all();
+        }
+
+        if ($value instanceof Augmentable) {
+            $value = $value->augmentedValue($field);
+        }
+
+        if (is_object($value)) {
+            throw new \LogicException("Cannot query [$field] using value [".get_class($value).']');
+        }
+
+        return $value;
     }
 }
