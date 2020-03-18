@@ -88,6 +88,54 @@ class QueriesConditionsTest extends TestCase
     }
 
     /** @test */
+    function it_filters_by_in_condition()
+    {
+        $this->makeEntry('dog')->set('type', 'canine')->save();
+        $this->makeEntry('wolf')->set('type', 'canine')->save();
+        $this->makeEntry('tiger')->set('type', 'feline')->save();
+        $this->makeEntry('cat')->set('type', 'feline')->save();
+        $this->makeEntry('lion')->set('type', 'feline')->save();
+        $this->makeEntry('horse')->set('type', 'equine')->save();
+        $this->makeEntry('bigfoot')->save();
+
+        $this->assertCount(7, $this->getEntries());
+        $this->assertEquals(['dog', 'wolf'], $this->getEntries(['type:in' => ['canine']])->map->slug()->all());
+        $this->assertEquals(['tiger', 'cat', 'lion'], $this->getEntries(['type:in' => ['feline']])->map->slug()->all());
+        $this->assertEquals(['dog', 'wolf', 'tiger', 'cat', 'lion'], $this->getEntries(['type:in' => ['canine', 'feline']])->map->slug()->all());
+        $this->assertEquals(['horse'], $this->getEntries(['type:in' => ['equine']])->map->slug()->all());
+    }
+
+    /** @test */
+    function it_filters_by_not_in_condition()
+    {
+        $this->makeEntry('dog')->set('type', 'canine')->save();
+        $this->makeEntry('wolf')->set('type', 'canine')->save();
+        $this->makeEntry('tiger')->set('type', 'feline')->save();
+        $this->makeEntry('cat')->set('type', 'feline')->save();
+        $this->makeEntry('lion')->set('type', 'feline')->save();
+        $this->makeEntry('horse')->set('type', 'equine')->save();
+        $this->makeEntry('bigfoot')->save();
+
+        $this->assertCount(7, $this->getEntries());
+        $this->assertEquals(
+            ['tiger', 'cat', 'lion', 'horse', 'bigfoot'],
+            $this->getEntries(['type:not_in' => ['canine']])->map->slug()->all()
+        );
+        $this->assertEquals(
+            ['dog', 'wolf', 'horse', 'bigfoot'],
+            $this->getEntries(['type:not_in' => ['feline']])->map->slug()->all()
+        );
+        $this->assertEquals(
+            ['horse', 'bigfoot'],
+            $this->getEntries(['type:not_in' => ['canine', 'feline']])->map->slug()->all()
+        );
+        $this->assertEquals(
+            ['dog', 'wolf', 'tiger', 'cat', 'lion', 'bigfoot'],
+            $this->getEntries(['type:not_in' => ['equine']])->map->slug()->all()
+        );
+    }
+
+    /** @test */
     function it_filters_by_starts_with_condition()
     {
         $this->makeEntry('dog')->set('title', 'Dog Stories')->save();
