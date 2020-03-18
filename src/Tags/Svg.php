@@ -12,6 +12,13 @@ class Svg extends Tags
 {
     use Concerns\RendersAttributes;
 
+    public function wildcard($src)
+    {
+        $this->params['src'] = $src;
+
+        return $this->index();
+    }
+
     public function index()
     {
         $name = Str::ensureRight($this->params->get('src'), '.svg');
