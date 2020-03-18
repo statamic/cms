@@ -60,7 +60,7 @@ abstract class User implements
             $name = $this->email();
         }
 
-        return strtoupper(substr($name, 0, 1) . substr($surname, 0, 1));
+        return strtoupper(mb_substr($name, 0, 1) . mb_substr($surname, 0, 1));
     }
 
     public function avatar($size = 64)
