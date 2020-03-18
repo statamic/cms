@@ -1,6 +1,6 @@
 <template>
 
-    <th>
+    <th v-show="field.type !== 'hidden'">
         <div class="flex items-center justify-between">
             <div>{{ field.display || field.handle }}</div>
             <div
