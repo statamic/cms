@@ -42,7 +42,7 @@ class Svg extends Tags
             }
         }
 
-        $attributes = $this->renderAttributes(['src']);
+        $attributes = $this->renderAttributesFromParams(['src']);
 
         return str_replace(
             '<svg',
