@@ -20,7 +20,7 @@
             'resource' => 'Global Set',
             'description' => __('statamic::messages.global_set_config_intro'),
             'docs_link' => Statamic::docsUrl('globals'),
-            'svg' => 'empty/global',
+            'svg' => 'empty/content',
             'route' => cp_route('globals.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Globals\GlobalSet')
         ])
