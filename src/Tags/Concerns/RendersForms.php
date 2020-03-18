@@ -6,7 +6,7 @@ use Statamic\Extend\HasParameters;
 
 trait RendersForms
 {
-    use HasParameters;
+    use HasParameters, RendersAttributes;
 
     /**
      * Open a form.
@@ -14,31 +14,23 @@ trait RendersForms
      * @param string $action
      * @return string
      */
-    protected function formOpen($action, $method = 'POST')
+    protected function formOpen($action, $method = 'POST', $knownTagParams = [])
     {
         $formMethod = $method === 'GET' ? 'GET' : 'POST';
 
         $defaultAttrs = [
-            "method:{$formMethod}",
-            "action:{$action}",
+            'method' => $formMethod,
+            'action' => $action,
         ];
 
         if ($this->getBool('files')) {
-            $defaultAttrs[] = 'enctype:multipart/form-data';
+            $defaultAttrs['enctype'] = 'multipart/form-data';
         }
 
-        $attrs = collect($defaultAttrs)
-            ->merge($this->getList('attr'))
-            ->mapWithKeys(function ($attr) {
-                $bits = explode(':', $attr, 2);
-                return [$bits[0] => $bits[1] ?? null];
-            })
-            ->map(function ($value, $attr) {
-                return $value ? "{$attr}=\"{$value}\"" : $attr;
-            })
-            ->implode(' ');
+        $defaultAttrs = $this->renderAttributes($defaultAttrs);
+        $additionalAttrs = $this->renderAttributesFromParams(array_merge(['method', 'action'], $knownTagParams));
 
-        $html = "<form {$attrs}>";
+        $html = collect(['<form', $defaultAttrs, $additionalAttrs])->filter()->implode(' ') . '>';
         $html .= csrf_field();
 
         $method = strtoupper($method);
