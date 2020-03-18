@@ -124,6 +124,7 @@ class CollectionsController extends CpController
             'blueprints' => $collection->entryBlueprints()->map->handle()->reject(function ($handle) {
                 return $handle == 'entry_link';
             })->all(),
+            'links' => $collection->entryBlueprints()->map->handle()->contains('entry_link'),
             'taxonomies' => $collection->taxonomies()->map->handle()->all(),
             'default_publish_state' => $collection->defaultPublishState(),
             'template' => $collection->template(),
@@ -186,6 +187,13 @@ class CollectionsController extends CpController
 
         $values = $fields->process()->values()->all();
 
+        $blueprints = collect($values['blueprints']);
+        if ($values['links']) {
+            $blueprints->push('entry_link')->unique();
+        } elseif ($blueprints->contains('entry_link')) {
+            $blueprints->diff(['entry_link'])->values();
+        }
+
         $collection
             ->title($values['title'])
             ->routes($values['routes'])
@@ -195,7 +203,7 @@ class CollectionsController extends CpController
             ->defaultPublishState($values['default_publish_state'])
             ->sortDirection($values['sort_direction'])
             ->ampable($values['amp'])
-            ->entryBlueprints($values['blueprints'])
+            ->entryBlueprints($blueprints->all())
             ->mount($values['mount'] ?? null)
             ->taxonomies($values['taxonomies'] ?? [])
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
@@ -321,6 +329,10 @@ class CollectionsController extends CpController
                         'instructions' => __('statamic::messages.collections_blueprint_instructions'),
                         'validate' => 'array',
                         'mode' => 'select',
+                    ],
+                    'links' => [
+                        'type' => 'toggle',
+                        'instructions' => __('statamic::messages.collections_links_instructions'),
                     ],
                     'taxonomies' => [
                         'type' => 'taxonomies',

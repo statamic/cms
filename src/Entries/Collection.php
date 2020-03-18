@@ -191,10 +191,6 @@ class Collection implements Contract
             ->getter(function ($blueprints) {
                 $blueprints = $blueprints ?? [$this->fallbackEntryBlueprint()->handle()];
 
-                if ($this->hasStructure()) {
-                    $blueprints[] = 'entry_link';
-                }
-
                 return collect($blueprints)->map(function ($blueprint) {
                     return Blueprint::find($blueprint);
                 });

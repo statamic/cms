@@ -60,6 +60,7 @@ return [
     'collections_default_publish_state_instructions' => 'While creating new entries in this collection the published toggle will default to **true** instead of **false** (draft).',
     'collections_future_date_behavior_instructions' => 'How future dated entries should behave.',
     'collections_layout_instructions' => 'Set this collection\'s default layout.',
+    'collections_links_instructions' => 'Entries in this collection may contain links (redirects) to other entries or URLs.',
     'collections_mount_instructions' => 'Enable add/edit shortcuts from Structures and `mount` variable in your route.',
     'collections_orderable_instructions' => 'Enable manual ordering via drag & drop.',
     'collections_past_date_behavior_instructions' => 'How past dated entries should behave.',
