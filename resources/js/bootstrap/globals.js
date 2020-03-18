@@ -3,12 +3,12 @@ import { translate, translateChoice } from '../translations/translator';
 
 global.cp_url = function(url) {
     url = Statamic.$config.get('cpRoot') + '/' + url;
-    return url.replace(/\/+/g, '/');
+    return url.replace(/([^:]\/)\/+/g, '/');
 };
 
 global.resource_url = function(url) {
     url = Statamic.$config.get('resourceUrl') + '/' + url;
-    return url.replace(/\/+/g, '/');
+    return url.replace(/([^:]\/)\/+/g, '/');
 };
 
 // Get url segments from the nth segment
