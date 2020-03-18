@@ -2,8 +2,10 @@
 
 namespace Statamic\Entries;
 
+use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
@@ -18,9 +20,9 @@ use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Collection implements Contract
+class Collection implements Contract, AugmentableContract
 {
-    use FluentlyGetsAndSets, ExistsAsFile;
+    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData;
 
     protected $handle;
     protected $routes = [];
@@ -576,5 +578,18 @@ class Collection implements Contract
     public static function __callStatic($method, $parameters)
     {
         return Facades\Collection::{$method}(...$parameters);
+    }
+
+    public function __toString()
+    {
+        return $this->handle();
+    }
+
+    public function augmentedArrayData()
+    {
+        return [
+            'title' => $this->title(),
+            'handle' => $this->handle(),
+        ];
     }
 }
