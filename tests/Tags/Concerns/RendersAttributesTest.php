@@ -17,14 +17,23 @@ class RendersAttributesTest extends TestCase
     }
 
     /** @test */
-    function it_renders_empty_string_by_default()
+    function it_renders_attributes_from_array()
     {
-        $this->assertEquals('', $this->tag->renderAttributes());
+        $this->assertEquals('', $this->tag->renderAttributes([]));
+
+        $output = $this->tag->renderAttributes([
+            'class' => 'm-0 mb-1',
+            ':name' => 'first_name',
+        ]);
+
+        $this->assertEquals('class="m-0 mb-1" :name="first_name"', $output);
     }
 
     /** @test */
-    function it_renders_attributes()
+    function it_renders_attributes_from_params()
     {
+        $this->assertEquals('', $this->tag->renderAttributesFromParams());
+
         $output = $this->tag
             ->setContext(['first_name' => 'Han'])
             ->setParameters([
@@ -33,7 +42,7 @@ class RendersAttributesTest extends TestCase
                 'attr:src' => 'avatar.jpg',
                 'disabled' => 'true',
             ])
-            ->renderAttributes();
+            ->renderAttributesFromParams();
 
         $this->assertEquals('class="m-0 mb-1" name="Han" src="avatar.jpg" disabled', $output);
     }
@@ -47,7 +56,7 @@ class RendersAttributesTest extends TestCase
                 'src' => 'avatar.jpg',
                 'name' => 'Han',
             ])
-            ->renderAttributes(['src', 'name']);
+            ->renderAttributesFromParams(['src', 'name']);
 
         $this->assertEquals('class="m-0 mb-1"', $output);
 
@@ -57,7 +66,7 @@ class RendersAttributesTest extends TestCase
                 'attr:src' => 'avatar.jpg',
                 'name' => 'Han',
             ])
-            ->renderAttributes(['src', 'name']);
+            ->renderAttributesFromParams(['src', 'name']);
 
         $this->assertEquals('class="m-0 mb-1" src="avatar.jpg"', $output);
     }
