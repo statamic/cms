@@ -26,16 +26,12 @@ class Fields extends Filter
 
     public function apply($query, $values)
     {
-        collect($values)
-            ->reject(function ($where) {
-                return empty($where['values']);
+        $this->getFields()
+            ->filter(function ($field, $handle) use ($values) {
+                return isset($values[$handle]);
             })
-            ->each(function ($where, $column) use ($query) {
-                $this
-                    ->getFields()
-                    ->get($column)
-                    ->fieldtype()
-                    ->filterQuery($query, $column, $where['operator'], $where['values'], $this->context);
+            ->each(function ($field, $handle) use ($query, $values) {
+                $field->fieldtype()->filter()->apply($query, $handle, $values[$handle]);
             });
     }
 
