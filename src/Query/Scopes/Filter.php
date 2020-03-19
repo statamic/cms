@@ -3,6 +3,7 @@
 namespace Statamic\Query\Scopes;
 
 use Statamic\Fields\Fields;
+use Statamic\Extend\HasFields;
 use Statamic\Extend\HasTitle;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Extend\RegistersItself;
@@ -10,7 +11,7 @@ use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Filter extends Scope implements Arrayable
 {
-    use HasTitle;
+    use HasTitle, HasFields;
 
     protected $context = [];
     protected $field;
@@ -33,15 +34,6 @@ abstract class Filter extends Scope implements Arrayable
     public function extra()
     {
         return [];
-    }
-
-    public function fields()
-    {
-        $fields = collect($this->fieldItems())->map(function ($field, $handle) {
-            return compact('handle', 'field');
-        });
-
-        return new Fields($fields);
     }
 
     protected function fieldItems()
