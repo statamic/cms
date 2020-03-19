@@ -21,7 +21,7 @@ class Fields extends Filter
                         'handle' => $field->handle(),
                         'display' => $field->display(),
                         'config' => $this->valueFieldConfig($field),
-                        'operators' => $field->fieldtype()->queryOperators(),
+                        'operators' => $field->fieldtype()->filterOperators(),
                     ];
                 });
             })

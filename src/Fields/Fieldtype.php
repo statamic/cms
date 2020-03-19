@@ -81,7 +81,7 @@ abstract class Fieldtype implements Arrayable
         return $this->categories;
     }
 
-    public function queryOperators(): array
+    public function filterOperators(): array
     {
         return [
             '=' => __('Is'),
