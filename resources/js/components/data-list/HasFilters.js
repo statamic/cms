@@ -10,6 +10,7 @@ export default {
             activePresetPayload: {},
             searchQuery: '',
             activeFilters: {},
+            activeFilterBadges: {},
         }
     },
 
@@ -69,6 +70,7 @@ export default {
             this.activePresetPayload = {};
             this.searchQuery = '';
             this.activeFilters = {};
+            this.activeFilterBadges = {};
         },
 
         unselectAllItems() {

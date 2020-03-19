@@ -121,7 +121,8 @@ export default {
             }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
-                this.activeFilters = {...response.data.meta.filters};
+                this.activeFilters = {...response.data.meta.filters.values};
+                this.activeFilterBadges = {...response.data.meta.filters.badges};
                 this.items = Object.values(response.data.data);
                 this.meta = response.data.meta;
                 if (this.shouldRequestFirstPage) return this.request();
