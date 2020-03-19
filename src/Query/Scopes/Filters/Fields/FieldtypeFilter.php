@@ -28,7 +28,7 @@ class FieldtypeFilter
                 ]
             ],
             'value' => [
-                'type' => $this->fieldtype->field()->toPublishArray(),
+                'type' => 'text',
             ],
         ];
     }
