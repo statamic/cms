@@ -84,12 +84,10 @@
         </div>
 
         <div class="flex flex-wrap mt-1" v-if="activeCount">
-            <template v-for="(filter, handle) in activeFilters.fields">
-                <div class="filter-badge mr-1" v-if="handle != 'badge'">
-                    <span>{{ fieldFilterBadge(handle, filter) }}</span>
-                    <button @click="removeFieldFilter(handle)">&times;</button>
-                </div>
-            </template>
+            <div class="filter-badge mr-1" v-for="(badge, handle) in fieldFilterBadges">
+                <span>{{ badge }}</span>
+                <button @click="removeFieldFilter(handle)">&times;</button>
+            </div>
             <div class="filter-badge mr-1" v-for="(badge, handle) in standardBadges">
                 <span>{{ badge }}</span>
                 <button @click="removeStandardFilter(handle)">&times;</button>
@@ -188,6 +186,10 @@ export default {
             return _.mapObject(this.activeFilters, filter => filter.badge);
         },
 
+        fieldFilterBadges() {
+            return this.activeFilters.fields.badge;
+        },
+
         standardBadges() {
             let badges = this.badges;
 
@@ -252,10 +254,6 @@ export default {
             this.creating = false;
 
             this.$refs.fieldFilter.reset();
-        },
-
-        fieldFilterBadge(handle, filter) {
-            return 'ha'; // wip
         },
 
         removeFieldFilter(handle) {

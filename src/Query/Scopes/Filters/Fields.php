@@ -36,7 +36,14 @@ class Fields extends Filter
 
     public function badge($values)
     {
-        return ['test one', 'test two']; // WIP
+        return $this->getFields()
+            ->filter(function ($field, $handle) use ($values) {
+                return isset($values[$handle]);
+            })
+            ->map(function ($field, $handle) use ($values) {
+                return $field->fieldtype()->filter()->badge($values[$handle]['values']);
+            })
+            ->all();
     }
 
     public function visibleTo($key)

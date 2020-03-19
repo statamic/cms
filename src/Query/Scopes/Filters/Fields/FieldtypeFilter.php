@@ -47,7 +47,7 @@ class FieldtypeFilter
         $query->where($handle, $operator, $value);
     }
 
-    public function badge($handle, $values)
+    public function badge($values)
     {
         $field = $this->fieldtype->field()->display();
         $operator = $values['operator'];
