@@ -220,7 +220,7 @@ abstract class Builder
 
     protected function filterTestLike($item, $like)
     {
-        $pattern = '/^' . str_replace(['%', '_'], ['.*', '.'], preg_quote($like)) . '$/i';
+        $pattern = '/^' . str_replace(['%', '_'], ['.*', '.'], preg_quote($like)) . '$/im';
 
         return preg_match($pattern, $item);
     }
@@ -232,7 +232,7 @@ abstract class Builder
 
     protected function filterTestLikeRegex($item, $pattern)
     {
-        return preg_match("/{$pattern}/i", $item);
+        return preg_match("/{$pattern}/im", $item);
     }
 
     protected function filterTestNotLikeRegex($item, $pattern)
