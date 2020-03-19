@@ -20,9 +20,4 @@ class Date extends FieldtypeFilter
             ],
         ];
     }
-
-    public function apply($query, $handle, $values)
-    {
-        $query->where($handle, $values['operator'], $values['value']);
-    }
 }
