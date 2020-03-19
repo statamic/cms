@@ -142,15 +142,19 @@ export default {
             this.filter = _.find(this.availableFilters, filter => filter.handle === field);
             this.field = field;
 
-            if (! this.showOperators) this.autoSelectFirstOperator();
-
-            this.$nextTick(() => {
-                this.$refs.operatorSelect.$refs.search.focus();
-            });
+            if (this.showOperators)
+                this.$nextTick(() => this.$refs.operatorSelect.$refs.search.focus());
+            else
+                this.autoSelectFirstOperator();
         },
 
         autoSelectFirstOperator() {
             this.operator = this.operatorOptions[0].value;
+
+            // TODO: When fieldtype has a reliable `.focus()` method...
+            // this.$nextTick(() => {
+            //     this.$refs.valueField.focus();
+            // });
         },
 
         updateOperator(operator) {
