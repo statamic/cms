@@ -79,11 +79,13 @@ export default {
             return this.field;
         },
 
-        // TODO: Dynamically handle multiple values by checking `required`?
         isFilterComplete() {
-            return this.field !== null
-                && this.fieldValues.operator
-                && this.fieldValues.value;
+            if (! this.filter) return false;
+
+            let fields = _.chain(this.filter.fields).mapObject(field => field.handle).values().value();
+            let allFieldsFilled = _.values(this.fieldValues).filter(value => value).length === fields.length;
+
+            return this.field !== null && allFieldsFilled;
         },
 
         newValues() {
@@ -91,9 +93,9 @@ export default {
 
             delete values[this.field];
 
-            if (this.isFilterComplete) {
-                values[this.field] = this.fieldValues;
-            }
+            values[this.field] = this.isFilterComplete
+                ? this.fieldValues
+                : null;
 
             return values;
         },
@@ -143,7 +145,7 @@ export default {
         }, 300),
 
         update() {
-            if (this.isFilterComplete) this.$emit('changed', this.newValues);
+            this.$emit('changed', this.newValues);
         },
 
     }
