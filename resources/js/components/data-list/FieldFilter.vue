@@ -11,7 +11,7 @@
                     @input="createFilter"
                 />
                 <v-select
-                    v-show="operatorOptions.length"
+                    v-show="showOperators"
                     ref="operatorSelect"
                     class="w-full mt-1"
                     :placeholder="__('Select Operator')"
@@ -88,6 +88,10 @@ export default {
             return this.normalizeInputOptions(this.filter.operators);
         },
 
+        showOperators() {
+            return this.operatorOptions.length > 1;
+        },
+
         isFilterComplete() {
             return this.field !== null && this.operator !== null && this.value !== null;
         },
@@ -138,9 +142,15 @@ export default {
             this.filter = _.find(this.availableFilters, filter => filter.handle === field);
             this.field = field;
 
+            if (! this.showOperators) this.autoSelectFirstOperator();
+
             this.$nextTick(() => {
                 this.$refs.operatorSelect.$refs.search.focus();
             });
+        },
+
+        autoSelectFirstOperator() {
+            this.operator = this.operatorOptions[0].value;
         },
 
         updateOperator(operator) {
