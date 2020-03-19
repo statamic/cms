@@ -20,18 +20,19 @@
                     :value="operator"
                     @input="updateOperator"
                 />
-                <div class="single-field">
-                    <publish-field
-                        v-if="operator"
-                        ref="valueField"
-                        :config="filter.config"
-                        :handle="field"
-                        name-prefix="field-filter"
-                        :name="field"
-                        class="single-field w-full mt-1"
-                        :value="value"
-                        @input="updateValue"
-                    />
+                <div v-if="operator" class="single-field">
+                    <template v-for="(config, handle) in filter.config">
+                        <publish-field
+                            ref="valueField"
+                            :config="config"
+                            name-prefix="field-filter"
+                            :name="`${field}-${handle}`"
+                            :handle="`${field}-${handle}`"
+                            class="single-field w-full mt-1"
+                            :value="valuesPayload[handle] || null"
+                            @input="updateValuesPayload(handle, $event)"
+                        />
+                    </template>
                 </div>
             </div>
         </div>
@@ -59,7 +60,7 @@ export default {
             filter: null,
             field: null,
             operator: null,
-            value: null,
+            valuesPayload: null,
         };
     },
 
@@ -93,7 +94,9 @@ export default {
         },
 
         isFilterComplete() {
-            return this.field !== null && this.operator !== null && this.value !== null;
+            let value = this.valuesPayload.value || null; // TODO: Handle multiple values from `filterValueConfig()`
+
+            return this.field !== null && this.operator !== null && value !== null;
         },
 
         newValues() {
@@ -104,7 +107,7 @@ export default {
             if (this.isFilterComplete) {
                 values[this.field] = {
                     operator: this.operator,
-                    value: this.value,
+                    values: this.valuesPayload,
                 };
             }
 
@@ -116,7 +119,12 @@ export default {
     watch: {
         field: 'update',
         operator: 'update',
-        value: 'update',
+        valuesPayload: {
+            deep: true,
+            handler() {
+                this.update();
+            }
+        },
     },
 
     mounted() {
@@ -132,7 +140,7 @@ export default {
             this.filter = null;
             this.field = null;
             this.operator = null;
-            this.value = null;
+            this.valuesPayload = {};
         },
 
         createFilter(field) {
@@ -145,29 +153,30 @@ export default {
             if (this.showOperators)
                 this.$nextTick(() => this.$refs.operatorSelect.$refs.search.focus());
             else
-                this.autoSelectFirstOperator();
+                this.autoselectOperator();
         },
 
-        autoSelectFirstOperator() {
+        autoselectOperator() {
             this.operator = this.operatorOptions[0].value;
 
-            // TODO: When fieldtype has a reliable `.focus()` method...
-            // this.$nextTick(() => {
-            //     this.$refs.valueField.focus();
-            // });
+            this.focusValueField();
         },
 
         updateOperator(operator) {
             this.operator = operator;
 
+            this.focusValueField();
+        },
+
+        focusValueField() {
             // TODO: When fieldtype has a reliable `.focus()` method...
             // this.$nextTick(() => {
             //     this.$refs.valueField.focus();
             // });
         },
 
-        updateValue: _.debounce(function (value) {
-            this.value = value;
+        updateValuesPayload: _.debounce(function (handle, value) {
+            Vue.set(this.valuesPayload, handle, value);
         }, 300),
 
         update() {

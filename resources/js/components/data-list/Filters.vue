@@ -258,8 +258,9 @@ export default {
             let meta = _.find(this.fieldFilter.extra, filter => filter.handle === handle);
             let field = meta.display.toLowerCase();
             let operator = meta.operators[filter.operator].toLowerCase();
+            let value = filter.values['value']; // TODO: Handle custom `filterValueConfig()`
 
-            return `${field} ${operator} ${filter.value}`;
+            return `${field} ${operator} ${value}`;
         },
 
         removeFieldFilter(handle) {

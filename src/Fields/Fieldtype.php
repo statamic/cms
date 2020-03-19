@@ -97,6 +97,18 @@ abstract class Fieldtype implements Arrayable
         ];
     }
 
+    public function filterQuery($query, $column, $operator, $values, $context)
+    {
+        $value = $values['value'];
+
+        if ($operator === 'like') {
+            $value = Str::ensureLeft($value, '%');
+            $value = Str::ensureRight($value, '%');
+        }
+
+        $query->where($column, $operator, $value);
+    }
+
     public function rules(): array
     {
         return Validator::explodeRules($this->rules);

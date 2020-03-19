@@ -33,6 +33,7 @@ class EntriesController extends CpController
 
         $filters = $this->queryFilters($query, $request->filters, [
             'collection' => $collection->handle(),
+            'blueprints' => $collection->entryBlueprints()->map->handle(),
         ]);
 
         $sortField = request('sort');

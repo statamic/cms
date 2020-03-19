@@ -11,19 +11,14 @@ class Fields extends Filter
 {
     public function extra()
     {
-        return collect($this->context['blueprints'])
-            ->map(function ($blueprint) {
-                return Blueprint::find($blueprint);
-            })
-            ->mapWithKeys(function ($blueprint) {
-                return $blueprint->fields()->all()->filter->isFilterable()->map(function ($field) {
-                    return [
-                        'handle' => $field->handle(),
-                        'display' => $field->display(),
-                        'config' => $this->filterValueConfig($field),
-                        'operators' => $field->fieldtype()->filterOperators(),
-                    ];
-                });
+        return $this->getFields()
+            ->map(function ($field) {
+                return [
+                    'handle' => $field->handle(),
+                    'display' => $field->display(),
+                    'config' => $this->filterValueConfig($field),
+                    'operators' => $field->fieldtype()->filterOperators(),
+                ];
             })
             ->values()
             ->all();
@@ -44,13 +39,14 @@ class Fields extends Filter
     {
         collect($values)
             ->reject(function ($where) {
-                return empty($where['value']);
-            })
-            ->map(function ($where) {
-                return $this->normalizeWhere($where);
+                return empty($where['values']);
             })
             ->each(function ($where, $column) use ($query) {
-                $query->where($column, $where['operator'], $where['value']);
+                $this
+                    ->getFields()
+                    ->get($column)
+                    ->fieldtype()
+                    ->filterQuery($query, $column, $where['operator'], $where['values'], $this->context);
             });
     }
 
@@ -59,18 +55,19 @@ class Fields extends Filter
         return null;
     }
 
-    protected function normalizeWhere($where)
-    {
-        if ($where['operator'] === 'like') {
-            $where['value'] = Str::ensureLeft($where['value'], '%');
-            $where['value'] = Str::ensureRight($where['value'], '%');
-        }
-
-        return $where;
-    }
-
     public function visibleTo($key)
     {
         return in_array($key, ['entries', 'entries-fieldtype', 'terms']);
+    }
+
+    protected function getFields()
+    {
+        return collect($this->context['blueprints'])->flatMap(function ($blueprint) {
+            return Blueprint::find($blueprint)
+                ->fields()
+                ->all()
+                ->filter
+                ->isFilterable();
+        });
     }
 }
