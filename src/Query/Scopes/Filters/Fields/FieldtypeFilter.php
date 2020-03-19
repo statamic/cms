@@ -4,6 +4,7 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 
 use Statamic\Extend\HasFields;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class FieldtypeFilter
 {
