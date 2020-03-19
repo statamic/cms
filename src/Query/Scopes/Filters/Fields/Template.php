@@ -15,7 +15,14 @@ class Template extends FieldtypeFilter
 
     public function apply($query, $handle, $values)
     {
-        $query->where($handle, $values['value']);
+        $template = $values['value'];
+
+        $variations = [
+            str_replace('.', '/', $template),
+            str_replace('/', '.', $template),
+        ];
+
+        $query->whereIn($handle, $variations);
     }
 
     public function badge($values)
