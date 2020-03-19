@@ -2,9 +2,10 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
-use Statamic\Support\Str;
 use Statamic\Facades\Blueprint;
+use Statamic\Fields\Field;
 use Statamic\Query\Scopes\Filter;
+use Statamic\Support\Str;
 
 class Fields extends Filter
 {
@@ -19,7 +20,7 @@ class Fields extends Filter
                     return [
                         'handle' => $field->handle(),
                         'display' => $field->display(),
-                        'config' => $this->valueFieldConfig($field),
+                        'config' => $this->filterValueConfig($field),
                         'operators' => $field->fieldtype()->filterOperators(),
                     ];
                 });
@@ -28,19 +29,15 @@ class Fields extends Filter
             ->all();
     }
 
-    public function valueFieldConfig($field)
+    public function filterValueConfig($field)
     {
-        // TODO: Implement a cleaner way to configure how field gets rendered from the fieldtype itself
+        $fields = $field->fieldtype()->filterValueConfig();
 
-        $toText = ['markdown', 'textarea', 'bard', 'replicator', 'grid'];
-
-        if ($field->type() === 'date') {
-            $field->setConfig(array_merge($field->config(), ['required' => true]));
-        } elseif (in_array($field->type(), $toText)) {
-            $field->setConfig(array_merge($field->config(), ['type' => 'text']));
-        }
-
-        return $field->toPublishArray();
+        return collect($fields)->map(function ($config, $handle) {
+            return isset($config['handle'])
+                ? $config
+                : (new Field($handle, $config))->toPublishArray();
+        })->all();
     }
 
     public function apply($query, $values)
