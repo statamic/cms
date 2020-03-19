@@ -222,6 +222,10 @@ abstract class Builder
     {
         $pattern = '/^' . str_replace(['%', '_'], ['.*', '.'], preg_quote($like)) . '$/im';
 
+        if (is_array($item)) {
+            $item = json_encode($item);
+        }
+
         return preg_match($pattern, $item);
     }
 
