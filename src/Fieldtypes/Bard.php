@@ -87,6 +87,23 @@ class Bard extends Replicator
         ]
     ];
 
+    public function filterOperators(): array
+    {
+        return [
+            'like' => __('Contains'),
+        ];
+    }
+
+    public function filterValueConfig(): array
+    {
+        return [
+            'value' => [
+                'type' => 'text',
+                'placeholder' => __('Contains'),
+            ]
+        ];
+    }
+
     public function augment($value)
     {
         if ($this->shouldSaveHtml()) {
