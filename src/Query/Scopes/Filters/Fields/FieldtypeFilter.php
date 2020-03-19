@@ -2,10 +2,13 @@
 
 namespace Statamic\Query\Scopes\Filters\Fields;
 
+use Statamic\Extend\HasFields;
 use Statamic\Support\Arr;
 
 class FieldtypeFilter
 {
+    use HasFields;
+
     protected $fieldtype;
 
     public function __construct($fieldtype)
