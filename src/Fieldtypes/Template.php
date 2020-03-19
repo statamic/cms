@@ -14,4 +14,11 @@ class Template extends Fieldtype
             'instructions' => 'Partials are rarely intended to be used as templates.'
         ],
     ];
+
+    public function queryOperators(): array
+    {
+        return [
+            '=' => __('Is'),
+        ];
+    }
 }
