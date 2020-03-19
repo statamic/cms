@@ -16,23 +16,12 @@ class Fields extends Filter
                 return [
                     'handle' => $field->handle(),
                     'display' => $field->display(),
-                    'config' => $this->filterValueConfig($field),
+                    'config' => $fields->fieldtype()->filter()->fields()->toPublishArray(),
                     'operators' => $field->fieldtype()->filterOperators(),
                 ];
             })
             ->values()
             ->all();
-    }
-
-    public function filterValueConfig($field)
-    {
-        $fields = $field->fieldtype()->filterValueConfig();
-
-        return collect($fields)->map(function ($config, $handle) {
-            return isset($config['handle'])
-                ? $config
-                : (new Field($handle, $config))->toPublishArray();
-        })->all();
     }
 
     public function apply($query, $values)
