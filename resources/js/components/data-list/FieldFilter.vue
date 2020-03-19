@@ -1,6 +1,6 @@
 <template>
     <div>
-        <div v-if="hasAvailableFilters">
+        <div v-if="hasAvailableFieldFilters">
             <div class="flex flex-col">
                 <v-select
                     ref="fieldSelect"
@@ -10,42 +10,35 @@
                     :value="field"
                     @input="createFilter"
                 />
-                <v-select
-                    v-show="showOperators"
-                    ref="operatorSelect"
-                    class="w-full mt-1"
-                    :placeholder="__('Select Operator')"
-                    :options="operatorOptions"
-                    :reduce="option => option.value"
-                    :value="operator"
-                    @input="updateOperator"
-                />
-                <div v-if="operator" class="single-field">
-                    <template v-for="(config, handle) in filter.config">
+                <!-- TODO: handle showing/hiding of labels more elegantly -->
+                <div v-if="showFieldFilter" class="mt-1">
+                    <template v-for="filterField in filter.fields">
                         <publish-field
-                            ref="valueField"
-                            :config="config"
-                            name-prefix="field-filter"
-                            :name="`${field}-${handle}`"
-                            :handle="`${field}-${handle}`"
-                            class="single-field w-full mt-1"
-                            :value="valuesPayload[handle] || null"
-                            @input="updateValuesPayload(handle, $event)"
+                            ref="valueFields"
+                            :config="filterField"
+                            :name-prefix="`field-filter-${field}`"
+                            :name="filterField.handle"
+                            :handle="filterField.handle"
+                            class="w-full no-label"
+                            :value="fieldValues[filterField.handle] || null"
+                            @input="updateValuesPayload(filterField.handle, $event)"
                         />
                     </template>
                 </div>
             </div>
+            <button
+                class="outline-none mt-2 text-xs text-blue hover:text-grey-80"
+                v-text="__('Clear')"
+                @click="reset"
+            />
         </div>
     </div>
 </template>
 
 <script>
 import PublishField from '../publish/Field.vue';
-import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 
 export default {
-
-    mixins: [HasInputOptions],
 
     components: { PublishField },
 
@@ -59,23 +52,22 @@ export default {
             initialValues: this.values,
             filter: null,
             field: null,
-            operator: null,
-            valuesPayload: null,
+            fieldValues: null,
         };
     },
 
     computed: {
 
-        availableFilters() {
+        availableFieldFilters() {
             return this.config.extra.filter(field => ! this.initialValues[field.handle]);
         },
 
-        hasAvailableFilters() {
-            return !! this.availableFilters.length;
+        hasAvailableFieldFilters() {
+            return !! this.availableFieldFilters.length;
         },
 
         fieldOptions() {
-            return this.availableFilters.map(filter => {
+            return this.availableFieldFilters.map(filter => {
                 return {
                     value: filter.handle,
                     label: filter.display,
@@ -83,20 +75,15 @@ export default {
             });
         },
 
-        operatorOptions() {
-            if (! this.filter) return [];
-
-            return this.normalizeInputOptions(this.filter.operators);
+        showFieldFilter() {
+            return this.field;
         },
 
-        showOperators() {
-            return this.operatorOptions.length > 1;
-        },
-
+        // TODO: Dynamically handle multiple values by checking `required`?
         isFilterComplete() {
-            let value = this.valuesPayload.value || null; // TODO: Handle multiple values from `filterValueConfig()`
-
-            return this.field !== null && this.operator !== null && value !== null;
+            return this.field !== null
+                && this.fieldValues.operator
+                && this.fieldValues.value;
         },
 
         newValues() {
@@ -105,10 +92,7 @@ export default {
             delete values[this.field];
 
             if (this.isFilterComplete) {
-                values[this.field] = {
-                    operator: this.operator,
-                    values: this.valuesPayload,
-                };
+                values[this.field] = { values: this.fieldValues };
             }
 
             return values;
@@ -118,8 +102,7 @@ export default {
 
     watch: {
         field: 'update',
-        operator: 'update',
-        valuesPayload: {
+        fieldValues: {
             deep: true,
             handler() {
                 this.update();
@@ -139,44 +122,24 @@ export default {
             this.initialValues = this.values;
             this.filter = null;
             this.field = null;
-            this.operator = null;
-            this.valuesPayload = {};
+            this.fieldValues = {};
         },
 
         createFilter(field) {
             if (this.field) this.$emit('changed', this.initialValues);
 
             this.reset();
-            this.filter = _.find(this.availableFilters, filter => filter.handle === field);
+            this.filter = _.find(this.availableFieldFilters, filter => filter.handle === field);
             this.field = field;
 
-            if (this.showOperators)
-                this.$nextTick(() => this.$refs.operatorSelect.$refs.search.focus());
-            else
-                this.autoselectOperator();
-        },
-
-        autoselectOperator() {
-            this.operator = this.operatorOptions[0].value;
-
-            this.focusValueField();
-        },
-
-        updateOperator(operator) {
-            this.operator = operator;
-
-            this.focusValueField();
-        },
-
-        focusValueField() {
             // TODO: When fieldtype has a reliable `.focus()` method...
             // this.$nextTick(() => {
-            //     this.$refs.valueField.focus();
+            //     this.$refs.valueFields[0].focus();
             // });
         },
 
         updateValuesPayload: _.debounce(function (handle, value) {
-            Vue.set(this.valuesPayload, handle, value);
+            Vue.set(this.fieldValues, handle, value);
         }, 300),
 
         update() {
