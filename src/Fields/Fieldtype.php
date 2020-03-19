@@ -2,11 +2,12 @@
 
 namespace Statamic\Fields;
 
-use Statamic\Support\Str;
-use Statamic\Extend\HasTitle;
-use Statamic\Extend\HasHandle;
-use Statamic\Extend\RegistersItself;
 use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Extend\HasHandle;
+use Statamic\Extend\HasTitle;
+use Statamic\Extend\RegistersItself;
+use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
+use Statamic\Support\Str;
 
 abstract class Fieldtype implements Arrayable
 {
@@ -81,32 +82,9 @@ abstract class Fieldtype implements Arrayable
         return $this->categories;
     }
 
-    public function filterOperators(): array
+    public function filter(): FieldtypeFilter
     {
-        return [
-            '=' => __('Is'),
-            '<>' => __('Isn\'t'),
-            'like' => __('Contains'),
-        ];
-    }
-
-    public function filterValueConfig(): array
-    {
-        return [
-            'value' => $this->field()->toPublishArray()
-        ];
-    }
-
-    public function filterQuery($query, $column, $operator, $values, $context)
-    {
-        $value = $values['value'];
-
-        if ($operator === 'like') {
-            $value = Str::ensureLeft($value, '%');
-            $value = Str::ensureRight($value, '%');
-        }
-
-        $query->where($column, $operator, $value);
+        return new FieldtypeFilter($this);
     }
 
     public function rules(): array
