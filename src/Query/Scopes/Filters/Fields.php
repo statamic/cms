@@ -30,7 +30,7 @@ class Fields extends Filter
                 return isset($values[$handle]);
             })
             ->each(function ($field, $handle) use ($query, $values) {
-                $field->fieldtype()->filter()->apply($query, $handle, $values[$handle]);
+                $field->fieldtype()->filter()->apply($query, $handle, $values[$handle]['values']);
             });
     }
 
