@@ -46,7 +46,16 @@
         }
     }
 
-    .single-field .form-group .field-inner {
-        @apply hidden;
+    .no-label.form-group,
+    .no-label .form-group {
+        @apply pb-1;
+
+        &:last-child {
+            @apply p-0;
+        }
+
+        .field-inner {
+            @apply hidden;
+        }
     }
 }

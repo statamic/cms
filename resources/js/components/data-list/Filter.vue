@@ -1,6 +1,6 @@
 <template>
 
-    <div class="w-full" :class="{ 'single-field': hasOnlyOneField }">
+    <div class="w-full" :class="{ 'no-label': hasOnlyOneField }">
         <publish-container
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"
