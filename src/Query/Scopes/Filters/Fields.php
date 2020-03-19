@@ -37,7 +37,7 @@ class Fields extends Filter
 
     public function badge($values)
     {
-        return null;
+        return ['test one', 'test two']; // WIP
     }
 
     public function visibleTo($key)
