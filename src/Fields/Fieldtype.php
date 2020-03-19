@@ -82,7 +82,7 @@ abstract class Fieldtype implements Arrayable
         return $this->categories;
     }
 
-    public function filter(): FieldtypeFilter
+    public function filter()
     {
         return new FieldtypeFilter($this);
     }
