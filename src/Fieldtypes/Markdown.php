@@ -56,23 +56,6 @@ class Markdown extends Fieldtype
 
     ];
 
-    public function filterOperators(): array
-    {
-        return [
-            'like' => __('Contains'),
-        ];
-    }
-
-    public function filterValueConfig(): array
-    {
-        return [
-            'value' => [
-                'type' => 'text',
-                'placeholder' => __('Contains'),
-            ]
-        ];
-    }
-
     public function augment($value)
     {
         $markdown = \Statamic\Facades\Markdown::parser(
