@@ -17,7 +17,6 @@ class Fields extends Filter
                     'handle' => $field->handle(),
                     'display' => $field->display(),
                     'config' => $field->fieldtype()->filter()->fields()->toPublishArray(),
-                    'operators' => $field->fieldtype()->filterOperators(),
                 ];
             })
             ->values()
