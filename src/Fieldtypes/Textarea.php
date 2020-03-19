@@ -14,4 +14,21 @@ class Textarea extends Fieldtype
     ];
 
     protected $view = 'statamic::forms.fields.textarea';
+
+    public function filterOperators(): array
+    {
+        return [
+            'like' => __('Contains'),
+        ];
+    }
+
+    public function filterValueConfig(): array
+    {
+        return [
+            'value' => [
+                'type' => 'text',
+                'placeholder' => __('Contains'),
+            ]
+        ];
+    }
 }
