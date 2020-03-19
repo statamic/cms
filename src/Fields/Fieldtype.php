@@ -90,6 +90,13 @@ abstract class Fieldtype implements Arrayable
         ];
     }
 
+    public function filterValueConfig(): array
+    {
+        return [
+            'value' => $this->field()->toPublishArray()
+        ];
+    }
+
     public function rules(): array
     {
         return Validator::explodeRules($this->rules);
