@@ -77,6 +77,16 @@ class Date extends Fieldtype
         ];
     }
 
+    public function filterValueConfig(): array
+    {
+        return [
+            'value' => [
+                'type' => 'date',
+                'required' => 'true',
+            ]
+        ];
+    }
+
     public function preProcess($data)
     {
         if (! $data) {
