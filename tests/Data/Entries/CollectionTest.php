@@ -7,6 +7,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
@@ -441,9 +442,18 @@ class CollectionTest extends TestCase
     {
         $collection = (new Collection)->handle('test');
 
-        $this->assertEquals('test', Antlers::parse('{{ mycollection }}', ['mycollection' => $collection]));
+        $this->assertEquals('test', Antlers::parse('{{ collection }}', ['collection' => $collection]));
 
-        $this->assertEquals('test Test', Antlers::parse('{{ mycollection }}{{ handle }} {{ title }}{{ /mycollection }}', ['mycollection' => $collection]));
+        $this->assertEquals('test Test', Antlers::parse('{{ collection }}{{ handle }} {{ title }}{{ /collection }}', ['collection' => $collection]));
+
+        $this->assertEquals('test', Antlers::parse('{{ collection:handle }}', ['collection' => $collection]));
+
+        try {
+            Antlers::parse('{{ collection from="somewhere" }}{{ title }}{{ /collection }}', ['collection' => $collection]);
+            $this->fail('Exception not thrown');
+        } catch (CollectionNotFoundException $e) {
+            $this->assertEquals('Collection [somewhere] not found', $e->getMessage());
+        }
     }
 
     private function makeStructure()
