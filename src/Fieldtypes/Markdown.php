@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Support\Html;
 use Statamic\Fields\Fieldtype;
+use Statamic\Query\Scopes\Filters\Fields\Markdown as MarkdownFilter;
 
 class Markdown extends Fieldtype
 {
@@ -53,8 +54,12 @@ class Markdown extends Fieldtype
             'instructions' => 'The name of a customized Markdown parser. Leave blank to use the default.',
             'width' => 50,
         ]
-
     ];
+
+    public function filter()
+    {
+        return new MarkdownFilter($this);
+    }
 
     public function augment($value)
     {
