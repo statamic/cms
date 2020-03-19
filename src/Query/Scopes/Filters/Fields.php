@@ -14,7 +14,6 @@ class Fields extends Filter
             ->map(function ($blueprint) {
                 return Blueprint::find($blueprint);
             })
-            // TODO: Reject unqueryable fields (ie. bard)
             ->mapWithKeys(function ($blueprint) {
                 return $blueprint->fields()->all()->filter->isFilterable()->map(function ($field) {
                     return [
