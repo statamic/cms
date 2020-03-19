@@ -7,6 +7,7 @@ use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\CP\FieldtypeFactory;
 use Statamic\Fields\ConfigFields;
+use Statamic\Query\Scopes\Filters\Fields\Grid as GridFilter;
 
 class Grid extends Fieldtype
 {
@@ -46,6 +47,11 @@ class Grid extends Fieldtype
             'instructions' => 'Enable to allow row reordering.',
         ],
     ];
+
+    public function filter()
+    {
+        return new GridFilter($this);
+    }
 
     public function process($data)
     {
