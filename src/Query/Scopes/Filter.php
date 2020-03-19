@@ -14,8 +14,6 @@ abstract class Filter extends Scope implements Arrayable
     use HasTitle, HasFields;
 
     protected $context = [];
-    protected $field;
-    protected $fields = [];
     protected $required = false;
     protected $pinned = false;
 
@@ -38,13 +36,11 @@ abstract class Filter extends Scope implements Arrayable
 
     protected function fieldItems()
     {
-        if ($this->fields) {
-            return $this->fields;
-        }
-
-        $field = $this->field ?? ['type' => 'text', 'display' => static::title()];
-
-        return ['value' => $field];
+        return [
+            'value' => [
+                'type' => 'text',
+            ],
+        ];
     }
 
     public function badge($values)
