@@ -92,7 +92,7 @@ export default {
             delete values[this.field];
 
             if (this.isFilterComplete) {
-                values[this.field] = { values: this.fieldValues };
+                values[this.field] = this.fieldValues;
             }
 
             return values;
