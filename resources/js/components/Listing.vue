@@ -45,12 +45,7 @@ export default {
         },
 
         activeFilterParameters() {
-            let filters = _.mapObject(clone(this.activeFilters), filter => {
-                delete filter.badge;
-                return filter;
-            });
-
-            return btoa(JSON.stringify(filters));
+            return btoa(JSON.stringify(this.activeFilters));
         },
 
         additionalParameters() {
