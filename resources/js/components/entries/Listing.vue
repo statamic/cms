@@ -28,6 +28,7 @@
                             :active-preset="activePreset"
                             :active-preset-payload="activePresetPayload"
                             :active-filters="activeFilters"
+                            :active-filter-badges="activeFilterBadges"
                             :active-count="activeFilterCount"
                             :search-query="searchQuery"
                             :saves-presets="true"

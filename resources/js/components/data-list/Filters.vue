@@ -116,6 +116,7 @@ export default {
         activePreset: String,
         activePresetPayload: Object,
         activeFilters: Object,
+        activeFilterBadges: Object,
         activeCount: Number,
         searchQuery: String,
         savesPresets: Boolean,
@@ -182,20 +183,12 @@ export default {
             return this.normalizeInputOptions(options);
         },
 
-        badges() {
-            return _.mapObject(this.activeFilters, filter => filter.badge);
-        },
-
         fieldFilterBadges() {
-            return this.activeFilters.fields.badge;
+            return data_get(this.activeFilterBadges, 'fields', {});
         },
 
         standardBadges() {
-            let badges = this.badges;
-
-            delete badges.fields;
-
-            return badges;
+            return _.omit(this.activeFilterBadges, 'fields');
         },
 
         isFiltering() {
