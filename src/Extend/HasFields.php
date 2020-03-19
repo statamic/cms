@@ -4,7 +4,7 @@ namespace Statamic\Extend;
 
 use Statamic\Fields\Fields;
 
-class HasFields
+trait HasFields
 {
     abstract protected function fieldItems();
 
