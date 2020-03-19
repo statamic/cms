@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\CP\FieldtypeFactory;
+use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
 
 class Replicator extends Fieldtype
 {
@@ -12,6 +13,11 @@ class Replicator extends Fieldtype
     protected $configFields = [
         'sets' => ['type' => 'sets'],
     ];
+
+    public function filter()
+    {
+        return new ReplicatorFilter($this);
+    }
 
     public function process($data)
     {
