@@ -8,7 +8,7 @@ trait HasAugmentedData
 
     public function newAugmentedInstance()
     {
-        return new AugmentedArray($this, $this->augmentedArrayData());
+        return new AugmentedData($this, $this->augmentedArrayData());
     }
 
     public function augmentedArrayData()

@@ -47,9 +47,7 @@ class EntriesTest extends TestCase
     /** @test */
     function it_shallow_augments_to_a_collection_of_enties()
     {
-        Statamic::enableShallowAugmentation();
-
-        $augmented = $this->fieldtype()->augment(['123', '456']);
+        $augmented = $this->fieldtype()->shallowAugment(['123', '456']);
 
         $this->assertInstanceOf(Collection::class, $augmented);
         $this->assertEquals([
@@ -71,9 +69,7 @@ class EntriesTest extends TestCase
     /** @test */
     function it_shallow_augments_to_a_single_entry_when_max_items_is_one()
     {
-        Statamic::enableShallowAugmentation();
-
-        $augmented = $this->fieldtype(['max_items' => 1])->augment(['123']);
+        $augmented = $this->fieldtype(['max_items' => 1])->shallowAugment(['123']);
 
         $this->assertEquals([
             'id' => '123',
