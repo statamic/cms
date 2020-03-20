@@ -9,6 +9,7 @@ class Date extends FieldtypeFilter
         return [
             'operator' => [
                 'type' => 'select',
+                'placeholder' => __('Select Operator'),
                 'options' => [
                     '<' => __('Before'),
                     '>' => __('After'),

@@ -22,6 +22,7 @@ class FieldtypeFilter
         return [
             'operator' => [
                 'type' => 'select',
+                'placeholder' => __('Select Operator'),
                 'options' => [
                     '=' => __('Is'),
                     '<>' => __('Isn\'t'),
