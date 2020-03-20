@@ -74,16 +74,16 @@ input.input-text-minimal:read-only,
     @apply appearance-none text-grey-80 w-full p-0 rounded flex items-center;
     height: 38px;
 
-    &:focus, &:focus-within {
+    &:not(.focus-within-only):focus, &:not(.focus-within-only):focus-within {
         @apply focus-outline;
+
+        .input-text:focus, .input-group-prepend:focus, .input-group-append:focus, .input-group-item:focus {
+            @apply focus-none;
+        }
     }
 
     .input-text {
         @apply .flex-1 border-grey-50;
-
-        &:focus, &:focus-within {
-            @apply focus-none;
-        }
     }
 
     .input-text:not(:first-child) {
@@ -102,12 +102,15 @@ input.input-text-minimal:read-only,
         height: 38px;
         line-height: 36px;
 
-        &:focus {
-            @apply focus-none;
-        }
-
         &button {
             @apply cursor-pointer;
+        }
+    }
+
+    &.focus-within-only {
+        .input-text:focus, .input-group-prepend:focus, .input-group-append:focus, .input-group-item:focus {
+            @apply focus-outline;
+            z-index: 1;
         }
     }
 

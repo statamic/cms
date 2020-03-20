@@ -1,10 +1,10 @@
 <template>
     <div class="w-full">
-        <div class="input-group">
+        <div class="input-group focus-within-only">
 
             <popover>
                 <template slot="trigger">
-                    <button class="input-group-prepend outline-none cursor-pointer px-2" @click="resetFilterPopover">
+                    <button class="input-group-prepend cursor-pointer px-2" @click="resetFilterPopover">
                         {{ __('Filter') }}
                         <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                     </button>

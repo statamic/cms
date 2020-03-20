@@ -18,7 +18,7 @@
         </publish-container>
 
         <button
-            class="outline-none mt-2 text-xs text-blue hover:text-grey-80"
+            class="mt-2 text-xs text-blue hover:text-grey-80"
             v-text="__('Clear')"
             @click="$emit('changed', null)"
         />
