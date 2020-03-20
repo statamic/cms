@@ -201,7 +201,7 @@
 
 .vs__search,
 .vs__search:focus {
-	@apply appearance-none text-base text-grey-80 px-1 border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
+	@apply appearance-none text-sm text-grey-80 px-1 border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
 	line-height: 1.4;
 	border-left: none;
 	box-shadow: none;
