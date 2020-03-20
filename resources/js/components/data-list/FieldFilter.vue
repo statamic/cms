@@ -1,5 +1,7 @@
 <template>
     <div>
+        <h6 class="mb-1" v-text="__('Show everything where:')"/>
+
         <div v-if="hasAvailableFieldFilters">
             <div class="flex flex-col">
 
