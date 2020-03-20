@@ -17,6 +17,9 @@ class Date extends FieldtypeFilter
             'value' => [
                 'type' => 'date',
                 'required' => 'true',
+                'if' => [
+                    'operator' => 'not empty',
+                ],
             ],
         ];
     }

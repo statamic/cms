@@ -2,6 +2,7 @@
     <div>
         <div v-if="hasAvailableFieldFilters">
             <div class="flex flex-col">
+
                 <v-select
                     ref="fieldSelect"
                     :placeholder="__('Select Field')"
@@ -10,27 +11,36 @@
                     :value="field"
                     @input="createFilter"
                 />
-                <!-- TODO: handle showing/hiding of labels more elegantly -->
-                <div v-if="showFieldFilter" class="mt-1">
-                    <template v-for="filterField in filter.fields">
-                        <publish-field
-                            ref="valueFields"
-                            :config="filterField"
-                            :name-prefix="`field-filter-${field}`"
-                            :name="filterField.handle"
-                            :handle="filterField.handle"
-                            class="w-full no-label"
-                            :value="fieldValues[filterField.handle] || null"
-                            @input="updateValuesPayload(filterField.handle, $event)"
-                        />
-                    </template>
-                </div>
+
+                <publish-container
+                    v-if="showFieldFilter"
+                    name="filter-field"
+                    :blueprint="{}"
+                    :meta="{}"
+                    :errors="{}"
+                    :values="fieldValues"
+                    :track-dirty-state="false"
+                    class="filter-fields mt-1"
+                    @updated="updateValues"
+                >
+                    <!-- TODO: handle showing/hiding of labels more elegantly -->
+                    <publish-fields
+                        slot-scope="{ setFieldValue }"
+                        :fields="filter.fields"
+                        name-prefix="filter-field"
+                        class="w-full no-label"
+                        @updated="setFieldValue"
+                    />
+                </publish-container>
+
             </div>
+
             <button
                 class="outline-none mt-2 text-xs text-blue hover:text-grey-80"
                 v-text="__('Clear')"
                 @click="reset"
             />
+
         </div>
     </div>
 </template>
@@ -140,8 +150,8 @@ export default {
             // });
         },
 
-        updateValuesPayload: _.debounce(function (handle, value) {
-            Vue.set(this.fieldValues, handle, value);
+        updateValues: _.debounce(function (values) {
+            this.fieldValues = clone(values);
         }, 300),
 
         update() {

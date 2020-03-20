@@ -30,6 +30,10 @@ class FieldtypeFilter
             ],
             'value' => [
                 'type' => 'text',
+                'placeholder' => __('Value'),
+                'if' => [
+                    'operator' => 'not empty',
+                ],
             ],
         ];
     }
