@@ -46,6 +46,10 @@
         }
     }
 
+    .text-fieldtype .input-text {
+        @apply py-1 px-1.5;
+    }
+
     .no-label.form-group,
     .no-label .form-group {
         @apply pb-1;
