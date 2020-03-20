@@ -140,6 +140,12 @@ export default {
             this.fieldValues = null;
         },
 
+        resetInitialValues() {
+            this.initialValues = this.values;
+
+            this.reset();
+        },
+
         createFilter(field) {
             if (this.field) this.$emit('changed', this.initialValues);
 

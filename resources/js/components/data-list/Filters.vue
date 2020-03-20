@@ -246,7 +246,7 @@ export default {
         resetFilterPopover() {
             this.creating = false;
 
-            this.$refs.fieldFilter.reset();
+            this.$refs.fieldFilter.resetInitialValues();
         },
 
         removeFieldFilter(handle) {
