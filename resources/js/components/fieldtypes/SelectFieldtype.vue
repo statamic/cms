@@ -1,20 +1,20 @@
 <template>
     <v-select
         ref="input"
-        @input="update"
         :name="name"
         :clearable="config.clearable"
         :disabled="config.disabled || isReadOnly"
         :options="options"
         :placeholder="config.placeholder"
-        :reduce="selection => selection.value"
         :searchable="config.searchable"
         :taggable="config.taggable"
         :push-tags="config.push_tags"
         :multiple="config.multiple"
         :reset-on-options-change="resetOnOptionsChange"
         :close-on-select="!config.taggable"
-        :value="value"
+        :value="selectedOptions"
+        :create-option="(value) => ({ value, label: value })"
+        @input="update($event.map(v => v.value))"
         @search:focus="$emit('focus')"
         @search:blur="$emit('blur')">
             <template #selected-option-container v-if="config.multiple"><i class="hidden"></i></template>
@@ -29,9 +29,9 @@
             </template>
             <template #footer="{ deselect }" v-if="config.multiple">
                 <div class="vs__selected-options-outside flex flex-wrap">
-                    <span v-for="option in value" class="vs__selected mt-1">
-                        {{ getLabel(option) }}
-                        <button @click="deselect(getOption(option))" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
+                    <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-1">
+                        {{ option.label }}
+                        <button @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
                             <span>×</span>
                         </button>
                     </span>
@@ -48,6 +48,13 @@ export default {
     mixins: [Fieldtype, HasInputOptions],
 
     computed: {
+        selectedOptions() {
+            let selections = this.value || [];
+            return selections.map(value => {
+                return _.findWhere(this.options, {value}) || { value, label: value };
+            });
+        },
+
         options() {
             return this.normalizeInputOptions(this.config.options);
         },
@@ -68,14 +75,6 @@ export default {
     methods: {
         focus() {
             this.$refs.input.focus();
-        },
-
-        getOption(value) {
-            return _.findWhere(this.options, {value});
-        },
-
-        getLabel(handle) {
-            return this.getOption(handle).label;
         }
     }
 };
