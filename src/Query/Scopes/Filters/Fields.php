@@ -67,12 +67,10 @@ class Fields extends Filter
     {
         if ($collection = $this->context['collection']) {
             return Collection::findByHandle($collection)->entryBlueprints();
-        } else {
-            return collect($this->context['blueprints'])->map(function ($blueprint) {
-                return Blueprint::find($blueprint);
-            });
         }
 
-        throw new \Exception('Context of [collection] or [blueprints] is required.');
+        return collect($this->context['blueprints'])->map(function ($blueprint) {
+            return Blueprint::find($blueprint);
+        });
     }
 }
