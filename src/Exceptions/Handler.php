@@ -3,6 +3,7 @@
 namespace Statamic\Exceptions;
 
 use Exception;
+use Throwable;
 use Statamic\Statamic;
 use Illuminate\Support\Facades\View;
 use App\Exceptions\Handler as ExceptionHandler;
@@ -11,7 +12,7 @@ use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthException;
 
 class Handler extends ExceptionHandler
 {
-    public function render($request, Exception $e)
+    public function render($request, Throwable $e)
     {
         if ($e instanceof NotFoundHttpException && Statamic::isApiRoute()) {
             return response()->json(['message' => $e->getMessage() ?: 'Not found.'], 404);
@@ -27,11 +28,11 @@ class Handler extends ExceptionHandler
     /**
      * Render an exception to a string using Symfony.
      *
-     * @param  \Exception  $e
+     * @param  Throwable  $e
      * @param  bool  $debug
      * @return string
      */
-    protected function renderExceptionWithSymfony(Exception $e, $debug)
+    protected function renderExceptionWithSymfony(Throwable $e, $debug)
     {
         return (new SymfonyExceptionHandler($debug))->getHtml(
             FlattenException::create($e)

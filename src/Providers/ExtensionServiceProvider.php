@@ -6,19 +6,14 @@ use Statamic\Tags;
 use Statamic\Actions;
 use Statamic\Fieldtypes;
 use Statamic\Query\Scopes;
-use Statamic\Modifiers\Modifier;
-use Statamic\Extensions\FileStore;
-use Statamic\Modifiers\CoreModifiers;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\ServiceProvider;
 use Statamic\Extend\Manifest;
-use Illuminate\Console\DetectsApplicationNamespace;
+use Statamic\Modifiers\Modifier;
+use Illuminate\Filesystem\Filesystem;
+use Statamic\Modifiers\CoreModifiers;
+use Illuminate\Support\ServiceProvider;
 
 class ExtensionServiceProvider extends ServiceProvider
 {
-    use DetectsApplicationNamespace;
-
     /**
      * Aliases for modifiers bundled with Statamic.
      *
