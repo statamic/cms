@@ -3,6 +3,7 @@
 namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Fields\Field;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Str;
@@ -53,8 +54,16 @@ class Fields extends Filter
 
     protected function getFields()
     {
-        return collect($this->context['blueprints'])->flatMap(function ($blueprint) {
-            return Blueprint::find($blueprint)
+        if ($collection = $this->context['collection']) {
+            $blueprints = Collection::findByHandle($collection)->entryBlueprints();
+        } else {
+            $blueprints = collect($this->context['blueprints'])->map(function ($blueprint) {
+                return Blueprint::find($blueprint);
+            });
+        }
+
+        return $blueprints->flatMap(function ($blueprint) {
+            return $blueprint
                 ->fields()
                 ->all()
                 ->filter

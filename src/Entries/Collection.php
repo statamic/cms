@@ -196,7 +196,7 @@ class Collection implements Contract
                 }
 
                 return collect($blueprints)->map(function ($blueprint) {
-                    return Blueprint::find($blueprint);
+                    return $this->ensureEntryBlueprintFields(Blueprint::find($blueprint));
                 });
             })
             ->setter(function ($blueprints) {
