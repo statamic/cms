@@ -14,6 +14,6 @@ class EntryResource extends Resource
      */
     public function toArray($request)
     {
-        return $this->resource->toAugmentedValues();
+        return $this->resource->toAugmentedCollection();
     }
 }

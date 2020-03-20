@@ -23,6 +23,6 @@ class UserResource extends Resource
             $fields = empty($diff) ? $fields : $diff;
         }
 
-        return $this->resource->toAugmentedValues($fields);
+        return $this->resource->toAugmentedCollection($fields);
     }
 }

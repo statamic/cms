@@ -9,7 +9,7 @@ use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Fields\Value;
 
-class AugmentedValues extends Collection
+class AugmentedCollection extends Collection
 {
     public function jsonSerialize()
     {
