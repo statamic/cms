@@ -18,7 +18,7 @@
                     :blueprint="{}"
                     :meta="{}"
                     :errors="{}"
-                    :values="fieldValues"
+                    :values="containerValues"
                     :track-dirty-state="false"
                     class="filter-fields mt-1"
                     @updated="updateValues"
@@ -60,6 +60,7 @@ export default {
     data() {
         return {
             initialValues: this.values,
+            containerValues: {},
             filter: null,
             field: null,
             fieldValues: null,
@@ -132,6 +133,7 @@ export default {
 
         reset() {
             this.initialValues = this.values;
+            this.containerValues = {};
             this.filter = null;
             this.field = null;
             this.fieldValues = {};
@@ -150,7 +152,16 @@ export default {
             // });
         },
 
-        updateValues: _.debounce(function (values) {
+        updateValues(values) {
+            this.updateContainerValues(values);
+            this.updateFieldValues(values);
+        },
+
+        updateContainerValues(values) {
+            this.containerValues = clone(values);
+        },
+
+        updateFieldValues: _.debounce(function (values) {
             this.fieldValues = clone(values);
         }, 300),
 
