@@ -20,6 +20,10 @@ class Augmentor
 
     public function augment($value)
     {
+        if (!$value) {
+            return '';
+        }
+
         if (is_string($value)) {
             return $value;
         }

@@ -84,6 +84,12 @@ class BardTest extends TestCase
     }
 
     /** @test */
+    function it_doesnt_augment_when_empty()
+    {
+        $this->assertEquals('', $this->bard()->augment(null));
+    }
+
+    /** @test */
     function it_augments_to_html_when_there_are_no_sets()
     {
         $data = [
