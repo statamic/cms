@@ -2,12 +2,11 @@
 
 namespace Statamic\Exceptions;
 
-use Exception;
 use Throwable;
 use Statamic\Statamic;
 use Illuminate\Support\Facades\View;
 use App\Exceptions\Handler as ExceptionHandler;
-use Symfony\Component\Debug\Exception\FlattenException;
+use Symfony\Component\ErrorHandler\Exception\FlattenException;
 use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthException;
 
 class Handler extends ExceptionHandler
