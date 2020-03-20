@@ -148,13 +148,29 @@ export default {
             if (this.field) this.$emit('changed', this.initialValues);
 
             this.reset();
-            this.filter = _.find(this.availableFieldFilters, filter => filter.handle === field);
+            this.setFilter(field);
+            this.setDefaultValues();
+
             this.field = field;
 
             // TODO: When fieldtype has a reliable `.focus()` method...
             // this.$nextTick(() => {
             //     this.$refs.valueFields[0].focus();
             // });
+        },
+
+        setFilter(field) {
+            this.filter = _.find(this.availableFieldFilters, filter => filter.handle === field);
+        },
+
+        setDefaultValues() {
+            let values = {};
+
+            this.filter.fields
+                .filter(field => field.default)
+                .forEach(field => values[field.handle] = field.default);
+
+            this.updateValues(values);
         },
 
         updateValues(values) {
