@@ -11,7 +11,7 @@
         :push-tags="config.push_tags"
         :multiple="config.multiple"
         :reset-on-options-change="resetOnOptionsChange"
-        :close-on-select="!config.taggable"
+        :close-on-select="true"
         :value="selectedOptions"
         :create-option="(value) => ({ value, label: value })"
         @input="update($event.map(v => v.value))"
@@ -26,6 +26,9 @@
                     v-on="events"
                     v-bind="attributes"
                 >
+            </template>
+             <template #no-options>
+                <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
             </template>
             <template #footer="{ deselect }" v-if="config.multiple">
                 <div class="vs__selected-options-outside flex flex-wrap">
