@@ -17,7 +17,7 @@
                         :options="filterTypeOptions"
                         :placeholder="__('Filter Type')"
                     />
-                    <div class="filter-fields">
+                    <div class="filter-fields text-sm">
                         <field-filter
                             v-if="showFieldFilter"
                             ref="fieldFilter"
