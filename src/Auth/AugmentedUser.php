@@ -37,6 +37,10 @@ class AugmentedUser extends AbstractAugmented
             return true;
         }
 
+        if ($handle === 'is_super') {
+            return $this->data->isSuper();
+        }
+
         if (Str::startsWith($handle, 'is_')) {
             return in_array(Str::after($handle, 'is_'), $this->roles());
         }
