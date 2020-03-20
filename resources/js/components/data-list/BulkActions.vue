@@ -3,7 +3,7 @@
     <div v-if="hasSelections" class="data-list-bulk-actions">
         <div class="input-group input-group-sm">
             <div class="input-group-prepend">
-                <div class="text-grey-50"
+                <div class="text-grey-60"
                     v-text="__n(`:count selected`, selections.length)" />
             </div>
 
