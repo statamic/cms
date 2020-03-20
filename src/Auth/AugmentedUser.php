@@ -24,6 +24,7 @@ class AugmentedUser extends AbstractAugmented
                 'is_user',
                 'last_login',
                 'avatar',
+                'api_url',
             ])
             ->merge($this->roleHandles())
             ->merge($this->groupHandles())

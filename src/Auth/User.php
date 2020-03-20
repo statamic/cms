@@ -18,10 +18,11 @@ use Statamic\Data\TracksQueriedColumns;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\URL;
+use Statamic\Fields\Value;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
-use Statamic\Fields\Value;
 
 abstract class User implements
     UserContract,
@@ -108,6 +109,11 @@ abstract class User implements
     public function updateUrl()
     {
         return cp_route('users.update', $this->id());
+    }
+
+    public function apiUrl()
+    {
+        return Statamic::apiRoute('users.show', $this->id());
     }
 
     public function newAugmentedInstance()
@@ -242,5 +248,10 @@ abstract class User implements
     public function defaultAugmentedArrayKeys()
     {
         return $this->selectedQueryColumns;
+    }
+
+    protected function shallowAugmentedArrayKeys()
+    {
+        return ['id', 'name', 'email', 'api_url'];
     }
 }
