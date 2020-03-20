@@ -29,7 +29,8 @@
                             v-for="filter in standardFilters"
                             v-if="creating === filter.handle"
                             :key="filter.handle"
-                            :filter="filter.values"
+                            :filter="filter"
+                            :values="activeFilters[filter.handle]"
                             @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
                         />
                     </div>
