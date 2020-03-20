@@ -4,9 +4,12 @@ namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
 use Statamic\Facades\Structure;
 use Statamic\Fields\Blueprint;
@@ -412,6 +415,45 @@ class CollectionTest extends TestCase
 
         $this->assertNotSame($structure, $collection->structure());
         $this->assertEquals(13, $collection->structure()->maxDepth());
+    }
+
+    /** @test */
+    function it_gets_the_handle_when_casting_to_a_string()
+    {
+        $collection = (new Collection)->handle('test');
+
+        $this->assertEquals('test', (string) $collection);
+    }
+
+    /** @test */
+    function it_augments()
+    {
+        $collection = (new Collection)->handle('test');
+
+        $this->assertInstanceof(Augmentable::class, $collection);
+        $this->assertEquals([
+            'title' => 'Test',
+            'handle' => 'test',
+        ], $collection->toAugmentedArray());
+    }
+
+    /** @test */
+    function it_augments_in_the_parser()
+    {
+        $collection = (new Collection)->handle('test');
+
+        $this->assertEquals('test', Antlers::parse('{{ collection }}', ['collection' => $collection]));
+
+        $this->assertEquals('test Test', Antlers::parse('{{ collection }}{{ handle }} {{ title }}{{ /collection }}', ['collection' => $collection]));
+
+        $this->assertEquals('test', Antlers::parse('{{ collection:handle }}', ['collection' => $collection]));
+
+        try {
+            Antlers::parse('{{ collection from="somewhere" }}{{ title }}{{ /collection }}', ['collection' => $collection]);
+            $this->fail('Exception not thrown');
+        } catch (CollectionNotFoundException $e) {
+            $this->assertEquals('Collection [somewhere] not found', $e->getMessage());
+        }
     }
 
     private function makeStructure()
