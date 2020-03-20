@@ -4,6 +4,7 @@ namespace Tests;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Data\AbstractAugmented;
+use Statamic\Data\AugmentedValues;
 use Statamic\Data\ContainsData;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fieldtype;
@@ -135,6 +136,8 @@ class AugmentedTest extends TestCase
             }
         };
 
+        $result = $augmented->all();
+        $this->assertInstanceOf(AugmentedValues::class, $result);
         $this->assertEquals([
             'foo' => $foo = new Value('bar', 'foo', $fieldtype, $this->blueprintThing),
             'slug' => $slug = new Value('the-thing', 'slug', $fieldtype, $this->blueprintThing),
@@ -142,23 +145,27 @@ class AugmentedTest extends TestCase
             'hello' => 'world',
             'unused' => $unused = new Value(null, 'unused', $fieldtype, $this->blueprintThing),
             'supplemented' => 'supplemented value',
-        ], $augmented->all());
+        ], $result->all());
 
+        $result = $augmented->select(['foo', 'hello']);
+        $this->assertInstanceOf(AugmentedValues::class, $result);
         $this->assertEquals([
             'foo' => $foo,
             'hello' => 'world',
-        ], $augmented->select(['foo', 'hello']));
+        ], $result->all());
 
         $this->assertEquals([
             'foo' => $foo,
-        ], $augmented->select('foo'));
+        ], $augmented->select('foo')->all());
 
+        $result = $augmented->except(['slug', 'hello']);
+        $this->assertInstanceOf(AugmentedValues::class, $result);
         $this->assertEquals([
             'foo' => $foo,
             'the_slug' => 'the-thing',
             'unused' => $unused,
             'supplemented' => 'supplemented value',
-        ], $augmented->except(['slug', 'hello']));
+        ], $result->all());
 
         $this->assertEquals([
             'foo' => $foo,
@@ -166,7 +173,7 @@ class AugmentedTest extends TestCase
             'the_slug' => 'the-thing',
             'unused' => $unused,
             'supplemented' => 'supplemented value',
-        ], $augmented->except('hello'));
+        ], $augmented->except('hello')->all());
     }
 
     /** @test */

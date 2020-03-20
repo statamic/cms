@@ -36,7 +36,7 @@ abstract class AbstractAugmented implements Augmented
             $arr[$key] = $this->get($key);
         }
 
-        return $arr;
+        return new AugmentedValues($arr);
     }
 
     abstract protected function keys();
