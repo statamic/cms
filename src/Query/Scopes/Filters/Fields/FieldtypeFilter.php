@@ -24,10 +24,11 @@ class FieldtypeFilter
                 'type' => 'select',
                 'placeholder' => __('Select Operator'),
                 'options' => [
+                    'like' => __('Contains'),
                     '=' => __('Is'),
                     '<>' => __('Isn\'t'),
-                    'like' => __('Contains'),
-                ]
+                ],
+                'default' => 'like',
             ],
             'value' => [
                 'type' => 'text',
