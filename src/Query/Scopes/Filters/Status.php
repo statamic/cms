@@ -45,18 +45,12 @@ class Status extends Filter
     public function badge($values)
     {
         if ($values['status'] === 'published') {
-            $status = __('published');
+            return  __('is published');
         } elseif ($values['status'] === 'scheduled') {
-            $status = __('scheduled');
+            return  __('is scheduled');
         } elseif ($values['status'] === 'draft') {
-            $status = __('draft');
+            return  __('is draft');
         }
-
-        $title = optional($this->collection())->title();
-
-        return collect([$status, strtolower($title)])
-            ->filter()
-            ->implode(' ');
     }
 
     public function visibleTo($key)
