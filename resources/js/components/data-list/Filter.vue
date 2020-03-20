@@ -4,10 +4,8 @@
         <publish-container
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"
-            :blueprint="fieldset"
+            :meta="{}"
             :values="containerValues"
-            :meta="filter.meta"
-            :errors="errors"
             :track-dirty-state="false"
             @updated="$emit('changed', $event)"
         >
@@ -43,21 +41,17 @@ export default {
     },
 
     computed: {
+        defaultValues() {
+            return this.filter.values || {};
+        },
+
         containerValues() {
             return clone(this.values || this.defaultValues);
         },
 
         hasOnlyOneField() {
             return this.filter.fields.length === 1;
-        }
-    },
-
-    data() {
-        return {
-            fieldset: {sections:[{fields:this.filter.fields}]},
-            defaultValues: this.filter.values || {},
-            errors: {},
-        }
+        },
     },
 
 }
