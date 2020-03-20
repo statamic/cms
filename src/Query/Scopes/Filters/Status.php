@@ -44,11 +44,11 @@ class Status extends Filter
     public function badge($values)
     {
         if ($values['status'] === 'published') {
-            return  __('is published');
+            return __('is published');
         } elseif ($values['status'] === 'scheduled') {
-            return  __('is scheduled');
+            return __('is scheduled');
         } elseif ($values['status'] === 'draft') {
-            return  __('is draft');
+            return __('is draft');
         }
     }
 
