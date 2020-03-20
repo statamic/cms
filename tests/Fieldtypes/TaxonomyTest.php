@@ -67,9 +67,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     function it_shallow_augments_slugs_to_a_collection_of_terms_when_using_a_single_taxonomy()
     {
-        Statamic::enableShallowAugmentation();
-
-        $augmented = $this->fieldtype(['taxonomy' => 'tags'])->augment(['one', 'two']);
+        $augmented = $this->fieldtype(['taxonomy' => 'tags'])->shallowAugment(['one', 'two']);
 
         $this->assertInstanceOf(Collection::class, $augmented);
         $this->assertNotInstanceOf(TermCollection::class, $augmented);
@@ -95,9 +93,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     function it_shallow_augments_to_a_single_term_when_max_items_is_one()
     {
-        Statamic::enableShallowAugmentation();
-
-        $augmented = $this->fieldtype(['taxonomy' => 'tags', 'max_items' => 1])->augment(['one']);
+        $augmented = $this->fieldtype(['taxonomy' => 'tags', 'max_items' => 1])->shallowAugment(['one']);
 
         $this->assertEquals([
             'id' => 'tags::one',

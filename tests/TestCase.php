@@ -42,8 +42,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             $this->deleteFakeStacheDirectory();
         }
 
-        Statamic::disableShallowAugmentation();
-
         parent::tearDown();
     }
 

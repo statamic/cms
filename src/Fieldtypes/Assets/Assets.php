@@ -113,22 +113,30 @@ class Assets extends Fieldtype
 
     public function augment($value)
     {
-        $assets = collect($value)->map(function ($path) {
-            return $this->container()->asset($path);
-        })->filter()->values();
-
-        if (Statamic::shallowAugmentationEnabled()) {
-            $assets = $assets->map(function ($asset) {
-                return [
-                    'id' => $asset->id(),
-                    'url' => $asset->url(),
-                    'permalink' => $asset->absoluteUrl(),
-                    'api_url' => $asset->apiUrl(),
-                ];
-            });
-        }
+        $assets = $this->getAssetsForAugmentation($value);
 
         return $this->config('max_files') === 1 ? $assets->first() : $assets;
+    }
+
+    public function shallowAugment($value)
+    {
+        $assets = $this->getAssetsForAugmentation($value)->map(function ($asset) {
+            return [
+                'id' => $asset->id(),
+                'url' => $asset->url(),
+                'permalink' => $asset->absoluteUrl(),
+                'api_url' => $asset->apiUrl(),
+            ];
+        });
+
+        return $this->config('max_files') === 1 ? $assets->first() : $assets;
+    }
+
+    private function getAssetsForAugmentation($value)
+    {
+        return collect($value)->map(function ($path) {
+            return $this->container()->asset($path);
+        })->filter()->values();
     }
 
     protected function container()

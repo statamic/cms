@@ -51,9 +51,7 @@ class AssetsTest extends TestCase
     /** @test */
     function it_shallow_augments_to_a_collection_of_assets()
     {
-        Statamic::enableShallowAugmentation();
-
-        $augmented = $this->fieldtype()->augment(['foo/one.txt', 'bar/two.txt', 'unknown.txt']);
+        $augmented = $this->fieldtype()->shallowAugment(['foo/one.txt', 'bar/two.txt', 'unknown.txt']);
 
         $this->assertInstanceOf(Collection::class, $augmented);
         $this->assertEquals([
@@ -75,9 +73,7 @@ class AssetsTest extends TestCase
     /** @test */
     function it_shallow_augments_to_a_single_asset_when_max_files_is_one()
     {
-        Statamic::enableShallowAugmentation();
-
-        $augmented = $this->fieldtype(['max_files' => 1])->augment(['foo/one.txt']);
+        $augmented = $this->fieldtype(['max_files' => 1])->shallowAugment(['foo/one.txt']);
 
         $this->assertEquals([
             'id' => 'test::foo/one.txt',
