@@ -76,12 +76,14 @@ export default {
         },
 
         fieldOptions() {
-            return this.availableFieldFilters.map(filter => {
+            let options = this.availableFieldFilters.map(filter => {
                 return {
                     value: filter.handle,
                     label: filter.display,
                 };
             });
+
+            return _.sortBy(options, option => option.label);
         },
 
         showFieldFilter() {
