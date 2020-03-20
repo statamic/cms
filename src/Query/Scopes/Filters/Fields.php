@@ -54,20 +54,25 @@ class Fields extends Filter
 
     protected function getFields()
     {
-        if ($collection = $this->context['collection']) {
-            $blueprints = Collection::findByHandle($collection)->entryBlueprints();
-        } else {
-            $blueprints = collect($this->context['blueprints'])->map(function ($blueprint) {
-                return Blueprint::find($blueprint);
-            });
-        }
-
-        return $blueprints->flatMap(function ($blueprint) {
+        return $this->getBlueprints()->flatMap(function ($blueprint) {
             return $blueprint
                 ->fields()
                 ->all()
                 ->filter
                 ->isFilterable();
         });
+    }
+
+    protected function getBlueprints()
+    {
+        if ($collection = $this->context['collection']) {
+            return Collection::findByHandle($collection)->entryBlueprints();
+        } else {
+            return collect($this->context['blueprints'])->map(function ($blueprint) {
+                return Blueprint::find($blueprint);
+            });
+        }
+
+        throw new \Exception('Context of [collection] or [blueprints] is required.');
     }
 }
