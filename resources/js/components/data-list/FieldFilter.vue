@@ -132,11 +132,12 @@ export default {
     methods: {
 
         reset() {
-            this.initialValues = this.values;
+            if (this.field) this.$emit('changed', this.initialValues);
+
             this.containerValues = {};
             this.filter = null;
             this.field = null;
-            this.fieldValues = {};
+            this.fieldValues = null;
         },
 
         createFilter(field) {
