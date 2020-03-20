@@ -14,8 +14,6 @@ class EntryResource extends Resource
      */
     public function toArray($request)
     {
-        return array_merge($this->resource->toAugmentedArray(), [
-            'api_url' => $this->resource->apiUrl(),
-        ]);
+        return $this->resource->toAugmentedValues();
     }
 }

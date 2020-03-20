@@ -18,6 +18,7 @@ class AugmentedEntry extends AbstractAugmented
                 'edit_url',
                 'permalink',
                 'amp_url',
+                'api_url',
                 'published',
                 'private',
                 'date',
