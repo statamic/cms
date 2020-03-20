@@ -1,6 +1,6 @@
 <template>
 
-    <div class="w-full" :class="{ 'no-label': hasOnlyOneField }">
+    <div class="w-full no-label">
         <publish-container
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"
@@ -47,10 +47,6 @@ export default {
 
         containerValues() {
             return clone(this.values || this.defaultValues);
-        },
-
-        hasOnlyOneField() {
-            return this.filter.fields.length === 1;
         },
     },
 
