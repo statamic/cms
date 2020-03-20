@@ -2,9 +2,9 @@
 
 namespace Statamic\Http\Resources\API;
 
-use Illuminate\Http\Resources\Json\JSONResource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class EntryResource extends JSONResource
+class EntryResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
