@@ -19,7 +19,7 @@
                     />
                     <div class="filter-fields text-sm">
                         <field-filter
-                            v-if="showFieldFilter"
+                            v-show="showFieldFilter"
                             ref="fieldFilter"
                             :config="fieldFilter"
                             :values="activeFilters.fields || {}"
