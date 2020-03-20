@@ -323,7 +323,7 @@ class EntryTest extends TestCase
             'baz' => 'qux',
             'last_modified' => $carbon = Carbon::createFromTimestamp($lastModified),
             'updated_at' => $carbon,
-            'updated_by' => $user->toAugmentedArray(),
+            'updated_by' => $user,
             'url' => '/blog/test',
             'permalink' => 'http://localhost/blog/test',
         ], $entry->toAugmentedArray());

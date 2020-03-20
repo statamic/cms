@@ -32,7 +32,7 @@ class AugmentedEntry extends AbstractAugmented
 
     protected function updatedBy()
     {
-        return optional($this->data->lastModifiedBy())->toAugmentedArray();
+        return $this->data->lastModifiedBy();
     }
 
     protected function updatedAt()
@@ -48,5 +48,10 @@ class AugmentedEntry extends AbstractAugmented
     protected function permalink()
     {
         return $this->get('absolute_url');
+    }
+
+    protected function parent()
+    {
+        return null;
     }
 }
