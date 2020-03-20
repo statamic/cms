@@ -2,6 +2,8 @@
 
 namespace Statamic\Query\Scopes\Filters\Fields;
 
+use Illuminate\Support\Carbon;
+
 class Date extends FieldtypeFilter
 {
     public function fieldItems()
@@ -23,5 +25,13 @@ class Date extends FieldtypeFilter
                 ],
             ],
         ];
+    }
+
+    public function apply($query, $handle, $values)
+    {
+        $operator = $values['operator'];
+        $value = Carbon::parse($values['value']);
+
+        $query->where($handle, $operator, $value);
     }
 }
