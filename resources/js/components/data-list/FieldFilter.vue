@@ -15,9 +15,7 @@
                 <publish-container
                     v-if="showFieldFilter"
                     name="filter-field"
-                    :blueprint="{}"
                     :meta="{}"
-                    :errors="{}"
                     :values="containerValues"
                     :track-dirty-state="false"
                     class="filter-fields mt-1"
