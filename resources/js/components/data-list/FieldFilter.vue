@@ -168,6 +168,8 @@ export default {
         },
 
         setDefaultValues() {
+            if (! this.filter) return;
+
             let values = {};
 
             this.filter.fields
