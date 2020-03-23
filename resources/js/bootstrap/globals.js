@@ -3,13 +3,17 @@ import { translate, translateChoice } from '../translations/translator';
 
 global.cp_url = function(url) {
     url = Statamic.$config.get('cpRoot') + '/' + url;
-    return url.replace(/([^:]\/)\/+/g, '/');
+    return tidy_url(url);
 };
 
 global.resource_url = function(url) {
     url = Statamic.$config.get('resourceUrl') + '/' + url;
-    return url.replace(/([^:]\/)\/+/g, '/');
+    return tidy_url(url);
 };
+
+global.tidy_url = function(path) {
+    return path.replace(/([^:])(\/\/+)/g, '$1/')
+}
 
 // Get url segments from the nth segment
 global.get_from_segment = function(count) {

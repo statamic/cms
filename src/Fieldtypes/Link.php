@@ -7,7 +7,7 @@ use Statamic\Fields\Fieldtype;
 use Statamic\Routing\ResolveRedirect;
 use Statamic\Support\Str;
 
-class Redirect extends Fieldtype
+class Link extends Fieldtype
 {
     public function augment($value)
     {

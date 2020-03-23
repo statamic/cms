@@ -76,8 +76,10 @@ class CpController extends Controller
         return response()->view('statamic::errors.404', [], 404);
     }
 
-    public function authorize($ability, $args = [], $message = 'This action is unauthorized.')
+    public function authorize($ability, $args = [], $message = null)
     {
+        $message = $message ?? __('This action is unauthorized.');
+
         try {
             return parent::authorize($ability, $args);
         } catch (LaravelAuthException $e) {
