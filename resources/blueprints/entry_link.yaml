@@ -7,5 +7,5 @@ fields:
   -
     handle: redirect
     field:
-      type: redirect
+      type: link
       required: true
