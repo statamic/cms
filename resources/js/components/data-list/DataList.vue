@@ -11,6 +11,14 @@ export default {
             type: Array,
             required: true,
         },
+        search: {
+            type: Boolean,
+            default: true
+        },
+        searchQuery: {
+            type: String,
+            default: ''
+        },
         selections: {
             type: Array,
             default: () => []
@@ -36,6 +44,7 @@ export default {
     data() {
         return {
             sharedState: {
+                searchQuery: this.searchQuery,
                 columns: this.columns,
                 sortColumn: null,
                 sortDirection: this.sortDirection,
