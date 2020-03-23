@@ -6,6 +6,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Field;
 use Statamic\Query\Scopes\Filter;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Fields extends Filter
@@ -70,7 +71,7 @@ class Fields extends Filter
 
     protected function getBlueprints()
     {
-        if ($collection = $this->context['collection']) {
+        if ($collection = Arr::get($this->context, 'collection')) {
             return Collection::findByHandle($collection)->entryBlueprints();
         }
 
