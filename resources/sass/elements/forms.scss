@@ -133,6 +133,7 @@ input.input-text-minimal:read-only,
         &:last-child { @apply rounded-r border-r; }
     }
 
+    > *:last-child[class*="input-group-"],
     > *:last-child [class*="input-group-"] {
         @apply rounded-r;
     }
