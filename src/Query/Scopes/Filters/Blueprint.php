@@ -34,11 +34,11 @@ class Blueprint extends Filter
 
     public function visibleTo($key)
     {
-        if ($this->blueprints()->count() === 1) {
+        if ($key !== 'entries') {
             return false;
         }
 
-        return $key === 'entries';
+        return $this->blueprints()->count() > 1;
     }
 
     public function blueprints()
