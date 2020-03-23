@@ -27,6 +27,7 @@
                             :config="fieldFilter"
                             :values="activeFilters.fields || {}"
                             @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
+                            @cleared="creating = null"
                         />
                         <data-list-filter
                             v-for="filter in standardFilters"
@@ -35,6 +36,7 @@
                             :filter="filter"
                             :values="activeFilters[filter.handle]"
                             @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
+                            @cleared="creating = null"
                         />
                     </div>
                 </div>

@@ -20,7 +20,7 @@
         <button
             class="mt-2 text-xs text-blue hover:text-grey-80"
             v-text="__('Clear')"
-            @click="$emit('changed', null)"
+            @click="resetAll"
         />
     </div>
 
@@ -47,6 +47,13 @@ export default {
 
         containerValues() {
             return clone(this.values || this.defaultValues);
+        },
+    },
+
+    methods: {
+        resetAll() {
+            this.$emit('changed', null);
+            this.$emit('cleared');
         },
     },
 

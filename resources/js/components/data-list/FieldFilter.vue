@@ -36,7 +36,7 @@
             <button
                 class="outline-none mt-2 text-xs text-blue hover:text-grey-80"
                 v-text="__('Clear')"
-                @click="reset"
+                @click="resetAll"
             />
 
         </div>
@@ -138,6 +138,13 @@ export default {
             this.filter = null;
             this.field = null;
             this.fieldValues = null;
+
+        },
+
+        resetAll() {
+            this.reset();
+
+            this.$emit('cleared');
         },
 
         resetInitialValues() {
