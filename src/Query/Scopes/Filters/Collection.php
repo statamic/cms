@@ -9,15 +9,11 @@ class Collection extends Filter
 {
     public function fieldItems()
     {
-        $options = collect($this->context['collections'])->mapWithKeys(function ($collection) {
-            return [$collection => Facades\Collection::findByHandle($collection)->title()];
-        })->all();
-
         return [
             'value' => [
                 'display' => __('Collection'),
                 'type' => 'select',
-                'options' => $options,
+                'options' => $this->options()->all(),
                 'clearable' => true,
                 'multiple' => true,
             ],
@@ -38,5 +34,12 @@ class Collection extends Filter
     public function visibleTo($key)
     {
         return $key === 'entries-fieldtype' && count($this->context['collections']) > 1;
+    }
+
+    protected function options()
+    {
+        return collect($this->context['collections'])->mapWithKeys(function ($collection) {
+            return [$collection => Facades\Collection::findByHandle($collection)->title()];
+        });
     }
 }

@@ -12,20 +12,10 @@ class Status extends Filter
 
     public function fieldItems()
     {
-        $options = collect([
-            'published' => __('Published'),
-            'scheduled' => __('Scheduled'),
-            'draft' => __('Draft'),
-        ]);
-
-        if (! $this->collection()->dated()) {
-            $options->forget('scheduled');
-        }
-
         return [
             'status' => [
                 'type' => 'radio',
-                'options' => $options->all(),
+                'options' => $this->options()->all(),
             ],
         ];
     }
@@ -55,6 +45,21 @@ class Status extends Filter
     public function visibleTo($key)
     {
         return $key === 'entries';
+    }
+
+    protected function options()
+    {
+        $options = collect([
+            'published' => __('Published'),
+            'scheduled' => __('Scheduled'),
+            'draft' => __('Draft'),
+        ]);
+
+        if (! $this->collection()->dated()) {
+            $options->forget('scheduled');
+        }
+
+        return $options;
     }
 
     protected function collection()

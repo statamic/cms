@@ -34,11 +34,7 @@ class Blueprint extends Filter
 
     public function visibleTo($key)
     {
-        if ($key !== 'entries') {
-            return false;
-        }
-
-        return $this->blueprints()->count() > 1;
+        return $key === 'entries' && $this->blueprints()->count() > 1;
     }
 
     public function blueprints()
