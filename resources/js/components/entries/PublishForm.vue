@@ -118,7 +118,7 @@
 
                                 <div class="flex items-center border-t justify-between px-2 py-1" v-if="!revisionsEnabled">
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
-                                    <toggle-input v-model="published" />
+                                    <toggle-input :value="published" @input="setFieldValue('published', $event)" />
                                 </div>
 
                                 <div class="border-t p-2" v-if="revisionsEnabled && !isCreating">
@@ -311,11 +311,9 @@ export default {
             revisionMessage: null,
             showRevisionHistory: false,
 
-            // The current value. What it will be when saving. User interaction updates this.
-            published: this.initialValues.published,
-
             // Whether it was published the last time it was saved.
             // Successful publish actions (if using revisions) or just saving (if not) will update this.
+            // The current published value is inside the "values" object, and also accessible as a computed.
             initialPublished: this.initialValues.published,
 
             confirmingPublish: false,
@@ -347,6 +345,10 @@ export default {
             if (this.readOnly || this.isCreating || this.somethingIsLoading || this.isDirty) return false;
 
             return true;
+        },
+
+        published() {
+            return this.values.published;
         },
 
         livePreviewUrl() {
@@ -381,14 +383,6 @@ export default {
 
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
-        },
-
-        published(published) {
-            this.$refs.container.setFieldValue('published', published);
-        },
-
-        'values.published': function (published) {
-            this.published = published;
         }
 
     },
@@ -557,7 +551,10 @@ export default {
         publishActionCompleted({ published, isWorkingCopy, response }) {
             this.saving = false;
             this.$refs.container.saved();
-            if (published !== undefined) this.published = this.initialPublished = published;
+            if (published !== undefined) {
+                this.$refs.container.setFieldValue('published', published);
+                this.initialPublished = published;
+            }
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
             this.title = response.data.data.title;
