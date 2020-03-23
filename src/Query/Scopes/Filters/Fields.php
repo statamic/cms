@@ -10,6 +10,11 @@ use Statamic\Support\Str;
 
 class Fields extends Filter
 {
+    public static function title()
+    {
+        return __('Field');
+    }
+
     public function extra()
     {
         return $this->getFields()
