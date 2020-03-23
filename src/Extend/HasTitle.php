@@ -10,6 +10,6 @@ trait HasTitle
 
     public static function title()
     {
-        return static::$title ?? Str::humanize(static::handle());
+        return static::$title ?? Str::title(Str::humanize(static::handle()));
     }
 }
