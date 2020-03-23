@@ -105,7 +105,7 @@ export default {
     methods: {
         update: _.debounce(function () {
             if (!this.query) {
-                this.reset();
+                this.results = [];
                 this.searching = false;
                 return;
             }
