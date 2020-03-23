@@ -24,6 +24,7 @@ class AugmentedUser extends AbstractAugmented
                 'is_user',
                 'last_login',
                 'avatar',
+                'api_url',
             ])
             ->merge($this->roleHandles())
             ->merge($this->groupHandles())
@@ -34,6 +35,10 @@ class AugmentedUser extends AbstractAugmented
     {
         if ($handle === 'is_user') {
             return true;
+        }
+
+        if ($handle === 'is_super') {
+            return $this->data->isSuper();
         }
 
         if (Str::startsWith($handle, 'is_')) {

@@ -214,6 +214,7 @@ class EntryTest extends TestCase
         $entryFr = (new Entry)->collection($collection)->locale('fr')->slug('le-foo');
         $entryDe = (new Entry)->collection($collection)->locale('de')->slug('das-foo');
         $redirectEntry = (new Entry)->collection($collection)->locale('en')->slug('redirected')->set('redirect', 'http://example.com/page');
+        $redirect404Entry = (new Entry)->collection($collection)->locale('en')->slug('redirect-404')->set('redirect', '404');
 
         $this->assertEquals('/blog/foo', $entryEn->uri());
         $this->assertEquals('/blog/foo', $entryEn->url());
@@ -233,11 +234,55 @@ class EntryTest extends TestCase
         $this->assertEquals('http://domain.de/amp/das-blog/das-foo', $entryDe->ampUrl());
         $this->assertNull($entryDe->redirectUrl());
 
-        $this->assertNull($redirectEntry->uri());
+        $this->assertEquals('/blog/redirected', $redirectEntry->uri());
         $this->assertEquals('http://example.com/page', $redirectEntry->url());
         $this->assertEquals('http://example.com/page', $redirectEntry->absoluteUrl());
         $this->assertNull($redirectEntry->ampUrl());
         $this->assertEquals('http://example.com/page', $redirectEntry->redirectUrl());
+
+        $this->assertEquals('/blog/redirect-404', $redirect404Entry->uri());
+        $this->assertEquals('/blog/redirect-404', $redirect404Entry->url());
+        $this->assertEquals('http://domain.com/blog/redirect-404', $redirect404Entry->absoluteUrl());
+        $this->assertEquals('http://domain.com/amp/blog/redirect-404', $redirect404Entry->ampUrl());
+        $this->assertEquals(404, $redirect404Entry->redirectUrl());
+    }
+
+    /** @test */
+    function it_gets_urls_for_first_child_redirects()
+    {
+        \Event::fake(); // Don't invalidate static cache etc when saving entries.
+
+        $collection = tap((new Collection)->handle('pages')->routes('{parent_uri}/{slug}'))->save();
+
+        $parent = tap((new Entry)->id('1')->locale('en')->collection($collection)->slug('parent')->set('redirect', '@child'))->save();
+        $child = tap((new Entry)->id('2')->locale('en')->collection($collection)->slug('child'))->save();
+        $noChildren = tap((new Entry)->id('3')->locale('en')->collection($collection)->slug('nochildren')->set('redirect', '@child'))->save();
+
+        $collection->structureContents([
+            'tree' => [
+                [
+                    'entry' => '1',
+                    'children' => [
+                        ['entry' => '2']
+                    ]
+                ],
+                [
+                    'entry' => '3'
+                ]
+            ]
+        ])->save();
+
+        $this->assertEquals('/parent', $parent->uri());
+        $this->assertEquals('/parent/child', $parent->url());
+        $this->assertEquals('/parent/child', $parent->redirectUrl());
+
+        $this->assertEquals('/parent/child', $child->uri());
+        $this->assertEquals('/parent/child', $child->url());
+        $this->assertNull($child->redirectUrl());
+
+        $this->assertEquals('/nochildren', $noChildren->uri());
+        $this->assertEquals('/nochildren', $noChildren->url());
+        $this->assertEquals(404, $noChildren->redirectUrl());
     }
 
     /** @test */
@@ -278,7 +323,7 @@ class EntryTest extends TestCase
             'baz' => 'qux',
             'last_modified' => $carbon = Carbon::createFromTimestamp($lastModified),
             'updated_at' => $carbon,
-            'updated_by' => $user->toAugmentedArray(),
+            'updated_by' => $user,
             'url' => '/blog/test',
             'permalink' => 'http://localhost/blog/test',
         ], $entry->toAugmentedArray());
@@ -533,6 +578,37 @@ class EntryTest extends TestCase
         Event::assertDispatched(EntrySaved::class, function ($event) use ($entry) {
             return $event->data === $entry;
         });
+    }
+
+    /** @test */
+    function it_performs_callbacks_after_saving_but_before_the_saved_event_and_only_once()
+    {
+        Event::fake();
+        $entry = (new Entry)->id('a')->collection(new Collection);
+        Facades\Entry::shouldReceive('save')->with($entry);
+        Facades\Entry::shouldReceive('taxonomize')->with($entry);
+        $callbackOneRan = 0;
+        $callbackTwoRan = 0;
+
+        $return = $entry->afterSave(function ($arg) use (&$callbackOneRan, $entry) {
+            $this->assertSame($entry, $arg);
+            $arg['result'] = 'one';
+            $callbackOneRan++;
+        });
+        $entry->afterSave(function ($arg) use (&$callbackTwoRan, $entry) {
+            $this->assertSame($entry, $arg);
+            $arg['result'] = 'two';
+            $callbackTwoRan++;
+        });
+
+        $entry->save();
+        $entry->save(); // save twice to show that the callbacks only get run the first time.
+
+        $this->assertEquals($entry, $return);
+        $this->assertEquals(1, $callbackOneRan);
+        $this->assertEquals(1, $callbackTwoRan);
+
+        // TODO: How to test that the callbacks are run *before* the EntrySaved event?
     }
 
     /** @test */

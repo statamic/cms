@@ -14,7 +14,7 @@ h1, h2, h3, h4, h5, h6 {
 }
 
 h1 {
-    @apply text-2xl font-bold;
+    @apply text-2xl font-medium;
     letter-spacing: -0.014em;
 }
 
@@ -50,7 +50,11 @@ a:not([class*="btn"]) {
 }
 
 .content {
-    h1, h2, h3, h4, h5, h6 {
+    h1 {
+        @apply mb-1 font-medium;
+    }
+
+    h2, h3, h4, h5, h6 {
         @apply .mb-1 font-bold;
     }
 

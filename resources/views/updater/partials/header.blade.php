@@ -8,7 +8,7 @@
             <p><a href="" class="font-bold text-blue">Learn more about updates in the docs</a><span class="inline-block text-blue w-4 h-4 ml-1">@svg('external-link')</span></p>
         </div>
         <div class="p-2 text-center">
-            @svg('marketing/shield-check')
+            @svg('marketing/tooter-yay')
         </div>
     </div>
 </div>

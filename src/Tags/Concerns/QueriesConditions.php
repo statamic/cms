@@ -2,8 +2,11 @@
 
 namespace Statamic\Tags\Concerns;
 
-use Statamic\Support\Str;
 use Carbon\Carbon;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Fields\Value;
+use Statamic\Support\Str;
 
 trait QueriesConditions
 {
@@ -12,9 +15,9 @@ trait QueriesConditions
         foreach ($this->parameters as $param => $value) {
             $this->queryCondition(
                 $query,
-                explode(':', $param)[0],
+                $field = explode(':', $param)[0],
                 explode(':', $param)[1] ?? false,
-                $value
+                $this->getQueryConditionValue($value, $field)
             );
         }
     }
@@ -46,6 +49,10 @@ trait QueriesConditions
                 return $this->queryContainsCondition($query, $field, $value);
             case 'doesnt_contain':
                 return $this->queryDoesntContainCondition($query, $field, $value);
+            case 'in':
+                return $this->queryInCondition($query, $field, $value);
+            case 'not_in':
+                return $this->queryNotInCondition($query, $field, $value);
             case 'starts_with':
             case 'begins_with':
                 return $this->queryStartsWithCondition($query, $field, $value);
@@ -115,6 +122,16 @@ trait QueriesConditions
     protected function queryDoesntContainCondition($query, $field, $value)
     {
         $query->where($field, 'not like', "%{$value}%");
+    }
+
+    protected function queryInCondition($query, $field, $value)
+    {
+        $query->whereIn($field, $value);
+    }
+
+    protected function queryNotInCondition($query, $field, $value)
+    {
+        $query->whereNotIn($field, $value);
     }
 
     protected function queryStartsWithCondition($query, $field, $value)
@@ -253,5 +270,32 @@ trait QueriesConditions
     protected function removeRegexDelimitersAndModifiers($pattern)
     {
         return preg_replace(['/^\//', '/\/\w*$/'], ['', ''], $pattern);
+    }
+
+    protected function getQueryConditionValue($value, $field)
+    {
+        if ($value instanceof Value) {
+            $value = $value->value();
+        }
+
+        if (is_array($value)) {
+            $value = collect($value);
+        }
+
+        if ($value instanceof Collection) {
+            $value = $value->map(function ($value) use ($field) {
+                return $this->getQueryConditionValue($value, $field);
+            })->all();
+        }
+
+        if ($value instanceof Augmentable) {
+            $value = $value->augmentedValue($field);
+        }
+
+        if (is_object($value)) {
+            throw new \LogicException("Cannot query [$field] using value [".get_class($value).']');
+        }
+
+        return $value;
     }
 }

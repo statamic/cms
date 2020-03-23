@@ -16,10 +16,11 @@
 
     @else
 
-        @include('statamic::partials.create-first', [
+        @include('statamic::partials.empty-state', [
             'resource' => 'User Group',
-            'description' => 'User groups allow you to create permission groupings to remove the tedium of assigning multiple permissions to users.',
-            'svg' => 'empty/collection', // TODO: Need empty/user-group svg
+            'description' => __('statamic::messages.user_groups_intro'),
+            'docs_link' => Statamic::docsUrl('users#user-groups'),
+            'svg' => 'empty/users',
             'route' => cp_route('user-groups.create')
         ])
 

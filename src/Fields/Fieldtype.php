@@ -112,6 +112,11 @@ abstract class Fieldtype implements Arrayable
         return $value;
     }
 
+    public function shallowAugment($value)
+    {
+        return $this->augment($value);
+    }
+
     public function toArray(): array
     {
         return [

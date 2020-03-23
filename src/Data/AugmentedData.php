@@ -5,7 +5,7 @@ namespace Statamic\Data;
 use Illuminate\Support\Collection;
 use Statamic\Data\AbstractAugmented;
 
-class AugmentedArray extends AbstractAugmented
+class AugmentedData extends AbstractAugmented
 {
     protected $data;
     protected $array;

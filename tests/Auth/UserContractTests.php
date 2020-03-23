@@ -192,6 +192,7 @@ trait UserContractTests
             'title' => 'john@example.com',
             'edit_url' => 'http://localhost/cp/users/123/edit',
             'last_login' => null,
+            'api_url' => 'http://localhost/api/users/123',
         ], $this->additionalToArrayValues()), $arr);
     }
 

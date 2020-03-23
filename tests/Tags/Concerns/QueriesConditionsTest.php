@@ -8,7 +8,9 @@ use Statamic\Facades\Antlers;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
 use Illuminate\Support\Carbon;
+use Statamic\Query\Builder;
 use Statamic\Tags\Collection\Entries;
+use Statamic\Tags\Concerns\QueriesConditions;
 use Tests\PreventSavingStacheItemsToDisk;
 
 class QueriesConditionsTest extends TestCase
@@ -85,6 +87,54 @@ class QueriesConditionsTest extends TestCase
 
         $this->assertCount(3, $this->getEntries());
         $this->assertCount(2, $this->getEntries(['title:doesnt_contain' => 'sto']));
+    }
+
+    /** @test */
+    function it_filters_by_in_condition()
+    {
+        $this->makeEntry('dog')->set('type', 'canine')->save();
+        $this->makeEntry('wolf')->set('type', 'canine')->save();
+        $this->makeEntry('tiger')->set('type', 'feline')->save();
+        $this->makeEntry('cat')->set('type', 'feline')->save();
+        $this->makeEntry('lion')->set('type', 'feline')->save();
+        $this->makeEntry('horse')->set('type', 'equine')->save();
+        $this->makeEntry('bigfoot')->save();
+
+        $this->assertCount(7, $this->getEntries());
+        $this->assertEquals(['dog', 'wolf'], $this->getEntries(['type:in' => ['canine']])->map->slug()->all());
+        $this->assertEquals(['tiger', 'cat', 'lion'], $this->getEntries(['type:in' => ['feline']])->map->slug()->all());
+        $this->assertEquals(['dog', 'wolf', 'tiger', 'cat', 'lion'], $this->getEntries(['type:in' => ['canine', 'feline']])->map->slug()->all());
+        $this->assertEquals(['horse'], $this->getEntries(['type:in' => ['equine']])->map->slug()->all());
+    }
+
+    /** @test */
+    function it_filters_by_not_in_condition()
+    {
+        $this->makeEntry('dog')->set('type', 'canine')->save();
+        $this->makeEntry('wolf')->set('type', 'canine')->save();
+        $this->makeEntry('tiger')->set('type', 'feline')->save();
+        $this->makeEntry('cat')->set('type', 'feline')->save();
+        $this->makeEntry('lion')->set('type', 'feline')->save();
+        $this->makeEntry('horse')->set('type', 'equine')->save();
+        $this->makeEntry('bigfoot')->save();
+
+        $this->assertCount(7, $this->getEntries());
+        $this->assertEquals(
+            ['tiger', 'cat', 'lion', 'horse', 'bigfoot'],
+            $this->getEntries(['type:not_in' => ['canine']])->map->slug()->all()
+        );
+        $this->assertEquals(
+            ['dog', 'wolf', 'horse', 'bigfoot'],
+            $this->getEntries(['type:not_in' => ['feline']])->map->slug()->all()
+        );
+        $this->assertEquals(
+            ['horse', 'bigfoot'],
+            $this->getEntries(['type:not_in' => ['canine', 'feline']])->map->slug()->all()
+        );
+        $this->assertEquals(
+            ['dog', 'wolf', 'tiger', 'cat', 'lion', 'bigfoot'],
+            $this->getEntries(['type:not_in' => ['equine']])->map->slug()->all()
+        );
     }
 
     /** @test */
@@ -430,4 +480,123 @@ class QueriesConditionsTest extends TestCase
         $this->assertCount(2, $this->getEntries(['age:is_numberwang' => true]));
         $this->assertCount(1, $this->getEntries(['age:is_numberwang' => false]));
     }
+
+    /** @test */
+    function when_the_value_is_an_augmentable_object_it_will_use_the_corresponding_value()
+    {
+        // The value doesn't have to be an entry, it just has to be an augmentable.
+        // It's just simple for us to create an entry here.
+        $value = Facades\Entry::make()
+            ->collection(Facades\Collection::make('test'))
+            ->set('somefield', 'somevalue');
+
+        $class = new class($value) {
+            use QueriesConditions;
+            protected $parameters;
+            public function __construct($value)
+            {
+                $this->parameters = ['somefield:is' => $value];
+            }
+            public function query($query)
+            {
+                $this->queryConditions($query);
+            }
+        };
+
+        $query = $this->mock(Builder::class);
+        $query->shouldReceive('where')->with('somefield', 'somevalue');
+
+        $class->query($query);
+    }
+
+    /** @test */
+    function when_the_value_is_an_array_of_augmentables_it_will_get_the_respective_values()
+    {
+        // The value doesn't have to be an entry, it just has to be an augmentable.
+        // It's just simple for us to create an entry here.
+        $value = Facades\Entry::make()
+            ->collection(Facades\Collection::make('test'))
+            ->set('somefield', 'somevalue');
+
+        $values = [$value];
+
+        $class = new class($values) {
+            use QueriesConditions;
+            protected $parameters;
+            public function __construct($values)
+            {
+                $this->parameters = ['somefield:is_in' => $values];
+            }
+            public function query($query)
+            {
+                $this->queryConditions($query);
+            }
+        };
+
+        $query = $this->mock(Builder::class);
+        $query->shouldReceive('whereIn')->with('somefield', ['somevalue']);
+
+        $class->query($query);
+    }
+
+    /** @test */
+    function when_the_value_is_a_collection_of_augmentables_it_will_get_the_respective_values()
+    {
+        // The value doesn't have to be an entry, it just has to be an augmentable.
+        // It's just simple for us to create an entry here.
+        $value = Facades\Entry::make()
+            ->collection(Facades\Collection::make('test'))
+            ->set('somefield', 'somevalue');
+
+        $values = collect([$value]);
+
+        $class = new class($values) {
+            use QueriesConditions;
+            protected $parameters;
+            public function __construct($values)
+            {
+                $this->parameters = ['somefield:is_in' => $values];
+            }
+            public function query($query)
+            {
+                $this->queryConditions($query);
+            }
+        };
+
+        $query = $this->mock(Builder::class);
+        $query->shouldReceive('whereIn')->with('somefield', ['somevalue']);
+
+        $class->query($query);
+    }
+
+    /** @test */
+    function when_the_value_is_a_non_augmentable_object_it_will_throw_an_exception()
+    {
+        $this->expectExceptionMessage('Cannot query [somefield] using value [Tests\Tags\Concerns\SomeArbitraryTestObject]');
+
+        $value = new SomeArbitraryTestObject;
+
+        $class = new class($value) {
+            use QueriesConditions;
+            protected $parameters;
+            public function __construct($value)
+            {
+                $this->parameters = ['somefield:is' => $value];
+            }
+            public function query($query)
+            {
+                $this->queryConditions($query);
+            }
+        };
+
+        $query = $this->mock(Builder::class);
+        $query->shouldReceive('where')->with('somefield', 'somevalue');
+
+        $class->query($query);
+    }
+}
+
+class SomeArbitraryTestObject
+{
+    //
 }

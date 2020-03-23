@@ -39,8 +39,8 @@ export default {
 
     methods: {
 
-        create() {
-            if (this.blueprints.length === 1) this.select();
+        create($event) {
+            if (this.blueprints.length === 1) this.select(null, $event);
         },
 
         select(blueprint, $event) {

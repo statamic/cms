@@ -177,6 +177,15 @@ class EntriesController extends CpController
             $entry->date($this->formatDateForSaving($request->date));
         }
 
+        if ($collection->structure() && !$collection->orderable()) {
+            $entry->afterSave(function ($entry) use ($parent) {
+                $entry->structure()
+                    ->in($entry->locale())
+                    ->move($entry->id(), $parent)
+                    ->save();
+            });
+        }
+
         if ($entry->revisionsEnabled() && $entry->published()) {
             $entry
                 ->makeWorkingCopy()
@@ -190,13 +199,6 @@ class EntriesController extends CpController
             $entry
                 ->set('updated_by', User::fromUser($request->user())->id())
                 ->set('updated_at', now()->timestamp)
-                ->save();
-        }
-
-        if ($parent && ($structure = $collection->structure())) {
-            $structure
-                ->in($entry->locale())
-                ->move($entry->id(), $parent)
                 ->save();
         }
 
@@ -294,6 +296,14 @@ class EntriesController extends CpController
             $entry->date($this->formatDateForSaving($request->date));
         }
 
+        if (($structure = $collection->structure()) && !$collection->orderable()) {
+            $tree = $structure->in($site->handle());
+            $parent = $values['parent'] ?? null;
+            $entry->afterSave(function ($entry) use ($parent, $tree) {
+                $tree->appendTo($parent, $entry)->save();
+            });
+        }
+
         if ($entry->revisionsEnabled()) {
             $entry->store([
                 'message' => $request->message,
@@ -304,18 +314,6 @@ class EntriesController extends CpController
                 ->set('updated_by', User::fromUser($request->user())->id())
                 ->set('updated_at', now()->timestamp)
                 ->save();
-        }
-
-        if ($structure = $collection->structure()) {
-            $tree = $structure->in($site->handle());
-
-            if ($request->parent) {
-                $tree->appendTo($values['parent'], $entry);
-            } else {
-                $tree->append($entry);
-            }
-
-            $tree->save();
         }
 
         return new EntryResource($entry);

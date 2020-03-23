@@ -620,7 +620,9 @@ class Asset implements AssetContract, ArrayAccess, Augmentable
 
         $stream = fopen($file->getRealPath(), 'r');
         $this->disk()->put($path, $stream);
-        fclose($stream);
+        if (is_resource($stream)) {
+            fclose($stream);
+        }
 
         $this->path($path);
 

@@ -22,10 +22,6 @@ trait Routable
 
     public function uri()
     {
-        if ($this->isRedirect()) {
-            return null;
-        }
-
         if (! $route = $this->route()) {
             return null;
         }
@@ -56,13 +52,14 @@ trait Routable
 
     public function isRedirect()
     {
-        return (bool) $this->value('redirect');
+        return ($url = $this->redirectUrl())
+            && $url !== 404;
     }
 
     public function redirectUrl()
     {
         if ($redirect = $this->value('redirect')) {
-            return (new \Statamic\Routing\ResolveRedirect)($redirect);
+            return (new \Statamic\Routing\ResolveRedirect)($redirect, $this);
         }
     }
 

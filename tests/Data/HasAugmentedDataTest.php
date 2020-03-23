@@ -3,6 +3,7 @@
 namespace Tests;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedData;
@@ -22,7 +23,7 @@ class HasAugmentedDataTest extends TestCase
             }
         });
 
-        $thing = new class {
+        $thing = new class implements Augmentable {
             use HasAugmentedData, ContainsData;
             public function __construct()
             {
@@ -61,14 +62,14 @@ class HasAugmentedDataTest extends TestCase
             'bar' => 'BAR',
             'baz' => new Value(null, 'baz', $fieldtype, $thing),
         ];
-        $this->assertEquals($expectedArr, $thing->augmented()->all());
+        $this->assertEquals($expectedArr, $thing->augmented()->all()->all());
         $this->assertEquals($expectedArr, $thing->toAugmentedArray());
 
         $expectedSelectArr = [
             'foo' => new Value('FOO', 'foo', $fieldtype, $thing),
             'bar' => 'BAR',
         ];
-        $this->assertEquals($expectedSelectArr, $thing->augmented()->select(['foo', 'bar']));
+        $this->assertEquals($expectedSelectArr, $thing->augmented()->select(['foo', 'bar'])->all());
         $this->assertEquals($expectedSelectArr, $thing->toAugmentedArray(['foo', 'bar']));
     }
 }

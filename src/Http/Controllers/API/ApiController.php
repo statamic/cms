@@ -24,8 +24,6 @@ class ApiController extends Controller
      */
     public function __construct(Request $request)
     {
-        Statamic::enableShallowAugmentation();
-
         $this->request = $request;
     }
 

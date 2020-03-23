@@ -4,6 +4,7 @@ namespace Tests\Tags\Collection;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection as SupportCollection;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
@@ -466,6 +467,28 @@ class CollectionTest extends TestCase
             'c' => null,
             'd' => 'Banana'
         ], $items);
+    }
+
+    /** @test */
+    function when_using_the_tag_without_any_parameters_that_define_the_collection_it_will_get_the_collection_object_from_context()
+    {
+        $item = Facades\Collection::make();
+
+        $this->collectionTag->setContext(['collection' => $item]);
+
+        // Without a param that would instruct Statamic which collection to get, we just return the collection from context.
+        // Which essentially gives the illusion that the tag wasn't run, and a collection variable was accessed.
+        $this->assertEquals($item, $this->collectionTag->setParameters([])->index());
+
+        // Sanity check that *any* parameter isn't the thing that causes it.
+        $this->assertEquals($item, $this->collectionTag->setParameters(['something' => 'else'])->index());
+
+        // Using one of the inclusive params results in an Illuminate\Support\Collection (ie. a list of entries)
+        $this->assertInstanceOf(SupportCollection::class, $this->collectionTag->setParameters(['from' => 'music'])->index());
+        $this->assertInstanceOf(SupportCollection::class, $this->collectionTag->setParameters(['in' => 'music'])->index());
+        $this->assertInstanceOf(SupportCollection::class, $this->collectionTag->setParameters(['folder' => 'music'])->index());
+        $this->assertInstanceOf(SupportCollection::class, $this->collectionTag->setParameters(['use' => 'music'])->index());
+        $this->assertInstanceOf(SupportCollection::class, $this->collectionTag->setParameters(['collection' => 'music'])->index());
     }
 
     private function setTagParameters($parameters)

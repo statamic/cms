@@ -12,7 +12,7 @@
 
 <script>
     Statamic.config(@json(array_merge(Statamic::jsonVariables(request()), [
-        'wrapperClass' => $__env->getSection('wrapper_class')
+        'wrapperClass' => $__env->getSection('wrapper_class', 'max-w-xl')
     ])));
     Statamic.start();
 </script>

@@ -21,7 +21,9 @@ class Collection extends Tags
     {
         $this->parameters['from'] = $this->method;
 
-        return $this->index();
+        return $this->output(
+            $this->entries()->get()
+        );
     }
 
     /**
@@ -29,6 +31,10 @@ class Collection extends Tags
      */
     public function index()
     {
+        if (! $this->params->hasAny(['from', 'in', 'folder', 'use', 'collection'])) {
+            return $this->context->get('collection');
+        }
+
         return $this->output(
             $this->entries()->get()
         );
