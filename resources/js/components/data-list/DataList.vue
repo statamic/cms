@@ -11,10 +11,6 @@ export default {
             type: Array,
             required: true,
         },
-        search: {
-            type: Boolean,
-            default: true
-        },
         searchQuery: {
             type: String,
             default: ''
@@ -122,7 +118,7 @@ export default {
         },
 
         filterBySearch(rows) {
-            if (!this.search || !this.searchQuery) return rows;
+            if (! this.searchQuery) return rows;
 
             const fuse = new Fuse(rows, {
                 findAllMatches: true,
