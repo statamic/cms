@@ -16,17 +16,18 @@
             :sort-direction="sortDirection"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0">
+                <div class="card p-0 relative">
                     <div class="data-list-header min-h-16">
                         <data-list-search v-model="searchQuery" />
-                        <data-list-bulk-actions
-                            :url="actionUrl"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
-                        />
                     </div>
 
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
+
+                    <data-list-bulk-actions
+                        :url="actionUrl"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                    />
 
                     <data-list-table
                         v-if="items.length"
