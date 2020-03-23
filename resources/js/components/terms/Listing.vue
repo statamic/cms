@@ -15,6 +15,13 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0 relative">
+                    <data-list-filter-presets
+                        ref="presets"
+                        :active-preset="activePreset"
+                        :preferences-prefix="preferencesPrefix"
+                        @selected="selectPreset"
+                        @reset="filtersReset"
+                    />
                     <div class="data-list-header">
                         <data-list-filters
                             :filters="filters"
@@ -24,6 +31,7 @@
                             :active-filter-badges="activeFilterBadges"
                             :active-count="activeFilterCount"
                             :search-query="searchQuery"
+                            :saves-presets="true"
                             :preferences-prefix="preferencesPrefix"
                             @filter-changed="filterChanged"
                             @search-changed="searchChanged"
