@@ -19,6 +19,7 @@ class SearchController extends CpController
             ->toAugmentedCollection([
                 'title',
                 'collection', 'is_entry',
+                'taxonomy', 'is_term',
                 'container', 'is_asset',
             ]);
     }

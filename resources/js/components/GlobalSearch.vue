@@ -30,6 +30,7 @@
                 <div class="flex-1 ml-1 title" v-html="result.title"></div>
                 <span class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey">
                     <template v-if="result.is_entry">{{ result.collection.title }}</template>
+                    <template v-if="result.is_term">{{ result.taxonomy.title }}</template>
                     <template v-if="result.is_user">{{ __('User') }}</template>
                     <template v-if="result.is_asset">{{ result.container.title }}</template>
                 </span>
