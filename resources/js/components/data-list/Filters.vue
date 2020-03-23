@@ -10,6 +10,7 @@
                     </button>
                 </template>
                 <div class="flex flex-col p-2 text-left w-64">
+                    <h6 class="mb-1" v-text="__('Show everything where:')"/>
                     <v-select
                         v-if="showFilterSelect"
                         v-model="creating"
