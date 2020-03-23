@@ -68,6 +68,8 @@ export default {
     computed: {
 
         availableFieldFilters() {
+            if (! this.config) return [];
+
             return this.config.extra.filter(field => ! this.initialValues[field.handle]);
         },
 
@@ -124,6 +126,8 @@ export default {
     },
 
     mounted() {
+        if (! this.hasAvailableFieldFilters) return;
+
         this.reset();
 
         this.$refs.fieldSelect.$refs.search.focus();
