@@ -16,6 +16,7 @@
                 :vertical="true"
                 item-class="column-picker-item"
                 handle-class="column-picker-item"
+                append-to=".popover-content"
             >
                 <div class="outline-none text-left px-1 py-1">
                     <h6 v-text="__('Displayed Columns')" class="p-1"/>
