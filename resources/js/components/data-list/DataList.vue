@@ -50,7 +50,9 @@ export default {
     computed: {
 
         filteredRows() {
-            return this.sortRows(this.rows);
+            let rows = this.rows;
+            rows = this.filterBySearch(rows);
+            return this.sortRows(rows);
         },
 
         visibleColumns() {
@@ -103,6 +105,19 @@ export default {
             let firstVisibleColumn = this.visibleColumns[0];
             firstVisibleColumn = firstVisibleColumn ? firstVisibleColumn.field : columns[0].field;
             this.sharedState.sortColumn = this.sortColumn || (this.sort ? firstVisibleColumn : null);
+        },
+
+        filterBySearch(rows) {
+            if (!this.search || !this.searchQuery) return rows;
+
+            const fuse = new Fuse(rows, {
+                findAllMatches: true,
+                threshold: 0.1,
+                minMatchCharLength: 2,
+                keys: this.columns.length ? this.visibleColumns : Object.keys(rows[0])
+            });
+
+            return fuse.search(this.searchQuery);
         },
 
         sortRows(rows) {
