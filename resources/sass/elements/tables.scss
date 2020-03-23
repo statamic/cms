@@ -16,7 +16,7 @@
 }
 
 .data-list-bulk-actions {
-	@apply bg-white absolute w-full pt-2;
+	@apply bg-white absolute w-full pt-2 z-10;
 	padding-left: 56px;
 }
 
@@ -90,7 +90,7 @@
     }
 
     .checkbox-column {
-		@apply .w-4 .pr-0;
+		@apply .w-4 .pr-0 relative z-20;
 		padding-left: 20px;
     }
 
