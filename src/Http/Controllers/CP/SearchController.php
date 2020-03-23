@@ -16,6 +16,10 @@ class SearchController extends CpController
             ->search($request->query('q'))
             ->limit(10)
             ->get()
-            ->toAugmentedCollection();
+            ->toAugmentedCollection([
+                'title',
+                'collection', 'is_entry',
+                'container', 'is_asset',
+            ]);
     }
 }
