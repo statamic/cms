@@ -65,9 +65,14 @@ export default {
         },
 
         visibleColumns() {
-            const columns = this.sharedState.columns;
-            return columns.filter(col => col.visible);
-        }
+            return this.sharedState.columns.filter(column => column.visible);
+        },
+
+        searchableColumns() {
+            return this.visibleColumns.length
+                ? this.visibleColumns.map(column => column.field)
+                : Object.keys(rows[0]);
+        },
 
     },
 
@@ -123,7 +128,7 @@ export default {
                 findAllMatches: true,
                 threshold: 0.1,
                 minMatchCharLength: 2,
-                keys: this.columns.length ? this.visibleColumns : Object.keys(rows[0])
+                keys: this.searchableColumns,
             });
 
             return fuse.search(this.searchQuery);
