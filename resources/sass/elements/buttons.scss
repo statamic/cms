@@ -35,8 +35,7 @@
     }
 
     &:disabled {
-        @apply text-grey-70;
-        background: config('colors.grey-30') !important;
+        @apply text-grey-70 opacity-75;
     }
 }
 
@@ -52,6 +51,10 @@
         border: 1px solid #config('colors.blue-800');
         box-shadow: inset 0 1px 0 0 config('colors.blue-500'), 0 1px 0 0 rgba(25,30,35,.05), 0 0 0 0 transparent;
     }
+
+    &:disabled {
+        @apply text-blue-200 opacity-75;
+    }
 }
 
 // Danger/delete button
@@ -64,6 +67,10 @@
     &:hover:not(:disabled), &:active:not(:disabled) {
         background: linear-gradient(180deg, #c53030, #9b2c2c);
         border-color: #742a2a;
+    }
+
+    &:disabled {
+        @apply text-red-lighter opacity-75;
     }
 }
 
@@ -82,6 +89,10 @@
 
     &:active, &:focus:active {
         @apply bg-grey-50;
+    }
+
+    &:disabled {
+        @apply text-grey-60 opacity-75;
     }
 }
 
