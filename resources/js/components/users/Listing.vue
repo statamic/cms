@@ -15,22 +15,38 @@
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0">
+                    <data-list-filter-presets
+                        ref="presets"
+                        :active-preset="activePreset"
+                        :preferences-prefix="preferencesPrefix"
+                        @selected="selectPreset"
+                        @reset="filtersReset"
+                    />
                     <div class="data-list-header">
-                        <data-list-toggle-all ref="toggleAll" />
-                        <div class="flex-1" />
+                        <data-list-filters
+                            :filters="filters"
+                            :active-preset="activePreset"
+                            :active-preset-payload="activePresetPayload"
+                            :active-filters="activeFilters"
+                            :active-filter-badges="activeFilterBadges"
+                            :active-count="activeFilterCount"
+                            :search-query="searchQuery"
+                            :saves-presets="true"
+                            :preferences-prefix="preferencesPrefix"
+                            @filter-changed="filterChanged"
+                            @search-changed="searchChanged"
+                            @saved="$refs.presets.setPreset($event)"
+                            @deleted="$refs.presets.refreshPresets()"
+                            @restore-preset="$refs.presets.viewPreset($event)"
+                            @reset="filtersReset"
+                        />
+
                         <data-list-bulk-actions
                             class="rounded-b"
                             :url="actionUrl"
                             @started="actionStarted"
                             @completed="actionCompleted"
                         />
-                        <template v-if="!hasSelections">
-                            <data-list-filters
-                                :filters="filters"
-                                :active-filters="activeFilters"
-                                :active-count="activeFilterCount"
-                            />
-                        </template>
                     </div>
                     <data-list-table :allow-bulk-actions="true" @sorted="sorted">
                         <template slot="cell-email" slot-scope="{ row: user, value }">
@@ -88,6 +104,7 @@ export default {
     data() {
         return {
             requestUrl: cp_url('users'),
+            preferencesPrefix: 'users',
         }
     },
 
