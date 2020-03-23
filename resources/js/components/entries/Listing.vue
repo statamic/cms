@@ -9,22 +9,38 @@
             v-if="!initializing"
             :rows="items"
             :columns="columns"
-            :search="false"
-            :search-query="searchQuery"
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0">
-                    <div class="data-list-header min-h-16">
-                        <data-list-toggle-all ref="toggleAll" />
-                        <data-list-search v-model="searchQuery" />
-                        <data-list-bulk-actions
-                            :url="actionUrl"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
+                <div class="card p-0 relative">
+                    <data-list-filter-presets
+                        ref="presets"
+                        :active-preset="activePreset"
+                        :preferences-prefix="preferencesPrefix"
+                        @selected="selectPreset"
+                        @reset="filtersReset"
+                    />
+                    <div class="data-list-header">
+                        <data-list-filters
+                            :filters="filters"
+                            :active-preset="activePreset"
+                            :active-preset-payload="activePresetPayload"
+                            :active-filters="activeFilters"
+                            :active-filter-badges="activeFilterBadges"
+                            :active-count="activeFilterCount"
+                            :search-query="searchQuery"
+                            :saves-presets="true"
+                            :preferences-prefix="preferencesPrefix"
+                            @filter-changed="filterChanged"
+                            @search-changed="searchChanged"
+                            @saved="$refs.presets.setPreset($event)"
+                            @deleted="$refs.presets.refreshPresets()"
+                            @restore-preset="$refs.presets.viewPreset($event)"
+                            @reset="filtersReset"
                         />
+
                         <template v-if="!hasSelections">
                             <button class="btn-flat ml-1"
                                 v-if="showReorderButton"
@@ -35,17 +51,16 @@
                                 <button class="btn-flat ml-1" @click="saveOrder" v-text="__('Save Order')" />
                                 <button class="btn-flat ml-1" @click="cancelReordering" v-text="__('Cancel')" />
                             </template>
-                            <data-list-filters
-                                class="ml-1"
-                                :filters="filters"
-                                :active-filters="activeFilters"
-                                :active-count="activeFilterCount"
-                                :preferences-key="preferencesKey('filters')" />
-                            <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" />
                         </template>
                     </div>
 
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
+
+                    <data-list-bulk-actions
+                        :url="actionUrl"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                    />
 
                     <data-list-table
                         v-show="items.length"
@@ -54,6 +69,8 @@
                         :reorderable="reordering"
                         :sortable="!reordering"
                         :toggle-selection-on-row-click="true"
+                        :allow-column-picker="true"
+                        :column-preferences-key="preferencesKey('columns')"
                         @sorted="sorted"
                         @reordered="reordered"
                     >
@@ -87,7 +104,8 @@
                     class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
-                    @page-selected="page = $event"
+                    @page-selected="selectPage"
+                    @per-page-changed="changePerPage"
                 />
             </div>
         </data-list>
@@ -132,10 +150,6 @@ export default {
         reorderingDisabled() {
             return this.sortColumn !== 'order';
         }
-    },
-
-    created() {
-        this.filtersChanged(this.$preferences.get(this.preferencesKey('filters')));
     },
 
     methods: {
@@ -200,7 +214,7 @@ export default {
 
         reordered(items) {
             this.items = items;
-        }
+        },
 
     }
 

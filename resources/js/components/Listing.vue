@@ -16,7 +16,6 @@ export default {
     props: {
         initialSortColumn: String,
         initialSortDirection: String,
-        filters: Array,
     },
 
     data() {
@@ -29,7 +28,6 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             meta: null,
-            searchQuery: '',
         }
     },
 
@@ -42,8 +40,12 @@ export default {
                 page: this.page,
                 perPage: this.perPage,
                 search: this.searchQuery,
-                filters: btoa(JSON.stringify(this.activeFilters)),
+                filters: this.activeFilterParameters,
             }, this.additionalParameters);
+        },
+
+        activeFilterParameters() {
+            return btoa(JSON.stringify(this.activeFilters));
         },
 
         additionalParameters() {
@@ -89,7 +91,7 @@ export default {
         searchQuery(query) {
             this.sortColumn = null;
             this.sortDirection = null;
-            this.pageReset();
+            this.resetPage();
             this.request();
         }
 
@@ -114,7 +116,7 @@ export default {
             }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
-                this.activeFilters = {...response.data.meta.filters};
+                this.setActiveFilters(response);
                 this.items = Object.values(response.data.data);
                 this.meta = response.data.meta;
                 if (this.shouldRequestFirstPage) return this.request();
@@ -131,6 +133,13 @@ export default {
 
         afterRequestCompleted(response) {
             //
+        },
+
+        setActiveFilters(response) {
+            if (! response.data.meta.filters) return;
+
+            this.activeFilters = {...response.data.meta.filters.values};
+            this.activeFilterBadges = {...response.data.meta.filters.badges};
         },
 
         sorted(column, direction) {

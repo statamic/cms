@@ -1,74 +1,210 @@
 <template>
-
     <div>
+        <div v-if="hasAvailableFieldFilters">
+            <div class="flex flex-col">
 
-        <div class="flex items-center text-sm">
+                <v-select
+                    ref="fieldSelect"
+                    :placeholder="__('Select Field')"
+                    :options="fieldOptions"
+                    :reduce="option => option.value"
+                    :value="field"
+                    @input="createFilter"
+                />
 
-            <select-input
-                class="w-1/3 mr-2"
-                name="operator"
-                :value="filter.operator"
-                placeholder=""
-                :options="operatorOptions"
-                @input="onOperatorUpdated" />
+                <publish-container
+                    v-if="showFieldFilter"
+                    name="filter-field"
+                    :meta="{}"
+                    :values="containerValues"
+                    :track-dirty-state="false"
+                    class="filter-fields mt-1"
+                    @updated="updateValues"
+                >
+                    <!-- TODO: handle showing/hiding of labels more elegantly -->
+                    <publish-fields
+                        slot-scope="{ setFieldValue }"
+                        :fields="filter.fields"
+                        name-prefix="filter-field"
+                        class="w-full no-label"
+                        @updated="setFieldValue"
+                    />
+                </publish-container>
 
-            <div class="flex-1">
-                <text-input
-                    name="value"
-                    :value="filter.value"
-                    @input="onValueUpdated" />
             </div>
 
+            <button
+                class="outline-none mt-2 text-xs text-blue hover:text-grey-80"
+                v-text="__('Clear')"
+                @click="resetAll"
+            />
+
         </div>
-
     </div>
-
 </template>
 
 <script>
-import HasInputOptions from '../fieldtypes/HasInputOptions.js';
+import PublishField from '../publish/Field.vue';
 
 export default {
 
-    mixins: [HasInputOptions],
+    components: { PublishField },
 
     props: {
-        operators: {
-            type: Object,
-            required: true
-        },
-        filter: {
-            type: Object,
-            required: true
-        }
+        config: Object,
+        values: Object,
     },
 
-    mounted() {
-        if (this.filter && !this.filter.operator && this.operatorOptions[0].value) {
-            this.onOperatorUpdated(this.operatorOptions[0].value);
-        }
+    data() {
+        return {
+            initialValues: this.values,
+            containerValues: {},
+            filter: null,
+            field: null,
+            fieldValues: null,
+        };
     },
 
     computed: {
-        operatorOptions() {
-            return this.normalizeInputOptions(this.operators);
+
+        availableFieldFilters() {
+            if (! this.config) return [];
+
+            return this.config.extra.filter(field => ! this.initialValues[field.handle]);
+        },
+
+        hasAvailableFieldFilters() {
+            return !! this.availableFieldFilters.length;
+        },
+
+        fieldOptions() {
+            let options = this.availableFieldFilters.map(filter => {
+                return {
+                    value: filter.handle,
+                    label: filter.display,
+                };
+            });
+
+            return _.sortBy(options, option => option.label);
+        },
+
+        showFieldFilter() {
+            return this.field;
+        },
+
+        isFilterComplete() {
+            if (! this.filter) return false;
+
+            let fields = _.chain(this.filter.fields).mapObject(field => field.handle).values().value();
+            let allFieldsFilled = _.values(this.fieldValues).filter(value => value).length === fields.length;
+
+            return this.field !== null && allFieldsFilled;
+        },
+
+        newValues() {
+            let values = clone(this.values);
+
+            delete values[this.field];
+
+            values[this.field] = this.isFilterComplete
+                ? this.fieldValues
+                : null;
+
+            return values;
+        },
+
+    },
+
+    watch: {
+        field: 'update',
+        fieldValues: {
+            deep: true,
+            handler() {
+                this.update();
+            }
         },
     },
 
+    mounted() {
+        if (! this.hasAvailableFieldFilters) return;
+
+        this.reset();
+
+        this.$refs.fieldSelect.$refs.search.focus();
+    },
+
     methods: {
-        onOperatorUpdated(operator) {
-            this.filter.operator = operator;
-            this.update();
+
+        reset() {
+            if (this.field) this.$emit('changed', this.initialValues);
+
+            this.containerValues = {};
+            this.filter = null;
+            this.field = null;
+            this.fieldValues = null;
+
         },
 
-        onValueUpdated: _.debounce(function (value) {
-            this.filter.value = value;
-            this.update();
+        resetAll() {
+            this.reset();
+
+            this.$emit('cleared');
+        },
+
+        resetInitialValues() {
+            this.initialValues = this.values;
+
+            this.reset();
+        },
+
+        createFilter(field) {
+            if (this.field) this.$emit('changed', this.initialValues);
+
+            this.reset();
+            this.setFilter(field);
+            this.setDefaultValues();
+
+            this.field = field;
+
+            // TODO: When fieldtype has a reliable `.focus()` method...
+            // this.$nextTick(() => {
+            //     this.$refs.valueFields[0].focus();
+            // });
+        },
+
+        setFilter(field) {
+            this.filter = _.find(this.availableFieldFilters, filter => filter.handle === field);
+        },
+
+        setDefaultValues() {
+            if (! this.filter) return;
+
+            let values = {};
+
+            this.filter.fields
+                .filter(field => field.default)
+                .forEach(field => values[field.handle] = field.default);
+
+            this.updateValues(values);
+        },
+
+        updateValues(values) {
+            this.updateContainerValues(values);
+            this.updateFieldValues(values);
+        },
+
+        updateContainerValues(values) {
+            this.containerValues = clone(values);
+        },
+
+        updateFieldValues: _.debounce(function (values) {
+            this.fieldValues = clone(values);
         }, 300),
 
         update() {
-            this.$emit('updated', this.filter);
-        }
+            this.$emit('changed', this.newValues);
+        },
+
     }
 
 }

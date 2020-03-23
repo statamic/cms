@@ -194,7 +194,7 @@ class Collection implements Contract, AugmentableContract
                 $blueprints = $blueprints ?? [$this->fallbackEntryBlueprint()->handle()];
 
                 return collect($blueprints)->map(function ($blueprint) {
-                    return Blueprint::find($blueprint);
+                    return $this->ensureEntryBlueprintFields(Blueprint::find($blueprint));
                 });
             })
             ->setter(function ($blueprints) {

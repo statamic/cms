@@ -99,7 +99,6 @@
 </template>
 
 <script>
-import Popper from 'vue-popperjs';
 import HasFilters from '../../data-list/HasFilters';
 
 export default {
@@ -107,10 +106,6 @@ export default {
     mixins: [
         HasFilters,
     ],
-
-    components: {
-        Popper
-    },
 
     props: {
         url: String,

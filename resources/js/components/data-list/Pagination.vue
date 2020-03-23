@@ -5,6 +5,7 @@
         <div class="flex-1" v-if="! inline"></div>
 
         <ul v-if="hasMultiplePages" class="pagination" :class="{'pagination-inline': inline}">
+
             <li v-if="hasPrevious">
                 <a @click="selectPreviousPage"><span class="text-xs">&larr;</span></a>
             </li>
@@ -33,7 +34,7 @@
                 :placeholder="__('Per Page')"
                 :options="perPageOptions"
                 :value="perPage"
-                @input="$events.$emit('per-page-changed', $event)" />
+                @input="$emit('per-page-changed', $event)" />
         </div>
 
     </div>

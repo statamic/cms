@@ -3,7 +3,7 @@
 namespace Statamic\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Statamic\Query\Scopes\Repository as ScopeRepository;
+use Statamic\Query\Scopes\ScopeRepository;
 
 class Scope extends Facade
 {

@@ -12,7 +12,7 @@
             </div>
             <div class="p-2 bg-grey-20 border-t flex items-center justify-end text-sm">
                 <button class="text-grey hover:text-grey-90" @click="$emit('cancel')">{{ __('Cancel') }}</button>
-                <button class="btn ml-2" :class="buttonClass" v-text="buttonText" @click="$emit('confirm')" />
+                <button class="ml-2" :class="buttonClass" v-text="buttonText" @click="$emit('confirm')" />
             </div>
         </div>
     </modal>

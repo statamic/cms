@@ -23,11 +23,10 @@
 
 // Default, non-primary action button
 .btn, .btn-default {
-    @apply text-grey-80;
+    @apply text-grey-80 shadow-button;
 
     background: linear-gradient(180deg, #fff, #f9fafb);
     border: 1px solid #c4cdd6;
-    box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
 
     &:hover:not(:disabled), &:active:not(:disabled) {
         background: linear-gradient(180deg, #f9fafb, #f4f6f8);

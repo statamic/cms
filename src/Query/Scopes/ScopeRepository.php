@@ -4,7 +4,7 @@ namespace Statamic\Query\Scopes;
 
 use Statamic\Query\Scopes\Filter;
 
-class Repository
+class ScopeRepository
 {
     public function all()
     {

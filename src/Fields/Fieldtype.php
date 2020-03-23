@@ -2,11 +2,12 @@
 
 namespace Statamic\Fields;
 
-use Statamic\Support\Str;
-use Statamic\Extend\HasTitle;
-use Statamic\Extend\HasHandle;
-use Statamic\Extend\RegistersItself;
 use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Extend\HasHandle;
+use Statamic\Extend\HasTitle;
+use Statamic\Extend\RegistersItself;
+use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
+use Statamic\Support\Str;
 
 abstract class Fieldtype implements Arrayable
 {
@@ -28,12 +29,6 @@ abstract class Fieldtype implements Arrayable
     protected $configFields = [];
     protected $icon;
     protected $view;
-
-    protected $queryOperators = [
-        '=' => 'Equal to',
-        '<>' => 'Not equal to',
-        'like' => 'Like',
-    ];
 
     public function setField(Field $field)
     {
@@ -87,9 +82,9 @@ abstract class Fieldtype implements Arrayable
         return $this->categories;
     }
 
-    public function queryOperators(): array
+    public function filter()
     {
-        return $this->queryOperators;
+        return new FieldtypeFilter($this);
     }
 
     public function rules(): array

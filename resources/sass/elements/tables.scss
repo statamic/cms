@@ -3,11 +3,21 @@
    ========================================================================== */
 
 .data-list-header {
-    @apply py-1.5 pr-2 flex flex-wrap items-center border-b;
+    @apply p-2 pb-1 flex flex-wrap items-center;
 }
 
 .data-list-search-input {
-    @apply text-sm px-2 py-1 outline-none flex-1;
+	// @apply text-sm px-2 py-1 flex-1 rounded border;
+	@apply bg-white;
+
+	&:focus {
+		@apply focus-outline;
+	}
+}
+
+.data-list-bulk-actions {
+	@apply bg-white absolute w-full pt-2 z-10;
+	padding-left: 56px;
 }
 
 .data-list-footer {
@@ -20,23 +30,35 @@
 	width: fit-content;
 
     thead {
-        @apply bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide outline-none;
+		// @apply bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide outline-none;
+		@apply text-sm text-grey-70 text-grey-90;
 
 		tr {
 			@apply border-b;
 		}
 
         th {
-            @apply font-medium px-2 py-1.5;
+            @apply font-medium px-2 pt-2 pb-1;
             &:first-child { @apply .rounded-tl; }
-            &:last-child { @apply .rounded-tr; }
-        }
+			&:last-child { @apply .rounded-tr; }
+			&:hover {
+				@apply text-grey-90;
+			}
+		}
+		.actions-column {
+			@apply p-0 pr-2 text-right;
+			width: 24px;
+		}
 	}
 
     tbody {
 		outline: none;
         tr {
-            @apply border-b text-sm;
+			@apply border-b text-sm;
+
+			&.row-selected {
+				@apply bg-grey-20;
+			}
 
 			&:last-child {
 				@apply border-none;
@@ -57,18 +79,26 @@
                 @apply py-1 px-2;
                 word-break: break-all;
             }
-        }
+		}
+		.actions-column {
+			@apply p-0 text-right;
+			width: 24px;
+			.rotating-dots-button {
+				margin-right: 18px;
+			}
+		}
     }
 
     .checkbox-column {
-        @apply .w-4 .pr-0;
+		@apply .w-4 .pr-0 relative z-20;
+		padding-left: 20px;
     }
 
     .sortable-column {
         @apply cursor-pointer select-none;
 
         &:hover {
-            @apply bg-grey-30;
+			@apply text-blue-500;
         }
 
         &.current-column {
@@ -77,7 +107,7 @@
         }
 
         svg {
-            transition: all 150ms ease;
+            // transition: all 150ms ease;
             opacity: 0;
         }
 
@@ -101,6 +131,24 @@
     thead th {
         border-radius: 0;
     }
+}
+
+.data-list-filter-link {
+	@apply border-grey-40 text-grey-60 mr-1 p-1.5 pb-1;
+
+	&:hover {
+		@apply border-b-3 text-grey-70;
+	}
+
+	&:focus {
+		@apply border-blue-light;
+		outline: 0;
+		box-shadow: inset 0 0 0 0.2rem rgba(0,125,255,.25);
+	}
+
+	&.active {
+		@apply border-b-3 border-blue text-grey-80;
+	}
 }
 
 td.table-drag-handle {

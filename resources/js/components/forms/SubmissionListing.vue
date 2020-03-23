@@ -16,25 +16,24 @@
             :sort-direction="sortDirection"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0">
+                <div class="card p-0 relative">
                     <div class="data-list-header min-h-16">
-                        <data-list-toggle-all ref="toggleAll" />
                         <data-list-search v-model="searchQuery" />
-                        <data-list-bulk-actions
-                            :url="actionUrl"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
-                        />
-                        <template v-if="!hasSelections">
-                            <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" />
-                        </template>
                     </div>
 
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
 
+                    <data-list-bulk-actions
+                        :url="actionUrl"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                    />
+
                     <data-list-table
                         v-if="items.length"
                         :allow-bulk-actions="true"
+                        :allow-column-picker="true"
+                        :column-preferences-key="preferencesKey('columns')"
                         @sorted="sorted"
                     >
                         <template slot="cell-datestamp" slot-scope="{ row: submission, value }">
@@ -59,7 +58,8 @@
                     class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
-                    @page-selected="page = $event"
+                    @page-selected="selectPage"
+                    @per-page-changed="changePerPage"
                 />
             </div>
         </data-list>

@@ -35,6 +35,7 @@
             <div slot-scope="{ container, setFieldValue, setFieldMeta }">
                 <publish-sections
                     :enable-sidebar="false"
+                    :can-toggle-labels="true"
                     @updated="setFieldValue"
                     @meta-updated="setFieldMeta"
                     @focus="container.$emit('focus', $event)"

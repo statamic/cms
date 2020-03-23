@@ -7,17 +7,15 @@ use Statamic\Query\Scopes\Filter;
 
 class Site extends Filter
 {
+    public $required = true;
+
     public function fieldItems()
     {
-        $options = Facades\Site::all()->mapWithKeys(function ($site) {
-            return [$site->handle() => $site->name()];
-        })->all();
-
         return [
             'value' => [
                 'display' => __('Site'),
                 'type' => 'select',
-                'options' => $options
+                'options' => $this->options()->all(),
             ]
         ];
     }
@@ -27,17 +25,15 @@ class Site extends Filter
         $query->where('site', $values['value']);
     }
 
-    public function required()
-    {
-        return true;
-    }
-
     public function visibleTo($key)
     {
-        if (! Facades\Site::hasMultiple()) {
-            return false;
-        }
+        return $key === 'entries' && Facades\Site::hasMultiple();
+    }
 
-        return $key === 'entries';
+    protected function options()
+    {
+        return Facades\Site::all()->mapWithKeys(function ($site) {
+            return [$site->handle() => $site->name()];
+        });
     }
 }

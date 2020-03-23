@@ -3,6 +3,7 @@
 @section('wrapper_class', 'max-w-full')
 
 @section('content')
+
     <collection-view
         title="{{ $collection->title() }}"
         handle="{{ $collection->handle() }}"
