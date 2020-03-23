@@ -40,6 +40,7 @@
             />
 
         </div>
+        <v-select v-else :disabled="true" :placeholder="__('No available filters')" />
     </div>
 </template>
 
