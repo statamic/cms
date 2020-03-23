@@ -14,7 +14,7 @@
         :close-on-select="true"
         :value="selectedOptions"
         :create-option="(value) => ({ value, label: value })"
-        @input="update($event.map(v => v.value))"
+        @input="vueSelectUpdated"
         @search:focus="$emit('focus')"
         @search:blur="$emit('blur')">
             <template #selected-option-container v-if="config.multiple"><i class="hidden"></i></template>
@@ -53,6 +53,9 @@ export default {
     computed: {
         selectedOptions() {
             let selections = this.value || [];
+            if (typeof selections === 'string') {
+                selections = [selections];
+            }
             return selections.map(value => {
                 return _.findWhere(this.options, {value}) || { value, label: value };
             });
@@ -78,6 +81,14 @@ export default {
     methods: {
         focus() {
             this.$refs.input.focus();
+        },
+
+        vueSelectUpdated(value) {
+            if (this.config.multiple) {
+                this.update(value.map(v => v.value));
+            } else {
+                this.update(value.value);
+            }
         }
     }
 };
