@@ -148,12 +148,12 @@
                                         </button>
                                 </div>
 
-                                <div class="p-2 site-list border-t" v-if="localizations.length > 1">
+                                <div class="p-2 border-t" v-if="localizations.length > 1">
                                     <label class="publish-field-label font-medium mb-1" v-text="__('Sites')" />
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
-                                        class="site-item flex items-center border-grey-30"
+                                        class="text-sm flex items-center -mx-2 px-2 py-1 cursor-pointer hover:bg-grey-20"
                                         :class="{ 'opacity-50': !option.active }"
                                         @click="localizationSelected(option)"
                                     >
