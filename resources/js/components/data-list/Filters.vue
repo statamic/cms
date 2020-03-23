@@ -11,13 +11,15 @@
                 </template>
                 <div class="flex flex-col p-2 text-left w-64">
                     <h6 class="mb-1" v-text="__('Show everything where:')"/>
-                    <v-select
-                        v-if="showFilterSelect"
-                        v-model="creating"
-                        :reduce="option => option.value"
-                        :options="filterTypeOptions"
-                        :placeholder="__('Filter Type')"
-                    />
+                    <div v-if="showFilterSelection" class="-mt-1">
+                        <button
+                            v-for="filter in unpinnedFilters"
+                            :key="filter.handle"
+                            v-text="filter.title"
+                            class="btn w-full mt-1"
+                            @click="creating = filter.handle"
+                        />
+                    </div>
                     <div class="filter-fields text-sm">
                         <field-filter
                             v-show="showFieldFilter"
@@ -102,11 +104,8 @@
 <script>
 import DataListFilter from './Filter.vue';
 import FieldFilter from './FieldFilter.vue';
-import HasInputOptions from '../fieldtypes/HasInputOptions.js';
 
 export default {
-
-    mixins: [HasInputOptions],
 
     components: {
         DataListFilter,
@@ -165,7 +164,7 @@ export default {
             return this.filters.filter(filter => ! filter.pinned);
         },
 
-        showFilterSelect() {
+        showFilterSelection() {
             if (this.fieldFilter && this.unpinnedFilters.length === 1) return false;
 
             return ! this.creating;
@@ -175,14 +174,6 @@ export default {
             if (this.fieldFilter && this.unpinnedFilters.length === 1) return true;
 
             return this.creating === 'fields';
-        },
-
-        filterTypeOptions() {
-            let options = {};
-
-            this.unpinnedFilters.forEach(filter => options[filter.handle] = filter.title);
-
-            return this.normalizeInputOptions(options);
         },
 
         fieldFilterBadges() {
