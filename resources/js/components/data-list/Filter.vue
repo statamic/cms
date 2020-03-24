@@ -7,7 +7,7 @@
             :meta="{}"
             :values="containerValues"
             :track-dirty-state="false"
-            @updated="$emit('changed', $event)"
+            @updated="updateValues"
         >
             <publish-fields
                 slot-scope="{ setFieldValue }"
@@ -51,6 +51,16 @@ export default {
     },
 
     methods: {
+        updateValues(values) {
+            let filteredValues = clone(values);
+
+            Object.keys(values).forEach(key => {
+                if (_.isEmpty(values[key])) delete filteredValues[key];
+            });
+
+            this.$emit('changed', filteredValues);
+        },
+
         resetAll() {
             this.$emit('changed', null);
             this.$emit('cleared');
