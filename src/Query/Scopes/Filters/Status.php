@@ -10,6 +10,11 @@ class Status extends Filter
 {
     public $pinned = true;
 
+    public static function title()
+    {
+        return __('Status');
+    }
+
     public function fieldItems()
     {
         return [

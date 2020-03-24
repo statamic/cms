@@ -7,6 +7,11 @@ use Statamic\Query\Scopes\Filter;
 
 class UserRole extends Filter
 {
+    public static function title()
+    {
+        return __('Role');
+    }
+
     public function fieldItems()
     {
         return [

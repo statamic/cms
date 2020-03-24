@@ -7,6 +7,11 @@ use Statamic\Query\Scopes\Filter;
 
 class UserGroup extends Filter
 {
+    public static function title()
+    {
+        return __('Group');
+    }
+
     public function fieldItems()
     {
         return [

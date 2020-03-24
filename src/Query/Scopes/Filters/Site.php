@@ -7,6 +7,11 @@ use Statamic\Query\Scopes\Filter;
 
 class Site extends Filter
 {
+    public static function title()
+    {
+        return __('Site');
+    }
+
     public function fieldItems()
     {
         return [

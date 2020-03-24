@@ -7,6 +7,11 @@ use Statamic\Query\Scopes\Filter;
 
 class Collection extends Filter
 {
+    public static function title()
+    {
+        return __('Collection');
+    }
+
     public function fieldItems()
     {
         return [
