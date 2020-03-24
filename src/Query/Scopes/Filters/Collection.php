@@ -15,8 +15,8 @@ class Collection extends Filter
     public function fieldItems()
     {
         return [
-            'value' => [
-                'display' => __('Collection'),
+            'collections' => [
+                'placeholder' => __('Select Collection(s)'),
                 'type' => 'select',
                 'options' => $this->options()->all(),
                 'clearable' => true,
@@ -27,13 +27,12 @@ class Collection extends Filter
 
     public function apply($query, $values)
     {
-        $collections = $values['value'];
+        $query->whereIn('collection', $values['collections']);
+    }
 
-        if (empty($collections)) {
-            $collections = $this->context['collections'];
-        }
-
-        $query->whereIn('collection', $collections);
+    public function badge($values)
+    {
+        return __('collections') . ': ' . collect($values['collections'])->implode(', ');
     }
 
     public function visibleTo($key)
