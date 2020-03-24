@@ -101,6 +101,8 @@ export default {
     methods: {
 
         autoApplyFilters() {
+            if (! this.filters) return;
+
             let values = {};
 
             this.filters.filter(filter => ! _.isEmpty(filter.auto_apply)).forEach(filter => {
