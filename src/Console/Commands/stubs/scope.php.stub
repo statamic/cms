@@ -3,7 +3,6 @@
 namespace DummyNamespace;
 
 use Statamic\Query\Scopes\Scope;
-use Statamic\Query\Scopes\Filter;
 
 class DummyClass extends Scope
 {
