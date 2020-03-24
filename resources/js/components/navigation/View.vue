@@ -68,14 +68,14 @@
                                 <p>{{ __('messages.navigation_configure_settings_intro') }}</p>
                             </div>
                         </a>
-                        <a @click="linkPage" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+                        <a @click="linkPage()" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
                             <svg-icon name="paperclip" class="h-8 w-8 mr-2 text-grey-80" />
                             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
                                 <h3 class="mb-1 text-blue">{{ __('Link to URL') }} &rarr;</h3>
                                  <p>{{ __('messages.navigation_link_to_url_instructions') }}</p>
                             </div>
                         </a>
-                        <a @click="linkEntries" v-if="hasCollections" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+                        <a @click="linkEntries()" v-if="hasCollections" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
                             <svg-icon name="hierarchy-files" class="h-8 w-8 mr-2 text-grey-80" />
                             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
                                 <h3 class="mb-1 text-blue">{{ __('Link to Entry') }} &rarr;</h3>
