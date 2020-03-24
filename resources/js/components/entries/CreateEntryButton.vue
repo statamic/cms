@@ -1,6 +1,6 @@
 <template>
 
-    <dropdown-list class="inline-block" :show-dropdown-if="hasMultipleBlueprints">
+    <dropdown-list class="inline-block" :disabled="!hasMultipleBlueprints">
         <template v-slot:trigger>
             <button
                 :class="[buttonClass, {'flex items-center pr-2': hasMultipleBlueprints }]"
