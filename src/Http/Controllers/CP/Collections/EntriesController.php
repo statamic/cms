@@ -8,6 +8,7 @@ use Statamic\Facades\Entry;
 use Statamic\CP\Column;
 use Statamic\CP\Breadcrumbs;
 use Statamic\Facades\Blueprint;
+use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Entries\Entries;
 use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
@@ -16,7 +17,6 @@ use Statamic\Facades\User;
 use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Events\Data\PublishBlueprintFound;
-use Statamic\Http\Requests\FilteredSiteRequest;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
@@ -25,7 +25,7 @@ class EntriesController extends CpController
 {
     use QueriesFilters;
 
-    public function index(FilteredSiteRequest $request, $collection)
+    public function index(FilteredRequest $request, $collection)
     {
         $this->authorize('view', $collection);
 
