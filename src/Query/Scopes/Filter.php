@@ -42,6 +42,11 @@ abstract class Filter extends Scope implements Arrayable
         ];
     }
 
+    public function autoApply()
+    {
+        return [];
+    }
+
     public function badge($values)
     {
         $valuesSummary = collect($values)
@@ -58,6 +63,7 @@ abstract class Filter extends Scope implements Arrayable
             'title' => $this->title(),
             'extra' => $this->extra(),
             'pinned' => $this->pinned(),
+            'auto_apply' => $this->autoApply(),
             'fields' => $this->fields()->toPublishArray(),
             'meta' => $this->fields()->meta(),
             'values' => $this->fields()->all()->map->defaultValue(),
