@@ -19,21 +19,18 @@
         >
             <div slot-scope="{}" class="flex flex-col h-full">
                 <div class="bg-white border-b flex items-center justify-between bg-grey-20">
-                    <data-list-toggle-all v-if="!hasMaxSelections" />
                     <div class="p-2 flex flex-1 items-center">
-                        <div class="flex-1">
-                            <data-list-search
-                                v-if="search"
-                                v-model="searchQuery"
-                                ref="search"
-                                class="w-full bg-transparent p-0" />
-                        </div>
-
                         <data-list-filters
-                            class="ml-1"
+                            ref="filters"
                             :filters="filters"
                             :active-filters="activeFilters"
-                            :active-count="activeFilterCount" />
+                            :active-filter-badges="activeFilterBadges"
+                            :active-count="activeFilterCount"
+                            :search-query="searchQuery"
+                            @filter-changed="filterChanged"
+                            @search-changed="searchChanged"
+                            @reset="filtersReset"
+                        />
                     </div>
                 </div>
 
@@ -131,7 +128,6 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             page: 1,
-            searchQuery: '',
             selections: _.clone(this.initialSelections),
             columns: [],
             filters: [],
@@ -159,7 +155,7 @@ export default {
 
     mounted() {
         this.request().then(() => {
-            if (this.search) this.$refs.search.focus();
+            if (this.search) this.$refs.filters.$refs.search.focus();
         });
     },
 
@@ -214,7 +210,7 @@ export default {
                 this.items = response.data.data;
                 this.meta = response.data.meta;
                 this.filters = response.data.meta.filters;
-                this.activeFilters = {...response.data.meta.activeFilters};
+                this.setActiveFilters(response);
                 this.loading = false;
                 this.initializing = false;
             }).catch(e => {
@@ -223,6 +219,13 @@ export default {
                 this.initializing = false;
                 this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { duration: null });
             });
+        },
+
+        setActiveFilters(response) {
+            if (! response.data.meta.activeFilters) return;
+
+            this.activeFilters = {...response.data.meta.activeFilters.values};
+            this.activeFilterBadges = {...response.data.meta.activeFilters.badges};
         },
 
         sorted(column, direction) {
