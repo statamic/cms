@@ -7,8 +7,6 @@ use Statamic\Query\Scopes\Filter;
 
 class Site extends Filter
 {
-    public $required = true;
-
     public function fieldItems()
     {
         return [
