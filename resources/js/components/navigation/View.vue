@@ -32,8 +32,8 @@
                             <svg-icon name="chevron-down-xs" class="w-2 ml-2" v-if="hasCollections" />
                         </button>
                     </template>
-                    <dropdown-item :text="__('Link to URL')" @click="linkPage" />
-                    <dropdown-item :text="__('Link to Entry')" @click="linkEntries" />
+                    <dropdown-item :text="__('Link to URL')" @click="linkPage()" />
+                    <dropdown-item :text="__('Link to Entry')" @click="linkEntries()" />
                 </dropdown-list>
 
                 <button
