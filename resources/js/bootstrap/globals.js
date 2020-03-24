@@ -6,6 +6,10 @@ global.cp_url = function(url) {
     return tidy_url(url);
 };
 
+global.docs_url = function(url) {
+    return tidy_url('https://statamic.dev/' + url);
+};
+
 global.resource_url = function(url) {
     url = Statamic.$config.get('resourceUrl') + '/' + url;
     return tidy_url(url);
