@@ -42,7 +42,7 @@
                 </div>
             </popover>
 
-            <data-list-search :value="searchQuery" @input="$emit('search-changed', $event)" />
+            <data-list-search ref="search" :value="searchQuery" @input="$emit('search-changed', $event)" />
 
             <template v-if="isFiltering">
                 <popover v-if="canSave" placement="bottom-end" ref="savePopover">
