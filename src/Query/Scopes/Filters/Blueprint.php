@@ -7,6 +7,11 @@ use Statamic\Query\Scopes\Filter;
 
 class Blueprint extends Filter
 {
+    public static function title()
+    {
+        return __('Blueprint');
+    }
+
     public function fieldItems()
     {
         $options = $this->blueprints()->mapWithKeys(function ($blueprint) {

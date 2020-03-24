@@ -20,7 +20,7 @@ class DummyClass extends Filter
      */
     public static function title()
     {
-        return __('Blueprint');
+        return __('DummyClass');
     }
 
     /**
