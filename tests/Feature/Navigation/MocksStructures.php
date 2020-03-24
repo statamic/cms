@@ -20,6 +20,7 @@ trait MocksStructures
             $s->shouldReceive('deleteUrl')->andReturn('/nav-delete-url');
             $s->shouldReceive('collections')->andReturn(collect());
             $s->shouldReceive('expectsRoot')->andReturnFalse();
+            $s->shouldReceive('maxDepth')->andReturnNull();
         });
     }
 
