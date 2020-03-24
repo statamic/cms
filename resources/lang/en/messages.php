@@ -113,7 +113,7 @@ return [
     'getting_started_widget_navigation' => 'Create multi-level lists of links that can be used to render navbars, footers, and so on.',
     'global_search_open_using_slash' => 'You can open global search using the <kbd>/</kbd> key',
     'global_set_blueprint_instructions' => 'Defines the field layout when editing this global set.',
-    'global_set_config_intro' => 'Global Sets manage content make available across the entire site, like company details, contact information, or front-end settings.',
+    'global_set_config_intro' => 'Global Sets manage content available across the entire site, like company details, contact information, or front-end settings.',
     'global_set_handle_instructions' => 'How you will reference this global set in templates, etc.',
     'global_set_title_instructions' => 'The display name of this global set.',
     'phpinfo_utility_description' => 'Check your PHP configuration settings and installed modules.',
