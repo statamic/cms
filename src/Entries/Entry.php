@@ -442,6 +442,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
             return 'scheduled';
         }
 
+        if ($collection->pastDateBehavior() === 'private' && $this->date()->isPast()) {
+            return 'expired';
+        }
+
         return 'published';
     }
 

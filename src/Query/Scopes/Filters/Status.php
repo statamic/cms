@@ -43,7 +43,7 @@ class Status extends Filter
 
     public function visibleTo($key)
     {
-        return $key === 'entries';
+        return in_array($key, ['entries', 'entries-fieldtype']);
     }
 
     protected function options()
@@ -51,11 +51,21 @@ class Status extends Filter
         $options = collect([
             'published' => __('Published'),
             'scheduled' => __('Scheduled'),
+            'expired' => __('Expired'),
             'draft' => __('Draft'),
         ]);
 
-        if (! $this->collection()->dated()) {
+        if (! $collection = $this->collection()) {
+            return $options;
+        }
+
+        if ($collection->dated() && $collection->futureDateBehavior() === 'private') {
+            $options->forget('expired');
+        } elseif ($collection->dated() && $collection->pastDateBehavior() === 'private') {
             $options->forget('scheduled');
+        } else {
+            $options->forget('scheduled');
+            $options->forget('expired');
         }
 
         return $options;
