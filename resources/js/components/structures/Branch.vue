@@ -1,13 +1,10 @@
 <template>
 
-    <div class="flex" :class="{ 'mb-1': isRoot }">
+    <div class="flex">
         <div class="page-move w-6" />
-
         <div class="flex items-center flex-1 p-1 ml-1 text-xs leading-normal">
-
             <div class="flex items-center flex-1">
-                <i v-if="isRoot" class="icon icon-home mr-1 opacity-25" />
-
+                <svg-icon name="home-page" class="mr-1 h-4 w-4 text-grey-80" v-if="isRoot" v-tooltip="__('This is the root page')" />
                 <a
                     @click="$emit('edit', $event)"
                     :class="{ 'text-sm font-medium': isTopLevel }"
@@ -16,9 +13,9 @@
                 <div v-if="page.collection" class="ml-2 flex items-center">
                     <svg-icon name="content-writing" class="w-4 h-4" />
                     <div class="ml-sm">
-                        <a :href="page.collection.create_url">Add</a>
-                        <span class="text-grey">or</span>
-                        <a :href="page.collection.edit_url">Edit</a>
+                        <a :href="page.collection.create_url" v-text="__('Add')" />
+                        <span class="text-grey">/</span>
+                        <a :href="page.collection.edit_url" v-text="__('Edit')" />
                     </div>
                 </div>
             </div>
