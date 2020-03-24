@@ -6,22 +6,13 @@
                     <svg-icon name="pin"></svg-icon>
                 </button>
             </template>
-            <div>
-                <div class="flex justify-between text-center">
-                    <h6 class="whitespace-no-wrap cursor-pointer py-1 px-2 border-r" :class="{'border-b bg-grey-10': ! showingPinTab }" @click="showingPinTab = true">
-                        {{ __('Pin to Favorites') }}
-                    </h6>
-                    <h6 class="whitespace-no-wrap cursor-pointer py-1 px-2 rounded-tr" :class="{'border-b bg-grey-10': showingPinTab }" @click="showingPinTab = false">
-                        {{ __('Make Start Page') }}
-                    </h6>
-                </div>
-                <div class="p-2 flex items-center" v-if="showingPinTab">
-                    <input type="text" class="input-text" autofocus ref="fave" v-model="name" @keydown.enter="save">
+            <div class="p-2 pb-1">
+                <h6 class="mb-1">{{ __('Pin to Favorites') }}</h6>
+                <div class="flex items-center">
+                    <input type="text" class="input-text w-auto" autofocus ref="fave" v-model="name" @keydown.enter="save">
                     <button @click="save" class="btn-primary ml-1">{{ __('Save') }}</button>
                 </div>
-                <div class="p-2" v-else>
-                    <button @click="makeStartPage" class="btn block w-full">{{ __('Start here on sign in') }}</button>
-                </div>
+                <button @click="makeStartPage" class="mt-1 text-xs text-blue outline-none hover:text-blue-darker">{{ __('Set as sign-in page') }} &rarr;</button>
             </div>
         </popover>
         <div v-else>
@@ -39,8 +30,7 @@ export default {
     data() {
         return {
             name: document.title.replace(' ‹ Statamic', ''),
-            currentUrl: this.$config.get('urlPath').substr(this.$config.get('cpRoot').length+1),
-            showingPinTab: true
+            currentUrl: this.$config.get('urlPath').substr(this.$config.get('cpRoot').length+1)
         }
     },
 
@@ -70,10 +60,6 @@ export default {
 
         highlight() {
             setTimeout(() => this.$refs.fave.select(), 20);
-        },
-
-        toggleTab() {
-            this.showingPinTab = ! this.showingPinTab;
         },
 
         save() {
