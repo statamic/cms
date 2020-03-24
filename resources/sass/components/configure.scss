@@ -7,10 +7,6 @@
            @apply border-b;
        }
 
-       .publish-field-label {
-           @apply text-base;
-       }
-
        // Push toggle off to the right
        .toggle-fieldtype {
            @apply flex justify-between;
