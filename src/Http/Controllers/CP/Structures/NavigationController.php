@@ -19,7 +19,7 @@ class NavigationController extends CpController
 {
     public function index()
     {
-        $this->authorize('index', NavContract::class, 'You are not authorized to view any navs.');
+        $this->authorize('index', NavContract::class, __('You are not authorized to view any navs.'));
 
         $navs = Nav::all()->filter(function ($nav) {
             return User::current()->can('view', $nav);
@@ -41,7 +41,7 @@ class NavigationController extends CpController
     {
         $nav = Nav::find($nav);
 
-        $this->authorize('edit', $nav, 'You are not authorized to configure navs.');
+        $this->authorize('edit', $nav, __('You are not authorized to configure navs.'));
 
         $values = [
             'title' => $nav->title(),
@@ -93,7 +93,7 @@ class NavigationController extends CpController
     {
         $nav = Nav::find($nav);
 
-        $this->authorize('update', $nav, 'You are not authorized to configure navs.');
+        $this->authorize('update', $nav, __('You are not authorized to configure navs.'));
 
         $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 
@@ -129,14 +129,14 @@ class NavigationController extends CpController
 
     public function create()
     {
-        $this->authorize('create', NavContract::class, 'You are not authorized to configure navs.');
+        $this->authorize('create', NavContract::class, __('You are not authorized to configure navs.'));
 
         return view('statamic::navigation.create');
     }
 
     public function store(Request $request)
     {
-        $this->authorize('store', NavContract::class, 'You are not authorized to configure navs.');
+        $this->authorize('store', NavContract::class, __('You are not authorized to configure navs.'));
 
         $values = $request->validate([
             'title' => 'required',
@@ -163,10 +163,11 @@ class NavigationController extends CpController
                     'title' => [
                         'type' => 'text',
                         'validate' => 'required',
+                        'instructions' => __('statamic::messages.navigation_configure_title_instructions'),
                     ],
                     'handle' => [
                         'type' => 'slug',
-                        'read_only' => true,
+                        'instructions' => __('statamic::messages.navigation_configure_handle_instructions'),
                     ],
                 ],
             ],
@@ -176,18 +177,18 @@ class NavigationController extends CpController
                     'collections' => [
                         'type' => 'collections',
                         'display' => 'Collections',
-                        'instructions' => 'You will be able to add links to entries from these collections.',
+                        'instructions' => __('statamic::messages.navigation_configure_collections_instructions'),
                         'mode' => 'select',
                     ],
                     'root' => [
                         'type' => 'toggle',
-                        'display' => 'Expect a root page',
-                        'instructions' => 'The first page in the tree should be considered the "root" or "home" page.',
+                        'display' => 'Has a root page',
+                        'instructions' => __('statamic::messages.navigation_configure_expect_root_instructions'),
                     ],
                     'max_depth' => [
                         'type' => 'integer',
                         'display' => 'Max depth',
-                        'instructions' => 'The maximum number of levels deep a page may be nested. Leave blank for no limit.',
+                        'instructions' => __('statamic::messages.navigation_configure_max_depth_instructions'),
                         'validate' => 'min:0',
                     ],
                 ],
@@ -210,7 +211,7 @@ class NavigationController extends CpController
     {
         $nav = Nav::findByHandle($nav);
 
-        $this->authorize('delete', $nav, 'You are not authorized to configure navs.');
+        $this->authorize('delete', $nav, __('You are not authorized to configure navs.'));
 
         $nav->delete();
     }

@@ -9,7 +9,7 @@
                 <h1 class="flex-1" v-text="title" />
 
                 <dropdown-list class="mr-1">
-                    <dropdown-item :text="__('Edit Navigation Config')" :redirect="editUrl" />
+                    <dropdown-item :text="__('Configure Navigation')" :redirect="editUrl" />
                 </dropdown-list>
 
                 <a @click="$refs.tree.cancel" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
@@ -21,7 +21,7 @@
                     @input="siteSelected"
                 />
 
-                <dropdown-list :show-dropdown-if="hasCollections">
+                <dropdown-list :disabled="! hasCollections">
                     <template #trigger>
                         <button
                             class="btn"
@@ -59,13 +59,37 @@
             @canceled="changed = false"
         >
             <template #empty>
-                <div class="text-center max-w-md mx-auto rounded-lg px-4 py-4">
-                    <svg-icon name="empty/structure" class="w-24 h-auto mx-auto" />
-                    <h1 class="my-3" v-text="__('Create your first link now')" />
-                    <p class="text-grey mb-3">
-                        {{ __('messages.navigation_configure_intro') }}
-                    </p>
-                    <button class="btn-primary btn-lg" v-text="__('Create first link')" @click="openPageCreator" />
+                <div class="card p-2 content w-full">
+                    <div class="flex flex-wrap w-full">
+                        <a :href="editUrl" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+                            <svg-icon name="hammer-wrench" class="h-8 w-8 mr-2 text-grey-80" />
+                            <div class="flex-1 mb-2 md:mb-0 md:mr-3">
+                                <h3 class="mb-1 text-blue">{{ __('Configure Navigation') }} &rarr;</h3>
+                                <p>{{ __('messages.navigation_configure_settings_intro') }}</p>
+                            </div>
+                        </a>
+                        <a @click="linkPage" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+                            <svg-icon name="paperclip" class="h-8 w-8 mr-2 text-grey-80" />
+                            <div class="flex-1 mb-2 md:mb-0 md:mr-3">
+                                <h3 class="mb-1 text-blue">{{ __('Link to URL') }} &rarr;</h3>
+                                 <p>{{ __('messages.navigation_link_to_url_instructions') }}</p>
+                            </div>
+                        </a>
+                        <a @click="linkEntries" v-if="hasCollections" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+                            <svg-icon name="hierarchy-files" class="h-8 w-8 mr-2 text-grey-80" />
+                            <div class="flex-1 mb-2 md:mb-0 md:mr-3">
+                                <h3 class="mb-1 text-blue">{{ __('Link to Entry') }} &rarr;</h3>
+                                 <p>{{ __('messages.navigation_link_to_entry_instructions') }}</p>
+                            </div>
+                        </a>
+                        <a :href="docs_url('navigation')" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+                            <svg-icon name="book-pages" class="h-8 w-8 mr-2 text-grey-80" />
+                            <div class="flex-1 mb-2 md:mb-0 md:mr-3">
+                                <h3 class="mb-1 text-blue">{{ __('Read the Documentation') }} &rarr;</h3>
+                                 <p>{{ __('messages.navigation_documentation_instructions') }}</p>
+                            </div>
+                        </a>
+                    </div>
                 </div>
             </template>
 

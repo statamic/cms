@@ -5,7 +5,7 @@
             <loading-graphic />
         </div>
 
-        <div v-if="!loading && pages.length == 0" class="no-results border-dashed border-2 w-full flex items-center">
+        <div v-if="!loading && pages.length == 0" class="no-results w-full flex items-center">
             <slot name="empty" />
         </div>
 
