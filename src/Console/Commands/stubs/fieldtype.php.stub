@@ -7,7 +7,7 @@ use Statamic\Fields\Fieldtype;
 class DummyClass extends Fieldtype
 {
     /**
-     * The blank/default value
+     * The blank/default value.
      *
      * @return array
      */
@@ -17,7 +17,7 @@ class DummyClass extends Fieldtype
     }
 
     /**
-     * Pre-process the data before it gets sent to the publish page
+     * Pre-process the data before it gets sent to the publish page.
      *
      * @param mixed $data
      * @return array|mixed
@@ -28,7 +28,7 @@ class DummyClass extends Fieldtype
     }
 
     /**
-     * Process the data before it gets saved
+     * Process the data before it gets saved.
      *
      * @param mixed $data
      * @return array|mixed
