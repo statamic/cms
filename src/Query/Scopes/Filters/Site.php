@@ -10,7 +10,7 @@ class Site extends Filter
     public function fieldItems()
     {
         return [
-            'value' => [
+            'site' => [
                 'display' => __('Site'),
                 'type' => 'select',
                 'options' => $this->options()->all(),
@@ -20,7 +20,12 @@ class Site extends Filter
 
     public function apply($query, $values)
     {
-        $query->where('site', $values['value']);
+        $query->where('site', $values['site']);
+    }
+
+    public function badge($values)
+    {
+        return __('in') . ' ' . strtolower($values['site']) . ' ' . __('site');
     }
 
     public function visibleTo($key)
