@@ -27,13 +27,7 @@ class Status extends Filter
 
     public function apply($query, $values)
     {
-        if ($values['status'] === 'published') {
-            $query->where('published', true);
-        } elseif ($values['status'] === 'scheduled') {
-            $query->where('published', true)->where('date', '>', Carbon::now());
-        } elseif ($values['status'] === 'draft') {
-            $query->where('published', false);
-        }
+        $query->where('status', $values['status']);
     }
 
     public function badge($values)

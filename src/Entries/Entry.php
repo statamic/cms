@@ -426,6 +426,25 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         return User::find($this->get('updated_by'));
     }
 
+    public function status()
+    {
+        $collection = $this->collection();
+
+        if (! $this->published()) {
+            return 'draft';
+        }
+
+        if (! $collection->dated() && $this->published()) {
+            return 'published';
+        }
+
+        if ($collection->futureDateBehavior() === 'private' && $this->date()->isFuture()) {
+            return 'scheduled';
+        }
+
+        return 'published';
+    }
+
     public function private()
     {
         $collection = $this->collection();
