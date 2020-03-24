@@ -7,6 +7,8 @@ use Statamic\Query\Scopes\Filter;
 
 class Site extends Filter
 {
+    protected $pinned = true;
+
     public static function title()
     {
         return __('Site');
@@ -17,9 +19,16 @@ class Site extends Filter
         return [
             'site' => [
                 'display' => __('Site'),
-                'type' => 'select',
+                'type' => 'radio',
                 'options' => $this->options()->all(),
-            ]
+            ],
+        ];
+    }
+
+    public function autoApply()
+    {
+        return [
+            'site' => Facades\Site::selected()->handle(),
         ];
     }
 
@@ -30,7 +39,7 @@ class Site extends Filter
 
     public function badge($values)
     {
-        return __('in') . ' ' . strtolower($values['site']) . ' ' . __('site');
+        return __('in site') . ': ' . strtolower($values['site']);
     }
 
     public function visibleTo($key)
