@@ -49,6 +49,7 @@ class NavigationController extends CpController
             'collections' => $nav->collections()->map->handle()->all(),
             'root' => $nav->expectsRoot(),
             'sites' => $nav->trees()->keys()->all(),
+            'max_depth' => $nav->maxDepth(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint($nav))
