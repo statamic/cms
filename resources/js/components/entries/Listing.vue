@@ -16,13 +16,14 @@
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0 relative">
                     <data-list-filter-presets
+                        v-if="!reordering"
                         ref="presets"
                         :active-preset="activePreset"
                         :preferences-prefix="preferencesPrefix"
                         @selected="selectPreset"
                         @reset="filtersReset"
                     />
-                    <div class="data-list-header">
+                    <div class="data-list-header" v-if="!reordering">
                         <data-list-filters
                             :filters="filters"
                             :active-preset="activePreset"
@@ -40,18 +41,6 @@
                             @restore-preset="$refs.presets.viewPreset($event)"
                             @reset="filtersReset"
                         />
-
-                        <template v-if="!hasSelections">
-                            <button class="btn-flat ml-1"
-                                v-if="showReorderButton"
-                                @click="reorder"
-                                v-text="__('Reorder')"
-                            />
-                            <template v-if="reordering">
-                                <button class="btn-flat ml-1" @click="saveOrder" v-text="__('Save Order')" />
-                                <button class="btn-flat ml-1" @click="cancelReordering" v-text="__('Cancel')" />
-                            </template>
-                        </template>
                     </div>
 
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
@@ -64,7 +53,7 @@
 
                     <data-list-table
                         v-show="items.length"
-                        :allow-bulk-actions="true"
+                        :allow-bulk-actions="!reordering"
                         :loading="loading"
                         :reorderable="reordering"
                         :sortable="!reordering"
@@ -100,7 +89,6 @@
                     </data-list-table>
                 </div>
                 <data-list-pagination
-                    v-if="! reordering"
                     class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
@@ -122,10 +110,9 @@ export default {
 
     props: {
         collection: String,
-        reorderable: Boolean,
+        reordering: Boolean,
         reorderUrl: String,
-        structureUrl: String,
-        site: String
+        site: String,
     },
 
     data() {
@@ -133,30 +120,19 @@ export default {
             listingKey: 'entries',
             preferencesPrefix: `collections.${this.collection}`,
             requestUrl: cp_url(`collections/${this.collection}/entries`),
-            reordering: false,
-            reorderingRequested: false,
-            initialOrder: null,
         }
     },
 
-    computed: {
-        showReorderButton() {
-            if (this.structureUrl) return true;
-            if (this.hasActiveFilters) return false;
+    watch: {
 
-            return this.reorderable && !this.reordering;
-        },
-
-        reorderingDisabled() {
-            return this.sortColumn !== 'order';
+        reordering(reordering, wasReordering) {
+            if (reordering === wasReordering) return;
+            reordering ? this.reorder() : this.cancelReordering();
         }
+
     },
 
     methods: {
-
-        afterRequestCompleted(response) {
-            if (this.reorderingRequested) this.reorder();
-        },
 
         getStatusClass(entry) {
             // TODO: Replace with `entry.status` (will need to pass down)
@@ -170,23 +146,17 @@ export default {
         },
 
         reorder() {
-            if (this.structureUrl) {
-                window.location = this.structureUrl;
-                return;
-            }
+            this.filtersReset();
+            this.page = 1;
+            this.sortColumn = 'order';
+        },
 
-            // If the listing isn't in order when attempting to reorder, things would get
-            // all jumbled up. We'll change the sort order, which triggers an async
-            // request. Once it's completed, reordering will be re-triggered.
-            if (this.sortColumn !== 'order') {
-                this.reorderingRequested = true;
-                this.sortColumn = 'order';
-                return;
-            }
+        cancelReordering() {
+            this.request();
+        },
 
-            this.reordering = true;
-            this.initialOrder = this.items.map(item => item.id);
-            this.reorderingRequested = false;
+        reordered(items) {
+            this.items = items;
         },
 
         saveOrder() {
@@ -199,22 +169,13 @@ export default {
 
             this.$axios.post(this.reorderUrl, payload)
                 .then(response => {
-                    this.reordering = false;
+                    this.$emit('reordered');
                     this.$toast.success(__('Entries successfully reordered'))
                 })
                 .catch(e => {
+                    console.log(e);
                     this.$toast.error(__('Something went wrong'));
                 });
-        },
-
-        cancelReordering() {
-            this.reordering = false;
-            this.items = this.initialOrder.map(id => _.findWhere(this.items, { id }));
-            this.initialOrder = null;
-        },
-
-        reordered(items) {
-            this.items = items;
         },
 
     }
