@@ -2,6 +2,8 @@
 
 namespace Statamic\Actions;
 
+use Statamic\Contracts\Auth\User as UserContract;
+
 class Delete extends Action
 {
     protected $dangerous = true;
@@ -13,6 +15,10 @@ class Delete extends Action
 
     public function authorize($user, $item)
     {
+        if ($item instanceof UserContract && $user->id() === $item->id()) {
+            return false;
+        }
+
         return $user->can('delete', $item);
     }
 
