@@ -29,6 +29,7 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             meta: null,
+            requestOnParameterChange: true
         }
     },
 
@@ -74,6 +75,8 @@ export default {
         parameters: {
             deep: true,
             handler(after, before) {
+                if (! this.requestOnParameterChange) return;
+
                 // A change to the search query would trigger both watchers.
                 // We only want the searchQuery one to kick in.
                 if (before.search !== after.search) return;
