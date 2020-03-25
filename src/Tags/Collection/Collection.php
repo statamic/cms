@@ -2,15 +2,15 @@
 
 namespace Statamic\Tags\Collection;
 
-use Statamic\Facades\URL;
-use Statamic\Facades\Entry;
-use Statamic\Tags\Tags;
-use Statamic\Tags\OutputsItems;
 use Statamic\Entries\EntryCollection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\URL;
+use Statamic\Tags\Concerns;
+use Statamic\Tags\Tags;
 
 class Collection extends Tags
 {
-    use OutputsItems;
+    use Concerns\OutputsItems;
 
     protected $defaultAsKey = 'entries';
 
@@ -21,7 +21,9 @@ class Collection extends Tags
     {
         $this->parameters['from'] = $this->method;
 
-        return $this->index();
+        return $this->output(
+            $this->entries()->get()
+        );
     }
 
     /**
@@ -29,6 +31,10 @@ class Collection extends Tags
      */
     public function index()
     {
+        if (! $this->params->hasAny(['from', 'in', 'folder', 'use', 'collection'])) {
+            return $this->context->get('collection');
+        }
+
         return $this->output(
             $this->entries()->get()
         );

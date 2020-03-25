@@ -43,15 +43,3 @@
 		}
 	}
 }
-
-.site-list .site-item {
-	@apply p-1 text-sm block cursor-pointer border-b;
-
-	&:hover {
-        @apply bg-grey-20;
-    }
-
-	&:last-child {
-        @apply border-b-0;
-    }
-}

@@ -49,6 +49,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
     protected $date;
     protected $locale;
     protected $localizations;
+    protected $afterSaveCallbacks = [];
 
     public function __construct()
     {
@@ -123,6 +124,22 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function delete()
     {
+        if ($this->hasStructure()) {
+            tap($this->structure(), function ($structure) {
+                $structure->trees()->each(function ($tree) {
+                    // Ugly, but it's moving all the child pages to the parent. TODO: Tidy.
+                    $parent = $this->parent();
+                    if (optional($parent)->isRoot()) {
+                        $parent = null;
+                    }
+                    $this->page()->pages()->all()->each(function ($child) use ($tree, $parent) {
+                        $tree->move($child->id(), optional($parent)->id());
+                    });
+                    $tree->remove($this);
+                });
+            })->save();
+        }
+
         Facades\Entry::delete($this);
 
         return true;
@@ -130,9 +147,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function editUrl()
     {
-        return $this->hasStructure()
-            ? $this->cpUrl('structures.entries.edit')
-            : $this->cpUrl('collections.entries.edit');
+        return $this->cpUrl('collections.entries.edit');
     }
 
     public function updateUrl()
@@ -202,8 +217,18 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         });
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
     public function save()
     {
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
         if (EntrySaving::dispatch($this) === false) {
             return false;
         }
@@ -217,6 +242,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         $this->taxonomize();
 
         optional(Collection::findByMount($this))->updateEntryUris();
+
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
 
         EntrySaved::dispatch($this, []);  // TODO: Fix test
 
@@ -246,15 +275,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         ]);
     }
 
-    public function order($order = null)
+    public function order()
     {
-        if (func_num_args() === 0) {
-            return $this->collection()->getEntryOrder($this->id());
+        if (! $this->collection()->orderable()) {
+            return null;
         }
 
-        $this->collection()->setEntryPosition($this->id(), $order)->save();
-
-        return $this;
+        return $this->structure()->in($this->locale)
+            ->flattenedPages()
+            ->map->reference()
+            ->flip()->get($this->id) + 1;
     }
 
     public function template($template = null)
@@ -396,6 +426,29 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         return User::find($this->get('updated_by'));
     }
 
+    public function status()
+    {
+        $collection = $this->collection();
+
+        if (! $this->published()) {
+            return 'draft';
+        }
+
+        if (! $collection->dated() && $this->published()) {
+            return 'published';
+        }
+
+        if ($collection->futureDateBehavior() === 'private' && $this->date()->isFuture()) {
+            return 'scheduled';
+        }
+
+        if ($collection->pastDateBehavior() === 'private' && $this->date()->isPast()) {
+            return 'expired';
+        }
+
+        return 'published';
+    }
+
     public function private()
     {
         $collection = $this->collection();
@@ -492,6 +545,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function parent()
     {
+        return optional($this->page())->parent();
+    }
+
+    public function page()
+    {
         if (! $this->hasStructure()) {
             return null;
         }
@@ -500,12 +558,12 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
             return null;
         }
 
-        return $this->structure()->in($this->locale())->page($id)->parent();
+        return $this->structure()->in($this->locale())->page($id);
     }
 
     public function route()
     {
-        return $this->collection()->route();
+        return $this->collection()->route($this->locale());
     }
 
     public function routeData()

@@ -12,6 +12,8 @@
             :errors="errors[field.handle]"
             :read-only="readOnly"
             :syncable="syncable"
+            :can-toggle-label="canToggleLabels"
+            :name-prefix="namePrefix"
             @input="$emit('updated', field.handle, $event)"
             @meta-updated="$emit('meta-updated', field.handle, $event)"
             @synced="$emit('synced', field.handle)"
@@ -43,6 +45,8 @@ export default {
         },
         readOnly: Boolean,
         syncable: Boolean,
+        canToggleLabels: Boolean,
+        namePrefix: String,
     },
 
     computed: {

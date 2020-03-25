@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', Statamic::crumb(__('Edit Role'), __('Roles & Permissions')))
+@section('title', Statamic::crumb(__('Configure Role'), __('Permissions')))
 
 @section('content')
 
@@ -10,6 +10,7 @@
         initial-handle="{{ $role->handle() }}"
         :initial-super="{{ Statamic\Support\Str::bool($super) }}"
         :initial-permissions="{{ json_encode($permissions) }}"
+        index-url="{{ cp_route('roles.index') }}"
         v-cloak
     >
 

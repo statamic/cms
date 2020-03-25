@@ -6,7 +6,7 @@ use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Statamic\Entries\Collection;
 use Statamic\Stache\Stores\EntriesStore;
-use Statamic\Stache\Stores\StructuresStore;
+use Statamic\Stache\Stores\NavigationStore;
 use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Stache\Repositories\CollectionRepository;
@@ -24,7 +24,7 @@ class CollectionRepositoryTest extends TestCase
         $stache->registerStores([
             (new CollectionsStore($stache, app('files')))->directory($this->directory),
             (new EntriesStore($stache, app('files')))->directory($this->directory),
-            (new StructuresStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/structures'),
+            (new NavigationStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/navigation'),
         ]);
 
         $this->repo = new CollectionRepository($stache);

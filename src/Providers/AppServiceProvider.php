@@ -58,8 +58,8 @@ class AppServiceProvider extends ServiceProvider
         $this->loadViewsFrom("{$this->root}/resources/views/extend", 'statamic');
 
         $this->publishes([
-            "{$this->root}/resources/views/extend" => resource_path('views/vendor/statamic')
-        ], 'statamic-views');
+            "{$this->root}/resources/views/extend/forms" => resource_path('views/vendor/statamic/forms')
+        ], 'statamic-forms');
 
         Blade::directive('svg', function ($expression) {
             return "<?php echo Statamic::svg({$expression}) ?>";
@@ -94,7 +94,8 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Globals\GlobalRepository::class => \Statamic\Stache\Repositories\GlobalRepository::class,
             \Statamic\Contracts\Assets\AssetContainerRepository::class => \Statamic\Stache\Repositories\AssetContainerRepository::class,
             \Statamic\Contracts\Data\Repositories\ContentRepository::class => \Statamic\Stache\Repositories\ContentRepository::class,
-            \Statamic\Contracts\Structures\StructureRepository::class => \Statamic\Stache\Repositories\StructureRepository::class,
+            \Statamic\Contracts\Structures\StructureRepository::class => \Statamic\Structures\StructureRepository::class,
+            \Statamic\Contracts\Structures\NavigationRepository::class => \Statamic\Stache\Repositories\NavigationRepository::class,
             \Statamic\Contracts\Assets\AssetRepository::class => \Statamic\Assets\AssetRepository::class,
         ])->each(function ($concrete, $abstract) {
             $this->app->singleton($abstract, $concrete);

@@ -20,11 +20,17 @@ class Augmentor
 
     public function augment($value)
     {
+        $hasSets = !!$this->fieldtype->config('sets');
+
+        if (! $value) {
+            return $hasSets ? [] : null;
+        }
+
         if (is_string($value)) {
             return $value;
         }
 
-        if (! $this->fieldtype->config('sets')) {
+        if (! $hasSets) {
             return $this->convertToHtml($value);
         }
 

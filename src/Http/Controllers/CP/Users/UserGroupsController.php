@@ -37,6 +37,20 @@ class UserGroupsController extends CpController
         ]);
     }
 
+    public function show($group)
+    {
+        $this->authorize('edit user groups');
+
+        if (! $group = UserGroup::find($group)) {
+            return $this->pageNotFound();
+        }
+
+        return view('statamic::usergroups.show', [
+            'group' => $group,
+            'filters' => Scope::filters('usergroup-users'),
+        ]);
+    }
+
     public function edit($group)
     {
         $this->authorize('edit user groups');
@@ -72,7 +86,9 @@ class UserGroupsController extends CpController
             ->roles($request->roles)
             ->save();
 
-        return ['redirect' => cp_route('user-groups.edit', $group->handle())];
+        session()->flash('success', 'User group updated');
+
+        return ['redirect' => cp_route('user-groups.show', $group->handle())];
     }
 
     public function create()
@@ -98,7 +114,9 @@ class UserGroupsController extends CpController
             ->roles($request->roles)
             ->save();
 
-        return ['redirect' => cp_route('user-groups.edit', $group->handle())];
+        session()->flash('success', 'User group created');
+
+        return ['redirect' => cp_route('user-groups.show', $group->handle())];
     }
 
     public function destroy($group)

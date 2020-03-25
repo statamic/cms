@@ -65,6 +65,8 @@ class RolesController extends CpController
             ->permissions($request->super ? ['super'] : $request->permissions)
             ->save();
 
+        session()->flash('success', 'Role created');
+
         return ['redirect' => cp_route('roles.index', $role->handle())];
     }
 
@@ -103,6 +105,8 @@ class RolesController extends CpController
             ->handle($request->handle ?: snake_case($request->title))
             ->permissions($request->super ? ['super'] : $request->permissions)
             ->save();
+
+        session()->flash('success', 'Role updated');
 
         return ['redirect' => cp_route('roles.index', $role->handle())];
     }

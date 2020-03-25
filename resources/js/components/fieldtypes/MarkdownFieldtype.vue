@@ -1,5 +1,5 @@
 <template>
-    <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode}">
+    <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
 
         <uploader
             ref="uploader"
@@ -20,7 +20,11 @@
                         <button @click="bold" v-tooltip="__('Bold')"><i class="fa fa-bold"></i></button>
                         <button @click="italic" v-tooltip="__('Italic')"><i class="fa fa-italic"></i></button>
                         <button @click="insertLink('')" v-tooltip="__('Insert Link')"><i class="fa fa-link"></i></button>
-                        <button @click="insertImage('')" v-tooltip="__('Insert Image')"><i class="fa fa-picture-o"></i></button>
+                        <button @click="addAsset" v-tooltip="__('Insert Asset')" v-if="assetsEnabled"><i class="fa fa-picture-o"></i></button>
+                        <button @click="insertImage('')" v-tooltip="__('Insert Image')" v-else><i class="fa fa-picture-o"></i></button>
+                        <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" v-if="fullScreenMode">
+                            <svg-icon name="dark-mode" class="w-4 h-4" />
+                        </button>
                         <button @click="openFullScreen" v-tooltip="__('Fullscreen Mode')" v-if="! fullScreenMode">
                             <svg-icon name="expand" class="w-4 h-4" />
                         </button>
@@ -41,7 +45,7 @@
                     class="-mt-px"
                 />
 
-                <div :class="`mode-wrap mode-${mode}`">
+                <div :class="`mode-wrap mode-${mode}`" @click="focus">
                     <div class="markdown-writer"
                         ref="writer"
                         v-show="mode == 'write'"
@@ -59,13 +63,6 @@
                                         <svg-icon name="markdown-icon" class="w-6 items-start mr-px" />
                                         <span>{{ __('Markdown Cheatsheet') }}</span>
                                     </button>
-                                </div>
-                                <div class="markdown-asset-helper flex items-center" v-if="assetsEnabled">
-                                    <button class="text-link flex items-center mr-1" @click.prevent="addAsset">
-                                        <svg-icon name="folder-image" class='w-4 h-4 mr-sm' />
-                                        {{ __('Insert Asset') }}
-                                    </button>
-                                    <span class="text-2xs text-grey-60" v-text="__('(drop file to upload)')"></span>
                                 </div>
                             </div>
                             <div v-if="fullScreenMode" class="flex items-center pr-1">
@@ -163,6 +160,7 @@ export default {
             draggingFile: false,
             showCheatsheet: false,
             fullScreenMode: false,
+            darkMode: false,
             codemirror: null,       // The CodeMirror instance
             uploads: [],
             count: {},
@@ -203,6 +201,10 @@ export default {
             this.trackHeightUpdates();
         },
 
+        toggleDarkMode() {
+            this.darkMode = ! this.darkMode;
+        },
+
         /**
          * Get the text for a selection
          *
@@ -235,8 +237,8 @@ export default {
 
             // Replace the string
             var str = '![' + selection + ']('+ url +')';
-            cm.replaceSelection(str, 'start');
 
+            cm.replaceSelection(str, 'start');
             // Select the text
             var line = cm.getCursor().line;
             var start = cm.getCursor().ch + 2; // move past the ![
@@ -455,9 +457,9 @@ export default {
 
             this.$axios.get(cp_url('assets-fieldtype'), { params: { assets } }).then(response => {
                 _(response.data).each((asset) => {
-                    var alt = asset.alt || '';
+                    var alt = asset.values.alt || '';
                     var url = encodeURI(asset.url);
-                    if (asset.is_image) {
+                    if (asset.isImage) {
                         this[method+'Image'](url, alt);
                     } else {
                         this[method+'Link'](url, alt);
@@ -574,8 +576,6 @@ export default {
                 self.codemirror.doc.setValue(val);
             }
         });
-
-        this.$keys.bind('esc', this.closeFullScreen)
 
         this.trackHeightUpdates();
 

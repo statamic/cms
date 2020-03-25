@@ -7,17 +7,18 @@ use Statamic\Query\Scopes\Filter;
 
 class Collection extends Filter
 {
+    public static function title()
+    {
+        return __('Collection');
+    }
+
     public function fieldItems()
     {
-        $options = collect($this->context['collections'])->mapWithKeys(function ($collection) {
-            return [$collection => Facades\Collection::findByHandle($collection)->title()];
-        })->all();
-
         return [
-            'value' => [
-                'display' => __('Collection'),
+            'collections' => [
+                'placeholder' => __('Select Collection(s)'),
                 'type' => 'select',
-                'options' => $options,
+                'options' => $this->options()->all(),
                 'clearable' => true,
                 'multiple' => true,
             ],
@@ -26,17 +27,23 @@ class Collection extends Filter
 
     public function apply($query, $values)
     {
-        $collections = $values['value'];
+        $query->whereIn('collection', $values['collections']);
+    }
 
-        if (empty($collections)) {
-            $collections = $this->context['collections'];
-        }
-
-        $query->whereIn('collection', $collections);
+    public function badge($values)
+    {
+        return __('collections') . ': ' . collect($values['collections'])->implode(', ');
     }
 
     public function visibleTo($key)
     {
         return $key === 'entries-fieldtype' && count($this->context['collections']) > 1;
+    }
+
+    protected function options()
+    {
+        return collect($this->context['collections'])->mapWithKeys(function ($collection) {
+            return [$collection => Facades\Collection::findByHandle($collection)->title()];
+        });
     }
 }

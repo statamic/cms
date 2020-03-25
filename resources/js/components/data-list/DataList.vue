@@ -11,10 +11,6 @@ export default {
             type: Array,
             required: true,
         },
-        search: {
-            type: Boolean,
-            default: true
-        },
         searchQuery: {
             type: String,
             default: ''
@@ -65,9 +61,14 @@ export default {
         },
 
         visibleColumns() {
-            const columns = this.sharedState.columns;
-            return columns.filter(col => col.visible);
-        }
+            return this.sharedState.columns.filter(column => column.visible);
+        },
+
+        searchableColumns() {
+            return this.visibleColumns.length
+                ? this.visibleColumns.map(column => column.field)
+                : Object.keys(rows[0]);
+        },
 
     },
 
@@ -100,6 +101,8 @@ export default {
 
     created() {
         this.setInitialSortColumn();
+
+        this.$events.$on('clear-selections', this.clearSelections);
     },
 
     methods: {
@@ -115,13 +118,13 @@ export default {
         },
 
         filterBySearch(rows) {
-            if (!this.search || !this.searchQuery) return rows;
+            if (! this.searchQuery) return rows;
 
             const fuse = new Fuse(rows, {
                 findAllMatches: true,
                 threshold: 0.1,
                 minMatchCharLength: 2,
-                keys: this.columns.length ? this.visibleColumns : Object.keys(rows[0])
+                keys: this.searchableColumns,
             });
 
             return fuse.search(this.searchQuery);
@@ -140,6 +143,10 @@ export default {
             }
 
             return rows;
+        },
+
+        clearSelections() {
+            this.sharedState.selections = [];
         },
 
     },

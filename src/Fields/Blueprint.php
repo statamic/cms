@@ -89,16 +89,23 @@ class Blueprint
 
     public function columns()
     {
-        return new Columns($this->fields()->all()->map(function ($field) {
-            return Column::make()
-                ->field($field->handle())
-                ->fieldtype($field->fieldtype()->indexComponent())
-                ->label(__($field->display()))
-                ->listable($field->isListable())
-                ->visibleDefault($field->isVisible())
-                ->visible($field->isVisible())
-                ->sortable($field->isSortable());
-        }));
+        $columns = $this->fields()
+            ->all()
+            ->values()
+            ->map(function ($field, $index) {
+                return Column::make()
+                    ->field($field->handle())
+                    ->fieldtype($field->fieldtype()->indexComponent())
+                    ->label(__($field->display()))
+                    ->listable($field->isListable())
+                    ->defaultVisibility($field->isVisible())
+                    ->visible($field->isVisible())
+                    ->sortable($field->isSortable())
+                    ->defaultOrder($index + 1);
+            })
+            ->keyBy('field');
+
+        return new Columns($columns);
     }
 
     public function isEmpty(): bool

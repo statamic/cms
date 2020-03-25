@@ -1,7 +1,7 @@
 <template>
-    <div class="px-2 w-4">
-        <input type="checkbox" @change="toggle" :checked="allItemsChecked">
-    </div>
+    <label for="checkerOfAllBoxes" class="btn btn-sm px-sm py-sm -ml-sm cursor-pointer">
+        <input type="checkbox" @change="toggle" :checked="anyItemsChecked" id="checkerOfAllBoxes">
+    </label>
 </template>
 
 <script>
@@ -13,10 +13,13 @@ export default {
 
             return this.sharedState.selections.length === this.sharedState.rows.length;
         },
+        anyItemsChecked() {
+            return this.sharedState.selections.length > 0;
+        },
     },
     methods: {
         toggle() {
-            this.allItemsChecked ? this.uncheckAllItems() : this.checkAllItems()
+            this.anyItemsChecked ? this.uncheckAllItems() : this.checkAllItems()
         },
 
         checkAllItems() {

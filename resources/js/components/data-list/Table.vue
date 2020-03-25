@@ -1,8 +1,10 @@
 <template>
     <table class="data-table" :class="{ 'opacity-50': loading }">
-        <thead v-if="visibleColumns.length > 1">
+        <thead v-if="allowBulkActions || allowColumnPicker || visibleColumns.length > 1">
             <tr>
-                <th class="checkbox-column" v-if="allowBulkActions || reorderable"></th>
+                <th class="checkbox-column" v-if="allowBulkActions || reorderable">
+                    <data-list-toggle-all ref="toggleAll" />
+                </th>
                 <th
                     v-for="column in visibleColumns"
                     :key="column.field"
@@ -15,10 +17,12 @@
                 >
                     <span v-text="column.label" />
                     <svg v-if="sharedState.sortColumn === column.field" :class="sharedState.sortDirection" height="8" width="8" viewBox="0 0 10 6.5">
-                        <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z"/>
+                        <path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor"/>
                     </svg>
                 </th>
-                <th class="actions-column"></th>
+                <th class="actions-column">
+                    <data-list-column-picker :preferences-key="columnPreferencesKey" v-if="allowColumnPicker" />
+                </th>
             </tr>
         </thead>
         <sortable-list
@@ -30,7 +34,7 @@
         >
         <tbody>
             <slot name="tbody-start" />
-            <tr v-for="(row, index) in rows" :key="row.id" @click="rowClicked(row)" class="sortable-row outline-none">
+            <tr v-for="(row, index) in rows" :key="row.id" class="sortable-row outline-none" :class="{'row-selected': sharedState.selections.includes(row.id)}">
                 <td class="table-drag-handle" v-if="reorderable"></td>
                 <td class="checkbox-column" v-if="allowBulkActions && !reorderable">
                     <input
@@ -42,7 +46,7 @@
                         :id="`checkbox-${row.id}`"
                     />
                 </td>
-                <td v-for="column in visibleColumns" :key="column.field">
+                <td v-for="column in visibleColumns" :key="column.field" @click="rowClicked(row)">
                     <slot
                         :name="`cell-${column.field}`"
                         :value="row[column.value || column.field]"
@@ -55,7 +59,7 @@
                         <table-field :handle="column.field" :value="row[column.value || column.field]" :values="row" :fieldtype="column.fieldtype" :key="column.field" />
                     </slot>
                 </td>
-                <td class="text-right">
+                <td class="actions-column">
                     <slot
                         name="actions"
                         :row="row"
@@ -101,6 +105,13 @@ export default {
             type: Boolean,
             default: false
         },
+        allowColumnPicker: {
+            type: Boolean,
+            default: false
+        },
+        columnPreferencesKey: {
+            type: String,
+        },
     },
 
     inject: ['sharedState'],
@@ -143,8 +154,16 @@ export default {
                 return;
             }
 
+            // If sorting by the same column, flip the direction
+            if (this.sharedState.sortColumn === column) {
+                this.swapSortDirection();
+
+            // Always start sorting by asc unless column is a date field
+            } else if (this.getFieldtype(column) !== 'date') {
+                this.sharedState.sortDirection = 'asc'
+            }
+
             this.sharedState.currentPage = 1;
-            if (this.sharedState.sortColumn === column) this.swapSortDirection();
             this.sharedState.sortColumn = column;
             this.$emit('sorted', this.sharedState.sortColumn, this.sharedState.sortDirection);
         },
@@ -152,6 +171,14 @@ export default {
         swapSortDirection() {
             this.sharedState.currentPage = 1;
             this.sharedState.sortDirection = this.sharedState.sortDirection === 'asc' ? 'desc' : 'asc';
+        },
+
+        getFieldtype(columnName) {
+            let field = _.find(this.sharedState.columns, function(field) {
+                return columnName === field.field
+            })
+
+            return field.fieldtype
         },
 
         actualIndex(row) {

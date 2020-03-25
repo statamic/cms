@@ -54,12 +54,12 @@ class FieldtypeTest extends TestCase
     function title_is_the_humanized_handle_by_default()
     {
         $this->assertEquals(
-            'Test multi word',
+            'Test Multi Word',
             (new TestMultiWordFieldtype)->title()
         );
 
         $this->assertEquals(
-            'Test multi word with no fieldtype suffix',
+            'Test Multi Word With No Fieldtype Suffix',
             (new TestMultiWordWithNoFieldtypeSuffix)->title()
         );
     }

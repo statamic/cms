@@ -35,10 +35,8 @@ class DeleteCollectionTest extends TestCase
     /** @test */
     function it_deletes_the_collection()
     {
-        $this->markTestIncomplete(); // TODO: Skipped until ->delete() is reimplemented
-
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
-        $user = User::make()->assignRole('test');
+        $user = tap(User::make()->assignRole('test'))->save();
 
         $collection = Collection::make('test')->save();
         $this->assertCount(1, Collection::all());
@@ -46,8 +44,7 @@ class DeleteCollectionTest extends TestCase
         $this
             ->actingAs($user)
             ->delete(cp_route('collections.destroy', $collection->handle()))
-            ->assertRedirect(cp_route('collections.index'))
-            ->assertSessionHas('success');
+            ->assertOk();
 
         $this->assertCount(0, Collection::all());
     }

@@ -23,7 +23,7 @@
                 <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
 
-            <publish-sections @updated="setFieldValue" :enable-sidebar="false"/>
+            <configure-sections @updated="setFieldValue" :enable-sidebar="false"/>
         </div>
     </publish-container>
 

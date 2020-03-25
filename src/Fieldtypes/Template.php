@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Query\Scopes\Filters\Fields\Template as TemplateFilter;
 
 class Template extends Fieldtype
 {
@@ -14,4 +15,9 @@ class Template extends Fieldtype
             'instructions' => 'Partials are rarely intended to be used as templates.'
         ],
     ];
+
+    public function filter()
+    {
+        return new TemplateFilter($this);
+    }
 }

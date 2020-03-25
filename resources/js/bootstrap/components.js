@@ -30,6 +30,7 @@ Vue.component('UserPublishForm', require('../components/users/PublishForm.vue').
 
 // Data List
 Vue.component('data-list', require('../components/data-list/DataList.vue').default);
+Vue.component('data-list-table', require('../components/data-list/Table.vue').default);
 Vue.component('data-list-search', require('../components/data-list/Search.vue').default);
 Vue.component('data-list-bulk-actions', require('../components/data-list/BulkActions.vue').default);
 Vue.component('data-list-inline-actions', require('../components/data-list/InlineActions.vue').default);
@@ -37,7 +38,7 @@ Vue.component('data-list-column-picker', require('../components/data-list/Column
 Vue.component('data-list-toggle-all', require('../components/data-list/ToggleAll.vue').default);
 Vue.component('data-list-pagination', require('../components/data-list/Pagination.vue').default);
 Vue.component('data-list-filters', require('../components/data-list/Filters.vue').default);
-Vue.component('data-list-table', require('../components/data-list/Table.vue').default);
+Vue.component('data-list-filter-presets', require('../components/data-list/FilterPresets.vue').default);
 
 // Resource Type Lists
 Vue.component('entry-list', require('../components/entries/Listing.vue').default);
@@ -64,6 +65,7 @@ Vue.component('avatar', require('../components/Avatar.vue').default);
 Vue.component('breadcrumb', require('../components/Breadcrumb.vue').default);
 Vue.component('breadcrumbs', require('../components/Breadcrumbs.vue').default);
 Vue.component('create-entry-button', require('../components/entries/CreateEntryButton.vue').default);
+Vue.component('popover', require('../components/Popover.vue').default);
 
 // Recursive
 Vue.component('role-permission-tree', require('../components/roles/PermissionTree.vue').default);

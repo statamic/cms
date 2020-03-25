@@ -12,6 +12,17 @@ class ArrayAccessor extends Collection
         return Arr::getFirst($this->items, Arr::wrap($key), $default);
     }
 
+    public function hasAny(array $keys)
+    {
+        foreach ($keys as $key) {
+            if ($this->has($key)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function explode($key, $default = null)
     {
         if (! $value = $this->get($key)) {

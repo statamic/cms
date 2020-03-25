@@ -74,14 +74,8 @@
 </template>
 
 <script>
-import Popper from 'vue-popperjs';
 
 export default {
-
-    components: {
-        Popper
-    },
-
     props: {
         saveUrl: String,
         deleteUrl: String,

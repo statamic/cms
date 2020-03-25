@@ -1579,6 +1579,16 @@ EOT;
     {
         $this->assertEquals('yes', Antlers::parse('{{ if object }}yes{{ else }}no{{ /if }}', ['object' => new \stdClass]));
     }
+
+    /** @test */
+    function parameter_style_modifier_with_colon_prefix_will_get_the_values_from_context()
+    {
+        $this->assertEquals('Tes Te', Antlers::parse('{{ word :backspace="one" }} {{ word :backspace="two" }}', [
+            'word' => 'Test',
+            'one' => 1,
+            'two' => 2,
+        ]));
+    }
 }
 
 class NonArrayableObject

@@ -30,7 +30,12 @@ svg {
 	position: relative;
 	width: 7px;
     flex-shrink: 0;
+
+    &.published { @apply bg-green-light }
+    &.draft, &.expired { @apply bg-grey-60 }
+    &.scheduled { @apply bg-transparent border border-grey-60 }
 }
+
 .icon-status-draft {
 	background: $color_gray_light;
 }

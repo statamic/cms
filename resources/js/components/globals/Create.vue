@@ -16,7 +16,7 @@
                 v-model="title"
                 :errors="errors.title"
                 width="50"
-                autofocus
+                :focus="true"
             />
 
             <slugify

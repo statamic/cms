@@ -9,13 +9,14 @@ use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Traits\ForwardsCalls;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Facades\Blink;
 
 class Page implements Entry, Augmentable, Responsable
 {
-    use HasAugmentedInstance;
+    use HasAugmentedInstance, ForwardsCalls;
 
     protected $tree;
     protected $reference;
@@ -40,9 +41,18 @@ class Page implements Entry, Augmentable, Responsable
             return $this->url;
         }
 
+        if ($this->isRedirect()) {
+            return $this->redirectUrl();
+        }
+
         if ($this->reference && $this->referenceExists()) {
             return URL::makeRelative($this->absoluteUrl());
         }
+    }
+
+    public function isRedirect()
+    {
+        return optional($this->entry())->isRedirect();
     }
 
     public function setDepth($depth)
@@ -123,7 +133,7 @@ class Page implements Entry, Augmentable, Responsable
         return $this;
     }
 
-    public function setRoute(string $route): self
+    public function setRoute(?string $route): self
     {
         $this->route = $route;
 
@@ -156,7 +166,7 @@ class Page implements Entry, Augmentable, Responsable
             return $cached;
         }
 
-        if (! $this->structure()->collection()) {
+        if (! $this->structure() instanceof CollectionStructure) {
             return $uris[$this->reference] = $this->entry()->uri();
         }
 
@@ -175,6 +185,10 @@ class Page implements Entry, Augmentable, Responsable
     {
         if ($this->url) {
             return $this->url;
+        }
+
+        if ($this->isRedirect()) {
+            return $this->redirectUrl();
         }
 
         if ($this->reference && $this->referenceExists()) {
@@ -272,7 +286,7 @@ class Page implements Entry, Augmentable, Responsable
     public function toResponse($request)
     {
         if ($this->reference && $this->referenceExists()) {
-            return $this->entry()->toResponse($request);
+            return (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
         }
 
         throw new \LogicException('A page without a reference to an entry cannot be rendered.');
@@ -296,5 +310,10 @@ class Page implements Entry, Augmentable, Responsable
     public function collection()
     {
         return Collection::findByMount($this);
+    }
+
+    public function __call($method, $args)
+    {
+        return $this->forwardCallTo($this->entry(), $method, $args);
     }
 }

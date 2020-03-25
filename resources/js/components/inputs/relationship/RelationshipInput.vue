@@ -81,7 +81,6 @@
 </template>
 
 <script>
-import Popper from 'vue-popperjs';
 import RelatedItem from './Item.vue';
 import ItemSelector from './Selector.vue';
 import CreateButton from './CreateButton.vue';
@@ -121,7 +120,6 @@ export default {
     },
 
     components: {
-        Popper,
         ItemSelector,
         RelatedItem,
         CreateButton,

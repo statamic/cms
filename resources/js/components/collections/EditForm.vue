@@ -11,13 +11,7 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setFieldValue, setFieldMeta }" class="mac-w-">
-
-            <header class="mb-3">
-                <breadcrumb :url="url" :title="title" />
-                <h1 class="">{{ __('Configure Collection') }}</h1>
-            </header>
-
+        <div slot-scope="{ setFieldValue, setFieldMeta }">
             <configure-sections
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
@@ -39,15 +33,11 @@ export default {
         blueprint: Object,
         initialValues: Object,
         meta: Object,
-        initialTitle: String,
-        parentTitle: String,
-        url: String,
-        listingUrl: String,
+        url: String
     },
 
     data() {
         return {
-            title: this.initialTitle,
             values: this.initialValues,
             error: null,
             errors: {},
@@ -67,7 +57,6 @@ export default {
 
             this.$axios.patch(this.url, this.values).then(response => {
                 this.saving = false;
-                this.title = response.data.title;
                 this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
             }).catch(e => this.handleAxiosError(e));

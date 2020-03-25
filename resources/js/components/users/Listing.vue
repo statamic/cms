@@ -14,24 +14,13 @@
             :sort-direction="sortDirection"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0">
-                    <div class="data-list-header">
-                        <data-list-toggle-all ref="toggleAll" />
-                        <div class="flex-1" />
-                        <data-list-bulk-actions
-                            class="rounded-b"
-                            :url="actionUrl"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
-                        />
-                        <template v-if="!hasSelections">
-                            <data-list-filters
-                                :filters="filters"
-                                :active-filters="activeFilters"
-                                :active-count="activeFilterCount"
-                            />
-                        </template>
-                    </div>
+                <div class="card p-0 relative">
+                    <data-list-bulk-actions
+                        class="rounded"
+                        :url="actionUrl"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                    />
                     <data-list-table :allow-bulk-actions="true" @sorted="sorted">
                         <template slot="cell-email" slot-scope="{ row: user, value }">
                             <a :href="user.edit_url" class="flex items-center">
@@ -64,7 +53,8 @@
                     class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
-                    @page-selected="page = $event"
+                    @page-selected="selectPage"
+                    @per-page-changed="changePerPage"
                 />
             </div>
         </data-list>

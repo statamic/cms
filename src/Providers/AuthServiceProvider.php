@@ -31,7 +31,7 @@ use Statamic\Stache\Repositories\UserRepository as StacheUsers;
 class AuthServiceProvider extends ServiceProvider
 {
     protected $policies = [
-        \Statamic\Contracts\Structures\Structure::class => Policies\StructurePolicy::class,
+        \Statamic\Contracts\Structures\Nav::class => Policies\NavPolicy::class,
         \Statamic\Contracts\Entries\Collection::class => Policies\CollectionPolicy::class,
         \Statamic\Contracts\Entries\Entry::class => Policies\EntryPolicy::class,
         \Statamic\Contracts\Taxonomies\Taxonomy::class => Policies\TaxonomyPolicy::class,

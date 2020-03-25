@@ -15,9 +15,12 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class UsersController extends CpController
 {
+    use QueriesFilters;
+
     /**
      * @var UserContract
      */
@@ -44,7 +47,7 @@ class UsersController extends CpController
             ? UserGroup::find($request->group)->queryUsers()
             : User::query();
 
-        $this->filter($query, $request->filters);
+        $filters = $this->queryFilters($query, $request->filters);
 
         $users = $query
             ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
@@ -59,18 +62,9 @@ class UsersController extends CpController
                 Column::make('last_login')->label(__('Last Login'))->sortable(false),
             ])
             ->additional(['meta' => [
-                'filters' => $request->filters,
+                'filters' => $filters,
                 'sortColumn' => $sort,
             ]]);
-    }
-
-    protected function filter($query, $filters)
-    {
-        foreach ($filters as $handle => $values) {
-            $class = app('statamic.scopes')->get($handle);
-            $filter = app($class);
-            $filter->apply($query, $values);
-        }
     }
 
     /**
@@ -109,7 +103,7 @@ class UsersController extends CpController
 
         $blueprint = Blueprint::find('user');
 
-        $fields = $blueprint->fields()->addValues($request->all());
+        $fields = $blueprint->fields()->only(['email', 'name'])->addValues($request->all());
 
         $fields->validate(['email' => 'required|email|unique_user_value']);
 
@@ -190,7 +184,7 @@ class UsersController extends CpController
     {
         $this->authorize('edit', $user);
 
-        $fields = $user->blueprint()->fields()->addValues($request->all());
+        $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->all());
 
         $fields->validate(['email' => 'required|unique_user_value:'.$user->id()]);
 

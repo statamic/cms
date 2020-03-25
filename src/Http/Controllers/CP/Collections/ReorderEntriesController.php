@@ -12,16 +12,34 @@ class ReorderEntriesController extends CpController
     {
         $this->authorize('reorder', $collection);
 
-        $request->validate(['ids' => 'required|array']);
+        $request->validate([
+            'ids' => 'required|array',
+            'page' => 'required|integer',
+            'perPage' => 'required|integer',
+            'site' => 'required',
+        ]);
 
-        $entries = collect($request->ids)->mapWithKeys(function ($id) {
-            return [$id => Entry::find($id)];
-        });
+        $tree = $collection->structure()->in($request->site);
 
-        $initialOrderPositions = $entries->map->order()->sort()->values();
+        $contents = collect($tree->tree())->keyBy('entry');
 
-        foreach ($request->ids as $index => $id) {
-            $entries[$id]->order($initialOrderPositions[$index])->save();
-        }
+        $reorderPayload = $request->ids;
+
+        $reorderedEntries = clone $contents;
+
+        $contents
+            ->keys()
+            ->forPage($request->page, $request->perPage)
+            ->zip($reorderPayload)
+            ->each(function ($operation) use ($contents, &$reorderedEntries) {
+                $reorderedEntries->put(
+                    $operation[0],
+                    $contents->get($operation[1])
+                );
+            });
+
+        $tree
+            ->tree($reorderedEntries->values()->all())
+            ->save();
     }
 }

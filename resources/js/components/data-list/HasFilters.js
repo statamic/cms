@@ -2,7 +2,11 @@ export default {
 
     data() {
         return {
+            activePreset: null,
+            activePresetPayload: {},
+            searchQuery: '',
             activeFilters: {},
+            activeFilterBadges: {},
         }
     },
 
@@ -12,7 +16,7 @@ export default {
             let count = Object.keys(this.activeFilters).length;
 
             if (this.activeFilters.hasOwnProperty('fields')) {
-                count = count + Object.keys(this.activeFilters.fields).length - 1;
+                count = count + Object.keys(this.activeFilters.fields).filter(field => field != 'badge').length - 1;
             }
 
             return count;
@@ -24,12 +28,11 @@ export default {
 
     },
 
-    created() {
-        this.$events.$on('filter-changed', this.filterChanged);
-        this.$events.$on('filters-reset', this.filtersReset);
-    },
-
     methods: {
+
+        searchChanged(query) {
+            this.searchQuery = query;
+        },
 
         hasFields(values) {
             for (const fieldHandle in values) {
@@ -48,24 +51,37 @@ export default {
         },
 
         filtersChanged(filters) {
+            this.activeFilters = {};
+
             for (const handle in filters) {
                 const values = filters[handle];
                 this.filterChanged({ handle, values }, false);
             }
+
             this.unselectAllItems();
         },
 
         filtersReset() {
-            this.filters.forEach(filter => {
-                Vue.set(this.activeFilters, filter.handle, filter.values);
-            });
+            this.activePreset = null;
+            this.activePresetPayload = {};
+            this.searchQuery = '';
+            this.activeFilters = {};
+            this.activeFilterBadges = {};
         },
 
         unselectAllItems() {
             if (this.$refs.toggleAll) {
                 this.$refs.toggleAll.uncheckAllItems();
             }
-        }
+        },
+
+        selectPreset(handle, preset)  {
+            this.activePreset = handle;
+            this.activePresetPayload = preset;
+            this.searchQuery = preset.query;
+
+            this.filtersChanged(preset.filters);
+        },
 
     }
 

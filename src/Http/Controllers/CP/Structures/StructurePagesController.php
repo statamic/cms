@@ -29,17 +29,10 @@ class StructurePagesController extends CpController
     {
         $tree = $this->toTree($request->pages);
 
-        if ($request->expectsRoot) {
-            $root = array_pull($tree, 0)['entry'];
-            $tree = array_values($tree);
-        }
-
-        $tree = Structure::find($structure)
+        Structure::find($structure)
             ->in($request->site)
-            ->root($root ?? null)
-            ->tree($tree);
-
-        $tree->save();
+            ->tree($tree)
+            ->save();
     }
 
     protected function toTree($items)

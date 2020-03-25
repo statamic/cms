@@ -11,7 +11,10 @@ export default {
         },
 
         actionCompleted() {
+            this.$events.$emit('clear-selections');
+
             this.$toast.success(__('Action completed'));
+
             this.request();
         }
 

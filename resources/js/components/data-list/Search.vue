@@ -2,16 +2,16 @@
     <input
         type="text"
         ref="input"
-        class="data-list-search-input"
         placeholder="Search..."
         :value="value"
         @input="emitEvent"
         @keyup.esc="reset"
-    >
+        class="input-text flex-1 bg-white text-sm">
 </template>
 
 <script>
 export default {
+
     props: ['value'],
 
     methods: {

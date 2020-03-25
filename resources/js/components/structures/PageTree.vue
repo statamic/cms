@@ -1,81 +1,15 @@
 <template>
-    <div class="page-tree">
+    <div>
 
-        <header class="mb-3">
-            <breadcrumb :url="breadcrumbUrl" :title="__('Structures')" />
-
-            <div class="flex items-center">
-                <h1 class="flex-1" v-text="title" />
-
-                <dropdown-list class="mr-1">
-                    <dropdown-item :text="__('Edit Structure Config')" :redirect="editUrl" />
-                </dropdown-list>
-
-                <a @click="cancel" class="text-2xs text-blue mr-2 underline" v-if="isDirty" v-text="__('Discard changes')" />
-
-                <dropdown-list>
-                    <template #trigger>
-                        <button class="btn" v-text="`${__('Add Link')}`" />
-                    </template>
-                    <dropdown-item :text="__('Link to URL')" @click="linkPage" />
-                    <dropdown-item :text="__('Link to Entry')" @click="linkToEntries" />
-                </dropdown-list>
-
-                <create-entry-button
-                    v-if="hasCollection"
-                    class="ml-2"
-                    :url="createEntryUrl()"
-                    :blueprints="collectionBlueprints"
-                    :text="__('Create Page')" />
-
-                <button
-                    class="btn-primary ml-2"
-                    :class="{ 'disabled': !changed }"
-                    :disabled="!changed"
-                    @click="save"
-                    v-text="__('Save Changes')" />
-            </div>
-        </header>
-
-        <loading-graphic v-if="loading"></loading-graphic>
-
-        <div class="" v-if="localizations.length > 1">
-            <div
-                v-for="option in localizations"
-                :key="option.handle"
-                class="revision-item flex items-center border-grey-30"
-                :class="{ 'opacity-50': !option.active }"
-                @click="localizationSelected(option)"
-            >
-                <div class="flex-1 flex items-center">
-                    <span class="little-dot mr-1 bg-green" />
-                    {{ option.name }}
-                </div>
-                <div class="badge bg-orange" v-if="option.origin" v-text="__('Origin')" />
-                <div class="badge bg-blue" v-if="option.active" v-text="__('Active')" />
-                <div class="badge bg-purple" v-if="option.root && !option.origin && !option.active" v-text="__('Root')" />
-            </div>
+        <div class="loading card" v-if="loading">
+            <loading-graphic />
         </div>
 
-        <div v-if="pages.length == 0" class="no-results border-dashed border-2 w-full flex items-center">
-            <div class="text-center max-w-md mx-auto rounded-lg px-4 py-4">
-                <slot name="no-pages-svg" />
-                <h1 class="my-3" v-text="__('Create your first link now')" />
-                <p class="text-grey mb-3">
-                    {{ __('messages.structures_empty') }}
-                </p>
-                <button v-if="!hasCollection" class="btn-primary btn-lg" v-text="__('Create first page')" @click="openPageCreator" />
-
-                <create-entry-button
-                    v-if="hasCollection"
-                    button-class="btn-primary"
-                    :url="createEntryUrl()"
-                    :blueprints="collectionBlueprints"
-                    :text="__('Create first page')" />
-            </div>
+        <div v-if="!loading && pages.length == 0" class="no-results w-full flex items-center">
+            <slot name="empty" />
         </div>
 
-        <div class="page-tree w-full" v-show="pages.length">
+        <div v-if="!loading" class="page-tree w-full">
             <draggable-tree
                 draggable
                 ref="tree"
@@ -86,37 +20,27 @@
                 @drag="treeDragstart"
             >
                 <tree-branch
-                    slot-scope="{ data: page, store: tree, vm }"
+                    slot-scope="{ data: page, store, vm }"
                     :page="page"
                     :depth="vm.level"
                     :vm="vm"
                     :first-page-is-root="expectsRoot"
                     :hasCollection="hasCollection"
-                    @edit="editPage(page, vm)"
-                    @updated="pageUpdated(tree)"
+                    @edit="$emit('edit-page', page, vm, store, $event)"
                     @removed="pageRemoved"
-                    @link-page="linkChildPage(vm)"
-                    @link-entries="linkChildEntries(vm)"
-                    @create-entry="createEntry"
-                />
+                    @children-orphaned="childrenOrphaned"
+                >
+                    <template #branch-icon="props">
+                        <slot name="branch-icon" v-bind="{ ...props, vm }" />
+                    </template>
+
+                    <template #branch-options="props">
+                        <slot name="branch-options" v-bind="{ ...props, vm }" />
+                    </template>
+                </tree-branch>
             </draggable-tree>
 
         </div>
-
-        <page-selector
-            v-if="collections.length"
-            ref="selector"
-            :site="site"
-            :collections="collections"
-            :exclusions="exclusions"
-            @selected="pagesSelected"
-        />
-
-        <page-editor
-            v-if="creatingPage"
-            @closed="closePageCreator"
-            @submitted="pageCreated"
-        />
 
         <audio ref="soundDrop">
             <source :src="soundDropUrl" type="audio/mp3">
@@ -131,50 +55,34 @@ import * as th from 'tree-helper';
 import {Sortable, Plugins} from '@shopify/draggable';
 import {DraggableTree} from 'vue-draggable-nested-tree/dist/vue-draggable-nested-tree';
 import TreeBranch from './Branch.vue';
-import PageSelector from './PageSelector.vue';
-import PageEditor from './PageEditor.vue';
 
 export default {
 
     components: {
         DraggableTree,
         TreeBranch,
-        PageSelector,
-        PageEditor,
     },
 
     props: {
-        title: String,
-        breadcrumbUrl: String,
-        initialPages: Array,
-        pagesUrl: String,
-        submitUrl: String,
-        editUrl: String,
-        createUrl: String,
-        soundDropUrl: String,
-        site: String,
-        localizations: Array,
-        collections: Array,
-        maxDepth: {
-            type: Number,
-            default: Infinity,
-        },
-        expectsRoot: Boolean,
-        hasCollection: Boolean,
-        collectionBlueprints: Array,
+        pagesUrl: { type: String, required: true },
+        submitUrl: { type: String, required: true },
+        submitParameters: { type: Object, default: () => ({}) },
+        createUrl: { type: String },
+        site: { type: String, required: true },
+        localizations: { type: Array },
+        maxDepth: { type: Number, default: Infinity, },
+        expectsRoot: { type: Boolean, required: true },
+        hasCollection: { type: Boolean, required: true },
     },
 
     data() {
         return {
             loading: false,
             saving: false,
-            changed: false,
-            pages: this.initialPages,
+            pages: [],
             treeData: [],
             pageIds: [],
-            parentPageForAdding: null,
-            targetPage: null,
-            creatingPage: false,
+            soundDropUrl: this.$config.get('resourceUrl') + '/audio/click.mp3',
         }
     },
 
@@ -182,10 +90,6 @@ export default {
 
         activeLocalization() {
             return _.findWhere(this.localizations, { active: true });
-        },
-
-        isDirty() {
-            return this.$dirty.has('page-tree');
         },
 
         exclusions() {
@@ -196,26 +100,26 @@ export default {
 
     watch: {
 
-        changed(changed) {
-            this.$dirty.state('page-tree', changed);
-        },
-
-        expectsRoot(value) {
-            this.changed = true;
-        },
-
         pages: {
-            immediate: true,
             deep: true,
             handler(pages) {
                 this.pageIds = this.getPageIds(pages);
             }
-        }
+        },
 
+        pageIds(ids) {
+            this.$emit('page-ids-updated', ids);
+        },
+
+        site(site) {
+            this.getPages();
+        }
     },
 
     created() {
-        this.updateTreeData();
+        this.getPages().then(() => {
+            this.initialPages = this.pages;
+        })
 
         this.$keys.bindGlobal(['mod+s'], e => {
             e.preventDefault();
@@ -227,9 +131,9 @@ export default {
 
         getPages() {
             this.loading = true;
-            const url = this.pagesUrl;
+            const url = `${this.pagesUrl}?site=${this.site}`;
 
-            this.$axios.get(url).then(response => {
+            return this.$axios.get(url).then(response => {
                 this.pages = response.data.pages;
                 this.updateTreeData();
                 this.loading = false;
@@ -256,26 +160,27 @@ export default {
 
             this.pages = tree.getPureData();
             this.$refs.soundDrop.play();
-            this.changed = true;
+            this.$emit('changed');
         },
 
         save() {
             this.saving = true;
-            const payload = { pages: this.pages, site: this.site, expectsRoot: this.expectsRoot };
+            const payload = { pages: this.pages, site: this.site, expectsRoot: this.expectsRoot, ...this.submitParameters };
 
             this.$axios.post(this.submitUrl, payload).then(response => {
-                this.changed = false;
+                this.$emit('saved');
                 this.saving = false;
                 this.$toast.success(__('Saved'));
+                this.initialPages = this.pages;
             });
         },
 
-        pagesSelected(selections) {
-            const parent = this.parentPageForAdding
-                ? this.parentPageForAdding.data.children
+        addPages(pages, targetParent) {
+            const parent = targetParent
+                ? targetParent.data.children
                 : this.treeData;
 
-            selections.forEach(selection => {
+            pages.forEach(selection => {
                 parent.push({
                     id: selection.id,
                     title: selection.title,
@@ -286,7 +191,6 @@ export default {
                 });
             });
 
-            this.parentPageForAdding = null;
             this.treeUpdated();
         },
 
@@ -296,7 +200,12 @@ export default {
 
         pageRemoved(tree) {
             this.pages = tree.getPureData();
-            this.changed = true;
+            this.$emit('changed');
+        },
+
+        childrenOrphaned(tree) {
+            this.pages = tree.getPureData();
+            this.$emit('changed');
         },
 
         localizationSelected(localization) {
@@ -318,12 +227,11 @@ export default {
         },
 
         cancel() {
-            if (!this.isDirty) return;
             if (! confirm('Are you sure?')) return;
 
             this.pages = this.initialPages;
             this.updateTreeData();
-            this.changed = false;
+            this.$emit('canceled');
         },
 
         treeDragstart(node) {
@@ -349,62 +257,9 @@ export default {
             });
         },
 
-        createEntry(parent) {
-            window.location = this.createEntryUrl(parent);
-        },
-
-        createEntryUrl(parent) {
-            let url = this.createUrl;
-            if (parent) url += '?parent=' + parent;
-            return url;
-        },
-
-        linkChildPage(vm) {
-            this.parentPageForAdding = vm;
-            this.openPageCreator();
-        },
-
-        linkChildEntries(vm) {
-            this.parentPageForAdding = vm;
-            this.linkToEntries();
-        },
-
-        linkPage() {
-            this.openPageCreator();
-        },
-
-        linkToEntries() {
-            this.$refs.selector.linkExistingItem();
-        },
-
-        openPageCreator() {
-            this.creatingPage = true;
-        },
-
-        closePageCreator() {
-            this.creatingPage = false;
-        },
-
-        pageCreated(page) {
-            this.closePageCreator();
-            this.pagesSelected([{
-                title: page.title,
-                url: page.url,
-                children: []
-            }]);
-        },
-
         pageUpdated(tree) {
             this.pages = tree.getPureData();
-            this.changed = true;
-        },
-
-        makeFirstPage() {
-            if (this.hasCollection) {
-                return window.location = this.createUrl
-            } else {
-                this.openPageCreator()
-            }
+            this.$emit('changed');
         }
 
     }

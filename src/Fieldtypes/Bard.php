@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\Fields\Fields;
 use Scrumpy\ProseMirrorToHtml\Renderer;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
 
 class Bard extends Replicator
 {
@@ -86,6 +87,11 @@ class Bard extends Replicator
             'instructions' => 'Enable the option to view the HTML source code while writing.'
         ]
     ];
+
+    public function filter()
+    {
+        return new BardFilter($this);
+    }
 
     public function augment($value)
     {
