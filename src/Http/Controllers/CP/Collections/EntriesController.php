@@ -126,6 +126,7 @@ class EntriesController extends CpController
                     'root' => $exists ? $localized->isRoot() : false,
                     'origin' => $exists ? $localized->id() === optional($entry->origin())->id() : null,
                     'published' => $exists ? $localized->published() : false,
+                    'status' => $exists ? $localized->status() : null,
                     'url' => $exists ? $localized->editUrl() : null,
                     'livePreviewUrl' => $exists ? $localized->livePreviewUrl() : null,
                 ];
