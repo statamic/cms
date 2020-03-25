@@ -248,6 +248,17 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    function it_gets_the_uri_from_the_structure()
+    {
+        $structure = $this->partialMock(CollectionStructure::class);
+        $collection = tap((new Collection)->handle('test')->structure($structure))->save();
+        $entry = (new Entry)->collection($collection)->locale('en')->slug('foo');
+        $structure->shouldReceive('entryUri')->with($entry)->once()->andReturn('/structured-uri');
+
+        $this->assertEquals('/structured-uri', $entry->uri());
+    }
+
+    /** @test */
     function it_gets_urls_for_first_child_redirects()
     {
         \Event::fake(); // Don't invalidate static cache etc when saving entries.

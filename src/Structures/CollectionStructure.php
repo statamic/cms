@@ -33,6 +33,10 @@ class CollectionStructure extends Structure
 
     public function entryUri($entry)
     {
+        if (! $this->route($entry->locale())) {
+            return null;
+        }
+
         $page = $this->in($entry->locale())
             ->flattenedPages()
             ->keyBy->reference()
