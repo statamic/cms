@@ -146,11 +146,9 @@ export default {
         },
 
         reorder() {
-            this.requestOnParameterChange = false;
             this.filtersReset();
             this.page = 1;
             this.sortColumn = 'order';
-            this.request().then(() => this.requestOnParameterChange = true);
         },
 
         cancelReordering() {
