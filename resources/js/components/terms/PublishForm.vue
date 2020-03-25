@@ -97,7 +97,7 @@
                                             class="flex items-center justify-center btn-flat w-full mx-1 px-1"
                                             v-if="isBase"
                                             @click="openLivePreview">
-                                            <svg-icon name="syncronize" class="w-5 h-5 mr-1" />
+                                            <svg-icon name="synchronize" class="w-5 h-5 mr-1" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a

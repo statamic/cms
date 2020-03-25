@@ -60,7 +60,7 @@ class Manifest extends PackageManifest
             'marketplaceProductId' => data_get($marketplaceData, 'id', null),
             'marketplaceVariantId' => data_get($installedVariant, 'id', null),
             'marketplaceSlug' => data_get($marketplaceData, 'slug', null),
-            'version' => $package['version'], // Is this syncronized with git tag?
+            'version' => $package['version'], // Is this synchronized with git tag?
             'namespace' => $namespace,
             'directory' => $directory,
             'autoload' => $autoload,

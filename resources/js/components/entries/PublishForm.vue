@@ -6,9 +6,7 @@
         <div class="flex items-center mb-3">
             <h1 class="flex-1">
                 <div class="flex items-center">
-                    <span v-if="! isCreating"
-                        class="little-dot mr-1"
-                        :class="{ 'bg-green-light': published, 'bg-grey-60': !published }" />
+                    <span v-if="! isCreating" class="little-dot mr-1" :class="activeLocalization.status" v-tooltip="activeLocalization.status" />
                     <span v-html="$options.filters.striptags(title)" />
                 </div>
             </h1>
@@ -103,7 +101,7 @@
                                             class="flex items-center justify-center btn-flat w-full mx-1 px-1"
                                             v-if="isBase"
                                             @click="openLivePreview">
-                                            <svg-icon name="syncronize" class="w-5 h-5 mr-1" />
+                                            <svg-icon name="synchronize" class="w-5 h-5 mr-1" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
