@@ -3,7 +3,7 @@
         <thead v-if="allowBulkActions || allowColumnPicker || visibleColumns.length > 1">
             <tr>
                 <th class="checkbox-column" v-if="allowBulkActions || reorderable">
-                    <data-list-toggle-all ref="toggleAll" />
+                    <data-list-toggle-all ref="toggleAll" v-if="allowBulkActions" />
                 </th>
                 <th
                     v-for="column in visibleColumns"
