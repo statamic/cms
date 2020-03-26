@@ -38,7 +38,12 @@ class Nav extends Structure
             $this->content = trim($this->content);
         }
 
-        $output = $this->parseLoop($crumbs->values()->toAugmentedArray());
+        $crumbs = $crumbs->values()->map(function ($crumb) {
+            $crumb->setSupplement('is_current', URL::getCurrent() === $crumb->url());
+            return $crumb;
+        });
+
+        $output = $this->parseLoop($crumbs->toAugmentedArray());
 
         if ($backspaces = $this->params->int('backspace', 0)) {
             $output = substr($output, 0, -$backspaces);
