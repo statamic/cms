@@ -27,6 +27,7 @@
             <button
                 class="p-1 hover:bg-grey-10 flex-1 rounded-br border-l text-xs"
                 v-text="__('Close')"
+                @click="$emit('closed')"
             />
         </div>
     </div>

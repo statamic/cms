@@ -9,6 +9,7 @@
                         <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                     </button>
                 </template>
+                <template #default="{ close: closePopover }">
                 <div class="flex flex-col text-left w-64">
                     <h6 class="p-2 pb-1" v-text="__('Show everything where:')"/>
                     <div v-if="showFilterSelection" class="px-2 pb-2">
@@ -28,6 +29,7 @@
                             :values="activeFilters.fields || {}"
                             @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
                             @cleared="creating = false"
+                            @closed="closePopover"
                         />
                         <data-list-filter
                             v-for="filter in standardFilters"
@@ -37,9 +39,11 @@
                             :values="activeFilters[filter.handle]"
                             @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
                             @cleared="creating = false"
+                            @closed="closePopover"
                         />
                     </div>
                 </div>
+                </template>
             </popover>
 
             <data-list-search ref="search" :value="searchQuery" @input="$emit('search-changed', $event)" />
@@ -77,14 +81,17 @@
                         <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                     </button>
                 </template>
+                <template #default="{ close: closePopover }">
                 <div class="filter-fields">
                     <data-list-filter
                         :key="filter.handle"
                         :filter="filter"
                         :values="activeFilters[filter.handle]"
                         @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
+                        @closed="closePopover"
                     />
                 </div>
+                </template>
             </popover>
 
         </div>
