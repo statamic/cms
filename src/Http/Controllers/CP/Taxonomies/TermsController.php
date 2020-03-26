@@ -60,7 +60,6 @@ class TermsController extends CpController
             ->columnPreferenceKey("taxonomies.{$taxonomy->handle()}.columns")
             ->additional(['meta' => [
                 'filters' => $filters,
-                'sortColumn' => $sortField,
             ]]);
     }
 

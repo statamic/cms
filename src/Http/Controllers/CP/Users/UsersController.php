@@ -63,7 +63,6 @@ class UsersController extends CpController
             ])
             ->additional(['meta' => [
                 'filters' => $filters,
-                'sortColumn' => $sort,
             ]]);
     }
 

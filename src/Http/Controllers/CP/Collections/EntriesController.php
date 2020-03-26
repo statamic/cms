@@ -55,7 +55,6 @@ class EntriesController extends CpController
             ->columnPreferenceKey("collections.{$collection->handle()}.columns")
             ->additional(['meta' => [
                 'filters' => $filters,
-                'sortColumn' => $sortField,
             ]]);
     }
 

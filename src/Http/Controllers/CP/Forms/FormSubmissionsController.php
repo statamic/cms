@@ -49,10 +49,7 @@ class FormSubmissionsController extends CpController
 
         return (new Submissions($paginator))
             ->blueprint($form->blueprint())
-            ->columnPreferenceKey("forms.{$form->handle()}.columns")
-            ->additional(['meta' => [
-                'sortColumn' => $sort,
-            ]]);
+            ->columnPreferenceKey("forms.{$form->handle()}.columns");
     }
 
     private function sanitizeSubmission($submission)
