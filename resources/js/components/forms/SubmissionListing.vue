@@ -18,7 +18,11 @@
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0 relative">
                     <div class="data-list-header min-h-16">
-                        <data-list-search v-model="searchQuery" />
+                        <data-list-filters
+                            :search-query="searchQuery"
+                            @search-changed="searchChanged"
+                            @reset="filtersReset"
+                        />
                     </div>
 
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
