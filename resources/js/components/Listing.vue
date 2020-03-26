@@ -29,7 +29,6 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             meta: null,
-            pendingRequest: false,
         }
     },
 
@@ -80,8 +79,7 @@ export default {
                 if (before.search !== after.search) return;
 
                 if (JSON.stringify(before) === JSON.stringify(after)) return;
-
-                this.queueRequest();
+                this.request();
             }
         },
 
@@ -96,12 +94,8 @@ export default {
             this.sortColumn = null;
             this.sortDirection = null;
             this.resetPage();
-            this.queueRequest();
-        },
-
-        pendingRequest(isPending) {
-            if (isPending) this.debounceRequest();
-        },
+            this.request();
+        }
 
     },
 
@@ -118,18 +112,6 @@ export default {
 
             this.activeFilters = values;
         },
-
-        queueRequest() {
-            if (this.pendingRequest) return;
-
-            this.pendingRequest = true;
-        },
-
-        debounceRequest: _.debounce(function () {
-            this.request();
-
-            this.pendingRequest = false;
-        }, 10),
 
         request() {
             if (! this.requestUrl) {
