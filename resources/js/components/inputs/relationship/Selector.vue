@@ -206,7 +206,6 @@ export default {
 
             return this.$axios.get(this.url, { params, cancelToken: this.source.token }).then(response => {
                 this.columns = response.data.meta.columns;
-                this.sortColumn = response.data.meta.sortColumn;
                 this.items = response.data.data;
                 this.meta = response.data.meta;
                 this.filters = response.data.meta.filters;

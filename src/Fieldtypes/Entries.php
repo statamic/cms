@@ -74,7 +74,6 @@ class Entries extends Relationship
             ->blueprint($this->getBlueprint($request))
             ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
             ->additional(['meta' => [
-                'sortColumn' => $this->getSortColumn($request),
                 'filters' => $this->getSelectionFilters($request),
                 'activeFilterBadges' => $this->activeFilterBadges,
             ]]);
