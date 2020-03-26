@@ -1,11 +1,11 @@
 <template>
     <div class="popover-container" :class="{'popover-open': isOpen}" v-on-clickaway="close">
-        <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$slots.default">
+        <div @click="toggle" ref="trigger" aria-haspopup="true" :aria-expanded="isOpen" v-if="$scopedSlots.default">
             <slot name="trigger"></slot>
         </div>
         <div ref="popover" class="popover" v-if="!disabled">
             <div class="popover-content bg-white shadow-popover rounded-md">
-                <slot></slot>
+                <slot :close="close" />
             </div>
         </div>
     </div>

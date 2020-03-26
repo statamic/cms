@@ -2,6 +2,10 @@
    BUTTONS
    ========================================================================== */
 
+button {
+    @apply font-normal;
+}
+
 // Base button styles that shouldn't need overriding
 [class*="btn"] {
     @apply cursor-pointer select-none h-auto rounded relative;

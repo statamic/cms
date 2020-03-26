@@ -40,11 +40,17 @@
             </div>
         </div>
 
-        <div v-if="preferencesKey" class="px-2 py-1 border-t bg-grey-10 rounded-b">
-            <div class="flex">
-                <button class="btn btn-sm mr-sm flex-1" @click="reset" :disabled="saving">{{ __('Reset') }}</button>
-                <button class="btn-primary flex-1 ml-sm btn-sm" @click="save" :disabled="saving">{{ __('Save') }}</button>
-            </div>
+        <div class="flex border-t text-grey-80" v-if="preferencesKey">
+            <button
+                class="p-1 hover:bg-grey-10 rounded-bl text-xs flex-1"
+                v-text="__('Reset')"
+                @click="reset" :disabled="saving"
+            />
+            <button
+                class="p-1 hover:bg-grey-10 text-blue flex-1 rounded-br border-l text-xs"
+                v-text="__('Save')"
+                @click="save" :disabled="saving"
+            />
         </div>
 
     </popover>
