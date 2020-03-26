@@ -2,7 +2,7 @@
     <div class="w-full">
         <div class="input-group focus-within-only">
 
-            <popover>
+            <popover v-if="filters.length">
                 <template slot="trigger">
                     <button class="input-group-prepend cursor-pointer px-2" @click="resetFilterPopover">
                         {{ __('Filter') }}
@@ -115,7 +115,10 @@ export default {
     },
 
     props: {
-        filters: Array,
+        filters: {
+            type: Array,
+            default: () => [],
+        },
         activePreset: String,
         activePresetPayload: Object,
         activeFilters: Object,
