@@ -8,7 +8,7 @@
     <div slot-scope="{ meta, value, loading: loadingMeta }" :class="classes">
         <div class="field-inner">
             <label class="publish-field-label" :class="{'font-bold': config.bold}">
-                <span class="cursor-pointer" :class="{'font-mono bg-grey-20 py-px px-sm text-xs': showHandle}" v-text="labelText" @click="toggleLabel" />
+                <span :class="{'font-mono bg-grey-20 py-px px-sm text-xs': showHandle, 'cursor-pointer': canToggleLabel }" v-text="labelText" @click="toggleLabel" />
                 <i class="required ml-sm" v-if="config.required">*</i>
                 <avatar v-if="isLocked" :user="lockingUser" class="w-4 rounded-full -mt-px ml-1 mr-1" v-tooltip="lockingUser.name" />
                 <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">
@@ -92,6 +92,7 @@ export default {
         syncable: Boolean,
         namePrefix: String,
         errorKeyPrefix: String,
+        canToggleLabel: Boolean,
     },
 
     data() {
@@ -182,7 +183,9 @@ export default {
         },
 
         toggleLabel() {
-            this.showHandle = ! this.showHandle
+            if (this.canToggleLabel) {
+                this.showHandle = ! this.showHandle
+            }
         }
 
     }

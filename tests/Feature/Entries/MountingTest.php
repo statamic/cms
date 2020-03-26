@@ -15,11 +15,11 @@ class MountingTest extends TestCase
     /** @test */
     function updating_a_mounted_page_will_update_the_uris_for_each_entry_in_that_collection()
     {
-        Collection::make('pages')->route('pages/{slug}')->save();
+        Collection::make('pages')->routes('pages/{slug}')->save();
 
         EntryFactory::collection('pages')->slug('another-page')->create();
         $mount = EntryFactory::collection('pages')->slug('blog')->create();
-        Collection::make('blog')->route('{mount}/{slug}')->mount($mount->id())->save();
+        Collection::make('blog')->routes('{mount}/{slug}')->mount($mount->id())->save();
 
         $one = EntryFactory::collection('blog')->slug('one')->create();
         $two = EntryFactory::collection('blog')->slug('two')->create();

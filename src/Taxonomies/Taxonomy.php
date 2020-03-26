@@ -2,6 +2,8 @@
 
 namespace Statamic\Taxonomies;
 
+use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Statamic\Facades\Stache;
@@ -13,9 +15,9 @@ use Statamic\Facades\Site;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 
-class Taxonomy implements Contract, Responsable
+class Taxonomy implements Contract, Responsable, AugmentableContract
 {
-    use FluentlyGetsAndSets, ExistsAsFile;
+    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData;
 
     protected $handle;
     protected $title;
@@ -257,5 +259,13 @@ class Taxonomy implements Contract, Responsable
     public static function __callStatic($method, $parameters)
     {
         return Facades\Taxonomy::{$method}(...$parameters);
+    }
+
+    public function augmentedArrayData()
+    {
+        return [
+            'title' => $this->title(),
+            'handle' => $this->handle(),
+        ];
     }
 }

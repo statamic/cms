@@ -17,10 +17,11 @@
 
     @else
 
-        @include('statamic::partials.create-first', [
+        @include('statamic::partials.empty-state', [
             'resource' => 'Blueprint',
-            'description' => 'Blueprints let you mix and match fields and fieldsets to create the content structures for collections and other data types.',
-            'svg' => 'empty/blueprints',
+            'description' => __('statamic::messages.blueprints_intro'),
+            'docs_link' => Statamic::docsUrl('blueprints'),
+            'svg' => 'empty/form',
             'route' => cp_route('blueprints.create'),
             'can' => $user->can('create', 'Statamic\Fields\Blueprint')
         ])

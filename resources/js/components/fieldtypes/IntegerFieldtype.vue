@@ -3,7 +3,7 @@
         type="number"
         tabindex="0"
         :name="name"
-        :autofocus="autofocus"
+        :focus="focus"
         :value="value"
         :is-read-only="isReadOnly"
         @input="update"
@@ -18,7 +18,7 @@ export default {
 
     mixins: [Fieldtype],
 
-    props: ['autofocus']
+    props: ['focus']
 
 };
 </script>

@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
+use Statamic\Query\Scopes\Filters\Fields\Textarea as TextareaFilter;
 
 class Textarea extends Fieldtype
 {
@@ -14,4 +15,9 @@ class Textarea extends Fieldtype
     ];
 
     protected $view = 'statamic::forms.fields.textarea';
+
+    public function filter()
+    {
+        return new TextareaFilter($this);
+    }
 }

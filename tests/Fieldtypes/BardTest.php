@@ -106,6 +106,18 @@ class BardTest extends TestCase
     }
 
     /** @test */
+    function augmenting_an_empty_value_when_not_using_sets_returns_null()
+    {
+        $this->assertNull($this->bard(['sets' => null])->augment(null));
+    }
+
+    /** @test */
+    function augmenting_an_empty_value_when_using_sets_returns_an_empty_array()
+    {
+        $this->assertSame([], $this->bard(['sets' => ['one' => []]])->augment(null));
+    }
+
+    /** @test */
     function it_removes_disabled_sets()
     {
         $data = [

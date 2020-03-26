@@ -27,14 +27,13 @@ Route::middleware(Statamic::cpMiddleware())->group(function () {
     Route::get('select-site/{handle}', 'SelectSiteController@select');
 
     Route::group(['namespace' => 'Structures'], function () {
-        Route::resource('structures', 'StructuresController');
+        Route::resource('navigation', 'NavigationController');
         Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
     });
 
-    Route::get('structures/{collection}/entries/{entry}/{slug}', 'Collections\EntriesController@edit')->name('structures.entries.edit');
-
     Route::group(['namespace' => 'Collections'], function () {
         Route::resource('collections', 'CollectionsController');
+        Route::post('collections/{collection}/structure', 'CollectionStructureController@update')->name('collections.structure.update');
         Route::get('collections/{collection}/scaffold', 'ScaffoldCollectionController@index')->name('collections.scaffold');
         Route::post('collections/{collection}/scaffold', 'ScaffoldCollectionController@create')->name('collections.scaffold.create');
 
@@ -151,6 +150,7 @@ Route::middleware(Statamic::cpMiddleware())->group(function () {
     Route::group(['namespace' => 'Forms'], function () {
         Route::resource('forms', 'FormsController');
         Route::resource('forms.submissions', 'FormSubmissionsController');
+        Route::post('forms/{form}/submissions/actions', 'SubmissionActionController')->name('forms.submissions.actions');
         Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
     });
 

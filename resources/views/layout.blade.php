@@ -14,7 +14,7 @@
             @include('statamic::partials.nav-main')
 
             <div class="workspace">
-                  <div class="page-wrapper @yield('wrapper_class')">
+                  <div class="page-wrapper" :class="wrapperClass">
                         @yield('content')
                   </div>
             </div>

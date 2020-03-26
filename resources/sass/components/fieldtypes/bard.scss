@@ -31,9 +31,9 @@
 .bard-fixed-toolbar {
     @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between;
     position: sticky;
-    top: 0;
     padding: 4px 8px;
     z-index: 5;
+    top:  0;
 
     .bard-toolbar-button {
         @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center;
@@ -183,6 +183,7 @@
     .bard-fixed-toolbar {
         @apply shadow h-12 justify-center;
         padding: 7px 8px;
+        z-index: 999;
 
         button {
             @apply mx-sm;
@@ -447,4 +448,14 @@
     &:hover {
         cursor: grab;
     }
+}
+
+
+/* Bard inside a set
+  ========================================================================== */
+
+.replicator-set-body .bard-fixed-toolbar {
+    top: 0;
+    position: relative;
+    z-index: 1;
 }

@@ -22,9 +22,9 @@ Route::name('statamic.')->group(function () {
         Route::post('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@store')->name('protect.password.store');
 
         Route::group(['prefix' => 'auth'], function () {
-            Route::post('login', 'UserController@login');
+            Route::post('login', 'UserController@login')->name('login');
             Route::get('logout', 'UserController@logout')->name('logout');
-            Route::post('register', 'UserController@register');
+            Route::post('register', 'UserController@register')->name('register');
 
             Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.email');
             Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset');

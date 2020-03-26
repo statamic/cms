@@ -103,7 +103,6 @@ Statamic.app({
     components: {
         GlobalSearch: require('./components/GlobalSearch.vue').default,
         SiteSelector: require('./components/SiteSelector.vue').default,
-        PageTree: require('./components/structures/PageTree.vue').default,
         Login: require('./components/login/login'),
         LoginModal: require('./components/login/LoginModal.vue').default,
         BaseEntryCreateForm: require('./components/entries/BaseCreateForm.vue').default,
@@ -128,10 +127,12 @@ Statamic.app({
         CollectionCreateForm: require('./components/collections/CreateForm.vue').default,
         CollectionScaffolder: require('./components/collections/Scaffolder.vue').default,
         CollectionEditForm: require('./components/collections/EditForm.vue').default,
+        CollectionView: require('./components/collections/View.vue').default,
         SessionExpiry: require('./components/SessionExpiry.vue').default,
-        StructureWizard: require('./components/structures/Wizard.vue').default,
-        StructureListing: require('./components/structures/Listing.vue').default,
-        StructureEditForm: require('./components/structures/EditForm.vue').default,
+        NavigationListing: require('./components/navigation/Listing.vue').default,
+        NavigationCreateForm: require('./components/navigation/CreateForm.vue').default,
+        NavigationEditForm: require('./components/navigation/EditForm.vue').default,
+        NavigationView: require('./components/navigation/View.vue').default,
         Stacks: require('./components/stacks/Stacks.vue').default,
         TaxonomyWizard: require('./components/taxonomies/Wizard.vue').default,
         TaxonomyEditForm: require('./components/taxonomies/EditForm.vue').default,
@@ -163,6 +164,10 @@ Statamic.app({
 
         stackCount() {
             return this.$stacks.count();
+        },
+
+        wrapperClass() {
+            return this.$config.get('wrapperClass', 'max-w-xl');
         }
 
     },

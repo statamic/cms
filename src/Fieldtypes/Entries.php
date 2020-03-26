@@ -9,9 +9,12 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class Entries extends Relationship
 {
+    use QueriesFilters;
+
     protected $canEdit = true;
     protected $canCreate = true;
     protected $canSearch = true;
@@ -48,30 +51,21 @@ class Entries extends Relationship
 
     public function getIndexItems($request)
     {
-        $this->updateRequest($request);
-
         $query = $this->getIndexQuery($request);
 
-        foreach ($request->filters as $handle => $values) {
-            Scope::find($handle, $this->getSelectionFilterContext($request))->apply($query, $values);
+        $filters = $request->filters;
+
+        if (! isset($filters['collection'])) {
+            $query->whereIn('collection', $this->getConfiguredCollections());
         }
+
+        $this->activeFilters = $this->queryFilters($query, $filters, $this->getSelectionFilterContext($request));
 
         if ($sort = $this->getSortColumn($request)) {
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
         return $query->paginate()->preProcessForIndex();
-    }
-
-    protected function updateRequest($request)
-    {
-        if (! $request->filters) {
-            $request->filters = collect();
-        }
-
-        if (! $request->filters->has('collection')) {
-            $request->filters['collection'] = ['value' => []];
-        }
     }
 
     public function getResourceCollection($request, $items)
@@ -82,7 +76,7 @@ class Entries extends Relationship
             ->additional(['meta' => [
                 'sortColumn' => $this->getSortColumn($request),
                 'filters' => $this->getSelectionFilters($request),
-                'activeFilters' => $this->getActiveFilters($request),
+                'activeFilters' => $this->activeFilters,
             ]]);
     }
 
@@ -93,7 +87,7 @@ class Entries extends Relationship
 
     protected function getFirstCollectionFromRequest($request)
     {
-        $collections = $request->filters['collection']['value'];
+        $collections = $request->input('filters.collection.collections', []);
 
         if (empty($collections)) {
             $collections = $this->getConfiguredCollections();
@@ -172,9 +166,11 @@ class Entries extends Relationship
 
     protected function augmentValue($value)
     {
-        if ($entry = Entry::find($value)) {
-            return $entry;
+        if (is_string($value)) {
+            $value = Entry::find($value);
         }
+
+        return $value;
     }
 
     protected function shallowAugmentValue($value)
@@ -198,17 +194,6 @@ class Entries extends Relationship
             'collections' => $this->getConfiguredCollections(),
             'blueprints' => [$this->getBlueprint($request)->handle()]
         ];
-    }
-
-    protected function getActiveFilters($request)
-    {
-        $filters = $request->filters;
-
-        if (empty($filters['collection']['value'])) {
-            unset($filters['collection']);
-        }
-
-        return $filters;
     }
 
     protected function getConfiguredCollections()

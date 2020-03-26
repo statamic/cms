@@ -6,12 +6,13 @@ use Statamic\Support\Str;
 use Statamic\Fields\Fields;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\HasHandle;
+use Statamic\Extend\HasFields;
 use Statamic\Extend\RegistersItself;
 use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Action implements Arrayable
 {
-    use HasHandle, HasTitle, RegistersItself;
+    use HasHandle, HasTitle, HasFields, RegistersItself;
 
     protected static $binding = 'actions';
 
@@ -30,15 +31,6 @@ abstract class Action implements Arrayable
         $this->context = $context;
 
         return $this;
-    }
-
-    public function fields()
-    {
-        $fields = collect($this->fieldItems())->map(function ($field, $handle) {
-            return compact('handle', 'field');
-        });
-
-        return new Fields($fields);
     }
 
     protected function fieldItems()

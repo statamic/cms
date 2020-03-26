@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Carbon\Carbon;
 use Statamic\Fields\Fieldtype;
+use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
 
 class Date extends Fieldtype
 {
@@ -69,10 +70,10 @@ class Date extends Fieldtype
         ],
     ];
 
-    protected $queryOperators = [
-        '<' => 'Before',
-        '>' => 'After',
-    ];
+    public function filter()
+    {
+        return new DateFilter($this);
+    }
 
     public function preProcess($data)
     {

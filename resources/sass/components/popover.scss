@@ -1,39 +1,62 @@
-$size: 16px;
+/* ==========================================================================
+   POPOVERS
+   ========================================================================== */
 
 .popover {
-    @apply border bg-white rounded shadow-lg;
-    z-index: 5000; // arbitrary to appear on top of modals.
-}
+    pointer-events: none;
+    visibility: hidden;
+    z-index: 999;
 
-.popover-inner {
-    @apply bg-white rounded;
-}
-
-.popover .popper__arrow {
-    @apply bg-white absolute border shadow-lg;
-    top: -$size/2;
-    width: $size;
-    height: $size;
-    z-index: -1; // under popover-inner
-    transform: rotate(45deg);
-}
-
-.popover[x-placement^="top"] {
-    margin-bottom: $size/2;
-    .popper__arrow {
-        top: auto;
-        bottom: -$size/2;
+    .popover-content {
+        min-width: 180px;
+        transform-origin: 50% 10%;
+        animation-fill-mode: forwards;
+        opacity: 0;
+        transform: scale(.85);
+        transition: all .05s ease-in;
+        will-change: transform, opacity;
+        background-clip: padding-box;
     }
 }
-.popover[x-placement^="bottom"] {
-    margin-top: $size/2;
-    .popper__arrow { top: -$size/2; }
+
+.popover-container {
+    position: relative;
 }
-.popover[x-placement^="left"] {
-    margin-right: $size/2;
-    .popper__arrow { right: -$size/2; }
+
+// Supporting elements
+.rotating-dots {
+    @apply relative cursor-pointer;
+    transition: .12s ease-out;
+    // top: 1px;
 }
-.popover[x-placement^="right"] {
-    margin-left: $size/2;
-    .popper__arrow { left: -$size/2; }
+
+.rotating-dots-button {
+    @apply  text-grey-70 rounded-full flex items-center justify-center;
+    height: 24px;
+    width: 24px;
+
+    &:hover {
+        @apply text-grey-100;
+    }
+
+    &:focus {
+        @apply focus-outline;
+    }
+}
+
+// When open
+.popover-open {
+    .popover {
+        pointer-events: auto;
+        visibility: visible;
+    }
+
+    .popover-content {
+        transform: scale(1);
+        opacity: 1;
+    }
+
+    .rotating-dots {
+        transform: rotate(90deg);
+    }
 }

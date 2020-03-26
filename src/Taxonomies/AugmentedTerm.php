@@ -18,6 +18,8 @@ class AugmentedTerm extends AbstractAugmented
                 'is_term',
                 'entries',
                 'entries_count',
+                'api_url',
+                'taxonomy'
             ])->all();
     }
 

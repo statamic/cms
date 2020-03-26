@@ -64,7 +64,6 @@
 
         <div v-if="fieldset.empty" class="text-center mt-5 border-2 border-dashed rounded-lg px-4 py-8">
             <div class="max-w-md mx-auto opacity-50">
-                <span v-html="globeSvg" />
                 <h1 class="my-3">This Global Set has no fields.</h1>
                 <p>You can add fields to the Blueprint, or you can manually add variables to the set itself.</p>
             </div>
@@ -94,6 +93,7 @@
                 <publish-sections
                     :read-only="! canEdit"
                     :syncable="hasOrigin"
+                    :can-toggle-labels="true"
                     :enable-sidebar="false"
                     @updated="setFieldValue"
                     @meta-updated="setFieldMeta"
@@ -193,10 +193,6 @@ export default {
 
         originLocalization() {
             return _.findWhere(this.localizations, { origin: true });
-        },
-
-        globeSvg() {
-            return require(`!!html-loader!./../../../svg/empty/global.svg`)
         }
 
     },

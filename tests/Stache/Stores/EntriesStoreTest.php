@@ -129,4 +129,10 @@ class EntriesStoreTest extends TestCase
         @unlink($path);
         $this->assertFileNotExists($path);
     }
+
+    /** @test */
+    function it_ignores_entries_in_a_site_subdirectory_where_the_collection_doesnt_have_that_site_enabled()
+    {
+        $this->markTestIncomplete();
+    }
 }

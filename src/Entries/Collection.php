@@ -2,8 +2,10 @@
 
 namespace Statamic\Entries;
 
+use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
@@ -14,15 +16,16 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Structure;
 use Statamic\Facades\Taxonomy;
+use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Collection implements Contract
+class Collection implements Contract, AugmentableContract
 {
-    use FluentlyGetsAndSets, ExistsAsFile;
+    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData;
 
     protected $handle;
-    protected $route;
+    protected $routes = [];
     protected $mount;
     protected $title;
     protected $template;
@@ -31,7 +34,6 @@ class Collection implements Contract
     protected $blueprints = [];
     protected $searchIndex;
     protected $dated = false;
-    protected $orderable = false;
     protected $sortField;
     protected $sortDirection;
     protected $ampable = false;
@@ -41,6 +43,7 @@ class Collection implements Contract
     protected $futureDateBehavior = 'public';
     protected $pastDateBehavior = 'public';
     protected $structure;
+    protected $structureContents;
     protected $taxonomies = [];
     protected $cascade;
 
@@ -59,9 +62,22 @@ class Collection implements Contract
         return $this->fluentlyGetOrSet('handle')->args(func_get_args());
     }
 
-    public function route($route = null)
+    public function routes($routes = null)
     {
-        return $this->fluentlyGetOrSet('route')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('routes')
+            ->getter(function ($routes) {
+                return $this->sites()->mapWithKeys(function ($site) use ($routes) {
+                    $siteRoute = is_string($routes) ? $routes : ($routes[$site] ?? null);
+                    return [$site => $siteRoute];
+                });
+            })
+            ->args(func_get_args());
+    }
+
+    public function route($site)
+    {
+        return $this->routes()->get($site);
     }
 
     public function dated($dated = null)
@@ -69,9 +85,9 @@ class Collection implements Contract
         return $this->fluentlyGetOrSet('dated')->args(func_get_args());
     }
 
-    public function orderable($orderable = null)
+    public function orderable()
     {
-        return $this->fluentlyGetOrSet('orderable')->args(func_get_args());
+        return optional($this->structure())->maxDepth() === 1;
     }
 
     public function sortField($field = null)
@@ -175,12 +191,10 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('blueprints')
             ->getter(function ($blueprints) {
-                if (is_null($blueprints)) {
-                    return collect([$this->fallbackEntryBlueprint()]);
-                }
+                $blueprints = $blueprints ?? [$this->fallbackEntryBlueprint()->handle()];
 
                 return collect($blueprints)->map(function ($blueprint) {
-                    return Blueprint::find($blueprint);
+                    return $this->ensureEntryBlueprintFields(Blueprint::find($blueprint));
                 });
             })
             ->setter(function ($blueprints) {
@@ -237,7 +251,11 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
+                if (! Site::hasMultiple() || ! $sites) {
+                    $sites = [Site::default()->handle()];
+                }
+
+                return collect($sites);
             })
             ->args(func_get_args());
     }
@@ -269,7 +287,9 @@ class Collection implements Contract
         Blink::flush('collection-handles');
         Blink::flushStartingWith("collection-{$this->id()}");
 
-        optional($this->structure())->updateEntryUris();
+        if ($this->hasStructure()) { // todo: only if the structure changed.
+            $this->updateEntryUris();
+        }
 
         return $this;
     }
@@ -304,75 +324,6 @@ class Collection implements Contract
         return $this->searchIndex() !== null;
     }
 
-    public function getEntryPositions()
-    {
-        if ($this->positions) {
-            return $this->positions;
-        }
-
-        $this->positions = $this->queryEntries()->get()->mapWithKeys(function ($entry, $index) {
-            return [$index + 1 => $entry->id()];
-        });
-
-        return $this->positions;
-    }
-
-    public function setEntryPositions($positions)
-    {
-        $this->positions = collect($positions);
-
-        return $this;
-    }
-
-    public function setEntryPosition($id, $position)
-    {
-        $positions = $this->getEntryPositions()->all();
-
-        Arr::set($positions, $position, $id);
-
-        ksort($positions);
-
-        $this->setEntryPositions($positions);
-
-        return $this;
-    }
-
-    public function appendEntryPosition($id)
-    {
-        $position = $this->getEntryPositions()->keys()->sort()->last() + 1;
-
-        return $this->setEntryPosition($id, $position);
-    }
-
-    public function removeEntryPosition($id)
-    {
-        $positions = $this->getEntryPositions()->all();
-
-        unset($positions[$this->getEntryPosition($id)]);
-
-        $this->setEntryPositions($positions);
-
-        return $this;
-    }
-
-    public function getEntryPosition($id)
-    {
-        return $this->getEntryPositions()->flip()->get($id);
-    }
-
-    public function getEntryOrder($id = null)
-    {
-        $order = $this->getEntryPositions()->values();
-
-        if (func_num_args() === 0) {
-            return $order;
-        }
-
-        $index = $order->flip()->get($id);
-
-        return $index === null ? null : $index + 1;
-    }
-
     public function cascade($key = null, $default = null)
     {
         if (is_null($key)) {
@@ -395,12 +346,17 @@ class Collection implements Contract
             'future_date_behavior',
             'default_publish_state',
             'dated',
+            'structured',
+            'orderable',
+            'routes'
         ]);
 
+        $route = is_string($this->routes) ? $this->routes : $this->routes()->filter()->all();
+
         $array = Arr::removeNullValues(array_merge($array, [
+            'route' => $route,
             'amp' => $array['amp'] ?: null,
             'date' => $this->dated ?: null,
-            'orderable' => $array['orderable'] ?: null,
             'sort_by' => $this->sortField,
             'sort_dir' => $this->sortDirection,
             'default_status' => $this->defaultPublishState === false ? 'draft' : null,
@@ -409,10 +365,6 @@ class Collection implements Contract
                 'future' => $this->futureDateBehavior,
             ],
         ]));
-
-        if ($this->orderable()) {
-            $array['entry_order'] = $this->getEntryOrder()->all();
-        }
 
         if (! Site::hasMultiple()) {
             unset($array['sites']);
@@ -423,6 +375,20 @@ class Collection implements Contract
         }
 
         $array['inject'] = Arr::pull($array, 'cascade');
+
+        if ($this->hasStructure()) {
+            $array['structure'] = Arr::removeNullValues([
+                'root' => $this->structure()->expectsRoot(),
+                'max_depth' => $this->structure()->maxDepth(),
+                'tree' => $this->structure()->trees()->map(function ($tree) {
+                    return $tree->fileData()['tree'];
+                })->all()
+            ]);
+
+            if (!Site::hasMultiple()) {
+                $array['structure']['tree'] = $array['structure']['tree'][Site::default()->handle()];
+            }
+        }
 
         return $array;
     }
@@ -453,7 +419,7 @@ class Collection implements Contract
         return [
             'title' => $this->title,
             'handle' => $this->handle,
-            'route' => $this->route,
+            'routes' => $this->routes,
             'dated' => $this->dated,
             'past_date_behavior' => $this->pastDateBehavior(),
             'future_date_behavior' => $this->futureDateBehavior(),
@@ -465,8 +431,8 @@ class Collection implements Contract
             'cascade' => $this->cascade->all(),
             'blueprints' => $this->blueprints,
             'search_index' => $this->searchIndex,
-            'orderable' => $this->orderable,
-            'structure' => $this->structure,
+            'orderable' => $this->orderable(),
+            'structured' => $this->hasStructure(),
             'mount' => $this->mount,
             'taxonomies' => $this->taxonomies,
             'revisions' => $this->revisions,
@@ -502,12 +468,55 @@ class Collection implements Contract
         return $this
             ->fluentlyGetOrSet('structure')
             ->getter(function ($structure) {
-                $key = "collection-{$this->id()}-structure-{$structure}";
-                return is_string($structure) ? Blink::once($key, function () use ($structure) {
-                    return Structure::findByHandle($structure);
-                }) : $structure;
+                return Blink::once("collection-{$this->id()}-structure", function () use ($structure) {
+                    if (! $structure && $this->structureContents) {
+                        $structure = $this->structure = $this->makeStructureFromContents();
+                    }
+                    return $structure;
+                });
+            })
+            ->setter(function ($structure) {
+                if ($structure) {
+                    $structure->collection($this);
+                }
+                $this->structureContents = null;
+                Blink::forget("collection-{$this->id()}-structure");
+                return $structure;
             })
             ->args(func_get_args());
+    }
+
+    public function structureContents(array $contents = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('structureContents')
+            ->setter(function ($contents) {
+                Blink::forget("collection-{$this->id()}-structure");
+                $this->structure = null;
+                return $contents;
+            })
+            ->args(func_get_args());
+    }
+
+    protected function makeStructureFromContents()
+    {
+        $structure = (new CollectionStructure)
+            ->collection($this)
+            ->expectsRoot($this->structureContents['root'] ?? false)
+            ->maxDepth($this->structureContents['max_depth'] ?? null);
+
+        $trees = $this->structureContents['tree'];
+
+        if (! Site::hasMultiple()) {
+            $trees = [Site::default()->handle() => $trees];
+        }
+
+        foreach ($trees as $site => $contents) {
+            $tree = $structure->makeTree($site)->tree($contents);
+            $structure->addTree($tree);
+        }
+
+        return $structure;
     }
 
     public function structureHandle()
@@ -516,12 +525,12 @@ class Collection implements Contract
             return null;
         }
 
-        return is_string($this->structure) ? $this->structure : $this->structure->handle();
+        return $this->structure()->handle();
     }
 
     public function hasStructure()
     {
-        return $this->structure !== null;
+        return $this->structure !== null || $this->structureContents !== null;
     }
 
     public function delete()
@@ -569,5 +578,18 @@ class Collection implements Contract
     public static function __callStatic($method, $parameters)
     {
         return Facades\Collection::{$method}(...$parameters);
+    }
+
+    public function __toString()
+    {
+        return $this->handle();
+    }
+
+    public function augmentedArrayData()
+    {
+        return [
+            'title' => $this->title(),
+            'handle' => $this->handle(),
+        ];
     }
 }

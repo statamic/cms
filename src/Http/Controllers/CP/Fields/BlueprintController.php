@@ -45,8 +45,14 @@ class BlueprintController extends CpController
             'title' => 'required'
         ]);
 
+        $handle = Str::snake($request->title);
+
+        if (Facades\Blueprint::find($handle)) {
+            return back()->withInput()->with('error', __('A blueprint with that name already exists.'));
+        }
+
         $blueprint = (new Blueprint)
-            ->setHandle(Str::snake($request->title))
+            ->setHandle($handle)
             ->setContents([
                 'title' => $request->title,
                 'sections' => [
@@ -57,7 +63,7 @@ class BlueprintController extends CpController
                 ]
             ])->save();
 
-        return redirect($blueprint->editUrl())->with('message', __('Saved'));
+        return redirect($blueprint->editUrl())->with('success', __('Blueprint created'));
     }
 
     public function edit($blueprint)

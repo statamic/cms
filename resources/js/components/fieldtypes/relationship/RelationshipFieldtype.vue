@@ -1,6 +1,7 @@
 <template>
 
     <relationship-input
+        ref="input"
         :name="name"
         :value="value"
         :mode="config.mode"
@@ -140,6 +141,10 @@ export default {
             const meta = clone(this.meta);
             meta.data = data;
             this.updateMeta(meta);
+        },
+
+        linkExistingItem() {
+            this.$refs.input.$refs.existing.click();
         }
 
     }

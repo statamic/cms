@@ -215,11 +215,18 @@ abstract class Relationship extends Fieldtype
             return $this->augmentValue($value);
         });
 
-        if (Statamic::shallowAugmentationEnabled()) {
-            $values = $values->map(function ($value) {
-                return $this->shallowAugmentValue($value);
-            });
-        }
+        return $this->config('max_items') === 1 ? $values->first() : $values;
+    }
+
+    public function shallowAugment($values)
+    {
+        $values = collect($values)->map(function ($value) {
+            return $this->augmentValue($value);
+        });
+
+        $values = $values->map(function ($value) {
+            return $this->shallowAugmentValue($value);
+        });
 
         return $this->config('max_items') === 1 ? $values->first() : $values;
     }

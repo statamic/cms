@@ -2,13 +2,14 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\Stache\Stache;
-use Statamic\Facades\Blink;
-use Statamic\Entries\Collection;
-use Statamic\Events\Data\CollectionSaved;
-use Statamic\Events\Data\CollectionDeleted;
 use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
+use Statamic\Contracts\Structures\Structure;
+use Statamic\Entries\Collection;
+use Statamic\Events\Data\CollectionDeleted;
+use Statamic\Events\Data\CollectionSaved;
+use Statamic\Facades\Blink;
+use Statamic\Stache\Stache;
 
 class CollectionRepository implements RepositoryContract
 {
@@ -87,5 +88,10 @@ class CollectionRepository implements RepositoryContract
     public function updateEntryUris(Collection $collection)
     {
         $this->store->updateEntryUris($collection);
+    }
+
+    public function whereStructured(): IlluminateCollection
+    {
+        return $this->all()->filter->hasStructure();
     }
 }

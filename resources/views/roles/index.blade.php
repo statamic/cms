@@ -17,10 +17,11 @@
 
     @else
 
-        @include('statamic::partials.create-first', [
+        @include('statamic::partials.empty-state', [
             'resource' => 'Role',
-            'description' => 'Roles are groups of access and action permissions in the Control Panel that can be assigned to users and user groups.',
-            'svg' => 'empty/permission',
+            'description' => __('statamic::messages.role_intro'),
+            'docs_link' => Statamic::docsUrl('users#permissions'),
+            'svg' => 'empty/users',
             'route' => cp_route('roles.create')
         ])
 

@@ -69,7 +69,6 @@ return [
     'date_format' => 'F jS, Y',
 
     'charset' => 'UTF-8',
-    // 'parser_backtrack_limit' => null,
     'timezone' => 'UTC',
     'protect' => [],
 
@@ -91,5 +90,6 @@ return [
     'php_memory_limit' => '-1',
     'php_max_execution_time' => '-1',
     'ajax_timeout' => '600000',
+    'pcre_backtrack_limit' => '-1',
 
 ];

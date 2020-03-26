@@ -30,7 +30,7 @@ class PageProtectionTestCase extends TestCase
     protected function createPage($slug, $attributes = [])
     {
         $collection = Collection::make('pages')
-            ->route('{slug}')
+            ->routes('{slug}')
             ->template('default')
             ->save();
 

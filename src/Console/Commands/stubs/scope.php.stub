@@ -3,12 +3,11 @@
 namespace DummyNamespace;
 
 use Statamic\Query\Scopes\Scope;
-use Statamic\Query\Scopes\Filter;
 
 class DummyClass extends Scope
 {
     /**
-     * Apply the scope to a given query builder.
+     * Apply the scope.
      *
      * @param \Statamic\Query\Builder $query
      * @param array $values
@@ -16,6 +15,6 @@ class DummyClass extends Scope
      */
     public function apply($query, $values)
     {
-        //
+        // $query->where('featured', true);
     }
 }

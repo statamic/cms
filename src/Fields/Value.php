@@ -17,13 +17,15 @@ class Value implements IteratorAggregate, JsonSerializable
     protected $parser;
     protected $context;
     protected $augmentable;
+    protected $shallow = false;
 
-    public function __construct($value, $handle = null, $fieldtype = null, $augmentable = null)
+    public function __construct($value, $handle = null, $fieldtype = null, $augmentable = null, $shallow = false)
     {
         $this->raw = $value;
         $this->handle = $handle;
         $this->fieldtype = $fieldtype;
         $this->augmentable = $augmentable;
+        $this->shallow = $shallow;
 
         if ($fieldtype && $fieldtype->field()) {
             $this->fieldtype->field()->setParent($augmentable);
@@ -41,7 +43,9 @@ class Value implements IteratorAggregate, JsonSerializable
             return $this->raw;
         }
 
-        $value = $this->fieldtype->augment($this->raw);
+        $value = $this->shallow
+            ? $this->fieldtype->shallowAugment($this->raw)
+            : $this->fieldtype->augment($this->raw);
 
         if ($this->shouldParse()) {
             $value = $this->parse($value);
@@ -112,5 +116,10 @@ class Value implements IteratorAggregate, JsonSerializable
     public function handle()
     {
         return $this->handle;
+    }
+
+    public function shallow()
+    {
+        return new static($this->raw, $this->handle, $this->fieldtype, $this->augmentable, true);
     }
 }

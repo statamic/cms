@@ -33,6 +33,8 @@ class RoutesTest extends TestCase
 
             Route::statamic('/basic-route-without-data', 'test');
 
+            Route::statamic('/route/with/placeholders/{foo}/{bar}/{baz}', 'test');
+
             Route::statamic('/route-with-custom-layout', 'test', [
                 'layout' => 'custom-layout',
                 'hello' => 'world'
@@ -82,6 +84,17 @@ class RoutesTest extends TestCase
     }
 
     /** @test */
+    function it_renders_a_view_with_placeholders()
+    {
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('test', 'Hello {{ foo }} {{ bar }} {{ baz }}');
+
+        $this->get('/route/with/placeholders/one/two/three')
+            ->assertOk()
+            ->assertSee('Hello one two three');
+    }
+
+    /** @test */
     function it_renders_a_view_with_custom_layout()
     {
         $this->viewShouldReturnRaw('custom-layout', 'Custom layout {{ template_content }}');
@@ -109,7 +122,7 @@ class RoutesTest extends TestCase
     /** @test */
     function it_loads_content_by_uri()
     {
-        $collection = Collection::make('pages')->route('/{slug}')->save();
+        $collection = Collection::make('pages')->routes('/{slug}')->save();
         EntryFactory::id('pages-blog')->collection($collection)->slug('blog')->data(['title' => 'Blog'])->create();
 
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');

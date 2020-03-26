@@ -54,7 +54,8 @@
 	}
 }
 
-.date-time-container .vc-popover-content-wrapper {
+// Dear sweet baby Jesus please forgive me for this brittle selector
+.date-time-container .date-container > span > .vc-popover-content-wrapper {
 	left: -50px !important;
 }
 

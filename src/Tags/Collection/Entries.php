@@ -9,16 +9,18 @@ use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Tags\Query;
+use Statamic\Tags\Concerns;
 
 class Entries
 {
-    use Query\HasConditions,
-        Query\HasScopes,
-        Query\HasOrderBys,
-        Query\GetsResults;
+    use Concerns\QueriesConditions,
+        Concerns\QueriesScopes,
+        Concerns\GetsQueryResults;
+
+    use Concerns\QueriesOrderBys {
+        queryOrderBys as traitQueryOrderBys;
+    }
 
     protected $ignoredParams = ['as'];
     protected $parameters;
@@ -56,8 +58,8 @@ class Entries
 
     public function next($currentEntry)
     {
-        throw_if(Arr::has($this->parameters, 'paginate'), new \Exception('collection:next is not compatible with [paginate] parameter'));
-        throw_if(Arr::has($this->parameters, 'offset'), new \Exception('collection:next is not compatible with [offset] parameter'));
+        throw_if($this->parameters->has('paginate'), new \Exception('collection:next is not compatible with [paginate] parameter'));
+        throw_if($this->parameters->has('offset'), new \Exception('collection:next is not compatible with [offset] parameter'));
         throw_if($this->collections->count() > 1, new \Exception('collection:next is not compatible with multiple collections'));
 
         $collection = $this->collections->first();
@@ -80,8 +82,8 @@ class Entries
 
     public function previous($currentEntry)
     {
-        throw_if(Arr::has($this->parameters, 'paginate'), new \Exception('collection:previous is not compatible with [paginate] parameter'));
-        throw_if(Arr::has($this->parameters, 'offset'), new \Exception('collection:previous is not compatible with [offset] parameter'));
+        throw_if($this->parameters->has('paginate'), new \Exception('collection:previous is not compatible with [paginate] parameter'));
+        throw_if($this->parameters->has('offset'), new \Exception('collection:previous is not compatible with [offset] parameter'));
         throw_if($this->collections->count() > 1, new \Exception('collection:previous is not compatible with multiple collections'));
 
         $collection = $this->collections->first();
@@ -143,6 +145,7 @@ class Entries
         $this->queryPastFuture($query);
         $this->querySinceUntil($query);
         $this->queryTaxonomies($query);
+        $this->queryRedirects($query);
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
@@ -152,20 +155,21 @@ class Entries
 
     protected function parseParameters($params)
     {
-        $this->parameters = Arr::except($params->all(), $this->ignoredParams);
+        $this->parameters = $params->except($this->ignoredParams);
+
         $this->collections = $this->parseCollections();
         $this->orderBys = $this->parseOrderBys();
-        $this->site = Arr::getFirst($this->parameters, ['site', 'locale']);
-        $this->showPublished = Arr::get($this->parameters, 'show_published', true);
-        $this->showUnpublished = Arr::get($this->parameters, 'show_unpublished', false);
-        $this->since = Arr::get($this->parameters, 'since');
-        $this->until = Arr::get($this->parameters, 'until');
+        $this->site = $this->parameters->get(['site', 'locale']);
+        $this->showPublished = $this->parameters->get('show_published', true);
+        $this->showUnpublished = $this->parameters->get('show_unpublished', false);
+        $this->since = $this->parameters->get('since');
+        $this->until = $this->parameters->get('until');
     }
 
     protected function parseCollections()
     {
-        $from = Arr::getFirst($this->parameters, ['from', 'in', 'folder', 'use', 'collection']);
-        $not = Arr::getFirst($this->parameters, ['not_from', 'not_in', 'not_folder', 'dont_use', 'not_collection']);
+        $from = $this->parameters->get(['from', 'in', 'folder', 'use', 'collection']);
+        $not = $this->parameters->get(['not_from', 'not_in', 'not_folder', 'dont_use', 'not_collection']);
 
         if ($from === '*') {
             $from = Collection::handles();
@@ -203,7 +207,7 @@ class Entries
 
     protected function querySite($query)
     {
-        $site = Arr::getFirst($this->parameters, ['site', 'locale'], Site::current()->handle());
+        $site = $this->parameters->get(['site', 'locale'], Site::current()->handle());
 
         if ($site === '*' || ! Site::hasMultiple()) {
             return;
@@ -311,5 +315,36 @@ class Entries
                 );
             }
         });
+    }
+
+    protected function queryOrderBys($query)
+    {
+        $isSortingByOrder = null !== $this->orderBys->first(function ($orderBy) {
+            return $orderBy->sort === 'order';
+        });
+
+        if ($isSortingByOrder) {
+            $nonOrderableCollections = $this->collections->reject->orderable();
+            if ($nonOrderableCollections->isNotEmpty()) {
+                throw new \LogicException('Cannot sort a nested collection by order.');
+            }
+        }
+
+        return $this->traitQueryOrderBys($query);
+    }
+
+    protected function queryRedirects($query)
+    {
+        $isQueryingRedirect = $this->parameters->first(function ($v, $k) {
+            return Str::startsWith($k, 'redirect:');
+        });
+
+        if ($isQueryingRedirect) {
+            return;
+        }
+
+        if (! $this->parameters->bool(['redirects', 'links'], false)) {
+            $query->where('redirect', '=', null);
+        }
     }
 }

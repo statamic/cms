@@ -2,15 +2,17 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Statamic\Facades\Form;
-use Statamic\CP\Column;
-use Statamic\Facades\Config;
-use Statamic\Facades\Helper;
 use Illuminate\Http\Resources\Json\Resource;
-use Statamic\Facades\User;
-use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Forms\Presenters\UploadedFilePresenter;
+use Statamic\CP\Column;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Facades\Config;
+use Statamic\Facades\Form;
+use Statamic\Facades\Helper;
+use Statamic\Facades\User;
+use Statamic\Forms\Presenters\UploadedFilePresenter;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Resources\CP\Submissions\Submissions;
+use Statamic\Support\Str;
 
 class FormSubmissionsController extends CpController
 {
@@ -22,39 +24,22 @@ class FormSubmissionsController extends CpController
             return ['data' => [], 'meta' => ['columns' => []]];
         }
 
-        $columns = $form->blueprint()->columns()
-            ->setPreferred("forms.{$form->handle()}.columns")
-            ->ensurePrepended(Column::make('datestamp')->label('date')->value('datestring'))
-            ->rejectUnlisted()
-            ->values();
-
-        $submissions = $form->submissions()->map(function ($submission) use ($form) {
+        // Get sanitized submissions.
+        $submissions = $form->submissions()->each(function ($submission) {
             $this->sanitizeSubmission($submission);
+        })->values();
 
-            return array_merge($submission->toArray(), [
-                'datestring' => $submission->date()->format($form->dateFormat()),
-                'datestamp' => $submission->date()->timestamp,
-                'url' => cp_route('forms.submissions.show', [$form->handle(), $submission->id()]),
-                'deleteable' => User::current()->can('delete', $submission),
-            ]);
-        });
-
-        // Set the default/fallback sort order
-        $sort = 'datestamp';
-        $sortOrder = 'asc';
-
-        // Custom sorting will override anything predefined.
-        if ($customSort = $this->request->sort) {
-            $sort = $customSort;
-        }
-        if ($customOrder = $this->request->order) {
-            $sortOrder = $customOrder;
+        // Search submissions.
+        if ($search = $this->request->search) {
+            $submissions = $this->searchSubmissions($submissions);
         }
 
-        // Perform the sort!
-        $submissions = $submissions->sortBy($sort, null, $sortOrder === 'desc');
+        // Sort submissions.
+        $sort = $this->request->sort ?? 'datestamp';
+        $order = $this->request->order ?? ($sort === 'datestamp' ? 'desc' : 'asc');
+        $submissions = $this->sortSubmissions($submissions, $sort, $order);
 
-        // Set up the paginator, since we don't want to display all the entries.
+        // Paginate submissions.
         $totalSubmissionCount = $submissions->count();
         $perPage = request('perPage') ?? Config::get('statamic.cp.pagination_size');
         $currentPage = (int) $this->request->page ?: 1;
@@ -62,10 +47,12 @@ class FormSubmissionsController extends CpController
         $submissions = $submissions->slice($offset, $perPage);
         $paginator = new LengthAwarePaginator($submissions, $totalSubmissionCount, $perPage, $currentPage);
 
-        return Resource::collection($paginator)->additional(['meta' => [
-            'columns' => $columns,
-            'sortColumn' => $sort,
-        ]]);
+        return (new Submissions($paginator))
+            ->blueprint($form->blueprint())
+            ->columnPreferenceKey("forms.{$form->handle()}.columns")
+            ->additional(['meta' => [
+                'sortColumn' => $sort,
+            ]]);
     }
 
     private function sanitizeSubmission($submission)
@@ -94,6 +81,29 @@ class FormSubmissionsController extends CpController
         }
 
         return ($is_arr) ? $values : $values[0];
+    }
+
+    private function searchSubmissions($submissions)
+    {
+        return $submissions->filter(function ($submission) {
+            return collect($submission->data())
+                ->filter(function ($value) {
+                    return $value && is_string($value);
+                })
+                ->filter(function ($value) {
+                    return Str::contains(strtolower($value), strtolower($this->request->search));
+                })
+                ->isNotEmpty();
+        })->values();
+    }
+
+    private function sortSubmissions($submissions, $sortBy, $sortOrder)
+    {
+        return $submissions->sortBy(function ($submission) use ($sortBy) {
+            return $sortBy === 'datestamp'
+                ? $submission->date()->timestamp
+                : $submission->get($sortBy);
+        }, null, $sortOrder === 'desc')->values();
     }
 
     public function destroy($form, $id)

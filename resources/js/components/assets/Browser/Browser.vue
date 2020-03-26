@@ -38,7 +38,6 @@
                     :columns="columns"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
-                    :search="false"
                     :sort="false"
                     :sort-column="sortColumn"
                     :sort-direction="sortDirection"
@@ -48,7 +47,6 @@
                         <div class="card p-0" :class="{ 'rounded-tl-none': showContainerTabs }">
 
                             <div class="data-list-header">
-                                <data-list-toggle-all ref="toggleAll" v-if="!hasMaxFiles" />
                                 <data-list-search v-model="searchQuery" />
 
                                 <data-list-bulk-actions
@@ -59,7 +57,7 @@
                                 />
 
                                 <template v-if="! hasSelections">
-                                    <button v-if="canCreateFolders" class="btn-flat btn-icon-only" @click="creatingFolder = true">
+                                    <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-2" @click="creatingFolder = true">
                                         <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
                                         <span>{{ __('Create Folder') }}</span>
                                     </button>
@@ -70,11 +68,11 @@
                                     </button>
                                 </template>
 
-                                <div class="btn-group-flat ml-2">
-                                    <button @click="setMode('grid')" :class="{'active': mode === 'grid'}">
+                                <div class="btn-group ml-2">
+                                    <button class="btn-flat px-2" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                         <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                     </button>
-                                    <button @click="setMode('table')" :class="{'active': mode === 'table'}">
+                                    <button class="btn-flat px-2" @click="setMode('table')" :class="{'active': mode === 'table'}">
                                         <svg-icon name="assets-mode-table" class="h-4 w-4" />
                                     </button>
                                 </div>

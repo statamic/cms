@@ -20,16 +20,22 @@ use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Taxonomies\Terms;
 use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Contracts\Taxonomies\Term as TermContract;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class TermsController extends CpController
 {
+    use QueriesFilters;
+
     public function index(FilteredRequest $request, $taxonomy)
     {
         $this->authorize('view', $taxonomy);
 
         $query = $this->indexQuery($taxonomy);
 
-        $this->filter($query, $request->filters);
+        $filters = $this->queryFilters($query, $request->filters, [
+            'blueprints' => $taxonomy->termBlueprints()->map->handle(),
+        ]);
 
         $sortField = request('sort');
         $sortDirection = request('order', 'asc');
@@ -53,18 +59,9 @@ class TermsController extends CpController
             ->blueprint($taxonomy->termBlueprint())
             ->columnPreferenceKey("taxonomies.{$taxonomy->handle()}.columns")
             ->additional(['meta' => [
-                'filters' => $request->filters,
+                'filters' => $filters,
                 'sortColumn' => $sortField,
             ]]);
-    }
-
-    protected function filter($query, $filters)
-    {
-        foreach ($filters as $handle => $values) {
-            $class = app('statamic.scopes')->get($handle);
-            $filter = app($class);
-            $filter->apply($query, $values);
-        }
     }
 
     protected function indexQuery($taxonomy)

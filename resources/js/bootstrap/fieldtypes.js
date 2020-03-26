@@ -13,7 +13,6 @@ Vue.component('slug-fieldtype', require('../components/fieldtypes/SlugFieldtype.
 // Fieldtypes
 import FieldsetFieldtype from '../components/fieldtypes/FieldsetFieldtype.vue'
 import RevealerFieldtype from '../components/fieldtypes/RevealerFieldtype.vue'
-import RoutesFieldtype from '../components/fieldtypes/RoutesFieldtype.vue'
 import StatusFieldtype from '../components/fieldtypes/StatusFieldtype.vue'
 import TemplateFieldtype from '../components/fieldtypes/TemplateFieldtype.vue'
 
@@ -25,6 +24,7 @@ Vue.component('bard-fieldtype', require('../components/fieldtypes/bard/BardField
 Vue.component('bard_buttons_setting-fieldtype', require('../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue').default);
 Vue.component('checkboxes-fieldtype', require('../components/fieldtypes/CheckboxesFieldtype.vue').default);
 Vue.component('code-fieldtype', require('../components/fieldtypes/CodeFieldtype.vue').default);
+Vue.component('collection_routes-fieldtype', require('../components/collections/Routes.vue').default);
 Vue.component('color-fieldtype', require('../components/fieldtypes/ColorFieldtype.vue').default);
 Vue.component('date-fieldtype', require('../components/fieldtypes/DateFieldtype.vue').default);
 Vue.component('fieldset-fieldtype', FieldsetFieldtype);
@@ -33,6 +33,7 @@ Vue.component('grid-fieldtype', require('../components/fieldtypes/grid/Grid.vue'
 Vue.component('grid-fieldtype-index', require('../components/fieldtypes/grid/GridIndex.vue').default);
 Vue.component('hidden-fieldtype', require('../components/fieldtypes/HiddenFieldtype.vue').default);
 Vue.component('integer-fieldtype', require('../components/fieldtypes/IntegerFieldtype.vue').default);
+Vue.component('link-fieldtype', require('../components/fieldtypes/LinkFieldtype.vue').default);
 Vue.component('list-fieldtype', require('../components/fieldtypes/ListFieldtype.vue').default);
 Vue.component('markdown-fieldtype', require('../components/fieldtypes/MarkdownFieldtype.vue').default);
 Vue.component('radio-fieldtype', require('../components/fieldtypes/RadioFieldtype.vue').default);
@@ -42,12 +43,10 @@ Vue.component('relationship-fieldtype-index', require('../components/fieldtypes/
 Vue.component('replicator-fieldtype', require('../components/fieldtypes/replicator/Replicator.vue').default);
 Vue.component('replicator-fieldtype-index', require('../components/fieldtypes/replicator/ReplicatorIndex.vue').default);
 Vue.component('revealer-fieldtype', RevealerFieldtype);
-Vue.component('routes-fieldtype', RoutesFieldtype);
 Vue.component('section-fieldtype', require('../components/fieldtypes/SectionFieldtype.vue').default);
 Vue.component('select-fieldtype', require('../components/fieldtypes/SelectFieldtype.vue').default);
 Vue.component('sets-fieldtype', require('../components/fieldtypes/replicator/SetsFieldtype.vue').default);
 Vue.component('status-fieldtype', StatusFieldtype);
-Vue.component('structure_sites-fieldtype', require('../components/structures/Sites.vue').default);
 Vue.component('table-fieldtype', require('../components/fieldtypes/TableFieldtype.vue').default);
 Vue.component('tags-fieldtype', require('../components/fieldtypes/TagsFieldtype.vue').default);
 Vue.component('tags-fieldtype-index', require('../components/fieldtypes/TagsIndexFieldtype.vue').default);

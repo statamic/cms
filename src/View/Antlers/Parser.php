@@ -64,13 +64,13 @@ class Parser
     public function __construct()
     {
         // expand allowed characters in variable regex
-        $this->variableRegex = "(?!if|unless\s)[a-zA-Z0-9_\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.!'\":]*";
+        $this->variableRegex = "(?!{if|unless\s)[a-zA-Z0-9_\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.!'\":]*";
 
         // Allow spaces after the variable name so you can do modifiers like | this | and_that
-        $this->looseVariableRegex = "(?!if|unless\s)[a-zA-Z0-9_'\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.(\s.*)?!'\":]*";
+        $this->looseVariableRegex = "(?!{if|unless\s)[a-zA-Z0-9_'\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.(\s.*)?!'\":]*";
 
         // Different from variable regex somehow.
-        $this->callbackNameRegex = '(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\^\/,0-9_\.(\s.*?):]*:'.$this->variableRegex;
+        $this->callbackNameRegex = '(?!{if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\^\/,0-9_\.(\s.*?):]*:'.$this->variableRegex;
 
         $this->variableLoopRegex = '/{{\s*('.$this->looseVariableRegex.')\s*}}(.*?){{\s*\/\1\s*}}/ms';
 
@@ -91,9 +91,6 @@ class Parser
         $this->conditionalEndRegex = '/{{\s*(?:endif|\/if|\/unless)\s*}}/ms';
         $this->conditionalExistsRegex = '/(\s+|^)exists\s+('.$this->variableRegex.')(\s+|$)/ms';
         $this->conditionalNotRegex = '/(\s+|^)not(\s+|$)/ms';
-
-        // Large strings can spawn many backtrack attempts. Let's crank this sucker up.
-        ini_set('pcre.backtrack_limit', Config::get('parser_backtrack_limit', 1000000));
     }
 
     public function allowPhp($allow = true)
@@ -1383,6 +1380,13 @@ class Parser
         }
 
         $value = $data->parseUsing($this, $context)->value();
+
+        if (Str::startsWith($modifier, ':')) {
+            $parameters = array_map(function ($param) use ($context) {
+                return $context[$param] ?? null;
+            }, $parameters);
+            $modifier = substr($modifier, 1);
+        }
 
         try {
             return Modify::value($value)->context($context)->$modifier($parameters)->fetch();

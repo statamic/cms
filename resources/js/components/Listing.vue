@@ -29,7 +29,6 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             meta: null,
-            searchQuery: '',
         }
     },
 
@@ -42,17 +41,31 @@ export default {
                 page: this.page,
                 perPage: this.perPage,
                 search: this.searchQuery,
-                filters: btoa(JSON.stringify(this.activeFilters)),
+                filters: this.activeFilterParameters,
             }, this.additionalParameters);
+        },
+
+        activeFilterParameters() {
+            return btoa(JSON.stringify(this.activeFilters));
         },
 
         additionalParameters() {
             return {};
-        }
+        },
+
+        shouldRequestFirstPage() {
+            if (this.page > 1 && this.items.length === 0) {
+                this.page = 1;
+                return true;
+            }
+
+            return false;
+        },
 
     },
 
     created() {
+        this.autoApplyFilters();
         this.request();
     },
 
@@ -80,13 +93,25 @@ export default {
         searchQuery(query) {
             this.sortColumn = null;
             this.sortDirection = null;
-            this.pageReset();
+            this.resetPage();
             this.request();
         }
 
     },
 
     methods: {
+
+        autoApplyFilters() {
+            if (! this.filters) return;
+
+            let values = {};
+
+            this.filters.filter(filter => ! _.isEmpty(filter.auto_apply)).forEach(filter => {
+                values[filter.handle] = filter.auto_apply;
+            });
+
+            this.activeFilters = values;
+        },
 
         request() {
             if (! this.requestUrl) {
@@ -105,9 +130,10 @@ export default {
             }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.sortColumn = response.data.meta.sortColumn;
-                this.activeFilters = {...response.data.meta.filters};
+                this.setActiveFilters(response);
                 this.items = Object.values(response.data.data);
                 this.meta = response.data.meta;
+                if (this.shouldRequestFirstPage) return this.request();
                 this.loading = false;
                 this.initializing = false;
                 this.afterRequestCompleted();
@@ -121,6 +147,13 @@ export default {
 
         afterRequestCompleted(response) {
             //
+        },
+
+        setActiveFilters(response) {
+            if (! response.data.meta.filters) return;
+
+            this.activeFilters = {...response.data.meta.filters.values};
+            this.activeFilterBadges = {...response.data.meta.filters.badges};
         },
 
         sorted(column, direction) {

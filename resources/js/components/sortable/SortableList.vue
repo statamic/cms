@@ -26,6 +26,9 @@ export default {
         handleClass: {
             default: 'sortable-handle',
         },
+        appendTo: {
+            default: null,
+        },
         options: {
             default: () => {}
         },
@@ -44,12 +47,16 @@ export default {
                 swapAnimation: { vertical: this.vertical, horizontal: !this.vertical },
                 plugins: [Plugins.SwapAnimation],
                 mirror: {
-                    constrainDimensions: true,
+                    constrainDimensions: false
                 },
             }, this.options);
 
             if (this.vertical) {
                 options.mirror.xAxis = false;
+            }
+
+            if (this.appendTo) {
+                options.mirror.appendTo = this.appendTo
             }
 
             return options;

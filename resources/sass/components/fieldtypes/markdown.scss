@@ -17,6 +17,7 @@
     .markdown-buttons {
         @apply flex items-center;
     }
+
     .markdown-buttons button {
         @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center;
         height: 32px;
@@ -100,6 +101,50 @@
 }
 
 
+/* Dark Mode
+  ========================================================================== */
+
+.markdown-fieldtype-wrapper.markdown-fullscreen.markdown-dark-mode {
+    @apply bg-grey-80 border-none;
+
+    .markdown-toolbar {
+        @apply text-white border-b border-grey-100 shadow-lg;
+        background: linear-gradient(180deg, config('colors.grey-90'), hsl(210, 20%, 13%));
+    }
+
+    .helpers {
+        @apply bg-grey-90 text-white border-t border-grey-100;
+    }
+
+    .markdown-buttons button {
+        @apply text-grey-40;
+    }
+
+    .markdown-buttons button:hover {
+        @apply bg-grey-100 text-white;
+    }
+
+    .markdown-modes button {
+        @apply text-grey-70;
+        &.active {
+            @apply text-white;
+        }
+    }
+
+    .CodeMirror {
+        @apply text-white antialiased;
+    }
+
+    [class*="cm-"] {
+        color: white !important;
+    }
+
+    .CodeMirror-cursor {
+        border-left: 2px solid white;
+    }
+}
+
+
 /* Read Only
   ========================================================================== */
 
@@ -123,7 +168,31 @@
 }
 
 
-/* Markdown Preview typography
+/* Writing Mode Typography
+  ========================================================================== */
+
+.markdown-fieldtype .cm-header {
+    @apply text-grey-80;
+
+    &.cm-header-1 {
+        @apply text-lg;
+    }
+
+    &.cm-header-2 {
+        @apply text-base;
+    }
+
+    &.cm-header-3 {
+        @apply text-sm;
+    }
+}
+
+.markdown-fieldtype .cm-quote {
+    @apply text-grey-80 italic text-sm;
+}
+
+
+/* Preview Mode Typography
   ========================================================================== */
 
 .markdown-preview {
@@ -147,6 +216,7 @@
     .mode-wrap {
         height: calc(100vh - 88px); // sans toolbars
         overflow-y: scroll;
+        cursor: text;
         &.mode-preview {
             height: calc(100vh - 52px); // no footer toolbar
         }

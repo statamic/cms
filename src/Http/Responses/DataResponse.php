@@ -10,6 +10,7 @@ use Statamic\Events\ResponseCreated;
 use Statamic\Auth\Protect\Protection;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Routing\ResolveRedirect;
 
 class DataResponse implements Responsable
 {
@@ -86,6 +87,8 @@ class DataResponse implements Responsable
         if (! $redirect = $this->data->get('redirect')) {
             return;
         }
+
+        $redirect = (new ResolveRedirect)($redirect, $this->data);
 
         if ($redirect == '404') {
             throw new NotFoundHttpException;
