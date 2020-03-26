@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="hasAvailableFieldFilters">
-            <div class="flex flex-col px-2 pb-2">
+            <div class="flex flex-col p-2">
 
                 <v-select
                     ref="fieldSelect"
