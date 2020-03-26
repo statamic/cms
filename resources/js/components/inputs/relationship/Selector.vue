@@ -210,7 +210,7 @@ export default {
                 this.items = response.data.data;
                 this.meta = response.data.meta;
                 this.filters = response.data.meta.filters;
-                this.setActiveFilters(response);
+                this.activeFilterBadges = {...response.data.meta.activeFilterBadges};
                 this.loading = false;
                 this.initializing = false;
             }).catch(e => {
@@ -219,13 +219,6 @@ export default {
                 this.initializing = false;
                 this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'), { duration: null });
             });
-        },
-
-        setActiveFilters(response) {
-            if (! response.data.meta.activeFilters) return;
-
-            this.activeFilters = {...response.data.meta.activeFilters.values};
-            this.activeFilterBadges = {...response.data.meta.activeFilters.badges};
         },
 
         sorted(column, direction) {

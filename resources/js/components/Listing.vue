@@ -129,7 +129,7 @@ export default {
                 cancelToken: this.source.token
             }).then(response => {
                 this.columns = response.data.meta.columns;
-                this.setActiveFilters(response);
+                this.activeFilterBadges = {...response.data.meta.activeFilterBadges};
                 this.items = Object.values(response.data.data);
                 this.meta = response.data.meta;
                 if (this.shouldRequestFirstPage) return this.request();
@@ -146,13 +146,6 @@ export default {
 
         afterRequestCompleted(response) {
             //
-        },
-
-        setActiveFilters(response) {
-            if (! response.data.meta.filters) return;
-
-            this.activeFilters = {...response.data.meta.filters.values};
-            this.activeFilterBadges = {...response.data.meta.filters.badges};
         },
 
         sorted(column, direction) {

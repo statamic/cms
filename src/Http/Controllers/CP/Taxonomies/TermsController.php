@@ -33,7 +33,7 @@ class TermsController extends CpController
 
         $query = $this->indexQuery($taxonomy);
 
-        $filters = $this->queryFilters($query, $request->filters, [
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
             'blueprints' => $taxonomy->termBlueprints()->map->handle(),
         ]);
 
@@ -59,7 +59,7 @@ class TermsController extends CpController
             ->blueprint($taxonomy->termBlueprint())
             ->columnPreferenceKey("taxonomies.{$taxonomy->handle()}.columns")
             ->additional(['meta' => [
-                'filters' => $filters,
+                'activeFilterBadges' => $activeFilterBadges,
             ]]);
     }
 
