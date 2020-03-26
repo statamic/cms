@@ -127,7 +127,7 @@ export default {
             this.request();
 
             this.pendingRequest = false;
-        }, 20),
+        }, 10),
 
         request() {
             if (! this.requestUrl) {
