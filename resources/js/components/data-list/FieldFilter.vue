@@ -1,7 +1,7 @@
 <template>
     <div>
         <div v-if="hasAvailableFieldFilters">
-            <div class="flex flex-col">
+            <div class="flex flex-col px-2 pb-2">
 
                 <v-select
                     ref="fieldSelect"
@@ -33,11 +33,17 @@
 
             </div>
 
-            <button
-                class="outline-none mt-2 text-xs text-blue hover:text-grey-80"
-                v-text="__('Clear')"
-                @click="resetAll"
-            />
+            <div class="flex border-t text-grey-80">
+                <button
+                    class="p-1 hover:bg-grey-10 rounded-bl text-xs flex-1"
+                    v-text="__('Clear')"
+                    @click="resetAll"
+                />
+                <button
+                    class="p-1 hover:bg-grey-10 flex-1 rounded-br border-l text-xs"
+                    v-text="__('Close')"
+                />
+            </div>
 
         </div>
         <v-select v-else :disabled="true" :placeholder="__('No available filters')" />
