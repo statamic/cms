@@ -14,14 +14,10 @@ class Blueprint extends Filter
 
     public function fieldItems()
     {
-        $options = $this->blueprints()->mapWithKeys(function ($blueprint) {
-            return [$blueprint->handle() => $blueprint->title()];
-        })->all();
-
         return [
             'blueprint' => [
                 'type' => 'select',
-                'options' => $options,
+                'options' => $this->options()->all(),
                 'placeholder' => __('Blueprint'),
             ],
         ];
@@ -45,5 +41,12 @@ class Blueprint extends Filter
     public function blueprints()
     {
         return Collection::findByHandle($this->context['collection'])->entryBlueprints();
+    }
+
+    protected function options()
+    {
+        return $this->blueprints()->mapWithKeys(function ($blueprint) {
+            return [$blueprint->handle() => $blueprint->title()];
+        });
     }
 }
