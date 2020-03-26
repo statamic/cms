@@ -93,6 +93,8 @@ export default {
         },
 
         searchQuery(query) {
+            this.sortColumn = null;
+            this.sortDirection = null;
             this.resetPage();
             this.queueRequest();
         },
