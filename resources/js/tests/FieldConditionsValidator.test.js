@@ -317,6 +317,28 @@ test('it can call a custom function on a specific field using params against a r
     expect(showFieldIf({'root.favorite_animals': 'custom lovesAnimals:7'})).toBe(false);
 });
 
+test('it can mix custom and non-custom conditions', () => {
+    Fields.setValues({
+        first_name: 'San',
+        last_name: 'Holo',
+        age: 22,
+    });
+
+    Statamic.$conditions.add('isOlderThan', function ({ target, params, store, storeName, root }) {
+        return target > params[0];
+    });
+
+    Statamic.$conditions.add('startsWith', function ({ target, params, store, storeName, root }) {
+        return target[0].toLowerCase() === params[0];
+    });
+
+    expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:h', age: 'custom isOlderThan:16'})).toBe(true);
+    expect(showFieldIf({first_name: 'is Feedo', last_name: 'custom startsWith:h', age: 'custom isOlderThan:16'})).toBe(false);
+    expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:h', age: 'custom isOlderThan:40'})).toBe(false);
+    expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:z', age: 'custom isOlderThan:16'})).toBe(false);
+    expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:z', age: 'custom isOlderThan:40'})).toBe(false);
+});
+
 // TODO: Implement wildcards using asterisks? Is this useful?
 // test('it can run conditions on nested data using wildcards', () => {
 //     Fields.setValues({
