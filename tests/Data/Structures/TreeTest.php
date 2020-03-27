@@ -249,6 +249,65 @@ class TreeTest extends TestCase
         $this->assertEquals($arr, $tree->tree());
     }
 
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/1548
+     **/
+    function it_can_move_the_root()
+    {
+        // don't use the $this->tree() helper because the second page (about) has children.
+        // when the root is moved away, it becomes the first, and we'd get an error saying the root can't have children.
+        // todo: update tests so that the second page doesn't have children.
+        $tree = (new Tree)
+            ->locale('en')
+            ->structure((new Nav)->expectsRoot(true))
+            ->tree([
+                [
+                    'entry' => 'pages-home',
+                ],
+                [
+                    'entry' => 'pages-blog'
+                ],
+                [
+                    'entry' => 'pages-about',
+                    'children' => [
+                        [
+                            'entry' => 'pages-board',
+                            'children' => [
+                                [
+                                    'entry' => 'pages-directors'
+                                ]
+                            ]
+                        ]
+                    ],
+                ]
+            ]);
+
+        $tree->move('pages-home', 'pages-board');
+
+        $this->assertEquals([
+            [
+                'entry' => 'pages-blog',
+            ],
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                        'children' => [
+                            [
+                                'entry' => 'pages-directors',
+                            ],
+                            [
+                                'entry' => 'pages-home',
+                            ]
+                        ]
+                    ]
+                ],
+            ]
+        ], $tree->tree());
+    }
+
     /** @test */
     function it_fixes_indexes_when_moving()
     {
