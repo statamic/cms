@@ -1597,6 +1597,15 @@ EOT;
             'two' => 2,
         ]));
     }
+
+    /** @test */
+    function variables_starting_with_if_arent_treated_as_if_statements()
+    {
+        $this->assertEquals('test', Antlers::parse('{{ iframe }}', ['iframe' => 'test']));
+        $this->assertEquals('test', Antlers::parse('{{ unlesses }}', ['unlesses' => 'test']));
+        $this->assertEquals('test', Antlers::parse('{{ elseifs }}', ['elseifs' => 'test']));
+        $this->assertEquals('test', Antlers::parse('{{ elseunlessses }}', ['elseunlessses' => 'test']));
+    }
 }
 
 class NonArrayableObject

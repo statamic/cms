@@ -86,7 +86,7 @@ class Parser
 
         $this->ignoreRegex = '/@{{[^}]*}}/';
 
-        $this->conditionalRegex = '/{{\s*(if|unless|elseif|elseunless)\s*((?:\()?(.*?)(?:\))?)\s*}}/ms';
+        $this->conditionalRegex = '/{{\s*(if|unless|elseif|elseunless)\s+((?:\()?(.*?)(?:\))?)\s*}}/ms';
         $this->conditionalElseRegex = '/{{\s*else\s*}}/ms';
         $this->conditionalEndRegex = '/{{\s*(?:endif|\/if|\/unless)\s*}}/ms';
         $this->conditionalExistsRegex = '/(\s+|^)exists\s+('.$this->variableRegex.')(\s+|$)/ms';
