@@ -13,7 +13,10 @@
             :taggable="taggable"
             :value="items"
             @input="input"
-            @search="search">
+            @search="search"
+            @search:focus="$emit('focus')"
+            @search:blur="$emit('blur')"
+        >
             <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
             <template #search="{ events, attributes }" v-if="multiple">
                 <input

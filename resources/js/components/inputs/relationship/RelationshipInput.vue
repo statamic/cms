@@ -12,6 +12,8 @@
             :read-only="readOnly"
             :url="selectionsUrl"
             @input="selectFieldSelected"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
         />
 
         <loading-graphic v-if="initializing" :inline="true" />
