@@ -51,7 +51,7 @@ return [
     'collections_default_publish_state_instructions' => 'Gibt an, ob neue Einträge, die in der Systemsteuerung erstellt wurden, standardmäßig veröffentlicht werden sollen.',
     'collections_future_date_behavior_instructions' => 'Wie sich zukünftig datierte Einträge verhalten sollen.',
     'collections_layout_instructions' => 'Legen Sie ein Standardlayout für diese Sammlung fest.',
-    'collections_mount_instructions' => 'Aktivieren Sie das Hinzufügen/Bearbeiten von Verknüpfungen aus Strukturen und der Mount-Variable in Ihrer Route.',
+    'collections_mount_instructions' => 'Wählen Sie einen Eintrag, auf dem diese Sammlung gemountet werden soll. Weitere Informationen finden Sie in der [Dokumentation](https://statamic.dev/collections-and-entries#mounting).',
     'collections_orderable_instructions' => 'Aktivieren Sie die manuelle Sortierung per Drag & Drop.',
     'collections_past_date_behavior_instructions' => 'Wie sich Einträge mit Datumsangaben aus der Vergangenheit verhalten sollen.',
     'collections_route_instructions' => 'Die Route steuert das URL-Muster der Einträge.',
