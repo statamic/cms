@@ -31,7 +31,7 @@ class EntriesController extends CpController
 
         $query = $this->indexQuery($collection);
 
-        $filters = $this->queryFilters($query, $request->filters, [
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
             'collection' => $collection->handle(),
             'blueprints' => $collection->entryBlueprints()->map->handle(),
         ]);
@@ -54,8 +54,7 @@ class EntriesController extends CpController
             ->blueprint($collection->entryBlueprint())
             ->columnPreferenceKey("collections.{$collection->handle()}.columns")
             ->additional(['meta' => [
-                'filters' => $filters,
-                'sortColumn' => $sortField,
+                'activeFilterBadges' => $activeFilterBadges,
             ]]);
     }
 

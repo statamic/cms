@@ -358,6 +358,36 @@ class FrontendTest extends TestCase
         $this->get('/fr/le-about')->assertSee('Bonjour');
     }
 
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/1537
+     **/
+    function home_page_is_not_overridden_by_entries_in_another_structured_collection_with_no_url()
+    {
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('default', '<h1>{{ title }}</h1>');
+
+        // The bug would happen if the non-routable collection happened to be created first. It's not
+        // really specific to the naming. However when reading from files, it goes in alphabetical
+        // order which makes it seem like it could be an alphabetical problem.
+        Collection::make('services')->entryBlueprints(['empty'])->structureContents([
+            'root' => true,
+            'tree' => [['entry' => '2']]
+        ])->save();
+
+        Collection::make('pages')->entryBlueprints(['empty'])->routes('{slug}')->structureContents([
+            'root' => true,
+            'tree' => [['entry' => '1']]
+        ])->save();
+
+        EntryFactory::id('1')->slug('service')->collection('services')->data(['title' => 'Service'])->create();
+        EntryFactory::id('2')->slug('home')->collection('pages')->data(['title' => 'Home'])->create();
+
+        // Before the fix, you'd see "Service" instead of "Home", because the URI would also be /
+        $this->get('/')->assertSee('Home');
+    }
+
     private function createPage($slug, $attributes = [])
     {
         $this->makeCollection()->save();

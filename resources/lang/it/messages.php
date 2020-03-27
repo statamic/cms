@@ -51,7 +51,7 @@ return [
     'collections_default_publish_state_instructions' => 'Se le nuove voci create nel Pannello di controllo devono essere pubblicate per impostazione predefinita.',
     'collections_future_date_behavior_instructions' => 'Come dovrebbero comportarsi le voci datate future.',
     'collections_layout_instructions' => 'Imposta il layout predefinito di questa raccolta.',
-    'collections_mount_instructions' => 'Abilita i collegamenti di aggiunta / modifica da Structures e la variabile `mount` nel tuo percorso.',
+    'collections_mount_instructions' => 'Scegli una voce su cui montare questa raccolta. Ulteriori informazioni nella [documentazione](https://statamic.dev/collections-and-entries#mounting).',
     'collections_orderable_instructions' => 'Abilita l\'ordinamento manuale tramite trascinamento della selezione.',
     'collections_past_date_behavior_instructions' => 'Come dovrebbero comportarsi le voci datate in passato.',
     'collections_route_instructions' => 'Il percorso controlla il pattern URL delle voci.',

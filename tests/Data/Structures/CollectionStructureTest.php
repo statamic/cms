@@ -3,9 +3,12 @@
 namespace Tests\Data\Structures;
 
 use Statamic\Contracts\Entries\Collection;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Entry;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Structures\CollectionStructure;
+use Statamic\Structures\Page;
+use Statamic\Structures\Pages;
 use Statamic\Structures\Tree;
 
 class CollectionStructureTest extends StructureTestCase
@@ -117,7 +120,40 @@ class CollectionStructureTest extends StructureTestCase
     /** @test */
     function it_gets_an_entry_uri()
     {
-        $this->markTestIncomplete();
+        $structure = $this->structure();
+
+        $this->collection->shouldReceive('handle')->andReturn('test');
+        $this->collection->shouldReceive('route')->with('en')->once()->andReturn('{slug}');
+
+        $page = $this->mock(Page::class);
+        $page->shouldReceive('reference')->andReturn('the-entry-id');
+        $page->shouldReceive('uri')->andReturn('/the-uri-from-the-page');
+
+        $tree = $this->mock(Tree::class);
+        $tree->shouldReceive('structure')->andReturn($structure);
+        $tree->shouldReceive('locale')->andReturn('en');
+        $tree->shouldReceive('flattenedPages')->andReturn(collect([$page]));
+        $structure->addTree($tree);
+
+        $entry = $this->mock(EntryContract::class);
+        $entry->shouldReceive('id')->andReturn('the-entry-id');
+        $entry->shouldReceive('locale')->andReturn('en');
+
+        $this->assertEquals('/the-uri-from-the-page', $structure->entryUri($entry));
+    }
+
+    /** @test */
+    function the_entry_uri_is_null_if_the_collection_doesnt_have_a_route()
+    {
+        $structure = $this->structure();
+
+        $this->collection->shouldReceive('route')->with('en')->once()->andReturnNull();
+
+        $entry = $this->mock(EntryContract::class);
+        $entry->shouldReceive('id')->andReturn('the-entry-id');
+        $entry->shouldReceive('locale')->andReturn('en');
+
+        $this->assertNull($structure->entryUri($entry));
     }
 
     /** @test */

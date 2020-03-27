@@ -51,7 +51,7 @@ return [
     'collections_default_publish_state_instructions' => 'Se novas entradas criadas no Painel de Controlo devem ser publicadas por padrão.',
     'collections_future_date_behavior_instructions' => 'Como as entradas futuras datadas devem se comportar.',
     'collections_layout_instructions' => 'Definir um layout padrão.',
-    'collections_mount_instructions' => 'Active adicionar/editar atalhos de estruturas e a variável `mount` na sua rota.',
+    'collections_mount_instructions' => 'Escolha uma entrada na qual esta coleção deve ser montada. Saiba mais na [documentação](https://statamic.dev/collections-and-entries#mounting).',
     'collections_orderable_instructions' => 'Activar o pedido manual via arrastar e soltar.',
     'collections_past_date_behavior_instructions' => 'Como as entradas datadas do passado devem se comportar.',
     'collections_route_instructions' => 'A rota controla o padrão de URL das entradas.',

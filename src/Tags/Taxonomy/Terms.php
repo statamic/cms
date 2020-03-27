@@ -77,7 +77,7 @@ class Terms
 
     protected function parseParameters($params)
     {
-        $this->parameters = Arr::except($params->all(), $this->ignoredParams);
+        $this->parameters = $params->except($this->ignoredParams);
         $this->taxonomies = $this->parseTaxonomies();
         $this->orderBys = $this->parseOrderBys();
         $this->collections = $this->parseCollections();

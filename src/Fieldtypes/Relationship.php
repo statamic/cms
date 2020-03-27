@@ -247,7 +247,6 @@ abstract class Relationship extends Fieldtype
     {
         return Resource::collection($items)->additional(['meta' => [
             'columns' => $this->getColumns(),
-            'sortColumn' => $this->getSortColumn($request),
         ]]);
     }
 

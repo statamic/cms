@@ -36,6 +36,7 @@ class ParserTest extends TestCase
                 ['string' => 'the first string'],
                 ['string' => 'the second string']
             ],
+            'complex_string' => 'Hello wildernesses',
             'associative' => [
                 'one' => 'hello',
                 'two' => 'wilderness',
@@ -284,6 +285,13 @@ EOT;
         $this->assertEquals('yes', Antlers::parse($should_also_pass, $this->variables));
         $this->assertEquals(null, Antlers::parse($should_fail, $this->variables));
         $this->assertEquals(null, Antlers::parse($should_also_fail, $this->variables));
+    }
+
+    public function testConditionsOnOverlappingVariableNames()
+    {
+        $template = '{{ if complex_string }}{{ complex_string }}{{ /if }}{{ complex }}{{ /complex }}';
+
+        $this->assertEquals('Hello wildernesses', Antlers::parse($template, $this->variables));
     }
 
     public function testTernaryCondition()
@@ -1588,6 +1596,15 @@ EOT;
             'one' => 1,
             'two' => 2,
         ]));
+    }
+
+    /** @test */
+    function variables_starting_with_if_arent_treated_as_if_statements()
+    {
+        $this->assertEquals('test', Antlers::parse('{{ iframe }}', ['iframe' => 'test']));
+        $this->assertEquals('test', Antlers::parse('{{ unlesses }}', ['unlesses' => 'test']));
+        $this->assertEquals('test', Antlers::parse('{{ elseifs }}', ['elseifs' => 'test']));
+        $this->assertEquals('test', Antlers::parse('{{ elseunlessses }}', ['elseunlessses' => 'test']));
     }
 }
 

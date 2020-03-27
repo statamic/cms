@@ -47,7 +47,7 @@ class UsersController extends CpController
             ? UserGroup::find($request->group)->queryUsers()
             : User::query();
 
-        $filters = $this->queryFilters($query, $request->filters);
+        $activeFilterBadges = $this->queryFilters($query, $request->filters);
 
         $users = $query
             ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
@@ -62,8 +62,7 @@ class UsersController extends CpController
                 Column::make('last_login')->label(__('Last Login'))->sortable(false),
             ])
             ->additional(['meta' => [
-                'filters' => $filters,
-                'sortColumn' => $sort,
+                'activeFilterBadges' => $activeFilterBadges,
             ]]);
     }
 

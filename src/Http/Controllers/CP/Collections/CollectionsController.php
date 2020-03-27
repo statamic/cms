@@ -132,6 +132,7 @@ class CollectionsController extends CpController
             'amp' => $collection->ampable(),
             'sites' => $collection->sites()->all(),
             'routes' => $collection->routes()->all(),
+            'mount' => optional($collection->mount())->id(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint())
@@ -207,7 +208,8 @@ class CollectionsController extends CpController
             ->mount($values['mount'] ?? null)
             ->taxonomies($values['taxonomies'] ?? [])
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
-            ->pastDateBehavior(array_get($values, 'past_date_behavior'));
+            ->pastDateBehavior(array_get($values, 'past_date_behavior'))
+            ->mount(array_get($values, 'mount'));
 
         if ($sites = array_get($values, 'sites')) {
             $collection->sites($sites);
@@ -378,10 +380,16 @@ class CollectionsController extends CpController
                         'type' => 'collection_routes',
                         'instructions' => __('statamic::messages.collections_route_instructions'),
                     ],
+                    'mount' => [
+                        'type' => 'entries',
+                        'max_items' => 1,
+                        'create' => false,
+                        'instructions' => __('statamic::messages.collections_mount_instructions'),
+                    ],
                     'amp' => [
                         'type' => 'toggle',
                         'display' => __('Enable AMP'),
-                        'instructions' => __('Enable Accelerated Mobile Pages (AMP). Automatically adds routes and URL for entries in this collection. Learn more in the [documentation](https://statamic.dev/amp).'),
+                        'instructions' => __('statamic::messages.collections_amp_instructions'),
                     ],
                 ]
             ]

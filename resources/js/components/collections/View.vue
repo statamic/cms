@@ -48,7 +48,25 @@
 
                 </template>
 
+                <div v-if="view === 'list' && reorderable">
+                    <button class="btn mr-2"
+                        v-if="!reordering"
+                        @click="reordering = true"
+                        v-text="__('Reorder')" />
+
+                    <template v-if="reordering">
+                        <button class="btn ml-1"
+                            @click="reordering = false"
+                            v-text="__('Cancel')" />
+
+                        <button class="btn-primary ml-1"
+                            @click="$refs.list.saveOrder"
+                            v-text="__('Save Order')" />
+                    </template>
+                </div>
+
                 <create-entry-button
+                    v-if="!reordering"
                     button-class="btn-primary"
                     :url="createUrl"
                     :blueprints="blueprints" />
@@ -58,14 +76,16 @@
 
         <entry-list
             v-if="view === 'list'"
+            ref="list"
             :collection="handle"
             :initial-sort-column="sortColumn"
             :initial-sort-direction="sortDirection"
             :filters="filters"
             :action-url="actionUrl"
-            :reorderable="reorderable"
+            :reordering="reordering"
             :reorder-url="reorderUrl"
             :site="site"
+            @reordered="reordering = false"
         />
 
         <page-tree
@@ -94,12 +114,16 @@
 
             <template #branch-options="{ branch, removeBranch, orphanChildren, depth }">
                 <template v-if="depth < structureMaxDepth">
+
+                    <h6 class="px-1" v-text="__('Create Child Entry')" v-if="blueprints.length > 1" />
+                    <li class="divider" v-if="blueprints.length > 1" />
                     <dropdown-item
                         v-for="blueprint in blueprints"
                         :key="blueprint.handle"
                         @click="createEntry(blueprint.handle, branch.id)"
-                        v-text="__('New :thing', { thing: blueprint.title })" />
+                        v-text="blueprints.length > 1 ? blueprint.title : __('Create Child Entry')" />
                 </template>
+                <li class="divider"></li>
                 <dropdown-item
                     :text="__('Delete')"
                     class="warning"
@@ -162,6 +186,7 @@ export default {
             entryBeingDeleted: null,
             entryDeletionConfirmCallback: null,
             treeSite: this.site,
+            reordering: false
         }
     },
 

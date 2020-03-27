@@ -2,6 +2,7 @@
 
     <div class="w-full no-label">
         <publish-container
+            class="p-2"
             v-if="filter.fields.length"
             :name="`filter-${filter.handle}`"
             :meta="{}"
@@ -17,11 +18,18 @@
             />
         </publish-container>
 
-        <button
-            class="mt-2 text-xs text-blue hover:text-grey-80"
-            v-text="__('Clear')"
-            @click="resetAll"
-        />
+        <div class="flex border-t">
+            <button
+                class="p-1 hover:bg-grey-10 rounded-bl text-xs flex-1"
+                v-text="__('Clear')"
+                @click="resetAll"
+            />
+            <button
+                class="p-1 hover:bg-grey-10 flex-1 rounded-br border-l text-xs"
+                v-text="__('Close')"
+                @click="$emit('closed')"
+            />
+        </div>
     </div>
 
 </template>
@@ -65,6 +73,10 @@ export default {
             this.$emit('changed', null);
             this.$emit('cleared');
         },
+
+        close() {
+            this.$emit('closed');
+        }
     },
 
 }

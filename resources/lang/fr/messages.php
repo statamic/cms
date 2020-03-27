@@ -34,6 +34,8 @@ return [
     'collections_default_publish_state_instructions' => 'Si les nouvelles entrées créées dans le Panneau de configuration doivent être publiées par défaut.',
     'collections_future_date_behavior_instructions' => 'Comment les entrées datées dans le futur doivent se comporter.',
     'collections_links_instructions' => 'Les entrées de cette collection peuvent contenir des liens (redirections) vers d’autres entrées ou URLs.',
+    'collections_layout_instructions' => 'Détermine la mise en page par défaut pour cette collection.',
+    'collections_mount_instructions' => 'Choisissez une entrée sur laquelle cette collection doit être montée. En savoir plus dans la [documentation](https://statamic.dev/collections-and-entries#mounting).',
     'collections_orderable_instructions' => 'Activez le réordonnancement manuel par glisser-déposer.',
     'collections_past_date_behavior_instructions' => 'Comment les entrées datées ayant expiré doivent se comporter.',
     'collections_route_instructions' => 'La route contrôle le modèle d’URL des entrées.',

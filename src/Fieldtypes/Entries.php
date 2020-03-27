@@ -59,7 +59,7 @@ class Entries extends Relationship
             $query->whereIn('collection', $this->getConfiguredCollections());
         }
 
-        $this->activeFilters = $this->queryFilters($query, $filters, $this->getSelectionFilterContext($request));
+        $this->activeFilterBadges = $this->queryFilters($query, $filters, $this->getSelectionFilterContext($request));
 
         if ($sort = $this->getSortColumn($request)) {
             $query->orderBy($sort, $this->getSortDirection($request));
@@ -74,9 +74,8 @@ class Entries extends Relationship
             ->blueprint($this->getBlueprint($request))
             ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
             ->additional(['meta' => [
-                'sortColumn' => $this->getSortColumn($request),
                 'filters' => $this->getSelectionFilters($request),
-                'activeFilters' => $this->activeFilters,
+                'activeFilterBadges' => $this->activeFilterBadges,
             ]]);
     }
 

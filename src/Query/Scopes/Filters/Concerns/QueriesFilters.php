@@ -7,18 +7,16 @@ use Statamic\Facades\Scope;
 trait QueriesFilters
 {
     /**
-     * Query filters and return active filter values and badges.
+     * Query filters and return active filter badges.
      *
      * @param mixed $query
      * @param array $filters
      * @param array $context
+     * @return array
      */
     public function queryFilters($query, $filters, $context = [])
     {
-        $values = [];
-        $badges = [];
-
-        collect($filters)
+        return collect($filters)
             ->map(function ($values, $handle) use ($context) {
                 return (object) [
                     'filterInstance' => Scope::find($handle, $context),
@@ -28,11 +26,9 @@ trait QueriesFilters
             ->each(function ($filter) use ($query) {
                 $filter->filterInstance->apply($query, $filter->values);
             })
-            ->each(function ($filter, $handle) use (&$values, &$badges) {
-                $values[$handle] = $filter->values;
-                $badges[$handle] = $filter->filterInstance->badge($filter->values);
-            });
-
-        return compact('values', 'badges');
+            ->mapWithKeys(function ($filter, $handle) use (&$values, &$badges) {
+                return [$handle => $filter->filterInstance->badge($filter->values)];
+            })
+            ->all();
     }
 }
