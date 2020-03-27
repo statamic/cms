@@ -27,6 +27,9 @@
                     v-bind="attributes"
                 >
             </template>
+             <template #no-options>
+                <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+            </template>
             <template #footer="{ deselect }" v-if="multiple">
                 <div class="vs__selected-options-outside flex flex-wrap">
                     <span v-for="item in items" class="vs__selected mt-1">
