@@ -389,7 +389,7 @@ class CollectionsController extends CpController
                     'amp' => [
                         'type' => 'toggle',
                         'display' => __('Enable AMP'),
-                        'instructions' => __('Enable Accelerated Mobile Pages (AMP). Automatically adds routes and URL for entries in this collection. Learn more in the [documentation](https://statamic.dev/amp).'),
+                        'instructions' => __('statamic::messages.collections_amp_instructions'),
                     ],
                 ]
             ]
