@@ -17,7 +17,7 @@ class SearchController extends CpController
             ->limit(10)
             ->get()
             ->toAugmentedCollection([
-                'title',
+                'title', 'edit_url',
                 'collection', 'is_entry',
                 'taxonomy', 'is_term',
                 'container', 'is_asset',
