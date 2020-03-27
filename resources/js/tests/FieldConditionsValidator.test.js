@@ -254,7 +254,8 @@ test('it can call a custom logic function', () => {
         favorite_animals: ['cats', 'dogs'],
     });
 
-    Statamic.$conditions.add('reallyLovesAnimals', function (values) {
+    Statamic.$conditions.add('reallyLovesAnimals', function ({ values, params }) {
+        expect(params).toEqual([]);
         return values.favorite_animals.length > 3;
     });
 
@@ -262,18 +263,20 @@ test('it can call a custom logic function', () => {
     expect(Fields.showField({unless: 'reallyLovesAnimals'})).toBe(true);
 });
 
-test('it can call a custom logic function and has access to root values and extra store stuff', () => {
+test('it can call a custom logic function and has access to params, root values, store, etc.', () => {
     Fields.setStoreValues({
         favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
     });
 
-    Statamic.$conditions.add('reallyLovesFood', function (values, root, extra) {
-        expect(extra.store).toBe(Store);
-        expect(extra.storeName).toBe('base');
+    Statamic.$conditions.add('reallyLoves', function ({ target, params, root, store, storeName }) {
+        expect(target).toBe(null);
+        expect(params).toEqual(['lasagna', 'pizza']);
+        expect(store).toBe(Store);
+        expect(storeName).toBe('base');
         return root.favorite_foods.length > 3;
     });
 
-    expect(Fields.showField({if: 'reallyLovesFood'})).toBe(true);
+    expect(Fields.showField({if: 'reallyLoves:lasagna,pizza'})).toBe(true);
 });
 
 // TODO: Implement wildcards using asterisks? Is this useful?
