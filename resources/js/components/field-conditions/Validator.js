@@ -73,7 +73,7 @@ export default class {
     }
 
     prepareCondition(condition) {
-        if (_.isString(condition)) {
+        if (_.isString(condition) || condition.operator === 'custom') {
             return this.prepareCustomCondition(condition);
         }
 
@@ -154,17 +154,15 @@ export default class {
             : rhs;
     }
 
-    getFieldValue(field) {
-        return field.startsWith('root.')
-            ?  data_get(this.rootValues, field.replace(new RegExp('^root.'), ''))
-            :  data_get(this.values, field);
-    }
-
     prepareCustomCondition(condition) {
-        let functionName = this.prepareFunctionName(condition);
-        let params = this.prepareParams(condition);
+        let functionName = this.prepareFunctionName(condition.value || condition);
+        let params = this.prepareParams(condition.value || condition);
 
-        return {functionName, params};
+        let target = condition.field
+            ? this.getFieldValue(condition.field)
+            : null;
+
+        return {functionName, params, target};
     }
 
     prepareFunctionName(condition) {
@@ -179,6 +177,12 @@ export default class {
         return params
             ? params.split(',').map(string => string.trim())
             : [];
+    }
+
+    getFieldValue(field) {
+        return field.startsWith('root.')
+            ?  data_get(this.rootValues, field.replace(new RegExp('^root.'), ''))
+            :  data_get(this.values, field);
     }
 
     passesCondition(condition) {
@@ -198,7 +202,7 @@ export default class {
         return eval(`${condition.lhs} ${condition.operator} ${condition.rhs}`);
     }
 
-    passesCustomCondition(condition, target=null) {
+    passesCustomCondition(condition) {
         let customFunction = data_get(this.store.state.statamic.conditions, condition.functionName);
 
         if (typeof customFunction !== 'function') {
@@ -208,7 +212,7 @@ export default class {
 
         let passes = customFunction({
             params: condition.params,
-            target: target,
+            target: condition.target,
             values: this.values,
             root: this.rootValues,
             store: this.store,

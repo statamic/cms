@@ -282,6 +282,41 @@ test('it can call a custom function using params against root values', () => {
     expect(Fields.showField({if: 'reallyLoves:lasagna,pizza,sandwiches'})).toBe(false);
 });
 
+test('it can call a custom function on a specific field', () => {
+    Fields.setValues({
+        favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
+    });
+
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, values }) {
+        expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
+        expect(values.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
+        expect(params).toEqual([]);
+        expect(store).toBe(Store);
+        expect(storeName).toBe('base');
+        return values.favorite_animals.length > 3;
+    });
+
+    expect(showFieldIf({'favorite_animals': 'custom lovesAnimals'})).toBe(true);
+});
+
+test('it can call a custom function on a specific field using params against a root value', () => {
+    Fields.setStoreValues({
+        favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
+    });
+
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, root }) {
+        expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
+        expect(root.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
+        expect(store).toBe(Store);
+        expect(storeName).toBe('base');
+        return target.length > (params[0] || 3);
+    });
+
+    expect(showFieldIf({'root.favorite_animals': 'custom lovesAnimals'})).toBe(true);
+    expect(showFieldIf({'root.favorite_animals': 'custom lovesAnimals:2'})).toBe(true);
+    expect(showFieldIf({'root.favorite_animals': 'custom lovesAnimals:7'})).toBe(false);
+});
+
 // TODO: Implement wildcards using asterisks? Is this useful?
 // test('it can run conditions on nested data using wildcards', () => {
 //     Fields.setValues({

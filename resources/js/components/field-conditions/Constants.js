@@ -23,5 +23,6 @@ export const OPERATORS = [
     '>',
     '>=',
     '<',
-    '<='
+    '<=',
+    'custom',
 ];
