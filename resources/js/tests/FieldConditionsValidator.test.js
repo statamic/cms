@@ -324,11 +324,11 @@ test('it can mix custom and non-custom conditions', () => {
         age: 22,
     });
 
-    Statamic.$conditions.add('isOlderThan', function ({ target, params, store, storeName, root }) {
+    Statamic.$conditions.add('isOlderThan', function ({ target, params }) {
         return target > params[0];
     });
 
-    Statamic.$conditions.add('startsWith', function ({ target, params, store, storeName, root }) {
+    Statamic.$conditions.add('startsWith', function ({ target, params }) {
         return target[0].toLowerCase() === params[0];
     });
 
