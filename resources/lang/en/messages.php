@@ -157,7 +157,7 @@ return [
     'taxonomy_wizard_title_instructions' => 'We recommend using a plural noun, like "Categories" or "Tags".',
     'updates_available' => 'Updates are available!',
     'user_groups_handle_instructions' => 'Used to reference this user group on the frontend. It\'s non-trivial to change later.',
-    'user_groups_intro' => 'User groups allow you organize users and apply permission-based roles to simplify the process of assigning configuring permissions on individual users.',
+    'user_groups_intro' => 'User groups allow you to organize users and apply permission-based roles in aggregate.',
     'user_groups_role_instructions' => 'Assign roles to give users in this group all of their corresponding permissions.',
     'user_groups_title_instructions' => 'Usually a plural noun, like Editors or Photographers',
     'user_wizard_account_created' => 'The user account has been created.',
