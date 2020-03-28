@@ -2169,6 +2169,16 @@ class CoreModifiers extends Modifier
         if (str_contains($url, 'youtube')) {
             return str_replace('watch?v=', 'embed/', $url);
         }
+        
+        if (str_contains($url, 'youtu.be')) {
+            $url = str_replace('youtu.be', 'www.youtube.com/embed', $url);
+            
+            // Check for start at point and replace it with correct parameter.
+            if (str_contains($url, '?t=')) {
+                $url = str_replace('?t=', '?start=', $url);
+            }
+            return $url;
+        }
 
         if (str_contains($url, 'vimeo')) {
             return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
@@ -2185,7 +2195,7 @@ class CoreModifiers extends Modifier
      */
     public function isEmbeddable($url)
     {
-        return Str::contains($url, ['youtube', 'vimeo']);
+        return Str::contains($url, ['youtu.be', 'youtube', 'vimeo']);
     }
 
     // ------------------------------------
