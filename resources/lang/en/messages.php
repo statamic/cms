@@ -144,7 +144,7 @@ return [
     'navigation_configure_collections_instructions' => 'Enable linking to entries in these collections.',
     'navigation_documentation_instructions' => 'Learn more about building, configuring, and rendering Navigations.',
     'navigation_link_to_entry_instructions' => 'Add a link to an entry. Enable linking to additional collections in your config.',
-    'navigation_link_to_url_instructions' => 'Add a link to any internal or external URL Enable linking to entries in your config.',
+    'navigation_link_to_url_instructions' => 'Add a link to any internal or external URL. Enable linking to entries in your config.',
     'navigation_empty' => 'Navigations are multi-level lists of links that can be used to build navbars, footers, sitemaps, and other forms of frontend navigation.',
     'tab_sections_instructions' => 'The fields in each section will be grouped together into tabs. Create new fields, reuse existing fields, or import entire groups of fields from existing fieldsets.',
     'taxonomies_blueprints_instructions' => 'Terms in this taxonomy may use any of these blueprints.',
