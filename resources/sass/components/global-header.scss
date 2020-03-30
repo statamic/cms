@@ -31,7 +31,7 @@
     }
 
     .global-search-results {
-        @apply shadow-lg absolute p-0 w-full bg-white rounded border border-grey-50 w-128;
+        @apply shadow-lg absolute p-0 w-full bg-white rounded border border-grey-50;
         top: 36px;
         left: -1px; // border offset
         z-index: 999;
@@ -97,7 +97,10 @@
 }
 
 @screen lg {
-    .global-search { @apply w-128 max-w-full; }
+    .global-search {
+        @apply w-128 max-w-full;
+        .global-search-results { @apply w-128 }
+    }
 }
 
 .site-selector {
