@@ -4,14 +4,18 @@ namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class Blueprint
+class Blueprint implements Augmentable
 {
+    use HasAugmentedData;
+
     protected $handle;
     protected $contents = [];
     protected $fieldsCache;
@@ -278,5 +282,18 @@ class Blueprint
     public static function __callStatic($method, $parameters)
     {
         return Facades\Blueprint::{$method}(...$parameters);
+    }
+
+    public function __toString()
+    {
+        return $this->handle();
+    }
+
+    public function augmentedArrayData()
+    {
+        return [
+            'title' => $this->title(),
+            'handle' => $this->handle(),
+        ];
     }
 }
