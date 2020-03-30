@@ -3,19 +3,15 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white shadow h-13 items-center flex justify-between relative w-full;
+    @apply bg-white shadow pr-2 h-13 items-center flex justify-between relative w-full;
     z-index: 997; // Let Live Preview stack on top
 }
 
 /* Responsive Wangjangling
    ========================================================================== */
 
-@screen sm {
-    .global-header { @apply px-4; }
-}
-
 @screen md {
-    .global-header { @apply px-0 fixed; }
+    .global-header { @apply px-0 fixed }
 }
 
 /* Search
@@ -100,7 +96,7 @@
     }
 }
 
-@screen md {
+@screen lg {
     .global-search { @apply w-128 max-w-full; }
 }
 
