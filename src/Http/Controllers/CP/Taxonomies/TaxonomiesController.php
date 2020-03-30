@@ -76,25 +76,20 @@ class TaxonomiesController extends CpController
     {
         $this->authorize('store', TaxonomyContract::class, 'You are not authorized to create taxonomies.');
 
-        $data = $request->validate([
+        $request->validate([
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
-            'blueprints' => 'array',
-            'collections' => 'array',
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
 
-        $taxonomy = $this->updateTaxonomy(Taxonomy::make($handle), $data);
+        if (Collection::find($handle)) {
+            throw new \Exception('Taxonomy already exists');
+        }
+
+        $taxonomy = Taxonomy::make($handle)->title($request->title);
 
         $taxonomy->save();
-
-        foreach ($request->collections as $collection) {
-            $collection = Collection::findByHandle($collection);
-            $collection->taxonomies(
-                $collection->taxonomies()->map->handle()->push($handle)->unique()->all()
-            )->save();
-        }
 
         session()->flash('success', __('Taxonomy created'));
 
@@ -107,7 +102,10 @@ class TaxonomiesController extends CpController
     {
         $this->authorize('edit', $taxonomy, 'You are not authorized to edit this taxonomy.');
 
-        $values = $taxonomy->toArray();
+        $values = [
+            'title' => $taxonomy->title(),
+            'blueprints' => $taxonomy->termBlueprints()->map->handle()->all(),
+        ];
 
         $fields = ($blueprint = $this->editFormBlueprint())
             ->fields()
@@ -130,7 +128,11 @@ class TaxonomiesController extends CpController
 
         $fields->validate();
 
-        $taxonomy = $this->updateTaxonomy($taxonomy, $fields->process()->values()->all());
+        $values = $fields->process()->values()->all();
+
+        $taxonomy
+            ->title($values['title'])
+            ->termBlueprints($values['blueprints']);
 
         $taxonomy->save();
 
@@ -144,33 +146,29 @@ class TaxonomiesController extends CpController
         $taxonomy->delete();
     }
 
-    protected function updateTaxonomy($taxonomy, $data)
-    {
-        return $taxonomy
-            ->title($data['title'])
-            ->termBlueprints($data['blueprints']);
-    }
-
     protected function editFormBlueprint()
     {
-        return Blueprint::makeFromFields([
-            'title' => [
-                'type' => 'text',
-                'validate' => 'required',
-                'width' => 50,
+        return Blueprint::makeFromSections([
+            'name' => [
+                'display' => __('Name'),
+                'fields' => [
+                    'title' => [
+                        'type' => 'text',
+                        'validate' => 'required',
+                    ],
+                ]
             ],
-            'handle' => [
-                'type' => 'text',
-                'validate' => 'required|alpha_dash',
-                'width' => 50,
-            ],
-
-            'content_model' => ['type' => 'section'],
-            'blueprints' => [
-                'type' => 'blueprints',
-                'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
-                'validate' => 'array',
-            ],
+            'content_model' => [
+                'display' => 'Content Model',
+                'fields' => [
+                    'blueprints' => [
+                        'type' => 'blueprints',
+                        'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
+                        'validate' => 'array',
+                        'mode' => 'select',
+                    ],
+                ]
+            ]
         ]);
     }
 }
