@@ -144,6 +144,7 @@ Statamic.app({
     data: {
         showLoginModal: false,
         navOpen: true,
+        mobileNavOpen: false,
         modals: [],
         stacks: [],
         panes: [],
@@ -154,12 +155,6 @@ Statamic.app({
 
         version() {
             return Statamic.$config.get('version');
-        },
-
-        computedNavOpen() {
-            // if (this.stackCount > 0) return false;
-
-            return this.navOpen;
         },
 
         stackCount() {
@@ -207,6 +202,10 @@ Statamic.app({
         toggleNav() {
             this.navOpen = ! this.navOpen;
             localStorage.setItem('statamic.nav', this.navOpen ? 'open' : 'closed');
+        },
+
+        toggleMobileNav() {
+            this.mobileNavOpen = ! this.mobileNavOpen;
         }
     }
 

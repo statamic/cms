@@ -149,7 +149,7 @@ class Nav
     {
         collect($this->items)
             ->filter(function ($item) {
-                return is_callable($item->children()) && $item->isActive();
+                return is_callable($item->children());
             })
             ->each(function ($item) {
                 $item->children($item->children()());

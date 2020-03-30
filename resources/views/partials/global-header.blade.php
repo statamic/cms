@@ -1,6 +1,8 @@
 <div class="global-header">
     <div class="lg:w-56 pl-1 md:pl-3 h-full flex items-center">
-        <button class="nav-toggle ml-sm flex-no-shrink" @click="toggleNav">@svg('burger')</button>
+        <button class="nav-toggle hidden md:block ml-sm flex-no-shrink" @click="toggleNav">@svg('burger')</button>
+        <button class="nav-toggle md:hidden ml-sm flex-no-shrink" @click="toggleMobileNav" v-if="! mobileNavOpen">@svg('burger')</button>
+        <button class="nav-toggle md:hidden ml-sm flex-no-shrink" @click="toggleMobileNav" v-else v-cloak>@svg('close')</button>
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
             <div v-tooltip="version" class="hidden md:block flex-no-shrink">
                 @svg('statamic-wordmark')

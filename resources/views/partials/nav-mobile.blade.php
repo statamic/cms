@@ -1,17 +1,31 @@
-<nav class="nav-mobile">
-    <a href="">
-        <i>@svg('charts')</i><span>Dashboard</span>
-    </a>
-    <a href="">
-        <i class="">@svg('content-writing')</i><span>Content</span>
-    </a>
-    <a href="">
-        <i>@svg('users-multiple')</i><span>Users</span>
-    </a>
-    <a href="">
-        <i>@svg('drawer-file')</i><span>Tools</span>
-    </a>
-    <a href="">
-        <i>@svg('hammer-wrench')</i><span>Site</span>
-    </a>
+<nav class="nav-main nav-mobile" v-cloak>
+    <div class="nav-main-inner">
+        @foreach (Statamic\Facades\CP\Nav::build() as $section => $items)
+            @if ($section !== 'Top Level')
+                <h6>{{ __($section) }}</h6>
+            @endif
+            <ul>
+                @foreach ($items as $item)
+                    @unless ($item->view())
+                        <li class="{{ $item->isActive() ? 'current' : '' }}">
+                            <a href="{{ $item->url() }}">
+                                <i>@svg($item->icon())</i><span>{{ __($item->name()) }}</span>
+                            </a>
+                            @if ($item->children())
+                                <ul>
+                                    @foreach ($item->children() as $child)
+                                        <li class="{{ $child->isActive() ? 'current' : '' }}">
+                                            <a href="{{ $child->url() }}">{{ __($child->name()) }}</a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            @endif
+                        </li>
+                    @else
+                        @include($item->view())
+                    @endunless
+                @endforeach
+            </ul>
+        @endforeach
+    </div>
 </nav>
