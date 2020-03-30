@@ -255,13 +255,7 @@ class TreeTest extends TestCase
      **/
     function it_can_move_the_root()
     {
-        // don't use the $this->tree() helper because the second page (about) has children.
-        // when the root is moved away, it becomes the first, and we'd get an error saying the root can't have children.
-        // todo: update tests so that the second page doesn't have children.
-        $tree = (new Tree)
-            ->locale('en')
-            ->structure((new Nav)->expectsRoot(true))
-            ->tree([
+        $tree = $this->tree()->tree([
                 [
                     'entry' => 'pages-home',
                 ],
