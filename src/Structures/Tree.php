@@ -52,7 +52,11 @@ class Tree implements Localization
             return null;
         }
 
-        return $this->tree()[0]['entry'];
+        if (! $root = $this->tree()[0] ?? null) {
+            return null;
+        }
+
+        return $root['entry'];
     }
 
     public function handle()

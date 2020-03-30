@@ -105,6 +105,36 @@ class TreeTest extends TestCase
     }
 
     /** @test */
+    function it_gets_the_root()
+    {
+        $tree = $this->tree();
+        $tree->structure()->expectsRoot(true);
+        $tree->tree([['entry' => 'pages-home']]);
+
+        $this->assertEquals('pages-home', $tree->root());
+    }
+
+    /** @test */
+    function a_tree_not_expecting_a_root_will_have_no_root()
+    {
+        $tree = $this->tree();
+        $tree->structure()->expectsRoot(false);
+        $tree->tree([['entry' => 'pages-home']]);
+
+        $this->assertNull($tree->root());
+    }
+
+    /** @test */
+    function a_tree_expecting_a_root_but_with_no_branches_has_no_root()
+    {
+        $tree = $this->tree();
+        $tree->structure()->expectsRoot(true);
+        $tree->tree([]);
+
+        $this->assertNull($tree->root());
+    }
+
+    /** @test */
     function it_gets_the_child_pages_including_the_root()
     {
         $pages = $this->tree()->pages();
