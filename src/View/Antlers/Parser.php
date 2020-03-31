@@ -64,13 +64,13 @@ class Parser
     public function __construct()
     {
         // expand allowed characters in variable regex
-        $this->variableRegex = "(?!{if|unless\s)[a-zA-Z0-9_\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.!'\":]*";
+        $this->variableRegex = "(?!if\s|unless\s)[a-zA-Z0-9_'\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.!'\":]*";
 
         // Allow spaces after the variable name so you can do modifiers like | this | and_that
-        $this->looseVariableRegex = "(?!{if|unless\s)[a-zA-Z0-9_'\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.(\s.*)?!'\":]*";
+        $this->looseVariableRegex = "(?!if\s|unless\s)[a-zA-Z0-9_'\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.(\s.*)?!'\":]*";
 
         // Different from variable regex somehow.
-        $this->callbackNameRegex = '(?!{if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\^\/,0-9_\.(\s.*?):]*:'.$this->variableRegex;
+        $this->callbackNameRegex = '(?!if\s|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\^\/,0-9_\.(\s.*?):]*:'.$this->variableRegex;
 
         $this->variableLoopRegex = '/{{\s*('.$this->looseVariableRegex.')\s*}}(.*?){{\s*\/\1\s*}}/ms';
 
@@ -78,7 +78,7 @@ class Parser
         $this->variableTagRegex = '/{{\s*('.$this->looseVariableRegex.'(?:\s*or\s*(?:'.$this->looseVariableRegex.'|".*?"))*)\s*}}/m';
 
         // make the space-anything after the variable regex optional allowing {{tags}} and {{ tags }}
-        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')([^?]*?)?}}(.*?){{\s*\/\1\s*}}/ms';
+        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')(?:\s([^?]*?))}}(.*?){{\s*\/\1\s*}}/ms';
 
         $this->recursiveRegex = '/{{\s*\*recursive\s*('.$this->variableRegex.')\*\s*}}/ms';
 

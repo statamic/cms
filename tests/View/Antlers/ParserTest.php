@@ -289,6 +289,13 @@ EOT;
 
     public function testConditionsOnOverlappingVariableNames()
     {
+        $template = '{{ if complex }}{{ complex limit="1" }}{{ string }}{{ /complex }}{{ /if }}';
+
+        $this->assertEquals('the first string', Antlers::parse($template, $this->variables));
+    }
+
+    public function testLoopWithParamInsideConditionMatchingVariableName()
+    {
         $template = '{{ if complex_string }}{{ complex_string }}{{ /if }}{{ complex }}{{ /complex }}';
 
         $this->assertEquals('Hello wildernesses', Antlers::parse($template, $this->variables));
