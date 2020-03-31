@@ -23,7 +23,7 @@ export default class {
         if (conditions === undefined) {
             return true;
         } else if (_.isString(conditions)) {
-            return this.passesCustomLogicFunction(conditions);
+            return this.passesCustomCondition(this.prepareCondition(conditions));
         }
 
         conditions = this.converter.fromBlueprint(conditions);
@@ -73,6 +73,10 @@ export default class {
     }
 
     prepareCondition(condition) {
+        if (_.isString(condition) || condition.operator === 'custom') {
+            return this.prepareCustomCondition(condition);
+        }
+
         let operator = this.prepareOperator(condition.operator);
         let lhs = this.prepareLhs(condition.field, operator);
         let rhs = this.prepareRhs(condition.value, operator);
@@ -150,6 +154,31 @@ export default class {
             : rhs;
     }
 
+    prepareCustomCondition(condition) {
+        let functionName = this.prepareFunctionName(condition.value || condition);
+        let params = this.prepareParams(condition.value || condition);
+
+        let target = condition.field
+            ? this.getFieldValue(condition.field)
+            : null;
+
+        return {functionName, params, target};
+    }
+
+    prepareFunctionName(condition) {
+        return condition
+            .replace(new RegExp('^custom .'), '')
+            .split(':')[0];
+    }
+
+    prepareParams(condition) {
+        let params = condition.split(':')[1];
+
+        return params
+            ? params.split(',').map(string => string.trim())
+            : [];
+    }
+
     getFieldValue(field) {
         return field.startsWith('root.')
             ?  data_get(this.rootValues, field.replace(new RegExp('^root.'), ''))
@@ -157,6 +186,10 @@ export default class {
     }
 
     passesCondition(condition) {
+        if (condition.functionName) {
+            return this.passesCustomCondition(condition);
+        }
+
         if (condition.operator === 'includes') {
             return condition.lhs.includes(condition.rhs);
         }
@@ -169,20 +202,22 @@ export default class {
         return eval(`${condition.lhs} ${condition.operator} ${condition.rhs}`);
     }
 
-    passesCustomLogicFunction(functionName) {
-        let customFunction = data_get(this.store.state.statamic.conditions, functionName);
+    passesCustomCondition(condition) {
+        let customFunction = data_get(this.store.state.statamic.conditions, condition.functionName);
 
         if (typeof customFunction !== 'function') {
-            console.error(`Statamic field condition [${functionName}] was not properly defined.`);
+            console.error(`Statamic field condition [${condition.functionName}] was not properly defined.`);
             return false;
         }
 
-        let extra = {
+        let passes = customFunction({
+            params: condition.params,
+            target: condition.target,
+            values: this.values,
+            root: this.rootValues,
             store: this.store,
-            storeName: this.storeName
-        }
-
-        let passes = customFunction(this.values, this.rootValues, extra);
+            storeName: this.storeName,
+        });
 
         return this.showOnPass ? passes : ! passes;
     }

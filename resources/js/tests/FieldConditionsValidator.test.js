@@ -249,12 +249,16 @@ test('it can run conditions on root store values', () => {
     expect(showFieldIf({'root.favorite_foods': 'contains lasagna'})).toBe(true);
 });
 
-test('it can call a custom logic function', () => {
+test('it can call a custom function', () => {
     Fields.setValues({
         favorite_animals: ['cats', 'dogs'],
     });
 
-    Statamic.$conditions.add('reallyLovesAnimals', function (values) {
+    Statamic.$conditions.add('reallyLovesAnimals', function ({ target, params, store, storeName, values }) {
+        expect(target).toBe(null);
+        expect(params).toEqual([]);
+        expect(store).toBe(Store);
+        expect(storeName).toBe('base');
         return values.favorite_animals.length > 3;
     });
 
@@ -262,18 +266,77 @@ test('it can call a custom logic function', () => {
     expect(Fields.showField({unless: 'reallyLovesAnimals'})).toBe(true);
 });
 
-test('it can call a custom logic function and has access to root values and extra store stuff', () => {
+test('it can call a custom function using params against root values', () => {
     Fields.setStoreValues({
         favorite_foods: ['pizza', 'lasagna', 'asparagus', 'quinoa', 'peppers'],
     });
 
-    Statamic.$conditions.add('reallyLovesFood', function (values, root, extra) {
-        expect(extra.store).toBe(Store);
-        expect(extra.storeName).toBe('base');
-        return root.favorite_foods.length > 3;
+    Statamic.$conditions.add('reallyLoves', function ({ target, params, store, storeName, root }) {
+        expect(target).toBe(null);
+        expect(store).toBe(Store);
+        expect(storeName).toBe('base');
+        return params.filter(food => ! root.favorite_foods.includes(food)).length === 0;
     });
 
-    expect(Fields.showField({if: 'reallyLovesFood'})).toBe(true);
+    expect(Fields.showField({if: 'reallyLoves:lasagna,pizza'})).toBe(true);
+    expect(Fields.showField({if: 'reallyLoves:lasagna,pizza,sandwiches'})).toBe(false);
+});
+
+test('it can call a custom function on a specific field', () => {
+    Fields.setValues({
+        favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
+    });
+
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, values }) {
+        expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
+        expect(values.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
+        expect(params).toEqual([]);
+        expect(store).toBe(Store);
+        expect(storeName).toBe('base');
+        return values.favorite_animals.length > 3;
+    });
+
+    expect(showFieldIf({'favorite_animals': 'custom lovesAnimals'})).toBe(true);
+});
+
+test('it can call a custom function on a specific field using params against a root value', () => {
+    Fields.setStoreValues({
+        favorite_animals: ['cats', 'dogs', 'rats', 'bats'],
+    });
+
+    Statamic.$conditions.add('lovesAnimals', function ({ target, params, store, storeName, root }) {
+        expect(target).toEqual(['cats', 'dogs', 'rats', 'bats']);
+        expect(root.favorite_animals).toEqual(['cats', 'dogs', 'rats', 'bats']);
+        expect(store).toBe(Store);
+        expect(storeName).toBe('base');
+        return target.length > (params[0] || 3);
+    });
+
+    expect(showFieldIf({'root.favorite_animals': 'custom lovesAnimals'})).toBe(true);
+    expect(showFieldIf({'root.favorite_animals': 'custom lovesAnimals:2'})).toBe(true);
+    expect(showFieldIf({'root.favorite_animals': 'custom lovesAnimals:7'})).toBe(false);
+});
+
+test('it can mix custom and non-custom conditions', () => {
+    Fields.setValues({
+        first_name: 'San',
+        last_name: 'Holo',
+        age: 22,
+    });
+
+    Statamic.$conditions.add('isOlderThan', function ({ target, params }) {
+        return target > params[0];
+    });
+
+    Statamic.$conditions.add('startsWith', function ({ target, params }) {
+        return target[0].toLowerCase() === params[0];
+    });
+
+    expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:h', age: 'custom isOlderThan:16'})).toBe(true);
+    expect(showFieldIf({first_name: 'is Feedo', last_name: 'custom startsWith:h', age: 'custom isOlderThan:16'})).toBe(false);
+    expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:h', age: 'custom isOlderThan:40'})).toBe(false);
+    expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:z', age: 'custom isOlderThan:16'})).toBe(false);
+    expect(showFieldIf({first_name: 'is San', last_name: 'custom startsWith:z', age: 'custom isOlderThan:40'})).toBe(false);
 });
 
 // TODO: Implement wildcards using asterisks? Is this useful?
