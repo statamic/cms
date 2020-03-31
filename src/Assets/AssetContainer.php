@@ -6,7 +6,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Data\HasAugmentedData;
+use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\Data\AssetContainerDeleted;
 use Statamic\Events\Data\AssetContainerSaved;
 use Statamic\Facades;
@@ -19,13 +19,14 @@ use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements AssetContainerContract, Augmentable
 {
-    use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
+    use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
     protected $title;
     protected $handle;
@@ -123,12 +124,9 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $array;
     }
 
-    public function augmentedArrayData()
+    public function newAugmentedInstance()
     {
-        return array_merge($this->toArray(), [
-            'handle' => $this->handle(),
-            'assets' => $this->assets()
-        ]);
+        return new AugmentedAssetContainer($this);
     }
 
     /**
@@ -149,6 +147,11 @@ class AssetContainer implements AssetContainerContract, Augmentable
     public function showUrl()
     {
         return cp_route('assets.browse.show', $this->handle());
+    }
+
+    public function apiUrl()
+    {
+        return null; // TODO
     }
 
     /**
