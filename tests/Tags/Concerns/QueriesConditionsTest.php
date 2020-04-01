@@ -8,6 +8,7 @@ use Statamic\Facades\Antlers;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
 use Illuminate\Support\Carbon;
+use Statamic\Fields\LabeledValue;
 use Statamic\Query\Builder;
 use Statamic\Tags\Collection\Entries;
 use Statamic\Tags\Concerns\QueriesConditions;
@@ -565,6 +566,30 @@ class QueriesConditionsTest extends TestCase
 
         $query = $this->mock(Builder::class);
         $query->shouldReceive('whereIn')->with('somefield', ['somevalue']);
+
+        $class->query($query);
+    }
+
+    /** @test */
+    function when_the_value_is_a_labeled_value_object_it_will_use_the_corresponding_value()
+    {
+        $value = new LabeledValue('foo', 'The Foo Label');
+
+        $class = new class($value) {
+            use QueriesConditions;
+            protected $parameters;
+            public function __construct($value)
+            {
+                $this->parameters = new Parameters(['somefield:is' => $value]);
+            }
+            public function query($query)
+            {
+                $this->queryConditions($query);
+            }
+        };
+
+        $query = $this->mock(Builder::class);
+        $query->shouldReceive('where')->with('somefield', 'foo');
 
         $class->query($query);
     }
