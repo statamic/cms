@@ -294,8 +294,9 @@ export default {
             window.location = url;
         },
 
-        editPage(page, vm, store) {
-            window.location = page.edit_url;
+        editPage(page, vm, store, $event) {
+            const url = page.edit_url;
+            $event.metaKey ? window.open(url) : window.location = url;
         }
 
     }
