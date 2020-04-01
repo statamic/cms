@@ -6,7 +6,6 @@ use Exception;
 use Statamic\Statamic;
 use Illuminate\Support\Facades\View;
 use App\Exceptions\Handler as ExceptionHandler;
-use Symfony\Component\Debug\Exception\FlattenException;
 use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthException;
 
 class Handler extends ExceptionHandler
@@ -22,20 +21,6 @@ class Handler extends ExceptionHandler
         }
 
         return parent::render($request, $e);
-    }
-
-    /**
-     * Render an exception to a string using Symfony.
-     *
-     * @param  \Exception  $e
-     * @param  bool  $debug
-     * @return string
-     */
-    protected function renderExceptionWithSymfony(Exception $e, $debug)
-    {
-        return (new SymfonyExceptionHandler($debug))->getHtml(
-            FlattenException::create($e)
-        );
     }
 
     /**
