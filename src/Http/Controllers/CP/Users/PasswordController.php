@@ -8,7 +8,7 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class PasswordController extends CpController
 {
-    public function update(Request $request, $user)
+    public function update(Request $request, User $user)
     {
         $this->authorize('editPassword', $user);
 
