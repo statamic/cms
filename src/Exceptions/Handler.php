@@ -4,7 +4,6 @@ namespace Statamic\Exceptions;
 
 use Exception;
 use Statamic\Statamic;
-use Illuminate\Support\Facades\View;
 use App\Exceptions\Handler as ExceptionHandler;
 use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthException;
 
@@ -21,20 +20,6 @@ class Handler extends ExceptionHandler
         }
 
         return parent::render($request, $e);
-    }
-
-    /**
-     * The Control Panel should use its own error views.
-     */
-    protected function registerErrorViewPaths()
-    {
-        if (! Statamic::isCpRoute()) {
-            return parent::registerErrorViewPaths();
-        }
-
-        $path = View::getFinder()->getHints()['statamic'][0] . '/errors';
-
-        View::replaceNamespace('errors', $path);
     }
 
     protected function getAuthExceptionRedirectUrl()
