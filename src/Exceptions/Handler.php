@@ -11,10 +11,6 @@ class Handler extends ExceptionHandler
 {
     public function render($request, Exception $e)
     {
-        if ($e instanceof NotFoundHttpException && Statamic::isApiRoute()) {
-            return response()->json(['message' => $e->getMessage() ?: 'Not found.'], 404);
-        }
-
         if ($e instanceof IlluminateAuthException && Statamic::isCpRoute() && !$request->expectsJson()) {
             return redirect($this->getAuthExceptionRedirectUrl())->withError($e->getMessage());
         }

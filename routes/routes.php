@@ -1,11 +1,16 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+use Statamic\Http\Middleware\API\SwapExceptionHandler;
+
 if (config('statamic.api.enabled')) {
-    Route::middleware(config('statamic.api.middleware'))
-        ->name('statamic.api.')
-        ->prefix(config('statamic.api.route'))
-        ->namespace('Statamic\Http\Controllers\API')
-        ->group(__DIR__.'/api.php');
+    Route::middleware(SwapExceptionHandler::class)->group(function () {
+        Route::middleware(config('statamic.api.middleware'))
+            ->name('statamic.api.')
+            ->prefix(config('statamic.api.route'))
+            ->namespace('Statamic\Http\Controllers\API')
+            ->group(__DIR__.'/api.php');
+    });
 }
 
 if (config('statamic.cp.enabled')) {
