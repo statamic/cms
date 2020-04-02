@@ -9,6 +9,6 @@ class ControlPanelExceptionHandlerForLaravelSix extends Handler
 {
     public function render($request, Exception $e)
     {
-        app(static::class)->render($request, $e);
+        return app(ControlPanelExceptionHandler::class)->render($request, $e);
     }
 }

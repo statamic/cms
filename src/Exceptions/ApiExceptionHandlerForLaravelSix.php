@@ -9,6 +9,6 @@ class ApiExceptionHandlerForLaravelSix extends Handler
 {
     public function render($request, Exception $e)
     {
-        app(static::class)->render($request, $e);
+        return app(ApiExceptionHandler::class)->render($request, $e);
     }
 }
