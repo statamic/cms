@@ -5,6 +5,7 @@ namespace Tests\CP;
 use Illuminate\Support\Facades\Route;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\User;
+use Statamic\Statamic;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -18,8 +19,8 @@ class AuthRedirectTest extends TestCase
     {
         parent::resolveApplicationConfiguration($app);
 
-        $app->booted(function () {
-            Route::get('/cp/hammertime', function () {
+        Statamic::pushCpRoutes(function () {
+            Route::get('hammertime', function () {
                 throw new AuthorizationException("Can't touch this.");
             });
         });
@@ -28,17 +29,25 @@ class AuthRedirectTest extends TestCase
     /** @test */
     function it_redirects_back_to_referrer()
     {
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
         $this
-            ->from('/cp/original')
+            ->actingAs($user)
+            ->from('/original')
             ->get('/cp/hammertime')
-            ->assertRedirect('/cp/original')
+            ->assertRedirect('/original')
             ->assertSessionHas(['error' => "Can't touch this."]);
     }
 
     /** @test */
     function it_redirects_to_cp_index_without_referrer()
     {
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
         $this
+            ->actingAs($user)
             ->get('/cp/hammertime')
             ->assertRedirect(cp_route('index'))
             ->assertSessionHas(['error' => "Can't touch this."]);
@@ -47,7 +56,11 @@ class AuthRedirectTest extends TestCase
     /** @test */
     function it_redirects_somewhere_if_the_referrer_was_the_login_page()
     {
+        $this->setTestRoles(['test' => ['access cp']]);
+        $user = tap(User::make()->assignRole('test'))->save();
+
         $this
+            ->actingAs($user)
             ->from(cp_route('login'))
             ->get('/cp/hammertime')
             ->assertRedirect(cp_route('index'))
