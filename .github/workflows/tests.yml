@@ -13,10 +13,12 @@ jobs:
         strategy:
             matrix:
                 php: [7.4, 7.3, 7.2, 7.1]
-                laravel: [6.*, 5.8.*]
+                laravel: [7.*, 6.*, 5.8.*]
                 dependency-version: [prefer-lowest, prefer-stable]
                 os: [ubuntu-latest]
                 include:
+                    - laravel 7.*
+                      testbench: 5.*
                     - laravel: 6.*
                       testbench: 4.*
                     - laravel: 5.8.*
@@ -25,6 +27,8 @@ jobs:
                       dependency-version: prefer-lowest
                       additional-deps: '"mockery/mockery:1.2.3"'
                 exclude:
+                    - laravel: 7.*
+                      php: 7.1
                     - laravel: 6.*
                       php: 7.1
 
