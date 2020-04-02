@@ -31,9 +31,9 @@ class NavTest extends TestCase
         $expected = collect([
             'Top Level' => ['Dashboard', 'Playground'],
             'Content' => ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'],
+            'Fields' => ['Blueprints', 'Fieldsets'],
             'Tools' => ['Forms', /*'Updates',*/ 'Utilities'],
-            'Users' => ['Users', 'Groups', 'Permissions'],
-            'Site' => [/*'Addons',*/ 'Fields']
+            'Users' => ['Users', 'Groups', 'Permissions']
         ]);
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -42,9 +42,9 @@ class NavTest extends TestCase
 
         $this->assertEquals($expected->keys(), $nav->keys());
         $this->assertEquals($expected->get('Content'), $nav->get('Content')->map->name()->all());
+        $this->assertEquals($expected->get('Fields'), $nav->get('Fields')->map->name()->all());
         $this->assertEquals($expected->get('Tools'), $nav->get('Tools')->map->name()->all());
         $this->assertEquals($expected->get('Users'), $nav->get('Users')->map->name()->all());
-        $this->assertEquals($expected->get('Site'), $nav->get('Site')->map->name()->all());
     }
 
     /** @test */

@@ -17,10 +17,7 @@ class FieldsController extends CpController
 
     public function index(Request $request)
     {
-        return view('statamic::fields.index', [
-            'blueprints' => Blueprint::all(),
-            'fieldsets' => Fieldset::all(),
-        ]);
+        return redirect(cp_route('blueprints.index'));
     }
 
     public function edit(Request $request)

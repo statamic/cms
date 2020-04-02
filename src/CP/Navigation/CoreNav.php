@@ -37,9 +37,9 @@ class CoreNav
         (new static)
             ->makeTopLevel()
             ->makeContentSection()
+            ->makeFieldsSection()
             ->makeToolsSection()
-            ->makeUsersSection()
-            ->makeSiteSection();
+            ->makeUsersSection();
     }
 
     /**
@@ -131,6 +131,26 @@ class CoreNav
         return $this;
     }
 
+        /**
+     * Make fields section items.
+     *
+     * @return $this
+     */
+    protected function makeFieldsSection()
+    {
+        Nav::fields('Blueprints')
+            ->route('blueprints.index')
+            ->icon('blueprint')
+            ->can('configure fields');
+
+        Nav::fields('Fieldsets')
+            ->route('fieldsets.index')
+            ->icon('fieldsets')
+            ->can('configure fields');
+
+        return $this;
+    }
+
     /**
      * Make tools section items.
      *
@@ -215,25 +235,16 @@ class CoreNav
     }
 
     /**
-     * Make site section items.
+     * @TODO AREAS
      *
      * @return $this
      */
-    protected function makeSiteSection()
+    protected function makeUnusedSection()
     {
         // Nav::site('Addons')
         //     ->route('addons.index')
         //     ->icon('addons')
         //     ->can('configure addons');
-
-        Nav::site('Fields')
-            ->route('fields.index')
-            ->icon('wireframe')
-            ->can('configure fields')
-            ->children([
-                Nav::item('Blueprints')->route('blueprints.index'),
-                Nav::item('Fieldsets')->route('fieldsets.index'),
-            ]);
 
         // Nav::site('Preferences')
         //     ->route('')
