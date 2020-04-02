@@ -11,7 +11,7 @@
                 </slot>
             </div>
             <div class="p-2 bg-grey-20 border-t flex items-center justify-end text-sm">
-                <button class="text-grey hover:text-grey-90" @click="$emit('cancel')">{{ __('Cancel') }}</button>
+                <button class="text-grey hover:text-grey-90" @click="$emit('cancel')" v-text="cancelText" />
                 <button class="ml-2" :class="buttonClass" v-text="buttonText" @click="$emit('confirm')" />
             </div>
         </div>
@@ -31,6 +31,10 @@ export default {
         buttonText: {
             type: String,
             default: 'Confirm'
+        },
+        cancelText: {
+            type: String,
+            default: 'Cancel'
         },
         danger: {
             type: Boolean,
