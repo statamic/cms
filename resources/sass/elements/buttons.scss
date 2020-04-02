@@ -37,7 +37,7 @@ button {
         border-color: #c4cdd5;
     }
 
-    &.active {
+    &.active, &.active:hover {
         box-shadow: inset 2px 2px 3px 0px rgba(25,30,35,.1);
         background: config('colors.grey-40');
         border-color: #aeb9c3;
