@@ -57,7 +57,7 @@ export default {
 
             let actions = rows.reduce((carry, row) => carry.concat(row.actions), []);
 
-            actions = _.uniq(actions, 'handle');
+            actions = _.uniq(actions, 'handle').filter(action => ! action.inlineOnly);
 
             // Remove any actions that are missing from any row. If you can't apply the action
             // to all of the selected items, you should not see the button. There's server
