@@ -1,39 +1,60 @@
 ---
 name: Bug report
-about: Create a report to help us improve
+about: Fill out a bug report to help us improve Statamic.
 title: ''
 labels: ''
 assignees: ''
 
 ---
 
-**Describe the bug**
-A clear and concise description of what the bug is.
+---
+name: Bug Report
+about: Create a report to help us improve Statamic.
+title: ''
+labels: ''
+assignees: ''
 
-**To Reproduce**
-Steps to reproduce the behavior:
+---
+**If you don't fill out at least most of this this template the issue may be automatically closed. Thanks in advance!**
+
+## Bug Description
+Here's a clear description of what the bug is.
+
+## How to Reproduce
+Here's how I can recreate the bug:
 1. Go to '...'
 2. Click on '....'
 3. Scroll down to '....'
 4. See error
 
-**Expected behavior**
-A clear and concise description of what you expected to happen.
+## Expected Behavior
+I expected...
 
-**Screenshots**
-If applicable, add screenshots or screencasts to help explain your problem.
+## Screenshot/Exception
+Here's where you can add screenshots, screencasts, or a link to a Flare exception message to help explain the problem.
 
-**Environment (please complete the following information):**
- - Statamic version:
-    (Run `php please -V` to find it.)
- - Install method: 
-    (eg. Fresh install from statamic/statamic, starter kit, or existing laravel app.)
- - PHP version:
-   (Run `php -v` to find it)
- - Operating System:
-    (eg. MacOS, Windows)
- - Browser:
-    (eg. Chrome, Firefox)
+## Environment
 
-**Additional context**
-Add any other context about the problem here.
+Statamic version: 3.0.0.-beta-{replace_me}
+_run `php please -V` to find it._
+
+Install method:
+- [ ] Fresh install from `statamic/statamic`
+- [ ] Starter kit
+- [ ] Existing Laravel app
+- [ ] Other (please explain this magic!)
+
+PHP version: 7.{replace_me}
+_run `php -v` to find it_
+
+Operating System:
+- [ ] MacOS
+- [ ] Linux
+- [ ] Windows
+- [ ] MS-DOS 6.1
+
+Browser:
+- [ ] Chrome
+- [ ] Firefox
+- [ ] Safari
+- [ ] Netscape Navigator 2.0
