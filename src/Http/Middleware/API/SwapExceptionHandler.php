@@ -2,16 +2,16 @@
 
 namespace Statamic\Http\Middleware\API;
 
-use Closure;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Statamic\Exceptions\ApiExceptionHandler;
+use Statamic\Exceptions\ApiExceptionHandlerForLaravelSix;
+use Statamic\Http\Middleware\SwapExceptionHandler as Middleware;
 
-class SwapExceptionHandler
+class SwapExceptionHandler extends Middleware
 {
-    public function handle($request, Closure $next)
+    public function handler()
     {
-        app()->singleton(ExceptionHandler::class, ApiExceptionHandler::class);
-
-        return $next($request);
+        return version_compare(app()->version(), 7, '>=')
+            ? ApiExceptionHandler::class
+            : ApiExceptionHandlerForLaravelSix::class;
     }
 }

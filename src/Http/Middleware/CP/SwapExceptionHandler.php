@@ -2,16 +2,16 @@
 
 namespace Statamic\Http\Middleware\CP;
 
-use Closure;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 use Statamic\Exceptions\ControlPanelExceptionHandler;
+use Statamic\Exceptions\ControlPanelExceptionHandlerForLaravelSix;
+use Statamic\Http\Middleware\SwapExceptionHandler as Middleware;
 
-class SwapExceptionHandler
+class SwapExceptionHandler extends Middleware
 {
-    public function handle($request, Closure $next)
+    public function handler()
     {
-        app()->singleton(ExceptionHandler::class, ControlPanelExceptionHandler::class);
-
-        return $next($request);
+        return version_compare(app()->version(), 7, '>=')
+            ? ControlPanelExceptionHandler::class
+            : ControlPanelExceptionHandlerForLaravelSix::class;
     }
 }

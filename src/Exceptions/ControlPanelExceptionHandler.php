@@ -2,13 +2,13 @@
 
 namespace Statamic\Exceptions;
 
-use Exception;
-use Illuminate\Foundation\Exceptions\Handler;
 use Illuminate\Auth\Access\AuthorizationException as IlluminateAuthException;
+use Illuminate\Foundation\Exceptions\Handler;
+use Throwable;
 
 class ControlPanelExceptionHandler extends Handler
 {
-    public function render($request, Exception $e)
+    public function render($request, Throwable $e)
     {
         if ($e instanceof IlluminateAuthException && !$request->expectsJson()) {
             return redirect($this->getAuthExceptionRedirectUrl())->withError($e->getMessage());

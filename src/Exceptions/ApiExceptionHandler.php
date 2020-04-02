@@ -2,13 +2,13 @@
 
 namespace Statamic\Exceptions;
 
-use Exception;
 use Illuminate\Foundation\Exceptions\Handler;
 use Statamic\Exceptions\NotFoundHttpException;
+use Throwable;
 
 class ApiExceptionHandler extends Handler
 {
-    public function render($request, Exception $e)
+    public function render($request, Throwable $e)
     {
         if ($e instanceof NotFoundHttpException) {
             return response()->json(['message' => $e->getMessage() ?: 'Not found.'], 404);
