@@ -25,7 +25,7 @@ jobs:
                       testbench: 3.8.*
                     - php: 7.4
                       dependency-version: prefer-lowest
-                      additional-deps: '"mockery/mockery:1.2.3"'
+                      additional-deps: '"mockery/mockery:>=1.2.3"'
                 exclude:
                     - laravel: 7.*
                       php: 7.1
