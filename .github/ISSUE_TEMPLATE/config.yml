@@ -1,1 +1,6 @@
 blank_issues_enabled: false
+
+contact_links:
+  - name: Feature Requests and Ideas
+    url: https://github.com/statamic/ideas
+    about: Please submit feature requests to the ideas repo.
