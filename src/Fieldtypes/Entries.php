@@ -43,11 +43,15 @@ class Entries extends Relationship
         'collectionHandle' => 'collection',
     ];
 
-    protected $extraConfigFields = [
-        'collections' => [
-            'type' => 'collections'
-        ],
-    ];
+    protected function configFieldItems(): array
+    {
+        return [
+            'collections' => [
+                'display' => __('Collections'),
+                'type' => 'collections'
+            ],
+        ];
+    }
 
     public function getIndexItems($request)
     {

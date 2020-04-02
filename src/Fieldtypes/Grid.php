@@ -14,39 +14,51 @@ class Grid extends Fieldtype
     protected $defaultable = false;
     protected $defaultValue = [];
 
-    protected $configFields = [
-        'fields' => [
-            'type' => 'fields'
-        ],
-        'mode' => [
-            'type' => 'select',
-            'default' => 'table',
-            'instructions' => 'Choose the layout style you wish to use by default.',
-            'options' => [
-                'table' => 'Table',
-                'stacked' => 'Stacked'
+    protected function configFieldItems(): array
+    {
+        return [
+            'fields' => [
+                'display' => __('Fields'),
+                'instructions' => __('statamic::fieldtypes.grid.config.fields'),
+                'type' => 'fields',
             ],
-        ],
-        'max_rows' => [
-            'type' => 'integer',
-            'width' => '50',
-            'instructions' => 'Set a maximum number of rows that can be created.',
-        ],
-        'min_rows' => [
-            'type' => 'integer',
-            'width' => '50',
-            'instructions' => 'Set a minimum number of rows that must be created.',
-        ],
-        'add_row' => [
-            'type' => 'text',
-            'instructions' => 'Set the label of the "Add Row" button.',
-        ],
-        'reorderable' => [
-            'type' => 'toggle',
-            'default' => true,
-            'instructions' => 'Enable to allow row reordering.',
-        ],
-    ];
+            'mode' => [
+                'display' => __('Mode'),
+                'instructions' => __('statamic::fieldtypes.grid.config.mode'),
+                'type' => 'select',
+                'options' => [
+                    'table' => __('Table'),
+                    'stacked' => __('Stacked'),
+                ],
+                'default' => 'table',
+            ],
+            'max_rows' => [
+                'display' => __('Maximum Rows'),
+                'instructions' => __('statamic::fieldtypes.grid.config.max_rows'),
+                'type' => 'integer',
+                'width' => '50',
+            ],
+            'min_rows' => [
+                'display' => __('Minimum Rows'),
+                'instructions' => __('statamic::fieldtypes.grid.config.min_rows'),
+                'type' => 'integer',
+                'width' => '50',
+            ],
+            'add_row' => [
+                'display' => __('Add Row Label'),
+                'instructions' => __('statamic::fieldtypes.grid.config.add_row'),
+                'type' => 'text',
+                'width' => '50',
+            ],
+            'reorderable' => [
+                'display' => __('Reorderable'),
+                'instructions' => __('statamic::fieldtypes.grid.config.reorderable'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => '50',
+            ],
+        ];
+    }
 
     public function filter()
     {
