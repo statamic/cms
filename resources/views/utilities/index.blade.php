@@ -23,6 +23,9 @@
         </div>
     </div>
 
-
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Utilities'),
+        'url' => 'extending/utilities'
+    ])
 
 @endsection

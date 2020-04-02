@@ -22,12 +22,16 @@
         @include('statamic::partials.empty-state', [
             'resource' => 'Navigation',
             'description' => __('statamic::messages.navigation_configure_intro'),
-            'docs_link' => Statamic::docsUrl('navigation'),
             'svg' => 'empty/navigation',
             'route' => cp_route('navigation.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Structures\Nav')
         ])
 
     @endunless
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Navigation'),
+        'url' => 'navigation'
+    ])
 
 @endsection

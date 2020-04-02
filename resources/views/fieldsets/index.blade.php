@@ -20,12 +20,15 @@
         @include('statamic::partials.empty-state', [
             'resource' => 'Fieldset',
             'description' => __('statamic::messages.fieldset_intro'),
-            'docs_link' => Statamic::docsUrl('fieldsets'),
             'svg' => 'empty/form',
             'route' => cp_route('fieldsets.create'),
             'can' => $user->can('create', 'Statamic\Fields\Fieldset')
         ])
 
     @endunless
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Fieldsets'), 'url' => 'fieldsets'
+    ])
 
 @endsection
