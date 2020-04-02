@@ -2,7 +2,6 @@
 
 namespace Tests;
 
-use Illuminate\Foundation\Testing\Assert;
 use Statamic\Statamic;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
@@ -147,7 +146,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     public static function assertArraySubset($subset, $array, bool $checkForObjectIdentity = false, string $message = ''): void
     {
-        Assert::assertArraySubset($subset, $array, $checkForObjectIdentity, $message);
+        $class = version_compare(app()->version(), 7, '>=') ? \Illuminate\Testing\Assert::class : \Illuminate\Foundation\Testing\Assert::class;
+        $class::assertArraySubset($subset, $array, $checkForObjectIdentity, $message);
     }
 
     protected function isRunningWindows()
