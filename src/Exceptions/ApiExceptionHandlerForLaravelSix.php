@@ -7,8 +7,10 @@ use Illuminate\Foundation\Exceptions\Handler;
 
 class ApiExceptionHandlerForLaravelSix extends Handler
 {
+    use Concerns\RendersApiExceptions;
+
     public function render($request, Exception $e)
     {
-        return app(ApiExceptionHandler::class)->render($request, $e);
+        return $this->renderException($request, $e);
     }
 }
