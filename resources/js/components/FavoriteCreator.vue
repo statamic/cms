@@ -12,7 +12,7 @@
                     <input type="text" class="input-text w-auto" autofocus ref="fave" v-model="name" @keydown.enter="save">
                     <button @click="save" class="btn-primary ml-1">{{ __('Save') }}</button>
                 </div>
-                <button @click="makeStartPage" class="mt-1 text-xs text-blue outline-none hover:text-blue-darker">{{ __('Set as sign-in page') }} &rarr;</button>
+                <button @click="makeStartPage" class="mt-1 text-xs text-blue outline-none hover:text-blue-darker">{{ __('Set as start page') }} &rarr;</button>
             </div>
         </popover>
         <div v-else>
