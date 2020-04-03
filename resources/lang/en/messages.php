@@ -54,8 +54,6 @@ return [
     'collection_configure_date_behavior_public' => 'Public - Always visible',
     'collection_configure_date_behavior_unlisted' => 'Unlisted - Hidden from listings, URLs visible',
     'collection_configure_date_behavior_private' => 'Private - Hidden from listings, URLs 404',
-    // 'collection_configure_' =>
-    // 'collection_configure_' =>
     'collection_configure_title_instructions' => 'We recommend a plural noun, like "Articles" or "Products".',
     'collection_next_steps_configure_description' => 'Configure URLs and routes, define blueprints, date behaviors, ordering and other options.',
     'collection_next_steps_create_entry_description' => 'Create your first entry or stub out a handful of placeholder entries, it\'s up to you.',
