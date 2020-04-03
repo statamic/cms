@@ -33,6 +33,7 @@
 
                     <site-selector
                         v-if="structureSites.length > 1"
+                        class="mr-2"
                         :sites="structureSites"
                         :value="treeSite"
                         @input="treeSite = $event.handle"
@@ -145,7 +146,7 @@
 <script>
 import PageTree from '../structures/PageTree.vue';
 import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
-import SiteSelector from '../structures/SiteSelector.vue';
+import SiteSelector from '../SiteSelector.vue';
 
 export default {
 
