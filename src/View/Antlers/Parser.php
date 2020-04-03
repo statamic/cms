@@ -698,7 +698,7 @@ class Parser
      */
     public function parseTernaries($text, $data)
     {
-        if ($this->preg_match_all('/{{\s*([^}]+[^}]\s(\?[^}]*\s\:|\?=).*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
+        if ($this->preg_match_all('/{{\s*([^{}]+[^}]\s(\?[^}]*\s\:|\?=).*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 // Our made up "truth coalescing" syntax.
                 // eg. {{ true ?= "foo" }} is shorthand for {{ if true }}foo{{ /if }}

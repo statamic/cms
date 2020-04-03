@@ -348,6 +348,15 @@ EOT;
         $this->assertEquals('"Wow" said the man', Antlers::parse($template, $data));
     }
 
+    public function testTernaryConditionInsideParameter()
+    {
+        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+
+        $template = "{{ test variable='{{ true ? 'Hello wilderness' : 'fail' }}' }}";
+
+        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
+    }
+
     public function testNullCoalescence()
     {
         // or, ?:, and ?? are all aliases.
