@@ -31,8 +31,8 @@ class CacheController extends CpController
         return [
             'records' => Stache::fileCount(),
             'size' => Str::fileSizeForHumans(Stache::fileSize()),
-            'time' => $time ? Str::timeForHumans($time) : 'Refresh',
-            'rebuilt' => $built ? $built->diffForHumans() : 'Refresh',
+            'time' => $time ? Str::timeForHumans($time) : __('Refresh'),
+            'rebuilt' => $built ? $built->diffForHumans() : __('Refresh'),
         ];
     }
 
@@ -83,21 +83,21 @@ class CacheController extends CpController
         $this->clearApplicationCache();
         $this->clearImageCache();
 
-        return back()->withSuccess('All caches cleared.');
+        return back()->withSuccess(__('All caches cleared.'));
     }
 
     protected function clearStacheCache()
     {
         Stache::refresh();
 
-        return back()->withSuccess('Stache cleared.');
+        return back()->withSuccess(__('Stache cleared.'));
     }
 
     protected function clearStaticCache()
     {
         app(StaticCacher::class)->flush();
 
-        return back()->withSuccess('Static page cache cleared.');
+        return back()->withSuccess(__('Static page cache cleared.'));
     }
 
     protected function clearApplicationCache()
@@ -107,13 +107,13 @@ class CacheController extends CpController
         // TODO: Stache doesn't appear to be clearing?
         // Maybe related to https://github.com/statamic/three-cms/issues/149
 
-        return back()->withSuccess('Application cache cleared.');
+        return back()->withSuccess(__('Application cache cleared.'));
     }
 
     protected function clearImageCache()
     {
         Artisan::call('statamic:glide:clear');
 
-        return back()->withSuccess('Image cache cleared.');
+        return back()->withSuccess(__('Image cache cleared.'));
     }
 }
