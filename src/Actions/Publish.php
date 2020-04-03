@@ -7,6 +7,11 @@ use Statamic\Facades\User;
 
 class Publish extends Action
 {
+    public static function title()
+    {
+        return __('Publish');
+    }
+
     public function filter($item)
     {
         return $item instanceof Entry;

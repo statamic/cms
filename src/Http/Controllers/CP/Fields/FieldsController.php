@@ -17,10 +17,7 @@ class FieldsController extends CpController
 
     public function index(Request $request)
     {
-        return view('statamic::fields.index', [
-            'blueprints' => Blueprint::all(),
-            'fieldsets' => Fieldset::all(),
-        ]);
+        return redirect(cp_route('blueprints.index'));
     }
 
     public function edit(Request $request)
@@ -72,30 +69,34 @@ class FieldsController extends CpController
     {
         $prepends = collect([
             'display' => [
-                'type' => 'text',
+                'display' => __('Display'),
                 'instructions' => __('statamic::messages.fields_display_instructions'),
+                'type' => 'text',
                 'width' => 50,
             ],
             'handle' => [
-                'type' => 'text',
+                'display' => __('Handle'),
                 'instructions' => __('statamic::messages.fields_handle_instructions'),
+                'type' => 'text',
                 'width' => 50,
             ],
             'instructions' => [
-                'type' => 'text',
+                'display' => __('Instructions'),
                 'instructions' => __('statamic::messages.fields_instructions_instructions'),
+                'type' => 'text',
             ],
             'listable' => [
-                'type' => 'select',
+                'display' => __('Listable'),
                 'instructions' => __('statamic::messages.fields_listable_instructions'),
+                'type' => 'select',
                 'cast_booleans' => true,
-                'default' => 'hidden',
-                'width' => 50,
                 'options' => [
                     'hidden' => __('Hidden by default'),
                     'true' => __('Shown by default'),
                     'false' => __('Not listable'),
                 ],
+                'default' => 'hidden',
+                'width' => 50,
             ]
         ]);
 

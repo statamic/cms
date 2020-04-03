@@ -22,4 +22,9 @@
         action-url="{{ cp_route('users.actions') }}"
     ></user-listing>
 
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Users'),
+        'url' => 'users'
+    ])
+
 @endsection

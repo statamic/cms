@@ -8,24 +8,31 @@ class Arr extends Fieldtype
 {
     protected static $handle = 'array';
 
-    protected $configFields = [
-        'mode' => [
-            'type' => 'radio',
-            'options' => [
-                'dynamic' => 'Dynamic',
-                'keyed' => 'Keyed'
+    protected function configFieldItems(): array
+    {
+        return [
+            'mode' => [
+                'display' => __('Mode'),
+                'instructions' => __('statamic::fieldtypes.array.config.mode'),
+                'type' => 'radio',
+                'default' => 'dynamic',
+                'options' => [
+                    'dynamic' => __('Dynamic'),
+                    'keyed' => __('Keyed')
+                ],
             ],
-            'default' => 'dynamic'
-        ],
-        'keys' => [
-            'type' => 'array',
-            'value_header' => 'Label (optional)',
-            'instructions' => 'Set the array keys (variables) and optional labels.',
-            'if' => [
-                'mode' => 'keyed'
-            ]
-        ],
-    ];
+            'keys' => [
+                'display' => __('Keys'),
+                'instructions' => __('statamic::fieldtypes.array.config.keys'),
+                'type' => 'array',
+                'key_header' => __('Key'),
+                'value_header' => __('Label (optional)'),
+                'if' => [
+                    'mode' => 'keyed'
+                ]
+            ],
+        ];
+    }
 
     public function preProcess($data)
     {

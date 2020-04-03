@@ -6,8 +6,8 @@
                 {{ __('Remove Page') }}
             </div>
             <div class="flex-1 px-2 py-3 text-grey">
-                <p class="mb-2">Are you sure you want to remove this page?</p>
-                <p class="mb-2">Only the references will be removed. Entries will not be deleted.</p>
+                <p class="mb-2" v-text="__('Are you sure you want to remove this page?')" />
+                <p class="mb-2" v-text="__('Only the references will be removed. Entries will not be deleted.')" />
                 <label class="flex items-center" v-if="children">
                     <input type="checkbox" class="mr-1" v-model="shouldDeleteChildren" />
                     {{ __n('Remove child page|Remove :count child pages', children) }}

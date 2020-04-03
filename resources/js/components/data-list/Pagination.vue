@@ -132,7 +132,7 @@ export default {
 
             options.push({
                 value: defaultPaginationSize,
-                label: `${defaultPaginationSize} (default)`
+                label: `${defaultPaginationSize}`
             });
 
             return _.sortBy(options, 'value');

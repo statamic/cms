@@ -6,7 +6,10 @@ use Statamic\Contracts\Assets\Asset;
 
 class RenameAsset extends Action
 {
-    protected static $title = 'Rename';
+    public static function title()
+    {
+        return __('Rename');
+    }
 
     public function filter($item)
     {

@@ -477,7 +477,7 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (! confirm('Are you sure? Unsaved changes will be lost.')) {
+                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
                     return;
                 }
             }

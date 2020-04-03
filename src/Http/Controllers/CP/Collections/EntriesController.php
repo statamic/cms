@@ -214,7 +214,7 @@ class EntriesController extends CpController
             : $collection->entryBlueprint();
 
         if (! $blueprint) {
-            throw new \Exception('A valid blueprint is required.');
+            throw new \Exception(__('A valid blueprint is required.'));
         }
 
         $values = [];
