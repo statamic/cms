@@ -35,6 +35,9 @@ $additionalStrings = [
     'Content',
     'Groups',
     'Tools',
+    'Laptop',
+    'Tablet',
+    'Mobile',
 ];
 
 $app = new Symfony\Component\Console\Application('Statamic Translator');

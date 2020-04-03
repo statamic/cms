@@ -6,7 +6,7 @@
                 {{ __('Delete Entry') }}
             </div>
             <div class="flex-1 px-2 py-3 text-grey">
-                <p class="mb-2">Are you sure you want to delete this entry?</p>
+                <p class="mb-2" v-text="__('Are you sure you want to delete this entry?')" />
                 <label class="flex items-center" v-if="children">
                     <input type="checkbox" class="mr-1" v-model="shouldDeleteChildren" />
                     {{ __n('Delete child entry|Delete :count child entries', children) }}

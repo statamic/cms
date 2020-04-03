@@ -127,7 +127,7 @@ return [
     'structure_wizard_description' => 'Strukturen sind Verknüpfsbäume, die am häufigsten zum Erstellen von Navigationsleisten oder ähnlichem verwendet werden.',
     'structure_wizard_expect_root_instructions' => 'Gibt an, ob die erste Seite im Baum als "Stamm-" oder "Homepage" Seite betrachtet werden soll.',
     'structure_wizard_handle_instructions' => 'Wie Sie in Ihren Vorlagen auf diese Struktur verweisen. Kann nicht leicht geändert werden.',
-    'structure_wizard_max_depth_instructions' => 'Die maximale Anzahl von Ebenen in der eine Seite verschachtelt sein kann. Für ein offenes Limit leer lassen.',
+    'max_depth_instructions' => 'Die maximale Anzahl von Ebenen in der eine Seite verschachtelt sein kann. Für ein offenes Limit leer lassen.',
     'structure_wizard_purpose_collection' => 'Legen Sie die URLs einer Sammlung mit übergeordneten/untergeordneten Beziehungen fest.',
     'structure_wizard_purpose_intro' => 'Strukturen können entweder eine Sammlung mit übergeordneten/untergeordneten URLs festlegen oder handgefertigte Navigationsbäume aus vorhandenen Einträgen und benutzerdefinierdierte URLs verwenden.',
     'structure_wizard_purpose_navigation' => 'Erstellen Sie eine Baumstruktur mit Links zu vorhandenen Einträgen und/oder benutzerdefinierten URLs.',

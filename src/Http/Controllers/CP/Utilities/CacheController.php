@@ -64,7 +64,7 @@ class CacheController extends CpController
 
         return [
             'enabled' => (bool) $strategy,
-            'strategy' => $strategy ?? 'Disabled',
+            'strategy' => $strategy ?? __('Disabled'),
             'count' => app(StaticCacher::class)->getUrls()->count(),
         ];
     }

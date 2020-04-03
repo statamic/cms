@@ -276,7 +276,7 @@ export default {
             }
 
             if (! url) {
-                url = prompt('Enter URL', 'http://');
+                url = prompt(__('Enter URL'), 'http://');
                 if (! url) {
                     url = '';
                 }

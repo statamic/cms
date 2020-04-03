@@ -54,6 +54,7 @@ class MoveAsset extends Action
 
         return [
             'folder' => [
+                'display' => __('Folder'),
                 'type' => 'select',
                 'options' => $options,
                 'validate' => 'required',

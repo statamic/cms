@@ -22,8 +22,8 @@
                 <div class="flex-1 overflow-auto p-3">
 
                     <div>
-                        <p class="text-sm font-medium mb-1">Link a single field</p>
-                        <p class="text-2xs text-grey mb-1">Changes to this field will stay in sync.</p>
+                        <p class="text-sm font-medium mb-1" v-text="__('Link a single field')" />
+                        <p class="text-2xs text-grey mb-1" v-text="__('Changes to this field will stay in sync.')" />
                         <v-select
                             name="field"
                             :placeholder="__('Fields')"
@@ -52,8 +52,8 @@
                         <div class="border-b border-grey-30 flex-1" />
                     </div>
                     <div>
-                        <p class="text-sm font-medium mb-1">Link a fieldset</p>
-                        <p class="text-2xs text-grey mb-1">Changes to this fieldset will stay in sync.</p>
+                        <p class="text-sm font-medium mb-1" v-text="__('Link a fieldset')" />
+                        <p class="text-2xs text-grey mb-1" v-text="__('Changes to this fieldset will stay in sync.')" />
                         <v-select
                             name="field"
                             :placeholder="__('Fieldsets')"
@@ -63,8 +63,8 @@
                             :reduce="(opt) => opt.value"
                             v-model="fieldset"
                         />
-                        <p class="text-sm font-medium mt-3 mb-1">Prefix</p>
-                        <p class="text-2xs text-grey mb-1">Every field in the linked fieldset will be prefixed with this. Useful if you want to import the same fields multiple times.</p>
+                        <p class="text-sm font-medium mt-3 mb-1" v-text="__('Prefix')" />
+                        <p class="text-2xs text-grey mb-1" v-text="__('messages.fieldset_link_fields_prefix_instructions')" />
                         <text-input v-model="importPrefix" placeholder="eg. hero_" />
                         <button
                             class="btn-primary w-full mt-3"

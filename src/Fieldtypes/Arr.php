@@ -25,7 +25,8 @@ class Arr extends Fieldtype
                 'display' => __('Keys'),
                 'instructions' => __('statamic::fieldtypes.array.config.keys'),
                 'type' => 'array',
-                'value_header' => 'Label (optional)',
+                'key_header' => __('Key'),
+                'value_header' => __('Label (optional)'),
                 'if' => [
                     'mode' => 'keyed'
                 ]

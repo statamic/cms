@@ -127,7 +127,7 @@ return [
     'structure_wizard_description' => 'Las estructuras son árboles de enlaces que se usan con mayor frecuencia para crear barras de navegación y otras formas de navegación del sitio.',
     'structure_wizard_expect_root_instructions' => 'Si deseas que la primera página del árbol se considere la página \'raíz\' o la \'página principal\'.',
     'structure_wizard_handle_instructions' => 'Cómo harás referencia a esta estructura en tus plantillas. No se puede cambiar fácilmente.',
-    'structure_wizard_max_depth_instructions' => 'El número máximo de niveles de profundidad que puedes anidar una página. Deja en blanco para que sea ilimitado.',
+    'max_depth_instructions' => 'El número máximo de niveles de profundidad que puedes anidar una página. Deja en blanco para que sea ilimitado.',
     'structure_wizard_purpose_collection' => 'Controla los URLs de una colección con relaciones padre / hijo.',
     'structure_wizard_purpose_intro' => 'Las estructuras pueden controlar una colección con URLs principales / secundarias, o definir árboles de navegación hechos a mano a partir de entradas existentes y URLs definidos por el usuario.',
     'structure_wizard_purpose_navigation' => 'Crea un árbol de enlaces a entradas existentes y / o URLs definidos por el usuario.',
