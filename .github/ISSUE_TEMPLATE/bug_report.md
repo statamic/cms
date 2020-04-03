@@ -35,26 +35,26 @@ Here's where you can add screenshots, screencasts, or a link to a Flare exceptio
 
 ## Environment
 
-Statamic version: 3.0.0.-beta-{replace_me}
+**Statamic version:** 3.0.0.-beta-{replace_me}
 _run `php please -V` to find it._
 
-Install method:
-- [ ] Fresh install from `statamic/statamic`
-- [ ] Starter kit
-- [ ] Existing Laravel app
-- [ ] Other (please explain this magic!)
+**Install method:**
+- Fresh install from `statamic/statamic`
+- Starter kit
+- Existing Laravel app
+- Other (please explain this magic!)
 
-PHP version: 7.{replace_me}
+**PHP version:** 7.{replace_me}
 _run `php -v` to find it_
 
-Operating System:
-- [ ] MacOS
-- [ ] Linux
-- [ ] Windows
-- [ ] MS-DOS 6.1
+**Operating System:**
+- MacOS
+- Linux
+- Windows
+- MS-DOS 6.1
 
-Browser:
-- [ ] Chrome
-- [ ] Firefox
-- [ ] Safari
-- [ ] Netscape Navigator 2.0
+**Browser:**
+- Chrome
+- Firefox
+- Safari
+- Netscape Navigator 2.0
