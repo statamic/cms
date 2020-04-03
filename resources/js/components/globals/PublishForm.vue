@@ -70,7 +70,7 @@
         </div>
 
         <publish-container
-            v-if="fieldset"
+            v-if="fieldset && !fieldset.empty"
             ref="container"
             :name="publishContainer"
             :blueprint="fieldset"

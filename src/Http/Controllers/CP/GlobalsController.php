@@ -226,6 +226,6 @@ class GlobalsController extends CpController
             ->addValues($set->values()->all())
             ->preProcess();
 
-        return [$fields->values()->all(), $fields->meta()];
+        return [$fields->values()->all(), $fields->meta()->all()];
     }
 }
