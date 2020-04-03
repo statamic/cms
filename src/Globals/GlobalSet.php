@@ -14,16 +14,15 @@ class GlobalSet implements Contract
 {
     use ExistsAsFile, FluentlyGetsAndSets;
 
-    protected $id;
     protected $title;
     protected $handle;
     protected $sites;
     protected $blueprint;
     protected $localizations;
 
-    public function id($id = null)
+    public function id()
     {
-        return $this->fluentlyGetOrSet('id')->args(func_get_args());
+        return $this->handle();
     }
 
     public function sites($sites = null)
@@ -103,7 +102,6 @@ class GlobalSet implements Contract
     public function fileData()
     {
         $data = [
-            'id' => $this->id,
             'title' => $this->title(),
             'blueprint' => $this->blueprint,
         ];
@@ -162,12 +160,12 @@ class GlobalSet implements Contract
 
     public function editUrl()
     {
-        return cp_route('globals.edit', [$this->id(), $this->handle()]);
+        return cp_route('globals.edit', $this->handle());
     }
 
     public function deleteUrl()
     {
-        return cp_route('globals.destroy', $this->id());
+        return cp_route('globals.destroy', $this->handle());
     }
 
     public static function __callStatic($method, $parameters)

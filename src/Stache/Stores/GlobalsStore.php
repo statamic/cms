@@ -76,7 +76,6 @@ class GlobalsStore extends BasicStore
     protected function makeBaseGlobalFromFile($handle, $path, $data)
     {
         return GlobalSet::make()
-            ->id($data['id'])
             ->handle($handle)
             ->title($data['title'] ?? null)
             ->blueprint($data['blueprint'] ?? null)

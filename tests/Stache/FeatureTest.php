@@ -90,11 +90,11 @@ class FeatureTest extends TestCase
     /** @test */
     function it_gets_globals()
     {
-        $global = GlobalSet::find('globals-global');
+        $global = GlobalSet::find('global');
         $this->assertEquals('Bar', $global->in('en')->get('foo'));
-        $this->assertSame($global, Data::find('global::globals-global'));
-        $this->assertSame($global, Data::find('globals-global'));
-        $this->assertEquals('555-1234', GlobalSet::find('globals-contact')->in('en')->get('phone'));
+        $this->assertSame($global, Data::find('global::global'));
+        $this->assertSame($global, Data::find('global'));
+        $this->assertEquals('555-1234', GlobalSet::find('contact')->in('en')->get('phone'));
     }
 
     /** @test */
@@ -246,10 +246,7 @@ class FeatureTest extends TestCase
     /** @test */
     function saving_a_global_set_writes_it_to_file()
     {
-        $global = GlobalSet::make()
-            ->id('123')
-            ->handle('new')
-            ->title('New Global Set');
+        $global = GlobalSet::make('new')->title('New Global Set');
 
         $global->addLocalization(
             $global->makeLocalization('en')->data(['foo' => 'bar'])
@@ -259,7 +256,7 @@ class FeatureTest extends TestCase
 
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/globals/new.yaml',
-            "id: '123'\ntitle: 'New Global Set'\ndata:\n  foo: bar\n"
+            "title: 'New Global Set'\ndata:\n  foo: bar\n"
         );
         @unlink($path);
     }

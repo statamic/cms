@@ -18,9 +18,7 @@ class GlobalSetTest extends TestCase
             ]
         ]);
 
-        $set = (new GlobalSet)
-            ->id('123')
-            ->title('The title');
+        $set = (new GlobalSet)->title('The title');
 
         $variables = $set->makeLocalization('en')->data([
             'array' => ['first one', 'second one'],
@@ -30,7 +28,6 @@ class GlobalSetTest extends TestCase
         $set->addLocalization($variables);
 
         $expected = <<<'EOT'
-id: '123'
 title: 'The title'
 data:
   array:
@@ -55,7 +52,6 @@ EOT;
         ]);
 
         $set = (new GlobalSet)
-            ->id('123')
             ->title('The title')
             ->sites(['en', 'fr']);
 
@@ -74,7 +70,6 @@ EOT;
         });
 
         $expected = <<<'EOT'
-id: '123'
 title: 'The title'
 sites:
   - en
