@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <breadcrumb :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
+        <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
 
         <div class="flex items-center mb-3">
             <h1 class="flex-1">
