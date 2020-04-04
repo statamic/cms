@@ -328,7 +328,7 @@ export default {
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders;
+            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation;
         },
 
         parameters() {
