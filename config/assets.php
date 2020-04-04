@@ -108,7 +108,7 @@ return [
     |
     | Filetypes that cannot be rendered with HTML5 can opt into the Google Docs
     | Viewer. Google will get temporary access to these files so keep that in
-    | mind for any privacy implecations: https://policies.google.com/privacy
+    | mind for any privacy implications: https://policies.google.com/privacy
     |
     */
 
