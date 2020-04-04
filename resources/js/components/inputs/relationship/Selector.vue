@@ -67,7 +67,7 @@
                             <div class="text-sm text-grey-70"
                                 v-text="hasMaxSelections
                                     ? __n(':count/:max selected', selections, { max: maxSelections })
-                                    : __n(':count selected', selections)" />
+                                    : __n(':count item selected|:count items selected', selections)" />
 
                             <div>
                                 <button
