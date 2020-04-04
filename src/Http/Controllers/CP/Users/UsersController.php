@@ -194,11 +194,11 @@ class UsersController extends CpController
         }
         $user->email($request->email);
 
-        if ($request->roles && User::current()->can('edit roles')) {
+        if (User::current()->can('edit roles')) {
             $user->roles($request->roles);
         }
 
-        if ($request->groups && User::current()->can('edit user groups')) {
+        if (User::current()->can('edit user groups')) {
             $user->groups($request->groups);
         }
 
