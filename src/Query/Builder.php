@@ -3,12 +3,15 @@
 namespace Statamic\Query;
 
 use Exception;
+use Statamic\Tags\Concerns;
 use InvalidArgumentException;
 use Illuminate\Pagination\Paginator;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
 abstract class Builder
 {
+    use Concerns\QueriesConditions;
+
     protected $limit;
     protected $offset = 0;
     protected $wheres = [];
@@ -29,14 +32,14 @@ abstract class Builder
 
     public function limit($value)
     {
-        $this->limit = $value;
+        $this->limit = $this->getQueryConditionValue($value, null);
 
         return $this;
     }
 
     public function offset($value)
     {
-        $this->offset = max(0, $value);
+        $this->offset = max(0, $this->getQueryConditionValue($value, null));
 
         return $this;
     }
@@ -92,7 +95,6 @@ abstract class Builder
         } elseif ($this->invalidOperatorAndValue($operator, $value)) {
             throw new InvalidArgumentException('Illegal operator and value combination.');
         }
-
 
         return [$value, $operator];
     }
