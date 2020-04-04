@@ -98,4 +98,9 @@ class Code extends Fieldtype
             ],
         ];
     }
+
+    public function augment($value)
+    {
+        return str_replace('<?php', '&lt;?php', $value);
+    }
 }
