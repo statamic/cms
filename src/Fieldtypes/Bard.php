@@ -112,7 +112,7 @@ class Bard extends Replicator
         return new BardFilter($this);
     }
 
-    public function augment($value)
+    protected function performAugmentation($value, $shallow)
     {
         if ($this->shouldSaveHtml()) {
             return $value;
@@ -122,7 +122,7 @@ class Bard extends Replicator
             $value = $this->convertLegacyData($value);
         }
 
-        return (new Augmentor($this))->augment($value);
+        return (new Augmentor($this))->augment($value, $shallow);
     }
 
     public function process($value)
