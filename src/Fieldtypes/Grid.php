@@ -150,8 +150,20 @@ class Grid extends Fieldtype
 
     public function augment($value)
     {
-        return collect($value)->map(function ($row) {
-            return $this->fields()->addValues($row)->augment()->values()->all();
+        return $this->performAugmentation($value, false);
+    }
+
+    public function shallowAugment($value)
+    {
+        return $this->performAugmentation($value, true);
+    }
+
+    private function performAugmentation($value, $shallow)
+    {
+        $method = $shallow ? 'shallowAugment' : 'augment';
+
+        return collect($value)->map(function ($row) use ($method) {
+            return $this->fields()->addValues($row)->{$method}()->values()->all();
         });
     }
 }
