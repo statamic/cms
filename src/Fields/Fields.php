@@ -139,6 +139,13 @@ class Fields
         );
     }
 
+    public function shallowAugment()
+    {
+        return $this->newInstance()->setFields(
+            $this->fields->map->shallowAugment()
+        );
+    }
+
     public function createFields(array $config): array
     {
         if (isset($config['import'])) {

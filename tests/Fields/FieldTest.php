@@ -471,6 +471,9 @@ class FieldTest extends TestCase
             public function augment($data) {
                 return $data . ' augmented';
             }
+            public function shallowAugment($data) {
+                return $data . ' shallow augmented';
+            }
         };
 
         FieldtypeRepository::shouldReceive('find')
@@ -479,14 +482,24 @@ class FieldTest extends TestCase
 
         $field = (new Field('test', ['type' => 'fieldtype']))->setValue('foo');
 
-        $augmented = $field->augment();
+        tap($field->augment(), function ($augmented) use ($field, $fieldtype) {
+            $this->assertNotSame($field, $augmented);
+            $value = $augmented->value();
+            $this->assertInstanceOf(Value::class, $value);
+            $this->assertEquals($fieldtype, $value->fieldtype());
+            $this->assertEquals('test', $value->handle());
+            $this->assertEquals('foo', $value->raw());
+            $this->assertEquals('foo augmented', $value->value());
+        });
 
-        $this->assertNotSame($field, $augmented);
-        $value = $augmented->value();
-        $this->assertInstanceOf(Value::class, $value);
-        $this->assertEquals($fieldtype, $value->fieldtype());
-        $this->assertEquals('test', $value->handle());
-        $this->assertEquals('foo', $value->raw());
-        $this->assertEquals('foo augmented', $value->value());
+        tap($field->shallowAugment(), function ($augmented) use ($field, $fieldtype) {
+            $this->assertNotSame($field, $augmented);
+            $value = $augmented->value();
+            $this->assertInstanceOf(Value::class, $value);
+            $this->assertEquals($fieldtype, $value->fieldtype());
+            $this->assertEquals('test', $value->handle());
+            $this->assertEquals('foo', $value->raw());
+            $this->assertEquals('foo shallow augmented', $value->value());
+        });
     }
 }

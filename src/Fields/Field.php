@@ -229,6 +229,13 @@ class Field implements Arrayable
         );
     }
 
+    public function shallowAugment()
+    {
+        return $this->newInstance()->setValue(
+            (new Value($this->value, $this->handle, $this->fieldtype(), $this->parent))->shallow()
+        );
+    }
+
     public function toArray()
     {
         return array_merge($this->config, [
