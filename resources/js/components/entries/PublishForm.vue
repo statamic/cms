@@ -428,6 +428,7 @@ export default {
                 this.saving = false;
                 this.title = this.values.title;
                 this.isWorkingCopy = true;
+                document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
