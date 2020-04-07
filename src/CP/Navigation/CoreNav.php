@@ -17,8 +17,8 @@ use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Contracts\Structures\Structure;
 use Statamic\Contracts\Assets\AssetContainer;
+use Statamic\Contracts\Structures\Nav as NavContract;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Utility;
 
@@ -82,12 +82,12 @@ class CoreNav
         Nav::content('Navigation')
             ->route('navigation.index')
             ->icon('hierarchy-files')
-            ->can('index', Structure::class)
+            ->can('index', NavContract::class)
             ->children(function () {
-                return NavAPI::all()->map(function ($structure) {
-                    return Nav::item($structure->title())
-                              ->url($structure->showUrl())
-                              ->can('view', $structure);
+                return NavAPI::all()->map(function ($nav) {
+                    return Nav::item($nav->title())
+                              ->url($nav->showUrl())
+                              ->can('view', $nav);
                 });
             });
 
