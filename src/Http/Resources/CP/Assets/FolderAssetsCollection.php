@@ -21,7 +21,7 @@ class FolderAssetsCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'assets' => $this->collection,
+            'assets' => $this->collection->values(),
             'folder' => (new Folder($this->folder))->withChildFolders(),
         ];
     }
