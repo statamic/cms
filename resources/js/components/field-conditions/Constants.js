@@ -13,6 +13,7 @@ export const OPERATORS = [
     'equals',
     'not',
     'contains',
+    'contains_any',
     '===',
     '!==',
     '>',
@@ -28,4 +29,5 @@ export const ALIASES = {
     'isnt': 'not',
     '!=': 'not',
     'includes': 'contains',
+    'includes_any': 'contains_any',
 };
