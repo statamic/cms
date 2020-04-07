@@ -1,5 +1,5 @@
 import Converter from './Converter.js';
-import { KEYS, OPERATORS } from './Constants.js';
+import { KEYS } from './Constants.js';
 
 const NUMBER_SPECIFIC_COMPARISONS = [
     '>', '>=', '<', '<='
