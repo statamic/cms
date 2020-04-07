@@ -63,29 +63,35 @@ class Parser
      */
     public function __construct()
     {
-        // expand allowed characters in variable regex
-        $this->variableRegex = "(?!if\s|unless\s)[a-zA-Z0-9_'\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.!'\":]*";
+        // Matches a variable inside curly braces. Spaces not allowed.
+        $this->variableRegex = "(?!if\s|unless\s)[a-zA-Z0-9_'\"][^<>{}=\s]*";
 
-        // Allow spaces after the variable name so you can do modifiers like | this | and_that
-        $this->looseVariableRegex = "(?!if\s|unless\s)[a-zA-Z0-9_'\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.(\s.*)?!'\":]*";
+        // Matches a full variable expression inside curly braces.
+        $this->looseVariableRegex = "(?!if\s|unless\s)[a-zA-Z0-9_'\"][^<>{}=]*";
 
-        // Different from variable regex somehow.
-        $this->callbackNameRegex = '(?!if\s|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\^\/,0-9_\.(\s.*?):]*:'.$this->variableRegex;
+        // Matches the first part of a {{ tag: followed a variable name and full expression.
+        $this->callbackNameRegex  = '(?!if\s|unless\s)[a-zA-Z0-9_][^<>{}=!?]*' . ':' . $this->variableRegex;
 
+        // Matches a tag pair and captures everything inside it.
         $this->variableLoopRegex = '/{{\s*('.$this->looseVariableRegex.')\s*}}(.*?){{\s*\/\1\s*}}/ms';
 
-        // expanded to allow `or` options in variable tags
-        $this->variableTagRegex = '/{{\s*('.$this->looseVariableRegex.'(?:\s*or\s*(?:'.$this->looseVariableRegex.'|".*?"))*)\s*}}/m';
+        // Matches a variable expression inside curly braces.
+        $this->variableTagRegex = '/{{\s*('.$this->looseVariableRegex.')\s*}}/m';
 
-        // make the space-anything after the variable regex optional allowing {{tags}} and {{ tags }}
+        // Matches the callback handle for a matching tag pair, captures the contents, and ignores the parameters.
+        // We assume it's a callback because the of the matching tag pair and lack of "?" in the expression.
         $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')(?:\s([^?]*?))}}(.*?){{\s*\/\1\s*}}/ms';
 
+        // Matches a recursive children loop.
         $this->recursiveRegex = '/{{\s*\*recursive\s*('.$this->variableRegex.')\*\s*}}/ms';
 
+        // Matches the noparse tag and captures everything inside.
         $this->noparseRegex = '/{{\s*noparse\s*}}(.*?){{\s*\/noparse\s*}}/ms';
 
+        // Matches an ignored tag as indicated by a prefixed @ symbol: @{{ }}
         $this->ignoreRegex = '/@{{[^}]*}}/';
 
+        // Matches the logic operator tags
         $this->conditionalRegex = '/{{\s*(if|unless|elseif|elseunless)\s+((?:\()?(.*?)(?:\))?)\s*}}/ms';
         $this->conditionalElseRegex = '/{{\s*else\s*}}/ms';
         $this->conditionalEndRegex = '/{{\s*(?:endif|\/if|\/unless)\s*}}/ms';
