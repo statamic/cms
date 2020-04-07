@@ -76,7 +76,7 @@
                                 :url="actionUrl"
                                 :context="actionContext"
                                 @started="actionStarted"
-                                @completed="bulkActionsCompleted"
+                                @completed="actionCompleted"
                             />
 
                             <uploads
@@ -416,12 +416,11 @@ export default {
         },
 
         actionCompleted() {
-            this.loadAssets();
-        },
+            this.$toast.success(__('Action completed'));
 
-        bulkActionsCompleted() {
-            this.$refs.toggleAll.uncheckAllItems();
-            this.actionCompleted();
+            this.$events.$emit('clear-selections');
+
+            this.loadAssets();
         },
 
         loadContainers() {
