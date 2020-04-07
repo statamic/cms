@@ -180,6 +180,7 @@ class Entries extends Relationship
     {
         return [
             'id' => $value->id(),
+            'title' => $value->value('title'),
             'url' => $value->url(),
             'permalink' => $value->absoluteUrl(),
             'api_url' => $value->apiUrl(),
