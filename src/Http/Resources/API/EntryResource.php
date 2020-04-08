@@ -14,6 +14,9 @@ class EntryResource extends Resource
      */
     public function toArray($request)
     {
-        return $this->resource->toAugmentedCollection();
+        return $this->resource
+            ->toAugmentedCollection()
+            ->withShallowNesting()
+            ->toArray();
     }
 }
