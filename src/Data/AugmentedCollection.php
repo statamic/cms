@@ -31,6 +31,10 @@ class AugmentedCollection extends Collection
                 $value = $value->shallow();
             }
 
+            if ($this->shallowNesting && $value instanceof Augmentable) {
+                return $value->toShallowAugmentedArray();
+            }
+
             return $value instanceof Arrayable ? $value->toArray() : $value;
         })->all();
     }

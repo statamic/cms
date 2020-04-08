@@ -57,6 +57,18 @@ class AugmentedCollectionTest extends TestCase
     }
 
     /** @test */
+    function augmentables_get_converted_to_shallow_array_with_flag()
+    {
+        $augmentable = m::mock(Augmentable::class);
+        $augmentable->shouldNotReceive('toArray');
+        $augmentable->shouldReceive('toShallowAugmentedArray')->once()->andReturn(['augmented array']);
+        $c = new AugmentedCollection([$augmentable]);
+        $results = $c->withShallowNesting()->toArray();
+
+        $this->assertEquals([['augmented array']], $results);
+    }
+
+    /** @test */
     public function it_json_serializes()
     {
         $value = m::mock(Value::class);
