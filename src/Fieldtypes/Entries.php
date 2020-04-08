@@ -70,7 +70,7 @@ class Entries extends Relationship
             $query->whereIn('collection', $this->getConfiguredCollections());
         }
 
-        $this->activeFilterBadges = $this->queryFilters($query, $filters, $this->getSelectionFilterContext($request));
+        $this->activeFilterBadges = $this->queryFilters($query, $filters, $this->getSelectionFilterContext());
 
         if ($sort = $this->getSortColumn($request)) {
             $query->orderBy($sort, $this->getSortDirection($request));
@@ -85,17 +85,16 @@ class Entries extends Relationship
             ->blueprint($this->getBlueprint($request))
             ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
             ->additional(['meta' => [
-                'filters' => $this->getSelectionFilters($request),
                 'activeFilterBadges' => $this->activeFilterBadges,
             ]]);
     }
 
-    protected function getBlueprint($request = null)
+    protected function getBlueprint($request)
     {
         return $this->getFirstCollectionFromRequest($request)->entryBlueprint();
     }
 
-    protected function getFirstCollectionFromRequest($request = null)
+    protected function getFirstCollectionFromRequest($request)
     {
         $collections = $request
             ? $request->input('filters.collection.collections', [])
@@ -196,17 +195,20 @@ class Entries extends Relationship
         ];
     }
 
-    protected function getSelectionFilters($request = null)
+    protected function getSelectionFilters()
     {
-        return Scope::filters('entries-fieldtype', $this->getSelectionFilterContext($request));
+        return Scope::filters('entries-fieldtype', $this->getSelectionFilterContext());
     }
 
-    protected function getSelectionFilterContext($request = null)
+    protected function getSelectionFilterContext()
     {
-        return [
-            'collections' => $this->getConfiguredCollections(),
-            'blueprints' => [$this->getBlueprint($request)->handle()]
-        ];
+        $collections = $this->getConfiguredCollections();
+
+        $blueprints = collect($collections)->flatMap(function ($collection) {
+            return Collection::findByHandle($collection)->entryBlueprints()->map->handle();
+        })->all();
+
+        return compact('collections', 'blueprints');
     }
 
     protected function getConfiguredCollections()
