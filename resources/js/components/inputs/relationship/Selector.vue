@@ -209,6 +209,7 @@ export default {
                 this.items = response.data.data;
                 this.meta = response.data.meta;
                 this.filters = response.data.meta.filters;
+                if (this.initializing) this.autoApplyFilters(this.filters);
                 this.activeFilterBadges = {...response.data.meta.activeFilterBadges};
                 this.loading = false;
                 this.initializing = false;
