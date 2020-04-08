@@ -90,7 +90,7 @@ return [
     | Control Panel Thumbnail Restrictions
     |--------------------------------------------------------------------------
     |
-    | Thumbnails will not be genereated for any assets any larger (in either
+    | Thumbnails will not be generated for any assets any larger (in either
     | axis) than the values listed below. This helps prevent memory usage
     | issues out of the box. You may increase or decrease as necessary.
     |
