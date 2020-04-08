@@ -53,6 +53,13 @@ class Entries extends Relationship
         ];
     }
 
+    public function preload()
+    {
+        return array_merge(parent::preload(), [
+            'filters' => $this->getSelectionFilters(),
+        ]);
+    }
+
     public function getIndexItems($request)
     {
         $query = $this->getIndexQuery($request);
@@ -83,14 +90,16 @@ class Entries extends Relationship
             ]]);
     }
 
-    protected function getBlueprint($request)
+    protected function getBlueprint($request = null)
     {
         return $this->getFirstCollectionFromRequest($request)->entryBlueprint();
     }
 
-    protected function getFirstCollectionFromRequest($request)
+    protected function getFirstCollectionFromRequest($request = null)
     {
-        $collections = $request->input('filters.collection.collections', []);
+        $collections = $request
+            ? $request->input('filters.collection.collections', [])
+            : [];
 
         if (empty($collections)) {
             $collections = $this->getConfiguredCollections();
@@ -187,12 +196,12 @@ class Entries extends Relationship
         ];
     }
 
-    protected function getSelectionFilters($request)
+    protected function getSelectionFilters($request = null)
     {
         return Scope::filters('entries-fieldtype', $this->getSelectionFilterContext($request));
     }
 
-    protected function getSelectionFilterContext($request)
+    protected function getSelectionFilterContext($request = null)
     {
         return [
             'collections' => $this->getConfiguredCollections(),

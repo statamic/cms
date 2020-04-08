@@ -106,6 +106,7 @@ export default {
 
     props: {
         url: String,
+        initialFilters: Array,
         initialSelections: Array,
         initialSortColumn: String,
         initialSortDirection: String,
@@ -130,7 +131,7 @@ export default {
             page: 1,
             selections: _.clone(this.initialSelections),
             columns: [],
-            filters: [],
+            filters: this.initialFilters,
         }
     },
 
@@ -154,6 +155,8 @@ export default {
     },
 
     mounted() {
+        this.autoApplyFilters(this.filters);
+
         this.request().then(() => {
             if (this.search) this.$refs.filters.$refs.search.focus();
         });
@@ -164,6 +167,7 @@ export default {
         parameters: {
             deep: true,
             handler(after, before) {
+                if (this.initializing) return;
                 if (JSON.stringify(before) === JSON.stringify(after)) return;
                 this.request();
             }
@@ -209,7 +213,6 @@ export default {
                 this.items = response.data.data;
                 this.meta = response.data.meta;
                 this.filters = response.data.meta.filters;
-                if (this.initializing) this.autoApplyFilters(this.filters);
                 this.activeFilterBadges = {...response.data.meta.activeFilterBadges};
                 this.loading = false;
                 this.initializing = false;

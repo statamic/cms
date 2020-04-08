@@ -63,6 +63,7 @@
             <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
                 <item-selector
                     slot-scope="{ close }"
+                    :initial-filters="filters"
                     :url="selectionsUrl"
                     :site="site"
                     initial-sort-column="title"
@@ -119,6 +120,7 @@ export default {
             default: 'default',
         },
         taggable: Boolean,
+        filters: Array,
     },
 
     components: {
