@@ -19,7 +19,11 @@ class Publish extends Action
 
     public function authorize($user, $entry)
     {
-        return $user->can('publish', $entry);
+        if ($entry->status() != 'published') {
+            return $user->can('publish', $entry);
+        }
+
+        return false;
     }
 
     public function confirmationText()
