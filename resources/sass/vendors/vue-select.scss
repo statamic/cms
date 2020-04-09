@@ -64,7 +64,11 @@
 	line-height: 1.5;
 
     transition: border-color .15s ease-in-out,
-                box-shadow .15s ease-in-out;
+				box-shadow .15s ease-in-out;
+
+	.tags-fieldtype & {
+		@apply border-r rounded-r;
+	}
 }
 
 .vs--single .vs__selected-options {
