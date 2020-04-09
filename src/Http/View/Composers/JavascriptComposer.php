@@ -24,6 +24,7 @@ class JavascriptComposer
             'cpUrl' => cp_route('index'),
             'cpRoot' => str_start(config('statamic.cp.route'), '/'),
             'urlPath' => '/' . request()->path(),
+            'fullUrl' => Statamic::fullUrl(),
             'resourceUrl' => Statamic::cpAssetUrl(),
             'locales' => config('statamic.system.locales'),
             'flash' => Statamic::flash(),
