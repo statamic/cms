@@ -177,6 +177,17 @@ export default {
         },
 
         submitUnpublish() {
+            this.runBeforeUnpublishHook();
+        },
+
+        runBeforeUnpublishHook() {
+            Statamic.$hooks
+                .run('entry.unpublishing', { collection: this.collection, message: this.revisionMessage, storeName: this.publishContainer })
+                .then(this.performUnpublishRequest)
+                .catch(e => this.handleAxiosError(e));
+        },
+
+        performUnpublishRequest() {
             const payload = { message: this.revisionMessage };
 
             this.$axios.post(this.actions.unpublish, { data: payload }).then(response => {
