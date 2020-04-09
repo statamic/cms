@@ -39,6 +39,11 @@ class Arr extends Fieldtype
         return array_merge($this->blankKeyed(), $data ?? []);
     }
 
+    public function preProcessConfig($data)
+    {
+        return $data;
+    }
+
     public function process($data)
     {
         return collect($data)
