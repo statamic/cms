@@ -1684,17 +1684,20 @@ class CoreModifiers extends Modifier
         $key = Arr::get($params, 0);
         $is_descending = strtolower(Arr::get($params, 1)) == 'desc';
 
+        // Enforce collection
+        $value = ($value instanceof Collection) ? $value : collect($value);
+
+        // Random sort
         if ($key === 'random') {
-            return $this->shuffle($value);
+            return $value->shuffle();
         }
 
-        // Using sort="true" will allow primitive arrays to be sorted.
-        if ($key === 'true') {
-            natcasesort($value);
-            return $is_descending ? $this->reverse($value) : $value;
+        // Primitive array sort
+        if ($key === 'true' || $key == 'value') {
+            return $is_descending ? $value->sort()->reverse() : $value->sort();
         }
 
-        return collect($value)->sortBy($key, SORT_REGULAR, $is_descending)->values()->toArray();
+        return $is_descending ? $value->sortByDesc($key) : $value->sortBy($key);
     }
 
     /**
