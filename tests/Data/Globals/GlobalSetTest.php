@@ -51,9 +51,7 @@ EOT;
             ]
         ]);
 
-        $set = (new GlobalSet)
-            ->title('The title')
-            ->sites(['en', 'fr']);
+        $set = (new GlobalSet)->title('The title');
 
         // We set the data but it's basically irrelevant since it won't get saved to this file.
         $set->in('en', function ($loc) {
@@ -71,9 +69,6 @@ EOT;
 
         $expected = <<<'EOT'
 title: 'The title'
-sites:
-  - en
-  - fr
 
 EOT;
         $this->assertEquals($expected, $set->fileContents());

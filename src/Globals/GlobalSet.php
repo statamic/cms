@@ -16,23 +16,12 @@ class GlobalSet implements Contract
 
     protected $title;
     protected $handle;
-    protected $sites;
     protected $blueprint;
     protected $localizations;
 
     public function id()
     {
         return $this->handle();
-    }
-
-    public function sites($sites = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('sites')
-            ->getter(function ($sites) {
-                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
-            })
-            ->args(func_get_args());
     }
 
     public function handle($handle = null)
@@ -106,9 +95,7 @@ class GlobalSet implements Contract
             'blueprint' => $this->blueprint,
         ];
 
-        if (Site::hasMultiple()) {
-            $data['sites'] = $this->sites()->all();
-        } else {
+        if (! Site::hasMultiple()) {
             $data['data'] = $this->in(Site::default()->handle())->data()->all();
         }
 

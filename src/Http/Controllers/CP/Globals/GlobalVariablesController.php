@@ -52,16 +52,15 @@ class GlobalVariablesController extends CpController
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
-            'localizations' => $variables->globalSet()->sites()->map(function ($handle) use ($variables) {
-                $localized = $variables->globalSet()->in($handle);
+            'localizations' => $variables->globalSet()->localizations()->map(function ($localized) use ($variables) {
                 return [
-                    'handle' => $handle,
-                    'name' => Site::get($handle)->name(),
-                    'active' => $handle === $variables->locale(),
+                    'handle' => $localized->locale(),
+                    'name' => $localized->site()->name(),
+                    'active' => $localized->locale() === $variables->locale(),
                     'origin' => !$localized->hasOrigin(),
                     'url' => $localized->editUrl(),
                 ];
-            })->all(),
+            })->values()->all(),
             'canEdit' => $user->can('edit', $variables),
             'canConfigure' => $user->can('configure', $variables),
             'canDelete' => $user->can('delete', $variables),

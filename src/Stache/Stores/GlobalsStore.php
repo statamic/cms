@@ -48,13 +48,11 @@ class GlobalsStore extends BasicStore
 
     protected function makeSingleSiteGlobalFromFile($handle, $path, $data)
     {
-        $set = $this
-            ->makeBaseGlobalFromFile($handle, $path, $data)
-            ->sites([$site = Site::default()->handle()]);
+        $set = $this->makeBaseGlobalFromFile($handle, $path, $data);
 
         return $set->addLocalization(
             $set
-                ->makeLocalization($site)
+                ->makeLocalization(Site::default()->handle())
                 ->initialPath($path)
                 ->data($data['data'] ?? [])
         );
@@ -64,7 +62,9 @@ class GlobalsStore extends BasicStore
     {
         $set = $this->makeBaseGlobalFromFile($handle, $path, $data);
 
-        $set->sites()->map(function ($site) use ($set) {
+        Site::all()->filter(function ($site) use ($handle) {
+            return File::exists($this->directory . $site->handle() . '/' . $handle . '.yaml');
+        })->map->handle()->map(function ($site) use ($set) {
             return $this->makeVariables($set, $site);
         })->filter()->each(function ($variables) use ($set) {
             $set->addLocalization($variables);
@@ -79,7 +79,6 @@ class GlobalsStore extends BasicStore
             ->handle($handle)
             ->title($data['title'] ?? null)
             ->blueprint($data['blueprint'] ?? null)
-            ->sites($data['sites'] ?? null)
             ->initialPath($path);
     }
 
@@ -129,7 +128,10 @@ class GlobalsStore extends BasicStore
         parent::save($set);
 
         if (Site::hasMultiple()) {
-            $set->localizations()->each->writeFile();
+            Site::all()->each(function ($site) use ($set) {
+                $site = $site->handle();
+                $set->existsIn($site) ? $set->in($site)->writeFile() : $set->makeLocalization($site)->deleteFile();
+            });
         }
     }
 }
