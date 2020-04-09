@@ -30,7 +30,7 @@ export default {
     data() {
         return {
             name: document.title.replace(' ‹ Statamic', ''),
-            currentUrl: this.$config.get('fullUrl')
+            currentUrl: this.$config.get('cpFullUrl')
         }
     },
 

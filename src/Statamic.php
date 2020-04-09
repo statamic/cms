@@ -218,7 +218,7 @@ class Statamic
         return static::vendorAssetUrl('statamic/cp/' . $url);
     }
 
-    public static function fullUrl() {
+    public static function cpFullUrl() {
         $cpRoot = str_start(config('statamic.cp.route'), '/');
 
         $query = request()->getQueryString();
