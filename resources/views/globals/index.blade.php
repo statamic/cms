@@ -19,12 +19,16 @@
         @include('statamic::partials.empty-state', [
             'resource' => 'Global Set',
             'description' => __('statamic::messages.global_set_config_intro'),
-            'docs_link' => Statamic::docsUrl('globals'),
             'svg' => 'empty/content',
             'route' => cp_route('globals.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Globals\GlobalSet')
         ])
 
     @endunless
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Global Variables'),
+        'url' => 'globals'
+    ])
 
 @endsection

@@ -37,6 +37,12 @@ button {
         border-color: #c4cdd5;
     }
 
+    &.active, &.active:hover {
+        box-shadow: inset 2px 2px 3px 0px rgba(25,30,35,.1);
+        background: config('colors.grey-40');
+        border-color: #aeb9c3;
+    }
+
     &:disabled {
         @apply text-grey-70 opacity-75;
     }
@@ -51,7 +57,7 @@ button {
 
     &:hover:not(:disabled), :active:not(:disabled) {
         background: linear-gradient(to bottom, config('colors.blue-600'), config('colors.blue-700'));
-        border: 1px solid #config('colors.blue-800');
+        border: 1px solid config('colors.blue-800');
         box-shadow: inset 0 1px 0 0 config('colors.blue-500'), 0 1px 0 0 rgba(25,30,35,.05), 0 0 0 0 transparent;
     }
 

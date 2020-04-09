@@ -2,7 +2,6 @@
 
 namespace Statamic\Assets;
 
-use ArrayAccess;
 use Statamic\Facades;
 use Stringy\Stringy;
 use Statamic\Support\Str;
@@ -31,7 +30,7 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Statamic;
 
-class Asset implements AssetContract, ArrayAccess, Augmentable
+class Asset implements AssetContract, Augmentable
 {
     use HasAugmentedData, FluentlyGetsAndSets, ContainsData {
         set as traitSet;
@@ -726,23 +725,8 @@ class Asset implements AssetContract, ArrayAccess, Augmentable
         return Facades\Asset::{$method}(...$parameters);
     }
 
-    public function offsetExists($key)
+    protected function shallowAugmentedArrayKeys()
     {
-        return $this->has($key);
-    }
-
-    public function offsetGet($key)
-    {
-        return $this->get($key);
-    }
-
-    public function offsetSet($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
+        return ['id', 'url', 'permalink', 'api_url'];
     }
 }

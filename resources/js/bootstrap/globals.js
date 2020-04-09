@@ -2,7 +2,7 @@ import marked from 'marked';
 import { translate, translateChoice } from '../translations/translator';
 
 global.cp_url = function(url) {
-    url = Statamic.$config.get('cpRoot') + '/' + url;
+    url = Statamic.$config.get('cpUrl') + '/' + url;
     return tidy_url(url);
 };
 

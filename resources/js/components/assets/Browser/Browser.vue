@@ -49,13 +49,6 @@
                             <div class="data-list-header">
                                 <data-list-search v-model="searchQuery" />
 
-                                <data-list-bulk-actions
-                                    :url="actionUrl"
-                                    :context="actionContext"
-                                    @started="actionStarted"
-                                    @completed="bulkActionsCompleted"
-                                />
-
                                 <template v-if="! hasSelections">
                                     <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-2" @click="creatingFolder = true">
                                         <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
@@ -78,6 +71,13 @@
                                 </div>
 
                             </div>
+
+                            <data-list-bulk-actions
+                                :url="actionUrl"
+                                :context="actionContext"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                            />
 
                             <uploads
                                 v-if="uploads.length"
@@ -328,7 +328,7 @@ export default {
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders;
+            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation;
         },
 
         parameters() {
@@ -416,12 +416,11 @@ export default {
         },
 
         actionCompleted() {
-            this.loadAssets();
-        },
+            this.$toast.success(__('Action completed'));
 
-        bulkActionsCompleted() {
-            this.$refs.toggleAll.uncheckAllItems();
-            this.actionCompleted();
+            this.$events.$emit('clear-selections');
+
+            this.loadAssets();
         },
 
         loadContainers() {

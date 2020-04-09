@@ -2,7 +2,6 @@
 
 namespace Statamic\Entries;
 
-use ArrayAccess;
 use Statamic\Facades;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
@@ -30,7 +29,7 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksQueriedColumns;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAccess
+class Entry implements Contract, Augmentable, Responsable, Localization
 {
     use Routable {
         uri as routableUri;
@@ -613,26 +612,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
     protected function getOriginByString($origin)
     {
         return Facades\Entry::find($origin);
-    }
-
-    public function offsetExists($key)
-    {
-        return $this->has($key);
-    }
-
-    public function offsetGet($key)
-    {
-        return $this->value($key);
-    }
-
-    public function offsetSet($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
     }
 
     public function value($key)

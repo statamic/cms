@@ -8,6 +8,11 @@ class Delete extends Action
 {
     protected $dangerous = true;
 
+    public static function title()
+    {
+        return __('Delete');
+    }
+
     public function filter($item)
     {
         return true;

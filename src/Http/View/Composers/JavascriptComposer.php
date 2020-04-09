@@ -21,6 +21,7 @@ class JavascriptComposer
             'version' => Statamic::version(),
             'laravelVersion' => app()->version(),
             'csrfToken' => csrf_token(),
+            'cpUrl' => cp_route('index'),
             'cpRoot' => str_start(config('statamic.cp.route'), '/'),
             'urlPath' => '/' . request()->path(),
             'resourceUrl' => Statamic::cpAssetUrl(),

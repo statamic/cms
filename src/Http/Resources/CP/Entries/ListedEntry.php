@@ -40,6 +40,7 @@ class ListedEntry extends JsonResource
 
             $this->merge($this->values(['slug' => $entry->slug()])),
 
+            'permalink' => $entry->absoluteUrl(),
             'edit_url' => $entry->editUrl(),
             'viewable' => User::current()->can('view', $entry),
             'editable' => User::current()->can('edit', $entry),

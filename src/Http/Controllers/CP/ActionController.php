@@ -31,7 +31,7 @@ abstract class ActionController extends CpController
             return $action->authorize(User::current(), $item);
         });
 
-        abort_unless($unauthorized->isEmpty(), 403, 'You are not authorized to run this action.');
+        abort_unless($unauthorized->isEmpty(), 403, __('You are not authorized to run this action.'));
 
         $action->run($items, $request->all());
     }

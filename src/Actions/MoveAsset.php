@@ -8,7 +8,10 @@ use Statamic\Facades\Blink;
 
 class MoveAsset extends Action
 {
-    protected static $title = 'Move';
+    public static function title()
+    {
+        return __('Move');
+    }
 
     public function filter($item)
     {
@@ -51,6 +54,7 @@ class MoveAsset extends Action
 
         return [
             'folder' => [
+                'display' => __('Folder'),
                 'type' => 'select',
                 'options' => $options,
                 'validate' => 'required',

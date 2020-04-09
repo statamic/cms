@@ -43,11 +43,22 @@ class Entries extends Relationship
         'collectionHandle' => 'collection',
     ];
 
-    protected $extraConfigFields = [
-        'collections' => [
-            'type' => 'collections'
-        ],
-    ];
+    protected function configFieldItems(): array
+    {
+        return [
+            'collections' => [
+                'display' => __('Collections'),
+                'type' => 'collections'
+            ],
+        ];
+    }
+
+    public function preload()
+    {
+        return array_merge(parent::preload(), [
+            'filters' => $this->getSelectionFilters(),
+        ]);
+    }
 
     public function getIndexItems($request)
     {
@@ -79,14 +90,16 @@ class Entries extends Relationship
             ]]);
     }
 
-    protected function getBlueprint($request)
+    protected function getBlueprint($request = null)
     {
         return $this->getFirstCollectionFromRequest($request)->entryBlueprint();
     }
 
-    protected function getFirstCollectionFromRequest($request)
+    protected function getFirstCollectionFromRequest($request = null)
     {
-        $collections = $request->input('filters.collection.collections', []);
+        $collections = $request
+            ? $request->input('filters.collection.collections', [])
+            : [];
 
         if (empty($collections)) {
             $collections = $this->getConfiguredCollections();
@@ -176,18 +189,19 @@ class Entries extends Relationship
     {
         return [
             'id' => $value->id(),
+            'title' => $value->value('title'),
             'url' => $value->url(),
             'permalink' => $value->absoluteUrl(),
             'api_url' => $value->apiUrl(),
         ];
     }
 
-    protected function getSelectionFilters($request)
+    protected function getSelectionFilters($request = null)
     {
         return Scope::filters('entries-fieldtype', $this->getSelectionFilterContext($request));
     }
 
-    protected function getSelectionFilterContext($request)
+    protected function getSelectionFilterContext($request = null)
     {
         return [
             'collections' => $this->getConfiguredCollections(),

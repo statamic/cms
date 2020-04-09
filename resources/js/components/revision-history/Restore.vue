@@ -1,9 +1,7 @@
 <template>
 
     <div>
-        <button class="btn" @click="confirming = true">
-            Restore
-        </button>
+        <button class="btn" @click="confirming = true" v-text="__('Restore')" />
 
         <confirmation-modal
             v-if="confirming"
@@ -12,8 +10,8 @@
             @confirm="restore"
             @cancel="confirming = false"
         >
-            <p class="mb-2">Are you sure you want to restore this revision?</p>
-            <p class="mb-3">Your working copy will be replaced by the contents of this revision.</p>
+            <p class="mb-2" v-text="__('Are you sure you want to restore this revision?')" />
+            <p class="mb-3" v-text="__('Your working copy will be replaced by the contents of this revision.')" />
         </confirmation-modal>
     </div>
 

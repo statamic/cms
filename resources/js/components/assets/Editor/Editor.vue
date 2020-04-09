@@ -348,7 +348,7 @@ export default {
 
         shouldClose() {
             if (this.$dirty.has(this.publishContainer)) {
-                if (! confirm('Are you sure? Unsaved changes will be lost.')) {
+                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
                     return false;
                 }
             }

@@ -87,7 +87,11 @@ export default {
             if (this.config.multiple) {
                 this.update(value.map(v => v.value));
             } else {
-                this.update(value.value);
+                if (value) {
+                    this.update(value.value)
+                } else {
+                    this.update(null);
+                }
             }
         }
     }
