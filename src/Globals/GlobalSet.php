@@ -57,23 +57,6 @@ class GlobalSet implements Contract
         ]);
     }
 
-    public function toCacheableArray()
-    {
-        return [
-            'handle' => $this->handle,
-            'title' => $this->title,
-            'blueprint' => $this->blueprint,
-            'sites' => $this->sites()->all(),
-            'path' => $this->path(),
-            'localizations' => $this->localizations()->map(function ($localized) {
-                return [
-                    'path' => $localized->initialPath() ?? $localized->path(),
-                    'data' => $localized->data()
-                ];
-            })->all()
-        ];
-    }
-
     public function save()
     {
         Facades\GlobalSet::save($this);
