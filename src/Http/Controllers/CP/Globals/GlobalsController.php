@@ -9,6 +9,7 @@ use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class GlobalsController extends CpController
@@ -48,6 +49,14 @@ class GlobalsController extends CpController
         $values = [
             'title' => $set->title(),
             'blueprint' => optional($set->blueprint())->handle(),
+            'sites' => Site::all()->map(function ($site) use ($set) {
+                return [
+                    'name' => $site->name(),
+                    'handle' => $site->handle(),
+                    'enabled' => $enabled = $set->existsIn($site->handle()),
+                    'origin' => $enabled ? optional($set->in($site->handle())->origin())->locale() : null,
+                ];
+            })->values()
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint())
@@ -73,14 +82,31 @@ class GlobalsController extends CpController
 
         $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 
+        $fields->validate();
+
         $values = $fields->process()->values()->all();
 
         $set
             ->title($values['title'])
-            ->blueprint($values['blueprint'])
-            ->save();
+            ->blueprint($values['blueprint']);
 
-        // TODO: If multisite, take the sites and their origins, and create the appropriate variable files.
+        if (Site::hasMultiple()) {
+            $sites = collect(Arr::get($values, 'sites'));
+
+            foreach ($sites->filter->enabled as $site) {
+                $vars = $set->in($site['handle']) ?? $set->makeLocalization($site['handle']);
+                $vars->origin($site['origin']);
+                $set->addLocalization($vars);
+            }
+
+            foreach ($sites->reject->enabled as $site) {
+                if ($set->existsIn($site['handle'])) {
+                    $set->removeLocalization($set->in($site['handle']));
+                }
+            }
+        }
+
+        $set->save();
 
         return response('', 204);
     }
