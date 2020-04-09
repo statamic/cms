@@ -313,7 +313,7 @@ class CollectionsController extends CpController
                     ],
                     'max_depth' => [
                         'display' => __('Max Depth'),
-                        'instructions' => __('statamic::max_depth_instructions'),
+                        'instructions' => __('statamic::messages.max_depth_instructions'),
                         'type' => 'integer',
                         'validate' => 'min:0',
                         'if' => ['structured' => true],
