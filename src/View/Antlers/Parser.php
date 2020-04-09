@@ -1071,23 +1071,15 @@ class Parser
      */
     protected function extractLoopedTags($text, $data = array())
     {
-        /**
-         * $matches[][0] is the raw match
-         */
+        if ($this->preg_match_all($this->variableLoopRegex, $text, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $text = $this->createExtraction('looped_tags', $match[0], $match[0], $text);
+            }
+        }
+
         if ($this->preg_match_all($this->callbackBlockRegex, $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-
-                // Allow {{ /if }} to close if statements
-                if ($match[1] === 'if' || $match[1] === 'unless') {
-                    // move on
-                } elseif ($this->parseParameters($match[2], $data)) {
-                    // This callback block contains parameters
-                    // Let's extract it so it doesn't conflict with local variables when
-                    // parseVariables() is called.
-                    $text = $this->createExtraction('callback_blocks', $match[0], $match[0], $text);
-                } else {
-                    $text = $this->createExtraction('looped_tags', $match[0], $match[0], $text);
-                }
+                $text = $this->createExtraction('callback_blocks', $match[0], $match[0], $text);
             }
         }
 
