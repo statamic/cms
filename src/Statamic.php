@@ -218,16 +218,6 @@ class Statamic
         return static::vendorAssetUrl('statamic/cp/' . $url);
     }
 
-    public static function cpFullUrl() {
-        $cpRoot = str_start(config('statamic.cp.route'), '/');
-
-        $query = request()->getQueryString();
-
-        $question = $cpRoot.request()->getPathInfo() === '/' ? '/?' : '?';
-
-        return $query ? request()->url().$question.$query : request()->url();
-    }
-
     public static function flash()
     {
         if ($success = session('success')) {

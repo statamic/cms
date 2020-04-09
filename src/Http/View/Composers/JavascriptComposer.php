@@ -8,6 +8,7 @@ use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 
 class JavascriptComposer
 {
@@ -22,9 +23,8 @@ class JavascriptComposer
             'laravelVersion' => app()->version(),
             'csrfToken' => csrf_token(),
             'cpUrl' => cp_route('index'),
-            'cpFullUrl' => Statamic::cpFullUrl(),
             'cpRoot' => str_start(config('statamic.cp.route'), '/'),
-            'urlPath' => '/' . request()->path(),
+            'urlPath' => Str::after(request()->getRequestUri(), config('statamic.cp.route').'/'),
             'resourceUrl' => Statamic::cpAssetUrl(),
             'locales' => config('statamic.system.locales'),
             'flash' => Statamic::flash(),
