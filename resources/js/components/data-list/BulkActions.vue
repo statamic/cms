@@ -28,6 +28,7 @@
 
 <script>
 import Actions from './Actions.js';
+import qs from 'qs';
 
 export default {
 
@@ -70,13 +71,20 @@ export default {
                 return;
             }
 
-            let params = { selections: this.selections };
+            let params = {
+                selections: this.selections,
+            };
 
             if (this.context) {
                 params.context = this.context;
             }
 
-            this.$axios.get(this.url, { params }).then(response => {
+            let config = {
+                params,
+                paramsSerializer: params => qs.stringify(params, {arrayFormat: 'brackets'})
+            };
+
+            this.$axios.get(this.url, config).then(response => {
                 this.actions = response.data;
             });
         },
