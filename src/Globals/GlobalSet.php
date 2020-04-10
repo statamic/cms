@@ -3,6 +3,7 @@
 namespace Statamic\Globals;
 
 use Statamic\Facades;
+use Statamic\Support\Arr;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Blueprint;
@@ -79,7 +80,9 @@ class GlobalSet implements Contract
         ];
 
         if (! Site::hasMultiple()) {
-            $data['data'] = $this->in(Site::default()->handle())->data()->all();
+            $data['data'] = Arr::removeNullValues(
+                $this->in(Site::default()->handle())->data()->all()
+            );
         }
 
         return $data;
