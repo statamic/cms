@@ -14,7 +14,7 @@ class Publish extends Action
 
     public function filter($item)
     {
-        return $item instanceof Entry;
+        return $item instanceof Entry && ! $item->published();
     }
 
     public function authorize($user, $entry)
