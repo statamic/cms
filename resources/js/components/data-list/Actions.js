@@ -13,9 +13,11 @@ export default {
     computed: {
 
         sortedActions() {
+            let actions = _.sortBy(this.actions, 'title');
+
             return [
-                ...this.actions.filter(action => !action.dangerous),
-                ...this.actions.filter(action => action.dangerous)
+                ...actions.filter(action => !action.dangerous),
+                ...actions.filter(action => action.dangerous)
             ];
         },
 
