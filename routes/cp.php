@@ -41,7 +41,8 @@ Route::group([
 
         Route::group(['prefix' => 'collections/{collection}/entries'], function () {
             Route::get('/', 'EntriesController@index')->name('collections.entries.index');
-            Route::post('actions', 'EntryActionController')->name('collections.entries.actions');
+            Route::post('actions', 'EntryActionController@run')->name('collections.entries.actions.run');
+            Route::get('actions', 'EntryActionController@bulkActions')->name('collections.entries.actions.bulk-actions');
             Route::get('create/{site}', 'EntriesController@create')->name('collections.entries.create');
             Route::post('create/{site}/preview', 'EntryPreviewController@create')->name('collections.entries.preview.create');
             Route::post('reorder', 'ReorderEntriesController')->name('collections.entries.reorder');
