@@ -17,6 +17,19 @@ class Publish extends Action
         return $item instanceof Entry && ! $item->published();
     }
 
+    public function filterBulk($items)
+    {
+        if ($items->whereInstanceOf(Entry::class)->count() !== $items->count()) {
+            return false;
+        }
+
+        if ($items->filter->published()->count() === $items->count()) {
+            return false;
+        }
+
+        return true;
+    }
+
     public function authorize($user, $entry)
     {
         return $user->can('publish', $entry);
