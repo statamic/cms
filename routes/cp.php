@@ -72,7 +72,8 @@ Route::group([
 
         Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
             Route::get('/', 'TermsController@index')->name('taxonomies.terms.index');
-            Route::post('actions', 'TermActionController')->name('taxonomies.terms.actions');
+            Route::post('actions', 'TermActionController@run')->name('taxonomies.terms.actions.run');
+            Route::get('actions', 'TermActionController@bulkActions')->name('taxonomies.terms.actions.bulk-actions');
             Route::get('create/{site}', 'TermsController@create')->name('taxonomies.terms.create');
             Route::post('create/{site}/preview', 'TermPreviewController@create')->name('taxonomies.terms.preview.create');
             Route::post('{site}', 'TermsController@store')->name('taxonomies.terms.store');
