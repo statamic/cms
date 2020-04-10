@@ -1,4 +1,3 @@
-<script>
 import DataListAction from './Action.vue';
 
 export default {
@@ -49,4 +48,3 @@ export default {
     }
 
 }
-</script>

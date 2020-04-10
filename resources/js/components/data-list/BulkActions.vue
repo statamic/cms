@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import Actions from './Actions.vue';
+import Actions from './Actions.js';
 
 export default {
 
