@@ -181,7 +181,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization
 
     public function livePreviewUrl()
     {
-        return $this->cpUrl('collections.entries.preview.edit');
+        return $this->collection()->route($this->locale())
+            ? $this->cpUrl('collections.entries.preview.edit')
+            : null;
     }
 
     protected function cpUrl($route)
