@@ -24,7 +24,7 @@ class ActionRepository
     {
         return $this->all()
             ->each->context($context)
-            ->filter->filter($item)
+            ->filter->visibleTo($item)
             ->filter->authorize(User::current(), $item)
             ->values();
     }
@@ -33,7 +33,7 @@ class ActionRepository
     {
         return $this->all()
             ->each->context($context)
-            ->filter->filterBulk($items)
+            ->filter->visibleBulk($items)
             ->filter->authorizeBulk(User::current(), $items)
             ->values();
     }

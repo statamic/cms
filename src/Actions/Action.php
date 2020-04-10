@@ -22,19 +22,19 @@ abstract class Action implements Arrayable
     protected $context = [];
     protected $bulk = true;
 
-    public function filter($item)
+    public function visibleTo($item)
     {
         return true;
     }
 
-    public function filterBulk($items)
+    public function visibleBulk($items)
     {
         if (! $this->bulk) {
             return false;
         }
 
         $allowedOnItems = $items->filter(function ($item) {
-            return $this->filter($item);
+            return $this->visibleTo($item);
         });
 
         return $items->count() === $allowedOnItems->count();

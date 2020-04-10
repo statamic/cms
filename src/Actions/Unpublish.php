@@ -7,12 +7,12 @@ use Statamic\Facades\User;
 
 class Unpublish extends Action
 {
-    public function filter($item)
+    public function visibleTo($item)
     {
         return $item instanceof Entry && $item->published();
     }
 
-    public function filterBulk($items)
+    public function visibleBulk($items)
     {
         if ($items->whereInstanceOf(Entry::class)->count() !== $items->count()) {
             return false;

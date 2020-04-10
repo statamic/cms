@@ -12,12 +12,12 @@ class Publish extends Action
         return __('Publish');
     }
 
-    public function filter($item)
+    public function visibleTo($item)
     {
         return $item instanceof Entry && ! $item->published();
     }
 
-    public function filterBulk($items)
+    public function visibleBulk($items)
     {
         if ($items->whereInstanceOf(Entry::class)->count() !== $items->count()) {
             return false;
