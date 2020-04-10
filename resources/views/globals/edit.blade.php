@@ -24,6 +24,7 @@
         :can-configure="{{ json_encode($canConfigure) }}"
         configure-url="{{ $set->editUrl() }}"
         :can-edit="{{ json_encode($canEdit) }}"
+        :can-edit-blueprint="{{ $actions['editBlueprint'] ? Statamic\Support\Str::bool($user->can('configure fields')) : 'false' }}"
     ></global-publish-form>
 
 @endsection

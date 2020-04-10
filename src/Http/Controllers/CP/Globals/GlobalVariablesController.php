@@ -42,6 +42,7 @@ class GlobalVariablesController extends CpController
             'editing' => true,
             'actions' => [
                 'save' => $variables->updateUrl(),
+                'editBlueprint' => $blueprint->editUrl(),
             ],
             'values' => $values,
             'meta' => $meta,
