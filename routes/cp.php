@@ -155,9 +155,10 @@ Route::group([
     Route::post('addons/uninstall', 'AddonsController@uninstall');
 
     Route::group(['namespace' => 'Forms'], function () {
+        Route::post('forms/{form}/submissions/actions', 'SubmissionActionController@run')->name('forms.submissions.actions.run');
+        Route::get('forms/{form}/submissions/actions', 'SubmissionActionController@bulkActions')->name('forms.submissions.actions.bulk-actions');
         Route::resource('forms', 'FormsController');
         Route::resource('forms.submissions', 'FormSubmissionsController');
-        Route::post('forms/{form}/submissions/actions', 'SubmissionActionController')->name('forms.submissions.actions');
         Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
     });
 
