@@ -36,6 +36,10 @@ export default {
 
             this.$axios.post(this.url, payload).then(response => {
                 this.$emit('completed');
+
+                if (response.data.redirect) {
+                    window.location = response.data.redirect;
+                }
             }).catch(error => {
                 this.$toast.error(error.response.data.message);
                 this.$emit('completed');
