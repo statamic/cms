@@ -20,7 +20,6 @@ abstract class Action implements Arrayable
     protected $dangerous = false;
     protected $fields = [];
     protected $context = [];
-    protected $bulk = true;
 
     public function visibleTo($item)
     {
@@ -29,10 +28,6 @@ abstract class Action implements Arrayable
 
     public function visibleBulk($items)
     {
-        if (! $this->bulk) {
-            return false;
-        }
-
         $allowedOnItems = $items->filter(function ($item) {
             return $this->visibleTo($item);
         });
