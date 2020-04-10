@@ -20,7 +20,7 @@ abstract class Action implements Arrayable
     protected $dangerous = false;
     protected $fields = [];
     protected $context = [];
-    protected $inlineOnly = false;
+    protected $bulk = true;
 
     public function filter($item)
     {
@@ -73,7 +73,7 @@ abstract class Action implements Arrayable
             'fields' => $this->fields()->toPublishArray(),
             'meta' => $this->fields()->meta(),
             'context' => $this->context,
-            'inlineOnly' => $this->inlineOnly,
+            'bulk' => $this->bulk,
         ];
     }
 }
