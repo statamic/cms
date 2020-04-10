@@ -18,9 +18,9 @@
     <div class="lg:absolute pin-t pin-r head-link h-full md:pr-3 flex items-center">
 
         @if (Statamic\Facades\Site::hasMultiple())
-            <site-selector>
+            <global-site-selector>
                 <template slot="icon">@svg('sites')</template>
-            </site-selector>
+            </global-site-selector>
         @endif
 
         <favorite-creator class="hidden md:block"></favorite-creator>

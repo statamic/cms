@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Utility;
+use Statamic\Statamic;
 
 Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
     Route::get('login', 'LoginController@showLoginForm')->name('login');
@@ -92,14 +94,17 @@ Route::group([
         });
     });
 
-    Route::get('globals', 'GlobalsController@index')->name('globals.index');
-    Route::get('globals/create', 'GlobalsController@create')->name('globals.create');
-    Route::post('globals', 'GlobalsController@store')->name('globals.store');
-    Route::patch('globals/{global}/meta', 'GlobalsController@updateMeta')->name('globals.update-meta');
-    Route::delete('globals/{id}', 'GlobalsController@destroy')->name('globals.destroy');
-    Route::get('globals/{id}/{handle}', 'GlobalsController@edit')->name('globals.edit');
-    Route::patch('globals/{id}/{handle}', 'GlobalsController@update')->name('globals.update');
-    Route::post('globals/{id}/{handle}/localize', 'Globals\LocalizeGlobalsController')->name('globals.localize');
+    Route::group(['namespace' => 'Globals'], function () {
+        Route::get('globals', 'GlobalsController@index')->name('globals.index');
+        Route::get('globals/create', 'GlobalsController@create')->name('globals.create');
+        Route::post('globals', 'GlobalsController@store')->name('globals.store');
+        Route::get('globals/{global_set}/edit', 'GlobalsController@edit')->name('globals.edit');
+        Route::patch('globals/{global_set}', 'GlobalsController@update')->name('globals.update');
+        Route::delete('globals/{global_set}', 'GlobalsController@destroy')->name('globals.destroy');
+
+        Route::get('globals/{global_set}', 'GlobalVariablesController@edit')->name('globals.variables.edit');
+        Route::patch('globals/{global_set}/variables', 'GlobalVariablesController@update')->name('globals.variables.update');
+    });
 
     Route::group(['namespace' => 'Assets'], function () {
         Route::resource('asset-containers', 'AssetContainersController');

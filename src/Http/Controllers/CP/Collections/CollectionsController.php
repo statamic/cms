@@ -157,7 +157,7 @@ class CollectionsController extends CpController
             'handle' => 'nullable|alpha_dash'
         ]);
 
-        $handle = $request->handle ?? snake_case($request->title);
+        $handle = $request->handle ?? Str::snake($request->title);
 
         if (Collection::find($handle)) {
             throw new \Exception(__('Collection already exists'));

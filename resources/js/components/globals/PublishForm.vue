@@ -11,48 +11,22 @@
                     <svg-icon name="lock" class="w-4 mr-sm -mt-sm" /> {{ __('Read Only') }}
                 </div>
 
-                <configure-set
-                    class="ml-2"
-                    :save-url="configureSaveUrl"
-                    :delete-url="deleteUrl"
-                    :globals-url="globalsUrl"
-                    :id="id"
-                    :initial-title="initialTitle"
-                    :initial-handle="initialHandle"
-                    :initial-blueprint="initialBlueprintHandle"
-                    :can-configure="canConfigure"
-                    :can-delete="canDelete"
-                ></configure-set>
+                <dropdown-list v-if="canConfigure || canEditBlueprint" class="mr-1">
+                    <dropdown-item v-if="canConfigure" v-text="__('Configure')" :redirect="configureUrl" />
+                    <dropdown-item v-if="canEditBlueprint" :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                </dropdown-list>
 
-                <v-select
+                <site-selector
                     v-if="localizations.length > 1"
-                    :value="activeLocalization"
-                    label="name"
-                    :clearable="false"
-                    :options="localizations"
-                    :searchable="false"
-                    :multiple="false"
+                    class="mr-2"
+                    :sites="localizations"
+                    :value="site"
                     @input="localizationSelected"
-                    class="w-48 ml-2"
-                >
-                    <template slot="option" slot-scope="option">
-                        <div class="flex items-center" v-tooltip="localizationStatusText(option)">
-                            <loading-graphic :size="14" text="" class="flex -ml-1" v-if="localizing === option.handle" />
-                            <span class="little-dot mr-1" :class="{
-                                'bg-green': option.published,
-                                'bg-grey-50': !option.published,
-                                'bg-red': !option.exists
-                            }" />
-                            {{ option.name }}
-                            <svg-icon name="flag" class="h-3 w-3 ml-sm text-grey" v-if="option.origin" />
-                            <svg-icon name="check" class="h-3 w-3 ml-sm text-grey" v-if="option.active" />
-                        </div>
-                    </template>
-                </v-select>
+                />
 
                 <button
                     v-if="canEdit"
-                    class="btn-primary min-w-100 ml-2"
+                    class="btn-primary min-w-100"
                     :class="{ 'opacity-25': !canSave }"
                     :disabled="!canSave"
                     @click.prevent="save"
@@ -70,7 +44,7 @@
         </div>
 
         <publish-container
-            v-if="fieldset"
+            v-if="fieldset && !fieldset.empty"
             ref="container"
             :name="publishContainer"
             :blueprint="fieldset"
@@ -80,6 +54,7 @@
             :errors="errors"
             :site="site"
             :localized-fields="localizedFields"
+            :is-root="isRoot"
             @updated="values = $event"
         >
             <div slot-scope="{ container, components, setFieldMeta }">
@@ -109,17 +84,16 @@
 </template>
 
 <script>
-import ConfigureSet from './Configure.vue';
+import SiteSelector from '../SiteSelector.vue';
 
 export default {
 
     components: {
-        ConfigureSet
+        SiteSelector
     },
 
     props: {
         publishContainer: String,
-        id: String,
         initialReference: String,
         initialFieldset: Object,
         initialValues: Object,
@@ -138,11 +112,11 @@ export default {
         method: String,
         isCreating: Boolean,
         initialReadOnly: Boolean,
-        configureSaveUrl: String,
-        deleteUrl: String,
+        initialIsRoot: Boolean,
         canEdit: Boolean,
         canConfigure: Boolean,
-        canDelete: Boolean,
+        configureUrl: String,
+        canEditBlueprint: Boolean,
     },
 
     data() {
@@ -162,6 +136,7 @@ export default {
             site: this.initialSite,
             error: null,
             errors: {},
+            isRoot: this.initialIsRoot,
         }
     },
 
@@ -254,14 +229,10 @@ export default {
 
             this.localizing = localization.handle;
 
-            if (localization.exists) {
-                this.editLocalization(localization);
-            } else {
-                this.createLocalization(localization);
+            if (this.publishContainer === 'base') {
+                window.history.replaceState({}, '', localization.url);
             }
-        },
 
-        editLocalization(localization) {
             this.$axios.get(localization.url).then(response => {
                 const data = response.data;
                 this.values = data.values;
@@ -272,25 +243,11 @@ export default {
                 this.hasOrigin = data.hasOrigin;
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
+                this.isRoot = data.isRoot;
                 this.site = localization.handle;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
             })
-        },
-
-        createLocalization(localization) {
-            // TODO: This is obviously a horrible way to get the url. Do it better.
-            let url = this.activeLocalization.url;
-            url = url.includes('?site=') ? url.replace('?site=', '/localize?site=') : `${url}/localize`;
-
-            const payload = {
-                origin: this.originLocalization.handle,
-                target: localization.handle
-            };
-
-            this.$axios.post(url, payload).then(response => {
-                this.editLocalization(response.data);
-            });
         },
 
         localizationStatusText(localization) {

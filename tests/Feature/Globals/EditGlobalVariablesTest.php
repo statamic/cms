@@ -9,7 +9,7 @@ use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class EditGlobalsTest extends TestCase
+class EditGlobalVariablesTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
@@ -47,7 +47,7 @@ class EditGlobalsTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->get($global->editUrl())
+            ->get($global->in('en')->editUrl())
             ->assertSuccessful()
             ->assertViewHas('values', ['foo' => 'bar', 'unused' => null]);
     }
