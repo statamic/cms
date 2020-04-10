@@ -28,4 +28,13 @@ class ActionRepository
             ->filter->authorize(User::current(), $item)
             ->values();
     }
+
+    public function forBulk($items, $context = [])
+    {
+        return $this->all()
+            ->each->context($context)
+            ->filter->filterBulk($items)
+            ->filter->authorizeBulk(User::current(), $items)
+            ->values();
+    }
 }
