@@ -162,7 +162,8 @@ Route::group([
     });
 
     Route::group(['namespace' => 'Users'], function () {
-        Route::post('users/actions', 'UserActionController')->name('users.actions');
+        Route::post('users/actions', 'UserActionController@run')->name('users.actions.run');
+        Route::get('users/actions', 'UserActionController@bulkActions')->name('users.actions.bulk-actions');
         Route::resource('users', 'UsersController');
         Route::patch('users/{user}/password', 'PasswordController@update')->name('users.password.update');
         Route::get('account', 'AccountController')->name('account');
