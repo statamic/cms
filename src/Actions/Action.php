@@ -43,6 +43,11 @@ abstract class Action implements Arrayable
         return true;
     }
 
+    public function redirect()
+    {
+        return false;
+    }
+
     public function buttonText()
     {
         /** @translation */

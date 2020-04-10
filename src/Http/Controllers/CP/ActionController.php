@@ -33,7 +33,13 @@ abstract class ActionController extends CpController
 
         abort_unless($unauthorized->isEmpty(), 403, __('You are not authorized to run this action.'));
 
-        return $action->run($items, $request->all());
+        $action->run($items, $request->all());
+
+        if ($redirect = $action->redirect()) {
+            return ['redirect' => $redirect];
+        }
+
+        return [];
     }
 
     abstract protected function getSelectedItems($items, $context);
