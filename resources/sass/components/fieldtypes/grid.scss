@@ -42,7 +42,7 @@
         &.drag-handle {
             @apply w-3 border-r h-full p-1;
             cursor: grab;
-            background: config('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
+            background: theme('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
             &:hover { @apply .bg-grey-30; }
         }
     }

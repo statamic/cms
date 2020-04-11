@@ -109,7 +109,7 @@
 
     .markdown-toolbar {
         @apply text-white border-b border-grey-100 shadow-lg;
-        background: linear-gradient(180deg, config('colors.grey-90'), hsl(210, 20%, 13%));
+        background: linear-gradient(180deg, theme('colors.grey-90'), hsl(210, 20%, 13%));
     }
 
     .helpers {

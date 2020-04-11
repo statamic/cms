@@ -54,7 +54,7 @@
     @apply w-4 border-l border-r border-grey-30 shadow-sm;
     z-index: 1;
     cursor: ew-resize;
-    background: config('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
+    background: theme('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
 }
 
 

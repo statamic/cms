@@ -33,7 +33,7 @@
 
 .drag-notification {
     @apply text-lg absolute pin text-center rounded flex items-center justify-center;
-    border: 1px dashed config('colors.grey-60');
+    border: 1px dashed theme('colors.grey-60');
     pointer-events: none;
     z-index: 1049;
     background: rgba(white, .9);
@@ -345,7 +345,7 @@
 }
 
 .selected .asset-thumbnail {
-    box-shadow: 0 0 0 3px config('colors.blue');
+    box-shadow: 0 0 0 3px theme('colors.blue');
 }
 
 /* Lazyloading

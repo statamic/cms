@@ -48,7 +48,7 @@
 .selected-outline {
     @apply border-blue;
     outline: 0;
-    box-shadow: 0 0 0 2px config('colors.blue');
+    box-shadow: 0 0 0 2px theme('colors.blue');
 }
 
 .ease-quick {
