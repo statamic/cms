@@ -88,7 +88,7 @@ code.parent-url {
 }
 
 .publish-sidebar {
-    @apply flex-no-shrink;
+    @apply flex-shrink-0;
     margin-left: 20px;
 
     max-width: 300px;
