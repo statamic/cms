@@ -15,7 +15,7 @@
         </global-search>
     </div>
 
-    <div class="lg:absolute pin-t pin-r head-link h-full md:pr-3 flex items-center">
+    <div class="lg:absolute top-0 right-0 head-link h-full md:pr-3 flex items-center">
 
         @if (Statamic\Facades\Site::hasMultiple())
             <global-site-selector>
