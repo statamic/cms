@@ -26,7 +26,7 @@ abstract class Action implements Arrayable
         return true;
     }
 
-    public function visibleBulk($items)
+    public function visibleToBulk($items)
     {
         $allowedOnItems = $items->filter(function ($item) {
             return $this->visibleTo($item);

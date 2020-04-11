@@ -12,7 +12,7 @@ class Unpublish extends Action
         return $item instanceof Entry && $item->published();
     }
 
-    public function visibleBulk($items)
+    public function visibleToBulk($items)
     {
         if ($items->whereInstanceOf(Entry::class)->count() !== $items->count()) {
             return false;
