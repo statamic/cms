@@ -202,13 +202,13 @@
 }
 
 .markdown-fieldtype-wrapper.markdown-fullscreen {
-    @apply fixed bg-white pin h-screen rounded-none;
+    @apply fixed bg-white inset-0 h-screen rounded-none;
     padding-top: 52px; // offset the nav
     z-index: 998;
     will-change: transform;
 
     .markdown-toolbar {
-        @apply fixed pin-t w-full px-3 py-1 h-13 shadow text-base flex items-center justify-between;
+        @apply fixed top-0 w-full px-3 py-1 h-13 shadow text-base flex items-center justify-between;
         background: linear-gradient(180deg, #fff, #f9fafb);
         border-bottom: 1px solid #c4cdd6;
     }
@@ -235,6 +235,6 @@
     }
 
     .helpers {
-        @apply absolute pin-b pin-l pin-r bg-white;
+        @apply absolute bottom-0 inset-x-0 bg-white;
     }
 }

@@ -332,7 +332,7 @@
     }
 
     .editor-file-actions {
-		@apply absolute pin-b pin-l pin-r bg-grey-90 p-2 text-center h-16;
+		@apply absolute bottom-0 inset-x-0 bg-grey-90 p-2 text-center h-16;
 
         button {
             @apply mx-sm;

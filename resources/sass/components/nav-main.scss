@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .nav-main {
-    @apply hidden select-none bg-white shadow h-screen absolute pin-l overflow-scroll w-56;
+    @apply hidden select-none bg-white shadow h-screen absolute left-0 overflow-scroll w-56;
     transition: all .3s;
     z-index: 9998;
 

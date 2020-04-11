@@ -205,7 +205,7 @@
     }
 
     .bard-field-options {
-        @apply .fixed .pin-t .pin-l .pin-r .bg-grey-70 .p-2 .w-full;
+        @apply fixed top-0 inset-x-0 bg-grey-70 p-2 w-full;
         text-align: right;
         z-index: 1; // to appear over the top of .bard-editor
 
