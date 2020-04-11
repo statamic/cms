@@ -45,7 +45,7 @@
             initial-sort-direction="{{ $taxonomy->sortDirection() }}"
             :filters="{{ $filters->toJson() }}"
             run-action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy->handle()) }}"
-            bulk-actions-url="{{ cp_route('taxonomies.terms.actions.bulk-actions', $taxonomy->handle()) }}"
+            bulk-actions-url="{{ cp_route('taxonomies.terms.actions.bulk', $taxonomy->handle()) }}"
         ></term-list>
 
     @else

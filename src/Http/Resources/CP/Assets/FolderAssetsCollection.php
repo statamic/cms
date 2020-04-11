@@ -31,7 +31,7 @@ class FolderAssetsCollection extends ResourceCollection
         return [
             'links' => [
                 'run_asset_action' => cp_route('assets.actions.run'),
-                'bulk_asset_actions' => cp_route('assets.actions.bulk-actions'),
+                'bulk_asset_actions' => cp_route('assets.actions.bulk'),
                 'run_folder_action' => cp_route('assets.folders.actions.run', $this->folder->container()->id()),
             ]
         ];

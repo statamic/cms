@@ -20,7 +20,7 @@
         initial-sort-direction="asc"
         :filters="{{ $filters->toJson() }}"
         run-action-url="{{ cp_route('users.actions.run') }}"
-        bulk-actions-url="{{ cp_route('users.actions.bulk-actions') }}"
+        bulk-actions-url="{{ cp_route('users.actions.bulk') }}"
     ></user-listing>
 
     @include('statamic::partials.docs-callout', [
