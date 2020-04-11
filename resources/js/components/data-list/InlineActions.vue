@@ -21,7 +21,7 @@
 
 
 <script>
-import Actions from './Actions.js';
+import Actions from './Actions';
 
 export default {
 

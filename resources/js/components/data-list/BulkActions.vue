@@ -27,7 +27,7 @@
 </template>
 
 <script>
-import Actions from './Actions.js';
+import Actions from './Actions';
 import qs from 'qs';
 
 export default {
