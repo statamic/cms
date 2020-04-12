@@ -17,7 +17,7 @@
 		@apply h-full px-1.5 py-1 border-r bg-white block text-grey-50;
 
 		&:hover {
-			@apply cursor-text;
+      cursor: text;
 		}
 	}
 

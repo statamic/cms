@@ -262,7 +262,8 @@
     @apply flex flex-1 items-center;
 
     .meta-item {
-		@apply flex items-start flex-col border-l px-2 cursor-text h-full justify-center;
+  		@apply flex items-start flex-col border-l px-2 h-full justify-center;
+      cursor: text;
     }
 
     .meta-label {
