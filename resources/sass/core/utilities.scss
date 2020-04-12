@@ -98,13 +98,13 @@
 [v-cloak] { display: none }
 
 .loading-blocker {
-    @apply absolute pin z-10;
+    @apply absolute inset-0 z-10;
     background: rgba(white, .7);
 }
 
 // Saving Overlay
 .saving {
-    @apply absolute pin z-200 flex items-center rounded;
+    @apply absolute inset-0 z-200 flex items-center rounded;
     background: rgba(white, .9);
 
     .inner {

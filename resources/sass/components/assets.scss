@@ -32,7 +32,7 @@
 }
 
 .drag-notification {
-    @apply text-lg absolute pin text-center rounded flex items-center justify-center;
+    @apply text-lg absolute inset-0 text-center rounded flex items-center justify-center;
     border: 1px dashed theme('colors.grey-60');
     pointer-events: none;
     z-index: 1049;
