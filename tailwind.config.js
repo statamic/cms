@@ -43,7 +43,7 @@ module.exports = {
       'purple': '#c471ed',
       'darken-10': 'rgba(0,0,0,.1)',
       'darken-20': 'rgba(0,0,0,.2)',
-      primary: theme => theme('colors.blue'),
+      'primary': 'hsl(200, 80%, 50%)', // Set brand colors (same as "blue")
     },
     spacing: {
       'px':  '1px',
