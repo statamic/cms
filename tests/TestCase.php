@@ -162,4 +162,24 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $this->app->instance($abstract, $mock);
         return $mock;
     }
+
+    /**
+     * @deprecated
+     */
+    public static function assertFileNotExists(string $filename, string $message = '') : void
+    {
+        method_exists(static::class, 'assertFileDoesNotExist')
+            ? static::assertFileDoesNotExist($filename, $message)
+            : static::assertFileNotExists($filename, $message);
+    }
+
+    /**
+     * @deprecated
+     */
+    public static function assertDirectoryNotExists(string $filename, string $message = '') : void
+    {
+        method_exists(static::class, 'assertDirectoryDoesNotExist')
+            ? static::assertDirectoryDoesNotExist($filename, $message)
+            : static::assertDirectoryNotExists($filename, $message);
+    }
 }
