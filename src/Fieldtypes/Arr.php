@@ -41,7 +41,7 @@ class Arr extends Fieldtype
 
     public function preProcessConfig($data)
     {
-        return $data;
+        return $data ?? [];
     }
 
     public function process($data)
