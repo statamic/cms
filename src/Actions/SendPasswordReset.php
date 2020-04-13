@@ -33,7 +33,7 @@ class SendPasswordReset extends Action
         return 'Send|Send to :count users';
     }
 
-    public function run($users)
+    public function run($users, $values)
     {
         $users->each->generateTokenAndSendPasswordResetNotification();
     }
