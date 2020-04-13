@@ -1,8 +1,9 @@
 <?php
 
-namespace Tests;
+namespace Tests\Facades;
 
 use Statamic\Facades\Path;
+use Tests\TestCase;
 
 class PathTest extends TestCase
 {
