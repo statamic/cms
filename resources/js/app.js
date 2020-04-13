@@ -102,7 +102,7 @@ Statamic.app({
 
     components: {
         GlobalSearch: require('./components/GlobalSearch.vue').default,
-        SiteSelector: require('./components/SiteSelector.vue').default,
+        GlobalSiteSelector: require('./components/GlobalSiteSelector.vue').default,
         Login: require('./components/login/login'),
         LoginModal: require('./components/login/LoginModal.vue').default,
         BaseEntryCreateForm: require('./components/entries/BaseCreateForm.vue').default,
@@ -116,6 +116,7 @@ Statamic.app({
         FormListing: require('./components/forms/Listing.vue').default,
         FormSubmissionListing: require('./components/forms/SubmissionListing.vue').default,
         GlobalListing: require('./components/globals/Listing.vue').default,
+        GlobalEditForm: require('./components/globals/EditForm.vue').default,
         GlobalPublishForm: require('./components/globals/PublishForm.vue').default,
         GlobalCreateForm: require('./components/globals/Create.vue').default,
         UserListing: require('./components/users/Listing.vue').default,

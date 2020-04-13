@@ -19,11 +19,6 @@ global.tidy_url = function(path) {
     return path.replace(/([^:])(\/\/+)/g, '$1/')
 }
 
-// Get url segments from the nth segment
-global.get_from_segment = function(count) {
-    return Statamic.$config.get('urlPath').split('/').splice(count).join('/');
-};
-
 global.file_icon = function(extension) {
     return resource_url('img/filetypes/'+ extension +'.png');
 };

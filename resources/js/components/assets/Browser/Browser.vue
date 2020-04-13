@@ -73,7 +73,7 @@
                             </div>
 
                             <data-list-bulk-actions
-                                :url="actionUrl"
+                                :url="bulkActionsUrl"
                                 :context="actionContext"
                                 @started="actionStarted"
                                 @completed="actionCompleted"
@@ -121,7 +121,7 @@
 
                                                 <data-list-inline-actions
                                                     :item="folder.path"
-                                                    :url="folderActionUrl"
+                                                    :url="runFolderActionUrl"
                                                     :actions="folderActions(folder)"
                                                     @started="actionStarted"
                                                     @completed="actionCompleted"
@@ -155,7 +155,7 @@
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
                                             :item="asset.id"
-                                            :url="actionUrl"
+                                            :url="runActionUrl"
                                             :actions="asset.actions"
                                             @started="actionStarted"
                                             @completed="actionCompleted"
@@ -289,7 +289,9 @@ export default {
             sortColumn: 'basename',
             sortDirection: 'asc',
             mode: 'table',
-            folderActionUrl: null,
+            runActionUrl: null,
+            bulkActionsUrl: null,
+            runFolderActionUrl: null,
         }
     },
 
@@ -449,8 +451,9 @@ export default {
                 } else {
                     this.folder = data.data.folder;
                     this.folders = data.data.folder.folders;
-                    this.actionUrl = data.links.asset_actions;
-                    this.folderActionUrl = data.links.folder_actions;
+                    this.runActionUrl = data.links.run_asset_action;
+                    this.bulkActionsUrl = data.links.bulk_asset_actions;
+                    this.runFolderActionUrl = data.links.run_folder_action;
                 }
 
                 this.loadingAssets = false;

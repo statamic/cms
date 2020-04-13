@@ -45,10 +45,6 @@ class GlobalRepository implements RepositoryContract
 
     public function save($global)
     {
-        if (! $global->id()) {
-            $global->id($this->stache->generateId());
-        }
-
         $this->store->save($global);
     }
 

@@ -166,12 +166,12 @@ class Parser
         $text = $this->extractNoparse($text);
         $text = $this->stripComments($text);
 
-        $text = $this->extractLoopedTags($text, $data);
+        $text = $this->extractTagPairs($text, $data);
 
         // Parse conditionals first to avoid parsing and execution.
         $text = $this->parseConditionPairs($text, $data);
         $text = $this->parseTernaries($text, $data);
-        $text = $this->injectExtractions($text, 'looped_tags');
+        $text = $this->injectExtractions($text, 'tag_pair');
         $text = $this->parseVariables($text, $data);
         $text = $this->injectExtractions($text, 'callback_blocks');
         $text = $this->parseCallbackTags($text, $data);
@@ -328,10 +328,10 @@ class Parser
 
     protected function parseLoopInstance($str, $data)
     {
-        $str = $this->extractLoopedTags($str, $data);
+        $str = $this->extractTagPairs($str, $data);
         $str = $this->parseConditionPairs($str, $data);
         $str = $this->parseTernaries($str, $data);
-        $str = $this->injectExtractions($str, 'looped_tags');
+        $str = $this->injectExtractions($str, 'tag_pair');
         $str = $this->parseVariables($str, $data);
         $str = $this->injectExtractions($str, 'callback_blocks');
         $str = $this->parseCallbackTags($str, $data);
@@ -551,7 +551,7 @@ class Parser
                 $nested_regex = '/{{\s*(' . preg_quote($name, '/') . ')(\s.*?)}}(.*?){{\s*\/\1\s*}}/ms';
                 if ($this->preg_match($nested_regex, $content . $match[0][0], $nested_matches)) {
                     $nested_content = $this->preg_replace('/{{\s*\/' . preg_quote($name, '/') . '\s*}}/m', '', $nested_matches[0]);
-                    $content = $this->createExtraction('nested_looped_tags', $nested_content, $nested_content, $content);
+                    $content = $this->createExtraction('nested_tag_pair', $nested_content, $nested_content, $content);
                 }
             }
 
@@ -606,7 +606,7 @@ class Parser
                     } elseif (! empty($cb_data[$name])) {
                         // value not found in the data block, so we check the
                         // cumulative callback data block for a value and use that
-                        $text = $this->extractLoopedTags($text, $cb_data);
+                        $text = $this->extractTagPairs($text, $cb_data);
                         $text = $this->parseVariables($text, $cb_data);
                         $text = $this->injectExtractions($text, 'callback_blocks');
                     }
@@ -620,7 +620,7 @@ class Parser
             }
 
             $text = $this->preg_replace('/' . preg_quote($tag, '/') . '/m', addcslashes($replacement, '\\$'), $text, 1);
-            $text = $this->injectExtractions($text, 'nested_looped_tags');
+            $text = $this->injectExtractions($text, 'nested_tag_pair');
         }
 
         // parse for recursives, as they may not have been parsed yet
@@ -1069,25 +1069,17 @@ class Parser
      * @param array    $data     Data array to use
      * @return string
      */
-    protected function extractLoopedTags($text, $data = array())
+    protected function extractTagPairs($text, $data = array())
     {
-        /**
-         * $matches[][0] is the raw match
-         */
+        if ($this->preg_match_all($this->variableLoopRegex, $text, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $text = $this->createExtraction('tag_pair', $match[0], $match[0], $text);
+            }
+        }
+
         if ($this->preg_match_all($this->callbackBlockRegex, $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-
-                // Allow {{ /if }} to close if statements
-                if ($match[1] === 'if' || $match[1] === 'unless') {
-                    // move on
-                } elseif ($this->parseParameters($match[2], $data)) {
-                    // This callback block contains parameters
-                    // Let's extract it so it doesn't conflict with local variables when
-                    // parseVariables() is called.
-                    $text = $this->createExtraction('callback_blocks', $match[0], $match[0], $text);
-                } else {
-                    $text = $this->createExtraction('looped_tags', $match[0], $match[0], $text);
-                }
+                $text = $this->createExtraction('callback_blocks', $match[0], $match[0], $text);
             }
         }
 

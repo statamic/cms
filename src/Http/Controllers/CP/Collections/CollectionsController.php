@@ -157,7 +157,7 @@ class CollectionsController extends CpController
             'handle' => 'nullable|alpha_dash'
         ]);
 
-        $handle = $request->handle ?? snake_case($request->title);
+        $handle = $request->handle ?? Str::snake($request->title);
 
         if (Collection::find($handle)) {
             throw new \Exception(__('Collection already exists'));
@@ -313,7 +313,7 @@ class CollectionsController extends CpController
                     ],
                     'max_depth' => [
                         'display' => __('Max Depth'),
-                        'instructions' => __('statamic::max_depth_instructions'),
+                        'instructions' => __('statamic::messages.max_depth_instructions'),
                         'type' => 'integer',
                         'validate' => 'min:0',
                         'if' => ['structured' => true],

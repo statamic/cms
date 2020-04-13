@@ -25,21 +25,21 @@ class Date extends Fieldtype
                 ]
             ],
             'time_enabled'  => [
-                'display' => __('Time_enabled'),
+                'display' => __('Time Enabled'),
                 'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
             ],
             'time_required' => [
-                'display' => __('Time_required'),
+                'display' => __('Time Required'),
                 'instructions' => __('statamic::fieldtypes.date.config.time_required'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
             ],
             'earliest_date' => [
-                'display' => __('Earliest_date'),
+                'display' => __('Earliest Date'),
                 'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
                 'type' => 'text',
                 'default' => '1900-01-01',
@@ -52,7 +52,7 @@ class Date extends Fieldtype
                 'width' => 50,
             ],
             'full_width' => [
-                'display' => __('Full_width'),
+                'display' => __('Full Width'),
                 'instructions' => __('statamic::fieldtypes.date.config.full_width'),
                 'type' => 'toggle',
                 'default' => false,

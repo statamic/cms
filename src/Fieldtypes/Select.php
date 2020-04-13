@@ -56,14 +56,14 @@ class Select extends Fieldtype
                 'width' => 50,
             ],
             'push_tags' => [
-                'display' => __('Push_tags'),
+                'display' => __('Push Tags'),
                 'instructions' => __('statamic::fieldtypes.select.config.push_tags'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
             ],
             'cast_booleans' => [
-                'display' => __('Cast_booleans'),
+                'display' => __('Cast Booleans'),
                 'instructions' => __('statamic::fieldtypes.select.config.cast_booleans'),
                 'type' => 'toggle',
                 'default' => false,

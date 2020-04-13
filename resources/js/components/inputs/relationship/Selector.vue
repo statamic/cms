@@ -106,7 +106,7 @@ export default {
 
     props: {
         url: String,
-        initialFilters: Array,
+        filters: Array,
         initialSelections: Array,
         initialSortColumn: String,
         initialSortDirection: String,
@@ -131,7 +131,6 @@ export default {
             page: 1,
             selections: _.clone(this.initialSelections),
             columns: [],
-            filters: this.initialFilters,
         }
     },
 
@@ -212,7 +211,6 @@ export default {
                 this.columns = response.data.meta.columns;
                 this.items = response.data.data;
                 this.meta = response.data.meta;
-                this.filters = response.data.meta.filters;
                 this.activeFilterBadges = {...response.data.meta.activeFilterBadges};
                 this.loading = false;
                 this.initializing = false;

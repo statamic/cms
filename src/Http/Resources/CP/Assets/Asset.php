@@ -40,7 +40,7 @@ class Asset extends JsonResource
             $this->merge($this->publishFormData()),
 
             'allowDownloading' => $this->container()->allowDownloading(),
-            'actionUrl' => cp_route('assets.actions'),
+            'runActionUrl' => cp_route('assets.actions.run'),
             'actions' => Action::for($this->resource, ['container' => $this->container()->handle()]),
         ];
     }

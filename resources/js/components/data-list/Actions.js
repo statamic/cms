@@ -1,4 +1,3 @@
-<script>
 import DataListAction from './Action.vue';
 
 export default {
@@ -14,9 +13,11 @@ export default {
     computed: {
 
         sortedActions() {
+            let actions = _.sortBy(this.actions, 'title');
+
             return [
-                ...this.actions.filter(action => !action.dangerous),
-                ...this.actions.filter(action => action.dangerous)
+                ...actions.filter(action => !action.dangerous),
+                ...actions.filter(action => action.dangerous)
             ];
         },
 
@@ -36,6 +37,10 @@ export default {
 
             this.$axios.post(this.url, payload).then(response => {
                 this.$emit('completed');
+
+                if (response.data.redirect) {
+                    window.location = response.data.redirect;
+                }
             }).catch(error => {
                 this.$toast.error(error.response.data.message);
                 this.$emit('completed');
@@ -45,4 +50,3 @@ export default {
     }
 
 }
-</script>

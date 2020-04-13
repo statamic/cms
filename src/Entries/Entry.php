@@ -181,7 +181,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization
 
     public function livePreviewUrl()
     {
-        return $this->cpUrl('collections.entries.preview.edit');
+        return $this->collection()->route($this->locale())
+            ? $this->cpUrl('collections.entries.preview.edit')
+            : null;
     }
 
     protected function cpUrl($route)
@@ -422,7 +424,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization
 
     public function lastModifiedBy()
     {
-        return User::find($this->get('updated_by'));
+        return $this->has('updated_by')
+            ? User::find($this->get('updated_by'))
+            : null;
     }
 
     public function status()
