@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Statamic\Facades\Action;
 use Statamic\Facades\Entry;
 use Statamic\Facades\User;
@@ -33,11 +34,15 @@ abstract class ActionController extends CpController
 
         abort_unless($unauthorized->isEmpty(), 403, __('You are not authorized to run this action.'));
 
-        if ($redirect = $action->redirect()) {
+        $action->run($items, $values = $request->all());
+
+        if ($redirect = $action->redirect($items, $values)) {
             return ['redirect' => $redirect];
+        } elseif ($download = $action->download($items, $values)) {
+            return $download instanceof Response ? $download : response()->download($download);
         }
 
-        return $action->run($items, $request->all());
+        return [];
     }
 
     public function bulkActions(Request $request)

@@ -66,6 +66,11 @@ abstract class Action implements Arrayable
         return false;
     }
 
+    public function download($items, $values)
+    {
+        return false;
+    }
+
     public function buttonText()
     {
         /** @translation */
