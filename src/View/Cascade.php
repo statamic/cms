@@ -89,8 +89,9 @@ class Cascade
 
     private function hydrateSegments()
     {
-        foreach (request()->segments() as $segment => $value) {
-            $segment = $segment+1; // start at 1
+        $segments = explode('/', $this->site->relativePath($this->request->getUri()));
+
+        foreach ($segments as $segment => $value) {
             $this->set("segment_{$segment}", $value);
         }
 
