@@ -216,6 +216,6 @@ class EntryRepositoryTest extends TestCase
 
         $this->assertCount(14, $this->repo->all());
         $this->assertNull($item = $this->repo->find('test-blog-entry'));
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
     }
 }

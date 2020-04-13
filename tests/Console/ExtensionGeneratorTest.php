@@ -30,7 +30,7 @@ class ExtensionGeneratorTest extends TestCase
     {
         $path = $this->preparePath('app/Fieldtypes/Cat.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:fieldtype', ['name' => 'Cat']);
 
@@ -43,7 +43,7 @@ class ExtensionGeneratorTest extends TestCase
     {
         $path = $this->preparePath('app/Scopes/Dog.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:scope', ['name' => 'Dog']);
 
@@ -56,7 +56,7 @@ class ExtensionGeneratorTest extends TestCase
     {
         $path = $this->preparePath('app/Modifiers/Giraffe.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:modifier', ['name' => 'Giraffe']);
 
@@ -69,7 +69,7 @@ class ExtensionGeneratorTest extends TestCase
     {
         $path = $this->preparePath('app/Tags/Donkey.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:tag', ['name' => 'Donkey']);
 
@@ -82,7 +82,7 @@ class ExtensionGeneratorTest extends TestCase
     {
         $path = $this->preparePath('app/Widgets/Sloth.php');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:widget', ['name' => 'Sloth']);
 
@@ -125,7 +125,7 @@ class ExtensionGeneratorTest extends TestCase
     {
         $path = $this->preparePath('addons/erso/deaths-tar-vulnerability');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:addon', ['package' => 'erso/deaths-tar-vulnerability']);
 
@@ -150,7 +150,7 @@ class ExtensionGeneratorTest extends TestCase
         $this->artisan('statamic:make:addon', ['package' => 'some/path/deaths-tar-vulnerability'])
             ->expectsOutput('Please enter a valid composer package name (eg. john/my-addon).');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
     }
 
     /** @test */
@@ -201,7 +201,7 @@ class ExtensionGeneratorTest extends TestCase
 
         $path = $this->preparePath('addons/ford/san-holo');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:addon', ['package' => 'ford/san-holo', '--tag' => null]);
 
@@ -218,7 +218,7 @@ class ExtensionGeneratorTest extends TestCase
 
         $path = $this->preparePath('addons/ford/san-holo');
 
-        $this->assertFileNotExists($path);
+        $this->assertFileDoesNotExist($path);
 
         $this->artisan('statamic:make:addon', ['package' => 'ford/san-holo', '--all' => null]);
 
@@ -246,7 +246,7 @@ class ExtensionGeneratorTest extends TestCase
 
         $this->artisan('statamic:make:addon', ['package' => 'yoda/bag-odah']);
 
-        $this->assertFileNotExists("$path/src/Tags/Yoda.php");
+        $this->assertFileDoesNotExist("$path/src/Tags/Yoda.php");
 
         Composer::shouldReceive('installedPath')->andReturn($path);
 
