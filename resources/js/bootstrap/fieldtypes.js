@@ -22,6 +22,7 @@ Vue.component('assets-fieldtype-index', require('../components/fieldtypes/assets
 Vue.component('asset_folder-fieldtype', require('../components/fieldtypes/AssetFolderFieldtype.vue').default);
 Vue.component('bard-fieldtype', require('../components/fieldtypes/bard/BardFieldtype.vue').default);
 Vue.component('bard_buttons_setting-fieldtype', require('../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue').default);
+Vue.component('button_group-fieldtype', require('../components/fieldtypes/ButtonGroupFieldtype.vue').default);
 Vue.component('checkboxes-fieldtype', require('../components/fieldtypes/CheckboxesFieldtype.vue').default);
 Vue.component('code-fieldtype', require('../components/fieldtypes/CodeFieldtype.vue').default);
 Vue.component('collection_routes-fieldtype', require('../components/collections/Routes.vue').default);

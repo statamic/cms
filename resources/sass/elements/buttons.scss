@@ -40,7 +40,7 @@ button {
     &.active, &.active:hover {
         box-shadow: inset 2px 2px 3px 0px rgba(25,30,35,.1);
         background: config('colors.grey-40');
-        border-color: #aeb9c3;
+        border-color: #aeb9c3 !important;
     }
 
     &:disabled {
@@ -153,12 +153,24 @@ button {
     @apply flex items-center p-0;
     height: 2.375rem;
 
+    > button {
+        @apply rounded-none;
+    }
+
+    > button:not(:last-child):not(.active) {
+        @apply border-r-0;
+    }
+
+    > button.active + button {
+        @apply border-l-0;
+    }
+
     > button:first-child {
-        @apply border-r rounded-r-none;
+        @apply rounded-l;
     }
 
     button:last-child {
-        @apply rounded-l-none rounded-r border-l-0;
+        @apply rounded-r border-l;
         padding: .475rem .5rem;
         &.btn-flat { @apply border-r-0; }
     }

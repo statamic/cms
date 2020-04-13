@@ -67,6 +67,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Assets\Assets::class,
         Fieldtypes\Bard::class,
         Fieldtypes\Bard\Buttons::class,
+        Fieldtypes\ButtonGroup::class,
         Fieldtypes\Blueprints::class,
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
