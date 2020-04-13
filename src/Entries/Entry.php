@@ -424,7 +424,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization
 
     public function lastModifiedBy()
     {
-        return User::find($this->get('updated_by'));
+        return $this->has('updated_by')
+            ? User::find($this->get('updated_by'))
+            : null;
     }
 
     public function status()
