@@ -7,9 +7,22 @@ use Statamic\Facades\User;
 
 class Unpublish extends Action
 {
-    public function filter($item)
+    public function visibleTo($item)
     {
         return $item instanceof Entry && $item->published();
+    }
+
+    public function visibleToBulk($items)
+    {
+        if ($items->whereInstanceOf(Entry::class)->count() !== $items->count()) {
+            return false;
+        }
+
+        if ($items->reject->published()->count() === $items->count()) {
+            return false;
+        }
+
+        return true;
     }
 
     public function authorize($user, $entry)

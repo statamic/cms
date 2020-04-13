@@ -13,7 +13,7 @@ class Delete extends Action
         return __('Delete');
     }
 
-    public function filter($item)
+    public function visibleTo($item)
     {
         return true;
     }

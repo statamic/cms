@@ -20,11 +20,33 @@ abstract class Action implements Arrayable
     protected $dangerous = false;
     protected $fields = [];
     protected $context = [];
-    protected $bulk = true;
 
-    public function filter($item)
+    public function visibleTo($item)
     {
         return true;
+    }
+
+    public function visibleToBulk($items)
+    {
+        $allowedOnItems = $items->filter(function ($item) {
+            return $this->visibleTo($item);
+        });
+
+        return $items->count() === $allowedOnItems->count();
+    }
+
+    public function authorize($user, $item)
+    {
+        return true;
+    }
+
+    public function authorizeBulk($user, $items)
+    {
+        $authorizedOnItems = $items->filter(function ($item) use ($user) {
+            return $this->authorize($user, $item);
+        });
+
+        return $items->count() === $authorizedOnItems->count();
     }
 
     public function context($context)
@@ -37,11 +59,6 @@ abstract class Action implements Arrayable
     protected function fieldItems()
     {
         return $this->fields;
-    }
-
-    public function authorize($user, $item)
-    {
-        return true;
     }
 
     public function redirect()
@@ -73,7 +90,6 @@ abstract class Action implements Arrayable
             'fields' => $this->fields()->toPublishArray(),
             'meta' => $this->fields()->meta(),
             'context' => $this->context,
-            'bulk' => $this->bulk,
         ];
     }
 }

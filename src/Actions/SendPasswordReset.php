@@ -11,7 +11,7 @@ class SendPasswordReset extends Action
         return __('Send Password Reset');
     }
 
-    public function filter($item)
+    public function visibleTo($item)
     {
         return $item instanceof UserContract;
     }

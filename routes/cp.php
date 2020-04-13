@@ -41,7 +41,8 @@ Route::group([
 
         Route::group(['prefix' => 'collections/{collection}/entries'], function () {
             Route::get('/', 'EntriesController@index')->name('collections.entries.index');
-            Route::post('actions', 'EntryActionController')->name('collections.entries.actions');
+            Route::post('actions', 'EntryActionController@run')->name('collections.entries.actions.run');
+            Route::get('actions', 'EntryActionController@bulkActions')->name('collections.entries.actions.bulk');
             Route::get('create/{site}', 'EntriesController@create')->name('collections.entries.create');
             Route::post('create/{site}/preview', 'EntryPreviewController@create')->name('collections.entries.preview.create');
             Route::post('reorder', 'ReorderEntriesController')->name('collections.entries.reorder');
@@ -71,7 +72,8 @@ Route::group([
 
         Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
             Route::get('/', 'TermsController@index')->name('taxonomies.terms.index');
-            Route::post('actions', 'TermActionController')->name('taxonomies.terms.actions');
+            Route::post('actions', 'TermActionController@run')->name('taxonomies.terms.actions.run');
+            Route::get('actions', 'TermActionController@bulkActions')->name('taxonomies.terms.actions.bulk');
             Route::get('create/{site}', 'TermsController@create')->name('taxonomies.terms.create');
             Route::post('create/{site}/preview', 'TermPreviewController@create')->name('taxonomies.terms.preview.create');
             Route::post('{site}', 'TermsController@store')->name('taxonomies.terms.store');
@@ -110,10 +112,11 @@ Route::group([
         Route::resource('asset-containers', 'AssetContainersController');
         Route::post('asset-containers/{asset_container}/folders', 'FoldersController@store');
         Route::patch('asset-containers/{asset_container}/folders/{path}', 'FoldersController@update')->where('path', '.*');
-        Route::post('assets/actions', 'ActionController')->name('assets.actions');
+        Route::post('assets/actions', 'ActionController@run')->name('assets.actions.run');
+        Route::get('assets/actions', 'ActionController@bulkActions')->name('assets.actions.bulk');
         Route::get('assets/browse', 'BrowserController@index')->name('assets.browse.index');
         Route::get('assets/browse/search/{asset_container}', 'BrowserController@search');
-        Route::post('assets/browse/folders/{asset_container}/actions', 'FolderActionController')->name('assets.folders.actions');
+        Route::post('assets/browse/folders/{asset_container}/actions', 'FolderActionController@run')->name('assets.folders.actions.run');
         Route::get('assets/browse/folders/{asset_container}/{path?}', 'BrowserController@folder')->where('path', '.*');
         Route::get('assets/browse/{asset_container}/{path?}/edit', 'BrowserController@edit')->where('path', '.*')->name('assets.browse.edit');
         Route::get('assets/browse/{asset_container}/{path?}', 'BrowserController@show')->where('path', '.*')->name('assets.browse.show');
@@ -153,14 +156,16 @@ Route::group([
     Route::post('addons/uninstall', 'AddonsController@uninstall');
 
     Route::group(['namespace' => 'Forms'], function () {
+        Route::post('forms/{form}/submissions/actions', 'SubmissionActionController@run')->name('forms.submissions.actions.run');
+        Route::get('forms/{form}/submissions/actions', 'SubmissionActionController@bulkActions')->name('forms.submissions.actions.bulk');
         Route::resource('forms', 'FormsController');
         Route::resource('forms.submissions', 'FormSubmissionsController');
-        Route::post('forms/{form}/submissions/actions', 'SubmissionActionController')->name('forms.submissions.actions');
         Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
     });
 
     Route::group(['namespace' => 'Users'], function () {
-        Route::post('users/actions', 'UserActionController')->name('users.actions');
+        Route::post('users/actions', 'UserActionController@run')->name('users.actions.run');
+        Route::get('users/actions', 'UserActionController@bulkActions')->name('users.actions.bulk');
         Route::resource('users', 'UsersController');
         Route::patch('users/{user}/password', 'PasswordController@update')->name('users.password.update');
         Route::get('account', 'AccountController')->name('account');

@@ -1,4 +1,3 @@
-<script>
 import DataListAction from './Action.vue';
 
 export default {
@@ -14,9 +13,11 @@ export default {
     computed: {
 
         sortedActions() {
+            let actions = _.sortBy(this.actions, 'title');
+
             return [
-                ...this.actions.filter(action => !action.dangerous),
-                ...this.actions.filter(action => action.dangerous)
+                ...actions.filter(action => !action.dangerous),
+                ...actions.filter(action => action.dangerous)
             ];
         },
 
@@ -49,4 +50,3 @@ export default {
     }
 
 }
-</script>

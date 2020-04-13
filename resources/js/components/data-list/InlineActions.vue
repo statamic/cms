@@ -21,7 +21,7 @@
 
 
 <script>
-import Actions from './Actions.vue';
+import Actions from './Actions';
 
 export default {
 

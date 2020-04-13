@@ -11,7 +11,7 @@ class RenameAsset extends Action
         return __('Rename');
     }
 
-    public function filter($item)
+    public function visibleTo($item)
     {
         return $item instanceof Asset;
     }
