@@ -216,6 +216,7 @@ abstract class Store
         $deleted->each(function ($path) {
             if ($key = $this->getKeyFromPath($path)) {
                 $this->forgetItem($key);
+                $this->handleDeletedItem($path, $key);
             }
         });
 
@@ -269,6 +270,11 @@ abstract class Store
     }
 
     protected function handleModifiedItem($item)
+    {
+        //
+    }
+
+    protected function handleDeletedItem($item, $key)
     {
         //
     }

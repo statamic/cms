@@ -7,45 +7,63 @@ use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\CP\FieldtypeFactory;
 use Statamic\Fields\ConfigFields;
+use Statamic\Query\Scopes\Filters\Fields\Grid as GridFilter;
 
 class Grid extends Fieldtype
 {
     protected $defaultable = false;
     protected $defaultValue = [];
 
-    protected $configFields = [
-        'fields' => [
-            'type' => 'fields'
-        ],
-        'mode' => [
-            'type' => 'select',
-            'default' => 'table',
-            'instructions' => 'Choose the layout style you wish to use by default.',
-            'options' => [
-                'table' => 'Table',
-                'stacked' => 'Stacked'
+    protected function configFieldItems(): array
+    {
+        return [
+            'fields' => [
+                'display' => __('Fields'),
+                'instructions' => __('statamic::fieldtypes.grid.config.fields'),
+                'type' => 'fields',
             ],
-        ],
-        'max_rows' => [
-            'type' => 'integer',
-            'width' => '50',
-            'instructions' => 'Set a maximum number of rows that can be created.',
-        ],
-        'min_rows' => [
-            'type' => 'integer',
-            'width' => '50',
-            'instructions' => 'Set a minimum number of rows that must be created.',
-        ],
-        'add_row' => [
-            'type' => 'text',
-            'instructions' => 'Set the label of the "Add Row" button.',
-        ],
-        'reorderable' => [
-            'type' => 'toggle',
-            'default' => true,
-            'instructions' => 'Enable to allow row reordering.',
-        ],
-    ];
+            'mode' => [
+                'display' => __('Mode'),
+                'instructions' => __('statamic::fieldtypes.grid.config.mode'),
+                'type' => 'select',
+                'options' => [
+                    'table' => __('Table'),
+                    'stacked' => __('Stacked'),
+                ],
+                'default' => 'table',
+            ],
+            'max_rows' => [
+                'display' => __('Maximum Rows'),
+                'instructions' => __('statamic::fieldtypes.grid.config.max_rows'),
+                'type' => 'integer',
+                'width' => '50',
+            ],
+            'min_rows' => [
+                'display' => __('Minimum Rows'),
+                'instructions' => __('statamic::fieldtypes.grid.config.min_rows'),
+                'type' => 'integer',
+                'width' => '50',
+            ],
+            'add_row' => [
+                'display' => __('Add Row Label'),
+                'instructions' => __('statamic::fieldtypes.grid.config.add_row'),
+                'type' => 'text',
+                'width' => '50',
+            ],
+            'reorderable' => [
+                'display' => __('Reorderable'),
+                'instructions' => __('statamic::fieldtypes.grid.config.reorderable'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => '50',
+            ],
+        ];
+    }
+
+    public function filter()
+    {
+        return new GridFilter($this);
+    }
 
     public function process($data)
     {
@@ -132,8 +150,20 @@ class Grid extends Fieldtype
 
     public function augment($value)
     {
-        return collect($value)->map(function ($row) {
-            return $this->fields()->addValues($row)->augment()->values()->all();
+        return $this->performAugmentation($value, false);
+    }
+
+    public function shallowAugment($value)
+    {
+        return $this->performAugmentation($value, true);
+    }
+
+    private function performAugmentation($value, $shallow)
+    {
+        $method = $shallow ? 'shallowAugment' : 'augment';
+
+        return collect($value)->map(function ($row) use ($method) {
+            return $this->fields()->addValues($row)->{$method}()->values()->all();
         });
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Statamic\Auth;
 
-use ArrayAccess;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -18,17 +17,17 @@ use Statamic\Data\TracksQueriedColumns;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\URL;
+use Statamic\Fields\Value;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
+use Statamic\Statamic;
 use Statamic\Support\Arr;
-use Statamic\Fields\Value;
 
 abstract class User implements
     UserContract,
     Authenticatable,
     CanResetPasswordContract,
     Augmentable,
-    ArrayAccess,
     AuthorizableContract
 {
     use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns;
@@ -60,7 +59,7 @@ abstract class User implements
             $name = $this->email();
         }
 
-        return strtoupper(substr($name, 0, 1) . substr($surname, 0, 1));
+        return strtoupper(mb_substr($name, 0, 1) . mb_substr($surname, 0, 1));
     }
 
     public function avatar($size = 64)
@@ -108,6 +107,11 @@ abstract class User implements
     public function updateUrl()
     {
         return cp_route('users.update', $this->id());
+    }
+
+    public function apiUrl()
+    {
+        return Statamic::apiRoute('users.show', $this->id());
     }
 
     public function newAugmentedInstance()
@@ -202,26 +206,6 @@ abstract class User implements
         return Facades\User::{$method}(...$parameters);
     }
 
-    public function offsetExists($key)
-    {
-        return $this->has($key);
-    }
-
-    public function offsetGet($key)
-    {
-        return $this->value($key);
-    }
-
-    public function offsetSet($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
-    }
-
     public function name()
     {
         if ($name = $this->get('name')) {
@@ -242,5 +226,10 @@ abstract class User implements
     public function defaultAugmentedArrayKeys()
     {
         return $this->selectedQueryColumns;
+    }
+
+    protected function shallowAugmentedArrayKeys()
+    {
+        return ['id', 'name', 'email', 'api_url'];
     }
 }

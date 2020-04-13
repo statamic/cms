@@ -6,6 +6,10 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\CP\Column;
+use Statamic\CP\Columns;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Field as FieldAPI;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
@@ -206,6 +210,50 @@ class BlueprintTest extends TestCase
                 $this->assertEveryItemIsInstanceOf(Field::class, $items);
                 $this->assertEquals(['one', 'two'], $items->map->handle()->values()->all());
                 $this->assertEquals(['text', 'textarea'], $items->map->type()->values()->all());
+            });
+        });
+    }
+
+    /** @test */
+    function it_gets_columns()
+    {
+        $blueprint = new Blueprint;
+
+        FieldRepository::shouldReceive('find')
+            ->with('fieldset_one.field_one')
+            ->andReturn(new Field('field_one', ['type' => 'text']));
+        FieldRepository::shouldReceive('find')
+            ->with('fieldset_one.field_two')
+            ->andReturn(new Field('field_one', ['type' => 'textarea']));
+
+        $blueprint->setContents($contents = [
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        [
+                            'handle' => 'one',
+                            'field' => 'fieldset_one.field_one'
+                        ]
+                    ]
+                ],
+                'section_two' => [
+                    'fields' => [
+                        [
+                            'handle' => 'two',
+                            'field' => 'fieldset_one.field_two'
+                        ]
+                    ]
+                ]
+            ]
+        ]);
+
+        tap($blueprint->columns(), function ($columns) {
+            $this->assertInstanceOf(Columns::class, $columns);
+            tap($columns, function ($items) {
+                $this->assertCount(2, $items);
+                $this->assertEveryItemIsInstanceOf(Column::class, $items);
+                $this->assertEquals(['one', 'two'], $items->map->field()->values()->all());
+                $this->assertEquals([1, 2], $items->map->defaultOrder()->values()->all());
             });
         });
     }
@@ -537,4 +585,34 @@ class BlueprintTest extends TestCase
 
         $blueprint->fields();
     }
+
+        /** @test */
+        function it_gets_the_handle_when_casting_to_a_string()
+        {
+            $blueprint = (new Blueprint)->setHandle('test');
+
+            $this->assertEquals('test', (string) $blueprint);
+        }
+
+        /** @test */
+        function it_augments()
+        {
+            $blueprint = (new Blueprint)->setHandle('test');
+
+            $this->assertInstanceof(Augmentable::class, $blueprint);
+            $this->assertEquals([
+                'title' => 'Test',
+                'handle' => 'test',
+            ], $blueprint->toAugmentedArray());
+        }
+
+        /** @test */
+        function it_augments_in_the_parser()
+        {
+            $blueprint = (new Blueprint)->setHandle('test');
+
+            $this->assertEquals('test', Antlers::parse('{{ blueprint }}', ['blueprint' => $blueprint]));
+
+            $this->assertEquals('test Test', Antlers::parse('{{ blueprint }}{{ handle }} {{ title }}{{ /blueprint }}', ['blueprint' => $blueprint]));
+        }
 }

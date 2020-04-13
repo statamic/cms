@@ -9,15 +9,19 @@ use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Tags\Query;
+use Statamic\Tags\Concerns;
 
 class Entries
 {
-    use Query\HasConditions,
-        Query\HasScopes,
-        Query\HasOrderBys,
-        Query\GetsResults;
+    use Concerns\QueriesConditions,
+        Concerns\QueriesScopes,
+        Concerns\GetsQueryResults;
+
+    use Concerns\QueriesOrderBys {
+        queryOrderBys as traitQueryOrderBys;
+    }
 
     protected $ignoredParams = ['as'];
     protected $parameters;
@@ -142,6 +146,7 @@ class Entries
         $this->queryPastFuture($query);
         $this->querySinceUntil($query);
         $this->queryTaxonomies($query);
+        $this->queryRedirects($query);
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
@@ -168,7 +173,7 @@ class Entries
         $not = $this->parameters->get(['not_from', 'not_in', 'not_folder', 'dont_use', 'not_collection']);
 
         if ($from === '*') {
-            $from = Collection::handles();
+            $from = Collection::handles()->all();
         } elseif (is_string($from)) {
             $from = explode('|', $from);
         }
@@ -177,8 +182,16 @@ class Entries
             $not = explode('|', $not);
         }
 
-        return collect($from)
-            ->diff(collect($not)->filter())
+        $from = collect(Arr::wrap($from))->map(function ($collection) {
+            return (string) $collection;
+        });
+
+        $not = collect(Arr::wrap($not))->map(function ($collection) {
+            return (string) $collection;
+        })->filter();
+
+        return $from
+            ->diff($not)
             ->map(function ($handle) {
                 $collection = Collection::findByHandle($handle);
                 throw_unless($collection, new \Statamic\Exceptions\CollectionNotFoundException($handle));
@@ -311,5 +324,36 @@ class Entries
                 );
             }
         });
+    }
+
+    protected function queryOrderBys($query)
+    {
+        $isSortingByOrder = null !== $this->orderBys->first(function ($orderBy) {
+            return $orderBy->sort === 'order';
+        });
+
+        if ($isSortingByOrder) {
+            $nonOrderableCollections = $this->collections->reject->orderable();
+            if ($nonOrderableCollections->isNotEmpty()) {
+                throw new \LogicException('Cannot sort a nested collection by order.');
+            }
+        }
+
+        return $this->traitQueryOrderBys($query);
+    }
+
+    protected function queryRedirects($query)
+    {
+        $isQueryingRedirect = $this->parameters->first(function ($v, $k) {
+            return Str::startsWith($k, 'redirect:');
+        });
+
+        if ($isQueryingRedirect) {
+            return;
+        }
+
+        if (! $this->parameters->bool(['redirects', 'links'], false)) {
+            $query->where('redirect', '=', null);
+        }
     }
 }

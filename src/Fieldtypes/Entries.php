@@ -9,9 +9,12 @@ use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class Entries extends Relationship
 {
+    use QueriesFilters;
+
     protected $canEdit = true;
     protected $canCreate = true;
     protected $canSearch = true;
@@ -40,21 +43,34 @@ class Entries extends Relationship
         'collectionHandle' => 'collection',
     ];
 
-    protected $extraConfigFields = [
-        'collections' => [
-            'type' => 'collections'
-        ],
-    ];
+    protected function configFieldItems(): array
+    {
+        return [
+            'collections' => [
+                'display' => __('Collections'),
+                'type' => 'collections'
+            ],
+        ];
+    }
+
+    public function preload()
+    {
+        return array_merge(parent::preload(), [
+            'filters' => $this->getSelectionFilters(),
+        ]);
+    }
 
     public function getIndexItems($request)
     {
-        $this->updateRequest($request);
-
         $query = $this->getIndexQuery($request);
 
-        foreach ($request->filters as $handle => $values) {
-            Scope::find($handle, $this->getSelectionFilterContext($request))->apply($query, $values);
+        $filters = $request->filters;
+
+        if (! isset($filters['collection'])) {
+            $query->whereIn('collection', $this->getConfiguredCollections());
         }
+
+        $this->activeFilterBadges = $this->queryFilters($query, $filters, $this->getSelectionFilterContext());
 
         if ($sort = $this->getSortColumn($request)) {
             $query->orderBy($sort, $this->getSortDirection($request));
@@ -63,26 +79,13 @@ class Entries extends Relationship
         return $query->paginate()->preProcessForIndex();
     }
 
-    protected function updateRequest($request)
-    {
-        if (! $request->filters) {
-            $request->filters = collect();
-        }
-
-        if (! $request->filters->has('collection')) {
-            $request->filters['collection'] = ['value' => []];
-        }
-    }
-
     public function getResourceCollection($request, $items)
     {
         return (new EntriesResource($items))
             ->blueprint($this->getBlueprint($request))
             ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
             ->additional(['meta' => [
-                'sortColumn' => $this->getSortColumn($request),
-                'filters' => $this->getSelectionFilters($request),
-                'activeFilters' => $this->getActiveFilters($request),
+                'activeFilterBadges' => $this->activeFilterBadges,
             ]]);
     }
 
@@ -93,7 +96,9 @@ class Entries extends Relationship
 
     protected function getFirstCollectionFromRequest($request)
     {
-        $collections = $request->filters['collection']['value'];
+        $collections = $request
+            ? $request->input('filters.collection.collections', [])
+            : [];
 
         if (empty($collections)) {
             $collections = $this->getConfiguredCollections();
@@ -172,43 +177,38 @@ class Entries extends Relationship
 
     protected function augmentValue($value)
     {
-        if ($entry = Entry::find($value)) {
-            return $entry;
+        if (is_string($value)) {
+            $value = Entry::find($value);
         }
+
+        return $value;
     }
 
     protected function shallowAugmentValue($value)
     {
         return [
             'id' => $value->id(),
+            'title' => $value->value('title'),
             'url' => $value->url(),
             'permalink' => $value->absoluteUrl(),
             'api_url' => $value->apiUrl(),
         ];
     }
 
-    protected function getSelectionFilters($request)
+    protected function getSelectionFilters()
     {
-        return Scope::filters('entries-fieldtype', $this->getSelectionFilterContext($request));
+        return Scope::filters('entries-fieldtype', $this->getSelectionFilterContext());
     }
 
-    protected function getSelectionFilterContext($request)
+    protected function getSelectionFilterContext()
     {
-        return [
-            'collections' => $this->getConfiguredCollections(),
-            'blueprints' => [$this->getBlueprint($request)->handle()]
-        ];
-    }
+        $collections = $this->getConfiguredCollections();
 
-    protected function getActiveFilters($request)
-    {
-        $filters = $request->filters;
+        $blueprints = collect($collections)->flatMap(function ($collection) {
+            return Collection::findByHandle($collection)->entryBlueprints()->map->handle();
+        })->all();
 
-        if (empty($filters['collection']['value'])) {
-            unset($filters['collection']);
-        }
-
-        return $filters;
+        return compact('collections', 'blueprints');
     }
 
     protected function getConfiguredCollections()

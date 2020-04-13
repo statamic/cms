@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\CP\FieldtypeFactory;
+use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
 
 class Replicator extends Fieldtype
 {
@@ -12,6 +13,11 @@ class Replicator extends Fieldtype
     protected $configFields = [
         'sets' => ['type' => 'sets'],
     ];
+
+    public function filter()
+    {
+        return new ReplicatorFilter($this);
+    }
 
     public function process($data)
     {
@@ -79,16 +85,28 @@ class Replicator extends Fieldtype
         return array_get($this->getFieldConfig('sets'), $handle);
     }
 
-    public function augment($array)
+    public function augment($values)
     {
-        return collect($array)->reject(function ($set, $key) {
+        return $this->performAugmentation($values, false);
+    }
+
+    public function shallowAugment($values)
+    {
+        return $this->performAugmentation($values, true);
+    }
+
+    protected function performAugmentation($values, $shallow)
+    {
+        return collect($values)->reject(function ($set, $key) {
             return array_get($set, 'enabled', true) === false;
-        })->map(function ($set) {
+        })->map(function ($set) use ($shallow) {
             if (! $config = $this->config("sets.{$set['type']}.fields")) {
                 return $set;
             }
 
-            $values = (new Fields($config))->addValues($set)->augment()->values();
+            $augmentMethod = $shallow ? 'shallowAugment' : 'augment';
+
+            $values = (new Fields($config))->addValues($set)->{$augmentMethod}()->values();
 
             return $values->merge(['type' => $set['type']])->all();
         })->all();

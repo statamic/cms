@@ -11,6 +11,6 @@ interface StructureRepository
     public function all(): Collection;
     public function find($id): ?Structure;
     public function findByHandle($handle): ?Structure;
-    public function findEntryByUri(string $uri, string $site = null): ?Entry;
     public function save(Structure $structure);
+    public function make(string $handle = null): Structure;
 }

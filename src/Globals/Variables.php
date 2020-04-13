@@ -64,17 +64,17 @@ class Variables implements Contract, Localization, Augmentable
 
     public function editUrl()
     {
-        return $this->cpUrl('globals.edit');
+        return $this->cpUrl('globals.variables.edit');
     }
 
     public function updateUrl()
     {
-        return $this->cpUrl('globals.update');
+        return $this->cpUrl('globals.variables.update');
     }
 
     protected function cpUrl($route)
     {
-        $params = [$this->id(), $this->handle()];
+        $params = [$this->handle()];
 
         if (Site::hasMultiple()) {
             $params['site'] = $this->locale();
@@ -131,7 +131,7 @@ class Variables implements Contract, Localization, Augmentable
     public function fileData()
     {
         return array_merge([
-            'origin' => $this->hasOrigin() ? $this->origin->locale() : null,
+            'origin' => $this->hasOrigin() ? $this->origin()->locale() : null,
         ], $this->data()->all());
     }
 

@@ -29,7 +29,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         }
 
         if ($this->shouldPreventNavBeingBuilt) {
-            \Statamic\Facades\Nav::shouldReceive('build')->andReturn([]);
+            \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn([]);
             $this->addToAssertionCount(-1); // Dont want to assert this
         }
     }
@@ -41,8 +41,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         if (isset($uses[PreventSavingStacheItemsToDisk::class])) {
             $this->deleteFakeStacheDirectory();
         }
-
-        Statamic::disableShallowAugmentation();
 
         parent::tearDown();
     }
@@ -93,7 +91,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('statamic.stache.stores.terms.directory', __DIR__.'/__fixtures__/content/taxonomies');
         $app['config']->set('statamic.stache.stores.collections.directory', __DIR__.'/__fixtures__/content/collections');
         $app['config']->set('statamic.stache.stores.entries.directory', __DIR__.'/__fixtures__/content/collections');
-        $app['config']->set('statamic.stache.stores.structures.directory', __DIR__.'/__fixtures__/content/structures');
+        $app['config']->set('statamic.stache.stores.navigation.directory', __DIR__.'/__fixtures__/content/navigation');
         $app['config']->set('statamic.stache.stores.globals.directory', __DIR__.'/__fixtures__/content/globals');
         $app['config']->set('statamic.stache.stores.asset-containers.directory', __DIR__.'/__fixtures__/content/assets');
 
@@ -156,5 +154,13 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     protected function isRunningWindows()
     {
         return DIRECTORY_SEPARATOR === '\\';
+    }
+
+    // This method is unavailable on earlier versions of Laravel.
+    public function partialMock($abstract, \Closure $mock = null)
+    {
+        $mock = \Mockery::mock(...array_filter(func_get_args()))->makePartial();
+        $this->app->instance($abstract, $mock);
+        return $mock;
     }
 }

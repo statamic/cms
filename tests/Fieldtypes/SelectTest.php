@@ -62,4 +62,23 @@ class SelectTest extends TestCase
         $this->assertNull($augmented->value());
         $this->assertNull($augmented->label());
     }
+
+    /** @test */
+    function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents()
+    {
+        $field = (new Select)->setField(new Field('test', [
+            'type' => 'select',
+            'multiple' => true,
+            'options' => [
+                'au' => 'Australia',
+                'ca' => 'Canada',
+                'us' => 'USA',
+            ]
+        ]));
+
+        $this->assertEquals([
+            ['key' => 'au', 'value' => 'au', 'label' => 'Australia'],
+            ['key' => 'us', 'value' => 'us', 'label' => 'USA'],
+        ], $field->augment(['au', 'us']));
+    }
 }

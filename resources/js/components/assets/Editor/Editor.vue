@@ -144,7 +144,7 @@
                 v-if="actions.length"
                 :id="id"
                 :actions="actions"
-                :url="actionUrl"
+                :url="runActionUrl"
                 @started="actionStarted"
                 @completed="actionCompleted" />
         </portal>
@@ -257,7 +257,7 @@ export default {
                 this.asset = data;
                 this.values = data.values;
                 this.meta = data.meta;
-                this.actionUrl = data.actionUrl;
+                this.runActionUrl = data.runActionUrl;
                 this.actions = data.actions;
                 this.getFieldset();
             });
@@ -348,7 +348,7 @@ export default {
 
         shouldClose() {
             if (this.$dirty.has(this.publishContainer)) {
-                if (! confirm('Are you sure? Unsaved changes will be lost.')) {
+                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
                     return false;
                 }
             }

@@ -122,7 +122,7 @@ class RoutesTest extends TestCase
     /** @test */
     function it_loads_content_by_uri()
     {
-        $collection = Collection::make('pages')->route('/{slug}')->save();
+        $collection = Collection::make('pages')->routes('/{slug}')->save();
         EntryFactory::id('pages-blog')->collection($collection)->slug('blog')->data(['title' => 'Blog'])->create();
 
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');

@@ -7,13 +7,13 @@ use DebugBar\DebugBarException;
 use Illuminate\Support\Facades\Crypt;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
-use Statamic\Tags\OutputsItems;
+use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
-use Statamic\Tags\Traits\RendersForms;
 
 class Tags extends BaseTags
 {
-    use OutputsItems, RendersForms;
+    use Concerns\OutputsItems,
+        Concerns\RendersForms;
 
     const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
 
@@ -65,7 +65,9 @@ class Tags extends BaseTags
         $this->formHandle = $this->getForm();
         $this->errorBag = $this->getErrorBag();
 
-        $html = $this->formOpen(route('statamic.forms.store'));
+        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect']);
+
+        $html = $this->formOpen(route('statamic.forms.store'), 'POST', $knownParams);
 
         if ($this->hasErrors()) {
             $data['error']  = $this->getErrors();

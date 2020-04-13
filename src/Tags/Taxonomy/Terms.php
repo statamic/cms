@@ -3,22 +3,22 @@
 namespace Statamic\Tags\Taxonomy;
 
 use Closure;
-use Statamic\Facades;
-use Statamic\Support\Arr;
-use Statamic\Facades\Site;
-use Statamic\Facades\Term;
-use Statamic\Tags\Query;
-use Statamic\Facades\Taxonomy;
-use Statamic\Facades\Collection;
 use Illuminate\Support\Carbon;
+use Statamic\Facades;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
+use Statamic\Support\Arr;
+use Statamic\Tags\Concerns;
 use Statamic\Taxonomies\TermCollection;
 
 class Terms
 {
-    use Query\HasConditions,
-        Query\HasScopes,
-        Query\HasOrderBys,
-        Query\GetsResults;
+    use Concerns\QueriesConditions,
+        Concerns\QueriesScopes,
+        Concerns\QueriesOrderBys,
+        Concerns\GetsQueryResults;
 
     protected $ignoredParams = ['as'];
     protected $parameters;
@@ -77,7 +77,7 @@ class Terms
 
     protected function parseParameters($params)
     {
-        $this->parameters = Arr::except($params->all(), $this->ignoredParams);
+        $this->parameters = $params->except($this->ignoredParams);
         $this->taxonomies = $this->parseTaxonomies();
         $this->orderBys = $this->parseOrderBys();
         $this->collections = $this->parseCollections();

@@ -80,6 +80,7 @@
                             v-show="sectionsVisible"
                             :read-only="readOnly"
                             :syncable="hasOrigin"
+                            :can-toggle-labels="true"
                             @updated="setFieldValue"
                             @meta-updated="setFieldMeta"
                             @synced="syncField"
@@ -96,7 +97,7 @@
                                             class="flex items-center justify-center btn-flat w-full mx-1 px-1"
                                             v-if="isBase"
                                             @click="openLivePreview">
-                                            <svg-icon name="syncronize" class="w-5 h-5 mr-1" />
+                                            <svg-icon name="synchronize" class="w-5 h-5 mr-1" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
@@ -406,7 +407,7 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (! confirm('Are you sure? Unsaved changes will be lost.')) {
+                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
                     return;
                 }
             }
@@ -493,7 +494,7 @@ export default {
         },
 
         syncField(handle) {
-            if (! confirm('Are you sure? This field\'s value will be replaced by the value in the original entry.'))
+            if (! confirm(__('Are you sure? This field\'s value will be replaced by the value in the original entry.')))
                 return;
 
             this.localizedFields = this.localizedFields.filter(field => field !== handle);

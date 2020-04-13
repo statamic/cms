@@ -2,10 +2,12 @@
 
 namespace Statamic\Structures;
 
-use Statamic\Facades;
-use Statamic\Facades\Stache;
-use Statamic\Data\ExistsAsFile;
 use Statamic\Contracts\Data\Localization;
+use Statamic\Data\ExistsAsFile;
+use Statamic\Facades;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Tree implements Localization
@@ -13,7 +15,6 @@ class Tree implements Localization
     use ExistsAsFile, FluentlyGetsAndSets;
 
     protected $locale;
-    protected $root;
     protected $tree = [];
     protected $structure;
     protected $cachedFlattenedPages;
@@ -21,6 +22,11 @@ class Tree implements Localization
     public function locale($locale = null)
     {
         return $this->fluentlyGetOrSet('locale')->args(func_get_args());
+    }
+
+    public function site()
+    {
+        return Site::get($this->locale());
     }
 
     public function structure($structure = null)
@@ -31,24 +37,26 @@ class Tree implements Localization
     public function tree($tree = null)
     {
         return $this->fluentlyGetOrSet('tree')
-            ->setter(function ($tree) {
-                return $this->validateTree($tree);
+            ->getter(function ($tree)  {
+                $key = "structure-{$this->structure->handle()}-{$this->locale()}-" . md5(json_encode($tree));
+                return Blink::once($key, function () use ($tree) {
+                    return $this->structure->validateTree($tree, $this->locale());
+                });
             })
             ->args(func_get_args());
     }
 
-    public function root($root = null)
+    public function root()
     {
-        return $this->fluentlyGetOrSet('root')
-            ->setter(function ($root) {
-                return $this->validateRoot($root);
-            })
-            ->args(func_get_args());
-    }
+        if (! $this->structure()->expectsRoot()) {
+            return null;
+        }
 
-    public function sites()
-    {
-        $this->structure->sites();
+        if (! $root = $this->tree()[0] ?? null) {
+            return null;
+        }
+
+        return $root['entry'];
     }
 
     public function handle()
@@ -58,19 +66,13 @@ class Tree implements Localization
 
     public function route()
     {
-        if (! $collection = $this->structure->collection()) {
-            return null;
-        }
-
-        return is_array($route = $collection->route())
-            ? $route[$this->locale()]
-            : $route;
+        return $this->structure->route($this->locale());
     }
 
     public function path()
     {
         return vsprintf('%s/%s/%s.yaml', [
-            rtrim(Stache::store('structures')->directory(), '/'),
+            rtrim(Stache::store('navigation')->directory(), '/'),
             $this->locale(),
             $this->handle()
         ]);
@@ -78,13 +80,13 @@ class Tree implements Localization
 
     public function parent()
     {
-        if (!$this->root) {
+        if (!$this->root()) {
             return null;
         }
 
         return (new Page)
             ->setTree($this)
-            ->setEntry($this->root)
+            ->setEntry($this->root())
             ->setRoute($this->route())
             ->setDepth(1)
             ->setRoot(true);
@@ -92,9 +94,15 @@ class Tree implements Localization
 
     public function pages()
     {
+        $pages = $this->tree();
+
+        if ($this->root()) {
+            $pages = array_slice($pages, 1);
+        }
+
         $pages = (new Pages)
             ->setTree($this)
-            ->setPages($this->tree)
+            ->setPages($pages)
             ->setParent($this->parent())
             ->setDepth(1);
 
@@ -129,6 +137,8 @@ class Tree implements Localization
 
     public function save()
     {
+        $this->cachedFlattenedPages = null;
+
         $this
             ->structure()
             ->addTree($this)
@@ -138,7 +148,6 @@ class Tree implements Localization
     public function fileData()
     {
         return [
-            'root' => $this->root,
             'tree' => $this->removeEmptyChildren($this->tree),
         ];
     }
@@ -156,18 +165,25 @@ class Tree implements Localization
         })->all();
     }
 
-    public function editUrl()
+    public function showUrl()
     {
-        return cp_route('structures.show', ['structure' => $this->handle(), 'site' => $this->locale()]);
+        $params = [];
+
+        if (Site::hasMultiple()) {
+            $params['site'] = $this->locale();
+        }
+
+        return $this->structure->showUrl($params);
     }
 
-    public function toCacheableArray()
+    public function editUrl()
     {
-        return [
-            'path' => $this->initialPath() ?? $this->path(),
-            'root' => $this->root,
-            'tree' => $this->tree,
-        ];
+        return $this->structure->editUrl();
+    }
+
+    public function deleteUrl()
+    {
+        return $this->structure->deleteUrl();
     }
 
     public function append($entry)
@@ -179,7 +195,7 @@ class Tree implements Localization
 
     public function appendTo($parent, $page)
     {
-        if (! $this->page($parent)) {
+        if ($parent && !$this->page($parent)) {
             throw new \Exception("Page [{$parent}] does not exist in this structure");
         }
 
@@ -189,7 +205,11 @@ class Tree implements Localization
             $page = ['entry' => $page->id()];
         }
 
-        $this->tree = $this->appendToInBranches($parent, $page, $this->tree);
+        if ($parent) {
+            $this->tree = $this->appendToInBranches($parent, $page, $this->tree);
+        } else {
+            $this->tree[] = $page;
+        }
 
         return $this;
     }
@@ -217,7 +237,7 @@ class Tree implements Localization
 
     public function move($entry, $target)
     {
-        if ($this->page($entry)->parent()->id() === $target) {
+        if (optional($this->page($entry)->parent())->id() === $target) {
             return $this;
         }
 
@@ -226,6 +246,17 @@ class Tree implements Localization
         $this->tree = $branches;
 
         return $this->appendTo($target, $match);
+    }
+
+    public function remove($entry)
+    {
+        $id = is_string($entry) ? $entry : $entry->id();
+
+        [, $branches] = $this->removeFromInBranches($id, $this->tree);
+
+        $this->tree = $branches;
+
+        return $this;
     }
 
     private function removeFromInBranches($entry, $branches)
@@ -253,55 +284,5 @@ class Tree implements Localization
         }
 
         return [$match, array_values($branches)];
-    }
-
-    protected function validateRoot($root)
-    {
-        if (! $this->structure->isCollectionBased()) {
-            return $root;
-        }
-
-        if ($entryId = $this->getEntryIdsFromTree($this->tree)->duplicates()->first()) {
-            $this->throwDuplicateEntryException($entryId);
-        }
-
-        return $root;
-    }
-
-    protected function validateTree($tree)
-    {
-        if (! $this->structure->isCollectionBased()) {
-            return $tree;
-        }
-
-        $entryIds = $this->getEntryIdsFromTree($tree);
-
-        if ($this->root) {
-            $entryIds->push($this->root);
-        }
-
-        if ($entryId = $entryIds->duplicates()->first()) {
-            $this->throwDuplicateEntryException($entryId);
-        }
-
-        return $tree;
-    }
-
-    private function throwDuplicateEntryException($id)
-    {
-        throw new \Exception("Duplicate entry [{$id}] in [{$this->structure->handle()}] structure.");
-    }
-
-    protected function getEntryIdsFromTree($tree)
-    {
-        return collect($tree)
-            ->map(function ($item) {
-                return [
-                    'entry' => $item['entry'] ?? null,
-                    'children' => isset($item['children']) ? $this->getEntryIdsFromTree($item['children']) : null
-                ];
-            })
-            ->flatten()
-            ->filter();
     }
 }

@@ -6,7 +6,12 @@ use Statamic\Contracts\Auth\User as UserContract;
 
 class SendPasswordReset extends Action
 {
-    public function filter($item)
+    public static function title()
+    {
+        return __('Send Password Reset');
+    }
+
+    public function visibleTo($item)
     {
         return $item instanceof UserContract;
     }

@@ -18,6 +18,30 @@ class Taxonomy extends Relationship
 
     public function augment($value)
     {
+        $terms = $this->getTermsForAugmentation($value);
+
+        return $this->config('max_items') === 1 ? $terms->first() : $terms;
+    }
+
+    public function shallowAugment($value)
+    {
+        $terms = $this->getTermsForAugmentation($value);
+
+        $terms = collect($terms->map(function ($term) {
+            return [
+                'id' => $term->id(),
+                'slug' => $term->slug(),
+                'url' => $term->url(),
+                'permalink' => $term->absoluteUrl(),
+                'api_url' => $term->apiUrl(),
+            ];
+        }));
+
+        return $this->config('max_items') === 1 ? $terms->first() : $terms;
+    }
+
+    private function getTermsForAugmentation($value)
+    {
         $handle = $taxonomy = null;
 
         if ($this->usingSingleTaxonomy()) {
@@ -25,7 +49,7 @@ class Taxonomy extends Relationship
             $taxonomy = Facades\Taxonomy::findByHandle($handle);
         }
 
-        $terms = (new TermCollection(Arr::wrap($value)))
+        return (new TermCollection(Arr::wrap($value)))
             ->map(function ($value) use ($handle, $taxonomy) {
                 if ($taxonomy) {
                     $slug = $value;
@@ -47,20 +71,6 @@ class Taxonomy extends Relationship
                     ->collection($entry->collection())
                     ->in($entry->locale());
             });
-
-        if (Statamic::shallowAugmentationEnabled()) {
-            $terms = collect($terms->map(function ($term) {
-                return [
-                    'id' => $term->id(),
-                    'slug' => $term->slug(),
-                    'url' => $term->url(),
-                    'permalink' => $term->absoluteUrl(),
-                    'api_url' => $term->apiUrl(),
-                ];
-            }));
-        }
-
-        return $this->config('max_items') === 1 ? $terms->first() : $terms;
     }
 
     public function process($data)
@@ -114,8 +124,7 @@ class Taxonomy extends Relationship
     {
         return (new TermsResource($items))
             ->blueprint($this->getBlueprint($request))
-            ->columnPreferenceKey("taxonomies.{$this->getFirstTaxonomyFromRequest($request)->handle()}.columns")
-            ->additional(['meta' => ['sortColumn' => $this->getSortColumn($request)]]);
+            ->columnPreferenceKey("taxonomies.{$this->getFirstTaxonomyFromRequest($request)->handle()}.columns");
     }
 
     protected function getBlueprint($request)

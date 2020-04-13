@@ -19,21 +19,18 @@
         >
             <div slot-scope="{}" class="flex flex-col h-full">
                 <div class="bg-white border-b flex items-center justify-between bg-grey-20">
-                    <data-list-toggle-all v-if="!hasMaxSelections" />
                     <div class="p-2 flex flex-1 items-center">
-                        <div class="flex-1">
-                            <data-list-search
-                                v-if="search"
-                                v-model="searchQuery"
-                                ref="search"
-                                class="w-full bg-transparent p-0" />
-                        </div>
-
                         <data-list-filters
-                            class="ml-1"
+                            ref="filters"
                             :filters="filters"
                             :active-filters="activeFilters"
-                            :active-count="activeFilterCount" />
+                            :active-filter-badges="activeFilterBadges"
+                            :active-count="activeFilterCount"
+                            :search-query="searchQuery"
+                            @filter-changed="filterChanged"
+                            @search-changed="searchChanged"
+                            @reset="filtersReset"
+                        />
                     </div>
                 </div>
 
@@ -61,15 +58,16 @@
 
                         <data-list-pagination
                             v-if="meta.last_page > 1"
-                            class="p-1 border-t shadow-lg"
+                            class="border-t shadow-lg"
                             :resource-meta="meta"
+                            :inline="true"
                             @page-selected="setPage" />
 
                         <div class="p-2 border-t flex items-center justify-between bg-grey-20">
                             <div class="text-sm text-grey-70"
                                 v-text="hasMaxSelections
                                     ? __n(':count/:max selected', selections, { max: maxSelections })
-                                    : __n(':count selected', selections)" />
+                                    : __n(':count item selected|:count items selected', selections)" />
 
                             <div>
                                 <button
@@ -98,7 +96,6 @@
 </template>
 
 <script>
-import Popper from 'vue-popperjs';
 import HasFilters from '../../data-list/HasFilters';
 
 export default {
@@ -107,12 +104,9 @@ export default {
         HasFilters,
     ],
 
-    components: {
-        Popper
-    },
-
     props: {
         url: String,
+        filters: Array,
         initialSelections: Array,
         initialSortColumn: String,
         initialSortDirection: String,
@@ -135,10 +129,8 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             page: 1,
-            searchQuery: '',
             selections: _.clone(this.initialSelections),
             columns: [],
-            filters: [],
         }
     },
 
@@ -162,8 +154,10 @@ export default {
     },
 
     mounted() {
+        this.autoApplyFilters(this.filters);
+
         this.request().then(() => {
-            if (this.search) this.$refs.search.focus();
+            if (this.search) this.$refs.filters.$refs.search.focus();
         });
     },
 
@@ -172,6 +166,7 @@ export default {
         parameters: {
             deep: true,
             handler(after, before) {
+                if (this.initializing) return;
                 if (JSON.stringify(before) === JSON.stringify(after)) return;
                 this.request();
             }
@@ -214,11 +209,9 @@ export default {
 
             return this.$axios.get(this.url, { params, cancelToken: this.source.token }).then(response => {
                 this.columns = response.data.meta.columns;
-                this.sortColumn = response.data.meta.sortColumn;
                 this.items = response.data.data;
                 this.meta = response.data.meta;
-                this.filters = response.data.meta.filters;
-                this.activeFilters = {...response.data.meta.activeFilters};
+                this.activeFilterBadges = {...response.data.meta.activeFilterBadges};
                 this.loading = false;
                 this.initializing = false;
             }).catch(e => {

@@ -36,3 +36,30 @@
         top: 2px;
     }
 }
+
+.filter-fields {
+    .form-group {
+        @apply p-0 pb-2;
+
+        &:last-child {
+            @apply p-0;
+        }
+    }
+
+    .text-fieldtype .input-text {
+        @apply py-1 px-1.5;
+    }
+
+    .no-label.form-group,
+    .no-label .form-group {
+        @apply pb-1;
+
+        &:last-child {
+            @apply p-0;
+        }
+
+        .field-inner {
+            @apply hidden;
+        }
+    }
+}

@@ -4,57 +4,74 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Support\Html;
 use Statamic\Fields\Fieldtype;
+use Statamic\Query\Scopes\Filters\Fields\Markdown as MarkdownFilter;
 
 class Markdown extends Fieldtype
 {
-    protected $configFields = [
-        'container' => [
-            'type' => 'asset_container',
-            'max_items' => 1,
-            'instructions' => 'Set an optional asset container to be used for inserting images in your content.',
-        ],
-        'folder' => [
-            'type' => 'asset_folder',
-            'instructions' => 'The folder to begin browsing Assets in.',
-            'max_items' => 1,
-            'width' => 50,
-        ],
-        'restrict' => [
-            'type' => 'toggle',
-            'instructions' => 'Prevent users from navigating to other Asset folders.',
-            'width' => 50,
-        ],
-        'automatic_line_breaks' => [
-            'type' => 'toggle',
-            'default' => true,
-            'instructions' => 'Enables automatic line breaks.',
-            'width' => 50,
-        ],
-        'automatic_links' => [
-            'type' => 'toggle',
-            'default' => false,
-            'instructions' => 'Enables automatic linking of any URLs.',
-            'width' => 50,
-        ],
-        'escape_markup' => [
-            'type' => 'toggle',
-            'default' => false,
-            'instructions' => 'Escapes inline HTML markup (e.g. `<div>` to `&lt;div&gt;`).',
-            'width' => 50,
-        ],
-        'smartypants' => [
-            'type' => 'toggle',
-            'default' => false,
-            'instructions' => 'Automatically convert straight quotes into curly quotes, dashes into en/em-dashes, and other similar text transformations.',
-            'width' => 50,
-        ],
-        'parser' => [
-            'type' => 'text',
-            'instructions' => 'The name of a customized Markdown parser. Leave blank to use the default.',
-            'width' => 50,
-        ]
+    protected function configFieldItems(): array
+    {
+        return [
+            'container' => [
+                'display' => __('Container'),
+                'instructions' => __('statamic::fieldtypes.markdown.config.container'),
+                'type' => 'asset_container',
+                'max_items' => 1,
+                'width' => 50,
+            ],
+            'folder' => [
+                'display' => __('Folder'),
+                'instructions' => __('statamic::fieldtypes.markdown.config.folder'),
+                'type' => 'asset_folder',
+                'max_items' => 1,
+                'width' => 50,
+            ],
+            'restrict' => [
+                'display' => __('Restrict'),
+                'instructions' => __('statamic::fieldtypes.markdown.config.restrict'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
+            'automatic_line_breaks' => [
+                'display' => __('Automatic Line Breaks'),
+                'instructions' => __('statamic::fieldtypes.markdown.config.automatic_line_breaks'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
+            'automatic_links' => [
+                'display' => __('Automatic Links'),
+                'instructions' => __('statamic::fieldtypes.markdown.config.automatic_links'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'escape_markup' => [
+                'display' => __('Escape Markup'),
+                'instructions' => __('statamic::fieldtypes.markdown.config.escape_markup'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'smartypants' => [
+                'display' => __('Smartypants'),
+                'instructions' => __('statamic::fieldtypes.markdown.config.smartypants'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'parser' => [
+                'display' => __('Parser'),
+                'instructions' => __('statamic::fieldtypes.markdown.config.parser'),
+                'type' => 'text',
+                'width' => 50,
+            ]
+        ];
+    }
 
-    ];
+    public function filter()
+    {
+        return new MarkdownFilter($this);
+    }
 
     public function augment($value)
     {

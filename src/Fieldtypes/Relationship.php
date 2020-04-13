@@ -26,24 +26,30 @@ abstract class Relationship extends Fieldtype
         '_' => '_' // forces an object in js
     ];
     protected $extraConfigFields = [];
-    protected $configFields = [
-        'max_items' => [
-            'type' => 'integer',
-            'instructions' => 'Set a maximum number of selectable items',
-        ],
-        'mode' => [
-            'type' => 'radio',
-            'options' => [
-                'default' => 'Stack Selector',
-                'select' => 'Select Dropdown',
-                'typeahead' => 'Typeahead Field'
-            ]
-        ]
-    ];
 
     protected function configFieldItems(): array
     {
-        return array_merge($this->configFields, $this->extraConfigFields);
+        $configFields = [
+            'max_items' => [
+                'display' => __('Max Items'),
+                'instructions' => __('statamic::messages.max_items_instructions'),
+                'type' => 'integer',
+                'width' => 50,
+            ],
+            'mode' => [
+                'display' => __('Mode'),
+                'type' => 'radio',
+                'default' => 'default',
+                'options' => [
+                    'default' => __('Stack Selector'),
+                    'select' => __('Select Dropdown'),
+                    'typeahead' => __('Typeahead Field'),
+                ],
+                'width' => 50,
+            ]
+        ];
+
+        return array_merge($configFields, $this->extraConfigFields);
     }
 
     public function preProcess($data)
@@ -215,11 +221,18 @@ abstract class Relationship extends Fieldtype
             return $this->augmentValue($value);
         });
 
-        if (Statamic::shallowAugmentationEnabled()) {
-            $values = $values->map(function ($value) {
-                return $this->shallowAugmentValue($value);
-            });
-        }
+        return $this->config('max_items') === 1 ? $values->first() : $values;
+    }
+
+    public function shallowAugment($values)
+    {
+        $values = collect($values)->map(function ($value) {
+            return $this->augmentValue($value);
+        });
+
+        $values = $values->map(function ($value) {
+            return $this->shallowAugmentValue($value);
+        });
 
         return $this->config('max_items') === 1 ? $values->first() : $values;
     }
@@ -240,7 +253,6 @@ abstract class Relationship extends Fieldtype
     {
         return Resource::collection($items)->additional(['meta' => [
             'columns' => $this->getColumns(),
-            'sortColumn' => $this->getSortColumn($request),
         ]]);
     }
 

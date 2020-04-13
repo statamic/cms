@@ -10,6 +10,46 @@ use Tests\TestCase;
 class ValueTest extends TestCase
 {
     /** @test */
+    function it_augments_through_the_fieldtype()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($data)
+            {
+                return strtoupper($data) . '!';
+            }
+            public function shallowAugment($data)
+            {
+                return $data . ' shallow';
+            }
+        };
+
+        $value = new Value('test', null, $fieldtype);
+
+        $this->assertEquals('TEST!', $value->value());
+    }
+
+    /** @test */
+    function it_shallow_augments_through_the_fieldtype()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($data)
+            {
+                return strtoupper($data) . '!';
+            }
+            public function shallowAugment($data)
+            {
+                return $data . ' shallow';
+            }
+        };
+
+        $value = new Value('test', null, $fieldtype);
+
+        $this->assertNotSame($value, $value->shallow());
+        $this->assertInstanceOf(Value::class, $value->shallow());
+        $this->assertEquals('test shallow', $value->shallow()->value());
+    }
+
+    /** @test */
     function it_converts_to_string_using_the_augmented_value()
     {
         $fieldtype = new class extends Fieldtype {

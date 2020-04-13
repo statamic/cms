@@ -1,6 +1,7 @@
 <template>
 
     <relationship-input
+        ref="input"
         :name="name"
         :value="value"
         :mode="config.mode"
@@ -19,6 +20,7 @@
         :form-component-props="formComponentProps"
         :status-icons="statusIcons"
         :columns="columns"
+        :filters="filters"
         :search="canSearch"
         :read-only="isReadOnly"
         :taggable="taggable"
@@ -57,6 +59,10 @@ export default {
 
         columns() {
             return this.meta.columns;
+        },
+
+        filters() {
+            return this.meta.filters || [];
         },
 
         itemComponent() {
@@ -140,6 +146,10 @@ export default {
             const meta = clone(this.meta);
             meta.data = data;
             this.updateMeta(meta);
+        },
+
+        linkExistingItem() {
+            this.$refs.input.$refs.existing.click();
         }
 
     }

@@ -63,37 +63,40 @@ class Parser
      */
     public function __construct()
     {
-        // expand allowed characters in variable regex
-        $this->variableRegex = "(?!if|unless\s)[a-zA-Z0-9_\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.!'\":]*";
+        // Matches a variable inside curly braces. Spaces not allowed.
+        $this->variableRegex = "(?!if\s|unless\s)[a-zA-Z0-9_'\"][^<>{}=\s]*";
 
-        // Allow spaces after the variable name so you can do modifiers like | this | and_that
-        $this->looseVariableRegex = "(?!if|unless\s)[a-zA-Z0-9_'\"][|a-zA-Z\-\+\*%\#\^\@\/,0-9_\.(\s.*)?!'\":]*";
+        // Matches a full variable expression inside curly braces.
+        $this->looseVariableRegex = "(?!if\s|unless\s)[a-zA-Z0-9_'\"][^<>{}=]*";
 
-        // Different from variable regex somehow.
-        $this->callbackNameRegex = '(?!if|unless\s)[a-zA-Z0-9_][|a-zA-Z\-\+\*%\^\/,0-9_\.(\s.*?):]*:'.$this->variableRegex;
+        // Matches the first part of a {{ tag: followed a variable name and full expression.
+        $this->callbackNameRegex  = '(?!if\s|unless\s)[a-zA-Z0-9_][^<>{}=!?]*' . ':' . $this->variableRegex;
 
+        // Matches a tag pair and captures everything inside it.
         $this->variableLoopRegex = '/{{\s*('.$this->looseVariableRegex.')\s*}}(.*?){{\s*\/\1\s*}}/ms';
 
-        // expanded to allow `or` options in variable tags
-        $this->variableTagRegex = '/{{\s*('.$this->looseVariableRegex.'(?:\s*or\s*(?:'.$this->looseVariableRegex.'|".*?"))*)\s*}}/m';
+        // Matches a variable expression inside curly braces.
+        $this->variableTagRegex = '/{{\s*('.$this->looseVariableRegex.')\s*}}/m';
 
-        // make the space-anything after the variable regex optional allowing {{tags}} and {{ tags }}
-        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')([^?]*?)?}}(.*?){{\s*\/\1\s*}}/ms';
+        // Matches the callback handle for a matching tag pair, captures the contents, and ignores the parameters.
+        // We assume it's a callback because the of the matching tag pair and lack of "?" in the expression.
+        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')(?:\s([^?]*?))}}(.*?){{\s*\/\1\s*}}/ms';
 
+        // Matches a recursive children loop.
         $this->recursiveRegex = '/{{\s*\*recursive\s*('.$this->variableRegex.')\*\s*}}/ms';
 
+        // Matches the noparse tag and captures everything inside.
         $this->noparseRegex = '/{{\s*noparse\s*}}(.*?){{\s*\/noparse\s*}}/ms';
 
+        // Matches an ignored tag as indicated by a prefixed @ symbol: @{{ }}
         $this->ignoreRegex = '/@{{[^}]*}}/';
 
-        $this->conditionalRegex = '/{{\s*(if|unless|elseif|elseunless)\s*((?:\()?(.*?)(?:\))?)\s*}}/ms';
+        // Matches the logic operator tags
+        $this->conditionalRegex = '/{{\s*(if|unless|elseif|elseunless)\s+((?:\()?(.*?)(?:\))?)\s*}}/ms';
         $this->conditionalElseRegex = '/{{\s*else\s*}}/ms';
         $this->conditionalEndRegex = '/{{\s*(?:endif|\/if|\/unless)\s*}}/ms';
         $this->conditionalExistsRegex = '/(\s+|^)exists\s+('.$this->variableRegex.')(\s+|$)/ms';
         $this->conditionalNotRegex = '/(\s+|^)not(\s+|$)/ms';
-
-        // Large strings can spawn many backtrack attempts. Let's crank this sucker up.
-        ini_set('pcre.backtrack_limit', Config::get('parser_backtrack_limit', 1000000));
     }
 
     public function allowPhp($allow = true)
@@ -163,12 +166,12 @@ class Parser
         $text = $this->extractNoparse($text);
         $text = $this->stripComments($text);
 
-        $text = $this->extractLoopedTags($text, $data);
+        $text = $this->extractTagPairs($text, $data);
 
         // Parse conditionals first to avoid parsing and execution.
         $text = $this->parseConditionPairs($text, $data);
         $text = $this->parseTernaries($text, $data);
-        $text = $this->injectExtractions($text, 'looped_tags');
+        $text = $this->injectExtractions($text, 'tag_pair');
         $text = $this->parseVariables($text, $data);
         $text = $this->injectExtractions($text, 'callback_blocks');
         $text = $this->parseCallbackTags($text, $data);
@@ -325,10 +328,10 @@ class Parser
 
     protected function parseLoopInstance($str, $data)
     {
-        $str = $this->extractLoopedTags($str, $data);
+        $str = $this->extractTagPairs($str, $data);
         $str = $this->parseConditionPairs($str, $data);
         $str = $this->parseTernaries($str, $data);
-        $str = $this->injectExtractions($str, 'looped_tags');
+        $str = $this->injectExtractions($str, 'tag_pair');
         $str = $this->parseVariables($str, $data);
         $str = $this->injectExtractions($str, 'callback_blocks');
         $str = $this->parseCallbackTags($str, $data);
@@ -548,7 +551,7 @@ class Parser
                 $nested_regex = '/{{\s*(' . preg_quote($name, '/') . ')(\s.*?)}}(.*?){{\s*\/\1\s*}}/ms';
                 if ($this->preg_match($nested_regex, $content . $match[0][0], $nested_matches)) {
                     $nested_content = $this->preg_replace('/{{\s*\/' . preg_quote($name, '/') . '\s*}}/m', '', $nested_matches[0]);
-                    $content = $this->createExtraction('nested_looped_tags', $nested_content, $nested_content, $content);
+                    $content = $this->createExtraction('nested_tag_pair', $nested_content, $nested_content, $content);
                 }
             }
 
@@ -603,7 +606,7 @@ class Parser
                     } elseif (! empty($cb_data[$name])) {
                         // value not found in the data block, so we check the
                         // cumulative callback data block for a value and use that
-                        $text = $this->extractLoopedTags($text, $cb_data);
+                        $text = $this->extractTagPairs($text, $cb_data);
                         $text = $this->parseVariables($text, $cb_data);
                         $text = $this->injectExtractions($text, 'callback_blocks');
                     }
@@ -617,7 +620,7 @@ class Parser
             }
 
             $text = $this->preg_replace('/' . preg_quote($tag, '/') . '/m', addcslashes($replacement, '\\$'), $text, 1);
-            $text = $this->injectExtractions($text, 'nested_looped_tags');
+            $text = $this->injectExtractions($text, 'nested_tag_pair');
         }
 
         // parse for recursives, as they may not have been parsed yet
@@ -701,7 +704,7 @@ class Parser
      */
     public function parseTernaries($text, $data)
     {
-        if ($this->preg_match_all('/{{\s*([^}]+[^}]\s(\?[^}]*\s\:|\?=).*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
+        if ($this->preg_match_all('/{{\s*([^{}]+[^}]\s(\?[^}]*\s\:|\?=).*)\s*}}/msU', $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
                 // Our made up "truth coalescing" syntax.
                 // eg. {{ true ?= "foo" }} is shorthand for {{ if true }}foo{{ /if }}
@@ -1066,25 +1069,17 @@ class Parser
      * @param array    $data     Data array to use
      * @return string
      */
-    protected function extractLoopedTags($text, $data = array())
+    protected function extractTagPairs($text, $data = array())
     {
-        /**
-         * $matches[][0] is the raw match
-         */
+        if ($this->preg_match_all($this->variableLoopRegex, $text, $matches, PREG_SET_ORDER)) {
+            foreach ($matches as $match) {
+                $text = $this->createExtraction('tag_pair', $match[0], $match[0], $text);
+            }
+        }
+
         if ($this->preg_match_all($this->callbackBlockRegex, $text, $matches, PREG_SET_ORDER)) {
             foreach ($matches as $match) {
-
-                // Allow {{ /if }} to close if statements
-                if ($match[1] === 'if' || $match[1] === 'unless') {
-                    // move on
-                } elseif ($this->parseParameters($match[2], $data)) {
-                    // This callback block contains parameters
-                    // Let's extract it so it doesn't conflict with local variables when
-                    // parseVariables() is called.
-                    $text = $this->createExtraction('callback_blocks', $match[0], $match[0], $text);
-                } else {
-                    $text = $this->createExtraction('looped_tags', $match[0], $match[0], $text);
-                }
+                $text = $this->createExtraction('callback_blocks', $match[0], $match[0], $text);
             }
         }
 
@@ -1383,6 +1378,13 @@ class Parser
         }
 
         $value = $data->parseUsing($this, $context)->value();
+
+        if (Str::startsWith($modifier, ':')) {
+            $parameters = array_map(function ($param) use ($context) {
+                return $context[$param] ?? null;
+            }, $parameters);
+            $modifier = substr($modifier, 1);
+        }
 
         try {
             return Modify::value($value)->context($context)->$modifier($parameters)->fetch();

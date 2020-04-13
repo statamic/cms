@@ -15,6 +15,10 @@ class Entry extends Resource
             'published' => $this->resource->published(),
             'private' => $this->resource->private(),
             'edit_url' => $this->resource->editUrl(),
+            'collection' => [
+                'title' => $this->resource->collection()->title(),
+                'handle' => $this->resource->collection()->handle(),
+            ]
         ];
     }
 }

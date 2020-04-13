@@ -51,7 +51,7 @@ class StoreFieldsetTest extends TestCase
             ->actingAs($user)
             ->post(cp_route('fieldsets.store'), ['title' => 'Test'])
             ->assertRedirect(cp_route('fieldsets.edit', 'test'))
-            ->assertSessionHas('message', __('Saved'));
+            ->assertSessionHas('success');
 
         $this->assertCount(1, Facades\Fieldset::all());
         $this->assertEquals([

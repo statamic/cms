@@ -1,14 +1,12 @@
 <template>
 
     <div>
-        <breadcrumb :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
+        <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
 
         <div class="flex items-center mb-3">
             <h1 class="flex-1">
                 <div class="flex items-center">
-                    <span v-if="! isCreating"
-                        class="little-dot mr-1"
-                        :class="{ 'bg-green-light': published, 'bg-grey-60': !published }" />
+                    <span v-if="! isCreating" class="little-dot mr-1" :class="activeLocalization.status" v-tooltip="activeLocalization.status" />
                     <span v-html="$options.filters.striptags(title)" />
                 </div>
             </h1>
@@ -24,7 +22,6 @@
             <div class="hidden md:flex items-center">
                 <button
                     v-if="!readOnly"
-                    class="btn-primary"
                     :class="{
                         'btn': revisionsEnabled,
                         'btn-primary': isCreating || !revisionsEnabled,
@@ -87,6 +84,7 @@
                             v-show="sectionsVisible"
                             :read-only="readOnly"
                             :syncable="hasOrigin"
+                            :can-toggle-labels="true"
                             @updated="setFieldValue"
                             @meta-updated="setFieldMeta"
                             @synced="syncField"
@@ -101,9 +99,9 @@
                                     <div class="p-2 flex items-center -mx-1">
                                         <button
                                             class="flex items-center justify-center btn-flat w-full mx-1 px-1"
-                                            v-if="isBase"
+                                            v-if="isBase && livePreviewUrl"
                                             @click="openLivePreview">
-                                            <svg-icon name="syncronize" class="w-5 h-5 mr-1" />
+                                            <svg-icon name="synchronize" class="w-5 h-5 mr-1" />
                                             <span>{{ __('Live Preview') }}</span>
                                         </button>
                                         <a
@@ -119,7 +117,7 @@
 
                                 <div class="flex items-center border-t justify-between px-2 py-1" v-if="!revisionsEnabled">
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
-                                    <toggle-input v-model="published" />
+                                    <toggle-input :value="published" @input="setFieldValue('published', $event)" />
                                 </div>
 
                                 <div class="border-t p-2" v-if="revisionsEnabled && !isCreating">
@@ -149,12 +147,12 @@
                                         </button>
                                 </div>
 
-                                <div class="p-2 site-list border-t" v-if="localizations.length > 1">
+                                <div class="p-2 border-t" v-if="localizations.length > 1">
                                     <label class="publish-field-label font-medium mb-1" v-text="__('Sites')" />
                                     <div
                                         v-for="option in localizations"
                                         :key="option.handle"
-                                        class="site-item flex items-center border-grey-30"
+                                        class="text-sm flex items-center -mx-2 px-2 py-1 cursor-pointer hover:bg-grey-20"
                                         :class="{ 'opacity-50': !option.active }"
                                         @click="localizationSelected(option)"
                                     >
@@ -180,7 +178,11 @@
                 <template v-slot:buttons>
                    <button
                     v-if="!readOnly"
-                    class="ml-2 btn-primary"
+                    class="ml-2"
+                    :class="{
+                        'btn': revisionsEnabled,
+                        'btn-primary': isCreating || !revisionsEnabled,
+                    }"
                     :disabled="!canSave"
                     @click.prevent="save"
                     v-text="saveText" />
@@ -308,11 +310,9 @@ export default {
             revisionMessage: null,
             showRevisionHistory: false,
 
-            // The current value. What it will be when saving. User interaction updates this.
-            published: this.initialValues.published,
-
             // Whether it was published the last time it was saved.
             // Successful publish actions (if using revisions) or just saving (if not) will update this.
+            // The current published value is inside the "values" object, and also accessible as a computed.
             initialPublished: this.initialValues.published,
 
             confirmingPublish: false,
@@ -344,6 +344,10 @@ export default {
             if (this.readOnly || this.isCreating || this.somethingIsLoading || this.isDirty) return false;
 
             return true;
+        },
+
+        published() {
+            return this.values.published;
         },
 
         livePreviewUrl() {
@@ -378,14 +382,6 @@ export default {
 
         saving(saving) {
             this.$progress.loading(`${this.publishContainer}-entry-publish-form`, saving);
-        },
-
-        published(published) {
-            this.$refs.container.setFieldValue('published', published);
-        },
-
-        'values.published': function (published) {
-            this.published = published;
         }
 
     },
@@ -432,6 +428,9 @@ export default {
                 this.saving = false;
                 this.title = this.values.title;
                 this.isWorkingCopy = true;
+                if (this.isBase) {
+                    document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
+                }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
@@ -481,7 +480,7 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (! confirm('Are you sure? Unsaved changes will be lost.')) {
+                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
                     return;
                 }
             }
@@ -494,7 +493,7 @@ export default {
                 this.createLocalization(localization);
             }
 
-            if (this.publishContainer === 'base') {
+            if (this.isBase) {
                 window.history.replaceState({}, '', localization.url);
             }
         },
@@ -554,7 +553,10 @@ export default {
         publishActionCompleted({ published, isWorkingCopy, response }) {
             this.saving = false;
             this.$refs.container.saved();
-            if (published !== undefined) this.published = this.initialPublished = published;
+            if (published !== undefined) {
+                this.$refs.container.setFieldValue('published', published);
+                this.initialPublished = published;
+            }
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
             this.title = response.data.data.title;

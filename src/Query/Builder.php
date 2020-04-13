@@ -184,43 +184,31 @@ abstract class Builder
 
     protected function filterTestLessThan($item, $value)
     {
-        if ($item instanceof Carbon) {
-            return $item->lt($value);
-        }
-
         return $item < $value;
     }
 
     protected function filterTestGreaterThan($item, $value)
     {
-        if ($item instanceof Carbon) {
-            return $item->gt($value);
-        }
-
         return $item > $value;
     }
 
     protected function filterTestLessThanOrEqualTo($item, $value)
     {
-        if ($item instanceof Carbon) {
-            return $item->lte($value);
-        }
-
         return $item <= $value;
     }
 
     protected function filterTestGreaterThanOrEqualTo($item, $value)
     {
-        if ($item instanceof Carbon) {
-            return $item->gte($value);
-        }
-
         return $item >= $value;
     }
 
     protected function filterTestLike($item, $like)
     {
-        $pattern = '/^' . str_replace(['%', '_'], ['.*', '.'], preg_quote($like)) . '$/i';
+        $pattern = '/^' . str_replace(['%', '_'], ['.*', '.'], preg_quote($like)) . '$/im';
+
+        if (is_array($item)) {
+            $item = json_encode($item);
+        }
 
         return preg_match($pattern, $item);
     }
@@ -232,7 +220,7 @@ abstract class Builder
 
     protected function filterTestLikeRegex($item, $pattern)
     {
-        return preg_match("/{$pattern}/i", $item);
+        return preg_match("/{$pattern}/im", $item);
     }
 
     protected function filterTestNotLikeRegex($item, $pattern)

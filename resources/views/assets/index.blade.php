@@ -3,12 +3,18 @@
 
 @section('content')
 
-    @include('statamic::partials.create-first', [
+    @include('statamic::partials.empty-state', [
         'resource' => 'Asset Container',
-        'description' => 'Asset containers are the "source" where a set of assets and folders are located.',
-        'svg' => 'empty/collection', // TODO: Need empty/asset-container svg
+        'title' => __('Create an Asset Container'),
+        'description' => __('statamic::messages.asset_container_intro'),
+        'svg' => 'empty/asset-container',
         'route' => cp_route('asset-containers.create'),
         'can' => $user->can('create', \Statamic\Contracts\Assets\AssetContainer::class)
+    ])
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Assets'),
+        'url' => 'assets'
     ])
 
 @endsection

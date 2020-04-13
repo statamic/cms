@@ -2,7 +2,6 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Facades\Data;
 use Statamic\Facades\URL;
 use Statamic\Facades\Site;
 use Statamic\Structures\TreeBuilder;
@@ -11,7 +10,10 @@ class Structure extends Tags
 {
     public function wildcard($tag)
     {
-        return $this->structure($tag);
+        // Allow {{ structure:collection:pages }} rather than needing to use the double colon.
+        $handle = str_replace(':', '::', $tag);
+
+        return $this->structure($handle);
     }
 
     public function index()
@@ -25,6 +27,7 @@ class Structure extends Tags
             'structure' => $handle,
             'include_home' => $this->get('include_home'),
             'site' => $this->get('site', Site::current()->handle()),
+            'from' => $this->get('from'),
         ]);
 
         return $this->toArray($tree);
@@ -54,40 +57,5 @@ class Structure extends Tags
                 'is_external' => URL::isExternal($page->absoluteUrl()),
             ]);
         })->filter()->values()->all();
-    }
-
-    public function breadcrumbs()
-    {
-        $url = URL::getCurrent();
-        $segments = explode('/', $url);
-        $segments[0] = '/';
-
-        if (! $this->params->bool('include_home', true)) {
-            array_shift($segments);
-        }
-
-        $crumbs = collect($segments)->map(function () use (&$segments) {
-            $uri = URL::tidy(join('/', $segments));
-            array_pop($segments);
-            return $uri;
-        })->mapWithKeys(function ($uri) {
-            return [$uri => Data::findByUri($uri)];
-        })->filter();
-
-        if (! $this->params->bool('reverse', false)) {
-            $crumbs = $crumbs->reverse();
-        }
-
-        if ($this->params->bool('trim', true)) {
-            $this->content = trim($this->content);
-        }
-
-        $output = $this->parseLoop($crumbs->values()->toAugmentedArray());
-
-        if ($backspaces = $this->params->int('backspace', 0)) {
-            $output = substr($output, 0, -$backspaces);
-        }
-
-        return $output;
     }
 }

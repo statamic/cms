@@ -4,14 +4,18 @@ namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class Blueprint
+class Blueprint implements Augmentable
 {
+    use HasAugmentedData;
+
     protected $handle;
     protected $contents = [];
     protected $fieldsCache;
@@ -89,16 +93,23 @@ class Blueprint
 
     public function columns()
     {
-        return new Columns($this->fields()->all()->map(function ($field) {
-            return Column::make()
-                ->field($field->handle())
-                ->fieldtype($field->fieldtype()->indexComponent())
-                ->label(__($field->display()))
-                ->listable($field->isListable())
-                ->visibleDefault($field->isVisible())
-                ->visible($field->isVisible())
-                ->sortable($field->isSortable());
-        }));
+        $columns = $this->fields()
+            ->all()
+            ->values()
+            ->map(function ($field, $index) {
+                return Column::make()
+                    ->field($field->handle())
+                    ->fieldtype($field->fieldtype()->indexComponent())
+                    ->label(__($field->display()))
+                    ->listable($field->isListable())
+                    ->defaultVisibility($field->isVisible())
+                    ->visible($field->isVisible())
+                    ->sortable($field->isSortable())
+                    ->defaultOrder($index + 1);
+            })
+            ->keyBy('field');
+
+        return new Columns($columns);
     }
 
     public function isEmpty(): bool
@@ -123,12 +134,12 @@ class Blueprint
 
     public function editUrl()
     {
-        return cp_route('blueprints.edit', $this->handle());
+        return $this->handle() ? cp_route('blueprints.edit', $this->handle()) : null;
     }
 
     public function deleteUrl()
     {
-        return cp_route('blueprints.destroy', $this->handle());
+        return $this->handle() ? cp_route('blueprints.destroy', $this->handle()) : null;
     }
 
     public function save()
@@ -271,5 +282,18 @@ class Blueprint
     public static function __callStatic($method, $parameters)
     {
         return Facades\Blueprint::{$method}(...$parameters);
+    }
+
+    public function __toString()
+    {
+        return $this->handle();
+    }
+
+    public function augmentedArrayData()
+    {
+        return [
+            'title' => $this->title(),
+            'handle' => $this->handle(),
+        ];
     }
 }

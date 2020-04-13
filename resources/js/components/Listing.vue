@@ -29,7 +29,6 @@ export default {
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             meta: null,
-            searchQuery: '',
         }
     },
 
@@ -42,17 +41,31 @@ export default {
                 page: this.page,
                 perPage: this.perPage,
                 search: this.searchQuery,
-                filters: btoa(JSON.stringify(this.activeFilters)),
+                filters: this.activeFilterParameters,
             }, this.additionalParameters);
+        },
+
+        activeFilterParameters() {
+            return btoa(JSON.stringify(this.activeFilters));
         },
 
         additionalParameters() {
             return {};
-        }
+        },
+
+        shouldRequestFirstPage() {
+            if (this.page > 1 && this.items.length === 0) {
+                this.page = 1;
+                return true;
+            }
+
+            return false;
+        },
 
     },
 
     created() {
+        this.autoApplyFilters(this.filters);
         this.request();
     },
 
@@ -80,7 +93,7 @@ export default {
         searchQuery(query) {
             this.sortColumn = null;
             this.sortDirection = null;
-            this.pageReset();
+            this.resetPage();
             this.request();
         }
 
@@ -104,10 +117,10 @@ export default {
                 cancelToken: this.source.token
             }).then(response => {
                 this.columns = response.data.meta.columns;
-                this.sortColumn = response.data.meta.sortColumn;
-                this.activeFilters = {...response.data.meta.filters};
+                this.activeFilterBadges = {...response.data.meta.activeFilterBadges};
                 this.items = Object.values(response.data.data);
                 this.meta = response.data.meta;
+                if (this.shouldRequestFirstPage) return this.request();
                 this.loading = false;
                 this.initializing = false;
                 this.afterRequestCompleted();

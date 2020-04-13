@@ -17,14 +17,18 @@
 
     @else
 
-        @include('statamic::partials.create-first', [
+        @include('statamic::partials.empty-state', [
             'resource' => 'Fieldset',
-            'description' => 'Fieldsets are an optional companion to blueprints, allowing you to create partials to be used within blueprints.',
-            'svg' => 'empty/collection', // TODO: Need empty/fieldset svg
+            'description' => __('statamic::messages.fieldset_intro'),
+            'svg' => 'empty/form',
             'route' => cp_route('fieldsets.create'),
             'can' => $user->can('create', 'Statamic\Fields\Fieldset')
         ])
 
     @endunless
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Fieldsets'), 'url' => 'fieldsets'
+    ])
 
 @endsection

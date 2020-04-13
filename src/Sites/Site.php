@@ -38,7 +38,7 @@ class Site
 
     public function url()
     {
-        return $this->config['url'];
+        return Str::ensureRight($this->config['url'], '/');
     }
 
     public function absoluteUrl()
@@ -52,6 +52,8 @@ class Site
 
     public function relativePath($url)
     {
+        $url = Str::ensureRight($url, '/');
+
         $path = Str::removeLeft($url, $this->absoluteUrl());
 
         $path = Str::removeRight(Str::ensureLeft($path, '/'), '/');

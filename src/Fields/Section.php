@@ -51,7 +51,7 @@ class Section
 
     public function display()
     {
-        return array_get($this->contents, 'display', Str::humanize($this->handle));
+        return array_get($this->contents, 'display', __(Str::humanize($this->handle)));
     }
 
     public function instructions()

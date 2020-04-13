@@ -24,8 +24,17 @@ class ActionRepository
     {
         return $this->all()
             ->each->context($context)
-            ->filter->filter($item)
+            ->filter->visibleTo($item)
             ->filter->authorize(User::current(), $item)
+            ->values();
+    }
+
+    public function forBulk($items, $context = [])
+    {
+        return $this->all()
+            ->each->context($context)
+            ->filter->visibleToBulk($items)
+            ->filter->authorizeBulk(User::current(), $items)
             ->values();
     }
 }

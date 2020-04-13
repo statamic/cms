@@ -2,16 +2,18 @@
 
 namespace Tests\Data\Structures;
 
-use Tests\TestCase;
-use Tests\UnlinksPaths;
-use Statamic\Facades\Entry;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
+use Statamic\Facades\Structure as StructureAPI;
+use Statamic\Structures\Nav;
 use Statamic\Structures\Page;
-use Statamic\Structures\Tree;
 use Statamic\Structures\Pages;
 use Statamic\Structures\Structure;
+use Statamic\Structures\Tree;
 use Tests\PreventSavingStacheItemsToDisk;
-use Statamic\Facades\Structure as StructureAPI;
+use Tests\TestCase;
+use Tests\UnlinksPaths;
 
 class TreeTest extends TestCase
 {
@@ -29,28 +31,66 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_route_from_the_collection()
+    function it_gets_the_route_from_the_structure()
     {
-        $collection = tap(Collection::make('test-collection')
-            ->structure('test-structure')
-            ->route('the-uri/{slug}')
-        )->save();
+        $structure = $this->mock(Structure::class);
+        $structure->shouldReceive('route')->with('the-locale')->once()->andReturn('/the-route/{slug}');
 
-        $this->unlinkAfter($collection->path());
+        $tree = (new Tree)
+            ->locale('the-locale')
+            ->structure($structure);
 
-        $structure = (new Structure)->handle('test-structure');
-        $tree = (new Tree)->structure($structure);
-
-        $this->assertEquals('the-uri/{slug}', $tree->route());
+        $this->assertEquals('/the-route/{slug}', $tree->route());
     }
 
     /** @test */
-    function a_structure_without_a_collection_has_no_route()
+    function it_gets_the_edit_url()
     {
-        $structure = (new Structure)->handle('test-structure');
+        $structure = $this->mock(Structure::class);
+        $structure->shouldReceive('editUrl')->withNoArgs()->once()->andReturn('/edit-url');
+
         $tree = (new Tree)->structure($structure);
 
-        $this->assertNull($tree->route());
+        $this->assertEquals('/edit-url', $tree->editUrl());
+    }
+
+    /** @test */
+    function it_gets_the_delete_url()
+    {
+        $structure = $this->mock(Structure::class);
+        $structure->shouldReceive('deleteUrl')->withNoArgs()->once()->andReturn('/delete-url');
+
+        $tree = (new Tree)->structure($structure);
+
+        $this->assertEquals('/delete-url', $tree->deleteUrl());
+    }
+
+    /** @test */
+    function it_gets_the_show_url_from_the_structure()
+    {
+        Site::shouldReceive('hasMultiple')->once()->andReturnFalse();
+        $structure = $this->mock(Structure::class);
+        $structure->shouldReceive('showUrl')->with([])->once()->andReturn('/show-url');
+
+        $tree = (new Tree)
+            ->locale('the-locale')
+            ->structure($structure);
+
+        $this->assertEquals('/show-url', $tree->showUrl());
+    }
+
+    /** @test */
+    function it_gets_the_show_url_with_the_site_query_param_when_there_are_multiple_sites()
+    {
+        Site::shouldReceive('hasMultiple')->once()->andReturnTrue();
+        $structure = $this->mock(Structure::class);
+        $structure->shouldReceive('showUrl')->with(['site' => 'the-locale'])->once()->andReturn('/show-url');
+
+        $tree = (new Tree)
+            ->locale('the-locale')
+            ->structure($structure);
+
+        $this->assertEquals('/show-url', $tree->showUrl());
     }
 
     /** @test */
@@ -62,6 +102,36 @@ class TreeTest extends TestCase
 
         $this->assertInstanceOf(Page::class, $parent);
         $this->assertEquals(Entry::find('pages-home'), $parent->entry());
+    }
+
+    /** @test */
+    function it_gets_the_root()
+    {
+        $tree = $this->tree();
+        $tree->structure()->expectsRoot(true);
+        $tree->tree([['entry' => 'pages-home']]);
+
+        $this->assertEquals('pages-home', $tree->root());
+    }
+
+    /** @test */
+    function a_tree_not_expecting_a_root_will_have_no_root()
+    {
+        $tree = $this->tree();
+        $tree->structure()->expectsRoot(false);
+        $tree->tree([['entry' => 'pages-home']]);
+
+        $this->assertNull($tree->root());
+    }
+
+    /** @test */
+    function a_tree_expecting_a_root_but_with_no_branches_has_no_root()
+    {
+        $tree = $this->tree();
+        $tree->structure()->expectsRoot(true);
+        $tree->tree([]);
+
+        $this->assertNull($tree->root());
     }
 
     /** @test */
@@ -89,6 +159,9 @@ class TreeTest extends TestCase
         $tree->append(Entry::make()->id('appended-page'));
 
         $this->assertEquals([
+            [
+                'entry' => 'pages-home',
+            ],
             [
                 'entry' => 'pages-about',
                 'children' => [
@@ -120,6 +193,9 @@ class TreeTest extends TestCase
 
         $this->assertEquals([
             [
+                'entry' => 'pages-home',
+            ],
+            [
                 'entry' => 'pages-about',
                 'children' => [
                     [
@@ -148,12 +224,15 @@ class TreeTest extends TestCase
 
         // Add [foo=>bar] to the directors page, just so we can test the whole array gets moved.
         $treeContent = $tree->tree();
-        $treeContent[0]['children'][0]['children'][0]['foo'] = 'bar';
+        $treeContent[1]['children'][0]['children'][0]['foo'] = 'bar';
         $tree->tree($treeContent);
 
         $tree->move('pages-directors', 'pages-about');
 
         $this->assertEquals([
+            [
+                'entry' => 'pages-home',
+            ],
             [
                 'entry' => 'pages-about',
                 'children' => [
@@ -177,6 +256,9 @@ class TreeTest extends TestCase
     {
         $tree = $this->tree()->tree($arr = [
             [
+                'entry' => 'pages-home',
+            ],
+            [
                 'entry' => 'pages-about',
                 'children' => [
                     [
@@ -197,10 +279,66 @@ class TreeTest extends TestCase
         $this->assertEquals($arr, $tree->tree());
     }
 
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/1548
+     **/
+    function it_can_move_the_root()
+    {
+        $tree = $this->tree()->tree([
+                [
+                    'entry' => 'pages-home',
+                ],
+                [
+                    'entry' => 'pages-blog'
+                ],
+                [
+                    'entry' => 'pages-about',
+                    'children' => [
+                        [
+                            'entry' => 'pages-board',
+                            'children' => [
+                                [
+                                    'entry' => 'pages-directors'
+                                ]
+                            ]
+                        ]
+                    ],
+                ]
+            ]);
+
+        $tree->move('pages-home', 'pages-board');
+
+        $this->assertEquals([
+            [
+                'entry' => 'pages-blog',
+            ],
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                        'children' => [
+                            [
+                                'entry' => 'pages-directors',
+                            ],
+                            [
+                                'entry' => 'pages-home',
+                            ]
+                        ]
+                    ]
+                ],
+            ]
+        ], $tree->tree());
+    }
+
     /** @test */
     function it_fixes_indexes_when_moving()
     {
         $tree = $this->tree()->tree([
+            [
+                'entry' => 'pages-home',
+            ],
             [
                 'entry' => 'pages-blog',
             ],
@@ -219,6 +357,9 @@ class TreeTest extends TestCase
         // If the indexes hadn't been fixed, we'd have an array starting with 1.
         $this->assertEquals([
             [
+                'entry' => 'pages-home',
+            ],
+            [
                 'entry' => 'pages-about',
                 'children' => [
                     [
@@ -232,12 +373,46 @@ class TreeTest extends TestCase
         ], $tree->tree());
     }
 
+    /** @test */
+    function the_structure_validates_the_tree_when_getting_it_the_first_time()
+    {
+        $structure = $this->mock(Structure::class);
+        $structure->shouldReceive('handle')->andReturn('test');
+
+        $firstContents = ['first' => 'time'];
+        $secondContents = ['second' => 'time'];
+
+        $structure->shouldReceive('validateTree')->with($firstContents, 'the-locale')->once()->andReturn($firstContents);
+        $structure->shouldReceive('validateTree')->with($secondContents, 'the-locale')->once()->andReturn($secondContents);
+
+        $tree = (new Tree)->structure($structure)->locale('the-locale');
+
+        // Calling tree multiple times doesn't re-validate
+        $tree->tree($firstContents);
+        $tree->tree();
+        $tree->tree();
+
+        // Re-setting the tree exactly the same also won't re-validate
+        $tree->tree($firstContents);
+        $tree->tree();
+
+        // Using different contents will re-validate.
+        $tree->tree($secondContents);
+        $tree->tree();
+        $tree->tree($secondContents);
+        $tree->tree();
+        $tree->tree();
+    }
+
     protected function tree()
     {
         return (new Tree)
-            ->structure(new Structure)
-            ->root('pages-home')
+            ->locale('en')
+            ->structure((new Nav)->expectsRoot(true))
             ->tree([
+                [
+                    'entry' => 'pages-home',
+                ],
                 [
                     'entry' => 'pages-about',
                     'children' => [

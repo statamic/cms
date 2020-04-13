@@ -38,7 +38,6 @@
                     :columns="columns"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
-                    :search="false"
                     :sort="false"
                     :sort-column="sortColumn"
                     :sort-direction="sortDirection"
@@ -48,18 +47,10 @@
                         <div class="card p-0" :class="{ 'rounded-tl-none': showContainerTabs }">
 
                             <div class="data-list-header">
-                                <data-list-toggle-all ref="toggleAll" v-if="!hasMaxFiles" />
                                 <data-list-search v-model="searchQuery" />
 
-                                <data-list-bulk-actions
-                                    :url="actionUrl"
-                                    :context="actionContext"
-                                    @started="actionStarted"
-                                    @completed="bulkActionsCompleted"
-                                />
-
                                 <template v-if="! hasSelections">
-                                    <button v-if="canCreateFolders" class="btn-flat btn-icon-only" @click="creatingFolder = true">
+                                    <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-2" @click="creatingFolder = true">
                                         <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
                                         <span>{{ __('Create Folder') }}</span>
                                     </button>
@@ -70,16 +61,23 @@
                                     </button>
                                 </template>
 
-                                <div class="btn-group-flat ml-2">
-                                    <button @click="setMode('grid')" :class="{'active': mode === 'grid'}">
+                                <div class="btn-group ml-2">
+                                    <button class="btn-flat px-2" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                         <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                     </button>
-                                    <button @click="setMode('table')" :class="{'active': mode === 'table'}">
+                                    <button class="btn-flat px-2" @click="setMode('table')" :class="{'active': mode === 'table'}">
                                         <svg-icon name="assets-mode-table" class="h-4 w-4" />
                                     </button>
                                 </div>
 
                             </div>
+
+                            <data-list-bulk-actions
+                                :url="bulkActionsUrl"
+                                :context="actionContext"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                            />
 
                             <uploads
                                 v-if="uploads.length"
@@ -123,7 +121,7 @@
 
                                                 <data-list-inline-actions
                                                     :item="folder.path"
-                                                    :url="folderActionUrl"
+                                                    :url="runFolderActionUrl"
                                                     :actions="folderActions(folder)"
                                                     @started="actionStarted"
                                                     @completed="actionCompleted"
@@ -157,7 +155,7 @@
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
                                             :item="asset.id"
-                                            :url="actionUrl"
+                                            :url="runActionUrl"
                                             :actions="asset.actions"
                                             @started="actionStarted"
                                             @completed="actionCompleted"
@@ -291,7 +289,9 @@ export default {
             sortColumn: 'basename',
             sortDirection: 'asc',
             mode: 'table',
-            folderActionUrl: null,
+            runActionUrl: null,
+            bulkActionsUrl: null,
+            runFolderActionUrl: null,
         }
     },
 
@@ -330,7 +330,7 @@ export default {
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders;
+            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation;
         },
 
         parameters() {
@@ -418,12 +418,11 @@ export default {
         },
 
         actionCompleted() {
-            this.loadAssets();
-        },
+            this.$toast.success(__('Action completed'));
 
-        bulkActionsCompleted() {
-            this.$refs.toggleAll.uncheckAllItems();
-            this.actionCompleted();
+            this.$events.$emit('clear-selections');
+
+            this.loadAssets();
         },
 
         loadContainers() {
@@ -452,8 +451,9 @@ export default {
                 } else {
                     this.folder = data.data.folder;
                     this.folders = data.data.folder.folders;
-                    this.actionUrl = data.links.asset_actions;
-                    this.folderActionUrl = data.links.folder_actions;
+                    this.runActionUrl = data.links.run_asset_action;
+                    this.bulkActionsUrl = data.links.bulk_asset_actions;
+                    this.runFolderActionUrl = data.links.run_folder_action;
                 }
 
                 this.loadingAssets = false;

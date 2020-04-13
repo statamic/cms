@@ -20,9 +20,9 @@ class EntriesTest extends TestCase
     {
         parent::setUp();
 
-        $collection = tap(Facades\Collection::make('blog')->route('blog/{slug}'))->save();
-        EntryFactory::id('123')->collection($collection)->slug('one')->create();
-        EntryFactory::id('456')->collection($collection)->slug('two')->create();
+        $collection = tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
+        EntryFactory::id('123')->collection($collection)->slug('one')->data(['title' => 'One'])->create();
+        EntryFactory::id('456')->collection($collection)->slug('two')->data(['title' => 'Two'])->create();
     }
 
     /** @test */
@@ -47,20 +47,20 @@ class EntriesTest extends TestCase
     /** @test */
     function it_shallow_augments_to_a_collection_of_enties()
     {
-        Statamic::enableShallowAugmentation();
-
-        $augmented = $this->fieldtype()->augment(['123', '456']);
+        $augmented = $this->fieldtype()->shallowAugment(['123', '456']);
 
         $this->assertInstanceOf(Collection::class, $augmented);
         $this->assertEquals([
             [
                 'id' => '123',
+                'title' => 'One',
                 'url' => '/blog/one',
                 'permalink' => 'http://localhost/blog/one',
                 'api_url' => 'http://localhost/api/collections/blog/entries/123',
             ],
             [
                 'id' => '456',
+                'title' => 'Two',
                 'url' => '/blog/two',
                 'permalink' => 'http://localhost/blog/two',
                 'api_url' => 'http://localhost/api/collections/blog/entries/456',
@@ -71,12 +71,11 @@ class EntriesTest extends TestCase
     /** @test */
     function it_shallow_augments_to_a_single_entry_when_max_items_is_one()
     {
-        Statamic::enableShallowAugmentation();
-
-        $augmented = $this->fieldtype(['max_items' => 1])->augment(['123']);
+        $augmented = $this->fieldtype(['max_items' => 1])->shallowAugment(['123']);
 
         $this->assertEquals([
             'id' => '123',
+            'title' => 'One',
             'url' => '/blog/one',
             'permalink' => 'http://localhost/blog/one',
             'api_url' => 'http://localhost/api/collections/blog/entries/123',

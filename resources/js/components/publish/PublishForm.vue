@@ -21,6 +21,7 @@
             <publish-sections
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
+                :can-toggle-labels="canToggleLabels"
                 :enable-sidebar="hasSidebar" />
         </div>
     </publish-container>
@@ -38,7 +39,8 @@ export default {
         name: { type: String, default: 'base' },
         breadcrumbs: Array,
         action: String,
-        method: { type: String, default: 'post' }
+        method: { type: String, default: 'post' },
+        canToggleLabels: { type: Boolean, default: true }
     },
 
     data() {

@@ -23,7 +23,7 @@
                 <h1 class="mb-sm">You are running the latest version of Statamic.</h1>
                 <h3>Version: {{ currentVersion }}</h3>
             </div>
-            <svg-icon name="marketing/shield-check" class="w-16 h-16" />
+            <svg-icon name="marketing/tooter-nay" class="w-16 h-16" />
         </div>
 
         <div v-for="release in changelog" class="card update-release mb-5">

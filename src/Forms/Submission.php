@@ -3,17 +3,18 @@
 namespace Statamic\Forms;
 
 use Carbon\Carbon;
-use Statamic\Facades\File;
-use Statamic\Facades\YAML;
-use Statamic\Facades\Helper;
-use Statamic\Exceptions\PublishException;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
+use Statamic\Data\ContainsData;
+use Statamic\Exceptions\PublishException;
+use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\File;
+use Statamic\Facades\Helper;
+use Statamic\Facades\YAML;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Submission implements SubmissionContract
 {
-    use FluentlyGetsAndSets;
+    use ContainsData, FluentlyGetsAndSets;
 
     /**
      * @var bool
@@ -29,11 +30,6 @@ class Submission implements SubmissionContract
      * @var Form
      */
     public $form;
-
-    /**
-     * @var array
-     */
-    private $data = [];
 
     /**
      * Get or set the ID

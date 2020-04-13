@@ -4,75 +4,88 @@ namespace Statamic\Fieldtypes;
 
 use Carbon\Carbon;
 use Statamic\Fields\Fieldtype;
+use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
 
 class Date extends Fieldtype
 {
-    protected $configFields = [
-        // @TODO hook up multiple mode
-        'mode' => [
-            'type' => 'select',
-            'default' => 'single',
-            'instructions' => 'Choose between single or range mode (range disables time picker).',
-            'width' => 50,
-            'options' => [
-                'single' => 'Single',
-                // 'multiple' => 'Multiple',
-                'range' => 'Range',
-            ]
-        ],
-        'time_enabled'  => [
-            'type' => 'toggle',
-            'default' => false,
-            'instructions' => 'Enable the timepicker.',
-            'width' => 50,
-        ],
-        'time_required' => [
-            'type' => 'toggle',
-            'default' => false,
-            'instructions' => 'Require time in addition to date.',
-            'width' => 50,
-        ],
-        'earliest_date' => [
-            'type' => 'text',
-            'default' => '1900-01-01',
-            'instructions' => 'Set the earliest selectable date.',
-            'width' => 50,
-        ],
-        'format' => [
-            'type' => 'text',
-            'instructions' => 'Optionally format the date string using [moment.js](https://momentjs.com/docs/#/displaying/format/).',
-            'width' => 50,
-        ],
-        'full_width' => [
-            'type' => 'toggle',
-            'default' => false,
-            'instructions' => 'Stretch the calender to use up the full width.',
-            'width' => 50,
-        ],
-        'inline' => [
-            'type' => 'toggle',
-            'default' => false,
-            'instructions' => 'Skip the dropdown input field and show the calendar directly.',
-            'width' => 50,
-        ],
-        'columns' => [
-            'type' => 'integer',
-            'default' => 1,
-            'instructions' => 'Show multiple months at one time, in rows and columns',
-            'width' => 50,
-        ],
-        'rows' => [
-            'type' => 'integer',
-            'default' => 1,
-            'instructions' => 'Show multiple months at one time, in rows and columns',
-            'width' => 50,
-        ],
-    ];
+    protected function configFieldItems(): array
+    {
+        return [
+            // @TODO hook up multiple mode
+            'mode' => [
+                'display' => __('Mode'),
+                'instructions' => __('statamic::fieldtypes.date.config.mode'),
+                'type' => 'select',
+                'default' => 'single',
+                'width' => 50,
+                'options' => [
+                    'single' => 'Single',
+                    // 'multiple' => 'Multiple',
+                    'range' => 'Range',
+                ]
+            ],
+            'time_enabled'  => [
+                'display' => __('Time Enabled'),
+                'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'time_required' => [
+                'display' => __('Time Required'),
+                'instructions' => __('statamic::fieldtypes.date.config.time_required'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'earliest_date' => [
+                'display' => __('Earliest Date'),
+                'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
+                'type' => 'text',
+                'default' => '1900-01-01',
+                'width' => 50,
+            ],
+            'format' => [
+                'display' => __('Format'),
+                'instructions' => __('statamic::fieldtypes.date.config.format'),
+                'type' => 'text',
+                'width' => 50,
+            ],
+            'full_width' => [
+                'display' => __('Full Width'),
+                'instructions' => __('statamic::fieldtypes.date.config.full_width'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'inline' => [
+                'display' => __('Inline'),
+                'instructions' => __('statamic::fieldtypes.date.config.inline'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'columns' => [
+                'display' => __('Columns'),
+                'instructions' => __('statamic::fieldtypes.date.config.columns'),
+                'type' => 'integer',
+                'default' => 1,
+                'width' => 50,
+            ],
+            'rows' => [
+                'display' => __('Rows'),
+                'instructions' => __('statamic::fieldtypes.date.config.rows'),
+                'type' => 'integer',
+                'default' => 1,
+                'width' => 50,
+            ],
+        ];
+    }
 
-    protected $queryOperators = [
-        '<' => 'Before',
-        '>' => 'After',
-    ];
+    public function filter()
+    {
+        return new DateFilter($this);
+    }
 
     public function preProcess($data)
     {

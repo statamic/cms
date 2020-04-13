@@ -9,11 +9,11 @@ use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Support\Arr;
 use Statamic\Tags\Tags;
-use Statamic\Tags\Traits\RendersForms;
+use Statamic\Tags\Concerns;
 
 class UserTags extends Tags
 {
-    use RendersForms;
+    use Concerns\RendersForms;
 
     protected static $handle = 'user';
 
@@ -49,13 +49,6 @@ class UserTags extends Tags
         // Get a user by ID, if the `id` parameter was used.
         if ($id = $this->get('id')) {
             if (! $user = User::find($id)) {
-                return $this->parseNoResults();
-            }
-        }
-
-        // Get a user by username, if the `username` parameter was used.
-        if ($username = $this->get('username')) {
-            if (! $user = User::whereUsername($username)) {
                 return $this->parseNoResults();
             }
         }
@@ -98,7 +91,9 @@ class UserTags extends Tags
     {
         $data = $this->setSessionData([]);
 
-        $html = $this->formOpen(route('statamic.login'));
+        $knownParams = ['redirect', 'allow_request_redirect'];
+
+        $html = $this->formOpen(route('statamic.login'), 'POST', $knownParams);
 
         if ($redirect = $this->getRedirectUrl()) {
             $html .= '<input type="hidden" name="referer" value="'.$redirect.'" />';
@@ -124,7 +119,9 @@ class UserTags extends Tags
 
         $data['fields'] = $this->getRegistrationFields();
 
-        $html = $this->formOpen(route('statamic.register'));
+        $knownParams = ['redirect', 'allow_request_redirect'];
+
+        $html = $this->formOpen(route('statamic.register'), 'POST', $knownParams);
 
         if ($redirect = $this->getRedirectUrl()) {
             $html .= '<input type="hidden" name="referer" value="'.$redirect.'" />';
@@ -198,7 +195,9 @@ class UserTags extends Tags
             $data['errors'] = session('errors')->all();
         }
 
-        $html = $this->formOpen(route('statamic.password.email'));
+        $knownParams = ['redirect', 'allow_request_redirect', 'reset_url'];
+
+        $html = $this->formOpen(route('statamic.password.email'), 'POST', $knownParams);
 
         if ($redirect = $this->getRedirectUrl()) {
             $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
@@ -236,7 +235,9 @@ class UserTags extends Tags
             $data['errors'] = session('errors')->all();
         }
 
-        $html = $this->formOpen(route('statamic.password.reset.action'));
+        $knownParams = ['redirect'];
+
+        $html = $this->formOpen(route('statamic.password.reset.action'), 'POST', $knownParams);
 
         $html .= '<input type="hidden" name="token" value="'.request('token').'" />';
 

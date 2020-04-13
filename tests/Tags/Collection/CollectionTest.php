@@ -2,18 +2,21 @@
 
 namespace Tests\Tags\Collection;
 
+use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection as SupportCollection;
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
-use Tests\TestCase;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Entry;
+use Statamic\Structures\CollectionStructure;
+use Statamic\Tags\Collection\Collection;
+use Statamic\Tags\Collection\Entries;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
-use Illuminate\Support\Carbon;
-use Statamic\Tags\Collection\Entries;
-use Statamic\Tags\Collection\Collection;
-use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
-use Statamic\Exceptions\CollectionNotFoundException;
-use Statamic\Facades\Blueprint;
+use Tests\TestCase;
 
 class CollectionTest extends TestCase
 {
@@ -35,7 +38,7 @@ class CollectionTest extends TestCase
 
     protected function makeEntry($collection, $slug)
     {
-        return EntryFactory::collection($collection)->slug($slug)->make();
+        return EntryFactory::id($slug)->collection($collection)->slug($slug)->make();
     }
 
     protected function makePosts()
@@ -84,6 +87,21 @@ class CollectionTest extends TestCase
         $this->assertCount(6, $this->collectionTag->index());
 
         $this->setTagParameters(['collection' => 'music|art']);
+        $this->assertCount(6, $this->collectionTag->index());
+    }
+
+    /** @test */
+    function it_gets_entries_from_collections_using_collection_objects()
+    {
+        $this->makePosts();
+
+        $this->setTagParameters(['from' => Facades\Collection::findByHandle('music')]);
+        $this->assertCount(3, $this->collectionTag->index());
+
+        $this->setTagParameters(['from' => [
+            Facades\Collection::findByHandle('music'),
+            Facades\Collection::findByHandle('art'),
+        ]]);
         $this->assertCount(6, $this->collectionTag->index());
     }
 
@@ -189,6 +207,45 @@ class CollectionTest extends TestCase
         $this->assertCount(2, $this->collectionTag->index());
 
         $this->setTagParameters(['collection' => '*', 'not_collection' => 'art|music', 'title:contains' => 'love']);
+        $this->assertCount(2, $this->collectionTag->index());
+    }
+
+    /** @test */
+    function it_can_exclude_collections_using_collection_objects()
+    {
+        $this->makePosts();
+
+        $this->setTagParameters(['from' => '*', 'not_from' => Facades\Collection::findByHandle('art')]);
+        $this->assertCount(6, $this->collectionTag->index());
+
+        $this->setTagParameters(['from' => '*', 'not_from' => [
+            Facades\Collection::findByHandle('music'),
+            Facades\Collection::findByHandle('art'),
+        ]]);
+        $this->assertCount(3, $this->collectionTag->index());
+    }
+
+    /** @test */
+    function it_filters_out_redirects()
+    {
+        $this->makePosts();
+        Entry::find('c')->set('redirect', 'http://example.com')->save();
+        Entry::find('d')->set('redirect', 'http://example.com')->save();
+
+        // Redirects get filtered out by default.
+        $this->setTagParameters(['collection' => '*']);
+        $this->assertCount(7, $this->collectionTag->index());
+
+        // Marking as true will include them.
+        $this->setTagParameters(['collection' => '*', 'redirects' => true]);
+        $this->assertCount(9, $this->collectionTag->index());
+
+        // Aliased to links
+        $this->setTagParameters(['collection' => '*', 'links' => true]);
+        $this->assertCount(9, $this->collectionTag->index());
+
+        // Shorthand param doesn't exist to get *only* redirects. Users can do it manually with a condition.
+        $this->setTagParameters(['collection' => '*', 'redirect:exists' => true]);
         $this->assertCount(2, $this->collectionTag->index());
     }
 
@@ -321,8 +378,6 @@ class CollectionTest extends TestCase
     /** @test */
     function it_can_get_previous_and_next_entries_in_an_orderable_asc_collection()
     {
-        $this->foods->orderable(true)->save();
-
         $this->makeEntry($this->foods, 'a')->set('title', 'Apple')->save();
         $this->makeEntry($this->foods, 'b')->set('title', 'Banana')->save();
         $this->makeEntry($this->foods, 'c')->set('title', 'Carrot')->save();
@@ -333,17 +388,19 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->foods, 'h')->set('title', 'Hummus')->save();
         $this->makeEntry($this->foods, 'i')->set('title', 'Ice Cream')->save();
 
-        $this->foods->setEntryPositions([
-            $this->findEntryByTitle('Carrot')->id(),
-            $this->findEntryByTitle('Hummus')->id(),
-            $this->findEntryByTitle('Apple')->id(),
-            $this->findEntryByTitle('Ice Cream')->id(),
-            $this->findEntryByTitle('Banana')->id(),
-            $this->findEntryByTitle('Fig')->id(),
-            $this->findEntryByTitle('Grape')->id(),
-            $this->findEntryByTitle('Egg')->id(),
-            $this->findEntryByTitle('Danish')->id(),
-        ])->save();
+        $structure = $this->makeStructure([
+            ['entry' => 'c'], // Carrot
+            ['entry' => 'h'], // Hummus
+            ['entry' => 'a'], // Apple
+            ['entry' => 'i'], // Ice Cream
+            ['entry' => 'b'], // Banana
+            ['entry' => 'f'], // Fig
+            ['entry' => 'g'], // Grape
+            ['entry' => 'e'], // Egg
+            ['entry' => 'd'], // Danish
+        ], $this->foods)->maxDepth(1);
+
+        $this->foods->structure($structure)->save();
 
         $currentId = $this->findEntryByTitle('Banana')->id();
 
@@ -370,8 +427,6 @@ class CollectionTest extends TestCase
     /** @test */
     function it_can_get_previous_and_next_entries_in_an_orderable_desc_collection()
     {
-        $this->foods->orderable(true)->save();
-
         $this->makeEntry($this->foods, 'a')->set('title', 'Apple')->save();
         $this->makeEntry($this->foods, 'b')->set('title', 'Banana')->save();
         $this->makeEntry($this->foods, 'c')->set('title', 'Carrot')->save();
@@ -382,17 +437,19 @@ class CollectionTest extends TestCase
         $this->makeEntry($this->foods, 'h')->set('title', 'Hummus')->save();
         $this->makeEntry($this->foods, 'i')->set('title', 'Ice Cream')->save();
 
-        $this->foods->setEntryPositions([
-            $this->findEntryByTitle('Carrot')->id(),
-            $this->findEntryByTitle('Hummus')->id(),
-            $this->findEntryByTitle('Apple')->id(),
-            $this->findEntryByTitle('Ice Cream')->id(),
-            $this->findEntryByTitle('Banana')->id(),
-            $this->findEntryByTitle('Fig')->id(),
-            $this->findEntryByTitle('Grape')->id(),
-            $this->findEntryByTitle('Egg')->id(),
-            $this->findEntryByTitle('Danish')->id(),
-        ])->save();
+        $structure = $this->makeStructure([
+            ['entry' => 'c'], // Carrot
+            ['entry' => 'h'], // Hummus
+            ['entry' => 'a'], // Apple
+            ['entry' => 'i'], // Ice Cream
+            ['entry' => 'b'], // Banana
+            ['entry' => 'f'], // Fig
+            ['entry' => 'g'], // Grape
+            ['entry' => 'e'], // Egg
+            ['entry' => 'd'], // Danish
+        ], $this->foods)->maxDepth(1);
+
+        $this->foods->structure($structure)->save();
 
         $currentId = $this->findEntryByTitle('Banana')->id();
 
@@ -442,6 +499,28 @@ class CollectionTest extends TestCase
         ], $items);
     }
 
+    /** @test */
+    function when_using_the_tag_without_any_parameters_that_define_the_collection_it_will_get_the_collection_object_from_context()
+    {
+        $item = Facades\Collection::make();
+
+        $this->collectionTag->setContext(['collection' => $item]);
+
+        // Without a param that would instruct Statamic which collection to get, we just return the collection from context.
+        // Which essentially gives the illusion that the tag wasn't run, and a collection variable was accessed.
+        $this->assertEquals($item, $this->collectionTag->setParameters([])->index());
+
+        // Sanity check that *any* parameter isn't the thing that causes it.
+        $this->assertEquals($item, $this->collectionTag->setParameters(['something' => 'else'])->index());
+
+        // Using one of the inclusive params results in an Illuminate\Support\Collection (ie. a list of entries)
+        $this->assertInstanceOf(SupportCollection::class, $this->collectionTag->setParameters(['from' => 'music'])->index());
+        $this->assertInstanceOf(SupportCollection::class, $this->collectionTag->setParameters(['in' => 'music'])->index());
+        $this->assertInstanceOf(SupportCollection::class, $this->collectionTag->setParameters(['folder' => 'music'])->index());
+        $this->assertInstanceOf(SupportCollection::class, $this->collectionTag->setParameters(['use' => 'music'])->index());
+        $this->assertInstanceOf(SupportCollection::class, $this->collectionTag->setParameters(['collection' => 'music'])->index());
+    }
+
     private function setTagParameters($parameters)
     {
         $this->collectionTag->setParameters($parameters);
@@ -457,5 +536,16 @@ class CollectionTest extends TestCase
     protected function runTagAndGetTitles($tagMethod)
     {
         return $this->collectionTag->{$tagMethod}()->map->get('title')->values()->all();
+    }
+
+    protected function makeStructure($tree = [], $collection = null)
+    {
+        $structure = new CollectionStructure;
+
+        if ($collection) {
+            $structure->collection($collection);
+        }
+
+        return $structure->addTree($structure->makeTree('en')->tree($tree));
     }
 }

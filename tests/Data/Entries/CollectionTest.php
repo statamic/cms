@@ -2,14 +2,20 @@
 
 namespace Tests\Data\Entries;
 
-use Statamic\Facades;
-use Tests\TestCase;
-use Statamic\Facades\Site;
-use Statamic\Fields\Blueprint;
-use Statamic\Entries\Entry;
-use Statamic\Entries\Collection;
-use Tests\PreventSavingStacheItemsToDisk;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Entries\Collection;
+use Statamic\Entries\Entry;
+use Statamic\Exceptions\CollectionNotFoundException;
+use Statamic\Facades;
+use Statamic\Facades\Antlers;
+use Statamic\Facades\Site;
+use Statamic\Facades\Structure;
+use Statamic\Fields\Blueprint;
+use Statamic\Structures\CollectionStructure;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class CollectionTest extends TestCase
 {
@@ -28,15 +34,69 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_route()
+    function it_gets_and_sets_the_routes()
     {
-        $collection = new Collection;
-        $this->assertNull($collection->route());
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.com/de/'],
+        ]]);
 
-        $return = $collection->route('{slug}');
+        // A collection with no sites uses the default site.
+        $collection = new Collection;
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->routes());
+        $this->assertEquals(['en' => null], $collection->routes()->all());
+
+        $return = $collection->routes([
+            'en' => 'blog/{slug}',
+            'fr' => 'le-blog/{slug}',
+            'de' => 'das-blog/{slug}'
+        ]);
 
         $this->assertEquals($collection, $return);
-        $this->assertEquals('{slug}', $collection->route());
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->routes());
+
+        // Only routes corresponding to the collection's sites will be returned.
+        $this->assertEquals(['en' => 'blog/{slug}'], $collection->routes()->all());
+        $this->assertEquals('blog/{slug}', $collection->route('en'));
+        $this->assertNull($collection->route('fr'));
+        $this->assertNull($collection->route('de'));
+        $this->assertNull($collection->route('unknown'));
+
+        $collection->sites(['en', 'fr']);
+
+        $this->assertEquals([
+            'en' => 'blog/{slug}',
+            'fr' => 'le-blog/{slug}'
+        ], $collection->routes()->all());
+        $this->assertEquals('blog/{slug}', $collection->route('en'));
+        $this->assertEquals('le-blog/{slug}', $collection->route('fr'));
+        $this->assertNull($collection->route('de'));
+        $this->assertNull($collection->route('unknown'));
+    }
+
+    /** @test */
+    function it_sets_all_the_routes_identically()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.com/de/'],
+        ]]);
+
+        $collection = (new Collection)->sites(['en', 'fr']);
+
+        $return = $collection->routes('{slug}');
+
+        $this->assertEquals($collection, $return);
+        $this->assertEquals([
+            'en' => '{slug}',
+            'fr' => '{slug}'
+        ], $collection->routes()->all());
+        $this->assertEquals('{slug}', $collection->route('en'));
+        $this->assertEquals('{slug}', $collection->route('fr'));
+        $this->assertNull($collection->route('de'));
+        $this->assertNull($collection->route('unknown'));
     }
 
     /** @test */
@@ -87,7 +147,7 @@ class CollectionTest extends TestCase
 
         $sites = $collection->sites();
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $sites);
-        $this->assertEquals([], $sites->all());
+        $this->assertEquals(['en'], $sites->all()); // collection with no sites will resolve to the default site.
 
         $return = $collection->sites(['en', 'fr']);
 
@@ -181,13 +241,22 @@ class CollectionTest extends TestCase
         $this->assertEquals('date', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
-        $ordered = (new Collection)->orderable(true);
+        $structureWithMaxDepthOfOne = $this->makeStructure()->maxDepth(1);
+        $ordered = (new Collection)->structure($structureWithMaxDepthOfOne);
         $this->assertEquals('order', $ordered->sortField());
         $this->assertEquals('asc', $ordered->sortDirection());
 
-        $datedAndOrdered = (new Collection)->dated(true)->orderable(true);
+        $datedAndOrdered = (new Collection)->dated(true)->structure($structureWithMaxDepthOfOne);
         $this->assertEquals('order', $datedAndOrdered->sortField());
         $this->assertEquals('asc', $datedAndOrdered->sortDirection());
+
+        $structure = $this->makeStructure();
+        $alpha->structure($structure);
+        $this->assertEquals('title', $alpha->sortField());
+        $this->assertEquals('asc', $alpha->sortDirection());
+        $dated->structure($structure);
+        $this->assertEquals('date', $dated->sortField());
+        $this->assertEquals('desc', $dated->sortDirection());
 
         // TODO: Ability to control sort direction
     }
@@ -204,42 +273,6 @@ class CollectionTest extends TestCase
         $return = $collection->save();
 
         $this->assertEquals($collection, $return);
-    }
-
-    /** @test */
-    function entry_can_be_ordered()
-    {
-        $collection = (new Collection)->handle('test')->setEntryPositions([]);
-
-        $return = $collection->setEntryPosition('one', 3);
-        $this->assertEquals($collection, $return);
-        $this->assertSame([3 => 'one'], $collection->getEntryPositions()->all());
-        $this->assertSame(['one'], $collection->getEntryOrder()->all());
-        $this->assertEquals(1, $collection->getEntryOrder('one'));
-
-        $collection->setEntryPosition('two', 7);
-        $this->assertSame([3 => 'one', 7 => 'two'], $collection->getEntryPositions()->all());
-        $this->assertSame(['one', 'two'], $collection->getEntryOrder()->all());
-        $this->assertEquals(1, $collection->getEntryOrder('one'));
-        $this->assertEquals(2, $collection->getEntryOrder('two'));
-
-        $collection->setEntryPosition('three', 5);
-        $this->assertSame([3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions()->all());
-        $this->assertSame(['one', 'three', 'two'], $collection->getEntryOrder()->all());
-        $this->assertEquals(1, $collection->getEntryOrder('one'));
-        $this->assertEquals(3, $collection->getEntryOrder('two'));
-        $this->assertEquals(2, $collection->getEntryOrder('three'));
-
-        $collection->setEntryPosition('four', 1);
-        $this->assertSame([1 => 'four', 3 => 'one', 5 => 'three', 7 => 'two'], $collection->getEntryPositions()->all());
-        $this->assertSame(['four', 'one', 'three', 'two'], $collection->getEntryOrder()->all());
-        $this->assertEquals(2, $collection->getEntryOrder('one'));
-        $this->assertEquals(4, $collection->getEntryOrder('two'));
-        $this->assertEquals(3, $collection->getEntryOrder('three'));
-        $this->assertEquals(1, $collection->getEntryOrder('four'));
-
-        $this->assertNull($collection->getEntryPosition('unknown'));
-        $this->assertNull($collection->getEntryOrder('unknown'));
     }
 
     /** @test */
@@ -303,5 +336,130 @@ class CollectionTest extends TestCase
 
         $collection->defaultPublishState(false);
         $this->assertFalse($collection->defaultPublishState());
+    }
+
+    /** @test */
+    function it_sets_and_gets_structure()
+    {
+        $structure = new CollectionStructure;
+        $collection = (new Collection)->handle('test');
+        $this->assertFalse($collection->hasStructure());
+        $this->assertNull($collection->structure());
+        $this->assertNull($structure->handle());
+
+        $collection->structure($structure);
+
+        $this->assertTrue($collection->hasStructure());
+        $this->assertSame($structure, $collection->structure());
+        $this->assertEquals('collection::test', $structure->handle());
+        $this->assertEquals('Test', $structure->title());
+    }
+
+    /** @test */
+    function it_sets_the_structure_inline()
+    {
+        // This applies to a file-based approach.
+
+        $collection = (new Collection)->handle('test');
+        $this->assertFalse($collection->hasStructure());
+        $this->assertNull($collection->structure());
+
+        EntryFactory::id('123')->collection('test')->create();
+        EntryFactory::id('456')->collection('test')->create();
+        EntryFactory::id('789')->collection('test')->create();
+
+        $return = $collection->structureContents($contents = [
+            'max_depth' => 2,
+            'tree' => [
+                ['entry' => '123', 'children' => [
+                    ['entry' => '789']
+                ]],
+                ['entry' => '456'],
+            ]
+        ]);
+
+        $this->assertEquals($collection, $return);
+        $this->assertEquals($contents, $collection->structureContents());
+        $this->assertTrue($collection->hasStructure());
+        $structure = $collection->structure();
+        $this->assertInstanceOf(CollectionStructure::class, $structure);
+        $this->assertEquals('collection::test', $structure->handle());
+        $this->assertSame($collection, $structure->collection());
+        $this->assertEquals(2, $structure->in('en')->pages()->all()->count());
+        $this->assertEquals(3, $structure->in('en')->flattenedPages()->count());
+        $this->assertEquals(2, $structure->maxDepth());
+    }
+
+    /** @test */
+    function setting_a_structure_removes_the_existing_inline_structure()
+    {
+        $collection = (new Collection)->handle('test');
+        $collection->structureContents($contents = ['tree' => []]);
+        $this->assertSame($contents, $collection->structureContents());
+
+        $collection->structure(new CollectionStructure);
+
+        $this->assertNull($collection->structureContents());
+    }
+
+    /** @test */
+    function setting_an_inline_structure_removes_the_existing_structure()
+    {
+        $collection = (new Collection)->handle('test');
+        $collection->structure($structure = (new CollectionStructure)->maxDepth(2));
+        $this->assertSame($structure, $collection->structure());
+        $this->assertEquals(2, $collection->structure()->maxDepth());
+        $this->assertNull($collection->structureContents());
+
+        $collection->structureContents(['max_depth' => 13, 'tree' => []]);
+
+        $this->assertNotSame($structure, $collection->structure());
+        $this->assertEquals(13, $collection->structure()->maxDepth());
+    }
+
+    /** @test */
+    function it_gets_the_handle_when_casting_to_a_string()
+    {
+        $collection = (new Collection)->handle('test');
+
+        $this->assertEquals('test', (string) $collection);
+    }
+
+    /** @test */
+    function it_augments()
+    {
+        $collection = (new Collection)->handle('test');
+
+        $this->assertInstanceof(Augmentable::class, $collection);
+        $this->assertEquals([
+            'title' => 'Test',
+            'handle' => 'test',
+        ], $collection->toAugmentedArray());
+    }
+
+    /** @test */
+    function it_augments_in_the_parser()
+    {
+        $collection = (new Collection)->handle('test');
+
+        $this->assertEquals('test', Antlers::parse('{{ collection }}', ['collection' => $collection]));
+
+        $this->assertEquals('test Test', Antlers::parse('{{ collection }}{{ handle }} {{ title }}{{ /collection }}', ['collection' => $collection]));
+
+        $this->assertEquals('test', Antlers::parse('{{ collection:handle }}', ['collection' => $collection]));
+
+        try {
+            Antlers::parse('{{ collection from="somewhere" }}{{ title }}{{ /collection }}', ['collection' => $collection]);
+            $this->fail('Exception not thrown');
+        } catch (CollectionNotFoundException $e) {
+            $this->assertEquals('Collection [somewhere] not found', $e->getMessage());
+        }
+    }
+
+    private function makeStructure()
+    {
+        return (new CollectionStructure)->tap(function ($s) {
+            $s->addTree($s->makeTree('en'));
+        });
     }
 }

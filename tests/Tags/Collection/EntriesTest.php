@@ -9,7 +9,9 @@ use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
+use Statamic\Fields\Value;
 use Statamic\Query\Scopes\Scope;
+use Statamic\Structures\CollectionStructure;
 use Statamic\Tags\Collection\Entries;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
@@ -47,7 +49,7 @@ class EntriesTest extends TestCase
 
     protected function makeEntry($slug)
     {
-        return EntryFactory::slug($slug)->collection($this->collection)->make();
+        return EntryFactory::id($slug)->slug($slug)->collection($this->collection)->make();
     }
 
     protected function getEntries($params = [])
@@ -127,6 +129,28 @@ class EntriesTest extends TestCase
         $this->assertEquals(
             ['B', 'C', 'D'],
             $this->getEntries(['limit' => 3, 'offset' => 1])->map->get('title')->values()->all()
+        );
+    }
+
+    /** @test */
+    function it_limits_entries_with_offset_using_value_objects()
+    {
+        $this->makeEntry('a')->set('title', 'A')->save();
+        $this->makeEntry('b')->set('title', 'B')->save();
+        $this->makeEntry('c')->set('title', 'C')->save();
+        $this->makeEntry('d')->set('title', 'D')->save();
+        $this->makeEntry('e')->set('title', 'E')->save();
+
+        $this->assertCount(5, $this->getEntries());
+
+        $this->assertEquals(
+            ['A', 'B', 'C'],
+            $this->getEntries(['limit' => new Value(3)])->map->get('title')->values()->all()
+        );
+
+        $this->assertEquals(
+            ['B', 'C', 'D'],
+            $this->getEntries(['limit' => 3, 'offset' => new Value(1)])->map->get('title')->values()->all()
         );
     }
 
@@ -306,6 +330,39 @@ class EntriesTest extends TestCase
         }
 
         $this->assertTrue($orders->unique()->count() > 1);
+    }
+
+    /** @test */
+    function it_cannot_sort_a_nested_structured_collection()
+    {
+        $this->expectException(\LogicException::class);
+        $this->expectExceptionMessage('Cannot sort a nested collection by order.');
+
+        $structure = (new CollectionStructure)->maxDepth(2);
+        $this->collection->structure($structure)->save();
+
+        $this->getEntries(['sort' => 'order|title']);
+    }
+
+    /** @test */
+    function it_can_sort_a_linear_structured_collection()
+    {
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+
+        $structure = (new CollectionStructure)->collection($this->collection)->maxDepth(1)->tap(function ($s) {
+            $s->addTree($s->makeTree('en')->tree([
+                ['entry' => 'b'],
+                ['entry' => 'c'],
+                ['entry' => 'a'],
+            ]));
+        });
+
+        $this->collection->structure($structure)->save();
+
+        $this->assertEquals(['a', 'b', 'c'], $this->getEntries(['sort' => 'id'])->map->id()->all());
+        $this->assertEquals(['b', 'c', 'a'], $this->getEntries(['sort' => 'order|title'])->map->id()->all());
     }
 
     /** @test */

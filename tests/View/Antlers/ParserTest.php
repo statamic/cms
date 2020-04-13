@@ -36,6 +36,7 @@ class ParserTest extends TestCase
                 ['string' => 'the first string'],
                 ['string' => 'the second string']
             ],
+            'complex_string' => 'Hello wildernesses',
             'associative' => [
                 'one' => 'hello',
                 'two' => 'wilderness',
@@ -286,6 +287,20 @@ EOT;
         $this->assertEquals(null, Antlers::parse($should_also_fail, $this->variables));
     }
 
+    public function testConditionsOnOverlappingVariableNames()
+    {
+        $template = '{{ if complex }}{{ complex limit="1" }}{{ string }}{{ /complex }}{{ /if }}';
+
+        $this->assertEquals('the first string', Antlers::parse($template, $this->variables));
+    }
+
+    public function testLoopWithParamInsideConditionMatchingVariableName()
+    {
+        $template = '{{ if complex_string }}{{ complex_string }}{{ /if }}{{ complex }}{{ /complex }}';
+
+        $this->assertEquals('Hello wildernesses', Antlers::parse($template, $this->variables));
+    }
+
     public function testTernaryCondition()
     {
         $template = '{{ string ? "Pass" : "Fail" }}';
@@ -331,6 +346,15 @@ EOT;
         $template = '{{ condition ? var : "nah" }}';
 
         $this->assertEquals('"Wow" said the man', Antlers::parse($template, $data));
+    }
+
+    public function testTernaryConditionInsideParameter()
+    {
+        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+
+        $template = "{{ test variable='{{ true ? 'Hello wilderness' : 'fail' }}' }}";
+
+        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
     }
 
     public function testNullCoalescence()
@@ -1578,6 +1602,25 @@ EOT;
     function objects_are_considered_truthy()
     {
         $this->assertEquals('yes', Antlers::parse('{{ if object }}yes{{ else }}no{{ /if }}', ['object' => new \stdClass]));
+    }
+
+    /** @test */
+    function parameter_style_modifier_with_colon_prefix_will_get_the_values_from_context()
+    {
+        $this->assertEquals('Tes Te', Antlers::parse('{{ word :backspace="one" }} {{ word :backspace="two" }}', [
+            'word' => 'Test',
+            'one' => 1,
+            'two' => 2,
+        ]));
+    }
+
+    /** @test */
+    function variables_starting_with_if_arent_treated_as_if_statements()
+    {
+        $this->assertEquals('test', Antlers::parse('{{ iframe }}', ['iframe' => 'test']));
+        $this->assertEquals('test', Antlers::parse('{{ unlesses }}', ['unlesses' => 'test']));
+        $this->assertEquals('test', Antlers::parse('{{ elseifs }}', ['elseifs' => 'test']));
+        $this->assertEquals('test', Antlers::parse('{{ elseunlessses }}', ['elseunlessses' => 'test']));
     }
 }
 

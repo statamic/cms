@@ -21,14 +21,19 @@
 
     @else
 
-        @include('statamic::partials.create-first', [
+        @include('statamic::partials.empty-state', [
             'resource' => 'Taxonomy',
-            'description' => 'A Taxonomy is a system of classifying data around a set of unique characteristics, such as category or color.',
-            'svg' => 'empty/collection',
+            'description' => __('statamic::messages.taxonomy_wizard_intro'),
+            'svg' => 'empty/taxonomy',
             'route' => cp_route('taxonomies.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')
         ])
 
     @endunless
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Taxonomies'),
+        'url' => 'taxonomies'
+    ])
 
 @endsection

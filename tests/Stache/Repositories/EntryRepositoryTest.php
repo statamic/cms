@@ -10,7 +10,7 @@ use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\EntryCollection;
-use Statamic\Stache\Stores\StructuresStore;
+use Statamic\Stache\Stores\NavigationStore;
 use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Stache\Repositories\EntryRepository;
 use Statamic\Exceptions\InvalidLocalizationException;
@@ -29,7 +29,7 @@ class EntryRepositoryTest extends TestCase
         $this->stache->registerStores([
             (new CollectionsStore($this->stache, app('files')))->directory($this->directory),
             (new EntriesStore($this->stache, app('files')))->directory($this->directory),
-            (new StructuresStore($this->stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/structures'),
+            (new NavigationStore($this->stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/navigation'),
         ]);
 
         $this->repo = new EntryRepository($this->stache);

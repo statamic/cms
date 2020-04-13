@@ -68,14 +68,20 @@ class FieldsetController extends CpController
             'title' => 'required',
         ]);
 
+        $handle = Str::snake($request->title);
+
+        if (Facades\Fieldset::find($handle)) {
+            return back()->withInput()->with('error', __('A fieldset with that name already exists.'));
+        }
+
         $fieldset = (new Fieldset)
-            ->setHandle(Str::snake($request->title))
+            ->setHandle($handle)
             ->setContents([
                 'title' => $request->title,
                 'fields' => []
             ])->save();
 
-        return redirect($fieldset->editUrl())->with('message', __('Saved'));
+        return redirect($fieldset->editUrl())->with('success', __('Fieldset created'));
     }
 
     public function destroy($fieldset)

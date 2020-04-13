@@ -14,7 +14,33 @@
             :value="items"
             @input="input"
             @search="search"
-        />
+            @search:focus="$emit('focus')"
+            @search:blur="$emit('blur')"
+        >
+            <template #selected-option-container v-if="multiple"><i class="hidden"></i></template>
+            <template #search="{ events, attributes }" v-if="multiple">
+                <input
+                    :placeholder="config.placeholder || __('Choose...')"
+                    class="vs__search"
+                    type="search"
+                    v-on="events"
+                    v-bind="attributes"
+                >
+            </template>
+             <template #no-options>
+                <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+            </template>
+            <template #footer="{ deselect }" v-if="multiple">
+                <div class="vs__selected-options-outside flex flex-wrap">
+                    <span v-for="item in items" class="vs__selected mt-1">
+                        {{ item.title }}
+                        <button @click="deselect(item)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
+                            <span>×</span>
+                        </button>
+                    </span>
+                </div>
+            </template>
+        </v-select>
     </div>
 
 </template>

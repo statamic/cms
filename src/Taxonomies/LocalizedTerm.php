@@ -2,7 +2,6 @@
 
 namespace Statamic\Taxonomies;
 
-use ArrayAccess;
 use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable;
@@ -17,7 +16,7 @@ use Statamic\Routing\Routable;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 
-class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
+class LocalizedTerm implements Term, Responsable, Augmentable
 {
     use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns;
 
@@ -289,26 +288,6 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
     public function apiUrl()
     {
         return Statamic::apiRoute('taxonomies.terms.show', [$this->taxonomyHandle(), $this->slug()]);
-    }
-
-    public function offsetExists($key)
-    {
-        return $this->has($key);
-    }
-
-    public function offsetGet($key)
-    {
-        return $this->value($key);
-    }
-
-    public function offsetSet($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
     }
 
     public function route()

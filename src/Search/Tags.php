@@ -3,12 +3,13 @@
 namespace Statamic\Search;
 
 use Statamic\Facades\Search;
-use Statamic\Tags\OutputsItems;
+use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
 class Tags extends BaseTags
 {
-    use OutputsItems;
+    use Concerns\OutputsItems,
+        Concerns\QueriesConditions;
 
     protected static $handle = 'search';
 
@@ -18,15 +19,16 @@ class Tags extends BaseTags
             return $this->parseNoResults();
         }
 
-        $results = Search::index($this->get('index'))
+        $builder = Search::index($this->get('index'))
             ->ensureExists()
             ->search($query)
             ->withData($this->get('supplement_data', true))
             ->limit($this->get('limit'))
-            ->offset($this->get('offset'))
-            ->get();
+            ->offset($this->get('offset'));
 
-        $results = $this->addResultTypes($results);
+        $this->queryConditions($builder);
+
+        $results = $this->addResultTypes($builder->get());
 
         return $this->output($results);
     }

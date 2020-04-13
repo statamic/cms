@@ -3,12 +3,12 @@
 namespace Statamic\Auth\Protect;
 
 use Illuminate\Support\ViewErrorBag;
+use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
-use Statamic\Tags\Traits\RendersForms;
 
 class Tags extends BaseTags
 {
-    use RendersForms;
+    use Concerns\RendersForms;
 
     protected static $handle = 'protect';
 

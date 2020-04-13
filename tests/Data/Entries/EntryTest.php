@@ -14,6 +14,10 @@ use Statamic\Facades;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Sites\Site;
+use Statamic\Structures\CollectionStructure;
+use Statamic\Structures\Page;
+use Statamic\Structures\Pages;
+use Statamic\Structures\Tree;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -90,27 +94,6 @@ class EntryTest extends TestCase
 
         $this->assertTrue($entry->has('foo'));
         $this->assertEquals('bar', $entry->foo);
-    }
-
-    /** @test */
-    function it_gets_sets_and_removes_data_values_using_array_access()
-    {
-        Collection::make('test')->save();
-        $entry = (new Entry)->collection('test');
-        $this->assertNull($entry['foo']);
-        $this->assertFalse(isset($entry['foo']));
-
-        $entry['foo'] = 'bar';
-
-        $this->assertTrue($entry->has('foo'));
-        $this->assertTrue(isset($entry['foo']));
-        $this->assertEquals('bar', $entry['foo']);
-
-        unset($entry['foo']);
-
-        $this->assertFalse($entry->has('foo'));
-        $this->assertFalse(isset($entry['foo']));
-        $this->assertNull($entry['foo']);
     }
 
     /** @test */
@@ -200,7 +183,7 @@ class EntryTest extends TestCase
             'de' => ['url' => 'http://domain.de/'],
         ]]);
 
-        $collection = (new Collection)->handle('blog')->ampable(true)->route([
+        $collection = (new Collection)->sites(['en', 'fr', 'de'])->handle('blog')->ampable(true)->routes([
             'en' => 'blog/{slug}',
             'fr' => 'le-blog/{slug}',
             'de' => 'das-blog/{slug}',
@@ -209,21 +192,87 @@ class EntryTest extends TestCase
         $entryEn = (new Entry)->collection($collection)->locale('en')->slug('foo');
         $entryFr = (new Entry)->collection($collection)->locale('fr')->slug('le-foo');
         $entryDe = (new Entry)->collection($collection)->locale('de')->slug('das-foo');
+        $redirectEntry = (new Entry)->collection($collection)->locale('en')->slug('redirected')->set('redirect', 'http://example.com/page');
+        $redirect404Entry = (new Entry)->collection($collection)->locale('en')->slug('redirect-404')->set('redirect', '404');
 
         $this->assertEquals('/blog/foo', $entryEn->uri());
         $this->assertEquals('/blog/foo', $entryEn->url());
         $this->assertEquals('http://domain.com/blog/foo', $entryEn->absoluteUrl());
         $this->assertEquals('http://domain.com/amp/blog/foo', $entryEn->ampUrl());
+        $this->assertNull($entryEn->redirectUrl());
 
         $this->assertEquals('/le-blog/le-foo', $entryFr->uri());
         $this->assertEquals('/fr/le-blog/le-foo', $entryFr->url());
         $this->assertEquals('http://domain.com/fr/le-blog/le-foo', $entryFr->absoluteUrl());
         $this->assertEquals('http://domain.com/fr/amp/le-blog/le-foo', $entryFr->ampUrl());
+        $this->assertNull($entryFr->redirectUrl());
 
         $this->assertEquals('/das-blog/das-foo', $entryDe->uri());
         $this->assertEquals('/das-blog/das-foo', $entryDe->url());
         $this->assertEquals('http://domain.de/das-blog/das-foo', $entryDe->absoluteUrl());
         $this->assertEquals('http://domain.de/amp/das-blog/das-foo', $entryDe->ampUrl());
+        $this->assertNull($entryDe->redirectUrl());
+
+        $this->assertEquals('/blog/redirected', $redirectEntry->uri());
+        $this->assertEquals('http://example.com/page', $redirectEntry->url());
+        $this->assertEquals('http://example.com/page', $redirectEntry->absoluteUrl());
+        $this->assertNull($redirectEntry->ampUrl());
+        $this->assertEquals('http://example.com/page', $redirectEntry->redirectUrl());
+
+        $this->assertEquals('/blog/redirect-404', $redirect404Entry->uri());
+        $this->assertEquals('/blog/redirect-404', $redirect404Entry->url());
+        $this->assertEquals('http://domain.com/blog/redirect-404', $redirect404Entry->absoluteUrl());
+        $this->assertEquals('http://domain.com/amp/blog/redirect-404', $redirect404Entry->ampUrl());
+        $this->assertEquals(404, $redirect404Entry->redirectUrl());
+    }
+
+    /** @test */
+    function it_gets_the_uri_from_the_structure()
+    {
+        $structure = $this->partialMock(CollectionStructure::class);
+        $collection = tap((new Collection)->handle('test')->structure($structure))->save();
+        $entry = (new Entry)->collection($collection)->locale('en')->slug('foo');
+        $structure->shouldReceive('entryUri')->with($entry)->once()->andReturn('/structured-uri');
+
+        $this->assertEquals('/structured-uri', $entry->uri());
+    }
+
+    /** @test */
+    function it_gets_urls_for_first_child_redirects()
+    {
+        \Event::fake(); // Don't invalidate static cache etc when saving entries.
+
+        $collection = tap((new Collection)->handle('pages')->routes('{parent_uri}/{slug}'))->save();
+
+        $parent = tap((new Entry)->id('1')->locale('en')->collection($collection)->slug('parent')->set('redirect', '@child'))->save();
+        $child = tap((new Entry)->id('2')->locale('en')->collection($collection)->slug('child'))->save();
+        $noChildren = tap((new Entry)->id('3')->locale('en')->collection($collection)->slug('nochildren')->set('redirect', '@child'))->save();
+
+        $collection->structureContents([
+            'tree' => [
+                [
+                    'entry' => '1',
+                    'children' => [
+                        ['entry' => '2']
+                    ]
+                ],
+                [
+                    'entry' => '3'
+                ]
+            ]
+        ])->save();
+
+        $this->assertEquals('/parent', $parent->uri());
+        $this->assertEquals('/parent/child', $parent->url());
+        $this->assertEquals('/parent/child', $parent->redirectUrl());
+
+        $this->assertEquals('/parent/child', $child->uri());
+        $this->assertEquals('/parent/child', $child->url());
+        $this->assertNull($child->redirectUrl());
+
+        $this->assertEquals('/nochildren', $noChildren->uri());
+        $this->assertEquals('/nochildren', $noChildren->url());
+        $this->assertEquals(404, $noChildren->redirectUrl());
     }
 
     /** @test */
@@ -248,7 +297,7 @@ class EntryTest extends TestCase
             ->id('test-id')
             ->locale('en')
             ->slug('test')
-            ->collection(Collection::make('blog')->route('blog/{slug}')->save())
+            ->collection(Collection::make('blog')->routes('blog/{slug}')->save())
             ->data([
                 'foo' => 'bar',
                 'bar' => 'baz',
@@ -264,7 +313,7 @@ class EntryTest extends TestCase
             'baz' => 'qux',
             'last_modified' => $carbon = Carbon::createFromTimestamp($lastModified),
             'updated_at' => $carbon,
-            'updated_by' => $user->toAugmentedArray(),
+            'updated_by' => $user,
             'url' => '/blog/test',
             'permalink' => 'http://localhost/blog/test',
         ], $entry->toAugmentedArray());
@@ -373,43 +422,30 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_order()
+    function it_gets_the_order_from_the_collections_structure()
     {
         $collection = tap(Collection::make('ordered'))->save();
-        $one = (new Entry)->id('one')->collection($collection);
+
+        $one = tap((new Entry)->locale('en')->id('one')->collection($collection))->save();
+        $two = tap((new Entry)->locale('en')->id('two')->collection($collection))->save();
+        $three = tap((new Entry)->locale('en')->id('three')->collection($collection))->save();
+
+        $this->assertNull($one->order());
+        $this->assertNull($one->order());
         $this->assertNull($one->order());
 
-        $return = $one->order(5);
-        $this->assertEquals($one, $return);
-        $this->assertEquals(1, $one->order());
+        $collection->structureContents([
+            'max_depth' => 1,
+            'tree' => [
+                ['entry' => 'three'],
+                ['entry' => 'one'],
+                ['entry' => 'two'],
+            ]
+        ])->save();
 
-        $two = (new Entry)->id('two')->collection($collection);
-        $two->order(10);
-        $this->assertEquals(1, $one->order());
-        $this->assertEquals(2, $two->order());
-
-        $three = (new Entry)->id('three')->collection($collection);
-        $three->order(2);
         $this->assertEquals(2, $one->order());
         $this->assertEquals(3, $two->order());
         $this->assertEquals(1, $three->order());
-    }
-
-    /** @test */
-    function it_sets_the_order_on_the_collection_when_dealing_with_numeric_collections()
-    {
-        $collection = tap(Collection::make('ordered')->orderable(true))->save();
-        $one = (new Entry)->id('one')->collection($collection);
-        $two = (new Entry)->id('two')->collection($collection);
-
-        $one->order('3');
-        $two->order('2');
-
-        $this->assertEquals([2 => 'two', 3 => 'one'], $collection->getEntryPositions()->all());
-        $this->assertEquals(['two', 'one'], $collection->getEntryOrder()->all());
-
-        $this->assertEquals(2, $one->order());
-        $this->assertEquals(1, $two->order());
     }
 
     /** @test */
@@ -421,15 +457,13 @@ class EntryTest extends TestCase
             $collection = tap(Collection::make('dated')->dated(true))->save();
             return (new Entry)->collection($collection);
         });
+
         $numberEntry = with('', function() {
-            $collection = tap(Collection::make('ordered')->orderable(true))->save();
+            $collection = tap(Collection::make('ordered')->structureContents(['max_depth' => 1, 'tree' => []]))->save();
             return (new Entry)->collection($collection);
         });
-        $this->assertNull($dateEntry->order());
-        $this->assertNull($numberEntry->order());
 
         $dateEntry->date('2017-01-02');
-        $numberEntry->order('2017-01-02');
 
         $this->assertEquals('2017-01-02 12:00am', $dateEntry->date()->format('Y-m-d h:ia'));
         $this->assertTrue($dateEntry->hasDate());
@@ -534,6 +568,37 @@ class EntryTest extends TestCase
         Event::assertDispatched(EntrySaved::class, function ($event) use ($entry) {
             return $event->data === $entry;
         });
+    }
+
+    /** @test */
+    function it_performs_callbacks_after_saving_but_before_the_saved_event_and_only_once()
+    {
+        Event::fake();
+        $entry = (new Entry)->id('a')->collection(new Collection);
+        Facades\Entry::shouldReceive('save')->with($entry);
+        Facades\Entry::shouldReceive('taxonomize')->with($entry);
+        $callbackOneRan = 0;
+        $callbackTwoRan = 0;
+
+        $return = $entry->afterSave(function ($arg) use (&$callbackOneRan, $entry) {
+            $this->assertSame($entry, $arg);
+            $arg->set('result', 'one');
+            $callbackOneRan++;
+        });
+        $entry->afterSave(function ($arg) use (&$callbackTwoRan, $entry) {
+            $this->assertSame($entry, $arg);
+            $arg->set('result', 'two');
+            $callbackTwoRan++;
+        });
+
+        $entry->save();
+        $entry->save(); // save twice to show that the callbacks only get run the first time.
+
+        $this->assertEquals($entry, $return);
+        $this->assertEquals(1, $callbackOneRan);
+        $this->assertEquals(1, $callbackTwoRan);
+
+        // TODO: How to test that the callbacks are run *before* the EntrySaved event?
     }
 
     /** @test */
@@ -670,12 +735,42 @@ class EntryTest extends TestCase
     function it_deletes_through_the_api()
     {
         Event::fake();
-        $entry = new Entry;
+        $entry = (new Entry)->collection(tap(Collection::make('test'))->save());
         Facades\Entry::shouldReceive('delete')->with($entry);
 
         $return = $entry->delete();
 
         $this->assertTrue($return);
+    }
+
+    /** @test */
+    function it_gets_the_corresponding_page_from_the_collections_structure()
+    {
+        $parentPage = $this->mock(Page::class);
+        $page = $this->mock(Page::class);
+        $page->shouldReceive('parent')->andReturn($parentPage);
+        $tree = $this->partialMock(Tree::class);
+        $tree->locale('en');
+        $tree->shouldReceive('page')->with('entry-id')->andReturn($page);
+
+        $structure = new CollectionStructure;
+        $structure->addTree($tree);
+        $collection = tap(Collection::make('test')->structure($structure))->save();
+
+        $entry = (new Entry)->id('entry-id')->locale('en')->collection($collection);
+
+        $this->assertSame($page, $entry->page());
+        $this->assertSame($parentPage, $entry->parent());
+    }
+
+    /** @test */
+    function no_page_is_returned_when_the_collection_isnt_using_a_structure()
+    {
+        $collection = tap(Collection::make('test'))->save();
+        $entry = (new Entry)->id('entry-id')->locale('en')->collection($collection);
+
+        $this->assertNull($entry->page());
+        $this->assertNull($entry->parent());
     }
 
     // todo: add tests for localization things. in(), descendants(), addLocalization(), etc
