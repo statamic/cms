@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Action;
