@@ -45,7 +45,6 @@ jobs:
 
             - name: Execute tests
               run: vendor/bin/phpunit
-              continue-on-error: ${{ matrix.laravel == '5.8.*' }}
 
             - name: Send Slack notification
               uses: 8398a7/action-slack@v2
