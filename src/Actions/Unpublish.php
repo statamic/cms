@@ -42,7 +42,7 @@ class Unpublish extends Action
         return 'Unpublish Entry|Unpublish :count Entries';
     }
 
-    public function run($entries)
+    public function run($entries, $values)
     {
         $entries->each(function ($entry) {
             $entry->unpublish(['user' => User::current()]);

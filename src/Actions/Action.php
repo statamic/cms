@@ -61,7 +61,12 @@ abstract class Action implements Arrayable
         return $this->fields;
     }
 
-    public function redirect()
+    public function run($items, $values)
+    {
+        //
+    }
+
+    public function redirect($items, $values)
     {
         return false;
     }

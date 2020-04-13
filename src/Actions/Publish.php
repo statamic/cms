@@ -47,7 +47,7 @@ class Publish extends Action
         return 'Publish Entry|Publish :count Entries';
     }
 
-    public function run($entries)
+    public function run($entries, $values)
     {
         $entries->each(function ($entry) {
             $entry->publish(['user' => User::current()]);
