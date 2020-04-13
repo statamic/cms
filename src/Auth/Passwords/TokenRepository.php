@@ -17,12 +17,13 @@ class TokenRepository extends DatabaseTokenRepository
     protected $expires;
     protected $path;
 
-    public function __construct(Filesystem $files, HasherContract $hasher, $hashKey, $expires = 60)
+    public function __construct(Filesystem $files, HasherContract $hasher, $hashKey, $expires = 60, $throttle = 60)
     {
         $this->files = $files;
         $this->hasher = $hasher;
         $this->hashKey = $hashKey;
         $this->expires = $expires * 60;
+        $this->throttle = $throttle;
 
         $this->path = storage_path('statamic/password_resets.yaml');
     }
@@ -71,6 +72,13 @@ class TokenRepository extends DatabaseTokenRepository
         return $record &&
             ! $this->tokenExpired(Carbon::createFromTimestamp($record['created_at']))
             && $this->hasher->check($token, $record['token']);
+    }
+
+    public function recentlyCreatedToken(CanResetPasswordContract $user)
+    {
+        $record = $this->getResets()->get($user->email());
+
+        return $record && parent::tokenRecentlyCreated($record['created_at']);
     }
 
     protected function getResets()
