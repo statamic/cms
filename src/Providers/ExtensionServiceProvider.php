@@ -387,7 +387,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
         foreach ($this->app['files']->files($path) as $file) {
             $class = $file->getBasename('.php');
-            $fqcn = $this->getAppNamespace() . "{$folder}\\{$class}";
+            $fqcn = $this->app->getNamespace() . "{$folder}\\{$class}";
             if (is_subclass_of($fqcn, $requiredClass)) {
                 $fqcn::register();
             }
