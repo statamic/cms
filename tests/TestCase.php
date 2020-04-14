@@ -170,7 +170,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         method_exists(static::class, 'assertFileDoesNotExist')
             ? static::assertFileDoesNotExist($filename, $message)
-            : static::assertFileNotExists($filename, $message);
+            : parent::assertFileNotExists($filename, $message);
     }
 
     /**
@@ -180,6 +180,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         method_exists(static::class, 'assertDirectoryDoesNotExist')
             ? static::assertDirectoryDoesNotExist($filename, $message)
-            : static::assertDirectoryNotExists($filename, $message);
+            : parent::assertDirectoryNotExists($filename, $message);
     }
 }
