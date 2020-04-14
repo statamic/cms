@@ -434,6 +434,7 @@ class CascadeTest extends TestCase
     private function fakeSiteConfig()
     {
         config(['app.url' => 'http://test.com']);
+        url()->forceRootUrl(config('app.url'));
         Site::setConfig([
             'default' => 'en',
             'sites' => [
