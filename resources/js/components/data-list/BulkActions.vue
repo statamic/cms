@@ -4,7 +4,7 @@
         <div class="input-group input-group-sm relative z-10">
             <div class="input-group-prepend">
                 <div class="text-grey-60"
-                    v-text="__n(`:count selected`, selections.length)" />
+                    v-text="__n(`:count item selected|:count items selected`, selections.length)" />
             </div>
 
             <data-list-action
@@ -27,7 +27,8 @@
 </template>
 
 <script>
-import Actions from './Actions.vue';
+import Actions from './Actions';
+import qs from 'qs';
 
 export default {
 
@@ -42,8 +43,13 @@ export default {
         }
     },
 
-    computed: {
+    data() {
+        return {
+            actions: [],
+        };
+    },
 
+    computed: {
         selections() {
             return this.sharedState.selections;
         },
@@ -51,47 +57,38 @@ export default {
         hasSelections() {
             return this.selections.length > 0;
         },
+    },
 
-        actions() {
-            const rows = this.sharedState.rows.filter(row => this.selections.includes(row.id));
-
-            let actions = rows.reduce((carry, row) => carry.concat(row.actions), []);
-
-            actions = _.uniq(actions, 'handle');
-
-            // Remove any actions that are missing from any row. If you can't apply the action
-            // to all of the selected items, you should not see the button. There's server
-            // side authorization for when the action is executed anyway, just in case.
-            rows.forEach(row => {
-                actions = actions.filter(action => row.actions.map(a => a.handle).includes(action.handle));
-            });
-
-            return _.sortBy(actions, 'title');
-        }
-
+    watch: {
+        selections: 'getActions',
     },
 
     methods: {
-
-        getActions(selections) {
-            if (selections.length === 0) {
+        getActions() {
+            if (this.selections.length === 0) {
                 this.actions = [];
 
                 return;
             }
 
-            let params = {selections};
+            let params = {
+                selections: this.selections,
+            };
 
             if (this.context) {
                 params.context = this.context;
             }
 
-            this.$axios.get(this.url, {params}).then(response => {
+            let config = {
+                params,
+                paramsSerializer: params => qs.stringify(params, {arrayFormat: 'brackets'})
+            };
+
+            this.$axios.get(this.url, config).then(response => {
                 this.actions = response.data;
             });
         },
-
-    }
+    },
 
 }
 </script>

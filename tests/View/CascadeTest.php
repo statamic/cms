@@ -297,6 +297,58 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
+    function it_hydrates_segments_on_the_home_page()
+    {
+        $this->get('/');
+
+        $cascade = $this->cascade()->withSite(Site::get('en'));
+
+        tap($cascade->hydrate()->toArray(), function ($cascade) {
+            $this->assertArrayNotHasKey('segment_1', $cascade);
+            $this->assertArrayNotHasKey('last_segment', $cascade);
+        });
+    }
+
+    /** @test */
+    function it_hydrates_segments_on_the_home_page_in_subdirectory_site()
+    {
+        $this->get('de');
+
+        $cascade = $this->cascade()->withSite(Site::get('de'));
+
+        tap($cascade->hydrate()->toArray(), function ($cascade) {
+            $this->assertArrayNotHasKey('segment_1', $cascade);
+            $this->assertArrayNotHasKey('last_segment', $cascade);
+        });
+    }
+
+    /** @test */
+    function last_segment_doesnt_contain_query_params()
+    {
+        $this->get('/foo?bar=baz');
+
+        $cascade = $this->cascade()->withSite(Site::get('en'));
+
+        tap($cascade->hydrate()->toArray(), function ($cascade) {
+            $this->assertEquals('foo', $cascade['segment_1']);
+            $this->assertEquals('foo', $cascade['last_segment']);
+        });
+    }
+
+    /** @test */
+    function last_segment_doesnt_contain_query_params_in_subdirectory_site()
+    {
+        $this->get('/de/foo?bar=baz');
+
+        $cascade = $this->cascade()->withSite(Site::get('de'));
+
+        tap($cascade->hydrate()->toArray(), function ($cascade) {
+            $this->assertEquals('foo', $cascade['segment_1']);
+            $this->assertEquals('foo', $cascade['last_segment']);
+        });
+    }
+
+    /** @test */
     function it_hydrates_page_data()
     {
         $vars = ['foo' => 'bar', 'baz' => 'qux'];
@@ -382,6 +434,7 @@ class CascadeTest extends TestCase
     private function fakeSiteConfig()
     {
         config(['app.url' => 'http://test.com']);
+        url()->forceRootUrl(config('app.url'));
         Site::setConfig([
             'default' => 'en',
             'sites' => [

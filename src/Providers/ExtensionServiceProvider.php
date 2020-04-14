@@ -6,19 +6,14 @@ use Statamic\Tags;
 use Statamic\Actions;
 use Statamic\Fieldtypes;
 use Statamic\Query\Scopes;
-use Statamic\Modifiers\Modifier;
-use Statamic\Extensions\FileStore;
-use Statamic\Modifiers\CoreModifiers;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\ServiceProvider;
 use Statamic\Extend\Manifest;
-use Illuminate\Console\DetectsApplicationNamespace;
+use Statamic\Modifiers\Modifier;
+use Illuminate\Filesystem\Filesystem;
+use Statamic\Modifiers\CoreModifiers;
+use Illuminate\Support\ServiceProvider;
 
 class ExtensionServiceProvider extends ServiceProvider
 {
-    use DetectsApplicationNamespace;
-
     /**
      * Aliases for modifiers bundled with Statamic.
      *
@@ -67,6 +62,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Assets\Assets::class,
         Fieldtypes\Bard::class,
         Fieldtypes\Bard\Buttons::class,
+        Fieldtypes\ButtonGroup::class,
         Fieldtypes\Blueprints::class,
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
@@ -75,6 +71,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
         Fieldtypes\Entries::class,
+        Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Hidden::class,
         Fieldtypes\Integer::class,
@@ -121,6 +118,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\GetFiles::class,
         Tags\Glide::class,
         Tags\In::class,
+        Tags\Increment::class,
         Tags\Is::class,
         Tags\Iterate::class,
         Tags\Link::class,

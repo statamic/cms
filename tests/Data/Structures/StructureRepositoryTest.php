@@ -10,7 +10,7 @@ use Statamic\Structures\Structure;
 use Statamic\Structures\StructureRepository;
 use Tests\TestCase;
 
-class StuctureRepositoryTest extends TestCase
+class StructureRepositoryTest extends TestCase
 {
     public function setUp(): void
     {

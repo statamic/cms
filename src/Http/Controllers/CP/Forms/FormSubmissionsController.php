@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Illuminate\Http\Resources\Json\Resource;
 use Statamic\CP\Column;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Config;

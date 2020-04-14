@@ -97,27 +97,6 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_sets_and_removes_data_values_using_array_access()
-    {
-        Collection::make('test')->save();
-        $entry = (new Entry)->collection('test');
-        $this->assertNull($entry['foo']);
-        $this->assertFalse(isset($entry['foo']));
-
-        $entry['foo'] = 'bar';
-
-        $this->assertTrue($entry->has('foo'));
-        $this->assertTrue(isset($entry['foo']));
-        $this->assertEquals('bar', $entry['foo']);
-
-        unset($entry['foo']);
-
-        $this->assertFalse($entry->has('foo'));
-        $this->assertFalse(isset($entry['foo']));
-        $this->assertNull($entry['foo']);
-    }
-
-    /** @test */
     function it_gets_and_sets_all_data()
     {
         $entry = new Entry;
@@ -603,12 +582,12 @@ class EntryTest extends TestCase
 
         $return = $entry->afterSave(function ($arg) use (&$callbackOneRan, $entry) {
             $this->assertSame($entry, $arg);
-            $arg['result'] = 'one';
+            $arg->set('result', 'one');
             $callbackOneRan++;
         });
         $entry->afterSave(function ($arg) use (&$callbackTwoRan, $entry) {
             $this->assertSame($entry, $arg);
-            $arg['result'] = 'two';
+            $arg->set('result', 'two');
             $callbackTwoRan++;
         });
 

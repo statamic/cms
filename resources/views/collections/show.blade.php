@@ -14,7 +14,8 @@
         sort-column="{{ $collection->sortField() }}"
         sort-direction="{{ $collection->sortDirection() }}"
         :filters="{{ $filters->toJson() }}"
-        action-url="{{ cp_route('collections.entries.actions', $collection->handle()) }}"
+        run-action-url="{{ cp_route('collections.entries.actions.run', $collection->handle()) }}"
+        bulk-actions-url="{{ cp_route('collections.entries.actions.bulk', $collection->handle()) }}"
         reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
         site="{{ $site }}"
 

@@ -12,4 +12,9 @@
         create-container-url="{{ cp_route('asset-containers.create') }}"
     ></asset-manager>
 
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Assets'),
+        'url' => 'assets'
+    ])
+
 @endsection

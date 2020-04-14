@@ -134,12 +134,12 @@ class Blueprint implements Augmentable
 
     public function editUrl()
     {
-        return cp_route('blueprints.edit', $this->handle());
+        return $this->handle() ? cp_route('blueprints.edit', $this->handle()) : null;
     }
 
     public function deleteUrl()
     {
-        return cp_route('blueprints.destroy', $this->handle());
+        return $this->handle() ? cp_route('blueprints.destroy', $this->handle()) : null;
     }
 
     public function save()
@@ -295,5 +295,10 @@ class Blueprint implements Augmentable
             'title' => $this->title(),
             'handle' => $this->handle(),
         ];
+    }
+
+    public function shallowAugmentedArrayKeys()
+    {
+        return ['handle', 'title'];
     }
 }

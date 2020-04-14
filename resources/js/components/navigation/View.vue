@@ -16,6 +16,7 @@
 
                 <site-selector
                     v-if="sites.length > 1"
+                    class="mr-2"
                     :sites="sites"
                     :value="site"
                     @input="siteSelected"
@@ -153,7 +154,7 @@ import PageTree from '../structures/PageTree.vue';
 import PageEditor from '../structures/PageEditor.vue';
 import PageSelector from '../structures/PageSelector.vue';
 import RemovePageConfirmation from './RemovePageConfirmation.vue';
-import SiteSelector from '../structures/SiteSelector.vue';
+import SiteSelector from '../SiteSelector.vue';
 
 export default {
 

@@ -19,7 +19,7 @@ class NavigationController extends CpController
 {
     public function index()
     {
-        $this->authorize('index', NavContract::class, __('You are not authorized to view any navs.'));
+        $this->authorize('index', NavContract::class, __('You are not authorized to view navs.'));
 
         $navs = Nav::all()->filter(function ($nav) {
             return User::current()->can('view', $nav);
@@ -137,7 +137,7 @@ class NavigationController extends CpController
 
     public function store(Request $request)
     {
-        $this->authorize('store', NavContract::class, __('You are not authorized to configure navs.'));
+        $this->authorize('store', NavContract::class, __('You are not authorized to create navs.'));
 
         $values = $request->validate([
             'title' => 'required',
@@ -159,37 +159,39 @@ class NavigationController extends CpController
     {
         $contents = [
             'name' => [
-                'display' => 'Name',
+                'display' => __('Name'),
                 'fields' => [
                     'title' => [
+                        'display' => __('Title'),
+                        'instructions' => __('statamic::messages.navigation_configure_title_instructions'),
                         'type' => 'text',
                         'validate' => 'required',
-                        'instructions' => __('statamic::messages.navigation_configure_title_instructions'),
                     ],
                     'handle' => [
-                        'type' => 'slug',
+                        'display' => __('Handle'),
                         'instructions' => __('statamic::messages.navigation_configure_handle_instructions'),
+                        'type' => 'slug',
                     ],
                 ],
             ],
             'options' => [
-                'display' => 'Options',
+                'display' => __('Options'),
                 'fields' => [
                     'collections' => [
-                        'type' => 'collections',
-                        'display' => 'Collections',
+                        'display' => __('Collections'),
                         'instructions' => __('statamic::messages.navigation_configure_collections_instructions'),
+                        'type' => 'collections',
                         'mode' => 'select',
                     ],
                     'root' => [
+                        'display' => __('Expect a root page'),
+                        'instructions' => __('statamic::messages.expect_root_instructions'),
                         'type' => 'toggle',
-                        'display' => 'Has a root page',
-                        'instructions' => __('statamic::messages.navigation_configure_expect_root_instructions'),
                     ],
                     'max_depth' => [
+                        'display' => __('Max Depth'),
+                        'instructions' => __('statamic::messages.max_depth_instructions'),
                         'type' => 'integer',
-                        'display' => 'Max depth',
-                        'instructions' => __('statamic::messages.navigation_configure_max_depth_instructions'),
                         'validate' => 'min:0',
                     ],
                 ],
@@ -198,8 +200,8 @@ class NavigationController extends CpController
 
         if (Site::hasMultiple()) {
             $contents['options']['fields']['sites'] = [
-                'type' => 'sites',
                 'display' => __('Sites'),
+                'type' => 'sites',
                 'mode' => 'select',
                 'required' => true,
             ];
@@ -212,7 +214,7 @@ class NavigationController extends CpController
     {
         $nav = Nav::findByHandle($nav);
 
-        $this->authorize('delete', $nav, __('You are not authorized to configure navs.'));
+        $this->authorize('delete', $nav, __('You are not authorized to delete navs.'));
 
         $nav->delete();
     }

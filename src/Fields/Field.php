@@ -49,7 +49,7 @@ class Field implements Arrayable
 
     public function display()
     {
-        return array_get($this->config, 'display', Str::slugToTitle($this->handle));
+        return array_get($this->config, 'display', __(Str::slugToTitle($this->handle)));
     }
 
     public function instructions()
@@ -226,6 +226,13 @@ class Field implements Arrayable
     {
         return $this->newInstance()->setValue(
             new Value($this->value, $this->handle, $this->fieldtype(), $this->parent)
+        );
+    }
+
+    public function shallowAugment()
+    {
+        return $this->newInstance()->setValue(
+            (new Value($this->value, $this->handle, $this->fieldtype(), $this->parent))->shallow()
         );
     }
 

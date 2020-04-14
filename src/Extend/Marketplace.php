@@ -6,7 +6,7 @@ use Facades\GuzzleHttp\Client;
 use Statamic\Facades\Addon as AddonAPI;
 use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 
 class Marketplace
@@ -181,7 +181,7 @@ class Marketplace
 
         $paginator = new LengthAwarePaginator($items, $total, $perPage, $currentPage, $options);
 
-        return Resource::collection($paginator)->additional($this->installedMeta());
+        return JsonResource::collection($paginator)->additional($this->installedMeta());
     }
 
     /**

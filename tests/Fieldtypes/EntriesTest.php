@@ -21,8 +21,8 @@ class EntriesTest extends TestCase
         parent::setUp();
 
         $collection = tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
-        EntryFactory::id('123')->collection($collection)->slug('one')->create();
-        EntryFactory::id('456')->collection($collection)->slug('two')->create();
+        EntryFactory::id('123')->collection($collection)->slug('one')->data(['title' => 'One'])->create();
+        EntryFactory::id('456')->collection($collection)->slug('two')->data(['title' => 'Two'])->create();
     }
 
     /** @test */
@@ -53,12 +53,14 @@ class EntriesTest extends TestCase
         $this->assertEquals([
             [
                 'id' => '123',
+                'title' => 'One',
                 'url' => '/blog/one',
                 'permalink' => 'http://localhost/blog/one',
                 'api_url' => 'http://localhost/api/collections/blog/entries/123',
             ],
             [
                 'id' => '456',
+                'title' => 'Two',
                 'url' => '/blog/two',
                 'permalink' => 'http://localhost/blog/two',
                 'api_url' => 'http://localhost/api/collections/blog/entries/456',
@@ -73,6 +75,7 @@ class EntriesTest extends TestCase
 
         $this->assertEquals([
             'id' => '123',
+            'title' => 'One',
             'url' => '/blog/one',
             'permalink' => 'http://localhost/blog/one',
             'api_url' => 'http://localhost/api/collections/blog/entries/123',

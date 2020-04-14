@@ -35,7 +35,7 @@ export default {
             // Filter out partials
             if (this.config.hide_partials) {
                 templates = _.reject(templates, function(template) {
-                    return template.match(/(^_.*|\/_.*|._.*)/g);
+                    return template.match(/(^_.*|\/_.*|\._.*)/g);
                 });
             }
 

@@ -1,7 +1,8 @@
 <?php
 
-namespace Tests;
+namespace Tests\Imaging;
 
+use Tests\TestCase;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Imaging\GlideUrlBuilder;

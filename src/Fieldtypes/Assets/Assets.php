@@ -17,46 +17,56 @@ class Assets extends Fieldtype
     protected $categories = ['media', 'relationship'];
     protected $defaultValue = [];
 
-    protected $configFields = [
-        'container' => [
-            'type' => 'asset_container',
-            'max_items' => 1,
-            'instructions' => 'The asset container to work with.',
-            'width' => 50
-        ],
-        'mode' => [
-            'type' => 'select',
-            'default' => 'grid',
-            'options' => [
-                'grid' => 'Grid',
-                'list' => 'List',
+    protected function configFieldItems(): array
+    {
+        return [
+            'mode' => [
+                'display' => __('Mode'),
+                'instructions' => __('statamic::fieldtypes.assets.config.mode'),
+                'type' => 'select',
+                'default' => 'grid',
+                'options' => [
+                    'grid' => __('Grid'),
+                    'list' => __('List'),
+                ],
+                'width' => 50
             ],
-            'instructions' => 'Default layout interface.',
-            'width' => 50
-        ],
-        'folder' => [
-            'type' => 'asset_folder',
-            'max_items' => 1,
-            'instructions' => 'The folder to begin browsing in.',
-            'width' => 50
-        ],
-        'restrict' => [
-            'type' => 'toggle',
-            'instructions' => 'Prevent users from navigating to other folders.',
-            'width' => 50
-        ],
-        'allow_uploads' => [
-            'type' => 'toggle',
-            'default' => true,
-            'instructions' => 'Allow new files to be uploaded?',
-            'width' => 50
-        ],
-         'max_files' => [
-            'type' => 'integer',
-            'instructions' => 'The maximum number of selectable assets.',
-            'width' => 50
-        ],
-    ];
+            'container' => [
+                'display' => __('Container'),
+                'instructions' => __('statamic::fieldtypes.assets.config.container'),
+                'type' => 'asset_container',
+                'max_items' => 1,
+                'mode' => 'select',
+                'width' => 50
+            ],
+            'folder' => [
+                'display' => __('Folder'),
+                'instructions' => __('statamic::fieldtypes.assets.config.folder'),
+                'type' => 'asset_folder',
+                'max_items' => 1,
+                'width' => 50
+            ],
+            'restrict' => [
+                'display' => __('Restrict'),
+                'instructions' => __('statamic::fieldtypes.assets.config.restrict'),
+                'type' => 'toggle',
+                'width' => 50
+            ],
+            'allow_uploads' => [
+                'display' => __('Allow Uploads'),
+                'instructions' => __('statamic::fieldtypes.assets.config.allow_uploads'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50
+            ],
+            'max_files' => [
+                'display' => __('Max Files'),
+                'instructions' => __('statamic::fieldtypes.assets.config.max_files'),
+                'type' => 'integer',
+                'width' => 50
+            ],
+        ];
+    }
 
     public function canHaveDefault()
     {

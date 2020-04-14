@@ -127,7 +127,7 @@ return [
     'structure_wizard_description' => 'Estruturas são árvores de ligações usadas com mais frequência para criar barras de navegação e outras formas de navegação no site.',
     'structure_wizard_expect_root_instructions' => 'Se deseja que a primeira página da árvore seja considerada a página "raiz" ou "home".',
     'structure_wizard_handle_instructions' => 'Como fará referência a essa estrutura nos seus modelos. Não pode ser alterado facilmente.',
-    'structure_wizard_max_depth_instructions' => 'O número máximo de níveis em uma página pode estar encadeado. Deixe em branco sem limite.',
+    'max_depth_instructions' => 'O número máximo de níveis em uma página pode estar encadeado. Deixe em branco sem limite.',
     'structure_wizard_purpose_collection' => 'Controlar os URLs de uma colecção com relacionamentos pai/filho.',
     'structure_wizard_purpose_intro' => 'As estruturas podem controlar uma colecção com URLs pai/filho ou definir árvores de navegação artesanais a partir de entradas existentes e URLs definidas pelo utilizador.',
     'structure_wizard_purpose_navigation' => 'Crie uma árvore de links para entradas existentes e/ou URLs definidas pelo utilizador.',

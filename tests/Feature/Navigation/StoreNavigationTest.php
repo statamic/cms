@@ -21,7 +21,7 @@ class StoreNavigationTest extends TestCase
             ->actingAs($this->userWithoutPermission())
             ->submit()
             ->assertRedirect('/original')
-            ->assertSessionHas('error', 'You are not authorized to configure navs.');
+            ->assertSessionHas('error', 'You are not authorized to create navs.');
     }
 
     /** @test */

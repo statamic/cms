@@ -117,9 +117,7 @@ export default {
         },
 
         operatorOptions() {
-            return this.normalizeInputOptions(
-                _.reject(OPERATORS, operator => ['is', 'isnt', '==', '!='].includes(operator))
-            );
+            return this.normalizeInputOptions(OPERATORS);
         },
 
         hasConditions() {

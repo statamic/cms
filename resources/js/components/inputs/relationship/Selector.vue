@@ -67,7 +67,7 @@
                             <div class="text-sm text-grey-70"
                                 v-text="hasMaxSelections
                                     ? __n(':count/:max selected', selections, { max: maxSelections })
-                                    : __n(':count selected', selections)" />
+                                    : __n(':count item selected|:count items selected', selections)" />
 
                             <div>
                                 <button
@@ -106,6 +106,7 @@ export default {
 
     props: {
         url: String,
+        filters: Array,
         initialSelections: Array,
         initialSortColumn: String,
         initialSortDirection: String,
@@ -130,7 +131,6 @@ export default {
             page: 1,
             selections: _.clone(this.initialSelections),
             columns: [],
-            filters: [],
         }
     },
 
@@ -154,6 +154,8 @@ export default {
     },
 
     mounted() {
+        this.autoApplyFilters(this.filters);
+
         this.request().then(() => {
             if (this.search) this.$refs.filters.$refs.search.focus();
         });
@@ -164,6 +166,7 @@ export default {
         parameters: {
             deep: true,
             handler(after, before) {
+                if (this.initializing) return;
                 if (JSON.stringify(before) === JSON.stringify(after)) return;
                 this.request();
             }
@@ -208,7 +211,6 @@ export default {
                 this.columns = response.data.meta.columns;
                 this.items = response.data.data;
                 this.meta = response.data.meta;
-                this.filters = response.data.meta.filters;
                 this.activeFilterBadges = {...response.data.meta.activeFilterBadges};
                 this.loading = false;
                 this.initializing = false;

@@ -10,8 +10,9 @@
       @include('statamic::partials.session-expiry')
       @include('statamic::partials.global-header')
 
-      <div id="main" class="@yield('content-class')" :class="{'nav-closed': ! computedNavOpen}">
+      <div id="main" class="@yield('content-class')" :class="{'nav-closed': ! navOpen, 'nav-mobile-open': mobileNavOpen}">
             @include('statamic::partials.nav-main')
+            @include('statamic::partials.nav-mobile')
 
             <div class="workspace">
                   <div class="page-wrapper" :class="wrapperClass">

@@ -6,12 +6,14 @@ const FieldConditionsConverter = new Converter;
 test('it converts from blueprint format', () => {
     let converted = FieldConditionsConverter.fromBlueprint({
         name: 'isnt joe',
-        age: 13
+        age: 13,
+        email: 'equals san@holo.com',
     });
 
     let expected = [
-        {field: 'name', operator: 'isnt', value: 'joe'},
-        {field: 'age', operator: '==', value: '13'}
+        {field: 'name', operator: 'not', value: 'joe'},
+        {field: 'age', operator: 'equals', value: '13'},
+        {field: 'email', operator: 'equals', value: 'san@holo.com'}
     ];
 
     expect(converted).toEqual(expected);

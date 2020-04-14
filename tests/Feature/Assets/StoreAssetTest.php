@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Fieldsets;
+namespace Tests\Feature\Assets;
 
 use Statamic\Facades;
 use Tests\TestCase;

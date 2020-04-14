@@ -21,7 +21,7 @@ class FolderAssetsCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'assets' => $this->collection,
+            'assets' => $this->collection->values(),
             'folder' => (new Folder($this->folder))->withChildFolders(),
         ];
     }
@@ -30,8 +30,9 @@ class FolderAssetsCollection extends ResourceCollection
     {
         return [
             'links' => [
-                'asset_actions' => cp_route('assets.actions'),
-                'folder_actions' => cp_route('assets.folders.actions', $this->folder->container()->id())
+                'run_asset_action' => cp_route('assets.actions.run'),
+                'bulk_asset_actions' => cp_route('assets.actions.bulk'),
+                'run_folder_action' => cp_route('assets.folders.actions.run', $this->folder->container()->id()),
             ]
         ];
     }

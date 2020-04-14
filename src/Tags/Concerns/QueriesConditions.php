@@ -5,6 +5,7 @@ namespace Statamic\Tags\Concerns;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
@@ -292,6 +293,10 @@ trait QueriesConditions
 
         if ($value instanceof Augmentable) {
             $value = $value->augmentedValue($field);
+        }
+
+        if ($value instanceof LabeledValue) {
+            $value = $value->value();
         }
 
         if (is_object($value)) {

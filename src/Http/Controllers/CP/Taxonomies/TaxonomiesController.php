@@ -67,14 +67,14 @@ class TaxonomiesController extends CpController
 
     public function create()
     {
-        $this->authorize('create', TaxonomyContract::class, 'You are not authorized to create taxonomies.');
+        $this->authorize('create', TaxonomyContract::class, __('You are not authorized to create taxonomies.'));
 
         return view('statamic::taxonomies.create');
     }
 
     public function store(Request $request)
     {
-        $this->authorize('store', TaxonomyContract::class, 'You are not authorized to create taxonomies.');
+        $this->authorize('store', TaxonomyContract::class, __('You are not authorized to create taxonomies.'));
 
         $request->validate([
             'title' => 'required',
@@ -100,7 +100,7 @@ class TaxonomiesController extends CpController
 
     public function edit($taxonomy)
     {
-        $this->authorize('edit', $taxonomy, 'You are not authorized to edit this taxonomy.');
+        $this->authorize('edit', $taxonomy, __('You are not authorized to edit this taxonomy.'));
 
         $values = [
             'title' => $taxonomy->title(),
@@ -122,7 +122,7 @@ class TaxonomiesController extends CpController
 
     public function update(Request $request, $taxonomy)
     {
-        $this->authorize('update', $taxonomy, 'You are not authorized to edit this taxonomy.');
+        $this->authorize('update', $taxonomy, __('You are not authorized to edit this taxonomy.'));
 
         $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 
@@ -141,7 +141,7 @@ class TaxonomiesController extends CpController
 
     public function destroy($taxonomy)
     {
-        $this->authorize('delete', $taxonomy, 'You are not authorized to delete this taxonomy.');
+        $this->authorize('delete', $taxonomy, __('You are not authorized to delete this taxonomy.'));
 
         $taxonomy->delete();
     }
@@ -159,11 +159,12 @@ class TaxonomiesController extends CpController
                 ]
             ],
             'content_model' => [
-                'display' => 'Content Model',
+                'display' => __('Content Model'),
                 'fields' => [
                     'blueprints' => [
-                        'type' => 'blueprints',
+                        'display' => __('Blueprints'),
                         'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
+                        'type' => 'blueprints',
                         'validate' => 'array',
                         'mode' => 'select',
                     ],

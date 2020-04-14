@@ -4,7 +4,7 @@ namespace Tests\Auth\Protect;
 
 use Tests\TestCase;
 
-class PasswordEntry extends TestCase
+class PasswordEntryTest extends TestCase
 {
     /** @test */
     function it_returns_back_with_error_if_theres_no_token()

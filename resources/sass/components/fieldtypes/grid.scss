@@ -62,3 +62,11 @@
     @apply w-8 pl-0 text-center;
     padding-top: 21px; // pseudo-center for text/select fields
 }
+
+.grid-item-header {
+    @apply bg-grey-20 border-b px-2 py-1 text-sm flex items-center justify-between outline-none cursor-move;
+}
+
+.grid-stacked .input-text {
+    @apply bg-white;
+}

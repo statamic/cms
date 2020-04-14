@@ -15,6 +15,6 @@ class EmailController
 
         Mail::to($request->email)->send(new Test);
 
-        return back()->withSuccess('Attempt to send email completed successfully');
+        return back()->withSuccess(__('Test email sent.'));
     }
 }

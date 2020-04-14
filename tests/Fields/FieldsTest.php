@@ -446,6 +446,9 @@ class FieldsTest extends TestCase
             public function augment($data) {
                 return $data . ' augmented';
             }
+            public function shallowAugment($data) {
+                return $data . ' shallow augmented';
+            }
         });
 
         FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
@@ -464,17 +467,29 @@ class FieldsTest extends TestCase
 
         $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
-        $augmented = $fields->augment();
+        tap($fields->augment(), function ($augmented) use ($fields) {
+            $this->assertNotSame($fields, $augmented);
+            $this->assertEquals([
+                'one' => 'foo',
+                'two' => 'bar'
+            ], $fields->values()->all());
+            $this->assertEquals([
+                'one' => 'foo augmented',
+                'two' => 'bar augmented'
+            ], $augmented->values()->all());
+        });
 
-        $this->assertNotSame($fields, $augmented);
-        $this->assertEquals([
-            'one' => 'foo',
-            'two' => 'bar'
-        ], $fields->values()->all());
-        $this->assertEquals([
-            'one' => 'foo augmented',
-            'two' => 'bar augmented'
-        ], $augmented->values()->all());
+        tap($fields->shallowAugment(), function ($augmented) use ($fields) {
+            $this->assertNotSame($fields, $augmented);
+            $this->assertEquals([
+                'one' => 'foo',
+                'two' => 'bar'
+            ], $fields->values()->all());
+            $this->assertEquals([
+                'one' => 'foo shallow augmented',
+                'two' => 'bar shallow augmented'
+            ], $augmented->values()->all());
+        });
     }
 
     /** @test */

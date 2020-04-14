@@ -3,19 +3,15 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white shadow h-13 items-center flex justify-between relative w-full;
+    @apply bg-white shadow pr-2 h-13 items-center flex justify-between relative w-full;
     z-index: 997; // Let Live Preview stack on top
 }
 
 /* Responsive Wangjangling
    ========================================================================== */
 
-@screen sm {
-    .global-header { @apply px-4; }
-}
-
 @screen md {
-    .global-header { @apply px-0 fixed; }
+    .global-header { @apply px-0 fixed }
 }
 
 /* Search
@@ -35,7 +31,7 @@
     }
 
     .global-search-results {
-        @apply shadow-lg absolute p-0 w-full bg-white rounded border border-grey-50 w-128;
+        @apply shadow-lg absolute p-0 w-full bg-white rounded border border-grey-50;
         top: 36px;
         left: -1px; // border offset
         z-index: 999;
@@ -100,12 +96,15 @@
     }
 }
 
-@screen md {
-    .global-search { @apply w-128 max-w-full; }
+@screen lg {
+    .global-search {
+        @apply w-128 max-w-full;
+        .global-search-results { @apply w-128 }
+    }
 }
 
 .site-selector {
-    @apply flex items-center px-2 border-l border-r mr-2 h-full text-sm;
+    @apply flex items-center border-l border-r mr-2 h-full text-sm;
 
     .site-selector-icon {
         @apply block mr-1;

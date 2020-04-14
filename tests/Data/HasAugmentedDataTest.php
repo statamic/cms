@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\Data;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Contracts\Data\Augmentable;
@@ -10,6 +10,7 @@ use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Tests\TestCase;
 
 class HasAugmentedDataTest extends TestCase
 {
