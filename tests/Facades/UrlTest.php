@@ -1,7 +1,8 @@
 <?php
 
-namespace Tests;
+namespace Tests\Facades;
 
+use Tests\TestCase;
 use Statamic\Support\Str;
 use Statamic\Facades\URL;
 use Statamic\Facades\Site;

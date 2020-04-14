@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Resources\CP\Assets;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Action;
 use Statamic\Support\Str;
 
-class Asset extends Resource
+class Asset extends JsonResource
 {
     public function toArray($request)
     {

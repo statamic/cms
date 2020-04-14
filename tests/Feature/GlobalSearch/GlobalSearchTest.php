@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Fieldsets;
+namespace Tests\Feature\GlobalSearch;
 
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;

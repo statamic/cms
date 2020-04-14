@@ -1,7 +1,8 @@
 <?php
 
-namespace Tests;
+namespace Tests\Imaging;
 
+use Tests\TestCase;
 use League\Glide\Server;
 use Mockery as m;
 use Statamic\Assets\Asset;

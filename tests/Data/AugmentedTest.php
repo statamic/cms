@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\Data;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Data\AbstractAugmented;

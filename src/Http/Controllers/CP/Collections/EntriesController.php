@@ -14,7 +14,6 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
-use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Contracts\Entries\Entry as EntryContract;

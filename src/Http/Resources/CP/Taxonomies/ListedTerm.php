@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Resources\CP\Taxonomies;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
 
-class ListedTerm extends Resource
+class ListedTerm extends JsonResource
 {
     protected $blueprint;
     protected $columns;

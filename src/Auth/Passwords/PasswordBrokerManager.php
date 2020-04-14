@@ -15,6 +15,12 @@ class PasswordBrokerManager extends BaseManager
             $key = base64_decode(substr($key, 7));
         }
 
-        return new TokenRepository($this->app['files'], $this->app['hash'], $key, $config['expire']);
+        return new TokenRepository(
+            $this->app['files'],
+            $this->app['hash'],
+            $key,
+            $config['expire'],
+            $config['throttle'] ?? 0
+        );
     }
 }

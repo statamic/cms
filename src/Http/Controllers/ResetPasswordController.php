@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\ResetsPasswords;
+use Statamic\Auth\ResetsPasswords;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
 

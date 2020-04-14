@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Blueprint;
+namespace Tests\Feature\Blueprints;
 
 use Statamic\Facades;
 use Tests\TestCase;

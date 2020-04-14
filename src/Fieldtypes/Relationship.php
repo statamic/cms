@@ -5,7 +5,7 @@ namespace Statamic\Fieldtypes;
 use Illuminate\Support\Arr;
 use Statamic\CP\Column;
 use Statamic\Fields\Fieldtype;
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource as Resource;
 use Statamic\Statamic;
 
 abstract class Relationship extends Fieldtype
