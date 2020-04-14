@@ -296,4 +296,9 @@ class Blueprint implements Augmentable
             'handle' => $this->handle(),
         ];
     }
+
+    public function shallowAugmentedArrayKeys()
+    {
+        return ['handle', 'title'];
+    }
 }
