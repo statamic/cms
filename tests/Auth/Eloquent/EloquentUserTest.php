@@ -57,9 +57,11 @@ class EloquentUserTest extends TestCase
 
     function additionalDataValues()
     {
+        $lt7 = version_compare(app()->version(), 7, '<');
+
         return [
-            'created_at' => '2019-11-21 23:39:29',
-            'updated_at' => '2019-11-21 23:39:29',
+            'created_at' => $lt7 ? now()->format('Y-m-d H:i:s') : now()->toISOString(),
+            'updated_at' => $lt7 ? now()->format('Y-m-d H:i:s') : now()->toISOString(),
         ];
     }
 }

@@ -29,18 +29,11 @@
     <p class="text-sm text-grey mb-2">{!! __('statamic::messages.email_utility_configuration_description', ['path' => config_path('mail.php')]) !!}</p>
     <div class="card p-0">
         <table class="data-table">
-            <tr>
-                <th class="pl-2 py-1 w-1/4">{{ __('Driver') }}</th>
-                <td><code>{{ config('mail.driver') }}</code></td>
-            </tr>
-            <tr>
-                <th class="pl-2 py-1 w-1/4">{{ __('Host') }}</th>
-                <td><code>{{ config('mail.host') }}</code></td>
-            </tr>
-            <tr>
-                <th class="pl-2 py-1 w-1/4">{{ __('Port') }}</th>
-                <td><code>{{ config('mail.port') }}</code></td>
-            </tr>
+            @if (config('mail.mailers'))
+                @include('statamic::utilities.partials.email-l7')
+            @else
+                @include('statamic::utilities.partials.email-l6')
+            @endif
             <tr>
                 <th class="pl-2 py-1 w-1/4">{{ __('Default From Address') }}</th>
                 <td><code>{{ config('mail.from.address') }}</code></td>
@@ -48,34 +41,6 @@
             <tr>
                 <th class="pl-2 py-1 w-1/4">{{ __('Default From Name') }}</th>
                 <td><code>{{ config('mail.from.name') }}</code></td>
-            </tr>
-            <tr>
-                <th class="pl-2 py-1 w-1/4">{{ __('Encryption') }}</th>
-                <td>
-                    @if (config('mail.encryption'))
-                        <code>{{ config('mail.encryption') }}</code>
-                    @endif
-                </td>
-            </tr>
-            <tr>
-                <th class="pl-2 py-1 w-1/4">{{ __('Username') }}</th>
-                <td>
-                    @if (config('mail.username'))
-                        <code>{{ config('mail.username') }}</code>
-                    @endif
-                </td>
-            </tr>
-            <tr>
-                <th class="pl-2 py-1 w-1/4">{{ __('Password') }}</th>
-                <td>
-                    @if (config('mail.password'))
-                        <code>{{ config('mail.password') }}</code>
-                    @endif
-                </td>
-            </tr>
-            <tr>
-                <th class="pl-2 py-1 w-1/4">{{ __('Sendmail') }}</th>
-                <td><code>{{ config('mail.sendmail') }}</code></td>
             </tr>
             <tr>
                 <th class="pl-2 py-1 w-1/4">{{ __('Markdown theme') }}</th>

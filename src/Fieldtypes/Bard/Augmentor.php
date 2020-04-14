@@ -18,7 +18,7 @@ class Augmentor
         $this->fieldtype = $fieldtype;
     }
 
-    public function augment($value)
+    public function augment($value, $shallow = false)
     {
         $hasSets = !!$this->fieldtype->config('sets');
 
@@ -43,7 +43,7 @@ class Augmentor
         $value = $this->convertToSets($value);
 
         if ($this->augmentSets) {
-            $value = $this->augmentSets($value);
+            $value = $this->augmentSets($value, $shallow);
         }
 
         return $value;
@@ -110,14 +110,16 @@ class Augmentor
         });
     }
 
-    protected function augmentSets($value)
+    protected function augmentSets($value, $shallow)
     {
-        return $value->map(function ($set) {
+        $augmentMethod = $shallow ? 'shallowAugment' : 'augment';
+
+        return $value->map(function ($set) use ($augmentMethod) {
             if (! $config = $this->fieldtype->config("sets.{$set['type']}.fields")) {
                 return $set;
             }
 
-            $values = (new Fields($config))->addValues($set)->augment()->values()->all();
+            $values = (new Fields($config))->addValues($set)->{$augmentMethod}()->values()->all();
 
             return array_merge($values, ['type' => $set['type']]);
         })->all();

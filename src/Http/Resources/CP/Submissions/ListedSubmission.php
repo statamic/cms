@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Resources\CP\Submissions;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
 
-class ListedSubmission extends Resource
+class ListedSubmission extends JsonResource
 {
     protected $blueprint;
 

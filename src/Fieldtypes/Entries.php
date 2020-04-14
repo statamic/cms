@@ -43,11 +43,22 @@ class Entries extends Relationship
         'collectionHandle' => 'collection',
     ];
 
-    protected $extraConfigFields = [
-        'collections' => [
-            'type' => 'collections'
-        ],
-    ];
+    protected function configFieldItems(): array
+    {
+        return [
+            'collections' => [
+                'display' => __('Collections'),
+                'type' => 'collections'
+            ],
+        ];
+    }
+
+    public function preload()
+    {
+        return array_merge(parent::preload(), [
+            'filters' => $this->getSelectionFilters(),
+        ]);
+    }
 
     public function getIndexItems($request)
     {
@@ -59,7 +70,7 @@ class Entries extends Relationship
             $query->whereIn('collection', $this->getConfiguredCollections());
         }
 
-        $this->activeFilterBadges = $this->queryFilters($query, $filters, $this->getSelectionFilterContext($request));
+        $this->activeFilterBadges = $this->queryFilters($query, $filters, $this->getSelectionFilterContext());
 
         if ($sort = $this->getSortColumn($request)) {
             $query->orderBy($sort, $this->getSortDirection($request));
@@ -74,7 +85,6 @@ class Entries extends Relationship
             ->blueprint($this->getBlueprint($request))
             ->columnPreferenceKey("collections.{$this->getFirstCollectionFromRequest($request)->handle()}.columns")
             ->additional(['meta' => [
-                'filters' => $this->getSelectionFilters($request),
                 'activeFilterBadges' => $this->activeFilterBadges,
             ]]);
     }
@@ -86,7 +96,9 @@ class Entries extends Relationship
 
     protected function getFirstCollectionFromRequest($request)
     {
-        $collections = $request->input('filters.collection.collections', []);
+        $collections = $request
+            ? $request->input('filters.collection.collections', [])
+            : [];
 
         if (empty($collections)) {
             $collections = $this->getConfiguredCollections();
@@ -176,23 +188,27 @@ class Entries extends Relationship
     {
         return [
             'id' => $value->id(),
+            'title' => $value->value('title'),
             'url' => $value->url(),
             'permalink' => $value->absoluteUrl(),
             'api_url' => $value->apiUrl(),
         ];
     }
 
-    protected function getSelectionFilters($request)
+    protected function getSelectionFilters()
     {
-        return Scope::filters('entries-fieldtype', $this->getSelectionFilterContext($request));
+        return Scope::filters('entries-fieldtype', $this->getSelectionFilterContext());
     }
 
-    protected function getSelectionFilterContext($request)
+    protected function getSelectionFilterContext()
     {
-        return [
-            'collections' => $this->getConfiguredCollections(),
-            'blueprints' => [$this->getBlueprint($request)->handle()]
-        ];
+        $collections = $this->getConfiguredCollections();
+
+        $blueprints = collect($collections)->flatMap(function ($collection) {
+            return Collection::findByHandle($collection)->entryBlueprints()->map->handle();
+        })->all();
+
+        return compact('collections', 'blueprints');
     }
 
     protected function getConfiguredCollections()

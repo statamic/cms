@@ -33,7 +33,7 @@
     position: sticky;
     padding: 4px 8px;
     z-index: 5;
-    top:  0;
+    top:  52px;
 
     .bard-toolbar-button {
         @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center;
@@ -183,6 +183,7 @@
     .bard-fixed-toolbar {
         @apply shadow h-12 justify-center;
         padding: 7px 8px;
+        top: 0;
         z-index: 999;
 
         button {

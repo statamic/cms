@@ -49,4 +49,9 @@ class AugmentedEntry extends AbstractAugmented
     {
         return $this->get('absolute_url');
     }
+
+    protected function parent()
+    {
+        return $this->data->parent();
+    }
 }

@@ -5,7 +5,7 @@ namespace Statamic\Fieldtypes;
 use Illuminate\Support\Arr;
 use Statamic\CP\Column;
 use Statamic\Fields\Fieldtype;
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource as Resource;
 use Statamic\Statamic;
 
 abstract class Relationship extends Fieldtype
@@ -26,24 +26,30 @@ abstract class Relationship extends Fieldtype
         '_' => '_' // forces an object in js
     ];
     protected $extraConfigFields = [];
-    protected $configFields = [
-        'max_items' => [
-            'type' => 'integer',
-            'instructions' => 'Set a maximum number of selectable items',
-        ],
-        'mode' => [
-            'type' => 'radio',
-            'options' => [
-                'default' => 'Stack Selector',
-                'select' => 'Select Dropdown',
-                'typeahead' => 'Typeahead Field'
-            ]
-        ]
-    ];
 
     protected function configFieldItems(): array
     {
-        return array_merge($this->configFields, $this->extraConfigFields);
+        $configFields = [
+            'max_items' => [
+                'display' => __('Max Items'),
+                'instructions' => __('statamic::messages.max_items_instructions'),
+                'type' => 'integer',
+                'width' => 50,
+            ],
+            'mode' => [
+                'display' => __('Mode'),
+                'type' => 'radio',
+                'default' => 'default',
+                'options' => [
+                    'default' => __('Stack Selector'),
+                    'select' => __('Select Dropdown'),
+                    'typeahead' => __('Typeahead Field'),
+                ],
+                'width' => 50,
+            ]
+        ];
+
+        return array_merge($configFields, $this->extraConfigFields);
     }
 
     public function preProcess($data)

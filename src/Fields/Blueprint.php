@@ -4,14 +4,18 @@ namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
-class Blueprint
+class Blueprint implements Augmentable
 {
+    use HasAugmentedData;
+
     protected $handle;
     protected $contents = [];
     protected $fieldsCache;
@@ -130,12 +134,12 @@ class Blueprint
 
     public function editUrl()
     {
-        return cp_route('blueprints.edit', $this->handle());
+        return $this->handle() ? cp_route('blueprints.edit', $this->handle()) : null;
     }
 
     public function deleteUrl()
     {
-        return cp_route('blueprints.destroy', $this->handle());
+        return $this->handle() ? cp_route('blueprints.destroy', $this->handle()) : null;
     }
 
     public function save()
@@ -278,5 +282,23 @@ class Blueprint
     public static function __callStatic($method, $parameters)
     {
         return Facades\Blueprint::{$method}(...$parameters);
+    }
+
+    public function __toString()
+    {
+        return $this->handle();
+    }
+
+    public function augmentedArrayData()
+    {
+        return [
+            'title' => $this->title(),
+            'handle' => $this->handle(),
+        ];
+    }
+
+    public function shallowAugmentedArrayKeys()
+    {
+        return ['handle', 'title'];
     }
 }

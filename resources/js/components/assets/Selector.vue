@@ -24,7 +24,7 @@
                 <div class="text-sm text-grey-70"
                     v-text="hasMaxFiles
                         ? __n(':count/:max selected', browserSelections, { max: maxFiles })
-                        : __n(':count selected', browserSelections)">
+                        : __n(':count selected|:count selected', browserSelections)">
                 </div>
                 <div>
                     <button

@@ -8,10 +8,8 @@ use Statamic\Sites\Sites;
 use Stringy\StaticStringy;
 use Statamic\Facades\Preference;
 use Illuminate\Support\Carbon;
-use Statamic\Exceptions\Handler;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Debug\ExceptionHandler;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -80,8 +78,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->app->singleton(ExceptionHandler::class, Handler::class);
-
         $this->app->singleton(Sites::class, function () {
             return new Sites(config('statamic.sites'));
         });

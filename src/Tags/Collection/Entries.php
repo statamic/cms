@@ -9,6 +9,7 @@ use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 
@@ -172,7 +173,7 @@ class Entries
         $not = $this->parameters->get(['not_from', 'not_in', 'not_folder', 'dont_use', 'not_collection']);
 
         if ($from === '*') {
-            $from = Collection::handles();
+            $from = Collection::handles()->all();
         } elseif (is_string($from)) {
             $from = explode('|', $from);
         }
@@ -181,8 +182,16 @@ class Entries
             $not = explode('|', $not);
         }
 
-        return collect($from)
-            ->diff(collect($not)->filter())
+        $from = collect(Arr::wrap($from))->map(function ($collection) {
+            return (string) $collection;
+        });
+
+        $not = collect(Arr::wrap($not))->map(function ($collection) {
+            return (string) $collection;
+        })->filter();
+
+        return $from
+            ->diff($not)
             ->map(function ($handle) {
                 $collection = Collection::findByHandle($handle);
                 throw_unless($collection, new \Statamic\Exceptions\CollectionNotFoundException($handle));

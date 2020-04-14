@@ -91,6 +91,21 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    function it_gets_entries_from_collections_using_collection_objects()
+    {
+        $this->makePosts();
+
+        $this->setTagParameters(['from' => Facades\Collection::findByHandle('music')]);
+        $this->assertCount(3, $this->collectionTag->index());
+
+        $this->setTagParameters(['from' => [
+            Facades\Collection::findByHandle('music'),
+            Facades\Collection::findByHandle('art'),
+        ]]);
+        $this->assertCount(6, $this->collectionTag->index());
+    }
+
+    /** @test */
     function it_gets_entries_from_all_collections()
     {
         $this->makePosts();
@@ -193,6 +208,21 @@ class CollectionTest extends TestCase
 
         $this->setTagParameters(['collection' => '*', 'not_collection' => 'art|music', 'title:contains' => 'love']);
         $this->assertCount(2, $this->collectionTag->index());
+    }
+
+    /** @test */
+    function it_can_exclude_collections_using_collection_objects()
+    {
+        $this->makePosts();
+
+        $this->setTagParameters(['from' => '*', 'not_from' => Facades\Collection::findByHandle('art')]);
+        $this->assertCount(6, $this->collectionTag->index());
+
+        $this->setTagParameters(['from' => '*', 'not_from' => [
+            Facades\Collection::findByHandle('music'),
+            Facades\Collection::findByHandle('art'),
+        ]]);
+        $this->assertCount(3, $this->collectionTag->index());
     }
 
     /** @test */

@@ -60,10 +60,10 @@ class GlobalsStoreTest extends TestCase
     /** @test */
     function it_makes_global_set_instances_from_files()
     {
-        $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/example.yaml'), "id: globals-example\ntitle: Example\ndata:\n  foo: bar");
+        $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/example.yaml'), "title: Example\ndata:\n  foo: bar");
 
         $this->assertInstanceOf(GlobalSet::class, $item);
-        $this->assertEquals('globals-example', $item->id());
+        $this->assertEquals('example', $item->id());
         $this->assertEquals('example', $item->handle());
         $this->assertEquals('Example', $item->title());
         $this->assertEquals(['foo' => 'bar'], $item->in('en')->data()->all());
@@ -84,7 +84,7 @@ class GlobalsStoreTest extends TestCase
     /** @test */
     function it_saves_to_disk()
     {
-        $set = GlobalsAPI::make()->id('global-test')->handle('test');
+        $set = GlobalsAPI::make('test');
         $set->addLocalization($set->makeLocalization('en'));
 
         $this->store->save($set);

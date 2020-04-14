@@ -2,7 +2,6 @@
 
 namespace Statamic\Forms;
 
-use ArrayAccess;
 use Carbon\Carbon;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
@@ -13,7 +12,7 @@ use Statamic\Facades\Helper;
 use Statamic\Facades\YAML;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Submission implements SubmissionContract, ArrayAccess
+class Submission implements SubmissionContract
 {
     use ContainsData, FluentlyGetsAndSets;
 
@@ -300,25 +299,5 @@ class Submission implements SubmissionContract, ArrayAccess
                 'date' => $this->date(),
             ])
             ->all();
-    }
-
-    public function offsetExists($key)
-    {
-        return $this->has($key);
-    }
-
-    public function offsetGet($key)
-    {
-        return $this->get($key);
-    }
-
-    public function offsetSet($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
     }
 }

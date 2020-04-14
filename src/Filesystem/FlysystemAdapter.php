@@ -53,10 +53,6 @@ class FlysystemAdapter extends AbstractAdapter
 
     public function getFiles($path, $recursive = false)
     {
-        if (! $this->exists($path)) {
-            return $this->collection();
-        }
-
         return $this->collection(
             $this->filesystem->files($this->normalizePath($path), $recursive)
         );

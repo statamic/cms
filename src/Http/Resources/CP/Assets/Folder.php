@@ -2,10 +2,10 @@
 
 namespace Statamic\Http\Resources\CP\Assets;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Action;
 
-class Folder extends Resource
+class Folder extends JsonResource
 {
     protected $withChildFolders = false;
 

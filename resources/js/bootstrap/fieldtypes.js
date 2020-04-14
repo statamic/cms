@@ -22,6 +22,7 @@ Vue.component('assets-fieldtype-index', require('../components/fieldtypes/assets
 Vue.component('asset_folder-fieldtype', require('../components/fieldtypes/AssetFolderFieldtype.vue').default);
 Vue.component('bard-fieldtype', require('../components/fieldtypes/bard/BardFieldtype.vue').default);
 Vue.component('bard_buttons_setting-fieldtype', require('../components/fieldtypes/bard/BardButtonsSettingFieldtype.vue').default);
+Vue.component('button_group-fieldtype', require('../components/fieldtypes/ButtonGroupFieldtype.vue').default);
 Vue.component('checkboxes-fieldtype', require('../components/fieldtypes/CheckboxesFieldtype.vue').default);
 Vue.component('code-fieldtype', require('../components/fieldtypes/CodeFieldtype.vue').default);
 Vue.component('collection_routes-fieldtype', require('../components/collections/Routes.vue').default);
@@ -29,6 +30,7 @@ Vue.component('color-fieldtype', require('../components/fieldtypes/ColorFieldtyp
 Vue.component('date-fieldtype', require('../components/fieldtypes/DateFieldtype.vue').default);
 Vue.component('fieldset-fieldtype', FieldsetFieldtype);
 Vue.component('fields-fieldtype', require('../components/fieldtypes/grid/FieldsFieldtype.vue').default);
+Vue.component('global_set_sites-fieldtype', require('../components/globals/Sites.vue').default);
 Vue.component('grid-fieldtype', require('../components/fieldtypes/grid/Grid.vue').default);
 Vue.component('grid-fieldtype-index', require('../components/fieldtypes/grid/GridIndex.vue').default);
 Vue.component('hidden-fieldtype', require('../components/fieldtypes/HiddenFieldtype.vue').default);

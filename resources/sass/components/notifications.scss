@@ -28,6 +28,10 @@
         @apply bg-red;
     }
 
+    &.default i {
+        @apply bg-grey-80;
+    }
+
     .action {
         @apply font-normal text-xl px-2 h-full text-grey-60 m-0 ml-1 flex items-center;
         &:hover {

@@ -32,9 +32,13 @@ $dontTranslate = [
 // Additional strings to be translated that aren't picked up by the scanner.
 // eg. When variables as passed into translation helpers, like nav items.
 $additionalStrings = [
+    'Author',
     'Content',
     'Groups',
     'Tools',
+    'Laptop',
+    'Tablet',
+    'Mobile',
 ];
 
 $app = new Symfony\Component\Console\Application('Statamic Translator');

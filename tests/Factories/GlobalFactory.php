@@ -30,7 +30,7 @@ class GlobalFactory
 
     public function make()
     {
-        $set = GlobalSet::make($this->handle)->sites(['en']);
+        $set = GlobalSet::make($this->handle);
 
         $set->addLocalization(
             $set->makeLocalization('en')->data($this->data)

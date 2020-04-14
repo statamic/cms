@@ -127,7 +127,7 @@ return [
     'structure_wizard_description' => 'Le strutture sono alberi di collegamento più spesso utilizzati per creare barre di navigazione e altre forme di navigazione del sito.',
     'structure_wizard_expect_root_instructions' => 'Se si desidera che la prima pagina dell\'albero venga considerata la pagina "principale" o "principale".',
     'structure_wizard_handle_instructions' => 'Come farai riferimento a questa struttura sul frontend. Non può essere facilmente modificato.',
-    'structure_wizard_max_depth_instructions' => 'Il numero massimo di livelli in profondità in una pagina può essere nidificato. Lascia vuoto per nessun limite.',
+    'max_depth_instructions' => 'Il numero massimo di livelli in profondità in una pagina può essere nidificato. Lascia vuoto per nessun limite.',
     'structure_wizard_purpose_collection' => 'Controlla gli URL di una raccolta con relazioni padre / figlio.',
     'structure_wizard_purpose_intro' => 'Le strutture possono controllare una raccolta con URL padre / figlio o definire alberi di navigazione artigianali da voci esistenti e URL definiti dall\'utente.',
     'structure_wizard_purpose_navigation' => 'Crea un albero di collegamenti a voci esistenti e / o URL definiti dall\'utente.',

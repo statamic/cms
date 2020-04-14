@@ -407,7 +407,7 @@ export default {
             if (localization.active) return;
 
             if (this.isDirty) {
-                if (! confirm('Are you sure? Unsaved changes will be lost.')) {
+                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
                     return;
                 }
             }
@@ -494,7 +494,7 @@ export default {
         },
 
         syncField(handle) {
-            if (! confirm('Are you sure? This field\'s value will be replaced by the value in the original entry.'))
+            if (! confirm(__('Are you sure? This field\'s value will be replaced by the value in the original entry.')))
                 return;
 
             this.localizedFields = this.localizedFields.filter(field => field !== handle);

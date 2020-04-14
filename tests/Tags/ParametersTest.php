@@ -2,10 +2,12 @@
 
 namespace Tests\Tags;
 
-use Tests\TestCase;
 use Statamic\Facades\Antlers;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Value;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
+use Tests\TestCase;
 
 class ParametersTest extends TestCase
 {
@@ -64,6 +66,19 @@ class ParametersTest extends TestCase
         $this->assertEquals(true, $this->params->get('truthy'));
         $this->assertEquals(false, $this->params->get('falsey'));
         $this->assertEquals('one|two', $this->params->get('list'));
+    }
+
+    /** @test */
+    function it_gets_a_value_objects_value()
+    {
+        $fieldtype = $this->partialMock(Fieldtype::class);
+        $fieldtype->shouldReceive('augment')->with('the raw value')->andReturn('the augmented value');
+        $value = new Value('the raw value', 'test', $fieldtype);
+
+        $params = Parameters::make(['test' => $value], new Context);
+
+        $this->assertIsString($params->get('test'));
+        $this->assertSame('the augmented value', $params->get('test'));
     }
 
     /** @test */

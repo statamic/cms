@@ -19,11 +19,15 @@
         @include('statamic::partials.empty-state', [
             'resource' => 'User Group',
             'description' => __('statamic::messages.user_groups_intro'),
-            'docs_link' => Statamic::docsUrl('users#user-groups'),
             'svg' => 'empty/users',
             'route' => cp_route('user-groups.create')
         ])
 
     @endunless
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('User Groups'),
+        'url' => 'users#user-groups'
+    ])
 
 @endsection

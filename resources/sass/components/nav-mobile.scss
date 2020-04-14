@@ -2,26 +2,23 @@
    THE MOBILE NAV
    ========================================================================== */
 
-.nav-mobile {
-    @apply .bg-white border-t w-full fixed h-14 pin-b pin-l pin-r flex items-center justify-center;
-    z-index: 9999;
-
-    a {
-        @apply .flex flex-col .mx-1 .p-1 .text-grey text-center .text-3xs .flex-1;
-    }
-
-    svg {
-        @apply .w-6 .h-6;
+.nav-main.nav-mobile {
+    left: -110%;
+    display: block;
+    z-index: 996;
+    .nav-main-inner {
+        padding-left: 12px;
     }
 }
 
-
-
-/* Responsive Wangjangling
-  ========================================================================== */
+.nav-mobile-open {
+    .nav-main.nav-mobile {
+        left: 0;
+    }
+}
 
 @screen md {
-    .nav-mobile {
-        display: none;
+    .nav-main.nav-mobile {
+        @apply hidden;
     }
 }

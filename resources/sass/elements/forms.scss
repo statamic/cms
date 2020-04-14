@@ -156,10 +156,7 @@ input.input-text-minimal:read-only,
 
 .radio-fieldtype .option,
 .checkboxes-fieldtype .option {
-    @apply mb-1.5 flex items-center;
-    &:last-child {
-        @apply mb-0;
-    }
+    @apply mt-1.5 flex items-center;
 
     input {
         @apply leading-normal mr-1 relative;
@@ -204,7 +201,7 @@ input.input-text-minimal:read-only,
         border: 1px solid #c4cdd6;
         height: 2.375rem; // 38px
         letter-spacing: -0.01em;
-        padding: .475rem 1.25rem .475rem .75rem;
+        padding: .475rem 1.75rem .475rem .75rem;
 
         &:focus {
             @apply focus-outline;

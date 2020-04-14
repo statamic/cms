@@ -17,7 +17,7 @@
                 <div class="card p-0 relative">
                     <data-list-bulk-actions
                         class="rounded"
-                        :url="actionUrl"
+                        :url="bulkActionsUrl"
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
@@ -39,7 +39,7 @@
                                 <dropdown-item :text="__('View')" :redirect="user.edit_url" v-else />
                                 <data-list-inline-actions
                                     :item="user.id"
-                                    :url="actionUrl"
+                                    :url="runActionUrl"
                                     :actions="user.actions"
                                     @started="actionStarted"
                                     @completed="actionCompleted"

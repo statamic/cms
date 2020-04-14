@@ -16,13 +16,13 @@
 
                 <div class="publish-fields">
                     <form-group
-                        display="Title"
+                        :display="__('Title')"
                         handle="title"
                         v-model="title"
                         :instructions="__('Link display text. Leave blank to use the URL.')"
                     />
                     <form-group
-                        display="URL"
+                        :display="__('URL')"
                         handle="url"
                         v-model="url"
                         :instructions="__('Enter any internal or external URL. Leave blank for a text-only item.')"

@@ -1,4 +1,4 @@
-<?php namespace Tests;
+<?php namespace Tests\Imaging;
 
 use Mockery;
 use Tests\TestCase;

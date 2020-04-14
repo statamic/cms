@@ -99,7 +99,7 @@ return [
     'globals_configure_title_instructions' => 'Nous recommandons un nom représentatif des contenus de ce jeu, comme "Marque" ou "Société".',
     'max_depth_instructions' => 'Définissez le nombre maximum de niveaux sur lesquels une page peut être imbriquée. Laissez vide pour aucune limite.',
     'max_items_instructions' => 'Définissez un nombre maxi d’éléments sélectionnables.',
-     'navigation_configure_collections_instructions' => 'Activer le lien vers les entrées de ces collections.',
+    'navigation_configure_collections_instructions' => 'Activer le lien vers les entrées de ces collections.',
     'navigation_configure_handle_instructions' => 'Comment vous allez faire référence à cette navigation sur le frontal. Ne peut pas être facilement changé.',
     'navigation_configure_intro' => 'Les navigations sont des listes multi-niveaux de liens qui peuvent être utilisées pour construire des barres de navigation, des pieds de page, des plans de site et d’autres formes de navigation sur le frontal.',
     'navigation_configure_settings_intro' => 'Activer les liens vers les collections, définir une profondeur maximale et d’autres comportements.',

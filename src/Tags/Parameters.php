@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
 class Parameters extends ArrayAccessor
@@ -32,5 +33,12 @@ class Parameters extends ArrayAccessor
         })->all();
 
         return parent::make($items);
+    }
+
+    public function get($keys, $default = null)
+    {
+        $value = parent::get($keys, $default);
+
+        return $value instanceof Value ? $value->value() : $value;
     }
 }

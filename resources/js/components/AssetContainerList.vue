@@ -34,7 +34,7 @@ export default {
     methods: {
 
         destroy(container, index) {
-            if (confirm('Are you sure?')) {
+            if (confirm(__('Are you sure?'))) {
                 this.$axios.delete(container.delete_url).then(response => {
                     this.rows.splice(index, 1);
                 });

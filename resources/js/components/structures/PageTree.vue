@@ -227,7 +227,7 @@ export default {
         },
 
         cancel() {
-            if (! confirm('Are you sure?')) return;
+            if (! confirm(__('Are you sure?'))) return;
 
             this.pages = this.initialPages;
             this.updateTreeData();
