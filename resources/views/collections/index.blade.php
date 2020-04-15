@@ -24,12 +24,16 @@
         @include('statamic::partials.empty-state', [
             'resource' => 'Collection',
             'description' => __('statamic::messages.collection_configure_intro'),
-            'docs_link' => Statamic::docsUrl('collections-and-entries'),
             'svg' => 'empty/content',
             'route' => cp_route('collections.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Entries\Collection')
         ])
 
     @endunless
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Collections'),
+        'url' => 'collections-and-entries'
+    ])
 
 @endsection

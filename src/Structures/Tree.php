@@ -52,7 +52,11 @@ class Tree implements Localization
             return null;
         }
 
-        return $this->tree()[0]['entry'];
+        if (! $root = $this->tree()[0] ?? null) {
+            return null;
+        }
+
+        return $root['entry'];
     }
 
     public function handle()
@@ -233,7 +237,7 @@ class Tree implements Localization
 
     public function move($entry, $target)
     {
-        if ($this->page($entry)->parent()->id() === $target) {
+        if (optional($this->page($entry)->parent())->id() === $target) {
             return $this;
         }
 

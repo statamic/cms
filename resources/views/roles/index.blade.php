@@ -27,4 +27,9 @@
 
     @endunless
 
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Roles & Permissions'),
+        'url' => 'users#permissions'
+    ])
+
 @endsection

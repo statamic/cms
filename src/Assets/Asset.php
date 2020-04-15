@@ -2,7 +2,6 @@
 
 namespace Statamic\Assets;
 
-use ArrayAccess;
 use Statamic\Facades;
 use Stringy\Stringy;
 use Statamic\Support\Str;
@@ -28,12 +27,12 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
-use Statamic\Data\HasAugmentedData;
+use Statamic\Data\HasAugmentedInstance;
 use Statamic\Statamic;
 
-class Asset implements AssetContract, ArrayAccess, Augmentable
+class Asset implements AssetContract, Augmentable
 {
-    use HasAugmentedData, FluentlyGetsAndSets, ContainsData {
+    use HasAugmentedInstance, FluentlyGetsAndSets, ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
@@ -539,63 +538,6 @@ class Asset implements AssetContract, ArrayAccess, Augmentable
     }
 
     /**
-     * Get data for the augmented array
-     *
-     * @return array
-     */
-    public function augmentedArrayData()
-    {
-        $attributes = [
-            'id'             => $this->id(),
-            'title'          => $this->title(),
-            'path'           => $this->path(),
-            'filename'       => $this->filename(),
-            'basename'       => $this->basename(),
-            'extension'      => $this->extension(),
-            'is_asset'       => true,
-            'is_audio'       => $this->isAudio(),
-            'is_previewable' => $this->isPreviewable(),
-            'is_image'       => $this->isImage(),
-            'is_video'       => $this->isVideo(),
-            'blueprint'      => $this->blueprint()->handle(),
-            'edit_url'       => $this->editUrl(),
-            'container'      => $this->container()->id(),
-            'folder'         => $this->folder(),
-            'url'            => $this->url(),
-            'permalink'      => $this->absoluteUrl(),
-        ];
-
-        if ($this->exists()) {
-            $size = $this->size();
-            $kb = number_format($size / 1024, 2);
-            $mb = number_format($size / 1048576, 2);
-            $gb = number_format($size / 1073741824, 2);
-
-            $attributes = array_merge($attributes, [
-                'size'           => Str::fileSizeForHumans($this->size()),
-                'size_bytes'     => $size,
-                'size_kilobytes' => $kb,
-                'size_megabytes' => $mb,
-                'size_gigabytes' => $gb,
-                'size_b'         => $size,
-                'size_kb'        => $kb,
-                'size_mb'        => $mb,
-                'size_gb'        => $gb,
-                'last_modified'  => (string) $this->lastModified(),
-                'last_modified_timestamp' => $this->lastModified()->timestamp,
-                'last_modified_instance'  => $this->lastModified(),
-                'focus_css' => \Statamic\Modifiers\Modify::value($this->get('focus'))->backgroundPosition()->fetch(),
-                'height' => $this->height(),
-                'width' => $this->width(),
-                'orientation' => $this->orientation(),
-                'ratio' => $this->ratio()
-            ]);
-        }
-
-        return $this->data()->merge($attributes)->merge($this->supplements)->all();
-    }
-
-    /**
      * Upload a file
      *
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
@@ -726,23 +668,13 @@ class Asset implements AssetContract, ArrayAccess, Augmentable
         return Facades\Asset::{$method}(...$parameters);
     }
 
-    public function offsetExists($key)
+    public function newAugmentedInstance()
     {
-        return $this->has($key);
+        return new AugmentedAsset($this);
     }
 
-    public function offsetGet($key)
+    protected function shallowAugmentedArrayKeys()
     {
-        return $this->get($key);
-    }
-
-    public function offsetSet($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
+        return ['id', 'url', 'permalink', 'api_url'];
     }
 }

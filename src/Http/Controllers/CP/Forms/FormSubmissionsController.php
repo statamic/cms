@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Illuminate\Http\Resources\Json\Resource;
 use Statamic\CP\Column;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Config;
@@ -49,10 +48,7 @@ class FormSubmissionsController extends CpController
 
         return (new Submissions($paginator))
             ->blueprint($form->blueprint())
-            ->columnPreferenceKey("forms.{$form->handle()}.columns")
-            ->additional(['meta' => [
-                'sortColumn' => $sort,
-            ]]);
+            ->columnPreferenceKey("forms.{$form->handle()}.columns");
     }
 
     private function sanitizeSubmission($submission)

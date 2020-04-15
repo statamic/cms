@@ -1669,7 +1669,7 @@ class CoreModifiers extends Modifier
      */
     public function slugify($value)
     {
-        return Stringy::slugify($value);
+        return Stringy::slugify($value, '-', Config::getShortLocale());
     }
 
     /**
@@ -1684,17 +1684,20 @@ class CoreModifiers extends Modifier
         $key = Arr::get($params, 0);
         $is_descending = strtolower(Arr::get($params, 1)) == 'desc';
 
+        // Enforce collection
+        $value = ($value instanceof Collection) ? $value : collect($value);
+
+        // Random sort
         if ($key === 'random') {
-            return $this->shuffle($value);
+            return $value->shuffle();
         }
 
-        // Using sort="true" will allow primitive arrays to be sorted.
-        if ($key === 'true') {
-            natcasesort($value);
-            return $is_descending ? $this->reverse($value) : $value;
+        // Primitive array sort
+        if ($key === 'true' || $key == 'value') {
+            return $is_descending ? $value->sort()->reverse() : $value->sort();
         }
 
-        return collect($value)->sortBy($key, SORT_REGULAR, $is_descending)->values()->toArray();
+        return $is_descending ? $value->sortByDesc($key) : $value->sortBy($key);
     }
 
     /**
@@ -2170,6 +2173,16 @@ class CoreModifiers extends Modifier
             return str_replace('watch?v=', 'embed/', $url);
         }
 
+        if (str_contains($url, 'youtu.be')) {
+            $url = str_replace('youtu.be', 'www.youtube.com/embed', $url);
+
+            // Check for start at point and replace it with correct parameter.
+            if (str_contains($url, '?t=')) {
+                $url = str_replace('?t=', '?start=', $url);
+            }
+            return $url;
+        }
+
         if (str_contains($url, 'vimeo')) {
             return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
         }
@@ -2185,7 +2198,7 @@ class CoreModifiers extends Modifier
      */
     public function isEmbeddable($url)
     {
-        return Str::contains($url, ['youtube', 'vimeo']);
+        return Str::contains($url, ['youtu.be', 'youtube', 'vimeo']);
     }
 
     // ------------------------------------

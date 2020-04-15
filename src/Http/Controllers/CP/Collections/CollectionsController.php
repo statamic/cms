@@ -20,7 +20,7 @@ class CollectionsController extends CpController
 {
     public function index()
     {
-        $this->authorize('index', CollectionContract::class, 'You are not authorized to view any collections.');
+        $this->authorize('index', CollectionContract::class, __('You are not authorized to view collections.'));
 
         $collections = Collection::all()->filter(function ($collection) {
             return User::current()->can('view', $collection);
@@ -48,7 +48,7 @@ class CollectionsController extends CpController
 
     public function show(Request $request, $collection)
     {
-        $this->authorize('view', $collection, 'You are not authorized to view this collection.');
+        $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
         $blueprints = $collection->entryBlueprints()->map(function ($blueprint) {
             return [
@@ -95,21 +95,21 @@ class CollectionsController extends CpController
 
     public function create()
     {
-        $this->authorize('create', CollectionContract::class, 'You are not authorized to create collections.');
+        $this->authorize('create', CollectionContract::class, __('You are not authorized to create collections.'));
 
         return view('statamic::collections.create');
     }
 
     public function fresh($collection)
     {
-        $this->authorize('view', $collection, 'You are not authorized to view this collection.');
+        $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
         return view('statamic::collections.fresh');
     }
 
     public function edit($collection)
     {
-        $this->authorize('edit', $collection, 'You are not authorized to edit this collection.');
+        $this->authorize('edit', $collection, __('You are not authorized to edit this collection.'));
 
         $values = [
             'title' => $collection->title(),
@@ -132,6 +132,7 @@ class CollectionsController extends CpController
             'amp' => $collection->ampable(),
             'sites' => $collection->sites()->all(),
             'routes' => $collection->routes()->all(),
+            'mount' => optional($collection->mount())->id(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint())
@@ -149,17 +150,17 @@ class CollectionsController extends CpController
 
     public function store(Request $request)
     {
-        $this->authorize('store', CollectionContract::class, 'You are not authorized to create collections.');
+        $this->authorize('store', CollectionContract::class, __('You are not authorized to create collections.'));
 
         $data = $request->validate([
             'title' => 'required',
             'handle' => 'nullable|alpha_dash'
         ]);
 
-        $handle = $request->handle ?? snake_case($request->title);
+        $handle = $request->handle ?? Str::snake($request->title);
 
         if (Collection::find($handle)) {
-            throw new \Exception('Collection already exists');
+            throw new \Exception(__('Collection already exists'));
         }
 
         $collection = Collection::make($handle);
@@ -179,7 +180,7 @@ class CollectionsController extends CpController
 
     public function update(Request $request, $collection)
     {
-        $this->authorize('update', $collection, 'You are not authorized to edit this collection.');
+        $this->authorize('update', $collection, __('You are not authorized to edit this collection.'));
 
         $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
 
@@ -207,7 +208,8 @@ class CollectionsController extends CpController
             ->mount($values['mount'] ?? null)
             ->taxonomies($values['taxonomies'] ?? [])
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
-            ->pastDateBehavior(array_get($values, 'past_date_behavior'));
+            ->pastDateBehavior(array_get($values, 'past_date_behavior'))
+            ->mount(array_get($values, 'mount'));
 
         if ($sites = array_get($values, 'sites')) {
             $collection->sites($sites);
@@ -237,7 +239,7 @@ class CollectionsController extends CpController
 
     public function destroy($collection)
     {
-        $this->authorize('delete', $collection, 'You are not authorized to delete this collection.');
+        $this->authorize('delete', $collection, __('You are not authorized to delete this collection.'));
 
         $collection->delete();
     }
@@ -249,8 +251,9 @@ class CollectionsController extends CpController
                 'display' => __('Name'),
                 'fields' => [
                     'title' => [
-                        'type' => 'text',
+                        'display' => __('Title'),
                         'instructions' => __('statamic::messages.collection_configure_title_instructions'),
+                        'type' => 'text',
                         'validate' => 'required',
                     ]
                 ]
@@ -259,31 +262,31 @@ class CollectionsController extends CpController
                 'display' => __('Dates & Behaviors'),
                 'fields' => [
                     'dated' => [
-                        'type' => 'toggle',
                         'display' => __('Enable Publish Dates'),
-                        'instructions' => 'Publish dates can be used to schedule and expire content.'
+                        'instructions' => __('statamic::messages.collection_configure_dated_instructions'),
+                        'type' => 'toggle',
                     ],
                     'past_date_behavior' => [
-                        'type' => 'select',
                         'display' => __('Past Date Behavior'),
                         'instructions' => __('statamic::messages.collections_past_date_behavior_instructions'),
+                        'type' => 'select',
                         'options' => [
-                            'public' => 'Public - Always visible',
-                            'unlisted' => 'Unlisted - Hidden from listings, URLs visible',
-                            'private' => 'Private - Hidden from listings, URLs 404'
+                            'public' => __('statamic::messages.collection_configure_date_behavior_public'),
+                            'unlisted' => __('statamic::messages.collection_configure_date_behavior_unlisted'),
+                            'private' => __('statamic::messages.collection_configure_date_behavior_private'),
                         ],
                         'if' => [
                             'dated' => true
                         ]
                     ],
                     'future_date_behavior' => [
-                        'type' => 'select',
                         'display' => __('Future Date Behavior'),
                         'instructions' => __('statamic::messages.collections_future_date_behavior_instructions'),
+                        'type' => 'select',
                         'options' => [
-                            'public' => 'Public - Always visible',
-                            'unlisted' => 'Unlisted - Hidden from listings, URLs visible',
-                            'private' => 'Private - Hidden from listings, URLs 404'
+                            'public' => __('statamic::messages.collection_configure_date_behavior_public'),
+                            'unlisted' => __('statamic::messages.collection_configure_date_behavior_unlisted'),
+                            'private' => __('statamic::messages.collection_configure_date_behavior_private'),
                         ],
                         'if' => [
                             'dated' => true
@@ -292,65 +295,72 @@ class CollectionsController extends CpController
                 ],
             ],
             'ordering' => [
+                'display' => __('Ordering'),
                 'fields' => [
                     'structured' => [
                         'display' => __('Orderable'),
-                        'type' => 'toggle',
                         'instructions' => __('statamic::messages.collections_orderable_instructions'),
+                        'type' => 'toggle',
                     ],
                     'sort_direction' => [
-                        'type' => 'select',
+                        'display' => __('Sort Direction'),
                         'instructions' => __('statamic::messages.collections_sort_direction_instructions'),
+                        'type' => 'select',
                         'options' => [
-                            'asc' => 'Ascending',
-                            'desc' => 'Descending'
+                            'asc' => __('Ascending'),
+                            'desc' => __('Descending'),
                         ],
                     ],
                     'max_depth' => [
+                        'display' => __('Max Depth'),
+                        'instructions' => __('statamic::messages.max_depth_instructions'),
                         'type' => 'integer',
-                        'display' => 'Max depth',
-                        'instructions' => 'The maximum number of levels deep a page may be nested. Leave blank for no limit.',
                         'validate' => 'min:0',
                         'if' => ['structured' => true],
                     ],
                     'expects_root' => [
+                        'display' => __('Expect a root page'),
+                        'instructions' => __('statamic::messages.expect_root_instructions'),
                         'type' => 'toggle',
-                        'display' => 'Expect a root page',
-                        'instructions' => 'The first page in the tree should be considered the "root" or "home" page.',
                         'if' => ['structured' => true],
                     ],
                 ],
             ],
             'content_model' => [
-                'display' => 'Content Model',
+                'display' => __('Content Model'),
                 'fields' => [
                     'blueprints' => [
-                        'type' => 'blueprints',
+                        'display' => __('Blueprints'),
                         'instructions' => __('statamic::messages.collections_blueprint_instructions'),
+                        'type' => 'blueprints',
                         'validate' => 'array',
                         'mode' => 'select',
                     ],
                     'links' => [
-                        'type' => 'toggle',
+                        'display' => __('Links'),
                         'instructions' => __('statamic::messages.collections_links_instructions'),
+                        'type' => 'toggle',
                     ],
                     'taxonomies' => [
-                        'type' => 'taxonomies',
+                        'display' => __('Taxonomies'),
                         'instructions' => __('statamic::messages.collections_taxonomies_instructions'),
+                        'type' => 'taxonomies',
                         'mode' => 'select',
                     ],
                     'default_publish_state' => [
                         'display' => __('Publish by Default'),
-                        'type' => 'toggle',
                         'instructions' => __('statamic::messages.collections_default_publish_state_instructions'),
+                        'type' => 'toggle',
                     ],
                     'template' => [
-                        'type' => 'template',
+                        'display' => __('Template'),
                         'instructions' => __('statamic::messages.collection_configure_template_instructions'),
+                        'type' => 'template',
                     ],
                     'layout' => [
-                        'type' => 'template',
+                        'display' => __('Layout'),
                         'instructions' => __('statamic::messages.collection_configure_layout_instructions'),
+                        'type' => 'template',
                     ],
                 ]
             ],
@@ -371,17 +381,24 @@ class CollectionsController extends CpController
 
         $fields = array_merge($fields, [
             'routing' => [
-                'display' => 'Routing & URLs',
+                'display' => __('Routing & URLs'),
                 'fields' => [
                     'routes' => [
                         'display' => __('Route'),
-                        'type' => 'collection_routes',
                         'instructions' => __('statamic::messages.collections_route_instructions'),
+                        'type' => 'collection_routes',
+                    ],
+                    'mount' => [
+                        'display' => __('Mount'),
+                        'instructions' => __('statamic::messages.collections_mount_instructions'),
+                        'type' => 'entries',
+                        'max_items' => 1,
+                        'create' => false,
                     ],
                     'amp' => [
-                        'type' => 'toggle',
                         'display' => __('Enable AMP'),
-                        'instructions' => __('Enable Accelerated Mobile Pages (AMP). Automatically adds routes and URL for entries in this collection. Learn more in the [documentation](https://statamic.dev/amp).'),
+                        'instructions' => __('statamic::messages.collections_amp_instructions'),
+                        'type' => 'toggle',
                     ],
                 ]
             ]

@@ -20,11 +20,15 @@
         @include('statamic::partials.empty-state', [
             'resource' => 'Form',
             'description' => __('statamic::messages.form_wizard_intro'),
-            'docs_link' => Statamic::docsUrl('forms'),
             'svg' => 'empty/form',
             'route' => cp_route('forms.create')
         ])
 
     @endunless
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Forms'),
+        'url' => 'forms'
+    ])
 
 @endsection

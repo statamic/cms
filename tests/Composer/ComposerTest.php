@@ -18,7 +18,7 @@ class ComposerTest extends TestCase
 
         parent::setUp();
 
-        (new Process('tar -xzvf vendor.tar.gz', $this->basePath()))->mustRun();
+        (new Process(['tar', '-xzvf', 'vendor.tar.gz'], $this->basePath()))->mustRun();
         copy($this->basePath('composer.json'), $this->basePath('composer.json.bak'));
         copy($this->basePath('composer.lock'), $this->basePath('composer.lock.bak'));
         Cache::forget('composer.test/package');

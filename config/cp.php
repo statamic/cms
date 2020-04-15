@@ -64,7 +64,7 @@ return [
     |
     */
 
-    'date_format' => 'Y/m/d',
+    'date_format' => 'Y-m-d',
 
     /*
     |--------------------------------------------------------------------------
@@ -76,5 +76,16 @@ return [
     */
 
     'pagination_size' => 50,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Links to Documentation
+    |--------------------------------------------------------------------------
+    |
+    | Show contextual links to documentation throughout the Control Panel.
+    |
+    */
+
+    'link_to_docs' => true,
 
 ];

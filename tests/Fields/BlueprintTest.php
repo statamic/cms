@@ -6,8 +6,10 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
+use Statamic\Facades\Antlers;
 use Statamic\Facades\Field as FieldAPI;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
@@ -583,4 +585,34 @@ class BlueprintTest extends TestCase
 
         $blueprint->fields();
     }
+
+        /** @test */
+        function it_gets_the_handle_when_casting_to_a_string()
+        {
+            $blueprint = (new Blueprint)->setHandle('test');
+
+            $this->assertEquals('test', (string) $blueprint);
+        }
+
+        /** @test */
+        function it_augments()
+        {
+            $blueprint = (new Blueprint)->setHandle('test');
+
+            $this->assertInstanceof(Augmentable::class, $blueprint);
+            $this->assertEquals([
+                'title' => 'Test',
+                'handle' => 'test',
+            ], $blueprint->toAugmentedArray());
+        }
+
+        /** @test */
+        function it_augments_in_the_parser()
+        {
+            $blueprint = (new Blueprint)->setHandle('test');
+
+            $this->assertEquals('test', Antlers::parse('{{ blueprint }}', ['blueprint' => $blueprint]));
+
+            $this->assertEquals('test Test', Antlers::parse('{{ blueprint }}{{ handle }} {{ title }}{{ /blueprint }}', ['blueprint' => $blueprint]));
+        }
 }

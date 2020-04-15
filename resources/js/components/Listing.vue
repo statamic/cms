@@ -65,7 +65,7 @@ export default {
     },
 
     created() {
-        this.autoApplyFilters();
+        this.autoApplyFilters(this.filters);
         this.request();
     },
 
@@ -101,18 +101,6 @@ export default {
 
     methods: {
 
-        autoApplyFilters() {
-            if (! this.filters) return;
-
-            let values = {};
-
-            this.filters.filter(filter => ! _.isEmpty(filter.auto_apply)).forEach(filter => {
-                values[filter.handle] = filter.auto_apply;
-            });
-
-            this.activeFilters = values;
-        },
-
         request() {
             if (! this.requestUrl) {
                 this.loading = false;
@@ -129,8 +117,7 @@ export default {
                 cancelToken: this.source.token
             }).then(response => {
                 this.columns = response.data.meta.columns;
-                this.sortColumn = response.data.meta.sortColumn;
-                this.setActiveFilters(response);
+                this.activeFilterBadges = {...response.data.meta.activeFilterBadges};
                 this.items = Object.values(response.data.data);
                 this.meta = response.data.meta;
                 if (this.shouldRequestFirstPage) return this.request();
@@ -147,13 +134,6 @@ export default {
 
         afterRequestCompleted(response) {
             //
-        },
-
-        setActiveFilters(response) {
-            if (! response.data.meta.filters) return;
-
-            this.activeFilters = {...response.data.meta.filters.values};
-            this.activeFilterBadges = {...response.data.meta.filters.badges};
         },
 
         sorted(column, direction) {

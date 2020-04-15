@@ -1,10 +1,11 @@
 <?php
 
-namespace Tests;
+namespace Tests\Data;
 
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Data\HasAugmentedInstance;
+use Tests\TestCase;
 
 class HasAugmentedInstanceTest extends TestCase
 {

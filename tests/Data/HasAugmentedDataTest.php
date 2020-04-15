@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\Data;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Contracts\Data\Augmentable;
@@ -10,6 +10,7 @@ use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Tests\TestCase;
 
 class HasAugmentedDataTest extends TestCase
 {
@@ -60,7 +61,6 @@ class HasAugmentedDataTest extends TestCase
         $expectedArr = [
             'foo' => new Value('FOO', 'foo', $fieldtype, $thing),
             'bar' => 'BAR',
-            'baz' => new Value(null, 'baz', $fieldtype, $thing),
         ];
         $this->assertEquals($expectedArr, $thing->augmented()->all()->all());
         $this->assertEquals($expectedArr, $thing->toAugmentedArray());

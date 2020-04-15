@@ -15,14 +15,14 @@ class ScaffoldCollectionController extends CpController
 {
     public function index($collection)
     {
-        $this->authorize('view', $collection, 'You are not authorized to view this collection.');
+        $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
         return view('statamic::collections.scaffold', compact('collection'));
     }
 
     public function create(Request $request)
     {
-        $this->authorize('store', CollectionContract::class, 'You are not authorized to scaffold resources.');
+        $this->authorize('store', CollectionContract::class, __('You are not authorized to scaffold resources.'));
 
         // Make the blueprint
         if ($blueprint = $this->request->get('blueprint')) {
@@ -64,7 +64,7 @@ class ScaffoldCollectionController extends CpController
                 'title' => $title,
                 'sections' => [
                     'main' => [
-                        'display' => 'Main',
+                        'display' => __('Main'),
                         'fields' => []
                     ]
                 ]

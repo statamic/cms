@@ -2,7 +2,6 @@
 
 namespace Statamic\Auth;
 
-use ArrayAccess;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -29,7 +28,6 @@ abstract class User implements
     Authenticatable,
     CanResetPasswordContract,
     Augmentable,
-    ArrayAccess,
     AuthorizableContract
 {
     use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns;
@@ -206,26 +204,6 @@ abstract class User implements
     public static function __callStatic($method, $parameters)
     {
         return Facades\User::{$method}(...$parameters);
-    }
-
-    public function offsetExists($key)
-    {
-        return $this->has($key);
-    }
-
-    public function offsetGet($key)
-    {
-        return $this->value($key);
-    }
-
-    public function offsetSet($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
     }
 
     public function name()

@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Action;
@@ -47,7 +46,7 @@ class UsersController extends CpController
             ? UserGroup::find($request->group)->queryUsers()
             : User::query();
 
-        $filters = $this->queryFilters($query, $request->filters);
+        $activeFilterBadges = $this->queryFilters($query, $request->filters);
 
         $users = $query
             ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
@@ -62,8 +61,7 @@ class UsersController extends CpController
                 Column::make('last_login')->label(__('Last Login'))->sortable(false),
             ])
             ->additional(['meta' => [
-                'filters' => $filters,
-                'sortColumn' => $sort,
+                'activeFilterBadges' => $activeFilterBadges,
             ]]);
     }
 
@@ -195,11 +193,11 @@ class UsersController extends CpController
         }
         $user->email($request->email);
 
-        if ($request->roles && User::current()->can('edit roles')) {
+        if (User::current()->can('edit roles')) {
             $user->roles($request->roles);
         }
 
-        if ($request->groups && User::current()->can('edit user groups')) {
+        if (User::current()->can('edit user groups')) {
             $user->groups($request->groups);
         }
 

@@ -6,7 +6,7 @@ use Statamic\Facades\URL;
 use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
-use Illuminate\Foundation\Auth\SendsPasswordResetEmails;
+use Statamic\Auth\SendsPasswordResetEmails;
 
 class ForgotPasswordController extends Controller
 {

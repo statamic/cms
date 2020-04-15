@@ -5,6 +5,7 @@ namespace Statamic\Tags\Concerns;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
@@ -12,14 +13,16 @@ trait QueriesConditions
 {
     protected function queryConditions($query)
     {
-        foreach ($this->parameters as $param => $value) {
+        $this->parameters->filter(function ($value, $param) {
+            return Str::contains($param, ':');
+        })->each(function ($value, $param) use ($query) {
             $this->queryCondition(
                 $query,
                 $field = explode(':', $param)[0],
                 explode(':', $param)[1] ?? false,
                 $this->getQueryConditionValue($value, $field)
             );
-        }
+        });
     }
 
     protected function queryCondition($query, $field, $condition, $value)
@@ -290,6 +293,10 @@ trait QueriesConditions
 
         if ($value instanceof Augmentable) {
             $value = $value->augmentedValue($field);
+        }
+
+        if ($value instanceof LabeledValue) {
+            $value = $value->value();
         }
 
         if (is_object($value)) {

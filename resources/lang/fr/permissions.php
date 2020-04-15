@@ -1,6 +1,7 @@
 <?php
 
 return [
+
     'super' => 'Super utilisateur',
     'super_desc' => 'Cela accorde à l’utilisateur un accès illimité à tout. Faites attention.',
     
@@ -32,11 +33,11 @@ return [
     'publish_{taxonomy}_terms' => 'Gérer l’état de publication',
     'reorder_{taxonomy}_terms' => 'Réorganiser les termes',
     
-    'group_structures' => 'Structures',
-    'configure_structures' => 'Configurer les structures',
-    'configure_structures_desc' => 'Permet d’accéder à toutes les autorisations liées à la structure',
-    'view_{structure}_structure' => 'Voir la structure :structure',
-    'edit_{structure}_structure' => 'Modifier la structure',
+    'group_navigation' => 'Navigation',
+    'configure_navs' => 'Configurer la navigation',
+    'configure_navs_desc' => 'Permet d’accéder à toutes les autorisations liées à la navigation',
+    'view_{nav}_nav' => 'Voir la navigation :nav',
+    'edit_{nav}_nav' => 'Modifier la navigation',
     
     'group_globals' => 'Globales',
     'configure_globals' => 'Configurer les globales',
@@ -77,4 +78,5 @@ return [
     'access_utility_desc' => 'Permet d’accéder à l’utilitaire :title',
     
     'group_misc' => 'Divers',
+    
 ];

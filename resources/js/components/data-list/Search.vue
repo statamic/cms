@@ -2,7 +2,7 @@
     <input
         type="text"
         ref="input"
-        placeholder="Search..."
+        :placeholder="__('Search...')"
         :value="value"
         @input="emitEvent"
         @keyup.esc="reset"

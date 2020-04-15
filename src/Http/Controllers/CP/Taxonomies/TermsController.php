@@ -13,7 +13,6 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
-use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Http\Requests\FilteredRequest;
@@ -33,7 +32,7 @@ class TermsController extends CpController
 
         $query = $this->indexQuery($taxonomy);
 
-        $filters = $this->queryFilters($query, $request->filters, [
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
             'blueprints' => $taxonomy->termBlueprints()->map->handle(),
         ]);
 
@@ -59,8 +58,7 @@ class TermsController extends CpController
             ->blueprint($taxonomy->termBlueprint())
             ->columnPreferenceKey("taxonomies.{$taxonomy->handle()}.columns")
             ->additional(['meta' => [
-                'filters' => $filters,
-                'sortColumn' => $sortField,
+                'activeFilterBadges' => $activeFilterBadges,
             ]]);
     }
 

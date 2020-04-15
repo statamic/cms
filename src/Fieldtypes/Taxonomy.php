@@ -124,8 +124,7 @@ class Taxonomy extends Relationship
     {
         return (new TermsResource($items))
             ->blueprint($this->getBlueprint($request))
-            ->columnPreferenceKey("taxonomies.{$this->getFirstTaxonomyFromRequest($request)->handle()}.columns")
-            ->additional(['meta' => ['sortColumn' => $this->getSortColumn($request)]]);
+            ->columnPreferenceKey("taxonomies.{$this->getFirstTaxonomyFromRequest($request)->handle()}.columns");
     }
 
     protected function getBlueprint($request)

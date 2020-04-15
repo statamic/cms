@@ -316,6 +316,17 @@ class GlideImageManipulator implements ImageManipulator
      * @param string $value
      * @return $this
      */
+    public function format($value)
+    {
+        $this->params['fm'] = $value;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     * @return $this
+     */
     public function quality($value)
     {
         $this->params['q'] = $value;

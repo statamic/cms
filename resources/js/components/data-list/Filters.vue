@@ -2,44 +2,48 @@
     <div class="w-full">
         <div class="input-group focus-within-only">
 
-            <popover>
+            <popover v-if="filters.length">
                 <template slot="trigger">
                     <button class="input-group-prepend cursor-pointer px-2" @click="resetFilterPopover">
                         {{ __('Filter') }}
                         <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                     </button>
                 </template>
-                <div class="flex flex-col p-2 text-left w-64">
-                    <h6 class="mb-1" v-text="__('Show everything where:')"/>
-                    <div v-if="showFilterSelection" class="-mt-1">
-                        <button
-                            v-for="filter in unpinnedFilters"
-                            :key="filter.handle"
-                            v-text="filter.title"
-                            class="btn w-full mt-1"
-                            @click="creating = filter.handle"
-                        />
+                <template #default="{ close: closePopover }">
+                    <div class="flex flex-col text-left w-64">
+                        <h6 class="p-2 pb-0" v-text="__('Show everything where:')"/>
+                        <div v-if="showFilterSelection" class="p-2 pt-1">
+                            <button
+                                v-for="filter in unpinnedFilters"
+                                :key="filter.handle"
+                                v-text="filter.title"
+                                class="btn w-full mt-1"
+                                @click="creating = filter.handle"
+                            />
+                        </div>
+                        <div class="filter-fields text-sm">
+                            <field-filter
+                                v-show="showFieldFilter"
+                                ref="fieldFilter"
+                                :config="fieldFilter"
+                                :values="activeFilters.fields || {}"
+                                @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
+                                @cleared="creating = false"
+                                @closed="closePopover"
+                            />
+                            <data-list-filter
+                                v-for="filter in standardFilters"
+                                v-if="creating === filter.handle"
+                                :key="filter.handle"
+                                :filter="filter"
+                                :values="activeFilters[filter.handle]"
+                                @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
+                                @cleared="creating = false"
+                                @closed="closePopover"
+                            />
+                        </div>
                     </div>
-                    <div class="filter-fields text-sm">
-                        <field-filter
-                            v-show="showFieldFilter"
-                            ref="fieldFilter"
-                            :config="fieldFilter"
-                            :values="activeFilters.fields || {}"
-                            @changed="$emit('filter-changed', {handle: 'fields', values: $event})"
-                            @cleared="creating = false"
-                        />
-                        <data-list-filter
-                            v-for="filter in standardFilters"
-                            v-if="creating === filter.handle"
-                            :key="filter.handle"
-                            :filter="filter"
-                            :values="activeFilters[filter.handle]"
-                            @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
-                            @cleared="creating = false"
-                        />
-                    </div>
-                </div>
+                </template>
             </popover>
 
             <data-list-search ref="search" :value="searchQuery" @input="$emit('search-changed', $event)" />
@@ -77,14 +81,17 @@
                         <svg height="8" width="8" viewBox="0 0 10 6.5" class="ml-sm"><path d="M9.9,1.4L5,6.4L0,1.4L1.4,0L5,3.5L8.5,0L9.9,1.4z" fill="currentColor" /></svg>
                     </button>
                 </template>
-                <div class="filter-fields p-2">
-                    <data-list-filter
-                        :key="filter.handle"
-                        :filter="filter"
-                        :values="activeFilters[filter.handle]"
-                        @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
-                    />
-                </div>
+                <template #default="{ close: closePopover }">
+                    <div class="filter-fields">
+                        <data-list-filter
+                            :key="filter.handle"
+                            :filter="filter"
+                            :values="activeFilters[filter.handle]"
+                            @changed="$emit('filter-changed', {handle: filter.handle, values: $event})"
+                            @closed="closePopover"
+                        />
+                    </div>
+                </template>
             </popover>
 
         </div>
@@ -115,7 +122,10 @@ export default {
     },
 
     props: {
-        filters: Array,
+        filters: {
+            type: Array,
+            default: () => [],
+        },
         activePreset: String,
         activePresetPayload: Object,
         activeFilters: Object,

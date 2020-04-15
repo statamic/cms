@@ -83,6 +83,18 @@ export default {
             this.filtersChanged(preset.filters);
         },
 
+        autoApplyFilters(filters) {
+            if (! filters) return;
+
+            let values = {};
+
+            filters.filter(filter => ! _.isEmpty(filter.auto_apply)).forEach(filter => {
+                values[filter.handle] = filter.auto_apply;
+            });
+
+            this.activeFilters = values;
+        },
+
     }
 
 }

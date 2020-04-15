@@ -1,7 +1,8 @@
 <?php
 
-namespace Tests;
+namespace Tests\Facades;
 
+use Tests\TestCase;
 use Statamic\Facades\Image;
 use Statamic\Contracts\Imaging\ImageManipulator;
 

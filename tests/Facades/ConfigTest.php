@@ -1,7 +1,8 @@
-<?php namespace Tests;
+<?php namespace Tests\Facades;
 
 use Statamic\Facades\Config;
 use Statamic\Sites\Site;
+use Tests\TestCase;
 
 class ConfigTest extends TestCase
 {

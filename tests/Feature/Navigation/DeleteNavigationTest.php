@@ -27,7 +27,7 @@ class DeleteNavigationTest extends TestCase
             ->actingAs($user)
             ->delete(cp_route('navigation.destroy', $nav->handle()))
             ->assertRedirect('/original')
-            ->assertSessionHas('error', 'You are not authorized to configure navs.');
+            ->assertSessionHas('error', 'You are not authorized to delete navs.');
 
         $this->assertCount(1, Nav::all());
     }

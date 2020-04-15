@@ -14,7 +14,6 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
-use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Contracts\Entries\Entry as EntryContract;
@@ -31,7 +30,7 @@ class EntriesController extends CpController
 
         $query = $this->indexQuery($collection);
 
-        $filters = $this->queryFilters($query, $request->filters, [
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
             'collection' => $collection->handle(),
             'blueprints' => $collection->entryBlueprints()->map->handle(),
         ]);
@@ -54,8 +53,7 @@ class EntriesController extends CpController
             ->blueprint($collection->entryBlueprint())
             ->columnPreferenceKey("collections.{$collection->handle()}.columns")
             ->additional(['meta' => [
-                'filters' => $filters,
-                'sortColumn' => $sortField,
+                'activeFilterBadges' => $activeFilterBadges,
             ]]);
     }
 
@@ -215,7 +213,7 @@ class EntriesController extends CpController
             : $collection->entryBlueprint();
 
         if (! $blueprint) {
-            throw new \Exception('A valid blueprint is required.');
+            throw new \Exception(__('A valid blueprint is required.'));
         }
 
         $values = [];
@@ -257,7 +255,7 @@ class EntriesController extends CpController
                     'exists' => false,
                     'published' => false,
                     'url' => cp_route('collections.entries.create', [$collection->handle(), $handle]),
-                    'livePreviewUrl' => cp_route('collections.entries.preview.create', [$collection->handle(), $handle]),
+                    'livePreviewUrl' => $collection->route($handle) ? cp_route('collections.entries.preview.create', [$collection->handle(), $handle]) : null,
                 ];
             })->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),

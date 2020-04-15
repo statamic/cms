@@ -105,6 +105,36 @@ class TreeTest extends TestCase
     }
 
     /** @test */
+    function it_gets_the_root()
+    {
+        $tree = $this->tree();
+        $tree->structure()->expectsRoot(true);
+        $tree->tree([['entry' => 'pages-home']]);
+
+        $this->assertEquals('pages-home', $tree->root());
+    }
+
+    /** @test */
+    function a_tree_not_expecting_a_root_will_have_no_root()
+    {
+        $tree = $this->tree();
+        $tree->structure()->expectsRoot(false);
+        $tree->tree([['entry' => 'pages-home']]);
+
+        $this->assertNull($tree->root());
+    }
+
+    /** @test */
+    function a_tree_expecting_a_root_but_with_no_branches_has_no_root()
+    {
+        $tree = $this->tree();
+        $tree->structure()->expectsRoot(true);
+        $tree->tree([]);
+
+        $this->assertNull($tree->root());
+    }
+
+    /** @test */
     function it_gets_the_child_pages_including_the_root()
     {
         $pages = $this->tree()->pages();
@@ -247,6 +277,59 @@ class TreeTest extends TestCase
         $tree->move('pages-board', 'pages-about');
 
         $this->assertEquals($arr, $tree->tree());
+    }
+
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/1548
+     **/
+    function it_can_move_the_root()
+    {
+        $tree = $this->tree()->tree([
+                [
+                    'entry' => 'pages-home',
+                ],
+                [
+                    'entry' => 'pages-blog'
+                ],
+                [
+                    'entry' => 'pages-about',
+                    'children' => [
+                        [
+                            'entry' => 'pages-board',
+                            'children' => [
+                                [
+                                    'entry' => 'pages-directors'
+                                ]
+                            ]
+                        ]
+                    ],
+                ]
+            ]);
+
+        $tree->move('pages-home', 'pages-board');
+
+        $this->assertEquals([
+            [
+                'entry' => 'pages-blog',
+            ],
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                        'children' => [
+                            [
+                                'entry' => 'pages-directors',
+                            ],
+                            [
+                                'entry' => 'pages-home',
+                            ]
+                        ]
+                    ]
+                ],
+            ]
+        ], $tree->tree());
     }
 
     /** @test */

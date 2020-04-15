@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Extend;
+namespace Tests\Tags;
 
 use Tests\TestCase;
 use Statamic\Facades\Antlers;

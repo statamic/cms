@@ -14,10 +14,10 @@
                 </dropdown-list>
 
                 <div class="btn-group mr-2" v-if="canUseStructureTree && !treeIsDirty">
-                    <button class="btn px-2" @click="view = 'tree'" :disabled="view === 'tree'">
+                    <button class="btn px-2" @click="view = 'tree'" :class="{'active': view === 'tree'}">
                         <svg-icon name="structures" class="h-4 w-4"/>
                     </button>
-                    <button class="btn px-2" @click="view = 'list'" :disabled="view === 'list'">
+                    <button class="btn px-2" @click="view = 'list'" :class="{'active': view === 'list'}">
                         <svg-icon name="assets-mode-table" class="h-4 w-4" />
                     </button>
                 </div>
@@ -33,6 +33,7 @@
 
                     <site-selector
                         v-if="structureSites.length > 1"
+                        class="mr-2"
                         :sites="structureSites"
                         :value="treeSite"
                         @input="treeSite = $event.handle"
@@ -81,7 +82,8 @@
             :initial-sort-column="sortColumn"
             :initial-sort-direction="sortDirection"
             :filters="filters"
-            :action-url="actionUrl"
+            :run-action-url="runActionUrl"
+            :bulk-actions-url="bulkActionsUrl"
             :reordering="reordering"
             :reorder-url="reorderUrl"
             :site="site"
@@ -114,12 +116,16 @@
 
             <template #branch-options="{ branch, removeBranch, orphanChildren, depth }">
                 <template v-if="depth < structureMaxDepth">
+
+                    <h6 class="px-1" v-text="__('Create Child Entry')" v-if="blueprints.length > 1" />
+                    <li class="divider" v-if="blueprints.length > 1" />
                     <dropdown-item
                         v-for="blueprint in blueprints"
                         :key="blueprint.handle"
                         @click="createEntry(blueprint.handle, branch.id)"
-                        v-text="__('New :thing', { thing: blueprint.title })" />
+                        v-text="blueprints.length > 1 ? blueprint.title : __('Create Child Entry')" />
                 </template>
+                <li class="divider"></li>
                 <dropdown-item
                     :text="__('Delete')"
                     class="warning"
@@ -141,7 +147,7 @@
 <script>
 import PageTree from '../structures/PageTree.vue';
 import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
-import SiteSelector from '../structures/SiteSelector.vue';
+import SiteSelector from '../SiteSelector.vue';
 
 export default {
 
@@ -162,7 +168,8 @@ export default {
         sortColumn: { type: String, required: true },
         sortDirection: { type: String, required: true },
         filters: { type: Array, required: true },
-        actionUrl: { type: String, required: true },
+        runActionUrl: { type: String, required: true },
+        bulkActionsUrl: { type: String, required: true },
         reorderUrl: { type: String, required: true },
         blueprints: { type: Array, required: true },
         site: { type: String, required: true },
@@ -290,8 +297,9 @@ export default {
             window.location = url;
         },
 
-        editPage(page, vm, store) {
-            window.location = page.edit_url;
+        editPage(page, vm, store, $event) {
+            const url = page.edit_url;
+            $event.metaKey ? window.open(url) : window.location = url;
         }
 
     }

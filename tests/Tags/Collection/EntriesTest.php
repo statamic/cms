@@ -9,6 +9,7 @@ use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
+use Statamic\Fields\Value;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Tags\Collection\Entries;
@@ -128,6 +129,28 @@ class EntriesTest extends TestCase
         $this->assertEquals(
             ['B', 'C', 'D'],
             $this->getEntries(['limit' => 3, 'offset' => 1])->map->get('title')->values()->all()
+        );
+    }
+
+    /** @test */
+    function it_limits_entries_with_offset_using_value_objects()
+    {
+        $this->makeEntry('a')->set('title', 'A')->save();
+        $this->makeEntry('b')->set('title', 'B')->save();
+        $this->makeEntry('c')->set('title', 'C')->save();
+        $this->makeEntry('d')->set('title', 'D')->save();
+        $this->makeEntry('e')->set('title', 'E')->save();
+
+        $this->assertCount(5, $this->getEntries());
+
+        $this->assertEquals(
+            ['A', 'B', 'C'],
+            $this->getEntries(['limit' => new Value(3)])->map->get('title')->values()->all()
+        );
+
+        $this->assertEquals(
+            ['B', 'C', 'D'],
+            $this->getEntries(['limit' => 3, 'offset' => new Value(1)])->map->get('title')->values()->all()
         );
     }
 

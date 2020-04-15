@@ -17,8 +17,8 @@ use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Contracts\Structures\Structure;
 use Statamic\Contracts\Assets\AssetContainer;
+use Statamic\Contracts\Structures\Nav as NavContract;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Utility;
 
@@ -37,9 +37,9 @@ class CoreNav
         (new static)
             ->makeTopLevel()
             ->makeContentSection()
+            ->makeFieldsSection()
             ->makeToolsSection()
-            ->makeUsersSection()
-            ->makeSiteSection();
+            ->makeUsersSection();
     }
 
     /**
@@ -82,12 +82,12 @@ class CoreNav
         Nav::content('Navigation')
             ->route('navigation.index')
             ->icon('hierarchy-files')
-            ->can('index', Structure::class)
+            ->can('index', NavContract::class)
             ->children(function () {
-                return NavAPI::all()->map(function ($structure) {
-                    return Nav::item($structure->title())
-                              ->url($structure->showUrl())
-                              ->can('view', $structure);
+                return NavAPI::all()->map(function ($nav) {
+                    return Nav::item($nav->title())
+                              ->url($nav->showUrl())
+                              ->can('view', $nav);
                 });
             });
 
@@ -127,6 +127,26 @@ class CoreNav
                               ->can('view', $globalSet);
                 });
             });
+
+        return $this;
+    }
+
+        /**
+     * Make fields section items.
+     *
+     * @return $this
+     */
+    protected function makeFieldsSection()
+    {
+        Nav::fields('Blueprints')
+            ->route('blueprints.index')
+            ->icon('blueprint')
+            ->can('configure fields');
+
+        Nav::fields('Fieldsets')
+            ->route('fieldsets.index')
+            ->icon('fieldsets')
+            ->can('configure fields');
 
         return $this;
     }
@@ -215,25 +235,16 @@ class CoreNav
     }
 
     /**
-     * Make site section items.
+     * @TODO AREAS
      *
      * @return $this
      */
-    protected function makeSiteSection()
+    protected function makeUnusedSection()
     {
         // Nav::site('Addons')
         //     ->route('addons.index')
         //     ->icon('addons')
         //     ->can('configure addons');
-
-        Nav::site('Fields')
-            ->route('fields.index')
-            ->icon('wireframe')
-            ->can('configure fields')
-            ->children([
-                Nav::item('Blueprints')->route('blueprints.index'),
-                Nav::item('Fieldsets')->route('fieldsets.index'),
-            ]);
 
         // Nav::site('Preferences')
         //     ->route('')

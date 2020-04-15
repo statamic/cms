@@ -24,12 +24,16 @@
         @include('statamic::partials.empty-state', [
             'resource' => 'Taxonomy',
             'description' => __('statamic::messages.taxonomy_wizard_intro'),
-            'docs_link' => Statamic::docsUrl('taxonomies'),
             'svg' => 'empty/taxonomy',
             'route' => cp_route('taxonomies.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')
         ])
 
     @endunless
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Taxonomies'),
+        'url' => 'taxonomies'
+    ])
 
 @endsection
