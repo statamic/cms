@@ -2,7 +2,6 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Statamic;
 use Statamic\Facades\User;
 use Statamic\Policies;
 use Statamic\Auth\UserProvider;
@@ -105,9 +104,5 @@ class AuthServiceProvider extends ServiceProvider
                 ? new PasswordBrokerManager($app)
                 : $broker;
         });
-
-        if (! $this->app->runningInConsole() && Statamic::isCpRoute()) {
-            Auth::shouldUse(config('statamic.cp.guard'));
-        }
     }
 }
