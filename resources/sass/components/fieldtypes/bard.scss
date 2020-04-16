@@ -172,7 +172,7 @@
    ========================================================================== */
 
 .bard-fieldtype .bard-fullscreen {
-    @apply .fixed .bg-grey-20 .pin .min-h-screen .overflow-scroll rounded-none;
+    @apply fixed bg-grey-20 inset-0 min-h-screen overflow-scroll rounded-none;
     z-index: 998; // to appear over the top of the rest of the stuff on the page.
                 // too high and it'll be over the top of stacks, etc.
 
@@ -205,7 +205,7 @@
     }
 
     .bard-field-options {
-        @apply .fixed .pin-t .pin-l .pin-r .bg-grey-70 .p-2 .w-full;
+        @apply fixed top-0 inset-x-0 bg-grey-70 p-2 w-full;
         text-align: right;
         z-index: 1; // to appear over the top of .bard-editor
 
@@ -370,7 +370,7 @@
             @apply relative;
 
             &:after {
-                @apply bg-grey-40 absolute pin pointer-events-none opacity-25;
+                @apply bg-grey-40 absolute inset-0 pointer-events-none opacity-25;
                 content: '';
             }
         }

@@ -3,12 +3,14 @@
    ========================================================================== */
 
 svg {
+    display: inline;
     max-width: 100%;
     max-height: 100%;
+    vertical-align: baseline;
 }
 
 .heroicon-component-accent {
-    fill: config('colors.blue');
+    fill: theme('colors.blue');
 }
 
 [class^="icon"] {

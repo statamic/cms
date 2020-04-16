@@ -28,7 +28,7 @@ div[data-popover="tooltip"] {
     border-style: solid;
     position: absolute;
     margin: 5px;
-    border-color: config('colors.grey-80');
+    border-color: theme('colors.grey-80');
     z-index: 1;
   }
 

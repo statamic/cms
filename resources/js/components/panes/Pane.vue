@@ -2,7 +2,7 @@
 
     <portal to="pane">
         <transition name="pane-slide">
-            <div class="w-96 bg-white shadow-lg fixed pin-t pin-r pin-b">
+            <div class="w-96 bg-white shadow-lg fixed inset-y-0 right-0">
                 <slot name="default" :close="close" />
             </div>
         </transition>

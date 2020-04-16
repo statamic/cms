@@ -115,7 +115,7 @@
 
 
 .session-expiry-stripe {
-    @apply px-2 py-1 text-xs pin-t text-center bg-red text-white cursor-pointer w-full outline-none fixed;
+    @apply px-2 py-1 text-xs top-0 text-center bg-red text-white cursor-pointer w-full outline-none fixed;
     z-index: 999;
     height: 48px;
 

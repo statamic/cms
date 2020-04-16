@@ -39,7 +39,7 @@ button {
 
     &.active, &.active:hover {
         box-shadow: inset 2px 2px 3px 0px rgba(25,30,35,.1);
-        background: config('colors.grey-40');
+        background: theme('colors.grey-40');
         border-color: #aeb9c3 !important;
     }
 
@@ -51,14 +51,14 @@ button {
 // Primary action button
 .btn-primary {
     @apply text-white;
-    background: linear-gradient(to bottom, config('colors.blue-500'), config('colors.blue-600'));
-    border: 1px solid config('colors.blue-700');
-    box-shadow: inset 0 1px 0 0 config('colors.blue-400'), 0 1px 0 0 rgba(25,30,35,.05), 0 0 0 0 transparent;
+    background: linear-gradient(to bottom, theme('colors.blue-500'), theme('colors.blue-600'));
+    border: 1px solid theme('colors.blue-700');
+    box-shadow: inset 0 1px 0 0 theme('colors.blue-400'), 0 1px 0 0 rgba(25,30,35,.05), 0 0 0 0 transparent;
 
     &:hover:not(:disabled), :active:not(:disabled) {
-        background: linear-gradient(to bottom, config('colors.blue-600'), config('colors.blue-700'));
-        border: 1px solid config('colors.blue-800');
-        box-shadow: inset 0 1px 0 0 config('colors.blue-500'), 0 1px 0 0 rgba(25,30,35,.05), 0 0 0 0 transparent;
+        background: linear-gradient(to bottom, theme('colors.blue-600'), theme('colors.blue-700'));
+        border: 1px solid theme('colors.blue-800');
+        box-shadow: inset 0 1px 0 0 theme('colors.blue-500'), 0 1px 0 0 rgba(25,30,35,.05), 0 0 0 0 transparent;
     }
 
     &:disabled {

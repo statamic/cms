@@ -88,7 +88,7 @@ code.parent-url {
 }
 
 .publish-sidebar {
-    @apply flex-no-shrink;
+    @apply flex-shrink-0;
     margin-left: 20px;
 
     max-width: 300px;
@@ -149,7 +149,7 @@ code.parent-url {
     }
 
     .editor-form-actions {
-        @apply absolute p-2 h-16 border-t pin-l pin-r pin-b;
+        @apply absolute p-2 h-16 border-t bottom-0 inset-x-0;
         z-index: 2;
     }
 
