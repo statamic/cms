@@ -44,11 +44,7 @@ class Fieldset
     {
         $fields = array_get($this->contents, 'fields', []);
 
-        $fields = collect($fields)->map(function ($field, $handle) {
-            return compact('handle', 'field');
-        })->values();
-
-        return new Fields($fields->all());
+        return new Fields($fields);
     }
 
     public function field(string $handle): ?Field
