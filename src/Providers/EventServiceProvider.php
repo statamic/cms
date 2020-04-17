@@ -7,9 +7,6 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
-        \Statamic\Events\DataIdCreated::class => [
-            \Statamic\Stache\Listeners\SaveCreatedId::class
-        ],
         'Form.submission.created' => [
             \Statamic\Forms\Listeners\SendEmails::class
         ],
