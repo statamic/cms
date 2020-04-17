@@ -6,6 +6,8 @@ use Statamic\Tags\Tags;
 
 class Range extends Tags
 {
+    protected static $aliases = ['loop'];
+
     public function index()
     {
         $from   = $this->params->int('from', 1);
