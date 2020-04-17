@@ -8,9 +8,9 @@ class Range extends Tags
 {
     public function index()
     {
-        $from   = $this->getInt('from', 1);
-        $to     = $this->getInt('to', null);
-        $times  = $this->getInt('times', null);
+        $from   = $this->params->int('from', 1);
+        $to     = $this->params->int('to', null);
+        $times  = $this->params->int('times', null);
         $vars = [];
 
         if ($times) {
@@ -23,6 +23,6 @@ class Range extends Tags
             ];
         }
 
-        return $this->parseLoop($vars);
+        return $vars;
     }
 }
