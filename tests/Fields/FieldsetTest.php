@@ -30,11 +30,7 @@ class FieldsetTest extends TestCase
         $this->assertEquals([], $fieldset->contents());
 
         $contents = [
-            'sections' => [
-                'main' => [
-                    'fields' => ['one' => ['type' => 'text']]
-                ]
-            ]
+            'fields' => ['one' => ['type' => 'text']]
         ];
 
         $return = $fieldset->setContents($contents);
