@@ -168,7 +168,7 @@ EOT;
         File::shouldReceive('makeDirectory')->with('/path/to/resources/blueprints')->once();
         File::shouldReceive('put')->with('/path/to/resources/blueprints/the_test_blueprint.yaml', $expectedYaml)->once();
 
-        $fieldset = (new Blueprint)->setHandle('the_test_blueprint')->setContents([
+        $blueprint = (new Blueprint)->setHandle('the_test_blueprint')->setContents([
             'title' => 'Test Blueprint',
             'sections' => [
                 'one' => [
@@ -195,6 +195,6 @@ EOT;
             ]
         ]);
 
-        $this->repo->save($fieldset);
+        $this->repo->save($blueprint);
     }
 }
