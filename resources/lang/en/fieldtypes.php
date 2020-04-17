@@ -44,7 +44,7 @@ return [
             'indent_type' => 'Set your preferred type of indentation.',
             'key_map' => 'Choose preferred set of keyboard shortcuts.',
             'mode' => 'Choose language for syntax highlighting.',
-            'theme' => 'Choose your prefered theme.',
+            'theme' => 'Choose your preferred theme.',
         ],
     ],
     'color' => [
@@ -61,7 +61,7 @@ return [
             'columns' => 'Show multiple months at one time, in rows and columns',
             'earliest_date' => 'Set the earliest selectable date.',
             'format' => 'Optionally format the date string using [moment.js](https://momentjs.com/docs/#/displaying/format/).',
-            'full_width' => 'Stretch the calender to use up the full width.',
+            'full_width' => 'Stretch the calendar to use up the full width.',
             'inline' => 'Skip the dropdown input field and show the calendar directly.',
             'mode' => 'Choose between single or range mode (range disables time picker).',
             'rows' => 'Show multiple months at one time, in rows and columns',
