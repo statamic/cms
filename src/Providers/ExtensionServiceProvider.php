@@ -133,6 +133,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Partial::class,
         Tags\Path::class,
         Tags\Query::class,
+        Tags\Range::class,
         Tags\Redirect::class,
         Tags\Relate::class,
         Tags\Rotate::class,
