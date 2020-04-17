@@ -18,7 +18,7 @@ Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
     Route::get('unauthorized', 'UnauthorizedController')->name('unauthorized');
 });
 
-Route::middleware(Statamic::cpMiddleware())->group(function () {
+Route::middleware('statamic.cp.authenticated')->group(function () {
     Statamic::additionalCpRoutes();
 
     Route::get('/', 'StartPageController')->name('index');

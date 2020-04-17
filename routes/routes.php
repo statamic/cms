@@ -16,7 +16,7 @@ if (config('statamic.api.enabled')) {
 
 if (config('statamic.cp.enabled')) {
     Route::middleware(SwapCpExceptionHandler::class)->group(function () {
-        Route::middleware('statamic-cp')
+        Route::middleware('statamic.cp')
             ->name('statamic.cp.')
             ->prefix(config('statamic.cp.route'))
             ->namespace('Statamic\Http\Controllers\CP')

@@ -21,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->registerCpMiddlewareGroup();
+        $this->registerMiddlewareGroup();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
              ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class);
@@ -118,15 +118,11 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    protected function registerCpMiddlewareGroup()
+    protected function registerMiddlewareGroup()
     {
-        $this->app->make(Router::class)->middlewareGroup('statamic-cp', [
-            \Illuminate\Cookie\Middleware\EncryptCookies::class,
-            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
-            \Statamic\Http\Middleware\CP\StartSession::class,
-            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
-            \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
-            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        $this->app->make(Router::class)->middlewareGroup('statamic.web', [
+            \Statamic\Http\Middleware\Localize::class,
+            \Statamic\StaticCaching\Middleware\Cache::class,
         ]);
     }
 }

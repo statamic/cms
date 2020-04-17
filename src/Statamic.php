@@ -21,14 +21,6 @@ class Statamic
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
-    protected static $webMiddleware = [
-        \Statamic\Http\Middleware\Localize::class,
-        \Statamic\StaticCaching\Middleware\Cache::class,
-    ];
-    protected static $cpMiddleware = [
-        \Statamic\Http\Middleware\CP\Authorize::class,
-        \Statamic\Http\Middleware\CP\Localize::class,
-    ];
 
     public static function version()
     {
@@ -229,26 +221,6 @@ class Statamic
     public static function crumb(...$values)
     {
         return implode(' ‹ ', array_map("__", $values));
-    }
-
-    public static function cpMiddleware()
-    {
-        return static::$cpMiddleware;
-    }
-
-    public static function webMiddleware()
-    {
-        return static::$webMiddleware;
-    }
-
-    public static function pushCpMiddleware($middleware)
-    {
-        static::$cpMiddleware[] = $middleware;
-    }
-
-    public static function pushWebMiddleware($middleware)
-    {
-        static::$webMiddleware[] = $middleware;
     }
 
     public static function docsUrl($url)

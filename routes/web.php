@@ -48,5 +48,4 @@ Statamic::additionalWebRoutes();
  */
 Route::any('/{segments?}', 'FrontendController@index')
     ->where('segments', '.*')
-    ->name('statamic.site')
-    ->middleware(Statamic::webMiddleware());
+    ->name('statamic.site');

@@ -18,6 +18,11 @@ use Statamic\View\View;
  */
 class FrontendController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('statamic.web');
+    }
+
     /**
      * Handles all URLs
      *
