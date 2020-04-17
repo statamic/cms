@@ -2,12 +2,11 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Facades\File;
-use Statamic\Statamic;
+use Illuminate\Routing\Router;
 use Statamic\Sites\Sites;
-use Stringy\StaticStringy;
-use Statamic\Facades\Preference;
 use Illuminate\Support\Carbon;
+use Statamic\Facades\Preference;
+use Statamic\Exceptions\Handler;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 
@@ -22,7 +21,7 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->swapSessionMiddleware();
+        $this->registerMiddlewareGroup();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
              ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class);
@@ -119,11 +118,11 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    protected function swapSessionMiddleware()
+    protected function registerMiddlewareGroup()
     {
-        $this->app->singleton(
-            \Illuminate\Session\Middleware\StartSession::class,
-            \Statamic\Http\Middleware\CP\StartSession::class
-        );
+        $this->app->make(Router::class)->middlewareGroup('statamic.web', [
+            \Statamic\Http\Middleware\Localize::class,
+            \Statamic\StaticCaching\Middleware\Cache::class,
+        ]);
     }
 }

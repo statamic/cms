@@ -13,7 +13,7 @@ class FieldsetController extends CpController
 {
     public function __construct()
     {
-        $this->middleware('can:configure fields');
+        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class . ':configure fields');
     }
 
     public function index(Request $request)

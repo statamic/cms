@@ -16,7 +16,7 @@ if (config('statamic.api.enabled')) {
 
 if (config('statamic.cp.enabled')) {
     Route::middleware(SwapCpExceptionHandler::class)->group(function () {
-        Route::middleware('web')
+        Route::middleware('statamic.cp')
             ->name('statamic.cp.')
             ->prefix(config('statamic.cp.route'))
             ->namespace('Statamic\Http\Controllers\CP')
@@ -25,7 +25,7 @@ if (config('statamic.cp.enabled')) {
 }
 
 if (config('statamic.routes.enabled')) {
-    Route::middleware('web')
+    Route::middleware(config('statamic.routes.middleware', 'web'))
         ->namespace('Statamic\Http\Controllers')
         ->group(__DIR__.'/web.php');
 }

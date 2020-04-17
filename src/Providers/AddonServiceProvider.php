@@ -28,7 +28,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $externalScripts = [];
     protected $publishables = [];
     protected $routes = [];
-    protected $middleware = [];
+    protected $middlewareGroups = [];
 
     public function boot()
     {
@@ -263,12 +263,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootMiddleware()
     {
-        foreach (array_get($this->middleware, 'web', []) as $middleware) {
-            Statamic::pushWebMiddleware($middleware);
-        }
-
-        foreach (array_get($this->middleware, 'cp', []) as $middleware) {
-            Statamic::pushCpMiddleware($middleware);
+        foreach ($this->middlewareGroups as $group => $middleware) {
+            foreach ($middleware as $class) {
+                $this->app['router']->pushMiddlewareToGroup($group, $class);
+            }
         }
     }
 
