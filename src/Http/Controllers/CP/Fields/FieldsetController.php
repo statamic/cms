@@ -118,13 +118,14 @@ class FieldsetController extends CpController
 
     private function save(Fieldset $fieldset, Request $request)
     {
-        $fields = collect($request->fields)->mapWithKeys(function ($field) {
+        $fields = collect($request->fields)->map(function ($field) {
             $field = Arr::removeNullValues($field);
             $field = Arr::except($field, ['_id', 'isNew']);
             if (Arr::get($field, 'width') === 100) {
                 unset($field['width']);
             }
-            return [Arr::pull($field, 'handle') => $field];
+            $handle = Arr::pull($field, 'handle');
+            return compact('handle', 'field');
         })->all();
 
         $fieldset->setContents([
