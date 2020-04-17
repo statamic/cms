@@ -9,6 +9,8 @@ class FieldtypeWithPreprocessableConfigField extends Fieldtype
 {
     public function getConfigFieldset()
     {
-        return FieldsetFactory::withFields(['test' => ['type' => 'baz']])->create();
+        return FieldsetFactory::withFields([
+            ['handle' => 'test', 'field' => ['type' => 'baz']],
+        ])->create();
     }
 }

@@ -21,7 +21,10 @@ class FieldRepositoryTest extends TestCase
             return (new Fieldset)->setHandle('test')->setContents([
                 'title' => 'Test',
                 'fields' => [
-                    'one' => ['type' => 'textarea', 'display' => 'First Field'],
+                    [
+                        'handle' => 'one',
+                        'field' => ['type' => 'textarea', 'display' => 'First Field'],
+                    ]
                 ]
             ]);
         });

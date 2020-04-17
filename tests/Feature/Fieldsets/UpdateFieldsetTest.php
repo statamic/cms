@@ -79,18 +79,24 @@ class UpdateFieldsetTest extends TestCase
         $this->assertEquals([
             'title' => 'Updated title',
             'fields' => [
-                'one' => [
-                    'type' => 'textarea',
-                    'display' => 'First Field',
-                    'instructions' => 'First field instructions',
-                    'foo' => 'bar',
-                    'width' => 50,
+                [
+                    'handle' => 'one',
+                    'field' => [
+                        'type' => 'textarea',
+                        'display' => 'First Field',
+                        'instructions' => 'First field instructions',
+                        'foo' => 'bar',
+                        'width' => 50,
+                    ],
                 ],
-                'two' => [
-                    'type' => 'text',
-                    'display' => 'Second Field',
-                    'instructions' => 'Second field instructions',
-                    'baz' => 'qux'
+                [
+                    'handle' => 'two',
+                    'field' => [
+                        'type' => 'text',
+                        'display' => 'Second Field',
+                        'instructions' => 'Second field instructions',
+                        'baz' => 'qux'
+                    ]
                 ]
             ]
         ], Facades\Fieldset::find('test')->contents());
@@ -120,7 +126,9 @@ class UpdateFieldsetTest extends TestCase
         $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
-            'fields' => ['foo' => 'bar']
+            'fields' => [
+                ['handle' => 'foo', 'field' => ['type' => 'bar']]
+            ]
         ])->save();
 
         $this

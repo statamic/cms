@@ -127,7 +127,10 @@ class BlueprintTest extends TestCase
             ->andReturn((new Fieldset)->setHandle('partial')->setContents([
                 'title' => 'Partial',
                 'fields' => [
-                    'three' => ['type' => 'text'],
+                    [
+                        'handle' => 'three',
+                        'field' => ['type' => 'text'],
+                    ],
                 ],
             ]));
 
@@ -367,7 +370,10 @@ class BlueprintTest extends TestCase
             ->andReturn((new Fieldset)->setHandle('partial')->setContents([
                 'title' => 'Partial',
                 'fields' => [
-                    'three' => ['type' => 'text'],
+                    [
+                        'handle' => 'three',
+                        'field' => ['type' => 'text'],
+                    ],
                 ],
             ]));
 

@@ -28,12 +28,16 @@ class FieldsetRepositoryTest extends TestCase
         $contents = <<<'EOT'
 title: Test Fieldset
 fields:
-  one:
-    type: text
-    display: First Field
-  two:
-    type: text
-    display: Second Field
+  -
+    handle: one
+    field:
+      type: text
+      display: First Field
+  -
+    handle: two
+    field:
+      type: text
+      display: Second Field
 EOT;
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturnTrue();
         File::shouldReceive('get')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturn($contents);
@@ -148,9 +152,11 @@ EOT;
         $expectedYaml = <<<'EOT'
 title: 'Test Fieldset'
 fields:
-  foo:
-    type: textarea
-    bar: baz
+  -
+    handle: foo
+    field:
+      type: textarea
+      bar: baz
 
 EOT;
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnFalse();
@@ -160,7 +166,10 @@ EOT;
         $fieldset = (new Fieldset)->setHandle('the_test_fieldset')->setContents([
             'title' => 'Test Fieldset',
             'fields' => [
-                'foo' => ['type' => 'textarea', 'bar' => 'baz']
+                [
+                    'handle' => 'foo',
+                    'field' => ['type' => 'textarea', 'bar' => 'baz']
+                ],
             ]
         ]);
 

@@ -30,7 +30,9 @@ class FieldsetTest extends TestCase
         $this->assertEquals([], $fieldset->contents());
 
         $contents = [
-            'fields' => ['one' => ['type' => 'text']]
+            'fields' => [
+                ['handle' => 'one', 'field' => ['type' => 'text']]
+            ],
         ];
 
         $return = $fieldset->setContents($contents);
@@ -64,11 +66,13 @@ class FieldsetTest extends TestCase
 
         $fieldset->setContents([
             'fields' => [
-                'one' => [
-                    'type' => 'text'
+                [
+                    'handle' => 'one',
+                    'field' => ['type' => 'text'],
                 ],
-                'two' => [
-                    'type' => 'textarea'
+                [
+                    'handle' => 'two',
+                    'field' => ['type' => 'textarea'],
                 ]
             ]
         ]);
@@ -88,9 +92,12 @@ class FieldsetTest extends TestCase
 
         $fieldset->setContents([
             'fields' => [
-                'one' => [
-                    'type' => 'textarea',
-                    'display' => 'First field'
+                [
+                    'handle' => 'one',
+                    'field' => [
+                        'type' => 'textarea',
+                        'display' => 'First field'
+                    ],
                 ]
             ]
         ]);
