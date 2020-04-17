@@ -3,20 +3,20 @@
    ========================================================================== */
 
 .stacks-on-stacks {
-    @apply fixed pin;
+    @apply fixed inset-0;
     z-index: 10000;
 
     > .vue-portal-target {
-        @apply absolute pin;
+        @apply absolute inset-0;
     }
 
     .stack-container {
-        @apply absolute pin;
+        @apply absolute inset-0;
         transition: left .3s ease;
     }
 
     .stack-overlay {
-        @apply bg-black absolute pin;
+        @apply bg-black absolute inset-0;
         z-index: 99;
         opacity: 0.2;
         pointer-events: none;
@@ -30,7 +30,7 @@
 
 
     .stack-hit-area {
-        @apply absolute pin cursor-pointer;
+        @apply absolute inset-0 cursor-pointer;
         z-index: 100;
     }
 

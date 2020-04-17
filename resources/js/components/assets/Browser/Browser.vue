@@ -113,8 +113,10 @@
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
+                                        <td />
+                                        <td />
 
-                                        <td class="text-right" :colspan="columns.length">
+                                        <td class="actions-column" :colspan="columns.length">
                                             <dropdown-list v-if="folderActions(folder).length">
                                                 <!-- TODO: Do we want folder edit functionality for launch? -->
                                                 <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
@@ -171,7 +173,7 @@
                                     <!-- Parent Folder -->
                                     <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-if="folder.parent_path && !restrictFolderNavigation">
                                         <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="selectFolder(folder.parent_path)">
-                                            <div class="absolute pin flex items-center justify-center">
+                                            <div class="absolute inset-0 flex items-center justify-center">
                                                 <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue"></file-icon>
                                             </div>
                                         </div>
@@ -180,7 +182,7 @@
                                     <!-- Sub-Folders -->
                                     <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="selectFolder(folder.path)">
-                                            <div class="absolute pin flex items-center justify-center">
+                                            <div class="absolute inset-0 flex items-center justify-center">
                                                 <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue"></file-icon>
                                             </div>
                                         </div>
@@ -189,7 +191,7 @@
                                     <!-- Assets -->
                                     <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="asset in assets" :key="asset.id">
                                         <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="toggleSelection(asset.id)" @dblclick="$emit('edit-asset', asset)">
-                                            <div class="absolute pin flex items-center justify-center" :class="{ 'selected': isSelected(asset.id) }">
+                                            <div class="absolute inset-0 flex items-center justify-center" :class="{ 'selected': isSelected(asset.id) }">
                                                 <asset-thumbnail :asset="asset" class="h-full w-full" />
                                             </div>
                                         </div>

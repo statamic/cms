@@ -1,10 +1,10 @@
 <div class="global-header">
     <div class="lg:w-56 pl-1 md:pl-3 h-full flex items-center">
-        <button class="nav-toggle hidden md:block ml-sm flex-no-shrink" @click="toggleNav">@svg('burger')</button>
-        <button class="nav-toggle md:hidden ml-sm flex-no-shrink" @click="toggleMobileNav" v-if="! mobileNavOpen">@svg('burger')</button>
-        <button class="nav-toggle md:hidden ml-sm flex-no-shrink" @click="toggleMobileNav" v-else v-cloak>@svg('close')</button>
+        <button class="nav-toggle hidden md:block ml-sm flex-shrink-0" @click="toggleNav">@svg('burger')</button>
+        <button class="nav-toggle md:hidden ml-sm flex-shrink-0" @click="toggleMobileNav" v-if="! mobileNavOpen">@svg('burger')</button>
+        <button class="nav-toggle md:hidden ml-sm flex-shrink-0" @click="toggleMobileNav" v-else v-cloak>@svg('close')</button>
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
-            <div v-tooltip="version" class="hidden md:block flex-no-shrink">
+            <div v-tooltip="version" class="hidden md:block flex-shrink-0">
                 @svg('statamic-wordmark')
             </div>
         </a>
@@ -15,7 +15,7 @@
         </global-search>
     </div>
 
-    <div class="lg:absolute pin-t pin-r head-link h-full md:pr-3 flex items-center">
+    <div class="lg:absolute top-0 right-0 head-link h-full md:pr-3 flex items-center">
 
         @if (Statamic\Facades\Site::hasMultiple())
             <global-site-selector>

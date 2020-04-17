@@ -32,8 +32,8 @@
 }
 
 .drag-notification {
-    @apply text-lg absolute pin text-center rounded flex items-center justify-center;
-    border: 1px dashed config('colors.grey-60');
+    @apply text-lg absolute inset-0 text-center rounded flex items-center justify-center;
+    border: 1px dashed theme('colors.grey-60');
     pointer-events: none;
     z-index: 1049;
     background: rgba(white, .9);
@@ -262,7 +262,8 @@
     @apply flex flex-1 items-center;
 
     .meta-item {
-		@apply flex items-start flex-col border-l px-2 cursor-text h-full justify-center;
+  		@apply flex items-start flex-col border-l px-2 h-full justify-center;
+      cursor: text;
     }
 
     .meta-label {
@@ -332,7 +333,7 @@
     }
 
     .editor-file-actions {
-		@apply absolute pin-b pin-l pin-r bg-grey-90 p-2 text-center h-16;
+		@apply absolute bottom-0 inset-x-0 bg-grey-90 p-2 text-center h-16;
 
         button {
             @apply mx-sm;
@@ -345,7 +346,7 @@
 }
 
 .selected .asset-thumbnail {
-    box-shadow: 0 0 0 3px config('colors.blue');
+    box-shadow: 0 0 0 3px theme('colors.blue');
 }
 
 /* Lazyloading

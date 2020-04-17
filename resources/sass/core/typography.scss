@@ -103,7 +103,7 @@ sup {
 }
 
 .list-unstyled {
-    @apply .list-reset;
+    @apply list-none p-0;
 }
 
 code {
