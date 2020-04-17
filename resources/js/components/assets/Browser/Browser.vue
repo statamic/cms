@@ -113,8 +113,10 @@
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
+                                        <td />
+                                        <td />
 
-                                        <td class="text-right" :colspan="columns.length">
+                                        <td class="actions-column" :colspan="columns.length">
                                             <dropdown-list v-if="folderActions(folder).length">
                                                 <!-- TODO: Do we want folder edit functionality for launch? -->
                                                 <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
