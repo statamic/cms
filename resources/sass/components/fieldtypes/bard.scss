@@ -23,7 +23,7 @@
     min-height: 80px;
 }
 
-// Responise Wangjangling
+// Responive Wangjangling
 @screen md {
     .bard-editor .ProseMirror { @apply p-2; }
 }
@@ -459,4 +459,11 @@
     top: 0;
     position: relative;
     z-index: 1;
+}
+
+/* Bard inside the live preview
+  ========================================================================== */
+
+  .live-preview-fields .bard-fixed-toolbar {
+    top: 0;
 }
