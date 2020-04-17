@@ -41,7 +41,9 @@ class BlueprintTest extends TestCase
         $contents = [
             'sections' => [
                 'main' => [
-                    'fields' => ['one' => ['type' => 'text']]
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']]
+                    ]
                 ]
             ]
         ];
