@@ -3,50 +3,50 @@
 return [
 
     'super' => 'Super User',
-    'super_desc' => 'Super-Admins haben die vollständige Kontrolle und den Zugang auf alles im Control Panel. Erteile diese Rolle mit Verstand.',
+    'super_desc' => 'Super-Admins haben die vollständige Kontrolle und den Zugriff auf alles im Control Panel. Erteile diese Rolle mit Verstand.',
 
     'group_cp' => 'Control Panel',
     'access_cp' => 'Zugriff aufs Control Panel',
-    'access_cp_desc' => 'Erteilt den Zugriff aufs Control Panel, garantiert aber nicht, dass darin etwas geändert werden kann.',
+    'access_cp_desc' => 'Erteilt Zugriff aufs Control Panel. Garantiert aber nicht, dass darin etwas getan werden kann.',
     'configure_fields' => 'Felder konfigurieren',
-    'configure_fields_desc' => 'Ermöglicht die Bearbeitung von Blueprints, Fieldsets und deren Felder',
+    'configure_fields_desc' => 'Ermöglicht das Bearbeiten von Blueprints, Fieldsets und den dazugehörigen Feldern.',
 
     'group_collections' => 'Sammlungen',
     'configure_collections' => 'Sammlungen konfigurieren',
-    'configure_collections_desc' => 'Erteilt Zugriffsrechte auf die Verwaltung der Sammlungen',
+    'configure_collections_desc' => 'Gewährt Zugriff auf alle Berechtigungen im Zusammenhang mit Sammlungen.',
     'view_{collection}_entries' => ':collection Einträge anzeigen',
     'edit_{collection}_entries' => 'Einträge bearbeiten',
     'create_{collection}_entries' => 'Einträge erstellen',
     'delete_{collection}_entries' => 'Einträge löschen',
     'publish_{collection}_entries' => 'Veröffentlichung verwalten',
-    'publish_{collection}_entries_desc' => 'Berechtigung vom Entwurf zur Veröffentlichung und umgekehrt zu wechseln',
+    'publish_{collection}_entries_desc' => 'Ermöglicht den Wechsel vom Entwurf zur Veröffentlichung und umgekehrt.',
     'reorder_{collection}_entries' => 'Einträge neu anordnen',
-    'reorder_{collection}_entries_desc' => 'Aktiviert die Neuanordnung per Drag & Drop',
+    'reorder_{collection}_entries_desc' => 'Ermöglicht die Neuanordnung per Drag & Drop.',
 
     'group_taxonomies' => 'Taxonomien',
     'configure_taxonomies' => 'Taxonomien konfigurieren',
-    'configure_taxonomies_desc' => 'Erteilt Zugriffrechte auf die Verwaltung der Taxonomien',
+    'configure_taxonomies_desc' => 'Gewährt Zugriff auf alle Berechtigungen im Zusammenhang mit Taxonomien.',
     'view_{taxonomy}_terms' => ':taxonomy Begriffe anzeigen',
     'edit_{taxonomy}_terms' => 'Begriffe bearbeiten',
     'create_{taxonomy}_terms' => 'Neue Begriffe erstellen',
     'delete_{taxonomy}_terms' => 'Begriffe löschen',
-    'publish_{taxonomy}_terms' => 'Veröffentlichung verwalten',
+    'publish_{taxonomy}_terms' => 'Status der Veröffentlichung verwalten',
     'reorder_{taxonomy}_terms' => 'Begriffe neu anordnen',
 
     'group_navigation' => 'Navigation',
-    'configure_navs' => 'Navigation(en) bearbeiten',
-    'configure_navs_desc' => 'Erteilt Zugriffsrechte auf die Verwaltung der Navigation(en)',
+    'configure_navs' => 'Navigation bearbeiten',
+    'configure_navs_desc' => 'Gewährt Zugriff auf alle Berechtigungen im Zusammenhang mit der Navigation.',
     'view_{nav}_nav' => ':nav Navigation anzeigen',
     'edit_{nav}_nav' => 'Navigation bearbeiten',
 
     'group_globals' => 'Gobale Inhalte',
     'configure_globals' => 'Globale Sets konfigurieren',
-    'configure_globals_desc' => 'Erteilt Zugriffsrechte auf die Verwaltung der Globalen Sets',
+    'configure_globals_desc' => 'Gewährt Zugriff auf alle Berechtigungen im Zusammenhang mit globalen Sets.',
     'edit_{global}_globals' => ':global Inhalte bearbeiten',
 
     'group_assets' => 'Dateien',
     'configure_asset_containers' => 'Container konfigurieren',
-    'configure_asset_containers_desc' => 'Erteilt Zugriffsrechte auf die Verwaltung der Container',
+    'configure_asset_containers_desc' => 'Gewährt Zugriff auf alle Berechtigungen im Zusammenhang mit Datei-Container.',
     'view_{container}_assets' => 'Dateien in «:container» anzeigen',
     'upload_{container}_assets' => 'Neue Dateien hochladen',
     'edit_{container}_assets' => 'Dateien bearbeiten',
@@ -56,7 +56,7 @@ return [
 
     'group_forms' => 'Formulare',
     'configure_forms' => 'Formulare konfigurieren',
-    'configure_forms_desc' => 'Erteilt Zugriffsrechte auf die Verwaltung der Formulare',
+    'configure_forms_desc' => 'Gewährt Zugriff auf alle Berechtigungen im Zusammenhang mit Formularen.',
     'view_{form}_form_submissions' => ':form Antworten anzeigen',
     'delete_{form}_form_submissions' => ':form Antworten löschen',
 
@@ -75,7 +75,7 @@ return [
 
     'group_utilities' => 'Hilfsmittel',
     'access_utility' => ':title',
-    'access_utility_desc' => 'Zugriffsrechte auf das Hilfsmittel :title',
+    'access_utility_desc' => 'Gewährt Zugriff auf das Hilfsmittel «:title»',
 
     'group_misc' => 'Sonstiges',
 
