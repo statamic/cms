@@ -55,23 +55,25 @@ class UpdateFieldsetTest extends TestCase
                 'title' => 'Updated title',
                 'fields' => [
                     [
-                        '_id' => 'id-one',
-                        'handle' => 'one',
-                        'type' => 'textarea',
-                        'display' => 'First Field',
-                        'instructions' => 'First field instructions',
-                        'foo' => 'bar',
-                        'width' => 50,
+                        '_id' => 'id-s1-f1',
+                        'handle' => 'one-one',
+                        'type' => 'reference',
+                        'field_reference' => 'somefieldset.somefield',
+                        'config' => [
+                            'foo' => 'bar',
+                            'baz' => 'qux', // not in config_overrides so it shouldn't get saved
+                        ],
+                        'config_overrides' => ['foo']
                     ],
                     [
-                        '_id' => 'id-two',
-                        'handle' => 'two',
-                        'type' => 'text',
-                        'display' => 'Second Field',
-                        'instructions' => 'Second field instructions',
-                        'baz' => 'qux',
-                        'width' => 100,
-                    ],
+                        '_id' => 'id-s1-f1',
+                        'handle' => 'one-two',
+                        'type' => 'inline',
+                        'config' => [
+                            'type' => 'text',
+                            'foo' => 'bar',
+                        ]
+                    ]
                 ]
             ])
             ->assertStatus(204);
@@ -80,22 +82,17 @@ class UpdateFieldsetTest extends TestCase
             'title' => 'Updated title',
             'fields' => [
                 [
-                    'handle' => 'one',
-                    'field' => [
-                        'type' => 'textarea',
-                        'display' => 'First Field',
-                        'instructions' => 'First field instructions',
+                    'handle' => 'one-one',
+                    'field' => 'somefieldset.somefield',
+                    'config' => [
                         'foo' => 'bar',
-                        'width' => 50,
-                    ],
+                    ]
                 ],
                 [
-                    'handle' => 'two',
+                    'handle' => 'one-two',
                     'field' => [
                         'type' => 'text',
-                        'display' => 'Second Field',
-                        'instructions' => 'Second field instructions',
-                        'baz' => 'qux'
+                        'foo' => 'bar',
                     ]
                 ]
             ]

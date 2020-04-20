@@ -10,7 +10,7 @@
             </div>
         </header>
 
-        <div class="publish-form card p-0">
+        <div class="publish-form card p-0 mb-5">
 
             <div class="form-group">
                 <label class="block">{{ __('Title') }}</label>
@@ -23,22 +23,31 @@
 
         </div>
 
-        <fieldset-fields
-            :initial-fields="fieldset.fields"
-            @updated="fieldsUpdated"
-        />
+        <div class="card">
+            <fields
+                :fields="fieldset.fields"
+                :editing-field="editingField"
+                @field-created="fieldCreated"
+                @field-updated="fieldUpdated"
+                @field-linked="fieldLinked"
+                @field-deleted="deleteField"
+                @field-editing="editingField = $event"
+                @editor-closed="editingField = null"
+            />
+        </div>
 
     </div>
 
 </template>
 
 <script>
-import FieldsetFields from './Fields.vue';
+import Fields from '../blueprints/Fields.vue';
+import {Sortable, Plugins} from '@shopify/draggable';
 
 export default {
 
     components: {
-        FieldsetFields
+        Fields
     },
 
     props: ['action', 'initialFieldset', 'breadcrumbUrl'],
@@ -47,9 +56,27 @@ export default {
         return {
             method: 'patch',
             initialTitle: this.initialFieldset.title,
-            fieldset: JSON.parse(JSON.stringify(this.initialFieldset)),
-            errors: {}
+            fieldset: clone(this.initialFieldset),
+            errors: {},
+            editingField: null,
         }
+    },
+
+    computed: {
+
+        fields: {
+            get() {
+                return this.fieldset.fields;
+            },
+            set(fields) {
+                this.fieldset.fields = fields;
+            }
+        }
+
+    },
+
+    mounted() {
+        this.makeSortable();
     },
 
     methods: {
@@ -66,9 +93,37 @@ export default {
                 })
         },
 
-        fieldsUpdated(fields) {
-            this.fieldset.fields = fields;
+        fieldCreated(field) {
+            this.fields.push(field);
         },
+
+        fieldUpdated(i, field) {
+            this.fields.splice(i, 1, field);
+        },
+
+        deleteField(i) {
+            this.fields.splice(i, 1);
+        },
+
+        fieldLinked(field) {
+            this.fields.push(field);
+            this.$toast.success(__('Field added'));
+
+            if (field.type === 'reference') {
+                this.$nextTick(() => this.editingField = field._id);
+            }
+        },
+
+        makeSortable() {
+            new Sortable(this.$el.querySelector('.blueprint-section-draggable-zone'), {
+                draggable: '.blueprint-section-field',
+                handle: '.blueprint-drag-handle',
+                mirror: { constrainDimensions: true },
+                plugins: [Plugins.SwapAnimation]
+            }).on('sortable:stop', e => {
+                this.fieldset.fields.splice(e.newIndex, 0, this.fieldset.fields.splice(e.oldIndex, 1)[0]);
+            });
+        }
 
     }
 
