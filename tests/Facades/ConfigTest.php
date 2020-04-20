@@ -135,10 +135,10 @@ class ConfigTest extends TestCase
     {
         $this->fakeSiteConfig();
 
-        $this->assertEquals('http://test.com/', Config::getSiteUrl());
-        $this->assertEquals('http://test.com/', Config::getSiteUrl('en'));
-        $this->assertEquals('http://fr.test.com/', Config::getSiteUrl('fr'));
-        $this->assertEquals('http://test.com/de/', Config::getSiteUrl('de'));
+        $this->assertEquals('http://test.com', Config::getSiteUrl());
+        $this->assertEquals('http://test.com', Config::getSiteUrl('en'));
+        $this->assertEquals('http://fr.test.com', Config::getSiteUrl('fr'));
+        $this->assertEquals('http://test.com/de', Config::getSiteUrl('de'));
     }
 
     /** @test */
