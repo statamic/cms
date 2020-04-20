@@ -27,6 +27,7 @@
             <fields
                 :fields="fieldset.fields"
                 :editing-field="editingField"
+                :exclude-fieldset="fieldset.handle"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-linked="fieldLinked"

@@ -24,7 +24,9 @@
 
         <div class="blueprint-section-field-actions flex mt-1 -mx-sm">
             <div class="px-sm">
-                <link-fields @linked="$emit('field-linked', $event)" />
+                <link-fields
+                    :exclude-fieldset="excludeFieldset"
+                    @linked="$emit('field-linked', $event)" />
             </div>
             <div class="px-sm">
                 <button class="btn w-full flex justify-center items-center" @click="isSelectingNewFieldtype = true;">
@@ -84,6 +86,7 @@ export default {
         editingField: {},
         isSectionExpanded: Boolean,
         suggestableConditionFields: Array,
+        excludeFieldset: String,
     },
 
     data() {

@@ -43,6 +43,7 @@ class FieldsetController extends CpController
 
         $vue = [
             'title' => $fieldset->title(),
+            'handle' => $fieldset->handle(),
             'fields' => collect(Arr::get($fieldset->contents(), 'fields'))->map(function ($field, $i) {
                 return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
             })->all()
