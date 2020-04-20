@@ -23,7 +23,11 @@
 
         </div>
 
-        <div class="card">
+        <div class="content mt-5 mb-2">
+            <h2 v-text="__('Fields')" />
+        </div>
+
+        <div class="card" :class="{ 'pt-1': !fields.length }">
             <fields
                 :fields="fieldset.fields"
                 :editing-field="editingField"
