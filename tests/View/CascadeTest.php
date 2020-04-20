@@ -138,18 +138,18 @@ class CascadeTest extends TestCase
         $cascade = $this->cascade()->withSite(Site::get('en'));
 
         tap($cascade->hydrate()->toArray(), function ($cascade) {
-            $this->assertEquals('http://test.com/', $cascade['homepage']);
+            $this->assertEquals('http://test.com', $cascade['homepage']);
 
             $this->assertEquals('en', $cascade['site']);
             $this->assertEquals('English', $cascade['site_name']);
             $this->assertEquals('en_US', $cascade['site_locale']);
             $this->assertEquals('en', $cascade['site_short_locale']);
-            $this->assertEquals('http://test.com/', $cascade['site_url']);
+            $this->assertEquals('http://test.com', $cascade['site_url']);
 
             $this->assertEquals('en', $cascade['locale']);
             $this->assertEquals('English', $cascade['locale_name']);
             $this->assertEquals('en_US', $cascade['locale_full']);
-            $this->assertEquals('http://test.com/', $cascade['locale_url']);
+            $this->assertEquals('http://test.com', $cascade['locale_url']);
         });
     }
 
@@ -159,18 +159,18 @@ class CascadeTest extends TestCase
         $cascade = $this->cascade()->withSite(Site::get('fr'));
 
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
-            $this->assertEquals('http://fr.test.com/', $cascade['homepage']);
+            $this->assertEquals('http://fr.test.com', $cascade['homepage']);
 
             $this->assertEquals('fr', $cascade['site']);
             $this->assertEquals('French', $cascade['site_name']);
             $this->assertEquals('fr_FR', $cascade['site_locale']);
             $this->assertEquals('fr', $cascade['site_short_locale']);
-            $this->assertEquals('http://fr.test.com/', $cascade['site_url']);
+            $this->assertEquals('http://fr.test.com', $cascade['site_url']);
 
             $this->assertEquals('fr', $cascade['locale']);
             $this->assertEquals('French', $cascade['locale_name']);
             $this->assertEquals('fr_FR', $cascade['locale_full']);
-            $this->assertEquals('http://fr.test.com/', $cascade['locale_url']);
+            $this->assertEquals('http://fr.test.com', $cascade['locale_url']);
         });
     }
 
@@ -180,18 +180,18 @@ class CascadeTest extends TestCase
         $cascade = $this->cascade()->withSite(Site::get('de'));
 
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
-            $this->assertEquals('http://test.com/de/', $cascade['homepage']);
+            $this->assertEquals('http://test.com/de', $cascade['homepage']);
 
             $this->assertEquals('de', $cascade['site']);
             $this->assertEquals('German', $cascade['site_name']);
             $this->assertEquals('de_DE', $cascade['site_locale']);
             $this->assertEquals('de', $cascade['site_short_locale']);
-            $this->assertEquals('http://test.com/de/', $cascade['site_url']);
+            $this->assertEquals('http://test.com/de', $cascade['site_url']);
 
             $this->assertEquals('de', $cascade['locale']);
             $this->assertEquals('German', $cascade['locale_name']);
             $this->assertEquals('de_DE', $cascade['locale_full']);
-            $this->assertEquals('http://test.com/de/', $cascade['locale_url']);
+            $this->assertEquals('http://test.com/de', $cascade['locale_url']);
         });
     }
 
