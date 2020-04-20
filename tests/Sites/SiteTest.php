@@ -64,6 +64,30 @@ class SiteTest extends TestCase
     }
 
     /** @test */
+    function gets_url_given_a_relative_url()
+    {
+        $site = new Site('en', ['url' => '/']);
+
+        $this->assertEquals('/', $site->url());
+    }
+
+    /** @test */
+    function gets_url_given_a_relative_url_and_subdirectory()
+    {
+        $site = new Site('en', ['url' => '/sub']);
+
+        $this->assertEquals('/sub', $site->url());
+    }
+
+    /** @test */
+    function gets_url_given_a_relative_url_and_subdirectory_with_trailing_slash()
+    {
+        $site = new Site('en', ['url' => '/sub/']);
+
+        $this->assertEquals('/sub', $site->url());
+    }
+
+    /** @test */
     function gets_absolute_url()
     {
         $this->assertEquals(
