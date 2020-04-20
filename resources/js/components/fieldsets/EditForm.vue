@@ -32,6 +32,7 @@
                 :fields="fieldset.fields"
                 :editing-field="editingField"
                 :exclude-fieldset="fieldset.handle"
+                :is-section-expanded="true"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-linked="fieldLinked"
