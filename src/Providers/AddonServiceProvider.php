@@ -50,7 +50,8 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootScripts()
                 ->bootPublishables()
                 ->bootRoutes()
-                ->bootMiddleware();
+                ->bootMiddleware()
+                ->bootViews();
         });
     }
 
@@ -268,6 +269,18 @@ abstract class AddonServiceProvider extends ServiceProvider
                 $this->app['router']->pushMiddlewareToGroup($group, $class);
             }
         }
+
+        return $this;
+    }
+
+    protected function bootViews()
+    {
+        $this->loadViewsFrom(
+            $this->getAddon()->directory() . 'resources/views',
+            $this->getAddon()->packageName()
+        );
+
+        return $this;
     }
 
     public function registerScript(string $path)
