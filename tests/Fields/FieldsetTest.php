@@ -86,6 +86,30 @@ class FieldsetTest extends TestCase
     }
 
     /** @test */
+    function it_gets_fields_using_legacy_syntax()
+    {
+        $fieldset = new Fieldset;
+
+        $fieldset->setContents([
+            'fields' => [
+                'one' => [
+                    'type' => 'text',
+                ],
+                'two' => [
+                    'type' => 'textarea',
+                ]
+            ]
+        ]);
+
+        $fields = $fieldset->fields();
+
+        $this->assertInstanceOf(Fields::class, $fields);
+        $this->assertEveryItemIsInstanceOf(Field::class, $fields = $fields->all());
+        $this->assertEquals(['one', 'two'], $fields->map->handle()->values()->all());
+        $this->assertEquals(['text', 'textarea'], $fields->map->type()->values()->all());
+    }
+
+    /** @test */
     function gets_a_single_field()
     {
         $fieldset = new Fieldset;

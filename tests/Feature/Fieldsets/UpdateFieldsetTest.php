@@ -145,7 +145,9 @@ class UpdateFieldsetTest extends TestCase
         $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
-            'fields' => ['foo' => 'bar']
+            'fields' => [
+                ['handle' => 'foo', 'field' => 'bar']
+            ]
         ])->save();
 
         $this
