@@ -84,7 +84,7 @@ class NestedFieldsTest extends TestCase
     function it_preprocesses_from_blueprint_format_to_vue()
     {
         $testFieldset = Fieldset::make('test')->setContents(['fields' => [
-            'bar' => ['type' => 'text']
+            ['handle' => 'bar', 'field' => ['type' => 'text']]
         ]]);
         Fieldset::shouldReceive('all')->andReturn(collect([$testFieldset]));
 

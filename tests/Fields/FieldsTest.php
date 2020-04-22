@@ -41,8 +41,8 @@ class FieldsTest extends TestCase
             ->with('fieldset_three')
             ->andReturnUsing(function () {
                 return (new Fieldset)->setHandle('fieldset_three')->setContents(['fields' => [
-                    'foo' => ['type' => 'textarea'],
-                    'bar' => ['type' => 'text'],
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'bar', 'field' => ['type' => 'text']],
                 ]]);
             });
 
@@ -156,12 +156,14 @@ class FieldsTest extends TestCase
     {
         $fieldset = (new Fieldset)->setHandle('partial')->setContents([
             'fields' => [
-                'one' => [
-                    'type' => 'text'
+                [
+                    'handle' => 'one',
+                    'field' => ['type' => 'text'],
                 ],
-                'two' => [
-                    'type' => 'textarea'
-                ]
+                [
+                    'handle' => 'two',
+                    'field' => ['type' => 'textarea'],
+                ],
             ]
         ]);
 
@@ -182,12 +184,14 @@ class FieldsTest extends TestCase
     {
         $fieldset = (new Fieldset)->setHandle('partial')->setContents([
             'fields' => [
-                'one' => [
-                    'type' => 'text'
+                [
+                    'handle' => 'one',
+                    'field' => ['type' => 'text'],
                 ],
-                'two' => [
-                    'type' => 'textarea'
-                ]
+                [
+                    'handle' => 'two',
+                    'field' => ['type' => 'textarea']
+                ],
             ]
         ]);
 
