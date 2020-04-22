@@ -29,6 +29,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $publishables = [];
     protected $routes = [];
     protected $middlewareGroups = [];
+    protected $viewNamespace;
 
     public function boot()
     {
@@ -277,7 +278,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         $this->loadViewsFrom(
             $this->getAddon()->directory() . 'resources/views',
-            $this->getAddon()->packageName()
+            $this->viewNamespace ?? $this->getAddon()->packageName()
         );
 
         return $this;
