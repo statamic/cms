@@ -13,6 +13,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Globals\Variables as Contract;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Statamic;
 
 class Variables implements Contract, Localization, Augmentable
 {
@@ -143,5 +144,13 @@ class Variables implements Contract, Localization, Augmentable
     protected function getOriginByString($origin)
     {
         return $this->globalSet()->in($origin);
+    }
+
+    protected function augmentedArrayData()
+    {
+        return $this->values()->merge([
+            'handle' => $this->handle(),
+            'api_url' => Statamic::apiRoute('globals.show', [$this->handle()]),
+        ])->all();
     }
 }
