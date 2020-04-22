@@ -17,6 +17,10 @@ class GlobalSetResource extends JsonResource
     {
         return $this->resource
             ->toAugmentedCollection()
+            ->merge([
+                'handle' => $this->resource->handle(),
+                'api_url' => Statamic::apiRoute('globals.show', [$this->resource->handle()]),
+            ])
             ->withShallowNesting()
             ->toArray();
     }

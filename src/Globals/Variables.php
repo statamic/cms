@@ -145,12 +145,4 @@ class Variables implements Contract, Localization, Augmentable
     {
         return $this->globalSet()->in($origin);
     }
-
-    protected function augmentedArrayData()
-    {
-        return $this->values()->merge([
-            'handle' => $this->handle(),
-            'api_url' => Statamic::apiRoute('globals.show', [$this->handle()]),
-        ])->all();
-    }
 }
