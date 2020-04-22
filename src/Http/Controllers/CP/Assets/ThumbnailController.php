@@ -95,12 +95,14 @@ class ThumbnailController extends Controller
 
         Cache::put($this->mutex(), true, now()->addMinutes(120));
 
-        $path = $this->generator->generateByAsset(
-            $this->asset,
-            $this->size ? ['p' => $this->getPreset()] : []
-        );
-
-        Cache::forget($this->mutex());
+        try {
+            $path = $this->generator->generateByAsset(
+                $this->asset,
+                $this->size ? ['p' => $this->getPreset()] : []
+            );
+        } finally {
+            Cache::forget($this->mutex());
+        }
 
         return $path;
     }
