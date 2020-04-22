@@ -14,8 +14,13 @@ class TermResource extends JsonResource
      */
     public function toArray($request)
     {
+        $fields = $this->resource->selectedQueryColumns() ?? $this->resource->augmented()->keys();
+
+        // Don't want the 'entries' variable in API requests.
+        $fields = array_diff($fields, ['entries']);
+
         return $this->resource
-            ->toAugmentedCollection()
+            ->toAugmentedCollection($fields)
             ->withShallowNesting()
             ->toArray();
     }
