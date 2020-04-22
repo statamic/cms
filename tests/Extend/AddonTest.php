@@ -44,6 +44,24 @@ class AddonTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_vendor_name()
+    {
+        $this->assertEquals(
+            'vendor-name',
+            Addon::make('vendor-name/package-name')->vendorName()
+        );
+    }
+
+    /** @test */
+    public function it_gets_the_package_name()
+    {
+        $this->assertEquals(
+            'package-name',
+            Addon::make('vendor-name/package-name')->packageName()
+        );
+    }
+
+    /** @test */
     function it_creates_an_instance_from_a_package()
     {
         $addon = $this->makeFromPackage([]);

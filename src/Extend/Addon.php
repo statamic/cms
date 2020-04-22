@@ -173,12 +173,35 @@ final class Addon
 
     /**
      * The composer package string
+     * eg. statamic/bloodhound
      *
      * @return string
      */
     public function package()
     {
         return $this->id();
+    }
+
+    /**
+     * The composer package name string
+     * eg. in statamic/blodhound, it's bloodhound
+     *
+     * @return string
+     */
+    public function packageName()
+    {
+        return explode('/', $this->package())[1];
+    }
+
+    /**
+     * The composer vendor name string
+     * eg. in statamic/blodhound, it's statamic
+     *
+     * @return string
+     */
+    public function vendorName()
+    {
+        return explode('/', $this->package())[0];
     }
 
     /**
