@@ -272,6 +272,10 @@ trait PermissibleContractTests
         $groupC = (new UserGroup)->handle('c');
         $user = $this->createPermissible();
 
+        $this->assertFalse($user->isInGroup($groupA));
+        $this->assertFalse($user->isInGroup($groupB));
+        $this->assertFalse($user->isInGroup($groupC));
+
         UserGroupAPI::shouldReceive('find')->with('a')->andReturn($groupA);
         UserGroupAPI::shouldReceive('find')->with('b')->andReturn($groupB);
         UserGroupAPI::shouldReceive('find')->with('c')->andReturn($groupC);

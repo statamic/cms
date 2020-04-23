@@ -218,7 +218,7 @@ class User extends BaseUser
 
     public function isInGroup($group)
     {
-        return $this->groups->has(
+        return $this->groups()->has(
             is_string($group) ? $group : $group->handle()
         );
     }
