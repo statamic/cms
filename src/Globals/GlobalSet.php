@@ -121,6 +121,11 @@ class GlobalSet implements Contract
         return $this->in(Site::selected()->handle());
     }
 
+    public function inCurrentSite()
+    {
+        return $this->in(Site::current()->handle());
+    }
+
     public function existsIn($locale)
     {
         return $this->in($locale) !== null;
