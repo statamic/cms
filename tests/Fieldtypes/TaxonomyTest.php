@@ -76,6 +76,7 @@ class TaxonomyTest extends TestCase
             [
                 'id' => 'tags::one',
                 'slug' => 'one',
+                'title' => 'one',
                 'url' => '/blog/tags/one',
                 'permalink' => 'http://localhost/blog/tags/one',
                 'api_url' => 'http://localhost/api/taxonomies/tags/terms/one',
@@ -83,6 +84,7 @@ class TaxonomyTest extends TestCase
             [
                 'id' => 'tags::two',
                 'slug' => 'two',
+                'title' => 'two',
                 'url' => '/blog/tags/two',
                 'permalink' => 'http://localhost/blog/tags/two',
                 'api_url' => 'http://localhost/api/taxonomies/tags/terms/two',
@@ -97,6 +99,7 @@ class TaxonomyTest extends TestCase
 
         $this->assertEquals([
             'id' => 'tags::one',
+            'title' => 'one',
             'slug' => 'one',
             'url' => '/blog/tags/one',
             'permalink' => 'http://localhost/blog/tags/one',
