@@ -152,7 +152,7 @@ class User extends BaseUser
 
     public function hasRole($role)
     {
-        return $this->roles->has(
+        return $this->roles()->has(
             is_string($role) ? $role : $role->handle()
         );
     }

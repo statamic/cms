@@ -130,6 +130,12 @@ trait PermissibleContractTests
         RoleAPI::shouldReceive('find')->with('a')->andReturn($roleA);
 
         $user = $this->createPermissible();
+
+        $this->assertFalse($user->hasRole($roleA));
+        $this->assertFalse($user->hasRole('a'));
+        $this->assertFalse($user->hasRole($roleB));
+        $this->assertFalse($user->hasRole('b'));
+
         $user->assignRole($roleA);
         $user->save();
 
