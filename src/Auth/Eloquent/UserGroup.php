@@ -9,9 +9,12 @@ class UserGroup extends FileUserGroup
 {
     public function users($users = null)
     {
-        return User::query()
-            ->whereIn('id', $this->getUserIds())
-            ->get();
+        return $this->queryUsers()->get();
+    }
+
+    public function queryUsers()
+    {
+        return User::query()->whereIn('id', $this->getUserIds());
     }
 
     protected function getUserIds()
