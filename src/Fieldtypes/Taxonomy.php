@@ -30,6 +30,7 @@ class Taxonomy extends Relationship
         $terms = collect($terms->map(function ($term) {
             return [
                 'id' => $term->id(),
+                'title' => $term->title(),
                 'slug' => $term->slug(),
                 'url' => $term->url(),
                 'permalink' => $term->absoluteUrl(),
