@@ -216,7 +216,7 @@ class CoreNav
             ->children(function () {
                 return UserGroupAPI::all()->map(function ($userGroup) {
                     return Nav::item($userGroup->title())
-                              ->url($userGroup->editUrl());
+                              ->url($userGroup->showUrl());
                 });
             });
 

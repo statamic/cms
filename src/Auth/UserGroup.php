@@ -143,6 +143,11 @@ abstract class UserGroup implements UserGroupContract
         return true;
     }
 
+    public function showUrl()
+    {
+        return cp_route('user-groups.show', $this->handle());
+    }
+
     public function editUrl()
     {
         return cp_route('user-groups.edit', $this->handle());
