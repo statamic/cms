@@ -69,9 +69,9 @@ class UserGroupRepository implements RepositoryContract
             $groups->forget($group->originalHandle());
         }
 
-        $this->updateUsers($group);
-
         $this->write($groups);
+
+        $this->groups = null;
     }
 
     public function delete(UserGroup $group)
@@ -81,6 +81,8 @@ class UserGroupRepository implements RepositoryContract
         $groups->forget($group->handle());
 
         $this->write($groups);
+
+        $this->groups = null;
     }
 
     protected function raw()
@@ -95,29 +97,5 @@ class UserGroupRepository implements RepositoryContract
     protected function write($groups)
     {
         File::put($this->path, YAML::dump($groups->all()));
-    }
-
-    protected function updateUsers($group)
-    {
-        // A bucket of the users that we can pick from, since we'll be diffing with IDs in the next steps.
-        $users = $group->users()->merge($group->originalUsers());
-
-        $originals = $group->originalUsers() ?? collect();
-
-        // Update each of the users that have just been added to this group.
-        $group->users()->keys()
-            ->diff($originals->keys())
-            ->each(function ($id) use ($users, $group) {
-                $users->get($id)->addToGroup($group)->save();
-            });
-
-        // Update each of the users that have just been removed from this group.
-        $originals->keys()
-            ->diff($group->users()->keys())
-            ->each(function ($id) use ($users, $group) {
-                $users->get($id)->removeFromGroup($group)->save();
-            });
-
-        $group->resetOriginalUsers();
     }
 }

@@ -51,29 +51,4 @@ class UsersStore extends BasicStore
     {
         return $file->getExtension() === 'yaml';
     }
-
-    // protected function queueGroups($user)
-    // {
-    //     if (! $groups = $user->get('groups')) {
-    //         return;
-    //     }
-
-    //     foreach ($groups as $group) {
-    //         $this->groups[$group][] = $user;
-    //     }
-    // }
-
-    // public function loadingComplete()
-    // {
-    //     foreach ($this->groups as $group => $users) {
-    //         if ($group = UserGroup::find($group)) {
-    //             $group->users($users)->resetOriginalUsers();
-    //         }
-    //     }
-    // }
-
-    // public function delete($user)
-    // {
-    //     File::delete($user->path());
-    // }
 }
