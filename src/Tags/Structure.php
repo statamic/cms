@@ -10,8 +10,12 @@ class Structure extends Tags
 {
     public function wildcard($tag)
     {
+        $handle = $this->context->get($tag, $tag);
+
         // Allow {{ structure:collection:pages }} rather than needing to use the double colon.
-        $handle = str_replace(':', '::', $tag);
+        if (is_string($handle)) {
+            $handle = str_replace(':', '::', $tag);
+        }
 
         return $this->structure($handle);
     }
