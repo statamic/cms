@@ -5,6 +5,7 @@ namespace Statamic\Tags;
 use Statamic\Facades\URL;
 use Statamic\Facades\Site;
 use Statamic\Structures\TreeBuilder;
+use Statamic\Contracts\Structures\Structure as StructureContract;
 
 class Structure extends Tags
 {
@@ -27,6 +28,10 @@ class Structure extends Tags
 
     protected function structure($handle)
     {
+        if ($handle instanceof StructureContract) {
+            $handle = $handle->handle();
+        }
+
         $tree = (new TreeBuilder)->build([
             'structure' => $handle,
             'include_home' => $this->get('include_home'),
