@@ -124,7 +124,7 @@ test('it can use includes or contains operators in conditions', () => {
     expect(showFieldIf({age: 'contains fox'})).toBe(false);
 
     expect(showFieldIf({empty_string: 'contains fox'})).toBe(false);
-    expect(showFieldIf({null_values: 'contains fox'})).toBe(false);
+    expect(showFieldIf({null_value: 'contains fox'})).toBe(false);
 });
 
 test('it can use includes_any or contains_any operators in conditions', () => {
@@ -155,7 +155,7 @@ test('it can use includes_any or contains_any operators in conditions', () => {
     expect(showFieldIf({age: 'contains_any fox, 14'})).toBe(false);
 
     expect(showFieldIf({empty_string: 'contains_any fox, 13'})).toBe(false);
-    expect(showFieldIf({null_values: 'contains_any fox, 13'})).toBe(false);
+    expect(showFieldIf({null_value: 'contains_any fox, 13'})).toBe(false);
 });
 
 test('it handles null, true, and false in condition as literal', () => {
