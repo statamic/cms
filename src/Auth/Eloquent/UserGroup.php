@@ -20,4 +20,10 @@ class UserGroup extends FileUserGroup
             ->where('group_id', $this->id())
             ->pluck('user_id');
     }
+
+    public function queryUsers()
+    {
+        return User::query()
+            ->whereIn('id', $this->getUserIds() ?: [0]);
+    }
 }
