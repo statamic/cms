@@ -12,6 +12,7 @@ use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Gate;
 use Statamic\Exceptions\NotBootedException;
+use Facades\Statamic\Console\Processes\Composer;
 
 abstract class AddonServiceProvider extends ServiceProvider
 {
@@ -288,12 +289,13 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         $name = $this->getAddon()->id();
         $filename = pathinfo($path, PATHINFO_FILENAME);
+        $version =  Composer::installedVersion($name);
 
         $this->publishes([
             $path => public_path("vendor/{$name}/js/{$filename}.js"),
         ]);
 
-        Statamic::script($name, $filename);
+        Statamic::script($name, $filename, "v={$version}");
     }
 
     public function registerExternalScript(string $url)
@@ -305,12 +307,13 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         $name = $this->getAddon()->id();
         $filename = pathinfo($path, PATHINFO_FILENAME);
+        $version =  Composer::installedVersion($name);
 
         $this->publishes([
             $path => public_path("vendor/{$name}/css/{$filename}.css"),
         ]);
 
-        Statamic::style($name, $filename);
+        Statamic::style($name, $filename, "v={$version}");
     }
 
     protected function schedule($schedule)

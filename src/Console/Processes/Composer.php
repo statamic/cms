@@ -2,6 +2,7 @@
 
 namespace Statamic\Console\Processes;
 
+use Statamic\Facades\Blink;
 use Statamic\Jobs\RunComposer;
 use Illuminate\Support\Facades\Cache;
 
@@ -50,11 +51,12 @@ class Composer extends Process
      */
     public function installedVersion(string $package)
     {
-        $version = collect(json_decode(file_get_contents($this->basePath . 'composer.lock'))->packages)
-            ->keyBy('name')
-            ->get($package)
-            ->version;
-
+        $packages = Blink::once('composer-packages', function() {
+            return collect(json_decode(file_get_contents($this->basePath . 'composer.lock'))->packages)
+                ->keyBy('name');
+        });
+        $version = $packages->get($package)->version;
+        
         return $this->normalizeVersion($version);
     }
 

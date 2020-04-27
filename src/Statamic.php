@@ -37,9 +37,13 @@ class Statamic
         return static::$externalScripts;
     }
 
-    public static function script($name, $path)
+    public static function script($name, $path, $query = '')
     {
-        static::$scripts[$name] = str_finish($path, '.js');
+        $url = str_finish($path, '.js');
+        if ($query) {
+            $url .= '?' . $query;
+        }
+        static::$scripts[$name] = $url;
 
         return new static;
     }
@@ -56,9 +60,13 @@ class Statamic
         return static::$styles;
     }
 
-    public static function style($name, $path)
+    public static function style($name, $path, $query = '')
     {
-        static::$styles[$name] = str_finish($path, '.css');
+        $url = str_finish($path, '.css');
+        if ($query) {
+            $url .= '?' . $query;
+        }
+        static::$styles[$name] = $url;
 
         return new static;
     }
