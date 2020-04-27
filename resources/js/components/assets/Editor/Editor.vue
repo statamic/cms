@@ -69,7 +69,7 @@
                     </div>
 
                     <div class="h-full" v-if="asset.isPreviewable && canUseGoogleDocsViewer">
-                        <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.url + '&embedded=true'"></iframe>
+                        <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
                     </div>
 
                     <div class="editor-file-actions">

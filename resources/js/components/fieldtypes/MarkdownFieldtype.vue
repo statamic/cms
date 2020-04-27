@@ -458,7 +458,7 @@ export default {
             this.$axios.get(cp_url('assets-fieldtype'), { params: { assets } }).then(response => {
                 _(response.data).each((asset) => {
                     var alt = asset.values.alt || '';
-                    var url = encodeURI(relative_url(asset.url));
+                    var url = encodeURI(asset.url);
                     if (asset.isImage) {
                         this[method+'Image'](url, alt);
                     } else {
