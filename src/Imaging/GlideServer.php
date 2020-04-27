@@ -35,7 +35,7 @@ class GlideServer
     {
         return Config::get('statamic.assets.image_manipulation.cache')
             ? Config::get('statamic.assets.image_manipulation.cache_path')
-            : storage_path('glide');
+            : storage_path('statamic/glide');
     }
 
     /**
