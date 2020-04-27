@@ -4,6 +4,7 @@ namespace Statamic\Tags\Collection;
 
 use Closure;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection as IlluminateCollection;
 use InvalidArgumentException;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
@@ -182,11 +183,14 @@ class Entries
             $not = explode('|', $not);
         }
 
-        $from = collect(Arr::wrap($from))->map(function ($collection) {
+        $from = $from instanceof IlluminateCollection ? $from : collect(Arr::wrap($from));
+        $not = $not instanceof IlluminateCollection ? $not : collect(Arr::wrap($not));
+
+        $from = $from->map(function ($collection) {
             return (string) $collection;
         });
 
-        $not = collect(Arr::wrap($not))->map(function ($collection) {
+        $not = $not->map(function ($collection) {
             return (string) $collection;
         })->filter();
 
