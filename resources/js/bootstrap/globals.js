@@ -15,8 +15,12 @@ global.resource_url = function(url) {
     return tidy_url(url);
 };
 
-global.tidy_url = function(path) {
-    return path.replace(/([^:])(\/\/+)/g, '$1/')
+global.tidy_url = function(url) {
+    return url.replace(/([^:])(\/\/+)/g, '$1/')
+}
+
+global.relative_url = function(url) {
+    return url.replace(/^(?:\/\/|[^/]+)*\//, '/');
 }
 
 global.file_icon = function(extension) {
