@@ -147,7 +147,7 @@ class LoginController extends CpController
     private function hasError()
     {
         return function ($field) {
-            if (! $error = session('errors')->first($field)) {
+            if (! $error = optional(session('errors'))->first($field)) {
                 return false;
             }
 
