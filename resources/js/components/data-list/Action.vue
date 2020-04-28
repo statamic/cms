@@ -11,6 +11,8 @@
             @confirm="confirm"
             @cancel="cancel"
         >
+            <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-2': action.fields.length }" />
+
             <publish-container
                 v-if="action.fields.length"
                 name="confirm-action"
@@ -21,8 +23,6 @@
             >
                 <publish-fields :fields="action.fields" @updated="valueUpdated" />
             </publish-container>
-
-            <div v-else v-text="confirmationText" />
         </confirmation-modal>
     </span>
 
@@ -61,6 +61,8 @@ export default {
     computed: {
 
         confirmationText() {
+            if (! this.action.confirmationText) return;
+
             return __n(this.action.confirmationText, this.selections);
         },
 
