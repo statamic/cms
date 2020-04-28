@@ -2,9 +2,11 @@
 
 namespace Tests\Feature\Taxonomies;
 
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
+use Statamic\Fields\BlueprintRepository;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -13,6 +15,60 @@ class UpdateTaxonomyTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
+
+    /** @test */
+    function it_denies_access_if_you_dont_have_permission()
+    {
+        $taxonomy = tap(Taxonomy::make('test'))->save();
+
+        $this
+            ->from('/original')
+            ->actingAs($this->userWithoutPermission())
+            ->update($taxonomy)
+            ->assertRedirect('/original')
+            ->assertSessionHas('error');
+    }
+
+    /** @test */
+    function it_updates_a_taxonomy()
+    {
+        $taxonomy = tap(
+            Taxonomy::make('test')
+                ->title('Original title')
+        )->save();
+        $this->assertCount(1, Taxonomy::all());
+        $this->assertEquals('Original title', $taxonomy->title());
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, [
+                'title' => 'Updated title',
+            ])
+            ->assertOk();
+
+        $this->assertCount(1, Taxonomy::all());
+        $this->assertEquals('Updated title', $taxonomy->title());
+    }
+
+    /** @test */
+    function it_updates_blueprints()
+    {
+        $mock = $this->partialMock(BlueprintRepository::class);
+        $mock->shouldReceive('find')->with('one')->andReturn(Blueprint::make('one'));
+        $mock->shouldReceive('find')->with('two')->andReturn(Blueprint::make('two'));
+        $mock->shouldReceive('find')->with('three')->andReturn(Blueprint::make('three'));
+        $mock->shouldReceive('find')->with('four')->andReturn(Blueprint::make('four'));
+
+        $taxonomy = tap(Taxonomy::make('test')->termBlueprints(['one', 'two']))->save();
+        $this->assertEquals(['one', 'two'], $taxonomy->termBlueprints()->map->handle()->all());
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($taxonomy, ['blueprints' => ['three', 'four']])
+            ->assertOk();
+
+        $this->assertEquals(['three', 'four'], Taxonomy::all()->first()->termBlueprints()->map->handle()->all());
+    }
 
     /** @test */
     function it_associates_taxonomies_with_collections()
@@ -38,6 +94,13 @@ class UpdateTaxonomyTest extends TestCase
         $this->assertTrue($collectionOne->taxonomies()->contains($taxonomy));
         $this->assertFalse($collectionTwo->taxonomies()->contains($taxonomy));
         $this->assertTrue($collectionThree->taxonomies()->contains($taxonomy));
+    }
+
+    private function userWithoutPermission()
+    {
+        $this->setTestRoles(['test' => ['access cp']]);
+
+        return tap(User::make()->assignRole('test'))->save();
     }
 
     private function userWithPermission()
