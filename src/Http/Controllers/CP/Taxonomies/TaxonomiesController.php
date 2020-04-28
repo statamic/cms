@@ -111,6 +111,7 @@ class TaxonomiesController extends CpController
         $values = [
             'title' => $taxonomy->title(),
             'blueprints' => $taxonomy->termBlueprints()->map->handle()->all(),
+            'collections' => $taxonomy->collections()->map->handle()->all(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint())
@@ -142,7 +143,35 @@ class TaxonomiesController extends CpController
 
         $taxonomy->save();
 
+        $this->associateTaxonomyWithCollections($taxonomy, $values['collections']);
+
         return $taxonomy->toArray();
+    }
+
+    protected function associateTaxonomyWithCollections($taxonomy, $collections)
+    {
+        $collections = collect($collections);
+        $existing = $taxonomy->collections()->map->handle();
+
+        $collections->diff($existing)->each(function ($collection) use ($taxonomy) {
+            $collection = Collection::findByHandle($collection);
+            $collection->taxonomies(
+                $collection->taxonomies()->map->handle()
+                    ->push($taxonomy->handle())
+                    ->unique()->all()
+            );
+            $collection->save();
+        });
+
+        $existing->diff($collections)->each(function ($collection) use ($taxonomy) {
+            $collection = Collection::findByHandle($collection);
+            $collection->taxonomies(
+                $collection->taxonomies()->map->handle()
+                    ->diff([$taxonomy->handle()])
+                    ->values()->all()
+            );
+            $collection->save();
+        });
     }
 
     public function destroy($taxonomy)
@@ -174,8 +203,14 @@ class TaxonomiesController extends CpController
                         'validate' => 'array',
                         'mode' => 'select',
                     ],
+                    'collections' => [
+                        'display' => __('Collections'),
+                        'instructions' => __('statamic::messages.taxonomies_collections_instructions'),
+                        'type' => 'collections',
+                        'mode' => 'select',
+                    ]
                 ]
-            ]
+            ],
         ]);
     }
 }

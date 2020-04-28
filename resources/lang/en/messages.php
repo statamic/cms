@@ -159,6 +159,7 @@ return [
     'session_expiry_new_window' => 'Opens in a new window. Come back once you\'ve logged in.',
     'tab_sections_instructions' => 'The fields in each section will be grouped together into tabs. Create new fields, reuse existing fields, or import entire groups of fields from existing fieldsets.',
     'taxonomies_blueprints_instructions' => 'Terms in this taxonomy may use any of these blueprints.',
+    'taxonomies_collections_instructions' => 'The collections that use this taxonomy.',
     'taxonomy_next_steps_configure_description' => 'Configure names, associated collections, define blueprints, and other options.',
     'taxonomy_next_steps_create_term_description' => 'Create your first term or stub out a handful of placeholder terms, it\'s up to you.',
     'taxonomy_next_steps_documentation_description' => 'Learn more about taxonomies, how they work, and how to configure them.',
