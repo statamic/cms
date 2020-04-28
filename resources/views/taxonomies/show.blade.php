@@ -30,7 +30,7 @@
 
             @can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
                 <create-term-button
-                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]) }}"
+                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
                     :blueprints="{{ $blueprints->toJson() }}">
                 </create-term-button>
             @endcan
@@ -57,7 +57,7 @@
         ])
             @slot('button')
                 {{-- <create-term-button
-                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]) }}"
+                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
                     :blueprints="{{ $blueprints->toJson() }}">
                 </create-term-button> --}}
             @endslot

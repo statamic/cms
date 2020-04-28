@@ -53,16 +53,22 @@ class TaxonomiesController extends CpController
             ];
         });
 
-        return view('statamic::taxonomies.show', [
+        $viewData = [
             'taxonomy' => $taxonomy,
             'hasTerms' => true, // todo $taxonomy->queryTerms()->count(),
             'blueprints' => $blueprints,
-            'site' => Site::selected(),
+            'site' => Site::selected()->handle(),
             'filters' => Scope::filters('terms', [
                 'taxonomy' => $taxonomy->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-        ]);
+        ];
+
+        if ($taxonomy->queryTerms()->count() === 0) {
+            return view('statamic::taxonomies.empty', $viewData);
+        }
+
+        return view('statamic::taxonomies.show', $viewData);
     }
 
     public function create()
