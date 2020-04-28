@@ -55,23 +55,25 @@ class UpdateFieldsetTest extends TestCase
                 'title' => 'Updated title',
                 'fields' => [
                     [
-                        '_id' => 'id-one',
-                        'handle' => 'one',
-                        'type' => 'textarea',
-                        'display' => 'First Field',
-                        'instructions' => 'First field instructions',
-                        'foo' => 'bar',
-                        'width' => 50,
+                        '_id' => 'id-s1-f1',
+                        'handle' => 'one-one',
+                        'type' => 'reference',
+                        'field_reference' => 'somefieldset.somefield',
+                        'config' => [
+                            'foo' => 'bar',
+                            'baz' => 'qux', // not in config_overrides so it shouldn't get saved
+                        ],
+                        'config_overrides' => ['foo']
                     ],
                     [
-                        '_id' => 'id-two',
-                        'handle' => 'two',
-                        'type' => 'text',
-                        'display' => 'Second Field',
-                        'instructions' => 'Second field instructions',
-                        'baz' => 'qux',
-                        'width' => 100,
-                    ],
+                        '_id' => 'id-s1-f1',
+                        'handle' => 'one-two',
+                        'type' => 'inline',
+                        'config' => [
+                            'type' => 'text',
+                            'foo' => 'bar',
+                        ]
+                    ]
                 ]
             ])
             ->assertStatus(204);
@@ -79,18 +81,19 @@ class UpdateFieldsetTest extends TestCase
         $this->assertEquals([
             'title' => 'Updated title',
             'fields' => [
-                'one' => [
-                    'type' => 'textarea',
-                    'display' => 'First Field',
-                    'instructions' => 'First field instructions',
-                    'foo' => 'bar',
-                    'width' => 50,
+                [
+                    'handle' => 'one-one',
+                    'field' => 'somefieldset.somefield',
+                    'config' => [
+                        'foo' => 'bar',
+                    ]
                 ],
-                'two' => [
-                    'type' => 'text',
-                    'display' => 'Second Field',
-                    'instructions' => 'Second field instructions',
-                    'baz' => 'qux'
+                [
+                    'handle' => 'one-two',
+                    'field' => [
+                        'type' => 'text',
+                        'foo' => 'bar',
+                    ]
                 ]
             ]
         ], Facades\Fieldset::find('test')->contents());
@@ -120,7 +123,9 @@ class UpdateFieldsetTest extends TestCase
         $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
-            'fields' => ['foo' => 'bar']
+            'fields' => [
+                ['handle' => 'foo', 'field' => ['type' => 'bar']]
+            ]
         ])->save();
 
         $this
@@ -140,7 +145,9 @@ class UpdateFieldsetTest extends TestCase
         $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
-            'fields' => ['foo' => 'bar']
+            'fields' => [
+                ['handle' => 'foo', 'field' => 'bar']
+            ]
         ])->save();
 
         $this

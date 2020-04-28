@@ -61,7 +61,6 @@ class HasAugmentedDataTest extends TestCase
         $expectedArr = [
             'foo' => new Value('FOO', 'foo', $fieldtype, $thing),
             'bar' => 'BAR',
-            'baz' => new Value(null, 'baz', $fieldtype, $thing),
         ];
         $this->assertEquals($expectedArr, $thing->augmented()->all()->all());
         $this->assertEquals($expectedArr, $thing->toAugmentedArray());

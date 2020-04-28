@@ -37,6 +37,7 @@ class LoginController extends CpController
             'oauth' => $enabled = OAuth::enabled(),
             'providers' => $enabled ? OAuth::providers() : [],
             'referer' => $this->getReferrer($request),
+            'hasError' => $this->hasError()
         ];
 
         $view = view('statamic::auth.login', $data);
@@ -141,5 +142,19 @@ class LoginController extends CpController
     public function username()
     {
         return 'email';
+    }
+
+    private function hasError()
+    {
+        return function ($field) {
+            if (! $error = session('errors')->first($field)) {
+                return false;
+            }
+
+            return ! in_array($error, [
+                __('auth.failed'),
+                __('statamic::validation.required')
+            ]);
+        };
     }
 }

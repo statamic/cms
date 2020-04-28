@@ -103,6 +103,12 @@ class CollectionTest extends TestCase
             Facades\Collection::findByHandle('art'),
         ]]);
         $this->assertCount(6, $this->collectionTag->index());
+
+        $this->setTagParameters(['from' => collect([
+            Facades\Collection::findByHandle('music'),
+            Facades\Collection::findByHandle('art'),
+        ])]);
+        $this->assertCount(6, $this->collectionTag->index());
     }
 
     /** @test */

@@ -66,7 +66,7 @@ class SitesTest extends TestCase
     {
         $this->sites->setConfig('sites.en.url', 'http://foobar.com/');
 
-        $this->assertEquals('http://foobar.com/', $this->sites->get('en')->url());
+        $this->assertEquals('http://foobar.com', $this->sites->get('en')->url());
     }
 
     /** @test */

@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Routing\Router;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Statamic\CP\Utilities\CoreUtilities;
@@ -26,6 +27,8 @@ class CpServiceProvider extends ServiceProvider
         View::composer(JavascriptComposer::VIEWS, JavascriptComposer::class);
 
         CoreUtilities::boot();
+
+        $this->registerMiddlewareGroups();
     }
 
     public function register()
@@ -43,5 +46,24 @@ class CpServiceProvider extends ServiceProvider
         $this->app->singleton(UtilityRepository::class, function () {
             return new UtilityRepository;
         });
+    }
+
+    protected function registerMiddlewareGroups()
+    {
+        $router = $this->app->make(Router::class);
+
+        $router->middlewareGroup('statamic.cp', [
+            \Illuminate\Cookie\Middleware\EncryptCookies::class,
+            \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
+            \Statamic\Http\Middleware\CP\StartSession::class,
+            \Illuminate\View\Middleware\ShareErrorsFromSession::class,
+            \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ]);
+
+        $router->middlewareGroup('statamic.cp.authenticated', [
+            \Statamic\Http\Middleware\CP\Authorize::class,
+            \Statamic\Http\Middleware\CP\Localize::class,
+        ]);
     }
 }

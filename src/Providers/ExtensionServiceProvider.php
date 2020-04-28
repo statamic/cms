@@ -133,6 +133,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Partial::class,
         Tags\Path::class,
         Tags\Query::class,
+        Tags\Range::class,
         Tags\Redirect::class,
         Tags\Relate::class,
         Tags\Rotate::class,
@@ -387,7 +388,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
         foreach ($this->app['files']->files($path) as $file) {
             $class = $file->getBasename('.php');
-            $fqcn = $this->getAppNamespace() . "{$folder}\\{$class}";
+            $fqcn = $this->app->getNamespace() . "{$folder}\\{$class}";
             if (is_subclass_of($fqcn, $requiredClass)) {
                 $fqcn::register();
             }

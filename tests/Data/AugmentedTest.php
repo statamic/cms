@@ -37,6 +37,24 @@ class AugmentedTest extends TestCase
     }
 
     /** @test */
+    function it_gets_a_single_value_by_key_using_the_value_method_if_it_exists()
+    {
+        $thingWithValueMethod = new class($this->thing->data()) extends Thing {
+            public function value($key)
+            {
+                return $this->get($key) ? $this->get($key) . ' (value)' : null;
+            }
+        };
+
+        $augmented = new class($thingWithValueMethod) extends BaseAugmentedThing {
+            //
+        };
+
+        $this->assertEquals('bar (value)', $augmented->get('foo'));
+        $this->assertNull($augmented->get('unknown'));
+    }
+
+    /** @test */
     function it_gets_a_value_from_the_thing_if_theres_a_method()
     {
         $augmented = new class($this->thing) extends BaseAugmentedThing {
@@ -143,7 +161,6 @@ class AugmentedTest extends TestCase
             'slug' => $slug = new Value('the-thing', 'slug', $fieldtype, $this->blueprintThing),
             'the_slug' => 'the-thing',
             'hello' => 'world',
-            'unused' => $unused = new Value(null, 'unused', $fieldtype, $this->blueprintThing),
             'supplemented' => 'supplemented value',
         ], $result->all());
 
@@ -163,7 +180,6 @@ class AugmentedTest extends TestCase
         $this->assertEquals([
             'foo' => $foo,
             'the_slug' => 'the-thing',
-            'unused' => $unused,
             'supplemented' => 'supplemented value',
         ], $result->all());
 
@@ -171,7 +187,6 @@ class AugmentedTest extends TestCase
             'foo' => $foo,
             'slug' => $slug,
             'the_slug' => 'the-thing',
-            'unused' => $unused,
             'supplemented' => 'supplemented value',
         ], $augmented->except('hello')->all());
     }

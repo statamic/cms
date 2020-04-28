@@ -98,7 +98,7 @@
 
         <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
             <div class="h-full overflow-auto p-3 bg-white relative">
-                <button class="btn-close absolute pin-t pin-r mt-2 mr-4" @click="showCheatsheet = false">&times;</button>
+                <button class="btn-close absolute top-0 right-0 mt-2 mr-4" @click="showCheatsheet = false">&times;</button>
                 <div class="max-w-md mx-auto my-4 clean-content">
                     <h2 v-text="__('Markdown Cheatsheet')"></h2>
                     <div v-html="__('markdown.cheatsheet')"></div>

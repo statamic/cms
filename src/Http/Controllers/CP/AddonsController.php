@@ -10,7 +10,7 @@ class AddonsController extends CpController
 {
     public function __construct()
     {
-        $this->middleware('can:configure addons');
+        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class . ':configure addons');
     }
 
     public function index()

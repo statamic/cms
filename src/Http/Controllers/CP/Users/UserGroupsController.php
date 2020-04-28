@@ -23,6 +23,7 @@ class UserGroupsController extends CpController
                 'handle' => $group->handle(),
                 'users' => $group->users()->count(),
                 'roles' => $group->roles()->count(),
+                'show_url' => $group->showUrl(),
                 'edit_url' => $group->editUrl(),
                 'delete_url' => $group->deleteUrl(),
             ];

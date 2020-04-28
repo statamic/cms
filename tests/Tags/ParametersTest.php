@@ -16,7 +16,10 @@ class ParametersTest extends TestCase
         parent::setUp();
 
         $context = new Context([
-            'foo' => 'bar'
+            'foo' => 'bar',
+            'nested' => [
+                'foo' => 'bar',
+            ],
         ]);
 
         $this->params = Parameters::make([
@@ -26,6 +29,8 @@ class ParametersTest extends TestCase
             'float' => 123.456,
             ':evaluated' => 'foo',
             'unevaluated' => 'foo',
+            ':evaluatednested' => 'nested:foo',
+            'unevaluatednested' => 'nested:foo',
             'true' => true,
             'false' => false,
             'truthy' => 'true',
@@ -44,6 +49,8 @@ class ParametersTest extends TestCase
             'float' => 123.456,
             'evaluated' => 'bar',
             'unevaluated' => 'foo',
+            'evaluatednested' => 'bar',
+            'unevaluatednested' => 'nested:foo',
             'true' => true,
             'false' => false,
             'truthy' => true,
@@ -184,6 +191,8 @@ class ParametersTest extends TestCase
             'float' => 123.456,
             'evaluated' => 'bar',
             'unevaluated' => 'foo',
+            'evaluatednested' => 'bar',
+            'unevaluatednested' => 'nested:foo',
             'true' => true,
             'false' => false,
             'truthy' => true,

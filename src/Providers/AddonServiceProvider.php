@@ -28,7 +28,8 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $externalScripts = [];
     protected $publishables = [];
     protected $routes = [];
-    protected $middleware = [];
+    protected $middlewareGroups = [];
+    protected $viewNamespace;
 
     public function boot()
     {
@@ -50,7 +51,8 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootScripts()
                 ->bootPublishables()
                 ->bootRoutes()
-                ->bootMiddleware();
+                ->bootMiddleware()
+                ->bootViews();
         });
     }
 
@@ -196,7 +198,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerWebRoutes($routes)
     {
         Statamic::pushWebRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace())->group($routes);
+            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')->group($routes);
         });
     }
 
@@ -209,7 +211,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerCpRoutes($routes)
     {
         Statamic::pushCpRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace())->group($routes);
+            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')->group($routes);
         });
     }
 
@@ -222,7 +224,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerActionRoutes($routes)
     {
         Statamic::pushActionRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace())
+            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')
                 ->prefix($this->getAddon()->slug())
                 ->group($routes);
         });
@@ -263,13 +265,23 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootMiddleware()
     {
-        foreach (array_get($this->middleware, 'web', []) as $middleware) {
-            Statamic::pushWebMiddleware($middleware);
+        foreach ($this->middlewareGroups as $group => $middleware) {
+            foreach ($middleware as $class) {
+                $this->app['router']->pushMiddlewareToGroup($group, $class);
+            }
         }
 
-        foreach (array_get($this->middleware, 'cp', []) as $middleware) {
-            Statamic::pushCpMiddleware($middleware);
-        }
+        return $this;
+    }
+
+    protected function bootViews()
+    {
+        $this->loadViewsFrom(
+            $this->getAddon()->directory() . 'resources/views',
+            $this->viewNamespace ?? $this->getAddon()->packageName()
+        );
+
+        return $this;
     }
 
     public function registerScript(string $path)

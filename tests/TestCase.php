@@ -76,7 +76,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
                 'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/',]
             ]
         ]);
-
         $app['config']->set('auth.providers.users.driver', 'statamic');
         $app['config']->set('statamic.stache.watcher', false);
         $app['config']->set('statamic.users.repository', 'file');

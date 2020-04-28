@@ -109,7 +109,6 @@ class Multisite extends Command
         $data = $yaml['data'] ?? [];
 
         $set
-            ->sites([$this->siteOne, $this->siteTwo])
             ->addLocalization($origin = $set->makeLocalization($this->siteOne)->data($data))
             ->addLocalization($set->makeLocalization($this->siteTwo)->origin($origin))
             ->save();

@@ -1,6 +1,8 @@
 <?php
 
+use Statamic\Statamic;
 use Statamic\Facades\OAuth;
+use Illuminate\Support\Facades\Route;
 
 Route::name('statamic.')->group(function () {
     /**
@@ -44,5 +46,6 @@ Statamic::additionalWebRoutes();
  * Front-end
  * All front-end website requests go through a single controller method.
  */
-Route::any('/{segments?}', 'FrontendController@index')->where('segments', '.*')->name('statamic.site')
-     ->middleware(Statamic::webMiddleware());
+Route::any('/{segments?}', 'FrontendController@index')
+    ->where('segments', '.*')
+    ->name('statamic.site');

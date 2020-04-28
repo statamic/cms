@@ -54,7 +54,7 @@
             </div>
         </div>
         <portal to="outside" v-if="focused">
-            <div class="absolute pin h-full w-full bg-darken-10 z-10"></div>
+            <div class="absolute inset-0 h-full w-full bg-darken-10 z-10"></div>
         </portal>
     </div>
 </template>

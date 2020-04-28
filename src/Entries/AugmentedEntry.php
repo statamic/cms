@@ -6,28 +6,35 @@ use Statamic\Data\AbstractAugmented;
 
 class AugmentedEntry extends AbstractAugmented
 {
-    protected function keys()
+    public function keys()
     {
-        return $this->data->data()->keys()
+        return $this->data->values()->keys()
             ->merge($this->data->supplements()->keys())
-            ->merge([
-                'id',
-                'slug',
-                'uri',
-                'url',
-                'edit_url',
-                'permalink',
-                'amp_url',
-                'api_url',
-                'published',
-                'private',
-                'date',
-                'is_entry',
-                'collection',
-                'last_modified',
-                'updated_at',
-                'updated_by',
-            ])->all();
+            ->merge($this->commonKeys())
+            ->merge($this->blueprintFields()->keys())
+            ->unique()->sort()->values()->all();
+    }
+
+    private function commonKeys()
+    {
+        return [
+            'id',
+            'slug',
+            'uri',
+            'url',
+            'edit_url',
+            'permalink',
+            'amp_url',
+            'api_url',
+            'published',
+            'private',
+            'date',
+            'is_entry',
+            'collection',
+            'last_modified',
+            'updated_at',
+            'updated_by',
+        ];
     }
 
     protected function updatedBy()

@@ -5,13 +5,18 @@ namespace Statamic\Tags;
 use Statamic\Facades\URL;
 use Statamic\Facades\Site;
 use Statamic\Structures\TreeBuilder;
+use Statamic\Contracts\Structures\Structure as StructureContract;
 
 class Structure extends Tags
 {
     public function wildcard($tag)
     {
+        $handle = $this->context->get($tag, $tag);
+
         // Allow {{ structure:collection:pages }} rather than needing to use the double colon.
-        $handle = str_replace(':', '::', $tag);
+        if (is_string($handle)) {
+            $handle = str_replace(':', '::', $tag);
+        }
 
         return $this->structure($handle);
     }
@@ -23,6 +28,10 @@ class Structure extends Tags
 
     protected function structure($handle)
     {
+        if ($handle instanceof StructureContract) {
+            $handle = $handle->handle();
+        }
+
         $tree = (new TreeBuilder)->build([
             'structure' => $handle,
             'include_home' => $this->get('include_home'),

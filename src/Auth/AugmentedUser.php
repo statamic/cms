@@ -10,25 +10,31 @@ use Statamic\Support\Str;
 
 class AugmentedUser extends AbstractAugmented
 {
-    protected function keys()
+    public function keys()
     {
         return $this->data->data()->keys()
             ->merge(collect($this->data->supplements() ?? [])->keys())
-            ->merge([
-                'id',
-                'name',
-                'title',
-                'email',
-                'initials',
-                'edit_url',
-                'is_user',
-                'last_login',
-                'avatar',
-                'api_url',
-            ])
+            ->merge($this->commonKeys())
             ->merge($this->roleHandles())
             ->merge($this->groupHandles())
-            ->all();
+            ->merge($this->blueprintFields()->keys())
+            ->unique()->sort()->values()->all();
+    }
+
+    private function commonKeys()
+    {
+        return [
+            'id',
+            'name',
+            'title',
+            'email',
+            'initials',
+            'edit_url',
+            'is_user',
+            'last_login',
+            'avatar',
+            'api_url',
+        ];
     }
 
     public function get($handle)

@@ -11,24 +11,21 @@ use Statamic\Contracts\Auth\Permissible;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 
-class UserGroup implements UserGroupContract
+abstract class UserGroup implements UserGroupContract
 {
     protected $title;
     protected $handle;
     protected $originalHandle;
-    protected $users;
-    protected $originalUsers;
     protected $roles;
 
     public function __construct()
     {
-        $this->users = collect();
         $this->roles = collect();
     }
 
     public function title(string $title = null)
     {
-        if (is_null($title)) {
+        if (func_num_args() === 0) {
             return $this->title;
         }
 
@@ -62,62 +59,16 @@ class UserGroup implements UserGroupContract
         return $this->originalHandle;
     }
 
-    public function users($users = null)
+    public function users()
     {
-        if (is_null($users)) {
-            return $this->users;
-        }
-
-        $this->users = collect();
-
-        foreach ($users as $user) {
-            $this->addUser($user);
-        }
-
-        return $this;
+        return $this->queryUsers()->get();
     }
 
-    public function originalUsers()
-    {
-        return $this->originalUsers;
-    }
-
-    public function resetOriginalUsers()
-    {
-        $this->originalUsers = collect($this->users);
-
-        return $this;
-    }
-
-    public function addUser($user)
-    {
-        if (is_string($user)) {
-            $user = User::find($user);
-        }
-
-        $this->users->put($user->id(), $user);
-
-        return $this;
-    }
-
-    public function removeUser($user)
-    {
-        if ($user instanceof UserContract) {
-            $user = $user->id();
-        }
-
-        $this->users->forget($user);
-
-        return $this;
-    }
+    abstract public function queryUsers();
 
     public function hasUser($user): bool
     {
-        if ($user instanceof UserContract) {
-            $user = $user->id();
-        }
-
-        return $this->users->has($user);
+        return $user->isInGroup($this);
     }
 
     public function roles($roles = null)
@@ -182,14 +133,19 @@ class UserGroup implements UserGroupContract
     {
         Facades\UserGroup::save($this);
 
-        return $this;
+        return true;
     }
 
     public function delete()
     {
         Facades\UserGroup::delete($this);
 
-        return $this;
+        return true;
+    }
+
+    public function showUrl()
+    {
+        return cp_route('user-groups.show', $this->handle());
     }
 
     public function editUrl()

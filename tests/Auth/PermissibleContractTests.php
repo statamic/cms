@@ -130,6 +130,12 @@ trait PermissibleContractTests
         RoleAPI::shouldReceive('find')->with('a')->andReturn($roleA);
 
         $user = $this->createPermissible();
+
+        $this->assertFalse($user->hasRole($roleA));
+        $this->assertFalse($user->hasRole('a'));
+        $this->assertFalse($user->hasRole($roleB));
+        $this->assertFalse($user->hasRole('b'));
+
         $user->assignRole($roleA);
         $user->save();
 
@@ -265,6 +271,10 @@ trait PermissibleContractTests
         $groupB = (new UserGroup)->handle('b');
         $groupC = (new UserGroup)->handle('c');
         $user = $this->createPermissible();
+
+        $this->assertFalse($user->isInGroup($groupA));
+        $this->assertFalse($user->isInGroup($groupB));
+        $this->assertFalse($user->isInGroup($groupC));
 
         UserGroupAPI::shouldReceive('find')->with('a')->andReturn($groupA);
         UserGroupAPI::shouldReceive('find')->with('b')->andReturn($groupB);

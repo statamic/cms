@@ -30,11 +30,9 @@ class FieldsetTest extends TestCase
         $this->assertEquals([], $fieldset->contents());
 
         $contents = [
-            'sections' => [
-                'main' => [
-                    'fields' => ['one' => ['type' => 'text']]
-                ]
-            ]
+            'fields' => [
+                ['handle' => 'one', 'field' => ['type' => 'text']]
+            ],
         ];
 
         $return = $fieldset->setContents($contents);
@@ -68,11 +66,37 @@ class FieldsetTest extends TestCase
 
         $fieldset->setContents([
             'fields' => [
+                [
+                    'handle' => 'one',
+                    'field' => ['type' => 'text'],
+                ],
+                [
+                    'handle' => 'two',
+                    'field' => ['type' => 'textarea'],
+                ]
+            ]
+        ]);
+
+        $fields = $fieldset->fields();
+
+        $this->assertInstanceOf(Fields::class, $fields);
+        $this->assertEveryItemIsInstanceOf(Field::class, $fields = $fields->all());
+        $this->assertEquals(['one', 'two'], $fields->map->handle()->values()->all());
+        $this->assertEquals(['text', 'textarea'], $fields->map->type()->values()->all());
+    }
+
+    /** @test */
+    function it_gets_fields_using_legacy_syntax()
+    {
+        $fieldset = new Fieldset;
+
+        $fieldset->setContents([
+            'fields' => [
                 'one' => [
-                    'type' => 'text'
+                    'type' => 'text',
                 ],
                 'two' => [
-                    'type' => 'textarea'
+                    'type' => 'textarea',
                 ]
             ]
         ]);
@@ -92,9 +116,12 @@ class FieldsetTest extends TestCase
 
         $fieldset->setContents([
             'fields' => [
-                'one' => [
-                    'type' => 'textarea',
-                    'display' => 'First field'
+                [
+                    'handle' => 'one',
+                    'field' => [
+                        'type' => 'textarea',
+                        'display' => 'First field'
+                    ],
                 ]
             ]
         ]);

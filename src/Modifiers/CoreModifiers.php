@@ -1119,6 +1119,8 @@ class CoreModifiers extends Modifier
      */
     public function markdown($value, $params)
     {
+        if (! is_string($value)) return $value;
+
         $parser = $params[0] ?? 'default';
 
         if (in_array($parser, [true, 'true', ''])) {
@@ -1313,6 +1315,8 @@ class CoreModifiers extends Modifier
      */
     public function output($value)
     {
+        if (! is_string($value)) return $value;
+
         $asset = Asset::find($value);
 
         if ($asset) {

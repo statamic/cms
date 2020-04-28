@@ -13,6 +13,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Globals\Variables as Contract;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Statamic;
 
 class Variables implements Contract, Localization, Augmentable
 {

@@ -25,6 +25,17 @@ class Fieldset
 
     public function setContents(array $contents)
     {
+        $fields = array_get($contents, 'fields', []);
+
+        // Support legacy syntax
+        if (! empty($fields) && array_keys($fields)[0] !== 0) {
+            $fields = collect($fields)->map(function ($field, $handle) {
+                return compact('handle', 'field');
+            })->values()->all();
+        }
+
+        $contents['fields'] = $fields;
+
         $this->contents = $contents;
 
         return $this;
@@ -44,11 +55,7 @@ class Fieldset
     {
         $fields = array_get($this->contents, 'fields', []);
 
-        $fields = collect($fields)->map(function ($field, $handle) {
-            return compact('handle', 'field');
-        })->values();
-
-        return new Fields($fields->all());
+        return new Fields($fields);
     }
 
     public function field(string $handle): ?Field

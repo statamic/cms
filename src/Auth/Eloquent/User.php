@@ -152,7 +152,7 @@ class User extends BaseUser
 
     public function hasRole($role)
     {
-        return $this->roles->has(
+        return $this->roles()->has(
             is_string($role) ? $role : $role->handle()
         );
     }
@@ -218,7 +218,7 @@ class User extends BaseUser
 
     public function isInGroup($group)
     {
-        return $this->groups->has(
+        return $this->groups()->has(
             is_string($group) ? $group : $group->handle()
         );
     }
@@ -250,11 +250,11 @@ class User extends BaseUser
 
     public function saveToDatabase()
     {
+        $this->model()->save();
+
         $this->saveRoles();
 
         $this->saveGroups();
-
-        $this->model()->save();
     }
 
     public function delete()
