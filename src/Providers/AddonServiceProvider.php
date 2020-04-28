@@ -160,7 +160,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootPublishables()
     {
-        $package = $this->getAddon()->id();
+        $package = $this->getAddon()->packageName();
 
         $publishables = collect($this->publishables)
             ->mapWithKeys(function ($destination, $origin) use ($package) {
@@ -286,7 +286,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function registerScript(string $path)
     {
-        $name = $this->getAddon()->id();
+        $name = $this->getAddon()->packageName();
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([
@@ -303,7 +303,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function registerStylesheet(string $path)
     {
-        $name = $this->getAddon()->id();
+        $name = $this->getAddon()->packageName();
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([

@@ -8,8 +8,8 @@
 <link rel="shortcut icon" type="image/x-icon" href="{{ Statamic::cpAssetUrl('img/favicon.ico') }}" sizes="16x16 32x32"/>
 <link href="{{ Statamic::cpAssetUrl('css/cp.css') }}?v={{ Statamic::version() }}" rel="stylesheet" />
 
-@foreach (Statamic::availableStyles(request()) as $name => $path)
-<link href="{{ Statamic::vendorAssetUrl("$name/css/$path") }}" rel="stylesheet" />
+@foreach (Statamic::availableStyles(request()) as $package => $path)
+<link href="{{ Statamic::vendorAssetUrl("$package/css/$path") }}" rel="stylesheet" />
 @endforeach
 
 @stack('head')
