@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::resource('collections.entries', 'CollectionEntriesController');
 Route::resource('taxonomies.terms', 'TaxonomyTermsController');
+Route::resource('taxonomies.terms.entries', 'TaxonomyTermEntriesController');
 Route::resource('globals', 'GlobalsController');
 Route::resource('users', 'UsersController');
 
