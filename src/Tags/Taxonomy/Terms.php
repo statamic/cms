@@ -10,6 +10,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Taxonomies\TermCollection;
 
@@ -71,6 +72,7 @@ class Terms
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
+        $this->queryMinimumEntries($query);
 
         return $query;
     }
@@ -124,5 +126,20 @@ class Terms
     protected function defaultOrderBy()
     {
         return 'title:asc';
+    }
+
+    protected function queryMinimumEntries($query)
+    {
+        $isQueryingEntriesCount = $this->parameters->first(function ($v, $k) {
+            return Str::startsWith($k, 'entries_count:');
+        });
+
+        if ($isQueryingEntriesCount) {
+            return;
+        }
+
+        if ($count = $this->parameters->int('min_count')) {
+            $query->where('entries_count', '>=', $count);
+        }
     }
 }
