@@ -720,7 +720,10 @@ class CoreModifiers extends Modifier
      */
     public function joinplode($value, $params)
     {
-        $value = array_column($value, 'value');
+        // If the items are passed in as arrays, we just want to get the values
+        if (is_array(array_values($value)[0])) {
+            $value = array_column($value, 'value');
+        }
         
         // Workaround to support pipe characters. If there are multiple params
         // that means a pipe was used. We'll just join them for now.
