@@ -97,6 +97,8 @@ class Select extends Fieldtype
             })->all();
         }
 
+        throw_if(is_array($value), new MultipleValuesEncounteredException($this));
+
         $label = is_null($value) ? null : array_get($this->config('options'), $value, $value);
 
         return new LabeledValue($value, $label);
