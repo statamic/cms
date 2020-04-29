@@ -8,6 +8,7 @@ use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
+use Statamic\Facades\User;
 use Statamic\Fields\Value;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Taxonomies\AugmentedTerm;
@@ -19,6 +20,7 @@ class AugmentedTermTest extends AugmentedTestCase
     function it_gets_values()
     {
         Carbon::setTestNow('2020-04-15 13:00:00');
+        User::make()->id('test-user')->save();
 
         $blueprint = Blueprint::makeFromFields([
             'two' => ['type' => 'text'],
@@ -36,6 +38,8 @@ class AugmentedTermTest extends AugmentedTestCase
             ->data([
                 'one' => 'the "one" value on the term',
                 'two' => 'the "two" value on the term and in the blueprint',
+                'updated_by' => 'test-user',
+                'updated_at' => '1486131000'
             ]);
 
         $augmented = new AugmentedTerm($term);
@@ -56,6 +60,8 @@ class AugmentedTermTest extends AugmentedTestCase
             'one'           => ['type' => 'string', 'value' => 'the "one" value on the term'],
             'two'           => ['type' => Value::class, 'value' => 'the "two" value on the term and in the blueprint'],
             'unused_in_bp'  => ['type' => Value::class, 'value' => null],
+            'updated_at'    => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
+            'updated_by'    => ['type' => UserContract::class, 'value' => 'test-user'],
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);

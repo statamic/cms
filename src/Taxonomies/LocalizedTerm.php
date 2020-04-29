@@ -4,12 +4,14 @@ namespace Statamic\Taxonomies;
 
 use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Carbon;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
@@ -382,5 +384,19 @@ class LocalizedTerm implements Term, Responsable, Augmentable
     public function defaultAugmentedArrayKeys()
     {
         return $this->selectedQueryColumns;
+    }
+
+    public function lastModified()
+    {
+        return $this->has('updated_at')
+            ? Carbon::createFromTimestamp($this->get('updated_at'))
+            : $this->term->fileLastModified();
+    }
+
+    public function lastModifiedBy()
+    {
+        return $this->has('updated_by')
+            ? User::find($this->get('updated_by'))
+            : null;
     }
 }

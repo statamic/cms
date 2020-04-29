@@ -29,7 +29,19 @@ class AugmentedTerm extends AbstractAugmented
             'api_url',
             'taxonomy',
             'edit_url',
+            'updated_at',
+            'updated_by',
         ];
+    }
+
+    protected function updatedBy()
+    {
+        return $this->data->lastModifiedBy();
+    }
+
+    protected function updatedAt()
+    {
+        return $this->data->lastModified();
     }
 
     protected function entries()
