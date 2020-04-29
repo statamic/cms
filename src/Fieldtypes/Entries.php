@@ -45,12 +45,12 @@ class Entries extends Relationship
 
     protected function configFieldItems(): array
     {
-        return [
+        return array_merge(parent::configFieldItems(), [
             'collections' => [
                 'display' => __('Collections'),
                 'type' => 'collections'
             ],
-        ];
+        ]);
     }
 
     public function preload()

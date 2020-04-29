@@ -25,11 +25,10 @@ abstract class Relationship extends Fieldtype
     protected $formComponentProps = [
         '_' => '_' // forces an object in js
     ];
-    protected $extraConfigFields = [];
 
     protected function configFieldItems(): array
     {
-        $configFields = [
+        return [
             'max_items' => [
                 'display' => __('Max Items'),
                 'instructions' => __('statamic::messages.max_items_instructions'),
@@ -48,8 +47,6 @@ abstract class Relationship extends Fieldtype
                 'width' => 50,
             ]
         ];
-
-        return array_merge($configFields, $this->extraConfigFields);
     }
 
     public function preProcess($data)
