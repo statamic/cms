@@ -98,6 +98,7 @@ abstract class Action implements Arrayable
             'confirmationText' => $this->confirmationText(),
             'dangerous' => $this->dangerous,
             'fields' => $this->fields()->toPublishArray(),
+            'values' => $this->fields()->values(),
             'meta' => $this->fields()->meta(),
             'context' => $this->context,
         ];

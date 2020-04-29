@@ -20,8 +20,14 @@
                 :values="values"
                 :meta="action.meta"
                 :errors="errors"
+                @updated="values = $event"
             >
-                <publish-fields :fields="action.fields" @updated="valueUpdated" />
+                <publish-fields
+                    slot-scope="{ setFieldValue, setFieldMeta }"
+                    :fields="action.fields"
+                    @updated="setFieldValue"
+                    @meta-updated="setFieldMeta"
+                />
             </publish-container>
         </confirmation-modal>
     </span>
@@ -53,7 +59,7 @@ export default {
         return {
             confirming: false,
             fieldset: {sections:[{fields:this.action.fields}]},
-            values: {},
+            values: this.action.values,
             errors: {},
         }
     },
@@ -85,10 +91,6 @@ export default {
 
         cancel() {
             this.confirming = false;
-        },
-
-        valueUpdated(field, value) {
-            this.values[field] = value;
         }
     }
 
