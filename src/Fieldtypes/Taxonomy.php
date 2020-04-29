@@ -16,6 +16,16 @@ class Taxonomy extends Relationship
     protected $statusIcons = false;
     protected $taggable = true;
 
+    protected function configFieldItems(): array
+    {
+        return array_merge(parent::configFieldItems(), [
+            'taxonomies' => [
+                'display' => __('Taxonomies'),
+                'type' => 'taxonomies'
+            ],
+        ]);
+    }
+
     public function augment($value)
     {
         $terms = $this->getTermsForAugmentation($value);
