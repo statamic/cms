@@ -8,6 +8,9 @@
             :disabled="readOnly"
             :multiple="multiple"
             :options="options"
+            :get-option-key="(option) => option.id"
+            :get-option-label="(option) => option.title"
+            :create-option="(value) => ({ title: value, id: value })"
             :placeholder="config.placeholder || __('Choose...')"
             :searchable="true"
             :taggable="taggable"
@@ -91,13 +94,6 @@ export default {
             if (! this.multiple) {
                 items = items === null ? [] : [items];
             }
-
-            // On-the-fly items created (when using taggable) won't have an ID.
-            // But v-select gives them a title, so we'll use that as the ID.
-            items = items.map(item => {
-                if (! item.id) item.id = item.title;
-                return item;
-            });
 
             this.$emit('input', items);
         }
