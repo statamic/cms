@@ -6,9 +6,9 @@ use Illuminate\Support\Facades\Facade;
 use Statamic\Contracts\Data\DataRepository;
 
 /**
- * @method static find($reference);
- * @method static findByUri($uri, $site = null);
- * @method static splitReference($reference);
+ * @method static find($reference)
+ * @method static findByUri($uri, $site = null)
+ * @method static splitReference($reference)
  *
  * @see \Statamic\Data\DataRepository
  */
