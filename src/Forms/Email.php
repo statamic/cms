@@ -65,7 +65,6 @@ class Email extends Mailable
         if ($template) {
             $view = (new View)
                 ->template($template)
-                ->layout(null)
                 ->with($this->submission->toArray())
                 ->render();
 
