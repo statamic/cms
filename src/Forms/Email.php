@@ -9,6 +9,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\View\View;
 
 class Email extends Mailable
 {
@@ -57,8 +58,19 @@ class Email extends Mailable
 
     protected function addViews()
     {
+        $template = array_get($this->config, 'template');
         $html = array_get($this->config, 'html');
         $text = array_get($this->config, 'text');
+        
+        if ($template) {
+            $view = (new View)
+                ->template($template)
+                ->layout(null)
+                ->with($this->submission->toArray())
+                ->render();
+
+            return $this->html($view);
+        }
 
         if (!$text && !$html) {
             return $this->automagic();
