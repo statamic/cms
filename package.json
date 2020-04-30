@@ -28,7 +28,7 @@
     "fuse.js": "^3.4.6",
     "generate-password": "^1.5.1",
     "highlight.js": "^9.18.1",
-    "jquery": "^3.4.1",
+    "jquery": "^3.5.0",
     "jquery-ui": "file:resources/js/vendor/jquery-ui",
     "laravel-echo": "^1.6.1",
     "lazysizes": "^4.1.8",
