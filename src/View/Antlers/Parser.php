@@ -21,6 +21,7 @@ use Facade\IgnitionContracts\ProvidesSolution;
 use Statamic\Ignition\Value as IgnitionViewValue;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Facade\Ignition\Exceptions\ViewExceptionWithSolution;
+use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Parser
 {
@@ -1417,7 +1418,7 @@ class Parser
         }
 
         // Redirects etc should work instead of actually generating an exception.
-        if ($e instanceof HttpResponseException) {
+        if ($e instanceof HttpException || $e instanceof HttpResponseException) {
             return $e;
         }
 
