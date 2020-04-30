@@ -5,7 +5,7 @@ namespace Statamic\Contracts\Config;
 interface Config
 {
     /**
-     * Populate the config object with data
+     * Populate the config object with data.
      *
      * @param array $config
      * @return void
@@ -13,7 +13,7 @@ interface Config
     public function hydrate(array $config);
 
     /**
-     * Get a config value
+     * Get a config value.
      *
      * @param string $key
      * @param bool   $default
@@ -22,7 +22,7 @@ interface Config
     public function get($key, $default = false);
 
     /**
-     * Set a config value
+     * Set a config value.
      *
      * @param string $key
      * @param mixed $value
@@ -31,14 +31,14 @@ interface Config
     public function set($key, $value);
 
     /**
-     * Get all config values
+     * Get all config values.
      *
      * @return array
      */
     public function all();
 
     /**
-     * Save the config
+     * Save the config.
      *
      * @return void
      */

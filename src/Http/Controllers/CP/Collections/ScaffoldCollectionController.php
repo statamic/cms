@@ -2,14 +2,13 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\Facades;
-use Statamic\Support\Str;
-use Statamic\Facades\File;
 use Illuminate\Http\Request;
-use Statamic\Fields\Blueprint;
-use Statamic\Facades\Collection;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
+use Statamic\Facades;
+use Statamic\Facades\File;
+use Statamic\Fields\Blueprint;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Str;
 
 class ScaffoldCollectionController extends CpController
 {
@@ -42,7 +41,7 @@ class ScaffoldCollectionController extends CpController
         session()->flash('success', __('Resources scaffolded'));
 
         return [
-            'redirect' => route('statamic.cp.collections.show', $request->collection->handle())
+            'redirect' => route('statamic.cp.collections.show', $request->collection->handle()),
         ];
     }
 
@@ -65,9 +64,9 @@ class ScaffoldCollectionController extends CpController
                 'sections' => [
                     'main' => [
                         'display' => __('Main'),
-                        'fields' => []
-                    ]
-                ]
+                        'fields' => [],
+                    ],
+                ],
             ])->save();
     }
 

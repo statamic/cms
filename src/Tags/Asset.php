@@ -2,14 +2,13 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Facades\Helper;
 use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Support\Arr;
 
 class Asset extends Assets
 {
     /**
-     * Gets a single Asset's data from a value
+     * Gets a single Asset's data from a value.
      *
      * Usage:
      * {{ asset:[variable] }}
@@ -34,7 +33,7 @@ class Asset extends Assets
     }
 
     /**
-     * Gets a single Asset's data from a URL
+     * Gets a single Asset's data from a URL.
      *
      * @return mixed
      */

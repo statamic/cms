@@ -2,14 +2,14 @@
 
 namespace Tests\Assets;
 
-use Tests\TestCase;
-use Statamic\Assets\Asset;
+use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Storage;
+use Statamic\Assets\Asset;
 use Statamic\Assets\Dimensions;
 use Statamic\Facades\AssetContainer;
-use Illuminate\Http\UploadedFile;
 use Statamic\Imaging\ImageGenerator;
-use Illuminate\Support\Facades\Storage;
+use Tests\TestCase;
 
 class DimensionsTest extends TestCase
 {
@@ -28,7 +28,7 @@ class DimensionsTest extends TestCase
     }
 
     /** @test */
-    function a_non_image_asset_has_no_dimensions()
+    public function a_non_image_asset_has_no_dimensions()
     {
         $asset = $this->mock(Asset::class);
         $asset->shouldReceive('isImage')->andReturnFalse();
@@ -41,7 +41,7 @@ class DimensionsTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_dimensions()
+    public function it_gets_the_dimensions()
     {
         Carbon::setTestNow(now());
 
@@ -53,7 +53,7 @@ class DimensionsTest extends TestCase
         Storage::disk('test')->putFileAs('path/to', $file, 'asset.jpg');
 
         // Test about the actual file, for good measure.
-        $realpath = Storage::disk('test')->getAdapter()->getPathPrefix() . 'path/to/asset.jpg';
+        $realpath = Storage::disk('test')->getAdapter()->getPathPrefix().'path/to/asset.jpg';
         $this->assertFileExists($realpath);
         $imagesize = getimagesize($realpath);
         $this->assertEquals([30, 60], array_splice($imagesize, 0, 2));

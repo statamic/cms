@@ -2,8 +2,8 @@
 
 namespace Statamic\Facades;
 
-use Statamic\Filesystem\Manager;
 use Illuminate\Support\Facades\Facade;
+use Statamic\Filesystem\Manager;
 
 class File extends Facade
 {

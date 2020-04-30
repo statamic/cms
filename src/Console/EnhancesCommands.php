@@ -2,9 +2,9 @@
 
 namespace Statamic\Console;
 
-use Wilderborn\Partyline\Facade as Partyline;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Wilderborn\Partyline\Facade as Partyline;
 
 trait EnhancesCommands
 {

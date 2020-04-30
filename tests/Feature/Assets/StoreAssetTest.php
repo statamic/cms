@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\Assets;
 
-use Statamic\Facades;
-use Tests\TestCase;
-use Tests\FakesRoles;
 use Illuminate\Http\UploadedFile;
-use Statamic\Assets\AssetContainer;
 use Illuminate\Support\Facades\Storage;
+use Statamic\Assets\AssetContainer;
+use Statamic\Facades;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class StoreAssetTest extends TestCase
 {
@@ -33,7 +33,7 @@ class StoreAssetTest extends TestCase
     }
 
     /** @test */
-    function it_uploads_an_asset()
+    public function it_uploads_an_asset()
     {
         Storage::disk('test')->assertMissing('path/to/test.jpg');
 
@@ -52,7 +52,7 @@ class StoreAssetTest extends TestCase
     }
 
     /** @test */
-    function it_denied_access_without_permission()
+    public function it_denied_access_without_permission()
     {
         $this
             ->actingAs($this->userWithoutPermission())
@@ -61,7 +61,7 @@ class StoreAssetTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_uploads_are_disabled()
+    public function it_denies_access_if_uploads_are_disabled()
     {
         $this->container->allowUploads(false);
 
@@ -72,23 +72,23 @@ class StoreAssetTest extends TestCase
     }
 
     /** @test */
-    function it_doesnt_upload_without_a_container()
+    public function it_doesnt_upload_without_a_container()
     {
         $this
             ->actingAs($this->userWithPermission())
             ->submit([
                 'container' => '',
-            ]) ->assertStatus(422);
+            ])->assertStatus(422);
     }
 
     /** @test */
-    function it_doesnt_upload_without_a_folder()
+    public function it_doesnt_upload_without_a_folder()
     {
         $this
             ->actingAs($this->userWithPermission())
             ->submit([
                 'folder' => '',
-            ]) ->assertStatus(422);
+            ])->assertStatus(422);
     }
 
     private function submit($overrides = [])
@@ -101,7 +101,7 @@ class StoreAssetTest extends TestCase
         return array_merge([
             'container' => 'test_container',
             'folder' => 'path/to',
-            'file' => UploadedFile::fake()->image('test.jpg')
+            'file' => UploadedFile::fake()->image('test.jpg'),
         ], $overrides);
     }
 

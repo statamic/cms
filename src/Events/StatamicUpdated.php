@@ -19,7 +19,7 @@ class StatamicUpdated extends Event
     public $previousVersion;
 
     /**
-     * Create a new event instance
+     * Create a new event instance.
      */
     public function __construct($to, $from)
     {

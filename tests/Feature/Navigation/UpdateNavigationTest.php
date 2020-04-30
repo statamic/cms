@@ -2,13 +2,9 @@
 
 namespace Tests\Feature\Navigation;
 
-use Illuminate\Support\Facades\Event;
-use Statamic\Events\Data\CollectionSaved;
-use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Http\Controllers\CP\Structures\NavigationController;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -19,7 +15,7 @@ class UpdateNavigationTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $nav = $this->createNav();
 
@@ -32,7 +28,7 @@ class UpdateNavigationTest extends TestCase
     }
 
     /** @test */
-    function it_updates_a_nav()
+    public function it_updates_a_nav()
     {
         $nav = $this->createNav();
         $this->assertCount(1, Nav::all());
@@ -51,9 +47,8 @@ class UpdateNavigationTest extends TestCase
     }
 
     /** @test */
-    function it_updates_a_nav_with_multiple_sites()
+    public function it_updates_a_nav_with_multiple_sites()
     {
-
         Site::setConfig(['sites' => [
             'en' => ['url' => 'http://localhost/', 'locale' => 'en'],
             'fr' => ['url' => 'http://localhost/fr/', 'locale' => 'fr'],
@@ -68,7 +63,7 @@ class UpdateNavigationTest extends TestCase
         $this
             ->actingAs($this->userWithPermission())
             ->submit($nav, $this->validParams(['sites' => [
-                'en', 'fr' // starts with en+de, but should remove de and add fr, ending with en+fr
+                'en', 'fr', // starts with en+de, but should remove de and add fr, ending with en+fr
             ]]))
             ->assertOk()
             ->assertJson(['title' => 'Updated']);
@@ -82,7 +77,7 @@ class UpdateNavigationTest extends TestCase
     }
 
     /** @test */
-    function title_is_required()
+    public function title_is_required()
     {
         $nav = $this->createNav();
         $this->assertCount(1, Nav::all());
@@ -119,7 +114,7 @@ class UpdateNavigationTest extends TestCase
             'title' => 'Updated',
             'collections' => ['pages'],
             'root' => true,
-            'max_depth' => 2
+            'max_depth' => 2,
         ], $overrides);
     }
 

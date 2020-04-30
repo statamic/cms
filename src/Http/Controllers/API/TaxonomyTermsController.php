@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\API;
 
 use Illuminate\Http\Request;
-use Statamic\Facades\Term;
 use Statamic\Http\Resources\API\TermResource;
 
 class TaxonomyTermsController extends ApiController

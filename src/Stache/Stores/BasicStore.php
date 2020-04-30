@@ -2,8 +2,8 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\Facades\File;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\File;
 use Symfony\Component\Finder\SplFileInfo;
 
 abstract class BasicStore extends Store

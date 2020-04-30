@@ -2,14 +2,14 @@
 
 namespace Tests\Stache\Repositories;
 
-use Tests\TestCase;
-use Statamic\Stache\Stache;
 use Illuminate\Support\Collection;
-use Statamic\Stache\Stores\EntriesStore;
-use Statamic\Stache\Stores\NavigationStore;
-use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Contracts\Structures\Structure;
 use Statamic\Stache\Repositories\NavigationRepository;
+use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\CollectionsStore;
+use Statamic\Stache\Stores\EntriesStore;
+use Statamic\Stache\Stores\NavigationStore;
+use Tests\TestCase;
 
 class NavigationRepositoryTest extends TestCase
 {
@@ -22,7 +22,7 @@ class NavigationRepositoryTest extends TestCase
         $stache->registerStores([
             (new CollectionsStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/collections'),
             (new EntriesStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/collections'),
-            (new NavigationStore($stache, app('files')))->directory($this->directory)
+            (new NavigationStore($stache, app('files')))->directory($this->directory),
         ]);
         $this->app->instance(Stache::class, $stache);
 
@@ -30,7 +30,7 @@ class NavigationRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_navs()
+    public function it_gets_all_navs()
     {
         $navs = $this->repo->all();
 
@@ -44,7 +44,7 @@ class NavigationRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_nav_by_handle()
+    public function it_gets_a_nav_by_handle()
     {
         tap($this->repo->findByHandle('sidebar'), function ($nav) {
             $this->assertInstanceOf(Structure::class, $nav);
@@ -62,7 +62,7 @@ class NavigationRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_saves_a_nav_to_the_stache_and_to_a_file()
+    public function it_saves_a_nav_to_the_stache_and_to_a_file()
     {
         $structure = (new \Statamic\Structures\Nav)->handle('new');
         $structure->addTree($structure->makeTree('en'));

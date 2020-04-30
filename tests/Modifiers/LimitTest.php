@@ -9,7 +9,7 @@ use Tests\TestCase;
 class LimitTest extends TestCase
 {
     /** @test */
-    function it_limits_arrays()
+    public function it_limits_arrays()
     {
         $arr = ['one', 'two', 'three', 'four', 'five'];
 
@@ -18,7 +18,7 @@ class LimitTest extends TestCase
     }
 
     /** @test */
-    function it_limits_collections()
+    public function it_limits_collections()
     {
         $collection = collect(['one', 'two', 'three', 'four', 'five']);
 
@@ -31,7 +31,7 @@ class LimitTest extends TestCase
         $this->assertEquals(['one', 'two', 'three'], $limited->all());
     }
 
-    function modify($arr, $limit)
+    public function modify($arr, $limit)
     {
         return Modify::value($arr)->limit($limit)->fetch();
     }

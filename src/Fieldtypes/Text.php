@@ -32,7 +32,7 @@ class Text extends Fieldtype
                     'time',
                     'url',
                     'week',
-                ]
+                ],
             ],
             'character_limit' => [
                 'display' => __('Character Limit'),

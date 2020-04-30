@@ -2,10 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Facades\URL;
-use Statamic\Facades\Site;
-use Statamic\Structures\TreeBuilder;
 use Statamic\Contracts\Structures\Structure as StructureContract;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
+use Statamic\Structures\TreeBuilder;
 
 class Structure extends Tags
 {
@@ -47,11 +47,11 @@ class Structure extends Tags
         return collect($tree)->map(function ($item) use ($parent) {
             $page = $item['page'];
 
-            if ($page->reference() && !$page->referenceExists()) {
+            if ($page->reference() && ! $page->referenceExists()) {
                 return null;
             }
 
-            if (! $this->get('show_unpublished') && $page->entry() && !$page->entry()->published()) {
+            if (! $this->get('show_unpublished') && $page->entry() && ! $page->entry()->published()) {
                 return null;
             }
 

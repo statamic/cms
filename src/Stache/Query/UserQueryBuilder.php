@@ -3,7 +3,6 @@
 namespace Statamic\Stache\Query;
 
 use Statamic\Auth\UserCollection;
-use Statamic\Stache\Query\Builder;
 
 class UserQueryBuilder extends Builder
 {
@@ -42,6 +41,7 @@ class UserQueryBuilder extends Builder
     {
         return collect($this->orderBys)->mapWithKeys(function ($orderBy) {
             $items = $this->store->index($orderBy->sort)->items()->all();
+
             return [$orderBy->sort => $items];
         });
     }

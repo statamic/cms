@@ -71,14 +71,14 @@ class AugmentedUser extends AbstractAugmented
     protected function roleHandles()
     {
         return Role::all()->map(function ($role) {
-            return 'is_' . $role->handle();
+            return 'is_'.$role->handle();
         })->values()->all();
     }
 
     protected function groupHandles()
     {
         return UserGroup::all()->map(function ($group) {
-            return 'in_' . $group->handle();
+            return 'in_'.$group->handle();
         })->values()->all();
     }
 

@@ -31,6 +31,6 @@ class Template extends FieldtypeFilter
         $operator = __('Is');
         $value = $values['value'];
 
-        return strtolower($field) . ' ' . strtolower($operator) . ' ' . $value;
+        return strtolower($field).' '.strtolower($operator).' '.$value;
     }
 }

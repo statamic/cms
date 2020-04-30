@@ -2,10 +2,10 @@
 
 namespace Tests\Sites;
 
-use Tests\TestCase;
+use Illuminate\Support\Collection;
 use Statamic\Sites\Site;
 use Statamic\Sites\Sites;
-use Illuminate\Support\Collection;
+use Tests\TestCase;
 
 class SitesTest extends TestCase
 {
@@ -31,7 +31,7 @@ class SitesTest extends TestCase
     }
 
     /** @test */
-    function gets_all_sites()
+    public function gets_all_sites()
     {
         tap($this->sites->all(), function ($sites) {
             $this->assertInstanceOf(Collection::class, $sites);
@@ -44,14 +44,14 @@ class SitesTest extends TestCase
     }
 
     /** @test */
-    function can_reinitialize_sites_by_reproviding_the_config()
+    public function can_reinitialize_sites_by_reproviding_the_config()
     {
         $this->sites->setConfig([
             'default' => 'foo',
             'sites' => [
                 'foo' => [],
                 'bar' => [],
-            ]
+            ],
         ]);
 
         $this->assertEquals('foo', $this->sites->get('foo')->handle());
@@ -62,7 +62,7 @@ class SitesTest extends TestCase
     }
 
     /** @test */
-    function can_change_specific_config_items()
+    public function can_change_specific_config_items()
     {
         $this->sites->setConfig('sites.en.url', 'http://foobar.com/');
 
@@ -70,14 +70,14 @@ class SitesTest extends TestCase
     }
 
     /** @test */
-    function checks_whether_there_are_multiple_sites()
+    public function checks_whether_there_are_multiple_sites()
     {
         $this->sites->setConfig([
             'default' => 'foo',
             'sites' => [
                 'foo' => [],
                 'bar' => [],
-            ]
+            ],
         ]);
 
         $this->assertTrue($this->sites->hasMultiple());
@@ -86,14 +86,14 @@ class SitesTest extends TestCase
             'default' => 'foo',
             'sites' => [
                 'foo' => [],
-            ]
+            ],
         ]);
 
         $this->assertFalse($this->sites->hasMultiple());
     }
 
     /** @test */
-    function gets_site_by_handle()
+    public function gets_site_by_handle()
     {
         tap($this->sites->get('en'), function ($site) {
             $this->assertInstanceOf(Site::class, $site);
@@ -102,7 +102,7 @@ class SitesTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_default_site()
+    public function it_gets_the_default_site()
     {
         tap($this->sites->default(), function ($site) {
             $this->assertInstanceOf(Site::class, $site);
@@ -111,7 +111,7 @@ class SitesTest extends TestCase
     }
 
     /** @test */
-    function gets_site_from_url()
+    public function gets_site_from_url()
     {
         $this->assertEquals('en', $this->sites->findByUrl('http://test.com/something')->handle());
         $this->assertEquals('de', $this->sites->findByUrl('http://test.com/de/something')->handle());
@@ -120,7 +120,7 @@ class SitesTest extends TestCase
     }
 
     /** @test */
-    function current_site_can_be_explicitly_set()
+    public function current_site_can_be_explicitly_set()
     {
         $this->assertEquals('en', $this->sites->current()->handle());
 
@@ -130,7 +130,7 @@ class SitesTest extends TestCase
     }
 
     /** @test */
-    function gets_site_from_url_when_using_relative_urls()
+    public function gets_site_from_url_when_using_relative_urls()
     {
         $sites = new Sites([
             'default' => 'en',

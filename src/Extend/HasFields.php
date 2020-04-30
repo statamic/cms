@@ -6,7 +6,7 @@ use Statamic\Fields\Fields;
 
 trait HasFields
 {
-    abstract function fieldItems();
+    abstract public function fieldItems();
 
     public function fields()
     {

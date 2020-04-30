@@ -2,12 +2,12 @@
 
 namespace Statamic\Http\Controllers\CP\Fieldtypes;
 
-use Statamic\Fields\Field;
+use Facades\Statamic\Fields\FieldtypeRepository as Fieldtype;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
-use Statamic\Http\Requests\FilteredRequest;
+use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
-use Facades\Statamic\Fields\FieldtypeRepository as Fieldtype;
+use Statamic\Http\Requests\FilteredRequest;
 
 class RelationshipFieldtypeController extends CpController
 {

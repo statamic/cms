@@ -8,7 +8,7 @@ trait RendersControlPanelExceptions
 {
     protected function renderException($request, $e)
     {
-        if ($e instanceof IlluminateAuthException && !$request->expectsJson()) {
+        if ($e instanceof IlluminateAuthException && ! $request->expectsJson()) {
             return redirect($this->getAuthExceptionRedirectUrl())->withError($e->getMessage());
         }
 

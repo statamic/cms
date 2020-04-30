@@ -7,7 +7,7 @@ use Illuminate\Http\Request;
 interface Cacher
 {
     /**
-     * Cache a page
+     * Cache a page.
      *
      * @param \Illuminate\Http\Request $request     Request associated with the page to be cached
      * @param string                   $content     The response content to be cached
@@ -15,7 +15,7 @@ interface Cacher
     public function cachePage(Request $request, $content);
 
     /**
-     * Get a cached page
+     * Get a cached page.
      *
      * @param Request $request
      * @return string
@@ -23,14 +23,14 @@ interface Cacher
     public function getCachedPage(Request $request);
 
     /**
-     * Flush out the entire static cache
+     * Flush out the entire static cache.
      *
      * @return void
      */
     public function flush();
 
     /**
-     * Invalidate a URL
+     * Invalidate a URL.
      *
      * @param string $url
      * @return void
@@ -38,7 +38,7 @@ interface Cacher
     public function invalidateUrl($url);
 
     /**
-     * Invalidate multiple URLs
+     * Invalidate multiple URLs.
      *
      * @param array $urls
      * @return void
@@ -46,7 +46,7 @@ interface Cacher
     public function invalidateUrls($urls);
 
     /**
-     * Get all the URLs that have been cached
+     * Get all the URLs that have been cached.
      *
      * @param string|null $domain
      * @return \Illuminate\Support\Collection

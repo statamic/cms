@@ -41,7 +41,7 @@ class FlysystemAdapterTest extends TestCase
     }
 
     /** @test */
-    function it_normalizes_relative_paths()
+    public function it_normalizes_relative_paths()
     {
         $this->assertEquals('bar.txt', $this->adapter->normalizePath('bar.txt'));
         $this->assertEquals('foo/bar.txt', $this->adapter->normalizePath('foo/bar.txt'));
@@ -51,7 +51,7 @@ class FlysystemAdapterTest extends TestCase
     }
 
     /** @test */
-    function it_normalizes_absolute_paths()
+    public function it_normalizes_absolute_paths()
     {
         $this->assertEquals('bar.txt', $this->adapter->normalizePath($this->tempDir.'/bar.txt'));
         $this->assertEquals('foo/bar.txt', $this->adapter->normalizePath($this->tempDir.'/foo/bar.txt'));
@@ -60,7 +60,7 @@ class FlysystemAdapterTest extends TestCase
     }
 
     /** @test */
-    function it_throws_an_exception_when_normalizing_a_path_outside_the_root()
+    public function it_throws_an_exception_when_normalizing_a_path_outside_the_root()
     {
         $this->expectException(\LogicException::class);
 
@@ -68,13 +68,13 @@ class FlysystemAdapterTest extends TestCase
     }
 
     /** @test */
-    function it_throws_exception_when_normalizing_an_absolute_path_on_a_non_local_adapter()
+    public function it_throws_exception_when_normalizing_an_absolute_path_on_a_non_local_adapter()
     {
         $this->markTestIncomplete();
     }
 
     /** @test */
-    function it_throws_an_exception_when_requesting_absolute_paths()
+    public function it_throws_an_exception_when_requesting_absolute_paths()
     {
         $this->expectException(\LogicException::class);
 

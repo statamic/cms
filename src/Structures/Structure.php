@@ -2,16 +2,11 @@
 
 namespace Statamic\Structures;
 
+use Illuminate\Support\Traits\Tappable;
+use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Facades;
 use Statamic\Support\Str;
-use Statamic\Facades\Site;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Collection;
-use Illuminate\Support\Traits\Tappable;
-use Statamic\Facades\Structure as StructureAPI;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Structures\Structure as StructureContract;
-use Statamic\Facades\Blink;
 
 abstract class Structure implements StructureContract
 {
@@ -109,7 +104,7 @@ abstract class Structure implements StructureContract
             return $tree;
         }
 
-        if (!empty($tree) && !isset($tree[0]['entry'])) {
+        if (! empty($tree) && ! isset($tree[0]['entry'])) {
             throw new \Exception('Root page must be an entry');
         }
 

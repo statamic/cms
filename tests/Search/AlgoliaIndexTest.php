@@ -3,9 +3,9 @@
 namespace Tests\Search;
 
 use Mockery;
+use Statamic\Search\Algolia\Index;
 use Statamic\Search\ItemResolver;
 use Tests\TestCase;
-use Statamic\Search\Algolia\Index;
 
 class AlgoliaIndexTest extends TestCase
 {

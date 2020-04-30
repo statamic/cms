@@ -2,11 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Concerns;
-use Stringy\StaticStringy;
 use Statamic\Facades\File;
-use Statamic\Support\Str;
 use Statamic\Facades\URL;
+use Statamic\Support\Str;
+use Stringy\StaticStringy;
 
 class Svg extends Tags
 {

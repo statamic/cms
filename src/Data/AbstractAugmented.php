@@ -58,7 +58,7 @@ abstract class AbstractAugmented implements Augmented
 
     private function methodExistsOnThisClass($method)
     {
-        return method_exists($this, $method) && !in_array($method, ['select', 'except']);
+        return method_exists($this, $method) && ! in_array($method, ['select', 'except']);
     }
 
     protected function getFromData($handle)

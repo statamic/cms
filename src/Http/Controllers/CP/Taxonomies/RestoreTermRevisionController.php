@@ -2,10 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
-use Statamic\Facades\Entry;
 use Illuminate\Http\Request;
-use Statamic\Revisions\WorkingCopy;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Revisions\WorkingCopy;
 
 class RestoreTermRevisionController extends CpController
 {

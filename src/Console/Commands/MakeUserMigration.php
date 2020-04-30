@@ -2,9 +2,9 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Facades\File;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Statamic\Facades\File;
 
 class MakeUserMigration extends Command
 {
@@ -32,7 +32,7 @@ class MakeUserMigration extends Command
     public function handle()
     {
         File::put(
-            database_path().'/migrations/'.date('Y_m_d_His') . '_create_users_tables.php',
+            database_path().'/migrations/'.date('Y_m_d_His').'_create_users_tables.php',
             File::get(__DIR__.'/stubs/create_users_tables.php.stub')
         );
     }

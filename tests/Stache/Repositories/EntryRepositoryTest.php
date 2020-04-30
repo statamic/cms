@@ -2,18 +2,17 @@
 
 namespace Tests\Stache\Repositories;
 
-use Tests\TestCase;
-use Tests\UnlinksPaths;
-use Statamic\Stache\Stache;
-use Statamic\Facades\Collection;
-use Statamic\Facades\Entry as EntryAPI;
-use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\EntryCollection;
-use Statamic\Stache\Stores\NavigationStore;
-use Statamic\Stache\Stores\CollectionsStore;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Stache\Repositories\EntryRepository;
-use Statamic\Exceptions\InvalidLocalizationException;
+use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\CollectionsStore;
+use Statamic\Stache\Stores\EntriesStore;
+use Statamic\Stache\Stores\NavigationStore;
+use Tests\TestCase;
+use Tests\UnlinksPaths;
 
 class EntryRepositoryTest extends TestCase
 {
@@ -36,7 +35,7 @@ class EntryRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_entries()
+    public function it_gets_all_entries()
     {
         $entries = $this->repo->all();
 
@@ -62,7 +61,7 @@ class EntryRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entries_from_a_collection()
+    public function it_gets_entries_from_a_collection()
     {
         tap($this->repo->whereCollection('alphabetical'), function ($entries) {
             $this->assertInstanceOf(EntryCollection::class, $entries);
@@ -102,7 +101,7 @@ class EntryRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entries_from_multiple_collections()
+    public function it_gets_entries_from_multiple_collections()
     {
         $entries = $this->repo->whereInCollection(['alphabetical', 'blog']);
 
@@ -119,7 +118,7 @@ class EntryRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entry_by_id()
+    public function it_gets_entry_by_id()
     {
         $entry = $this->repo->find('alphabetical-bravo');
 
@@ -130,7 +129,7 @@ class EntryRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entry_by_slug()
+    public function it_gets_entry_by_slug()
     {
         $entry = $this->repo->findBySlug('bravo', 'alphabetical');
 
@@ -143,7 +142,7 @@ class EntryRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entry_by_uri()
+    public function it_gets_entry_by_uri()
     {
         $entry = $this->repo->findByUri('/alphabetical/bravo');
 
@@ -154,7 +153,7 @@ class EntryRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entry_by_structure_uri()
+    public function it_gets_entry_by_structure_uri()
     {
         $entry = $this->repo->findByUri('/about/board/directors');
 
@@ -164,7 +163,7 @@ class EntryRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_saves_an_entry_to_the_stache_and_to_a_file()
+    public function it_saves_an_entry_to_the_stache_and_to_a_file()
     {
         $entry = EntryAPI::make()
             ->locale('en')

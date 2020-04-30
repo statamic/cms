@@ -2,22 +2,21 @@
 
 namespace Statamic\Facades\Endpoint;
 
-use Statamic\Support\Str;
-use Statamic\Facades\Path;
-use Statamic\Facades\Config;
-use Statamic\Facades\Content;
-use Statamic\Facades\Pattern;
-use Stringy\StaticStringy as Stringy;
 use Statamic\Data\Services\ContentService;
+use Statamic\Facades\Config;
+use Statamic\Facades\Path;
+use Statamic\Facades\Pattern;
+use Statamic\Support\Str;
+use Stringy\StaticStringy as Stringy;
 
 /**
- * Manipulate URLs
+ * Manipulate URLs.
  */
 class URL
 {
     /**
      * Removes occurrences of "//" in a $path (except when part of a protocol)
-     * Alias of Path::tidy()
+     * Alias of Path::tidy().
      *
      * @param string  $url  URL to remove "//" from
      * @return string
@@ -28,7 +27,7 @@ class URL
     }
 
     /**
-     * Assembles a URL from an ordered list of segments
+     * Assembles a URL from an ordered list of segments.
      *
      * @param mixed string  Open ended number of arguments
      * @return string
@@ -41,7 +40,7 @@ class URL
     }
 
     /**
-     * Get the slug of a URL
+     * Get the slug of a URL.
      *
      * @param string $url  URL to parse
      * @return string
@@ -52,7 +51,7 @@ class URL
     }
 
     /**
-     * Swaps the slug of a $url with the $slug provided
+     * Swaps the slug of a $url with the $slug provided.
      *
      * @param string  $url   URL to modify
      * @param string  $slug  New slug to use
@@ -64,7 +63,7 @@ class URL
     }
 
     /**
-     * Get the parent URL
+     * Get the parent URL.
      *
      * @param string $url
      * @return string
@@ -80,10 +79,10 @@ class URL
     }
 
     /**
-     * Check if a URL is an acestor of the current URL
+     * Check if a URL is an acestor of the current URL.
      *
      * @param string        $uri
-     * @return boolean
+     * @return bool
      */
     public function isAncestor($parent_uri, $uri = null)
     {
@@ -94,8 +93,7 @@ class URL
         }
 
         // We default to the current URL.
-        if ($uri === null)
-        {
+        if ($uri === null) {
             $uri = self::getCurrent();
         }
 
@@ -108,11 +106,11 @@ class URL
     }
 
     /**
-     * Make sure the site root is prepended to a URL
+     * Make sure the site root is prepended to a URL.
      *
      * @param  string       $url
      * @param  string|null  $locale
-     * @param  boolean      $controller
+     * @param  bool      $controller
      * @return string
      */
     public function prependSiteRoot($url, $locale = null, $controller = true)
@@ -131,7 +129,7 @@ class URL
     }
 
     /**
-     * Make sure the site root url is prepended to a URL
+     * Make sure the site root url is prepended to a URL.
      *
      * @param string      $url
      * @param string|null $locale
@@ -156,18 +154,18 @@ class URL
     }
 
     /**
-     * Removes the site root url from the beginning of a URL
+     * Removes the site root url from the beginning of a URL.
      *
      * @param string $url
      * @return string
      */
     public function removeSiteUrl($url)
     {
-        return preg_replace('#^'. Config::getSiteUrl() .'#', '/', $url);
+        return preg_replace('#^'.Config::getSiteUrl().'#', '/', $url);
     }
 
     /**
-     * Make an absolute URL relative
+     * Make an absolute URL relative.
      *
      * @param string $url
      * @return string
@@ -179,18 +177,18 @@ class URL
         $url = $parsed['path'];
 
         if (isset($parsed['query'])) {
-            $url .= '?' . $parsed['query'];
+            $url .= '?'.$parsed['query'];
         }
 
         if (isset($parsed['fragment'])) {
-            $url .= '#' . $parsed['fragment'];
+            $url .= '#'.$parsed['fragment'];
         }
 
         return $url;
     }
 
     /**
-     * Make a relative URL absolute
+     * Make a relative URL absolute.
      *
      * @param string $url
      * @return string
@@ -206,7 +204,7 @@ class URL
     }
 
     /**
-     * Get the current URL
+     * Get the current URL.
      *
      * @return string
      */
@@ -216,20 +214,20 @@ class URL
     }
 
     /**
-     * Formats a URL properly
+     * Formats a URL properly.
      *
      * @param string $url
      * @return string
      */
     public function format($url)
     {
-        return self::tidy('/' . trim($url, '/'));
+        return self::tidy('/'.trim($url, '/'));
     }
 
     /**
-     * Checks whether a URL is external or not
+     * Checks whether a URL is external or not.
      * @param  string  $url
-     * @return boolean
+     * @return bool
      */
     public function isExternal($url)
     {
@@ -240,7 +238,7 @@ class URL
     }
 
     /**
-     * Get the current site url from Apache headers
+     * Get the current site url from Apache headers.
      * @return string
      */
     public function getSiteUrl()
@@ -250,16 +248,16 @@ class URL
         }
 
         $protocol = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443)
-            ? "https://"
-            : "http://";
+            ? 'https://'
+            : 'http://';
 
-        $domain_name = $_SERVER['HTTP_HOST'] . '/';
+        $domain_name = $_SERVER['HTTP_HOST'].'/';
 
-        return $protocol . $domain_name;
+        return $protocol.$domain_name;
     }
 
     /**
-     * Build a page URL from a path
+     * Build a page URL from a path.
      *
      * @param string $path
      * @return string
@@ -280,7 +278,7 @@ class URL
     }
 
     /**
-     * Encode a URL
+     * Encode a URL.
      *
      * @param string $url
      * @return string
@@ -308,7 +306,7 @@ class URL
     }
 
     /**
-     * Given a localized URI, get the default URI
+     * Given a localized URI, get the default URI.
      *
      * @param string $locale  The locale of the provided URI
      * @param string $uri     The URI from which to find the default
@@ -320,18 +318,18 @@ class URL
     }
 
     /**
-     * Return a gravatar image
+     * Return a gravatar image.
      *
      * @param  string  $email
-     * @param  integer $size
+     * @param  int $size
      * @return string
      */
     public function gravatar($email, $size = null)
     {
-        $url = "https://www.gravatar.com/avatar/" . e(md5(strtolower($email)));
+        $url = 'https://www.gravatar.com/avatar/'.e(md5(strtolower($email)));
 
         if ($size) {
-            $url .= '?s=' . $size;
+            $url .= '?s='.$size;
         }
 
         return $url;

@@ -2,13 +2,13 @@
 
 namespace Statamic\Widgets;
 
-use Statamic\Facades\User;
 use Statamic\Facades\Collection as CollectionAPI;
+use Statamic\Facades\User;
 
 class Collection extends Widget
 {
     /**
-     * The HTML that should be shown in the widget
+     * The HTML that should be shown in the widget.
      *
      * @return \Illuminate\View\View
      */

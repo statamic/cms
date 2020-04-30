@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers\CP;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Statamic\Facades\Action;
-use Statamic\Facades\Entry;
 use Statamic\Facades\User;
 
 abstract class ActionController extends CpController

@@ -35,21 +35,20 @@ class TreeBuilder
                 ->all();
         }
 
-
         return $this->toTree($pages, 1);
     }
 
     protected function toTree($pages, $depth)
     {
         return $pages->map(function ($page) use ($depth) {
-            if ($page->reference() && !$page->referenceExists()) {
+            if ($page->reference() && ! $page->referenceExists()) {
                 return null;
             }
 
             return [
                 'page' => $page,
                 'depth' => $depth,
-                'children' => $this->toTree($page->pages()->all(), $depth + 1)
+                'children' => $this->toTree($page->pages()->all(), $depth + 1),
             ];
         })->filter()->values()->all();
     }
@@ -74,13 +73,13 @@ class TreeBuilder
                 'edit_url'    => $page->editUrl(),
                 'slug'        => $page->slug(),
                 'redirect'    => $page->reference() ? $page->entry()->get('redirect') : null,
-                'collection'  => !$collection ? null : [
+                'collection'  => ! $collection ? null : [
                     'handle' => $collection->handle(),
                     'title' => $collection->title(),
                     'edit_url' => $collection->showUrl(),
                     'create_url' => $collection->createEntryUrl(),
                 ],
-                'children'    => (! empty($item['children'])) ? $this->transformTreeForController($item['children']) : []
+                'children'    => (! empty($item['children'])) ? $this->transformTreeForController($item['children']) : [],
             ];
         })->values()->all();
     }

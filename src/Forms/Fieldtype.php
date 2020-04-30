@@ -2,8 +2,8 @@
 
 namespace Statamic\Forms;
 
-use Statamic\Facades;
 use Statamic\CP\Column;
+use Statamic\Facades;
 use Statamic\Fieldtypes\Relationship;
 
 class Fieldtype extends Relationship
@@ -17,7 +17,7 @@ class Fieldtype extends Relationship
     protected $configFields = [
         'placeholder' => [
             'type' => 'text',
-            'instructions' => 'Set default placeholder text.'
+            'instructions' => 'Set default placeholder text.',
         ],
     ];
 

@@ -2,7 +2,6 @@
 
 namespace Statamic\Providers;
 
-use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\AggregateServiceProvider;
 
 class StatamicServiceProvider extends AggregateServiceProvider

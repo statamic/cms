@@ -3,7 +3,6 @@
 namespace Statamic\Sites;
 
 use Statamic\Support\Str;
-use Statamic\Statamic;
 
 class Sites
 {

@@ -3,8 +3,8 @@
 namespace Statamic\Imaging;
 
 use League\Flysystem\FilesystemInterface;
-use Symfony\Component\HttpFoundation\Request;
 use League\Glide\Responses\ResponseFactoryInterface;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\StreamedResponse;
 
 class ResponseFactory implements ResponseFactoryInterface

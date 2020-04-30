@@ -25,7 +25,7 @@ class Folder extends JsonResource
 
             $this->mergeWhen($this->withChildFolders, function () {
                 return ['folders' => Folder::collection($this->assetFolders()->values())];
-            })
+            }),
         ];
     }
 }

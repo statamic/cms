@@ -6,12 +6,10 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Entries\Collection;
-use Statamic\Entries\Entry;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
-use Statamic\Facades\Structure;
 use Statamic\Fields\Blueprint;
 use Statamic\Structures\CollectionStructure;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -22,7 +20,7 @@ class CollectionTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_gets_and_sets_the_handle()
+    public function it_gets_and_sets_the_handle()
     {
         $collection = new Collection;
         $this->assertNull($collection->handle());
@@ -34,7 +32,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_routes()
+    public function it_gets_and_sets_the_routes()
     {
         Site::setConfig(['sites' => [
             'en' => ['url' => 'http://domain.com/'],
@@ -50,7 +48,7 @@ class CollectionTest extends TestCase
         $return = $collection->routes([
             'en' => 'blog/{slug}',
             'fr' => 'le-blog/{slug}',
-            'de' => 'das-blog/{slug}'
+            'de' => 'das-blog/{slug}',
         ]);
 
         $this->assertEquals($collection, $return);
@@ -67,7 +65,7 @@ class CollectionTest extends TestCase
 
         $this->assertEquals([
             'en' => 'blog/{slug}',
-            'fr' => 'le-blog/{slug}'
+            'fr' => 'le-blog/{slug}',
         ], $collection->routes()->all());
         $this->assertEquals('blog/{slug}', $collection->route('en'));
         $this->assertEquals('le-blog/{slug}', $collection->route('fr'));
@@ -76,7 +74,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_sets_all_the_routes_identically()
+    public function it_sets_all_the_routes_identically()
     {
         Site::setConfig(['sites' => [
             'en' => ['url' => 'http://domain.com/'],
@@ -91,7 +89,7 @@ class CollectionTest extends TestCase
         $this->assertEquals($collection, $return);
         $this->assertEquals([
             'en' => '{slug}',
-            'fr' => '{slug}'
+            'fr' => '{slug}',
         ], $collection->routes()->all());
         $this->assertEquals('{slug}', $collection->route('en'));
         $this->assertEquals('{slug}', $collection->route('fr'));
@@ -100,7 +98,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_template()
+    public function it_gets_and_sets_the_template()
     {
         $collection = new Collection;
         $this->assertEquals('default', $collection->template());
@@ -112,7 +110,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_layout()
+    public function it_gets_and_sets_the_layout()
     {
         $collection = new Collection;
         $this->assertEquals('layout', $collection->layout());
@@ -124,7 +122,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_title()
+    public function it_gets_and_sets_the_title()
     {
         $collection = (new Collection)->handle('blog');
         $this->assertEquals('Blog', $collection->title());
@@ -136,7 +134,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_sites_it_can_be_used_in_when_using_multiple_sites()
+    public function it_gets_and_sets_the_sites_it_can_be_used_in_when_using_multiple_sites()
     {
         Site::setConfig(['sites' => [
             'en' => ['url' => 'http://domain.com/'],
@@ -156,7 +154,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_default_site_when_in_single_site_mode()
+    public function it_gets_the_default_site_when_in_single_site_mode()
     {
         $collection = new Collection;
 
@@ -171,7 +169,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_stores_cascading_data_in_a_collection()
+    public function it_stores_cascading_data_in_a_collection()
     {
         $collection = new Collection;
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $collection->cascade());
@@ -184,7 +182,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_sets_all_the_cascade_data_when_passing_an_array()
+    public function it_sets_all_the_cascade_data_when_passing_an_array()
     {
         $collection = new Collection;
 
@@ -199,7 +197,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_values_from_the_cascade_with_fallbacks()
+    public function it_gets_values_from_the_cascade_with_fallbacks()
     {
         $collection = new Collection;
         $collection->cascade(['foo' => 'bar']);
@@ -210,7 +208,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_entry_blueprints()
+    public function it_gets_and_sets_entry_blueprints()
     {
         BlueprintRepository::shouldReceive('find')->with('default')->andReturn($default = new Blueprint);
         BlueprintRepository::shouldReceive('find')->with('one')->andReturn($blueprintOne = new Blueprint);
@@ -231,7 +229,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_sort_field_and_direction()
+    public function it_gets_sort_field_and_direction()
     {
         $alpha = new Collection;
         $this->assertEquals('title', $alpha->sortField());
@@ -262,7 +260,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_saves_the_collection_through_the_api()
+    public function it_saves_the_collection_through_the_api()
     {
         $collection = (new Collection)->handle('test');
 
@@ -276,7 +274,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_sets_future_date_behavior()
+    public function it_sets_future_date_behavior()
     {
         $collection = (new Collection)->handle('test');
         $this->assertEquals('public', $collection->futureDateBehavior());
@@ -291,7 +289,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_sets_past_date_behavior()
+    public function it_sets_past_date_behavior()
     {
         $collection = (new Collection)->handle('test');
         $this->assertEquals('public', $collection->pastDateBehavior());
@@ -306,7 +304,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_default_publish_state()
+    public function it_gets_and_sets_the_default_publish_state()
     {
         $collection = (new Collection)->handle('test');
         $this->assertTrue($collection->defaultPublishState());
@@ -321,7 +319,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function default_publish_state_is_always_false_when_using_revisions()
+    public function default_publish_state_is_always_false_when_using_revisions()
     {
         config(['statamic.revisions.enabled' => true]);
 
@@ -339,7 +337,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_sets_and_gets_structure()
+    public function it_sets_and_gets_structure()
     {
         $structure = new CollectionStructure;
         $collection = (new Collection)->handle('test');
@@ -356,7 +354,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_sets_the_structure_inline()
+    public function it_sets_the_structure_inline()
     {
         // This applies to a file-based approach.
 
@@ -372,10 +370,10 @@ class CollectionTest extends TestCase
             'max_depth' => 2,
             'tree' => [
                 ['entry' => '123', 'children' => [
-                    ['entry' => '789']
+                    ['entry' => '789'],
                 ]],
                 ['entry' => '456'],
-            ]
+            ],
         ]);
 
         $this->assertEquals($collection, $return);
@@ -391,7 +389,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function setting_a_structure_removes_the_existing_inline_structure()
+    public function setting_a_structure_removes_the_existing_inline_structure()
     {
         $collection = (new Collection)->handle('test');
         $collection->structureContents($contents = ['tree' => []]);
@@ -403,7 +401,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function setting_an_inline_structure_removes_the_existing_structure()
+    public function setting_an_inline_structure_removes_the_existing_structure()
     {
         $collection = (new Collection)->handle('test');
         $collection->structure($structure = (new CollectionStructure)->maxDepth(2));
@@ -418,7 +416,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_handle_when_casting_to_a_string()
+    public function it_gets_the_handle_when_casting_to_a_string()
     {
         $collection = (new Collection)->handle('test');
 
@@ -426,7 +424,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_augments()
+    public function it_augments()
     {
         $collection = (new Collection)->handle('test');
 
@@ -438,7 +436,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_augments_in_the_parser()
+    public function it_augments_in_the_parser()
     {
         $collection = (new Collection)->handle('test');
 

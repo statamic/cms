@@ -69,7 +69,7 @@ class Resource
         }
 
         if (! is_subclass_of($class, JsonResource::class)) {
-            throw new JsonResourceException("[{$class}] must be a subclass of " . JsonResource::class);
+            throw new JsonResourceException("[{$class}] must be a subclass of ".JsonResource::class);
         }
     }
 }

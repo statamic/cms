@@ -25,7 +25,7 @@ class FormCreateTest extends TestCase
     }
 
     /** @test */
-    function it_renders_form()
+    public function it_renders_form()
     {
         $forms = [
             $this->tag('{{ form:create handle="contact" }}{{ /form:create }}'),
@@ -54,7 +54,7 @@ class FormCreateTest extends TestCase
                     'field' => [
                         'type' => 'text',
                         'display' => 'Full Name',
-                    ]
+                    ],
                 ],
                 [
                     'handle' => 'email',
@@ -63,7 +63,7 @@ class FormCreateTest extends TestCase
                         'input_type' => 'email',
                         'display' => 'Email Address',
                         'validate' => 'required|email',
-                    ]
+                    ],
                 ],
                 [
                     'handle' => 'message',
@@ -71,9 +71,9 @@ class FormCreateTest extends TestCase
                         'type' => 'textarea',
                         'display' => 'Message',
                         'validate' => 'required',
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ]);
 
         Blueprint::shouldReceive('find')

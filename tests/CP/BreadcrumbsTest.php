@@ -2,14 +2,14 @@
 
 namespace Tests\CP;
 
-use Tests\TestCase;
-use Statamic\CP\Breadcrumbs;
 use Illuminate\Contracts\Translation\Translator;
+use Statamic\CP\Breadcrumbs;
+use Tests\TestCase;
 
 class BreadcrumbsTest extends TestCase
 {
     /** @test */
-    function it_creates_breadcrumbs()
+    public function it_creates_breadcrumbs()
     {
         $bc = new Breadcrumbs($array = [
             ['text' => 'First', 'url' => '/first'],
@@ -22,7 +22,7 @@ class BreadcrumbsTest extends TestCase
     }
 
     /** @test */
-    function it_is_arrayable()
+    public function it_is_arrayable()
     {
         $bc = new Breadcrumbs($array = [
             ['text' => 'First', 'url' => '/first'],
@@ -35,7 +35,7 @@ class BreadcrumbsTest extends TestCase
     }
 
     /** @test */
-    function it_pushes_a_crumb_into_the_title()
+    public function it_pushes_a_crumb_into_the_title()
     {
         app()->instance('translator', $this->mock(Translator::class)
             ->shouldReceive('get')->with('The title', [], null)->once()

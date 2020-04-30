@@ -22,6 +22,7 @@ class GlobalsStore extends BasicStore
         // The global sets themselves should only exist in the root
         // (ie. no slashes in the filename)
         $filename = str_after(Path::tidy($file->getPathName()), $this->directory);
+
         return substr_count($filename, '/') === 0 && $file->getExtension() === 'yaml';
     }
 
@@ -34,8 +35,9 @@ class GlobalsStore extends BasicStore
         // base file was requested. The variables will get made as part of it.
         if (Site::hasMultiple() && str_contains($relative, '/')) {
             $handle = pathinfo($relative, PATHINFO_FILENAME);
-            $path = $this->directory . $handle . '.yaml';
+            $path = $this->directory.$handle.'.yaml';
             $data = YAML::file($path)->parse();
+
             return $this->makeMultiSiteGlobalFromFile($handle, $path, $data);
         }
 
@@ -63,7 +65,7 @@ class GlobalsStore extends BasicStore
         $set = $this->makeBaseGlobalFromFile($handle, $path, $data);
 
         Site::all()->filter(function ($site) use ($handle) {
-            return File::exists($this->directory . $site->handle() . '/' . $handle . '.yaml');
+            return File::exists($this->directory.$site->handle().'/'.$handle.'.yaml');
         })->map->handle()->map(function ($site) use ($set) {
             return $this->makeVariables($set, $site);
         })->filter()->each(function ($variables) use ($set) {
@@ -118,7 +120,8 @@ class GlobalsStore extends BasicStore
         // Given a path to a variables file, get the key based on its base global set path.
         if (str_contains($relative = str_after($path, $this->directory), '/')) {
             $handle = pathinfo($relative, PATHINFO_FILENAME);
-            $path = $this->directory . $handle . '.yaml';
+            $path = $this->directory.$handle.'.yaml';
+
             return $this->paths()->flip()->get($path);
         }
     }

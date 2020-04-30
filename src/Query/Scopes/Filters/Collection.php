@@ -32,7 +32,7 @@ class Collection extends Filter
 
     public function badge($values)
     {
-        return __('collections') . ': ' . collect($values['collections'])->implode(', ');
+        return __('collections').': '.collect($values['collections'])->implode(', ');
     }
 
     public function visibleTo($key)

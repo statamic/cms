@@ -14,7 +14,7 @@ class AssetIndexTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_redirects_to_the_first_authorized_containers_browse_url()
+    public function it_redirects_to_the_first_authorized_containers_browse_url()
     {
         $this->setTestRoles(['test' => ['access cp', 'view two assets']]);
         $user = User::make()->assignRole('test')->save();
@@ -28,7 +28,7 @@ class AssetIndexTest extends TestCase
     }
 
     /** @test */
-    function it_shows_the_empty_state_if_there_are_no_containers_and_you_have_permission_to_create()
+    public function it_shows_the_empty_state_if_there_are_no_containers_and_you_have_permission_to_create()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure asset containers']]);
         $user = User::make()->assignRole('test')->save();
@@ -41,7 +41,7 @@ class AssetIndexTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_there_are_no_containers_and_you_dont_have_permission_to_create()
+    public function it_denies_access_if_there_are_no_containers_and_you_dont_have_permission_to_create()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test')->save();

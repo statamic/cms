@@ -11,6 +11,7 @@ abstract class UserRepository implements RepositoryContract
     {
         // TODO: Factory?
         throw new \Exception('Factory not supported. Use User::make() to get an instance.');
+
         return app(UserFactory::class);
     }
 

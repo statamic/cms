@@ -8,7 +8,6 @@ use Statamic\Data\ContainsData;
 use Statamic\Exceptions\PublishException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\File;
-use Statamic\Facades\Helper;
 use Statamic\Facades\YAML;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -32,7 +31,7 @@ class Submission implements SubmissionContract
     public $form;
 
     /**
-     * Get or set the ID
+     * Get or set the ID.
      *
      * @param mixed|null
      * @return mixed
@@ -47,7 +46,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Get or set the form
+     * Get or set the form.
      *
      * @param Form|null $form
      * @return Form
@@ -58,7 +57,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Get the form fields
+     * Get the form fields.
      *
      * @return array
      */
@@ -68,7 +67,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Get or set the columns
+     * Get or set the columns.
      *
      * @return array
      */
@@ -78,7 +77,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Get the date when this was submitted
+     * Get the date when this was submitted.
      *
      * @return Carbon
      */
@@ -88,7 +87,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Get the date, formatted by what's specified in the form config
+     * Get the date, formatted by what's specified in the form config.
      *
      * @return string
      */
@@ -100,7 +99,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Disable validation
+     * Disable validation.
      */
     public function unguard()
     {
@@ -110,7 +109,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Enable validation
+     * Enable validation.
      */
     public function guard()
     {
@@ -120,7 +119,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Get or set the data
+     * Get or set the data.
      *
      * @param array|null $data
      * @return array
@@ -148,7 +147,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Upload files
+     * Upload files.
      */
     public function uploadFiles()
     {
@@ -157,21 +156,18 @@ class Submission implements SubmissionContract
         collect($this->fields())->filter(function ($field) {
             // Only deal with uploadable fields
             return in_array(array_get($field, 'type'), ['file', 'files', 'asset', 'assets']);
-
         })->map(function ($config, $field) {
             // Map into a nicer data schema to work with
             return compact('field', 'config');
-
         })->reject(function ($arr) use ($request) {
             // Remove if no file was uploaded
-            return !$request->hasFile($arr['field']);
-
+            return ! $request->hasFile($arr['field']);
         })->map(function ($arr, $field) use ($request) {
             // Add the uploaded files to our data array
             $files = collect(array_filter((array) $request->file($field)));
             $arr['files'] = $files;
-            return $arr;
 
+            return $arr;
         })->each(function ($arr) {
             // A plural type uses the singular version. assets => asset, etc.
             $type = rtrim(array_get($arr, 'config.type'), 's');
@@ -187,7 +183,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Validate an array of data against rules in the form blueprint
+     * Validate an array of data against rules in the form blueprint.
      *
      * @param  array $data       Data to validate
      * @throws PublishException  An exception will be thrown if it doesn't validate
@@ -230,7 +226,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Get a value of a field
+     * Get a value of a field.
      *
      * @param  string $key
      * @return mixed
@@ -241,7 +237,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Set a value of a field
+     * Set a value of a field.
      *
      * @param string $field
      * @param mixed  $value
@@ -253,7 +249,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Save the submission
+     * Save the submission.
      */
     public function save()
     {
@@ -261,7 +257,7 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Delete this submission
+     * Delete this submission.
      */
     public function delete()
     {
@@ -269,17 +265,17 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Get the path to the file
+     * Get the path to the file.
      *
      * @return string
      */
     public function getPath()
     {
-        return config('statamic.forms.submissions') . '/' . $this->form()->handle() . '/' . $this->id() . '.yaml';
+        return config('statamic.forms.submissions').'/'.$this->form()->handle().'/'.$this->id().'.yaml';
     }
 
     /**
-     * Convert to an array
+     * Convert to an array.
      *
      * @return array
      */

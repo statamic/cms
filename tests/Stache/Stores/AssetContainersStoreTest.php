@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 class AssetContainersStoreTest extends TestCase
 {
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -25,14 +25,14 @@ class AssetContainersStoreTest extends TestCase
         $this->store = (new AssetContainersStore($stache, app('files')))->directory($this->tempDir);
     }
 
-    function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
     /** @test */
-    function it_gets_yaml_files()
+    public function it_gets_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
         touch($this->tempDir.'/two.yaml', 1234567890);
@@ -56,7 +56,7 @@ class AssetContainersStoreTest extends TestCase
     }
 
     /** @test */
-    function it_makes_asset_container_instances_from_files()
+    public function it_makes_asset_container_instances_from_files()
     {
         config(['filesystems.disks.test' => ['driver' => 'local', 'root' => __DIR__.'/../../Assets/__fixtures__/container']]);
 
@@ -64,7 +64,7 @@ class AssetContainersStoreTest extends TestCase
             ->with('test')->once()
             ->andReturn($blueprint = new \Statamic\Fields\Blueprint);
 
-$contents = <<<EOL
+        $contents = <<<'EOL'
 disk: test
 title: Example
 blueprint: test
@@ -92,7 +92,7 @@ EOL;
     }
 
     /** @test */
-    function it_uses_the_handle_as_the_item_key()
+    public function it_uses_the_handle_as_the_item_key()
     {
         $this->assertEquals(
             'test',
@@ -101,7 +101,7 @@ EOL;
     }
 
     /** @test */
-    function it_saves_to_disk()
+    public function it_saves_to_disk()
     {
         Facades\Stache::shouldReceive('store')
             ->with('asset-containers')
@@ -116,7 +116,7 @@ EOL;
 
         $this->store->save($container);
 
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 title: 'New Container'
 blueprint: foo
 
@@ -125,7 +125,7 @@ EOT;
 
         $container->allowUploads(false)->createFolders(false)->save();
 
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 title: 'New Container'
 blueprint: foo
 allow_uploads: false

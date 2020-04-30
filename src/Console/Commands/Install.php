@@ -2,9 +2,8 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Facades\File;
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
+use Statamic\Facades\File;
 
 class Install extends Command
 {

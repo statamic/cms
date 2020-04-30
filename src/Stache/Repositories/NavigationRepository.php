@@ -3,13 +3,9 @@
 namespace Statamic\Stache\Repositories;
 
 use Illuminate\Support\Collection;
-use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Structures\NavigationRepository as RepositoryContract;
-use Statamic\Facades;
 use Statamic\Stache\Stache;
-use Statamic\Support\Str;
-use Statamic\Support\Arr;
 
 class NavigationRepository implements RepositoryContract
 {

@@ -2,8 +2,6 @@
 
 namespace Statamic\Tags\Concerns;
 
-use Statamic\Support\Arr;
-
 trait GetsQueryResults
 {
     protected function results($query)

@@ -4,10 +4,6 @@ namespace Statamic\Modifiers;
 
 use ArrayIterator;
 use Exception;
-use Statamic\Facades\Helper;
-use Statamic\Modifiers\Loader;
-use Statamic\Modifiers\ModifierException;
-use Statamic\Modifiers\ModifierNotFoundException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -34,7 +30,7 @@ class Modify implements \IteratorAggregate
     }
 
     /**
-     * Invoke the class as a function
+     * Invoke the class as a function.
      *
      * @param mixed $value
      * @return \Statamic\Modifiers\Modify
@@ -45,7 +41,7 @@ class Modify implements \IteratorAggregate
     }
 
     /**
-     * Specify a value to start the modification chain
+     * Specify a value to start the modification chain.
      *
      * @param mixed $value
      * @return \Statamic\Modifiers\Modify
@@ -60,7 +56,7 @@ class Modify implements \IteratorAggregate
     }
 
     /**
-     * Set the context
+     * Set the context.
      *
      * @param array $context
      * @return $this
@@ -73,7 +69,7 @@ class Modify implements \IteratorAggregate
     }
 
     /**
-     * Get the raw value
+     * Get the raw value.
      *
      * @return mixed
      */
@@ -83,7 +79,7 @@ class Modify implements \IteratorAggregate
     }
 
     /**
-     * Get the value as a string
+     * Get the value as a string.
      *
      * @return string
      * @throws \Statamic\Modifiers\ModifierException
@@ -100,7 +96,7 @@ class Modify implements \IteratorAggregate
     }
 
     /**
-     * Get the value as an array
+     * Get the value as an array.
      *
      * @return \Traversable
      * @throws \Statamic\Modifiers\ModifierException
@@ -118,7 +114,7 @@ class Modify implements \IteratorAggregate
     }
 
     /**
-     * Allow calls to modifiers via method names
+     * Allow calls to modifiers via method names.
      *
      * @param  string $method Modifier name
      * @param  array  $args   Any parameters as arguments
@@ -132,7 +128,7 @@ class Modify implements \IteratorAggregate
     }
 
     /**
-     * Modify a value
+     * Modify a value.
      *
      * @param string $modifier
      * @param array  $params
@@ -153,19 +149,16 @@ class Modify implements \IteratorAggregate
             // Attempt to run the modifier. If it worked, awesome,
             // we'll have successfully returned a modified value.
             return $this->runModifier($modifier, $params);
-
         } catch (ModifierException $e) {
             // If this class explicitly raised an exception, it would've
             // been a ModifierException, so we'll just rethrow it since
             // we'll be catching it on the view side of things.
             $e->setModifier($modifier);
             throw $e;
-
         } catch (ModifierNotFoundException $e) {
             // Modifiers that don't exist shouldn't fail silently.
             // This exception will have a nice Ignition solution.
             throw $e;
-
         } catch (Exception $e) {
             // If a modifier's code raised an exception, we'll just
             // catch it here and rethrow it as a ModifierException.
@@ -176,7 +169,7 @@ class Modify implements \IteratorAggregate
     }
 
     /**
-     * Run the modifier
+     * Run the modifier.
      *
      * We keep all the native bundled modifiers in one big juicy class
      * rather than a million separate files. First, we'll check there
@@ -189,7 +182,7 @@ class Modify implements \IteratorAggregate
      */
     protected function runModifier($modifier, $params)
     {
-        list($class, $method) = $this->loader->load($modifier);
+        [$class, $method] = $this->loader->load($modifier);
 
         return $class->$method($this->value, $params, $this->context);
     }

@@ -129,14 +129,14 @@ abstract class Fieldtype implements Arrayable
             'selectable'  => $this->selectable(),
             'categories' => $this->categories(),
             'icon' => $this->icon(),
-            'config' => $this->configFields()->toPublishArray()
+            'config' => $this->configFields()->toPublishArray(),
         ];
     }
 
     public function configBlueprint(): Blueprint
     {
         return (new Blueprint)->setContents([
-            'fields' => $this->configFields()->items()->all()
+            'fields' => $this->configFields()->items()->all(),
         ]);
     }
 
@@ -185,7 +185,7 @@ abstract class Fieldtype implements Arrayable
             return $this->view;
         }
 
-        $default = 'statamic::forms.fields.' . $this->handle();
+        $default = 'statamic::forms.fields.'.$this->handle();
 
         return view()->exists($default)
             ? $default
@@ -194,7 +194,7 @@ abstract class Fieldtype implements Arrayable
 
     public function config(string $key = null, $fallback = null)
     {
-        if (!$this->field) {
+        if (! $this->field) {
             return $fallback;
         }
 

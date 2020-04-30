@@ -23,7 +23,7 @@ class Associations extends Index
                                     'value' => $value,
                                     'slug' => Str::slug($value),
                                     'entry' => $entry->id(),
-                                    'site' => $entry->locale()
+                                    'site' => $entry->locale(),
                                 ];
                             });
                     })->all();

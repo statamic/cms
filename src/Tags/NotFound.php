@@ -2,7 +2,6 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tags;
 use Statamic\Exceptions\NotFoundHttpException;
 
 class NotFound extends Tags

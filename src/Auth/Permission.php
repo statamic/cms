@@ -151,7 +151,7 @@ class Permission
                 'label' => $permission->label(),
                 'description' => $permission->description(),
                 'group' => $permission->group(),
-                'children' => $children->flatMap->toTree()->all()
+                'children' => $children->flatMap->toTree()->all(),
             ];
         })->all();
     }

@@ -47,7 +47,7 @@ class AssetsController extends CpController
         $fields->validate();
 
         $values = $fields->process()->values()->merge([
-            'focus' => $request->focus
+            'focus' => $request->focus,
         ]);
 
         foreach ($values as $key => $value) {
@@ -73,7 +73,7 @@ class AssetsController extends CpController
         $this->authorize('store', [AssetContract::class, $container]);
 
         $file = $request->file('file');
-        $path = ltrim($request->folder . '/' . $file->getClientOriginalName(), '/');
+        $path = ltrim($request->folder.'/'.$file->getClientOriginalName(), '/');
 
         $asset = $container->makeAsset($path)->upload($file);
 
@@ -94,9 +94,9 @@ class AssetsController extends CpController
         return response()->stream(function () use ($stream) {
             fpassthru($stream);
         }, 200, [
-            "Content-Type" => $filesystem->getMimetype($file),
-            "Content-Length" => $filesystem->getSize($file),
-            "Content-disposition" => "attachment; filename=\"" . basename($file) . "\"",
+            'Content-Type' => $filesystem->getMimetype($file),
+            'Content-Length' => $filesystem->getSize($file),
+            'Content-disposition' => 'attachment; filename="'.basename($file).'"',
         ]);
     }
 

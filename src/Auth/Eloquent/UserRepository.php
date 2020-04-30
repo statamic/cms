@@ -2,10 +2,10 @@
 
 namespace Statamic\Auth\Eloquent;
 
-use Statamic\Auth\UserCollection;
 use Illuminate\Database\Eloquent\Model;
-use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Auth\UserCollection;
 use Statamic\Auth\UserRepository as BaseRepository;
+use Statamic\Contracts\Auth\User as UserContract;
 
 class UserRepository extends BaseRepository
 {

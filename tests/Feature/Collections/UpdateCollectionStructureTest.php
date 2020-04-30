@@ -16,7 +16,7 @@ class UpdateCollectionStructureTest extends TestCase
     use FakesRoles;
 
     /** @test */
-    function it_updates_the_tree()
+    public function it_updates_the_tree()
     {
         $user = tap(User::make()->makeSuper())->save();
         $collection = tap(Collection::make('test'))->save();
@@ -38,8 +38,8 @@ class UpdateCollectionStructureTest extends TestCase
             ->update($collection, ['pages' => [
                 ['id' => '3', 'children' => [
                     ['id' => '5', 'children' => [
-                        ['id' => '4', 'children' => []]
-                    ]]
+                        ['id' => '4', 'children' => []],
+                    ]],
                 ]],
                 ['id' => '1', 'children' => []],
                 ['id' => '2', 'children' => []],
@@ -49,8 +49,8 @@ class UpdateCollectionStructureTest extends TestCase
         $this->assertEquals([
             ['entry' => '3', 'children' => [
                 ['entry' => '5', 'children' => [
-                    ['entry' => '4']
-                ]]
+                    ['entry' => '4'],
+                ]],
             ]],
             ['entry' => '1'],
             ['entry' => '2'],
@@ -58,7 +58,7 @@ class UpdateCollectionStructureTest extends TestCase
     }
 
     /** @test */
-    function it_deletes_entries_scheduled_for_deletion()
+    public function it_deletes_entries_scheduled_for_deletion()
     {
         $user = tap(User::make()->makeSuper())->save();
         $collection = tap(Collection::make('test'))->save();
@@ -77,7 +77,7 @@ class UpdateCollectionStructureTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission_to_reorder()
+    public function it_denies_access_if_you_dont_have_permission_to_reorder()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -89,12 +89,12 @@ class UpdateCollectionStructureTest extends TestCase
             ->assertForbidden();
     }
 
-    function update($collection, $payload = [])
+    public function update($collection, $payload = [])
     {
         $validParams = [
             'site' => 'en',
             'pages' => [],
-            'deletedEntries' => []
+            'deletedEntries' => [],
         ];
 
         return $this->postJson(
@@ -104,7 +104,7 @@ class UpdateCollectionStructureTest extends TestCase
     }
 
     /** @test */
-    function it_updates_a_specific_sites_tree()
+    public function it_updates_a_specific_sites_tree()
     {
         $this->markTestIncomplete();
     }

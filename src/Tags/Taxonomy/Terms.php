@@ -2,11 +2,7 @@
 
 namespace Statamic\Tags\Taxonomy;
 
-use Closure;
-use Illuminate\Support\Carbon;
-use Statamic\Facades;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Support\Arr;
@@ -101,6 +97,7 @@ class Terms
             ->map(function ($handle) {
                 $taxonomy = Taxonomy::findByHandle($handle);
                 throw_unless($taxonomy, new \Statamic\Exceptions\TaxonomyNotFoundException($handle));
+
                 return $taxonomy;
             })
             ->values();
@@ -118,6 +115,7 @@ class Terms
             ->map(function ($handle) {
                 $collection = Collection::findByHandle($handle);
                 throw_unless($collection, new \Statamic\Exceptions\CollectionNotFoundException("Collection [{$handle}] does not exist."));
+
                 return $collection;
             })
             ->values();

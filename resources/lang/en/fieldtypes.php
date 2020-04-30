@@ -30,7 +30,7 @@ return [
             'sets' => 'Sets are configurable blocks of fields that can be inserted anywhere in your Bard content.',
             'target_blank' => 'Set `target="_blank` on all links.',
             'toolbar_mode' => 'Choose which style of toolbar you prefer.',
-        ]
+        ],
     ],
     'checkboxes' => [
         'config' => [
@@ -139,7 +139,7 @@ return [
     ],
     'relationship' => [
         'config' => [
-            'mode' => 'Choose your preferred UI style.'
-        ]
+            'mode' => 'Choose your preferred UI style.',
+        ],
     ],
 ];

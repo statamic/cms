@@ -2,21 +2,20 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Illuminate\Http\Request;
-use Statamic\Facades\Addon;
 use Facades\Statamic\Extend\AddonInstaller;
+use Illuminate\Http\Request;
 
 class AddonsController extends CpController
 {
     public function __construct()
     {
-        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class . ':configure addons');
+        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure addons');
     }
 
     public function index()
     {
         return view('statamic::addons.index', [
-            'title' => __('Addons')
+            'title' => __('Addons'),
         ]);
     }
 

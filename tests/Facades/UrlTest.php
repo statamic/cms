@@ -2,10 +2,9 @@
 
 namespace Tests\Facades;
 
-use Tests\TestCase;
-use Statamic\Support\Str;
-use Statamic\Facades\URL;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
+use Tests\TestCase;
 
 class UrlTest extends TestCase
 {
@@ -23,7 +22,7 @@ class UrlTest extends TestCase
 
     public function testBuildsUrlFromFullPath()
     {
-        $url = URL::buildFromPath(base_path() . '/pages/index.md');
+        $url = URL::buildFromPath(base_path().'/pages/index.md');
         $this->assertEquals('/', $url);
     }
 

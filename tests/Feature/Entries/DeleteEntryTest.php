@@ -16,7 +16,7 @@ class DeleteEntryTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_deletes_entries()
+    public function it_deletes_entries()
     {
         $user = tap(User::make('test')->makeSuper())->save();
         EntryFactory::id('1')->slug('one')->collection('test')->create();
@@ -35,7 +35,7 @@ class DeleteEntryTest extends TestCase
     }
 
     /** @test */
-    function entries_get_removed_from_the_structure_and_child_pages_are_moved_to_the_parent()
+    public function entries_get_removed_from_the_structure_and_child_pages_are_moved_to_the_parent()
     {
         // We need to confirm that the structure actually gets saved, which would mean it becomes a new object.
         // When using the array cache driver, the same instance would always be returned.
@@ -59,18 +59,18 @@ class DeleteEntryTest extends TestCase
                 ['entry' => '1', 'children' => [
                     ['entry' => '4'],
                     ['entry' => '5', 'children' => [
-                        ['entry' => '6']
+                        ['entry' => '6'],
                     ]],
                 ]],
                 ['entry' => '2'],
                 ['entry' => '3', 'children' => [
                     ['entry' => '7', 'children' => [
                         ['entry' => '8', 'children' => [
-                            ['entry' => '9']
+                            ['entry' => '9'],
                         ]],
-                    ]]
+                    ]],
                 ]],
-            ]
+            ],
         ]))->save();
         $originalStructure = $collection->structure();
 
@@ -98,17 +98,17 @@ class DeleteEntryTest extends TestCase
         $this->assertEquals([
             'entry' => '3', 'children' => [
                 ['entry' => '8', 'children' => [
-                    ['entry' => '9']
-                ]]
-            ]
+                    ['entry' => '9'],
+                ]],
+            ],
         ], collect($updatedTree)->first(function ($item) {
             return $item['entry'] == '3';
         }));
 
         $this->assertEquals([
             'entry' => '5', 'children' => [
-                ['entry' => '6']
-            ]
+                ['entry' => '6'],
+            ],
         ], collect($updatedTree)->first(function ($item) {
             return $item['entry'] == '5';
         }));
@@ -117,7 +117,7 @@ class DeleteEntryTest extends TestCase
     }
 
     /** @test */
-    function entries_get_removed_from_the_structure_and_child_pages_are_moved_to_the_parent_and_maintain_order()
+    public function entries_get_removed_from_the_structure_and_child_pages_are_moved_to_the_parent_and_maintain_order()
     {
         // TODO: This is a reminder that the previous test needs to have the following assertion swapped in.
         $this->markTestIncomplete();
@@ -135,7 +135,7 @@ class DeleteEntryTest extends TestCase
         // ], $updatedTree);
     }
 
-    function deleteEntries($ids)
+    public function deleteEntries($ids)
     {
         return $this->postJson('/cp/collections/test/entries/actions', [
             'action' => 'delete',

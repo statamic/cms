@@ -57,7 +57,7 @@ class EntryRevisionsController extends CpController
 
         $values = array_merge($fields->values()->all(), [
             'title' => $entry->get('title'),
-            'slug' => $entry->slug()
+            'slug' => $entry->slug(),
         ]);
 
         if ($entry->collection()->dated()) {
@@ -87,6 +87,7 @@ class EntryRevisionsController extends CpController
             'localizations' => $entry->collection()->sites()->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
+
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -97,7 +98,7 @@ class EntryRevisionsController extends CpController
                     'published' => $exists ? $localized->published() : false,
                     'url' => $exists ? $localized->editUrl() : null,
                 ];
-            })->all()
+            })->all(),
         ];
     }
 
@@ -117,7 +118,7 @@ class EntryRevisionsController extends CpController
     {
         return [
             'title' => $collection->title(),
-            'url' => cp_route('collections.show', $collection->handle())
+            'url' => cp_route('collections.show', $collection->handle()),
         ];
     }
 }

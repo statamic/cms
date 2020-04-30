@@ -20,7 +20,7 @@ class AugmentedCollectionTest extends TestCase
     }
 
     /** @test */
-    function it_calls_toArray_on_each_item()
+    public function it_calls_toArray_on_each_item()
     {
         $item1 = m::mock(Arrayable::class);
         $item1->shouldReceive('toArray')->once()->andReturn('foo.array');
@@ -33,7 +33,7 @@ class AugmentedCollectionTest extends TestCase
     }
 
     /** @test */
-    function values_get_flagged_shallow_when_calling_toArray_with_flag()
+    public function values_get_flagged_shallow_when_calling_toArray_with_flag()
     {
         $value = m::mock(Value::class);
         // $value->shouldNotReceive('toArray');
@@ -45,7 +45,7 @@ class AugmentedCollectionTest extends TestCase
     }
 
     /** @test */
-    function values_do_not_get_flagged_shallow_when_calling_toArray_without_flag()
+    public function values_do_not_get_flagged_shallow_when_calling_toArray_without_flag()
     {
         $value = m::mock(Value::class);
         $value->shouldNotReceive('toArray');
@@ -57,7 +57,7 @@ class AugmentedCollectionTest extends TestCase
     }
 
     /** @test */
-    function augmentables_get_converted_to_shallow_array_with_flag()
+    public function augmentables_get_converted_to_shallow_array_with_flag()
     {
         $augmentable = m::mock(Augmentable::class);
         $augmentable->shouldNotReceive('toArray');
@@ -94,7 +94,7 @@ class AugmentedCollectionTest extends TestCase
     }
 
     /** @test */
-    function augmentables_get_shallow_augmented_when_json_serializing_with_flag()
+    public function augmentables_get_shallow_augmented_when_json_serializing_with_flag()
     {
         $value = m::mock(Value::class);
         $value->shouldReceive('jsonSerialize')->once()->andReturn('value json serialized');

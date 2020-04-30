@@ -2,8 +2,8 @@
 
 namespace Statamic\Facades;
 
-use Statamic\Sites\Sites;
 use Illuminate\Support\Facades\Facade;
+use Statamic\Sites\Sites;
 
 class Site extends Facade
 {

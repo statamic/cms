@@ -8,7 +8,7 @@ use Statamic\Translator\Placeholders;
 class PlaceholdersTest extends TestCase
 {
     /** @test */
-    function it_adds_placeholders()
+    public function it_adds_placeholders()
     {
         $this->assertEquals('foo <span class="notranslate">:bar</span>', $this->wrap('foo :bar'));
         $this->assertEquals('foo <span class="notranslate">:bar</span> baz', $this->wrap('foo :bar baz'));
@@ -20,7 +20,7 @@ class PlaceholdersTest extends TestCase
     }
 
     /** @test */
-    function it_removes_placeholders()
+    public function it_removes_placeholders()
     {
         $this->assertEquals('foo :bar', $this->unwrap('foo <span class="notranslate">:bar</span>'));
         $this->assertEquals('foo :bar baz', $this->unwrap('foo <span class="notranslate">:bar</span> baz'));

@@ -2,14 +2,10 @@
 
 namespace Statamic\Auth;
 
-use Statamic\Facades;
-use Statamic\Facades\User;
-use Statamic\Facades\Role as RoleAPI;
-use Illuminate\Support\Collection;
 use Statamic\Contracts\Auth\Role;
-use Statamic\Contracts\Auth\Permissible;
-use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
+use Statamic\Facades;
+use Statamic\Facades\Role as RoleAPI;
 
 abstract class UserGroup implements UserGroupContract
 {

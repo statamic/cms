@@ -2,14 +2,14 @@
 
 namespace Tests\Feature\Entries;
 
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Statamic\Facades\User;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Collection;
-use Tests\PreventSavingStacheItemsToDisk;
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\User;
 use Statamic\Structures\CollectionStructure;
+use Tests\FakesRoles;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class ReorderEntriesTest extends TestCase
 {
@@ -31,7 +31,7 @@ class ReorderEntriesTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -45,7 +45,7 @@ class ReorderEntriesTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_the_collection_is_not_orderable()
+    public function it_denies_access_if_the_collection_is_not_orderable()
     {
         $this->setTestRoles(['test' => ['access cp', 'reorder test entries']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -61,7 +61,7 @@ class ReorderEntriesTest extends TestCase
     }
 
     /** @test */
-    function it_reorders_entries()
+    public function it_reorders_entries()
     {
         EntryFactory::id('1')->slug('one')->collection('test')->create();
         EntryFactory::id('2')->slug('two')->collection('test')->create();
@@ -92,7 +92,7 @@ class ReorderEntriesTest extends TestCase
     }
 
     /** @test */
-    function it_reorders_paginated_entries()
+    public function it_reorders_paginated_entries()
     {
         EntryFactory::id('1')->slug('one')->collection('test')->create();
         EntryFactory::id('2')->slug('two')->collection('test')->create();

@@ -83,7 +83,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindTerms()
     {
         Route::bind('term', function ($handle, $route) {
-            $id = $route->parameter('taxonomy')->handle() . '::' . $handle;
+            $id = $route->parameter('taxonomy')->handle().'::'.$handle;
             $site = $route->parameter('site') ?? Site::default()->handle();
 
             throw_unless(
@@ -110,7 +110,7 @@ class RouteServiceProvider extends ServiceProvider
     protected function bindAssets()
     {
         Route::bind('asset', function ($handle, $route) {
-            $id = $route->parameter('asset_container')->handle() . '::' . $handle;
+            $id = $route->parameter('asset_container')->handle().'::'.$handle;
 
             throw_unless(
                 $asset = Asset::find($id),

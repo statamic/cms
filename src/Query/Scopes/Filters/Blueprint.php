@@ -30,7 +30,7 @@ class Blueprint extends Filter
 
     public function badge($values)
     {
-        return __('blueprint is') . ' ' . $values['blueprint'];
+        return __('blueprint is').' '.$values['blueprint'];
     }
 
     public function visibleTo($key)

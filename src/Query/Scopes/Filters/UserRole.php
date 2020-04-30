@@ -19,7 +19,7 @@ class UserRole extends Filter
                 'type' => 'select',
                 'placeholder' => __('Select Role'),
                 'options' => $this->options()->all(),
-            ]
+            ],
         ];
     }
 
@@ -30,7 +30,7 @@ class UserRole extends Filter
 
     public function badge($values)
     {
-        return __('is') . ' ' . strtolower($this->options()->get($values['role']));
+        return __('is').' '.strtolower($this->options()->get($values['role']));
     }
 
     public function visibleTo($key)

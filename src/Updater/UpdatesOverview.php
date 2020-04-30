@@ -3,9 +3,9 @@
 namespace Statamic\Updater;
 
 use Carbon\Carbon;
-use Statamic\Statamic;
-use Statamic\Facades\Addon;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Addon;
+use Statamic\Statamic;
 
 class UpdatesOverview
 {

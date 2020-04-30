@@ -2,10 +2,9 @@
 
 namespace Statamic\Stache\Query;
 
-use Statamic\Facades;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Stache;
 use Statamic\Entries\EntryCollection;
+use Statamic\Facades;
+use Statamic\Facades\Stache;
 
 class EntryQueryBuilder extends Builder
 {
@@ -16,6 +15,7 @@ class EntryQueryBuilder extends Builder
     {
         if ($column === 'collection') {
             $this->collections[] = $operator;
+
             return $this;
         }
 
@@ -26,6 +26,7 @@ class EntryQueryBuilder extends Builder
     {
         if (in_array($column, ['collection', 'collections'])) {
             $this->collections = array_merge($this->collections ?? [], $values);
+
             return $this;
         }
 
@@ -36,7 +37,7 @@ class EntryQueryBuilder extends Builder
     {
         $this->taxonomyWheres[] = [
             'type' => 'Basic',
-            'value' => $term
+            'value' => $term,
         ];
 
         return $this;
@@ -46,7 +47,7 @@ class EntryQueryBuilder extends Builder
     {
         $this->taxonomyWheres[] = [
             'type' => 'In',
-            'values' => $term
+            'values' => $term,
         ];
 
         return $this;
@@ -130,6 +131,7 @@ class EntryQueryBuilder extends Builder
             foreach ($collection as $sort => $values) {
                 $carry[$sort] = array_merge($carry[$sort] ?? [], $values);
             }
+
             return $carry;
         }, collect());
     }
@@ -141,8 +143,9 @@ class EntryQueryBuilder extends Builder
         }
 
         $entryIds = collect($this->taxonomyWheres)->reduce(function ($ids, $where) {
-            $method = 'getKeysForTaxonomyWhere' . $where['type'];
+            $method = 'getKeysForTaxonomyWhere'.$where['type'];
             $keys = $this->$method($where);
+
             return $ids ? $ids->intersect($keys)->values() : $keys;
         });
 
@@ -169,6 +172,7 @@ class EntryQueryBuilder extends Builder
         $taxonomies = collect($where['values'])
             ->map(function ($value) {
                 [$taxonomy, $term] = explode('::', $value);
+
                 return compact('taxonomy', 'term');
             })
             ->groupBy->taxonomy

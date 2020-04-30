@@ -3,8 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Assets;
 
 use Illuminate\Http\Request;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Fieldtypes\Assets\Assets as AssetsFieldtype;
+use Statamic\Http\Controllers\CP\CpController;
 
 class FieldtypeController extends CpController
 {

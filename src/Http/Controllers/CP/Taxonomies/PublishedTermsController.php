@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
-use Statamic\Facades\User;
 use Illuminate\Http\Request;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
 

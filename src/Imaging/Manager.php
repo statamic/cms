@@ -31,7 +31,7 @@ class Manager
     }
 
     /**
-     * Get an image manipulator instance
+     * Get an image manipulator instance.
      *
      * @return ImageManipulator
      */
@@ -41,7 +41,7 @@ class Manager
     }
 
     /**
-     * Get the image manipulation presets required by the control panel
+     * Get the image manipulation presets required by the control panel.
      *
      * @return array
      */
@@ -52,7 +52,7 @@ class Manager
             'cp_thumbnail_small_landscape' => ['w' => '400', 'h' => '300', 'fit' => 'crop'],
             'cp_thumbnail_small_portrait' => ['h' => '300', 'fit' => 'crop'],
             'cp_thumbnail_small_square' => ['w' => '300', 'h' => '300'],
-            'cp_thumbnail_large' => ['w' => '1000', 'h' => '1000']
+            'cp_thumbnail_large' => ['w' => '1000', 'h' => '1000'],
         ];
     }
 }

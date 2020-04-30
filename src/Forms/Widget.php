@@ -22,7 +22,7 @@ class Widget extends BaseWidget
             'format'      => $this->config('date_format', $form->dateFormat()),
             'fields'      => $this->config('fields', []),
             'submissions' => collect($form->submissions())->reverse()->take((int) $this->config('limit', 5))->toArray(),
-            'title'       => $this->config('title', $form->title())
+            'title'       => $this->config('title', $form->title()),
         ]);
     }
 }

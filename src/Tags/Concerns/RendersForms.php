@@ -30,7 +30,7 @@ trait RendersForms
         $defaultAttrs = $this->renderAttributes($defaultAttrs);
         $additionalAttrs = $this->renderAttributesFromParams(array_merge(['method', 'action'], $knownTagParams));
 
-        $html = collect(['<form', $defaultAttrs, $additionalAttrs])->filter()->implode(' ') . '>';
+        $html = collect(['<form', $defaultAttrs, $additionalAttrs])->filter()->implode(' ').'>';
         $html .= csrf_field();
 
         $method = strtoupper($method);

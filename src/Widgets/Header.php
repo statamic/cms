@@ -5,7 +5,7 @@ namespace Statamic\Widgets;
 class Header extends Widget
 {
     /**
-     * The HTML that should be shown in the widget
+     * The HTML that should be shown in the widget.
      *
      * @return \Illuminate\View\View
      */

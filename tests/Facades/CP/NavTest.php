@@ -2,13 +2,13 @@
 
 namespace Tests\Facades\CP;
 
-use Tests\TestCase;
-use Statamic\Facades\CP\Nav;
-use Tests\FakesRoles;
-use Statamic\Facades\User;
-use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Request;
+use Illuminate\Support\Facades\Route;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\User;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class NavTest extends TestCase
 {
@@ -26,14 +26,14 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_can_build_a_default_nav()
+    public function it_can_build_a_default_nav()
     {
         $expected = collect([
             'Top Level' => ['Dashboard', 'Playground'],
             'Content' => ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'],
             'Fields' => ['Blueprints', 'Fieldsets'],
             'Tools' => ['Forms', /*'Updates',*/ 'Utilities'],
-            'Users' => ['Users', 'Groups', 'Permissions']
+            'Users' => ['Users', 'Groups', 'Permissions'],
         ]);
 
         $this->actingAs(tap(User::make()->makeSuper())->save());
@@ -48,7 +48,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function is_can_create_a_nav_item()
+    public function is_can_create_a_nav_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -68,7 +68,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_can_more_explicitly_create_a_nav_item()
+    public function it_can_more_explicitly_create_a_nav_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -84,7 +84,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_can_create_a_nav_item_with_a_more_custom_config()
+    public function it_can_create_a_nav_item_with_a_more_custom_config()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -106,7 +106,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_and_modify_an_existing_item()
+    public function it_can_get_and_modify_an_existing_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -126,7 +126,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_doesnt_build_items_that_the_user_is_not_authorized_to_see()
+    public function it_doesnt_build_items_that_the_user_is_not_authorized_to_see()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $this->actingAs(tap(User::make()->assignRole('test'))->save());
@@ -144,7 +144,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_can_create_a_nav_item_with_children()
+    public function it_can_create_a_nav_item_with_children()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -165,7 +165,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_doesnt_build_children_that_the_user_is_not_authorized_to_see()
+    public function it_doesnt_build_children_that_the_user_is_not_authorized_to_see()
     {
         $this->setTestRoles(['sith' => ['view sith diaries']]);
         $this->actingAs(tap(User::make()->assignRole('sith'))->save());
@@ -194,7 +194,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_can_create_a_nav_item_with_deferred_children()
+    public function it_can_create_a_nav_item_with_deferred_children()
     {
         $this->markTestSkipped('Getting a NotFoundHttpException, even though I\'m registering route?');
 
@@ -224,7 +224,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_can_remove_a_nav_section()
+    public function it_can_remove_a_nav_section()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -244,7 +244,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_can_remove_a_specific_nav_item()
+    public function it_can_remove_a_specific_nav_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -265,7 +265,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_can_use_extend_to_defer_the_creation_of_a_nav_item_until_build_time()
+    public function it_can_use_extend_to_defer_the_creation_of_a_nav_item_until_build_time()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -282,7 +282,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_can_use_extend_to_remove_a_default_statamic_nav_item()
+    public function it_can_use_extend_to_remove_a_default_statamic_nav_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
 
@@ -298,7 +298,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_checks_if_active()
+    public function it_checks_if_active()
     {
         $hello = Nav::create('hello')->url('http://localhost/cp/hello');
         $hell = Nav::create('hell')->url('http://localhost/cp/hell');
@@ -321,7 +321,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_sets_the_url()
+    public function it_sets_the_url()
     {
         tap(Nav::create('absolute')->url('http://domain.com'), function ($nav) {
             $this->assertEquals('http://domain.com', $nav->url());
@@ -340,7 +340,7 @@ class NavTest extends TestCase
     }
 
     /** @test */
-    function it_does_not_automatically_add_an_active_pattern_when_setting_url_if_one_is_already_defined()
+    public function it_does_not_automatically_add_an_active_pattern_when_setting_url_if_one_is_already_defined()
     {
         $nav = Nav::create('cp-relative')->active('foo.*')->url('foo/bar');
         $this->assertEquals('http://localhost/cp/foo/bar', $nav->url());

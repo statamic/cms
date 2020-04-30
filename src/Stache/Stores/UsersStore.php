@@ -2,10 +2,9 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\Facades\File;
 use Statamic\Facades\User;
-use Statamic\Facades\YAML;
 use Statamic\Facades\UserGroup;
+use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes\Users\Group;
 use Symfony\Component\Finder\SplFileInfo;
 

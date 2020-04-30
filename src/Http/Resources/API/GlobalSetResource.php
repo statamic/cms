@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Resources\API;
 
-use Statamic\Statamic;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Statamic\Statamic;
 
 class GlobalSetResource extends JsonResource
 {

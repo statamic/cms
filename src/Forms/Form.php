@@ -2,19 +2,17 @@
 
 namespace Statamic\Forms;
 
-use Statamic\Facades;
-use Statamic\Support\Str;
-use Statamic\Facades\File;
-use Statamic\Facades\YAML;
-use Statamic\CP\Column;
-use Statamic\Facades\Config;
-use Statamic\Facades\Folder;
-use Statamic\Fields\Blueprint;
-use Statamic\Exceptions\FatalException;
-use Statamic\Contracts\Forms\Submission;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades;
+use Statamic\Facades\Config;
+use Statamic\Facades\File;
+use Statamic\Facades\Folder;
+use Statamic\Facades\YAML;
+use Statamic\Fields\Blueprint;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
+use Statamic\Support\Str;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Form implements FormContract
 {
@@ -145,7 +143,7 @@ class Form implements FormContract
      */
     public function path()
     {
-        return config('statamic.forms.forms') . "/{$this->handle()}.yaml";
+        return config('statamic.forms.forms')."/{$this->handle()}.yaml";
     }
 
     /**
@@ -234,13 +232,13 @@ class Form implements FormContract
     }
 
     /**
-     * Get the submissions
+     * Get the submissions.
      *
      * @return \Illuminate\Support\Collection
      */
     public function submissions()
     {
-        $path = config('statamic.forms.submissions') . '/' . $this->handle();
+        $path = config('statamic.forms.submissions').'/'.$this->handle();
 
         return collect(Folder::getFilesByType($path, 'yaml'))->map(function ($file) {
             return $this->createSubmission()
@@ -251,7 +249,7 @@ class Form implements FormContract
     }
 
     /**
-     * Get a submission
+     * Get a submission.
      *
      * @param  string $id
      * @return Submission

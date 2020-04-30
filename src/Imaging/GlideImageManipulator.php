@@ -3,54 +3,53 @@
 namespace Statamic\Imaging;
 
 use Exception;
-use Statamic\Support\Str;
-use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Contracts\Assets\Asset;
-use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Contracts\Imaging\ImageManipulator;
+use Statamic\Contracts\Imaging\UrlBuilder;
+use Statamic\Facades\Asset as AssetAPI;
 
 class GlideImageManipulator implements ImageManipulator
 {
     /**
-     * The image URL builder instance
+     * The image URL builder instance.
      *
      * @var UrlBuilder
      */
     protected $builder;
 
     /**
-     * The item to be manipulated
+     * The item to be manipulated.
      *
-     * @var Asset|string $item
+     * @var Asset|string
      */
     protected $item;
 
     /**
-     * The type of item used
+     * The type of item used.
      *
      * @var string
      */
     protected $item_type;
 
     /**
-     * A custom filename
+     * A custom filename.
      *
      * @var string|null
      */
     protected $filename;
 
     /**
-     * Methods available in Glide's API
+     * Methods available in Glide's API.
      *
      * @var array
      */
     private $api = [
         'or', 'crop', 'w', 'h', 'fit', 'dpr', 'bri', 'con', 'gam', 'sharp', 'blur', 'pixel', 'filt',
-        'mark', 'markw', 'markx', 'marky', 'markpad', 'markpos', 'bg', 'border', 'q', 'fm', 'p'
+        'mark', 'markw', 'markx', 'marky', 'markpad', 'markpos', 'bg', 'border', 'q', 'fm', 'p',
     ];
 
     /**
-     * Manipulation parameters
+     * Manipulation parameters.
      *
      * @var array
      */
@@ -65,7 +64,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * Set the item to be manipulated
+     * Set the item to be manipulated.
      *
      * @param Asset|string $item The item. Can be an asset, an asset ID, a URL, or path.
      * @return $this
@@ -78,7 +77,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * Build the URL
+     * Build the URL.
      *
      * @return mixed
      */
@@ -88,7 +87,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * Set a custom filename
+     * Set a custom filename.
      *
      * @param string $filename
      * @return $this
@@ -101,7 +100,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * Set the parameters
+     * Set the parameters.
      *
      * @param array $params
      * @return $this
@@ -114,7 +113,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * Get all the parameters
+     * Get all the parameters.
      *
      * @return array
      */
@@ -124,7 +123,7 @@ class GlideImageManipulator implements ImageManipulator
     }
 
     /**
-     * Set a parameter
+     * Set a parameter.
      *
      * @param string $param
      * @param mixed  $value
@@ -191,7 +190,7 @@ class GlideImageManipulator implements ImageManipulator
 
             if ($asset) {
                 if ($focus = $asset->get('focus')) {
-                    $value .= '-' . $focus;
+                    $value .= '-'.$focus;
                 }
             }
         }

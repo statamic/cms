@@ -2,11 +2,11 @@
 
 namespace Statamic\Jobs;
 
+use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Bus\Queueable;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Facades\Statamic\Console\Processes\Composer;
+use Illuminate\Queue\InteractsWithQueue;
 
 class RunComposer implements ShouldQueue
 {

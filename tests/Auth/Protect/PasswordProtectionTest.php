@@ -15,11 +15,11 @@ class PasswordProtectionTest extends PageProtectionTestCase
     }
 
     /** @test */
-    function redirects_to_password_form_url_and_generates_token()
+    public function redirects_to_password_form_url_and_generates_token()
     {
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
-            'allowed' => ['test']
+            'allowed' => ['test'],
         ]]);
 
         Token::shouldReceive('generate')->andReturn('test-token');
@@ -34,7 +34,7 @@ class PasswordProtectionTest extends PageProtectionTestCase
     }
 
     /** @test */
-    function password_form_url_can_be_overridden()
+    public function password_form_url_can_be_overridden()
     {
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
@@ -50,7 +50,7 @@ class PasswordProtectionTest extends PageProtectionTestCase
     }
 
     /** @test */
-    function allow_access_if_password_has_been_entered_for_that_scheme()
+    public function allow_access_if_password_has_been_entered_for_that_scheme()
     {
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
@@ -65,14 +65,14 @@ class PasswordProtectionTest extends PageProtectionTestCase
     }
 
     /** @test */
-    function default_password_form_url_is_unprotected()
+    public function default_password_form_url_is_unprotected()
     {
         $this->viewShouldReturnRendered('statamic::auth.protect.password', '');
 
         config(['statamic.protect.default' => 'password-scheme']);
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
-            'allowed' => ['test']
+            'allowed' => ['test'],
         ]]);
 
         Token::shouldReceive('generate')->andReturn('test-token');
@@ -83,7 +83,7 @@ class PasswordProtectionTest extends PageProtectionTestCase
     }
 
     /** @test */
-    function custom_password_form_url_is_unprotected()
+    public function custom_password_form_url_is_unprotected()
     {
         $this->viewShouldReturnRendered('password-entry', 'Password form template');
 
@@ -91,7 +91,7 @@ class PasswordProtectionTest extends PageProtectionTestCase
         config(['statamic.protect.schemes.password-scheme' => [
             'driver' => 'password',
             'form_url' => '/password-entry',
-            'allowed' => ['test']
+            'allowed' => ['test'],
         ]]);
 
         Token::shouldReceive('generate')->andReturn('test-token');

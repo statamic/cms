@@ -3,7 +3,6 @@
 namespace Statamic\Data;
 
 use Illuminate\Support\Collection;
-use Statamic\Data\AbstractAugmented;
 
 class AugmentedData extends AbstractAugmented
 {

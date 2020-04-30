@@ -5,25 +5,21 @@ namespace Statamic\Modifiers;
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
-use Statamic\Facades\URL;
-use Statamic\Support\Arr;
-use Statamic\Support\Str;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Config;
 use Statamic\Facades\Data;
 use Statamic\Facades\File;
-use Statamic\Support\Html;
-use Statamic\Facades\Path;
-use Statamic\Facades\Site;
-use Statamic\Facades\YAML;
-use Statamic\Facades\Asset;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Parse;
-use Statamic\Facades\Theme;
-use Statamic\Facades\Config;
-use Statamic\Facades\Helper;
 use Statamic\Facades\Localization;
 use Statamic\Facades\Markdown;
+use Statamic\Facades\Parse;
+use Statamic\Facades\Path;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
+use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
+use Statamic\Support\Html;
+use Statamic\Support\Str;
 use Stringy\StaticStringy as Stringy;
-use Statamic\Modifiers\Modifier;
 
 class CoreModifiers extends Modifier
 {
@@ -40,7 +36,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Creates a sentence list from the given array and the ability to set the glue
+     * Creates a sentence list from the given array and the ability to set the glue.
      *
      * @param $value
      * @param $params
@@ -48,16 +44,18 @@ class CoreModifiers extends Modifier
      */
     public function ampersandList($value, $params)
     {
-        if (! is_array($value)) return $value;
+        if (! is_array($value)) {
+            return $value;
+        }
 
-        $glue         = Arr::get($params, 0, '&');
+        $glue = Arr::get($params, 0, '&');
         $oxford_comma = Arr::get($params, 1, false);
 
         return Str::makeSentenceList($value, $glue, $oxford_comma);
     }
 
     /**
-     * Alias an array variable
+     * Alias an array variable.
      *
      * @param $value
      * @param $params
@@ -114,7 +112,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Removes a given number ($param[0]) of characters from the end of a variable
+     * Removes a given number ($param[0]) of characters from the end of a variable.
      *
      * @param $value
      * @param array $params
@@ -122,8 +120,7 @@ class CoreModifiers extends Modifier
      */
     public function backspace($value, $params)
     {
-        if (is_array($value) || !isset($params[0]) || !is_numeric($params[0]) || $params[0] < 0)
-        {
+        if (is_array($value) || ! isset($params[0]) || ! is_numeric($params[0]) || $params[0] < 0) {
             return $value;
         }
 
@@ -144,18 +141,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Wraps a value in CDATA tags for RSS/XML feeds
+     * Wraps a value in CDATA tags for RSS/XML feeds.
      *
      * @param $value
      * @return string
      */
     public function cdata($value)
     {
-        return '<![CDATA[' . $value . ']]>';
+        return '<![CDATA['.$value.']]>';
     }
 
     /**
-     * Rounds a number up to the next whole number
+     * Rounds a number up to the next whole number.
      *
      * @param $value
      * @return int
@@ -165,9 +162,8 @@ class CoreModifiers extends Modifier
         return ceil((float) $value);
     }
 
-
     /**
-     * Collapses an array of arrays into a flat array
+     * Collapses an array of arrays into a flat array.
      *
      * @param $value
      * @return array
@@ -191,7 +187,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Debug a value with a call to JavaScript's console.log
+     * Debug a value with a call to JavaScript's console.log.
      *
      * @param  $value
      * @return string
@@ -200,7 +196,7 @@ class CoreModifiers extends Modifier
     {
         return '<script>
             window.log=function(a){if(this.console){console.log(a);}};
-            log('. json_encode($value) .');
+            log('.json_encode($value).');
         </script>';
     }
 
@@ -253,7 +249,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns the number of items in an array
+     * Returns the number of items in an array.
      * @param  $value
      * @param  $params
      * @return int
@@ -290,12 +286,12 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get the date difference in days
+     * Get the date difference in days.
      *
      * @param Carbon  $value
      * @param $params
      *
-     * @return integer
+     * @return int
      */
     public function daysAgo($value, $params)
     {
@@ -303,7 +299,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Dump, Die, and Debug using Ignition
+     * Dump, Die, and Debug using Ignition.
      *
      * @param $value
      */
@@ -313,7 +309,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Dump a var into the Debug bar for data exploration
+     * Dump a var into the Debug bar for data exploration.
      *
      * @param $value
      */
@@ -334,14 +330,14 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Replaces hyphens and underscores with spaces
+     * Replaces hyphens and underscores with spaces.
      *
      * @param $value
      * @return string
      */
     public function deslugify($value)
     {
-        return trim(preg_replace('~[-_]~', ' ', $value), " ");
+        return trim(preg_replace('~[-_]~', ' ', $value), ' ');
     }
 
     /**
@@ -357,7 +353,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Turn an array into an definition list
+     * Turn an array into an definition list.
      *
      * @param $value
      * @param $params
@@ -369,7 +365,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Dump and die the output of a variable
+     * Dump and die the output of a variable.
      *
      * @param $value
      */
@@ -379,7 +375,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Dump a variable
+     * Dump a variable.
      *
      * @param $value
      */
@@ -439,7 +435,7 @@ class CoreModifiers extends Modifier
 
     /**
      * Breaks a string at a given marker.
-     * Uses <!--more--> by default
+     * Uses <!--more--> by default.
      *
      * @param $value
      * @param array $params
@@ -447,7 +443,9 @@ class CoreModifiers extends Modifier
      */
     public function excerpt($value, $params)
     {
-        if (is_array($value)) return $value;
+        if (is_array($value)) {
+            return $value;
+        }
 
         $breaker = Arr::get($params, 0, '<!--more-->');
 
@@ -455,7 +453,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Just like the PHP method, breaks a string into an array on a specified key, $params[0]
+     * Just like the PHP method, breaks a string into an array on a specified key, $params[0].
      *
      * @param $value
      * @param $params
@@ -518,7 +516,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Swaps the keys with their corresponding values
+     * Swaps the keys with their corresponding values.
      *
      * @param $value
      * @return array
@@ -529,7 +527,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Rounds a number down to the next whole number
+     * Rounds a number down to the next whole number.
      *
      * @param $value
      * @return int
@@ -540,7 +538,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Converts a string to a Carbon instance and formats it according to the whim of the Overlord
+     * Converts a string to a Carbon instance and formats it according to the whim of the Overlord.
      *
      * @param $value
      * @param $params
@@ -552,7 +550,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Converts a string to a Carbon instance and formats it according to the whim of the Overlord
+     * Converts a string to a Carbon instance and formats it according to the whim of the Overlord.
      *
      * @param $value
      * @param $params
@@ -564,7 +562,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Format a number with grouped thousands and decimal points
+     * Format a number with grouped thousands and decimal points.
      *
      * @param $value
      * @param $params
@@ -582,7 +580,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Replace /absolute/urls with http://domain.com/urls
+     * Replace /absolute/urls with http://domain.com/urls.
      *
      * @param $value
      * @param $params
@@ -592,13 +590,13 @@ class CoreModifiers extends Modifier
     {
         $domain = Site::current()->absoluteUrl();
 
-        return preg_replace_callback('/="(\/[^"]+)"/ism', function($item) use ($domain) {
-            return '="' . Path::tidy($domain . $item[1]) . '"';
+        return preg_replace_callback('/="(\/[^"]+)"/ism', function ($item) use ($domain) {
+            return '="'.Path::tidy($domain.$item[1]).'"';
         }, $value);
     }
 
     /**
-     * Get any variable from a relationship
+     * Get any variable from a relationship.
      *
      * @param $value
      * @return string
@@ -640,7 +638,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get a Gravatar image URL from an email
+     * Get a Gravatar image URL from an email.
      *
      * @param $value
      * @param $params
@@ -652,7 +650,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Groups the collection's items by a given key
+     * Groups the collection's items by a given key.
      *
      * @param $value
      * @param $params
@@ -686,12 +684,12 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get the date difference in hours
+     * Get the date difference in hours.
      *
      * @param Carbon  $value
      * @param $params
      *
-     * @return integer
+     * @return int
      */
     public function hoursAgo($value, $params)
     {
@@ -763,7 +761,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Determines if the date is after another specified date ($params[0])
+     * Determines if the date is after another specified date ($params[0]).
      *
      * @param $value
      * @param $params
@@ -800,7 +798,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Determines if the date is before another specified date ($params[0])
+     * Determines if the date is before another specified date ($params[0]).
      *
      * @param $value
      * @param $params
@@ -815,7 +813,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Determines if the date is between two other specified dates, $params[0] and $params[1]
+     * Determines if the date is between two other specified dates, $params[0] and $params[1].
      *
      * @param $value
      * @param $params
@@ -851,11 +849,11 @@ class CoreModifiers extends Modifier
     {
         if (is_array($value)) {
             foreach ($value as $subvalue) {
-                if (!$this->isEmpty($subvalue)) {
+                if (! $this->isEmpty($subvalue)) {
                     return false;
                 }
             }
-        } elseif (!empty($value) || $value !== '') {
+        } elseif (! empty($value) || $value !== '') {
             return false;
         }
 
@@ -863,7 +861,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Determines if the date is in the future, ie. greater (after) than now
+     * Determines if the date is in the future, ie. greater (after) than now.
      *
      * @param $value
      * @return bool
@@ -885,7 +883,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Determines if the date in a leap year
+     * Determines if the date in a leap year.
      *
      * @param $value
      * @return bool
@@ -907,7 +905,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Finds whether a value is a number or a numeric string
+     * Finds whether a value is a number or a numeric string.
      *
      * @param $value
      * @return bool
@@ -918,7 +916,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Determines if the date is in the past, ie. less (before) than now
+     * Determines if the date is in the past, ie. less (before) than now.
      *
      * @param $value
      * @return bool
@@ -929,7 +927,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Determines if the date is today
+     * Determines if the date is today.
      *
      * @param $value
      * @return bool
@@ -951,19 +949,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Determines if the date on a weekday
+     * Determines if the date on a weekday.
      *
      * @param $value
      * @return bool
      */
     public function isWeekday($value)
     {
-
         return $this->carbon($value)->isWeekday();
     }
 
     /**
-     * Determines if the date on a weekend
+     * Determines if the date on a weekend.
      *
      * @param $value
      * @return bool
@@ -974,7 +971,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Determines if the date is yesterday
+     * Determines if the date is yesterday.
      *
      * @param $value
      * @return bool
@@ -1012,7 +1009,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get the items in an array or characters in a string
+     * Get the items in an array or characters in a string.
      *
      * @param $value
      * @return int
@@ -1023,7 +1020,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Limit the number of items in an array
+     * Limit the number of items in an array.
      *
      * @param $value
      * @param $params
@@ -1068,7 +1065,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Replace a var with a localized string
+     * Replace a var with a localized string.
      *
      * @param $value
      * @return string
@@ -1079,7 +1076,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Rough macro prototype that only uses CoreModifiers
+     * Rough macro prototype that only uses CoreModifiers.
      *
      * @param $value
      * @param $params
@@ -1112,14 +1109,16 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Parse content as Markdown
+     * Parse content as Markdown.
      *
      * @param $value
      * @return mixed
      */
     public function markdown($value, $params)
     {
-        if (! is_string($value)) return $value;
+        if (! is_string($value)) {
+            return $value;
+        }
 
         $parser = $params[0] ?? 'default';
 
@@ -1131,7 +1130,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Merge an array variable with another array variable
+     * Merge an array variable with another array variable.
      *
      * @param $value
      * @param $params
@@ -1146,12 +1145,12 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get the date difference in minutes
+     * Get the date difference in minutes.
      *
      * @param Carbon  $value
      * @param $params
      *
-     * @return integer
+     * @return int
      */
     public function minutesAgo($value, $params)
     {
@@ -1169,11 +1168,11 @@ class CoreModifiers extends Modifier
     {
         $number = Arr::get($context, $params[0], $params[0]);
 
-        return ($value % $number);
+        return $value % $number;
     }
 
     /**
-     * Alters the timestamp by incrementing or decremting in a format acceted by strtotime()
+     * Alters the timestamp by incrementing or decremting in a format acceted by strtotime().
      *
      * @link http://php.net/manual/en/function.strtotime.php
      *
@@ -1187,12 +1186,12 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get the date difference in months
+     * Get the date difference in months.
      *
      * @param Carbon  $value
      * @param $params
      *
-     * @return integer
+     * @return int
      */
     public function monthsAgo($value, $params)
     {
@@ -1219,11 +1218,11 @@ class CoreModifiers extends Modifier
      */
     public function neatify($value)
     {
-        return $value . ' is pretty neat!';
+        return $value.' is pretty neat!';
     }
 
     /**
-     * Replaces line breaks with <br> tags
+     * Replaces line breaks with <br> tags.
      *
      * @param $value
      * @return string
@@ -1268,7 +1267,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Turn an array into an ordered list
+     * Turn an array into an ordered list.
      *
      * @param $value
      * @param $params
@@ -1280,7 +1279,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Turn an array into a pipe delimited list
+     * Turn an array into a pipe delimited list.
      *
      * @param $value
      * @param $params
@@ -1296,7 +1295,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Offset the items in an array
+     * Offset the items in an array.
      *
      * @param $value
      * @param $params
@@ -1308,14 +1307,16 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get the output of an Asset, useful for SVGs
+     * Get the output of an Asset, useful for SVGs.
      *
      * @param $value
      * @return array
      */
     public function output($value)
     {
-        if (! is_string($value)) return $value;
+        if (! is_string($value)) {
+            return $value;
+        }
 
         $asset = Asset::find($value);
 
@@ -1325,7 +1326,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Renders an array variable with a partial, context aware
+     * Renders an array variable with a partial, context aware.
      * @param  $value
      * @param  $params
      * @return [string
@@ -1334,13 +1335,13 @@ class CoreModifiers extends Modifier
     {
         $name = Arr::get($context, $params[0], $params[0]);
 
-        $partial = 'partials/' . $name . '.html';
+        $partial = 'partials/'.$name.'.html';
 
         return Parse::template(File::disk('resources')->get($partial), $value);
     }
 
     /**
-     * Get the plural form of an English word with access to $context
+     * Get the plural form of an English word with access to $context.
      *
      * @param $value
      * @param $params
@@ -1351,7 +1352,7 @@ class CoreModifiers extends Modifier
     {
         $count = Arr::get($params, 0);
 
-        if ( ! is_numeric($count)) {
+        if (! is_numeric($count)) {
             $count = (int) Arr::get($context, $count);
         }
 
@@ -1359,7 +1360,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Return a random value from an array
+     * Return a random value from an array.
      *
      * @param $value
      * @return string
@@ -1370,7 +1371,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * URL-encode according to RFC 3986
+     * URL-encode according to RFC 3986.
      *
      * @param $value
      * @return string
@@ -1381,7 +1382,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Estimate the read time based on a given number of words per minute
+     * Estimate the read time based on a given number of words per minute.
      *
      * @param $value
      * @param $params
@@ -1471,7 +1472,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Repeats value a given number of times
+     * Repeats value a given number of times.
      *
      * @param $value
      * @param $params
@@ -1495,7 +1496,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Reverses the order of a string or list
+     * Reverses the order of a string or list.
      *
      * @param $value
      * @return mixed
@@ -1510,7 +1511,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Rounds a number to a specified precision (number of digits after the decimal point)
+     * Rounds a number to a specified precision (number of digits after the decimal point).
      * @param $value
      * @param $params
      * @return float
@@ -1536,7 +1537,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Convert special characters to HTML entities with htmlspecialchars
+     * Convert special characters to HTML entities with htmlspecialchars.
      *
      * @param $value
      * @return string
@@ -1547,7 +1548,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Place variables in a scope
+     * Place variables in a scope.
      *
      * @param  $value
      * @param  $params
@@ -1563,7 +1564,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns a segment by number from any valid URL or UI
+     * Returns a segment by number from any valid URL or UI.
      *
      * @param  $value
      * @param  $params
@@ -1593,12 +1594,12 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get the date difference in seconds
+     * Get the date difference in seconds.
      *
      * @param Carbon  $value
      * @param $params
      *
-     * @return integer
+     * @return int
      */
     public function secondsAgo($value, $params)
     {
@@ -1606,7 +1607,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Creates a sentence list from the given array and the ability to set the glue
+     * Creates a sentence list from the given array and the ability to set the glue.
      *
      * @param $value
      * @param $params
@@ -1614,16 +1615,18 @@ class CoreModifiers extends Modifier
      */
     public function sentenceList($value, $params)
     {
-        if (! is_array($value)) return $value;
+        if (! is_array($value)) {
+            return $value;
+        }
 
-        $glue         = Arr::get($params, 0, 'and');
+        $glue = Arr::get($params, 0, 'and');
         $oxford_comma = Arr::get($params, 1, true);
 
         return Str::makeSentenceList($value, $glue, $oxford_comma);
     }
 
     /**
-     * Because sometimes you just gotta /shrug
+     * Because sometimes you just gotta /shrug.
      *
      * @param $value
      * @return string
@@ -1649,7 +1652,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get the singular form of an English word
+     * Get the singular form of an English word.
      *
      * @param $value
      * @param $params
@@ -1677,7 +1680,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Sort an array by key $params[0] and direction $params[1]
+     * Sort an array by key $params[0] and direction $params[1].
      *
      * @param $value
      * @param $params
@@ -1767,7 +1770,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns the sum of all items in the array, optionally by specific key
+     * Returns the sum of all items in the array, optionally by specific key.
      * @param $value
      * @param $params
      * @return mixed
@@ -1801,7 +1804,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Convert an array of data from the Table fieldtype into a basic HTML table
+     * Convert an array of data from the Table fieldtype into a basic HTML table.
      *
      * @param $value
      * @param $params
@@ -1898,7 +1901,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Translates a string
+     * Translates a string.
      *
      * @param $value
      * @return string
@@ -1909,7 +1912,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Translates and pluralizes a string
+     * Translates and pluralizes a string.
      *
      * @param $value
      * @param $params
@@ -1960,7 +1963,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Applies a timezone to a date
+     * Applies a timezone to a date.
      *
      * Accepts a timezone string as a parameter. If none is provided, then
      * the timezone defined in the system settings will be used.
@@ -1988,7 +1991,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Turn an array into an unordered list
+     * Turn an array into an unordered list.
      *
      * @param $value
      * @param $params
@@ -2000,7 +2003,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Decodes URL-encoded string
+     * Decodes URL-encoded string.
      *
      * @param $value
      * @return string
@@ -2011,7 +2014,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * URL-encodes string
+     * URL-encodes string.
      *
      * @param $value
      * @return string
@@ -2046,7 +2049,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns all of the unique-by-key items in the array
+     * Returns all of the unique-by-key items in the array.
      *
      * @param $value
      * @param $params
@@ -2058,7 +2061,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get the URL from an ID
+     * Get the URL from an ID.
      *
      * @param $value
      * @return string
@@ -2073,12 +2076,12 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get the date difference in weeks
+     * Get the date difference in weeks.
      *
      * @param Carbon  $value
      * @param $params
      *
-     * @return integer
+     * @return int
      */
     public function weeksAgo($value, $params)
     {
@@ -2086,7 +2089,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Filters the data by a given key / value pair
+     * Filters the data by a given key / value pair.
      *
      * @param array $value
      * @param $params
@@ -2116,7 +2119,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Wraps an HTML tag around the value
+     * Wraps an HTML tag around the value.
      *
      * @param $value
      * @return string
@@ -2129,7 +2132,7 @@ class CoreModifiers extends Modifier
         // Emmet-esque classes
         // You may specify "tag.class.class.class" etc.
         if (Str::contains($tag, '.')) {
-            list($tag, $classes) = explode('.', $tag, 2);
+            [$tag, $classes] = explode('.', $tag, 2);
             $attributes = sprintf(' class="%s"', str_replace('.', ' ', $classes));
         }
 
@@ -2137,7 +2140,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Count the number of words in a string
+     * Count the number of words in a string.
      *
      * @param $value
      * @return mixed
@@ -2151,12 +2154,12 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Get the date difference in years
+     * Get the date difference in years.
      *
      * @param Carbon  $value
      * @param $params
      *
-     * @return integer
+     * @return int
      */
     public function yearsAgo($value, $params)
     {
@@ -2184,6 +2187,7 @@ class CoreModifiers extends Modifier
             if (str_contains($url, '?t=')) {
                 $url = str_replace('?t=', '?start=', $url);
             }
+
             return $url;
         }
 
@@ -2208,7 +2212,7 @@ class CoreModifiers extends Modifier
     // ------------------------------------
 
     /**
-     * Takes a modifier array, split on ":", and formats it for HTML attribute key:value pairs
+     * Takes a modifier array, split on ":", and formats it for HTML attribute key:value pairs.
      *
      * @param $params
      * @return array
@@ -2221,7 +2225,7 @@ class CoreModifiers extends Modifier
 
         $attributes = [];
         foreach ($params as $param) {
-            list($key, $value) = explode($delimiter, $param);
+            [$key, $value] = explode($delimiter, $param);
             $attributes[$key] = $value;
         }
 

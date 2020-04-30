@@ -2,16 +2,15 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\Stache\Stache;
-use Statamic\OAuth\Provider;
-use Statamic\Auth\UserFactory;
-use Statamic\Auth\UserCollection;
-use Statamic\Contracts\Auth\User;
 use Statamic\Auth\File\RoleRepository;
 use Statamic\Auth\File\User as FileUser;
 use Statamic\Auth\File\UserGroupRepository;
-use Statamic\Stache\Query\UserQueryBuilder;
+use Statamic\Auth\UserCollection;
 use Statamic\Auth\UserRepository as BaseRepository;
+use Statamic\Contracts\Auth\User;
+use Statamic\OAuth\Provider;
+use Statamic\Stache\Query\UserQueryBuilder;
+use Statamic\Stache\Stache;
 
 class UserRepository extends BaseRepository
 {

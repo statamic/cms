@@ -2,18 +2,18 @@
 
 namespace Tests\Stache\Stores;
 
-use Tests\TestCase;
-use Statamic\Stache\Stache;
-use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
-use Statamic\Stache\Stores\TaxonomiesStore;
-use Statamic\Facades\Taxonomy as TaxonomyAPI;
+use Illuminate\Filesystem\Filesystem;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Facades\Path;
+use Statamic\Facades\Taxonomy as TaxonomyAPI;
+use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\TaxonomiesStore;
+use Tests\TestCase;
 
 class TaxonomiesStoreTest extends TestCase
 {
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -24,14 +24,14 @@ class TaxonomiesStoreTest extends TestCase
         $stache->registerStore($this->store = (new TaxonomiesStore($stache, app('files')))->directory($this->tempDir));
     }
 
-    function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
     /** @test */
-    function it_only_gets_top_level_yaml_files()
+    public function it_only_gets_top_level_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
         touch($this->tempDir.'/two.yaml', 1234567890);
@@ -54,7 +54,7 @@ class TaxonomiesStoreTest extends TestCase
     }
 
     /** @test */
-    function it_makes_taxonomy_instances_from_files()
+    public function it_makes_taxonomy_instances_from_files()
     {
         $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "title: Example\nfoo: bar");
 
@@ -64,7 +64,7 @@ class TaxonomiesStoreTest extends TestCase
     }
 
     /** @test */
-    function it_uses_the_filename_as_the_item_key()
+    public function it_uses_the_filename_as_the_item_key()
     {
         $this->assertEquals(
             'test',
@@ -73,7 +73,7 @@ class TaxonomiesStoreTest extends TestCase
     }
 
     /** @test */
-    function it_saves_to_disk()
+    public function it_saves_to_disk()
     {
         $taxonomy = TaxonomyAPI::make('new');
 

@@ -2,11 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Statamic\Support\Str;
-use Statamic\Facades\File;
-use Statamic\Facades\Form;
 use Statamic\Exceptions\FatalException;
+use Statamic\Facades\File;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Str;
 
 class FormExportController extends CpController
 {
@@ -14,7 +13,7 @@ class FormExportController extends CpController
     {
         $this->authorize('forms');
 
-        $exporter = 'Statamic\Forms\Exporters\\' . Str::studly($type) . 'Exporter';
+        $exporter = 'Statamic\Forms\Exporters\\'.Str::studly($type).'Exporter';
 
         if (! class_exists($exporter)) {
             throw new FatalException("Exporter of type [$type] does not exist.");

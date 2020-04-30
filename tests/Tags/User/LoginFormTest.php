@@ -17,7 +17,7 @@ class LoginFormTest extends TestCase
     }
 
     /** @test */
-    function it_renders_form()
+    public function it_renders_form()
     {
         $output = $this->tag('{{ user:login_form }}{{ /user:login_form }}');
 
@@ -27,7 +27,7 @@ class LoginFormTest extends TestCase
     }
 
     /** @test */
-    function it_renders_form_with_params()
+    public function it_renders_form_with_params()
     {
         $output = $this->tag('{{ user:login_form redirect="/logged-in" class="form" id="form" }}{{ /user:login_form }}');
 
@@ -36,7 +36,7 @@ class LoginFormTest extends TestCase
     }
 
     /** @test */
-    function it_wont_log_user_in_and_renders_errors()
+    public function it_wont_log_user_in_and_renders_errors()
     {
         User::make()
             ->email('san@holo.com')
@@ -53,7 +53,7 @@ class LoginFormTest extends TestCase
 
         $this->assertFalse(auth()->check());
 
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:login_form }}
     {{ errors }}
         <p class="error">{{ value }}</p>
@@ -71,7 +71,7 @@ EOT
     }
 
     /** @test */
-    function it_will_log_user_in_and_render_success()
+    public function it_will_log_user_in_and_render_success()
     {
         $this->assertFalse(auth()->check());
 
@@ -90,7 +90,7 @@ EOT
 
         $this->assertTrue(auth()->check());
 
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:login_form }}
     {{ errors }}
         <p class="error">{{ value }}</p>
@@ -108,7 +108,7 @@ EOT
     }
 
     /** @test */
-    function it_will_log_user_in_and_follow_custom_redirect_with_success()
+    public function it_will_log_user_in_and_follow_custom_redirect_with_success()
     {
         $this->assertFalse(auth()->check());
 
@@ -128,7 +128,7 @@ EOT
 
         $this->assertTrue(auth()->check());
 
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:login_form }}
     {{ errors }}
         <p class="error">{{ value }}</p>
@@ -146,7 +146,7 @@ EOT
     }
 
     /** @test */
-    function it_will_use_redirect_query_param_off_url()
+    public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=login-successful');
 

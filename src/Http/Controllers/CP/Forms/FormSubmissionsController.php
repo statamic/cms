@@ -2,12 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
-use Statamic\CP\Column;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Config;
-use Statamic\Facades\Form;
-use Statamic\Facades\Helper;
-use Statamic\Facades\User;
 use Statamic\Forms\Presenters\UploadedFilePresenter;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Submissions\Submissions;

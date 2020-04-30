@@ -2,14 +2,14 @@
 
 namespace Tests\Fieldtypes;
 
-use Tests\TestCase;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Markdown;
+use Tests\TestCase;
 
 class MarkdownTest extends TestCase
 {
     /** @test */
-    function it_augments_to_html()
+    public function it_augments_to_html()
     {
         $this->assertEqualsTrimmed(
             '<p>Paragraph with <strong>bold</strong> and <em>italic</em> text.</p>',
@@ -18,7 +18,7 @@ class MarkdownTest extends TestCase
     }
 
     /** @test */
-    function it_augments_with_smartypants()
+    public function it_augments_with_smartypants()
     {
         $default = $this->fieldtype();
         $this->assertEqualsTrimmed('<p>Some &quot;quoted&quot; text.</p>', $default->augment('Some "quoted" text.'));
@@ -31,11 +31,11 @@ class MarkdownTest extends TestCase
     }
 
     /** @test */
-    function it_converts_to_smartypants_after_html()
+    public function it_converts_to_smartypants_after_html()
     {
         $md = $this->fieldtype(['smartypants' => true]);
 
-        $value = <<<EOT
+        $value = <<<'EOT'
 Paragraph with `some code`.
 
 Paragraph that hasn't got any "code".
@@ -45,7 +45,7 @@ code block
 ```
 EOT;
 
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 <p>Paragraph with <code>some code</code>.</p>
 <p>Paragraph that hasn’t got any “code”.</p>
 <pre><code class="language-js">code block
@@ -56,7 +56,7 @@ EOT;
     }
 
     /** @test */
-    function it_can_add_links_automatically_when_augmenting()
+    public function it_can_add_links_automatically_when_augmenting()
     {
         $value = 'before http://example.com after';
         $replaced = '<p>before <a href="http://example.com">http://example.com</a> after</p>';
@@ -73,7 +73,7 @@ EOT;
     }
 
     /** @test */
-    function it_can_escape_markup_when_augmenting()
+    public function it_can_escape_markup_when_augmenting()
     {
         $value = 'before <div>in the div</div> after';
         $escaped = '<p>before &lt;div&gt;in the div&lt;/div&gt; after</p>';
@@ -90,19 +90,19 @@ EOT;
     }
 
     /** @test */
-    function it_can_automatically_add_line_breaks_when_augmenting()
+    public function it_can_automatically_add_line_breaks_when_augmenting()
     {
-        $value = <<<EOT
+        $value = <<<'EOT'
 first line
 second line
 EOT;
 
-        $withBreaks = <<<EOT
+        $withBreaks = <<<'EOT'
 <p>first line<br />
 second line</p>
 EOT;
 
-        $withoutBreaks = <<<EOT
+        $withoutBreaks = <<<'EOT'
 <p>first line
 second line</p>
 EOT;

@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\Facades\URL;
 use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
-use Statamic\Http\Middleware\RedirectIfAuthenticated;
 use Statamic\Auth\SendsPasswordResetEmails;
+use Statamic\Facades\URL;
+use Statamic\Http\Middleware\RedirectIfAuthenticated;
 
 class ForgotPasswordController extends Controller
 {

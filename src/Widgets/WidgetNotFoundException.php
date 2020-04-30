@@ -29,7 +29,7 @@ class WidgetNotFoundException extends Exception implements ProvidesSolution
         return BaseSolution::create("The {$this->widget} widget was not found.")
             ->setSolutionDescription($description)
             ->setDocumentationLinks([
-                'Read the widgets guide' => Statamic::docsUrl('widgets')
+                'Read the widgets guide' => Statamic::docsUrl('widgets'),
             ]);
     }
 

@@ -2,10 +2,9 @@
 
 namespace Tests\StaticCaching;
 
-use Tests\TestCase;
-use Statamic\StaticCaching\Cacher;
-use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Data\Content\Content;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
 
 class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
@@ -32,7 +31,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /** @test */
-    function the_items_url_gets_invalidated()
+    public function the_items_url_gets_invalidated()
     {
         $cacher = \Mockery::spy(Cacher::class);
         $invalidator = new Invalidator($cacher);
@@ -48,19 +47,19 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /** @test */
-    function collection_urls_can_be_invralidated()
+    public function collection_urls_can_be_invralidated()
     {
         $this->markTestIncomplete();
     }
 
     /** @test */
-    function taxonomy_urls_can_be_invalidated()
+    public function taxonomy_urls_can_be_invalidated()
     {
         $this->markTestIncomplete();
     }
 
     /** @test */
-    function page_urls_can_be_invalidated()
+    public function page_urls_can_be_invalidated()
     {
         $this->markTestIncomplete();
     }

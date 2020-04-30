@@ -58,7 +58,7 @@ class GlobalVariablesController extends CpController
                     'handle' => $localized->locale(),
                     'name' => $localized->site()->name(),
                     'active' => $localized->locale() === $variables->locale(),
-                    'origin' => !$localized->hasOrigin(),
+                    'origin' => ! $localized->hasOrigin(),
                     'url' => $localized->editUrl(),
                 ];
             })->values()->all(),

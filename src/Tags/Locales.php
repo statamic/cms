@@ -2,12 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Str;
-use Statamic\Facades\Site;
-use Statamic\Facades\Entry;
-use Statamic\Tags\Tags;
-use Statamic\Facades\Config;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
+use Statamic\Support\Str;
 
 class Locales extends Tags
 {
@@ -91,6 +89,7 @@ class Locales extends Tags
             $localized['locale'] = $locale;
             $localized['current'] = Site::current()->handle();
             $localized['is_current'] = $key === Site::current()->handle();
+
             return $localized;
         });
     }
@@ -107,7 +106,7 @@ class Locales extends Tags
     }
 
     /**
-     * Get the data / content object
+     * Get the data / content object.
      *
      * @return \Statamic\Contracts\Data\Content\Content
      */
@@ -131,7 +130,7 @@ class Locales extends Tags
     private function sort($locales)
     {
         if ($sort = $this->get('sort')) {
-            list($sort, $dir) = $this->getSort($sort);
+            [$sort, $dir] = $this->getSort($sort);
             $locales = ($dir === 'asc') ? $locales->sortBy($sort) : $locales->sortByDesc($sort);
         }
 
@@ -153,7 +152,7 @@ class Locales extends Tags
         $dir = 'asc';
 
         if (Str::contains($sort, ':')) {
-            list($sort, $dir) = explode(':', $sort);
+            [$sort, $dir] = explode(':', $sort);
             $dir = ($dir === 'desc') ? 'desc' : 'asc';
         }
 
@@ -170,6 +169,7 @@ class Locales extends Tags
     {
         $key = Site::current()->handle();
         $current = $locales->pull($key);
+
         return collect([$key => $current])->merge($locales);
     }
 }

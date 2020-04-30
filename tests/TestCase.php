@@ -2,8 +2,6 @@
 
 namespace Tests;
 
-use Statamic\Statamic;
-
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $shouldFakeVersion = true;
@@ -11,7 +9,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function setUp(): void
     {
-        require_once(__DIR__.'/ConsoleKernel.php');
+        require_once __DIR__.'/ConsoleKernel.php';
 
         parent::setUp();
 
@@ -59,7 +57,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $configs = [
             'assets', 'cp', 'forms', 'routes', 'static_caching',
-            'sites', 'stache', 'system', 'users'
+            'sites', 'stache', 'system', 'users',
         ];
 
         foreach ($configs as $config) {
@@ -73,15 +71,15 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('statamic.sites', [
             'default' => 'en',
             'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/',]
-            ]
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
+            ],
         ]);
         $app['config']->set('auth.providers.users.driver', 'statamic');
         $app['config']->set('statamic.stache.watcher', false);
         $app['config']->set('statamic.users.repository', 'file');
         $app['config']->set('statamic.stache.stores.users', [
             'class' => \Statamic\Stache\Stores\UsersStore::class,
-            'directory' => __DIR__.'/__fixtures__/users'
+            'directory' => __DIR__.'/__fixtures__/users',
         ]);
 
         $app['config']->set('statamic.stache.stores.taxonomies.directory', __DIR__.'/__fixtures__/content/taxonomies');
@@ -126,7 +124,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             }
         }
 
-        $this->assertEquals(count($items), $matches, 'Failed asserting that every item is an instance of ' . $class);
+        $this->assertEquals(count($items), $matches, 'Failed asserting that every item is an instance of '.$class);
     }
 
     protected function assertFileEqualsString($filename, $expected)
@@ -138,7 +136,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function assertContainsHtml($string)
     {
-        preg_match("/<[^<]+>/", $string, $matches);
+        preg_match('/<[^<]+>/', $string, $matches);
 
         $this->assertNotEmpty($matches, 'Failed asserting that string contains HTML.');
     }
@@ -159,13 +157,14 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     {
         $mock = \Mockery::mock(...array_filter(func_get_args()))->makePartial();
         $this->app->instance($abstract, $mock);
+
         return $mock;
     }
 
     /**
      * @deprecated
      */
-    public static function assertFileNotExists(string $filename, string $message = '') : void
+    public static function assertFileNotExists(string $filename, string $message = ''): void
     {
         method_exists(static::class, 'assertFileDoesNotExist')
             ? static::assertFileDoesNotExist($filename, $message)
@@ -175,7 +174,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
     /**
      * @deprecated
      */
-    public static function assertDirectoryNotExists(string $filename, string $message = '') : void
+    public static function assertDirectoryNotExists(string $filename, string $message = ''): void
     {
         method_exists(static::class, 'assertDirectoryDoesNotExist')
             ? static::assertDirectoryDoesNotExist($filename, $message)
