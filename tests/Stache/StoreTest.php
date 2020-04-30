@@ -2,9 +2,9 @@
 
 namespace Tests\Stache;
 
-use Tests\TestCase;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\Store;
+use Tests\TestCase;
 
 class StoreTest extends TestCase
 {
@@ -18,7 +18,7 @@ class StoreTest extends TestCase
     }
 
     /** @test */
-    function it_forces_a_trailing_slash_when_setting_the_directory()
+    public function it_forces_a_trailing_slash_when_setting_the_directory()
     {
         $this->assertNull($this->store->directory());
 
@@ -39,6 +39,5 @@ class TestStore extends Store
 {
     public function getItem($key)
     {
-
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Facades\YAML;
 use Illuminate\Console\Command;
-use Statamic\Console\RunsInPlease;
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Console\RunsInPlease;
+use Statamic\Facades\YAML;
 
 class SiteClear extends Command
 {

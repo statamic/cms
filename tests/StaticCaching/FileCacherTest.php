@@ -3,7 +3,6 @@
 namespace Tests\StaticCaching;
 
 use Illuminate\Contracts\Cache\Repository;
-use Statamic\Facades\Path;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\Writer;
 use Tests\TestCase;
@@ -16,13 +15,13 @@ class FileCacherTest extends TestCase
         $cacher = $this->fileCacher([
             'path' => [
                 'en' => 'test/path',
-                'fr' => 'fr/test/path'
-            ]
+                'fr' => 'fr/test/path',
+            ],
         ]);
 
         $this->assertEquals([
             'en' => 'test/path',
-            'fr' => 'fr/test/path'
+            'fr' => 'fr/test/path',
         ], $cacher->getCachePaths());
     }
 
@@ -31,11 +30,11 @@ class FileCacherTest extends TestCase
     {
         $cacher = $this->fileCacher([
             'locale' => 'en',
-            'path' => 'test/path'
+            'path' => 'test/path',
         ]);
 
         $this->assertEquals([
-            'en' => 'test/path'
+            'en' => 'test/path',
         ], $cacher->getCachePaths());
     }
 
@@ -43,7 +42,7 @@ class FileCacherTest extends TestCase
     public function gets_cache_path()
     {
         $cacher = $this->fileCacher([
-            'path' => 'test/path'
+            'path' => 'test/path',
         ]);
 
         $this->assertEquals('test/path', $cacher->getCachePath());
@@ -53,7 +52,7 @@ class FileCacherTest extends TestCase
     public function gets_file_path_from_url()
     {
         $cacher = $this->fileCacher([
-            'path' => 'test/path'
+            'path' => 'test/path',
         ]);
 
         $this->assertEquals(
@@ -74,8 +73,8 @@ class FileCacherTest extends TestCase
             'locale' => 'en',
             'path' => [
                 'en' => 'test/path',
-                'fr' => 'fr/test/path'
-            ]
+                'fr' => 'fr/test/path',
+            ],
         ]);
 
         $this->assertEquals(
@@ -93,8 +92,8 @@ class FileCacherTest extends TestCase
             'locale' => 'en',
             'path' => [
                 'en' => 'test/path',
-                'fr' => 'fr/test/path'
-            ]
+                'fr' => 'fr/test/path',
+            ],
         ], $writer);
 
         $cacher->flush();
@@ -121,7 +120,7 @@ class FileCacherTest extends TestCase
         $cache = app(Repository::class);
         $cacher = new FileCacher($writer, $cache, ['base_url' => 'http://example.com']);
         $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
-            'one' => '/one', 'two' => '/two'
+            'one' => '/one', 'two' => '/two',
         ]);
 
         $cacher->invalidateUrl('/one');
@@ -134,6 +133,6 @@ class FileCacherTest extends TestCase
     {
         $writer = $writer ?: \Mockery::mock(Writer::class);
 
-        return new FileCacher($writer, app(Repository::Class), $config);
+        return new FileCacher($writer, app(Repository::class), $config);
     }
 }

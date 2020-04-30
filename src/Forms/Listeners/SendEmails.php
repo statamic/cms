@@ -2,9 +2,9 @@
 
 namespace Statamic\Forms\Listeners;
 
-use Statamic\Forms\Email;
 use Illuminate\Support\Facades\Mail;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Forms\Email;
 
 class SendEmails
 {

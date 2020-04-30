@@ -3,9 +3,8 @@
 namespace Statamic\Forms\Presenters;
 
 use Illuminate\Support\Collection;
-use Statamic\Facades\Asset;
-use Statamic\Facades\Helper;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades\Asset;
 
 class UploadedFilePresenter
 {
@@ -61,7 +60,7 @@ class UploadedFilePresenter
 
     private function buildHtmlForFile($file)
     {
-        $url = '/' . $this->config->get('destination') . '/' . $file;
+        $url = '/'.$this->config->get('destination').'/'.$file;
 
         return "<a href='$url'>$file</a>";
     }

@@ -2,24 +2,23 @@
 
 namespace Statamic\CP\Navigation;
 
-use Statamic\Facades\CP\Nav;
-use Statamic\Facades\Site;
-use Statamic\Facades\User;
-use Statamic\Facades\Form as FormAPI;
-use Statamic\Facades\Role as RoleAPI;
+use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Forms\Form;
-use Statamic\Facades\Taxonomy as TaxonomyAPI;
+use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Contracts\Structures\Nav as NavContract;
+use Statamic\Contracts\Taxonomies\Taxonomy;
+use Statamic\Facades\AssetContainer as AssetContainerAPI;
+use Statamic\Facades\Collection as CollectionAPI;
+use Statamic\Facades\CP\Nav;
+use Statamic\Facades\Form as FormAPI;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
 use Statamic\Facades\Nav as NavAPI;
+use Statamic\Facades\Role as RoleAPI;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Facades\UserGroup as UserGroupAPI;
-use Statamic\Facades\Collection as CollectionAPI;
-use Statamic\Contracts\Globals\GlobalSet;
-use Statamic\Contracts\Entries\Collection;
-use Statamic\Contracts\Taxonomies\Taxonomy;
-use Statamic\Contracts\Assets\AssetContainer;
-use Statamic\Contracts\Structures\Nav as NavContract;
-use Statamic\Facades\AssetContainer as AssetContainerAPI;
 use Statamic\Facades\Utility;
 
 class CoreNav
@@ -122,6 +121,7 @@ class CoreNav
             ->children(function () {
                 return GlobalSetAPI::all()->map(function ($globalSet) {
                     $globalSet = $globalSet->in(Site::selected()->handle());
+
                     return Nav::item($globalSet->title())
                               ->url($globalSet->editUrl())
                               ->can('view', $globalSet);
@@ -131,7 +131,7 @@ class CoreNav
         return $this;
     }
 
-        /**
+    /**
      * Make fields section items.
      *
      * @return $this
@@ -216,7 +216,7 @@ class CoreNav
             ->children(function () {
                 return UserGroupAPI::all()->map(function ($userGroup) {
                     return Nav::item($userGroup->title())
-                              ->url($userGroup->editUrl());
+                              ->url($userGroup->showUrl());
                 });
             });
 

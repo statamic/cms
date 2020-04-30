@@ -2,19 +2,18 @@
 
 namespace Tests\Feature\Entries;
 
+use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Carbon;
 use Mockery;
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Statamic\Facades\User;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Folder;
-use Statamic\Fields\Fields;
-use Statamic\Facades\Collection;
+use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
-use Illuminate\Support\Carbon;
+use Statamic\Fields\Fields;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
-use Facades\Tests\Factories\EntryFactory;
-use Facades\Statamic\Fields\BlueprintRepository;
+use Tests\TestCase;
 
 class UpdateEntryTest extends TestCase
 {
@@ -36,7 +35,7 @@ class UpdateEntryTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test');
@@ -56,7 +55,7 @@ class UpdateEntryTest extends TestCase
     }
 
     /** @test */
-    function published_entry_gets_saved_to_working_copy()
+    public function published_entry_gets_saved_to_working_copy()
     {
         $now = Carbon::parse('2017-02-03');
         Carbon::setTestNow($now);
@@ -71,7 +70,7 @@ class UpdateEntryTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Original title',
                 'foo' => 'bar',
-                'updated_at' => $originalTimestamp = $now->subDays(3)->timestamp
+                'updated_at' => $originalTimestamp = $now->subDays(3)->timestamp,
             ])->create();
 
         $this
@@ -79,7 +78,7 @@ class UpdateEntryTest extends TestCase
             ->save($entry, [
                 'title' => 'Updated title',
                 'foo' => 'updated foo',
-                'slug' => 'updated-slug'
+                'slug' => 'updated-slug',
             ])
             ->assertOk();
 
@@ -89,7 +88,7 @@ class UpdateEntryTest extends TestCase
             'blueprint' => 'test',
             'title' => 'Original title',
             'foo' => 'bar',
-            'updated_at' => $originalTimestamp
+            'updated_at' => $originalTimestamp,
         ], $entry->data());
 
         $workingCopy = $entry->fromWorkingCopy();
@@ -102,7 +101,7 @@ class UpdateEntryTest extends TestCase
     }
 
     /** @test */
-    function draft_entry_gets_saved_to_content()
+    public function draft_entry_gets_saved_to_content()
     {
         $now = Carbon::parse('2017-02-03');
         Carbon::setTestNow($now);
@@ -127,7 +126,7 @@ class UpdateEntryTest extends TestCase
             ->save($entry, [
                 'title' => 'Updated title',
                 'foo' => 'updated foo',
-                'slug' => 'updated-slug'
+                'slug' => 'updated-slug',
             ])
             ->assertOk();
 
@@ -144,7 +143,7 @@ class UpdateEntryTest extends TestCase
     }
 
     /** @test */
-    function validation_error_returns_back()
+    public function validation_error_returns_back()
     {
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text', 'validate' => 'required']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
@@ -165,7 +164,7 @@ class UpdateEntryTest extends TestCase
             ->save($entry, [
                 'title' => 'Updated title',
                 'foo' => '',
-                'slug' => 'updated-slug'
+                'slug' => 'updated-slug',
             ])
             ->assertRedirect('/original')
             ->assertSessionHasErrors('foo');

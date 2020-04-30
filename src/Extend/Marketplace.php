@@ -3,11 +3,11 @@
 namespace Statamic\Extend;
 
 use Facades\GuzzleHttp\Client;
-use Statamic\Facades\Addon as AddonAPI;
-use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Addon as AddonAPI;
 
 class Marketplace
 {
@@ -273,15 +273,15 @@ class Marketplace
             'name' => $addon->name(),
             'variants' => [
                 [
-                    'id' => $addon->id() . '-variant',
+                    'id' => $addon->id().'-variant',
                     'number' => 1,
                     'description' => 'N/A',
                     'assets' => [],
                     'package' => $addon->package(),
-                ]
+                ],
             ],
             'seller' => [
-                'id' => $addon->id() . '-seller',
+                'id' => $addon->id().'-seller',
                 'name' => 'NA',
                 'website' => null,
                 'avatar' => null,
@@ -346,8 +346,8 @@ class Marketplace
     {
         return [
             'meta' => [
-                'installed' => AddonAPI::all()->keys()->all()
-            ]
+                'installed' => AddonAPI::all()->keys()->all(),
+            ],
         ];
     }
 }

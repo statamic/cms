@@ -2,14 +2,13 @@
 
 namespace Tests\Stache\Repositories;
 
-use Tests\TestCase;
-use Statamic\Stache\Stache;
-use Statamic\Stache\Stores\GlobalsStore;
+use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
 use Statamic\Globals\GlobalCollection;
-use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Stache\Repositories\GlobalRepository;
-use Illuminate\Support\Collection as IlluminateCollection;
+use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\GlobalsStore;
+use Tests\TestCase;
 
 class GlobalRepositoryTest extends TestCase
 {
@@ -26,7 +25,7 @@ class GlobalRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_global_sets()
+    public function it_gets_all_global_sets()
     {
         $sets = $this->repo->all();
 
@@ -41,7 +40,7 @@ class GlobalRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_global_set_by_id()
+    public function it_gets_a_global_set_by_id()
     {
         tap($this->repo->find('global'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
@@ -61,7 +60,7 @@ class GlobalRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_global_set_by_handle()
+    public function it_gets_a_global_set_by_handle()
     {
         tap($this->repo->findByHandle('global'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
@@ -81,7 +80,7 @@ class GlobalRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_saves_a_global_to_the_stache_and_to_a_file()
+    public function it_saves_a_global_to_the_stache_and_to_a_file()
     {
         $global = GlobalSetAPI::make('new');
 

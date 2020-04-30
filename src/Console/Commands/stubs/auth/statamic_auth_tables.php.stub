@@ -18,6 +18,7 @@ class StatamicAuthTables extends Migration
             $table->string('avatar')->nullable();
             $table->json('preferences')->nullable();
             $table->timestamp('last_login')->nullable();
+            $table->string('password')->nullable()->change();
         });
 
         Schema::create('role_user', function (Blueprint $table) {

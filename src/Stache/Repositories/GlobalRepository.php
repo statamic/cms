@@ -2,11 +2,10 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\Stache\Stache;
-use Statamic\Globals\GlobalCollection;
-use Statamic\Contracts\Globals\GlobalSet;
-use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Globals\GlobalRepository as RepositoryContract;
+use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Globals\GlobalCollection;
+use Statamic\Stache\Stache;
 
 class GlobalRepository implements RepositoryContract
 {

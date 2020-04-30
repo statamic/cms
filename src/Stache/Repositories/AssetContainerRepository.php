@@ -2,11 +2,10 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\Stache\Stache;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\AssetContainer;
-use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Assets\AssetContainerRepository as RepositoryContract;
+use Statamic\Stache\Stache;
 
 class AssetContainerRepository implements RepositoryContract
 {

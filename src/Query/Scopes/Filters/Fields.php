@@ -4,10 +4,8 @@ namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Fields\Field;
 use Statamic\Query\Scopes\Filter;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class Fields extends Filter
 {

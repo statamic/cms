@@ -2,10 +2,10 @@
 
 namespace Statamic\Extensions\Translation;
 
-use Statamic\Statamic;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Contracts\Translation\Loader;
+use Illuminate\Filesystem\Filesystem;
 use Illuminate\Translation\Translator as BaseTranslator;
+use Statamic\Statamic;
 
 class Translator extends BaseTranslator
 {
@@ -18,7 +18,7 @@ class Translator extends BaseTranslator
     public function parseKey($key)
     {
         if (Statamic::isCpRoute() && starts_with($key, 'validation.')) {
-            $key = 'statamic::' . $key;
+            $key = 'statamic::'.$key;
         }
 
         return parent::parseKey($key);
@@ -35,6 +35,7 @@ class Translator extends BaseTranslator
         $translations = collect($this->loader->paths())->mapWithKeys(function ($path, $namespace) {
             // The default (un-hinted) translations come back with an asterisk as the namespace.
             $namespace = ($namespace === '*') ? null : $namespace;
+
             return $this->getTranslations($path, $namespace);
         });
 
@@ -48,8 +49,9 @@ class Translator extends BaseTranslator
     protected function getTranslations($path, $namespace)
     {
         return $this->phpFiles($path)->mapWithKeys(function ($name) use ($namespace) {
-            $key = ltrim($namespace . '::' . $name, ':');
+            $key = ltrim($namespace.'::'.$name, ':');
             $value = $this->loader->load($this->locale, $name, $namespace);
+
             return [$key => $value];
         })->all();
     }

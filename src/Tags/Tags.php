@@ -2,13 +2,13 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Arr;
-use Statamic\Facades\Parse;
-use Statamic\Facades\Antlers;
-use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasAliases;
+use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasParameters;
 use Statamic\Extend\RegistersItself;
+use Statamic\Facades\Antlers;
+use Statamic\Facades\Parse;
+use Statamic\Support\Arr;
 
 abstract class Tags
 {
@@ -17,13 +17,13 @@ abstract class Tags
     protected static $binding = 'tags';
 
     /**
-     * The content written between the tags (when a tag pair)
+     * The content written between the tags (when a tag pair).
      * @public string
      */
     public $content;
 
     /**
-     * The variable context around which this tag is positioned
+     * The variable context around which this tag is positioned.
      * @public array
      */
     public $context;
@@ -35,7 +35,7 @@ abstract class Tags
     public $params;
 
     /**
-     * The tag that was used
+     * The tag that was used.
      *
      * eg. For {{ ron:swanson foo="bar" }}, this would be `ron:swanson`
      *     and for {{ ron foo="bar" }} it would be `ron:index`
@@ -45,7 +45,7 @@ abstract class Tags
     public $tag;
 
     /**
-     * The tag method that was used
+     * The tag method that was used.
      *
      * eg. For {{ ron:swanson foo="bar" }}, this would be `swanson`
      *     and for {{ ron foo="bar" }}, it would `index`
@@ -55,7 +55,7 @@ abstract class Tags
     public $method;
 
     /**
-     * If is a tag pair
+     * If is a tag pair.
      * @var bool
      */
     public $isPair;
@@ -128,7 +128,7 @@ abstract class Tags
      */
     public function __call($method, $args)
     {
-        if ($this->wildcardHandled || !method_exists($this, $this->wildcardMethod)) {
+        if ($this->wildcardHandled || ! method_exists($this, $this->wildcardMethod)) {
             throw new \BadMethodCallException("Call to undefined method {$method}.");
         }
 
@@ -138,7 +138,7 @@ abstract class Tags
     }
 
     /**
-     * Parse the tag pair contents
+     * Parse the tag pair contents.
      *
      * @param array $data     Data to be parsed into template
      * @return string
@@ -155,7 +155,7 @@ abstract class Tags
     }
 
     /**
-     * Iterate over the data and parse the tag pair contents for each
+     * Iterate over the data and parse the tag pair contents for each.
      *
      * @param array|\Statamic\Data\DataCollection $data        Data to iterate over
      * @param bool                                $supplement  Whether to supplement with contextual values
@@ -177,7 +177,7 @@ abstract class Tags
     }
 
     /**
-     * Parse with no results
+     * Parse with no results.
      *
      * @param array $data Extra data to merge
      * @return string

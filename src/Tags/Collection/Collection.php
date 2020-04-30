@@ -2,9 +2,7 @@
 
 namespace Statamic\Tags\Collection;
 
-use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Entry;
-use Statamic\Facades\URL;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags;
 
@@ -15,7 +13,7 @@ class Collection extends Tags
     protected $defaultAsKey = 'entries';
 
     /**
-     * {{ collection:* }} ... {{ /collection:* }}
+     * {{ collection:* }} ... {{ /collection:* }}.
      */
     public function __call($method, $args)
     {
@@ -27,7 +25,7 @@ class Collection extends Tags
     }
 
     /**
-     * {{ collection from="" }} ... {{ /collection }}
+     * {{ collection from="" }} ... {{ /collection }}.
      */
     public function index()
     {
@@ -41,7 +39,7 @@ class Collection extends Tags
     }
 
     /**
-     * {{ collection:count from="" }} ... {{ /collection:count }}
+     * {{ collection:count from="" }} ... {{ /collection:count }}.
      */
     public function count()
     {
@@ -49,7 +47,7 @@ class Collection extends Tags
     }
 
     /**
-     * {{ collection:next }} ... {{ /collection:next }}
+     * {{ collection:next }} ... {{ /collection:next }}.
      */
     public function next()
     {
@@ -61,7 +59,7 @@ class Collection extends Tags
     }
 
     /**
-     * {{ collection:previous }} ... {{ /collection:previous }}
+     * {{ collection:previous }} ... {{ /collection:previous }}.
      */
     public function previous()
     {
@@ -73,7 +71,7 @@ class Collection extends Tags
     }
 
     /**
-     * {{ collection:older }} ... {{ /collection:older }}
+     * {{ collection:older }} ... {{ /collection:older }}.
      */
     public function older()
     {
@@ -85,7 +83,7 @@ class Collection extends Tags
     }
 
     /**
-     * {{ collection:newer }} ... {{ /collection:newer }}
+     * {{ collection:newer }} ... {{ /collection:newer }}.
      */
     public function newer()
     {

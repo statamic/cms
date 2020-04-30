@@ -19,7 +19,7 @@ class UserGroup extends Filter
                 'type' => 'select',
                 'placeholder' => __('Select Group'),
                 'options' => $this->options()->all(),
-            ]
+            ],
         ];
     }
 
@@ -30,7 +30,7 @@ class UserGroup extends Filter
 
     public function badge($values)
     {
-        return __('is in') . ' ' . strtolower($this->options()->get($values['group']));
+        return __('is in').' '.strtolower($this->options()->get($values['group']));
     }
 
     public function visibleTo($key)

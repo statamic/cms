@@ -2,9 +2,9 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Statamic\Support\Arr;
-use Statamic\Fields\Fields;
 use Scrumpy\ProseMirrorToHtml\Renderer;
+use Statamic\Fields\Fields;
+use Statamic\Support\Arr;
 
 class Augmentor
 {
@@ -20,7 +20,7 @@ class Augmentor
 
     public function augment($value, $shallow = false)
     {
-        $hasSets = !!$this->fieldtype->config('sets');
+        $hasSets = (bool) $this->fieldtype->config('sets');
 
         if (! $value) {
             return $hasSets ? [] : null;
@@ -34,7 +34,7 @@ class Augmentor
             return $this->convertToHtml($value);
         }
 
-        if (!$this->includeDisabledSets) {
+        if (! $this->includeDisabledSets) {
             $value = $this->removeDisabledSets($value);
         }
 
@@ -93,7 +93,7 @@ class Augmentor
 
         return $renderer->render([
             'type' => 'doc',
-            'content' => $value
+            'content' => $value,
         ]);
     }
 

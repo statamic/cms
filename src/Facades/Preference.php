@@ -2,8 +2,8 @@
 
 namespace Statamic\Facades;
 
-use Statamic\Preferences\Preferences;
 use Illuminate\Support\Facades\Facade;
+use Statamic\Preferences\Preferences;
 
 class Preference extends Facade
 {

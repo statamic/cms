@@ -2,10 +2,9 @@
 
 namespace Tests\Tags;
 
-use Statamic\Facades\File;
-use Tests\TestCase;
 use Statamic\Facades\Parse;
 use Tests\FakesViews;
+use Tests\TestCase;
 
 class PartialTagsTest extends TestCase
 {
@@ -29,7 +28,7 @@ class PartialTagsTest extends TestCase
     }
 
     /** @test */
-    function gets_partials_from_views_directory()
+    public function gets_partials_from_views_directory()
     {
         $this->viewShouldReturnRaw('mypartial', 'the partial content');
 
@@ -37,7 +36,7 @@ class PartialTagsTest extends TestCase
     }
 
     /** @test */
-    function gets_partials_from_partials_directory()
+    public function gets_partials_from_partials_directory()
     {
         $this->viewShouldReturnRaw('partials.sub.mypartial', 'the partial content');
 
@@ -45,7 +44,7 @@ class PartialTagsTest extends TestCase
     }
 
     /** @test */
-    function gets_partials_with_underscore_prefix()
+    public function gets_partials_with_underscore_prefix()
     {
         $this->viewShouldReturnRaw('sub._mypartial', 'the partial content');
 
@@ -53,7 +52,7 @@ class PartialTagsTest extends TestCase
     }
 
     /** @test */
-    function partials_can_contain_front_matter()
+    public function partials_can_contain_front_matter()
     {
         $this->viewShouldReturnRaw('mypartial', "---\nfoo: bar\n---\nthe partial content with {{ foo }}");
 
@@ -64,9 +63,9 @@ class PartialTagsTest extends TestCase
     }
 
     /** @test */
-    function partials_can_pass_data_through_params()
+    public function partials_can_pass_data_through_params()
     {
-        $this->viewShouldReturnRaw('mypartial', "the partial content with {{ foo }}");
+        $this->viewShouldReturnRaw('mypartial', 'the partial content with {{ foo }}');
 
         $this->assertEquals(
             'the partial content with bar',
@@ -75,7 +74,7 @@ class PartialTagsTest extends TestCase
     }
 
     /** @test */
-    function parameter_will_override_partial_front_matter()
+    public function parameter_will_override_partial_front_matter()
     {
         $this->viewShouldReturnRaw('mypartial', "---\nfoo: bar\n---\nthe partial content with {{ foo }}");
 

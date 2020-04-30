@@ -2,8 +2,6 @@
 
 namespace Statamic\Fields;
 
-use Illuminate\Support\Collection;
-use Statamic\Facades\Field as FieldAPI;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -45,7 +43,7 @@ class Section
             'display' => $this->display(),
             'instructions' => $this->instructions(),
             'handle' => $this->handle,
-            'fields' => $this->fields()->toPublishArray()
+            'fields' => $this->fields()->toPublishArray(),
         ];
     }
 

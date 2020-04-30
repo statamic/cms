@@ -3,11 +3,11 @@
 namespace Statamic\Console\Commands;
 
 use Exception;
-use Statamic\Support\Str;
 use Facades\Statamic\Console\Processes\Composer;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Input\InputArgument;
 use Illuminate\Console\GeneratorCommand as IlluminateGeneratorCommand;
+use Statamic\Support\Str;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 abstract class GeneratorCommand extends IlluminateGeneratorCommand
 {
@@ -48,7 +48,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
     {
         $stub = $stub ?? $this->stub;
 
-        return __DIR__ . '/stubs/' . $stub;
+        return __DIR__.'/stubs/'.$stub;
     }
 
     /**
@@ -82,7 +82,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
         $default = $this->laravel->getNamespace();
 
         if ($addon = $this->argument('addon')) {
-            $composerPath = $this->getAddonPath($addon) . '/../composer.json';
+            $composerPath = $this->getAddonPath($addon).'/../composer.json';
         } else {
             return $default;
         }
@@ -127,6 +127,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
         // use explicit path and allow external command to handle path output.
         if (starts_with($addon, '/') && $this->files->exists($addon)) {
             $this->hiddenPathOutput = true;
+
             return $addon;
         }
 
@@ -135,7 +136,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
 
         // Attempt to get addon path via composer.
         try {
-            $path = Composer::installedPath($addon) . '/src';
+            $path = Composer::installedPath($addon).'/src';
         } catch (Exception $exception) {
             $path = $fallbackPath;
         }
@@ -197,10 +198,10 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
 
         // Otherwise, specify addon base path.
         else {
-            $basePath = $basePath . '/resources/js';
+            $basePath = $basePath.'/resources/js';
         }
 
-        return $basePath . Str::ensureLeft($file, '/');
+        return $basePath.Str::ensureLeft($file, '/');
     }
 
     /**
@@ -254,6 +255,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
         // If trying to access `type` attribute, allow dynamic string manipulation like `typeLowerPlural`.
         if ($words[0] === 'type') {
             unset($words[0]);
+
             return Str::modifyMultiple($this->type, $words);
         }
 

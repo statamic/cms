@@ -2,9 +2,9 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Statamic\Support\Str;
 use Scrumpy\ProseMirrorToHtml\Nodes\Node;
 use Statamic\Facades\Asset;
+use Statamic\Support\Str;
 
 class ImageNode extends Node
 {
@@ -13,7 +13,8 @@ class ImageNode extends Node
         return $this->node->type === 'image';
     }
 
-    public function selfClosing() {
+    public function selfClosing()
+    {
         return true;
     }
 
@@ -30,7 +31,7 @@ class ImageNode extends Node
             [
                 'tag' => 'img',
                 'attrs' => (array) $attrs,
-            ]
+            ],
         ];
     }
 }

@@ -136,7 +136,7 @@ class ThemeTagsTest extends TestCase
     }
 
     /** @test */
-    function gets_versioned_filename_for_mix()
+    public function gets_versioned_filename_for_mix()
     {
         File::shouldReceive('get')
             ->with(public_path('mix-manifest.json'))
@@ -166,7 +166,7 @@ class ThemeTagsTest extends TestCase
     }
 
     /** @test */
-    function gets_regular_filename_if_file_isnt_in_mix_manifest()
+    public function gets_regular_filename_if_file_isnt_in_mix_manifest()
     {
         File::shouldReceive('get')
             ->with(public_path('mix-manifest.json'))
@@ -179,7 +179,7 @@ class ThemeTagsTest extends TestCase
     }
 
     /** @test */
-    function gets_regular_filename_if_file_isnt_in_elixir_manifest()
+    public function gets_regular_filename_if_file_isnt_in_elixir_manifest()
     {
         File::shouldReceive('get')
             ->with(public_path('mix-manifest.json'))
@@ -196,7 +196,7 @@ class ThemeTagsTest extends TestCase
     }
 
     /** @test */
-    function gets_regular_filename_if_manifests_dont_exist()
+    public function gets_regular_filename_if_manifests_dont_exist()
     {
         File::shouldReceive('get')
             ->with(public_path('mix-manifest.json'))

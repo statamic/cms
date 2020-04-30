@@ -2,17 +2,17 @@
 
 namespace Statamic\Taxonomies;
 
+use Statamic\Contracts\Taxonomies\Term as TermContract;
+use Statamic\Data\ExistsAsFile;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Path;
+use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Facades\Path;
-use Statamic\Facades\Blink;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Stache;
-use Statamic\Data\ExistsAsFile;
-use Statamic\Facades\Blueprint;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Taxonomies\Term as TermContract;
 
 class Term implements TermContract
 {
@@ -31,7 +31,7 @@ class Term implements TermContract
 
     public function id()
     {
-        return $this->taxonomyHandle() . '::' . $this->slug();
+        return $this->taxonomyHandle().'::'.$this->slug();
     }
 
     public function slug($slug = null)

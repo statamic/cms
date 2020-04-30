@@ -2,9 +2,8 @@
 
 namespace Tests\Sites;
 
-use Tests\TestCase;
 use Statamic\Sites\Site;
-use Statamic\Sites\Sites;
+use Tests\TestCase;
 
 class SiteTest extends TestCase
 {
@@ -16,7 +15,7 @@ class SiteTest extends TestCase
     }
 
     /** @test */
-    function gets_handle()
+    public function gets_handle()
     {
         $site = new Site('en', []);
 
@@ -24,7 +23,7 @@ class SiteTest extends TestCase
     }
 
     /** @test */
-    function gets_name()
+    public function gets_name()
     {
         $site = new Site('en', ['name' => 'English']);
 
@@ -32,7 +31,7 @@ class SiteTest extends TestCase
     }
 
     /** @test */
-    function gets_locale()
+    public function gets_locale()
     {
         $site = new Site('en', ['locale' => 'en_US']);
 
@@ -40,7 +39,7 @@ class SiteTest extends TestCase
     }
 
     /** @test */
-    function gets_short_locale()
+    public function gets_short_locale()
     {
         $this->assertEquals('en', (new Site('en', ['locale' => 'en']))->shortLocale());
         $this->assertEquals('en', (new Site('en', ['locale' => 'en_US']))->shortLocale());
@@ -48,69 +47,93 @@ class SiteTest extends TestCase
     }
 
     /** @test */
-    function gets_url()
+    public function gets_url_when_given_a_trailing_slash()
     {
         $site = new Site('en', ['url' => 'http://test.com/']);
 
-        $this->assertEquals('http://test.com/', $site->url());
+        $this->assertEquals('http://test.com', $site->url());
     }
 
     /** @test */
-    function gets_url_without_trailing_slash()
+    public function gets_url_when_not_given_a_trailing_slash()
     {
         $site = new Site('en', ['url' => 'http://test.com']);
 
-        $this->assertEquals('http://test.com/', $site->url());
+        $this->assertEquals('http://test.com', $site->url());
     }
 
     /** @test */
-    function gets_absolute_url()
+    public function gets_url_given_a_relative_url()
+    {
+        $site = new Site('en', ['url' => '/']);
+
+        $this->assertEquals('/', $site->url());
+    }
+
+    /** @test */
+    public function gets_url_given_a_relative_url_and_subdirectory()
+    {
+        $site = new Site('en', ['url' => '/sub']);
+
+        $this->assertEquals('/sub', $site->url());
+    }
+
+    /** @test */
+    public function gets_url_given_a_relative_url_and_subdirectory_with_trailing_slash()
+    {
+        $site = new Site('en', ['url' => '/sub/']);
+
+        $this->assertEquals('/sub', $site->url());
+    }
+
+    /** @test */
+    public function gets_absolute_url()
     {
         $this->assertEquals(
-            'http://a-defined-absolute-url.com/',
+            'http://a-defined-absolute-url.com',
             (new Site('en', ['url' => 'http://a-defined-absolute-url.com/']))->absoluteUrl()
         );
 
         $this->assertEquals(
-            'http://a-defined-absolute-url.com/',
+            'http://a-defined-absolute-url.com',
             (new Site('en', ['url' => 'http://a-defined-absolute-url.com']))->absoluteUrl()
         );
 
         $this->assertEquals(
-            'http://absolute-url-resolved-from-request.com/',
+            'http://absolute-url-resolved-from-request.com',
             (new Site('en', ['url' => '/']))->absoluteUrl()
         );
 
         $this->assertEquals(
-            'http://absolute-url-resolved-from-request.com/fr/',
+            'http://absolute-url-resolved-from-request.com/fr',
             (new Site('en', ['url' => '/fr/']))->absoluteUrl()
         );
 
         $this->assertEquals(
-            'http://absolute-url-resolved-from-request.com/fr/',
+            'http://absolute-url-resolved-from-request.com/fr',
             (new Site('en', ['url' => '/fr']))->absoluteUrl()
         );
 
         $this->get('/something');
 
         $this->assertEquals(
-            'http://absolute-url-resolved-from-request.com/',
+            'http://absolute-url-resolved-from-request.com',
             (new Site('en', ['url' => '/']))->absoluteUrl()
         );
 
         $this->assertEquals(
-            'http://absolute-url-resolved-from-request.com/fr/',
+            'http://absolute-url-resolved-from-request.com/fr',
             (new Site('en', ['url' => '/fr/']))->absoluteUrl()
         );
 
         $this->assertEquals(
-            'http://absolute-url-resolved-from-request.com/fr/',
+            'http://absolute-url-resolved-from-request.com/fr',
             (new Site('en', ['url' => '/fr']))->absoluteUrl()
         );
     }
 
     /** @test */
-    function gets_path()
+    public function gets_path()
     {
         tap(new Site('en', ['url' => 'http://test.com/']), function ($site) {
             $this->assertEquals('/', $site->relativePath('http://test.com'));

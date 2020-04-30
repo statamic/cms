@@ -27,7 +27,7 @@ class AuthRedirectTest extends TestCase
     }
 
     /** @test */
-    function it_redirects_back_to_referrer()
+    public function it_redirects_back_to_referrer()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -41,7 +41,7 @@ class AuthRedirectTest extends TestCase
     }
 
     /** @test */
-    function it_redirects_to_cp_index_without_referrer()
+    public function it_redirects_to_cp_index_without_referrer()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -54,7 +54,7 @@ class AuthRedirectTest extends TestCase
     }
 
     /** @test */
-    function it_redirects_somewhere_if_the_referrer_was_the_login_page()
+    public function it_redirects_somewhere_if_the_referrer_was_the_login_page()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -68,7 +68,7 @@ class AuthRedirectTest extends TestCase
     }
 
     /** @test */
-    function it_redirects_to_unauthorized_view_if_there_would_be_a_redirect_loop()
+    public function it_redirects_to_unauthorized_view_if_there_would_be_a_redirect_loop()
     {
         $this->setTestRoles(['undashboardable' => ['access cp']]);
         $user = tap(User::make()->assignRole('draft_viewer'))->save();

@@ -2,8 +2,8 @@
 
 namespace Statamic\Exceptions;
 
-use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Auth\AuthenticationException as Exception;
+use Illuminate\Contracts\Support\Responsable;
 
 class AuthenticationException extends Exception implements Responsable
 {

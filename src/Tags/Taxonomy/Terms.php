@@ -2,14 +2,11 @@
 
 namespace Statamic\Tags\Taxonomy;
 
-use Closure;
-use Illuminate\Support\Carbon;
-use Statamic\Facades;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Taxonomies\TermCollection;
 
@@ -71,6 +68,7 @@ class Terms
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
+        $this->queryMinimumEntries($query);
 
         return $query;
     }
@@ -99,6 +97,7 @@ class Terms
             ->map(function ($handle) {
                 $taxonomy = Taxonomy::findByHandle($handle);
                 throw_unless($taxonomy, new \Statamic\Exceptions\TaxonomyNotFoundException($handle));
+
                 return $taxonomy;
             })
             ->values();
@@ -116,6 +115,7 @@ class Terms
             ->map(function ($handle) {
                 $collection = Collection::findByHandle($handle);
                 throw_unless($collection, new \Statamic\Exceptions\CollectionNotFoundException("Collection [{$handle}] does not exist."));
+
                 return $collection;
             })
             ->values();
@@ -124,5 +124,20 @@ class Terms
     protected function defaultOrderBy()
     {
         return 'title:asc';
+    }
+
+    protected function queryMinimumEntries($query)
+    {
+        $isQueryingEntriesCount = $this->parameters->first(function ($v, $k) {
+            return Str::startsWith($k, 'entries_count:');
+        });
+
+        if ($isQueryingEntriesCount) {
+            return;
+        }
+
+        if ($count = $this->parameters->int('min_count')) {
+            $query->where('entries_count', '>=', $count);
+        }
     }
 }

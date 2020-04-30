@@ -2,8 +2,8 @@
 
 namespace Statamic\Auth\File;
 
-use Statamic\Facades\User;
 use Statamic\Auth\UserGroup as BaseUserGroup;
+use Statamic\Facades\User;
 
 class UserGroup extends BaseUserGroup
 {

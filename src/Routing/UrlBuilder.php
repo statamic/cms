@@ -2,10 +2,10 @@
 
 namespace Statamic\Routing;
 
-use Statamic\Support\Str;
-use Statamic\Facades\URL;
-use Statamic\Facades\Antlers;
 use Statamic\Contracts\Routing\UrlBuilder as UrlBuilderContract;
+use Statamic\Facades\Antlers;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 
 class UrlBuilder implements UrlBuilderContract
 {

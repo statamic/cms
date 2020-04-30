@@ -2,8 +2,8 @@
 
 namespace Statamic\Facades;
 
-use Statamic\Forms\FormRepository;
 use Illuminate\Support\Facades\Facade;
+use Statamic\Forms\FormRepository;
 
 class Form extends Facade
 {

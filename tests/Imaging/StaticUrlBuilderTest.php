@@ -2,12 +2,11 @@
 
 namespace Tests\Imaging;
 
-use Tests\TestCase;
 use League\Glide\Server;
 use Mockery as m;
-use Statamic\Assets\Asset;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Imaging\StaticUrlBuilder;
+use Tests\TestCase;
 
 class StaticUrlBuilderTest extends TestCase
 {
@@ -34,7 +33,7 @@ class StaticUrlBuilderTest extends TestCase
         $this->server = app(Server::class);
 
         $this->builder = new StaticUrlBuilder($this->generator, [
-            'route' => '/img'
+            'route' => '/img',
         ]);
     }
 

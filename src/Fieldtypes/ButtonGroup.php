@@ -15,7 +15,7 @@ class ButtonGroup extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.radio.config.options'),
                 'type' => 'array',
                 'value_header' => __('Label'),
-            ]
+            ],
         ];
     }
 

@@ -30,7 +30,7 @@
         @apply text-red;
 
         &.active {
-            box-shadow: config('colors.red') 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
+            box-shadow: theme('colors.red') 0px 3px inset, rgb(230, 235, 241) -1px 0px inset
         }
     }
 }

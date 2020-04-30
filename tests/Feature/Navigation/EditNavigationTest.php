@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\Navigation;
 
-use Mockery;
 use Statamic\Facades;
 use Statamic\Facades\Nav;
 use Tests\FakesRoles;
@@ -16,7 +15,7 @@ class EditNavigationTest extends TestCase
     use MocksStructures;
 
     /** @test */
-    function it_shows_the_edit_form_if_user_has_edit_permission()
+    public function it_shows_the_edit_form_if_user_has_edit_permission()
     {
         $nav = $this->createNav('foo');
         Nav::shouldReceive('all')->andReturn(collect([$nav]));
@@ -33,7 +32,7 @@ class EditNavigationTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_user_doesnt_have_edit_permission()
+    public function it_denies_access_if_user_doesnt_have_edit_permission()
     {
         $nav = $this->createNav('foo');
         Nav::shouldReceive('all')->andReturn(collect([$nav]));
@@ -50,7 +49,7 @@ class EditNavigationTest extends TestCase
             ->assertSessionHas('error', 'You are not authorized to configure navs.');
     }
 
-    function visitEditPage($nav)
+    public function visitEditPage($nav)
     {
         return $this->get(route('statamic.cp.navigation.edit', $nav->handle()));
     }

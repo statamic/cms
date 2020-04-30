@@ -2,18 +2,18 @@
 
 namespace Tests\Feature\Entries;
 
+use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Support\Carbon;
 use Mockery;
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Statamic\Facades\User;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Folder;
-use Statamic\Fields\Fields;
-use Statamic\Facades\Collection;
-use Illuminate\Support\Carbon;
+use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\Fields;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
-use Facades\Statamic\Fields\BlueprintRepository;
+use Tests\TestCase;
 
 class StoreEntryTest extends TestCase
 {
@@ -35,7 +35,7 @@ class StoreEntryTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test');
@@ -50,7 +50,7 @@ class StoreEntryTest extends TestCase
     }
 
     /** @test */
-    function entry_gets_created()
+    public function entry_gets_created()
     {
         $now = Carbon::parse('2017-02-03');
         Carbon::setTestNow($now);
@@ -75,7 +75,7 @@ class StoreEntryTest extends TestCase
 
         $response->assertJson([
             'redirect' => "http://localhost/cp/collections/blog/entries/{$entry->id()}/the-slug/en",
-            'entry' => []
+            'entry' => [],
         ]);
 
         $this->assertEquals('the-slug', $entry->slug());
@@ -91,7 +91,7 @@ class StoreEntryTest extends TestCase
     }
 
     /** @test */
-    function validation_error_returns_back()
+    public function validation_error_returns_back()
     {
         $this->setTestBlueprint('test', ['title' => ['type' => 'text'], 'foo' => ['type' => 'text', 'validate' => 'required']]);
         $this->setTestRoles(['test' => ['access cp', 'create blog entries']]);

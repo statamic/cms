@@ -3,8 +3,6 @@
 namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Statamic\Http\Resources\CP\Assets\Folder;
-use Statamic\Http\Resources\CP\Assets\FolderAsset;
 
 class FolderAssetsCollection extends ResourceCollection
 {
@@ -33,7 +31,7 @@ class FolderAssetsCollection extends ResourceCollection
                 'run_asset_action' => cp_route('assets.actions.run'),
                 'bulk_asset_actions' => cp_route('assets.actions.bulk'),
                 'run_folder_action' => cp_route('assets.folders.actions.run', $this->folder->container()->id()),
-            ]
+            ],
         ];
     }
 }

@@ -37,9 +37,9 @@ class RegexError extends \Error implements ProvidesSolution
 
         if ($this->message === 'PREG_BACKTRACK_LIMIT_ERROR') {
             $message = 'Regular expression backtrack limit reached';
-            $description = "This typically happens when a view is too large. You can try splitting it into partials.";
+            $description = 'This typically happens when a view is too large. You can try splitting it into partials.';
             if ($this->view) {
-                $description .= "\\\n\\\nView: `" . Str::after($this->view, base_path().'/') . '`';
+                $description .= "\\\n\\\nView: `".Str::after($this->view, base_path().'/').'`';
             }
         }
 

@@ -2,15 +2,15 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Tags;
-use Statamic\Actions;
-use Statamic\Fieldtypes;
-use Statamic\Query\Scopes;
-use Statamic\Extend\Manifest;
-use Statamic\Modifiers\Modifier;
 use Illuminate\Filesystem\Filesystem;
-use Statamic\Modifiers\CoreModifiers;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Actions;
+use Statamic\Extend\Manifest;
+use Statamic\Fieldtypes;
+use Statamic\Modifiers\CoreModifiers;
+use Statamic\Modifiers\Modifier;
+use Statamic\Query\Scopes;
+use Statamic\Tags;
 
 class ExtensionServiceProvider extends ServiceProvider
 {
@@ -52,7 +52,7 @@ class ExtensionServiceProvider extends ServiceProvider
      * @var array
      */
     protected $bundledWidgets = [
-        'getting-started', 'collection', 'template', 'updater', 'form'
+        'getting-started', 'collection', 'template', 'updater', 'form',
     ];
 
     protected $fieldtypes = [
@@ -133,6 +133,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Partial::class,
         Tags\Path::class,
         Tags\Query::class,
+        Tags\Range::class,
         Tags\Redirect::class,
         Tags\Relate::class,
         Tags\Rotate::class,
@@ -387,7 +388,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
         foreach ($this->app['files']->files($path) as $file) {
             $class = $file->getBasename('.php');
-            $fqcn = $this->app->getNamespace() . "{$folder}\\{$class}";
+            $fqcn = $this->app->getNamespace()."{$folder}\\{$class}";
             if (is_subclass_of($fqcn, $requiredClass)) {
                 $fqcn::register();
             }

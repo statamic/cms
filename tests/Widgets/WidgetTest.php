@@ -2,9 +2,9 @@
 
 namespace Tests\Widgets;
 
+use Statamic\Widgets\Widget;
 use Tests\TestCase;
 use Tests\TestDependency;
-use Statamic\Widgets\Widget;
 
 class WidgetTest extends TestCase
 {

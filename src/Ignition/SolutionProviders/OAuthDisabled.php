@@ -2,9 +2,9 @@
 
 namespace Statamic\Ignition\SolutionProviders;
 
-use Throwable;
-use Statamic\Ignition\Solutions\EnableOAuth;
 use Facade\IgnitionContracts\HasSolutionsForThrowable;
+use Statamic\Ignition\Solutions\EnableOAuth;
+use Throwable;
 
 class OAuthDisabled implements HasSolutionsForThrowable
 {

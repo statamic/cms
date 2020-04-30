@@ -2,19 +2,19 @@
 
 namespace Tests\Assets;
 
-use Statamic\Facades;
-use Tests\TestCase;
-use Statamic\Assets\Asset;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
-use Statamic\Filesystem\FlysystemAdapter;
+use Statamic\Assets\Asset;
 use Statamic\Assets\AssetFolder as Folder;
 use Statamic\Contracts\Assets\AssetContainer;
+use Statamic\Facades;
+use Statamic\Filesystem\FlysystemAdapter;
+use Tests\TestCase;
 
 class AssetFolderTest extends TestCase
 {
     /** @test */
-    function it_gets_and_sets_the_container()
+    public function it_gets_and_sets_the_container()
     {
         $folder = new Folder;
 
@@ -25,7 +25,7 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_path()
+    public function it_gets_and_sets_the_path()
     {
         $folder = new Folder;
 
@@ -37,7 +37,7 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_disk_from_the_container()
+    public function it_gets_the_disk_from_the_container()
     {
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('disk')->andReturn($disk = $this->mock(FlysystemAdapter::class));
@@ -48,7 +48,7 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_title()
+    public function it_gets_and_sets_the_title()
     {
         $folder = (new Folder)->path('path/to/somewhere');
         $this->assertEquals('somewhere', $folder->title());
@@ -60,7 +60,7 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_resolved_path()
+    public function it_gets_the_resolved_path()
     {
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('diskPath')->andReturn('path/to/container');
@@ -71,7 +71,7 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    function it_gets_assets_in_this_folder()
+    public function it_gets_assets_in_this_folder()
     {
         $container = $this->mock(AssetContainer::class);
         $container
@@ -88,7 +88,7 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    function it_gets_assets_in_this_folder_recursively()
+    public function it_gets_assets_in_this_folder_recursively()
     {
         $container = $this->mock(AssetContainer::class);
         $container
@@ -105,7 +105,7 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    function it_counts_assets_non_recursively()
+    public function it_counts_assets_non_recursively()
     {
         $container = $this->mock(AssetContainer::class);
         $container
@@ -122,7 +122,7 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_last_modified_date_by_aggregating_all_files()
+    public function it_gets_the_last_modified_date_by_aggregating_all_files()
     {
         Carbon::setTestNow(now());
 
@@ -151,7 +151,7 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    function it_saves_meta_file_to_disk()
+    public function it_saves_meta_file_to_disk()
     {
         Storage::fake('local');
 
@@ -165,7 +165,7 @@ class AssetFolderTest extends TestCase
 
         $return = $folder->save();
 
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 title: 'My Folder'
 
 EOT;
@@ -176,12 +176,12 @@ EOT;
     }
 
     /** @test */
-    function it_deletes_existing_meta_file_if_the_title_is_identical_to_computed_title()
+    public function it_deletes_existing_meta_file_if_the_title_is_identical_to_computed_title()
     {
         Storage::fake('local');
         $disk = Storage::disk('local');
         $path = 'path/to/folder/folder.yaml';
-        $disk->put($path, "title: Original Title");
+        $disk->put($path, 'title: Original Title');
 
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('disk')->andReturn($disk);
@@ -196,7 +196,7 @@ EOT;
     }
 
     /** @test */
-    function it_doesnt_save_meta_file_if_theres_no_title()
+    public function it_doesnt_save_meta_file_if_theres_no_title()
     {
         Storage::fake('local');
 
@@ -214,7 +214,7 @@ EOT;
     }
 
     /** @test */
-    function deleting_a_folder_deletes_the_assets_and_the_meta_file()
+    public function deleting_a_folder_deletes_the_assets_and_the_meta_file()
     {
         Storage::fake('local');
         $container = Facades\AssetContainer::make('test')->disk('local');
@@ -242,7 +242,7 @@ EOT;
     }
 
     /** @test */
-    function it_gets_the_parent_folder()
+    public function it_gets_the_parent_folder()
     {
         $container = $this->mock(AssetContainer::class);
         $expectedParent = (new Folder)
@@ -264,7 +264,7 @@ EOT;
     }
 
     /** @test */
-    function the_root_has_no_parent()
+    public function the_root_has_no_parent()
     {
         $folder = (new Folder)
             ->container($this->mock(AssetContainer::class))
@@ -274,7 +274,7 @@ EOT;
     }
 
     /** @test */
-    function it_converts_to_an_array()
+    public function it_converts_to_an_array()
     {
         $container = $this->mock(AssetContainer::class);
         $container

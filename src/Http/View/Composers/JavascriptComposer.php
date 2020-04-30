@@ -40,7 +40,7 @@ class JavascriptComposer
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
             'locale' => config('app.locale'),
-            'permissions' => $this->permissions($user)
+            'permissions' => $this->permissions($user),
         ]);
     }
 

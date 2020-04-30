@@ -2,14 +2,12 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Facades\File;
-use Statamic\Statamic;
-use Statamic\Sites\Sites;
-use Stringy\StaticStringy;
-use Statamic\Facades\Preference;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Facades\Preference;
+use Statamic\Sites\Sites;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -17,12 +15,12 @@ class AppServiceProvider extends ServiceProvider
 
     protected $configFiles = [
         'amp', 'api', 'assets', 'cp', 'forms', 'live_preview', 'oauth', 'protect', 'revisions',
-        'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'users'
+        'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'users',
     ];
 
     public function boot()
     {
-        $this->swapSessionMiddleware();
+        $this->registerMiddlewareGroup();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
              ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class);
@@ -43,20 +41,20 @@ class AppServiceProvider extends ServiceProvider
         ], 'statamic');
 
         $this->publishes([
-            "{$this->root}/resources/dist" => public_path('vendor/statamic/cp')
+            "{$this->root}/resources/dist" => public_path('vendor/statamic/cp'),
         ], 'statamic-cp');
 
         $this->loadTranslationsFrom("{$this->root}/resources/lang", 'statamic');
         $this->loadJsonTranslationsFrom("{$this->root}/resources/lang");
 
         $this->publishes([
-            "{$this->root}/resources/lang" => resource_path('lang/vendor/statamic')
+            "{$this->root}/resources/lang" => resource_path('lang/vendor/statamic'),
         ], 'statamic-translations');
 
         $this->loadViewsFrom("{$this->root}/resources/views/extend", 'statamic');
 
         $this->publishes([
-            "{$this->root}/resources/views/extend/forms" => resource_path('views/vendor/statamic/forms')
+            "{$this->root}/resources/views/extend/forms" => resource_path('views/vendor/statamic/forms'),
         ], 'statamic-forms');
 
         Blade::directive('svg', function ($expression) {
@@ -119,11 +117,11 @@ class AppServiceProvider extends ServiceProvider
         });
     }
 
-    protected function swapSessionMiddleware()
+    protected function registerMiddlewareGroup()
     {
-        $this->app->singleton(
-            \Illuminate\Session\Middleware\StartSession::class,
-            \Statamic\Http\Middleware\CP\StartSession::class
-        );
+        $this->app->make(Router::class)->middlewareGroup('statamic.web', [
+            \Statamic\Http\Middleware\Localize::class,
+            \Statamic\StaticCaching\Middleware\Cache::class,
+        ]);
     }
 }

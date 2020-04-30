@@ -25,11 +25,11 @@ class ResolveRedirect
 
     private function firstChildUrl($parent)
     {
-        if (!$parent || !$parent instanceof Entry) {
+        if (! $parent || ! $parent instanceof Entry) {
             throw new \Exception("Cannot resolve a page's child redirect without providing a page.");
         }
 
-        if (!$parent instanceof Page && $parent instanceof Entry) {
+        if (! $parent instanceof Page && $parent instanceof Entry) {
             $parent = $parent->page();
         }
 

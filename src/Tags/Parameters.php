@@ -18,7 +18,7 @@ class Parameters extends ArrayAccessor
             // field's value in the context. If it doesn't exist, the value remains the literal.
             if (Str::startsWith($key, ':')) {
                 $key = substr($key, 1);
-                $value = $context[$value] ?? $value;
+                $value = $context->get($value, $value);
             }
 
             if ($value === 'true') {

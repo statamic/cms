@@ -2,16 +2,21 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Facades\URL;
+use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 use Statamic\Structures\TreeBuilder;
 
 class Structure extends Tags
 {
     public function wildcard($tag)
     {
+        $handle = $this->context->get($tag, $tag);
+
         // Allow {{ structure:collection:pages }} rather than needing to use the double colon.
-        $handle = str_replace(':', '::', $tag);
+        if (is_string($handle)) {
+            $handle = str_replace(':', '::', $tag);
+        }
 
         return $this->structure($handle);
     }
@@ -23,6 +28,10 @@ class Structure extends Tags
 
     protected function structure($handle)
     {
+        if ($handle instanceof StructureContract) {
+            $handle = $handle->handle();
+        }
+
         $tree = (new TreeBuilder)->build([
             'structure' => $handle,
             'include_home' => $this->get('include_home'),
@@ -38,11 +47,11 @@ class Structure extends Tags
         return collect($tree)->map(function ($item) use ($parent) {
             $page = $item['page'];
 
-            if ($page->reference() && !$page->referenceExists()) {
+            if ($page->reference() && ! $page->referenceExists()) {
                 return null;
             }
 
-            if (! $this->get('show_unpublished') && $page->entry() && !$page->entry()->published()) {
+            if (! $this->get('show_unpublished') && $page->entry() && ! $page->entry()->published()) {
                 return null;
             }
 

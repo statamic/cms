@@ -4,17 +4,18 @@ namespace Statamic\Taxonomies;
 
 use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Carbon;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Facades\Site;
+use Statamic\Facades\User;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
-use Statamic\Support\Arr;
 
 class LocalizedTerm implements Term, Responsable, Augmentable
 {
@@ -96,6 +97,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable
             } elseif ($this->term->slug() !== $slug) {
                 $this->set('slug', $slug);
             }
+
             return $this;
         }
 
@@ -119,7 +121,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable
 
     public function hasOrigin()
     {
-        return !$this->isDefaultLocale();
+        return ! $this->isDefaultLocale();
     }
 
     public function id()
@@ -184,7 +186,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable
         return vsprintf('taxonomies/%s/%s/%s', [
             $this->taxonomyHandle(),
             $this->locale(),
-            $this->slug()
+            $this->slug(),
         ]);
     }
 
@@ -292,11 +294,11 @@ class LocalizedTerm implements Term, Responsable, Augmentable
 
     public function route()
     {
-        $route = '/' . str_replace('_', '-', $this->taxonomyHandle()) . '/{slug}';
+        $route = '/'.str_replace('_', '-', $this->taxonomyHandle()).'/{slug}';
 
         if ($this->collection()) {
             $collectionUrl = $this->collection()->url() ?? $this->collection()->handle();
-            $route = $collectionUrl . $route;
+            $route = $collectionUrl.$route;
         }
 
         return $route;
@@ -382,5 +384,19 @@ class LocalizedTerm implements Term, Responsable, Augmentable
     public function defaultAugmentedArrayKeys()
     {
         return $this->selectedQueryColumns;
+    }
+
+    public function lastModified()
+    {
+        return $this->has('updated_at')
+            ? Carbon::createFromTimestamp($this->get('updated_at'))
+            : $this->term->fileLastModified();
+    }
+
+    public function lastModifiedBy()
+    {
+        return $this->has('updated_by')
+            ? User::find($this->get('updated_by'))
+            : null;
     }
 }

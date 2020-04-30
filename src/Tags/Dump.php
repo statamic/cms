@@ -2,12 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tags;
-
 class Dump extends Tags
 {
     /**
-     * {{ dump }}
+     * {{ dump }}.
      */
     public function index()
     {
@@ -15,7 +13,7 @@ class Dump extends Tags
     }
 
     /**
-     * {{ dump:* }}
+     * {{ dump:* }}.
      */
     public function wildcard($var)
     {

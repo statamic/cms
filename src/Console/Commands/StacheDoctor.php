@@ -2,9 +2,9 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Facades\Stache;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Stache;
 use Statamic\Stache\Stores\AggregateStore;
 
 class StacheDoctor extends Command
@@ -21,7 +21,7 @@ class StacheDoctor extends Command
         })->mapWithKeys(function ($store) {
             return [$store->key() => $this->getUnconfiguredIndexes($store)];
         })->filter(function ($item) {
-            return !$item->isEmpty();
+            return ! $item->isEmpty();
         });
 
         if ($missing->isEmpty()) {
@@ -33,7 +33,7 @@ class StacheDoctor extends Command
         $missing->each(function ($item, $key) {
             $this->line("<fg=red>[✗]</> Unconfigured indexes in <comment>{$key}</comment>");
             $item->each(function ($item) {
-                $this->line('- ' . $item);
+                $this->line('- '.$item);
             });
             $this->line('');
         });

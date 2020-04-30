@@ -2,17 +2,16 @@
 
 namespace Statamic\Http\Controllers\CP\Fields;
 
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Http\Request;
-use Statamic\Facades\Fieldset;
 use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
-use Facades\Statamic\Fields\FieldtypeRepository;
 
 class FieldsController extends CpController
 {
     public function __construct()
     {
-        $this->middleware('can:configure fields');
+        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
     }
 
     public function index(Request $request)
@@ -40,7 +39,7 @@ class FieldsController extends CpController
             'fieldtype' => $fieldtype->toArray(),
             'blueprint' => $blueprint->toPublishArray(),
             'values' => array_merge($request->values, $fields->values()->all()),
-            'meta' => $fields->meta()
+            'meta' => $fields->meta(),
         ];
     }
 
@@ -97,7 +96,7 @@ class FieldsController extends CpController
                 ],
                 'default' => 'hidden',
                 'width' => 50,
-            ]
+            ],
         ]);
 
         foreach ($prepends->reverse() as $handle => $prepend) {

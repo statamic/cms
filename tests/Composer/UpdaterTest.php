@@ -2,15 +2,11 @@
 
 namespace Tests\Composer;
 
-use Tests\TestCase;
-use Statamic\Statamic;
-use Facades\Statamic\Updater\Updater;
-use Facades\Statamic\Updater\Changelog;
-use Statamic\Updater\Updater as RealUpdater;
 use Facades\Statamic\Console\Processes\Composer;
-use Illuminate\Foundation\Testing\RefreshDatabase;
+use Facades\Statamic\Updater\Updater;
+use Statamic\Updater\Updater as RealUpdater;
 use Tests\Fakes\Composer\Composer as FakeComposer;
-use Tests\Fakes\Composer\Changelog as FakeChangelog;
+use Tests\TestCase;
 
 class UpdaterTest extends TestCase
 {
@@ -30,7 +26,7 @@ class UpdaterTest extends TestCase
     }
 
     /** @test */
-    function it_can_update()
+    public function it_can_update()
     {
         Updater::update();
 
@@ -38,7 +34,7 @@ class UpdaterTest extends TestCase
     }
 
     /** @test */
-    function it_can_downgrade_to_explicit_version()
+    public function it_can_downgrade_to_explicit_version()
     {
         Updater::update();
 
@@ -50,7 +46,7 @@ class UpdaterTest extends TestCase
     }
 
     /** @test */
-    function it_can_update_to_latest_version()
+    public function it_can_update_to_latest_version()
     {
         $this->assertEquals('1.0.0', Composer::installedVersion('test/deaths-tar-vulnerability'));
 

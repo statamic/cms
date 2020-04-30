@@ -30,7 +30,7 @@ class Tags extends BaseTags
     private $errorBag;
 
     /**
-     * {{ form:* }} ... {{ /form:* }}
+     * {{ form:* }} ... {{ /form:* }}.
      */
     public function __call($method, $args)
     {
@@ -40,7 +40,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Maps to {{ form:set }}
+     * Maps to {{ form:set }}.
      *
      * Allows you to inject the formset into the context so child tags can use it.
      *
@@ -54,7 +54,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Maps to {{ form:create }}
+     * Maps to {{ form:create }}.
      *
      * @return string
      */
@@ -70,7 +70,7 @@ class Tags extends BaseTags
         $html = $this->formOpen(route('statamic.forms.store'), 'POST', $knownParams);
 
         if ($this->hasErrors()) {
-            $data['error']  = $this->getErrors();
+            $data['error'] = $this->getErrors();
             $data['errors'] = $this->getErrorMessages();
         } else {
             $data['errors'] = [];
@@ -94,7 +94,7 @@ class Tags extends BaseTags
             $params['error_redirect'] = $error_redirect;
         }
 
-        $html .= '<input type="hidden" name="_params" value="'. Crypt::encrypt($params) .'" />';
+        $html .= '<input type="hidden" name="_params" value="'.Crypt::encrypt($params).'" />';
 
         $html .= $this->parse($data);
 
@@ -104,7 +104,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Maps to {{ form:errors }}
+     * Maps to {{ form:errors }}.
      *
      * @return string
      */
@@ -125,12 +125,12 @@ class Tags extends BaseTags
         }
 
         return ($this->content === '')    // If this is a single tag...
-            ? !empty($errors)             // just output a boolean.
+            ? ! empty($errors)             // just output a boolean.
             : $this->parseLoop($errors);  // Otherwise, parse the content loop.
     }
 
     /**
-     * Maps to {{ form:success }}
+     * Maps to {{ form:success }}.
      *
      * @return bool
      */
@@ -144,7 +144,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Maps to {{ form:submission }}
+     * Maps to {{ form:submission }}.
      *
      * @return array
      */
@@ -156,7 +156,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Maps to {{ form:submissions }}
+     * Maps to {{ form:submissions }}.
      *
      * @return array
      */
@@ -168,7 +168,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Get the sort order for a collection
+     * Get the sort order for a collection.
      *
      * @return string
      */
@@ -178,7 +178,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Get the formset specified either by the parameter or from within the context
+     * Get the formset specified either by the parameter or from within the context.
      *
      * @return string
      */
@@ -247,7 +247,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Get the errorBag from session
+     * Get the errorBag from session.
      *
      * @return object
      */
@@ -259,7 +259,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Get an array of all the error messages, keyed by their input names
+     * Get an array of all the error messages, keyed by their input names.
      *
      * @return array
      */
@@ -269,7 +269,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Get an array of all the error messages
+     * Get an array of all the error messages.
      *
      * @return array
      */
@@ -279,7 +279,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Add data to the debug bar
+     * Add data to the debug bar.
      *
      * Each form on the page will have its data placed in an array named
      * by its name. We'll use blink to keep track of the data as
@@ -313,7 +313,7 @@ class Tags extends BaseTags
     public function eventUrl($url, $relative = true)
     {
         return URL::prependSiteUrl(
-            config('statamic.routes.action') . '/form/' . $url
+            config('statamic.routes.action').'/form/'.$url
         );
     }
 }

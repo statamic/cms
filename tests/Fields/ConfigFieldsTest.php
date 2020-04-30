@@ -2,30 +2,31 @@
 
 namespace Tests\Fields;
 
-use Tests\TestCase;
-use Statamic\Fields\Field;
-use Statamic\Fields\Fieldtype;
-use Statamic\Fields\ConfigFields;
-use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Statamic\Fields\ConfigFields;
+use Statamic\Fields\Fieldtype;
+use Tests\TestCase;
 
 class ConfigFieldsTest extends TestCase
 {
     /** @test */
-    function it_preprocesses_each_fields_values_by_its_fieldtype()
+    public function it_preprocesses_each_fields_values_by_its_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
-            public function preProcess($data) {
-                return $data . ' preprocessed';
+            public function preProcess($data)
+            {
+                return $data.' preprocessed';
             }
-            public function preProcessConfig($data) {
-                return $data . ' preprocessed config';
+
+            public function preProcessConfig($data)
+            {
+                return $data.' preprocessed config';
             }
         });
 
         $fields = new ConfigFields([
             ['handle' => 'one', 'field' => ['type' => 'fieldtype']],
-            ['handle' => 'two', 'field' => ['type' => 'fieldtype']]
+            ['handle' => 'two', 'field' => ['type' => 'fieldtype']],
         ]);
 
         $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
@@ -37,7 +38,7 @@ class ConfigFieldsTest extends TestCase
         $this->assertNotSame($fields, $preProcessed);
         $this->assertEquals([
             'one' => 'foo preprocessed config',
-            'two' => 'bar preprocessed config'
+            'two' => 'bar preprocessed config',
         ], $preProcessed->values()->all());
     }
 }

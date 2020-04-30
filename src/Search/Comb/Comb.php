@@ -2,198 +2,190 @@
 
 namespace Statamic\Search\Comb;
 
+use Statamic\Search\Comb\Exceptions\Exception as CombException;
 use Statamic\Search\Comb\Exceptions\NoQuery;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
 use Statamic\Search\Comb\Exceptions\NotEnoughCharacters;
 use Statamic\Search\Comb\Exceptions\TooManyResults;
-use Statamic\Search\Comb\Exceptions\Exception as CombException;
 
-class Comb {
-
+class Comb
+{
     // query methods
     // ----------------------------------------------------------------------
 
     const QUERY_BOOLEAN = 0;
-    const QUERY_WORDS   = 1;
-    const QUERY_WHOLE   = 2;
-
+    const QUERY_WORDS = 1;
+    const QUERY_WHOLE = 2;
 
     // matching & scoring
     // ----------------------------------------------------------------------
 
     /**
-     * Match weights
+     * Match weights.
      * @var array
      */
-    private $match_weights = array(
-        "partial_word" => 1,
-        "partial_first_word" => 2,
-        "partial_word_start" => 1,
-        "partial_first_word_start" => 2,
-        "whole_word" => 5,
-        "whole_first_word" => 5,
-        "partial_whole" => 2,
-        "partial_whole_start" => 2,
-        "whole" => 10
-    );
+    private $match_weights = [
+        'partial_word' => 1,
+        'partial_first_word' => 2,
+        'partial_word_start' => 1,
+        'partial_first_word_start' => 2,
+        'whole_word' => 5,
+        'whole_first_word' => 5,
+        'partial_whole' => 2,
+        'partial_whole_start' => 2,
+        'whole' => 10,
+    ];
 
     /**
-     * Minimum characters to search over
+     * Minimum characters to search over.
      * @var int
      */
     private $min_characters = 3;
 
     /**
-     * Minimum characters per word to include word in search
+     * Minimum characters per word to include word in search.
      * @var int
      */
     private $min_word_characters = 2;
 
     /**
-     * Score threshold
+     * Score threshold.
      * @var int
      */
     private $score_threshold = 1;
 
     /**
-     * Property weights
+     * Property weights.
      * @var array
      */
-    private $property_weights = array();
-
+    private $property_weights = [];
 
     // input
     // ----------------------------------------------------------------------
 
     /**
-     * Query mode
+     * Query mode.
      * @var int
      */
     private $query_mode = self::QUERY_BOOLEAN;
 
     /**
      * Should query be stemmed?
-     * @var boolean
+     * @var bool
      */
     private $use_stemming = false;
 
     /**
      * Should query use alternate character values?
-     * @var boolean
+     * @var bool
      */
     private $use_alternates = false;
 
     /**
      * Should the full query be included in boolean searches?
-     * @var boolean
+     * @var bool
      */
     private $include_full_query = true;
 
     /**
-     * A list of words filtered out of search queries
+     * A list of words filtered out of search queries.
      * @var array
      */
-    private $stop_words = array();
-
+    private $stop_words = [];
 
     // output
     // ----------------------------------------------------------------------
 
     /**
-     * Limit the number of results returned
+     * Limit the number of results returned.
      * @var int
      */
     private $limit = null;
 
     /**
      * Should we throw the too-many-results exception?
-     * @var boolean
+     * @var bool
      */
     private $enable_too_many_results = false;
 
     /**
      * Should we sort results by score?
-     * @var boolean
+     * @var bool
      */
     private $sort_by_score = true;
 
     /**
      * Should we group results by category?
-     * @var boolean
+     * @var bool
      */
     private $group_by_category = false;
-
 
     // data
     // ----------------------------------------------------------------------
 
     /**
-     * Haystack of data to look through
+     * Haystack of data to look through.
      * @var array
      */
-    private $haystack = array();
+    private $haystack = [];
 
     /**
-     * A list of properties to exclude
+     * A list of properties to exclude.
      * @var array
      */
-    private $exclude_properties = array();
+    private $exclude_properties = [];
 
     /**
-     * A list of the only properties to include
+     * A list of the only properties to include.
      * @var array
      */
-    private $include_properties = array();
-
+    private $include_properties = [];
 
     // internal data trackers
     // ----------------------------------------------------------------------
 
     /**
      * Has the data already been prepared?
-     * @var boolean
+     * @var bool
      */
     private $is_data_prepared = false;
 
     /**
      * Is the haystack categorized?
-     * @var boolean
+     * @var bool
      */
     private $is_haystack_categorized = false;
 
     /**
-     * The start time of a query (for measuring performance)
+     * The start time of a query (for measuring performance).
      * @var int
      */
     private $query_start_time = false;
 
     /**
-     * The end time of a query (for measuring performance)
+     * The end time of a query (for measuring performance).
      * @var int
      */
     private $query_end_time = false;
-
-
 
     // start up
     // ----------------------------------------------------------------------
 
     /**
-     * Constructor
+     * Constructor.
      *
      * @param mixed  $haystack  Array to find data
      * @param array  $settings  An array of settings for overriding defaults
      * @return Comb
      */
-    public function __construct(array $haystack, $settings=array())
+    public function __construct(array $haystack, $settings = [])
     {
         $this->setHaystack($haystack);
         $this->setSettings($settings);
     }
 
-
     /**
-     * Set the current haystack to deal with
+     * Set the current haystack to deal with.
      *
      * @param string  $data  Data to parse for haystack
      * @return void
@@ -204,7 +196,7 @@ class Comb {
         $firstKey = array_keys($data)[0];
         reset($data);
 
-        if (!is_numeric($firstKey)) {
+        if (! is_numeric($firstKey)) {
             $this->is_haystack_categorized = true;
         }
 
@@ -212,9 +204,8 @@ class Comb {
         $this->haystack = $data;
     }
 
-
     /**
-     * Look up a $query in the $haystack
+     * Look up a $query in the $haystack.
      *
      * @param string  $query  Query to look up
      * @return array
@@ -243,46 +234,45 @@ class Comb {
         return $this->searchOverData($params, $query);
     }
 
-
     /**
-     * Set settings
+     * Set settings.
      *
      * @param array  $settings  Array of options
      * @return void
      */
     public function setSettings($settings)
     {
-        if (!is_array($settings)) {
+        if (! is_array($settings)) {
             return;
         }
 
         // match weights
-        if (isset($settings['match_weights']) && !is_null($settings['match_weights']) && is_array($settings['match_weights'])) {
+        if (isset($settings['match_weights']) && ! is_null($settings['match_weights']) && is_array($settings['match_weights'])) {
             $this->match_weights = array_merge($this->match_weights, $settings['match_weights']);
         }
 
         // min characters
-        if (isset($settings['min_characters']) && !is_null($settings['min_characters'])) {
+        if (isset($settings['min_characters']) && ! is_null($settings['min_characters'])) {
             $this->min_characters = $settings['min_characters'];
         }
 
         // min word characters
-        if (isset($settings['min_word_characters']) && !is_null($settings['min_word_characters'])) {
+        if (isset($settings['min_word_characters']) && ! is_null($settings['min_word_characters'])) {
             $this->min_word_characters = $settings['min_word_characters'];
         }
 
         // score threshold
-        if (isset($settings['score_threshold']) && !is_null($settings['score_threshold'])) {
+        if (isset($settings['score_threshold']) && ! is_null($settings['score_threshold'])) {
             $this->score_threshold = $settings['score_threshold'];
         }
 
         // property weights
-        if (isset($settings['property_weights']) && !is_null($settings['property_weights']) && is_array($settings['property_weights'])) {
+        if (isset($settings['property_weights']) && ! is_null($settings['property_weights']) && is_array($settings['property_weights'])) {
             $this->property_weights = array_merge($this->property_weights, $settings['property_weights']);
         }
 
         // query mode
-        if (isset($settings['query_mode']) && !is_null($settings['query_mode'])) {
+        if (isset($settings['query_mode']) && ! is_null($settings['query_mode'])) {
             switch (strtolower($settings['query_mode'])) {
                 case 'boolean':
                     $this->query_mode = self::QUERY_BOOLEAN;
@@ -304,12 +294,12 @@ class Comb {
         }
 
         // stop words
-        if (isset($settings['stop_words']) && !is_null($settings['stop_words']) && is_array($settings['stop_words'])) {
+        if (isset($settings['stop_words']) && ! is_null($settings['stop_words']) && is_array($settings['stop_words'])) {
             $this->stop_words = array_merge($this->stop_words, $settings['stop_words']);
         }
 
         // limit
-        if (isset($settings['limit']) && !is_null($settings['limit'])) {
+        if (isset($settings['limit']) && ! is_null($settings['limit'])) {
             $this->limit = (int) $settings['limit'];
         }
 
@@ -334,34 +324,32 @@ class Comb {
         }
 
         // exclude properties
-        if (isset($settings['exclude_properties']) && !is_null($settings['exclude_properties']) && is_array($settings['exclude_properties'])) {
+        if (isset($settings['exclude_properties']) && ! is_null($settings['exclude_properties']) && is_array($settings['exclude_properties'])) {
             $this->exclude_properties = array_merge($this->exclude_properties, $settings['exclude_properties']);
         }
 
         // include properties
-        if (isset($settings['include_properties']) && !is_null($settings['include_properties']) && is_array($settings['include_properties'])) {
+        if (isset($settings['include_properties']) && ! is_null($settings['include_properties']) && is_array($settings['include_properties'])) {
             $this->include_properties = array_merge($this->include_properties, $settings['include_properties']);
         }
     }
-
 
     // formatting & parsing
     // ----------------------------------------------------------------------
 
     /**
-     * Preformats a query for searching
+     * Preformats a query for searching.
      *
      * @param string  $raw_query  The raw query to format
      * @return string
      */
     private function preformat($raw_query)
     {
-        return trim(mb_ereg_replace("[^\w\d\-\.:+\s&’'‘]", "", $raw_query));
+        return trim(mb_ereg_replace("[^\w\d\-\.:+\s&’'‘]", '', $raw_query));
     }
 
-
     /**
-     * Checks if a given $setting matches up with a $truthy_value
+     * Checks if a given $setting matches up with a $truthy_value.
      *
      * @param mixed  $setting  Setting to check
      * @param bool  $truthy_value  Which set of truthy values should be checked
@@ -375,40 +363,37 @@ class Comb {
         }
 
         if ($truthy_value) {
-            return (
+            return
                 $setting === true ||
                 strtolower($setting) === 'true' ||
                 strtolower($setting) === 'yes' ||
                 $setting === '1' ||
-                $setting === 1
-            );
+                $setting === 1;
         } else {
-            return (
+            return
                 $setting === false ||
                 strtolower($setting) === 'false' ||
                 strtolower($setting) === 'no' ||
                 $setting === '0' ||
-                $setting === 0
-            );
+                $setting === 0;
         }
     }
 
-
     /**
-     * Prepares data for querying
+     * Prepares data for querying.
      *
      * @return void
      */
     private function prepareData()
     {
-        $output = array();
+        $output = [];
 
         if ($this->is_data_prepared) {
             return;
         }
 
         // find non-categorized data
-        if (!$this->is_haystack_categorized) {
+        if (! $this->is_haystack_categorized) {
             foreach ($this->haystack as $item) {
                 $record = (array) $item;
                 $record['_category'] = 'data';
@@ -434,31 +419,30 @@ class Comb {
         $this->is_data_prepared = true;
     }
 
-
     /**
-     * Multidimensional array flattener
+     * Multidimensional array flattener.
      *
      * @param mixed  $item  Item to flatten
      * @param string  $glue  Optional glue to stick between items
      * @return string
      */
-    private function flattenArray($item, $glue=" ") {
-        $output = "";
+    private function flattenArray($item, $glue = ' ')
+    {
+        $output = '';
 
-        if (!is_array($item)) {
+        if (! is_array($item)) {
             return preg_replace('#\s+#ism', ' ', $item);
         }
 
         foreach ($item as $part) {
-            $output .= (is_array($part)) ? $this->flattenArray($part, $glue) : $glue . $part;
+            $output .= (is_array($part)) ? $this->flattenArray($part, $glue) : $glue.$part;
         }
 
         return preg_replace('#\s+#ism', ' ', $output);
     }
 
-
     /**
-     * Look through each result attempting to find good matches
+     * Look through each result attempting to find good matches.
      *
      * @param array  $params  Parameters for search
      * @param string  $raw_query  Raw query to search for
@@ -469,62 +453,61 @@ class Comb {
     private function searchOverData($params, $raw_query)
     {
         // make sure there's data to search over
-        if (!count($this->haystack)) {
+        if (! count($this->haystack)) {
             // the haystack is empty because it was parsed by a boolean
             // search return that no results were found
             if ($params['required']) {
-                throw new NoResultsFound("No results found.");
-
-                // otherwise, the haystack is empty and that's an error
+                throw new NoResultsFound('No results found.');
+            // otherwise, the haystack is empty and that's an error
             } else {
-                throw new CombException("Empty haystack.");
+                throw new CombException('Empty haystack.');
             }
         }
 
         // set up informational object to be returned alongside data object
-        $info = array(
+        $info = [
             'total_results' => 0,
             'raw_query' => $raw_query,
             'parsed_query' => $params,
-            'query_time' => 0
-        );
+            'query_time' => 0,
+        ];
 
         // loop over records
         foreach ($this->haystack as $key => $item) {
             $data = $item['pruned'];
 
             // counters
-            $found = array(
-                "partial_word" => 0,
-                "partial_first_word" => 0,
-                "partial_word_start" => 0,
-                "partial_first_word_start" => 0,
-                "whole_word" => 0,
-                "whole_first_word" => 0,
-                "partial_whole" => 0,
-                "partial_whole_start" => 0,
-                "whole" => 0
-            );
+            $found = [
+                'partial_word' => 0,
+                'partial_first_word' => 0,
+                'partial_word_start' => 0,
+                'partial_first_word_start' => 0,
+                'whole_word' => 0,
+                'whole_first_word' => 0,
+                'partial_whole' => 0,
+                'partial_whole_start' => 0,
+                'whole' => 0,
+            ];
 
             // loop over each query chunk
             foreach ($params['chunks'] as $chunk) {
                 $escaped_chunk = str_replace('#', '\#', $chunk);
-                $regex = array(
-                    "whole" => '#^' . $escaped_chunk . '$#i',
-                    "partial" => '#' . $escaped_chunk . '#i',
-                    "partial_from_start" => '#^' . $escaped_chunk . '#i'
-                );
+                $regex = [
+                    'whole' => '#^'.$escaped_chunk.'$#i',
+                    'partial' => '#'.$escaped_chunk.'#i',
+                    'partial_from_start' => '#^'.$escaped_chunk.'#i',
+                ];
 
                 // loop over each data property
                 foreach ($data as $name => $property) {
                     $property = $this->flattenArray($property);
 
-                    if (!is_string($property)) {
+                    if (! is_string($property)) {
                         continue;
                     }
 
                     $words = preg_split("#\s#i", $property);
-                    $strength = (!isset($this->property_weights[$name])) ? 1 : $this->property_weights[$name];
+                    $strength = (! isset($this->property_weights[$name])) ? 1 : $this->property_weights[$name];
 
                     // reset iterator
                     $i = 0;
@@ -595,7 +578,7 @@ class Comb {
 
         // perform sorting
         if ($this->sort_by_score) {
-            usort($clone, function($a, $b) {
+            usort($clone, function ($a, $b) {
                 if ($a['score'] > $b['score']) {
                     return -1;
                 } elseif ($a['score'] < $b['score']) {
@@ -607,7 +590,7 @@ class Comb {
         }
 
         // create output
-        $output = array();
+        $output = [];
 
         // only record whose score meets the threshold
         foreach ($clone as $record) {
@@ -626,11 +609,11 @@ class Comb {
 
         // if grouping by category, rearrange - will handle limiting
         if ($this->group_by_category && $this->is_haystack_categorized) {
-            $categorized_output = array();
+            $categorized_output = [];
 
             foreach ($output as $item) {
-                if (!isset($categorized_output[$item['category']])) {
-                    $categorized_output[$item['category']] = array();
+                if (! isset($categorized_output[$item['category']])) {
+                    $categorized_output[$item['category']] = [];
                     $output_length++;
                 }
 
@@ -641,7 +624,7 @@ class Comb {
 
             $output = $categorized_output;
 
-            // or trim outputs to limit if it was set
+        // or trim outputs to limit if it was set
         } elseif ($this->limit) {
             // if we do not want more results than the limit
             if ($this->enable_too_many_results && count($output) > $this->limit) {
@@ -651,7 +634,7 @@ class Comb {
             $output = array_slice($output, 0, $this->limit);
             $output_length = count($output);
 
-            // otherwise, the size is the size
+        // otherwise, the size is the size
         } else {
             $output_length = count($output);
         }
@@ -665,21 +648,20 @@ class Comb {
         }
 
         // results were found
-        return array('data' => $output, 'info' => $info);
+        return ['data' => $output, 'info' => $info];
     }
 
-
     /**
-     * Removes matches that have been disallowed by a boolean search
+     * Removes matches that have been disallowed by a boolean search.
      *
      * @param array  $params  Parameters for search
      * @return array
      */
     private function removeDisallowedMatches($params)
     {
-        $disallowed = '#' . join('|', $params['disallowed']) . '#i';
-        $required   = '#(?=.*' . join(')(?=.*', $params['required']) . ')#i';
-        $new_data   = array();
+        $disallowed = '#'.join('|', $params['disallowed']).'#i';
+        $required = '#(?=.*'.join(')(?=.*', $params['required']).')#i';
+        $new_data = [];
 
         // this only applies to boolean mode
         if ($this->query_mode !== self::QUERY_BOOLEAN || (count($params['disallowed']) === 0 && count($params['required']) === 0)) {
@@ -689,23 +671,23 @@ class Comb {
         // loop through data
         foreach ($this->haystack as $item) {
             try {
-                $record = "";
+                $record = '';
 
                 // string pruned results together
                 foreach ($item['pruned'] as $pruned) {
-                    $record .= " " . $pruned;
+                    $record .= ' '.$pruned;
                 }
 
                 // check for disallowed
                 if (count($params['disallowed']) && preg_match($disallowed, $record)) {
                     // a disallowed was found, we don't want this
-                    throw new Exception("");
+                    throw new Exception('');
                 }
 
                 // check for disallowed
-                if (count($params['required']) && !preg_match($required, $record)) {
+                if (count($params['required']) && ! preg_match($required, $record)) {
                     // a disallowed was found, we don't want this
-                    throw new Exception("");
+                    throw new Exception('');
                 }
 
                 array_push($new_data, $item);
@@ -717,16 +699,15 @@ class Comb {
         return $new_data;
     }
 
-
     /**
-     * Removes properties that are on the exclusion list
+     * Removes properties that are on the exclusion list.
      *
      * @param array  $data  Data to examine
      * @return array
      */
     private function removeDisallowedProperties($data)
     {
-        $output = array();
+        $output = [];
         $exclude = (is_array($this->exclude_properties) && count($this->exclude_properties));
         $include = (is_array($this->include_properties) && count($this->include_properties));
 
@@ -750,26 +731,25 @@ class Comb {
             // include properties
             if ($include) {
                 foreach ($local_item as $key => $value) {
-                    if (!in_array($key, $this->include_properties)) {
+                    if (! in_array($key, $this->include_properties)) {
                         unset($local_item[$key]);
                     }
                 }
             }
 
-            array_push($output, array(
-                "data" => $item,
-                "pruned" => $local_item,
-                "score" => 0,
-                "category" => $category
-            ));
+            array_push($output, [
+                'data' => $item,
+                'pruned' => $local_item,
+                'score' => 0,
+                'category' => $category,
+            ]);
         }
 
         return $output;
     }
 
-
     /**
-     * Removes duplicate values in a given array
+     * Removes duplicate values in a given array.
      *
      * @param array  $array  Array to make unique
      * @return array
@@ -788,15 +768,14 @@ class Comb {
         return $array;
     }
 
-
     // validation
     // ----------------------------------------------------------------------
 
     /**
-     * Tests for a valid query
+     * Tests for a valid query.
      *
      * @param string  $query  Query to test
-     * @return boolean
+     * @return bool
      * @throws NoQuery
      * @throws NotEnoughCharacters
      */
@@ -805,21 +784,19 @@ class Comb {
         $length = strlen($query);
 
         if ($length === 0) {
-            throw new NoQuery("No query given.");
+            throw new NoQuery('No query given.');
         }
 
         if ($length < $this->min_characters) {
-            throw new NotEnoughCharacters("Not enough characters entered.");
+            throw new NotEnoughCharacters('Not enough characters entered.');
         }
     }
-
-
 
     // helpers
     // ----------------------------------------------------------------------
 
     /**
-     * Parses the query for search parameters
+     * Parses the query for search parameters.
      *
      * @param string  $query  Query to parse
      * @return array
@@ -827,11 +804,11 @@ class Comb {
     private function parseSearchParameters($query)
     {
         // set up the array of parts to be returned
-        $parts = array(
-            "chunks" => array(),
-            "required" => array(),
-            "disallowed" => array()
-        );
+        $parts = [
+            'chunks' => [],
+            'required' => [],
+            'disallowed' => [],
+        ];
 
         // look for each word
         if ($this->query_mode === self::QUERY_WORDS) {
@@ -862,7 +839,7 @@ class Comb {
                 // found a disallowed word (a work prepended with a "-")
                 if (strpos($word, '-') === 0 && strlen($word) >= $this->min_word_characters + 1) {
                     array_push($parts['disallowed'], substr($word, 1));
-                } elseif (strpos($word, '+') === 0 && strlen($word) >= $this->min_word_characters +1) {
+                } elseif (strpos($word, '+') === 0 && strlen($word) >= $this->min_word_characters + 1) {
                     array_push($parts['required'], substr($word, 1));
                 } elseif (strlen($word) >= $this->min_word_characters) {
                     array_push($parts['chunks'], $word);
@@ -885,28 +862,27 @@ class Comb {
 
             // search for the entire query as one thing
         } else {
-            $parts['chunks'] = array(strtolower($query));
+            $parts['chunks'] = [strtolower($query)];
         }
 
-        return array(
+        return [
             'chunks' => $this->standardizeArray($this->filterStopWords($parts['chunks'])),
             'required' => $this->standardizeArray($this->filterStopWords($parts['required'])),
-            'disallowed' => $this->standardizeArray($this->filterStopWords($parts['disallowed']))
-        );
+            'disallowed' => $this->standardizeArray($this->filterStopWords($parts['disallowed'])),
+        ];
     }
 
-
     /**
-     * Grabs stemmed words
+     * Grabs stemmed words.
      *
      * @param array  $words  Words to look up
      * @return array
      */
     private function getStemmedWords($words)
     {
-        $output = array();
+        $output = [];
 
-        if (!is_array($words)) {
+        if (! is_array($words)) {
             $output = str_singular($words);
         } else {
             foreach ($words as $word) {
@@ -917,43 +893,42 @@ class Comb {
         return $output;
     }
 
-
     /**
-     * Attempts to find an alternate word, returns array of alternates or false if none
+     * Attempts to find an alternate word, returns array of alternates or false if none.
      *
      * @param array  $words  Words to look up
      * @return mixed
      */
     private function getAlternateWords($words)
     {
-        $output = array();
+        $output = [];
 
         foreach ($words as $word) {
-            if (strtolower($word) == "and") {
+            if (strtolower($word) == 'and') {
                 array_push($output, '&');
                 continue;
             }
 
-            if ($word == "&") {
+            if ($word == '&') {
                 array_push($output, 'and');
                 continue;
             }
 
             if (strpos($word, "'") !== false) {
-                array_push($output, preg_replace("/'/", "‘", $word));
-                array_push($output, preg_replace("/'/", "’", $word));
+                array_push($output, preg_replace("/'/", '‘', $word));
+                array_push($output, preg_replace("/'/", '’', $word));
                 continue;
             }
 
-            if (strpos($word, "’") !== false) {
-                array_push($output, preg_replace("/’/", "‘", $word));
-                array_push($output, preg_replace("/’/", "'", $word));
+            if (strpos($word, '’') !== false) {
+                array_push($output, preg_replace('/’/', '‘', $word));
+                array_push($output, preg_replace('/’/', "'", $word));
                 continue;
             }
 
-            if (strpos($word, "‘") !== false) {
-                array_push($output, preg_replace("/‘/", "'", $word));
-                array_push($output, preg_replace("/‘/", "’", $word));
+            if (strpos($word, '‘') !== false) {
+                array_push($output, preg_replace('/‘/', "'", $word));
+                array_push($output, preg_replace('/‘/', '’', $word));
                 continue;
             }
         }
@@ -961,9 +936,8 @@ class Comb {
         return $output;
     }
 
-
     /**
-     * Filters out stop words
+     * Filters out stop words.
      *
      * @param array $words A list of words to filter
      * @return array
@@ -971,7 +945,7 @@ class Comb {
     private function filterStopWords($words)
     {
         // short circuit if no stop words are set
-        if (!is_array($this->stop_words) || !count($this->stop_words)) {
+        if (! is_array($this->stop_words) || ! count($this->stop_words)) {
             return $words;
         }
 
@@ -984,9 +958,8 @@ class Comb {
         return $words;
     }
 
-
     /**
-     * Mark the start of a query
+     * Mark the start of a query.
      *
      * @return void
      */
@@ -995,9 +968,8 @@ class Comb {
         $this->query_start_time = microtime(true);
     }
 
-
     /**
-     * Mark the start of a query
+     * Mark the start of a query.
      *
      * @return int
      */
@@ -1008,9 +980,8 @@ class Comb {
         return $this->getQueryTime();
     }
 
-
     /**
-     * Get query time
+     * Get query time.
      *
      * @return int
      */
@@ -1019,13 +990,11 @@ class Comb {
         return $this->query_end_time - $this->query_start_time;
     }
 
-
-
     // creators for Bloodhound
     // ----------------------------------------------------------------------
 
     /**
-     * Create a new Comb object but remove limit from config
+     * Create a new Comb object but remove limit from config.
      *
      * @param array  $data  Data to search through
      * @param array  $config  Config array to use (and remove `limit` from)

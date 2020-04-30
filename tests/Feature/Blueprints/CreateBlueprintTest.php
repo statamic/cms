@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Blueprints;
 
-use Statamic\Facades;
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Tests\Fakes\FakeBlueprintRepository;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Statamic\Facades;
+use Tests\Fakes\FakeBlueprintRepository;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class CreateBlueprintTest extends TestCase
 {
@@ -22,7 +22,7 @@ class CreateBlueprintTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();

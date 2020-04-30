@@ -2,12 +2,12 @@
 
 namespace Statamic\Listeners;
 
-use Statamic\Facades\Path;
-use Statamic\Facades\Folder;
-use Statamic\Imaging\PresetGenerator;
-use Statamic\Events\Data\AssetUploaded;
-use Statamic\Events\Data\AssetReplaced;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\Events\Data\AssetReplaced;
+use Statamic\Events\Data\AssetUploaded;
+use Statamic\Facades\Folder;
+use Statamic\Facades\Path;
+use Statamic\Imaging\PresetGenerator;
 
 class GeneratePresetImageManipulations implements ShouldQueue
 {
@@ -25,7 +25,7 @@ class GeneratePresetImageManipulations implements ShouldQueue
     }
 
     /**
-     * Register the listeners for the subscriber
+     * Register the listeners for the subscriber.
      *
      * @param \Illuminate\Events\Dispatcher $events
      */
@@ -36,7 +36,7 @@ class GeneratePresetImageManipulations implements ShouldQueue
     }
 
     /**
-     * Handle the events
+     * Handle the events.
      *
      * @param AssetUploaded|AssetReplaced $event
      */

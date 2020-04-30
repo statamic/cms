@@ -2,12 +2,7 @@
 
 namespace Tests\Feature\Navigation;
 
-use Mockery;
-use Statamic\Auth\User;
-use Statamic\Contracts\Structures\Nav;
 use Statamic\Facades;
-use Statamic\Structures\Structure;
-use Statamic\Structures\Tree;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -17,7 +12,7 @@ class ViewNavigationListingTest extends TestCase
     use MocksStructures;
 
     /** @test */
-    function it_shows_a_list_of_nav_structures()
+    public function it_shows_a_list_of_nav_structures()
     {
         Facades\Nav::shouldReceive('all')->andReturn(collect([
             'foo' => $structureA = $this->createNav('foo'),
@@ -37,7 +32,7 @@ class ViewNavigationListingTest extends TestCase
     }
 
     /** @test */
-    function it_shows_no_results_when_there_are_no_structures()
+    public function it_shows_no_results_when_there_are_no_structures()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
 
@@ -50,11 +45,11 @@ class ViewNavigationListingTest extends TestCase
     }
 
     /** @test */
-    function it_filters_out_structures_the_user_cannot_access()
+    public function it_filters_out_structures_the_user_cannot_access()
     {
         Facades\Nav::shouldReceive('all')->andReturn(collect([
             'foo' => $this->createNav('foo'),
-            'bar' => $this->createNav('bar')
+            'bar' => $this->createNav('bar'),
         ]));
         $this->setTestRoles(['test' => ['access cp', 'view bar nav']]);
         $user = Facades\User::make()->assignRole('test')->save();
@@ -70,11 +65,11 @@ class ViewNavigationListingTest extends TestCase
     }
 
     /** @test */
-    function it_doesnt_filter_out_structures_if_they_have_permission_to_configure()
+    public function it_doesnt_filter_out_structures_if_they_have_permission_to_configure()
     {
         Facades\Nav::shouldReceive('all')->andReturn(collect([
             'foo' => $this->createNav('foo'),
-            'bar' => $this->createNav('bar')
+            'bar' => $this->createNav('bar'),
         ]));
         $this->setTestRoles(['test' => ['access cp', 'configure navs', 'view bar nav']]);
         $user = Facades\User::make()->assignRole('test')->save();
@@ -90,11 +85,11 @@ class ViewNavigationListingTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_when_there_are_no_permitted_structures()
+    public function it_denies_access_when_there_are_no_permitted_structures()
     {
         Facades\Structure::shouldReceive('all')->andReturn(collect([
             'foo' => $this->createNav('foo'),
-            'bar' => $this->createNav('bar')
+            'bar' => $this->createNav('bar'),
         ]));
 
         $this->setTestRoles(['test' => ['access cp']]);
@@ -108,7 +103,7 @@ class ViewNavigationListingTest extends TestCase
     }
 
     /** @test */
-    function create_structure_button_is_visible_with_permission_to_configure()
+    public function create_structure_button_is_visible_with_permission_to_configure()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure navs']]);
         $user = Facades\User::make()->assignRole('test')->save();
@@ -120,7 +115,7 @@ class ViewNavigationListingTest extends TestCase
     }
 
     /** @test */
-    function create_structure_button_is_not_visible_without_permission_to_configure()
+    public function create_structure_button_is_not_visible_without_permission_to_configure()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = Facades\User::make()->assignRole('test');
@@ -132,7 +127,7 @@ class ViewNavigationListingTest extends TestCase
     }
 
     /** @test */
-    function delete_button_is_visible_with_permission_to_configure()
+    public function delete_button_is_visible_with_permission_to_configure()
     {
         Facades\Structure::shouldReceive('all')->andReturn(collect([
             'foo' => $this->createNav('foo'),
@@ -148,7 +143,7 @@ class ViewNavigationListingTest extends TestCase
     }
 
     /** @test */
-    function delete_button_is_not_visible_without_permission_to_configure()
+    public function delete_button_is_not_visible_without_permission_to_configure()
     {
         $this->markTestIncomplete();
 
@@ -175,10 +170,14 @@ class ViewNavigationListingTest extends TestCase
 
         $fake = new class($roles) extends \Statamic\Auth\File\RoleRepository {
             protected $roles;
-            public function __construct($roles) {
+
+            public function __construct($roles)
+            {
                 $this->roles = $roles;
             }
-            public function all(): \Illuminate\Support\Collection {
+
+            public function all(): \Illuminate\Support\Collection
+            {
                 return $this->roles;
             }
         };

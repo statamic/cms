@@ -2,11 +2,10 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Support\Arr;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Contracts\Data\Augmentable;
-use Illuminate\Contracts\Support\Arrayable;
 
 class CollectionsServiceProvider extends ServiceProvider
 {
@@ -45,7 +44,7 @@ class CollectionsServiceProvider extends ServiceProvider
     }
 
     /**
-     * The Laravel 5.3 way of doing keyBy
+     * The Laravel 5.3 way of doing keyBy.
      *
      * 5.1 doesn't give us access to the keys.
      *
@@ -86,8 +85,8 @@ class CollectionsServiceProvider extends ServiceProvider
                 ->filter(function ($item) {
                     return pathinfo($item, PATHINFO_EXTENSION) == 'php';
                 })
-                ->keyBy(function ($item) use ($prefix){
-                    return $prefix . pathinfo($item, PATHINFO_FILENAME);
+                ->keyBy(function ($item) use ($prefix) {
+                    return $prefix.pathinfo($item, PATHINFO_FILENAME);
                 })
                 ->map(function ($item) {
                     return require base_path($item);
@@ -96,7 +95,7 @@ class CollectionsServiceProvider extends ServiceProvider
     }
 
     /**
-     * Backport of the pipe method from 5.2
+     * Backport of the pipe method from 5.2.
      *
      * @return void
      */
@@ -146,6 +145,7 @@ class CollectionsServiceProvider extends ServiceProvider
                     $transposed[$k][] = $v;
                 }
             }
+
             return new static($transposed);
         });
     }
@@ -157,6 +157,7 @@ class CollectionsServiceProvider extends ServiceProvider
                 if ($value instanceof Augmentable) {
                     return $value->toAugmentedArray($keys);
                 }
+
                 return $value instanceof Arrayable ? $value->toArray() : $value;
             }, $this->items);
         });
@@ -166,6 +167,7 @@ class CollectionsServiceProvider extends ServiceProvider
                 if ($value instanceof Augmentable) {
                     return $value->toAugmentedCollection($keys);
                 }
+
                 return $value instanceof Arrayable ? $value->toArray() : $value;
             }, $this->items);
         });

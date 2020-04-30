@@ -2,9 +2,9 @@
 
 namespace Statamic\Imaging;
 
-use Statamic\Facades\Image;
-use Statamic\Facades\Config;
 use League\Glide\ServerFactory;
+use Statamic\Facades\Config;
+use Statamic\Facades\Image;
 use Statamic\Imaging\ResponseFactory as LaravelResponseFactory;
 
 class GlideServer
@@ -16,7 +16,7 @@ class GlideServer
      */
     public function create()
     {
-       return ServerFactory::create([
+        return ServerFactory::create([
             'source'   => base_path(), // this gets overriden on the fly by the image generator
             'cache'    => $this->cachePath(),
             'response' => new LaravelResponseFactory(app('request')),
@@ -35,7 +35,7 @@ class GlideServer
     {
         return Config::get('statamic.assets.image_manipulation.cache')
             ? Config::get('statamic.assets.image_manipulation.cache_path')
-            : storage_path('glide');
+            : storage_path('statamic/glide');
     }
 
     /**

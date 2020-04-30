@@ -20,7 +20,6 @@
         @include('statamic::partials.empty-state', [
             'resource' => 'Role',
             'description' => __('statamic::messages.role_intro'),
-            'docs_link' => Statamic::docsUrl('users#permissions'),
             'svg' => 'empty/users',
             'route' => cp_route('roles.create')
         ])

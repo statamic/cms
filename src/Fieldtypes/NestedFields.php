@@ -3,8 +3,8 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fields;
-use Statamic\Fields\Fieldtype;
 use Statamic\Fields\FieldTransformer;
+use Statamic\Fields\Fieldtype;
 
 class NestedFields extends Fieldtype
 {

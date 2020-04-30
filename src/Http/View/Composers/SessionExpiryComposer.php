@@ -3,11 +3,8 @@
 namespace Statamic\Http\View\Composers;
 
 use Illuminate\View\View;
-use Statamic\Facades\Fieldset;
 use Statamic\Facades\OAuth;
 use Statamic\Facades\User;
-use Statamic\Fields\FieldTransformer;
-use Statamic\Statamic;
 
 class SessionExpiryComposer
 {

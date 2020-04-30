@@ -2,10 +2,10 @@
 
 namespace Tests\Search;
 
-use Mockery;
-use Tests\TestCase;
-use Statamic\Search\Comb\Index;
 use Illuminate\Contracts\Filesystem\Filesystem;
+use Mockery;
+use Statamic\Search\Comb\Index;
+use Tests\TestCase;
 
 class CombIndexTest extends TestCase
 {

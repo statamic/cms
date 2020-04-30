@@ -2,9 +2,9 @@
 
 namespace Statamic\Assets;
 
+use Illuminate\Support\Facades\Storage;
 use League\Flysystem\MountManager;
 use Statamic\Imaging\ImageGenerator;
-use Illuminate\Support\Facades\Storage;
 
 class Dimensions
 {
@@ -29,7 +29,7 @@ class Dimensions
     }
 
     /**
-     * Get the dimensions of an asset
+     * Get the dimensions of an asset.
      *
      * @return array
      */
@@ -39,7 +39,7 @@ class Dimensions
     }
 
     /**
-     * Get the width of the asset
+     * Get the width of the asset.
      *
      * @return int
      */
@@ -49,7 +49,7 @@ class Dimensions
     }
 
     /**
-     * Get the height of the asset
+     * Get the height of the asset.
      *
      * @return int
      */
@@ -59,7 +59,7 @@ class Dimensions
     }
 
     /**
-     * Get the dimensions
+     * Get the dimensions.
      *
      * @return array
      */
@@ -69,14 +69,14 @@ class Dimensions
         // grab the dimensions. So we'll copy it locally and read the dimensions from there.
         $manager = new MountManager([
             'source' => $this->asset->disk()->filesystem()->getDriver(),
-            'cache' => $cache = $this->getCacheFlysystem()
+            'cache' => $cache = $this->getCacheFlysystem(),
         ]);
 
         $cachePath = "{$this->asset->containerId()}/{$this->asset->path()}";
 
         $manager->copy("source://{$this->asset->path()}", "cache://{$cachePath}");
 
-        $size = getimagesize($cache->getAdapter()->getPathPrefix() . $cachePath);
+        $size = getimagesize($cache->getAdapter()->getPathPrefix().$cachePath);
 
         $cache->delete($cachePath);
 
@@ -89,7 +89,7 @@ class Dimensions
 
         config(["filesystems.disks.{$disk}" => [
             'driver' => 'local',
-            'root' => storage_path('statamic/dimensions-cache')
+            'root' => storage_path('statamic/dimensions-cache'),
         ]]);
 
         return Storage::disk($disk)->getDriver();

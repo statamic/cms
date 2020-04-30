@@ -18,7 +18,7 @@ class Entry extends JsonResource
             'collection' => [
                 'title' => $this->resource->collection()->title(),
                 'handle' => $this->resource->collection()->handle(),
-            ]
+            ],
         ];
     }
 }

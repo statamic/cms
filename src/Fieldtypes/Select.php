@@ -68,7 +68,7 @@ class Select extends Fieldtype
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
-            ]
+            ],
         ];
     }
 
@@ -92,10 +92,12 @@ class Select extends Fieldtype
                 return [
                     'key' => $value,
                     'value' => $value,
-                    'label' => array_get($this->config('options'), $value, $value)
+                    'label' => array_get($this->config('options'), $value, $value),
                 ];
             })->all();
         }
+
+        throw_if(is_array($value), new MultipleValuesEncounteredException($this));
 
         $label = is_null($value) ? null : array_get($this->config('options'), $value, $value);
 

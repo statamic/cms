@@ -57,7 +57,7 @@ class TermRevisionsController extends CpController
 
         $values = array_merge($fields->values()->all(), [
             'title' => $term->get('title'),
-            'slug' => $term->slug()
+            'slug' => $term->slug(),
         ]);
 
         return [
@@ -81,6 +81,7 @@ class TermRevisionsController extends CpController
             'localizations' => $term->taxonomy()->sites()->map(function ($handle) use ($term) {
                 $localized = $term->in($handle);
                 $exists = $localized !== null;
+
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -91,7 +92,7 @@ class TermRevisionsController extends CpController
                     'published' => $exists ? $localized->published() : false,
                     'url' => $exists ? $localized->editUrl() : null,
                 ];
-            })->all()
+            })->all(),
         ];
     }
 
@@ -111,7 +112,7 @@ class TermRevisionsController extends CpController
     {
         return [
             'title' => $taxonomy->title(),
-            'url' => cp_route('taxonomies.show', $taxonomy->handle())
+            'url' => cp_route('taxonomies.show', $taxonomy->handle()),
         ];
     }
 }

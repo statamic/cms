@@ -34,7 +34,7 @@ class GlobalsController extends CpController
         })->values();
 
         return view('statamic::globals.index', [
-            'globals' => $globals
+            'globals' => $globals,
         ]);
     }
 
@@ -56,7 +56,7 @@ class GlobalsController extends CpController
                     'enabled' => $enabled = $set->existsIn($site->handle()),
                     'origin' => $enabled ? optional($set->in($site->handle())->origin())->locale() : null,
                 ];
-            })->values()
+            })->values(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint())
@@ -163,8 +163,8 @@ class GlobalsController extends CpController
                         'type' => 'text',
                         'instructions' => __('statamic::messages.globals_configure_title_instructions'),
                         'validate' => 'required',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'content_model' => [
                 'display' => 'Content Model',
@@ -174,7 +174,7 @@ class GlobalsController extends CpController
                         'instructions' => __('statamic::messages.globals_blueprint_instructions'),
                         'validate' => 'array',
                         'mode' => 'select',
-                        'max_items' => 1
+                        'max_items' => 1,
                     ],
                 ],
             ],
@@ -188,8 +188,8 @@ class GlobalsController extends CpController
                         'type' => 'global_set_sites',
                         'mode' => 'select',
                         'required' => true,
-                    ]
-                ]
+                    ],
+                ],
             ];
         }
 

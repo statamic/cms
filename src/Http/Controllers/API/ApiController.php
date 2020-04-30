@@ -4,7 +4,6 @@ namespace Statamic\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\Controller;
-use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\QueriesConditions;
 
@@ -18,7 +17,7 @@ class ApiController extends Controller
     protected $request;
 
     /**
-     * Create a new CpController
+     * Create a new CpController.
      *
      * @param \Illuminate\Http\Request $request
      */

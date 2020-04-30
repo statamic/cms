@@ -3,7 +3,6 @@
 namespace Statamic\Tags;
 
 use Statamic\Support\Arr;
-use Statamic\Tags\Tags;
 
 class Rotate extends Tags
 {
@@ -11,7 +10,7 @@ class Rotate extends Tags
     protected static $counts = [];
 
     /**
-     * The {{ rotate }} tag
+     * The {{ rotate }} tag.
      *
      * @return string
      */

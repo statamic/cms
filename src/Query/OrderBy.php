@@ -46,7 +46,7 @@ class OrderBy
     }
 
     /**
-     * Convert order by to string, ie) 'title:desc'
+     * Convert order by to string, ie) 'title:desc'.
      *
      * @return string
      */
@@ -56,7 +56,7 @@ class OrderBy
     }
 
     /**
-     * Convert order by to string, ie) 'title:desc'
+     * Convert order by to string, ie) 'title:desc'.
      *
      * @return string
      */

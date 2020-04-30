@@ -7,6 +7,7 @@ use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 
 abstract class Fieldtype implements Arrayable
@@ -128,14 +129,14 @@ abstract class Fieldtype implements Arrayable
             'selectable'  => $this->selectable(),
             'categories' => $this->categories(),
             'icon' => $this->icon(),
-            'config' => $this->configFields()->toPublishArray()
+            'config' => $this->configFields()->toPublishArray(),
         ];
     }
 
     public function configBlueprint(): Blueprint
     {
         return (new Blueprint)->setContents([
-            'fields' => $this->configFields()->items()->all()
+            'fields' => $this->configFields()->items()->all(),
         ]);
     }
 
@@ -184,7 +185,7 @@ abstract class Fieldtype implements Arrayable
             return $this->view;
         }
 
-        $default = 'statamic::forms.fields.' . $this->handle();
+        $default = 'statamic::forms.fields.'.$this->handle();
 
         return view()->exists($default)
             ? $default
@@ -193,7 +194,7 @@ abstract class Fieldtype implements Arrayable
 
     public function config(string $key = null, $fallback = null)
     {
-        if (!$this->field) {
+        if (! $this->field) {
             return $fallback;
         }
 
@@ -210,5 +211,10 @@ abstract class Fieldtype implements Arrayable
     public static function preloadable()
     {
         return static::$preloadable ?? (new \ReflectionClass(static::class))->getMethod('preload')->class === static::class;
+    }
+
+    public static function docsUrl()
+    {
+        return Statamic::docsUrl('fieldtypes/'.static::handle());
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Resources\API;
 
-use Statamic\Statamic;
 use Illuminate\Http\Resources\Json\JsonResource;
 
 class UserResource extends JsonResource

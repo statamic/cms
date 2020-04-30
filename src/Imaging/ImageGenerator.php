@@ -3,12 +3,11 @@
 namespace Statamic\Imaging;
 
 use GuzzleHttp\Client;
-use Statamic\Facades\File;
-use Statamic\Facades\Config;
-use League\Glide\Server;
-use Statamic\Facades\Helper;
-use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
+use League\Flysystem\Filesystem;
+use League\Glide\Server;
+use Statamic\Facades\Config;
+use Statamic\Facades\File;
 use Twistor\Flysystem\GuzzleAdapter;
 
 class ImageGenerator
@@ -49,7 +48,7 @@ class ImageGenerator
     }
 
     /**
-     * Generate a manipulated image by a path
+     * Generate a manipulated image by a path.
      *
      * @param string $path
      * @param array  $params
@@ -68,7 +67,7 @@ class ImageGenerator
     }
 
     /**
-     * Generate a manipulated image by a URL
+     * Generate a manipulated image by a URL.
      *
      * @param string $url
      * @param array  $params
@@ -81,7 +80,7 @@ class ImageGenerator
 
         $parsed = parse_url($url);
 
-        $base = $parsed['scheme'] . '://' . $parsed['host'];
+        $base = $parsed['scheme'].'://'.$parsed['host'];
 
         $filesystem = new Filesystem(new GuzzleAdapter($base, new Client()));
 
@@ -93,7 +92,7 @@ class ImageGenerator
     }
 
     /**
-     * Generate a manipulated image by an asset
+     * Generate a manipulated image by an asset.
      *
      * @param \Statamic\Contracts\Assets\Asset $asset
      * @param array                            $params
@@ -110,13 +109,13 @@ class ImageGenerator
         $this->server->setSourcePathPrefix($this->asset->folder());
 
         // Set the cache path so files are saved appropriately.
-        $this->server->setCachePathPrefix('containers/' . $this->asset->container()->id() . '/' . $this->asset->folder());
+        $this->server->setCachePathPrefix('containers/'.$this->asset->container()->id().'/'.$this->asset->folder());
 
         return $this->generate($this->asset->basename());
     }
 
     /**
-     * This one goes to eleven
+     * This one goes to eleven.
      */
     public function toEleven()
     {
@@ -126,7 +125,7 @@ class ImageGenerator
     }
 
     /**
-     * Generate the image
+     * Generate the image.
      *
      * @param string $image The filename of the image
      * @return mixed
@@ -152,7 +151,7 @@ class ImageGenerator
     }
 
     /**
-     * Apply default Glide manipulations on the image
+     * Apply default Glide manipulations on the image.
      *
      * @return void
      */
@@ -171,7 +170,7 @@ class ImageGenerator
     }
 
     /**
-     * Ensure that the image is actually an image
+     * Ensure that the image is actually an image.
      *
      * @throws \Exception
      */

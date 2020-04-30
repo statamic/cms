@@ -8,6 +8,6 @@ class FieldtypeThatPreprocesses extends Fieldtype
 {
     public function preProcess($data)
     {
-        return 'preprocessed ' . $data;
+        return 'preprocessed '.$data;
     }
 }

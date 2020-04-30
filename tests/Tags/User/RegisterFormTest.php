@@ -18,7 +18,7 @@ class RegisterFormTest extends TestCase
     }
 
     /** @test */
-    function it_renders_form()
+    public function it_renders_form()
     {
         $output = $this->tag('{{ user:register_form }}{{ /user:register_form }}');
         $aliased = $this->tag('{{ user:registration_form }}{{ /user:registration_form }}');
@@ -32,7 +32,7 @@ class RegisterFormTest extends TestCase
     }
 
     /** @test */
-    function it_renders_form_with_params()
+    public function it_renders_form_with_params()
     {
         $output = $this->tag('{{ user:register_form redirect="/registered" class="form" id="form" }}{{ /user:register_form }}');
 
@@ -41,9 +41,9 @@ class RegisterFormTest extends TestCase
     }
 
     /** @test */
-    function it_renders_form_with_fields_array()
+    public function it_renders_form_with_fields_array()
     {
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:register_form }}
     {{ fields }}
         <label>{{ display }}</label>{{ field }}
@@ -65,11 +65,11 @@ EOT
     }
 
     /** @test */
-    function it_renders_form_with_fields_array_and_custom_blueprint()
+    public function it_renders_form_with_fields_array_and_custom_blueprint()
     {
         $this->useCustomBlueprint();
 
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:register_form }}
     {{ fields }}
         <label>{{ display }}</label>{{ field }}
@@ -93,7 +93,7 @@ EOT
     }
 
     /** @test */
-    function it_wont_register_user_and_renders_errors()
+    public function it_wont_register_user_and_renders_errors()
     {
         $this->assertNull(User::findByEmail('san@holo.com'));
         $this->assertFalse(auth()->check());
@@ -111,7 +111,7 @@ EOT
         $this->assertNull(User::findByEmail('san@holo.com'));
         $this->assertFalse(auth()->check());
 
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:register_form }}
     {{ errors }}
         <p class="error">{{ value }}</p>
@@ -134,7 +134,7 @@ EOT
     }
 
     /** @test */
-    function it_wont_register_user_and_renders_custom_validation_errors()
+    public function it_wont_register_user_and_renders_custom_validation_errors()
     {
         $this->useCustomBlueprint();
 
@@ -157,7 +157,7 @@ EOT
         $this->assertNull(User::findByEmail('san@holo.com'));
         $this->assertFalse(auth()->check());
 
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:register_form }}
     {{ errors }}
         <p class="error">{{ value }}</p>
@@ -180,7 +180,7 @@ EOT
     }
 
     /** @test */
-    function it_will_register_user_and_render_success()
+    public function it_will_register_user_and_render_success()
     {
         $this->assertNull(User::findByEmail('san@holo.com'));
         $this->assertFalse(auth()->check());
@@ -199,7 +199,7 @@ EOT
         $this->assertTrue(auth()->check());
         $this->assertEquals('san@holo.com', auth()->user()->email());
 
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:register_form }}
     {{ errors }}
         <p class="error">{{ value }}</p>
@@ -217,7 +217,7 @@ EOT
     }
 
     /** @test */
-    function it_will_register_user_and_follow_custom_redirect_with_success()
+    public function it_will_register_user_and_follow_custom_redirect_with_success()
     {
         $this->assertNull(User::findByEmail('san@holo.com'));
         $this->assertFalse(auth()->check());
@@ -237,7 +237,7 @@ EOT
         $this->assertTrue(auth()->check());
         $this->assertEquals('san@holo.com', auth()->user()->email());
 
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:register_form }}
     {{ errors }}
         <p class="error">{{ value }}</p>
@@ -255,7 +255,7 @@ EOT
     }
 
     /** @test */
-    function it_will_use_redirect_query_param_off_url()
+    public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=login-successful');
 
@@ -279,7 +279,7 @@ EOT
                     'field' => [
                         'type' => 'text',
                         'display' => 'Full Name',
-                    ]
+                    ],
                 ],
                 [
                     'handle' => 'password', // Field already exists, but we're defining custom validation rules.
@@ -288,14 +288,14 @@ EOT
                         'input_type' => 'password',
                         'display' => 'Password',
                         'validate' => 'min:8',
-                    ]
+                    ],
                 ],
                 [
                     'handle' => 'phone', // Adding custom phone field.
                     'field' => [
                         'type' => 'text',
                         'display' => 'Phone Number',
-                    ]
+                    ],
                 ],
                 [
                     'handle' => 'age', // Adding custom age field.
@@ -303,9 +303,9 @@ EOT
                         'type' => 'text',
                         'display' => 'Over 18 years of age?',
                         'validate' => 'required',
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ]);
 
         Blueprint::shouldReceive('find')

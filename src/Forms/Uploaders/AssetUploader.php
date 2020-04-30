@@ -22,7 +22,7 @@ class AssetUploader extends Uploader
     }
 
     /**
-     * Create an asset from a file
+     * Create an asset from a file.
      *
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
      * @return \Statamic\Assets\File\Asset

@@ -18,7 +18,7 @@ class AugmentedPage extends AugmentedEntry
         }
     }
 
-    protected function keys()
+    public function keys()
     {
         if ($this->hasEntry) {
             return parent::keys();

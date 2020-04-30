@@ -2,13 +2,11 @@
 
 namespace Statamic\Actions;
 
-use Statamic\Support\Str;
-use Statamic\Fields\Fields;
-use Statamic\Extend\HasTitle;
-use Statamic\Extend\HasHandle;
-use Statamic\Extend\HasFields;
-use Statamic\Extend\RegistersItself;
 use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Extend\HasFields;
+use Statamic\Extend\HasHandle;
+use Statamic\Extend\HasTitle;
+use Statamic\Extend\RegistersItself;
 
 abstract class Action implements Arrayable
 {
@@ -98,6 +96,7 @@ abstract class Action implements Arrayable
             'confirmationText' => $this->confirmationText(),
             'dangerous' => $this->dangerous,
             'fields' => $this->fields()->toPublishArray(),
+            'values' => $this->fields()->values(),
             'meta' => $this->fields()->meta(),
             'context' => $this->context,
         ];

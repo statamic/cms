@@ -2,10 +2,10 @@
 
 namespace Tests\Revisions;
 
-use Tests\TestCase;
-use Statamic\Revisions\Revision;
 use Illuminate\Support\Collection;
+use Statamic\Revisions\Revision;
 use Statamic\Revisions\RevisionRepository;
+use Tests\TestCase;
 
 class RepositoryTest extends TestCase
 {
@@ -17,7 +17,7 @@ class RepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_revisions_and_excludes_working_copies()
+    public function it_gets_revisions_and_excludes_working_copies()
     {
         $revisions = $this->repo->whereKey('123');
 

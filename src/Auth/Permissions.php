@@ -69,18 +69,18 @@ class Permissions
                 return $permission['group'] ?? 'misc';
             });
 
-            // Place ungrouped permissions at the end.
-            if ($tree->has('misc')) {
-                $tree->put('misc', $tree->pull('misc'));
-            }
+        // Place ungrouped permissions at the end.
+        if ($tree->has('misc')) {
+            $tree->put('misc', $tree->pull('misc'));
+        }
 
-            $tree = $tree->map(function ($permissions, $group) {
-                return [
-                    'handle' => $group,
-                    'label' => $this->groups[$group] ?? __('Miscellaneous'),
-                    'permissions' => $permissions->all(),
-                ];
-            });
+        $tree = $tree->map(function ($permissions, $group) {
+            return [
+                'handle' => $group,
+                'label' => $this->groups[$group] ?? __('Miscellaneous'),
+                'permissions' => $permissions->all(),
+            ];
+        });
 
         return $tree->values();
     }

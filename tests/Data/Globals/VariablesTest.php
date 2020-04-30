@@ -2,17 +2,17 @@
 
 namespace Tests\Data\Globals;
 
-use Tests\TestCase;
 use Statamic\Globals\Variables;
+use Tests\TestCase;
 
 class VariablesTest extends TestCase
 {
     /** @test */
-    function it_gets_file_contents_for_saving()
+    public function it_gets_file_contents_for_saving()
     {
         $entry = (new Variables)->data([
             'array' => ['first one', 'second one'],
-            'string' => 'The string'
+            'string' => 'The string',
         ]);
 
         $expected = <<<'EOT'

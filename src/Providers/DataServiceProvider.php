@@ -2,9 +2,8 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Facades\Config;
-use Statamic\Structures\UriCache;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Structures\UriCache;
 
 class DataServiceProvider extends ServiceProvider
 {

@@ -2,12 +2,12 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
+use Illuminate\Http\Request;
+use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
-use Illuminate\Http\Request;
-use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Contracts\Forms\Form as FormContract;
 
 class FormsController extends CpController
 {
@@ -27,7 +27,7 @@ class FormsController extends CpController
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
                     'delete_url' => $form->deleteUrl(),
-                    'deleteable' => User::current()->can('delete', $form)
+                    'deleteable' => User::current()->can('delete', $form),
                 ];
             })
             ->values();
@@ -55,14 +55,14 @@ class FormsController extends CpController
         foreach ($form->formset()->get('metrics', []) as $params) {
             $metric = [
                 'type' => $params['type'],
-                'label' => $params['label']
+                'label' => $params['label'],
             ];
             unset($params['type'], $params['label']);
 
             foreach ($params as $key => $value) {
                 $metric['params'][] = [
                     'value' => $key,
-                    'text' => $value
+                    'text' => $value,
                 ];
             }
 
@@ -100,7 +100,7 @@ class FormsController extends CpController
 
         return [
             'success' => true,
-            'redirect' => $form->showUrl()
+            'redirect' => $form->showUrl(),
         ];
     }
 
@@ -163,7 +163,7 @@ class FormsController extends CpController
     }
 
     /**
-     * Clean up the email values from the Grid field
+     * Clean up the email values from the Grid field.
      *
      * @return array
      */
@@ -246,15 +246,15 @@ class FormsController extends CpController
                                         'required',
                                     ],
                                     'instructions' => __('statamic::messages.form_configure_email_to_instructions'),
-                                ]
+                                ],
                             ],
                             [
                                 'handle' => 'from',
                                 'field' => [
                                     'type' => 'text',
                                     'display' => __('Sender (From)'),
-                                    'instructions' => __('statamic::messages.form_configure_email_from_instructions') . ' (' . config('mail.from.address') . ').',
-                                ]
+                                    'instructions' => __('statamic::messages.form_configure_email_from_instructions').' ('.config('mail.from.address').').',
+                                ],
                             ],
                             [
                                 'handle' => 'reply_to',
@@ -262,29 +262,26 @@ class FormsController extends CpController
                                     'type' => 'text',
                                     'display' => __('Reply To'),
                                     'instructions' => __('statamic::messages.form_configure_email_reply_to_instructions'),
-                                ]
+                                ],
                             ],
                             [
                                 'handle' => 'subject',
                                 'field' => [
                                     'type' => 'text',
                                     'instructions' => __('statamic::messages.form_configure_email_subject_instructions'),
-                                ]
+                                ],
                             ],
                             [
                                 'handle' => 'template',
                                 'field' => [
                                     'type' => 'template',
                                     'instructions' => __('statamic::messages.form_configure_email_template_instructions'),
-                                ]
+                                ],
                             ],
-                        ]
+                        ],
                     ],
                 ],
             ],
-
-
-
 
             // metrics
         ]);

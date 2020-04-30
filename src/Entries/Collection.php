@@ -69,6 +69,7 @@ class Collection implements Contract, AugmentableContract
             ->getter(function ($routes) {
                 return $this->sites()->mapWithKeys(function ($site) use ($routes) {
                     $siteRoute = is_string($routes) ? $routes : ($routes[$site] ?? null);
+
                     return [$site => $siteRoute];
                 });
             })
@@ -102,6 +103,7 @@ class Collection implements Contract, AugmentableContract
                 } elseif ($this->dated()) {
                     return 'date';
                 }
+
                 return 'title';
             })
             ->args(func_get_args());
@@ -193,8 +195,10 @@ class Collection implements Contract, AugmentableContract
             ->getter(function ($blueprints) {
                 $blueprints = $blueprints ?? [$this->fallbackEntryBlueprint()->handle()];
 
-                return collect($blueprints)->map(function ($blueprint) {
-                    return $this->ensureEntryBlueprintFields(Blueprint::find($blueprint));
+                return collect($blueprints)->map(function ($handle) {
+                    throw_unless($blueprint = Blueprint::find($handle), new \Exception("Blueprint [$handle] not found"));
+
+                    return $this->ensureEntryBlueprintFields($blueprint);
                 });
             })
             ->setter(function ($blueprints) {
@@ -305,7 +309,7 @@ class Collection implements Contract, AugmentableContract
     {
         return vsprintf('%s/%s.yaml', [
             rtrim(Stache::store('collections')->directory(), '/'),
-            $this->handle
+            $this->handle,
         ]);
     }
 
@@ -314,7 +318,7 @@ class Collection implements Contract, AugmentableContract
         return $this
             ->fluentlyGetOrSet('searchIndex')
             ->getter(function ($index) {
-                return $index ?  Search::index($index) : null;
+                return $index ? Search::index($index) : null;
             })
             ->args(func_get_args());
     }
@@ -332,6 +336,7 @@ class Collection implements Contract, AugmentableContract
 
         if (is_array($key)) {
             $this->cascade = collect($key);
+
             return $this;
         }
 
@@ -348,7 +353,7 @@ class Collection implements Contract, AugmentableContract
             'dated',
             'structured',
             'orderable',
-            'routes'
+            'routes',
         ]);
 
         $route = is_string($this->routes) ? $this->routes : $this->routes()->filter()->all();
@@ -382,10 +387,10 @@ class Collection implements Contract, AugmentableContract
                 'max_depth' => $this->structure()->maxDepth(),
                 'tree' => $this->structure()->trees()->map(function ($tree) {
                     return $tree->fileData()['tree'];
-                })->all()
+                })->all(),
             ]);
 
-            if (!Site::hasMultiple()) {
+            if (! Site::hasMultiple()) {
                 $array['structure']['tree'] = $array['structure']['tree'][Site::default()->handle()];
             }
         }
@@ -402,7 +407,6 @@ class Collection implements Contract, AugmentableContract
             })
             ->args(func_get_args());
     }
-
 
     public function defaultPublishState($state = null)
     {
@@ -472,6 +476,7 @@ class Collection implements Contract, AugmentableContract
                     if (! $structure && $this->structureContents) {
                         $structure = $this->structure = $this->makeStructureFromContents();
                     }
+
                     return $structure;
                 });
             })
@@ -481,6 +486,7 @@ class Collection implements Contract, AugmentableContract
                 }
                 $this->structureContents = null;
                 Blink::forget("collection-{$this->id()}-structure");
+
                 return $structure;
             })
             ->args(func_get_args());
@@ -493,6 +499,7 @@ class Collection implements Contract, AugmentableContract
             ->setter(function ($contents) {
                 Blink::forget("collection-{$this->id()}-structure");
                 $this->structure = null;
+
                 return $contents;
             })
             ->args(func_get_args());
@@ -560,6 +567,7 @@ class Collection implements Contract, AugmentableContract
             ->fluentlyGetOrSet('taxonomies')
             ->getter(function ($taxonomies) {
                 $key = "collection-{$this->id()}-taxonomies-".md5(json_encode($taxonomies));
+
                 return Blink::once($key, function () use ($taxonomies) {
                     return collect($taxonomies)->map(function ($taxonomy) {
                         return Taxonomy::findByHandle($taxonomy);
@@ -572,7 +580,7 @@ class Collection implements Contract, AugmentableContract
     public function deleteFile()
     {
         File::delete($this->path());
-        File::delete(dirname($this->path()) . '/' . $this->handle);
+        File::delete(dirname($this->path()).'/'.$this->handle);
     }
 
     public static function __callStatic($method, $parameters)

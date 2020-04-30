@@ -5,7 +5,7 @@ namespace Statamic\Contracts\Imaging;
 interface UrlBuilder
 {
     /**
-     * Build the URL
+     * Build the URL.
      *
      * @param \Statamic\Contracts\Assets\Asset|string $item
      * @param array                                   $params

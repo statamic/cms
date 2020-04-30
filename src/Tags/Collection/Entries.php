@@ -4,6 +4,7 @@ namespace Statamic\Tags\Collection;
 
 use Closure;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection as IlluminateCollection;
 use InvalidArgumentException;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
@@ -18,7 +19,6 @@ class Entries
     use Concerns\QueriesConditions,
         Concerns\QueriesScopes,
         Concerns\GetsQueryResults;
-
     use Concerns\QueriesOrderBys {
         queryOrderBys as traitQueryOrderBys;
     }
@@ -182,11 +182,14 @@ class Entries
             $not = explode('|', $not);
         }
 
-        $from = collect(Arr::wrap($from))->map(function ($collection) {
+        $from = $from instanceof IlluminateCollection ? $from : collect(Arr::wrap($from));
+        $not = $not instanceof IlluminateCollection ? $not : collect(Arr::wrap($not));
+
+        $from = $from->map(function ($collection) {
             return (string) $collection;
         });
 
-        $not = collect(Arr::wrap($not))->map(function ($collection) {
+        $not = $not->map(function ($collection) {
             return (string) $collection;
         })->filter();
 
@@ -195,6 +198,7 @@ class Entries
             ->map(function ($handle) {
                 $collection = Collection::findByHandle($handle);
                 throw_unless($collection, new \Statamic\Exceptions\CollectionNotFoundException($handle));
+
                 return $collection;
             })
             ->values();
@@ -307,17 +311,15 @@ class Entries
             }
 
             $values = collect($values)->map(function ($term) use ($taxonomy) {
-                return Str::contains($term, '::') ? $term : $taxonomy . '::' . $term;
+                return Str::contains($term, '::') ? $term : $taxonomy.'::'.$term;
             });
 
             if ($modifier === 'all') {
                 $values->each(function ($value) use ($query) {
                     $query->whereTaxonomy($value);
                 });
-
             } elseif ($modifier === 'any') {
                 $query->whereTaxonomyIn($values->all());
-
             } else {
                 throw new InvalidArgumentException(
                     'Unknown taxonomy query modifier ['.$modifier.']. Valid values are "any" and "all".'

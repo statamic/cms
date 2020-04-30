@@ -10,7 +10,7 @@ use Tests\TestCase;
 class HasAugmentedInstanceTest extends TestCase
 {
     /** @test */
-    function it_makes_an_augmented_instance()
+    public function it_makes_an_augmented_instance()
     {
         $mock = $this->mock(Augmented::class);
         $mock->shouldReceive('get')->with('foo')->once()->andReturn('bar');
@@ -39,7 +39,7 @@ class HasAugmentedInstanceTest extends TestCase
     }
 
     /** @test */
-    function augmented_thing_can_define_the_default_array_keys()
+    public function augmented_thing_can_define_the_default_array_keys()
     {
         $mock = $this->mock(Augmented::class);
         $mock->shouldReceive('select')->with(['foo', 'bar'])->once()->andReturn(new AugmentedCollection(['foo', 'bar']));

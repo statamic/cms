@@ -2,19 +2,17 @@
 
 namespace Tests\Fields;
 
+use Illuminate\Support\Collection;
 use Mockery;
-use Tests\TestCase;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
-use Statamic\Extend\Fieldtype;
 use Statamic\Fields\Validator;
-use Illuminate\Support\Collection;
-use Facades\Statamic\Fields\FieldtypeRepository;
+use Tests\TestCase;
 
 class ValidatorTest extends TestCase
 {
     /** @test */
-    function it_explodes_pipe_style_rules_into_arrays()
+    public function it_explodes_pipe_style_rules_into_arrays()
     {
         $this->assertEquals(['foo'], Validator::explodeRules('foo'));
 
@@ -26,7 +24,7 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
-    function it_merges_rules()
+    public function it_merges_rules()
     {
         $original = [
             'one' => ['required'],
@@ -49,7 +47,7 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
-    function it_compiles_field_rules()
+    public function it_compiles_field_rules()
     {
         $fieldWithItsOwnRules = Mockery::mock(Field::class);
         $fieldWithItsOwnRules->shouldReceive('rules')->andReturn(['one' => ['required']]);
@@ -77,7 +75,7 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
-    function it_adds_additional_rules()
+    public function it_adds_additional_rules()
     {
         $fields = Mockery::mock(Fields::class);
         $fields->shouldReceive('all')->andReturn(collect([]));
@@ -85,7 +83,7 @@ class ValidatorTest extends TestCase
 
         $validation = (new Validator)->fields($fields)->withRules([
             'foo' => 'required',
-            'test' => 'required|array'
+            'test' => 'required|array',
         ]);
 
         $this->assertEquals([
@@ -95,7 +93,7 @@ class ValidatorTest extends TestCase
     }
 
     /** @test */
-    function it_merges_additional_rules_into_field_rules()
+    public function it_merges_additional_rules_into_field_rules()
     {
         $field = Mockery::mock(Field::class);
         $field->shouldReceive('rules')->andReturn([
@@ -109,13 +107,13 @@ class ValidatorTest extends TestCase
 
         $validation = (new Validator)->fields($fields)->withRules([
             'one' => 'required|min:2',
-            'additional' => 'required'
+            'additional' => 'required',
         ]);
 
         $this->assertEquals([
             'one' => ['required', 'array', 'min:2'], // notice required is deduplicated.
             'extra' => ['min:2'],
-            'additional' => ['required']
+            'additional' => ['required'],
         ], $validation->rules());
     }
 }

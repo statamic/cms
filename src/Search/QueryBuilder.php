@@ -2,8 +2,8 @@
 
 namespace Statamic\Search;
 
-use Statamic\Facades\Data;
 use Statamic\Data\DataCollection;
+use Statamic\Facades\Data;
 use Statamic\Query\IteratorBuilder as BaseQueryBuilder;
 
 abstract class QueryBuilder extends BaseQueryBuilder

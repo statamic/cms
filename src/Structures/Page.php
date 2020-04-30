@@ -2,17 +2,17 @@
 
 namespace Statamic\Structures;
 
-use Statamic\Facades\URL;
-use Statamic\Facades\Site;
-use Statamic\Facades\Collection;
-use Statamic\Facades\Entry as EntryAPI;
-use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Routing\UrlBuilder;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry as EntryAPI;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 
 class Page implements Entry, Augmentable, Responsable
 {
@@ -173,7 +173,7 @@ class Page implements Entry, Augmentable, Responsable
         return $uris[$this->reference] = app(UrlBuilder::class)
             ->content($this)
             ->merge([
-                'parent_uri' => $this->parent && !$this->parent->isRoot() ? $this->parent->uri() : '',
+                'parent_uri' => $this->parent && ! $this->parent->isRoot() ? $this->parent->uri() : '',
                 'slug' => $this->isRoot() ? '' : $this->slug(),
                 'depth' => $this->depth,
                 'is_root' => $this->isRoot(),
@@ -194,7 +194,7 @@ class Page implements Entry, Augmentable, Responsable
         if ($this->reference && $this->referenceExists()) {
             return vsprintf('%s/%s', [
                 rtrim($this->site()->absoluteUrl(), '/'),
-                ltrim($this->uri(), '/')
+                ltrim($this->uri(), '/'),
             ]);
         }
     }

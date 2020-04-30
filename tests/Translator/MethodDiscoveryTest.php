@@ -21,7 +21,7 @@ class MethodDiscoveryTest extends TestCase
     }
 
     /** @test */
-    function it_discovers_methods()
+    public function it_discovers_methods()
     {
         $expected = collect([
             'blade underscore single quote string',

@@ -4,7 +4,6 @@ namespace Statamic\Sites;
 
 use Statamic\Support\Str;
 
-
 class Site
 {
     protected $handle;
@@ -38,16 +37,22 @@ class Site
 
     public function url()
     {
-        return Str::ensureRight($this->config['url'], '/');
+        $url = $this->config['url'];
+
+        if ($url === '/') {
+            return '/';
+        }
+
+        return Str::removeRight($url, '/');
     }
 
     public function absoluteUrl()
     {
         if (Str::startsWith($url = $this->url(), '/')) {
-            return Str::ensureLeft($url, request()->getSchemeAndHttpHost());
+            $url = Str::ensureLeft($url, request()->getSchemeAndHttpHost());
         }
 
-        return $url;
+        return Str::removeRight($url, '/');
     }
 
     public function relativePath($url)
@@ -65,6 +70,6 @@ class Site
     {
         $parsed = parse_url($url);
 
-        return $parsed['scheme'] . '://' . $parsed['host'];
+        return $parsed['scheme'].'://'.$parsed['host'];
     }
 }

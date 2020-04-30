@@ -2,11 +2,10 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Http\Resources\Json\JsonResource as Resource;
 use Illuminate\Support\Arr;
 use Statamic\CP\Column;
 use Statamic\Fields\Fieldtype;
-use Illuminate\Http\Resources\Json\JsonResource as Resource;
-use Statamic\Statamic;
 
 abstract class Relationship extends Fieldtype
 {
@@ -23,13 +22,12 @@ abstract class Relationship extends Fieldtype
     protected $taggable = false;
     protected $defaultValue = [];
     protected $formComponentProps = [
-        '_' => '_' // forces an object in js
+        '_' => '_', // forces an object in js
     ];
-    protected $extraConfigFields = [];
 
     protected function configFieldItems(): array
     {
-        $configFields = [
+        return [
             'max_items' => [
                 'display' => __('Max Items'),
                 'instructions' => __('statamic::messages.max_items_instructions'),
@@ -46,10 +44,8 @@ abstract class Relationship extends Fieldtype
                     'typeahead' => __('Typeahead Field'),
                 ],
                 'width' => 50,
-            ]
+            ],
         ];
-
-        return array_merge($configFields, $this->extraConfigFields);
     }
 
     public function preProcess($data)
@@ -102,7 +98,7 @@ abstract class Relationship extends Fieldtype
         $rules = ['array'];
 
         if ($max = $this->config('max_items')) {
-            $rules[] = 'max:' . $max;
+            $rules[] = 'max:'.$max;
         }
 
         return $rules;
@@ -211,7 +207,7 @@ abstract class Relationship extends Fieldtype
         return [
             'id' => $id,
             'title' => $id,
-            'invalid' => true
+            'invalid' => true,
         ];
     }
 

@@ -2,14 +2,14 @@
 
 namespace Tests\Auth;
 
-use Tests\TestCase;
-use Statamic\Auth\File\Role;
 use Illuminate\Support\Collection;
+use Statamic\Auth\File\Role;
+use Tests\TestCase;
 
 class RoleTest extends TestCase
 {
     /** @test */
-    function it_gets_and_sets_the_title()
+    public function it_gets_and_sets_the_title()
     {
         $role = new Role;
         $this->assertNull($role->title());
@@ -21,7 +21,7 @@ class RoleTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_handle()
+    public function it_gets_and_sets_the_handle()
     {
         $role = new Role;
         $this->assertNull($role->handle());
@@ -33,7 +33,7 @@ class RoleTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_adds_permissions()
+    public function it_gets_and_adds_permissions()
     {
         $role = new Role;
         $this->assertInstanceOf(Collection::class, $role->permissions());
@@ -48,7 +48,7 @@ class RoleTest extends TestCase
     }
 
     /** @test */
-    function it_sets_all_permissions()
+    public function it_sets_all_permissions()
     {
         $role = new Role;
         $role->addPermission('one');
@@ -61,7 +61,7 @@ class RoleTest extends TestCase
     }
 
     /** @test */
-    function permissions_get_deduplicated()
+    public function permissions_get_deduplicated()
     {
         $role = new Role;
         $role->addPermission(['foo', 'bar']);
@@ -71,7 +71,7 @@ class RoleTest extends TestCase
     }
 
     /** @test */
-    function it_removes_permissions()
+    public function it_removes_permissions()
     {
         $role = (new Role)->addPermission(['foo', 'bar', 'baz', 'qux']);
 
@@ -83,7 +83,7 @@ class RoleTest extends TestCase
     }
 
     /** @test */
-    function it_checks_if_it_has_permission()
+    public function it_checks_if_it_has_permission()
     {
         $role = (new Role)->addPermission('foo');
 
@@ -92,7 +92,7 @@ class RoleTest extends TestCase
     }
 
     /** @test */
-    function it_checks_if_it_has_super_permissions()
+    public function it_checks_if_it_has_super_permissions()
     {
         $superRole = (new Role)->addPermission('super');
         $nonSuperRole = (new Role)->addPermission('something else');
@@ -102,13 +102,13 @@ class RoleTest extends TestCase
     }
 
     /** @test */
-    function it_can_be_saved()
+    public function it_can_be_saved()
     {
         $this->markTestIncomplete();
     }
 
     /** @test */
-    function it_can_be_deleted()
+    public function it_can_be_deleted()
     {
         $this->markTestIncomplete();
     }

@@ -2,25 +2,20 @@
 
 namespace Statamic\Http\Controllers;
 
-use Carbon\Carbon;
-use Statamic\Support\Arr;
-use Statamic\Facades\Form;
-use Statamic\Facades\Email;
-use Statamic\Facades\Parse;
-use Statamic\Facades\Config;
-use Illuminate\Http\Response;
-use Illuminate\Support\MessageBag;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Crypt;
+use Illuminate\Support\MessageBag;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Exceptions\PublishException;
-use Statamic\Http\Controllers\Controller;
 use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\Form;
+use Statamic\Support\Arr;
 
 class FormController extends Controller
 {
     /**
-     * Handle a create form submission request
+     * Handle a create form submission request.
      *
      * @return mixed
      */
@@ -50,7 +45,7 @@ class FormController extends Controller
 
             // Allow addons to prevent the submission of the form, return
             // their own errors, and modify the submission.
-            list($errors, $submission) = $this->runCreatingEvent($submission);
+            [$errors, $submission] = $this->runCreatingEvent($submission);
         } catch (PublishException $e) {
             return $this->formFailure($params, $e->getErrors(), $handle);
         } catch (SilentFormFailureException $e) {
@@ -83,7 +78,7 @@ class FormController extends Controller
         if (request()->ajax()) {
             return response([
                 'success' => true,
-                'submission' => $submission->data()
+                'submission' => $submission->data(),
             ]);
         }
 
@@ -109,7 +104,7 @@ class FormController extends Controller
     {
         if (request()->ajax()) {
             return response([
-                'errors' => (new MessageBag($errors))->all()
+                'errors' => (new MessageBag($errors))->all(),
             ], 400);
         }
 

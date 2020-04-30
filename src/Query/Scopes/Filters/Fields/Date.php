@@ -15,7 +15,7 @@ class Date extends FieldtypeFilter
                 'options' => [
                     '<' => __('Before'),
                     '>' => __('After'),
-                ]
+                ],
             ],
             'value' => [
                 'type' => 'date',

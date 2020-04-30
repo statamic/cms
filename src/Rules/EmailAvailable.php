@@ -2,8 +2,8 @@
 
 namespace Statamic\Rules;
 
-use Statamic\Facades\User;
 use Illuminate\Contracts\Validation\Rule;
+use Statamic\Facades\User;
 
 class EmailAvailable implements Rule
 {

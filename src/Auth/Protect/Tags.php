@@ -17,7 +17,7 @@ class Tags extends BaseTags
         if (! $token = request('token')) {
             return $this->parse([
                 'errors' => [],
-                'no_token' => true
+                'no_token' => true,
             ]);
         }
 
@@ -29,7 +29,7 @@ class Tags extends BaseTags
 
         $html .= $this->parse([
             'errors' => $errors->toArray(),
-            'error' => $errors->first()
+            'error' => $errors->first(),
         ]);
 
         $html .= $this->formClose();

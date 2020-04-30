@@ -2,14 +2,14 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\Support\Str;
-use Statamic\Stache\Stache;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Query\TermQueryBuilder;
+use Statamic\Stache\Stache;
+use Statamic\Support\Str;
 use Statamic\Taxonomies\TermCollection;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
 
 class TermRepository implements RepositoryContract
 {

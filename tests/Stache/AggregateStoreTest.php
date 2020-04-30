@@ -2,10 +2,10 @@
 
 namespace Tests\Stache;
 
-use Tests\TestCase;
 use Statamic\Stache\Stache;
-use Statamic\Stache\Stores\ChildStore;
 use Statamic\Stache\Stores\AggregateStore;
+use Statamic\Stache\Stores\ChildStore;
+use Tests\TestCase;
 
 class AggregateStoreTest extends TestCase
 {
@@ -21,7 +21,7 @@ class AggregateStoreTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_child_stores()
+    public function it_gets_and_sets_child_stores()
     {
         $this->assertEquals([], $this->store->stores()->all());
 
@@ -50,5 +50,4 @@ class TestAggregateStore extends AggregateStore
 
 class TestChildStore extends ChildStore
 {
-
 }

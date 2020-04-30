@@ -2,8 +2,6 @@
 
 namespace Tests\Fakes\Composer;
 
-use Facades\Statamic\Updater\Updater;
-
 class Composer
 {
     public $installed;

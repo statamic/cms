@@ -2,14 +2,14 @@
 
 namespace Statamic\Http\Controllers\CP\Auth;
 
-use Statamic\Support\Str;
-use Statamic\Facades\OAuth;
 use Illuminate\Http\Request;
-use Statamic\Auth\ThrottlesLogins;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\ValidationException;
+use Statamic\Auth\ThrottlesLogins;
+use Statamic\Facades\OAuth;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
+use Statamic\Support\Str;
 
 class LoginController extends CpController
 {
@@ -37,6 +37,7 @@ class LoginController extends CpController
             'oauth' => $enabled = OAuth::enabled(),
             'providers' => $enabled ? OAuth::providers() : [],
             'referer' => $this->getReferrer($request),
+            'hasError' => $this->hasError(),
         ];
 
         $view = view('statamic::auth.login', $data);
@@ -57,6 +58,7 @@ class LoginController extends CpController
 
         if ($this->hasTooManyLoginAttempts($request)) {
             $this->fireLockoutEvent($request);
+
             return $this->sendLockoutResponse($request);
         }
 
@@ -114,7 +116,7 @@ class LoginController extends CpController
     {
         $credentials = [
             $this->username() => strtolower($request->get($this->username())),
-            'password' => $request->get('password')
+            'password' => $request->get('password'),
         ];
 
         return $credentials;
@@ -141,5 +143,19 @@ class LoginController extends CpController
     public function username()
     {
         return 'email';
+    }
+
+    private function hasError()
+    {
+        return function ($field) {
+            if (! $error = optional(session('errors'))->first($field)) {
+                return false;
+            }
+
+            return ! in_array($error, [
+                __('auth.failed'),
+                __('statamic::validation.required'),
+            ]);
+        };
     }
 }

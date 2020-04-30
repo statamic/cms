@@ -19,8 +19,7 @@ class GlobalSetSites extends Fieldtype
 
     private function cannotAllHaveOriginsRule()
     {
-        return new class implements ValidationRule
-        {
+        return new class implements ValidationRule {
             public function passes($attribute, $value)
             {
                 return collect($value)->map->origin->filter()->count() !== count($value);
@@ -35,15 +34,14 @@ class GlobalSetSites extends Fieldtype
 
     private function originsMustBeEnabledRule()
     {
-        return new class implements ValidationRule
-        {
+        return new class implements ValidationRule {
             public function passes($attribute, $value)
             {
                 $sites = collect($value)->keyBy->handle->filter->enabled;
                 $origins = $sites->map->origin->filter();
 
                 foreach ($origins as $origin) {
-                    if (!$sites->has($origin)) {
+                    if (! $sites->has($origin)) {
                         return false;
                     }
                 }

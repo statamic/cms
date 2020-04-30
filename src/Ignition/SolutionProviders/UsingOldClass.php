@@ -24,6 +24,7 @@ class UsingOldClass implements HasSolutionsForThrowable
     public function getSolutions(Throwable $throwable): array
     {
         $class = $this->classes()[$this->oldClass];
+
         return [new UpdateClassReference($this->oldClass, $class['class'], $class['docs'] ?? [])];
     }
 
@@ -54,7 +55,7 @@ class UsingOldClass implements HasSolutionsForThrowable
             'Statamic\Extend\Widget' => [
                 'class' => \Statamic\Widgets\Widget::class,
                 'docs' => ['Widgets Documentation' => Statamic::docsUrl('extending/widgets')],
-            ]
+            ],
         ];
     }
 }

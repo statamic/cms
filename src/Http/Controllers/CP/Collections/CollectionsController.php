@@ -5,12 +5,10 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\CP\Column;
-use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
-use Statamic\Facades\Structure;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Structures\CollectionStructure;
@@ -33,7 +31,7 @@ class CollectionsController extends CpController
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
                 'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),
-                'deleteable' => User::current()->can('delete', $collection)
+                'deleteable' => User::current()->can('delete', $collection),
             ];
         })->values();
 
@@ -84,12 +82,13 @@ class CollectionsController extends CpController
             'expectsRoot' => $structure->expectsRoot(),
             'structureSites' => $collection->sites()->map(function ($site) use ($structure) {
                 $tree = $structure->in($site);
+
                 return [
                     'handle' => $tree->locale(),
                     'name' => $tree->site()->name(),
                     'url' => $tree->showUrl(),
                 ];
-            })->values()->all()
+            })->values()->all(),
         ]));
     }
 
@@ -154,7 +153,7 @@ class CollectionsController extends CpController
 
         $data = $request->validate([
             'title' => 'required',
-            'handle' => 'nullable|alpha_dash'
+            'handle' => 'nullable|alpha_dash',
         ]);
 
         $handle = $request->handle ?? Str::snake($request->title);
@@ -174,7 +173,7 @@ class CollectionsController extends CpController
         session()->flash('success', __('Collection created'));
 
         return [
-            'redirect' => route('statamic.cp.collections.show', $handle)
+            'redirect' => route('statamic.cp.collections.show', $handle),
         ];
     }
 
@@ -255,8 +254,8 @@ class CollectionsController extends CpController
                         'instructions' => __('statamic::messages.collection_configure_title_instructions'),
                         'type' => 'text',
                         'validate' => 'required',
-                    ]
-                ]
+                    ],
+                ],
             ],
             'dates' => [
                 'display' => __('Dates & Behaviors'),
@@ -276,8 +275,8 @@ class CollectionsController extends CpController
                             'private' => __('statamic::messages.collection_configure_date_behavior_private'),
                         ],
                         'if' => [
-                            'dated' => true
-                        ]
+                            'dated' => true,
+                        ],
                     ],
                     'future_date_behavior' => [
                         'display' => __('Future Date Behavior'),
@@ -289,8 +288,8 @@ class CollectionsController extends CpController
                             'private' => __('statamic::messages.collection_configure_date_behavior_private'),
                         ],
                         'if' => [
-                            'dated' => true
-                        ]
+                            'dated' => true,
+                        ],
                     ],
                 ],
             ],
@@ -362,7 +361,7 @@ class CollectionsController extends CpController
                         'instructions' => __('statamic::messages.collection_configure_layout_instructions'),
                         'type' => 'template',
                     ],
-                ]
+                ],
             ],
         ];
 
@@ -374,8 +373,8 @@ class CollectionsController extends CpController
                         'type' => 'sites',
                         'mode' => 'select',
                         'required' => true,
-                    ]
-                ]
+                    ],
+                ],
             ];
         }
 
@@ -400,8 +399,8 @@ class CollectionsController extends CpController
                         'instructions' => __('statamic::messages.collections_amp_instructions'),
                         'type' => 'toggle',
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
 
         return Blueprint::makeFromSections($fields);

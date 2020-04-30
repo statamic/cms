@@ -11,18 +11,18 @@ class RecursiveChildren extends \Statamic\Tags\Tags
                 'title' => 'One',
                 'children' => [
                     [
-                        'title' => 'Two'
+                        'title' => 'Two',
                     ],
                     [
                         'title' => 'Three',
                         'children' => [
                             [
-                                'title' => 'Four'
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                                'title' => 'Four',
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ]);
     }
 }

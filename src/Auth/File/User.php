@@ -2,25 +2,24 @@
 
 namespace Statamic\Auth\File;
 
-use Statamic\Facades;
 use Carbon\Carbon;
-use Statamic\Facades\File;
-use Statamic\Facades\YAML;
-use Statamic\Data\Data;
-use Statamic\Support\Arr;
-use Statamic\Facades\Stache;
-use Statamic\Data\ContainsData;
-use Statamic\Data\ExistsAsFile;
+use Illuminate\Support\Facades\Hash;
 use Statamic\Auth\PermissionCache;
 use Statamic\Auth\User as BaseUser;
-use Illuminate\Support\Facades\Hash;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Auth\Role as RoleContract;
-use Statamic\Preferences\HasPreferencesInProperty;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
+use Statamic\Data\ContainsData;
+use Statamic\Data\Data;
+use Statamic\Data\ExistsAsFile;
+use Statamic\Facades;
+use Statamic\Facades\File;
+use Statamic\Facades\Stache;
+use Statamic\Facades\YAML;
+use Statamic\Preferences\HasPreferencesInProperty;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 /**
- * A user
+ * A user.
  */
 class User extends BaseUser
 {
@@ -69,7 +68,7 @@ class User extends BaseUser
     }
 
     /**
-     * Get or set a user's email
+     * Get or set a user's email.
      *
      * @param string|null $email
      * @return mixed
@@ -80,7 +79,7 @@ class User extends BaseUser
     }
 
     /**
-     * Get or set a user's password
+     * Get or set a user's password.
      *
      * @param string|null $password
      * @return string
@@ -321,7 +320,7 @@ class User extends BaseUser
     }
 
     /**
-     * Get a value from the user's meta YAML file
+     * Get a value from the user's meta YAML file.
      *
      * @param  string $key
      * @param  mixed $default
@@ -335,7 +334,7 @@ class User extends BaseUser
     }
 
     /**
-     * Write to the user's meta YAML file
+     * Write to the user's meta YAML file.
      *
      * @param  string $key
      * @param  mixed $value
@@ -351,7 +350,7 @@ class User extends BaseUser
     }
 
     /**
-     * Path to the user's meta YAML file
+     * Path to the user's meta YAML file.
      *
      * @return string
      */

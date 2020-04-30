@@ -2,17 +2,17 @@
 
 namespace Tests\Preferences;
 
-use Tests\TestCase;
-use Statamic\Facades\User;
 use Statamic\Facades\Preference;
+use Statamic\Facades\User;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class EndpointsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_can_set_a_preference()
+    public function it_can_set_a_preference()
     {
         $user = User::make()->makeSuper()->save();
 
@@ -20,9 +20,9 @@ class EndpointsTest extends TestCase
             'favorites' => [
                 'foods' => [
                     'pizza',
-                    'lasagna'
-                ]
-            ]
+                    'lasagna',
+                ],
+            ],
         ];
 
         $response = $this
@@ -31,8 +31,8 @@ class EndpointsTest extends TestCase
                 'key' => 'favorites.foods',
                 'value' => [
                     'pizza',
-                    'lasagna'
-                ]
+                    'lasagna',
+                ],
             ])
             ->assertExactJson($expected);
 
@@ -40,7 +40,7 @@ class EndpointsTest extends TestCase
     }
 
     /** @test */
-    function it_can_append_a_preference()
+    public function it_can_append_a_preference()
     {
         $user = User::make()
             ->makeSuper()
@@ -52,9 +52,9 @@ class EndpointsTest extends TestCase
                 'foods' => [
                     'pizza',
                     'lasagna',
-                    'spaghetti'
-                ]
-            ]
+                    'spaghetti',
+                ],
+            ],
         ];
 
         $response = $this
@@ -62,7 +62,7 @@ class EndpointsTest extends TestCase
             ->post(cp_route('preferences.store'), [
                 'key' => 'favorites.foods',
                 'value' => 'spaghetti',
-                'append' => true
+                'append' => true,
             ])
             ->assertExactJson($expected);
 
@@ -70,18 +70,18 @@ class EndpointsTest extends TestCase
     }
 
     /** @test */
-    function it_can_remove_a_preference()
+    public function it_can_remove_a_preference()
     {
         $user = User::make()
             ->makeSuper()
             ->setPreferences([
                 'food' => 'pizza',
-                'color' => 'red'
+                'color' => 'red',
             ])
             ->save();
 
         $expected = [
-            'color' => 'red'
+            'color' => 'red',
         ];
 
         $response = $this
@@ -93,7 +93,7 @@ class EndpointsTest extends TestCase
     }
 
     /** @test */
-    function it_can_remove_a_preference_array_value()
+    public function it_can_remove_a_preference_array_value()
     {
         $user = User::make()
             ->makeSuper()
@@ -102,9 +102,9 @@ class EndpointsTest extends TestCase
                     'foods' => [
                         'pizza',
                         'lasagna',
-                        'spaghetti'
-                    ]
-                ]
+                        'spaghetti',
+                    ],
+                ],
             ])
             ->save();
 
@@ -112,9 +112,9 @@ class EndpointsTest extends TestCase
             'favorites' => [
                 'foods' => [
                     'pizza',
-                    'spaghetti'
-                ]
-            ]
+                    'spaghetti',
+                ],
+            ],
         ];
 
         $response = $this

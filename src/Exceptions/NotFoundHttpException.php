@@ -3,7 +3,6 @@
 namespace Statamic\Exceptions;
 
 use Statamic\View\View;
-use Facades\Statamic\View\Cascade;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as SymfonyException;
 
 class NotFoundHttpException extends SymfonyException
@@ -30,7 +29,7 @@ class NotFoundHttpException extends SymfonyException
             'errors.layout',
             'layouts.layout',
             'layout',
-            'statamic::blank'
+            'statamic::blank',
         ]);
 
         return $layouts->filter()->first(function ($layout) {

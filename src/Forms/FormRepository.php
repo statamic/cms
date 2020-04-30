@@ -2,9 +2,9 @@
 
 namespace Statamic\Forms;
 
+use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
-use Statamic\Contracts\Forms\Form as FormContract;
 
 class FormRepository
 {

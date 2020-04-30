@@ -3,7 +3,7 @@
 namespace Statamic\Exceptions;
 
 /**
- * Trigger a 404
+ * Trigger a 404.
  */
 class UrlNotFoundException extends \Exception
 {

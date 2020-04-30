@@ -2,7 +2,7 @@
 
     <div class="h-full bg-white">
 
-        <div v-if="initializing" class="absolute pin z-200 flex items-center justify-center text-center">
+        <div v-if="initializing" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
         </div>
 

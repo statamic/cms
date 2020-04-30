@@ -10,7 +10,7 @@ use Tests\TestCase;
 class RadioTest extends TestCase
 {
     /** @test */
-    function it_augments_to_a_LabeledValue_object_with_options_with_keys()
+    public function it_augments_to_a_LabeledValue_object_with_options_with_keys()
     {
         $field = (new Radio)->setField(new Field('test', [
             'type' => 'radio',
@@ -18,7 +18,7 @@ class RadioTest extends TestCase
                 'au' => 'Australia',
                 'ca' => 'Canada',
                 'us' => 'USA',
-            ]
+            ],
         ]));
 
         $augmented = $field->augment('au');
@@ -28,7 +28,7 @@ class RadioTest extends TestCase
     }
 
     /** @test */
-    function it_augments_to_a_LabeledValue_object_with_options_without_keys()
+    public function it_augments_to_a_LabeledValue_object_with_options_without_keys()
     {
         $field = (new Radio)->setField(new Field('test', [
             'type' => 'radio',
@@ -36,7 +36,7 @@ class RadioTest extends TestCase
                 'Australia',
                 'Canada',
                 'USA',
-            ]
+            ],
         ]));
 
         $augmented = $field->augment('Australia');
@@ -46,7 +46,7 @@ class RadioTest extends TestCase
     }
 
     /** @test */
-    function it_augments_to_a_LabeledValue_object_with_a_null_value()
+    public function it_augments_to_a_LabeledValue_object_with_a_null_value()
     {
         $field = (new Radio)->setField(new Field('test', [
             'type' => 'radio',
@@ -54,7 +54,7 @@ class RadioTest extends TestCase
                 'au' => 'Australia',
                 'ca' => 'Canada',
                 'us' => 'USA',
-            ]
+            ],
         ]));
 
         $augmented = $field->augment(null);

@@ -2,17 +2,17 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\Support\Str;
-use Statamic\Facades\File;
-use Statamic\Facades\YAML;
-use Statamic\Facades\Folder;
-use Illuminate\Http\Request;
-use Statamic\Http\Controllers\Controller;
-use Statamic\Exceptions\AuthorizationException;
 use Illuminate\Auth\Access\AuthorizationException as LaravelAuthException;
+use Illuminate\Http\Request;
+use Statamic\Exceptions\AuthorizationException;
+use Statamic\Facades\File;
+use Statamic\Facades\Folder;
+use Statamic\Facades\YAML;
+use Statamic\Http\Controllers\Controller;
+use Statamic\Support\Str;
 
 /**
- * The base control panel controller
+ * The base control panel controller.
  */
 class CpController extends Controller
 {
@@ -22,7 +22,7 @@ class CpController extends Controller
     protected $request;
 
     /**
-     * Create a new CpController
+     * Create a new CpController.
      *
      * @param \Illuminate\Http\Request $request
      */
@@ -32,7 +32,7 @@ class CpController extends Controller
     }
 
     /**
-     * Get all the template names from the current theme
+     * Get all the template names from the current theme.
      *
      * @return array
      */
@@ -69,7 +69,7 @@ class CpController extends Controller
     }
 
     /**
-     * 404
+     * 404.
      */
     public function pageNotFound()
     {
