@@ -135,4 +135,12 @@ class UserTagsTest extends TestCase
 
         $this->assertEquals(route('statamic.logout', ['redirect' => 'home']), $this->tag('{{ user:logout_url redirect="home" }}'));
     }
+
+    /** @test */
+    public function it_can_load_user_by_email()
+    {
+        User::make()->email('foo@bar.com')->save();
+
+        $this->assertEquals('foo@bar.com', $this->tag('{{ user email="foo@bar.com" }}{{email}}{{ /user }}'));
+    }
 }
