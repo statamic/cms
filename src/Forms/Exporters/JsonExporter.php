@@ -2,12 +2,10 @@
 
 namespace Statamic\Forms\Exporters;
 
-use Statamic\Forms\Exporters\AbstractExporter;
-
 class JsonExporter extends AbstractExporter
 {
     /**
-     * Perform the export
+     * Perform the export.
      *
      * @return string
      */
@@ -19,7 +17,7 @@ class JsonExporter extends AbstractExporter
     }
 
     /**
-     * Get the content type
+     * Get the content type.
      *
      * @return string
      */

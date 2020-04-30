@@ -9,14 +9,12 @@ use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
 use Statamic\Events\Data\EntrySaved;
 use Statamic\Events\Data\EntrySaving;
-use Statamic\Exceptions\InvalidLocalizationException;
 use Statamic\Facades;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Sites\Site;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\Page;
-use Statamic\Structures\Pages;
 use Statamic\Structures\Tree;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -27,7 +25,7 @@ class EntryTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_sets_and_gets_the_locale()
+    public function it_sets_and_gets_the_locale()
     {
         $entry = new Entry;
         $this->assertNull($entry->locale());
@@ -39,7 +37,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_site()
+    public function it_gets_the_site()
     {
         config(['statamic.sites.sites' => [
             'en' => ['locale' => 'en_US'],
@@ -53,7 +51,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_sets_and_gets_the_slug()
+    public function it_sets_and_gets_the_slug()
     {
         $entry = new Entry;
         $this->assertNull($entry->slug());
@@ -65,7 +63,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_sets_gets_and_removes_data_values()
+    public function it_sets_gets_and_removes_data_values()
     {
         $entry = new Entry;
         $this->assertNull($entry->get('foo'));
@@ -85,7 +83,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_data_values_using_magic_properties()
+    public function it_gets_and_sets_data_values_using_magic_properties()
     {
         $entry = new Entry;
         $this->assertNull($entry->foo);
@@ -97,7 +95,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_all_data()
+    public function it_gets_and_sets_all_data()
     {
         $entry = new Entry;
         $this->assertEquals([], $entry->data()->all());
@@ -109,7 +107,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_merges_in_additional_data()
+    public function it_merges_in_additional_data()
     {
         $entry = (new Entry)->data([
             'foo' => 'bar',
@@ -132,7 +130,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function values_fall_back_to_the_origin_then_the_collection()
+    public function values_fall_back_to_the_origin_then_the_collection()
     {
         $collection = tap(Collection::make('test'))->save();
         $origin = (new Entry)->collection('test');
@@ -148,7 +146,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_values_from_origin_and_collection()
+    public function it_gets_values_from_origin_and_collection()
     {
         tap(Collection::make('test')->cascade([
             'one' => 'one in collection',
@@ -173,7 +171,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_url_from_the_collection()
+    public function it_gets_the_url_from_the_collection()
     {
         config(['statamic.amp.enabled' => true]);
 
@@ -227,7 +225,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_uri_from_the_structure()
+    public function it_gets_the_uri_from_the_structure()
     {
         $structure = $this->partialMock(CollectionStructure::class);
         $collection = tap((new Collection)->handle('test')->structure($structure))->save();
@@ -238,7 +236,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_urls_for_first_child_redirects()
+    public function it_gets_urls_for_first_child_redirects()
     {
         \Event::fake(); // Don't invalidate static cache etc when saving entries.
 
@@ -253,13 +251,13 @@ class EntryTest extends TestCase
                 [
                     'entry' => '1',
                     'children' => [
-                        ['entry' => '2']
-                    ]
+                        ['entry' => '2'],
+                    ],
                 ],
                 [
-                    'entry' => '3'
-                ]
-            ]
+                    'entry' => '3',
+                ],
+            ],
         ])->save();
 
         $this->assertEquals('/parent', $parent->uri());
@@ -276,7 +274,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_supplemental_data()
+    public function it_gets_and_sets_supplemental_data()
     {
         $entry = new Entry;
         $this->assertEquals([], $entry->supplements()->all());
@@ -289,7 +287,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_compiles_augmented_array_data()
+    public function it_compiles_augmented_array_data()
     {
         $user = tap(User::make()->id('user-1'))->save();
 
@@ -320,7 +318,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function setting_queried_keys_will_filter_the_arrayable_array()
+    public function setting_queried_keys_will_filter_the_arrayable_array()
     {
         $entry = (new Entry)
             ->id('test-id')
@@ -348,7 +346,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_initial_path()
+    public function it_gets_and_sets_initial_path()
     {
         $entry = new Entry;
         $this->assertNull($entry->initialPath());
@@ -360,7 +358,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_path_and_excludes_locale_when_theres_a_single_site()
+    public function it_gets_the_path_and_excludes_locale_when_theres_a_single_site()
     {
         Facades\Site::setConfig(['default' => 'en', 'sites' => [
             'en' => ['url' => '/'],
@@ -374,7 +372,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_path_and_includes_locale_when_theres_multiple_sites()
+    public function it_gets_the_path_and_includes_locale_when_theres_multiple_sites()
     {
         Facades\Site::setConfig(['default' => 'en', 'sites' => [
             'en' => ['url' => '/'],
@@ -389,7 +387,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_date()
+    public function it_gets_and_sets_the_date()
     {
         Carbon::setTestNow(Carbon::parse('2015-09-24'));
 
@@ -422,7 +420,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_order_from_the_collections_structure()
+    public function it_gets_the_order_from_the_collections_structure()
     {
         $collection = tap(Collection::make('ordered'))->save();
 
@@ -440,7 +438,7 @@ class EntryTest extends TestCase
                 ['entry' => 'three'],
                 ['entry' => 'one'],
                 ['entry' => 'two'],
-            ]
+            ],
         ])->save();
 
         $this->assertEquals(2, $one->order());
@@ -449,17 +447,19 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_date_for_date_collections()
+    public function it_gets_and_sets_the_date_for_date_collections()
     {
         Carbon::setTestNow(Carbon::parse('2015-09-24'));
 
-        $dateEntry = with('', function() {
+        $dateEntry = with('', function () {
             $collection = tap(Collection::make('dated')->dated(true))->save();
+
             return (new Entry)->collection($collection);
         });
 
-        $numberEntry = with('', function() {
+        $numberEntry = with('', function () {
             $collection = tap(Collection::make('ordered')->structureContents(['max_depth' => 1, 'tree' => []]))->save();
+
             return (new Entry)->collection($collection);
         });
 
@@ -479,7 +479,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function future_dated_entries_are_private_when_configured_in_the_collection()
+    public function future_dated_entries_are_private_when_configured_in_the_collection()
     {
         Carbon::setTestNow('2019-01-01');
         $collection = tap(Collection::make('dated')->dated(true)->futureDateBehavior('private'))->save();
@@ -495,7 +495,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function past_dated_entries_are_private_when_configured_in_the_collection()
+    public function past_dated_entries_are_private_when_configured_in_the_collection()
     {
         Carbon::setTestNow('2019-01-01');
         $collection = tap(Collection::make('dated')->dated(true)->pastDateBehavior('private'))->save();
@@ -511,7 +511,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_published_state()
+    public function it_gets_and_sets_the_published_state()
     {
         $entry = new Entry;
         $this->assertTrue($entry->published());
@@ -523,7 +523,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_blueprint_when_defined_on_itself()
+    public function it_gets_the_blueprint_when_defined_on_itself()
     {
         Collection::make('blog')->save();
         BlueprintRepository::shouldReceive('find')->with('default')->andReturn($default = new Blueprint);
@@ -537,7 +537,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_blueprint_based_on_the_collection()
+    public function it_gets_the_blueprint_based_on_the_collection()
     {
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint = new Blueprint);
         BlueprintRepository::shouldReceive('find')->with('another')->andReturn(new Blueprint);
@@ -549,7 +549,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_saves_through_the_api()
+    public function it_saves_through_the_api()
     {
         Event::fake();
         $entry = (new Entry)->id('a')->collection(new Collection);
@@ -571,7 +571,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_performs_callbacks_after_saving_but_before_the_saved_event_and_only_once()
+    public function it_performs_callbacks_after_saving_but_before_the_saved_event_and_only_once()
     {
         Event::fake();
         $entry = (new Entry)->id('a')->collection(new Collection);
@@ -602,7 +602,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function if_saving_event_returns_false_the_entry_doesnt_save()
+    public function if_saving_event_returns_false_the_entry_doesnt_save()
     {
         Facades\Entry::spy();
         Event::fake([EntrySaved::class]);
@@ -621,7 +621,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_file_contents_for_saving()
+    public function it_gets_file_contents_for_saving()
     {
         $entry = (new Entry)
             ->id('123')
@@ -631,7 +631,7 @@ class EntryTest extends TestCase
             ->data([
                 'title' => 'The title',
                 'array' => ['first one', 'second one'],
-                'content' => 'The content'
+                'content' => 'The content',
             ]);
 
         $this->assertEquals([
@@ -647,7 +647,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_template()
+    public function it_gets_and_sets_the_template()
     {
         $collection = tap(Collection::make('test'))->save();
         $entry = (new Entry)->collection($collection);
@@ -666,7 +666,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_layout()
+    public function it_gets_and_sets_the_layout()
     {
         $collection = tap(Collection::make('test'))->save();
         $entry = (new Entry)->collection($collection);
@@ -685,7 +685,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_last_modified_time()
+    public function it_gets_the_last_modified_time()
     {
         $collection = tap(Collection::make('test'))->save();
         $entry = (new Entry)->collection($collection)->slug('bar');
@@ -705,7 +705,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_collection()
+    public function it_gets_and_sets_the_collection()
     {
         $entry = new Entry;
         $collection = tap(Collection::make('foo'))->save();
@@ -719,7 +719,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_id()
+    public function it_gets_and_sets_the_id()
     {
         $entry = new Entry;
         $this->assertNull($entry->id());
@@ -732,7 +732,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_deletes_through_the_api()
+    public function it_deletes_through_the_api()
     {
         Event::fake();
         $entry = (new Entry)->collection(tap(Collection::make('test'))->save());
@@ -744,7 +744,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_corresponding_page_from_the_collections_structure()
+    public function it_gets_the_corresponding_page_from_the_collections_structure()
     {
         $parentPage = $this->mock(Page::class);
         $page = $this->mock(Page::class);
@@ -764,7 +764,7 @@ class EntryTest extends TestCase
     }
 
     /** @test */
-    function no_page_is_returned_when_the_collection_isnt_using_a_structure()
+    public function no_page_is_returned_when_the_collection_isnt_using_a_structure()
     {
         $collection = tap(Collection::make('test'))->save();
         $entry = (new Entry)->id('entry-id')->locale('en')->collection($collection);

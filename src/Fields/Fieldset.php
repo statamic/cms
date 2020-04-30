@@ -2,9 +2,9 @@
 
 namespace Statamic\Fields;
 
+use Facades\Statamic\Fields\FieldsetRepository;
 use Statamic\Facades;
 use Statamic\Support\Str;
-use Facades\Statamic\Fields\FieldsetRepository;
 
 class Fieldset
 {

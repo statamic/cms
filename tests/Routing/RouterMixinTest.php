@@ -5,7 +5,6 @@ namespace Tests\Routing;
 use Illuminate\Container\Container;
 use Illuminate\Contracts\Events\Dispatcher;
 use Illuminate\Routing\Router;
-use Illuminate\Support\Facades\Route;
 use Mockery as m;
 use Statamic\Http\Controllers\FrontendController;
 use Statamic\Mixins\Router as RouterMixin;
@@ -22,7 +21,7 @@ class RouterMixinTest extends TestCase
     }
 
     /** @test */
-    function statamic_routes_are_registered()
+    public function statamic_routes_are_registered()
     {
         $this->assertCount(0, $this->router->getRoutes()->get());
 
@@ -36,7 +35,7 @@ class RouterMixinTest extends TestCase
     }
 
     /** @test */
-    function amp_routes_are_registered()
+    public function amp_routes_are_registered()
     {
         config(['statamic.amp.enabled' => true]);
 
@@ -76,7 +75,7 @@ class RouterMixinTest extends TestCase
     }
 
     /** @test */
-    function amp_routes_do_not_get_registered_if_amp_is_disabled()
+    public function amp_routes_do_not_get_registered_if_amp_is_disabled()
     {
         config(['statamic.amp.enabled' => false]);
 
@@ -95,7 +94,7 @@ class RouterMixinTest extends TestCase
         });
     }
 
-    function commonRouteAssertions($route)
+    public function commonRouteAssertions($route)
     {
         $this->assertEquals(['GET', 'HEAD'], $route->methods());
 

@@ -86,7 +86,7 @@ return [
     'global_set_config_intro' => 'Les jeux de globales gèrent le contenu mis à disposition sur l’ensemble du site, comme les détails de l’entreprise, les coordonnées ou les paramètres frontaux.',
     'global_set_handle_instructions' => 'Comment vous allez référencer ce jeu de globales dans les modèles, etc.',
     'global_set_title_instructions' => 'Le nom d’affichage de ce jeu de globales.',
-     'navigation_configure_collections_instructions' => 'Activer le lien vers les entrées de ces collections.',
+    'navigation_configure_collections_instructions' => 'Activer le lien vers les entrées de ces collections.',
     'expect_root_instructions' => 'Considérer la première page de l’arborescence comme une page "racine" ou "d’accueil".',
     'navigation_configure_handle_instructions' => 'Comment vous allez faire référence à cette navigation sur le frontal. Ne peut pas être facilement changé.',
     'navigation_configure_intro' => 'Les navigations sont des listes multi-niveaux de liens qui peuvent être utilisées pour construire des barres de navigation, des pieds de page, des plans de site et d’autres formes de navigation sur le frontal.',

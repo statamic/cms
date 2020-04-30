@@ -2,7 +2,6 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
-use Illuminate\Support\Carbon;
 use Statamic\Facades\Collection;
 use Statamic\Query\Scopes\Filter;
 

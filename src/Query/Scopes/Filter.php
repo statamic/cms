@@ -2,12 +2,9 @@
 
 namespace Statamic\Query\Scopes;
 
-use Statamic\Fields\Fields;
+use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasFields;
 use Statamic\Extend\HasTitle;
-use Statamic\Query\Scopes\Scope;
-use Statamic\Extend\RegistersItself;
-use Illuminate\Contracts\Support\Arrayable;
 
 abstract class Filter extends Scope implements Arrayable
 {
@@ -53,7 +50,7 @@ abstract class Filter extends Scope implements Arrayable
             ->filter()
             ->implode(', ');
 
-        return strtolower($this->title()) . ': ' . $valuesSummary;
+        return strtolower($this->title()).': '.$valuesSummary;
     }
 
     public function toArray()

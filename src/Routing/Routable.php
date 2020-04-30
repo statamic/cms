@@ -2,15 +2,16 @@
 
 namespace Statamic\Routing;
 
-use Statamic\Support\Str;
-use Statamic\Facades\URL;
 use Statamic\Contracts\Routing\UrlBuilder;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 
 trait Routable
 {
     protected $slug;
 
     abstract public function route();
+
     abstract public function routeData();
 
     public function slug($slug = null)
@@ -46,7 +47,7 @@ trait Routable
 
         return vsprintf('%s/%s', [
             rtrim($this->site()->absoluteUrl(), '/'),
-            ltrim($this->uri(), '/')
+            ltrim($this->uri(), '/'),
         ]);
     }
 
@@ -69,10 +70,10 @@ trait Routable
             return null;
         }
 
-        return !$this->ampable() ? null : vsprintf('%s/%s/%s', [
+        return ! $this->ampable() ? null : vsprintf('%s/%s/%s', [
             rtrim($this->site()->absoluteUrl(), '/'),
             config('statamic.amp.route'),
-            ltrim($this->uri(), '/')
+            ltrim($this->uri(), '/'),
         ]);
     }
 }

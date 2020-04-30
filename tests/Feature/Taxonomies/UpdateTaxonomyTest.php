@@ -17,7 +17,7 @@ class UpdateTaxonomyTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $taxonomy = tap(Taxonomy::make('test'))->save();
 
@@ -30,7 +30,7 @@ class UpdateTaxonomyTest extends TestCase
     }
 
     /** @test */
-    function it_updates_a_taxonomy()
+    public function it_updates_a_taxonomy()
     {
         $taxonomy = tap(
             Taxonomy::make('test')
@@ -51,7 +51,7 @@ class UpdateTaxonomyTest extends TestCase
     }
 
     /** @test */
-    function it_updates_blueprints()
+    public function it_updates_blueprints()
     {
         $mock = $this->partialMock(BlueprintRepository::class);
         $mock->shouldReceive('find')->with('one')->andReturn(Blueprint::make('one'));
@@ -71,7 +71,7 @@ class UpdateTaxonomyTest extends TestCase
     }
 
     /** @test */
-    function it_associates_taxonomies_with_collections()
+    public function it_associates_taxonomies_with_collections()
     {
         $taxonomy = tap(Taxonomy::make('test'))->save();
         $collectionOne = tap(Collection::make('one')->taxonomies(['test']))->save();
@@ -86,7 +86,7 @@ class UpdateTaxonomyTest extends TestCase
         $this
             ->actingAs($this->userWithPermission())
             ->update($taxonomy, [
-                'collections' => ['one', 'three']
+                'collections' => ['one', 'three'],
             ])
             ->assertOk();
 

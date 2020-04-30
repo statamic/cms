@@ -8,11 +8,11 @@ class FieldtypeThatPreAndPostProcesses extends Fieldtype
 {
     public function preProcess($data)
     {
-        return 'preprocessed ' . $data;
+        return 'preprocessed '.$data;
     }
 
     public function process($data)
     {
-        return 'processed ' . $data;
+        return 'processed '.$data;
     }
 }

@@ -2,8 +2,6 @@
 
 namespace Statamic\StaticCaching;
 
-use Statamic\StaticCaching\Cacher;
-
 class DefaultInvalidator implements Invalidator
 {
     protected $cacher;

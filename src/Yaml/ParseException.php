@@ -28,7 +28,7 @@ class ParseException extends ErrorException implements ProvidesSolution
 
         return [
             'Invalid YAML',
-            $description ?? 'Correct any syntax errors. You may have used YAML 1.0 syntax, but 1.2 is expected.'
+            $description ?? 'Correct any syntax errors. You may have used YAML 1.0 syntax, but 1.2 is expected.',
         ];
     }
 }

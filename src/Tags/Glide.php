@@ -2,20 +2,19 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Str;
-use Statamic\Facades\URL;
-use Statamic\Facades\Asset;
-use Statamic\Facades\Image;
-use Statamic\Tags\Tags;
 use League\Glide\Server;
-use Statamic\Facades\Config;
-use Statamic\Imaging\ImageGenerator;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Config;
+use Statamic\Facades\Image;
+use Statamic\Facades\URL;
+use Statamic\Imaging\ImageGenerator;
+use Statamic\Support\Str;
 
 class Glide extends Tags
 {
     /**
-     * Maps to {{ glide:[field] }}
+     * Maps to {{ glide:[field] }}.
      *
      * Where `field` is the variable containing the image ID
      *
@@ -37,7 +36,7 @@ class Glide extends Tags
     }
 
     /**
-     * Maps to {{ glide }}
+     * Maps to {{ glide }}.
      *
      * Alternate syntax, where you pass the ID or path directly as a parameter or tag pair content
      *
@@ -55,7 +54,7 @@ class Glide extends Tags
     }
 
     /**
-     * Maps to {{ glide:batch }}
+     * Maps to {{ glide:batch }}.
      *
      * A tag pair that converts all image URLs to Glide URLs.
      *
@@ -74,7 +73,7 @@ class Glide extends Tags
         $matches = collect($matches)->map(function ($match) {
             return [
                 $match[0],
-                sprintf('<img src="%s"', $this->generateGlideUrl($match[1]))
+                sprintf('<img src="%s"', $this->generateGlideUrl($match[1])),
             ];
         })->transpose();
 
@@ -84,7 +83,7 @@ class Glide extends Tags
     }
 
     /**
-     * Maps to {{ glide:generate }} ... {{ /glide:generate }}
+     * Maps to {{ glide:generate }} ... {{ /glide:generate }}.
      *
      * Generates the image and makes variables available within the pair.
      *
@@ -101,7 +100,7 @@ class Glide extends Tags
 
             $path = $this->generateImage($item);
 
-            list($width, $height) = getimagesize($this->getServer()->getCache()->getAdapter()->getPathPrefix().$path);
+            [$width, $height] = getimagesize($this->getServer()->getCache()->getAdapter()->getPathPrefix().$path);
 
             $data = compact('url', 'width', 'height');
 
@@ -114,7 +113,7 @@ class Glide extends Tags
     }
 
     /**
-     * Generate the image
+     * Generate the image.
      *
      * @param string $item  Either a path or an asset ID
      * @return string       Path to the generated image
@@ -129,7 +128,7 @@ class Glide extends Tags
     }
 
     /**
-     * Output the tag
+     * Output the tag.
      *
      * @param string $url
      * @return string
@@ -149,7 +148,7 @@ class Glide extends Tags
     }
 
     /**
-     * The URL generation
+     * The URL generation.
      *
      * @param  string $item  Either the ID or path of the image.
      * @return string
@@ -160,6 +159,7 @@ class Glide extends Tags
             $url = $this->getManipulator($item)->build();
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
+
             return;
         }
 
@@ -169,7 +169,7 @@ class Glide extends Tags
     }
 
     /**
-     * Get the raw Glide parameters
+     * Get the raw Glide parameters.
      *
      * @param string|null $item
      * @return array
@@ -180,7 +180,7 @@ class Glide extends Tags
     }
 
     /**
-     * Get the image manipulator with the parameters added to it
+     * Get the image manipulator with the parameters added to it.
      *
      * @param string|null $item
      * @return \Statamic\Imaging\GlideImageManipulator
@@ -229,7 +229,7 @@ class Glide extends Tags
     }
 
     /**
-     * Get the tag parameters applicable to image manipulation
+     * Get the tag parameters applicable to image manipulation.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -247,7 +247,7 @@ class Glide extends Tags
     }
 
     /**
-     * Get the image generator
+     * Get the image generator.
      *
      * @return ImageGenerator
      */
@@ -257,7 +257,7 @@ class Glide extends Tags
     }
 
     /**
-     * Get the Glide Server instance
+     * Get the Glide Server instance.
      *
      * @return Server
      */

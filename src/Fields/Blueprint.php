@@ -36,7 +36,7 @@ class Blueprint implements Augmentable
     {
         if ($fields = array_pull($contents, 'fields')) {
             $contents['sections'] = [
-                'main' => ['fields' => $fields]
+                'main' => ['fields' => $fields],
             ];
         }
 

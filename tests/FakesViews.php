@@ -2,8 +2,8 @@
 
 namespace Tests;
 
-use Illuminate\View\View;
 use Illuminate\View\Factory;
+use Illuminate\View\View;
 
 trait FakesViews
 {
@@ -56,6 +56,7 @@ class FakeViewFactory extends Factory
     {
         $engine = app('FakeViewEngine');
         $ext = $this->extensions[$view] ?? 'antlers.html';
+
         return new View($this, $engine, $view, "{$view}.{$ext}", $data);
     }
 

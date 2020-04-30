@@ -2,11 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP\Fields;
 
-use Statamic\Support\Arr;
-use Statamic\Fields\Field;
 use Illuminate\Http\Request;
+use Statamic\Fields\Field;
 use Statamic\Http\Controllers\CP\CpController;
-use Facades\Statamic\Fields\FieldtypeRepository;
 
 class MetaController extends CpController
 {

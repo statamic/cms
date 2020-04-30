@@ -13,18 +13,21 @@ class GlobalFactory
     public function id($id)
     {
         $this->id = $id;
+
         return $this;
     }
 
     public function handle($handle)
     {
         $this->handle = $handle;
+
         return $this;
     }
 
     public function data($data)
     {
         $this->data = $data;
+
         return $this;
     }
 

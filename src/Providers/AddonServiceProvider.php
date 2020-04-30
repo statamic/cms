@@ -3,15 +3,15 @@
 namespace Statamic\Providers;
 
 use Closure;
-use Statamic\Support\Str;
-use Statamic\Statamic;
-use Statamic\Facades\Addon;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Support\Facades\Gate;
 use Statamic\Exceptions\NotBootedException;
+use Statamic\Facades\Addon;
+use Statamic\Statamic;
+use Statamic\Support\Str;
 
 abstract class AddonServiceProvider extends ServiceProvider
 {
@@ -259,7 +259,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function routeGroupAttributes($overrides = [])
     {
         return array_merge($overrides, [
-            'namespace' => $this->getAddon()->namespace()
+            'namespace' => $this->getAddon()->namespace(),
         ]);
     }
 
@@ -277,7 +277,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function bootViews()
     {
         $this->loadViewsFrom(
-            $this->getAddon()->directory() . 'resources/views',
+            $this->getAddon()->directory().'resources/views',
             $this->viewNamespace ?? $this->getAddon()->packageName()
         );
 

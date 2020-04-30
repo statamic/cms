@@ -2,11 +2,11 @@
 
 namespace Tests\StaticCaching;
 
-use Tests\TestCase;
-use Illuminate\Http\Request;
 use Illuminate\Cache\Repository;
+use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
 use Statamic\StaticCaching\Cachers\AbstractCacher;
+use Tests\TestCase;
 
 class CacherTest extends TestCase
 {
@@ -14,7 +14,7 @@ class CacherTest extends TestCase
     public function gets_config_values()
     {
         $cacher = $this->cacher([
-            'foo' => 'bar'
+            'foo' => 'bar',
         ]);
 
         $this->assertEquals('bar', $cacher->config('foo'));
@@ -25,7 +25,7 @@ class CacherTest extends TestCase
     public function gets_default_expiration()
     {
         $cacher = $this->cacher([
-            'default_cache_length' => 10
+            'default_cache_length' => 10,
         ]);
 
         $this->assertEquals(10, $cacher->getDefaultExpiration());
@@ -37,7 +37,7 @@ class CacherTest extends TestCase
         $cacher = $this->cacher();
 
         $request = Request::create('http://example.com/test', 'GET', [
-            'foo' => 'bar'
+            'foo' => 'bar',
         ]);
 
         $this->assertEquals('http://example.com/test?foo=bar', $cacher->getUrl($request));
@@ -49,7 +49,7 @@ class CacherTest extends TestCase
         $cacher = $this->cacher(['ignore_query_strings' => true]);
 
         $request = Request::create('http://example.com/test', 'GET', [
-            'foo' => 'bar'
+            'foo' => 'bar',
         ]);
 
         $this->assertEquals('http://example.com/test', $cacher->getUrl($request));
@@ -99,7 +99,7 @@ class CacherTest extends TestCase
         $cacher = $this->cacher(['base_url' => 'http://example.com']);
 
         $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
-            'one' => '/one'
+            'one' => '/one',
         ]);
 
         $cacher->cacheUrl('two', '/two');
@@ -117,7 +117,7 @@ class CacherTest extends TestCase
         $cacher = $this->cacher(['base_url' => 'http://example.com']);
 
         $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
-            'one' => '/one', 'two' => '/two'
+            'one' => '/one', 'two' => '/two',
         ]);
 
         $cacher->forgetUrl('one');
@@ -133,14 +133,14 @@ class CacherTest extends TestCase
 
         $cache->forever('static-cache:domains', [
             'http://example.com',
-            'http://example.co.uk'
+            'http://example.co.uk',
         ]);
 
         $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
-            'one' => '/one', 'two' => '/two'
+            'one' => '/one', 'two' => '/two',
         ]);
         $cache->forever('static-cache:'.md5('http://example.co.uk').'.urls', [
-            'three' => '/three', 'four' => '/four'
+            'three' => '/three', 'four' => '/four',
         ]);
 
         $this->assertEquals(2, $cacher->getDomains()->count());
@@ -167,7 +167,7 @@ class CacherTest extends TestCase
     {
         $cacher = $this->cacher(['exclude' => [
             '/blog/*', // The slash indicates "only child pages"
-            '/news*'   // No slash would get the "news" page, child pages, and any page with the substring.
+            '/news*',   // No slash would get the "news" page, child pages, and any page with the substring.
         ]]);
 
         $this->assertTrue($cacher->isExcluded('/blog/post'));
@@ -191,7 +191,7 @@ class CacherTest extends TestCase
     {
         $cacher = $this->cacher([
             'base_url' => 'http://example.com',
-            'exclude' => ['/blog']
+            'exclude' => ['/blog'],
         ]);
 
         $this->assertTrue($cacher->isExcluded('http://example.com/blog'));
@@ -205,8 +205,19 @@ class CacherTest extends TestCase
 
 class TestCacher extends AbstractCacher
 {
-    public function cachePage(Request $request, $content) { }
-    public function getCachedPage(Request $request) { }
-    public function flush() { }
-    public function invalidateUrl($url) { }
+    public function cachePage(Request $request, $content)
+    {
+    }
+
+    public function getCachedPage(Request $request)
+    {
+    }
+
+    public function flush()
+    {
+    }
+
+    public function invalidateUrl($url)
+    {
+    }
 }

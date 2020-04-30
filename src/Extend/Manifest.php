@@ -3,11 +3,10 @@
 namespace Statamic\Extend;
 
 use Facades\Statamic\Extend\Marketplace;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\PackageManifest;
 use ReflectionClass;
-use Statamic\Support\Arr;
 use Statamic\Facades\File;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Manifest extends PackageManifest

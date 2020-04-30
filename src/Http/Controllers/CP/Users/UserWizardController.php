@@ -2,10 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP\Users;
 
-use Statamic\Facades\User;
 use Illuminate\Http\Request;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Contracts\Auth\User as UserContract;
 
 class UserWizardController extends CpController
 {

@@ -2,14 +2,14 @@
 
 namespace Statamic\Assets;
 
-use Statamic\Support\Arr;
+use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Contracts\Assets\AssetFolder as Contract;
+use Statamic\Events\Data\AssetFolderDeleted;
+use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
-use Statamic\Facades\AssetContainer;
-use Illuminate\Contracts\Support\Arrayable;
-use Statamic\Events\Data\AssetFolderDeleted;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Assets\AssetFolder as Contract;
 
 class AssetFolder implements Contract, Arrayable
 {
@@ -20,7 +20,7 @@ class AssetFolder implements Contract, Arrayable
 
     public static function find($reference)
     {
-        list($container, $path) = explode('::', $reference);
+        [$container, $path] = explode('::', $reference);
 
         return (new static)
             ->container(AssetContainer::find($container))
@@ -64,7 +64,7 @@ class AssetFolder implements Contract, Arrayable
 
     public function resolvedPath()
     {
-        return Path::tidy($this->container()->diskPath() . '/' . $this->path());
+        return Path::tidy($this->container()->diskPath().'/'.$this->path());
     }
 
     public function count()
@@ -108,10 +108,11 @@ class AssetFolder implements Contract, Arrayable
 
     public function save()
     {
-        $path = $this->path() . '/folder.yaml';
+        $path = $this->path().'/folder.yaml';
 
         if ($this->title === $this->computedTitle()) {
             $this->disk()->delete($path);
+
             return $this;
         }
 
@@ -148,7 +149,7 @@ class AssetFolder implements Contract, Arrayable
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function parent()
     {
@@ -163,7 +164,7 @@ class AssetFolder implements Contract, Arrayable
     }
 
     /**
-     * Get the folder represented as an array
+     * Get the folder represented as an array.
      *
      * @return array
      */

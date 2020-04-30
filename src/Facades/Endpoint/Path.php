@@ -2,17 +2,17 @@
 
 namespace Statamic\Facades\Endpoint;
 
-use Statamic\Support\Str;
 use League\Flysystem\Util;
 use Statamic\Facades\Pattern;
+use Statamic\Support\Str;
 
 /**
- * Everything to do with file paths
+ * Everything to do with file paths.
  */
 class Path
 {
     /**
-     * Makes a $path relative to the BASE
+     * Makes a $path relative to the BASE.
      *
      * @param string $path  The path to change
      * @return string
@@ -59,7 +59,7 @@ class Path
     }
 
     /**
-     * Makes a $path a valid URL
+     * Makes a $path a valid URL.
      *
      * @param string $path  The path to change
      * @return string
@@ -90,7 +90,7 @@ class Path
     }
 
     /**
-     * Cleans up a given $path, removing any flags and order keys (date-based or number-based)
+     * Cleans up a given $path, removing any flags and order keys (date-based or number-based).
      *
      * Assumes the path will always end with an extension.
      *
@@ -109,7 +109,7 @@ class Path
             // Skip the final segment (the basename) if it doesn't contain two periods.
             // This stops filenames like 404.md from being interpreted with 404 as
             // the order key, resulting in a borked filename.
-            if ($i+1 === $total_segments && substr_count($segment, '.') < 2) {
+            if ($i + 1 === $total_segments && substr_count($segment, '.') < 2) {
                 continue;
             }
 
@@ -120,7 +120,7 @@ class Path
     }
 
     /**
-     * Assembles a URL from an ordered list of segments
+     * Assembles a URL from an ordered list of segments.
      *
      * @param mixed string  Open ended number of arguments
      * @return string
@@ -164,7 +164,7 @@ class Path
     }
 
     /**
-     * Get the status of a $path
+     * Get the status of a $path.
      *
      * @param $path
      * @return string
@@ -231,7 +231,7 @@ class Path
     }
 
     /**
-     * Get the file extension
+     * Get the file extension.
      *
      * @param string $path
      * @return string|null
@@ -242,7 +242,7 @@ class Path
     }
 
     /**
-     * Removes the filename from a path
+     * Removes the filename from a path.
      *
      * eg. `foo/bar/baz/index.md` would return `foo/bar/baz`
      *
@@ -257,7 +257,7 @@ class Path
     }
 
     /**
-     * Get the folder of a path
+     * Get the folder of a path.
      *
      * eg. `foo/bar/baz/index.md` would return `baz`
      *
@@ -272,7 +272,7 @@ class Path
     }
 
     /**
-     * Remove the last segment of a path
+     * Remove the last segment of a path.
      *
      * eg. `foo/bar/baz/` would return `foo/bar`
      *
@@ -288,7 +288,7 @@ class Path
     }
 
     /**
-     * Swaps the slug of a $path with the $slug provided
+     * Swaps the slug of a $path with the $slug provided.
      *
      * @param string  $path  Path to modify
      * @param string  $slug  New slug to use
@@ -296,6 +296,6 @@ class Path
      */
     public function replaceSlug($path, $slug)
     {
-        return self::popLastSegment($path) . '/' . $slug;
+        return self::popLastSegment($path).'/'.$slug;
     }
 }

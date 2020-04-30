@@ -40,6 +40,7 @@ class CpServiceProvider extends ServiceProvider
         $this->app->extend('translator', function ($translator, $app) {
             $extended = new Translator($app['files'], $translator->getLoader(), $translator->getLocale());
             $extended->setFallback($translator->getFallback());
+
             return $extended;
         });
 

@@ -37,6 +37,7 @@ class Multisite extends Command
 
         if (! $confirmed) {
             $this->crossLine('Change the site handle in <comment>config/statamic/sites.php</comment> then try this command again.');
+
             return;
         }
 

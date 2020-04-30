@@ -2,8 +2,6 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\TagNotFoundException;
-
 class Loader
 {
     public function load($name, $properties)

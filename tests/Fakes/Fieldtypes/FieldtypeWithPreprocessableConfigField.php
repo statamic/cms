@@ -2,8 +2,8 @@
 
 namespace Tests\Fakes\Fieldtypes;
 
-use Statamic\Extend\Fieldtype;
 use Facades\Tests\Factories\FieldsetFactory;
+use Statamic\Extend\Fieldtype;
 
 class FieldtypeWithPreprocessableConfigField extends Fieldtype
 {

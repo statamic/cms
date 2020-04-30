@@ -2,9 +2,9 @@
 
 namespace Tests\Auth\Protect;
 
-use Tests\TestCase;
 use Statamic\Auth\Protect\Protectors\Fallback;
 use Symfony\Component\HttpKernel\Exception\HttpException;
+use Tests\TestCase;
 
 class FallbackProtectorTest extends TestCase
 {
@@ -16,12 +16,13 @@ class FallbackProtectorTest extends TestCase
     }
 
     /** @test */
-    function it_throws_403()
+    public function it_throws_403()
     {
         try {
             $this->protector->protect();
         } catch (HttpException $e) {
             $this->assertEquals(403, $e->getStatusCode());
+
             return;
         }
 

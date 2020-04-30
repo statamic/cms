@@ -2,14 +2,14 @@
 
 namespace Tests\Preferences;
 
-use Tests\TestCase;
 use Statamic\Preferences\HasPreferencesInProperty;
+use Tests\TestCase;
 
 class HasPreferencesInPropertyTraitTest extends TestCase
 {
     use HasPreferencesTests;
 
-    function makeUser()
+    public function makeUser()
     {
         return new class {
             use HasPreferencesInProperty;

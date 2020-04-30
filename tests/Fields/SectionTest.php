@@ -2,18 +2,16 @@
 
 namespace Tests\Fields;
 
-use Statamic\Facades;
-use Tests\TestCase;
+use Facades\Statamic\Fields\FieldRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Section;
-use Illuminate\Support\Collection;
-use Facades\Statamic\Fields\FieldRepository;
+use Tests\TestCase;
 
 class SectionTest extends TestCase
 {
     /** @test */
-    function it_gets_the_handle()
+    public function it_gets_the_handle()
     {
         $section = new Section('test');
 
@@ -21,13 +19,13 @@ class SectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_contents()
+    public function it_gets_contents()
     {
         $section = new Section('test');
         $this->assertEquals([], $section->contents());
 
         $contents = [
-            'fields' => ['one' => ['type' => 'text']]
+            'fields' => ['one' => ['type' => 'text']],
         ];
 
         $return = $section->setContents($contents);
@@ -37,17 +35,17 @@ class SectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_display_text()
+    public function it_gets_the_display_text()
     {
         $section = (new Section('test'))->setContents([
-            'display' => 'The Display Text'
+            'display' => 'The Display Text',
         ]);
 
         $this->assertEquals('The Display Text', $section->display());
     }
 
     /** @test */
-    function the_display_text_falls_back_to_a_humanized_handle()
+    public function the_display_text_falls_back_to_a_humanized_handle()
     {
         $section = new Section('the_section_handle');
 
@@ -55,7 +53,7 @@ class SectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_fields()
+    public function it_gets_fields()
     {
         $section = new Section('test');
         tap($section->fields(), function ($fields) {
@@ -74,13 +72,13 @@ class SectionTest extends TestCase
             'fields' => [
                 [
                     'handle' => 'one',
-                    'field' => 'fieldset_one.field_one'
+                    'field' => 'fieldset_one.field_one',
                 ],
                 [
                     'handle' => 'two',
-                    'field' => 'fieldset_one.field_two'
-                ]
-            ]
+                    'field' => 'fieldset_one.field_two',
+                ],
+            ],
         ]);
 
         tap($section->fields(), function ($fields) {
@@ -95,7 +93,7 @@ class SectionTest extends TestCase
     }
 
     /** @test */
-    function converts_to_array_suitable_for_rendering_fields_in_publish_component()
+    public function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_one')
@@ -111,7 +109,7 @@ class SectionTest extends TestCase
                 'type' => 'textarea',
                 'display' => 'Two',
                 'instructions' => 'Two instructions',
-                'validate' => 'min:2'
+                'validate' => 'min:2',
             ]));
 
         $section = (new Section('test'))->setContents([
@@ -120,13 +118,13 @@ class SectionTest extends TestCase
             'fields' => [
                 [
                     'handle' => 'one',
-                    'field' => 'fieldset_one.field_one'
+                    'field' => 'fieldset_one.field_one',
                 ],
                 [
                     'handle' => 'two',
-                    'field' => 'fieldset_one.field_two'
-                ]
-            ]
+                    'field' => 'fieldset_one.field_two',
+                ],
+            ],
         ]);
 
         $this->assertEquals([
@@ -157,8 +155,8 @@ class SectionTest extends TestCase
                     'validate' => 'min:2',
                     'character_limit' => null,
                     'component' => 'textarea',
-                ]
-            ]
+                ],
+            ],
         ], $section->toPublishArray());
     }
 }

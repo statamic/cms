@@ -2,21 +2,20 @@
 
 namespace Tests\Feature\Revisions;
 
-use Tests\TestCase;
-use Statamic\Facades\User;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Collection;
-use Illuminate\Support\Carbon;
-use Statamic\Revisions\Revision;
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Carbon;
+use Statamic\Facades\Collection;
+use Statamic\Facades\User;
+use Statamic\Revisions\Revision;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class RevisionsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function a_revision_can_be_made_from_an_entry()
+    public function a_revision_can_be_made_from_an_entry()
     {
         config(['statamic.revisions.path' => '/path/to']);
 

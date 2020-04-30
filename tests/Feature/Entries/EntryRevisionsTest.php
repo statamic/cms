@@ -2,21 +2,21 @@
 
 namespace Tests\Feature\Entries;
 
+use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Carbon;
 use Mockery;
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Statamic\Facades\User;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Folder;
-use Statamic\Fields\Fields;
-use Statamic\Facades\Collection;
+use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
-use Illuminate\Support\Carbon;
+use Statamic\Fields\Fields;
 use Statamic\Revisions\Revision;
 use Statamic\Revisions\WorkingCopy;
-use Facades\Tests\Factories\EntryFactory;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
-use Facades\Statamic\Fields\BlueprintRepository;
+use Tests\TestCase;
 
 class EntryRevisionsTest extends TestCase
 {
@@ -40,7 +40,7 @@ class EntryRevisionsTest extends TestCase
     }
 
     /** @test */
-    function it_publishes_an_entry()
+    public function it_publishes_an_entry()
     {
         $now = Carbon::parse('2017-02-03');
         Carbon::setTestNow($now);
@@ -91,7 +91,7 @@ class EntryRevisionsTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Title',
                 'foo' => 'foo modified in working copy',
-            ]
+            ],
         ], $revision->attributes());
         $this->assertEquals('user-1', $revision->user()->id());
         $this->assertEquals('Test!', $revision->message());
@@ -100,7 +100,7 @@ class EntryRevisionsTest extends TestCase
     }
 
     /** @test */
-    function it_unpublishes_an_entry()
+    public function it_unpublishes_an_entry()
     {
         $now = Carbon::parse('2017-02-03');
         Carbon::setTestNow($now);
@@ -145,7 +145,7 @@ class EntryRevisionsTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Title',
                 'foo' => 'bar',
-            ]
+            ],
         ], $revision->attributes());
         $this->assertEquals('user-1', $revision->user()->id());
         $this->assertEquals('Test!', $revision->message());
@@ -153,7 +153,7 @@ class EntryRevisionsTest extends TestCase
     }
 
     /** @test */
-    function it_creates_a_revision()
+    public function it_creates_a_revision()
     {
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
@@ -200,7 +200,7 @@ class EntryRevisionsTest extends TestCase
                 'blueprint' => 'test',
                 'title' => 'Title',
                 'foo' => 'foo modified in working copy',
-            ]
+            ],
         ], $revision->attributes());
         $this->assertEquals('user-1', $revision->user()->id());
         $this->assertEquals('Test!', $revision->message());
@@ -209,7 +209,7 @@ class EntryRevisionsTest extends TestCase
     }
 
     /** @test */
-    function it_restores_a_published_entrys_working_copy_to_another_revision()
+    public function it_restores_a_published_entrys_working_copy_to_another_revision()
     {
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
@@ -221,7 +221,7 @@ class EntryRevisionsTest extends TestCase
             ->attributes([
                 'published' => false,
                 'slug' => 'existing-slug',
-                'data' => ['foo' => 'existing foo']
+                'data' => ['foo' => 'existing foo'],
             ]))->save();
 
         WorkingCopy::fromRevision($revision)->save();
@@ -264,7 +264,7 @@ class EntryRevisionsTest extends TestCase
     }
 
     /** @test */
-    function it_restores_an_unpublished_entrys_contents_to_another_revision()
+    public function it_restores_an_unpublished_entrys_contents_to_another_revision()
     {
         $this->setTestBlueprint('test', ['foo' => ['type' => 'text']]);
         $this->setTestRoles(['test' => ['access cp', 'edit blog entries']]);
@@ -276,7 +276,7 @@ class EntryRevisionsTest extends TestCase
             ->attributes([
                 'published' => true,
                 'slug' => 'existing-slug',
-                'data' => ['foo' => 'existing foo']
+                'data' => ['foo' => 'existing foo'],
             ]))->save();
 
         WorkingCopy::fromRevision($revision)->save();

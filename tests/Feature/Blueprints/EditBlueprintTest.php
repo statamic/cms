@@ -3,12 +3,10 @@
 namespace Tests\Feature\Blueprints;
 
 use Statamic\Facades;
-use Tests\TestCase;
-use Tests\FakesRoles;
 use Statamic\Fields\Blueprint;
-use Tests\Fakes\FakeBlueprintRepository;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
-use Facades\Statamic\Fields\BlueprintRepository;
+use Tests\TestCase;
 
 class EditBlueprintTest extends TestCase
 {
@@ -16,7 +14,7 @@ class EditBlueprintTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();
@@ -31,7 +29,7 @@ class EditBlueprintTest extends TestCase
     }
 
     /** @test */
-    function it_provides_the_blueprint()
+    public function it_provides_the_blueprint()
     {
         $this->withoutExceptionHandling();
         $user = Facades\User::make()->makeSuper()->save();

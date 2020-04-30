@@ -2,8 +2,8 @@
 
 namespace Statamic\Auth;
 
-use Statamic\Facades;
 use Statamic\Contracts\Auth\Role as RoleContract;
+use Statamic\Facades;
 
 abstract class Role implements RoleContract
 {

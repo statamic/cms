@@ -14,7 +14,7 @@ class ListAssetContainersTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_lists_containers_you_have_access_to_when_requested_as_json()
+    public function it_lists_containers_you_have_access_to_when_requested_as_json()
     {
         $this->setTestRoles(['test' => ['access cp', 'view two assets', 'view three assets']]);
         $user = User::make()->assignRole('test')->save();
@@ -30,7 +30,7 @@ class ListAssetContainersTest extends TestCase
     }
 
     /** @test */
-    function it_loads_a_view_when_requested_normally()
+    public function it_loads_a_view_when_requested_normally()
     {
         $this->setTestRoles(['test' => ['access cp', 'view two assets', 'view three assets']]);
         $user = User::make()->assignRole('test')->save();
@@ -46,7 +46,7 @@ class ListAssetContainersTest extends TestCase
             ->assertViewHas('containers', $this->containerArray());
     }
 
-    function containerArray()
+    public function containerArray()
     {
         return [
             [

@@ -2,8 +2,8 @@
 
 namespace Statamic\Tags\Concerns;
 
-use Statamic\Support\Arr;
 use Statamic\Query\OrderBy;
+use Statamic\Support\Arr;
 
 trait QueriesOrderBys
 {

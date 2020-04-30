@@ -2,10 +2,10 @@
 
 namespace Tests\Imaging;
 
-use Tests\TestCase;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Imaging\GlideUrlBuilder;
+use Tests\TestCase;
 
 class GlideUrlBuilderTest extends TestCase
 {
@@ -20,7 +20,7 @@ class GlideUrlBuilderTest extends TestCase
 
         $this->builder = new GlideUrlBuilder([
             'key' => null,
-            'route' => 'img'
+            'route' => 'img',
         ]);
     }
 

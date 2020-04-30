@@ -2,14 +2,14 @@
 
 namespace Tests\Auth\Eloquent;
 
-use Tests\TestCase;
 use Faker\Generator as Faker;
+use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Support\Carbon;
+use Statamic\Auth\Eloquent\User as EloquentUser;
 use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
-use Illuminate\Database\Eloquent\Factory;
 use Tests\Preferences\HasPreferencesTests;
-use Statamic\Auth\Eloquent\User as EloquentUser;
+use Tests\TestCase;
 
 class EloquentUserTest extends TestCase
 {
@@ -25,7 +25,7 @@ class EloquentUserTest extends TestCase
 
         // TODO: The migration has been added into the test, but the implementation could be broken if the real
         // migration is different from what's in here. We should find a way to reference the actual migrations.
-        $this->loadMigrationsFrom(__DIR__ . '/__migrations__');
+        $this->loadMigrationsFrom(__DIR__.'/__migrations__');
 
         app(Factory::class)->define(User::class, function (Faker $faker) {
             return [
@@ -37,17 +37,18 @@ class EloquentUserTest extends TestCase
         });
     }
 
-    function makeUser() {
+    public function makeUser()
+    {
         return (new EloquentUser)
             ->model(factory(User::class)->create());
     }
 
-    function createPermissible()
+    public function createPermissible()
     {
         return $this->makeUser();
     }
 
-    function additionalToArrayValues()
+    public function additionalToArrayValues()
     {
         return [
             'created_at' => Carbon::parse('2019-11-21 23:39:29'),
@@ -55,7 +56,7 @@ class EloquentUserTest extends TestCase
         ];
     }
 
-    function additionalDataValues()
+    public function additionalDataValues()
     {
         $lt7 = version_compare(app()->version(), 7, '<');
 

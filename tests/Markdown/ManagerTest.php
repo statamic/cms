@@ -17,7 +17,7 @@ class ManagerTest extends TestCase
     }
 
     /** @test */
-    function it_forwards_calls_to_default_parser()
+    public function it_forwards_calls_to_default_parser()
     {
         $manager = new Manager;
         $manager->extend('default', function () {
@@ -28,7 +28,7 @@ class ManagerTest extends TestCase
     }
 
     /** @test */
-    function it_makes_a_new_parser_instance()
+    public function it_makes_a_new_parser_instance()
     {
         $manager = new Manager;
         $parser = $manager->makeParser($config = ['foo' => 'bar']);
@@ -39,7 +39,7 @@ class ManagerTest extends TestCase
     }
 
     /** @test */
-    function parser_instances_can_be_saved_and_retrieved()
+    public function parser_instances_can_be_saved_and_retrieved()
     {
         $manager = new Manager;
 
@@ -64,10 +64,10 @@ class ManagerTest extends TestCase
     }
 
     /** @test */
-    function it_throws_an_exception_if_extending_without_returning_a_parser()
+    public function it_throws_an_exception_if_extending_without_returning_a_parser()
     {
         $this->expectException(UnexpectedValueException::class);
-        $this->expectExceptionMessage('A ' . Parser::class . ' instance is expected.');
+        $this->expectExceptionMessage('A '.Parser::class.' instance is expected.');
 
         (new Manager)->extend('a', function ($parser) {
             //

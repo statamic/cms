@@ -2,13 +2,13 @@
 
 namespace Statamic\Http\Controllers\CP\Updater;
 
-use Statamic\Statamic;
-use Statamic\Facades\Addon;
-use Illuminate\Http\Request;
-use Statamic\Updater\Updater;
-use Statamic\Updater\Changelog;
-use Statamic\Http\Controllers\CP\CpController;
 use Facades\Statamic\Console\Processes\Composer;
+use Illuminate\Http\Request;
+use Statamic\Facades\Addon;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Statamic;
+use Statamic\Updater\Changelog;
+use Statamic\Updater\Updater;
 
 class UpdateProductController extends CpController
 {
@@ -32,7 +32,7 @@ class UpdateProductController extends CpController
         }
 
         return view('statamic::updater.show', array_merge($data, [
-            'slug' => $product
+            'slug' => $product,
         ]));
     }
 

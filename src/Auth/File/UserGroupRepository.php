@@ -4,9 +4,9 @@ namespace Statamic\Auth\File;
 
 use Illuminate\Support\Collection;
 use Statamic\Auth\UserGroupRepository as BaseRepository;
+use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Facades;
 use Statamic\Facades\File;
-use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
 use Statamic\Facades\YAML;
 
 class UserGroupRepository extends BaseRepository
@@ -48,7 +48,7 @@ class UserGroupRepository extends BaseRepository
 
         $groups->put($group->handle(), array_filter([
             'title' => $group->title(),
-            'roles' => $group->roles()->map->handle()->values()->all()
+            'roles' => $group->roles()->map->handle()->values()->all(),
         ]));
 
         if ($group->handle() !== $group->originalHandle()) {

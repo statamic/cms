@@ -20,8 +20,8 @@ class Radio extends Fieldtype
                 'display' => __('Inline'),
                 'instructions' => __('statamic::fieldtypes.radio.config.inline'),
                 'type' => 'toggle',
-                'width' => 50
-            ]
+                'width' => 50,
+            ],
         ];
     }
 

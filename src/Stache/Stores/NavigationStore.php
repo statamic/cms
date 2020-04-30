@@ -7,7 +7,6 @@ use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
-use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class NavigationStore extends BasicStore
@@ -22,6 +21,7 @@ class NavigationStore extends BasicStore
         // The structures themselves should only exist in the root
         // (ie. no slashes in the filename)
         $filename = str_after(Path::tidy($file->getPathName()), $this->directory);
+
         return substr_count($filename, '/') === 0 && $file->getExtension() === 'yaml';
     }
 
@@ -35,8 +35,9 @@ class NavigationStore extends BasicStore
         if (Site::hasMultiple() && str_contains($relative, '/')) {
             [$site, $relative] = explode('/', $relative, 2);
             $handle = str_before($relative, '.yaml');
-            $path = $this->directory . $handle . '.yaml';
+            $path = $this->directory.$handle.'.yaml';
             $data = YAML::file($path)->parse();
+
             return $this->makeMultiSiteStructureFromFile($handle, $path, $data);
         }
 
@@ -66,7 +67,7 @@ class NavigationStore extends BasicStore
         $structure = $this->makeBaseStructureFromFile($handle, $path, $data);
 
         Site::all()->filter(function ($site) use ($handle) {
-            return File::exists($this->directory . $site->handle() . '/' . $handle . '.yaml');
+            return File::exists($this->directory.$site->handle().'/'.$handle.'.yaml');
         })->map->handle()->map(function ($site) use ($structure) {
             return $this->makeTree($structure, $site);
         })->filter()->each(function ($variables) use ($structure) {

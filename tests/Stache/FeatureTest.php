@@ -3,24 +3,18 @@
 namespace Tests\Stache;
 
 use Mockery;
-use Tests\TestCase;
-use Statamic\Facades\Data;
-use Statamic\Facades\User;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Taxonomy;
-use Statamic\Facades\GlobalSet;
-use Statamic\Facades\Structure;
-use Statamic\Stache\Stache;
-use Statamic\Facades\Collection;
-use Statamic\Stache\Fakes\YAML;
-use Statamic\Facades\AssetContainer;
-use Illuminate\Support\Facades\Cache;
-use Statamic\Stache\Stores\BasicStore;
-use Statamic\Stache\Stores\EntriesStore;
-use Statamic\Stache\Stores\AggregateStore;
-use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Contracts\Structures\StructureRepository;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Data;
+use Statamic\Facades\Entry;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Structure;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\User;
+use Statamic\Stache\Stache;
+use Tests\TestCase;
 
 class FeatureTest extends TestCase
 {
@@ -30,24 +24,24 @@ class FeatureTest extends TestCase
 
         $this->stache = tap($this->app->make('stache'), function ($stache) {
             $dir = __DIR__.'/__fixtures__';
-            $stache->store('taxonomies')->directory($dir . '/content/taxonomies');
-            $stache->store('collections')->directory($dir . '/content/collections');
-            $stache->store('entries')->directory($dir . '/content/collections');
-            $stache->store('navigation')->directory($dir . '/content/navigation');
-            $stache->store('globals')->directory($dir . '/content/globals');
-            $stache->store('asset-containers')->directory($dir . '/content/assets');
-            $stache->store('users')->directory($dir . '/users');
+            $stache->store('taxonomies')->directory($dir.'/content/taxonomies');
+            $stache->store('collections')->directory($dir.'/content/collections');
+            $stache->store('entries')->directory($dir.'/content/collections');
+            $stache->store('navigation')->directory($dir.'/content/navigation');
+            $stache->store('globals')->directory($dir.'/content/globals');
+            $stache->store('asset-containers')->directory($dir.'/content/assets');
+            $stache->store('users')->directory($dir.'/users');
         });
     }
 
     /** @test */
-    function it_gets_all_collections()
+    public function it_gets_all_collections()
     {
         $this->assertEquals(4, Collection::all()->count());
     }
 
     /** @test */
-    function it_gets_all_entries()
+    public function it_gets_all_entries()
     {
         $this->assertEquals(14, Entry::all()->count());
         $this->assertEquals(3, Entry::whereCollection('alphabetical')->count());
@@ -58,7 +52,7 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entry()
+    public function it_gets_entry()
     {
         $entry = Entry::find('blog-christmas');
         $this->assertEquals('Christmas', $entry->get('title'));
@@ -70,25 +64,25 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entry_by_slug()
+    public function it_gets_entry_by_slug()
     {
         $this->assertEquals('Christmas', Entry::findBySlug('christmas', 'blog', 'christmas')->get('title'));
     }
 
     /** @test */
-    function it_gets_all_taxonomies()
+    public function it_gets_all_taxonomies()
     {
         $this->assertEquals(2, Taxonomy::all()->count());
     }
 
     /** @test */
-    function it_gets_all_globals()
+    public function it_gets_all_globals()
     {
         $this->assertEquals(2, GlobalSet::all()->count());
     }
 
     /** @test */
-    function it_gets_globals()
+    public function it_gets_globals()
     {
         $global = GlobalSet::find('global');
         $this->assertEquals('Bar', $global->in('en')->get('foo'));
@@ -98,26 +92,26 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
-    function it_gets_asset_containers()
+    public function it_gets_asset_containers()
     {
         $this->assertEquals(2, AssetContainer::all()->count());
     }
 
     /** @test */
-    function it_gets_an_asset_container()
+    public function it_gets_an_asset_container()
     {
         $this->assertEquals('Main Assets', AssetContainer::find('main')->title());
         $this->assertEquals('Another Asset Container', AssetContainer::find('another')->title());
     }
 
     /** @test */
-    function it_gets_users()
+    public function it_gets_users()
     {
         $this->assertEquals(2, User::all()->count());
     }
 
     /** @test */
-    function it_gets_a_user()
+    public function it_gets_a_user()
     {
         $user = User::find('users-john');
         $this->assertEquals('users-john', $user->id());
@@ -128,7 +122,7 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
-    function it_gets_an_entry_by_uri()
+    public function it_gets_an_entry_by_uri()
     {
         $entry = Entry::findByUri('/numeric/two');
         $this->assertInstanceOf(\Statamic\Contracts\Entries\Entry::class, $entry);
@@ -139,7 +133,7 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
-    function it_gets_an_entry_in_structure_by_uri()
+    public function it_gets_an_entry_in_structure_by_uri()
     {
         $entry = Entry::findByUri('/about/board/directors');
         $this->assertInstanceOf(\Statamic\Structures\Page::class, $entry);
@@ -148,19 +142,19 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
-    function it_returns_null_when_cannot_find_entry_by_uri()
+    public function it_returns_null_when_cannot_find_entry_by_uri()
     {
         $this->assertNull(Entry::findByUri('/unknown'));
     }
 
     /** @test */
-    function it_gets_structures()
+    public function it_gets_structures()
     {
         $this->assertEquals(3, Structure::all()->count());
     }
 
     /** @test */
-    function it_gets_a_structure()
+    public function it_gets_a_structure()
     {
         $structure = Structure::find('footer');
         $this->assertEquals('footer', $structure->handle());
@@ -168,13 +162,13 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
-    function it_gets_navs()
+    public function it_gets_navs()
     {
         $this->assertEquals(2, Nav::all()->count());
     }
 
     /** @test */
-    function it_gets_a_nav()
+    public function it_gets_a_nav()
     {
         $structure = Nav::find('footer');
         $this->assertEquals('footer', $structure->handle());
@@ -182,14 +176,14 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_collection_structure()
+    public function it_gets_a_collection_structure()
     {
         $structure = Structure::find('collection::pages');
         $this->assertEquals('collection::pages', $structure->handle());
     }
 
     /** @test */
-    function it_saves_structures()
+    public function it_saves_structures()
     {
         $structure = Structure::find('footer');
 
@@ -201,7 +195,7 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
-    function saving_a_collection_writes_it_to_file()
+    public function saving_a_collection_writes_it_to_file()
     {
         Collection::make('new')
             ->title('New Collection')
@@ -218,9 +212,8 @@ class FeatureTest extends TestCase
         @unlink($path);
     }
 
-
     /** @test */
-    function saving_an_asset_container_writes_it_to_file()
+    public function saving_an_asset_container_writes_it_to_file()
     {
         AssetContainer::make('new')->title('New Container')->save();
 
@@ -232,7 +225,7 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
-    function saving_a_taxonomy_writes_it_to_file()
+    public function saving_a_taxonomy_writes_it_to_file()
     {
         Taxonomy::make('new')->title('New Taxonomy')->save();
 
@@ -244,7 +237,7 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
-    function saving_a_global_set_writes_it_to_file()
+    public function saving_a_global_set_writes_it_to_file()
     {
         $global = GlobalSet::make('new')->title('New Global Set');
 
@@ -262,7 +255,7 @@ class FeatureTest extends TestCase
     }
 
     /** @test */
-    function saving_an_entry_writes_it_to_file()
+    public function saving_an_entry_writes_it_to_file()
     {
         $entry = tap(Entry::make()
             ->locale('en')

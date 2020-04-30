@@ -2,14 +2,13 @@
 
 namespace Statamic\Revisions;
 
-use Statamic\Facades;
-use Illuminate\Support\Carbon;
-use Statamic\Data\ExistsAsFile;
-use Statamic\Facades\Revision as Revisions;
-use Statamic\Contracts\Auth\User;
 use Illuminate\Contracts\Support\Arrayable;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
+use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Revisions\Revision as Contract;
+use Statamic\Data\ExistsAsFile;
+use Statamic\Facades;
+use Statamic\Facades\Revision as Revisions;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Revision implements Contract, Arrayable
 {
@@ -90,7 +89,7 @@ class Revision implements Contract, Arrayable
         return vsprintf('%s/%s/%s.yaml', [
             Revisions::directory(),
             $this->key(),
-            $this->date()->timestamp
+            $this->date()->timestamp,
         ]);
     }
 

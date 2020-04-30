@@ -14,7 +14,7 @@ class FieldsetController extends CpController
 {
     public function __construct()
     {
-        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class . ':configure fields');
+        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
     }
 
     public function index(Request $request)
@@ -46,12 +46,12 @@ class FieldsetController extends CpController
             'handle' => $fieldset->handle(),
             'fields' => collect(Arr::get($fieldset->contents(), 'fields'))->map(function ($field, $i) {
                 return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
-            })->all()
+            })->all(),
         ];
 
         return view('statamic::fieldsets.edit', [
             'fieldset' => $fieldset,
-            'fieldsetVueObject' => $vue
+            'fieldsetVueObject' => $vue,
         ]);
     }
 
@@ -68,7 +68,7 @@ class FieldsetController extends CpController
             'title' => $request->title,
             'fields' => collect($request->fields)->map(function ($field) {
                 return FieldTransformer::fromVue($field);
-            })->all()
+            })->all(),
         ])->save();
 
         return response('', 204);
@@ -95,7 +95,7 @@ class FieldsetController extends CpController
             ->setHandle($handle)
             ->setContents([
                 'title' => $request->title,
-                'fields' => []
+                'fields' => [],
             ])->save();
 
         return redirect($fieldset->editUrl())->with('success', __('Fieldset created'));
@@ -113,7 +113,7 @@ class FieldsetController extends CpController
     }
 
     /**
-     * Quickly create a new barebones fieldset from within the fieldtype
+     * Quickly create a new barebones fieldset from within the fieldtype.
      *
      * @return array
      */
@@ -127,7 +127,7 @@ class FieldsetController extends CpController
 
         $fieldset = (new Fieldset)->setHandle($handle)->setContents([
             'title' => $request->title,
-            'fields' => []
+            'fields' => [],
         ])->save();
 
         return ['success' => true];

@@ -3,8 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Statamic\Facades\Term;
-use Statamic\Facades\Action;
-use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\ActionController;
 
 class TermActionController extends ActionController

@@ -7,21 +7,21 @@ use Symfony\Component\HttpFoundation\File\UploadedFile;
 interface Asset
 {
     /**
-     * Get the filename
+     * Get the filename.
      *
      * @return string
      */
     public function filename();
 
     /**
-     * Get the basename
+     * Get the basename.
      *
      * @return string
      */
     public function basename();
 
     /**
-     * Get or set the container
+     * Get or set the container.
      *
      * @param AssetContainer|string $container  An asset container instance, or the handle of one.
      * @return AssetContainer
@@ -29,7 +29,7 @@ interface Asset
     public function container($container = null);
 
     /**
-     * Get the URL
+     * Get the URL.
      *
      * @return string
      */
@@ -51,21 +51,21 @@ interface Asset
     public function isImage();
 
     /**
-     * Get the file extension
+     * Get the file extension.
      *
      * @return string
      */
     public function extension();
 
     /**
-     * Get the last modified date
+     * Get the last modified date.
      *
      * @return \Carbon\Carbon
      */
     public function lastModified();
 
     /**
-     * Upload a file
+     * Upload a file.
      *
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
      * @return mixed

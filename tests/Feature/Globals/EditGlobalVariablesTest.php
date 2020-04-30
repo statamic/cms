@@ -15,7 +15,7 @@ class EditGlobalVariablesTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test')->save();
@@ -30,7 +30,7 @@ class EditGlobalVariablesTest extends TestCase
     }
 
     /** @test */
-    function it_shows_the_form()
+    public function it_shows_the_form()
     {
         $blueprint = Blueprint::make()->setContents(['fields' => [
             ['handle' => 'foo', 'field' => ['type' => 'text']],

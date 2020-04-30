@@ -2,12 +2,12 @@
 
 namespace Statamic\Search\Algolia;
 
+use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
+use Algolia\AlgoliaSearch\SearchClient;
+use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Arr;
 use Statamic\Search\Documents;
-use Algolia\AlgoliaSearch\SearchClient;
 use Statamic\Search\Index as BaseIndex;
-use GuzzleHttp\Exception\ConnectException;
-use Algolia\AlgoliaSearch\Exceptions\AlgoliaException;
 
 class Index extends BaseIndex
 {
@@ -29,6 +29,7 @@ class Index extends BaseIndex
     {
         $documents = $documents->map(function ($item, $id) {
             $item['objectID'] = $id;
+
             return $item;
         })->values();
 
@@ -70,6 +71,7 @@ class Index extends BaseIndex
 
         return collect($response['hits'])->map(function ($hit) {
             $hit['id'] = $hit['objectID'];
+
             return $hit;
         });
     }

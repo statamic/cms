@@ -194,7 +194,8 @@ class Fields
 
         if ($prefix = array_get($config, 'prefix')) {
             $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
-                $handle = $prefix . $field->handle();
+                $handle = $prefix.$field->handle();
+
                 return [$handle => $field->setHandle($handle)];
             });
         }

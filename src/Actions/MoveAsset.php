@@ -58,7 +58,7 @@ class MoveAsset extends Action
                 'type' => 'select',
                 'options' => $options,
                 'validate' => 'required',
-            ]
+            ],
         ];
     }
 }

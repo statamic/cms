@@ -10,7 +10,7 @@ class PhpInfoController extends CpController
     public function __invoke(Request $request)
     {
         return view('statamic::utilities.phpinfo', [
-            'phpinfo' => $this->phpinfo()
+            'phpinfo' => $this->phpinfo(),
         ]);
     }
 
@@ -59,11 +59,11 @@ class PhpInfoController extends CpController
             if (preg_match_all('#%S%(?:<td>(.*?)</td>)?(?:<td>(.*?)</td>)?(?:<td>(.*?)</td>)?%E%#', $section, $matches, PREG_SET_ORDER) !== 0) {
                 /** @var array[] $matches */
                 foreach ($matches as $row) {
-                    if (!isset($row[2])) {
+                    if (! isset($row[2])) {
                         continue;
                     }
 
-                    if (!isset($row[3]) || $row[2] === $row[3]) {
+                    if (! isset($row[3]) || $row[2] === $row[3]) {
                         $value = $row[2];
                     } else {
                         $value = array_slice($row, 2);
@@ -94,7 +94,7 @@ class PhpInfoController extends CpController
             foreach ($value as $n => &$v) {
                 $v = $this->redactIfSensitive($n, $v);
             }
-        } else if (
+        } elseif (
             is_string($value) &&
             preg_match('/\b('.implode('|', $sensitiveKeywords).')\b/', $this->camelToWords($name, false))
         ) {

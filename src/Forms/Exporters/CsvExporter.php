@@ -2,8 +2,8 @@
 
 namespace Statamic\Forms\Exporters;
 
-use SplTempFileObject;
 use League\Csv\Writer;
+use SplTempFileObject;
 
 class CsvExporter extends AbstractExporter
 {
@@ -13,7 +13,7 @@ class CsvExporter extends AbstractExporter
     private $writer;
 
     /**
-     * Create a new CsvExporter
+     * Create a new CsvExporter.
      */
     public function __construct()
     {
@@ -21,7 +21,7 @@ class CsvExporter extends AbstractExporter
     }
 
     /**
-     * Perform the export
+     * Perform the export.
      *
      * @return string
      */
@@ -35,7 +35,7 @@ class CsvExporter extends AbstractExporter
     }
 
     /**
-     * Insert the headers into the CSV
+     * Insert the headers into the CSV.
      */
     private function insertHeaders()
     {
@@ -47,7 +47,7 @@ class CsvExporter extends AbstractExporter
     }
 
     /**
-     * Insert the submission data into the CSV
+     * Insert the submission data into the CSV.
      */
     private function insertData()
     {

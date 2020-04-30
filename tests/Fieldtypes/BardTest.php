@@ -2,14 +2,14 @@
 
 namespace Tests\Fieldtypes;
 
-use Tests\TestCase;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Bard;
+use Tests\TestCase;
 
 class BardTest extends TestCase
 {
     /** @test */
-    function it_augments_prosemirror_structure_to_a_template_friendly_array()
+    public function it_augments_prosemirror_structure_to_a_template_friendly_array()
     {
         $data = [
             [
@@ -19,7 +19,7 @@ class BardTest extends TestCase
                         'type' => 'image',
                         'image' => 'test.jpg',
                         'caption' => 'test',
-                    ]
+                    ],
                 ],
             ],
             [
@@ -30,7 +30,7 @@ class BardTest extends TestCase
                     ['type' => 'text', 'text' => ' and '],
                     ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
                     ['type' => 'text', 'text' => ' text.'],
-                ]
+                ],
             ],
             [
                 'type' => 'paragraph',
@@ -42,15 +42,15 @@ class BardTest extends TestCase
                         'type' => 'image',
                         'image' => 'test.jpg',
                         'caption' => 'test',
-                    ]
+                    ],
                 ],
             ],
             [
                 'type' => 'paragraph',
                 'content' => [
-                    ['type' => 'text', 'text' => 'Another paragraph.']
-                ]
-            ]
+                    ['type' => 'text', 'text' => 'Another paragraph.'],
+                ],
+            ],
         ];
 
         $expected = [
@@ -71,20 +71,20 @@ class BardTest extends TestCase
             [
                 'type' => 'text',
                 'text' => '<p>Another paragraph.</p>',
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $this->bard()->augment($data));
     }
 
     /** @test */
-    function it_doesnt_augment_when_saved_as_html()
+    public function it_doesnt_augment_when_saved_as_html()
     {
         $this->assertEquals('<p>Paragraph</p>', $this->bard()->augment('<p>Paragraph</p>'));
     }
 
     /** @test */
-    function it_augments_to_html_when_there_are_no_sets()
+    public function it_augments_to_html_when_there_are_no_sets()
     {
         $data = [
             [
@@ -95,8 +95,8 @@ class BardTest extends TestCase
                     ['type' => 'text', 'text' => ' and '],
                     ['type' => 'text', 'marks' => [['type' => 'italic']], 'text' => 'italic'],
                     ['type' => 'text', 'text' => ' text.'],
-                ]
-            ]
+                ],
+            ],
         ];
 
         $expected = '<p>This is a paragraph with <strong>bold</strong> and <em>italic</em> text.</p>';
@@ -106,24 +106,24 @@ class BardTest extends TestCase
     }
 
     /** @test */
-    function augmenting_an_empty_value_when_not_using_sets_returns_null()
+    public function augmenting_an_empty_value_when_not_using_sets_returns_null()
     {
         $this->assertNull($this->bard(['sets' => null])->augment(null));
     }
 
     /** @test */
-    function augmenting_an_empty_value_when_using_sets_returns_an_empty_array()
+    public function augmenting_an_empty_value_when_using_sets_returns_an_empty_array()
     {
         $this->assertSame([], $this->bard(['sets' => ['one' => []]])->augment(null));
     }
 
     /** @test */
-    function it_removes_disabled_sets()
+    public function it_removes_disabled_sets()
     {
         $data = [
             [
                 'type' => 'paragraph',
-                'content' => [['type' => 'text', 'text' => 'This is a paragraph.']]
+                'content' => [['type' => 'text', 'text' => 'This is a paragraph.']],
             ],
             [
                 'type' => 'set',
@@ -132,7 +132,7 @@ class BardTest extends TestCase
                     'values' => [
                         'type' => 'test',
                         'value' => 'one',
-                    ]
+                    ],
                 ],
             ],
             [
@@ -141,15 +141,15 @@ class BardTest extends TestCase
                     'values' => [
                         'type' => 'test',
                         'value' => 'two',
-                    ]
+                    ],
                 ],
             ],
             [
                 'type' => 'paragraph',
                 'content' => [
-                    ['type' => 'text', 'text' => 'Another paragraph.']
-                ]
-            ]
+                    ['type' => 'text', 'text' => 'Another paragraph.'],
+                ],
+            ],
         ];
 
         $expected = [
@@ -164,14 +164,14 @@ class BardTest extends TestCase
             [
                 'type' => 'text',
                 'text' => '<p>Another paragraph.</p>',
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $this->bard()->augment($data));
     }
 
     /** @test */
-    function it_converts_plain_html_into_prosemirror_structure()
+    public function it_converts_plain_html_into_prosemirror_structure()
     {
         $data = '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>';
 
@@ -182,13 +182,13 @@ class BardTest extends TestCase
                     ['type' => 'text', 'text' => 'This is a paragraph with '],
                     ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
                     ['type' => 'text', 'text' => ' text.'],
-                ]
+                ],
             ],
             [
                 'type' => 'paragraph',
                 'content' => [
                     ['type' => 'text', 'text' => 'Second paragraph.'],
-                ]
+                ],
             ],
         ];
 
@@ -196,7 +196,7 @@ class BardTest extends TestCase
     }
 
     /** @test */
-    function it_detects_v2_formatted_content()
+    public function it_detects_v2_formatted_content()
     {
         $textOnly = [
             ['type' => 'text', 'text' => '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>'],
@@ -237,7 +237,7 @@ class BardTest extends TestCase
             'sets' => [
                 'one' => [],
                 'two' => [],
-            ]
+            ],
         ]));
 
         $this->assertTrue($bard->isLegacyData($textOnly));
@@ -250,7 +250,7 @@ class BardTest extends TestCase
     }
 
     /** @test */
-    function it_transforms_v2_formatted_content_into_prosemirror_structure()
+    public function it_transforms_v2_formatted_content_into_prosemirror_structure()
     {
         $data = [
             ['type' => 'text', 'text' => '<p>This is a paragraph with <strong>bold</strong> text.</p><p>Second paragraph.</p>'],
@@ -265,13 +265,13 @@ class BardTest extends TestCase
                     ['type' => 'text', 'text' => 'This is a paragraph with '],
                     ['type' => 'text', 'marks' => [['type' => 'bold']], 'text' => 'bold'],
                     ['type' => 'text', 'text' => ' text.'],
-                ]
+                ],
             ],
             [
                 'type' => 'paragraph',
                 'content' => [
                     ['type' => 'text', 'text' => 'Second paragraph.'],
-                ]
+                ],
             ],
             [
                 'type' => 'set',
@@ -282,28 +282,28 @@ class BardTest extends TestCase
                         'type' => 'myset',
                         'foo' => 'bar',
                         'baz' => 'qux',
-                    ]
+                    ],
                 ],
             ],
             [
                 'type' => 'paragraph',
                 'content' => [
-                    ['type' => 'text', 'text' => 'Another paragraph.']
-                ]
-            ]
+                    ['type' => 'text', 'text' => 'Another paragraph.'],
+                ],
+            ],
         ];
 
         $bard = $this->bard([
             'sets' => [
                 'myset' => [],
-            ]
+            ],
         ]);
 
         $this->assertEquals($expected, json_decode($bard->preProcess($data), true));
     }
 
     /** @test */
-    function it_transforms_v2_formatted_content_with_only_sets_into_prosemirror_structure()
+    public function it_transforms_v2_formatted_content_with_only_sets_into_prosemirror_structure()
     {
         $data = [
             ['type' => 'myset', 'foo' => 'bar', 'baz' => 'qux'],
@@ -319,7 +319,7 @@ class BardTest extends TestCase
                         'type' => 'myset',
                         'foo' => 'bar',
                         'baz' => 'qux',
-                    ]
+                    ],
                 ],
             ],
         ];
@@ -328,7 +328,7 @@ class BardTest extends TestCase
         $bard->setField(new Field('test', [
             'sets' => [
                 'myset' => [],
-            ]
+            ],
         ]));
 
         $this->assertEquals($expected, json_decode($bard->preProcess($data), true));

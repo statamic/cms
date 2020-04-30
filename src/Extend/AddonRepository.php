@@ -2,8 +2,6 @@
 
 namespace Statamic\Extend;
 
-use Statamic\Extend\Manifest;
-
 class AddonRepository
 {
     /**

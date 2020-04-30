@@ -18,7 +18,7 @@ use Tests\Data\AugmentedTestCase;
 class AugmentedEntryTest extends AugmentedTestCase
 {
     /** @test */
-    function it_has_a_parent_method()
+    public function it_has_a_parent_method()
     {
         $entry = Mockery::mock(Entry::class);
         $entry->shouldReceive('parent')->andReturn('the parent');
@@ -29,7 +29,7 @@ class AugmentedEntryTest extends AugmentedTestCase
     }
 
     /** @test */
-    function it_gets_values()
+    public function it_gets_values()
     {
         Carbon::setTestNow('2020-04-15 13:00:00');
         config(['statamic.amp.enabled' => true]);
@@ -38,7 +38,7 @@ class AugmentedEntryTest extends AugmentedTestCase
             'two' => ['type' => 'text'],
             'four' => ['type' => 'text'],
             'six' => ['type' => 'text'],
-            'unused_in_bp' => ['type' => 'text']
+            'unused_in_bp' => ['type' => 'text'],
         ]);
         Blueprint::shouldReceive('find')->with('test')->andReturn($blueprint);
 
@@ -65,7 +65,7 @@ class AugmentedEntryTest extends AugmentedTestCase
                 'one' => 'the "one" value on the entry',
                 'two' => 'the "two" value on the entry and in the blueprint',
                 'updated_by' => 'test-user',
-                'updated_at' => '1486131000'
+                'updated_at' => '1486131000',
             ])
             ->create();
 

@@ -7,10 +7,8 @@ use Illuminate\Support\Carbon;
 use Mockery;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
-use Statamic\Facades\Collection;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
-use Statamic\Stache\Stores\CollectionEntriesStore;
 use Statamic\Stache\Stores\EntriesStore;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -19,7 +17,7 @@ class EntriesStoreTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -33,7 +31,7 @@ class EntriesStoreTest extends TestCase
     }
 
     /** @test */
-    function it_gets_nested_files()
+    public function it_gets_nested_files()
     {
         $dir = Path::tidy($this->directory);
 
@@ -81,7 +79,7 @@ class EntriesStoreTest extends TestCase
     }
 
     /** @test */
-    function it_makes_entry_instances_from_files()
+    public function it_makes_entry_instances_from_files()
     {
         Facades\Collection::shouldReceive('findByHandle')->with('blog')->andReturn(
             (new \Statamic\Entries\Collection)->dated(true)
@@ -102,7 +100,7 @@ class EntriesStoreTest extends TestCase
     }
 
     /** @test */
-    function it_uses_the_id_of_the_entry_as_the_item_key()
+    public function it_uses_the_id_of_the_entry_as_the_item_key()
     {
         $entry = Mockery::mock();
         $entry->shouldReceive('id')->andReturn('test');
@@ -115,7 +113,7 @@ class EntriesStoreTest extends TestCase
     }
 
     /** @test */
-    function it_saves_to_disk()
+    public function it_saves_to_disk()
     {
         $entry = Facades\Entry::make()
             ->id('123')
@@ -131,7 +129,7 @@ class EntriesStoreTest extends TestCase
     }
 
     /** @test */
-    function it_ignores_entries_in_a_site_subdirectory_where_the_collection_doesnt_have_that_site_enabled()
+    public function it_ignores_entries_in_a_site_subdirectory_where_the_collection_doesnt_have_that_site_enabled()
     {
         $this->markTestIncomplete();
     }

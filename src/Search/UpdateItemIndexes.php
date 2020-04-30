@@ -2,16 +2,16 @@
 
 namespace Statamic\Search;
 
-use Statamic\Facades\Search;
-use Statamic\Events\Data\EntrySaved;
 use Statamic\Events\Data\EntryDeleted;
+use Statamic\Events\Data\EntrySaved;
+use Statamic\Facades\Search;
 
 class UpdateItemIndexes
 {
     public function subscribe($event)
     {
-        $event->listen(EntrySaved::class, self::class . '@update');
-        $event->listen(EntryDeleted::class, self::class . '@delete');
+        $event->listen(EntrySaved::class, self::class.'@update');
+        $event->listen(EntryDeleted::class, self::class.'@delete');
     }
 
     public function update($event)

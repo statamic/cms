@@ -2,14 +2,14 @@
 
 namespace Statamic\Globals;
 
+use Statamic\Contracts\Globals\GlobalSet as Contract;
+use Statamic\Data\ExistsAsFile;
 use Statamic\Facades;
-use Statamic\Support\Arr;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Facades\Blueprint;
-use Statamic\Data\ExistsAsFile;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Globals\GlobalSet as Contract;
 
 class GlobalSet implements Contract
 {
@@ -54,7 +54,7 @@ class GlobalSet implements Contract
         return vsprintf('%s/%s.%s', [
             rtrim(Stache::store('globals')->directory(), '/'),
             $this->handle(),
-            'yaml'
+            'yaml',
         ]);
     }
 

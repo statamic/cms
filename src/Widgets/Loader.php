@@ -2,8 +2,6 @@
 
 namespace Statamic\Widgets;
 
-use Statamic\Widgets\WidgetNotFoundException;
-
 class Loader
 {
     public function load($name, $config)

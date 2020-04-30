@@ -9,7 +9,7 @@ use Tests\TestCase;
 class CollectionMacrosTest extends TestCase
 {
     /** @test */
-    function to_augmented_array()
+    public function to_augmented_array()
     {
         $one = tap($this->mock(Augmentable::class), function ($m) {
             $m->shouldReceive('toAugmentedArray')->with(null)->once()->andReturn('first');
@@ -33,7 +33,7 @@ class CollectionMacrosTest extends TestCase
     }
 
     /** @test */
-    function to_augmented_array_with_selected_keys()
+    public function to_augmented_array_with_selected_keys()
     {
         $one = tap($this->mock(Augmentable::class), function ($m) {
             $m->shouldReceive('toAugmentedArray')->with(['foo', 'bar'])->once()->andReturn('first');

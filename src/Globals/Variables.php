@@ -2,18 +2,17 @@
 
 namespace Statamic\Globals;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
-use Statamic\Facades\GlobalSet;
-use Statamic\Data\HasOrigin;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Globals\Variables as Contract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Contracts\Data\Localization;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Globals\Variables as Contract;
 use Statamic\Data\HasAugmentedData;
-use Statamic\Statamic;
+use Statamic\Data\HasOrigin;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Variables implements Contract, Localization, Augmentable
 {
@@ -59,7 +58,7 @@ class Variables implements Contract, Localization, Augmentable
             rtrim(Stache::store('globals')->directory(), '/'),
             Site::hasMultiple() ? $this->locale().'/' : '',
             $this->handle(),
-            'yaml'
+            'yaml',
         ]);
     }
 
@@ -111,7 +110,7 @@ class Variables implements Contract, Localization, Augmentable
 
     protected function fallbackBlueprint()
     {
-        $fields  = collect($this->values())
+        $fields = collect($this->values())
             ->except(['id', 'title', 'blueprint'])
             ->map(function ($field, $handle) {
                 return [
@@ -123,9 +122,9 @@ class Variables implements Contract, Localization, Augmentable
         return (new \Statamic\Fields\Blueprint)->setContents([
             'sections' => [
                 'main' => [
-                    'fields' => $fields->all()
-                ]
-            ]
+                    'fields' => $fields->all(),
+                ],
+            ],
         ]);
     }
 

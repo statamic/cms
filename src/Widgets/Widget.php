@@ -2,10 +2,10 @@
 
 namespace Statamic\Widgets;
 
-use Statamic\Support\Str;
-use Statamic\Extend\HasTitle;
 use Statamic\Extend\HasHandle;
+use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Support\Str;
 
 abstract class Widget
 {

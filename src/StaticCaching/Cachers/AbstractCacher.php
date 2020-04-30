@@ -2,12 +2,12 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
-use Statamic\Support\Str;
-use Statamic\Facades\Config;
+use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
+use Statamic\Facades\Config;
 use Statamic\StaticCaching\Cacher;
-use Illuminate\Contracts\Cache\Repository;
+use Statamic\Support\Str;
 
 abstract class AbstractCacher implements Cacher
 {
@@ -31,7 +31,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Get a config value
+     * Get a config value.
      *
      * @param string $key
      * @param mixed $default
@@ -43,7 +43,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Get the base URL (domain)
+     * Get the base URL (domain).
      *
      * @return string
      */
@@ -74,7 +74,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Prefix a cache key
+     * Prefix a cache key.
      *
      * @param string $key
      * @return string
@@ -85,7 +85,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Get a hashed string representation of a URL
+     * Get a hashed string representation of a URL.
      *
      * @param string $url
      * @return string
@@ -96,7 +96,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Get the domains that have been cached
+     * Get the domains that have been cached.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -106,7 +106,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Cache the current domain
+     * Cache the current domain.
      *
      * @return void
      */
@@ -122,7 +122,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Get the URL from a request
+     * Get the URL from a request.
      *
      * @param Request $request
      * @return string
@@ -139,7 +139,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Get all the URLs that have been cached
+     * Get all the URLs that have been cached.
      *
      * @param string|null $domain
      * @return \Illuminate\Support\Collection
@@ -154,7 +154,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Flush all the cached URLs
+     * Flush all the cached URLs.
      *
      * @return void
      */
@@ -168,7 +168,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Save a URL to the cache
+     * Save a URL to the cache.
      *
      * @param string $key
      * @param string $url
@@ -188,7 +188,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Forget / remove a URL from the cache by its key
+     * Forget / remove a URL from the cache by its key.
      *
      * @param string $key
      * @return void
@@ -203,7 +203,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Invalidate a wildcard URL
+     * Invalidate a wildcard URL.
      *
      * @param string $wildcard
      */
@@ -220,7 +220,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Invalidate multiple URLs
+     * Invalidate multiple URLs.
      *
      * @param array $urls
      * @return void
@@ -237,7 +237,7 @@ abstract class AbstractCacher implements Cacher
     }
 
     /**
-     * Determine if a given URL should be excluded from caching
+     * Determine if a given URL should be excluded from caching.
      *
      * @param string $url
      * @return bool
@@ -272,6 +272,6 @@ abstract class AbstractCacher implements Cacher
     {
         $domain = $domain ?: $this->getBaseUrl();
 
-        return $this->normalizeKey($this->makeHash($domain) . '.urls');
+        return $this->normalizeKey($this->makeHash($domain).'.urls');
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Statamic\Console\Processes;
 
-use Statamic\Jobs\RunComposer;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Jobs\RunComposer;
 
 class Composer extends Process
 {
@@ -36,6 +36,7 @@ class Composer extends Process
             ->keyBy('name')
             ->map(function ($package) {
                 $package->version = $this->normalizeVersion($package->version);
+
                 return $package;
             });
     }
@@ -50,7 +51,7 @@ class Composer extends Process
      */
     public function installedVersion(string $package)
     {
-        $version = collect(json_decode(file_get_contents($this->basePath . 'composer.lock'))->packages)
+        $version = collect(json_decode(file_get_contents($this->basePath.'composer.lock'))->packages)
             ->keyBy('name')
             ->get($package)
             ->version;
@@ -185,7 +186,7 @@ class Composer extends Process
         return array_merge([
             $this->phpBinary(),
             "-d memory_limit={$this->memoryLimit}",
-            'vendor/bin/composer'
+            'vendor/bin/composer',
         ], $parts);
     }
 

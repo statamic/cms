@@ -31,14 +31,14 @@ class Marketplace
                 $this->addonPayload('addon/one'),
                 $this->addonPayload('addon/two'),
                 $this->addonPayload('addon/three'),
-            ]
+            ],
         ];
     }
 
     public function show($addon)
     {
         return [
-            'data' => $this->addonPayload($addon)
+            'data' => $this->addonPayload($addon),
         ];
     }
 
@@ -51,8 +51,8 @@ class Marketplace
     {
         return [
             'variants' => [
-                ['package' => $repo]
-            ]
+                ['package' => $repo],
+            ],
         ];
     }
 }

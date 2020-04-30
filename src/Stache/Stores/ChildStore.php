@@ -35,7 +35,7 @@ class ChildStore extends BasicStore
 
     public function key()
     {
-        return $this->parent->key() . '::' . $this->childKey;
+        return $this->parent->key().'::'.$this->childKey;
     }
 
     public function directory($directory = null)

@@ -120,7 +120,7 @@ class Statamic
             return null;
         }
 
-        $route = route('statamic.cp.' . $route, $params);
+        $route = route('statamic.cp.'.$route, $params);
 
         // TODO: This is a temporary workaround to routes like
         // `route('assets.browse.edit', 'some/image.jpg')` outputting two slashes.
@@ -145,7 +145,7 @@ class Statamic
             return null;
         }
 
-        $route = route('statamic.api.' . $route, $params);
+        $route = route('statamic.api.'.$route, $params);
 
         // TODO: This is a temporary workaround to routes like
         // `route('assets.browse.edit', 'some/image.jpg')` outputting two slashes.
@@ -165,7 +165,7 @@ class Statamic
             str_finish(request()->getUri(), '/')
         );
 
-        return starts_with($url, '/' . config('statamic.amp.route'));
+        return starts_with($url, '/'.config('statamic.amp.route'));
     }
 
     public static function jsonVariables(Request $request)
@@ -197,12 +197,12 @@ class Statamic
 
     public static function vendorAssetUrl($url = '/')
     {
-        return asset(URL::tidy('vendor/' . $url));
+        return asset(URL::tidy('vendor/'.$url));
     }
 
     public static function cpAssetUrl($url = '/')
     {
-        return static::vendorAssetUrl('statamic/cp/' . $url);
+        return static::vendorAssetUrl('statamic/cp/'.$url);
     }
 
     public static function flash()
@@ -220,11 +220,11 @@ class Statamic
 
     public static function crumb(...$values)
     {
-        return implode(' ‹ ', array_map("__", $values));
+        return implode(' ‹ ', array_map('__', $values));
     }
 
     public static function docsUrl($url)
     {
-        return URL::tidy('https://statamic.dev/' . $url);
+        return URL::tidy('https://statamic.dev/'.$url);
     }
 }

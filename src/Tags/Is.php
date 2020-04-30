@@ -2,14 +2,13 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tags;
-use Statamic\Support\Arr;
 use Statamic\Facades\User;
+use Statamic\Support\Arr;
 
 class Is extends Tags
 {
     /**
-     * Maps to {{ is:[role] }}
+     * Maps to {{ is:[role] }}.
      *
      * @param  string $method
      * @param  array $args

@@ -2,14 +2,12 @@
 
 namespace Tests\Feature\Blueprints;
 
-use Mockery;
-use Statamic\Facades;
-use Tests\TestCase;
-use Tests\FakesRoles;
 use Statamic\Auth\User;
+use Statamic\Facades;
 use Statamic\Fields\Blueprint;
-use Statamic\Entries\Collection;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class ViewBlueprintListingTest extends TestCase
 {
@@ -17,14 +15,14 @@ class ViewBlueprintListingTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_shows_a_list_of_fieldsets()
+    public function it_shows_a_list_of_fieldsets()
     {
         // When the CP header loads the avatar it reaches for the user blueprint.
         Facades\Blueprint::shouldReceive('find')->with('user')->andReturn(new Blueprint);
 
         Facades\Blueprint::shouldReceive('all')->andReturn(collect([
             'foo' => $blueprintA = $this->createBlueprint('foo'),
-            'bar' => $blueprintB = $this->createBlueprint('bar')
+            'bar' => $blueprintB = $this->createBlueprint('bar'),
         ]));
 
         $user = Facades\User::make()->makeSuper()->save();
@@ -57,7 +55,7 @@ class ViewBlueprintListingTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();

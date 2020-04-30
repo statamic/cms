@@ -2,12 +2,12 @@
 
 namespace Statamic\Search;
 
-use Statamic\Facades\Term;
-use Statamic\Facades\User;
-use Statamic\Facades\Asset;
-use Statamic\Facades\Entry;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Term;
+use Statamic\Facades\User;
 
 class Searchables
 {
@@ -33,16 +33,19 @@ class Searchables
         return $searchables->flatMap(function ($item) {
             if (starts_with($item, 'collection:')) {
                 $collection = str_after($item, 'collection:');
+
                 return $collection === '*' ? Entry::all() : Entry::whereCollection($collection);
             }
 
             if (starts_with($item, 'taxonomy:')) {
                 $taxonomy = str_after($item, 'taxonomy:');
+
                 return $taxonomy === '*' ? Term::all() : Term::whereTaxonomy($taxonomy);
             }
 
             if (starts_with($item, 'assets:')) {
                 $container = str_after($item, 'assets:');
+
                 return $container === '*' ? Asset::all() : Asset::whereContainer($container);
             }
 
@@ -65,6 +68,7 @@ class Searchables
 
         return collect($fields)->mapWithKeys(function ($field) use ($searchable) {
             $value = method_exists($searchable, $field) ? $searchable->{$field}() : $searchable->get($field);
+
             return [$field => $value];
         })->all();
     }

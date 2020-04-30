@@ -2,8 +2,8 @@
 
 namespace Statamic\Policies;
 
-use Statamic\Facades\User;
 use Statamic\Facades\Collection;
+use Statamic\Facades\User;
 
 class CollectionPolicy
 {

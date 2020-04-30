@@ -20,7 +20,7 @@ class PageTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_gets_and_sets_the_entry()
+    public function it_gets_and_sets_the_entry()
     {
         $page = new Page;
         $entry = (new Entry)->id('a');
@@ -33,7 +33,7 @@ class PageTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_entry_dynamically_when_its_set_using_a_string()
+    public function it_gets_the_entry_dynamically_when_its_set_using_a_string()
     {
         EntryAPI::shouldReceive('find')
             ->with('example-page')
@@ -49,7 +49,7 @@ class PageTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_parent()
+    public function it_gets_and_sets_the_parent()
     {
         $page = new Page;
         $parent = new Page;
@@ -63,7 +63,7 @@ class PageTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_route()
+    public function it_gets_and_sets_the_route()
     {
         $page = new Page;
         $this->assertNull($page->route());
@@ -75,13 +75,16 @@ class PageTest extends TestCase
     }
 
     /** @test */
-    function it_builds_a_uri_based_on_the_position_in_the_structure_when_the_structure_has_a_collection()
+    public function it_builds_a_uri_based_on_the_position_in_the_structure_when_the_structure_has_a_collection()
     {
         $entry = new class extends Entry {
-            public function id($id = null) {
+            public function id($id = null)
+            {
                 return 'a';
             }
-            public function slug($slug = null) {
+
+            public function slug($slug = null)
+            {
                 return 'entry-slug';
             }
         };
@@ -107,7 +110,7 @@ class PageTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_entrys_uri_when_the_structure_does_not_have_a_collection()
+    public function it_gets_the_entrys_uri_when_the_structure_does_not_have_a_collection()
     {
         $entry = $this->partialMock(Entry::class);
         $entry->shouldReceive('id')->andReturn('test');
@@ -130,7 +133,7 @@ class PageTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_uri_of_a_redirect_entry()
+    public function it_gets_the_uri_of_a_redirect_entry()
     {
         $entry = $this->partialMock(Entry::class);
         $entry->shouldReceive('id')->andReturn('test');
@@ -153,7 +156,7 @@ class PageTest extends TestCase
     }
 
     /** @test */
-    function it_gets_child_pages()
+    public function it_gets_child_pages()
     {
         $tree = (new Tree)->structure($this->mock(Structure::class));
 
@@ -164,8 +167,8 @@ class PageTest extends TestCase
             ->setChildren([
                 ['entry' => 'one'],
                 ['entry' => 'two', 'children' => [
-                    ['entry' => 'three']
-                ]]
+                    ['entry' => 'three'],
+                ]],
             ]);
 
         $pages = $page->pages();
@@ -176,30 +179,58 @@ class PageTest extends TestCase
     }
 
     /** @test */
-    function it_gets_flattened_pages()
+    public function it_gets_flattened_pages()
     {
         EntryAPI::shouldReceive('find')->with('one')
             ->andReturn(new class extends Entry {
-                public function id($slug = null) { return 'one'; }
-                public function slug($slug = null) { return 'one'; }
+                public function id($slug = null)
+                {
+                    return 'one';
+                }
+
+                public function slug($slug = null)
+                {
+                    return 'one';
+                }
             });
 
         EntryAPI::shouldReceive('find')->with('two')
             ->andReturn(new class extends Entry {
-                public function id($slug = null) { return 'two'; }
-                public function slug($slug = null) { return 'two'; }
+                public function id($slug = null)
+                {
+                    return 'two';
+                }
+
+                public function slug($slug = null)
+                {
+                    return 'two';
+                }
             });
 
         EntryAPI::shouldReceive('find')->with('three')
             ->andReturn(new class extends Entry {
-                public function id($slug = null) { return 'three'; }
-                public function slug($slug = null) { return 'three'; }
+                public function id($slug = null)
+                {
+                    return 'three';
+                }
+
+                public function slug($slug = null)
+                {
+                    return 'three';
+                }
             });
 
         EntryAPI::shouldReceive('find')->with('four')
             ->andReturn(new class extends Entry {
-                public function id($slug = null) { return 'four'; }
-                public function slug($slug = null) { return 'four'; }
+                public function id($slug = null)
+                {
+                    return 'four';
+                }
+
+                public function slug($slug = null)
+                {
+                    return 'four';
+                }
             });
 
         $entry = Mockery::mock(Page::class);
@@ -217,8 +248,8 @@ class PageTest extends TestCase
                 ['entry' => 'one'],
                 ['entry' => 'two', 'children' => [
                     ['entry' => 'three', 'children' => [
-                        ['entry' => 'four']
-                    ]]
+                        ['entry' => 'four'],
+                    ]],
                 ]],
             ]);
 
@@ -230,7 +261,7 @@ class PageTest extends TestCase
     }
 
     /** @test */
-    function it_forwards_calls_to_the_entry()
+    public function it_forwards_calls_to_the_entry()
     {
         $entry = $this->mock(Entry::class);
         $entry->shouldReceive('id')->andReturn('1');

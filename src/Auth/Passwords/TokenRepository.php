@@ -2,12 +2,12 @@
 
 namespace Statamic\Auth\Passwords;
 
-use Statamic\Facades\YAML;
-use Illuminate\Support\Carbon;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Auth\Passwords\DatabaseTokenRepository;
-use Illuminate\Contracts\Hashing\Hasher as HasherContract;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
+use Illuminate\Contracts\Hashing\Hasher as HasherContract;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Carbon;
+use Statamic\Facades\YAML;
 
 class TokenRepository extends DatabaseTokenRepository
 {
@@ -45,7 +45,7 @@ class TokenRepository extends DatabaseTokenRepository
 
         $resets[$payload['email']] = [
             'token' => $payload['token'],
-            'created_at' => $payload['created_at']->timestamp
+            'created_at' => $payload['created_at']->timestamp,
         ];
 
         $this->putResets($resets);

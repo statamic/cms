@@ -10,7 +10,7 @@ function cp_route($route, $params = [])
 
 function statamic_path($path = null)
 {
-    return Path::tidy(__DIR__ . '/../' . $path);
+    return Path::tidy(__DIR__.'/../'.$path);
 }
 
 if (! function_exists('debugbar')) {

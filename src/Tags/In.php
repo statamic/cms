@@ -2,14 +2,13 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tags;
-use Statamic\Support\Arr;
 use Statamic\Facades\User;
+use Statamic\Support\Arr;
 
 class In extends Tags
 {
     /**
-     * Maps to {{ in:[group] }}
+     * Maps to {{ in:[group] }}.
      *
      * @param  string $method
      * @param  array $args

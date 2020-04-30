@@ -4,7 +4,6 @@ namespace Statamic\Sites;
 
 use Statamic\Support\Str;
 
-
 class Site
 {
     protected $handle;
@@ -71,6 +70,6 @@ class Site
     {
         $parsed = parse_url($url);
 
-        return $parsed['scheme'] . '://' . $parsed['host'];
+        return $parsed['scheme'].'://'.$parsed['host'];
     }
 }

@@ -2,12 +2,12 @@
 
 namespace Statamic\Auth\Protect;
 
-use Statamic\Support\Manager;
+use Statamic\Auth\Protect\Protectors\Authenticated;
 use Statamic\Auth\Protect\Protectors\Fallback;
 use Statamic\Auth\Protect\Protectors\IpAddress;
-use Statamic\Auth\Protect\Protectors\Authenticated;
 use Statamic\Auth\Protect\Protectors\NullProtector;
 use Statamic\Auth\Protect\Protectors\Password\PasswordProtector;
+use Statamic\Support\Manager;
 
 class ProtectorManager extends Manager
 {

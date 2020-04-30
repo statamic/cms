@@ -2,15 +2,15 @@
 
 namespace Tests\Auth\Protect;
 
-use Tests\TestCase;
-use Statamic\Auth\Protect\Protection;
 use Facades\Tests\Factories\EntryFactory;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Auth\Protect\Protection;
 use Statamic\Auth\Protect\ProtectorManager;
-use Statamic\Auth\Protect\Protectors\Fallback;
-use Statamic\Auth\Protect\Protectors\Protector;
-use Statamic\Auth\Protect\Protectors\NullProtector;
 use Statamic\Auth\Protect\Protectors\Authenticated;
+use Statamic\Auth\Protect\Protectors\Fallback;
+use Statamic\Auth\Protect\Protectors\NullProtector;
+use Statamic\Auth\Protect\Protectors\Protector;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class ProtectionTest extends TestCase
 {
@@ -26,7 +26,7 @@ class ProtectionTest extends TestCase
     }
 
     /** @test */
-    function it_sets_and_gets_the_data()
+    public function it_sets_and_gets_the_data()
     {
         $this->assertNull($this->protection->data());
 
@@ -37,7 +37,7 @@ class ProtectionTest extends TestCase
     }
 
     /** @test */
-    function scheme_comes_from_data()
+    public function scheme_comes_from_data()
     {
         $this->assertNull($this->protection->scheme());
 
@@ -47,7 +47,7 @@ class ProtectionTest extends TestCase
     }
 
     /** @test */
-    function sitewide_scheme_comes_from_the_default_setting()
+    public function sitewide_scheme_comes_from_the_default_setting()
     {
         config(['statamic.protect.default' => 'logged_in']);
         config(['statamic.protect.schemes.logged_in' => [
@@ -59,10 +59,10 @@ class ProtectionTest extends TestCase
     }
 
     /** @test */
-    function driver_comes_from_schemes_driver_key()
+    public function driver_comes_from_schemes_driver_key()
     {
         config(['statamic.protect.schemes.custom_auth_scheme' => [
-            'driver' => 'auth'
+            'driver' => 'auth',
         ]]);
 
         $this->protection->setData($this->createEntryWithScheme('custom_auth_scheme'));
@@ -71,13 +71,13 @@ class ProtectionTest extends TestCase
     }
 
     /** @test */
-    function no_scheme_returns_a_null_driver()
+    public function no_scheme_returns_a_null_driver()
     {
         $this->assertInstanceOf(NullProtector::class, $this->protection->driver());
     }
 
     /** @test */
-    function invalid_driver_returns_a_fallback_driver()
+    public function invalid_driver_returns_a_fallback_driver()
     {
         $this->protection->setData($this->createEntryWithScheme('invalid'));
 
@@ -85,21 +85,22 @@ class ProtectionTest extends TestCase
     }
 
     /** @test */
-    function it_protects_through_the_driver()
+    public function it_protects_through_the_driver()
     {
         config(['statamic.protect.schemes.test' => [
-            'driver' => 'test'
+            'driver' => 'test',
         ]]);
 
         $state = (object) ['protected' => false];
 
         app(ProtectorManager::class)->extend('test', function ($app) use ($state) {
             return new class($state) extends Protector {
-                function __construct($state)
+                public function __construct($state)
                 {
                     $this->state = $state;
                 }
-                function protect()
+
+                public function protect()
                 {
                     $this->state->protected = true;
                 }

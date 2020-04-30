@@ -2,8 +2,8 @@
 
 namespace Statamic\Facades;
 
-use Statamic\Support\Comparator;
 use Illuminate\Support\Facades\Facade;
+use Statamic\Support\Comparator;
 
 class Compare extends Facade
 {

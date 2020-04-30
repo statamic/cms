@@ -145,7 +145,7 @@ class AssetContainersController extends CpController
 
         return [
             'message' => 'Container deleted',
-            'redirect' => cp_route('assets.index')
+            'redirect' => cp_route('assets.index'),
         ];
     }
 
@@ -196,7 +196,7 @@ class AssetContainersController extends CpController
                         'mode' => 'select',
                         'max_items' => 1,
                     ],
-                ]
+                ],
             ],
             'settings' => [
                 'display' => __('Settings'),
@@ -231,8 +231,8 @@ class AssetContainersController extends CpController
                         'instructions' => __('statamic::messages.asset_container_quick_download_instructions'),
                         'default' => true,
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 }

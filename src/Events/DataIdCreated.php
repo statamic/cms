@@ -12,7 +12,7 @@ class DataIdCreated extends Event
     public $data;
 
     /**
-     * Create a new event instance
+     * Create a new event instance.
      *
      * @param \Statamic\Contracts\Data\Data $data
      */

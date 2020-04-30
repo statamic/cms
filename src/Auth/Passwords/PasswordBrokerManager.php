@@ -2,8 +2,8 @@
 
 namespace Statamic\Auth\Passwords;
 
-use Illuminate\Support\Str;
 use Illuminate\Auth\Passwords\PasswordBrokerManager as BaseManager;
+use Illuminate\Support\Str;
 
 class PasswordBrokerManager extends BaseManager
 {

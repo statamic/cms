@@ -2,9 +2,8 @@
 
 namespace Tests\Support;
 
-use Tests\TestCase;
 use Statamic\Facades\Compare;
-use Statamic\Support\Comparator;
+use Tests\TestCase;
 
 class ComparatorTest extends TestCase
 {
@@ -24,7 +23,7 @@ class ComparatorTest extends TestCase
     }
 
     /** @test */
-    function it_compares_strings_case_insensitively()
+    public function it_compares_strings_case_insensitively()
     {
         $this->assertSecond(Compare::strings('a', 'b'));
         $this->assertFirst(Compare::strings('b', 'a'));
@@ -39,7 +38,7 @@ class ComparatorTest extends TestCase
     }
 
     /** @test */
-    function it_compares_numbers()
+    public function it_compares_numbers()
     {
         $this->assertSecond(Compare::numbers(1, 2));
         $this->assertFirst(Compare::numbers(2, 1));
@@ -47,7 +46,7 @@ class ComparatorTest extends TestCase
     }
 
     /** @test */
-    function it_compares_values()
+    public function it_compares_values()
     {
         $this->assertSecond(Compare::values('a', 'b'));
         $this->assertFirst(Compare::values('b', 'a'));

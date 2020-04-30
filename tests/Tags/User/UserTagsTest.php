@@ -5,7 +5,6 @@ namespace Tests\Tags\User;
 use Illuminate\Http\Exceptions\HttpResponseException;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
-use Statamic\Facades\UserGroup;
 use Tests\FakesRoles;
 use Tests\FakesUserGroups;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -23,7 +22,7 @@ class UserTagsTest extends TestCase
     }
 
     /** @test */
-    function it_renders_user_can_tag_content()
+    public function it_renders_user_can_tag_content()
     {
         $this->setTestRoles([
             'webmaster' => ['super'],
@@ -52,7 +51,7 @@ class UserTagsTest extends TestCase
     }
 
     /** @test */
-    function it_renders_user_is_tag_content()
+    public function it_renders_user_is_tag_content()
     {
         $this->setTestRoles([
             'webmaster' => ['super'], // Though super users have permission to do everything, they do not inherit all roles
@@ -72,7 +71,7 @@ class UserTagsTest extends TestCase
     }
 
     /** @test */
-    function it_renders_user_in_tag_content()
+    public function it_renders_user_in_tag_content()
     {
         $this->setTestRoles([
             'webmaster' => ['super'],
@@ -96,7 +95,7 @@ class UserTagsTest extends TestCase
     }
 
     /** @test */
-    function it_can_logout_user()
+    public function it_can_logout_user()
     {
         $this->actingAs(User::make()->save());
 
@@ -113,7 +112,7 @@ class UserTagsTest extends TestCase
     }
 
     /** @test */
-    function it_can_logout_user_with_custom_redirect()
+    public function it_can_logout_user_with_custom_redirect()
     {
         $this->actingAs(User::make()->save());
 
@@ -130,7 +129,7 @@ class UserTagsTest extends TestCase
     }
 
     /** @test */
-    function it_can_render_logout_url()
+    public function it_can_render_logout_url()
     {
         $this->assertEquals(route('statamic.logout'), $this->tag('{{ user:logout_url }}'));
 

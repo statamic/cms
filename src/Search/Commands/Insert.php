@@ -2,10 +2,10 @@
 
 namespace Statamic\Search\Commands;
 
-use Statamic\Facades\Data;
-use Statamic\Facades\Search;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Data;
+use Statamic\Facades\Search;
 
 class Insert extends Command
 {

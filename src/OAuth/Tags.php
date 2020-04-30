@@ -10,7 +10,7 @@ class Tags extends BaseTags
     public static $handle = 'oauth';
 
     /**
-     * Shorthand for generating an OAuth login URL
+     * Shorthand for generating an OAuth login URL.
      *
      * Maps to {{ oauth:[provider] }}
      */
@@ -20,7 +20,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Generate a login URL
+     * Generate a login URL.
      *
      * Maps to {{ oauth:login_url }}
      *
@@ -32,7 +32,7 @@ class Tags extends BaseTags
     }
 
     /**
-     * Generate the login URL
+     * Generate the login URL.
      *
      * @param string $provider
      * @return string

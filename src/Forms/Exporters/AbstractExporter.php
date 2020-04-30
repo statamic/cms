@@ -12,7 +12,7 @@ abstract class AbstractExporter implements Exporter
     private $form;
 
     /**
-     * Get or set the form
+     * Get or set the form.
      *
      * @param  Statamic\Contracts\Forms\Form|null $form
      * @return Statamic\Contracts\Forms\Form
@@ -27,7 +27,7 @@ abstract class AbstractExporter implements Exporter
     }
 
     /**
-     * Get the content type
+     * Get the content type.
      *
      * @return string
      */

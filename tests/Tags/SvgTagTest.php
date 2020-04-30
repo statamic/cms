@@ -21,14 +21,14 @@ class SvgTagTest extends TestCase
     }
 
     /** @test */
-    function it_renders_svg()
+    public function it_renders_svg()
     {
         $this->assertStringStartsWith('<svg xmlns="', $this->tag('{{ svg:users }}'));
         $this->assertStringStartsWith('<svg xmlns="', $this->tag('{{ svg src="users" }}'));
     }
 
-     /** @test */
-    function it_renders_svg_with_additional_params()
+    /** @test */
+    public function it_renders_svg_with_additional_params()
     {
         $this->assertStringStartsWith('<svg class="mb-1" xmlns="', $this->tag('{{ svg src="users" class="mb-1" }}'));
     }

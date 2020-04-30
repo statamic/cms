@@ -2,13 +2,13 @@
 
 namespace Statamic\Widgets;
 
-use Statamic\Facades\User;
 use Facades\Statamic\Updater\UpdatesOverview;
+use Statamic\Facades\User;
 
 class Updater extends Widget
 {
     /**
-     * The HTML that should be shown in the widget
+     * The HTML that should be shown in the widget.
      *
      * @return \Illuminate\View\View
      */

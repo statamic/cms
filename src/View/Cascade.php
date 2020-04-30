@@ -2,14 +2,12 @@
 
 namespace Statamic\View;
 
-use Statamic\Support\Arr;
-use Statamic\Facades\URL;
-use Statamic\Sites\Site;
-use Statamic\Fields\Value;
-use Statamic\Facades\GlobalSet;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Data\Augmentable;
-use Statamic\Support\Str;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\URL;
+use Statamic\Sites\Site;
+use Statamic\Support\Arr;
 
 class Cascade
 {

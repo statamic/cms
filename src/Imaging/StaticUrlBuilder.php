@@ -2,9 +2,9 @@
 
 namespace Statamic\Imaging;
 
-use Statamic\Support\Str;
-use Statamic\Facades\URL;
 use Statamic\Facades\Asset;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 
 class StaticUrlBuilder extends ImageUrlBuilder
 {
@@ -44,7 +44,7 @@ class StaticUrlBuilder extends ImageUrlBuilder
     }
 
     /**
-     * Build the URL
+     * Build the URL.
      *
      * @param \Statamic\Contracts\Assets\Asset|string $item
      * @param array                                   $params
@@ -56,7 +56,7 @@ class StaticUrlBuilder extends ImageUrlBuilder
         $this->item = $item;
         $this->params = $params;
 
-        $url = Str::removeRight($this->options['route'], '/') . '/' . $this->generatePath();
+        $url = Str::removeRight($this->options['route'], '/').'/'.$this->generatePath();
 
         return URL::encode($url);
     }
@@ -70,6 +70,7 @@ class StaticUrlBuilder extends ImageUrlBuilder
     {
         if (is_string($this->item) && Str::isUrl($this->item)) {
             $method = sprintf('generateBy%s', Str::startsWith($this->item, 'http') ? 'Url' : 'Path');
+
             return $this->generator->$method($this->item, $this->params);
         }
 

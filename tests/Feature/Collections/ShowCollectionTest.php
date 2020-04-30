@@ -2,12 +2,10 @@
 
 namespace Tests\Feature\Collections;
 
-use Facades\Tests\Factories\EntryFactory;
-use Tests\TestCase;
-use Tests\FakesRoles;
 use Statamic\Facades\User;
-use Statamic\Facades\Collection;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 abstract class ShowCollectionTest extends TestCase
 {
@@ -15,7 +13,7 @@ abstract class ShowCollectionTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_shows_the_empty_entry_listing_page_if_you_have_permission_and_there_are_no_entries()
+    public function it_shows_the_empty_entry_listing_page_if_you_have_permission_and_there_are_no_entries()
     {
         $this->setTestRoles(['test' => ['access cp', 'view test entries']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -29,7 +27,7 @@ abstract class ShowCollectionTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(User::make()->assignRole('test'))->save();
@@ -43,5 +41,5 @@ abstract class ShowCollectionTest extends TestCase
             ->assertSessionHas('error');
     }
 
-    abstract function createCollection($handle);
+    abstract public function createCollection($handle);
 }

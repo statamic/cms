@@ -12,19 +12,19 @@ use Statamic\Markdown\Parser;
 
 class ParserTest extends TestCase
 {
-    function setUp() : void
+    public function setUp(): void
     {
         $this->parser = new Parser(['foo' => 'bar']);
     }
 
     /** @test */
-    function it_parses_markdown()
+    public function it_parses_markdown()
     {
         $this->assertEquals("<h1>Heading One</h1>\n", $this->parser->parse('# Heading One'));
     }
 
     /** @test */
-    function it_adds_an_extension()
+    public function it_adds_an_extension()
     {
         $this->assertEquals("<p>smile :)</p>\n", $this->parser->parse('smile :)'));
 
@@ -36,7 +36,7 @@ class ParserTest extends TestCase
     }
 
     /** @test */
-    function it_adds_extensions_using_an_array()
+    public function it_adds_extensions_using_an_array()
     {
         $this->assertEquals("<p>smile :) frown :(</p>\n", $this->parser->parse('smile :) frown :('));
 
@@ -48,7 +48,7 @@ class ParserTest extends TestCase
     }
 
     /** @test */
-    function it_creates_a_new_instance_based_on_the_current_instance()
+    public function it_creates_a_new_instance_based_on_the_current_instance()
     {
         $this->parser->addExtension(function () {
             return new SmileyExtension;
@@ -95,7 +95,7 @@ class FrownyExtension implements ExtensionInterface
 }
 
 /**
- * Inspired by https://commonmark.thephpleague.com/1.0/customization/inline-parsing/
+ * Inspired by https://commonmark.thephpleague.com/1.0/customization/inline-parsing/.
  */
 class SmileyParser implements InlineParserInterface
 {

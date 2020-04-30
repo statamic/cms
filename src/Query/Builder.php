@@ -2,9 +2,8 @@
 
 namespace Statamic\Query;
 
-use Exception;
-use InvalidArgumentException;
 use Illuminate\Pagination\Paginator;
+use InvalidArgumentException;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
 abstract class Builder
@@ -67,7 +66,7 @@ abstract class Builder
         // Here we will make some assumptions about the operator. If only 2 values are
         // passed to the method, we will assume that the operator is an equals sign
         // and keep going. Otherwise, we'll require the operator to be passed in.
-        list($value, $operator) = $this->prepareValueAndOperator(
+        [$value, $operator] = $this->prepareValueAndOperator(
             $value, $operator, func_num_args() === 2
         );
 
@@ -75,7 +74,7 @@ abstract class Builder
         // assume that the developer is just short-cutting the '=' operators and
         // we will set the operators to '=' and set the values appropriately.
         if ($this->invalidOperator($operator)) {
-            list($value, $operator) = [$operator, '='];
+            [$value, $operator] = [$operator, '='];
         }
 
         $type = 'Basic';
@@ -92,7 +91,6 @@ abstract class Builder
         } elseif ($this->invalidOperatorAndValue($operator, $value)) {
             throw new InvalidArgumentException('Illegal operator and value combination.');
         }
-
 
         return [$value, $operator];
     }
@@ -166,6 +164,7 @@ abstract class Builder
     }
 
     abstract public function count();
+
     abstract public function get($columns = ['*']);
 
     protected function filterTestEquals($item, $value)
@@ -204,7 +203,7 @@ abstract class Builder
 
     protected function filterTestLike($item, $like)
     {
-        $pattern = '/^' . str_replace(['%', '_'], ['.*', '.'], preg_quote($like)) . '$/im';
+        $pattern = '/^'.str_replace(['%', '_'], ['.*', '.'], preg_quote($like)).'$/im';
 
         if (is_array($item)) {
             $item = json_encode($item);

@@ -2,18 +2,18 @@
 
 namespace Tests\Feature\Entries;
 
-use Tests\TestCase;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Collection;
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class MountingTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function updating_a_mounted_page_will_update_the_uris_for_each_entry_in_that_collection()
+    public function updating_a_mounted_page_will_update_the_uris_for_each_entry_in_that_collection()
     {
         Collection::make('pages')->routes('pages/{slug}')->save();
 

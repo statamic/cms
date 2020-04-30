@@ -2,8 +2,8 @@
 
 namespace Statamic\Extensions\Pagination;
 
-use Illuminate\Pagination\UrlWindow;
 use Illuminate\Contracts\Pagination\Paginator;
+use Illuminate\Pagination\UrlWindow;
 
 class Presenter
 {
@@ -24,12 +24,12 @@ class Presenter
 
         return [
             'all' => $this->getAllPages(),
-            'segments' => $this->getWindow()
+            'segments' => $this->getWindow(),
         ];
     }
 
     /**
-     * Simply iterate over all the pages
+     * Simply iterate over all the pages.
      *
      * @return array
      */
@@ -41,7 +41,7 @@ class Presenter
         while ($i <= $this->paginator->lastPage()) {
             $pages[] = [
                 'page' => $i,
-                'url'  => $this->paginator->url($i)
+                'url'  => $this->paginator->url($i),
             ];
 
             $i++;
@@ -51,7 +51,7 @@ class Presenter
     }
 
     /**
-     * Get the windowed arrays of links
+     * Get the windowed arrays of links.
      *
      * @return array
      */
@@ -75,7 +75,7 @@ class Presenter
     }
 
     /**
-     * Convert an array to an associative version
+     * Convert an array to an associative version.
      *
      * @param array $array
      * @return array
@@ -87,7 +87,7 @@ class Presenter
         foreach ($array as $key => $value) {
             $mapped[] = [
                 'page' => $key,
-                'url'  => $value
+                'url'  => $value,
             ];
         }
 

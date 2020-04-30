@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
-use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\FolderAssetsCollection;

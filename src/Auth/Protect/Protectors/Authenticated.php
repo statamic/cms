@@ -37,7 +37,7 @@ class Authenticated extends Protector
             $query .= '&';
         }
 
-        return $url['path'] . '?' . $query . 'redirect=' . $this->url;
+        return $url['path'].'?'.$query.'redirect='.$this->url;
     }
 
     protected function isLoginUrl()

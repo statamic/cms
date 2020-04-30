@@ -16,7 +16,6 @@ use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
-use Statamic\Support\Arr;
 
 class LocalizedTerm implements Term, Responsable, Augmentable
 {
@@ -98,6 +97,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable
             } elseif ($this->term->slug() !== $slug) {
                 $this->set('slug', $slug);
             }
+
             return $this;
         }
 
@@ -121,7 +121,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable
 
     public function hasOrigin()
     {
-        return !$this->isDefaultLocale();
+        return ! $this->isDefaultLocale();
     }
 
     public function id()
@@ -186,7 +186,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable
         return vsprintf('taxonomies/%s/%s/%s', [
             $this->taxonomyHandle(),
             $this->locale(),
-            $this->slug()
+            $this->slug(),
         ]);
     }
 
@@ -294,11 +294,11 @@ class LocalizedTerm implements Term, Responsable, Augmentable
 
     public function route()
     {
-        $route = '/' . str_replace('_', '-', $this->taxonomyHandle()) . '/{slug}';
+        $route = '/'.str_replace('_', '-', $this->taxonomyHandle()).'/{slug}';
 
         if ($this->collection()) {
             $collectionUrl = $this->collection()->url() ?? $this->collection()->handle();
-            $route = $collectionUrl . $route;
+            $route = $collectionUrl.$route;
         }
 
         return $route;
