@@ -130,10 +130,18 @@ class UserTagsTest extends TestCase
     }
 
     /** @test */
-    function it_can_render_logout_url()
+    public function it_can_render_logout_url()
     {
         $this->assertEquals(route('statamic.logout'), $this->tag('{{ user:logout_url }}'));
 
         $this->assertEquals(route('statamic.logout', ['redirect' => 'home']), $this->tag('{{ user:logout_url redirect="home" }}'));
+    }
+
+    /** @test */
+    public function it_can_load_user_by_email()
+    {
+        User::make()->email('foo@bar.com')->save();
+
+        $this->assertEquals('foo@bar.com', $this->tag('{{ user email="foo@bar.com" }}{{email}}{{ /user }}'));
     }
 }
