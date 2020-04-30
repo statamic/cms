@@ -2,16 +2,15 @@
 
 namespace Statamic\Auth\Eloquent;
 
-use Statamic\Support\Arr;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Hash;
+use Statamic\Auth\User as BaseUser;
+use Statamic\Data\ContainsSupplementalData;
 use Statamic\Facades\Role;
 use Statamic\Facades\UserGroup;
-use Illuminate\Support\Carbon;
-use Statamic\Data\ContainsSupplementalData;
-use Statamic\Auth\User as BaseUser;
-use Illuminate\Support\Facades\Hash;
-use Illuminate\Database\Eloquent\Model;
 use Statamic\Preferences\HasPreferences;
-use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Support\Arr;
 
 class User extends BaseUser
 {
@@ -40,7 +39,7 @@ class User extends BaseUser
     }
 
     /**
-     * Get or set all the data for the current locale
+     * Get or set all the data for the current locale.
      *
      * @param array|null $data
      * @return $this|array
@@ -52,6 +51,7 @@ class User extends BaseUser
                 'roles' => $this->roles()->map->handle()->values()->all(),
                 'groups' => $this->groups()->map->handle()->values()->all(),
             ]);
+
             return collect(array_except($data, ['id', 'email']));
         }
 

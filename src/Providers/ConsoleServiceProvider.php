@@ -2,9 +2,9 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Console\Commands;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Support\ServiceProvider;
+use Statamic\Console\Commands;
 
 class ConsoleServiceProvider extends ServiceProvider
 {

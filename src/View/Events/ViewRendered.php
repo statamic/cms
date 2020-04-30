@@ -2,8 +2,8 @@
 
 namespace Statamic\View\Events;
 
-use Statamic\View\View;
 use Statamic\Events\Event;
+use Statamic\View\View;
 
 class ViewRendered extends Event
 {

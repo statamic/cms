@@ -40,7 +40,7 @@ class Users extends Relationship
                 ],
                 'default' => 'select',
                 'width' => 50,
-            ]
+            ],
         ];
     }
 

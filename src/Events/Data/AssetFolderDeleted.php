@@ -2,8 +2,8 @@
 
 namespace Statamic\Events\Data;
 
-use Statamic\Events\Event;
 use Statamic\Contracts\Assets\AssetContainer;
+use Statamic\Events\Event;
 
 class AssetFolderDeleted extends Event
 {

@@ -2,16 +2,14 @@
 
 namespace Statamic\Testing\Extend;
 
-use Tests\TestCase;
-use Statamic\Facades\URL;
-use Statamic\Facades\Path;
-use Statamic\Facades\File;
 use Statamic\Extend\Addon;
+use Statamic\Facades\File;
+use Tests\TestCase;
 
 class AddonTest extends TestCase
 {
     /** @test */
-    function it_creates_an_instance_with_a_name()
+    public function it_creates_an_instance_with_a_name()
     {
         $this->assertInstanceOf(Addon::class, Addon::make('TestAddon'));
     }
@@ -62,7 +60,7 @@ class AddonTest extends TestCase
     }
 
     /** @test */
-    function it_creates_an_instance_from_a_package()
+    public function it_creates_an_instance_from_a_package()
     {
         $addon = $this->makeFromPackage([]);
 
@@ -111,7 +109,7 @@ class AddonTest extends TestCase
     }
 
     /** @test */
-    function it_doesnt_allow_getting_files_if_no_directory_is_set()
+    public function it_doesnt_allow_getting_files_if_no_directory_is_set()
     {
         File::spy();
         $addon = $this->makeFromPackage(['directory' => null]);
@@ -121,6 +119,7 @@ class AddonTest extends TestCase
         } catch (\Exception $e) {
             $this->assertEquals('Cannot get files without a directory specified.', $e->getMessage());
             File::shouldNotHaveReceived('get');
+
             return;
         }
 
@@ -128,7 +127,7 @@ class AddonTest extends TestCase
     }
 
     /** @test */
-    function it_doesnt_allow_checking_for_files_if_no_directory_is_set()
+    public function it_doesnt_allow_checking_for_files_if_no_directory_is_set()
     {
         File::spy();
         $addon = $this->makeFromPackage(['directory' => null]);
@@ -138,16 +137,15 @@ class AddonTest extends TestCase
         } catch (\Exception $e) {
             $this->assertEquals('Cannot check files without a directory specified.', $e->getMessage());
             File::shouldNotHaveReceived('get');
+
             return;
         }
 
         $this->fail('Exception was not thrown.');
     }
 
-
-
     /** @test */
-    function it_doesnt_allow_writing_files_if_no_directory_is_set()
+    public function it_doesnt_allow_writing_files_if_no_directory_is_set()
     {
         File::spy();
         $addon = $this->makeFromPackage(['directory' => null]);
@@ -157,6 +155,7 @@ class AddonTest extends TestCase
         } catch (\Exception $e) {
             $this->assertEquals('Cannot write files without a directory specified.', $e->getMessage());
             File::shouldNotHaveReceived('put');
+
             return;
         }
 

@@ -2,10 +2,10 @@
 
 namespace Statamic\Data;
 
-use Statamic\Support\Arr;
+use Illuminate\Support\Carbon;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
-use Illuminate\Support\Carbon;
+use Statamic\Support\Arr;
 
 trait ExistsAsFile
 {
@@ -27,7 +27,7 @@ trait ExistsAsFile
     public function fileData()
     {
         return array_merge($this->data(), [
-            'id' => $this->id()
+            'id' => $this->id(),
         ]);
     }
 

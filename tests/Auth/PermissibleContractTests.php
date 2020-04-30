@@ -2,20 +2,20 @@
 
 namespace Tests\Auth;
 
-use Statamic\Auth\File\Role;
-use Statamic\Facades\Role as RoleAPI;
 use Illuminate\Support\Collection;
+use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
-use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Contracts\Auth\Role as RoleContract;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
+use Statamic\Facades\Role as RoleAPI;
+use Statamic\Facades\UserGroup as UserGroupAPI;
 
 trait PermissibleContractTests
 {
     abstract protected function createPermissible();
 
     /** @test */
-    function it_gets_and_assigns_roles()
+    public function it_gets_and_assigns_roles()
     {
         $roleA = new class extends Role {
             public function handle(string $handle = null)
@@ -71,7 +71,7 @@ trait PermissibleContractTests
     }
 
     /** @test */
-    function it_removes_a_role_assignment()
+    public function it_removes_a_role_assignment()
     {
         $roleA = new class extends Role {
             public function handle(string $handle = null)
@@ -112,7 +112,7 @@ trait PermissibleContractTests
     }
 
     /** @test */
-    function it_checks_if_it_has_a_role()
+    public function it_checks_if_it_has_a_role()
     {
         $roleA = new class extends Role {
             public function handle(string $handle = null)
@@ -146,7 +146,7 @@ trait PermissibleContractTests
     }
 
     /** @test */
-    function it_gets_and_checks_permissions()
+    public function it_gets_and_checks_permissions()
     {
         $directRole = RoleAPI::make('direct')->addPermission([
             'permission one directly through role',
@@ -211,13 +211,14 @@ trait PermissibleContractTests
     }
 
     /** @test */
-    function it_checks_if_it_has_super_permissions_through_roles_and_groups()
+    public function it_checks_if_it_has_super_permissions_through_roles_and_groups()
     {
         $superRole = new class extends Role {
             public function handle(string $handle = null)
             {
                 return 'superrole';
             }
+
             public function permissions($permissions = null)
             {
                 return ['super'];
@@ -228,6 +229,7 @@ trait PermissibleContractTests
             {
                 return 'nonsuperrole';
             }
+
             public function permissions($permissions = null)
             {
                 return [];
@@ -255,7 +257,7 @@ trait PermissibleContractTests
     }
 
     /** @test */
-    function it_checks_if_it_has_super_permissions_on_itself()
+    public function it_checks_if_it_has_super_permissions_on_itself()
     {
         $user = $this->createPermissible()->save();
         $this->assertFalse($user->isSuper());
@@ -265,7 +267,7 @@ trait PermissibleContractTests
     }
 
     /** @test */
-    function it_adds_to_groups()
+    public function it_adds_to_groups()
     {
         $groupA = (new UserGroup)->handle('a');
         $groupB = (new UserGroup)->handle('b');
@@ -288,7 +290,7 @@ trait PermissibleContractTests
         $this->assertEquals([
             'a' => 'a',
             'b' => 'b',
-            'c' => 'c'
+            'c' => 'c',
         ], $user->groups()->map->handle()->all());
         $this->assertEquals($user, $return);
 
@@ -296,7 +298,7 @@ trait PermissibleContractTests
 
         $this->assertEquals([
             'a' => 'a',
-            'c' => 'c'
+            'c' => 'c',
         ], $user->groups()->map->handle()->all());
         $this->assertEquals($user, $return);
 
@@ -306,7 +308,7 @@ trait PermissibleContractTests
     }
 
     /** @test */
-    function it_sets_all_the_groups()
+    public function it_sets_all_the_groups()
     {
         $groupA = (new UserGroup)->handle('a');
         $groupB = (new UserGroup)->handle('b');
@@ -321,7 +323,7 @@ trait PermissibleContractTests
 
         $this->assertEquals([
             'b' => 'b',
-            'c' => 'c'
+            'c' => 'c',
         ], $user->groups()->map->handle()->all());
     }
 }

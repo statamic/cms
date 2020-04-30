@@ -2,16 +2,12 @@
 
 namespace Statamic\Taxonomies;
 
-use Statamic\Facades\Config;
-use Statamic\Facades\Helper;
-use Statamic\Facades\Taxonomy;
-use Statamic\Facades\Term;
-use Statamic\Data\Content\Content;
+use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 use Statamic\Events\Stache\RepositoryItemInserted;
 use Statamic\Events\Stache\RepositoryItemRemoved;
+use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Staches\TaxonomyStache;
-use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
 
 class TermTracker
 {
@@ -34,7 +30,7 @@ class TermTracker
     }
 
     /**
-     * Register the listeners for the subscriber
+     * Register the listeners for the subscriber.
      *
      * @param \Illuminate\Events\Dispatcher $events
      */
@@ -51,10 +47,11 @@ class TermTracker
     {
         if ($event->item instanceof TaxonomyContract) {
             $this->updateLocalizedTermUris($event->item);
+
             return;
         }
 
-        if (!method_exists($event->item, 'isTaxonomizable') || !$event->item->isTaxonomizable()) {
+        if (! method_exists($event->item, 'isTaxonomizable') || ! $event->item->isTaxonomizable()) {
             return;
         }
 
@@ -63,8 +60,8 @@ class TermTracker
                 try {
                     $this->addTerms($handle, $event->item);
                 } catch (\Exception $e) {
-                    \Log::debug('There was a problem adding taxonomy terms to data with ID ' . $event->item->id());
-                    \Log::debug($e->getMessage() . PHP_EOL . $e->getTraceAsString());
+                    \Log::debug('There was a problem adding taxonomy terms to data with ID '.$event->item->id());
+                    \Log::debug($e->getMessage().PHP_EOL.$e->getTraceAsString());
                 }
             }
         });

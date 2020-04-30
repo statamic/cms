@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class RendersFormsTest extends TestCase
 {
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -17,7 +17,7 @@ class RendersFormsTest extends TestCase
     }
 
     /** @test */
-    function it_renders_form_open_tags()
+    public function it_renders_form_open_tags()
     {
         $output = $this->tag->formOpen('http://localhost:8000/submit');
 
@@ -27,7 +27,7 @@ class RendersFormsTest extends TestCase
     }
 
     /** @test */
-    function it_renders_form_open_tags_with_custom_method()
+    public function it_renders_form_open_tags_with_custom_method()
     {
         $output = $this->tag->formOpen('http://localhost:8000/submit', 'DELETE');
 
@@ -37,7 +37,7 @@ class RendersFormsTest extends TestCase
     }
 
     /** @test */
-    function it_renders_form_open_tags_with_custom_attributes()
+    public function it_renders_form_open_tags_with_custom_attributes()
     {
         $output = $this->tag
             ->setParameters([
@@ -54,7 +54,7 @@ class RendersFormsTest extends TestCase
     }
 
     /** @test */
-    function it_renders_form_close_tag()
+    public function it_renders_form_close_tag()
     {
         $this->assertEquals('</form>', $this->tag->formClose());
     }

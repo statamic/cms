@@ -2,16 +2,16 @@
 
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\User;
-use Statamic\Facades\Scope;
-use Statamic\CP\Column;
-use Statamic\Facades\Taxonomy;
-use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
-use Statamic\Facades\Collection;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
+use Statamic\CP\Column;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Scope;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\CP\CpController;
 
 class TaxonomiesController extends CpController
 {
@@ -29,7 +29,7 @@ class TaxonomiesController extends CpController
                 'edit_url' => $taxonomy->editUrl(),
                 'delete_url' => $taxonomy->deleteUrl(),
                 'terms_url' => cp_route('taxonomies.show', $taxonomy->handle()),
-                'deleteable' => User::current()->can('delete', $taxonomy)
+                'deleteable' => User::current()->can('delete', $taxonomy),
             ];
         })->values();
 
@@ -100,7 +100,7 @@ class TaxonomiesController extends CpController
         session()->flash('success', __('Taxonomy created'));
 
         return [
-            'redirect' => $taxonomy->showUrl()
+            'redirect' => $taxonomy->showUrl(),
         ];
     }
 
@@ -191,7 +191,7 @@ class TaxonomiesController extends CpController
                         'type' => 'text',
                         'validate' => 'required',
                     ],
-                ]
+                ],
             ],
             'content_model' => [
                 'display' => __('Content Model'),
@@ -208,8 +208,8 @@ class TaxonomiesController extends CpController
                         'instructions' => __('statamic::messages.taxonomies_collections_instructions'),
                         'type' => 'collections',
                         'mode' => 'select',
-                    ]
-                ]
+                    ],
+                ],
             ],
         ]);
     }

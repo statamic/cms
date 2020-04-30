@@ -2,8 +2,6 @@
 
 namespace Statamic\Fields;
 
-use Statamic\Facades\YAML;
-
 class FieldRepository
 {
     protected $fieldsets;
@@ -19,7 +17,7 @@ class FieldRepository
             return null;
         }
 
-        list($fieldset, $handle) = explode('.', $field);
+        [$fieldset, $handle] = explode('.', $field);
 
         if (! $fieldset = $this->fieldsets->find($fieldset)) {
             return null;

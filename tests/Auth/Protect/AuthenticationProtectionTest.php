@@ -2,12 +2,10 @@
 
 namespace Tests\Auth\Protect;
 
-use Tests\TestCase;
-
 class AuthenticationProtectionTest extends PageProtectionTestCase
 {
     /** @test */
-    function redirects_to_login_page()
+    public function redirects_to_login_page()
     {
         config(['statamic.protect.schemes.logged_in' => [
             'driver' => 'auth',
@@ -21,7 +19,7 @@ class AuthenticationProtectionTest extends PageProtectionTestCase
     }
 
     /** @test */
-    function redirects_to_login_page_without_appending()
+    public function redirects_to_login_page_without_appending()
     {
         config(['statamic.protect.schemes.logged_in' => [
             'driver' => 'auth',
@@ -35,7 +33,7 @@ class AuthenticationProtectionTest extends PageProtectionTestCase
     }
 
     /** @test */
-    function it_denies_if_no_login_url_is_defined()
+    public function it_denies_if_no_login_url_is_defined()
     {
         config(['statamic.protect.schemes.logged_in' => [
             'driver' => 'auth',

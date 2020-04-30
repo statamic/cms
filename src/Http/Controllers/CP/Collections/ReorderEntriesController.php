@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\Facades\Entry;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 

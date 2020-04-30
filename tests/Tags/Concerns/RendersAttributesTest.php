@@ -9,7 +9,7 @@ use Tests\TestCase;
 
 class RendersAttributesTest extends TestCase
 {
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -17,7 +17,7 @@ class RendersAttributesTest extends TestCase
     }
 
     /** @test */
-    function it_renders_attributes_from_array()
+    public function it_renders_attributes_from_array()
     {
         $this->assertEquals('', $this->tag->renderAttributes([]));
 
@@ -30,7 +30,7 @@ class RendersAttributesTest extends TestCase
     }
 
     /** @test */
-    function it_renders_attributes_from_params()
+    public function it_renders_attributes_from_params()
     {
         $this->assertEquals('', $this->tag->renderAttributesFromParams());
 
@@ -48,7 +48,7 @@ class RendersAttributesTest extends TestCase
     }
 
     /** @test */
-    function it_wont_render_attributes_for_known_params_unless_attr_prepended()
+    public function it_wont_render_attributes_for_known_params_unless_attr_prepended()
     {
         $output = $this->tag
             ->setParameters([

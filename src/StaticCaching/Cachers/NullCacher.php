@@ -37,4 +37,3 @@ class NullCacher implements Cacher
         return collect();
     }
 }
-

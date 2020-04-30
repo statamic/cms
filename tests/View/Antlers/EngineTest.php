@@ -2,11 +2,11 @@
 
 namespace Tests\View\Antlers;
 
+use Illuminate\Filesystem\Filesystem;
 use Mockery;
-use Tests\TestCase;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Parser;
-use Illuminate\Filesystem\Filesystem;
+use Tests\TestCase;
 
 class EngineTest extends TestCase
 {
@@ -21,7 +21,7 @@ class EngineTest extends TestCase
     }
 
     /** @test */
-    function parses_a_basic_template()
+    public function parses_a_basic_template()
     {
         $this->files
             ->shouldReceive('get')
@@ -35,7 +35,7 @@ class EngineTest extends TestCase
     }
 
     /** @test */
-    function parses_a_template_with_noparse_tags()
+    public function parses_a_template_with_noparse_tags()
     {
         $this->files
             ->shouldReceive('get')
@@ -49,7 +49,7 @@ class EngineTest extends TestCase
     }
 
     /** @test */
-    function it_can_prevent_injecting_noparse_extractions()
+    public function it_can_prevent_injecting_noparse_extractions()
     {
         $this->files
             ->shouldReceive('get')
@@ -71,9 +71,9 @@ class EngineTest extends TestCase
     }
 
     /** @test */
-    function templates_can_have_front_matter_and_override_data()
+    public function templates_can_have_front_matter_and_override_data()
     {
-        $this->markTestSkipped();//todo
+        $this->markTestSkipped(); //todo
         $this->files
             ->shouldReceive('get')
             ->with('/path/to/foo.antlers.html')
@@ -86,7 +86,7 @@ class EngineTest extends TestCase
     }
 
     /** @test */
-    function php_is_not_executed_if_the_filename_is_html()
+    public function php_is_not_executed_if_the_filename_is_html()
     {
         $this->files
             ->shouldReceive('get')
@@ -100,7 +100,7 @@ class EngineTest extends TestCase
     }
 
     /** @test */
-    function php_is_executed_if_the_filename_is_php()
+    public function php_is_executed_if_the_filename_is_php()
     {
         $this->files
             ->shouldReceive('get')

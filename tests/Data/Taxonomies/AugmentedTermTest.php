@@ -17,14 +17,14 @@ use Tests\Data\AugmentedTestCase;
 class AugmentedTermTest extends AugmentedTestCase
 {
     /** @test */
-    function it_gets_values()
+    public function it_gets_values()
     {
         Carbon::setTestNow('2020-04-15 13:00:00');
         User::make()->id('test-user')->save();
 
         $blueprint = Blueprint::makeFromFields([
             'two' => ['type' => 'text'],
-            'unused_in_bp' => ['type' => 'text']
+            'unused_in_bp' => ['type' => 'text'],
         ]);
         Blueprint::shouldReceive('find')->with('test')->andReturn($blueprint);
 
@@ -39,7 +39,7 @@ class AugmentedTermTest extends AugmentedTestCase
                 'one' => 'the "one" value on the term',
                 'two' => 'the "two" value on the term and in the blueprint',
                 'updated_by' => 'test-user',
-                'updated_at' => '1486131000'
+                'updated_at' => '1486131000',
             ]);
 
         $augmented = new AugmentedTerm($term);

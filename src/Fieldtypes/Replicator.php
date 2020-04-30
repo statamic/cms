@@ -4,7 +4,6 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
-use Statamic\CP\FieldtypeFactory;
 use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
 
 class Replicator extends Fieldtype
@@ -117,6 +116,7 @@ class Replicator extends Fieldtype
         return [
             'existing' => collect($this->field->value())->mapWithKeys(function ($set) {
                 $config = $this->config("sets.{$set['type']}.fields", []);
+
                 return [$set['_id'] => (new Fields($config))->addValues($set)->meta()];
             })->toArray(),
             'new' => collect($this->config('sets'))->map(function ($set, $handle) {

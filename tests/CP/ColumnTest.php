@@ -2,13 +2,13 @@
 
 namespace Tests\CP;
 
-use Tests\TestCase;
 use Statamic\CP\Column;
+use Tests\TestCase;
 
 class ColumnTest extends TestCase
 {
     /** @test */
-    function it_can_make_a_basic_column()
+    public function it_can_make_a_basic_column()
     {
         $column = Column::make('first_name');
 
@@ -18,7 +18,7 @@ class ColumnTest extends TestCase
     }
 
     /** @test */
-    function it_can_explicitly_set_data_and_serialize_to_json()
+    public function it_can_explicitly_set_data_and_serialize_to_json()
     {
         $column = Column::make()
             ->field('bars')
@@ -39,7 +39,7 @@ class ColumnTest extends TestCase
     }
 
     /** @test */
-    function it_can_set_a_value_field()
+    public function it_can_set_a_value_field()
     {
         $column = Column::make()->field('date');
 

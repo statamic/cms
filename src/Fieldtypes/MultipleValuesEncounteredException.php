@@ -13,7 +13,7 @@ class MultipleValuesEncounteredException extends Exception implements ProvidesSo
 
     public function __construct($fieldtype)
     {
-        parent::__construct("Fieldtype expected a single value but encountered an array.");
+        parent::__construct('Fieldtype expected a single value but encountered an array.');
         $this->fieldtype = $fieldtype;
     }
 

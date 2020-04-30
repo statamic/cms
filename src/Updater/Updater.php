@@ -2,10 +2,9 @@
 
 namespace Statamic\Updater;
 
-use Statamic\Statamic;
-use Statamic\Facades\Addon;
-use Statamic\Updater\Changelog;
 use Facades\Statamic\Console\Processes\Composer;
+use Statamic\Facades\Addon;
+use Statamic\Statamic;
 use Statamic\Updater\Core\Updater as CoreUpdater;
 
 class Updater

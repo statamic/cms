@@ -2,13 +2,13 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\Statamic;
+use Illuminate\Support\Facades\Cache;
+use League\Glide\Server;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
-use League\Glide\Server;
-use Statamic\Imaging\ImageGenerator;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Http\Controllers\Controller;
+use Statamic\Imaging\ImageGenerator;
+use Statamic\Statamic;
 
 class ThumbnailController extends Controller
 {
@@ -135,7 +135,7 @@ class ThumbnailController extends Controller
             return $this->mutex;
         }
 
-        return $this->mutex = 'imagegenerator::generating.' . md5($this->asset->id() . $this->size);
+        return $this->mutex = 'imagegenerator::generating.'.md5($this->asset->id().$this->size);
     }
 
     /**
@@ -152,6 +152,6 @@ class ThumbnailController extends Controller
             return;
         }
 
-        return redirect(Statamic::cpAssetUrl('img/filetypes/' . $this->asset->extension() . '.png'));
+        return redirect(Statamic::cpAssetUrl('img/filetypes/'.$this->asset->extension().'.png'));
     }
 }

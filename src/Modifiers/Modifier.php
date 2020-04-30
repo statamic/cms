@@ -6,7 +6,7 @@ use Statamic\Extend\HasHandle;
 use Statamic\Support\Str;
 
 /**
- * Modify values within templates
+ * Modify values within templates.
  */
 class Modifier
 {

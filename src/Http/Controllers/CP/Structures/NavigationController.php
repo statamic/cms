@@ -2,18 +2,14 @@
 
 namespace Statamic\Http\Controllers\CP\Structures;
 
-use Statamic\Support\Arr;
-use Statamic\Facades\Site;
-use Statamic\Facades\Blueprint;
-use Statamic\Facades\Structure;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Structures\Nav as NavContract;
-use Statamic\Facades\Collection;
-use Statamic\Facades\User;
-use Statamic\Structures\TreeBuilder;
-use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Contracts\Structures\Structure as StructureContract;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Nav;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Arr;
 
 class NavigationController extends CpController
 {
@@ -30,7 +26,7 @@ class NavigationController extends CpController
                 'show_url' => $structure->showUrl(),
                 'edit_url' => $structure->editUrl(),
                 'delete_url' => $structure->deleteUrl(),
-                'deleteable' => User::current()->can('delete', $structure)
+                'deleteable' => User::current()->can('delete', $structure),
             ];
         })->values();
 
@@ -86,7 +82,7 @@ class NavigationController extends CpController
                     'name' => $tree->site()->name(),
                     'url' => $tree->showUrl(),
                 ];
-            })->values()->all()
+            })->values()->all(),
         ]);
     }
 
@@ -205,7 +201,7 @@ class NavigationController extends CpController
                 'mode' => 'select',
                 'required' => true,
             ];
-        };
+        }
 
         return Blueprint::makeFromSections($contents);
     }

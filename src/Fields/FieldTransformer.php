@@ -2,14 +2,14 @@
 
 namespace Statamic\Fields;
 
-use Statamic\Support\Arr;
 use Statamic\Facades\Fieldset;
+use Statamic\Support\Arr;
 
 class FieldTransformer
 {
     public static function fromVue(array $submitted)
     {
-        $method = $submitted['type'] . 'SectionField';
+        $method = $submitted['type'].'SectionField';
 
         return static::$method($submitted);
     }
@@ -18,7 +18,7 @@ class FieldTransformer
     {
         return array_filter([
             'import' => $submitted['fieldset'],
-            'prefix' => $submitted['prefix'] ?? null
+            'prefix' => $submitted['prefix'] ?? null,
         ]);
     }
 
@@ -32,7 +32,7 @@ class FieldTransformer
 
         return array_filter([
             'handle' => $submitted['handle'],
-            'field' => $field
+            'field' => $field,
         ]);
     }
 
@@ -43,7 +43,7 @@ class FieldTransformer
         return array_filter([
             'handle' => $submitted['handle'],
             'field' => $submitted['field_reference'],
-            'config' => $config
+            'config' => $config,
         ]);
     }
 
@@ -113,7 +113,7 @@ class FieldTransformer
                     'fieldset' => [
                         'handle' => $fieldset->handle(),
                         'title' => $fieldset->title(),
-                    ]
+                    ],
                 ])];
             });
         })->sortBy('display')->all();

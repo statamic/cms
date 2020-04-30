@@ -55,6 +55,7 @@ abstract class IteratorBuilder extends Builder
             $method = 'filterWhere'.$where['type'];
             $entries = $this->{$method}($entries, $where);
         }
+
         return $entries->values();
     }
 
@@ -62,6 +63,7 @@ abstract class IteratorBuilder extends Builder
     {
         return $entries->filter(function ($entry) use ($where) {
             $value = $this->getFilterItemValue($entry, $where['column']);
+
             return in_array($value, $where['values']);
         });
     }
@@ -70,7 +72,8 @@ abstract class IteratorBuilder extends Builder
     {
         return $entries->filter(function ($entry) use ($where) {
             $value = $this->getFilterItemValue($entry, $where['column']);
-            return !in_array($value, $where['values']);
+
+            return ! in_array($value, $where['values']);
         });
     }
 
@@ -78,7 +81,8 @@ abstract class IteratorBuilder extends Builder
     {
         return $entries->filter(function ($entry) use ($where) {
             $value = $this->getFilterItemValue($entry, $where['column']);
-            $method = 'filterTest' . $this->operators[$where['operator']];
+            $method = 'filterTest'.$this->operators[$where['operator']];
+
             return $this->{$method}($value, $where['value']);
         });
     }

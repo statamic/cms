@@ -12,13 +12,13 @@ class NavTest extends StructureTestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    function structure($handle = null)
+    public function structure($handle = null)
     {
         return (new Nav)->handle($handle);
     }
 
     /** @test */
-    function it_gets_and_sets_the_handle()
+    public function it_gets_and_sets_the_handle()
     {
         $structure = $this->structure();
         $this->assertNull($structure->handle());
@@ -30,7 +30,7 @@ class NavTest extends StructureTestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_title()
+    public function it_gets_and_sets_the_title()
     {
         $structure = $this->structure('test');
 
@@ -44,7 +44,7 @@ class NavTest extends StructureTestCase
     }
 
     /** @test */
-    function it_saves_the_nav_through_the_api()
+    public function it_saves_the_nav_through_the_api()
     {
         $nav = $this->structure();
 
@@ -54,7 +54,7 @@ class NavTest extends StructureTestCase
     }
 
     /** @test */
-    function it_deletes_through_the_api()
+    public function it_deletes_through_the_api()
     {
         $nav = $this->structure();
 
@@ -64,7 +64,7 @@ class NavTest extends StructureTestCase
     }
 
     /** @test */
-    function collections_can_be_get_and_set()
+    public function collections_can_be_get_and_set()
     {
         $nav = $this->structure();
         $collectionOne = tap(Facades\Collection::make('one'))->save();
@@ -85,7 +85,7 @@ class NavTest extends StructureTestCase
     }
 
     /** @test */
-    function it_has_cp_urls()
+    public function it_has_cp_urls()
     {
         $nav = $this->structure('test');
 
@@ -96,7 +96,7 @@ class NavTest extends StructureTestCase
     }
 
     /** @test */
-    function it_has_no_route()
+    public function it_has_no_route()
     {
         $this->assertNull($this->structure('test')->route('en'));
     }

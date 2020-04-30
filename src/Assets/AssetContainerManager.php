@@ -3,7 +3,6 @@
 namespace Statamic\Assets;
 
 use Illuminate\Filesystem\FilesystemManager;
-use Statamic\Facades\Config;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
@@ -24,11 +23,11 @@ class AssetContainerManager
     {
         return (Path::isAbsolute($path))
             ? $path
-            : Path::resolve(realpath(statamic_path('../')) . '/' . $path);
+            : Path::resolve(realpath(statamic_path('../')).'/'.$path);
     }
 
     /**
-     * Get an absolute version of a given URL
+     * Get an absolute version of a given URL.
      *
      * @param string $url
      * @return string|bool
@@ -39,7 +38,7 @@ class AssetContainerManager
     }
 
     /**
-     * Check if the URL of a given container exists
+     * Check if the URL of a given container exists.
      *
      * Since a directory cannot reliably be detected as a URL, a
      * temporary file will be written, and we'll check for that directly.
@@ -51,7 +50,7 @@ class AssetContainerManager
     public function urlExists($url, $path)
     {
         $filename = '/statamic-test-'.time();
-        $tmp = $path . $filename;
+        $tmp = $path.$filename;
         touch($tmp);
 
         $resolvedUrl = URL::assemble($this->getAbsoluteUrl($url), $filename);
@@ -60,11 +59,11 @@ class AssetContainerManager
 
         unlink($tmp);
 
-        return (!$headers || strpos($headers[0], '404')) == false;
+        return (! $headers || strpos($headers[0], '404')) == false;
     }
 
     /**
-     * Get an Amazon S3 filesystem instance
+     * Get an Amazon S3 filesystem instance.
      *
      * @param array $config  An array containing key, secret, region, bucket, and path.
      * @return
@@ -79,7 +78,7 @@ class AssetContainerManager
     }
 
     /**
-     * Parse the keys in an array for environment variables
+     * Parse the keys in an array for environment variables.
      *
      * @param array $data
      * @return static

@@ -5,7 +5,6 @@ namespace Statamic\Stache\Repositories;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
 use Statamic\Entries\EntryCollection;
-use Statamic\Facades\Collection;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Stache\Stache;
 

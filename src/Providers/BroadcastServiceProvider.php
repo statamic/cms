@@ -2,9 +2,9 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Statamic;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Broadcasting\BroadcastController;
+use Illuminate\Support\ServiceProvider;
+use Statamic\Statamic;
 
 class BroadcastServiceProvider extends ServiceProvider
 {
@@ -25,7 +25,7 @@ class BroadcastServiceProvider extends ServiceProvider
                 'key' => config('broadcasting.connections.pusher.key'),
                 'cluster' => config('broadcasting.connections.pusher.options.cluster'),
                 'encrypted' => config('broadcasting.connections.pusher.options.encrypted'),
-            ]
+            ],
         ];
     }
 

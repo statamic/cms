@@ -10,7 +10,7 @@ return [
 
     'routes' => [
         'login' => 'oauth/{provider}',
-        'callback' => 'oauth/{provider}/callback'
+        'callback' => 'oauth/{provider}/callback',
     ],
 
 ];

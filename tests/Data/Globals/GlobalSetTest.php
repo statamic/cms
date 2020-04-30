@@ -2,27 +2,27 @@
 
 namespace Tests\Data\Globals;
 
-use Tests\TestCase;
 use Statamic\Facades\Site;
 use Statamic\Globals\GlobalSet;
+use Tests\TestCase;
 
 class GlobalSetTest extends TestCase
 {
     /** @test */
-    function it_gets_file_contents_for_saving_with_a_single_site()
+    public function it_gets_file_contents_for_saving_with_a_single_site()
     {
         Site::setConfig([
             'default' => 'en',
             'sites' => [
                 'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
-            ]
+            ],
         ]);
 
         $set = (new GlobalSet)->title('The title');
 
         $variables = $set->makeLocalization('en')->data([
             'array' => ['first one', 'second one'],
-            'string' => 'The string'
+            'string' => 'The string',
         ]);
 
         $set->addLocalization($variables);
@@ -40,15 +40,15 @@ EOT;
     }
 
     /** @test */
-    function it_gets_file_contents_for_saving_with_multiple_sites()
+    public function it_gets_file_contents_for_saving_with_multiple_sites()
     {
         Site::setConfig([
             'default' => 'en',
             'sites' => [
                 'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
                 'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/']
-            ]
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
         ]);
 
         $set = (new GlobalSet)->title('The title');
@@ -57,13 +57,13 @@ EOT;
         $set->in('en', function ($loc) {
             $loc->data([
                 'array' => ['first one', 'second one'],
-                'string' => 'The string'
+                'string' => 'The string',
             ]);
         });
         $set->in('fr', function ($loc) {
             $loc->data([
                 'array' => ['le first one', 'le second one'],
-                'string' => 'Le string'
+                'string' => 'Le string',
             ]);
         });
 

@@ -3,18 +3,16 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Exception;
-use Throwable;
-use Statamic\Facades\Site;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Blueprint;
-use Illuminate\Http\Request;
-use Statamic\Facades\Collection;
-use Illuminate\Support\Facades\Facade;
-use Statamic\Http\Controllers\CP\CpController;
 use Illuminate\Contracts\Debug\ExceptionHandler;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Facade;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Entry;
+use Statamic\Http\Controllers\CP\CpController;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
 use Symfony\Component\HttpFoundation\Request as SymfonyRequest;
+use Throwable;
 
 class EntryPreviewController extends CpController
 {

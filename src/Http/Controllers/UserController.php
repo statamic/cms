@@ -5,7 +5,6 @@ namespace Statamic\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\MessageBag;
-use Statamic\Auth\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
@@ -18,7 +17,7 @@ class UserController extends Controller
     {
         $request->validate([
             'email' => 'required',
-            'password' => 'required'
+            'password' => 'required',
         ]);
 
         $loggedIn = Auth::attempt(

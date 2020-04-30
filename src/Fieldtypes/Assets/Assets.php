@@ -2,15 +2,11 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
-use Statamic\Assets\AssetCollection;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
-use Statamic\Facades\Helper;
 use Statamic\Fields\Fieldtype;
-use Statamic\Support\Arr;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
-use Statamic\Statamic;
 
 class Assets extends Fieldtype
 {
@@ -29,7 +25,7 @@ class Assets extends Fieldtype
                     'grid' => __('Grid'),
                     'list' => __('List'),
                 ],
-                'width' => 50
+                'width' => 50,
             ],
             'container' => [
                 'display' => __('Container'),
@@ -37,33 +33,33 @@ class Assets extends Fieldtype
                 'type' => 'asset_container',
                 'max_items' => 1,
                 'mode' => 'select',
-                'width' => 50
+                'width' => 50,
             ],
             'folder' => [
                 'display' => __('Folder'),
                 'instructions' => __('statamic::fieldtypes.assets.config.folder'),
                 'type' => 'asset_folder',
                 'max_items' => 1,
-                'width' => 50
+                'width' => 50,
             ],
             'restrict' => [
                 'display' => __('Restrict'),
                 'instructions' => __('statamic::fieldtypes.assets.config.restrict'),
                 'type' => 'toggle',
-                'width' => 50
+                'width' => 50,
             ],
             'allow_uploads' => [
                 'display' => __('Allow Uploads'),
                 'instructions' => __('statamic::fieldtypes.assets.config.allow_uploads'),
                 'type' => 'toggle',
                 'default' => true,
-                'width' => 50
+                'width' => 50,
             ],
             'max_files' => [
                 'display' => __('Max Files'),
                 'instructions' => __('statamic::fieldtypes.assets.config.max_files'),
                 'type' => 'integer',
-                'width' => 50
+                'width' => 50,
             ],
         ];
     }
@@ -171,7 +167,7 @@ class Assets extends Fieldtype
         $rules = ['array'];
 
         if ($max = $this->config('max_files')) {
-            $rules[] = 'max:' . $max;
+            $rules[] = 'max:'.$max;
         }
 
         return $rules;

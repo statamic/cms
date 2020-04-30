@@ -13,11 +13,11 @@ return [
     |
     */
 
-    "accepted"             => "deverá ser aceite.",
-    "active_url"           => "não contém um URL válido.",
-    "after"                => "deverá conter uma data posterior a :date.",
+    'accepted'             => 'deverá ser aceite.',
+    'active_url'           => 'não contém um URL válido.',
+    'after'                => 'deverá conter uma data posterior a :date.',
     'after_or_equal'       => 'deverá conter uma data igual ou posterior a :date.',
-    "alpha"                => "deverá conter apenas letras.",
+    'alpha'                => 'deverá conter apenas letras.',
     'alpha_dash'           => 'deverá conter apenas letras, números e traços.',
     'alpha_num'            => 'deverá conter apenas letras e números .',
     'array'                => 'deverá conter uma coleção de elementos.',

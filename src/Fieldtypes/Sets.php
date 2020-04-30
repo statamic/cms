@@ -2,11 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Support\Arr;
-use Statamic\Fields\Fieldset;
-use Statamic\Fields\Fieldtype;
 use Statamic\CP\FieldtypeFactory;
+use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
+use Statamic\Fields\Fieldtype;
+use Statamic\Support\Arr;
 
 class Sets extends Fieldtype
 {
@@ -24,6 +24,7 @@ class Sets extends Fieldtype
             $set['fields'] = collect($set['fields'])->map(function ($field, $i) {
                 return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
             })->all();
+
             return $set;
         })->values()->all();
     }
@@ -60,6 +61,7 @@ class Sets extends Fieldtype
                 $set['fields'] = collect($set['fields'])->map(function ($field) {
                     return FieldTransformer::fromVue($field);
                 })->all();
+
                 return [$handle => $set];
             })
             ->all();

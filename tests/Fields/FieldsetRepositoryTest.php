@@ -2,11 +2,8 @@
 
 namespace Tests\Fields;
 
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Statamic\Facades\File;
-use Statamic\Fields\Field;
-use Statamic\Fields\FieldRepository;
 use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldsetRepository;
 use Statamic\Support\FileCollection;
@@ -23,7 +20,7 @@ class FieldsetRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_fieldset()
+    public function it_gets_a_fieldset()
     {
         $contents = <<<'EOT'
 title: Test Fieldset
@@ -52,7 +49,7 @@ EOT;
     }
 
     /** @test */
-    function it_gets_a_fieldset_in_a_subdirectory()
+    public function it_gets_a_fieldset_in_a_subdirectory()
     {
         $contents = <<<'EOT'
 title: Test Fieldset
@@ -72,7 +69,7 @@ EOT;
     }
 
     /** @test */
-    function it_returns_null_if_fieldset_doesnt_exist()
+    public function it_returns_null_if_fieldset_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/unknown.yaml')->once()->andReturnFalse();
 
@@ -80,7 +77,7 @@ EOT;
     }
 
     /** @test */
-    function it_checks_if_a_fieldset_exists()
+    public function it_checks_if_a_fieldset_exists()
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/test.yaml')->once()->andReturnTrue();
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/unknown.yaml')->once()->andReturnFalse();
@@ -90,7 +87,7 @@ EOT;
     }
 
     /** @test */
-    function it_gets_all_fieldsets()
+    public function it_gets_all_fieldsets()
     {
         $firstContents = <<<'EOT'
 title: First Fieldset
@@ -136,7 +133,7 @@ EOT;
     }
 
     /** @test */
-    function it_returns_empty_collection_if_fieldset_directory_doesnt_exist()
+    public function it_returns_empty_collection_if_fieldset_directory_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets')->once()->andReturnFalse();
 
@@ -147,7 +144,7 @@ EOT;
     }
 
     /** @test */
-    function it_saves_to_disk()
+    public function it_saves_to_disk()
     {
         $expectedYaml = <<<'EOT'
 title: 'Test Fieldset'
@@ -168,9 +165,9 @@ EOT;
             'fields' => [
                 [
                     'handle' => 'foo',
-                    'field' => ['type' => 'textarea', 'bar' => 'baz']
+                    'field' => ['type' => 'textarea', 'bar' => 'baz'],
                 ],
-            ]
+            ],
         ]);
 
         $this->repo->save($fieldset);

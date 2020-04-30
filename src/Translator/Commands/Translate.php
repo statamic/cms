@@ -69,6 +69,7 @@ class Translate extends Command
 
         if ($pendingTranslations === 0) {
             $this->output->writeln("<comment>[!]</comment> No pending translations for <comment>$lang</comment>.");
+
             return;
         }
 
@@ -83,6 +84,7 @@ class Translate extends Command
                     $string = $this->translate((new Placeholders)->wrap($english), $lang);
                     $bar->advance();
                 }
+
                 return [$english => $string];
             })
             ->all();
@@ -102,7 +104,7 @@ class Translate extends Command
         collect($this->files->files(getcwd().'/resources/lang/'.$lang))
             ->filter(function ($file) {
                 $filename = substr($file->getBasename(), 0, -4); // without extension
-                return !in_array($filename, $this->excluded);
+                return ! in_array($filename, $this->excluded);
             })
             ->each(function ($file) use ($lang) {
                 $this->translateKeyFile($file, $lang);
@@ -122,6 +124,7 @@ class Translate extends Command
 
         if ($pendingTranslations === 0) {
             $this->output->writeln("<comment>[!]</comment> No pending translations for <comment>$lang/$filename</comment>.");
+
             return;
         }
 
@@ -137,6 +140,7 @@ class Translate extends Command
                     $string = $english == '' ? '' : $this->translate($english, $lang);
                     $bar->advance();
                 }
+
                 return [$key => $string];
             })
             ->all();
@@ -144,7 +148,7 @@ class Translate extends Command
         $bar->finish();
         $this->output->writeln('');
 
-        $contents = "<?php\n\nreturn " . VarExporter::export(Arr::undot($translations)) . ";\n";
+        $contents = "<?php\n\nreturn ".VarExporter::export(Arr::undot($translations)).";\n";
 
         $this->files->put($fullPath, $contents);
 
@@ -166,7 +170,7 @@ class Translate extends Command
 
         $path = getcwd()."/resources/lang/en/{$file}.php";
 
-        return $this->englishTranslations[$file] = require($path);
+        return $this->englishTranslations[$file] = require $path;
     }
 
     protected function languages()

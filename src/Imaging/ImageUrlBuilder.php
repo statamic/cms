@@ -2,9 +2,9 @@
 
 namespace Statamic\Imaging;
 
-use Statamic\Support\Str;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Imaging\UrlBuilder;
+use Statamic\Support\Str;
 
 abstract class ImageUrlBuilder implements UrlBuilder
 {
@@ -14,7 +14,7 @@ abstract class ImageUrlBuilder implements UrlBuilder
     protected $item;
 
     /**
-     * Get the type of item
+     * Get the type of item.
      *
      * @return string
      */

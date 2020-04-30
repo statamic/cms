@@ -141,6 +141,8 @@ trait Revisable
     }
 
     abstract protected function revisionKey();
+
     abstract protected function revisionAttributes();
+
     abstract public function makeFromRevision($revision);
 }

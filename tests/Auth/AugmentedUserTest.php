@@ -3,7 +3,6 @@
 namespace Tests\Auth;
 
 use Carbon\Carbon;
-use Mockery;
 use Statamic\Auth\AugmentedUser;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
@@ -18,7 +17,7 @@ class AugmentedUserTest extends AugmentedTestCase
     use FakesUserGroups;
 
     /** @test */
-    function it_gets_values()
+    public function it_gets_values()
     {
         Carbon::setTestNow('2020-04-15 13:00:00');
 

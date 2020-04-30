@@ -2,17 +2,16 @@
 
 namespace Tests\Fields;
 
-use Tests\TestCase;
+use Facades\Statamic\Fields\FieldsetRepository;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;
-use Illuminate\Support\Collection;
-use Facades\Statamic\Fields\FieldsetRepository;
+use Tests\TestCase;
 
 class FieldsetTest extends TestCase
 {
     /** @test */
-    function it_gets_the_handle()
+    public function it_gets_the_handle()
     {
         $fieldset = new Fieldset;
         $this->assertNull($fieldset->handle());
@@ -24,14 +23,14 @@ class FieldsetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_contents()
+    public function it_gets_contents()
     {
         $fieldset = new Fieldset;
         $this->assertEquals([], $fieldset->contents());
 
         $contents = [
             'fields' => [
-                ['handle' => 'one', 'field' => ['type' => 'text']]
+                ['handle' => 'one', 'field' => ['type' => 'text']],
             ],
         ];
 
@@ -42,17 +41,17 @@ class FieldsetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_title()
+    public function it_gets_the_title()
     {
         $fieldset = (new Fieldset)->setContents([
-            'title' => 'Test'
+            'title' => 'Test',
         ]);
 
         $this->assertEquals('Test', $fieldset->title());
     }
 
     /** @test */
-    function the_title_falls_back_to_a_humanized_handle()
+    public function the_title_falls_back_to_a_humanized_handle()
     {
         $fieldset = (new Fieldset)->setHandle('the_blueprint_handle');
 
@@ -60,7 +59,7 @@ class FieldsetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_fields()
+    public function it_gets_fields()
     {
         $fieldset = new Fieldset;
 
@@ -73,8 +72,8 @@ class FieldsetTest extends TestCase
                 [
                     'handle' => 'two',
                     'field' => ['type' => 'textarea'],
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $fields = $fieldset->fields();
@@ -86,7 +85,7 @@ class FieldsetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_fields_using_legacy_syntax()
+    public function it_gets_fields_using_legacy_syntax()
     {
         $fieldset = new Fieldset;
 
@@ -97,8 +96,8 @@ class FieldsetTest extends TestCase
                 ],
                 'two' => [
                     'type' => 'textarea',
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $fields = $fieldset->fields();
@@ -110,7 +109,7 @@ class FieldsetTest extends TestCase
     }
 
     /** @test */
-    function gets_a_single_field()
+    public function gets_a_single_field()
     {
         $fieldset = new Fieldset;
 
@@ -120,10 +119,10 @@ class FieldsetTest extends TestCase
                     'handle' => 'one',
                     'field' => [
                         'type' => 'textarea',
-                        'display' => 'First field'
+                        'display' => 'First field',
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
 
         $field = $fieldset->field('one');
@@ -136,7 +135,7 @@ class FieldsetTest extends TestCase
     }
 
     /** @test */
-    function it_saves_through_the_repository()
+    public function it_saves_through_the_repository()
     {
         FieldsetRepository::shouldReceive('save')->with($fieldset = new Fieldset)->once();
 

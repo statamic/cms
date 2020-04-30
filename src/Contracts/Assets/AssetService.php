@@ -7,7 +7,7 @@ use Statamic\Contracts\Data\DataService;
 interface AssetService extends DataService
 {
     /**
-     * Get assets from a folder
+     * Get assets from a folder.
      *
      * @param string      $folder
      * @param string|null $locale

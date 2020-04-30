@@ -2,10 +2,8 @@
 
 namespace Statamic\Filesystem;
 
-use Illuminate\Support\Facades\Storage;
-use Statamic\Filesystem\FlysystemAdapter;
-use Statamic\Filesystem\FilesystemAdapter;
 use Illuminate\Contracts\Container\BindingResolutionException;
+use Illuminate\Support\Facades\Storage;
 
 class Manager
 {
@@ -30,11 +28,12 @@ class Manager
 
         $fs = app(FilesystemAdapter::class);
         $fs->setRootDirectory($root);
+
         return $fs;
     }
 
     /**
-     * Pass methods through to the default disk
+     * Pass methods through to the default disk.
      *
      * @param string $method
      * @param array $args

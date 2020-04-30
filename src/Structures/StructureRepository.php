@@ -3,7 +3,6 @@
 namespace Statamic\Structures;
 
 use Illuminate\Support\Collection as IlluminateCollection;
-use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Structures\Structure;
 use Statamic\Contracts\Structures\StructureRepository as RepositoryContract;
 use Statamic\Facades\Collection;

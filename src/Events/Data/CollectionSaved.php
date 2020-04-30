@@ -2,10 +2,10 @@
 
 namespace Statamic\Events\Data;
 
-use Statamic\Facades\Path;
-use Statamic\Events\Event;
-use Statamic\Entries\Collection;
 use Statamic\Contracts\Data\DataSavedEvent;
+use Statamic\Entries\Collection;
+use Statamic\Events\Event;
+use Statamic\Facades\Path;
 
 class CollectionSaved extends Event implements DataSavedEvent
 {

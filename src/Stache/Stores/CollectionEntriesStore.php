@@ -2,15 +2,15 @@
 
 namespace Statamic\Stache\Stores;
 
+use Statamic\Entries\GetDateFromPath;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Collection;
 use Statamic\Stache\Indexes;
-use Symfony\Component\Finder\SplFileInfo;
-use Statamic\Entries\GetDateFromPath;
 use Statamic\Structures\CollectionStructure;
+use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionEntriesStore extends ChildStore
 {
@@ -21,7 +21,8 @@ class CollectionEntriesStore extends ChildStore
         return $this->collection ?? Collection::findByHandle($this->childKey);
     }
 
-    public function getFileFilter(SplFileInfo $file) {
+    public function getFileFilter(SplFileInfo $file)
+    {
         $dir = str_finish($this->directory(), '/');
         $relative = $file->getPathname();
 
@@ -98,7 +99,7 @@ class CollectionEntriesStore extends ChildStore
         $collection = str_after($collection, $this->parent->directory());
 
         if (Site::hasMultiple()) {
-            list($collection, $site) = explode('/', $collection);
+            [$collection, $site] = explode('/', $collection);
         }
 
         // Support entries within subdirectories at any level.
@@ -141,7 +142,10 @@ class CollectionEntriesStore extends ChildStore
             ->maxDepth($contents['max_depth'] ?? null);
 
         $tempStructure = new class extends \Statamic\Structures\Structure {
-            public function collections($collections = null) { return collect(); }
+            public function collections($collections = null)
+            {
+                return collect();
+            }
         };
 
         foreach ($trees as $site => $treeContents) {

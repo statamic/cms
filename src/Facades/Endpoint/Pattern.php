@@ -1,4 +1,6 @@
-<?php namespace Statamic\Facades\Endpoint;
+<?php
+
+namespace Statamic\Facades\Endpoint;
 
 /**
  * Regular expressions, et al.
@@ -6,7 +8,7 @@
 class Pattern
 {
     /**
-     * Order key for date
+     * Order key for date.
      *
      * 4 digits, dash, 2 digits, dash, 2 digits, period.
      */
@@ -16,7 +18,7 @@ class Pattern
     }
 
     /**
-     * Order key for datetime
+     * Order key for datetime.
      *
      * 4 digits, dash, 2 digits, dash, 2 digits, dash, 4 digits, period.
      */
@@ -26,7 +28,7 @@ class Pattern
     }
 
     /**
-     * Order key for date _or_ datetime
+     * Order key for date _or_ datetime.
      *
      * 4 digits, dash, 2 digits, dash, 2 digits
      * Then optionally a dash and 4 digits
@@ -38,7 +40,7 @@ class Pattern
     }
 
     /**
-     * Order key for numerics
+     * Order key for numerics.
      *
      * Any number of digits, period.
      */
@@ -48,7 +50,7 @@ class Pattern
     }
 
     /**
-     * Any order key
+     * Any order key.
      *
      * Either:
      *   A date or datetime: 4dig, -, 2dig, -, 2dig, (then opt. -, 2dig)
@@ -61,7 +63,7 @@ class Pattern
     }
 
     /**
-     * A UUID
+     * A UUID.
      */
     public function uuid()
     {
@@ -69,7 +71,7 @@ class Pattern
     }
 
     /**
-     * Checks to see if a given $haystack starts with a given $needle
+     * Checks to see if a given $haystack starts with a given $needle.
      *
      * @param string $haystack  String to check within
      * @param string $needle    String to look for
@@ -77,11 +79,11 @@ class Pattern
      */
     public function startsWith($haystack, $needle)
     {
-        return (substr($haystack, 0, strlen($needle)) === $needle);
+        return substr($haystack, 0, strlen($needle)) === $needle;
     }
 
     /**
-     * Checks to see if a given $haystack ends with a given $needle
+     * Checks to see if a given $haystack ends with a given $needle.
      *
      * @param string $haystack  String to check within
      * @param string $needle    String to look for
@@ -89,11 +91,11 @@ class Pattern
      */
     public function endsWith($haystack, $needle)
     {
-        return (strcasecmp(substr($haystack, strlen($haystack) - strlen($needle)), $needle) === 0);
+        return strcasecmp(substr($haystack, strlen($haystack) - strlen($needle)), $needle) === 0;
     }
 
     /**
-     * Checks to see if a given $value is a valid UUID
+     * Checks to see if a given $value is a valid UUID.
      *
      * @param string $value
      * @return bool

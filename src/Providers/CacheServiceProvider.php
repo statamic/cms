@@ -3,9 +3,9 @@
 namespace Statamic\Providers;
 
 use Carbon\Carbon;
-use Statamic\Extensions\FileStore;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Extensions\FileStore;
 
 class CacheServiceProvider extends ServiceProvider
 {
@@ -30,7 +30,7 @@ class CacheServiceProvider extends ServiceProvider
         Cache::extend('statamic', function () {
             return Cache::repository(new FileStore(
                 $this->app['files'],
-                $this->app['config']["cache.stores.file"]['path']
+                $this->app['config']['cache.stores.file']['path']
             ));
         });
 

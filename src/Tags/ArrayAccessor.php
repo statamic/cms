@@ -2,8 +2,8 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Arr;
 use Illuminate\Support\Collection;
+use Statamic\Support\Arr;
 
 class ArrayAccessor extends Collection
 {

@@ -2,13 +2,13 @@
 
 namespace Statamic\StaticCaching;
 
-use Statamic\Events\Data as DataEvents;
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\Events\Data as DataEvents;
 
 class Invalidate implements ShouldQueue
 {
     protected $invalidator;
-    
+
     protected $events = [
         DataEvents\EntrySaved::class,
     ];
@@ -21,7 +21,7 @@ class Invalidate implements ShouldQueue
     public function subscribe($dispatcher)
     {
         foreach ($this->events as $event) {
-            $dispatcher->listen($event, self::class . '@handle');
+            $dispatcher->listen($event, self::class.'@handle');
         }
     }
 

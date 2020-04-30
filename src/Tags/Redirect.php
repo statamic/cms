@@ -4,7 +4,6 @@ namespace Statamic\Tags;
 
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Fields\Value;
-use Statamic\Tags\Tags;
 
 class Redirect extends Tags
 {

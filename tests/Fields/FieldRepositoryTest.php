@@ -3,11 +3,11 @@
 namespace Tests\Fields;
 
 use Mockery;
-use Tests\TestCase;
 use Statamic\Fields\Field;
-use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldRepository;
+use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldsetRepository;
+use Tests\TestCase;
 
 class FieldRepositoryTest extends TestCase
 {
@@ -24,8 +24,8 @@ class FieldRepositoryTest extends TestCase
                     [
                         'handle' => 'one',
                         'field' => ['type' => 'textarea', 'display' => 'First Field'],
-                    ]
-                ]
+                    ],
+                ],
             ]);
         });
 
@@ -35,7 +35,7 @@ class FieldRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_field_within_a_fieldset()
+    public function it_gets_a_field_within_a_fieldset()
     {
         $field = $this->repo->find('test.one');
 
@@ -46,19 +46,19 @@ class FieldRepositoryTest extends TestCase
     }
 
     /** @test */
-    function unknown_field_in_valid_fieldset_returns_null()
+    public function unknown_field_in_valid_fieldset_returns_null()
     {
         $this->assertNull($this->repo->find('test.unknown'));
     }
 
     /** @test */
-    function it_returns_null_if_fieldset_doesnt_exist()
+    public function it_returns_null_if_fieldset_doesnt_exist()
     {
         $this->assertNull($this->repo->find('unknown.test'));
     }
 
     /** @test */
-    function it_returns_null_if_fieldset_and_field_are_not_both_provided()
+    public function it_returns_null_if_fieldset_and_field_are_not_both_provided()
     {
         $this->assertNull($this->repo->find('test'));
     }

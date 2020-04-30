@@ -2,10 +2,8 @@
 
 namespace Tests\Data\Structures;
 
-use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
-use Statamic\Facades\Structure as StructureAPI;
 use Statamic\Structures\Nav;
 use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
@@ -26,12 +24,12 @@ class TreeTest extends TestCase
 
         $stache = $this->app->make('stache');
         $dir = __DIR__.'/../../Stache/__fixtures__';
-        $stache->store('collections')->directory($dir . '/content/collections');
-        $stache->store('entries')->directory($dir . '/content/collections');
+        $stache->store('collections')->directory($dir.'/content/collections');
+        $stache->store('entries')->directory($dir.'/content/collections');
     }
 
     /** @test */
-    function it_gets_the_route_from_the_structure()
+    public function it_gets_the_route_from_the_structure()
     {
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('route')->with('the-locale')->once()->andReturn('/the-route/{slug}');
@@ -44,7 +42,7 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_edit_url()
+    public function it_gets_the_edit_url()
     {
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('editUrl')->withNoArgs()->once()->andReturn('/edit-url');
@@ -55,7 +53,7 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_delete_url()
+    public function it_gets_the_delete_url()
     {
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('deleteUrl')->withNoArgs()->once()->andReturn('/delete-url');
@@ -66,7 +64,7 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_show_url_from_the_structure()
+    public function it_gets_the_show_url_from_the_structure()
     {
         Site::shouldReceive('hasMultiple')->once()->andReturnFalse();
         $structure = $this->mock(Structure::class);
@@ -80,7 +78,7 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_show_url_with_the_site_query_param_when_there_are_multiple_sites()
+    public function it_gets_the_show_url_with_the_site_query_param_when_there_are_multiple_sites()
     {
         Site::shouldReceive('hasMultiple')->once()->andReturnTrue();
         $structure = $this->mock(Structure::class);
@@ -94,7 +92,7 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_parent()
+    public function it_gets_the_parent()
     {
         $tree = $this->tree();
 
@@ -105,7 +103,7 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_root()
+    public function it_gets_the_root()
     {
         $tree = $this->tree();
         $tree->structure()->expectsRoot(true);
@@ -115,7 +113,7 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function a_tree_not_expecting_a_root_will_have_no_root()
+    public function a_tree_not_expecting_a_root_will_have_no_root()
     {
         $tree = $this->tree();
         $tree->structure()->expectsRoot(false);
@@ -125,7 +123,7 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function a_tree_expecting_a_root_but_with_no_branches_has_no_root()
+    public function a_tree_expecting_a_root_but_with_no_branches_has_no_root()
     {
         $tree = $this->tree();
         $tree->structure()->expectsRoot(true);
@@ -135,7 +133,7 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_child_pages_including_the_root()
+    public function it_gets_the_child_pages_including_the_root()
     {
         $pages = $this->tree()->pages();
 
@@ -144,7 +142,7 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_page_by_key()
+    public function it_gets_a_page_by_key()
     {
         $page = $this->tree()->page('pages-directors');
 
@@ -152,7 +150,7 @@ class TreeTest extends TestCase
     }
 
     /** @test */
-    function it_appends_an_entry()
+    public function it_appends_an_entry()
     {
         $tree = $this->tree();
 
@@ -169,23 +167,23 @@ class TreeTest extends TestCase
                         'entry' => 'pages-board',
                         'children' => [
                             [
-                                'entry' => 'pages-directors'
-                            ]
-                        ]
-                    ]
+                                'entry' => 'pages-directors',
+                            ],
+                        ],
+                    ],
                 ],
             ],
             [
-                'entry' => 'pages-blog'
+                'entry' => 'pages-blog',
             ],
             [
-                'entry' => 'appended-page'
+                'entry' => 'appended-page',
             ],
         ], $tree->tree());
     }
 
     /** @test */
-    function it_appends_an_entry_to_another_page()
+    public function it_appends_an_entry_to_another_page()
     {
         $tree = $this->tree();
 
@@ -202,23 +200,23 @@ class TreeTest extends TestCase
                         'entry' => 'pages-board',
                         'children' => [
                             [
-                                'entry' => 'pages-directors'
+                                'entry' => 'pages-directors',
                             ],
                             [
-                                'entry' => 'appended-page'
+                                'entry' => 'appended-page',
                             ],
-                        ]
-                    ]
+                        ],
+                    ],
                 ],
             ],
             [
                 'entry' => 'pages-blog',
-            ]
+            ],
         ], $tree->tree());
     }
 
     /** @test */
-    function it_moves_an_entry_to_another_page()
+    public function it_moves_an_entry_to_another_page()
     {
         $tree = $this->tree();
 
@@ -242,17 +240,17 @@ class TreeTest extends TestCase
                     [
                         'entry' => 'pages-directors',
                         'foo' => 'bar',
-                    ]
+                    ],
                 ],
             ],
             [
                 'entry' => 'pages-blog',
-            ]
+            ],
         ], $tree->tree());
     }
 
     /** @test */
-    function it_doesnt_get_moved_if_its_already_in_the_target()
+    public function it_doesnt_get_moved_if_its_already_in_the_target()
     {
         $tree = $this->tree()->tree($arr = [
             [
@@ -266,12 +264,12 @@ class TreeTest extends TestCase
                     ],
                     [
                         'entry' => 'pages-directors',
-                    ]
+                    ],
                 ],
             ],
             [
                 'entry' => 'pages-blog',
-            ]
+            ],
         ]);
 
         $tree->move('pages-board', 'pages-about');
@@ -283,29 +281,29 @@ class TreeTest extends TestCase
      * @test
      * @see https://github.com/statamic/cms/issues/1548
      **/
-    function it_can_move_the_root()
+    public function it_can_move_the_root()
     {
         $tree = $this->tree()->tree([
-                [
-                    'entry' => 'pages-home',
-                ],
-                [
-                    'entry' => 'pages-blog'
-                ],
-                [
-                    'entry' => 'pages-about',
-                    'children' => [
-                        [
-                            'entry' => 'pages-board',
-                            'children' => [
-                                [
-                                    'entry' => 'pages-directors'
-                                ]
-                            ]
-                        ]
+            [
+                'entry' => 'pages-home',
+            ],
+            [
+                'entry' => 'pages-blog',
+            ],
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                        'children' => [
+                            [
+                                'entry' => 'pages-directors',
+                            ],
+                        ],
                     ],
-                ]
-            ]);
+                ],
+            ],
+        ]);
 
         $tree->move('pages-home', 'pages-board');
 
@@ -324,16 +322,16 @@ class TreeTest extends TestCase
                             ],
                             [
                                 'entry' => 'pages-home',
-                            ]
-                        ]
-                    ]
+                            ],
+                        ],
+                    ],
                 ],
-            ]
+            ],
         ], $tree->tree());
     }
 
     /** @test */
-    function it_fixes_indexes_when_moving()
+    public function it_fixes_indexes_when_moving()
     {
         $tree = $this->tree()->tree([
             [
@@ -347,9 +345,9 @@ class TreeTest extends TestCase
                 'children' => [
                     [
                         'entry' => 'pages-board',
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ]);
 
         $tree->move('pages-blog', 'pages-about');
@@ -367,14 +365,14 @@ class TreeTest extends TestCase
                     ],
                     [
                         'entry' => 'pages-blog',
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ], $tree->tree());
     }
 
     /** @test */
-    function the_structure_validates_the_tree_when_getting_it_the_first_time()
+    public function the_structure_validates_the_tree_when_getting_it_the_first_time()
     {
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('handle')->andReturn('test');
@@ -420,14 +418,14 @@ class TreeTest extends TestCase
                             'entry' => 'pages-board',
                             'children' => [
                                 [
-                                    'entry' => 'pages-directors'
-                                ]
-                            ]
-                        ]
+                                    'entry' => 'pages-directors',
+                                ],
+                            ],
+                        ],
                     ],
                 ],
                 [
-                    'entry' => 'pages-blog'
+                    'entry' => 'pages-blog',
                 ],
             ]);
     }

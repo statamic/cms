@@ -22,7 +22,7 @@ class Date extends Fieldtype
                     'single' => 'Single',
                     // 'multiple' => 'Multiple',
                     'range' => 'Range',
-                ]
+                ],
             ],
             'time_enabled'  => [
                 'display' => __('Time Enabled'),
@@ -93,7 +93,7 @@ class Date extends Fieldtype
             return $this->config('required') ? Carbon::now() : null;
         }
 
-        if ($this->config('mode') === "range") {
+        if ($this->config('mode') === 'range') {
 
             // If switching from single to range, all bets are off.
             if (! is_array($data)) {
@@ -102,7 +102,7 @@ class Date extends Fieldtype
 
             return [
                 'start' => Carbon::parse($data['start'])->format('Y-m-d'),
-                'end' => Carbon::parse($data['end'])->format('Y-m-d')
+                'end' => Carbon::parse($data['end'])->format('Y-m-d'),
             ];
         }
 
@@ -116,12 +116,14 @@ class Date extends Fieldtype
 
     public function process($data)
     {
-        if (is_null($data)) return $data;
+        if (is_null($data)) {
+            return $data;
+        }
 
-        if ($this->config('mode') === "range") {
+        if ($this->config('mode') === 'range') {
             return [
                 'start' => Carbon::parse($data['start'])->format('Y-m-d'),
-                'end' => Carbon::parse($data['end'])->format('Y-m-d')
+                'end' => Carbon::parse($data['end'])->format('Y-m-d'),
             ];
         }
 

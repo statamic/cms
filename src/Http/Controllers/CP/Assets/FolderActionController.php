@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\Facades\AssetContainer;
 use Statamic\Assets\AssetFolder;
 use Statamic\Http\Controllers\CP\ActionController as Controller;
 

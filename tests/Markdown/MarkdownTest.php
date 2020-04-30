@@ -7,27 +7,27 @@ use Tests\TestCase;
 
 class MarkdownTest extends TestCase
 {
-    function assertParses($expectedHtml, $markdown)
+    public function assertParses($expectedHtml, $markdown)
     {
         $this->assertEquals($expectedHtml, rtrim(Markdown::parse($markdown)));
     }
 
     /** @test */
-    function it_parses_markdown()
+    public function it_parses_markdown()
     {
-        $this->assertParses("<h1>Heading One</h1>", '# Heading One');
+        $this->assertParses('<h1>Heading One</h1>', '# Heading One');
     }
 
     /** @test */
-    function it_parses_strikethrough()
+    public function it_parses_strikethrough()
     {
-        $this->assertParses("<h1>Heading <del>One</del></h1>", '# Heading ~~One~~');
+        $this->assertParses('<h1>Heading <del>One</del></h1>', '# Heading ~~One~~');
     }
 
     /** @test */
-    function it_parses_markdown_inside_markup()
+    public function it_parses_markdown_inside_markup()
     {
-        $markdown = <<<EOT
+        $markdown = <<<'EOT'
 <div>
 
 # Heading
@@ -37,7 +37,7 @@ class MarkdownTest extends TestCase
 ## Another Heading
 EOT;
 
-        $html = <<<EOT
+        $html = <<<'EOT'
 <div>
 <h1>Heading</h1>
 </div>
@@ -48,7 +48,7 @@ EOT;
     }
 
     /** @test */
-    function it_parses_attributes()
+    public function it_parses_attributes()
     {
         $this->assertParses(
             '<h2 class="main header" id="the-heading" lang="en">Heading</h2>',
@@ -57,9 +57,9 @@ EOT;
     }
 
     /** @test */
-    function it_parses_code_blocks()
+    public function it_parses_code_blocks()
     {
-        $markdown = <<<EOT
+        $markdown = <<<'EOT'
 # Heading
 
 ``` yaml
@@ -69,7 +69,7 @@ foo: bar
 Paragraph
 EOT;
 
-        $html = <<<EOT
+        $html = <<<'EOT'
 <h1>Heading</h1>
 <pre><code class="language-yaml">foo: bar
 </code></pre>
@@ -77,10 +77,11 @@ EOT;
 EOT;
         $this->assertParses($html, $markdown);
     }
+
     /** @test */
-    function it_parses_tables()
+    public function it_parses_tables()
     {
-        $markdown = <<<EOT
+        $markdown = <<<'EOT'
 # Heading
 
 | Header One | Header Two |
@@ -91,7 +92,7 @@ EOT;
 Paragraph
 EOT;
 
-        $html = <<<EOT
+        $html = <<<'EOT'
 <h1>Heading</h1>
 <table>
 <thead>
@@ -118,7 +119,7 @@ EOT;
     }
 
     /** @test */
-    function it_does_not_automatically_convert_urls_to_links()
+    public function it_does_not_automatically_convert_urls_to_links()
     {
         $this->assertParses('<p>https://example.com</p>', 'https://example.com');
 
@@ -129,7 +130,7 @@ EOT;
     }
 
     /** @test */
-    function it_converts_line_breaks_on_demand()
+    public function it_converts_line_breaks_on_demand()
     {
         $this->assertParses("<p>foo\nbar</p>", "foo\nbar");
 
@@ -140,7 +141,7 @@ EOT;
     }
 
     /** @test */
-    function it_escapes_markup_on_demand()
+    public function it_escapes_markup_on_demand()
     {
         $this->assertParses('<div></div>', '<div></div>');
 
@@ -151,7 +152,7 @@ EOT;
     }
 
     /** @test */
-    function it_uses_smart_punctuation_on_demand()
+    public function it_uses_smart_punctuation_on_demand()
     {
         $this->assertParses('<p>&quot;Foo&quot; -- Bar...</p>', '"Foo" -- Bar...');
 

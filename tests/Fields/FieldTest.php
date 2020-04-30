@@ -2,21 +2,16 @@
 
 namespace Tests\Fields;
 
-use Tests\TestCase;
-use Statamic\Fields\Field;
-use Statamic\Fields\Value;
-use Statamic\Fields\Fields;
-use Statamic\Fields\Fieldtype;
-use Illuminate\Support\Collection;
-use Tests\Fakes\Fieldtypes\PlainFieldtype;
-use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
-use Tests\Fakes\Fieldtypes\FieldtypeWithValidationRules;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Value;
+use Tests\TestCase;
 
 class FieldTest extends TestCase
 {
     /** @test */
-    function it_gets_the_display_value()
+    public function it_gets_the_display_value()
     {
         $this->assertEquals(
             'Test Display Value',
@@ -35,7 +30,7 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_gets_instructions()
+    public function it_gets_instructions()
     {
         $this->assertEquals(
             'The instructions',
@@ -46,7 +41,7 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_determines_if_localizable()
+    public function it_determines_if_localizable()
     {
         $this->assertFalse((new Field('test', []))->isLocalizable());
         $this->assertFalse((new Field('test', ['localizable' => false]))->isLocalizable());
@@ -54,9 +49,10 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_fieldtype()
+    public function it_gets_the_fieldtype()
     {
-        $fieldtype = new class extends Fieldtype { };
+        $fieldtype = new class extends Fieldtype {
+        };
 
         FieldtypeRepository::shouldReceive('find')
             ->with('the_fieldtype')
@@ -68,7 +64,7 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_gets_validation_rules_from_field()
+    public function it_gets_validation_rules_from_field()
     {
         $fieldtype = new class extends Fieldtype {
             protected $rules = null;
@@ -80,16 +76,16 @@ class FieldTest extends TestCase
 
         $field = new Field('test', [
             'type' => 'fieldtype_with_no_rules',
-            'validate' => 'required|min:2'
+            'validate' => 'required|min:2',
         ]);
 
         $this->assertEquals([
-            'test' => ['required', 'min:2']
+            'test' => ['required', 'min:2'],
         ], $field->rules());
     }
 
     /** @test */
-    function it_gets_validation_rules_from_fieldtype()
+    public function it_gets_validation_rules_from_fieldtype()
     {
         $fieldtype = new class extends Fieldtype {
             protected $rules = 'min:2|max:5';
@@ -102,12 +98,12 @@ class FieldTest extends TestCase
         $field = new Field('test', ['type' => 'fieldtype_with_rules']);
 
         $this->assertEquals([
-            'test' => ['min:2', 'max:5', 'nullable']
+            'test' => ['min:2', 'max:5', 'nullable'],
         ], $field->rules());
     }
 
     /** @test */
-    function it_merges_validation_rules_from_field_with_fieldtype()
+    public function it_merges_validation_rules_from_field_with_fieldtype()
     {
         $fieldtype = new class extends Fieldtype {
             protected $rules = 'min:2|max:5';
@@ -119,21 +115,21 @@ class FieldTest extends TestCase
 
         $field = new Field('test', [
             'type' => 'fieldtype_with_rules',
-            'validate' => 'required|array'
+            'validate' => 'required|array',
         ]);
 
         $this->assertEquals([
-            'test' => ['required', 'array', 'min:2', 'max:5']
+            'test' => ['required', 'array', 'min:2', 'max:5'],
         ], $field->rules());
     }
 
     /** @test */
-    function it_merges_extra_fieldtype_rules()
+    public function it_merges_extra_fieldtype_rules()
     {
         $fieldtype = new class extends Fieldtype {
             protected $extraRules = [
                 'test.*.one' => 'required|min:2',
-                'test.*.two' => 'max:2'
+                'test.*.two' => 'max:2',
             ];
         };
 
@@ -143,7 +139,7 @@ class FieldTest extends TestCase
 
         $field = new Field('test', [
             'type' => 'fieldtype_with_extra_rules',
-            'validate' => 'required'
+            'validate' => 'required',
         ]);
 
         $this->assertEquals([
@@ -154,7 +150,7 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_checks_if_a_field_is_required_when_defined_in_field()
+    public function it_checks_if_a_field_is_required_when_defined_in_field()
     {
         $fieldtype = new class extends Fieldtype {
             protected $rules = null;
@@ -166,12 +162,12 @@ class FieldTest extends TestCase
 
         $requiredField = new Field('test', [
             'type' => 'fieldtype_with_no_rules',
-            'validate' => 'required|min:2'
+            'validate' => 'required|min:2',
         ]);
 
         $optionalField = new Field('test', [
             'type' => 'fieldtype_with_no_rules',
-            'validate' => 'min:2'
+            'validate' => 'min:2',
         ]);
 
         $this->assertTrue($requiredField->isRequired());
@@ -179,7 +175,7 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_checks_if_a_field_is_required_when_defined_in_fieldtype()
+    public function it_checks_if_a_field_is_required_when_defined_in_fieldtype()
     {
         $fieldtype = new class extends Fieldtype {
             protected $rules = 'required|min:2';
@@ -191,14 +187,14 @@ class FieldTest extends TestCase
 
         $field = new Field('test', [
             'type' => 'fieldtype_with_rules',
-            'validate' => 'min:2'
+            'validate' => 'min:2',
         ]);
 
         $this->assertTrue($field->isRequired());
     }
 
     /** @test */
-    function it_checks_if_a_field_is_required_when_defined_as_its_own_field_property()
+    public function it_checks_if_a_field_is_required_when_defined_as_its_own_field_property()
     {
         $fieldtype = new class extends Fieldtype {
             protected $rules = null;
@@ -231,7 +227,7 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_adds_nullable_rule_when_not_required()
+    public function it_adds_nullable_rule_when_not_required()
     {
         $fieldtype = new class extends Fieldtype {
             protected $rules = null;
@@ -243,7 +239,7 @@ class FieldTest extends TestCase
 
         $nullableField = new Field('test', [
             'type' => 'fieldtype_with_no_rules',
-            'validate' => 'min:2'
+            'validate' => 'min:2',
         ]);
 
         $booleanRequiredField = new Field('test', [
@@ -254,12 +250,12 @@ class FieldTest extends TestCase
 
         $validateRequiredField = new Field('test', [
             'type' => 'fieldtype_with_no_rules',
-            'validate' => 'required|min:2'
+            'validate' => 'required|min:2',
         ]);
 
         $validateRequiredIfField = new Field('test', [
             'type' => 'fieldtype_with_no_rules',
-            'validate' => 'required_if:foo|min:2'
+            'validate' => 'required_if:foo|min:2',
         ]);
 
         $this->assertEquals(['test' => ['min:2', 'nullable']], $nullableField->rules());
@@ -269,7 +265,7 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function converts_to_array_suitable_for_rendering_fields_in_publish_component()
+    public function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('example')
@@ -277,22 +273,24 @@ class FieldTest extends TestCase
                 protected $component = 'example';
                 protected $configFields = [
                     'a_config_field_with_pre_processing' => ['type' => 'with_processing'],
-                    'a_config_field_without_pre_processing' => ['type' => 'without_processing']
+                    'a_config_field_without_pre_processing' => ['type' => 'without_processing'],
                 ];
             });
 
-            FieldtypeRepository::shouldReceive('find')
+        FieldtypeRepository::shouldReceive('find')
                 ->with('with_processing')
                 ->andReturn(new class extends Fieldtype {
-                    public function preProcess($data) {
-                        return $data . ' preprocessed';
+                    public function preProcess($data)
+                    {
+                        return $data.' preprocessed';
                     }
                 });
 
-            FieldtypeRepository::shouldReceive('find')
+        FieldtypeRepository::shouldReceive('find')
                 ->with('without_processing')
                 ->andReturn(new class extends Fieldtype {
-                    public function preProcess($data) {
+                    public function preProcess($data)
+                    {
                         return $data;
                     }
                 });
@@ -320,7 +318,7 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_value()
+    public function it_gets_the_value()
     {
         $field = (new Field('test', ['type' => 'fieldtype']));
         $this->assertNull($field->value());
@@ -332,13 +330,14 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_processes_the_value_through_its_fieldtype()
+    public function it_processes_the_value_through_its_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
             ->andReturn(new class extends Fieldtype {
-                public function process($data) {
-                    return $data . ' processed';
+                public function process($data)
+                {
+                    return $data.' processed';
                 }
             });
 
@@ -351,13 +350,14 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_preprocesses_the_value_through_its_fieldtype()
+    public function it_preprocesses_the_value_through_its_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
             ->andReturn(new class extends Fieldtype {
-                public function preProcess($data) {
-                    return $data . ' preprocessed';
+                public function preProcess($data)
+                {
+                    return $data.' preprocessed';
                 }
             });
 
@@ -370,13 +370,14 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_preprocesses_the_value_through_its_fieldtype_for_the_index()
+    public function it_preprocesses_the_value_through_its_fieldtype_for_the_index()
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
             ->andReturn(new class extends Fieldtype {
-                public function preProcessIndex($data) {
-                    return $data . ' preprocessed for index';
+                public function preProcessIndex($data)
+                {
+                    return $data.' preprocessed for index';
                 }
             });
 
@@ -389,13 +390,14 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function preprocessing_a_field_with_no_value_will_take_the_default_from_the_field()
+    public function preprocessing_a_field_with_no_value_will_take_the_default_from_the_field()
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
             ->andReturn(new class extends Fieldtype {
-                public function preProcess($data) {
-                    return $data . ' preprocessed';
+                public function preProcess($data)
+                {
+                    return $data.' preprocessed';
                 }
             });
 
@@ -408,15 +410,18 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function preprocessing_a_field_with_no_value_and_no_field_defined_default_value_will_take_the_default_from_the_fieldtype()
+    public function preprocessing_a_field_with_no_value_and_no_field_defined_default_value_will_take_the_default_from_the_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('fieldtype')
             ->andReturn(new class extends Fieldtype {
-                public function preProcess($data) {
-                    return $data . ' preprocessed';
+                public function preProcess($data)
+                {
+                    return $data.' preprocessed';
                 }
-                public function defaultValue() {
+
+                public function defaultValue()
+                {
                     return 'fieldtype defined default';
                 }
             });
@@ -427,7 +432,7 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function converting_to_an_array_will_inline_the_handle()
+    public function converting_to_an_array_will_inline_the_handle()
     {
         $field = new Field('the_handle', ['foo' => 'bar']);
 
@@ -439,7 +444,7 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_config()
+    public function it_gets_and_sets_the_config()
     {
         $field = new Field('the_handle', ['foo' => 'bar']);
         $this->assertEquals(['foo' => 'bar'], $field->config());
@@ -451,7 +456,7 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_makes_a_new_instance()
+    public function it_makes_a_new_instance()
     {
         $field = new Field('test', ['foo' => 'bar']);
         $field->setValue('the value');
@@ -465,14 +470,17 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    function it_augments_the_value_through_its_fieldtype()
+    public function it_augments_the_value_through_its_fieldtype()
     {
         $fieldtype = new class extends Fieldtype {
-            public function augment($data) {
-                return $data . ' augmented';
+            public function augment($data)
+            {
+                return $data.' augmented';
             }
-            public function shallowAugment($data) {
-                return $data . ' shallow augmented';
+
+            public function shallowAugment($data)
+            {
+                return $data.' shallow augmented';
             }
         };
 

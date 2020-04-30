@@ -2,18 +2,18 @@
 
 namespace Statamic\Taxonomies;
 
+use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
+use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades;
-use Statamic\Support\Arr;
-use Statamic\Facades\Stache;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Data\ExistsAsFile;
-use Illuminate\Contracts\Support\Responsable;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 
 class Taxonomy implements Contract, Responsable, AugmentableContract
 {
@@ -67,7 +67,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     {
         return vsprintf('%s/%s.yaml', [
             rtrim(Stache::store('taxonomies')->directory(), '/'),
-            $this->handle
+            $this->handle,
         ]);
     }
 
@@ -197,7 +197,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function uri()
     {
-        return '/' . $this->handle;
+        return '/'.$this->handle;
     }
 
     public function collection($collection = null)
@@ -233,7 +233,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function template()
     {
-        return $this->handle() . '.index';
+        return $this->handle().'.index';
     }
 
     public function layout()
@@ -246,7 +246,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         return $this
             ->fluentlyGetOrSet('searchIndex')
             ->getter(function ($index) {
-                return $index ?  Search::index($index) : null;
+                return $index ? Search::index($index) : null;
             })
             ->args(func_get_args());
     }

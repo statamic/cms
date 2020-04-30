@@ -13,7 +13,7 @@ use Illuminate\Validation\ValidationException;
 
 /**
  * A copy of Illuminate\Auth\ResetsPasswords.
- * (but it doesn't import the RedirectsUsers trait)
+ * (but it doesn't import the RedirectsUsers trait).
  *
  * It was moved to laravel/ui, but we can't require it because it requires
  * Laravel 7 and would force us to drop support for Laravel <=6

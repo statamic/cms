@@ -45,7 +45,7 @@ class Range extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.range.config.append'),
                 'type' => 'text',
                 'width' => 50,
-            ]
+            ],
         ];
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\Fields;
 
-use Statamic\Facades;
 use Illuminate\Http\Request;
+use Statamic\Facades;
 use Statamic\Fields\Fieldset;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -28,7 +28,7 @@ class FieldsetFieldController extends CpController
             'fieldset' => [
                 'handle' => $fieldset->handle(),
                 'title' => $fieldset->title(),
-            ]
+            ],
         ]);
     }
 }

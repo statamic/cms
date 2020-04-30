@@ -3,8 +3,8 @@
 namespace Statamic\Stache\Query;
 
 use Statamic\Data\DataCollection;
-use Statamic\Stache\Stores\Store;
 use Statamic\Query\Builder as BaseBuilder;
+use Statamic\Stache\Stores\Store;
 
 abstract class Builder extends BaseBuilder
 {
@@ -15,6 +15,7 @@ abstract class Builder extends BaseBuilder
     {
         $this->store = $store;
     }
+
     public function count()
     {
         return $this->getFilteredAndLimitedKeys()->count();
@@ -106,7 +107,8 @@ abstract class Builder extends BaseBuilder
     protected function filterWhereBasic($values, $where)
     {
         return $values->filter(function ($value) use ($where) {
-            $method = 'filterTest' . $this->operators[$where['operator']];
+            $method = 'filterTest'.$this->operators[$where['operator']];
+
             return $this->{$method}($value, $where['value']);
         });
     }
@@ -121,7 +123,7 @@ abstract class Builder extends BaseBuilder
     protected function filterWhereNotIn($values, $where)
     {
         return $values->filter(function ($value) use ($where) {
-            return !in_array($value, $where['values']);
+            return ! in_array($value, $where['values']);
         });
     }
 }

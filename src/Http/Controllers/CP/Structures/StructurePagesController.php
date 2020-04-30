@@ -2,12 +2,12 @@
 
 namespace Statamic\Http\Controllers\CP\Structures;
 
-use Statamic\Support\Arr;
+use Illuminate\Http\Request;
 use Statamic\Facades\Site;
 use Statamic\Facades\Structure;
-use Illuminate\Http\Request;
-use Statamic\Structures\TreeBuilder;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Structures\TreeBuilder;
+use Statamic\Support\Arr;
 
 class StructurePagesController extends CpController
 {
@@ -42,7 +42,7 @@ class StructurePagesController extends CpController
                 'entry' => $ref = $item['id'] ?? null,
                 'title' => $ref ? null : ($item['title'] ?? null),
                 'url' => $ref ? null : ($item['url'] ?? null),
-                'children' => $this->toTree($item['children'])
+                'children' => $this->toTree($item['children']),
             ]);
         })->all();
     }

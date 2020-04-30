@@ -2,15 +2,13 @@
 
 namespace Tests\Feature\Fieldsets;
 
-use Mockery;
-use Statamic\Facades;
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Statamic\Fields\Fieldset;
-use Statamic\Entries\Collection;
-use Tests\Fakes\FakeFieldsetRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
+use Statamic\Facades;
+use Statamic\Fields\Fieldset;
+use Tests\Fakes\FakeFieldsetRepository;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class UpdateFieldsetTest extends TestCase
 {
@@ -25,7 +23,7 @@ class UpdateFieldsetTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();
@@ -43,7 +41,7 @@ class UpdateFieldsetTest extends TestCase
     }
 
     /** @test */
-    function fieldset_gets_saved()
+    public function fieldset_gets_saved()
     {
         $this->withoutExceptionHandling();
         $user = tap(Facades\User::make()->makeSuper())->save();
@@ -63,7 +61,7 @@ class UpdateFieldsetTest extends TestCase
                             'foo' => 'bar',
                             'baz' => 'qux', // not in config_overrides so it shouldn't get saved
                         ],
-                        'config_overrides' => ['foo']
+                        'config_overrides' => ['foo'],
                     ],
                     [
                         '_id' => 'id-s1-f1',
@@ -72,9 +70,9 @@ class UpdateFieldsetTest extends TestCase
                         'config' => [
                             'type' => 'text',
                             'foo' => 'bar',
-                        ]
-                    ]
-                ]
+                        ],
+                    ],
+                ],
             ])
             ->assertStatus(204);
 
@@ -86,21 +84,21 @@ class UpdateFieldsetTest extends TestCase
                     'field' => 'somefieldset.somefield',
                     'config' => [
                         'foo' => 'bar',
-                    ]
+                    ],
                 ],
                 [
                     'handle' => 'one-two',
                     'field' => [
                         'type' => 'text',
                         'foo' => 'bar',
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ], Facades\Fieldset::find('test')->contents());
     }
 
     /** @test */
-    function title_is_required()
+    public function title_is_required()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Fieldset::all());
@@ -117,15 +115,15 @@ class UpdateFieldsetTest extends TestCase
     }
 
     /** @test */
-    function fields_are_required()
+    public function fields_are_required()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
             'fields' => [
-                ['handle' => 'foo', 'field' => ['type' => 'bar']]
-            ]
+                ['handle' => 'foo', 'field' => ['type' => 'bar']],
+            ],
         ])->save();
 
         $this
@@ -139,15 +137,15 @@ class UpdateFieldsetTest extends TestCase
     }
 
     /** @test */
-    function fields_must_be_an_array()
+    public function fields_must_be_an_array()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
             'fields' => [
-                ['handle' => 'foo', 'field' => 'bar']
-            ]
+                ['handle' => 'foo', 'field' => 'bar'],
+            ],
         ])->save();
 
         $this

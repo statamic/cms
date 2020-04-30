@@ -12,7 +12,7 @@ class Textarea extends FieldtypeFilter
             'value' => [
                 'type' => 'text',
                 'placeholder' => __('Contains'),
-            ]
+            ],
         ];
     }
 
@@ -32,6 +32,6 @@ class Textarea extends FieldtypeFilter
         $operator = __('Contains');
         $value = $values['value'];
 
-        return strtolower($field) . ' ' . strtolower($operator) . ' ' . $value;
+        return strtolower($field).' '.strtolower($operator).' '.$value;
     }
 }

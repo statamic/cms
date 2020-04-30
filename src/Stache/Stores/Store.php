@@ -102,6 +102,7 @@ abstract class Store
 
         if ($indexes->contains($index = $index->name())) {
             $this->usedIndexes = $indexes;
+
             return;
         }
 
@@ -317,6 +318,7 @@ abstract class Store
         $paths = $files->mapWithKeys(function ($timestamp, $path) {
             $item = $this->makeItemFromFile($path, File::get($path));
             $this->cacheItem($item);
+
             return [$this->getItemKey($item) => $path];
         });
 

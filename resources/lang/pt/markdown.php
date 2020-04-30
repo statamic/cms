@@ -52,6 +52,6 @@ isto: é algum yaml
 <pre class="language-markdown"><code>Primeiro Cabeçalho  | Segundo Cabeçalho
 ------------------- | -------------------
   Contéudo da Cela  | Contéudo da Cela
-  Contéudo da Cela  | Contéudo da Cela </code></pre>'
+  Contéudo da Cela  | Contéudo da Cela </code></pre>',
 
 ];

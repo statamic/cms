@@ -25,6 +25,7 @@ class Nav extends Structure
         $crumbs = collect($segments)->map(function () use (&$segments) {
             $uri = URL::tidy(join('/', $segments));
             array_pop($segments);
+
             return $uri;
         })->mapWithKeys(function ($uri) {
             return [$uri => Data::findByUri($uri)];
@@ -40,6 +41,7 @@ class Nav extends Structure
 
         $crumbs = $crumbs->values()->map(function ($crumb) {
             $crumb->setSupplement('is_current', URL::getCurrent() === $crumb->url());
+
             return $crumb;
         });
 

@@ -3,10 +3,8 @@
 namespace Statamic\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Statamic\Contracts\Auth\User;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
+use Illuminate\Notifications\Notification;
 use Statamic\Auth\Passwords\PasswordReset as PasswordResetUrl;
 
 class PasswordReset extends Notification

@@ -3,9 +3,9 @@
 namespace Statamic\Console\Processes;
 
 use Illuminate\Support\Facades\Cache;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process as SymfonyProcess;
-use Symfony\Component\Process\Exception\ProcessFailedException;
 
 class Process
 {
@@ -46,6 +46,7 @@ class Process
 
         if ($cacheKey) {
             $this->runAndCacheOutput($process, $cacheKey);
+
             return;
         }
 

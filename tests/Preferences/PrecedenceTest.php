@@ -2,18 +2,18 @@
 
 namespace Tests\Preferences;
 
-use Tests\TestCase;
-use Tests\FakesRoles;
+use Statamic\Facades\Preference;
 use Statamic\Facades\Role;
 use Statamic\Facades\User;
-use Statamic\Facades\Preference;
+use Tests\FakesRoles;
+use Tests\TestCase;
 
 class PrecedenceTest extends TestCase
 {
     use FakesRoles;
 
     /** @test */
-    function it_can_get_user_preferences()
+    public function it_can_get_user_preferences()
     {
         $preferences = [
             'site' => 'english',
@@ -21,10 +21,10 @@ class PrecedenceTest extends TestCase
                 'collections' => [
                     'blog' => [
                         'title',
-                        'slug'
-                    ]
-                ]
-            ]
+                        'slug',
+                    ],
+                ],
+            ],
         ];
 
         $this->actingAs(User::make()->preferences($preferences));
@@ -35,7 +35,7 @@ class PrecedenceTest extends TestCase
     }
 
     /** @test */
-    function it_can_fallback_when_preference_doesnt_exist()
+    public function it_can_fallback_when_preference_doesnt_exist()
     {
         $this->actingAs(User::make()->makeSuper());
 
@@ -43,7 +43,7 @@ class PrecedenceTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_user_role_preferences()
+    public function it_can_get_user_role_preferences()
     {
         $preferences = [
             'site' => 'english',
@@ -51,10 +51,10 @@ class PrecedenceTest extends TestCase
                 'collections' => [
                     'blog' => [
                         'title',
-                        'slug'
-                    ]
-                ]
-            ]
+                        'slug',
+                    ],
+                ],
+            ],
         ];
 
         $this->setTestRoles(['author' => Role::make()->permissions('super')->preferences($preferences)]);
@@ -66,20 +66,20 @@ class PrecedenceTest extends TestCase
     }
 
     /** @test */
-    function it_gives_precedence_to_higher_roles_over_lower_roles_as_defined_on_user()
+    public function it_gives_precedence_to_higher_roles_over_lower_roles_as_defined_on_user()
     {
         $this->setTestRoles([
             'bear' => Role::make()->permissions('super')->preferences([
                 'actions' => [
                     'eats' => 'meat',
-                    'hibernates' => true
-                ]
+                    'hibernates' => true,
+                ],
             ]),
             'rabbit' => Role::make()->permissions('super')->preferences([
                 'actions' => [
                     'eats' => 'lettuce',
-                    'hops' => true
-                ]
+                    'hops' => true,
+                ],
             ]),
         ]);
 
@@ -91,27 +91,27 @@ class PrecedenceTest extends TestCase
     }
 
     /** @test */
-    function it_gives_precedence_to_user_preferences_over_role_preferences()
+    public function it_gives_precedence_to_user_preferences_over_role_preferences()
     {
         $this->setTestRoles([
             'bear' => Role::make()->permissions('super')->preferences([
                 'actions' => [
                     'eats' => 'meat',
-                    'hibernates' => true
-                ]
+                    'hibernates' => true,
+                ],
             ]),
             'rabbit' => Role::make()->permissions('super')->preferences([
                 'actions' => [
                     'eats' => 'lettuce',
-                    'hops' => true
-                ]
+                    'hops' => true,
+                ],
             ]),
         ]);
 
         $this->actingAs(User::make()->assignRole('rabbit')->assignRole('bear')->preferences([
             'actions' => [
                 'hibernates' => false,
-            ]
+            ],
         ]));
 
         $this->assertEquals('lettuce', Preference::get('actions.eats'));

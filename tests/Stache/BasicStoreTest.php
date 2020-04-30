@@ -17,14 +17,14 @@ class BasicStoreTest extends TestCase
         $this->store = (new TestBasicStore)->directory($this->tempDir);
     }
 
-    function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
     /** @test */
-    function it_gets_an_item_by_key()
+    public function it_gets_an_item_by_key()
     {
         file_put_contents($this->tempDir.'/foo.yaml', '');
 
@@ -35,7 +35,7 @@ class BasicStoreTest extends TestCase
     }
 
     /** @test */
-    function items_are_different_instances_every_time()
+    public function items_are_different_instances_every_time()
     {
         config(['cache.default' => 'file']); // Doesn't work when they're arrays since the object is stored in memory.
         \Illuminate\Support\Facades\Cache::clear();
@@ -48,19 +48,19 @@ class BasicStoreTest extends TestCase
     }
 
     /** @test */
-    function it_gets_an_item_by_path()
+    public function it_gets_an_item_by_path()
     {
         $this->markTestIncomplete();
     }
 
     /** @test */
-    function it_forgets_an_item_by_key()
+    public function it_forgets_an_item_by_key()
     {
         $this->markTestIncomplete();
     }
 
     /** @test */
-    function it_saves_an_item()
+    public function it_saves_an_item()
     {
         $this->markTestIncomplete();
     }
@@ -78,6 +78,7 @@ class TestBasicStore extends BasicStore
         $data = YAML::parse($contents);
         $id = Str::after($path, __DIR__.'/tmp/');
         $id = Str::before($id, '.yaml');
+
         return new TestBasicStoreItem($id, $data);
     }
 }
@@ -89,6 +90,7 @@ class TestBasicStoreItem
         $this->id = $id;
         $this->data = $data;
     }
+
     public function id()
     {
         return $this->id;

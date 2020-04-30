@@ -2,11 +2,10 @@
 
 namespace Statamic\Auth;
 
-use Statamic\Support\Str;
-use Statamic\Facades\User;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\UserProvider as UserProviderContract;
+use Illuminate\Support\Facades\Hash;
+use Statamic\Facades\User;
 
 class UserProvider implements UserProviderContract
 {

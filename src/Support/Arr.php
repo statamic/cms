@@ -4,7 +4,6 @@ namespace Statamic\Support;
 
 use Exception;
 use Illuminate\Support\Arr as IlluminateArr;
-use Statamic\Data\DataCollection;
 
 class Arr extends IlluminateArr
 {
@@ -45,6 +44,7 @@ class Arr extends IlluminateArr
     {
         if (static::isAssoc($array)) {
             $array[$scope] = $array;
+
             return $array;
         }
 
@@ -60,7 +60,7 @@ class Arr extends IlluminateArr
     }
 
     /**
-     * Checks if an array is associative
+     * Checks if an array is associative.
      *
      * @param $array
      * @return bool
@@ -71,7 +71,7 @@ class Arr extends IlluminateArr
     }
 
     /**
-     * Deep merges arrays better than array_merge_recursive()
+     * Deep merges arrays better than array_merge_recursive().
      *
      * @param array $array1
      * @param array $array2
@@ -110,7 +110,7 @@ class Arr extends IlluminateArr
     }
 
     /**
-     * Explodes options into an array
+     * Explodes options into an array.
      *
      * @param string  $string  String to explode
      * @param bool $keyed  Are options keyed?
@@ -121,23 +121,21 @@ class Arr extends IlluminateArr
         $options = explode('|', $string);
 
         if ($keyed) {
-
-            $temp_options = array();
+            $temp_options = [];
             foreach ($options as $value) {
-
                 if (strpos($value, ':')) {
-                    # key:value pair present
-                    list($option_key, $option_value) = explode(':', $value);
+                    // key:value pair present
+                    [$option_key, $option_value] = explode(':', $value);
                 } else {
-                    # default value is false
+                    // default value is false
                     $option_key = $value;
                     $option_value = false;
                 }
 
-                # set the main options array
+                // set the main options array
                 $temp_options[$option_key] = $option_value;
             }
-            # reassign and override
+            // reassign and override
             $options = $temp_options;
         }
 
@@ -145,7 +143,7 @@ class Arr extends IlluminateArr
     }
 
     /**
-     * Normalize arguments
+     * Normalize arguments.
      *
      * Ensures both ['one', 'two'] or 'one|two' ends up as the former
      *
@@ -168,7 +166,7 @@ class Arr extends IlluminateArr
     }
 
     /**
-     * Picks the first value that isn't null
+     * Picks the first value that isn't null.
      *
      * @return mixed
      */
@@ -176,12 +174,12 @@ class Arr extends IlluminateArr
     {
         $args = func_get_args();
 
-        if (!is_array($args) || !count($args)) {
+        if (! is_array($args) || ! count($args)) {
             return null;
         }
 
         foreach ($args as $arg) {
-            if (!is_null($arg)) {
+            if (! is_null($arg)) {
                 return $arg;
             }
         }
@@ -190,7 +188,7 @@ class Arr extends IlluminateArr
     }
 
     /**
-     * Sort an array by an array of keys
+     * Sort an array by an array of keys.
      *
      * @param  array  $array The array to be sorted
      * @param  array  $order An array of keys in the order to sort the first array
@@ -211,7 +209,7 @@ class Arr extends IlluminateArr
     }
 
     /**
-     * Get rid of null values. (Empty arrays, literal null values, and empty strings)
+     * Get rid of null values. (Empty arrays, literal null values, and empty strings).
      *
      * @param array $array
      * @return array
@@ -220,8 +218,8 @@ class Arr extends IlluminateArr
     {
         return array_filter($data, function ($item) {
             return is_array($item)
-                ? !empty($item)
-                : !in_array($item, [null, ''], true);
+                ? ! empty($item)
+                : ! in_array($item, [null, ''], true);
         });
     }
 

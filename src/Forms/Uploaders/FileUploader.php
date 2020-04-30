@@ -25,7 +25,7 @@ class FileUploader extends Uploader
     }
 
     /**
-     * Upload a file
+     * Upload a file.
      *
      * @param \Symfony\Component\HttpFoundation\File\UploadedFile $file
      * @param string $destination
@@ -48,11 +48,11 @@ class FileUploader extends Uploader
         $basename = $file->getClientOriginalName();
         $filename = pathinfo($basename)['filename'];
         $destination = $this->config->get('destination');
-        $path = $destination . '/' . $basename;
+        $path = $destination.'/'.$basename;
 
         if (File::exists($path)) {
-            $basename = $filename . '-' . time() . '.' . $file->getClientOriginalExtension();
-            $path = $destination . '/' . $basename;
+            $basename = $filename.'-'.time().'.'.$file->getClientOriginalExtension();
+            $path = $destination.'/'.$basename;
         }
 
         return $path;

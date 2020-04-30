@@ -3,8 +3,8 @@
 namespace Statamic\Support;
 
 use Closure;
-use ReflectionObject;
 use ReflectionException;
+use ReflectionObject;
 
 class FluentGetterSetter
 {

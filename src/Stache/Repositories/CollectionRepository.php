@@ -4,7 +4,6 @@ namespace Statamic\Stache\Repositories;
 
 use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
-use Statamic\Contracts\Structures\Structure;
 use Statamic\Entries\Collection;
 use Statamic\Events\Data\CollectionDeleted;
 use Statamic\Events\Data\CollectionSaved;

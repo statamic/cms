@@ -1,8 +1,8 @@
 <?php
 
-use Statamic\Statamic;
-use Statamic\Facades\OAuth;
 use Illuminate\Support\Facades\Route;
+use Statamic\Facades\OAuth;
+use Statamic\Statamic;
 
 Route::name('statamic.')->group(function () {
     /**

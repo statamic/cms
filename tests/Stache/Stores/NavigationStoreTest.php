@@ -4,9 +4,7 @@ namespace Tests\Stache\Stores;
 
 use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
-use Mockery;
 use Statamic\Contracts\Structures\Nav;
-use Statamic\Contracts\Structures\Structure;
 use Statamic\Facades;
 use Statamic\Facades\Path;
 use Statamic\Stache\Stache;
@@ -15,7 +13,7 @@ use Tests\TestCase;
 
 class NavigationStoreTest extends TestCase
 {
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -27,14 +25,14 @@ class NavigationStoreTest extends TestCase
         Facades\Stache::registerStore($this->store);
     }
 
-    function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
     /** @test */
-    function it_only_gets_top_level_yaml_files()
+    public function it_only_gets_top_level_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
         touch($this->tempDir.'/two.yaml', 1234567890);
@@ -59,7 +57,7 @@ class NavigationStoreTest extends TestCase
     }
 
     /** @test */
-    function it_makes_structure_instances_from_files()
+    public function it_makes_structure_instances_from_files()
     {
         $contents = <<<'EOT'
 title: Pages
@@ -87,7 +85,7 @@ EOT;
     }
 
     /** @test */
-    function it_uses_the_filename_as_the_item_key()
+    public function it_uses_the_filename_as_the_item_key()
     {
         $this->assertEquals(
             'test',
@@ -96,7 +94,7 @@ EOT;
     }
 
     /** @test */
-    function it_saves_to_disk()
+    public function it_saves_to_disk()
     {
         $structure = Facades\Nav::make()->handle('pages');
         $structure->addTree($structure->makeTree('en'));
@@ -107,7 +105,7 @@ EOT;
     }
 
     /** @test */
-    function it_saves_to_disk_with_multiple_sites()
+    public function it_saves_to_disk_with_multiple_sites()
     {
         $this->markTestIncomplete();
     }

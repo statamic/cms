@@ -2,16 +2,12 @@
 
 namespace Tests\Data\Structures;
 
-use Mockery;
-use Tests\TestCase;
-use Statamic\Entries\Entry;
 use Illuminate\Support\Collection;
+use Mockery;
 use Statamic\Structures\Page;
-use Statamic\Structures\Tree;
-use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Structures\Pages;
-use Statamic\Structures\Structure;
-use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Structures\Tree;
+use Tests\TestCase;
 
 class PagesTest extends TestCase
 {
@@ -21,12 +17,12 @@ class PagesTest extends TestCase
 
         $stache = $this->app->make('stache');
         $dir = __DIR__.'/../../Stache/__fixtures__';
-        $stache->store('collections')->directory($dir . '/content/collections');
-        $stache->store('entries')->directory($dir . '/content/collections');
+        $stache->store('collections')->directory($dir.'/content/collections');
+        $stache->store('entries')->directory($dir.'/content/collections');
     }
 
     /** @test */
-    function it_gets_a_list_of_pages()
+    public function it_gets_a_list_of_pages()
     {
         $parent = Mockery::mock(Page::class);
         $parent->shouldReceive('reference')->andReturn('the-root');
@@ -39,10 +35,10 @@ class PagesTest extends TestCase
                 ['entry' => 'one', 'children' => [
                     ['entry' => 'one-one'],
                     ['entry' => 'one-two', 'children' => [
-                        ['entry' => 'one-two-one']
+                        ['entry' => 'one-two-one'],
                     ]],
                 ]],
-                ['entry' => 'two']
+                ['entry' => 'two'],
             ]);
 
         $list = $pages->all();
@@ -53,7 +49,7 @@ class PagesTest extends TestCase
     }
 
     /** @test */
-    function it_gets_flattened_pages()
+    public function it_gets_flattened_pages()
     {
         $parent = Mockery::mock(Page::class);
         $parent->shouldReceive('reference')->andReturn('the-root');
@@ -68,10 +64,10 @@ class PagesTest extends TestCase
                 ['entry' => 'one', 'children' => [
                     ['entry' => 'one-one'],
                     ['entry' => 'one-two', 'children' => [
-                        ['entry' => 'one-two-one']
+                        ['entry' => 'one-two-one'],
                     ]],
                 ]],
-                ['entry' => 'two']
+                ['entry' => 'two'],
             ]);
 
         $this->assertEquals([
