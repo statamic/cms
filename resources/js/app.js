@@ -113,6 +113,7 @@ Statamic.app({
         FieldsetEditForm: require('./components/fieldsets/EditForm.vue').default,
         BlueprintListing: require('./components/blueprints/Listing.vue').default,
         BlueprintBuilder: require('./components/blueprints/Builder.vue').default,
+        FormCreateForm: require('./components/forms/CreateForm.vue').default,
         FormListing: require('./components/forms/Listing.vue').default,
         FormSubmissionListing: require('./components/forms/SubmissionListing.vue').default,
         GlobalListing: require('./components/globals/Listing.vue').default,
@@ -139,7 +140,6 @@ Statamic.app({
         TaxonomyEditForm: require('./components/taxonomies/EditForm.vue').default,
         AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue').default,
         AssetContainerEditForm: require('./components/asset-containers/EditForm.vue').default,
-        FormWizard: require('./components/forms/Wizard.vue').default,
     },
 
     data: {
