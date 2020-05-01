@@ -114,7 +114,7 @@ class Form implements FormContract
             ->setter(function ($emails) {
                 return collect($emails)
                     ->map(function ($email) {
-                        return collect($email)->only(['to', 'from', 'reply_to', 'subject', 'template'])->filter()->all();
+                        return collect($email)->only(['to', 'from', 'reply_to', 'subject', 'text', 'html'])->filter()->all();
                     })
                     ->filter()
                     ->all();
