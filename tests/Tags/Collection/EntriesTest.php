@@ -8,12 +8,14 @@ use InvalidArgumentException;
 use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Fields\Value;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Tags\Collection\Entries;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
+use Statamic\Taxonomies\TermCollection;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -372,6 +374,7 @@ class EntriesTest extends TestCase
         $this->makeEntry('3')->data(['tags' => ['meh']])->save();
 
         $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags' => 'rad'])->map->slug()->all());
+        $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags' => TermCollection::make([Term::make('rad')->taxonomy('tags')])])->map->slug()->all());
     }
 
     /** @test */

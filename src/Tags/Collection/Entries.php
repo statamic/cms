@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as IlluminateCollection;
 use InvalidArgumentException;
+use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -16,9 +17,11 @@ use Statamic\Tags\Concerns;
 
 class Entries
 {
-    use Concerns\QueriesConditions,
-        Concerns\QueriesScopes,
+    use Concerns\QueriesScopes,
         Concerns\GetsQueryResults;
+    use Concerns\QueriesConditions {
+        queryableConditionParams as traitQueryableConditionParams;
+    }
     use Concerns\QueriesOrderBys {
         queryOrderBys as traitQueryOrderBys;
     }
@@ -311,6 +314,10 @@ class Entries
             }
 
             $values = collect($values)->map(function ($term) use ($taxonomy) {
+                if ($term instanceof Term) {
+                    return $term->id();
+                }
+
                 return Str::contains($term, '::') ? $term : $taxonomy.'::'.$term;
             });
 
@@ -357,5 +364,12 @@ class Entries
         if (! $this->parameters->bool(['redirects', 'links'], false)) {
             $query->where('redirect', '=', null);
         }
+    }
+
+    protected function queryableConditionParams()
+    {
+        return $this->traitQueryableConditionParams()->reject(function ($value, $key) {
+            return Str::startsWith($key, 'taxonomy:');
+        });
     }
 }
