@@ -497,6 +497,8 @@ class Parser
      */
     public function parseCallbackTags($text, $data)
     {
+        $text = $this->injectExtractions($text, 'tag_pair');
+
         $inCondition = $this->inCondition;
 
         // if there are no instances of a tag, abort
