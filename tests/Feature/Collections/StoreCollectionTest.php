@@ -13,12 +13,6 @@ class StoreCollectionTest extends TestCase
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->markTestIncomplete(); // TODO: implementation was changed, tests werent.
-    }
-
     /** @test */
     public function it_denies_access_if_you_dont_have_permission()
     {
@@ -27,7 +21,7 @@ class StoreCollectionTest extends TestCase
             ->actingAs($this->userWithoutPermission())
             ->post(cp_route('collections.store'))
             ->assertRedirect('/original')
-            ->assertSessionHas('error');
+            ->assertSessionHas('error', 'You are not authorized to create collections.');
     }
 
     /** @test */
@@ -44,13 +38,9 @@ class StoreCollectionTest extends TestCase
         $this->assertCount(1, Collection::all());
         $collection = Collection::all()->first();
         $this->assertEquals('test', $collection->handle());
-        $this->assertEquals([
-            'title' => 'Test Collection',
-            'template' => 'test-template',
-            'fieldset' => 'test-fieldset',
-            'route' => 'test-route',
-            'order' => 'number',
-        ], $collection->data());
+        $this->assertEquals('Test Collection', $collection->title());
+        $this->assertEquals('public', $collection->pastDateBehavior());
+        $this->assertEquals('private', $collection->futureDateBehavior());
     }
 
     /** @test */
@@ -110,10 +100,6 @@ class StoreCollectionTest extends TestCase
         return array_merge([
             'title' => 'Test Collection',
             'handle' => 'test',
-            'template' => 'test-template',
-            'fieldset' => 'test-fieldset',
-            'route' => 'test-route',
-            'order' => 'number',
         ], $overrides);
     }
 
@@ -121,13 +107,13 @@ class StoreCollectionTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp']]);
 
-        return User::make()->assignRole('test');
+        return tap(User::make()->assignRole('test'))->save();
     }
 
     private function userWithPermission()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
 
-        return User::make()->assignRole('test');
+        return tap(User::make()->assignRole('test'))->save();
     }
 }

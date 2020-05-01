@@ -151,7 +151,7 @@ class CollectionsController extends CpController
     {
         $this->authorize('store', CollectionContract::class, __('You are not authorized to create collections.'));
 
-        $data = $request->validate([
+        $request->validate([
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
         ]);
@@ -172,9 +172,7 @@ class CollectionsController extends CpController
 
         session()->flash('success', __('Collection created'));
 
-        return [
-            'redirect' => route('statamic.cp.collections.show', $handle),
-        ];
+        return ['redirect' => $collection->showUrl()];
     }
 
     public function update(Request $request, $collection)
