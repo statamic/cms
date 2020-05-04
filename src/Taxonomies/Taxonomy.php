@@ -7,6 +7,7 @@ use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
@@ -217,6 +218,10 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function toResponse($request)
     {
+        if (! view()->exists($this->template())) {
+            throw new NotFoundHttpException;
+        }
+
         return (new \Statamic\Http\Responses\DataResponse($this))
             ->with([
                 'terms' => $termQuery = $this->queryTerms(),

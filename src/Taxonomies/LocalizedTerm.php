@@ -10,6 +10,7 @@ use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Http\Responses\DataResponse;
@@ -314,6 +315,10 @@ class LocalizedTerm implements Term, Responsable, Augmentable
 
     public function toResponse($request)
     {
+        if (! view()->exists($this->template())) {
+            throw new NotFoundHttpException;
+        }
+
         return (new DataResponse($this))->toResponse($request);
     }
 
