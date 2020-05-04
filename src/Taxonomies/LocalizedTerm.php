@@ -327,7 +327,13 @@ class LocalizedTerm implements Term, Responsable, Augmentable
     public function template($template = null)
     {
         if (func_num_args() === 0) {
-            return $this->get('template', $this->taxonomyHandle().'.show');
+            $defaultTemplate = $this->taxonomyHandle().'.show';
+
+            if ($collection = $this->collection()) {
+                $defaultTemplate = $collection->handle().'.'.$defaultTemplate;
+            }
+
+            return $this->get('template', $defaultTemplate);
         }
 
         return $this->set('template', $template);

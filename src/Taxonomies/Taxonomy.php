@@ -233,7 +233,13 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function template()
     {
-        return $this->handle().'.index';
+        $template = $this->handle().'.index';
+
+        if ($collection = $this->collection()) {
+            $template = $collection->handle().'.'.$template;
+        }
+
+        return $template;
     }
 
     public function layout()
