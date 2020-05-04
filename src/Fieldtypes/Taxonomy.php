@@ -77,9 +77,11 @@ class Taxonomy extends Relationship
 
                 $entry = $this->field->parent();
 
-                return $term
-                    ->collection($entry->collection())
-                    ->in($entry->locale());
+                if ($this->field->handle() === $taxonomy->handle()) {
+                    $term->collection($entry->collection());
+                }
+
+                return $term->in($entry->locale());
             });
     }
 

@@ -76,16 +76,16 @@ class TaxonomyTest extends TestCase
                 'id' => 'tags::one',
                 'slug' => 'one',
                 'title' => 'one',
-                'url' => '/blog/tags/one',
-                'permalink' => 'http://localhost/blog/tags/one',
+                'url' => '/tags/one',
+                'permalink' => 'http://localhost/tags/one',
                 'api_url' => 'http://localhost/api/taxonomies/tags/terms/one',
             ],
             [
                 'id' => 'tags::two',
                 'slug' => 'two',
                 'title' => 'two',
-                'url' => '/blog/tags/two',
-                'permalink' => 'http://localhost/blog/tags/two',
+                'url' => '/tags/two',
+                'permalink' => 'http://localhost/tags/two',
                 'api_url' => 'http://localhost/api/taxonomies/tags/terms/two',
             ],
         ], $augmented->all());
@@ -100,8 +100,8 @@ class TaxonomyTest extends TestCase
             'id' => 'tags::one',
             'title' => 'one',
             'slug' => 'one',
-            'url' => '/blog/tags/one',
-            'permalink' => 'http://localhost/blog/tags/one',
+            'url' => '/tags/one',
+            'permalink' => 'http://localhost/tags/one',
             'api_url' => 'http://localhost/api/taxonomies/tags/terms/one',
         ], $augmented);
     }
