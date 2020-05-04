@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Contracts\Container\BindingResolutionException;
 use Statamic\Facades\Path;
 use Statamic\Statamic;
 
@@ -16,6 +17,10 @@ function statamic_path($path = null)
 if (! function_exists('debugbar')) {
     function debugbar()
     {
-        return optional(app('debugbar'));
+        try {
+            return app('debugbar');
+        } catch (BindingResolutionException $e) {
+            return optional();
+        }
     }
 }
