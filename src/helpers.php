@@ -16,6 +16,6 @@ function statamic_path($path = null)
 if (! function_exists('debugbar')) {
     function debugbar()
     {
-        return optional();
+        return optional(app('debugbar'));
     }
 }
