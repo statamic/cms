@@ -168,6 +168,10 @@ class CollectionsController extends CpController
             ->pastDateBehavior('public')
             ->futureDateBehavior('private');
 
+        if (Site::hasMultiple()) {
+            $collection->sites([Site::default()->handle()]);
+        }
+
         $collection->save();
 
         session()->flash('success', __('Collection created'));
