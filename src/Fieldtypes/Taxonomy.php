@@ -84,7 +84,7 @@ class Taxonomy extends Relationship
 
                 $locale = $entry
                     ? $entry->locale()
-                    : Site::default()->locale();
+                    : Site::current()->locale();
 
                 return $term->in($locale);
             });
