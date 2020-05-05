@@ -52,11 +52,11 @@ class Updater
      */
     public function updateToLatest()
     {
-        // It can take time to figure out the latest version constraint below,
+        // It can take time to figure out the latest version below,
         // so here we preemptively clear the output cache for the composer ajax polling.
         Composer::clearCachedOutput($this->getPackage());
 
-        return Composer::require($this->getPackage(), $this->latestVersionConstraint());
+        return Composer::require($this->getPackage(), $this->latestVersion());
     }
 
     /**
@@ -87,19 +87,5 @@ class Updater
     protected function latestVersion()
     {
         return Changelog::product($this->slug)->latest()->version;
-    }
-
-    /**
-     * Get latest version and assemble recommended latest version constraint.
-     *
-     * @return string
-     */
-    protected function latestVersionConstraint()
-    {
-        $versionParts = collect(explode('.', $this->latestVersion()));
-        $versionParts->pop();
-        $versionParts->push('*');
-
-        return $versionParts->implode('.');
     }
 }
