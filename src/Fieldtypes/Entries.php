@@ -52,13 +52,6 @@ class Entries extends Relationship
         ]);
     }
 
-    public function preload()
-    {
-        return array_merge(parent::preload(), [
-            'filters' => $this->getSelectionFilters(),
-        ]);
-    }
-
     public function getIndexItems($request)
     {
         $query = $this->getIndexQuery($request);
@@ -194,7 +187,7 @@ class Entries extends Relationship
         ];
     }
 
-    protected function getSelectionFilters()
+    public function getSelectionFilters()
     {
         return Scope::filters('entries-fieldtype', $this->getSelectionFilterContext());
     }

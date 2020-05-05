@@ -95,6 +95,10 @@ class TaxonomiesController extends CpController
 
         $taxonomy = Taxonomy::make($handle)->title($request->title);
 
+        if (Site::hasMultiple()) {
+            $taxonomy->sites([Site::default()->handle()]);
+        }
+
         $taxonomy->save();
 
         session()->flash('success', __('Taxonomy created'));
@@ -112,6 +116,7 @@ class TaxonomiesController extends CpController
             'title' => $taxonomy->title(),
             'blueprints' => $taxonomy->termBlueprints()->map->handle()->all(),
             'collections' => $taxonomy->collections()->map->handle()->all(),
+            'sites' => $taxonomy->sites()->all(),
         ];
 
         $fields = ($blueprint = $this->editFormBlueprint())
@@ -140,6 +145,10 @@ class TaxonomiesController extends CpController
         $taxonomy
             ->title($values['title'])
             ->termBlueprints($values['blueprints']);
+
+        if ($sites = array_get($values, 'sites')) {
+            $taxonomy->sites($sites);
+        }
 
         $taxonomy->save();
 
@@ -183,7 +192,7 @@ class TaxonomiesController extends CpController
 
     protected function editFormBlueprint()
     {
-        return Blueprint::makeFromSections([
+        $fields = [
             'name' => [
                 'display' => __('Name'),
                 'fields' => [
@@ -211,6 +220,21 @@ class TaxonomiesController extends CpController
                     ],
                 ],
             ],
-        ]);
+        ];
+
+        if (Site::hasMultiple()) {
+            $fields['sites'] = [
+                'display' => __('Sites'),
+                'fields' => [
+                    'sites' => [
+                        'type' => 'sites',
+                        'mode' => 'select',
+                        'required' => true,
+                    ],
+                ],
+            ];
+        }
+
+        return Blueprint::makeFromSections($fields);
     }
 }

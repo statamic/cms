@@ -149,7 +149,8 @@ class Theme extends Tags
         );
 
         if ($this->getBool('cache_bust')) {
-            $url .= '?v='.File::lastModified(public_path($path));
+            throw_if(! File::exists($path = public_path($path)), new \Exception("File $path does not exist."));
+            $url .= '?v='.File::lastModified($path);
         }
 
         if (! $this->getBool('absolute')) {

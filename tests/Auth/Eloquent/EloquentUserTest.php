@@ -5,7 +5,11 @@ namespace Tests\Auth\Eloquent;
 use Faker\Generator as Faker;
 use Illuminate\Database\Eloquent\Factory;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection;
 use Statamic\Auth\Eloquent\User as EloquentUser;
+use Statamic\Auth\File\Role;
+use Statamic\Contracts\Auth\Role as RoleContract;
+use Statamic\Facades;
 use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
 use Tests\Preferences\HasPreferencesTests;
@@ -35,6 +39,60 @@ class EloquentUserTest extends TestCase
                 'remember_token' => str_random(10),
             ];
         });
+    }
+
+    /** @test */
+    public function it_gets_roles_already_in_the_db_without_explicitly_assigning_them()
+    {
+        $roleA = new class extends Role {
+            public function handle(string $handle = null)
+            {
+                return 'a';
+            }
+        };
+        $roleB = new class extends Role {
+            public function handle(string $handle = null)
+            {
+                return 'b';
+            }
+        };
+        $roleC = new class extends Role {
+            public function handle(string $handle = null)
+            {
+                return 'c';
+            }
+        };
+        $roleD = new class extends Role {
+            public function handle(string $handle = null)
+            {
+                return 'd';
+            }
+        };
+
+        Facades\Role::shouldReceive('find')->with('a')->andReturn($roleA);
+        Facades\Role::shouldReceive('find')->with('b')->andReturn($roleB);
+        Facades\Role::shouldReceive('find')->with('c')->andReturn($roleC);
+        Facades\Role::shouldReceive('find')->with('d')->andReturn($roleD);
+        Facades\Role::shouldReceive('find')->with('unknown')->andReturnNull();
+
+        $user = $this->createPermissible();
+
+        \DB::table('role_user')->insert([
+            ['user_id' => $user->id(), 'role_id' => 'a'],
+            ['user_id' => $user->id(), 'role_id' => 'b'],
+            ['user_id' => $user->id(), 'role_id' => 'c'],
+            ['user_id' => $user->id(), 'role_id' => 'd'],
+        ]);
+
+        $this->assertInstanceOf(Collection::class, $user->roles());
+        $this->assertCount(4, $user->roles());
+        $this->assertEveryItemIsInstanceOf(RoleContract::class, $user->roles());
+        $this->assertEquals([
+            'a' => 'a',
+            'b' => 'b',
+            'c' => 'c',
+            'd' => 'd',
+        ], $user->roles()->map->handle()->all());
     }
 
     public function makeUser()
