@@ -3,6 +3,7 @@
 namespace Statamic\Console\Processes;
 
 use Illuminate\Support\Facades\Cache;
+use Statamic\Support\Arr;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
 use Symfony\Component\Process\Process as SymfonyProcess;
@@ -158,7 +159,9 @@ class Process
      */
     public function lastCompletedCachedOutput(string $cacheKey)
     {
-        return Cache::get($cacheKey)['completed'] ? Cache::get($cacheKey) : ['output' => false];
+        $cache = $this->cachedOutput($cacheKey);
+
+        return Arr::get($cache, 'completed') ? $cache : ['output' => false];
     }
 
     /**
