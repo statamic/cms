@@ -14,13 +14,13 @@
         :max-items="maxItems"
         :item-component="itemComponent"
         :item-data-url="itemDataUrl"
+        :filters-url="filtersUrl"
         :selections-url="selectionsUrl"
         :creatables="creatables"
         :form-component="formComponent"
         :form-component-props="formComponentProps"
         :status-icons="statusIcons"
         :columns="columns"
-        :filters="filters"
         :search="canSearch"
         :read-only="isReadOnly"
         :taggable="taggable"
@@ -61,16 +61,16 @@ export default {
             return this.meta.columns;
         },
 
-        filters() {
-            return this.meta.filters || [];
-        },
-
         itemComponent() {
             return this.meta.itemComponent;
         },
 
         itemDataUrl() {
             return this.meta.itemDataUrl + '?' + qs.stringify({ config: this.configParameter });
+        },
+
+        filtersUrl() {
+            return this.meta.filtersUrl + '?' + qs.stringify({ config: this.configParameter });
         },
 
         selectionsUrl() {

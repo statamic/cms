@@ -105,8 +105,8 @@ export default {
     ],
 
     props: {
-        url: String,
-        filters: Array,
+        filtersUrl: String,
+        selectionsUrl: String,
         initialSelections: Array,
         initialSortColumn: String,
         initialSortDirection: String,
@@ -126,6 +126,7 @@ export default {
             loading: true,
             items: [],
             meta: {},
+            filters: [],
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             page: 1,
@@ -154,10 +155,9 @@ export default {
     },
 
     mounted() {
-        this.autoApplyFilters(this.filters);
-
-        this.request().then(() => {
-            if (this.search) this.$refs.filters.$refs.search.focus();
+        this.getFilters().then(() => {
+            this.autoApplyFilters(this.filters);
+            this.initialRequest();
         });
     },
 
@@ -197,6 +197,18 @@ export default {
 
     methods: {
 
+        getFilters() {
+            return this.$axios.get(this.filtersUrl).then(response => {
+                this.filters = response.data;
+            });
+        },
+
+        initialRequest() {
+            return this.request().then(() => {
+                if (this.search) this.$refs.filters.$refs.search.focus();
+            });
+        },
+
         request() {
             this.loading = true;
 
@@ -207,7 +219,7 @@ export default {
                 search: this.searchQuery,
             }};
 
-            return this.$axios.get(this.url, { params, cancelToken: this.source.token }).then(response => {
+            return this.$axios.get(this.selectionsUrl, { params, cancelToken: this.source.token }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.items = response.data.data;
                 this.meta = response.data.meta;
