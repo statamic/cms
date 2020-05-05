@@ -95,6 +95,10 @@ class TaxonomiesController extends CpController
 
         $taxonomy = Taxonomy::make($handle)->title($request->title);
 
+        if (Site::hasMultiple()) {
+            $taxonomy->sites([Site::default()->handle()]);
+        }
+
         $taxonomy->save();
 
         session()->flash('success', __('Taxonomy created'));
