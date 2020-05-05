@@ -123,6 +123,8 @@ class ThemeTagsTest extends TestCase
 
     public function testAppendsTimestampForCacheBusting()
     {
+        File::shouldReceive('exists')->with(public_path('/js/foo.js'))->andReturnTrue();
+
         File::shouldReceive('lastModified')
             ->withArgs(function ($arg) {
                 return Path::tidy(public_path('/js/foo.js')) === Path::tidy($arg);
