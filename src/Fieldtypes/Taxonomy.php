@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
 use Statamic\Facades;
+use Statamic\Facades\Site;
 use Statamic\Facades\Term;
 use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
 use Statamic\Support\Arr;
@@ -77,11 +78,15 @@ class Taxonomy extends Relationship
 
                 $entry = $this->field->parent();
 
-                if ($this->field->handle() === $taxonomy->handle()) {
+                if ($entry && $this->field->handle() === $taxonomy->handle()) {
                     $term->collection($entry->collection());
                 }
 
-                return $term->in($entry->locale());
+                $locale = $entry
+                    ? $entry->locale()
+                    : Site::default()->locale();
+
+                return $term->in($locale);
             });
     }
 
