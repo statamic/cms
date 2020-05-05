@@ -151,9 +151,16 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function fileData()
     {
-        return Arr::except($this->toArray(), [
-            'handle',
-        ]);
+        $data = [
+            'title' => $this->title,
+            'blueprints' => $this->blueprints,
+        ];
+
+        if (Site::hasMultiple()) {
+            $data['sites'] = $this->sites;
+        }
+
+        return $data;
     }
 
     public function defaultPublishState($state = null)
