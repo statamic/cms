@@ -182,7 +182,11 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
+                if (! Site::hasMultiple() || ! $sites) {
+                    $sites = [Site::default()->handle()];
+                }
+
+                return collect($sites);
             })
             ->args(func_get_args());
     }
