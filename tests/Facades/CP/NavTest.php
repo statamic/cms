@@ -32,7 +32,7 @@ class NavTest extends TestCase
             'Top Level' => ['Dashboard', 'Playground'],
             'Content' => ['Collections', 'Navigation', 'Taxonomies', 'Assets', 'Globals'],
             'Fields' => ['Blueprints', 'Fieldsets'],
-            'Tools' => ['Forms', /*'Updates',*/ 'Utilities'],
+            'Tools' => ['Forms', 'Updates', 'Utilities'],
             'Users' => ['Users', 'Groups', 'Permissions'],
         ]);
 
