@@ -6,14 +6,28 @@
 
         <data-list :rows="rows" v-if="loaded">
             <div class="" slot-scope="{ rows: addons }">
-                <div class="data-list-header flex items-center card p-0">
-                    <data-list-search class="flex-1" v-model="searchQuery"></data-list-search>
-                    <div class="filter bg-white ml-3 mb-0">
-                        <a @click="filter = 'installable'" :class="{ active: filter == 'installable' }" v-text="__('Not Installed')" />
-                        <a @click="filter = 'installed'" :class="{ active: filter == 'installed' }" v-text="__('Installed')" />
-                        <a @click="filter = 'all'" :class="{ active: filter == 'all' }" v-text="__('All')" />
+
+                <div class="card p-0">
+                    <div class="border-b px-2 text-sm">
+                        <button
+                            class="data-list-filter-link"
+                            :class="{ active: filter === 'all' }"
+                            @click="filter = 'all'"
+                            v-text="__('All')" />
+                        <button
+                            class="data-list-filter-link"
+                            :class="{ active: filter === 'installed' }"
+                            @click="filter = 'installed'"
+                            v-text="__('Installed')" />
+                    </div>
+
+                    <div class="p-1">
+                        <data-list-search
+                            ref="search"
+                            v-model="searchQuery" />
                     </div>
                 </div>
+
                 <div class="addon-grid my-4">
                     <div class="addon-card bg-white text-grey-80 h-full shadow rounded cursor-pointer" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
                         <div class="h-64 rounded-t bg-cover" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
@@ -63,7 +77,7 @@
                 rows: [],
                 meta: {},
                 searchQuery: '',
-                filter: 'installable',
+                filter: 'all',
                 page: 1,
                 showingAddon: false,
             }
