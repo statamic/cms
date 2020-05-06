@@ -176,6 +176,11 @@ class CoreNav
             ->view('statamic::nav.updates')
             ->can('view updates');
 
+        Nav::tools('Addons')
+            ->route('addons.index')
+            ->icon('addons')
+            ->can('configure addons');
+
         $this->makeUtilitiesSection();
 
         return $this;
@@ -241,11 +246,6 @@ class CoreNav
      */
     protected function makeUnusedSection()
     {
-        // Nav::site('Addons')
-        //     ->route('addons.index')
-        //     ->icon('addons')
-        //     ->can('configure addons');
-
         // Nav::site('Preferences')
         //     ->route('')
         //     ->icon('hammer-wrench');
