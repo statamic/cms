@@ -10,7 +10,7 @@
             <button v-else class="btn" :disabled="processing" @click="install">Install Addon</button>
         </div>
         <composer-output v-show="composer.status" :package="package" class="m-3"></composer-output>
-        <div v-if="! composer.status" class="p-4">{{ addon.variants[0].description }}</div>
+        <div v-if="! composer.status" class="p-4 content" v-html="description" />
     </div>
 </template>
 
@@ -43,6 +43,10 @@
             processing() {
                 return this.composer.processing || this.waitingForRefresh;
             },
+
+            description() {
+                return markdown(this.addon.variants[0].description);
+            }
         },
 
         created() {
