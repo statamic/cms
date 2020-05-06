@@ -44,7 +44,7 @@
 
                 <data-list-pagination :resource-meta="meta" @page-selected="setPage"></data-list-pagination>
 
-                <modal v-if="showingAddon" name="addon-modal" width="760px" :click-to-close="true" @closed="showingAddon = false">
+                <modal v-if="showingAddon" name="addon-modal" width="760px" :click-to-close="true" :scrollable="true" @closed="showingAddon = false">
                     <addon-details
                         :addon="showingAddon"
                         :cover="getCover(showingAddon)" />
