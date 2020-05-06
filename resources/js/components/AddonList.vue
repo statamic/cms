@@ -30,14 +30,11 @@
 
                 <data-list-pagination :resource-meta="meta" @page-selected="setPage"></data-list-pagination>
 
-                <portal to="modals" v-if="showingAddon">
-                    <modal name="addon-modal" height="auto" :scrollable="true" width="760px" :adaptive="true" :pivotY=".1">
-                        <addon-details
-                            :addon="showingAddon"
-                            :cover="getCover(showingAddon)">
-                        </addon-details>
-                    </modal>
-                </portal>
+                <modal v-if="showingAddon" name="addon-modal" width="760px" :click-to-close="true" @closed="showingAddon = false">
+                    <addon-details
+                        :addon="showingAddon"
+                        :cover="getCover(showingAddon)" />
+                </modal>
             </div>
         </data-list>
     </div>
