@@ -1,10 +1,10 @@
 <template>
     <div>
-        <div v-if="! loaded" class="card p-3 text-center">
+        <div v-if="loading" class="card p-3 text-center">
             <loading-graphic  />
         </div>
 
-        <data-list :rows="rows" v-if="loaded">
+        <data-list :rows="rows" v-if="!loading">
             <div class="" slot-scope="{ rows: addons }">
 
                 <div class="card p-0">
@@ -73,7 +73,7 @@
 
         data() {
             return {
-                loaded: false,
+                loading: true,
                 rows: [],
                 meta: {},
                 searchQuery: '',
@@ -107,6 +107,13 @@
                 this.page = 1;
                 this.getAddons();
             },
+
+            loading: {
+                immediate: true,
+                handler(loading) {
+                    this.$progress.loading('addon-list', loading);
+                }
+            },
         },
 
         created() {
@@ -118,7 +125,7 @@
         methods: {
             getAddons() {
                 this.$axios.get(window.Statamic.$config.get('cpRoot')+'/api/addons', {'params': this.params}).then(response => {
-                    this.loaded = true;
+                    this.loading = false;
                     this.rows = response.data.data;
                     this.meta = response.data.meta;
 
