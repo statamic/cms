@@ -1299,15 +1299,15 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return array
+     * @return array|Collection
      */
     public function offset($value, $params)
     {
-        if ($value instanceof Collection) {
-            return $value->slice(Arr::get($params, 0, 0))->values();
-        }
+        $isArray = is_array($value);
 
-        return collect(Arr::wrap($value))->slice(Arr::get($params, 0, 0))->values()->all();
+        $value = collect($value)->slice(Arr::get($params, 0, 0))->values();
+
+        return $isArray ? $value->all() : $value;
     }
 
     /**
