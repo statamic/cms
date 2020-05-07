@@ -25,7 +25,7 @@ class UpdateProductController extends CpController
             $data['package'] = $addon->package();
             $data['name'] = $addon->name();
         } elseif ($product === Statamic::CORE_SLUG) {
-            $data['package'] = Statamic::CORE_REPO;
+            $data['package'] = Statamic::PACKAGE;
             $data['name'] = 'Statamic';
         } else {
             abort(404);

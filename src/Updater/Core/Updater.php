@@ -14,6 +14,6 @@ class Updater extends BaseUpdater
      */
     protected function getPackage()
     {
-        return Statamic::CORE_REPO;
+        return Statamic::PACKAGE;
     }
 }

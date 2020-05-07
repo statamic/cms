@@ -12,7 +12,7 @@ use Stringy\StaticStringy;
 class Statamic
 {
     const CORE_SLUG = 'statamic';
-    const CORE_REPO = 'statamic/cms';
+    const PACKAGE = 'statamic/cms';
 
     protected static $scripts = [];
     protected static $externalScripts = [];

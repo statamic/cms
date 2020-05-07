@@ -57,7 +57,7 @@ class Changelog extends BaseChangelog
      */
     public function composerPackage()
     {
-        return Statamic::CORE_REPO;
+        return Statamic::PACKAGE;
     }
 
     /**
