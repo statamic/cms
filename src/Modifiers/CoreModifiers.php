@@ -1303,7 +1303,11 @@ class CoreModifiers extends Modifier
      */
     public function offset($value, $params)
     {
-        return array_slice($value, Arr::get($params, 0, 0));
+        if ($value instanceof Collection) {
+            return $value->slice(Arr::get($params, 0, 0));
+        }
+
+        return collect(Arr::wrap($value))->slice(Arr::get($params, 0, 0));
     }
 
     /**
