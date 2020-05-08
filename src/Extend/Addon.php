@@ -8,7 +8,7 @@ use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Updater\Changelog;
+use Statamic\Updater\AddonChangelog;
 
 final class Addon
 {
@@ -91,6 +91,13 @@ final class Addon
     protected $version;
 
     /**
+     * The latest version of the addon (via marketplace).
+     *
+     * @var string
+     */
+    protected $latestVersion;
+
+    /**
      * The marketing URL.
      *
      * @var string
@@ -148,7 +155,7 @@ final class Addon
 
         $keys = [
             'id', 'slug', 'marketplaceProductId', 'marketplaceVariantId', 'marketplaceSlug', 'name', 'namespace', 'directory',
-            'autoload', 'description', 'package', 'version', 'url', 'developer', 'developerUrl', 'isCommercial',
+            'autoload', 'description', 'package', 'version', 'latestVersion', 'url', 'developer', 'developerUrl', 'isCommercial',
         ];
 
         foreach (Arr::only($package, $keys) as $key => $value) {
@@ -357,11 +364,20 @@ final class Addon
     /**
      * Get addon changelog.
      *
-     * @return Changelog|null
+     * @return AddonChangelog|null
      */
     public function changelog()
     {
-        return Changelog::product($this->marketplaceSlug());
+        return new AddonChangelog($this);
+    }
+
+    public function isLatestVersion()
+    {
+        if (! $this->latestVersion) {
+            return true;
+        }
+
+        return version_compare($this->version, $this->latestVersion, '=');
     }
 
     /**

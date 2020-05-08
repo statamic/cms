@@ -20,7 +20,7 @@
 
         <div class="card mb-5 flex items-center" v-if="onLatestVersion">
             <div>
-                <h1 class="mb-sm">You are running the latest version of Statamic.</h1>
+                <h1 class="mb-sm">You are running the latest version.</h1>
                 <h3>Version: {{ currentVersion }}</h3>
             </div>
             <svg-icon name="marketing/tooter-nay" class="w-16 h-16" />
@@ -78,7 +78,7 @@
                 currentVersion: null,
                 lastInstallLog: null,
                 modalOpen: false,
-                onLatestVersion: false
+                latestVersion: null
             };
         },
 
@@ -94,6 +94,10 @@
             showActions() {
                 return ! this.gettingChangelog && ! this.composer.processing;
             },
+
+            onLatestVersion() {
+                return this.currentVersion == this.latestVersion;
+            }
         },
 
         mounted() {
@@ -112,36 +116,17 @@
                     this.gettingChangelog = false;
                     this.changelog = response.data.changelog;
                     this.currentVersion = response.data.currentVersion;
+                    this.latestVersion = response.data.changelog[0].version;
                     this.lastInstallLog = response.data.lastInstallLog;
                 });
             },
 
-            update() {
-                this.$axios.post(`/cp/updater/${this.slug}/update`, {}, this.toEleven);
-
-                this.$store.commit('statamic/composer', {
-                    processing: true,
-                    status: 'Updating ' + this.package,
-                    package: this.package,
-                });
-
-                this.modalOpen = true;
-            },
-
             updateToLatest() {
-                this.$axios.post(`/cp/updater/${this.slug}/update-to-latest`, {}, this.toEleven);
-
-                this.$store.commit('statamic/composer', {
-                    processing: true,
-                    status: 'Installing latest ' + this.package + ' version',
-                    package: this.package,
-                });
-
-                this.modalOpen = true;
+                this.installExplicitVersion(this.latestVersion);
             },
 
             installExplicitVersion(version) {
-                this.$axios.post(`/cp/updater/${this.slug}/install-explicit-version`, {'version': version}, this.toEleven);
+                this.$axios.post(`/cp/updater/${this.slug}/install`, {'version': version}, this.toEleven);
 
                 this.$store.commit('statamic/composer', {
                     processing: true,

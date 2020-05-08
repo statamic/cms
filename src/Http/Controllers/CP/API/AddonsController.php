@@ -2,9 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP\API;
 
-use Facades\Statamic\Extend\Marketplace;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Marketplace\AddonsQuery;
 
 class AddonsController extends CpController
 {
@@ -12,9 +13,12 @@ class AddonsController extends CpController
     {
         $this->authorize('configure addons');
 
-        return Marketplace::query()
-            ->filter($request->filter)
+        $addons = (new AddonsQuery)
             ->search($request->q)
-            ->paginate(30);
+            ->page($request->page)
+            ->installed($request->installed ?? false)
+            ->paginate();
+
+        return JsonResource::collection($addons);
     }
 }

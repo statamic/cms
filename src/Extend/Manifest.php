@@ -2,7 +2,7 @@
 
 namespace Statamic\Extend;
 
-use Facades\Statamic\Extend\Marketplace;
+use Facades\Statamic\Marketplace\Marketplace;
 use Illuminate\Foundation\PackageManifest;
 use ReflectionClass;
 use Statamic\Facades\File;
@@ -38,7 +38,7 @@ class Manifest extends PackageManifest
 
         $reflector = new ReflectionClass($provider);
         $providerParts = explode('\\', $provider, -1);
-        $namespace = join('\\', $providerParts);
+        $namespace = implode('\\', $providerParts);
 
         $autoload = $package['autoload']['psr-4'][$namespace.'\\'];
         $directory = Str::removeRight(dirname($reflector->getFileName()), $autoload);
@@ -47,19 +47,16 @@ class Manifest extends PackageManifest
         $statamic = $json['extra']['statamic'] ?? [];
         $author = $json['authors'][0] ?? null;
 
-        $marketplaceData = Marketplace::withoutLocalData()->findByPackageName($package['name']);
-
-        $installedVariant = collect(data_get($marketplaceData, 'variants', []))->first(function ($variant) use ($package) {
-            return explode('.', $package['version'])[0] == $variant['number'];
-        });
+        $marketplaceData = Marketplace::package($package['name'], $package['version']);
 
         return [
             'id' => $package['name'],
             'slug' => $statamic['slug'] ?? null,
-            'marketplaceProductId' => data_get($marketplaceData, 'id', null),
-            'marketplaceVariantId' => data_get($installedVariant, 'id', null),
+            'marketplaceProductId' => data_get($marketplaceData, 'product_id', null),
+            'marketplaceVariantId' => data_get($marketplaceData, 'variant_id', null),
             'marketplaceSlug' => data_get($marketplaceData, 'slug', null),
-            'version' => $package['version'], // Is this synchronized with git tag?
+            'latestVersion' => data_get($marketplaceData, 'latest_version', null),
+            'version' => Str::removeLeft($package['version'], 'v'),
             'namespace' => $namespace,
             'directory' => $directory,
             'autoload' => $autoload,

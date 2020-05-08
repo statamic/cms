@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Updater;
 
+use Facades\Statamic\Marketplace\Marketplace;
 use Facades\Statamic\Updater\UpdatesOverview;
 use Illuminate\Http\Request;
 use Statamic\Facades\Addon;
@@ -24,9 +25,9 @@ class UpdaterController extends CpController
             return redirect()->route('statamic.cp.updater.product', Statamic::CORE_SLUG);
         }
 
-        $statamicChangelog = Changelog::product(Statamic::CORE_SLUG);
+        $statamic = Marketplace::statamic()->changelog();
 
-        return view('statamic::updater.index', compact('statamicChangelog', 'addons'));
+        return view('statamic::updater.index', compact('statamic', 'addons'));
     }
 
     /**

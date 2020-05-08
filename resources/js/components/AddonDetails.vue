@@ -33,7 +33,7 @@
             },
 
             package() {
-                return this.addon.variants[0].package;
+                return this.addon.package;
             },
 
             composer() {
@@ -45,7 +45,7 @@
             },
 
             description() {
-                return markdown(this.addon.variants[0].description);
+                return markdown(this.addon.description);
             }
         },
 
