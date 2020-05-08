@@ -4,6 +4,7 @@ namespace Statamic\Modifiers;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
@@ -1314,7 +1315,7 @@ class CoreModifiers extends Modifier
      */
     public function output($value)
     {
-        if (! is_string($value)) {
+        if (! is_string($value) && ! $value instanceof AssetContract) {
             return $value;
         }
 
