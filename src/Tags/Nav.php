@@ -3,7 +3,9 @@
 namespace Statamic\Tags;
 
 use Statamic\Facades\Data;
+use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Support\Str;
 
 class Nav extends Structure
 {
@@ -14,7 +16,8 @@ class Nav extends Structure
 
     public function breadcrumbs()
     {
-        $url = URL::getCurrent();
+        $url = Str::removeLeft(URL::getCurrent(), Site::current()->url());
+        $url = Str::ensureLeft($url, '/');
         $segments = explode('/', $url);
         $segments[0] = '/';
 
@@ -28,7 +31,7 @@ class Nav extends Structure
 
             return $uri;
         })->mapWithKeys(function ($uri) {
-            return [$uri => Data::findByUri($uri)];
+            return [$uri => Data::findByUri($uri, Site::current()->handle())];
         })->filter();
 
         if (! $this->params->bool('reverse', false)) {
