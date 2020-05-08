@@ -7,7 +7,6 @@ use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Addon;
 use Statamic\Marketplace\Addon as AddonProduct;
-use Statamic\Marketplace\Core;
 use Statamic\Statamic;
 
 class Marketplace

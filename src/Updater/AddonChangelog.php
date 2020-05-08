@@ -2,8 +2,6 @@
 
 namespace Statamic\Updater;
 
-use Statamic\Updater\Changelog;
-
 class AddonChangelog extends Changelog
 {
     protected $addon;
