@@ -77,5 +77,5 @@ return [
     'text.config.placeholder' => 'Standard-Platzhaltertext festlegen.',
     'text.config.prepend' => 'Zusätzlichen Text links vom eigentlichen Text anhängen.',
     'textarea.config.character_limit' => 'Maximale Anzahl der möglichen Zeichen festlegen.',
-    'relationship.config.mode' => 'Bevorzugten UI Stil auswählen.'
+    'relationship.config.mode' => 'Bevorzugten UI Stil auswählen.',
 ];

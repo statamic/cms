@@ -51,6 +51,6 @@ dies: ist etwas yaml
 <pre class="language-markdown"><code>Erste Titelzelle  | Zweite Titelzelle
 ------------- | -------------
 Inhaltszelle  | Inhaltszelle
-Inhaltszelle  | Inhaltszelle</code></pre>'
+Inhaltszelle  | Inhaltszelle</code></pre>',
 
 ];
