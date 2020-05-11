@@ -2244,7 +2244,7 @@ class CoreModifiers extends Modifier
         // from a value in the context. This allows users to specify a variable name.
         return (is_numeric($number))
             ? $number
-            : Arr::get($context, $number, $number);
+            : Arr::get($context, $number, $number)->value() ?? Arr::get($context, $number, $number);
     }
 
     private function carbon($value)
