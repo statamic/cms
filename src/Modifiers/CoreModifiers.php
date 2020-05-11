@@ -1479,9 +1479,12 @@ class CoreModifiers extends Modifier
      * @param $params
      * @return string
      */
-    public function repeat($value, $params)
+    public function repeat($value, $params, $context)
     {
-        return str_repeat($value, (int) Arr::get($params, 0, 1));
+        $times = Arr::get($params, 0, 1);
+        $times = is_numeric($times) ? $times : Arr::get($context, $times);
+
+        return str_repeat($value, $times);
     }
 
     /**
