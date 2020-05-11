@@ -71,7 +71,7 @@ class View
 
         if ($this->layout && $isAntlers) {
             $contents = view($this->layoutViewName(), array_merge($cascade, [
-                'template_content' => $contents->withoutExtractions()->render()
+                'template_content' => $contents->withoutExtractions()->render(),
             ]));
         }
 

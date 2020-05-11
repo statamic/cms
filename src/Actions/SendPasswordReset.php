@@ -11,7 +11,7 @@ class SendPasswordReset extends Action
         return __('Send Password Reset');
     }
 
-    public function filter($item)
+    public function visibleTo($item)
     {
         return $item instanceof UserContract;
     }
@@ -33,7 +33,7 @@ class SendPasswordReset extends Action
         return 'Send|Send to :count users';
     }
 
-    public function run($users)
+    public function run($users, $values)
     {
         $users->each->generateTokenAndSendPasswordResetNotification();
     }

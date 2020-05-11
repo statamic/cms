@@ -16,7 +16,7 @@ class UpdateCollectionTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $collection = Collection::make('test')->save();
 
@@ -29,7 +29,7 @@ class UpdateCollectionTest extends TestCase
     }
 
     /** @test */
-    function it_updates_a_collection()
+    public function it_updates_a_collection()
     {
         config(['statamic.amp.enabled' => true]);
 
@@ -85,7 +85,7 @@ class UpdateCollectionTest extends TestCase
     }
 
     /** @test */
-    function it_updates_blueprints()
+    public function it_updates_blueprints()
     {
         $mock = $this->partialMock(BlueprintRepository::class);
         $mock->shouldReceive('find')->with('one')->andReturn(Blueprint::make('one'));

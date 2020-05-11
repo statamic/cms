@@ -2,25 +2,18 @@
 
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
+use Illuminate\Http\Request;
+use Statamic\Contracts\Taxonomies\Term as TermContract;
+use Statamic\Events\Data\PublishBlueprintFound;
+use Statamic\Facades\Asset;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
-use Statamic\Facades\Asset;
-use Statamic\Facades\Entry;
-use Statamic\CP\Column;
-use Statamic\Facades\Action;
-use Statamic\Facades\Blueprint;
-use Illuminate\Http\Request;
-use Statamic\Facades\Collection;
-use Statamic\Facades\Preference;
 use Statamic\Facades\User;
-use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Http\Requests\FilteredRequest;
-use Statamic\Http\Resources\CP\Taxonomies\Terms;
 use Statamic\Http\Resources\CP\Taxonomies\Term as TermResource;
-use Statamic\Contracts\Entries\Entry as EntryContract;
-use Statamic\Contracts\Taxonomies\Term as TermContract;
+use Statamic\Http\Resources\CP\Taxonomies\Terms;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class TermsController extends CpController
@@ -40,7 +33,7 @@ class TermsController extends CpController
         $sortField = request('sort');
         $sortDirection = request('order', 'asc');
 
-        if (!$sortField && !request('search')) {
+        if (! $sortField && ! request('search')) {
             $sortField = $taxonomy->sortField();
             $sortDirection = $taxonomy->sortDirection();
         }
@@ -121,6 +114,7 @@ class TermsController extends CpController
             'permalink' => $term->absoluteUrl(),
             'localizations' => $taxonomy->sites()->map(function ($handle) use ($term) {
                 $localized = $term->in($handle);
+
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -147,7 +141,7 @@ class TermsController extends CpController
         }
 
         return view('statamic::terms.edit', array_merge($viewData, [
-            'term' => $term
+            'term' => $term,
         ]));
     }
 
@@ -214,13 +208,13 @@ class TermsController extends CpController
         $values = $fields->values()->merge([
             'title' => null,
             'slug' => null,
-            'published' => $taxonomy->defaultPublishState()
+            'published' => $taxonomy->defaultPublishState(),
         ]);
 
         $viewData = [
             'title' => __('Create Term'),
             'actions' => [
-                'save' => cp_route('taxonomies.terms.store', [$taxonomy->handle(), $site->handle()])
+                'save' => cp_route('taxonomies.terms.store', [$taxonomy->handle(), $site->handle()]),
             ],
             'values' => $values,
             'meta' => $fields->meta(),
@@ -237,7 +231,7 @@ class TermsController extends CpController
                     'url' => cp_route('taxonomies.terms.create', [$taxonomy->handle(), $handle]),
                     'livePreviewUrl' => cp_route('taxonomies.terms.preview.create', [$taxonomy->handle(), $handle]),
                 ];
-            })->all()
+            })->all(),
         ];
 
         if ($request->wantsJson()) {
@@ -294,7 +288,7 @@ class TermsController extends CpController
     {
         return [
             'title' => $taxonomy->title(),
-            'url' => cp_route('taxonomies.show', $taxonomy->handle())
+            'url' => cp_route('taxonomies.show', $taxonomy->handle()),
         ];
     }
 
@@ -307,7 +301,7 @@ class TermsController extends CpController
 
         $values = $fields->values()->merge([
             'title' => $term->value('title'),
-            'slug' => $term->slug()
+            'slug' => $term->slug(),
         ]);
 
         return [$values->all(), $fields->meta()];
@@ -321,6 +315,7 @@ class TermsController extends CpController
             })
             ->map(function ($value) {
                 preg_match_all('/"asset::([^"]+)"/', $value, $matches);
+
                 return str_replace('\/', '/', $matches[1]) ?? null;
             })
             ->flatten(2)

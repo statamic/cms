@@ -2,16 +2,14 @@
 
 namespace Tests\Feature\Entries;
 
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Statamic\Facades\User;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Folder;
-use Statamic\Facades\Collection;
-use Statamic\Fields\Blueprint;
-use Tests\PreventSavingStacheItemsToDisk;
-use Facades\Tests\Factories\EntryFactory;
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Folder;
+use Statamic\Facades\User;
+use Statamic\Fields\Blueprint;
+use Tests\FakesRoles;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class EditEntryTest extends TestCase
 {
@@ -33,7 +31,7 @@ class EditEntryTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test');
@@ -48,7 +46,7 @@ class EditEntryTest extends TestCase
     }
 
     /** @test */
-    function it_shows_the_entry_form()
+    public function it_shows_the_entry_form()
     {
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn((new Blueprint)->setContents(['fields' => [
             ['handle' => 'foo', 'field' => ['type' => 'text']],
@@ -62,7 +60,7 @@ class EditEntryTest extends TestCase
             ->data([
                 'blueprint' => 'test',
                 'title' => 'Test',
-                'foo' => 'bar'
+                'foo' => 'bar',
             ])
             ->create();
 
@@ -80,7 +78,7 @@ class EditEntryTest extends TestCase
     }
 
     /** @test */
-    function it_overrides_values_from_the_working_copy()
+    public function it_overrides_values_from_the_working_copy()
     {
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn((new Blueprint)->setContents(['fields' => [
             ['handle' => 'foo', 'field' => ['type' => 'text']],
@@ -94,7 +92,7 @@ class EditEntryTest extends TestCase
             ->data([
                 'blueprint' => 'test',
                 'title' => 'Test',
-                'foo' => 'bar'
+                'foo' => 'bar',
             ])
             ->create();
 
@@ -117,7 +115,7 @@ class EditEntryTest extends TestCase
     }
 
     /** @test */
-    function it_marks_as_read_only_if_you_only_have_view_permission()
+    public function it_marks_as_read_only_if_you_only_have_view_permission()
     {
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn(new Blueprint);
         $this->setTestRoles(['test' => ['access cp', 'view blog entries']]);

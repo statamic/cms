@@ -2,8 +2,8 @@
 
 namespace Statamic\Console\Please;
 
-use Statamic\Console\RunsInPlease;
 use Illuminate\Console\Application as ConsoleApplication;
+use Statamic\Console\RunsInPlease;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
 
 class Application extends ConsoleApplication
@@ -27,6 +27,7 @@ class Application extends ConsoleApplication
 
         if (! in_array(RunsInPlease::class, class_uses($command))) {
             $this->deferredCommands[] = $command;
+
             return;
         }
 

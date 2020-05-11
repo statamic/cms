@@ -69,7 +69,7 @@
                     </div>
 
                     <div class="h-full" v-if="asset.isPreviewable && canUseGoogleDocsViewer">
-                        <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.url + '&embedded=true'"></iframe>
+                        <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
                     </div>
 
                     <div class="editor-file-actions">
@@ -144,7 +144,7 @@
                 v-if="actions.length"
                 :id="id"
                 :actions="actions"
-                :url="actionUrl"
+                :url="runActionUrl"
                 @started="actionStarted"
                 @completed="actionCompleted" />
         </portal>
@@ -257,7 +257,7 @@ export default {
                 this.asset = data;
                 this.values = data.values;
                 this.meta = data.meta;
-                this.actionUrl = data.actionUrl;
+                this.runActionUrl = data.runActionUrl;
                 this.actions = data.actions;
                 this.getFieldset();
             });

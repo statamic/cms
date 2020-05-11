@@ -76,7 +76,7 @@ return [
     */
 
     'defaults' => [
-        'fields' => ['title']
-    ]
+        'fields' => ['title'],
+    ],
 
 ];

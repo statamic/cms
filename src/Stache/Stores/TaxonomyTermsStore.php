@@ -26,7 +26,8 @@ class TaxonomyTermsStore extends ChildStore
         'site' => Indexes\Terms\Site::class,
     ];
 
-    public function getFileFilter(SplFileInfo $file) {
+    public function getFileFilter(SplFileInfo $file)
+    {
         $dir = str_finish($this->directory(), '/');
         $relative = $file->getPathname();
 
@@ -65,7 +66,7 @@ class TaxonomyTermsStore extends ChildStore
 
     public function getItemKey($item)
     {
-        return $item->locale() . '::' . $item->inDefaultLocale()->slug();
+        return $item->locale().'::'.$item->inDefaultLocale()->slug();
     }
 
     public function getItem($key)
@@ -157,6 +158,7 @@ class TaxonomyTermsStore extends ChildStore
 
         $items = $files->flatMap(function ($timestamp, $path) {
             $keys = $this->getKeyFromPath($path);
+
             return $keys->map(function ($key) {
                 return $this->getItem($key);
             });
@@ -181,8 +183,10 @@ class TaxonomyTermsStore extends ChildStore
 
         $paths = $files->mapWithKeys(function ($timestamp, $path) {
             $term = $this->makeItemFromFile($path, File::get($path));
+
             return $term->localizations()->flatMap(function ($localization, $locale) use ($path) {
                 $this->cacheItem($localization);
+
                 return [$this->getItemKey($localization) => $locale.'::'.$path];
             })->all();
         });

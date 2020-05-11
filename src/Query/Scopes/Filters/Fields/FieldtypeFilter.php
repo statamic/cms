@@ -60,6 +60,6 @@ class FieldtypeFilter
         $translatedOperator = Arr::get($this->fieldItems(), "operator.options.{$operator}");
         $value = $values['value'];
 
-        return strtolower($field) . ' ' . strtolower($translatedOperator) . ' ' . $value;
+        return strtolower($field).' '.strtolower($translatedOperator).' '.$value;
     }
 }

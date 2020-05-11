@@ -11,14 +11,38 @@ use Statamic\Fields\Value;
 
 class AugmentedCollection extends Collection
 {
-    public function jsonSerialize()
+    protected $shallowNesting = false;
+
+    /**
+     * Enables shallow augmentation on nested values when
+     * converting to array or JSON serializing.
+     */
+    public function withShallowNesting()
     {
-        return array_map(function ($value) {
-            if ($value instanceof Value) {
+        $this->shallowNesting = true;
+
+        return $this;
+    }
+
+    public function toArray()
+    {
+        return $this->map(function ($value) {
+            if ($this->shallowNesting && $value instanceof Value) {
                 $value = $value->shallow();
             }
 
-            if ($value instanceof Augmentable) {
+            if ($this->shallowNesting && $value instanceof Augmentable) {
+                return $value->toShallowAugmentedArray();
+            }
+
+            return $value instanceof Arrayable ? $value->toArray() : $value;
+        })->all();
+    }
+
+    public function jsonSerialize()
+    {
+        return array_map(function ($value) {
+            if ($this->shallowNesting && $value instanceof Augmentable) {
                 return $value->toShallowAugmentedArray();
             }
 

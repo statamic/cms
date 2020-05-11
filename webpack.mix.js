@@ -9,7 +9,7 @@ mix.setPublicPath('./resources/dist');
 mix.sass(`${src}/sass/cp.scss`, `${dest}/css`).options({
     processCssUrls: false,
     postCss: [
-        tailwindcss('./tailwind.js'),
+        tailwindcss('./tailwind.config.js'),
         require('autoprefixer')
     ],
 });

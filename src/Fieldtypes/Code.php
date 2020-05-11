@@ -16,7 +16,7 @@ class Code extends Fieldtype
                 'default' => 'material',
                 'options' => [
                     'material' => __('Dark'),
-                    'light' => __('Light')
+                    'light' => __('Light'),
                 ],
                 'width' => 50,
             ],
@@ -80,7 +80,7 @@ class Code extends Fieldtype
                 'options' => [
                     'default' => 'Default',
                     'sublime' => 'Sublime',
-                    'vim' => 'Vim'
+                    'vim' => 'Vim',
                 ],
                 'width' => 50,
             ],
@@ -97,5 +97,10 @@ class Code extends Fieldtype
                 'width' => 50,
             ],
         ];
+    }
+
+    public function augment($value)
+    {
+        return str_replace('<?php', '&lt;?php', $value);
     }
 }

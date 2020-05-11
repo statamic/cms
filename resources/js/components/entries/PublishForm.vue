@@ -99,7 +99,7 @@
                                     <div class="p-2 flex items-center -mx-1">
                                         <button
                                             class="flex items-center justify-center btn-flat w-full mx-1 px-1"
-                                            v-if="isBase"
+                                            v-if="isBase && livePreviewUrl"
                                             @click="openLivePreview">
                                             <svg-icon name="synchronize" class="w-5 h-5 mr-1" />
                                             <span>{{ __('Live Preview') }}</span>
@@ -428,6 +428,9 @@ export default {
                 this.saving = false;
                 this.title = this.values.title;
                 this.isWorkingCopy = true;
+                if (this.isBase) {
+                    document.title = this.title + ' ‹ ' + this.breadcrumbs[1].text + ' ‹ ' + this.breadcrumbs[0].text + ' ‹ Statamic';
+                }
                 if (!this.revisionsEnabled) this.permalink = response.data.data.permalink;
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
@@ -490,7 +493,7 @@ export default {
                 this.createLocalization(localization);
             }
 
-            if (this.publishContainer === 'base') {
+            if (this.isBase) {
                 window.history.replaceState({}, '', localization.url);
             }
         },

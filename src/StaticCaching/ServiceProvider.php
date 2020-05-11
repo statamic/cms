@@ -3,9 +3,8 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Support\Facades\Event;
-use Statamic\StaticCaching\Invalidator;
-use Statamic\StaticCaching\Middleware\Retrieve;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Statamic\StaticCaching\Middleware\Retrieve;
 
 class ServiceProvider extends LaravelServiceProvider
 {

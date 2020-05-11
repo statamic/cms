@@ -2,7 +2,7 @@
 
     <div class="replicator-fieldtype-container">
 
-        <div class="absolute pin-t pin-r p-3 text-2xs" v-if="values.length > 0">
+        <div class="absolute top-0 right-0 p-3 text-2xs" v-if="values.length > 0">
             <button @click="collapseAll" class="text-blue hover:text-black mr-1" v-text="__('Collapse All')" />
             <button @click="expandAll" class="text-blue hover:text-black" v-text="__('Expand All')" />
         </div>

@@ -53,7 +53,9 @@ class Session extends Tags
 
     protected function returnableSession()
     {
-        if (! $this->isPair) return;
+        if (! $this->isPair) {
+            return;
+        }
 
         if ($as = $this->params->get('as')) {
             return [$as => session()->all()];

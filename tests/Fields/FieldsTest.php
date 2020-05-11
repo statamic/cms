@@ -2,21 +2,21 @@
 
 namespace Tests\Fields;
 
-use Tests\TestCase;
-use Statamic\Fields\Field;
-use Statamic\Fields\Fields;
-use Statamic\Fields\Fieldset;
-use Statamic\Fields\Fieldtype;
-use Illuminate\Support\Collection;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Statamic\Fields\Validator;
+use Illuminate\Support\Collection;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
+use Statamic\Fields\Fieldset;
+use Statamic\Fields\Fieldtype;
+use Tests\TestCase;
 
 class FieldsTest extends TestCase
 {
     /** @test */
-    function it_converts_to_a_collection()
+    public function it_converts_to_a_collection()
     {
         $fields = new Fields;
 
@@ -41,25 +41,25 @@ class FieldsTest extends TestCase
             ->with('fieldset_three')
             ->andReturnUsing(function () {
                 return (new Fieldset)->setHandle('fieldset_three')->setContents(['fields' => [
-                    'foo' => ['type' => 'textarea'],
-                    'bar' => ['type' => 'text'],
+                    ['handle' => 'foo', 'field' => ['type' => 'textarea']],
+                    ['handle' => 'bar', 'field' => ['type' => 'text']],
                 ]]);
             });
 
         $fields->setItems([
             [
                 'handle' => 'one',
-                'field' => 'fieldset_one.field_one'
+                'field' => 'fieldset_one.field_one',
             ],
             [
                 'handle' => 'two',
-                'field' => 'fieldset_one.field_two'
+                'field' => 'fieldset_one.field_two',
             ],
             [
                 'handle' => 'three',
                 'field' => [
                     'type' => 'textarea',
-                ]
+                ],
             ],
             [
                 'import' => 'fieldset_three',
@@ -68,7 +68,7 @@ class FieldsTest extends TestCase
             [
                 'import' => 'fieldset_three',
                 'prefix' => 'b_',
-            ]
+            ],
         ]);
 
         tap($fields->all(), function ($items) {
@@ -82,7 +82,7 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_field_in_a_fieldset_when_given_a_reference()
+    public function it_gets_a_field_in_a_fieldset_when_given_a_reference()
     {
         $existing = new Field('bar', [
             'type' => 'textarea',
@@ -109,7 +109,7 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_can_override_the_config_in_a_referenced_field()
+    public function it_can_override_the_config_in_a_referenced_field()
     {
         $existing = new Field('bar', [
             'type' => 'textarea',
@@ -123,8 +123,8 @@ class FieldsTest extends TestCase
             'handle' => 'test',
             'field' => 'foo.bar',
             'config' => [
-                'var_one' => 'overridden'
-            ]
+                'var_one' => 'overridden',
+            ],
         ]);
 
         $this->assertTrue(is_array($fields));
@@ -139,7 +139,7 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_throws_an_exception_when_an_invalid_field_reference_is_encountered()
+    public function it_throws_an_exception_when_an_invalid_field_reference_is_encountered()
     {
         $this->expectException('Exception');
         $this->expectExceptionMessage('Field foo.bar not found.');
@@ -147,22 +147,24 @@ class FieldsTest extends TestCase
 
         (new Fields)->createFields([
             'handle' => 'test',
-            'field' => 'foo.bar'
+            'field' => 'foo.bar',
         ]);
     }
 
     /** @test */
-    function it_imports_the_fields_from_an_entire_fieldset_inline()
+    public function it_imports_the_fields_from_an_entire_fieldset_inline()
     {
         $fieldset = (new Fieldset)->setHandle('partial')->setContents([
             'fields' => [
-                'one' => [
-                    'type' => 'text'
+                [
+                    'handle' => 'one',
+                    'field' => ['type' => 'text'],
                 ],
-                'two' => [
-                    'type' => 'textarea'
-                ]
-            ]
+                [
+                    'handle' => 'two',
+                    'field' => ['type' => 'textarea'],
+                ],
+            ],
         ]);
 
         FieldsetRepository::shouldReceive('find')->with('partial')->once()->andReturn($fieldset);
@@ -178,17 +180,19 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_prefixes_the_handles_of_imported_fieldsets()
+    public function it_prefixes_the_handles_of_imported_fieldsets()
     {
         $fieldset = (new Fieldset)->setHandle('partial')->setContents([
             'fields' => [
-                'one' => [
-                    'type' => 'text'
+                [
+                    'handle' => 'one',
+                    'field' => ['type' => 'text'],
                 ],
-                'two' => [
-                    'type' => 'textarea'
-                ]
-            ]
+                [
+                    'handle' => 'two',
+                    'field' => ['type' => 'textarea'],
+                ],
+            ],
         ]);
 
         FieldsetRepository::shouldReceive('find')->with('partial')->once()->andReturn($fieldset);
@@ -205,25 +209,25 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_throws_exception_when_trying_to_import_a_non_existent_fieldset()
+    public function it_throws_exception_when_trying_to_import_a_non_existent_fieldset()
     {
         $this->expectException('Exception');
         $this->expectExceptionMessage('Fieldset test_partial not found.');
         FieldsetRepository::shouldReceive('find')->with('test_partial')->once()->andReturnNull();
 
         (new Fields)->createFields([
-            'import' => 'test_partial'
+            'import' => 'test_partial',
         ]);
     }
 
     /** @test */
-    function it_checks_if_a_given_field_exists()
+    public function it_checks_if_a_given_field_exists()
     {
         $fields = new Fields([
             [
                 'handle' => 'one',
-                'field' => []
-            ]
+                'field' => [],
+            ],
         ]);
 
         $this->assertTrue($fields->has('one'));
@@ -231,13 +235,13 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_given_field()
+    public function it_gets_a_given_field()
     {
         $fields = new Fields([
             [
                 'handle' => 'one',
-                'field' => ['display' => 'First']
-            ]
+                'field' => ['display' => 'First'],
+            ],
         ]);
 
         $this->assertInstanceOf(Field::class, $field = $fields->get('one'));
@@ -246,7 +250,7 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_fields_except()
+    public function it_gets_all_fields_except()
     {
         $fields = new Fields([
             ['handle' => 'one', 'field' => ['display' => 'First']],
@@ -261,7 +265,7 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_gets_only_specific_fields()
+    public function it_gets_only_specific_fields()
     {
         $fields = new Fields([
             ['handle' => 'one', 'field' => ['display' => 'First']],
@@ -276,7 +280,7 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function converts_to_array_suitable_for_rendering_fields_in_publish_component()
+    public function converts_to_array_suitable_for_rendering_fields_in_publish_component()
     {
         FieldRepository::shouldReceive('find')
             ->with('fieldset_one.field_one')
@@ -296,19 +300,19 @@ class FieldsTest extends TestCase
                     'type' => 'textarea',
                     'display' => 'Two',
                     'instructions' => 'Two instructions',
-                    'validate' => 'min:2'
+                    'validate' => 'min:2',
                 ]);
             });
 
         $fields = new Fields([
             'one' => [ // use keys to ensure they get stripped out
                 'handle' => 'one',
-                'field' => 'fieldset_one.field_one'
+                'field' => 'fieldset_one.field_one',
             ],
             'two' => [
                 'handle' => 'two',
-                'field' => 'fieldset_one.field_two'
-            ]
+                'field' => 'fieldset_one.field_two',
+            ],
         ]);
 
         $this->assertEquals([
@@ -335,12 +339,12 @@ class FieldsTest extends TestCase
                 'validate' => 'min:2',
                 'character_limit' => null,
                 'component' => 'textarea',
-            ]
+            ],
         ], $fields->toPublishArray());
     }
 
     /** @test */
-    function it_adds_values_to_fields()
+    public function it_adds_values_to_fields()
     {
         FieldRepository::shouldReceive('find')->with('one')->andReturnUsing(function () {
             return new Field('one', []);
@@ -352,7 +356,7 @@ class FieldsTest extends TestCase
 
         $fields = new Fields([
             ['handle' => 'one', 'field' => 'one'],
-            ['handle' => 'two', 'field' => 'two']
+            ['handle' => 'two', 'field' => 'two'],
         ]);
 
         $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
@@ -364,11 +368,12 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_processes_each_fields_values_by_its_fieldtype()
+    public function it_processes_each_fields_values_by_its_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
-            public function process($data) {
-                return $data . ' processed';
+            public function process($data)
+            {
+                return $data.' processed';
             }
         });
 
@@ -381,7 +386,7 @@ class FieldsTest extends TestCase
 
         $fields = new Fields([
             ['handle' => 'one', 'field' => 'one'],
-            ['handle' => 'two', 'field' => 'two']
+            ['handle' => 'two', 'field' => 'two'],
         ]);
 
         $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
@@ -393,20 +398,21 @@ class FieldsTest extends TestCase
         $this->assertNotSame($fields, $processed);
         $this->assertEquals([
             'one' => 'foo',
-            'two' => 'bar'
+            'two' => 'bar',
         ], $fields->values()->all());
         $this->assertEquals([
             'one' => 'foo processed',
-            'two' => 'bar processed'
+            'two' => 'bar processed',
         ], $processed->values()->all());
     }
 
     /** @test */
-    function it_preprocesses_each_fields_values_by_its_fieldtype()
+    public function it_preprocesses_each_fields_values_by_its_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
-            public function preProcess($data) {
-                return $data . ' preprocessed';
+            public function preProcess($data)
+            {
+                return $data.' preprocessed';
             }
         });
 
@@ -419,7 +425,7 @@ class FieldsTest extends TestCase
 
         $fields = new Fields([
             ['handle' => 'one', 'field' => 'one'],
-            ['handle' => 'two', 'field' => 'two']
+            ['handle' => 'two', 'field' => 'two'],
         ]);
 
         $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
@@ -431,20 +437,26 @@ class FieldsTest extends TestCase
         $this->assertNotSame($fields, $preProcessed);
         $this->assertEquals([
             'one' => 'foo',
-            'two' => 'bar'
+            'two' => 'bar',
         ], $fields->values()->all());
         $this->assertEquals([
             'one' => 'foo preprocessed',
-            'two' => 'bar preprocessed'
+            'two' => 'bar preprocessed',
         ], $preProcessed->values()->all());
     }
 
     /** @test */
-    function it_augments_each_fields_values_by_its_fieldtype()
+    public function it_augments_each_fields_values_by_its_fieldtype()
     {
         FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
-            public function augment($data) {
-                return $data . ' augmented';
+            public function augment($data)
+            {
+                return $data.' augmented';
+            }
+
+            public function shallowAugment($data)
+            {
+                return $data.' shallow augmented';
             }
         });
 
@@ -457,32 +469,45 @@ class FieldsTest extends TestCase
 
         $fields = new Fields([
             ['handle' => 'one', 'field' => 'one'],
-            ['handle' => 'two', 'field' => 'two']
+            ['handle' => 'two', 'field' => 'two'],
         ]);
 
         $this->assertEquals(['one' => null, 'two' => null], $fields->values()->all());
 
         $fields = $fields->addValues(['one' => 'foo', 'two' => 'bar', 'three' => 'baz']);
 
-        $augmented = $fields->augment();
+        tap($fields->augment(), function ($augmented) use ($fields) {
+            $this->assertNotSame($fields, $augmented);
+            $this->assertEquals([
+                'one' => 'foo',
+                'two' => 'bar',
+            ], $fields->values()->all());
+            $this->assertEquals([
+                'one' => 'foo augmented',
+                'two' => 'bar augmented',
+            ], $augmented->values()->all());
+        });
 
-        $this->assertNotSame($fields, $augmented);
-        $this->assertEquals([
-            'one' => 'foo',
-            'two' => 'bar'
-        ], $fields->values()->all());
-        $this->assertEquals([
-            'one' => 'foo augmented',
-            'two' => 'bar augmented'
-        ], $augmented->values()->all());
+        tap($fields->shallowAugment(), function ($augmented) use ($fields) {
+            $this->assertNotSame($fields, $augmented);
+            $this->assertEquals([
+                'one' => 'foo',
+                'two' => 'bar',
+            ], $fields->values()->all());
+            $this->assertEquals([
+                'one' => 'foo shallow augmented',
+                'two' => 'bar shallow augmented',
+            ], $augmented->values()->all());
+        });
     }
 
     /** @test */
-    function it_gets_meta_data_from_all_fields()
+    public function it_gets_meta_data_from_all_fields()
     {
         FieldtypeRepository::shouldReceive('find')->with('fieldtype')->andReturn(new class extends Fieldtype {
-            public function preload() {
-                return 'meta data from field ' . $this->field->handle() . ' is ' . ($this->field->value() * 2);
+            public function preload()
+            {
+                return 'meta data from field '.$this->field->handle().' is '.($this->field->value() * 2);
             }
         });
 
@@ -495,7 +520,7 @@ class FieldsTest extends TestCase
 
         $fields = (new Fields([
             ['handle' => 'one', 'field' => 'one'],
-            ['handle' => 'two', 'field' => 'two']
+            ['handle' => 'two', 'field' => 'two'],
         ]))->addValues(['one' => 10, 'two' => 20]);
 
         $this->assertEquals([
@@ -505,7 +530,7 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_filters_down_to_localizable_fields()
+    public function it_filters_down_to_localizable_fields()
     {
         $fields = new Fields([
             ['handle' => 'one', 'field' => ['type' => 'text', 'localizable' => false]],
@@ -530,7 +555,7 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_validator()
+    public function it_gets_a_validator()
     {
         $fields = new Fields;
         Validator::shouldReceive('make')->once()->andReturnSelf();
@@ -540,7 +565,7 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_validates_immediately()
+    public function it_validates_immediately()
     {
         $fields = new Fields;
         Validator::shouldReceive('make')->once()->andReturnSelf();
@@ -552,7 +577,7 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
-    function it_validates_immediately_with_extra_rules()
+    public function it_validates_immediately_with_extra_rules()
     {
         $fields = new Fields;
         Validator::shouldReceive('make')->once()->andReturnSelf();

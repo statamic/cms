@@ -14,7 +14,6 @@ use Statamic\Structures\CollectionStructure;
 use Statamic\Tags\Collection\Collection;
 use Statamic\Tags\Collection\Entries;
 use Statamic\Tags\Context;
-use Statamic\Tags\Parameters;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -22,7 +21,7 @@ class CollectionTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -57,7 +56,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_throws_an_exception_for_an_invalid_collection()
+    public function it_throws_an_exception_for_an_invalid_collection()
     {
         $this->makePosts();
 
@@ -70,7 +69,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entries_from_multiple_collections()
+    public function it_gets_entries_from_multiple_collections()
     {
         $this->makePosts();
 
@@ -91,7 +90,28 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entries_from_all_collections()
+    public function it_gets_entries_from_collections_using_collection_objects()
+    {
+        $this->makePosts();
+
+        $this->setTagParameters(['from' => Facades\Collection::findByHandle('music')]);
+        $this->assertCount(3, $this->collectionTag->index());
+
+        $this->setTagParameters(['from' => [
+            Facades\Collection::findByHandle('music'),
+            Facades\Collection::findByHandle('art'),
+        ]]);
+        $this->assertCount(6, $this->collectionTag->index());
+
+        $this->setTagParameters(['from' => collect([
+            Facades\Collection::findByHandle('music'),
+            Facades\Collection::findByHandle('art'),
+        ])]);
+        $this->assertCount(6, $this->collectionTag->index());
+    }
+
+    /** @test */
+    public function it_gets_entries_from_all_collections()
     {
         $this->makePosts();
 
@@ -112,7 +132,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entries_from_all_collections_excluding_one()
+    public function it_gets_entries_from_all_collections_excluding_one()
     {
         $this->makePosts();
 
@@ -133,7 +153,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entries_from_multiple_collections_using_params()
+    public function it_gets_entries_from_multiple_collections_using_params()
     {
         $this->makePosts();
 
@@ -154,7 +174,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entries_from_all_collections_using_params()
+    public function it_gets_entries_from_all_collections_using_params()
     {
         $this->makePosts();
 
@@ -175,7 +195,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entries_from_all_collections_excluding_some_with_params()
+    public function it_gets_entries_from_all_collections_excluding_some_with_params()
     {
         $this->makePosts();
 
@@ -196,7 +216,22 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_filters_out_redirects()
+    public function it_can_exclude_collections_using_collection_objects()
+    {
+        $this->makePosts();
+
+        $this->setTagParameters(['from' => '*', 'not_from' => Facades\Collection::findByHandle('art')]);
+        $this->assertCount(6, $this->collectionTag->index());
+
+        $this->setTagParameters(['from' => '*', 'not_from' => [
+            Facades\Collection::findByHandle('music'),
+            Facades\Collection::findByHandle('art'),
+        ]]);
+        $this->assertCount(3, $this->collectionTag->index());
+    }
+
+    /** @test */
+    public function it_filters_out_redirects()
     {
         $this->makePosts();
         Entry::find('c')->set('redirect', 'http://example.com')->save();
@@ -220,7 +255,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_counts_entries_in_a_collection()
+    public function it_counts_entries_in_a_collection()
     {
         $this->makePosts();
 
@@ -241,7 +276,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_counts_entries_in_a_collection_with_params()
+    public function it_counts_entries_in_a_collection_with_params()
     {
         $this->makePosts();
 
@@ -262,7 +297,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_previous_and_next_entries_in_a_dated_desc_collection()
+    public function it_can_get_previous_and_next_entries_in_a_dated_desc_collection()
     {
         $this->foods->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
@@ -280,13 +315,13 @@ class CollectionTest extends TestCase
         $currentId = $this->findEntryByTitle('Egg')->id();
 
         $orderBy = 'date:desc|title:asc';
-            // Grape
-            // Hummus
-            // Fig
-            // Egg (current)
-            // Danish
-            // Banana
-            // Carrot
+        // Grape
+        // Hummus
+        // Fig
+        // Egg (current)
+        // Danish
+        // Banana
+        // Carrot
 
         $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
 
@@ -304,7 +339,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_previous_and_next_entries_in_a_dated_asc_collection()
+    public function it_can_get_previous_and_next_entries_in_a_dated_asc_collection()
     {
         $this->foods->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-04-10 13:00'));
@@ -322,13 +357,13 @@ class CollectionTest extends TestCase
         $currentId = $this->findEntryByTitle('Egg')->id();
 
         $orderBy = 'date:asc|title:desc';
-            // Carrot
-            // Banana
-            // Danish
-            // Egg (current)
-            // Fig
-            // Hummus
-            // Grape
+        // Carrot
+        // Banana
+        // Danish
+        // Egg (current)
+        // Fig
+        // Hummus
+        // Grape
 
         $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
 
@@ -346,7 +381,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_previous_and_next_entries_in_an_orderable_asc_collection()
+    public function it_can_get_previous_and_next_entries_in_an_orderable_asc_collection()
     {
         $this->makeEntry($this->foods, 'a')->set('title', 'Apple')->save();
         $this->makeEntry($this->foods, 'b')->set('title', 'Banana')->save();
@@ -375,13 +410,13 @@ class CollectionTest extends TestCase
         $currentId = $this->findEntryByTitle('Banana')->id();
 
         $orderBy = 'order:asc';
-            // Hummus
-            // Apple
-            // Ice Cream
-            // Banana (current)
-            // Fig
-            // Grape
-            // Egg
+        // Hummus
+        // Apple
+        // Ice Cream
+        // Banana (current)
+        // Fig
+        // Grape
+        // Egg
 
         $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
 
@@ -395,7 +430,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_previous_and_next_entries_in_an_orderable_desc_collection()
+    public function it_can_get_previous_and_next_entries_in_an_orderable_desc_collection()
     {
         $this->makeEntry($this->foods, 'a')->set('title', 'Apple')->save();
         $this->makeEntry($this->foods, 'b')->set('title', 'Banana')->save();
@@ -424,13 +459,13 @@ class CollectionTest extends TestCase
         $currentId = $this->findEntryByTitle('Banana')->id();
 
         $orderBy = 'order:desc';
-            // Egg
-            // Grape
-            // Fig
-            // Banana (current)
-            // Ice Cream
-            // Apple
-            // Hummus
+        // Egg
+        // Grape
+        // Fig
+        // Banana (current)
+        // Ice Cream
+        // Apple
+        // Hummus
 
         $this->setTagParameters(['in' => 'foods', 'current' => $currentId, 'order_by' => $orderBy, 'limit' => 1]);
 
@@ -444,7 +479,7 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    function it_adds_defaults_for_missing_items_based_on_blueprint()
+    public function it_adds_defaults_for_missing_items_based_on_blueprint()
     {
         $blueprint = Blueprint::make('test')->setContents(['fields' => [['handle' => 'title', 'field' => ['type' => 'text']]]]);
         Blueprint::shouldReceive('find')->with('test')->andReturn($blueprint);
@@ -465,12 +500,12 @@ class CollectionTest extends TestCase
             'a' => 'Apple',
             'b' => null,
             'c' => null,
-            'd' => 'Banana'
+            'd' => 'Banana',
         ], $items);
     }
 
     /** @test */
-    function when_using_the_tag_without_any_parameters_that_define_the_collection_it_will_get_the_collection_object_from_context()
+    public function when_using_the_tag_without_any_parameters_that_define_the_collection_it_will_get_the_collection_object_from_context()
     {
         $item = Facades\Collection::make();
 

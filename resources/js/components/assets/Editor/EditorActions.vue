@@ -13,7 +13,7 @@
 </template>
 
 <script>
-import Actions from '../../data-list/Actions.vue';
+import Actions from '../../data-list/Actions.js';
 
 export default {
 

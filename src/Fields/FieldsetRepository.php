@@ -2,7 +2,6 @@
 
 namespace Statamic\Fields;
 
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
@@ -71,7 +70,7 @@ class FieldsetRepository
                 return (new Fieldset)
                     ->setHandle($handle)
                     ->setContents(YAML::file($file)->parse());
-                })
+            })
             ->keyBy->handle();
     }
 

@@ -2,8 +2,8 @@
 
 namespace Statamic\Auth\Passwords;
 
-use Illuminate\Support\Str;
 use Illuminate\Auth\Passwords\PasswordBrokerManager as BaseManager;
+use Illuminate\Support\Str;
 
 class PasswordBrokerManager extends BaseManager
 {
@@ -15,6 +15,12 @@ class PasswordBrokerManager extends BaseManager
             $key = base64_decode(substr($key, 7));
         }
 
-        return new TokenRepository($this->app['files'], $this->app['hash'], $key, $config['expire']);
+        return new TokenRepository(
+            $this->app['files'],
+            $this->app['hash'],
+            $key,
+            $config['expire'],
+            $config['throttle'] ?? 0
+        );
     }
 }

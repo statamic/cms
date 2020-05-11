@@ -2,38 +2,27 @@
 
 namespace Statamic\Globals;
 
+use Statamic\Contracts\Globals\GlobalSet as Contract;
+use Statamic\Data\ExistsAsFile;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Facades\Blueprint;
-use Statamic\Data\ExistsAsFile;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Globals\GlobalSet as Contract;
 
 class GlobalSet implements Contract
 {
     use ExistsAsFile, FluentlyGetsAndSets;
 
-    protected $id;
     protected $title;
     protected $handle;
-    protected $sites;
     protected $blueprint;
     protected $localizations;
 
-    public function id($id = null)
+    public function id()
     {
-        return $this->fluentlyGetOrSet('id')->args(func_get_args());
-    }
-
-    public function sites($sites = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('sites')
-            ->getter(function ($sites) {
-                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
-            })
-            ->args(func_get_args());
+        return $this->handle();
     }
 
     public function handle($handle = null)
@@ -65,25 +54,8 @@ class GlobalSet implements Contract
         return vsprintf('%s/%s.%s', [
             rtrim(Stache::store('globals')->directory(), '/'),
             $this->handle(),
-            'yaml'
+            'yaml',
         ]);
-    }
-
-    public function toCacheableArray()
-    {
-        return [
-            'handle' => $this->handle,
-            'title' => $this->title,
-            'blueprint' => $this->blueprint,
-            'sites' => $this->sites()->all(),
-            'path' => $this->path(),
-            'localizations' => $this->localizations()->map(function ($localized) {
-                return [
-                    'path' => $localized->initialPath() ?? $localized->path(),
-                    'data' => $localized->data()
-                ];
-            })->all()
-        ];
     }
 
     public function save()
@@ -103,15 +75,14 @@ class GlobalSet implements Contract
     public function fileData()
     {
         $data = [
-            'id' => $this->id,
             'title' => $this->title(),
             'blueprint' => $this->blueprint,
         ];
 
-        if (Site::hasMultiple()) {
-            $data['sites'] = $this->sites()->all();
-        } else {
-            $data['data'] = $this->in(Site::default()->handle())->data()->all();
+        if (! Site::hasMultiple()) {
+            $data['data'] = Arr::removeNullValues(
+                $this->in(Site::default()->handle())->data()->all()
+            );
         }
 
         return $data;
@@ -150,6 +121,11 @@ class GlobalSet implements Contract
         return $this->in(Site::selected()->handle());
     }
 
+    public function inCurrentSite()
+    {
+        return $this->in(Site::current()->handle());
+    }
+
     public function existsIn($locale)
     {
         return $this->in($locale) !== null;
@@ -162,12 +138,12 @@ class GlobalSet implements Contract
 
     public function editUrl()
     {
-        return cp_route('globals.edit', [$this->id(), $this->handle()]);
+        return cp_route('globals.edit', $this->handle());
     }
 
     public function deleteUrl()
     {
-        return cp_route('globals.destroy', $this->id());
+        return cp_route('globals.destroy', $this->handle());
     }
 
     public static function __callStatic($method, $parameters)

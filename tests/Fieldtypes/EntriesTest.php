@@ -8,7 +8,6 @@ use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Entries;
-use Statamic\Statamic;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -21,12 +20,12 @@ class EntriesTest extends TestCase
         parent::setUp();
 
         $collection = tap(Facades\Collection::make('blog')->routes('blog/{slug}'))->save();
-        EntryFactory::id('123')->collection($collection)->slug('one')->create();
-        EntryFactory::id('456')->collection($collection)->slug('two')->create();
+        EntryFactory::id('123')->collection($collection)->slug('one')->data(['title' => 'One'])->create();
+        EntryFactory::id('456')->collection($collection)->slug('two')->data(['title' => 'Two'])->create();
     }
 
     /** @test */
-    function it_augments_to_a_collection_of_entries()
+    public function it_augments_to_a_collection_of_entries()
     {
         $augmented = $this->fieldtype()->augment(['123', '456']);
 
@@ -36,7 +35,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_augments_to_a_single_asset_when_max_items_is_one()
+    public function it_augments_to_a_single_asset_when_max_items_is_one()
     {
         $augmented = $this->fieldtype(['max_items' => 1])->augment(['123']);
 
@@ -45,7 +44,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_shallow_augments_to_a_collection_of_enties()
+    public function it_shallow_augments_to_a_collection_of_enties()
     {
         $augmented = $this->fieldtype()->shallowAugment(['123', '456']);
 
@@ -53,12 +52,14 @@ class EntriesTest extends TestCase
         $this->assertEquals([
             [
                 'id' => '123',
+                'title' => 'One',
                 'url' => '/blog/one',
                 'permalink' => 'http://localhost/blog/one',
                 'api_url' => 'http://localhost/api/collections/blog/entries/123',
             ],
             [
                 'id' => '456',
+                'title' => 'Two',
                 'url' => '/blog/two',
                 'permalink' => 'http://localhost/blog/two',
                 'api_url' => 'http://localhost/api/collections/blog/entries/456',
@@ -67,19 +68,20 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_shallow_augments_to_a_single_entry_when_max_items_is_one()
+    public function it_shallow_augments_to_a_single_entry_when_max_items_is_one()
     {
         $augmented = $this->fieldtype(['max_items' => 1])->shallowAugment(['123']);
 
         $this->assertEquals([
             'id' => '123',
+            'title' => 'One',
             'url' => '/blog/one',
             'permalink' => 'http://localhost/blog/one',
             'api_url' => 'http://localhost/api/collections/blog/entries/123',
         ], $augmented);
     }
 
-    function fieldtype($config = [])
+    public function fieldtype($config = [])
     {
         return (new Entries)->setField(new Field('test', array_merge([
             'type' => 'entries',

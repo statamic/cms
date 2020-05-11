@@ -4,7 +4,6 @@ namespace Statamic\Structures;
 
 use Statamic\Contracts\Data\Localization;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -37,8 +36,9 @@ class Tree implements Localization
     public function tree($tree = null)
     {
         return $this->fluentlyGetOrSet('tree')
-            ->getter(function ($tree)  {
-                $key = "structure-{$this->structure->handle()}-{$this->locale()}-" . md5(json_encode($tree));
+            ->getter(function ($tree) {
+                $key = "structure-{$this->structure->handle()}-{$this->locale()}-".md5(json_encode($tree));
+
                 return Blink::once($key, function () use ($tree) {
                     return $this->structure->validateTree($tree, $this->locale());
                 });
@@ -74,13 +74,13 @@ class Tree implements Localization
         return vsprintf('%s/%s/%s.yaml', [
             rtrim(Stache::store('navigation')->directory(), '/'),
             $this->locale(),
-            $this->handle()
+            $this->handle(),
         ]);
     }
 
     public function parent()
     {
-        if (!$this->root()) {
+        if (! $this->root()) {
             return null;
         }
 
@@ -195,7 +195,7 @@ class Tree implements Localization
 
     public function appendTo($parent, $page)
     {
-        if ($parent && !$this->page($parent)) {
+        if ($parent && ! $this->page($parent)) {
             throw new \Exception("Page [{$parent}] does not exist in this structure");
         }
 

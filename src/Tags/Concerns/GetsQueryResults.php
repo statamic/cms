@@ -2,8 +2,6 @@
 
 namespace Statamic\Tags\Concerns;
 
-use Statamic\Support\Arr;
-
 trait GetsQueryResults
 {
     protected function results($query)
@@ -27,9 +25,9 @@ trait GetsQueryResults
 
     protected function parsePaginationParameters()
     {
-        $paginate = Arr::get($this->parameters, 'paginate');
-        $limit = Arr::get($this->parameters, 'limit');
-        $offset = Arr::get($this->parameters, 'offset');
+        $paginate = $this->parameters->get('paginate');
+        $limit = $this->parameters->get('limit');
+        $offset = $this->parameters->get('offset');
 
         if ($paginate === true) {
             $paginate = $limit;

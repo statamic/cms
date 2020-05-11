@@ -3,7 +3,6 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
-use Statamic\Facades\Config;
 use Statamic\StaticCaching\Cacher;
 
 class Cache

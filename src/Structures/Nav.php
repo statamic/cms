@@ -33,7 +33,7 @@ class Nav extends Structure implements Contract
     {
         return vsprintf('%s/%s.yaml', [
             rtrim(Stache::store('navigation')->directory(), '/'),
-            $this->handle
+            $this->handle,
         ]);
     }
 
@@ -68,7 +68,7 @@ class Nav extends Structure implements Contract
     public function showUrl($params = [])
     {
         return cp_route('navigation.show', array_merge($params, [
-            'navigation' => $this->handle()
+            'navigation' => $this->handle(),
         ]));
     }
 

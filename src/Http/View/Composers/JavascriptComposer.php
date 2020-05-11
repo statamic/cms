@@ -8,6 +8,7 @@ use Statamic\Facades\Preference;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 
 class JavascriptComposer
 {
@@ -21,8 +22,9 @@ class JavascriptComposer
             'version' => Statamic::version(),
             'laravelVersion' => app()->version(),
             'csrfToken' => csrf_token(),
+            'cpUrl' => cp_route('index'),
             'cpRoot' => str_start(config('statamic.cp.route'), '/'),
-            'urlPath' => '/' . request()->path(),
+            'urlPath' => Str::after(request()->getRequestUri(), config('statamic.cp.route').'/'),
             'resourceUrl' => Statamic::cpAssetUrl(),
             'locales' => config('statamic.system.locales'),
             'flash' => Statamic::flash(),
@@ -38,7 +40,7 @@ class JavascriptComposer
             'preloadableFieldtypes' => FieldtypeRepository::preloadable()->keys(),
             'livePreview' => config('statamic.live_preview'),
             'locale' => config('app.locale'),
-            'permissions' => $this->permissions($user)
+            'permissions' => $this->permissions($user),
         ]);
     }
 

@@ -2,8 +2,8 @@
 
 namespace Statamic\Events\Data;
 
-use Statamic\Events\Event;
 use Statamic\Contracts\Data\Data;
+use Statamic\Events\Event;
 
 abstract class DataDeleted extends Event
 {

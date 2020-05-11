@@ -13,15 +13,20 @@ trait QueriesConditions
 {
     protected function queryConditions($query)
     {
-        $this->parameters->filter(function ($value, $param) {
-            return Str::contains($param, ':');
-        })->each(function ($value, $param) use ($query) {
+        $this->queryableConditionParams()->each(function ($value, $param) use ($query) {
             $this->queryCondition(
                 $query,
                 $field = explode(':', $param)[0],
                 explode(':', $param)[1] ?? false,
                 $this->getQueryConditionValue($value, $field)
             );
+        });
+    }
+
+    protected function queryableConditionParams()
+    {
+        return $this->parameters->filter(function ($value, $param) {
+            return Str::contains($param, ':');
         });
     }
 

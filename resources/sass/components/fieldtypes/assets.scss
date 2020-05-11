@@ -12,6 +12,17 @@
     &.is-expanded {
         @apply border-b-0 rounded-b-none;
     }
+
+    .asset-upload-control {
+      @apply ml-2;
+    }
+
+    .upload-text-button {
+        @apply text-blue underline;
+        &:hover {
+            @apply text-blue-dark;
+        }
+    }
 }
 
 
@@ -115,7 +126,20 @@
 @element .assets-fieldtype and (max-width: 500px) {
     :self .assets-fieldtype-picker {
         @apply flex;
-        p { @apply ml-0 text-center }
+        p {
+            // @apply ml-0 text-center;
+        }
+        .drag-drop-text { display: none; }
+    }
+}
+
+@element .assets-fieldtype and (max-width: 280px) {
+    :self .assets-fieldtype-picker {
+        @apply flex-col;
+        .upload-asset-control {
+          @apply ml-0 text-center;
+        }
+        p { @apply ml-0 mt-1 text-center }
         .drag-drop-text { display: none; }
     }
 }

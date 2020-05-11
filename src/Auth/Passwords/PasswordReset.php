@@ -19,7 +19,7 @@ class PasswordReset
             $query = array_merge($query, ['redirect' => static::$redirect]);
         }
 
-        return explode('?', $url)[0] . '?' . http_build_query($query);
+        return explode('?', $url)[0].'?'.http_build_query($query);
 
         return $url;
     }

@@ -3,10 +3,8 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
-use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
@@ -67,7 +65,7 @@ class UsersController extends CpController
     }
 
     /**
-     * Create a new user
+     * Create a new user.
      *
      * @return \Illuminate\View\View
      */
@@ -169,7 +167,7 @@ class UsersController extends CpController
                 'save' => $user->updateUrl(),
                 'password' => cp_route('users.password.update', $user->id()),
             ],
-            'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user)
+            'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
         ];
 
         if ($request->wantsJson()) {
@@ -194,11 +192,11 @@ class UsersController extends CpController
         }
         $user->email($request->email);
 
-        if ($request->roles && User::current()->can('edit roles')) {
+        if (User::current()->can('edit roles')) {
             $user->roles($request->roles);
         }
 
-        if ($request->groups && User::current()->can('edit user groups')) {
+        if (User::current()->can('edit user groups')) {
             $user->groups($request->groups);
         }
 

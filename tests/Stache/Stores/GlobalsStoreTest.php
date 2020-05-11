@@ -2,21 +2,19 @@
 
 namespace Tests\Stache\Stores;
 
-use Mockery;
-use Tests\TestCase;
-use Statamic\Facades\Site;
-use Statamic\Facades\Blueprint;
-use Statamic\Stache\Stache;
-use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Stache\Traverser;
-use Statamic\Stache\Stores\GlobalsStore;
-use Statamic\Facades\GlobalSet as GlobalsAPI;
+use Illuminate\Filesystem\Filesystem;
+use Mockery;
 use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Facades\GlobalSet as GlobalsAPI;
 use Statamic\Facades\Path;
+use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\GlobalsStore;
+use Tests\TestCase;
 
 class GlobalsStoreTest extends TestCase
 {
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -27,14 +25,14 @@ class GlobalsStoreTest extends TestCase
         $stache->registerStore($this->store = (new GlobalsStore($stache, app('files')))->directory($this->tempDir));
     }
 
-    function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
     /** @test */
-    function it_gets_yaml_files_from_the_root()
+    public function it_gets_yaml_files_from_the_root()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
         touch($this->tempDir.'/two.yaml', 1234567890);
@@ -58,19 +56,19 @@ class GlobalsStoreTest extends TestCase
     }
 
     /** @test */
-    function it_makes_global_set_instances_from_files()
+    public function it_makes_global_set_instances_from_files()
     {
-        $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/example.yaml'), "id: globals-example\ntitle: Example\ndata:\n  foo: bar");
+        $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/example.yaml'), "title: Example\ndata:\n  foo: bar");
 
         $this->assertInstanceOf(GlobalSet::class, $item);
-        $this->assertEquals('globals-example', $item->id());
+        $this->assertEquals('example', $item->id());
         $this->assertEquals('example', $item->handle());
         $this->assertEquals('Example', $item->title());
         $this->assertEquals(['foo' => 'bar'], $item->in('en')->data()->all());
     }
 
     /** @test */
-    function it_uses_the_id_as_the_item_key()
+    public function it_uses_the_id_as_the_item_key()
     {
         $set = Mockery::mock();
         $set->shouldReceive('id')->andReturn('123');
@@ -82,9 +80,9 @@ class GlobalsStoreTest extends TestCase
     }
 
     /** @test */
-    function it_saves_to_disk()
+    public function it_saves_to_disk()
     {
-        $set = GlobalsAPI::make()->id('global-test')->handle('test');
+        $set = GlobalsAPI::make('test');
         $set->addLocalization($set->makeLocalization('en'));
 
         $this->store->save($set);
@@ -93,7 +91,7 @@ class GlobalsStoreTest extends TestCase
     }
 
     /** @test */
-    function it_saves_to_disk_with_multiple_sites()
+    public function it_saves_to_disk_with_multiple_sites()
     {
         $this->markTestIncomplete();
     }

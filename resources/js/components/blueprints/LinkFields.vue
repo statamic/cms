@@ -88,6 +88,10 @@ import uniqid from 'uniqid';
 
 export default {
 
+    props: {
+        excludeFieldset: String
+    },
+
     data() {
         let fields = this.$config.get('fieldsetFields');
         let fieldsets = this.$config.get('fieldsets');
@@ -97,14 +101,18 @@ export default {
             reference: null,
             fieldset: null,
             importPrefix: null,
-            fieldSuggestions: Object.values(fields).map(field => {
+            fieldSuggestions: Object.values(fields).filter(field => {
+                return field.fieldset.handle != this.excludeFieldset;
+            }).map(field => {
                 return {
                     value: `${field.fieldset.handle}.${field.handle}`,
                     label: field.display,
                     fieldset: fieldsets[field.fieldset.handle].title
                 };
             }),
-            fieldsetSuggestions: Object.values(fieldsets).map(fieldset => {
+            fieldsetSuggestions: Object.values(fieldsets).filter(fieldset => {
+                return fieldset.handle != this.excludeFieldset;
+            }).map(fieldset => {
                 return {
                     value: fieldset.handle,
                     label: fieldset.title,

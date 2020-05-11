@@ -28,7 +28,7 @@ class ResolveRedirectTest extends TestCase
     }
 
     /** @test */
-    function it_cant_resolve_a_first_child_without_a_parent()
+    public function it_cant_resolve_a_first_child_without_a_parent()
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Cannot resolve a page\'s child redirect without providing a page.');
@@ -39,7 +39,7 @@ class ResolveRedirectTest extends TestCase
     }
 
     /** @test */
-    function it_cannot_resolve_a_first_child_redirect_if_the_parent_is_not_a_page()
+    public function it_cannot_resolve_a_first_child_redirect_if_the_parent_is_not_a_page()
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Cannot resolve a page\'s child redirect without providing a page.');
@@ -50,7 +50,7 @@ class ResolveRedirectTest extends TestCase
     }
 
     /** @test */
-    function it_resolves_first_child()
+    public function it_resolves_first_child()
     {
         $resolver = new ResolveRedirect;
 
@@ -67,7 +67,7 @@ class ResolveRedirectTest extends TestCase
     }
 
     /** @test */
-    function it_resolves_first_child_through_an_entry()
+    public function it_resolves_first_child_through_an_entry()
     {
         $resolver = new ResolveRedirect;
 
@@ -87,7 +87,7 @@ class ResolveRedirectTest extends TestCase
     }
 
     /** @test */
-    function a_parent_without_a_child_resolves_to_a_404()
+    public function a_parent_without_a_child_resolves_to_a_404()
     {
         $resolver = new ResolveRedirect;
 
@@ -101,7 +101,7 @@ class ResolveRedirectTest extends TestCase
     }
 
     /** @test */
-    function it_resolves_references_to_entries()
+    public function it_resolves_references_to_entries()
     {
         $resolver = new ResolveRedirect;
 

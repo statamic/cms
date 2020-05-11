@@ -16,7 +16,7 @@ trait PreventSavingStacheItemsToDisk
         Stache::stores()->each(function ($store) {
             $dir = Path::tidy(__DIR__.'/__fixtures__');
             $relative = str_after(str_after($store->directory(), $dir), '/');
-            $store->directory($this->fakeStacheDirectory . '/' . $relative);
+            $store->directory($this->fakeStacheDirectory.'/'.$relative);
         });
     }
 

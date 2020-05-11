@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Tests\Data;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Data\AbstractAugmented;
@@ -26,7 +26,7 @@ class AugmentedTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_single_value_by_key()
+    public function it_gets_a_single_value_by_key()
     {
         $augmented = new class($this->thing) extends BaseAugmentedThing {
             //
@@ -37,7 +37,25 @@ class AugmentedTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_value_from_the_thing_if_theres_a_method()
+    public function it_gets_a_single_value_by_key_using_the_value_method_if_it_exists()
+    {
+        $thingWithValueMethod = new class($this->thing->data()) extends Thing {
+            public function value($key)
+            {
+                return $this->get($key) ? $this->get($key).' (value)' : null;
+            }
+        };
+
+        $augmented = new class($thingWithValueMethod) extends BaseAugmentedThing {
+            //
+        };
+
+        $this->assertEquals('bar (value)', $augmented->get('foo'));
+        $this->assertNull($augmented->get('unknown'));
+    }
+
+    /** @test */
+    public function it_gets_a_value_from_the_thing_if_theres_a_method()
     {
         $augmented = new class($this->thing) extends BaseAugmentedThing {
             //
@@ -49,10 +67,9 @@ class AugmentedTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_value_from_the_augmented_thing_if_theres_a_method()
+    public function it_gets_a_value_from_the_augmented_thing_if_theres_a_method()
     {
-        $augmented = new class($this->thing) extends BaseAugmentedThing
-        {
+        $augmented = new class($this->thing) extends BaseAugmentedThing {
             public function slug()
             {
                 return 'the-augmented-thing';
@@ -70,14 +87,13 @@ class AugmentedTest extends TestCase
     }
 
     /** @test */
-    function a_value_object_is_returned_if_the_thing_has_a_blueprint_and_theres_a_matching_field()
+    public function a_value_object_is_returned_if_the_thing_has_a_blueprint_and_theres_a_matching_field()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')
-            ->andReturn($fieldtype = new class extends Fieldtype
-            {
+            ->andReturn($fieldtype = new class extends Fieldtype {
                 public function augment($value)
                 {
-                    return 'AUGMENTED ' . strtoupper($value);
+                    return 'AUGMENTED '.strtoupper($value);
                 }
             });
 
@@ -113,14 +129,13 @@ class AugmentedTest extends TestCase
     }
 
     /** @test */
-    function it_can_select_multiple_keys()
+    public function it_can_select_multiple_keys()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')
-            ->andReturn($fieldtype = new class extends Fieldtype
-            {
+            ->andReturn($fieldtype = new class extends Fieldtype {
                 public function augment($value)
                 {
-                    return 'AUGMENTED ' . strtoupper($value);
+                    return 'AUGMENTED '.strtoupper($value);
                 }
             });
 
@@ -143,7 +158,6 @@ class AugmentedTest extends TestCase
             'slug' => $slug = new Value('the-thing', 'slug', $fieldtype, $this->blueprintThing),
             'the_slug' => 'the-thing',
             'hello' => 'world',
-            'unused' => $unused = new Value(null, 'unused', $fieldtype, $this->blueprintThing),
             'supplemented' => 'supplemented value',
         ], $result->all());
 
@@ -163,7 +177,6 @@ class AugmentedTest extends TestCase
         $this->assertEquals([
             'foo' => $foo,
             'the_slug' => 'the-thing',
-            'unused' => $unused,
             'supplemented' => 'supplemented value',
         ], $result->all());
 
@@ -171,13 +184,12 @@ class AugmentedTest extends TestCase
             'foo' => $foo,
             'slug' => $slug,
             'the_slug' => 'the-thing',
-            'unused' => $unused,
             'supplemented' => 'supplemented value',
         ], $augmented->except('hello')->all());
     }
 
     /** @test */
-    function no_infinite_loop_when_getting_keys_that_match_methods()
+    public function no_infinite_loop_when_getting_keys_that_match_methods()
     {
         $thing = new Thing([
             'select' => 'selected',
@@ -195,7 +207,7 @@ class Thing
 {
     use ContainsData;
 
-    function __construct($data)
+    public function __construct($data)
     {
         $this->data = $data;
         $this->supplements = [
@@ -231,8 +243,8 @@ class BlueprintThing extends Thing
                 [
                     'handle' => 'unused',
                     'field' => ['type' => 'test'],
-                ]
-            ]
+                ],
+            ],
         ]);
     }
 }

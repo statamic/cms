@@ -35,7 +35,7 @@ class Checkboxes extends Fieldtype
             return [
                 'key' => $value,
                 'value' => $value,
-                'label' => array_get($this->config('options'), $value, $value)
+                'label' => array_get($this->config('options'), $value, $value),
             ];
         })->all();
     }

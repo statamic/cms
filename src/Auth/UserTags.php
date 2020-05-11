@@ -2,14 +2,13 @@
 
 namespace Statamic\Auth;
 
-use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Support\Arr;
-use Statamic\Tags\Tags;
 use Statamic\Tags\Concerns;
+use Statamic\Tags\Tags;
 
 class UserTags extends Tags
 {
@@ -18,7 +17,7 @@ class UserTags extends Tags
     protected static $handle = 'user';
 
     /**
-     * Dynamically fetch a user's data by variable_name
+     * Dynamically fetch a user's data by variable_name.
      *
      * Maps to {{ user:variable_name }}
      *
@@ -36,7 +35,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Fetch a user
+     * Fetch a user.
      *
      * Maps to {{ user }}
      *
@@ -55,7 +54,7 @@ class UserTags extends Tags
 
         // Get a user by email, if the `email` parameter was used.
         if ($email = $this->get('email')) {
-            if (! $user = User::whereEmail($email)) {
+            if (! $user = User::findByEmail($email)) {
                 return $this->parseNoResults();
             }
         }
@@ -107,7 +106,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Output a registration form
+     * Output a registration form.
      *
      * Maps to {{ user:register_form }}
      *
@@ -135,7 +134,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Alias of {{ user:register_form }}
+     * Alias of {{ user:register_form }}.
      *
      * @return string
      */
@@ -145,7 +144,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Outputs a logout URL
+     * Outputs a logout URL.
      *
      * Maps to {{ user:logout_url }}
      *
@@ -163,7 +162,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Logs a user out and performs a redirect
+     * Logs a user out and performs a redirect.
      *
      * Maps to {{ user:logout }}
      */
@@ -175,7 +174,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Output a forgot password form
+     * Output a forgot password form.
      *
      * Maps to {{ user:forgot_password_form }}
      *
@@ -215,7 +214,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Output a reset password form
+     * Output a reset password form.
      *
      * Maps to {{ user:reset_password_form }}
      *
@@ -253,7 +252,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Displays content if a user has permission
+     * Displays content if a user has permission.
      *
      * Maps to {{ user:can }}
      *
@@ -275,7 +274,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Displays content if a user doesn't have permission
+     * Displays content if a user doesn't have permission.
      *
      * Maps to {{ user:cant }}
      *
@@ -302,7 +301,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Displays content if a user is a role
+     * Displays content if a user is a role.
      *
      * Maps to {{ user:is }}
      *
@@ -324,7 +323,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Displays content if a user is not a role
+     * Displays content if a user is not a role.
      *
      * Maps to {{ user:isnt }}
      *
@@ -351,7 +350,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Displays content if a user is in a group
+     * Displays content if a user is in a group.
      *
      * Maps to {{ user:in }}
      *
@@ -373,7 +372,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Displays content if a user isn't in a group
+     * Displays content if a user isn't in a group.
      *
      * Maps to {{ user:not_in }}
      *
@@ -405,12 +404,12 @@ class UserTags extends Tags
     public function eventUrl($url, $relative = false)
     {
         return URL::prependSiteUrl(
-            config('statamic.routes.action') . '/user/' . $url
+            config('statamic.routes.action').'/user/'.$url
         );
     }
 
     /**
-     * Get the redirect URL
+     * Get the redirect URL.
      *
      * @return string
      */

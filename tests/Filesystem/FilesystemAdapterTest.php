@@ -18,8 +18,8 @@ class FilesystemAdapterTest extends TestCase
         $this->tempDir = __DIR__.'/tmp';
         mkdir($this->tempDir);
         $this->baseDir = $this->tempDir;
-        mkdir($this->outsideRoot = $this->tempDir . '/outside-root');
-        mkdir($this->tempDir = $this->tempDir . '/root');
+        mkdir($this->outsideRoot = $this->tempDir.'/outside-root');
+        mkdir($this->tempDir = $this->tempDir.'/root');
 
         $this->adapter = $this->makeAdapter();
     }
@@ -40,7 +40,7 @@ class FilesystemAdapterTest extends TestCase
     }
 
     /** @test */
-    function it_normalizes_relative_paths()
+    public function it_normalizes_relative_paths()
     {
         $dir = Path::tidy($this->tempDir);
         $this->assertEquals($dir.'/bar.txt', $this->adapter->normalizePath('bar.txt'));
@@ -49,7 +49,7 @@ class FilesystemAdapterTest extends TestCase
     }
 
     /** @test */
-    function it_normalizes_absolute_paths()
+    public function it_normalizes_absolute_paths()
     {
         $dir = Path::tidy($this->tempDir);
         $this->assertEquals($dir.'/bar.txt', $this->adapter->normalizePath($this->tempDir.'/bar.txt'));
@@ -59,7 +59,7 @@ class FilesystemAdapterTest extends TestCase
     }
 
     /** @test */
-    function it_normalizes_absolute_paths_outside_the_root()
+    public function it_normalizes_absolute_paths_outside_the_root()
     {
         // unix
         $this->assertEquals('/path/to/bar.txt', $this->adapter->normalizePath('/path/to/bar.txt'));
@@ -81,7 +81,7 @@ class FilesystemAdapterTest extends TestCase
     }
 
     /** @test */
-    function it_checks_if_a_path_is_within_the_root()
+    public function it_checks_if_a_path_is_within_the_root()
     {
         $this->assertTrue($this->adapter->isWithinRoot('relative/test.txt'));
         $this->assertTrue($this->adapter->isWithinRoot($this->tempDir.'/test.txt'));
@@ -96,7 +96,7 @@ class FilesystemAdapterTest extends TestCase
     }
 
     /** @test */
-    function it_gets_files_from_outside_of_the_root_and_outputs_absolute_paths()
+    public function it_gets_files_from_outside_of_the_root_and_outputs_absolute_paths()
     {
         mkdir($this->outsideRoot.'/sub', 0755, true);
         file_put_contents($this->outsideRoot.'/sub/one.txt', '');
@@ -106,12 +106,12 @@ class FilesystemAdapterTest extends TestCase
 
         $this->assertArraysHaveSameValues([
             $dir.'/sub/one.txt',
-            $dir.'/sub/two.txt'
+            $dir.'/sub/two.txt',
         ], $this->adapter->getFiles($dir.'/sub')->all());
     }
 
     /** @test */
-    function it_can_explicitly_request_absolute_paths()
+    public function it_can_explicitly_request_absolute_paths()
     {
         mkdir($this->tempDir.'/sub/sub', 0755, true);
         file_put_contents($this->tempDir.'/one.txt', '');
@@ -127,7 +127,7 @@ class FilesystemAdapterTest extends TestCase
         $this->assertArraysHaveSameValues(
             [
                 $dir.'/sub/two.txt',
-                $dir.'/sub/three.txt'
+                $dir.'/sub/three.txt',
             ],
             $files->all()
         );

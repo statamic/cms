@@ -21,19 +21,19 @@ class AddonInstallerTest extends TestCase
     }
 
     /** @test */
-    function there_are_installable_addons_by_default()
+    public function there_are_installable_addons_by_default()
     {
         $this->assertCount(3, AddonInstaller::installable());
     }
 
     /** @test */
-    function there_are_no_installed_addons_by_default()
+    public function there_are_no_installed_addons_by_default()
     {
         $this->assertCount(0, AddonInstaller::installed());
     }
 
     /** @test */
-    function it_can_install_addon()
+    public function it_can_install_addon()
     {
         AddonInstaller::install('addon/one');
 
@@ -42,7 +42,7 @@ class AddonInstallerTest extends TestCase
     }
 
     /** @test */
-    function it_can_uninstall_addon()
+    public function it_can_uninstall_addon()
     {
         AddonInstaller::install('addon/one');
 
@@ -54,7 +54,7 @@ class AddonInstallerTest extends TestCase
     }
 
     /** @test */
-    function it_will_not_install_unapproved_addon()
+    public function it_will_not_install_unapproved_addon()
     {
         $this->expectException(Exception::class);
 
@@ -65,7 +65,7 @@ class AddonInstallerTest extends TestCase
     }
 
     /** @test */
-    function it_will_not_uninstall_unapproved_addon()
+    public function it_will_not_uninstall_unapproved_addon()
     {
         AddonInstaller::install('addon/one');
 

@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Navigation;
 
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Statamic\Facades\User;
 use Statamic\Facades\Nav;
+use Statamic\Facades\User;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class StoreNavigationTest extends TestCase
 {
@@ -14,7 +14,7 @@ class StoreNavigationTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this
             ->from('/original')
@@ -25,7 +25,7 @@ class StoreNavigationTest extends TestCase
     }
 
     /** @test */
-    function it_stores_a_nav()
+    public function it_stores_a_nav()
     {
         $this->assertCount(0, Nav::all());
 
@@ -41,7 +41,7 @@ class StoreNavigationTest extends TestCase
     }
 
     /** @test */
-    function title_is_required()
+    public function title_is_required()
     {
         $this->assertCount(0, Nav::all());
 
@@ -49,7 +49,7 @@ class StoreNavigationTest extends TestCase
             ->from('/original')
             ->actingAs($this->userWithPermission())
             ->submit($this->validParams([
-                'title' => ''
+                'title' => '',
             ]))
             ->assertRedirect('/original')
             ->assertSessionHasErrors('title');
@@ -58,7 +58,7 @@ class StoreNavigationTest extends TestCase
     }
 
     /** @test */
-    function handle_must_be_alpha_dash()
+    public function handle_must_be_alpha_dash()
     {
         $this->assertCount(0, Nav::all());
 
@@ -66,7 +66,7 @@ class StoreNavigationTest extends TestCase
             ->from('/original')
             ->actingAs($this->userWithPermission())
             ->submit($this->validParams([
-                'handle' => 'there are spaces in here'
+                'handle' => 'there are spaces in here',
             ]))
             ->assertRedirect('/original')
             ->assertSessionHasErrors('handle');

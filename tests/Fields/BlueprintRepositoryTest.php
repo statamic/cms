@@ -2,14 +2,10 @@
 
 namespace Tests\Fields;
 
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Statamic\Facades\File;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\BlueprintRepository;
-use Statamic\Fields\Factory;
-use Statamic\Fields\Field;
-use Statamic\Fields\Section;
 use Statamic\Support\FileCollection;
 use Tests\TestCase;
 
@@ -25,7 +21,7 @@ class BlueprintRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_blueprint()
+    public function it_gets_a_blueprint()
     {
         $contents = <<<'EOT'
 title: Test
@@ -46,14 +42,14 @@ EOT;
             'title' => 'Test',
             'sections' => [
                 'main' => [
-                    'fields' => ['one', 'two']
-                ]
-            ]
+                    'fields' => ['one', 'two'],
+                ],
+            ],
         ], $blueprint->contents());
     }
 
     /** @test */
-    function it_returns_null_if_blueprint_doesnt_exist()
+    public function it_returns_null_if_blueprint_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/unknown.yaml')->once()->andReturnFalse();
         File::shouldReceive('exists')->with('/path/to/vendor/fallbacks/unknown.yaml')->once()->andReturnFalse();
@@ -62,7 +58,7 @@ EOT;
     }
 
     /** @test */
-    function it_gets_fallback_blueprint()
+    public function it_gets_fallback_blueprint()
     {
         $contents = <<<'EOT'
 title: Fallback Blueprint
@@ -79,7 +75,7 @@ EOT;
     }
 
     /** @test */
-    function it_gets_all_blueprints()
+    public function it_gets_all_blueprints()
     {
         $firstContents = <<<'EOT'
 title: First Blueprint
@@ -130,7 +126,7 @@ EOT;
     }
 
     /** @test */
-    function it_returns_empty_collection_if_blueprint_directory_doesnt_exist()
+    public function it_returns_empty_collection_if_blueprint_directory_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints')->once()->andReturnFalse();
 
@@ -141,7 +137,7 @@ EOT;
     }
 
     /** @test */
-    function it_saves_to_disk()
+    public function it_saves_to_disk()
     {
         $expectedYaml = <<<'EOT'
 title: 'Test Blueprint'
@@ -168,7 +164,7 @@ EOT;
         File::shouldReceive('makeDirectory')->with('/path/to/resources/blueprints')->once();
         File::shouldReceive('put')->with('/path/to/resources/blueprints/the_test_blueprint.yaml', $expectedYaml)->once();
 
-        $fieldset = (new Blueprint)->setHandle('the_test_blueprint')->setContents([
+        $blueprint = (new Blueprint)->setHandle('the_test_blueprint')->setContents([
             'title' => 'Test Blueprint',
             'sections' => [
                 'one' => [
@@ -180,7 +176,7 @@ EOT;
                             'config' => [
                                 'display' => 'Foo',
                                 'foo' => 'bar',
-                            ]
+                            ],
                         ],
                         [
                             'handle' => 'bar',
@@ -188,13 +184,13 @@ EOT;
                                 'type' => 'bar',
                                 'display' => 'Bar',
                                 'bar' => 'foo',
-                            ]
-                        ]
-                    ]
-                ]
-            ]
+                            ],
+                        ],
+                    ],
+                ],
+            ],
         ]);
 
-        $this->repo->save($fieldset);
+        $this->repo->save($blueprint);
     }
 }

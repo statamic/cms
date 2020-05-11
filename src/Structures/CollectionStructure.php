@@ -11,7 +11,7 @@ class CollectionStructure extends Structure
         }
 
         if ($collection = $this->collection()) {
-            return 'collection::' . $collection->handle();
+            return 'collection::'.$collection->handle();
         }
     }
 
@@ -89,7 +89,7 @@ class CollectionStructure extends Structure
             ->map(function ($item) {
                 return [
                     'entry' => $item['entry'] ?? null,
-                    'children' => isset($item['children']) ? $this->getEntryIdsFromTree($item['children']) : null
+                    'children' => isset($item['children']) ? $this->getEntryIdsFromTree($item['children']) : null,
                 ];
             })
             ->flatten()
@@ -106,6 +106,7 @@ class CollectionStructure extends Structure
                 if (isset($branch['children'])) {
                     $branch['children'] = $this->removeEntryReferencesFromTree($branch['children'], $entries);
                 }
+
                 return $branch;
             })
             ->all();

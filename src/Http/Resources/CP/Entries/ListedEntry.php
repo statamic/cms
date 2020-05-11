@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Resources\CP\Entries;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
 
-class ListedEntry extends Resource
+class ListedEntry extends JsonResource
 {
     protected $blueprint;
     protected $columns;
@@ -40,6 +40,7 @@ class ListedEntry extends Resource
 
             $this->merge($this->values(['slug' => $entry->slug()])),
 
+            'permalink' => $entry->absoluteUrl(),
             'edit_url' => $entry->editUrl(),
             'viewable' => User::current()->can('view', $entry),
             'editable' => User::current()->can('edit', $entry),

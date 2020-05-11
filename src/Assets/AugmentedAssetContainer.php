@@ -19,13 +19,6 @@ class AugmentedAssetContainer extends AbstractAugmented
         ];
     }
 
-    public function augmentableKeys()
-    {
-        // Override this to prevent the default behavior of looking at the
-        // blueprint for the keys. Those are for the assets, not the container.
-        return $this->keys();
-    }
-
     protected function disk()
     {
         return $this->data->diskHandle();

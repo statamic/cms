@@ -2,11 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Facades\Helper;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
-use Statamic\CP\FieldtypeFactory;
-use Statamic\Fields\ConfigFields;
 use Statamic\Query\Scopes\Filters\Fields\Grid as GridFilter;
 
 class Grid extends Fieldtype
@@ -113,11 +110,11 @@ class Grid extends Fieldtype
         $rules = ['array'];
 
         if ($min = $this->config('min_rows')) {
-            $rules[] = 'min:' . $min;
+            $rules[] = 'min:'.$min;
         }
 
         if ($max = $this->config('max_rows')) {
-            $rules[] = 'max:' . $max;
+            $rules[] = 'max:'.$max;
         }
 
         return $rules;
@@ -150,8 +147,20 @@ class Grid extends Fieldtype
 
     public function augment($value)
     {
-        return collect($value)->map(function ($row) {
-            return $this->fields()->addValues($row)->augment()->values()->all();
+        return $this->performAugmentation($value, false);
+    }
+
+    public function shallowAugment($value)
+    {
+        return $this->performAugmentation($value, true);
+    }
+
+    private function performAugmentation($value, $shallow)
+    {
+        $method = $shallow ? 'shallowAugment' : 'augment';
+
+        return collect($value)->map(function ($row) use ($method) {
+            return $this->fields()->addValues($row)->{$method}()->values()->all();
         });
     }
 }

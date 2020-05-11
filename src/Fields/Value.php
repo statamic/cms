@@ -85,7 +85,7 @@ class Value implements IteratorAggregate, JsonSerializable
 
     public function shouldParse()
     {
-        if (!$this->parser || !$this->fieldtype) {
+        if (! $this->parser || ! $this->fieldtype) {
             return false;
         }
 

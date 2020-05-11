@@ -124,7 +124,38 @@ test('it can use includes or contains operators in conditions', () => {
     expect(showFieldIf({age: 'contains fox'})).toBe(false);
 
     expect(showFieldIf({empty_string: 'contains fox'})).toBe(false);
-    expect(showFieldIf({null_values: 'contains fox'})).toBe(false);
+    expect(showFieldIf({null_value: 'contains fox'})).toBe(false);
+});
+
+test('it can use includes_any or contains_any operators in conditions', () => {
+    Fields.setValues({
+        cancellation_reasons: [
+            'found another service',
+            'other'
+        ],
+        example_string: 'The quick brown fox jumps over the lazy dog',
+        age: 13,
+        empty_string: '',
+        null_value: null,
+    });
+
+    expect(showFieldIf({cancellation_reasons: 'includes_any sick, other'})).toBe(true);
+    expect(showFieldIf({cancellation_reasons: 'contains_any sick, other'})).toBe(true);
+    expect(showFieldIf({cancellation_reasons: 'includes_any sick, found another'})).toBe(false);
+    expect(showFieldIf({cancellation_reasons: 'contains_any sick, found another'})).toBe(false);
+
+    expect(showFieldIf({example_string: 'includes_any parrot, lazy dog'})).toBe(true);
+    expect(showFieldIf({example_string: 'contains_any parrot, lazy dog'})).toBe(true);
+    expect(showFieldIf({example_string: 'includes_any parrot, hops'})).toBe(false);
+    expect(showFieldIf({example_string: 'contains_any parrot, hops'})).toBe(false);
+
+    expect(showFieldIf({age: 'includes_any fox, 13'})).toBe(true);
+    expect(showFieldIf({age: 'contains_any fox, 13'})).toBe(true);
+    expect(showFieldIf({age: 'includes_any fox, 14'})).toBe(false);
+    expect(showFieldIf({age: 'contains_any fox, 14'})).toBe(false);
+
+    expect(showFieldIf({empty_string: 'contains_any fox, 13'})).toBe(false);
+    expect(showFieldIf({null_value: 'contains_any fox, 13'})).toBe(false);
 });
 
 test('it handles null, true, and false in condition as literal', () => {

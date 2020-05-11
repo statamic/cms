@@ -3,8 +3,6 @@
 namespace Statamic\Tags;
 
 use Statamic\Facades\User;
-use Statamic\Facades\UserGroup;
-use Statamic\Tags\Concerns;
 
 class Users extends Tags
 {
@@ -15,7 +13,7 @@ class Users extends Tags
         Concerns\OutputsItems;
 
     /**
-     * {{ get_content from="" }} ... {{ /get_content }}
+     * {{ get_content from="" }} ... {{ /get_content }}.
      */
     public function index()
     {

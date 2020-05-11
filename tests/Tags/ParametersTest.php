@@ -2,10 +2,11 @@
 
 namespace Tests\Tags;
 
-use Tests\TestCase;
-use Statamic\Facades\Antlers;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Value;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
+use Tests\TestCase;
 
 class ParametersTest extends TestCase
 {
@@ -14,7 +15,10 @@ class ParametersTest extends TestCase
         parent::setUp();
 
         $context = new Context([
-            'foo' => 'bar'
+            'foo' => 'bar',
+            'nested' => [
+                'foo' => 'bar',
+            ],
         ]);
 
         $this->params = Parameters::make([
@@ -24,6 +28,8 @@ class ParametersTest extends TestCase
             'float' => 123.456,
             ':evaluated' => 'foo',
             'unevaluated' => 'foo',
+            ':evaluatednested' => 'nested:foo',
+            'unevaluatednested' => 'nested:foo',
             'true' => true,
             'false' => false,
             'truthy' => 'true',
@@ -33,7 +39,7 @@ class ParametersTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_parameters()
+    public function it_gets_all_parameters()
     {
         $this->assertSame([
             'string' => 'hello',
@@ -42,6 +48,8 @@ class ParametersTest extends TestCase
             'float' => 123.456,
             'evaluated' => 'bar',
             'unevaluated' => 'foo',
+            'evaluatednested' => 'bar',
+            'unevaluatednested' => 'nested:foo',
             'true' => true,
             'false' => false,
             'truthy' => true,
@@ -51,7 +59,7 @@ class ParametersTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_parameter()
+    public function it_gets_a_parameter()
     {
         $this->assertEquals('hello', $this->params->get('string'));
         $this->assertEquals(['one', 'two'], $this->params->get('array'));
@@ -67,21 +75,34 @@ class ParametersTest extends TestCase
     }
 
     /** @test */
-    function unknown_keys_use_a_default_value()
+    public function it_gets_a_value_objects_value()
+    {
+        $fieldtype = $this->partialMock(Fieldtype::class);
+        $fieldtype->shouldReceive('augment')->with('the raw value')->andReturn('the augmented value');
+        $value = new Value('the raw value', 'test', $fieldtype);
+
+        $params = Parameters::make(['test' => $value], new Context);
+
+        $this->assertIsString($params->get('test'));
+        $this->assertSame('the augmented value', $params->get('test'));
+    }
+
+    /** @test */
+    public function unknown_keys_use_a_default_value()
     {
         $this->assertNull($this->params->get('unknown'));
         $this->assertEquals('fallback', $this->params->get('unknown', 'fallback'));
     }
 
     /** @test */
-    function it_checks_existence()
+    public function it_checks_existence()
     {
         $this->assertTrue($this->params->has('string'));
         $this->assertFalse($this->params->has('unknown'));
     }
 
     /** @test */
-    function it_gets_the_first_parameter_that_exists()
+    public function it_gets_the_first_parameter_that_exists()
     {
         $this->assertEquals('hello', $this->params->get(['string']));
         $this->assertEquals('hello', $this->params->get(['unknown', 'string']));
@@ -90,7 +111,7 @@ class ParametersTest extends TestCase
     }
 
     /** @test */
-    function it_forgets_keys()
+    public function it_forgets_keys()
     {
         $this->assertEquals('hello', $this->params->get('string'));
 
@@ -100,7 +121,7 @@ class ParametersTest extends TestCase
     }
 
     /** @test */
-    function it_uses_array_access()
+    public function it_uses_array_access()
     {
         $this->assertEquals('hello', $this->params->get('string'));
         $this->assertEquals('hello', $this->params['string']);
@@ -118,7 +139,7 @@ class ParametersTest extends TestCase
     }
 
     /** @test */
-    function it_gets_an_exploded_list()
+    public function it_gets_an_exploded_list()
     {
         $this->assertEquals(['one', 'two'], $this->params->explode('list'));
         $this->assertEquals(['hello'], $this->params->explode('string'));
@@ -127,7 +148,7 @@ class ParametersTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_boolean()
+    public function it_gets_a_boolean()
     {
         $this->assertTrue($this->params->bool('true'));
         $this->assertTrue($this->params->bool('truthy'));
@@ -140,7 +161,7 @@ class ParametersTest extends TestCase
     }
 
     /** @test */
-    function it_gets_an_integer()
+    public function it_gets_an_integer()
     {
         $this->assertEquals(7, $this->params->int('integer'));
         $this->assertEquals(0, $this->params->int('string'));
@@ -150,7 +171,7 @@ class ParametersTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_float()
+    public function it_gets_a_float()
     {
         $this->assertSame(123.456, $this->params->float('float'));
         $this->assertSame(0.0, $this->params->float('string'));
@@ -160,7 +181,7 @@ class ParametersTest extends TestCase
     }
 
     /** @test */
-    function it_is_iterable()
+    public function it_is_iterable()
     {
         $expected = [
             'string' => 'hello',
@@ -169,6 +190,8 @@ class ParametersTest extends TestCase
             'float' => 123.456,
             'evaluated' => 'bar',
             'unevaluated' => 'foo',
+            'evaluatednested' => 'bar',
+            'unevaluatednested' => 'nested:foo',
             'true' => true,
             'false' => false,
             'truthy' => true,

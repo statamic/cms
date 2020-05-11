@@ -102,7 +102,7 @@ Statamic.app({
 
     components: {
         GlobalSearch: require('./components/GlobalSearch.vue').default,
-        SiteSelector: require('./components/SiteSelector.vue').default,
+        GlobalSiteSelector: require('./components/GlobalSiteSelector.vue').default,
         Login: require('./components/login/login'),
         LoginModal: require('./components/login/LoginModal.vue').default,
         BaseEntryCreateForm: require('./components/entries/BaseCreateForm.vue').default,
@@ -113,9 +113,11 @@ Statamic.app({
         FieldsetEditForm: require('./components/fieldsets/EditForm.vue').default,
         BlueprintListing: require('./components/blueprints/Listing.vue').default,
         BlueprintBuilder: require('./components/blueprints/Builder.vue').default,
+        FormCreateForm: require('./components/forms/CreateForm.vue').default,
         FormListing: require('./components/forms/Listing.vue').default,
         FormSubmissionListing: require('./components/forms/SubmissionListing.vue').default,
         GlobalListing: require('./components/globals/Listing.vue').default,
+        GlobalEditForm: require('./components/globals/EditForm.vue').default,
         GlobalPublishForm: require('./components/globals/PublishForm.vue').default,
         GlobalCreateForm: require('./components/globals/Create.vue').default,
         UserListing: require('./components/users/Listing.vue').default,
@@ -134,11 +136,10 @@ Statamic.app({
         NavigationEditForm: require('./components/navigation/EditForm.vue').default,
         NavigationView: require('./components/navigation/View.vue').default,
         Stacks: require('./components/stacks/Stacks.vue').default,
-        TaxonomyWizard: require('./components/taxonomies/Wizard.vue').default,
+        TaxonomyCreateForm: require('./components/taxonomies/CreateForm.vue').default,
         TaxonomyEditForm: require('./components/taxonomies/EditForm.vue').default,
         AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue').default,
         AssetContainerEditForm: require('./components/asset-containers/EditForm.vue').default,
-        FormWizard: require('./components/forms/Wizard.vue').default,
     },
 
     data: {

@@ -2,9 +2,9 @@
 
 namespace Tests\CP;
 
-use Tests\TestCase;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
+use Tests\TestCase;
 
 class ColumnsTest extends TestCase
 {
@@ -20,7 +20,7 @@ class ColumnsTest extends TestCase
     }
 
     /** @test */
-    function it_can_ensure_has()
+    public function it_can_ensure_has()
     {
         $columns = $this->columns
             ->ensureHas(Column::make('date'))
@@ -37,7 +37,7 @@ class ColumnsTest extends TestCase
     }
 
     /** @test */
-    function it_can_ensure_prepended()
+    public function it_can_ensure_prepended()
     {
         $columns = $this->columns
             ->ensurePrepended(Column::make('date'))
@@ -54,7 +54,7 @@ class ColumnsTest extends TestCase
     }
 
     /** @test */
-    function it_can_set_preferred_visibility_and_order()
+    public function it_can_set_preferred_visibility_and_order()
     {
         $columns = $this->columns
             ->ensurePrepended(Column::make('date'))
@@ -78,7 +78,7 @@ class ColumnsTest extends TestCase
     }
 
     /** @test */
-    function it_bypasses_setting_preferred_if_preference_returns_null()
+    public function it_bypasses_setting_preferred_if_preference_returns_null()
     {
         $columns = $this->columns
             ->ensurePrepended(Column::make('date'))
@@ -102,7 +102,7 @@ class ColumnsTest extends TestCase
     }
 
     /** @test */
-    function it_can_reject_unlisted_columns()
+    public function it_can_reject_unlisted_columns()
     {
         $columns = $this->columns
             ->ensureHas(Column::make('bard')->listable(false))

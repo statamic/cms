@@ -9,7 +9,7 @@ use Tests\TestCase;
 class PermissionsTest extends TestCase
 {
     /** @test */
-    function it_registers_a_permission()
+    public function it_registers_a_permission()
     {
         $permissions = new Permissions;
         $this->assertInstanceOf(Collection::class, $permissions->all());
@@ -24,7 +24,7 @@ class PermissionsTest extends TestCase
     }
 
     /** @test */
-    function it_registers_a_permission_with_a_closure()
+    public function it_registers_a_permission_with_a_closure()
     {
         $permissions = new Permissions;
         $this->assertInstanceOf(Collection::class, $permissions->all());
@@ -43,7 +43,7 @@ class PermissionsTest extends TestCase
     }
 
     /** @test */
-    function it_registers_a_permission_via_a_string()
+    public function it_registers_a_permission_via_a_string()
     {
         $permissions = new Permissions;
 
@@ -55,13 +55,13 @@ class PermissionsTest extends TestCase
     }
 
     /** @test */
-    function it_registers_a_permission_via_a_string_and_closure()
+    public function it_registers_a_permission_via_a_string_and_closure()
     {
         $permissions = new Permissions;
 
         $permissions->register('one', function ($permission) use ($permissions) {
             $permission->children([
-                $permissions->make('two')
+                $permissions->make('two'),
             ]);
         });
 
@@ -72,7 +72,7 @@ class PermissionsTest extends TestCase
     }
 
     /** @test */
-    function any_permissions_registered_within_a_group_callback_will_belong_to_that_group()
+    public function any_permissions_registered_within_a_group_callback_will_belong_to_that_group()
     {
         $permissions = new Permissions;
 
@@ -100,7 +100,7 @@ class PermissionsTest extends TestCase
     }
 
     /** @test */
-    function it_makes_a_tree()
+    public function it_makes_a_tree()
     {
         $this->setupComplicatedTest($permissions = new Permissions);
 
@@ -126,13 +126,13 @@ class PermissionsTest extends TestCase
                                         'label' => 'nested-child',
                                         'description' => null,
                                         'group' => 'test',
-                                        'children' => []
-                                    ]
+                                        'children' => [],
+                                    ],
                                 ],
                             ],
                         ],
                     ],
-                ]
+                ],
             ],
             [
                 'handle' => 'group-with-replacements',
@@ -155,10 +155,10 @@ class PermissionsTest extends TestCase
                                         'label' => 'Replaced Nested FIRST',
                                         'description' => null,
                                         'group' => 'group-with-replacements',
-                                        'children' => []
-                                    ]
+                                        'children' => [],
+                                    ],
                                 ],
-                            ]
+                            ],
                         ],
                     ],
                     [
@@ -178,12 +178,12 @@ class PermissionsTest extends TestCase
                                         'label' => 'Replaced Nested SECOND',
                                         'description' => null,
                                         'group' => 'group-with-replacements',
-                                        'children' => []
-                                    ]
+                                        'children' => [],
+                                    ],
                                 ],
-                            ]
+                            ],
                         ],
-                    ]
+                    ],
                 ],
             ],
             [
@@ -209,8 +209,8 @@ class PermissionsTest extends TestCase
                                 'description' => null,
                                 'group' => null,
                                 'children' => [],
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                     [
                         'value' => 'three',
@@ -225,7 +225,7 @@ class PermissionsTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_permissions_in_a_flattened_structure()
+    public function it_gets_all_permissions_in_a_flattened_structure()
     {
         $this->setupComplicatedTest($permissions = new Permissions);
 
@@ -249,7 +249,7 @@ class PermissionsTest extends TestCase
     }
 
     /** @test */
-    function existing_permissions_can_be_modified()
+    public function existing_permissions_can_be_modified()
     {
         $permissions = new Permissions;
 
@@ -264,7 +264,7 @@ class PermissionsTest extends TestCase
         $this->assertEquals(['one' => 'Modified'], $permissions->all()->map->label()->all());
     }
 
-    function setupComplicatedTest($permissions)
+    public function setupComplicatedTest($permissions)
     {
         $permissions->register('one', function ($permission) use ($permissions) {
             $permission->children([
@@ -278,7 +278,7 @@ class PermissionsTest extends TestCase
                 $permission->children([
                     $permissions->make('child-three')->children([
                         $permissions->make('nested-child'),
-                    ])
+                    ]),
                 ]);
             });
         });
@@ -290,8 +290,8 @@ class PermissionsTest extends TestCase
                 $permission->children([
                     $permissions->make('replaced child {placeholder}')->label('Replaced :placeholder')->children([
                         $permissions->make('replaced nested child {placeholder}')
-                                    ->label('Replaced Nested :placeholder')
-                    ])
+                                    ->label('Replaced Nested :placeholder'),
+                    ]),
                 ])->replacements('placeholder', function () {
                     return [
                         ['value' => 'first', 'label' => 'FIRST'],

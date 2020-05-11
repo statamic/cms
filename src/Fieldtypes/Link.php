@@ -34,7 +34,7 @@ class Link extends Fieldtype
             'entry' => [
                 'config' => $entryFieldtype->config(),
                 'meta' => $entryFieldtype->preload(),
-            ]
+            ],
         ];
     }
 }

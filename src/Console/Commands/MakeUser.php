@@ -2,13 +2,12 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Facades\User;
-use Statamic\Facades\Stache;
-use Statamic\Facades\Blueprint;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
-use Statamic\Rules\EmailAvailable;
 use Statamic\Console\ValidatesInput;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\User;
+use Statamic\Rules\EmailAvailable;
 use Symfony\Component\Console\Input\InputArgument;
 
 class MakeUser extends Command

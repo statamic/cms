@@ -2,7 +2,6 @@
 
 namespace Statamic\Extensions\Translation;
 
-use Illuminate\Translation\FileLoader;
 use Illuminate\Contracts\Translation\Loader as LoaderContract;
 
 /**
@@ -51,7 +50,7 @@ class Loader implements LoaderContract
     public function paths()
     {
         return array_merge($this->hints, [
-            '*' => $this->path
+            '*' => $this->path,
         ]);
     }
 }

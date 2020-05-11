@@ -2,12 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP\Users;
 
-use Statamic\Facades\Role;
-use Statamic\Facades\User;
-use Statamic\Facades\Scope;
-use Statamic\Facades\Action;
-use Statamic\Facades\UserGroup;
 use Illuminate\Http\Request;
+use Statamic\Facades\Scope;
+use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
 
 class UserGroupsController extends CpController
@@ -23,6 +20,7 @@ class UserGroupsController extends CpController
                 'handle' => $group->handle(),
                 'users' => $group->users()->count(),
                 'roles' => $group->roles()->count(),
+                'show_url' => $group->showUrl(),
                 'edit_url' => $group->editUrl(),
                 'delete_url' => $group->deleteUrl(),
             ];
@@ -33,7 +31,7 @@ class UserGroupsController extends CpController
         }
 
         return view('statamic::usergroups.index', [
-            'groups' => $groups
+            'groups' => $groups,
         ]);
     }
 

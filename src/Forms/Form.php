@@ -2,19 +2,18 @@
 
 namespace Statamic\Forms;
 
-use Statamic\Facades;
-use Statamic\Support\Str;
-use Statamic\Facades\File;
-use Statamic\Facades\YAML;
-use Statamic\CP\Column;
-use Statamic\Facades\Config;
-use Statamic\Facades\Folder;
-use Statamic\Fields\Blueprint;
-use Statamic\Exceptions\FatalException;
-use Statamic\Contracts\Forms\Submission;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Contracts\Forms\Submission;
+use Statamic\Facades;
+use Statamic\Facades\Config;
+use Statamic\Facades\File;
+use Statamic\Facades\Folder;
+use Statamic\Facades\YAML;
+use Statamic\Fields\Blueprint;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Form implements FormContract
 {
@@ -112,16 +111,7 @@ class Form implements FormContract
      */
     public function email($emails = null)
     {
-        return $this->fluentlyGetOrSet('email')
-            ->setter(function ($emails) {
-                return collect($emails)
-                    ->map(function ($email) {
-                        return collect($email)->only(['to', 'from', 'reply_to', 'subject', 'template'])->filter()->all();
-                    })
-                    ->filter()
-                    ->all();
-            })
-            ->args(func_get_args());
+        return $this->fluentlyGetOrSet('email')->args(func_get_args());
     }
 
     /**
@@ -145,7 +135,7 @@ class Form implements FormContract
      */
     public function path()
     {
-        return config('statamic.forms.forms') . "/{$this->handle()}.yaml";
+        return config('statamic.forms.forms')."/{$this->handle()}.yaml";
     }
 
     /**
@@ -157,7 +147,9 @@ class Form implements FormContract
             'title' => $this->title,
             'blueprint' => $this->blueprint,
             'honeypot' => $this->honeypot,
-            'email' => $this->email,
+            'email' => collect($this->email)->map(function ($email) {
+                return Arr::removeNullValues($email);
+            })->all(),
             'metrics' => $this->metrics,
         ])->filter()->all();
 
@@ -234,13 +226,13 @@ class Form implements FormContract
     }
 
     /**
-     * Get the submissions
+     * Get the submissions.
      *
      * @return \Illuminate\Support\Collection
      */
     public function submissions()
     {
-        $path = config('statamic.forms.submissions') . '/' . $this->handle();
+        $path = config('statamic.forms.submissions').'/'.$this->handle();
 
         return collect(Folder::getFilesByType($path, 'yaml'))->map(function ($file) {
             return $this->createSubmission()
@@ -251,7 +243,7 @@ class Form implements FormContract
     }
 
     /**
-     * Get a submission
+     * Get a submission.
      *
      * @param  string $id
      * @return Submission
@@ -341,9 +333,9 @@ class Form implements FormContract
     public function dateFormat()
     {
         // TODO: Should this be a form.yaml config, a config/forms.php config, or a global config?
-        return 'M j, Y @ h:m';
+        return 'M j, Y @ h:i';
 
-        // return $this->formset()->get('date_format', 'M j, Y @ h:m');
+        // return $this->formset()->get('date_format', 'M j, Y @ h:i');
     }
 
     public function sanitize()

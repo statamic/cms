@@ -2,9 +2,9 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Support\Html;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Markdown as MarkdownFilter;
+use Statamic\Support\Html;
 
 class Markdown extends Fieldtype
 {
@@ -64,7 +64,7 @@ class Markdown extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.markdown.config.parser'),
                 'type' => 'text',
                 'width' => 50,
-            ]
+            ],
         ];
     }
 

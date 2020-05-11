@@ -21,6 +21,10 @@ class Value extends Index
             return $item->blueprint()->handle();
         }
 
+        if ($method === 'entriesCount') {
+            return $item->queryEntries()->count();
+        }
+
         return method_exists($item, $method)
             ? $item->{$method}()
             : $item->value($this->name);

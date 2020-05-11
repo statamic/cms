@@ -2,16 +2,16 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\Support\Str;
-use Statamic\Facades\Asset;
+use Illuminate\Http\Request;
+use League\Flysystem\FileNotFoundException;
 use League\Glide\Server;
+use League\Glide\Signatures\SignatureException;
+use League\Glide\Signatures\SignatureFactory;
+use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Config;
-use Illuminate\Http\Request;
 use Statamic\Imaging\ImageGenerator;
-use League\Flysystem\FileNotFoundException;
-use League\Glide\Signatures\SignatureFactory;
-use League\Glide\Signatures\SignatureException;
+use Statamic\Support\Str;
 
 class GlideController extends Controller
 {
@@ -44,7 +44,7 @@ class GlideController extends Controller
     }
 
     /**
-     * Generate a manipulated image by a path
+     * Generate a manipulated image by a path.
      *
      * @param string $path
      * @return mixed
@@ -65,7 +65,7 @@ class GlideController extends Controller
     }
 
     /**
-     * Generate a manipulated image by a URL
+     * Generate a manipulated image by a URL.
      *
      * @param string $url
      * @return mixed
@@ -80,7 +80,7 @@ class GlideController extends Controller
     }
 
     /**
-     * Generate a manipulated image by an asset reference
+     * Generate a manipulated image by an asset reference.
      *
      * @param string $ref
      * @return mixed
@@ -93,7 +93,7 @@ class GlideController extends Controller
         $decoded = base64_decode($encoded);
 
         // The string before the first slash is the container
-        list($container, $path) = explode('/', $decoded, 2);
+        [$container, $path] = explode('/', $decoded, 2);
 
         $asset = AssetContainer::find($container)->asset($path);
 
@@ -101,7 +101,7 @@ class GlideController extends Controller
     }
 
     /**
-     * Generate an image
+     * Generate an image.
      *
      * @param $type
      * @param $item
@@ -109,7 +109,7 @@ class GlideController extends Controller
      */
     private function generateBy($type, $item)
     {
-        $method = 'generateBy' . ucfirst($type);
+        $method = 'generateBy'.ucfirst($type);
 
         try {
             return $this->generator->$method($item, $this->request->all());
@@ -119,7 +119,7 @@ class GlideController extends Controller
     }
 
     /**
-     * Create a response
+     * Create a response.
      *
      * @param string $path  Path of the generated image
      * @return mixed
@@ -130,7 +130,7 @@ class GlideController extends Controller
     }
 
     /**
-     * Validate the signature, if applicable
+     * Validate the signature, if applicable.
      *
      * @return void
      */

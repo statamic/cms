@@ -22,24 +22,24 @@ class Date extends Fieldtype
                     'single' => 'Single',
                     // 'multiple' => 'Multiple',
                     'range' => 'Range',
-                ]
+                ],
             ],
             'time_enabled'  => [
-                'display' => __('Time_enabled'),
+                'display' => __('Time Enabled'),
                 'instructions' => __('statamic::fieldtypes.date.config.time_enabled'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
             ],
             'time_required' => [
-                'display' => __('Time_required'),
+                'display' => __('Time Required'),
                 'instructions' => __('statamic::fieldtypes.date.config.time_required'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
             ],
             'earliest_date' => [
-                'display' => __('Earliest_date'),
+                'display' => __('Earliest Date'),
                 'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
                 'type' => 'text',
                 'default' => '1900-01-01',
@@ -52,7 +52,7 @@ class Date extends Fieldtype
                 'width' => 50,
             ],
             'full_width' => [
-                'display' => __('Full_width'),
+                'display' => __('Full Width'),
                 'instructions' => __('statamic::fieldtypes.date.config.full_width'),
                 'type' => 'toggle',
                 'default' => false,
@@ -93,7 +93,7 @@ class Date extends Fieldtype
             return $this->config('required') ? Carbon::now() : null;
         }
 
-        if ($this->config('mode') === "range") {
+        if ($this->config('mode') === 'range') {
 
             // If switching from single to range, all bets are off.
             if (! is_array($data)) {
@@ -102,7 +102,7 @@ class Date extends Fieldtype
 
             return [
                 'start' => Carbon::parse($data['start'])->format('Y-m-d'),
-                'end' => Carbon::parse($data['end'])->format('Y-m-d')
+                'end' => Carbon::parse($data['end'])->format('Y-m-d'),
             ];
         }
 
@@ -116,12 +116,14 @@ class Date extends Fieldtype
 
     public function process($data)
     {
-        if (is_null($data)) return $data;
+        if (is_null($data)) {
+            return $data;
+        }
 
-        if ($this->config('mode') === "range") {
+        if ($this->config('mode') === 'range') {
             return [
                 'start' => Carbon::parse($data['start'])->format('Y-m-d'),
-                'end' => Carbon::parse($data['end'])->format('Y-m-d')
+                'end' => Carbon::parse($data['end'])->format('Y-m-d'),
             ];
         }
 

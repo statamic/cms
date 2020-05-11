@@ -2,7 +2,6 @@
 
 namespace Statamic\Auth;
 
-use ArrayAccess;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -22,22 +21,24 @@ use Statamic\Fields\Value;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
 use Statamic\Statamic;
-use Statamic\Support\Arr;
 
 abstract class User implements
     UserContract,
     Authenticatable,
     CanResetPasswordContract,
     Augmentable,
-    ArrayAccess,
     AuthorizableContract
 {
     use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns;
 
     abstract public function get($key, $fallback = null);
+
     abstract public function value($key);
+
     abstract public function has($key);
+
     abstract public function set($key, $value);
+
     abstract public function remove($key);
 
     public function reference()
@@ -55,13 +56,13 @@ abstract class User implements
         $surname = '';
         if ($name = $this->get('name')) {
             if (str_contains($name, ' ')) {
-                list($name, $surname) = explode(' ', $name);
+                [$name, $surname] = explode(' ', $name);
             }
         } else {
             $name = $this->email();
         }
 
-        return strtoupper(mb_substr($name, 0, 1) . mb_substr($surname, 0, 1));
+        return strtoupper(mb_substr($name, 0, 1).mb_substr($surname, 0, 1));
     }
 
     public function avatar($size = 64)
@@ -137,7 +138,7 @@ abstract class User implements
     }
 
     /**
-     * Get or set the blueprint
+     * Get or set the blueprint.
      *
      * @param string|null|bool
      * @return \Statamic\Fields\Blueprint
@@ -208,26 +209,6 @@ abstract class User implements
         return Facades\User::{$method}(...$parameters);
     }
 
-    public function offsetExists($key)
-    {
-        return $this->has($key);
-    }
-
-    public function offsetGet($key)
-    {
-        return $this->value($key);
-    }
-
-    public function offsetSet($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
-    }
-
     public function name()
     {
         if ($name = $this->get('name')) {
@@ -236,7 +217,7 @@ abstract class User implements
 
         if ($name = $this->get('first_name')) {
             if ($lastName = $this->get('last_name')) {
-                $name .= ' ' . $lastName;
+                $name .= ' '.$lastName;
             }
 
             return $name;

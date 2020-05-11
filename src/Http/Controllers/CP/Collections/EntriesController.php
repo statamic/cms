@@ -2,22 +2,18 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Asset;
-use Statamic\Facades\Entry;
-use Statamic\CP\Column;
+use Illuminate\Http\Request;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
+use Statamic\Events\Data\PublishBlueprintFound;
+use Statamic\Facades\Asset;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Entries\Entries;
-use Illuminate\Http\Request;
-use Statamic\Facades\Collection;
-use Statamic\Facades\Preference;
-use Statamic\Facades\User;
-use Illuminate\Http\Resources\Json\Resource;
-use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Events\Data\PublishBlueprintFound;
-use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
@@ -39,7 +35,7 @@ class EntriesController extends CpController
         $sortField = request('sort');
         $sortDirection = request('order', 'asc');
 
-        if (!$sortField && !request('search')) {
+        if (! $sortField && ! request('search')) {
             $sortField = $collection->sortField();
             $sortDirection = $collection->sortDirection();
         }
@@ -117,6 +113,7 @@ class EntriesController extends CpController
             'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
+
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -145,7 +142,7 @@ class EntriesController extends CpController
         }
 
         return view('statamic::entries.edit', array_merge($viewData, [
-            'entry' => $entry
+            'entry' => $entry,
         ]));
     }
 
@@ -177,7 +174,7 @@ class EntriesController extends CpController
             $entry->date($this->formatDateForSaving($request->date));
         }
 
-        if ($collection->structure() && !$collection->orderable()) {
+        if ($collection->structure() && ! $collection->orderable()) {
             $entry->afterSave(function ($entry) use ($parent) {
                 $entry->structure()
                     ->in($entry->locale())
@@ -231,7 +228,7 @@ class EntriesController extends CpController
         $values = $fields->values()->merge([
             'title' => null,
             'slug' => null,
-            'published' => $collection->defaultPublishState()
+            'published' => $collection->defaultPublishState(),
         ]);
 
         if ($collection->dated()) {
@@ -241,7 +238,7 @@ class EntriesController extends CpController
         $viewData = [
             'title' => __('Create Entry'),
             'actions' => [
-                'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()])
+                'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()]),
             ],
             'values' => $values->all(),
             'meta' => $fields->meta(),
@@ -256,7 +253,7 @@ class EntriesController extends CpController
                     'exists' => false,
                     'published' => false,
                     'url' => cp_route('collections.entries.create', [$collection->handle(), $handle]),
-                    'livePreviewUrl' => cp_route('collections.entries.preview.create', [$collection->handle(), $handle]),
+                    'livePreviewUrl' => $collection->route($handle) ? cp_route('collections.entries.preview.create', [$collection->handle(), $handle]) : null,
                 ];
             })->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
@@ -296,7 +293,7 @@ class EntriesController extends CpController
             $entry->date($this->formatDateForSaving($request->date));
         }
 
-        if (($structure = $collection->structure()) && !$collection->orderable()) {
+        if (($structure = $collection->structure()) && ! $collection->orderable()) {
             $tree = $structure->in($site->handle());
             $parent = $values['parent'] ?? null;
             $entry->afterSave(function ($entry) use ($parent, $tree) {
@@ -368,6 +365,7 @@ class EntriesController extends CpController
             })
             ->map(function ($value) {
                 preg_match_all('/"asset::([^"]+)"/', $value, $matches);
+
                 return str_replace('\/', '/', $matches[1]) ?? null;
             })
             ->flatten(2)
@@ -400,7 +398,7 @@ class EntriesController extends CpController
             [
                 'text' => $collection->title(),
                 'url' => $collection->showUrl(),
-            ]
+            ],
         ]);
     }
 }

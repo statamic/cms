@@ -2,8 +2,8 @@
 
 namespace Statamic\Facades;
 
-use Statamic\Imaging\Manager;
 use Illuminate\Support\Facades\Facade;
+use Statamic\Imaging\Manager;
 
 class Image extends Facade
 {

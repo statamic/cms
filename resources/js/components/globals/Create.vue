@@ -1,118 +1,80 @@
 <template>
+    <div class="max-w-lg mt-2 mx-auto">
 
-    <div>
-
-        <div class="flex items-center mb-3">
-            <slot name="header" />
-            <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
+        <div class="rounded p-3 lg:px-7 lg:py-5 shadow bg-white">
+            <header class="text-center mb-6">
+                <h1 class="mb-3">{{ __('Create a new Global Set') }}</h1>
+                <p class="text-grey" v-text="__('messages.globals_configure_intro')" />
+            </header>
+            <div class="mb-5">
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Title') }}</label>
+                <input type="text" v-model="title" class="input-text" autofocus tabindex="1">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
+                    {{ __('messages.globals_configure_title_instructions') }}
+                </div>
+            </div>
+            <div class="mb-2">
+                <label class="font-bold text-base mb-sm" for="name">{{ __('Handle') }}</label>
+                <input type="text" v-model="handle" class="input-text" tabindex="2">
+                <div class="text-2xs text-grey-60 mt-1 flex items-center">
+                    {{ __('messages.globals_configure_handle_instructions') }}
+                </div>
+            </div>
         </div>
 
-        <div class="card publish-fields p-0">
-
-            <form-group
-                handle="title"
-                :display="__('Title')"
-                :instructions="__('messages.global_set_title_instructions')"
-                v-model="title"
-                :errors="errors.title"
-                width="50"
-                :focus="true"
-            />
-
-            <slugify
-                :from="title"
-                v-model="handle"
-                separator="_"
-            >
-                <form-group
-                    slot-scope="{ }"
-                    fieldtype="slug"
-                    handle="handle"
-                    :display="__('Handle')"
-                    :instructions="__('messages.global_set_handle_instructions')"
-                    :value="handle"
-                    @input="handle = $event"
-                    :config="{ generate: false }"
-                    :errors="errors.handle"
-                    width="50"
-                />
-            </slugify>
-
-            <form-group
-                handle="blueprint"
-                fieldtype="blueprints"
-                :config="{ component: 'relationship', max_items: 1 }"
-                :display="__('Blueprint')"
-                :instructions="__('messages.global_set_blueprint_instructions')"
-                v-model="blueprint"
-                :errors="errors.blueprint"
-            />
-
+        <div class="flex justify-center mt-4">
+            <button tabindex="4" class="btn-primary mx-auto btn-lg" :disabled="! canSubmit" @click="submit">
+                {{ __('Create Global Set')}}
+            </button>
         </div>
     </div>
-
 </template>
-
 
 <script>
 export default {
 
     props: {
-        action: String,
+        route: {
+            type: String
+        }
     },
 
     data() {
         return {
-            saving: false,
-            error: null,
-            errors: {},
             title: null,
-            handle: null,
-            blueprint: null
+            handle: null
+        }
+    },
+
+    watch: {
+        'title': function(val) {
+            this.handle = this.$slugify(val, '_');
         }
     },
 
     computed: {
-
-        values() {
-            return {
-                title: this.title,
-                handle: this.handle,
-                blueprint: this.blueprint ? this.blueprint[0] : null
-            }
-        }
-
+        canSubmit() {
+            return Boolean(this.title && this.handle);
+        },
     },
 
     methods: {
-
-        clearErrors() {
-            this.error = null;
-            this.errors = {};
-        },
-
-        save() {
-            this.saving = true;
-            this.clearErrors();
-
-            this.$axios.post(this.action, this.values).then(response => {
-                this.saving = false;
+        submit() {
+            this.$axios.post(this.route, {title: this.title, handle: this.handle}).then(response => {
                 window.location = response.data.redirect;
-            }).catch(e => {
-                this.saving = false;
-                if (e.response && e.response.status === 422) {
-                    const { message, errors } = e.response.data;
-                    this.error = message;
-                    this.errors = errors;
-                    this.$toast.error(message);
-                } else {
-                    this.$toast.error(__('Something went wrong'));
-                }
-            })
+            }).catch(error => {
+                this.$toast.error(error.response.data.message);
+            });
         }
+    },
 
+    mounted() {
+        this.$keys.bindGlobal(['return'], e => {
+            if (this.canSubmit) {
+                this.submit();
+            }
+        });
     }
-
 
 }
 </script>

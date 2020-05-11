@@ -34,7 +34,7 @@ class CollectionStructureController extends CpController
                 'entry' => $ref = $item['id'] ?? null,
                 'title' => $ref ? null : ($item['title'] ?? null),
                 'url' => $ref ? null : ($item['url'] ?? null),
-                'children' => $this->toTree($item['children'])
+                'children' => $this->toTree($item['children']),
             ]);
         })->all();
     }

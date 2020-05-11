@@ -13,7 +13,7 @@ class Delete extends Action
         return __('Delete');
     }
 
-    public function filter($item)
+    public function visibleTo($item)
     {
         return true;
     }
@@ -39,7 +39,7 @@ class Delete extends Action
         return 'Are you sure you want to want to delete this?|Are you sure you want to delete these :count items?';
     }
 
-    public function run($items)
+    public function run($items, $values)
     {
         $items->each->delete();
     }

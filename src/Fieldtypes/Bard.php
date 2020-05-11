@@ -2,8 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Fields\Fields;
 use Scrumpy\ProseMirrorToHtml\Renderer;
+use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
 
@@ -18,7 +18,7 @@ class Bard extends Replicator
             'sets' => [
                 'display' => __('Sets'),
                 'instructions' => __('statamic::fieldtypes.bard.config.sets'),
-                'type' => 'sets'
+                'type' => 'sets',
             ],
             'buttons' => [
                 'display' => __('Buttons'),
@@ -36,7 +36,7 @@ class Bard extends Replicator
                     'anchor',
                     'image',
                     'table',
-                ]
+                ],
             ],
             'container' => [
                 'display' => __('Container'),
@@ -44,8 +44,8 @@ class Bard extends Replicator
                 'type' => 'asset_container',
                 'max_items' => 1,
                 'if' => [
-                    'buttons' => 'contains image'
-                ]
+                    'buttons' => 'contains image',
+                ],
             ],
             'save_html' => [
                 'display' => __('Display HTML'),
@@ -102,8 +102,8 @@ class Bard extends Replicator
                 'instructions' => __('statamic::fieldtypes.bard.config.allow_source'),
                 'type' => 'toggle',
                 'default' => true,
-                'width' => 50
-            ]
+                'width' => 50,
+            ],
         ];
     }
 
@@ -112,7 +112,7 @@ class Bard extends Replicator
         return new BardFilter($this);
     }
 
-    public function augment($value)
+    protected function performAugmentation($value, $shallow)
     {
         if ($this->shouldSaveHtml()) {
             return $value;
@@ -122,7 +122,7 @@ class Bard extends Replicator
             $value = $this->convertLegacyData($value);
         }
 
-        return (new Augmentor($this))->augment($value);
+        return (new Augmentor($this))->augment($value, $shallow);
     }
 
     public function process($value)
@@ -175,7 +175,7 @@ class Bard extends Replicator
         if (is_string($value)) {
             $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($value);
             $value = $doc['content'];
-        } else if ($this->isLegacyData($value)) {
+        } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
         }
 
@@ -200,7 +200,7 @@ class Bard extends Replicator
                 'id' => "set-$index",
                 'enabled' => array_pull($values, 'enabled', true),
                 'values' => $values,
-            ]
+            ],
         ];
     }
 
@@ -218,7 +218,7 @@ class Bard extends Replicator
 
         return $renderer->render([
             'type' => 'doc',
-            'content' => $data
+            'content' => $data,
         ]);
     }
 
@@ -232,6 +232,7 @@ class Bard extends Replicator
             return $set['type'] === 'set';
         })->map(function ($set, $index) {
             $set = $set['attrs']['values'];
+
             return $this->setRules($set['type'], $set, $index);
         })->reduce(function ($carry, $rules) {
             return $carry->merge($rules);
@@ -268,6 +269,7 @@ class Bard extends Replicator
                     return;
                 }
                 $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($set['text']);
+
                 return $doc['content'];
             }
 
@@ -277,8 +279,8 @@ class Bard extends Replicator
                     'attrs' => [
                         'id' => "set-$i",
                         'values' => $set,
-                    ]
-                ]
+                    ],
+                ],
             ];
         })->all();
     }
@@ -292,6 +294,7 @@ class Bard extends Replicator
         })->mapWithKeys(function ($set) {
             $values = $set['attrs']['values'];
             $config = $this->config("sets.{$values['type']}.fields", []);
+
             return [$set['attrs']['id'] => (new Fields($config))->addValues($values)->meta()];
         })->toArray();
 

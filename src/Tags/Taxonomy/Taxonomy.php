@@ -14,7 +14,7 @@ class Taxonomy extends Tags
     protected $defaultAsKey = 'terms';
 
     /**
-     * {{ taxonomy:* }} ... {{ /taxonomy:* }}
+     * {{ taxonomy:* }} ... {{ /taxonomy:* }}.
      */
     public function wildcard($tag)
     {
@@ -24,7 +24,7 @@ class Taxonomy extends Tags
     }
 
     /**
-     * {{ taxonomy from="" }} ... {{ /taxonomy }}
+     * {{ taxonomy from="" }} ... {{ /taxonomy }}.
      */
     public function index()
     {

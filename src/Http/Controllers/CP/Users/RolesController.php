@@ -2,10 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP\Users;
 
-use Statamic\Facades\Role;
-use Statamic\CP\Column;
 use Illuminate\Http\Request;
+use Statamic\CP\Column;
 use Statamic\Facades\Permission;
+use Statamic\Facades\Role;
 use Statamic\Http\Controllers\CP\CpController;
 
 class RolesController extends CpController
@@ -128,7 +128,7 @@ class RolesController extends CpController
     {
         return $tree->map(function ($group) use ($role) {
             return array_merge($group, [
-                'permissions' => $this->updatePermissions($group['permissions'], $role)
+                'permissions' => $this->updatePermissions($group['permissions'], $role),
             ]);
         });
     }

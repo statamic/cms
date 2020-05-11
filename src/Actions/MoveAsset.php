@@ -13,7 +13,7 @@ class MoveAsset extends Action
         return __('Move');
     }
 
-    public function filter($item)
+    public function visibleTo($item)
     {
         return $item instanceof Asset;
     }
@@ -58,7 +58,7 @@ class MoveAsset extends Action
                 'type' => 'select',
                 'options' => $options,
                 'validate' => 'required',
-            ]
+            ],
         ];
     }
 }

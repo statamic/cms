@@ -7,7 +7,6 @@ use Illuminate\Support\Collection;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Taxonomy;
-use Statamic\Statamic;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -26,7 +25,7 @@ class TaxonomyTest extends TestCase
     }
 
     /** @test */
-    function it_augments_slugs_to_a_collection_of_terms_when_using_a_single_taxonomy()
+    public function it_augments_slugs_to_a_collection_of_terms_when_using_a_single_taxonomy()
     {
         $augmented = $this->fieldtype(['taxonomy' => 'tags'])->augment(['one', 'two']);
 
@@ -37,7 +36,7 @@ class TaxonomyTest extends TestCase
     }
 
     /** @test */
-    function it_augments_ids_to_a_collection_of_terms_when_using_multiple_taxonomies()
+    public function it_augments_ids_to_a_collection_of_terms_when_using_multiple_taxonomies()
     {
         $augmented = $this->fieldtype(['taxonomy' => ['tags', 'categories']])->augment(['tags::one', 'categories::two']);
 
@@ -48,15 +47,15 @@ class TaxonomyTest extends TestCase
     }
 
     /** @test */
-    function it_throws_an_exception_when_augmenting_a_slug_when_using_multiple_taxonomies()
+    public function it_throws_an_exception_when_augmenting_a_slug_when_using_multiple_taxonomies()
     {
-        $this->expectExceptionMessage("Ambigious taxonomy term value [one]. Field [test] is configured with multiple taxonomies.");
+        $this->expectExceptionMessage('Ambigious taxonomy term value [one]. Field [test] is configured with multiple taxonomies.');
 
         $this->fieldtype(['taxonomy' => ['tags', 'categories']])->augment(['one', 'two']);
     }
 
     /** @test */
-    function it_augments_to_a_single_term_when_max_items_is_one()
+    public function it_augments_to_a_single_term_when_max_items_is_one()
     {
         $augmented = $this->fieldtype(['taxonomy' => 'tags', 'max_items' => 1])->augment(['one']);
 
@@ -65,7 +64,7 @@ class TaxonomyTest extends TestCase
     }
 
     /** @test */
-    function it_shallow_augments_slugs_to_a_collection_of_terms_when_using_a_single_taxonomy()
+    public function it_shallow_augments_slugs_to_a_collection_of_terms_when_using_a_single_taxonomy()
     {
         $augmented = $this->fieldtype(['taxonomy' => 'tags'])->shallowAugment(['one', 'two']);
 
@@ -76,35 +75,38 @@ class TaxonomyTest extends TestCase
             [
                 'id' => 'tags::one',
                 'slug' => 'one',
-                'url' => '/blog/tags/one',
-                'permalink' => 'http://localhost/blog/tags/one',
+                'title' => 'one',
+                'url' => '/tags/one',
+                'permalink' => 'http://localhost/tags/one',
                 'api_url' => 'http://localhost/api/taxonomies/tags/terms/one',
             ],
             [
                 'id' => 'tags::two',
                 'slug' => 'two',
-                'url' => '/blog/tags/two',
-                'permalink' => 'http://localhost/blog/tags/two',
+                'title' => 'two',
+                'url' => '/tags/two',
+                'permalink' => 'http://localhost/tags/two',
                 'api_url' => 'http://localhost/api/taxonomies/tags/terms/two',
             ],
         ], $augmented->all());
     }
 
     /** @test */
-    function it_shallow_augments_to_a_single_term_when_max_items_is_one()
+    public function it_shallow_augments_to_a_single_term_when_max_items_is_one()
     {
         $augmented = $this->fieldtype(['taxonomy' => 'tags', 'max_items' => 1])->shallowAugment(['one']);
 
         $this->assertEquals([
             'id' => 'tags::one',
+            'title' => 'one',
             'slug' => 'one',
-            'url' => '/blog/tags/one',
-            'permalink' => 'http://localhost/blog/tags/one',
+            'url' => '/tags/one',
+            'permalink' => 'http://localhost/tags/one',
             'api_url' => 'http://localhost/api/taxonomies/tags/terms/one',
         ], $augmented);
     }
 
-    function fieldtype($config = [])
+    public function fieldtype($config = [])
     {
         $field = new Field('test', array_merge([
             'type' => 'taxonomy',

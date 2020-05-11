@@ -2,14 +2,11 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Str;
-use Statamic\Facades\URL;
+use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
-use Statamic\Facades\Parse;
-use Statamic\Tags\Tags;
-use Statamic\Facades\Config;
-use Statamic\Facades\Antlers;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 
 class Theme extends Tags
 {
@@ -32,7 +29,7 @@ class Theme extends Tags
     {
         $src = $this->get('src');
 
-        $path = $dir . '/' . $src;
+        $path = $dir.'/'.$src;
 
         return $this->themeUrl($path);
     }
@@ -58,7 +55,7 @@ class Theme extends Tags
     {
         $src = $this->get('src');
 
-        $path = 'img/' . $src;
+        $path = 'img/'.$src;
 
         $url = $this->themeUrl($path);
 
@@ -80,19 +77,19 @@ class Theme extends Tags
     {
         $src = $this->get('src', 'app');
 
-        $path = 'js/' . Str::ensureRight($src, '.js');
+        $path = 'js/'.Str::ensureRight($src, '.js');
 
         $url = $this->themeUrl($path);
 
         if ($this->getBool('tag')) {
-            return '<script src="' . $url . '"></script>';
+            return '<script src="'.$url.'"></script>';
         }
 
         return $url;
     }
 
     /**
-     * The {{ theme:css }} tag
+     * The {{ theme:css }} tag.
      *
      * @return string
      */
@@ -100,19 +97,19 @@ class Theme extends Tags
     {
         $src = $this->get('src', 'app');
 
-        $path = 'css/' . Str::ensureRight($src, '.css');
+        $path = 'css/'.Str::ensureRight($src, '.css');
 
         $url = $this->themeUrl($path);
 
         if ($this->getBool('tag')) {
-            return '<link rel="stylesheet" href="' . $url . '" />';
+            return '<link rel="stylesheet" href="'.$url.'" />';
         }
 
         return $url;
     }
 
     /**
-     * The {{ theme:output }} tag
+     * The {{ theme:output }} tag.
      *
      * Outputs the contents of the specified file.
      *
@@ -152,7 +149,8 @@ class Theme extends Tags
         );
 
         if ($this->getBool('cache_bust')) {
-            $url .= '?v=' . File::lastModified(public_path($path));
+            throw_if(! File::exists($path = public_path($path)), new \Exception("File $path does not exist."));
+            $url .= '?v='.File::lastModified($path);
         }
 
         if (! $this->getBool('absolute')) {
@@ -164,7 +162,7 @@ class Theme extends Tags
 
     private function versioned($type, $file)
     {
-        list($manifest, $method) = $this->getManifestAndMethod();
+        [$manifest, $method] = $this->getManifestAndMethod();
         $manifest = json_decode($manifest, true);
 
         // Mix prepends filenames with slashes.
@@ -174,11 +172,11 @@ class Theme extends Tags
         });
 
         if (! $manifest->has($file = "{$type}/{$file}.{$type}")) {
-            return '/' . $file;
+            return '/'.$file;
         }
 
         return $method === 'elixir'
-            ? '/build/' . $manifest->get($file)
+            ? '/build/'.$manifest->get($file)
             : $manifest->get($file);
     }
 

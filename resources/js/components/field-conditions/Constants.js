@@ -10,14 +10,10 @@ export const KEYS = [
 ];
 
 export const OPERATORS = [
-    'is',
     'equals',
-    'isnt',
     'not',
-    'includes',
     'contains',
-    '==',
-    '!=',
+    'contains_any',
     '===',
     '!==',
     '>',
@@ -26,3 +22,12 @@ export const OPERATORS = [
     '<=',
     'custom',
 ];
+
+export const ALIASES = {
+    'is': 'equals',
+    '==': 'equals',
+    'isnt': 'not',
+    '!=': 'not',
+    'includes': 'contains',
+    'includes_any': 'contains_any',
+};

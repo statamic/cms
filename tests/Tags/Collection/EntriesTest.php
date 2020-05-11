@@ -6,14 +6,16 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Facades;
-use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
+use Statamic\Fields\Value;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Tags\Collection\Entries;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
+use Statamic\Taxonomies\TermCollection;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -21,7 +23,7 @@ class EntriesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -40,11 +42,11 @@ class EntriesTest extends TestCase
         $app['config']->set('statamic.sites', [
             'default' => 'en',
             'sites' => [
-                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/',],
-                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/',]
-            ]
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://localhost/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://localhost/fr/'],
+            ],
         ]);
-}
+    }
 
     protected function makeEntry($slug)
     {
@@ -61,7 +63,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entries_in_a_collection()
+    public function it_gets_entries_in_a_collection()
     {
         $this->assertCount(0, $this->getEntries());
 
@@ -71,7 +73,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_gets_paginated_entries_in_a_collection()
+    public function it_gets_paginated_entries_in_a_collection()
     {
         $this->makeEntry('a')->save();
         $this->makeEntry('b')->save();
@@ -87,7 +89,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_gets_localized_site_entries_in_a_collection()
+    public function it_gets_localized_site_entries_in_a_collection()
     {
         $this->withoutEvents();
 
@@ -110,7 +112,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_limits_entries_with_offset()
+    public function it_limits_entries_with_offset()
     {
         $this->makeEntry('a')->set('title', 'A')->save();
         $this->makeEntry('b')->set('title', 'B')->save();
@@ -132,7 +134,29 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_filters_by_publish_status()
+    public function it_limits_entries_with_offset_using_value_objects()
+    {
+        $this->makeEntry('a')->set('title', 'A')->save();
+        $this->makeEntry('b')->set('title', 'B')->save();
+        $this->makeEntry('c')->set('title', 'C')->save();
+        $this->makeEntry('d')->set('title', 'D')->save();
+        $this->makeEntry('e')->set('title', 'E')->save();
+
+        $this->assertCount(5, $this->getEntries());
+
+        $this->assertEquals(
+            ['A', 'B', 'C'],
+            $this->getEntries(['limit' => new Value(3)])->map->get('title')->values()->all()
+        );
+
+        $this->assertEquals(
+            ['B', 'C', 'D'],
+            $this->getEntries(['limit' => 3, 'offset' => new Value(1)])->map->get('title')->values()->all()
+        );
+    }
+
+    /** @test */
+    public function it_filters_by_publish_status()
     {
         $this->makeEntry('o')->published(true)->save();
         $this->makeEntry('b')->published(true)->save();
@@ -147,7 +171,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_filters_by_future_and_past()
+    public function it_filters_by_future_and_past()
     {
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
 
@@ -203,7 +227,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_filters_by_since_and_until()
+    public function it_filters_by_since_and_until()
     {
         $this->collection->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
@@ -225,7 +249,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_filters_by_custom_query_scopes()
+    public function it_filters_by_custom_query_scopes()
     {
         $this->makeEntry('a')->set('title', 'Cat Stories')->save();
         $this->makeEntry('b')->set('title', 'Tiger Stories')->save();
@@ -241,12 +265,12 @@ class EntriesTest extends TestCase
         $this->assertCount(1, $this->getEntries([
             'query_scope' => 'post_type|post_animal',
             'post_type' => 'stories',
-            'post_animal' => 'tiger'
+            'post_animal' => 'tiger',
         ]));
     }
 
     /** @test */
-    function it_sorts_entries()
+    public function it_sorts_entries()
     {
         $this->collection->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
@@ -272,7 +296,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_sorts_entries_by_multiple_columns()
+    public function it_sorts_entries_by_multiple_columns()
     {
         $this->collection->dated(true)->save();
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
@@ -294,7 +318,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_sorts_entries_randomly()
+    public function it_sorts_entries_randomly()
     {
         $this->makeEntry('a')->set('number', '1')->save();
         $this->makeEntry('b')->set('number', '2')->save();
@@ -302,7 +326,7 @@ class EntriesTest extends TestCase
 
         $orders = collect();
 
-        for ($i=0; $i < 10; $i++) {
+        for ($i = 0; $i < 10; $i++) {
             $orders[] = $this->getEntries(['sort' => 'random'])->map->get('number')->implode('');
         }
 
@@ -310,7 +334,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_cannot_sort_a_nested_structured_collection()
+    public function it_cannot_sort_a_nested_structured_collection()
     {
         $this->expectException(\LogicException::class);
         $this->expectExceptionMessage('Cannot sort a nested collection by order.');
@@ -322,7 +346,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_can_sort_a_linear_structured_collection()
+    public function it_can_sort_a_linear_structured_collection()
     {
         $this->makeEntry('a')->save();
         $this->makeEntry('b')->save();
@@ -343,17 +367,18 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_filters_by_a_single_taxonomy_term()
+    public function it_filters_by_a_single_taxonomy_term()
     {
         $this->makeEntry('1')->data(['tags' => ['rad']])->save();
         $this->makeEntry('2')->data(['tags' => ['rad']])->save();
         $this->makeEntry('3')->data(['tags' => ['meh']])->save();
 
         $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags' => 'rad'])->map->slug()->all());
+        $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags' => TermCollection::make([Term::make('rad')->taxonomy('tags')])])->map->slug()->all());
     }
 
     /** @test */
-    function it_filters_by_in_multiple_taxonomy_terms()
+    public function it_filters_by_in_multiple_taxonomy_terms()
     {
         $this->makeEntry('1')->data(['tags' => ['rad'], 'categories' => ['news']])->save();
         $this->makeEntry('2')->data(['tags' => ['awesome'], 'categories' => ['events']])->save();
@@ -373,7 +398,7 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    function it_throws_an_exception_when_using_an_unknown_taxonomy_query_modifier()
+    public function it_throws_an_exception_when_using_an_unknown_taxonomy_query_modifier()
     {
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Unknown taxonomy query modifier [xyz]. Valid values are "any" and "all".');

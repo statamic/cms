@@ -2,18 +2,19 @@
 
 namespace Statamic\Http\Controllers\CP\Fields;
 
+use Illuminate\Http\Request;
 use Statamic\Facades;
+use Statamic\Fields\Fieldset;
+use Statamic\Fields\FieldTransformer;
+use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Illuminate\Http\Request;
-use Statamic\Fields\Fieldset;
-use Statamic\Http\Controllers\CP\CpController;
 
 class FieldsetController extends CpController
 {
     public function __construct()
     {
-        $this->middleware('can:configure fields');
+        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
     }
 
     public function index(Request $request)
@@ -40,7 +41,18 @@ class FieldsetController extends CpController
     {
         $fieldset = Facades\Fieldset::find($fieldset);
 
-        return view('statamic::fieldsets.edit', compact('fieldset'));
+        $vue = [
+            'title' => $fieldset->title(),
+            'handle' => $fieldset->handle(),
+            'fields' => collect(Arr::get($fieldset->contents(), 'fields'))->map(function ($field, $i) {
+                return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
+            })->all(),
+        ];
+
+        return view('statamic::fieldsets.edit', [
+            'fieldset' => $fieldset,
+            'fieldsetVueObject' => $vue,
+        ]);
     }
 
     public function update(Request $request, $fieldset)
@@ -52,7 +64,12 @@ class FieldsetController extends CpController
             'fields' => 'array',
         ]);
 
-        $this->save($fieldset, $request);
+        $fieldset->setContents([
+            'title' => $request->title,
+            'fields' => collect($request->fields)->map(function ($field) {
+                return FieldTransformer::fromVue($field);
+            })->all(),
+        ])->save();
 
         return response('', 204);
     }
@@ -78,7 +95,7 @@ class FieldsetController extends CpController
             ->setHandle($handle)
             ->setContents([
                 'title' => $request->title,
-                'fields' => []
+                'fields' => [],
             ])->save();
 
         return redirect($fieldset->editUrl())->with('success', __('Fieldset created'));
@@ -96,7 +113,7 @@ class FieldsetController extends CpController
     }
 
     /**
-     * Quickly create a new barebones fieldset from within the fieldtype
+     * Quickly create a new barebones fieldset from within the fieldtype.
      *
      * @return array
      */
@@ -110,26 +127,9 @@ class FieldsetController extends CpController
 
         $fieldset = (new Fieldset)->setHandle($handle)->setContents([
             'title' => $request->title,
-            'fields' => []
+            'fields' => [],
         ])->save();
 
         return ['success' => true];
-    }
-
-    private function save(Fieldset $fieldset, Request $request)
-    {
-        $fields = collect($request->fields)->mapWithKeys(function ($field) {
-            $field = Arr::removeNullValues($field);
-            $field = Arr::except($field, ['_id', 'isNew']);
-            if (Arr::get($field, 'width') === 100) {
-                unset($field['width']);
-            }
-            return [Arr::pull($field, 'handle') => $field];
-        })->all();
-
-        $fieldset->setContents([
-            'title' => $request->title,
-            'fields' => $fields
-        ])->save();
     }
 }

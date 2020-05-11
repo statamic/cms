@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .badge {
-    @apply text-3xs roman bg-grey-30 text-grey-80 rounded-md leading-normal;
+    @apply text-3xs not-italic bg-grey-30 text-grey-80 rounded-md leading-normal;
     padding: 1px 5px 0;
 }
 
@@ -16,7 +16,7 @@
 }
 
 .badge-updates {
-    @apply text-3xs roman bg-red text-white rounded-full leading-normal;
+    @apply text-3xs not-italic bg-red text-white rounded-full leading-normal;
     padding: 2px 6px 1px;
 }
 

@@ -2,13 +2,13 @@
 
 namespace Tests\Stache\Repositories;
 
-use Statamic\Facades;
-use Tests\TestCase;
-use Statamic\Stache\Stache;
-use Statamic\Contracts\Assets\AssetContainer;
-use Statamic\Stache\Stores\AssetContainersStore;
 use Illuminate\Support\Collection as IlluminateCollection;
+use Statamic\Contracts\Assets\AssetContainer;
+use Statamic\Facades;
 use Statamic\Stache\Repositories\AssetContainerRepository;
+use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\AssetContainersStore;
+use Tests\TestCase;
 
 class AssetContainerRepositoryTest extends TestCase
 {
@@ -25,7 +25,7 @@ class AssetContainerRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_asset_containers()
+    public function it_gets_all_asset_containers()
     {
         $containers = $this->repo->all();
 
@@ -40,7 +40,7 @@ class AssetContainerRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_an_asset_container_by_handle()
+    public function it_gets_an_asset_container_by_handle()
     {
         tap($this->repo->findByHandle('main'), function ($container) {
             $this->assertInstanceOf(AssetContainer::class, $container);
@@ -60,7 +60,7 @@ class AssetContainerRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_saves_a_container_to_the_stache_and_to_a_file()
+    public function it_saves_a_container_to_the_stache_and_to_a_file()
     {
         $container = Facades\AssetContainer::make('new');
         $this->assertNull($this->repo->findByHandle('new'));

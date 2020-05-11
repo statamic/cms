@@ -2,17 +2,17 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Entries\EntryCollection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Facades\Site;
-use Statamic\Facades\Entry;
-use Statamic\Entries\EntryCollection;
 use Statamic\Tags\Collection\Collection;
 
 class GetContent extends Collection
 {
     /**
-     * {{ get_content:* }} ... {{ /get_content:* }}
+     * {{ get_content:* }} ... {{ /get_content:* }}.
      */
     public function __call($method, $args)
     {
@@ -28,7 +28,7 @@ class GetContent extends Collection
     }
 
     /**
-     * {{ get_content from="" }} ... {{ /get_content }}
+     * {{ get_content from="" }} ... {{ /get_content }}.
      */
     public function index()
     {

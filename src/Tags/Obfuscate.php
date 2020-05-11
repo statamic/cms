@@ -3,7 +3,6 @@
 namespace Statamic\Tags;
 
 use Statamic\Support\Html;
-use Statamic\Tags\Tags;
 
 class Obfuscate extends Tags
 {

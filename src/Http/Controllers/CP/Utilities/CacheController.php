@@ -2,14 +2,13 @@
 
 namespace Statamic\Http\Controllers\CP\Utilities;
 
-use Statamic\Support\Str;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Artisan;
 use League\Glide\Server;
 use Statamic\Facades\Stache;
-use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\Artisan;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\StaticCaching\Cacher as StaticCacher;
+use Statamic\Support\Str;
 
 class CacheController extends CpController
 {
@@ -19,7 +18,7 @@ class CacheController extends CpController
             'stache' => $this->getStacheStats(),
             'cache' => $this->getApplicationCacheStats(),
             'static' => $this->getStaticCacheStats(),
-            'images' => $this->getImageCacheStats()
+            'images' => $this->getImageCacheStats(),
         ]);
     }
 
@@ -40,6 +39,7 @@ class CacheController extends CpController
     {
         $driver = config('cache.default');
         $driver = ($driver === 'statamic') ? 'file (statamic)' : $driver;
+
         return compact('driver');
     }
 
@@ -71,7 +71,7 @@ class CacheController extends CpController
 
     public function clear(Request $request, $cache)
     {
-        $method = 'clear' . ucfirst($cache) . 'Cache';
+        $method = 'clear'.ucfirst($cache).'Cache';
 
         return $this->$method();
     }

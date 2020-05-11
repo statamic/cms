@@ -52,6 +52,6 @@ return [
     <pre class="language-markdown"><code>Erste Kopfzeile  | Zweite Kopfzeile
     ------------- | -------------
     Inhalt Zelle  | Inhalt Zelle
-    Inhalt Zelle  | Inhalt Zelle</code></pre>'
+    Inhalt Zelle  | Inhalt Zelle</code></pre>',
 
 ];

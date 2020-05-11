@@ -3,9 +3,9 @@
 namespace Statamic\Http\Middleware\CP;
 
 use Closure;
-use Statamic\Facades\User;
 use Statamic\Exceptions\AuthenticationException;
 use Statamic\Exceptions\AuthorizationException;
+use Statamic\Facades\User;
 
 class Authorize
 {

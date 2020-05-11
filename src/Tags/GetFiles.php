@@ -2,10 +2,8 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Arr;
-use Statamic\Tags\Tags;
 use Statamic\Facades\Folder;
-use Statamic\Facades\Helper;
+use Statamic\Support\Arr;
 use Statamic\Support\FileCollection;
 
 class GetFiles extends Tags
@@ -16,7 +14,7 @@ class GetFiles extends Tags
     private $files;
 
     /**
-     * The {{ get_files }} tag
+     * The {{ get_files }} tag.
      *
      * @return string
      */
@@ -34,7 +32,7 @@ class GetFiles extends Tags
     }
 
     /**
-     * Get all the files from the selected folders at the appropriate depth
+     * Get all the files from the selected folders at the appropriate depth.
      *
      * @return \Illuminate\Support\Collection
      */
@@ -71,7 +69,7 @@ class GetFiles extends Tags
     }
 
     /**
-     * Filter the files
+     * Filter the files.
      */
     private function filter()
     {
@@ -86,21 +84,21 @@ class GetFiles extends Tags
     }
 
     /**
-     * Filter out files from a requested folder
+     * Filter out files from a requested folder.
      */
     private function filterNotIn()
     {
         if ($not_in = $this->get('not_in')) {
-            $regex = '#^(' . $not_in . ')#';
+            $regex = '#^('.$not_in.')#';
 
-            $this->files = $this->files->reject(function($path) use ($regex) {
+            $this->files = $this->files->reject(function ($path) use ($regex) {
                 return preg_match($regex, $path);
             });
         }
     }
 
     /**
-     * Filter files by file size
+     * Filter files by file size.
      */
     private function filterSize()
     {
@@ -110,7 +108,7 @@ class GetFiles extends Tags
     }
 
     /**
-     * Filter files by extension(s)
+     * Filter files by extension(s).
      */
     private function filterExtension()
     {

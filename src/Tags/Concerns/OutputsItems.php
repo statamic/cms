@@ -39,7 +39,7 @@ trait OutputsItems
 
         return array_merge([
             $as => $items,
-            'paginate' => $this->getPaginationData($paginator)
+            'paginate' => $this->getPaginationData($paginator),
         ], $this->extraOutput($items));
     }
 
@@ -53,7 +53,7 @@ trait OutputsItems
             'prev_page'      => $paginator->previousPageUrl(),
             'next_page'      => $paginator->nextPageUrl(),
             'auto_links'     => $paginator->render('pagination::default'),
-            'links'          => $paginator->renderArray()
+            'links'          => $paginator->renderArray(),
         ];
     }
 }

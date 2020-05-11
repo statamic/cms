@@ -2,9 +2,8 @@
 
 namespace Tests;
 
-use Tests\TestCase;
-use Statamic\Support\Str;
 use Statamic\Data\ContainsData;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class FluentlyGetsAndSetsTest extends TestCase
@@ -17,7 +16,7 @@ class FluentlyGetsAndSetsTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_and_set_a_protected_property()
+    public function it_can_get_and_set_a_protected_property()
     {
         $this->assertNull($this->entry->blueprint());
 
@@ -27,7 +26,7 @@ class FluentlyGetsAndSetsTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_and_set_back_to_null()
+    public function it_can_get_and_set_back_to_null()
     {
         $this->assertEquals('Jesse', $this->entry->publishedBy());
 
@@ -37,7 +36,7 @@ class FluentlyGetsAndSetsTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_and_set_with_custom_get_and_set_logic()
+    public function it_can_get_and_set_with_custom_get_and_set_logic()
     {
         $this->assertNull($this->entry->title());
 
@@ -47,7 +46,7 @@ class FluentlyGetsAndSetsTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_and_set_into_the_data_property_through_magic_methods_in_parent()
+    public function it_can_get_and_set_into_the_data_property_through_magic_methods_in_parent()
     {
         $entry = new EntryContainingData;
         $this->assertNull($entry->get('template'));
@@ -60,7 +59,7 @@ class FluentlyGetsAndSetsTest extends TestCase
     }
 
     /** @test */
-    function it_can_run_custom_after_setter_logic()
+    public function it_can_run_custom_after_setter_logic()
     {
         $this->assertNull($this->entry->route());
 
@@ -71,7 +70,7 @@ class FluentlyGetsAndSetsTest extends TestCase
     }
 
     /** @test */
-    function it_can_set_fluently()
+    public function it_can_set_fluently()
     {
         $this->entry
             ->title('lol cat')

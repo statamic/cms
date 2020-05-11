@@ -2,13 +2,13 @@
 
 namespace Statamic\Auth\Protect\Protectors\Password;
 
-use Statamic\Auth\Protect\Protectors\Protector;
 use Facades\Statamic\Auth\Protect\Protectors\Password\Token;
+use Statamic\Auth\Protect\Protectors\Protector;
 
 class PasswordProtector extends Protector
 {
     /**
-     * Provide protection
+     * Provide protection.
      *
      * @return void
      */
@@ -41,7 +41,7 @@ class PasswordProtector extends Protector
 
     protected function redirectToPasswordForm()
     {
-        $url = $this->getPasswordFormUrl() . '?token=' . $this->generateToken();
+        $url = $this->getPasswordFormUrl().'?token='.$this->generateToken();
 
         abort(redirect($url));
     }

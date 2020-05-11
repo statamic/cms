@@ -2,7 +2,6 @@
 
 namespace Statamic\Http\Controllers\CP\Users;
 
-use Statamic\Facades\User;
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -13,7 +12,7 @@ class PasswordController extends CpController
         $this->authorize('editPassword', $user);
 
         $request->validate([
-            'password' => 'required|confirmed'
+            'password' => 'required|confirmed',
         ]);
 
         $user->password($request->password)->save();

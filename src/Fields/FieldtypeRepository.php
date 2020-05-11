@@ -2,8 +2,6 @@
 
 namespace Statamic\Fields;
 
-use Exception;
-
 class FieldtypeRepository
 {
     public function preloadable()

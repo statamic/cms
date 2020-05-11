@@ -1,12 +1,12 @@
 <?php
 
-namespace Tests\Extend;
+namespace Tests\Tags;
 
-use Tests\TestCase;
 use Statamic\Facades\Antlers;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Tags\Context;
+use Tests\TestCase;
 
 class ContextTest extends TestCase
 {
@@ -15,8 +15,9 @@ class ContextTest extends TestCase
         parent::setUp();
 
         $fieldtype = new class extends \Statamic\Fields\Fieldtype {
-            public function augment($value) {
-                return 'augmented ' . $value;
+            public function augment($value)
+            {
+                return 'augmented '.$value;
             }
         };
 
@@ -43,7 +44,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_parameters()
+    public function it_gets_all_parameters()
     {
         $this->assertSame([
             'string' => 'hello',
@@ -60,7 +61,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_value()
+    public function it_gets_a_value()
     {
         $this->assertEquals('hello', $this->context->get('string'));
         $this->assertEquals(['one', 'two'], $this->context->get('array'));
@@ -75,7 +76,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    function it_gets_raw_values()
+    public function it_gets_raw_values()
     {
         $this->assertSame('hello', $this->context->raw('string'));
         $this->assertSame('foo', $this->context->raw('value'));
@@ -86,7 +87,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    function it_gets_value_classes()
+    public function it_gets_value_classes()
     {
         tap($this->context->value('string'), function ($value) {
             $this->assertInstanceOf(Value::class, $value);
@@ -120,21 +121,21 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    function unknown_keys_use_a_default_value()
+    public function unknown_keys_use_a_default_value()
     {
         $this->assertNull($this->context->get('unknown'));
         $this->assertEquals('fallback', $this->context->get('unknown', 'fallback'));
     }
 
     /** @test */
-    function it_checks_existence()
+    public function it_checks_existence()
     {
         $this->assertTrue($this->context->has('string'));
         $this->assertFalse($this->context->has('unknown'));
     }
 
     /** @test */
-    function it_gets_the_first_parameter_that_exists()
+    public function it_gets_the_first_parameter_that_exists()
     {
         $this->assertEquals('hello', $this->context->get(['string']));
         $this->assertEquals('hello', $this->context->get(['unknown', 'string']));
@@ -143,7 +144,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    function it_forgets_keys()
+    public function it_forgets_keys()
     {
         $this->assertEquals('hello', $this->context->get('string'));
 
@@ -153,7 +154,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    function it_uses_array_access()
+    public function it_uses_array_access()
     {
         $this->assertEquals('hello', $this->context->get('string'));
         $this->assertEquals('hello', $this->context['string']);
@@ -171,7 +172,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    function it_gets_an_exploded_list()
+    public function it_gets_an_exploded_list()
     {
         $this->assertEquals(['one', 'two'], $this->context->explode('list'));
         $this->assertEquals(['hello'], $this->context->explode('string'));
@@ -180,7 +181,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_boolean()
+    public function it_gets_a_boolean()
     {
         $this->assertTrue($this->context->bool('true'));
         $this->assertTrue($this->context->bool('string'));
@@ -191,7 +192,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    function it_gets_an_integer()
+    public function it_gets_an_integer()
     {
         $this->assertEquals(7, $this->context->int('integer'));
         $this->assertEquals(0, $this->context->int('string'));
@@ -201,7 +202,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_float()
+    public function it_gets_a_float()
     {
         $this->assertSame(123.456, $this->context->float('float'));
         $this->assertSame(0.0, $this->context->float('string'));
@@ -211,7 +212,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    function it_is_iterable()
+    public function it_is_iterable()
     {
         $expected = [
             'string' => 'hello',

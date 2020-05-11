@@ -2,42 +2,39 @@
 
 namespace Statamic\Entries;
 
-use ArrayAccess;
-use Statamic\Facades;
-use Statamic\Statamic;
-use Statamic\Support\Arr;
-use Statamic\Facades\Site;
-use Statamic\Facades\User;
-use Statamic\Facades\Blink;
-use Statamic\Facades\Stache;
-use Statamic\Facades\Blueprint;
-use Statamic\Routing\Routable;
-use Statamic\Facades\Collection;
+use Facades\Statamic\View\Cascade;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Revisions\Revisable;
-use Facades\Statamic\View\Cascade;
-use Statamic\Events\Data\EntrySaved;
-use Statamic\Events\Data\EntrySaving;
-use Illuminate\Contracts\Support\Responsable;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Entries\Entry as Contract;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Data\HasOrigin;
-use Statamic\Contracts\Data\Localization;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Events\Data\EntrySaved;
+use Statamic\Events\Data\EntrySaving;
+use Statamic\Facades;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Facades\User;
+use Statamic\Revisions\Revisable;
+use Statamic\Routing\Routable;
+use Statamic\Statamic;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAccess
+class Entry implements Contract, Augmentable, Responsable, Localization
 {
     use Routable {
         uri as routableUri;
     }
 
     use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns;
-
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -182,7 +179,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function livePreviewUrl()
     {
-        return $this->cpUrl('collections.entries.preview.edit');
+        return $this->collection()->route($this->locale())
+            ? $this->cpUrl('collections.entries.preview.edit')
+            : null;
     }
 
     protected function cpUrl($route)
@@ -262,7 +261,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         $prefix = '';
 
         if ($this->hasDate()) {
-            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d') . '.';
+            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d').'.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
@@ -271,7 +270,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
             Site::hasMultiple() ? $this->locale().'/' : '',
             $prefix,
             $this->slug(),
-            $this->fileExtension()
+            $this->fileExtension(),
         ]);
     }
 
@@ -384,7 +383,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         return vsprintf('collections/%s/%s/%s', [
             $this->collectionHandle(),
             $this->locale(),
-            $this->id()
+            $this->id(),
         ]);
     }
 
@@ -423,7 +422,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function lastModifiedBy()
     {
-        return User::find($this->get('updated_by'));
+        return $this->has('updated_by')
+            ? User::find($this->get('updated_by'))
+            : null;
     }
 
     public function status()
@@ -613,26 +614,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
     protected function getOriginByString($origin)
     {
         return Facades\Entry::find($origin);
-    }
-
-    public function offsetExists($key)
-    {
-        return $this->has($key);
-    }
-
-    public function offsetGet($key)
-    {
-        return $this->value($key);
-    }
-
-    public function offsetSet($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
     }
 
     public function value($key)

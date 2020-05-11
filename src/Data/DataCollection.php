@@ -2,20 +2,20 @@
 
 namespace Statamic\Data;
 
-use Closure;
 use Carbon\Carbon;
-use Statamic\Support\Str;
-use Statamic\Facades\Compare;
-use Statamic\Exceptions\MethodNotFoundException;
+use Closure;
 use Illuminate\Support\Collection as IlluminateCollection;
+use Statamic\Exceptions\MethodNotFoundException;
+use Statamic\Facades\Compare;
+use Statamic\Support\Str;
 
 /**
- * An abstract collection of data types
+ * An abstract collection of data types.
  */
 class DataCollection extends IlluminateCollection
 {
     /**
-     * Limit a collection
+     * Limit a collection.
      *
      * @param $limit
      * @return static
@@ -26,7 +26,7 @@ class DataCollection extends IlluminateCollection
     }
 
     /**
-     * Sort a collection by multiple fields
+     * Sort a collection by multiple fields.
      *
      * Accepts a string like "title:desc|foo:asc"
      * The keys are optional. "title:desc|foo" is fine.
@@ -51,7 +51,7 @@ class DataCollection extends IlluminateCollection
                 $sort_by = $bits[0];
                 $sort_dir = array_get($bits, 1);
 
-                list($one, $two) = $this->getSortableValues($sort_by, $a, $b);
+                [$one, $two] = $this->getSortableValues($sort_by, $a, $b);
 
                 $result = Compare::values($one, $two);
 
@@ -67,7 +67,7 @@ class DataCollection extends IlluminateCollection
     }
 
     /**
-     * Get the values from two content objects to be sorted against each other
+     * Get the values from two content objects to be sorted against each other.
      *
      * @param string                        $sort The field to be searched
      * @param \Statamic\Contracts\Data\Data $a    The first data object
@@ -78,7 +78,7 @@ class DataCollection extends IlluminateCollection
     {
         return [
             $this->getSortableValue($sort, $a),
-            $this->getSortableValue($sort, $b)
+            $this->getSortableValue($sort, $b),
         ];
     }
 
@@ -98,7 +98,7 @@ class DataCollection extends IlluminateCollection
     }
 
     /**
-     * Make sure the sortable value is in a format suitable for sorting
+     * Make sure the sortable value is in a format suitable for sorting.
      *
      * @param mixed $value
      * @return mixed
@@ -113,7 +113,7 @@ class DataCollection extends IlluminateCollection
     }
 
     /**
-     * Walk over an array of methods and attempt to run each one
+     * Walk over an array of methods and attempt to run each one.
      *
      * @param array $actions
      * @return \Statamic\Data\DataCollection
@@ -135,7 +135,7 @@ class DataCollection extends IlluminateCollection
     }
 
     /**
-     * Add a new key to each item of the collection
+     * Add a new key to each item of the collection.
      *
      * @param string|callable $key       New key to add, or a function to return an array of new values
      * @param mixed           $callable  Function to return the new value when specifying a key
@@ -158,7 +158,7 @@ class DataCollection extends IlluminateCollection
     }
 
     /**
-     * Add a new set of keys to each item of the collection
+     * Add a new set of keys to each item of the collection.
      *
      * @param callable $callable  Function to return an array of new values
      * @return static
@@ -175,7 +175,7 @@ class DataCollection extends IlluminateCollection
     }
 
     /**
-     * Get the collection as a plain array
+     * Get the collection as a plain array.
      *
      * @return array
      */
@@ -185,7 +185,7 @@ class DataCollection extends IlluminateCollection
     }
 
     /**
-     * Get the collection as a plain array using only selected keys
+     * Get the collection as a plain array using only selected keys.
      *
      * @param array $keys
      * @return array
@@ -199,9 +199,9 @@ class DataCollection extends IlluminateCollection
                 // First try to get the supplemented value
                 if (! $data = $item->getSupplement($key)) {
                     // Then try the data / front-matter
-                    if (!$data = $item->get($key)) {
+                    if (! $data = $item->get($key)) {
                         // Finally try getting a property via its getter method
-                        $method = 'get' . ucfirst($key);
+                        $method = 'get'.ucfirst($key);
                         if (method_exists($item, $method)) {
                             $data = call_user_func([$item, $method]);
                         }

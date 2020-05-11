@@ -37,6 +37,7 @@ class Multisite extends Command
 
         if (! $confirmed) {
             $this->crossLine('Change the site handle in <comment>config/statamic/sites.php</comment> then try this command again.');
+
             return;
         }
 
@@ -109,7 +110,6 @@ class Multisite extends Command
         $data = $yaml['data'] ?? [];
 
         $set
-            ->sites([$this->siteOne, $this->siteTwo])
             ->addLocalization($origin = $set->makeLocalization($this->siteOne)->data($data))
             ->addLocalization($set->makeLocalization($this->siteTwo)->origin($origin))
             ->save();

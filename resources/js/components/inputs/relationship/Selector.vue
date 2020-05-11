@@ -2,7 +2,7 @@
 
     <div class="h-full bg-white">
 
-        <div v-if="initializing" class="absolute pin z-200 flex items-center justify-center text-center">
+        <div v-if="initializing" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
         </div>
 
@@ -67,7 +67,7 @@
                             <div class="text-sm text-grey-70"
                                 v-text="hasMaxSelections
                                     ? __n(':count/:max selected', selections, { max: maxSelections })
-                                    : __n(':count selected', selections)" />
+                                    : __n(':count item selected|:count items selected', selections)" />
 
                             <div>
                                 <button
@@ -105,7 +105,8 @@ export default {
     ],
 
     props: {
-        url: String,
+        filtersUrl: String,
+        selectionsUrl: String,
         initialSelections: Array,
         initialSortColumn: String,
         initialSortDirection: String,
@@ -125,12 +126,12 @@ export default {
             loading: true,
             items: [],
             meta: {},
+            filters: [],
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             page: 1,
             selections: _.clone(this.initialSelections),
             columns: [],
-            filters: [],
         }
     },
 
@@ -154,8 +155,9 @@ export default {
     },
 
     mounted() {
-        this.request().then(() => {
-            if (this.search) this.$refs.filters.$refs.search.focus();
+        this.getFilters().then(() => {
+            this.autoApplyFilters(this.filters);
+            this.initialRequest();
         });
     },
 
@@ -164,6 +166,7 @@ export default {
         parameters: {
             deep: true,
             handler(after, before) {
+                if (this.initializing) return;
                 if (JSON.stringify(before) === JSON.stringify(after)) return;
                 this.request();
             }
@@ -194,6 +197,18 @@ export default {
 
     methods: {
 
+        getFilters() {
+            return this.$axios.get(this.filtersUrl).then(response => {
+                this.filters = response.data;
+            });
+        },
+
+        initialRequest() {
+            return this.request().then(() => {
+                if (this.search) this.$refs.filters.$refs.search.focus();
+            });
+        },
+
         request() {
             this.loading = true;
 
@@ -204,11 +219,10 @@ export default {
                 search: this.searchQuery,
             }};
 
-            return this.$axios.get(this.url, { params, cancelToken: this.source.token }).then(response => {
+            return this.$axios.get(this.selectionsUrl, { params, cancelToken: this.source.token }).then(response => {
                 this.columns = response.data.meta.columns;
                 this.items = response.data.data;
                 this.meta = response.data.meta;
-                this.filters = response.data.meta.filters;
                 this.activeFilterBadges = {...response.data.meta.activeFilterBadges};
                 this.loading = false;
                 this.initializing = false;

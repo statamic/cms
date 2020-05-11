@@ -6,11 +6,10 @@ use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Nav;
 use Statamic\Structures\CollectionStructure;
-use Statamic\Structures\Structure;
 use Statamic\Structures\StructureRepository;
 use Tests\TestCase;
 
-class StuctureRepositoryTest extends TestCase
+class StructureRepositoryTest extends TestCase
 {
     public function setUp(): void
     {
@@ -20,7 +19,7 @@ class StuctureRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_structures()
+    public function it_gets_all_structures()
     {
         $navs = collect([
             Nav::make('nav-a'),
@@ -50,7 +49,7 @@ class StuctureRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_nav_structure_by_handle()
+    public function it_gets_a_nav_structure_by_handle()
     {
         $nav = Nav::make();
         Nav::shouldReceive('find')->with('test')->once()->andReturn($nav);
@@ -60,7 +59,7 @@ class StuctureRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_collection_structure_by_handle()
+    public function it_gets_a_collection_structure_by_handle()
     {
         $structure = new CollectionStructure;
         $collection = Collection::make()->structure($structure);
@@ -71,7 +70,7 @@ class StuctureRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_an_entry_by_uri()
+    public function it_gets_an_entry_by_uri()
     {
         $this->markTestIncomplete();
     }

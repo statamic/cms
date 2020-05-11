@@ -48,6 +48,7 @@ class Utility
     {
         return $this->fluentlyGetOrSet('view')->setter(function ($view) use ($data) {
             $this->viewData = $data;
+
             return $view;
         })->args(func_get_args());
     }
@@ -89,7 +90,7 @@ class Utility
 
     public function url()
     {
-        return cp_route('utilities.index') . '/' . $this->slug();
+        return cp_route('utilities.index').'/'.$this->slug();
     }
 
     public function routes(Closure $routes = null)

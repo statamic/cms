@@ -2,13 +2,12 @@
 
 namespace Statamic\View;
 
-use Statamic\Support\Arr;
-use Statamic\Facades\URL;
-use Statamic\Sites\Site;
-use Statamic\Fields\Value;
-use Statamic\Facades\GlobalSet;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\URL;
+use Statamic\Sites\Site;
+use Statamic\Support\Arr;
 
 class Cascade
 {
@@ -89,9 +88,13 @@ class Cascade
 
     private function hydrateSegments()
     {
-        $segments = explode('/', $this->site->relativePath($this->request->getUri()));
+        $path = $this->site->relativePath($this->request->url());
 
-        foreach ($segments as $segment => $value) {
+        if ($path === '/') {
+            return $this;
+        }
+
+        foreach (explode('/', $path) as $segment => $value) {
             $this->set("segment_{$segment}", $value);
         }
 

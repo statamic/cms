@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
 class Parameters extends ArrayAccessor
@@ -17,7 +18,7 @@ class Parameters extends ArrayAccessor
             // field's value in the context. If it doesn't exist, the value remains the literal.
             if (Str::startsWith($key, ':')) {
                 $key = substr($key, 1);
-                $value = $context[$value] ?? $value;
+                $value = $context->get($value, $value);
             }
 
             if ($value === 'true') {
@@ -32,5 +33,12 @@ class Parameters extends ArrayAccessor
         })->all();
 
         return parent::make($items);
+    }
+
+    public function get($keys, $default = null)
+    {
+        $value = parent::get($keys, $default);
+
+        return $value instanceof Value ? $value->value() : $value;
     }
 }

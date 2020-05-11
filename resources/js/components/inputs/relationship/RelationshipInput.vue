@@ -63,7 +63,8 @@
             <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
                 <item-selector
                     slot-scope="{ close }"
-                    :url="selectionsUrl"
+                    :filters-url="filtersUrl"
+                    :selections-url="selectionsUrl"
                     :site="site"
                     initial-sort-column="title"
                     initial-sort-direction="asc"
@@ -102,6 +103,7 @@ export default {
             default: 'RelatedItem',
         },
         itemDataUrl: String,
+        filtersUrl: String,
         selectionsUrl: String,
         statusIcons: Boolean,
         site: String,

@@ -33,9 +33,10 @@
                 v-model="conditions[index].field"
                 class="min-w-md"
                 :options="fieldOptions"
-                :reduce="field => field.value"
                 :placeholder="__('Select field')"
                 :taggable="true"
+                :push-tags="true"
+                :reduce="field => field.value"
                 :create-option="field => ({value: field, label: field })" />
 
             <select-input
@@ -117,9 +118,7 @@ export default {
         },
 
         operatorOptions() {
-            return this.normalizeInputOptions(
-                _.reject(OPERATORS, operator => ['is', 'isnt', '==', '!='].includes(operator))
-            );
+            return this.normalizeInputOptions(OPERATORS);
         },
 
         hasConditions() {

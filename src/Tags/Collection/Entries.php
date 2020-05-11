@@ -4,20 +4,24 @@ namespace Statamic\Tags\Collection;
 
 use Closure;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Collection as IlluminateCollection;
 use InvalidArgumentException;
+use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 
 class Entries
 {
-    use Concerns\QueriesConditions,
-        Concerns\QueriesScopes,
+    use Concerns\QueriesScopes,
         Concerns\GetsQueryResults;
-
+    use Concerns\QueriesConditions {
+        queryableConditionParams as traitQueryableConditionParams;
+    }
     use Concerns\QueriesOrderBys {
         queryOrderBys as traitQueryOrderBys;
     }
@@ -172,7 +176,7 @@ class Entries
         $not = $this->parameters->get(['not_from', 'not_in', 'not_folder', 'dont_use', 'not_collection']);
 
         if ($from === '*') {
-            $from = Collection::handles();
+            $from = Collection::handles()->all();
         } elseif (is_string($from)) {
             $from = explode('|', $from);
         }
@@ -181,11 +185,23 @@ class Entries
             $not = explode('|', $not);
         }
 
-        return collect($from)
-            ->diff(collect($not)->filter())
+        $from = $from instanceof IlluminateCollection ? $from : collect(Arr::wrap($from));
+        $not = $not instanceof IlluminateCollection ? $not : collect(Arr::wrap($not));
+
+        $from = $from->map(function ($collection) {
+            return (string) $collection;
+        });
+
+        $not = $not->map(function ($collection) {
+            return (string) $collection;
+        })->filter();
+
+        return $from
+            ->diff($not)
             ->map(function ($handle) {
                 $collection = Collection::findByHandle($handle);
                 throw_unless($collection, new \Statamic\Exceptions\CollectionNotFoundException($handle));
+
                 return $collection;
             })
             ->values();
@@ -298,17 +314,19 @@ class Entries
             }
 
             $values = collect($values)->map(function ($term) use ($taxonomy) {
-                return Str::contains($term, '::') ? $term : $taxonomy . '::' . $term;
+                if ($term instanceof Term) {
+                    return $term->id();
+                }
+
+                return Str::contains($term, '::') ? $term : $taxonomy.'::'.$term;
             });
 
             if ($modifier === 'all') {
                 $values->each(function ($value) use ($query) {
                     $query->whereTaxonomy($value);
                 });
-
             } elseif ($modifier === 'any') {
                 $query->whereTaxonomyIn($values->all());
-
             } else {
                 throw new InvalidArgumentException(
                     'Unknown taxonomy query modifier ['.$modifier.']. Valid values are "any" and "all".'
@@ -346,5 +364,12 @@ class Entries
         if (! $this->parameters->bool(['redirects', 'links'], false)) {
             $query->where('redirect', '=', null);
         }
+    }
+
+    protected function queryableConditionParams()
+    {
+        return $this->traitQueryableConditionParams()->reject(function ($value, $key) {
+            return Str::startsWith($key, 'taxonomy:');
+        });
     }
 }

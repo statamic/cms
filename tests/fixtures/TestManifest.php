@@ -22,7 +22,7 @@ class TestManifest
                 'developerUrl' => 'http://foo.com',
                 'email' => 'john@foo.com',
                 'version' => '1.0',
-            ]
+            ],
         ];
     }
 

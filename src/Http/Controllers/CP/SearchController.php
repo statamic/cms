@@ -2,10 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\Facades\Search;
-use Statamic\Facades\Content;
 use Illuminate\Http\Request;
-use Statamic\Search\IndexNotFoundException;
+use Statamic\Facades\Search;
 
 class SearchController extends CpController
 {

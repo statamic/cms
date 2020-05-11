@@ -29,7 +29,7 @@ class ModifierNotFoundException extends Exception implements ProvidesSolution
         return BaseSolution::create("The {$this->modifier} modifier was not found.")
             ->setSolutionDescription($description)
             ->setDocumentationLinks([
-                'Read the modifiers guide' => Statamic::docsUrl('modifiers')
+                'Read the modifiers guide' => Statamic::docsUrl('modifiers'),
             ]);
     }
 

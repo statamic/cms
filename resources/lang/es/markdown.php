@@ -52,6 +52,6 @@ esto: es algo de yaml
 <pre class="language-markdown"><code>Primer encabezado  | Segundo encabezado
 ------------- | -------------
 Celda de contenido  | Celda de contenido
-Celda de contenido  | Celda de contenido</code></pre>'
+Celda de contenido  | Celda de contenido</code></pre>',
 
 ];

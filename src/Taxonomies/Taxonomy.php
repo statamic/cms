@@ -2,18 +2,18 @@
 
 namespace Statamic\Taxonomies;
 
+use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
+use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
-use Statamic\Support\Arr;
-use Statamic\Facades\Stache;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Data\ExistsAsFile;
-use Illuminate\Contracts\Support\Responsable;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 
 class Taxonomy implements Contract, Responsable, AugmentableContract
 {
@@ -67,7 +67,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     {
         return vsprintf('%s/%s.yaml', [
             rtrim(Stache::store('taxonomies')->directory(), '/'),
-            $this->handle
+            $this->handle,
         ]);
     }
 
@@ -150,9 +150,16 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function fileData()
     {
-        return Arr::except($this->toArray(), [
-            'handle',
-        ]);
+        $data = [
+            'title' => $this->title,
+            'blueprints' => $this->blueprints,
+        ];
+
+        if (Site::hasMultiple()) {
+            $data['sites'] = $this->sites;
+        }
+
+        return $data;
     }
 
     public function defaultPublishState($state = null)
@@ -174,7 +181,11 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
+                if (! Site::hasMultiple() || ! $sites) {
+                    $sites = [Site::default()->handle()];
+                }
+
+                return collect($sites);
             })
             ->args(func_get_args());
     }
@@ -197,7 +208,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function uri()
     {
-        return '/' . $this->handle;
+        return '/'.$this->handle;
     }
 
     public function collection($collection = null)
@@ -217,6 +228,10 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function toResponse($request)
     {
+        if (! view()->exists($this->template())) {
+            throw new NotFoundHttpException;
+        }
+
         return (new \Statamic\Http\Responses\DataResponse($this))
             ->with([
                 'terms' => $termQuery = $this->queryTerms(),
@@ -233,7 +248,13 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function template()
     {
-        return $this->handle() . '.index';
+        $template = $this->handle().'.index';
+
+        if ($collection = $this->collection()) {
+            $template = $collection->handle().'.'.$template;
+        }
+
+        return $template;
     }
 
     public function layout()
@@ -246,7 +267,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         return $this
             ->fluentlyGetOrSet('searchIndex')
             ->getter(function ($index) {
-                return $index ?  Search::index($index) : null;
+                return $index ? Search::index($index) : null;
             })
             ->args(func_get_args());
     }

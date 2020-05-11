@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\Fieldsets;
+namespace Tests\Feature\GlobalSearch;
 
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -16,7 +16,7 @@ class GlobalSearchTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_performs_a_global_search()
+    public function it_performs_a_global_search()
     {
         $entry = tap(
             Entry::make()
@@ -45,7 +45,7 @@ class GlobalSearchTest extends TestCase
                     'collection', 'is_entry',
                     'taxonomy', 'is_term',
                     'container', 'is_asset',
-                ]
+                ],
             ]);
     }
 }

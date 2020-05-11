@@ -6,7 +6,7 @@
             <button type="button" class="btn-close" @click="close">×</button>
         </div>
 
-        <div v-if="fieldtypesLoading" class="absolute pin z-200 flex items-center justify-center text-center">
+        <div v-if="fieldtypesLoading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
         </div>
 

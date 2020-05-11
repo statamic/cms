@@ -65,7 +65,7 @@ export default {
     },
 
     created() {
-        this.autoApplyFilters();
+        this.autoApplyFilters(this.filters);
         this.request();
     },
 
@@ -100,18 +100,6 @@ export default {
     },
 
     methods: {
-
-        autoApplyFilters() {
-            if (! this.filters) return;
-
-            let values = {};
-
-            this.filters.filter(filter => ! _.isEmpty(filter.auto_apply)).forEach(filter => {
-                values[filter.handle] = filter.auto_apply;
-            });
-
-            this.activeFilters = values;
-        },
 
         request() {
             if (! this.requestUrl) {

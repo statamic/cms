@@ -113,7 +113,6 @@ class BlueprintRepository
     public function makeFromSections($sections)
     {
         $sections = collect($sections)->map(function ($section, $section_handle) {
-
             $fields = collect($section['fields'])->map(function ($field, $handle) {
                 return compact('handle', 'field');
             });

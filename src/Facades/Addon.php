@@ -2,8 +2,8 @@
 
 namespace Statamic\Facades;
 
-use Statamic\Extend\AddonRepository;
 use Illuminate\Support\Facades\Facade;
+use Statamic\Extend\AddonRepository;
 
 class Addon extends Facade
 {

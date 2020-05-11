@@ -12,9 +12,22 @@ class Publish extends Action
         return __('Publish');
     }
 
-    public function filter($item)
+    public function visibleTo($item)
     {
-        return $item instanceof Entry;
+        return $item instanceof Entry && ! $item->published();
+    }
+
+    public function visibleToBulk($items)
+    {
+        if ($items->whereInstanceOf(Entry::class)->count() !== $items->count()) {
+            return false;
+        }
+
+        if ($items->filter->published()->count() === $items->count()) {
+            return false;
+        }
+
+        return true;
     }
 
     public function authorize($user, $entry)
@@ -34,7 +47,7 @@ class Publish extends Action
         return 'Publish Entry|Publish :count Entries';
     }
 
-    public function run($entries)
+    public function run($entries, $values)
     {
         $entries->each(function ($entry) {
             $entry->publish(['user' => User::current()]);

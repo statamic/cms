@@ -2,20 +2,19 @@
 
 namespace Tests\Feature\Entries;
 
-use Tests\TestCase;
-use Statamic\Facades\Term;
+use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Taxonomy;
-use Statamic\Facades\Collection;
-use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class GetByTaxonomyTermsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_gets_entries_by_a_single_taxonomy_term()
+    public function it_gets_entries_by_a_single_taxonomy_term()
     {
         Taxonomy::make('tags')->save();
         Collection::make('blog')->taxonomies(['tags'])->save();
@@ -28,7 +27,7 @@ class GetByTaxonomyTermsTest extends TestCase
     }
 
     /** @test */
-    function it_gets_entries_in_multiple_taxonomy_terms()
+    public function it_gets_entries_in_multiple_taxonomy_terms()
     {
         Taxonomy::make('tags')->save();
         Taxonomy::make('categories')->save();

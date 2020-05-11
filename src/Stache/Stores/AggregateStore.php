@@ -48,7 +48,7 @@ abstract class AggregateStore extends Store
 
     public function childDirectory($child)
     {
-        return $this->directory . $child->childKey();
+        return $this->directory.$child->childKey();
     }
 
     public function getItems($keys)

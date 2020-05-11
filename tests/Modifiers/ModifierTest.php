@@ -2,9 +2,9 @@
 
 namespace Tests\Modifiers;
 
+use Statamic\Modifiers\Modifier;
 use Tests\TestCase;
 use Tests\TestDependency;
-use Statamic\Modifiers\Modifier;
 
 class ModifierTest extends TestCase
 {

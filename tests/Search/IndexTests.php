@@ -25,6 +25,5 @@ trait IndexTests
 
     protected function beforeSearched()
     {
-
     }
 }

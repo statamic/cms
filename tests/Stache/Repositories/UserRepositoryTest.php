@@ -2,12 +2,12 @@
 
 namespace Tests\Stache\Repositories;
 
-use Tests\TestCase;
+use Statamic\Auth\UserCollection;
+use Statamic\Contracts\Auth\User;
+use Statamic\Stache\Repositories\UserRepository;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\UsersStore;
-use Statamic\Contracts\Auth\User;
-use Statamic\Auth\UserCollection;
-use Statamic\Stache\Repositories\UserRepository;
+use Tests\TestCase;
 
 class UserRepositoryTest extends TestCase
 {
@@ -22,7 +22,7 @@ class UserRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_users()
+    public function it_gets_all_users()
     {
         $users = $this->repo->all();
 
@@ -37,7 +37,7 @@ class UserRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_user_by_id()
+    public function it_gets_a_user_by_id()
     {
         tap($this->repo->find('users-john'), function ($user) {
             $this->assertInstanceOf(User::class, $user);
