@@ -4,6 +4,7 @@ namespace Statamic\Modifiers;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
@@ -1314,7 +1315,7 @@ class CoreModifiers extends Modifier
      */
     public function output($value)
     {
-        if (! is_string($value)) {
+        if (! is_string($value) && ! $value instanceof AssetContract) {
             return $value;
         }
 
@@ -1478,9 +1479,12 @@ class CoreModifiers extends Modifier
      * @param $params
      * @return string
      */
-    public function repeat($value, $params)
+    public function repeat($value, $params, $context)
     {
-        return str_repeat($value, (int) Arr::get($params, 0, 1));
+        $times = Arr::get($params, 0, 1);
+        $times = is_numeric($times) ? $times : Arr::get($context, $times);
+
+        return str_repeat($value, $times);
     }
 
     /**
@@ -2240,7 +2244,7 @@ class CoreModifiers extends Modifier
         // from a value in the context. This allows users to specify a variable name.
         return (is_numeric($number))
             ? $number
-            : Arr::get($context, $number, $number);
+            : Arr::get($context, $number, $number)->value() ?? Arr::get($context, $number, $number);
     }
 
     private function carbon($value)
