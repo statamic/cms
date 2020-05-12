@@ -91,7 +91,7 @@
 
                         <div class="asset-table-listing" v-if="displayMode === 'list'">
 
-                            <table>
+                            <table class="table-fixed">
                                 <sortable-list
                                     v-model="assets"
                                     :vertical="true"
