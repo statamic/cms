@@ -154,7 +154,7 @@
             },
 
             refreshShowingAddon() {
-                this.showingAddon.installed = _.contains(this.meta.installed, this.showingAddon.variants[0].package);
+                this.showingAddon.installed = _.findWhere(this.rows, { id: this.showingAddon.id }).installed;
 
                 this.$events.$emit('addon-refreshed');
             },
