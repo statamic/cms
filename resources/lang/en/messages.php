@@ -3,6 +3,7 @@
 return [
     'activate_account_notification_body' => 'You are receiving this email because we received a password reset request for your account.',
     'activate_account_notification_subject' => 'Activate Your Account',
+    'addon_list_loading_error' => 'Something went wrong while loading addons. Try again later.',
     'asset_container_blueprint_instructions' => 'Blueprints define additional custom fields available when editing assets.',
     'asset_container_create_folder_instructions' => 'When enabled will give users the ability to create folders in this container.',
     'asset_container_disk_instructions' => 'Filesystem disks allow you to specify where to store files — either locally or in a remote location like Amazon S3. They can be configured in `config/filesystems.php`',

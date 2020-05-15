@@ -1,10 +1,14 @@
 <template>
     <div>
+        <div v-if="error" class="card text-sm">
+            {{ __('messages.addon_list_loading_error') }}
+        </div>
+
         <div v-if="loading" class="card p-3 text-center">
             <loading-graphic  />
         </div>
 
-        <data-list :rows="rows" v-if="!loading">
+        <data-list :rows="rows" v-if="loaded">
             <div class="" slot-scope="{ rows: addons }">
 
                 <div class="card p-0">
@@ -81,6 +85,7 @@
                 filter: 'all',
                 page: 1,
                 showingAddon: false,
+                error: false,
             }
         },
 
@@ -89,8 +94,12 @@
                 return {
                     page: this.page,
                     q: this.searchQuery,
-                    installed: this.filter === 'installed' ? 1 : 0
+                    installed: this.filter === 'installed' ? 1 : 0,
                 };
+            },
+
+            loaded() {
+                return !this.loading && !this.error;
             }
         },
 
@@ -133,7 +142,11 @@
                     if (this.showingAddon) {
                         this.refreshShowingAddon();
                     }
-                });
+                }).catch(e => {
+                    this.loading = false;
+                    this.error = true;
+                    this.$toast.error(__('Something went wrong'));
+                })
             },
 
             setPage(page) {
