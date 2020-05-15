@@ -52,6 +52,7 @@
         created() {
             this.$events.$on('composer-finished', this.composerFinished);
             this.$events.$on('addon-refreshed', this.addonRefreshed);
+            this.$store.commit('statamic/composer', {});
         },
 
         methods: {
