@@ -44,6 +44,10 @@ class AddonsQuery
         ];
 
         if ($this->installed) {
+            if ($installed->isEmpty()) {
+                return collect();
+            }
+
             $params['filter'] = ['variants' => $installed->join(',')];
         }
 
