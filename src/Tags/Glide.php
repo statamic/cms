@@ -162,6 +162,12 @@ class Glide extends Tags
 
             return;
         }
+        
+        // Get current locale
+        $locale = $this->get(['site', 'locale'], Site::current()->handle());
+
+        // Remove locale prefix from URL.
+        $url = preg_replace('%^((?:https?:)?(?://)?[^/]*)/' . $locale . '/%i', '$1/', $url);
 
         $url = ($this->getBool('absolute')) ? URL::makeAbsolute($url) : URL::makeRelative($url);
 
