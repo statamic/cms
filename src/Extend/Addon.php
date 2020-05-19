@@ -25,14 +25,7 @@ final class Addon
      *
      * @var int
      */
-    protected $marketplaceProductId;
-
-    /**
-     * The marketplace variant ID of the addon.
-     *
-     * @var int
-     */
-    protected $marketplaceVariantId;
+    protected $marketplaceId;
 
     /**
      * The marketplace slug of the addon.
@@ -40,6 +33,13 @@ final class Addon
      * @var int
      */
     protected $marketplaceSlug;
+
+    /**
+     * The marketplace slug of the addon's seller.
+     *
+     * @var int
+     */
+    protected $marketplaceSellerSlug;
 
     /**
      * The addon's namespace. eg. "Statamic\Addons\Bloodhound".
@@ -154,7 +154,7 @@ final class Addon
         $instance = self::make($package['id']);
 
         $keys = [
-            'id', 'slug', 'marketplaceProductId', 'marketplaceVariantId', 'marketplaceSlug', 'name', 'namespace', 'directory',
+            'id', 'slug', 'marketplaceId', 'marketplaceSlug', 'marketplaceSellerSlug', 'name', 'namespace', 'directory',
             'autoload', 'description', 'package', 'version', 'latestVersion', 'url', 'developer', 'developerUrl', 'isCommercial',
         ];
 
@@ -216,24 +216,11 @@ final class Addon
      * @param int $id
      * @return int
      */
-    public function marketplaceProductId($id = null)
+    public function marketplaceId($id = null)
     {
         return $id
-            ? $this->marketplaceProductId = $id
-            : $this->marketplaceProductId;
-    }
-
-    /**
-     * The marketplace variant ID of the addon.
-     *
-     * @param int $id
-     * @return int
-     */
-    public function marketplaceVariantId($id = null)
-    {
-        return $id
-            ? $this->marketplaceVariantId = $id
-            : $this->marketplaceVariantId;
+            ? $this->marketplaceId = $id
+            : $this->marketplaceId;
     }
 
     /**

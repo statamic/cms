@@ -52,9 +52,9 @@ class Manifest extends PackageManifest
         return [
             'id' => $package['name'],
             'slug' => $statamic['slug'] ?? null,
-            'marketplaceProductId' => data_get($marketplaceData, 'product_id', null),
-            'marketplaceVariantId' => data_get($marketplaceData, 'variant_id', null),
+            'marketplaceId' => data_get($marketplaceData, 'id', null),
             'marketplaceSlug' => data_get($marketplaceData, 'slug', null),
+            'marketplaceSellerSlug' => data_get($marketplaceData, 'seller', null),
             'latestVersion' => data_get($marketplaceData, 'latest_version', null),
             'version' => Str::removeLeft($package['version'], 'v'),
             'namespace' => $namespace,

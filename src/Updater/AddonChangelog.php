@@ -2,8 +2,6 @@
 
 namespace Statamic\Updater;
 
-use Statamic\Updater\Changelog;
-
 class AddonChangelog extends Changelog
 {
     protected $addon;
@@ -13,9 +11,9 @@ class AddonChangelog extends Changelog
         $this->addon = $addon;
     }
 
-    public function slug()
+    public function item()
     {
-        return $this->addon->marketplaceSlug();
+        return $this->addon->marketplaceSellerSlug().'/'.$this->addon->marketplaceSlug();
     }
 
     public function currentVersion()

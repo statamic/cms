@@ -16,11 +16,11 @@ abstract class Changelog
     abstract public function currentVersion();
 
     /**
-     * Get the marketplace slug.
+     * Get the marketplace item (seller slug + product slug).
      *
      * @return string
      */
-    abstract public function slug();
+    abstract public function item();
 
     /**
      * Get changelog, sorted from newest to oldest.
@@ -29,7 +29,7 @@ abstract class Changelog
      */
     public function get()
     {
-        return Marketplace::releases($this->slug())->map(function ($release, $index) {
+        return Marketplace::releases($this->item())->map(function ($release, $index) {
             return (object) [
                 'version' => $release['version'],
                 'type' => $this->parseReleaseType($release['version'], $index),

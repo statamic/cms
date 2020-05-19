@@ -35,12 +35,12 @@ class AddonsQuery
 
     public function get()
     {
-        $installed = $this->installedVariants();
+        $installed = $this->installedProducts();
 
         $params = [
-            'statamicVersion' => 3,
             'page' => $this->page,
             'search' => $this->search,
+            'filter' => ['statamic' => 3],
         ];
 
         if ($this->installed) {
@@ -48,13 +48,13 @@ class AddonsQuery
                 return collect();
             }
 
-            $params['filter'] = ['variants' => $installed->join(',')];
+            $params['filter']['products'] = $installed->join(',');
         }
 
         $addons = Client::get('addons', $params)['data'];
 
         return collect($addons)->map(function ($addon) use ($installed) {
-            return $addon + ['installed' => $installed->contains($addon['variant_id'])];
+            return $addon + ['installed' => $installed->contains($addon['id'])];
         });
     }
 
@@ -65,8 +65,8 @@ class AddonsQuery
         ]);
     }
 
-    private function installedVariants()
+    private function installedProducts()
     {
-        return Addon::all()->map->marketplaceVariantId()->filter();
+        return Addon::all()->map->marketplaceId()->filter();
     }
 }
