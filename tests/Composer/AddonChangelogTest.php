@@ -2,10 +2,10 @@
 
 namespace Tests\Composer;
 
-use Tests\TestCase;
 use Mockery;
 use Statamic\Extend\Addon;
 use Statamic\Updater\AddonChangelog;
+use Tests\TestCase;
 
 class AddonChangelogTest extends TestCase
 {
