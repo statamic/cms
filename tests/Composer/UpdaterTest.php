@@ -3,8 +3,6 @@
 namespace Tests\Composer;
 
 use Facades\Statamic\Console\Processes\Composer;
-use Statamic\Statamic;
-use Statamic\Updater\Core\Updater as CoreUpdater;
 use Statamic\Updater\Updater;
 use Tests\TestCase;
 

@@ -34,7 +34,7 @@ class AddonInstallerTest extends TestCase
     public function it_can_uninstall_addon()
     {
         Composer::shouldReceive('installed')->andReturn(collect([
-            'addon/one' => []
+            'addon/one' => [],
         ]));
 
         Composer::shouldReceive('remove')->with('addon/one')->once();

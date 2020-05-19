@@ -2,9 +2,9 @@
 
 namespace Tests\Composer;
 
-use Tests\TestCase;
 use Facades\Statamic\Version;
 use Statamic\Updater\CoreChangelog;
+use Tests\TestCase;
 
 class CoreChangelogTest extends TestCase
 {
