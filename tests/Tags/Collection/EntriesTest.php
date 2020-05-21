@@ -156,21 +156,6 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    public function it_filters_by_publish_status()
-    {
-        $this->makeEntry('o')->published(true)->save();
-        $this->makeEntry('b')->published(true)->save();
-        $this->makeEntry('c')->published(false)->save();
-
-        $this->assertCount(2, $this->getEntries());
-        $this->assertCount(2, $this->getEntries(['show_unpublished' => false]));
-        $this->assertCount(3, $this->getEntries(['show_unpublished' => true]));
-        $this->assertCount(2, $this->getEntries(['show_published' => true]));
-        $this->assertCount(0, $this->getEntries(['show_published' => false]));
-        $this->assertCount(1, $this->getEntries(['show_published' => false, 'show_unpublished' => true]));
-    }
-
-    /** @test */
     public function it_filters_by_future_and_past()
     {
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
