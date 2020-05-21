@@ -27,6 +27,11 @@ class Statamic
         return \Facades\Statamic\Version::get();
     }
 
+    public static function pro()
+    {
+        return \Facades\Statamic\Licensing\Pro::check();
+    }
+
     public static function availableScripts(Request $request)
     {
         return static::$scripts;

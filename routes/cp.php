@@ -188,6 +188,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::resource('templates', 'TemplatesController');
     });
 
+    Route::get('licensing', 'LicensingController@show')->name('licensing');
+    Route::get('licensing/refresh', 'LicensingController@refresh')->name('licensing.refresh');
+
     Route::get('session-timeout', 'SessionTimeoutController')->name('session.timeout');
 
     Route::view('/playground', 'statamic::playground')->name('playground');

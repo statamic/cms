@@ -389,4 +389,9 @@ final class Addon
 
         return $this;
     }
+
+    public function existsOnMarketplace()
+    {
+        return $this->marketplaceSlug() !== null;
+    }
 }
