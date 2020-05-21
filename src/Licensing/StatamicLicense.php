@@ -16,4 +16,3 @@ class StatamicLicense extends License
         return Statamic::version();
     }
 }
-

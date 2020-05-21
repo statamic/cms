@@ -130,7 +130,7 @@ class Outpost
 
         return $this->cacheResponse(now()->addHour(), [
             'error' => 422,
-            'errors' => $json['errors']
+            'errors' => $json['errors'],
         ]);
     }
 

@@ -51,7 +51,7 @@ class OutpostTest extends TestCase
     {
         $expectedResponse = [
             'foo' => 'bar',
-            'expiry' => now()->addHour()->timestamp
+            'expiry' => now()->addHour()->timestamp,
         ];
 
         Cache::shouldReceive('has')->with('statamic.outpost.response')->andReturnFalse();
@@ -93,7 +93,7 @@ class OutpostTest extends TestCase
     {
         $expectedResponse = [
             'error' => 500,
-            'expiry' => now()->addMinutes(5)->timestamp
+            'expiry' => now()->addMinutes(5)->timestamp,
         ];
 
         Cache::shouldReceive('has')->with('statamic.outpost.response')->andReturnFalse();
@@ -115,7 +115,7 @@ class OutpostTest extends TestCase
     {
         $expectedResponse = [
             'error' => 500,
-            'expiry' => now()->addMinutes(5)->timestamp
+            'expiry' => now()->addMinutes(5)->timestamp,
         ];
 
         Cache::shouldReceive('has')->with('statamic.outpost.response')->andReturnFalse();
@@ -137,18 +137,18 @@ class OutpostTest extends TestCase
 
         $expectedResponse = [
             'error' => 429,
-            'expiry' => now()->addSeconds($retryAfter)->timestamp
+            'expiry' => now()->addSeconds($retryAfter)->timestamp,
         ];
 
         Cache::shouldReceive('has')->with('statamic.outpost.response')->andReturnFalse();
         Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse, $retryAfter) {
             return $key === 'statamic.outpost.response'
                 && $value === $expectedResponse
-                && $expiry->diffInSeconds() == $retryAfter-1;
+                && $expiry->diffInSeconds() == $retryAfter - 1;
         });
 
         $outpost = $this->outpostWithErrorResponse(429, [
-            'Retry-After' => [$retryAfter]
+            'Retry-After' => [$retryAfter],
         ]);
 
         $this->assertEquals($expectedResponse, $outpost->response());
@@ -163,7 +163,7 @@ class OutpostTest extends TestCase
                 'a' => ['error one', 'error two'],
                 'b' => ['error one'],
             ],
-            'expiry' => now()->addHour()->timestamp
+            'expiry' => now()->addHour()->timestamp,
         ];
 
         Cache::shouldReceive('has')->with('statamic.outpost.response')->andReturnFalse();
