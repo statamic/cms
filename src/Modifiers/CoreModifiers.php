@@ -2213,6 +2213,18 @@ class CoreModifiers extends Modifier
         return Str::contains($url, ['youtu.be', 'youtube', 'vimeo']);
     }
 
+    /**
+     * Converts a string to a Carbon instance and formats it with ISO formats.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function isoFormat($value, $params)
+    {
+        return $this->carbon($value)->isoFormat(Arr::get($params, 0));
+    }
+
     // ------------------------------------
 
     /**
