@@ -234,6 +234,22 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
+    public function it_filters_by_status()
+    {
+        $this->collection->dated(true)->futureDateBehavior('private')->pastDateBehavior('public')->save();
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+
+        $this->makeEntry('a')->date('2019-03-09')->published(true)->save(); // definitely in past
+        $this->makeEntry('b')->date('2019-03-10')->published(false)->save(); // today
+        $this->makeEntry('c')->date('2019-03-11')->published(true)->save(); // definitely in future, so status will not be 'published'
+
+        $this->assertCount(2, $this->getEntries());
+        $this->assertCount(1, $this->getEntries(['status:is' => 'published']));
+        $this->assertCount(2, $this->getEntries(['status:not' => 'published']));
+        $this->assertCount(1, $this->getEntries(['status:is' => 'scheduled']));
+    }
+
+    /** @test */
     public function it_filters_by_custom_query_scopes()
     {
         $this->makeEntry('a')->set('title', 'Cat Stories')->save();

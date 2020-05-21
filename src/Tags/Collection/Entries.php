@@ -233,6 +233,8 @@ class Entries
     {
         if (! $this->allCollectionsAreDates()) {
             return;
+        } elseif ($this->isQueryingCondition('status')) {
+            return;
         }
 
         // Collection date behaviors
