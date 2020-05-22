@@ -10,26 +10,10 @@ class Pro
 {
     public function check()
     {
-        if (config('statamic.api.enabled')) {
-            return true;
-        }
-
-        if (Site::hasMultiple()) {
-            return true;
-        }
-
-        if (config('statamic.revisions.enabled')) {
-            return true;
-        }
-
-        if (Form::count() > 1) {
-            return true;
-        }
-
-        if (User::count() > 1) {
-            return true;
-        }
-
-        return false;
+        return config('statamic.api.enabled')
+            || config('statamic.revisions.enabled')
+            || Site::hasMultiple()
+            || Form::count() > 1
+            || User::count() > 1;
     }
 }
