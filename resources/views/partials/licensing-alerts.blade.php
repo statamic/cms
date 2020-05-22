@@ -19,7 +19,7 @@
             @if ($licenses->isOnPublicDomain()) bg-red text-white @endif
         ">
             @if ($licenses->isOnTestDomain())
-                <b>Test domain:</b>
+                <b>Trial Mode:</b>
                 You have licensing issues to resolve before moving to production.
                 <a href="{{ cp_route('licensing') }}" class="text-blue-200">View details</a>
             @else
