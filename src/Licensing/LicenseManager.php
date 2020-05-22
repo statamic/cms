@@ -40,7 +40,7 @@ class LicenseManager
 
     public function requestValidationErrors()
     {
-        return new MessageBag($this->response('error') !== 422 ? $this->response('errors') : []);
+        return new MessageBag($this->response('error') === 422 ? $this->response('errors') : []);
     }
 
     public function isOnPublicDomain()
