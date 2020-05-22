@@ -4,7 +4,6 @@ namespace Statamic\Licensing;
 
 use Illuminate\Support\Carbon;
 use Illuminate\Support\MessageBag;
-use Statamic\Extend\Addon;
 use Statamic\Support\Arr;
 
 class LicenseManager
@@ -19,7 +18,7 @@ class LicenseManager
 
     public function requestFailed()
     {
-        return !!$this->requestErrorCode();
+        return (bool) $this->requestErrorCode();
     }
 
     public function requestErrorCode()
@@ -62,7 +61,7 @@ class LicenseManager
 
     public function invalid()
     {
-        return !$this->valid();
+        return ! $this->valid();
     }
 
     public function response($key = null, $default = null)

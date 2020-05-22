@@ -2,7 +2,6 @@
 
 namespace Tests\Licensing;
 
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Licensing\AddonLicense;
 use Statamic\Licensing\LicenseManager;
@@ -118,7 +117,7 @@ class LicenseManagerTest extends TestCase
             'packages' => [
                 'foo/bar' => 'the foo/bar response',
                 'baz/qux' => 'the baz/qux response',
-            ]
+            ],
         ]);
 
         $addons = $licenses->addons();
@@ -149,7 +148,7 @@ class LicenseManagerTest extends TestCase
 
         tap($this->managerWithResponse([
             'error' => 429,
-            'expiry' => now()->addSeconds(10)->timestamp
+            'expiry' => now()->addSeconds(10)->timestamp,
         ]), function ($licenses) {
             $this->assertTrue($licenses->requestFailed());
             $this->assertEquals(429, $licenses->requestErrorCode());

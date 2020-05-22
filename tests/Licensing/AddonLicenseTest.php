@@ -4,7 +4,6 @@ namespace Tests\Licensing;
 
 use Statamic\Facades\Addon;
 use Statamic\Licensing\AddonLicense;
-
 use Tests\TestCase;
 
 class AddonLicenseTest extends TestCase
@@ -61,4 +60,3 @@ class FakeAddonLicenseAddon
         return $this->version;
     }
 }
-
