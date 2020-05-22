@@ -48,4 +48,18 @@ return [
 
     'avatars' => 'initials',
 
+    /*
+    |--------------------------------------------------------------------------
+    | New User Roles
+    |--------------------------------------------------------------------------
+    |
+    | When registering new users through the user:register_form tag, these
+    | roles will automatically be applied to your newly created users.
+    |
+    */
+
+    'new_user_roles' => [
+        //
+    ],
+
 ];
