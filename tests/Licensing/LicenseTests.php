@@ -25,7 +25,7 @@ trait LicenseTests
         $license = $this->license(['reason' => 'nope']);
 
         $this->assertEquals(
-            'statamic::messages.license_error_nope',
+            'statamic::messages.licensing_error_nope',
             $license->invalidReason()
         );
     }
