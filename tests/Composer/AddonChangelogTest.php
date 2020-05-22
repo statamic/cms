@@ -15,6 +15,8 @@ class AddonChangelogTest extends TestCase
     {
         $addon = Mockery::mock(new Addon('test'));
         $addon->shouldReceive('version')->andReturn('1.0.1');
+        $addon->shouldReceive('marketplaceSellerSlug')->andReturn('seller');
+        $addon->shouldReceive('marketplaceSlug')->andReturn('addon');
 
         return new AddonChangelog($addon);
     }
