@@ -57,14 +57,11 @@ class OutpostTest extends TestCase
             'payload' => $outpost->payload(),
         ];
 
-        Cache::shouldReceive('get')->with('statamic.outpost.response')->andReturnNull();
-        Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse) {
-            return $key === 'statamic.outpost.response'
-                && $value === $expectedResponse
-                && $expiry->diffInMinutes() == 59;
-        });
-
         $this->assertEquals($expectedResponse, $outpost->response());
+        Carbon::setTestNow(now()->addHour());
+        $this->assertCachedResponseEquals($expectedResponse);
+        Carbon::setTestNow(now()->addSeconds(1));
+        $this->assertResponseNotCached();
     }
 
     /** @test */
@@ -72,13 +69,10 @@ class OutpostTest extends TestCase
     {
         $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
 
-        $testCachedResponse = [
+        $this->setCachedResponse($testCachedResponse = [
             'cached' => 'response',
             'payload' => $outpost->payload(),
-        ];
-
-        Cache::shouldReceive('get')->times(4)->with('statamic.outpost.response')->andReturn($testCachedResponse);
-        Cache::shouldNotReceive('put');
+        ]);
 
         $first = $outpost->response();
         $second = $outpost->response();
@@ -90,6 +84,7 @@ class OutpostTest extends TestCase
     /** @test */
     public function the_cached_response_is_ignored_if_the_payload_is_different()
     {
+        $this->setCachedResponse(['payload' => 'old']);
         $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
 
         $expectedResponse = [
@@ -98,14 +93,11 @@ class OutpostTest extends TestCase
             'payload' => $outpost->payload(),
         ];
 
-        Cache::shouldReceive('get')->once()->with('statamic.outpost.response')->andReturn(['payload' => 'old']);
-        Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse) {
-            return $key === 'statamic.outpost.response'
-                && $value === $expectedResponse
-                && $expiry->diffInMinutes() == 59;
-        });
-
         $this->assertEquals($expectedResponse, $outpost->response());
+        Carbon::setTestNow(now()->addHour());
+        $this->assertCachedResponseEquals($expectedResponse);
+        Carbon::setTestNow(now()->addSeconds(1));
+        $this->assertResponseNotCached();
     }
 
     /** @test */
@@ -129,14 +121,11 @@ class OutpostTest extends TestCase
             'payload' => $outpost->payload(),
         ];
 
-        Cache::shouldReceive('get')->with('statamic.outpost.response')->andReturnNull();
-        Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse) {
-            return $key === 'statamic.outpost.response'
-                && $value === $expectedResponse
-                && $expiry->diffInMinutes() == 4;
-        });
-
         $this->assertEquals($expectedResponse, $outpost->response());
+        Carbon::setTestNow(now()->addMinutes(5));
+        $this->assertCachedResponseEquals($expectedResponse);
+        Carbon::setTestNow(now()->addSeconds(1));
+        $this->assertResponseNotCached();
     }
 
     /** @test */
@@ -150,14 +139,11 @@ class OutpostTest extends TestCase
             'payload' => $outpost->payload(),
         ];
 
-        Cache::shouldReceive('get')->with('statamic.outpost.response')->andReturnNull();
-        Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse) {
-            return $key === 'statamic.outpost.response'
-                && $value === $expectedResponse
-                && $expiry->diffInMinutes() == 4;
-        });
-
         $this->assertEquals($expectedResponse, $outpost->response());
+        Carbon::setTestNow(now()->addMinutes(5));
+        $this->assertCachedResponseEquals($expectedResponse);
+        Carbon::setTestNow(now()->addSeconds(1));
+        $this->assertResponseNotCached();
     }
 
     /** @test */
@@ -175,14 +161,11 @@ class OutpostTest extends TestCase
             'payload' => $outpost->payload(),
         ];
 
-        Cache::shouldReceive('get')->with('statamic.outpost.response')->andReturnNull();
-        Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse, $retryAfter) {
-            return $key === 'statamic.outpost.response'
-                && $value === $expectedResponse
-                && $expiry->diffInSeconds() == $retryAfter - 1;
-        });
-
         $this->assertEquals($expectedResponse, $outpost->response());
+        Carbon::setTestNow(now()->addSeconds($retryAfter));
+        $this->assertCachedResponseEquals($expectedResponse);
+        Carbon::setTestNow(now()->addSeconds(1));
+        $this->assertResponseNotCached();
     }
 
     /** @test */
@@ -206,14 +189,11 @@ class OutpostTest extends TestCase
             'payload' => $outpost->payload(),
         ];
 
-        Cache::shouldReceive('get')->with('statamic.outpost.response')->andReturnNull();
-        Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse) {
-            return $key === 'statamic.outpost.response'
-                && $value === $expectedResponse
-                && $expiry->diffInMinutes() == 59;
-        });
-
         $this->assertEquals($expectedResponse, $outpost->response());
+        Carbon::setTestNow(now()->addHour());
+        $this->assertCachedResponseEquals($expectedResponse);
+        Carbon::setTestNow(now()->addSeconds(1));
+        $this->assertResponseNotCached();
     }
 
     private function outpostWithJsonResponse(array $data)
@@ -244,6 +224,21 @@ class OutpostTest extends TestCase
     private function outpost($guzzle = null)
     {
         return new Outpost($guzzle ?? $this->mock(Client::class));
+    }
+
+    private function assertCachedResponseEquals($expected)
+    {
+        return $this->assertEquals($expected, Cache::get('statamic.outpost.response'));
+    }
+
+    private function assertResponseNotCached()
+    {
+        $this->assertNull(Cache::get('statamic.outpost.response'));
+    }
+
+    private function setCachedResponse($response)
+    {
+        Cache::put('statamic.outpost.response', $response);
     }
 }
 
