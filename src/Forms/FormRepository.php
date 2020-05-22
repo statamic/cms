@@ -38,7 +38,7 @@ class FormRepository
     }
 
     /**
-     * Get the number of forms
+     * Get the number of forms.
      *
      * @return int
      */
