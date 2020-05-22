@@ -3,12 +3,13 @@
 @if ($licenses->requestFailed())
     <div class="p-1 px-4 text-sm w-full bg-yellow">
         @if ($licenses->requestErrorCode() === 422)
-            Error communicating with statamic.com: {{ join(' ', $licenses->requestValidationErrors()->unique()) }}
+            {{ __('statamic::messages.outpost_error_422') }}
+            {{ join(' ', $licenses->requestValidationErrors()->unique()) }}
         @elseif ($licenses->requestErrorCode() === 429)
-            Too many requests to statamic.com.
-            Try again in {{$licenses->failedRequestRetrySeconds() }} seconds.
+            {{ __('statamic::messages.outpost_error_429') }}
+            {{ trans_choice('statamic::messages.try_again_in_seconds', $licenses->failedRequestRetrySeconds()) }}
         @else
-            Could not communicate with statamic.com. Please try again later.
+            {{ __('statamic::messages.outpost_issue_try_later') }}
         @endif
     </div>
 @else
@@ -19,12 +20,12 @@
             @if ($licenses->isOnPublicDomain()) bg-red text-white @endif
         ">
             @if ($licenses->isOnTestDomain())
-                <b>Trial Mode:</b>
-                You have licensing issues to resolve before moving to production.
-                <a href="{{ cp_route('licensing') }}" class="text-blue-200">View details</a>
+                <b>{{ __('Trial Mode') }}:</b>
+                {{ __('statamic::messages.licensing_trial_mode_alert') }}
+                <a href="{{ cp_route('licensing') }}" class="text-blue-200">{{ __('View details') }}</a>
             @else
-                Please purchase and enter your license key or risk violating the License Agreement.
-                <a href="{{ cp_route('licensing') }}" class="text-white underline">View details</a>
+                {{ __('statamic::messages.licensing_production_alert') }}
+                <a href="{{ cp_route('licensing') }}" class="text-white underline">{{ __('View details') }}</a>
             @endif
         </div>
     @endif

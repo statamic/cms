@@ -8,9 +8,9 @@
         <div class="no-results md:pt-8 max-w-2xl mx-auto">
             <div class="flex flex-wrap items-center">
                 <div class="w-full md:w-1/2">
-                    <h1 class="mb-4">Licensing</h1>
+                    <h1 class="mb-4">{{ __('Licensing') }}</h1>
                     <p class="text-grey-70 leading-normal mb-4 text-lg antialiased">
-                        There was an issue communicating with statamic.com. Please try again later.
+                        {{ __('statamic::messages.outpost_issue_try_later') }}
                     </p>
                     <a href="{{ cp_route('licensing.refresh') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
                 </div>
@@ -37,7 +37,7 @@
                     <td class="relative">
                         {{ $site->domain()['url'] ?? '' }}
                         @if ($site->hasMultipleDomains())
-                            <span class="text-2xs">(and {{ $site->additionalDomainCount() }} others)</span>
+                            <span class="text-2xs">({{ trans_choice('and :count more', $site->additionalDomainCount()) }})</span>
                         @endif
                     </td>
                     <td class="text-right text-red">{{ $site->invalidReason() }}</td>
@@ -59,9 +59,9 @@
             </table>
         </div>
 
-        <h6 class="mt-4">Addons</h6>
+        <h6 class="mt-4">{{ __('Addons') }}</h6>
         @empty($addons)
-        <p class="text-sm text-grey mt-1">No addons installed</p>
+        <p class="text-sm text-grey mt-1">{{ __('No addons installed') }}</p>
         @else
         <div class="card p-0 mt-1">
             <table class="data-table">
@@ -80,7 +80,7 @@
         @endempty
 
         @if (!empty($unlistedAddons))
-        <h6 class="mt-4">Unlisted Addons</h6>
+        <h6 class="mt-4">{{ __('Unlisted Addons') }}</h6>
         <div class="card p-0 mt-1">
             <table class="data-table">
                 @foreach ($unlistedAddons as $addon)
@@ -98,8 +98,8 @@
 
         <div class="mt-5 py-2 border-t flex items-center">
             <a href="{{ $site->url() }}" target="_blank" class="btn btn-primary mr-2">{{ __('Edit Site') }}</a>
-            <a href="{{ cp_route('licensing.refresh') }}" class="btn">{{ __('Refresh') }}</a>
-            <p class="ml-2 text-2xs text-grey">Data from statamic.com is synced once per hour. Refresh to see any changes you've made.</p>
+            <a href="{{ cp_route('licensing.refresh') }}" class="btn">{{ __('Sync') }}</a>
+            <p class="ml-2 text-2xs text-grey">{{ __('statamic::messages.licensing_sync_instructions') }}</p>
         </div>
 
     @endif
