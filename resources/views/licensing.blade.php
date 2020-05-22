@@ -104,4 +104,8 @@
 
     @endif
 
+    <div class="flex justify-center text-center mt-4">
+        <div class="bg-white rounded-full px-3 py-1 shadow-sm text-sm text-grey-70">{{ __('Learn more about') }} <a href="{{ Statamic::docsUrl('licensing') }}" class="text-blue hover:text-blue-dark">{{ __('Licensing') }}</a>.</div>
+    </div>
+
 @stop
