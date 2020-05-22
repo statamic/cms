@@ -6,6 +6,7 @@
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
             <div v-tooltip="version" class="hidden md:block flex-shrink-0">
                 @svg('statamic-wordmark')
+                @if (Statamic::pro())<span class="font-bold text-4xs align-top">PRO</span>@endif
             </div>
         </a>
     </div>
