@@ -166,7 +166,7 @@ class OutpostTest extends TestCase
         $retryAfter = 23; // arbitrary number
 
         $outpost = $this->outpostWithErrorResponse(429, [
-            'Retry-After' => [$retryAfter]
+            'Retry-After' => [$retryAfter],
         ]);
 
         $expectedResponse = [
@@ -179,7 +179,7 @@ class OutpostTest extends TestCase
         Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse, $retryAfter) {
             return $key === 'statamic.outpost.response'
                 && $value === $expectedResponse
-                && $expiry->diffInSeconds() == $retryAfter-1;
+                && $expiry->diffInSeconds() == $retryAfter - 1;
         });
 
         $this->assertEquals($expectedResponse, $outpost->response());
