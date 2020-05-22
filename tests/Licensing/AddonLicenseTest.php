@@ -37,6 +37,21 @@ class AddonLicenseTest extends TestCase
         $this->assertTrue($this->license(['exists' => true])->existsOnMarketplace());
         $this->assertFalse($this->license(['exists' => false])->existsOnMarketplace());
     }
+
+    /** @test */
+    public function it_gets_the_invalid_reason_for_a_range_issue()
+    {
+        $license = $this->license([
+            'reason' => 'outside_license_range',
+            'range' => ['2', '4'],
+        ]);
+
+        $message = trans('statamic::messages.licensing_error_outside_license_range', [
+            'start' => '2', 'end' => '4',
+        ]);
+
+        $this->assertEquals($message, $license->invalidReason());
+    }
 }
 
 class FakeAddonLicenseAddon
