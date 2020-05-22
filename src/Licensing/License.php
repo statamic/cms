@@ -29,6 +29,6 @@ abstract class License
             return;
         }
 
-        return trans('statamic::messages.license_error_'.$reason);
+        return trans('statamic::messages.licensing_error_'.$reason);
     }
 }
