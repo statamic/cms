@@ -88,6 +88,7 @@ class Outpost
     {
         $contents = array_merge($contents, [
             'expiry' => $expiration->timestamp,
+            'payload' => $this->payload(),
         ]);
 
         Cache::put(self::CACHE_KEY, $contents, $expiration);
@@ -97,7 +98,11 @@ class Outpost
 
     private function hasCachedResponse()
     {
-        return Cache::has(self::CACHE_KEY);
+        if (! $cached = $this->getCachedResponse()) {
+            return false;
+        }
+
+        return $cached['payload'] === $this->payload();
     }
 
     private function getCachedResponse()

@@ -49,35 +49,63 @@ class OutpostTest extends TestCase
     /** @test */
     public function it_contacts_the_outpost_and_caches_the_response()
     {
+        $outpost = $this->outpostWithJsonResponse(['foo' => 'bar']);
+
         $expectedResponse = [
             'foo' => 'bar',
-            'expiry' => now()->addHour()->timestamp
+            'expiry' => now()->addHour()->timestamp,
+            'payload' => $outpost->payload(),
         ];
 
-        Cache::shouldReceive('has')->with('statamic.outpost.response')->andReturnFalse();
+        Cache::shouldReceive('get')->with('statamic.outpost.response')->andReturnNull();
         Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse) {
             return $key === 'statamic.outpost.response'
                 && $value === $expectedResponse
                 && $expiry->diffInMinutes() == 59;
         });
 
-        $this->assertEquals($expectedResponse, $this->outpostWithJsonResponse(['foo' => 'bar'])->response());
+        $this->assertEquals($expectedResponse, $outpost->response());
     }
 
     /** @test */
     public function the_cached_response_is_used()
     {
-        Cache::shouldReceive('has')->times(2)->with('statamic.outpost.response')->andReturnTrue();
-        Cache::shouldReceive('get')->times(2)->with('statamic.outpost.response')->andReturn(['cached' => 'response']);
-        Cache::shouldNotReceive('put');
-
         $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
+
+        $testCachedResponse = [
+            'cached' => 'response',
+            'payload' => $outpost->payload(),
+        ];
+
+        Cache::shouldReceive('get')->times(4)->with('statamic.outpost.response')->andReturn($testCachedResponse);
+        Cache::shouldNotReceive('put');
 
         $first = $outpost->response();
         $second = $outpost->response();
 
-        $this->assertEquals(['cached' => 'response'], $first);
+        $this->assertEquals($testCachedResponse, $first);
         $this->assertSame($first, $second);
+    }
+
+    /** @test */
+    public function the_cached_response_is_ignored_if_the_payload_is_different()
+    {
+        $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
+
+        $expectedResponse = [
+            'newer' => 'response',
+            'expiry' => now()->addHour()->timestamp,
+            'payload' => $outpost->payload(),
+        ];
+
+        Cache::shouldReceive('get')->once()->with('statamic.outpost.response')->andReturn(['payload' => 'old']);
+        Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse) {
+            return $key === 'statamic.outpost.response'
+                && $value === $expectedResponse
+                && $expiry->diffInMinutes() == 59;
+        });
+
+        $this->assertEquals($expectedResponse, $outpost->response());
     }
 
     /** @test */
@@ -91,21 +119,22 @@ class OutpostTest extends TestCase
     /** @test */
     public function it_caches_a_timed_out_request_for_5_minutes_and_treats_it_like_a_500_error()
     {
+        $outpost = $this->outpostWithResponse(
+            new ConnectException('', new Request('POST', '/v3/query'))
+        );
+
         $expectedResponse = [
             'error' => 500,
-            'expiry' => now()->addMinutes(5)->timestamp
+            'expiry' => now()->addMinutes(5)->timestamp,
+            'payload' => $outpost->payload(),
         ];
 
-        Cache::shouldReceive('has')->with('statamic.outpost.response')->andReturnFalse();
+        Cache::shouldReceive('get')->with('statamic.outpost.response')->andReturnNull();
         Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse) {
             return $key === 'statamic.outpost.response'
                 && $value === $expectedResponse
                 && $expiry->diffInMinutes() == 4;
         });
-
-        $outpost = $this->outpostWithResponse(
-            new ConnectException('', new Request('POST', '/v3/query'))
-        );
 
         $this->assertEquals($expectedResponse, $outpost->response());
     }
@@ -113,19 +142,20 @@ class OutpostTest extends TestCase
     /** @test */
     public function it_caches_a_500_error_for_5_minutes()
     {
+        $outpost = $this->outpostWithErrorResponse(500);
+
         $expectedResponse = [
             'error' => 500,
-            'expiry' => now()->addMinutes(5)->timestamp
+            'expiry' => now()->addMinutes(5)->timestamp,
+            'payload' => $outpost->payload(),
         ];
 
-        Cache::shouldReceive('has')->with('statamic.outpost.response')->andReturnFalse();
+        Cache::shouldReceive('get')->with('statamic.outpost.response')->andReturnNull();
         Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse) {
             return $key === 'statamic.outpost.response'
                 && $value === $expectedResponse
                 && $expiry->diffInMinutes() == 4;
         });
-
-        $outpost = $this->outpostWithErrorResponse(500);
 
         $this->assertEquals($expectedResponse, $outpost->response());
     }
@@ -135,21 +165,22 @@ class OutpostTest extends TestCase
     {
         $retryAfter = 23; // arbitrary number
 
+        $outpost = $this->outpostWithErrorResponse(429, [
+            'Retry-After' => [$retryAfter]
+        ]);
+
         $expectedResponse = [
             'error' => 429,
-            'expiry' => now()->addSeconds($retryAfter)->timestamp
+            'expiry' => now()->addSeconds($retryAfter)->timestamp,
+            'payload' => $outpost->payload(),
         ];
 
-        Cache::shouldReceive('has')->with('statamic.outpost.response')->andReturnFalse();
+        Cache::shouldReceive('get')->with('statamic.outpost.response')->andReturnNull();
         Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse, $retryAfter) {
             return $key === 'statamic.outpost.response'
                 && $value === $expectedResponse
                 && $expiry->diffInSeconds() == $retryAfter-1;
         });
-
-        $outpost = $this->outpostWithErrorResponse(429, [
-            'Retry-After' => [$retryAfter]
-        ]);
 
         $this->assertEquals($expectedResponse, $outpost->response());
     }
@@ -157,22 +188,6 @@ class OutpostTest extends TestCase
     /** @test */
     public function it_caches_a_422_validation_error_for_an_hour()
     {
-        $expectedResponse = [
-            'error' => 422,
-            'errors' => [
-                'a' => ['error one', 'error two'],
-                'b' => ['error one'],
-            ],
-            'expiry' => now()->addHour()->timestamp
-        ];
-
-        Cache::shouldReceive('has')->with('statamic.outpost.response')->andReturnFalse();
-        Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse) {
-            return $key === 'statamic.outpost.response'
-                && $value === $expectedResponse
-                && $expiry->diffInMinutes() == 59;
-        });
-
         $outpost = $this->outpostWithErrorResponse(422, [], [
             'message' => 'The given data was invalid.',
             'errors' => [
@@ -180,6 +195,23 @@ class OutpostTest extends TestCase
                 'b' => ['error one'],
             ],
         ]);
+
+        $expectedResponse = [
+            'error' => 422,
+            'errors' => [
+                'a' => ['error one', 'error two'],
+                'b' => ['error one'],
+            ],
+            'expiry' => now()->addHour()->timestamp,
+            'payload' => $outpost->payload(),
+        ];
+
+        Cache::shouldReceive('get')->with('statamic.outpost.response')->andReturnNull();
+        Cache::shouldReceive('put')->once()->withArgs(function ($key, $value, $expiry) use ($expectedResponse) {
+            return $key === 'statamic.outpost.response'
+                && $value === $expectedResponse
+                && $expiry->diffInMinutes() == 59;
+        });
 
         $this->assertEquals($expectedResponse, $outpost->response());
     }
