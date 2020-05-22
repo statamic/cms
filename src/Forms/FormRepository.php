@@ -38,6 +38,16 @@ class FormRepository
     }
 
     /**
+     * Get the number of forms
+     *
+     * @return int
+     */
+    public function count()
+    {
+        return $this->all()->count();
+    }
+
+    /**
      * Make form instance.
      *
      * @param mixed $handle
