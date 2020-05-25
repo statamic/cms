@@ -42,9 +42,9 @@ class Structure extends Tags
         return $this->toArray($tree);
     }
 
-    public function toArray($tree, $parent = null)
+    public function toArray($tree, $parent = null, $depth = 1)
     {
-        return collect($tree)->map(function ($item) use ($parent) {
+        return collect($tree)->map(function ($item) use ($parent, $depth) {
             $page = $item['page'];
 
             if ($page->reference() && ! $page->referenceExists()) {
@@ -56,11 +56,12 @@ class Structure extends Tags
             }
 
             $data = $page->toAugmentedArray();
-            $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data);
+            $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
 
             return array_merge($data, [
                 'children'    => $children,
                 'parent'      => $parent,
+                'depth'       => $depth,
                 'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->url(), '/'),
                 'is_parent'   => URL::isAncestor($page->uri()),
                 'is_external' => URL::isExternal($page->absoluteUrl()),
