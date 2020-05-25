@@ -109,6 +109,7 @@ abstract class Relationship extends Fieldtype
         return [
             'data' => $this->getItemData($this->field->value())->all(),
             'itemDataUrl' => $this->getItemDataUrl(),
+            'filtersUrl' => $this->getFiltersUrl(),
             'baseSelectionsUrl' => $this->getBaseSelectionsUrl(),
             'getBaseSelectionsUrlParameters' => $this->getBaseSelectionsUrlParameters(),
             'itemComponent' => $this->getItemComponent(),
@@ -171,6 +172,11 @@ abstract class Relationship extends Fieldtype
     protected function getItemDataUrl()
     {
         return cp_route('relationship.data');
+    }
+
+    protected function getFiltersUrl()
+    {
+        return cp_route('relationship.filters');
     }
 
     protected function getBaseSelectionsUrl()

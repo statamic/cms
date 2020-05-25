@@ -145,7 +145,6 @@ class Entries
             ->whereIn('collection', $this->collections->map->handle()->all());
 
         $this->querySite($query);
-        $this->queryPublished($query);
         $this->queryPastFuture($query);
         $this->querySinceUntil($query);
         $this->queryTaxonomies($query);
@@ -164,8 +163,6 @@ class Entries
         $this->collections = $this->parseCollections();
         $this->orderBys = $this->parseOrderBys();
         $this->site = $this->parameters->get(['site', 'locale']);
-        $this->showPublished = $this->parameters->get('show_published', true);
-        $this->showUnpublished = $this->parameters->get('show_unpublished', false);
         $this->since = $this->parameters->get('since');
         $this->until = $this->parameters->get('until');
     }
@@ -232,22 +229,11 @@ class Entries
         return $query->where('site', $site);
     }
 
-    protected function queryPublished($query)
-    {
-        if ($this->showPublished && $this->showUnpublished) {
-            return;
-        } elseif ($this->showPublished && ! $this->showUnpublished) {
-            return $query->where('published', true);
-        } elseif (! $this->showPublished && $this->showUnpublished) {
-            return $query->where('published', false);
-        }
-
-        throw new NoResultsExpected;
-    }
-
     protected function queryPastFuture($query)
     {
         if (! $this->allCollectionsAreDates()) {
+            return;
+        } elseif ($this->isQueryingCondition('status')) {
             return;
         }
 

@@ -43,7 +43,7 @@
                     :sort-direction="sortDirection"
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
-                    <div slot-scope="{ filteredRows: rows }">
+                    <div slot-scope="{ filteredRows: rows }" :class="modeClass">
                         <div class="card p-0" :class="{ 'rounded-tl-none': showContainerTabs }">
 
                             <div class="data-list-header">
@@ -367,6 +367,10 @@ export default {
             let asset = _.find(this.assets, asset => asset.id == this.editedAssetId);
 
             return asset ? asset.basename : null;
+        },
+
+        modeClass() {
+            return 'mode-' + this.mode;
         }
 
     },

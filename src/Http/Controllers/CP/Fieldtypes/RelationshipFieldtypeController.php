@@ -35,6 +35,11 @@ class RelationshipFieldtypeController extends CpController
         return ['data' => $items];
     }
 
+    public function filters(Request $request)
+    {
+        return $this->fieldtype($request)->getSelectionFilters();
+    }
+
     protected function fieldtype($request)
     {
         $config = json_decode(utf8_encode(base64_decode($request->config)), true);

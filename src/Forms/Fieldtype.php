@@ -14,12 +14,24 @@ class Fieldtype extends Relationship
     protected $canEdit = false;
     protected $canSearch = false;
 
-    protected $configFields = [
-        'placeholder' => [
-            'type' => 'text',
-            'instructions' => 'Set default placeholder text.',
-        ],
-    ];
+    protected function configFieldItems(): array
+    {
+        return [
+            'placeholder' => [
+                'display' => __('Placeholder'),
+                'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                'type' => 'text',
+                'width' => 50,
+            ],
+            'max_items' => [
+                'type' => 'integer',
+                'display' => __('Max Items'),
+                'default' => 1,
+                'instructions' => __('statamic::fieldtypes.form.config.max_items'),
+                'width' => 50,
+            ],
+        ];
+    }
 
     public function fieldsetContents()
     {

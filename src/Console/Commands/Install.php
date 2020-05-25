@@ -54,9 +54,7 @@ class Install extends Command
         ];
 
         $gitignores = [
-            storage_path('statamic/users'),
-            storage_path('statamic/search'),
-            storage_path('statamic/revisions'),
+            storage_path('statamic'),
         ];
 
         foreach ($gitkeeps as $dir) {
