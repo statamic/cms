@@ -16,46 +16,47 @@
 </template>
 
 <script>
-export default {
+    export default {
+        mixins: [Fieldtype],
 
-    mixins: [Fieldtype],
+        data: function() {
+            return {
+                loading: true,
+                options: []
+            };
+        },
 
-    data: function() {
-        return {
-            loading: true,
-            options: []
-        }
-    },
+        mounted() {
+            this.$axios.get(cp_url("api/templates")).then(response => {
+                var templates = response.data;
 
-    mounted() {
-        this.$axios.get(cp_url('api/templates')).then(response => {
+                // Filter out partials
+                if (this.config.hide_partials) {
+                    templates = _.reject(templates, function(template) {
+                        return template.match(/(^_.*|\/_.*|\._.*)/g);
+                    });
+                }
 
-            var templates = response.data;
+                // Set default
+                var options = [];
 
-            // Filter out partials
-            if (this.config.hide_partials) {
-                templates = _.reject(templates, function(template) {
-                    return template.match(/(^_.*|\/_.*|\._.*)/g);
+                if (!this.config.hide_default) {
+                    options.push({
+                        label: __("Inherit (Default)"),
+                        value: null
+                    });
+                }
+
+                _.each(templates, function(template) {
+                    options.push({
+                        label: template,
+                        value: template
+                    });
                 });
-            }
 
-            // Set default
-            var options = [{
-                label: __('Inherit (Default)'),
-                value: null
-            }];
-
-            _.each(templates, function(template) {
-                options.push({
-                    label: template,
-                    value: template
-                });
+                this.options = options;
+                this.loading = false;
             });
-
-            this.options = options;
-            this.loading = false;
-        });
-    }
-
-};
+        }
+    };
 </script>

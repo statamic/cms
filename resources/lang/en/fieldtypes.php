@@ -126,6 +126,7 @@ return [
     'template' => [
         'config' => [
             'hide_partials' => 'Partials are rarely intended to be used as templates.',
+            'hide_default' => 'Don\'t inherit the template',
         ],
     ],
     'text' => [

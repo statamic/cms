@@ -15,7 +15,14 @@ class Template extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.template.config.hide_partials'),
                 'type' => 'toggle',
                 'default' => true,
-                'width' => 50,
+                'width' => 25,
+            ],
+            'hide_default' => [
+                'display' => __('Hide Default'),
+                'instructions' => __('statamic::fieldtypes.template.config.hide_default'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 25,
             ],
         ];
     }
