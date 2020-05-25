@@ -39,6 +39,7 @@ class OutpostTest extends TestCase
             'host' => 'localhost',
             'statamic_version' => '3.0.0-testing',
             'statamic_pro' => true,
+            'php_version' => PHP_VERSION,
             'packages' => [
                 'foo/bar' => '1.2.3',
                 'baz/qux' => '4.5.6',

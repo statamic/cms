@@ -73,6 +73,7 @@ class Outpost
             'host' => request()->getHost(),
             'statamic_version' => Statamic::version(),
             'statamic_pro' => Statamic::pro(),
+            'php_version' => PHP_VERSION,
             'packages' => $this->packagePayload(),
         ];
     }
