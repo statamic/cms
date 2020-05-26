@@ -34,9 +34,14 @@ class OutpostTest extends TestCase
             new FakeOutpostAddon('baz/qux', '4.5.6'),
         ]));
 
+        request()->server->set('SERVER_ADDR', '123.123.123.123');
+        request()->server->set('SERVER_PORT', 123);
+
         $this->assertEquals([
             'key' => 'test-key',
             'host' => 'localhost',
+            'ip' => '123.123.123.123',
+            'port' => 123,
             'statamic_version' => '3.0.0-testing',
             'statamic_pro' => true,
             'php_version' => PHP_VERSION,

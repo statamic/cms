@@ -71,6 +71,8 @@ class Outpost
         return [
             'key' => config('statamic.system.license_key'),
             'host' => request()->getHost(),
+            'ip' => request()->server('SERVER_ADDR'),
+            'port' => request()->server('SERVER_PORT'),
             'statamic_version' => Statamic::version(),
             'statamic_pro' => Statamic::pro(),
             'php_version' => PHP_VERSION,
