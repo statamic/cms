@@ -29,10 +29,20 @@ class LoginFormTest extends TestCase
     /** @test */
     public function it_renders_form_with_params()
     {
-        $output = $this->tag('{{ user:login_form redirect="/logged-in" class="form" id="form" }}{{ /user:login_form }}');
+        $output = $this->tag('{{ user:login_form redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /user:login_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/login" class="form" id="form">', $output);
-        $this->assertStringContainsString('<input type="hidden" name="referer" value="/logged-in" />', $output);
+        $this->assertStringContainsString('<input type="hidden" name="_redirect" value="/submitted" />', $output);
+        $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="/errors" />', $output);
+    }
+
+    /** @test */
+    public function it_renders_form_with_redirects_to_anchor()
+    {
+        $output = $this->tag('{{ user:register_form redirect="#form" error_redirect="#form" }}{{ /user:register_form }}');
+
+        $this->assertStringContainsString('<input type="hidden" name="_redirect" value="http://localhost#form" />', $output);
+        $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="http://localhost#form" />', $output);
     }
 
     /** @test */
@@ -95,6 +105,7 @@ EOT
     {{ errors }}
         <p class="error">{{ value }}</p>
     {{ /errors }}
+
     <p class="success">{{ success }}</p>
 {{ /user:login_form }}
 EOT
@@ -148,16 +159,19 @@ EOT
     /** @test */
     public function it_will_use_redirect_query_param_off_url()
     {
-        $this->get('/?redirect=login-successful');
+        $this->get('/?redirect=login-successful&error_redirect=login-failure');
 
-        $expected = '<input type="hidden" name="referer" value="login-successful" />';
+        $expectedRedirect = '<input type="hidden" name="_redirect" value="login-successful" />';
+        $expectedErrorRedirect = '<input type="hidden" name="_error_redirect" value="login-failure" />';
 
         $output = $this->tag('{{ user:login_form }}{{ /user:login_form }}');
 
-        $this->assertStringNotContainsString($expected, $output);
+        $this->assertStringNotContainsString($expectedRedirect, $output);
+        $this->assertStringNotContainsString($expectedErrorRedirect, $output);
 
         $output = $this->tag('{{ user:login_form allow_request_redirect="true" }}{{ /user:login_form }}');
 
-        $this->assertStringContainsString($expected, $output);
+        $this->assertStringContainsString($expectedRedirect, $output);
+        $this->assertStringContainsString($expectedErrorRedirect, $output);
     }
 }
