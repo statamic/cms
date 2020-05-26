@@ -90,8 +90,8 @@ class Tags extends BaseTags
             $params['redirect'] = $this->parseRedirect($redirect);
         }
 
-        if ($error_redirect = $this->get('error_redirect')) {
-            $params['error_redirect'] = $this->parseRedirect($redirect);
+        if ($errorRedirect = $this->get('error_redirect')) {
+            $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
 
         $html .= $this->formMetaFields($params);
