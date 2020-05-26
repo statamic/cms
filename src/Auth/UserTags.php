@@ -510,24 +510,4 @@ class UserTags extends Tags
             ->values()
             ->all();
     }
-
-    /**
-     * Get field with extra data for rendering.
-     *
-     * @param \Statamic\Fields\Field $field
-     * @return array
-     */
-    protected function getRenderableField($field)
-    {
-        $errors = session('errors') ? session('errors')->all() : [];
-
-        $data = array_merge($field->toArray(), [
-            'error' => $errors[$field->handle()] ?? null,
-            'old' => old($field->handle()),
-        ]);
-
-        $data['field'] = view($field->fieldtype()->view(), $data);
-
-        return $data;
-    }
 }
