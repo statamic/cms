@@ -123,7 +123,7 @@ class UserTags extends Tags
      */
     public function registerForm()
     {
-        $data = $this->setSessionData([]);
+        $data = $this->setSessionData([], 'user.register');
 
         $data['fields'] = $this->getRegistrationFields();
 
@@ -447,10 +447,10 @@ class UserTags extends Tags
      * @param array $data
      * @return array
      */
-    protected function setSessionData($data)
+    protected function setSessionData($data, $errorBag = 'default')
     {
         if ($errors = session('errors')) {
-            $data['errors'] = $errors->all();
+            $data['errors'] = $errors->getBag($errorBag)->all();
         }
 
         if ($success = session('success')) {
@@ -504,7 +504,7 @@ class UserTags extends Tags
             ]))
             ->merge($blueprintFields)
             ->map(function ($field) {
-                return $this->getRenderableField($field);
+                return $this->getRenderableField($field, 'user.register');
             })
             ->values()
             ->all();
@@ -522,7 +522,7 @@ class UserTags extends Tags
                 return in_array($field->handle(), ['email', 'password', 'password_confirmation', 'roles', 'groups']);
             })
             ->map(function ($field) {
-                return $this->getRenderableField($field);
+                return $this->getRenderableField($field, 'user.register');
             })
             ->values()
             ->all();
