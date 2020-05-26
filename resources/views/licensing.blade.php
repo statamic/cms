@@ -60,7 +60,7 @@
         </div>
 
         <h6 class="mt-4">{{ __('Addons') }}</h6>
-        @empty($addons)
+        @if ($addons->isEmpty())
         <p class="text-sm text-grey mt-1">{{ __('No addons installed') }}</p>
         @else
         <div class="card p-0 mt-1">
@@ -77,9 +77,9 @@
                 @endforeach
             </table>
         </div>
-        @endempty
+        @endif
 
-        @if (!empty($unlistedAddons))
+        @if (!$unlistedAddons->isEmpty())
         <h6 class="mt-4">{{ __('Unlisted Addons') }}</h6>
         <div class="card p-0 mt-1">
             <table class="data-table">
