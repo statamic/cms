@@ -69,6 +69,11 @@ return [
             'time_required' => 'Require time _in addition_ to date.',
         ],
     ],
+    'form' => [
+        'config' => [
+            'max_items' => 'The maximum number of selectable forms.',
+        ],
+    ],
     'grid' => [
         'config' => [
             'add_row' => 'Set the label of the "Add Row" button.',

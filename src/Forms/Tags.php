@@ -4,7 +4,6 @@ namespace Statamic\Forms;
 
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
-use Illuminate\Support\Facades\Crypt;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Tags\Concerns;
@@ -12,7 +11,8 @@ use Statamic\Tags\Tags as BaseTags;
 
 class Tags extends BaseTags
 {
-    use Concerns\OutputsItems,
+    use Concerns\GetsRedirects,
+        Concerns\OutputsItems,
         Concerns\RendersForms;
 
     const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
@@ -65,9 +65,9 @@ class Tags extends BaseTags
         $this->formHandle = $this->getForm();
         $this->errorBag = $this->getErrorBag();
 
-        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect']);
+        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect']);
 
-        $html = $this->formOpen(route('statamic.forms.store'), 'POST', $knownParams);
+        $html = $this->formOpen(route('statamic.forms.submit', $this->formHandle), 'POST', $knownParams);
 
         if ($this->hasErrors()) {
             $data['error'] = $this->getErrors();
@@ -76,25 +76,25 @@ class Tags extends BaseTags
             $data['errors'] = [];
         }
 
-        if (session()->exists("form.{$this->formHandle}.success")) {
-            $data['success'] = true;
+        if ($success = session()->get("form.{$this->formHandle}.success")) {
+            $data['success'] = $success;
         }
 
         $data['fields'] = $this->getFields();
 
         $this->addToDebugBar($data);
 
-        $params = ['form' => $this->formHandle];
+        $params = [];
 
-        if ($redirect = $this->get('redirect')) {
-            $params['redirect'] = $redirect;
+        if ($redirect = $this->getRedirectUrl()) {
+            $params['redirect'] = $this->parseRedirect($redirect);
         }
 
-        if ($error_redirect = $this->get('error_redirect')) {
-            $params['error_redirect'] = $error_redirect;
+        if ($errorRedirect = $this->getErrorRedirectUrl()) {
+            $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
 
-        $html .= '<input type="hidden" name="_params" value="'.Crypt::encrypt($params).'" />';
+        $html .= $this->formMetaFields($params);
 
         $html .= $this->parse($data);
 

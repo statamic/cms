@@ -156,21 +156,6 @@ class EntriesTest extends TestCase
     }
 
     /** @test */
-    public function it_filters_by_publish_status()
-    {
-        $this->makeEntry('o')->published(true)->save();
-        $this->makeEntry('b')->published(true)->save();
-        $this->makeEntry('c')->published(false)->save();
-
-        $this->assertCount(2, $this->getEntries());
-        $this->assertCount(2, $this->getEntries(['show_unpublished' => false]));
-        $this->assertCount(3, $this->getEntries(['show_unpublished' => true]));
-        $this->assertCount(2, $this->getEntries(['show_published' => true]));
-        $this->assertCount(0, $this->getEntries(['show_published' => false]));
-        $this->assertCount(1, $this->getEntries(['show_published' => false, 'show_unpublished' => true]));
-    }
-
-    /** @test */
     public function it_filters_by_future_and_past()
     {
         Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
@@ -246,6 +231,22 @@ class EntriesTest extends TestCase
         $this->assertCount(7, $this->getEntries(['show_future' => true, 'since' => '-2 days']));
         $this->assertCount(4, $this->getEntries(['show_future' => true, 'until' => 'now']));
         $this->assertCount(6, $this->getEntries(['show_future' => true, 'until' => 'tomorrow']));
+    }
+
+    /** @test */
+    public function it_filters_by_status()
+    {
+        $this->collection->dated(true)->futureDateBehavior('private')->pastDateBehavior('public')->save();
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+
+        $this->makeEntry('a')->date('2019-03-09')->published(true)->save(); // definitely in past
+        $this->makeEntry('b')->date('2019-03-10')->published(false)->save(); // today
+        $this->makeEntry('c')->date('2019-03-11')->published(true)->save(); // definitely in future, so status will not be 'published'
+
+        $this->assertCount(2, $this->getEntries());
+        $this->assertCount(1, $this->getEntries(['status:is' => 'published']));
+        $this->assertCount(2, $this->getEntries(['status:not' => 'published']));
+        $this->assertCount(1, $this->getEntries(['status:is' => 'scheduled']));
     }
 
     /** @test */

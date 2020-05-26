@@ -30,6 +30,15 @@ trait QueriesConditions
         });
     }
 
+    protected function isQueryingCondition($field)
+    {
+        return $this->queryableConditionParams()
+            ->map(function ($value, $param) {
+                return explode(':', $param)[0];
+            })
+            ->contains($field);
+    }
+
     protected function queryCondition($query, $field, $condition, $value)
     {
         $regexOperator = $value ? 'regexp' : 'not regexp';

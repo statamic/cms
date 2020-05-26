@@ -6,13 +6,13 @@
                  class="img svg-img mr-1 h-5 w-5 bg-no-repeat bg-center bg-cover"
                  :style="'background-image:url('+asset.url+')'">
             </div>
-            <div class="w-8 h-8 mr-1 cursor-pointer" v-else>
+            <div class="w-8 h-8 mr-1 cursor-pointer whitespace-no-wrap" v-else>
                 <img class="asset-thumbnail max-h-full max-w-full rounded w-8 h-8 fit-cover lazyloaded" :src="thumbnail" v-if="isImage" />
                 <div class="img" v-else><file-icon type="div" :extension="asset.extension"></file-icon></div>
             </div>
-            <a @click="edit" class="text-sm">{{ asset.basename }}</a>
+            <a @click="edit" class="flex-1 text-sm truncate">{{ asset.basename }}</a>
         </td>
-        <td class="w-4 p-0 pr-1 text-right align-middle">
+        <td class="p-0 pr-1 w-10 text-right align-middle">
 
             <button class="flex items-center p-1 w-full h-full text-grey-60 hover:text-grey-90" @click="remove">
                 <svg-icon name="trash" />
