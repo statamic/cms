@@ -12,7 +12,8 @@ use Statamic\Tags\Tags;
 
 class UserTags extends Tags
 {
-    use Concerns\RendersForms;
+    use Concerns\GetsRedirects,
+        Concerns\RendersForms;
 
     protected static $handle = 'user';
 
@@ -90,13 +91,21 @@ class UserTags extends Tags
     {
         $data = $this->setSessionData([]);
 
-        $knownParams = ['redirect', 'allow_request_redirect'];
+        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
 
         $html = $this->formOpen(route('statamic.login'), 'POST', $knownParams);
 
+        $params = [];
+
         if ($redirect = $this->getRedirectUrl()) {
-            $html .= '<input type="hidden" name="referer" value="'.$redirect.'" />';
+            $params['redirect'] = $this->parseRedirect($redirect);
         }
+
+        if ($errorRedirect = $this->getErrorRedirectUrl()) {
+            $params['error_redirect'] = $this->parseRedirect($errorRedirect);
+        }
+
+        $html .= $this->formMetaFields($params);
 
         $html .= $this->parse($data);
 
@@ -118,13 +127,21 @@ class UserTags extends Tags
 
         $data['fields'] = $this->getRegistrationFields();
 
-        $knownParams = ['redirect', 'allow_request_redirect'];
+        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
 
         $html = $this->formOpen(route('statamic.register'), 'POST', $knownParams);
 
+        $params = [];
+
         if ($redirect = $this->getRedirectUrl()) {
-            $html .= '<input type="hidden" name="referer" value="'.$redirect.'" />';
+            $params['redirect'] = $this->parseRedirect($redirect);
         }
+
+        if ($errorRedirect = $this->getErrorRedirectUrl()) {
+            $params['error_redirect'] = $this->parseRedirect($errorRedirect);
+        }
+
+        $html .= $this->formMetaFields($params);
 
         $html .= $this->parse($data);
 
