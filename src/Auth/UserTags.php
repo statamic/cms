@@ -12,7 +12,8 @@ use Statamic\Tags\Tags;
 
 class UserTags extends Tags
 {
-    use Concerns\GetsRedirects,
+    use Concerns\GetsFormSession,
+        Concerns\GetsRedirects,
         Concerns\RendersForms;
 
     protected static $handle = 'user';
@@ -89,7 +90,7 @@ class UserTags extends Tags
      */
     public function loginForm()
     {
-        $data = $this->setSessionData([]);
+        $data = $this->getFormSession();
 
         $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
 
@@ -123,7 +124,7 @@ class UserTags extends Tags
      */
     public function registerForm()
     {
-        $data = $this->setSessionData([], 'user.register');
+        $data = $this->getFormSession('user.register');
 
         $data['fields'] = $this->getRegistrationFields();
 
@@ -439,25 +440,6 @@ class UserTags extends Tags
         }
 
         return $return;
-    }
-
-    /**
-     * Set session data.
-     *
-     * @param array $data
-     * @return array
-     */
-    protected function setSessionData($data, $errorBag = 'default')
-    {
-        if ($errors = session('errors')) {
-            $data['errors'] = $errors->getBag($errorBag)->all();
-        }
-
-        if ($success = session('success')) {
-            $data['success'] = $success;
-        }
-
-        return $data;
     }
 
     /**
