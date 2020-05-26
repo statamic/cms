@@ -15,11 +15,11 @@ use Statamic\Support\Arr;
 class FormController extends Controller
 {
     /**
-     * Handle a create form submission request.
+     * Handle a form submission request.
      *
      * @return mixed
      */
-    public function store()
+    public function submit($form)
     {
         $fields = request()->all();
 
@@ -30,7 +30,6 @@ class FormController extends Controller
         $params = Crypt::decrypt($params);
         unset($fields['_params']);
 
-        $handle = array_get($params, 'form');
         $form = Form::find($handle);
 
         $submission = $form->createSubmission();
@@ -47,13 +46,13 @@ class FormController extends Controller
             // their own errors, and modify the submission.
             [$errors, $submission] = $this->runCreatingEvent($submission);
         } catch (PublishException $e) {
-            return $this->formFailure($params, $e->getErrors(), $handle);
+            return $this->formFailure($params, $e->getErrors(), $form->handle());
         } catch (SilentFormFailureException $e) {
             return $this->formSuccess($params, $submission);
         }
 
         if ($errors) {
-            return $this->formFailure($params, $errors, $handle);
+            return $this->formFailure($params, $errors, $form->handle());
         }
 
         $submission->save();
