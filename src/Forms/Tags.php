@@ -4,9 +4,9 @@ namespace Statamic\Forms;
 
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
-use Illuminate\Support\Facades\Crypt;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
@@ -67,7 +67,7 @@ class Tags extends BaseTags
 
         $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect']);
 
-        $html = $this->formOpen(route('statamic.forms.store'), 'POST', $knownParams);
+        $html = $this->formOpen(route('statamic.forms.submit', $this->formHandle), 'POST', $knownParams);
 
         if ($this->hasErrors()) {
             $data['error'] = $this->getErrors();
@@ -76,25 +76,25 @@ class Tags extends BaseTags
             $data['errors'] = [];
         }
 
-        if (session()->exists("form.{$this->formHandle}.success")) {
-            $data['success'] = true;
+        if ($success = session()->get("form.{$this->formHandle}.success")) {
+            $data['success'] = $success;
         }
 
         $data['fields'] = $this->getFields();
 
         $this->addToDebugBar($data);
 
-        $params = ['form' => $this->formHandle];
+        $params = [];
 
         if ($redirect = $this->get('redirect')) {
-            $params['redirect'] = $redirect;
+            $params['redirect'] = $this->parseRedirect($redirect);
         }
 
         if ($error_redirect = $this->get('error_redirect')) {
-            $params['error_redirect'] = $error_redirect;
+            $params['error_redirect'] = $this->parseRedirect($redirect);
         }
 
-        $html .= '<input type="hidden" name="_params" value="'.Crypt::encrypt($params).'" />';
+        $html .= $this->formMetaFields($params);
 
         $html .= $this->parse($data);
 
@@ -315,5 +315,14 @@ class Tags extends BaseTags
         return URL::prependSiteUrl(
             config('statamic.routes.action').'/form/'.$url
         );
+    }
+
+    protected function parseRedirect($redirect)
+    {
+        if (Str::startsWith($redirect, '#')) {
+            return request()->url().$redirect;
+        }
+
+        return $redirect;
     }
 }
