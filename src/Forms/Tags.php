@@ -6,13 +6,13 @@ use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
-use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
 class Tags extends BaseTags
 {
-    use Concerns\OutputsItems,
+    use Concerns\GetsRedirects,
+        Concerns\OutputsItems,
         Concerns\RendersForms;
 
     const HANDLE_PARAM = ['handle', 'is', 'in', 'form', 'formset'];
@@ -65,7 +65,7 @@ class Tags extends BaseTags
         $this->formHandle = $this->getForm();
         $this->errorBag = $this->getErrorBag();
 
-        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect']);
+        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect']);
 
         $html = $this->formOpen(route('statamic.forms.submit', $this->formHandle), 'POST', $knownParams);
 
@@ -86,11 +86,11 @@ class Tags extends BaseTags
 
         $params = [];
 
-        if ($redirect = $this->get('redirect')) {
+        if ($redirect = $this->getRedirectUrl()) {
             $params['redirect'] = $this->parseRedirect($redirect);
         }
 
-        if ($errorRedirect = $this->get('error_redirect')) {
+        if ($errorRedirect = $this->getErrorRedirectUrl()) {
             $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
 
@@ -315,14 +315,5 @@ class Tags extends BaseTags
         return URL::prependSiteUrl(
             config('statamic.routes.action').'/form/'.$url
         );
-    }
-
-    protected function parseRedirect($redirect)
-    {
-        if (Str::startsWith($redirect, '#')) {
-            return request()->url().$redirect;
-        }
-
-        return $redirect;
     }
 }
