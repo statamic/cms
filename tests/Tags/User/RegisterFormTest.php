@@ -252,7 +252,7 @@ EOT
                 'email' => 'san@holo.com',
                 'password' => 'chewy',
                 'password_confirmation' => 'chewy',
-                'referer' => '/registration-successful',
+                '_redirect' => '/registration-successful',
             ])
             ->assertSessionHasNoErrors()
             ->assertLocation('/registration-successful');

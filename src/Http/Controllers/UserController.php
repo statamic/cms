@@ -26,7 +26,7 @@ class UserController extends Controller
         );
 
         return $loggedIn
-            ? redirect($request->input('referer', '/'))->withSuccess(__('Login successful.'))
+            ? redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'))
             : back()->withInput()->withErrors(__('Invalid credentials.'));
     }
 
@@ -69,7 +69,11 @@ class UserController extends Controller
 
         Auth::login($user);
 
-        return redirect($request->input('referer', '/'))->withSuccess(__('Registration successful.'));
+        $response = $request->has('_redirect') ? redirect($request->get('_redirect')) : back();
+
+        session()->flash('user.register.success', __('Registration successful.'));
+
+        return $response;
     }
 
     /**
