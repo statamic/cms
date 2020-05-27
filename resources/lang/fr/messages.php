@@ -127,7 +127,7 @@ return [
     'taxonomy_configure_handle_instructions' => 'Comment vous allez faire référence à cette taxonomie sur le frontal. Ne peut pas être facilement changé.',
     'taxonomy_configure_intro' => 'Une taxonomie est un système de classification des données autour d’un ensemble de caractéristiques uniques, telles que la catégorie ou la couleur.',
     'taxonomy_configure_title_instructions' => 'Nous recommandons un nom au pluriel, comme "Catégories" ou "Etiquettes".',
-    'taxonomy_next_steps_configure_description' => 'Configurez des noms, associez des collections, définissez des Blueprints et d’autres options.',
+    'taxonomy_next_steps_configure_description' => 'Configurez des noms, associez des collections, définissez des Blueprints et plus encore.',
     'taxonomy_next_steps_create_term_description' => 'Créez votre premier terme ou écrasez une poignée de termes génériques, à vous de jouer.',
     'taxonomy_next_steps_documentation_description' => 'Apprenez-en plus au sujet des taxonomies, comment elles fonctionnent et comment les configurer.',
     'taxonomy_wizard_intro' => 'Une taxonomie est un système de classification des données autour d’un ensemble de caractéristiques uniques, telles que la catégorie ou la couleur.',
