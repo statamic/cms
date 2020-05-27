@@ -48,7 +48,7 @@ class UserController extends Controller
             'password' => 'required|confirmed',
         ])->rules();
 
-        $request->validateWithBag('user.register', $fieldRules);
+        $this->validateWithBag('user.register', $request, $fieldRules);
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
