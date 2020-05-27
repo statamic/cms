@@ -83,7 +83,10 @@ class Outpost
     private function packagePayload()
     {
         return Facades\Addon::all()->mapWithKeys(function ($addon) {
-            return [$addon->package() => $addon->version()];
+            return [$addon->package() => [
+                'version' => $addon->version(),
+                'edition' => $addon->edition(),
+            ]];
         })->all();
     }
 

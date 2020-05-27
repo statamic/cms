@@ -60,6 +60,16 @@ class AddonTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_edition()
+    {
+        $this->assertNull(Addon::make('foo/bar')->edition());
+
+        config(['statamic.editions.addons.foo/bar' => 'test']);
+
+        $this->assertEquals('test', Addon::make('foo/bar')->edition());
+    }
+
+    /** @test */
     public function it_creates_an_instance_from_a_package()
     {
         $addon = $this->makeFromPackage([]);

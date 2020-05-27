@@ -394,4 +394,9 @@ final class Addon
     {
         return $this->marketplaceSlug() !== null;
     }
+
+    public function edition()
+    {
+        return config('statamic.editions.addons.'.$this->package());
+    }
 }

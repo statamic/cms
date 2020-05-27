@@ -13,7 +13,7 @@ class AddonLicenseTest extends TestCase
     protected function license($response = [])
     {
         Addon::shouldReceive('get')->with('test/addon')
-            ->andReturn(new FakeAddonLicenseAddon('Test Addon', '1.2.3'));
+            ->andReturn(new FakeAddonLicenseAddon('Test Addon', '1.2.3', 'rad'));
         $this->addToAssertionCount(-1); // dont need to assert this.
 
         return new AddonLicense('test/addon', $response);
@@ -29,6 +29,12 @@ class AddonLicenseTest extends TestCase
     public function it_gets_the_addons_version()
     {
         $this->assertEquals($this->license()->version(), '1.2.3');
+    }
+
+    /** @test */
+    public function it_gets_the_addons_edition()
+    {
+        $this->assertEquals($this->license()->edition(), 'rad');
     }
 
     /** @test */
@@ -58,11 +64,13 @@ class FakeAddonLicenseAddon
 {
     protected $name;
     protected $version;
+    protected $edition;
 
-    public function __construct($name, $version)
+    public function __construct($name, $version, $edition)
     {
         $this->name = $name;
         $this->version = $version;
+        $this->edition = $edition;
     }
 
     public function name()
@@ -73,5 +81,10 @@ class FakeAddonLicenseAddon
     public function version()
     {
         return $this->version;
+    }
+
+    public function edition()
+    {
+        return $this->edition;
     }
 }

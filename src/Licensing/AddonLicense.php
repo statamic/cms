@@ -27,6 +27,11 @@ class AddonLicense extends License
         return $this->addon->version();
     }
 
+    public function edition()
+    {
+        return $this->addon->edition();
+    }
+
     public function existsOnMarketplace()
     {
         return $this->response['exists'];

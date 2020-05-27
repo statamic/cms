@@ -67,9 +67,10 @@
             <table class="data-table">
                 @foreach ($addons as $addon)
                     <tr>
-                        <td class="w-64 font-bold mr-1">
+                        <td class="w-64 mr-1">
                             <span class="little-dot {{ $addon->valid() ? 'bg-green' : 'bg-red' }} mr-1"></span>
-                            {{ $addon->name() }}
+                            <span class="font-bold">{{ $addon->name() }}</span>
+                            {{ $addon->edition() ?? '' }}
                         </td>
                         <td>{{ $addon->version() }}</td>
                         <td class="text-right text-red">{{ $addon->invalidReason() }}</td>

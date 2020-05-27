@@ -2,7 +2,6 @@
 
 namespace Tests\Licensing;
 
-use Facades\Statamic\Licensing\Pro;
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
@@ -27,11 +26,11 @@ class OutpostTest extends TestCase
     public function it_builds_the_request_payload()
     {
         config(['statamic.system.license_key' => 'test-key']);
-        Pro::shouldReceive('check')->andReturnTrue();
+        config(['statamic.editions.pro' => true]);
 
         Addon::shouldReceive('all')->once()->andReturn(collect([
-            new FakeOutpostAddon('foo/bar', '1.2.3'),
-            new FakeOutpostAddon('baz/qux', '4.5.6'),
+            new FakeOutpostAddon('foo/bar', '1.2.3', null),
+            new FakeOutpostAddon('baz/qux', '4.5.6', 'example'),
         ]));
 
         request()->server->set('SERVER_ADDR', '123.123.123.123');
@@ -46,8 +45,8 @@ class OutpostTest extends TestCase
             'statamic_pro' => true,
             'php_version' => PHP_VERSION,
             'packages' => [
-                'foo/bar' => '1.2.3',
-                'baz/qux' => '4.5.6',
+                'foo/bar' => ['version' => '1.2.3', 'edition' => null],
+                'baz/qux' => ['version' => '4.5.6', 'edition' => 'example'],
             ],
         ], $this->outpost()->payload());
     }
@@ -252,11 +251,13 @@ class FakeOutpostAddon
 {
     protected $package;
     protected $version;
+    protected $edition;
 
-    public function __construct($package, $version)
+    public function __construct($package, $version, $edition)
     {
         $this->package = $package;
         $this->version = $version;
+        $this->edition = $edition;
     }
 
     public function package()
@@ -267,5 +268,10 @@ class FakeOutpostAddon
     public function version()
     {
         return $this->version;
+    }
+
+    public function edition()
+    {
+        return $this->edition;
     }
 }
