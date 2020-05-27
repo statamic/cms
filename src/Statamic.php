@@ -29,7 +29,7 @@ class Statamic
 
     public static function pro()
     {
-        return \Facades\Statamic\Licensing\Pro::check();
+        return config('statamic.editions.pro');
     }
 
     public static function availableScripts(Request $request)
