@@ -133,7 +133,7 @@ EOT
                 'token' => 'test-token',
                 'email' => 'san@holo.com',
                 'password' => 'chewy',
-                'referer' => '/login-successful',
+                '_redirect' => '/login-successful',
             ])
             ->assertLocation('/login-successful');
 
