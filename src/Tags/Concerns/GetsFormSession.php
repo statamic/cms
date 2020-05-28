@@ -19,14 +19,11 @@ trait GetsFormSession
             ? "{$key}.success"
             : 'success';
 
-        if ($errors = session()->get('errors')) {
-            $data['errors'] = $errors->getBag($errorBagKey)->all();
-            $data['error'] = array_combine($errors->getBag($errorBagKey)->keys(), $data['errors']);
-        }
+        $errors = optional(session()->get('errors'))->getBag($errorBagKey);
 
-        if ($success = session()->get($successKey)) {
-            $data['success'] = $success;
-        }
+        $data['errors'] = $errors ? $errors->all() : [];
+        $data['error'] = $errors ? array_combine($errors->keys(), $data['errors']) : [];
+        $data['success'] = session()->get($successKey);
 
         return $data;
     }
