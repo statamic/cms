@@ -52,9 +52,11 @@ class FormController extends Controller
             return $this->formFailure($params, $errors, $form->handle());
         }
 
-        $submission->save();
+        if ($form->store()) {
+            $submission->save();
+            event('Form.submission.saved', $submission); // TODO: Refactor for Spock v3
+        }
 
-        // Emit an event after the submission has been created.
         event('Form.submission.created', $submission);
 
         return $this->formSuccess($params, $submission);
