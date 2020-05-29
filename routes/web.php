@@ -29,6 +29,9 @@ Route::name('statamic.')->group(function () {
             Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.email');
             Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset');
             Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.action');
+
+            Route::get('activate/{token}', 'ActivateAccountController@showResetForm')->name('account.activate');
+            Route::post('activate', 'ActivateAccountController@reset')->name('account.activate.action');
         });
 
         Statamic::additionalActionRoutes();
