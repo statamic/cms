@@ -81,7 +81,8 @@ class Sites
         });
     }
     
-    protected function absoluteUrl($site) {
+    protected function absoluteUrl($site) 
+    {
         return Str::ensureRight($site->absoluteUrl(), '/');
     }
 }
