@@ -40,7 +40,7 @@ class Sites
         $url = Str::ensureRight($url, '/');
 
         return collect($this->sites)->filter(function ($site) use ($url) {
-            return Str::startsWith($url, $site->absoluteUrl());
+            return Str::startsWith($url, $this->absoluteUrl($site));
         })->sortByDesc->url()->first();
     }
 
@@ -79,5 +79,9 @@ class Sites
         return collect($config)->map(function ($site, $handle) {
             return new Site($handle, $site);
         });
+    }
+    
+    protected function absoluteUrl($site) {
+        return Str::ensureRight($site->absoluteUrl(), '/');
     }
 }
