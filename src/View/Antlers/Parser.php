@@ -25,7 +25,7 @@ use Symfony\Component\HttpKernel\Exception\HttpException;
 
 class Parser
 {
-        // Instance state
+    // Instance state
     protected $cascade;
     protected $view;
     protected $allowPhp = false;
