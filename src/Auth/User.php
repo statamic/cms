@@ -182,11 +182,12 @@ abstract class User implements
 
     public function sendPasswordResetNotification($token)
     {
-        $notification = $this->password()
-            ? new PasswordResetNotification($token)
-            : new ActivateAccountNotification($token);
+        $this->notify(new PasswordResetNotification($token));
+    }
 
-        $this->notify($notification);
+    public function sendActivateAccountNotification($token)
+    {
+        $this->notify(new ActivateAccountNotification($token));
     }
 
     public function generateTokenAndSendPasswordResetNotification()
@@ -194,14 +195,23 @@ abstract class User implements
         $this->sendPasswordResetNotification($this->generatePasswordResetToken());
     }
 
-    public function getPasswordResetUrl()
+    public function generateTokenAndSendActivateAccountNotification()
     {
-        return PasswordReset::url($this->generatePasswordResetToken());
+        $this->sendActivateAccountNotification($this->generateActivateAccountToken());
     }
 
     public function generatePasswordResetToken()
     {
-        return Password::broker()->createToken($this);
+        $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_RESETS);
+
+        return Password::broker($broker)->createToken($this);
+    }
+
+    public function generateActivateAccountToken()
+    {
+        $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
+
+        return Password::broker($broker)->createToken($this);
     }
 
     public static function __callStatic($method, $parameters)
