@@ -11,7 +11,6 @@ use Statamic\Query\Scopes\ScopeRepository;
  * @method static mixed filters($key, $context = [])
  *
  * @see \Statamic\Query\Scopes\ScopeRepository
- * }
  */
 class Scope extends Facade
 {
