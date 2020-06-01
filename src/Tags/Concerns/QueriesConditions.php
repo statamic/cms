@@ -11,6 +11,8 @@ use Statamic\Support\Str;
 
 trait QueriesConditions
 {
+    use GetsPipedArrayValues;
+
     protected function queryConditions($query)
     {
         $this->queryableConditionParams()->each(function ($value, $param) use ($query) {
@@ -144,7 +146,7 @@ trait QueriesConditions
     protected function queryInCondition($query, $field, $value)
     {
         if (is_string($value)) {
-            $value = explode('|', $value);
+            $value = $this->getPipedValues($value);
         }
 
         $query->whereIn($field, $value);
@@ -153,7 +155,7 @@ trait QueriesConditions
     protected function queryNotInCondition($query, $field, $value)
     {
         if (is_string($value)) {
-            $value = explode('|', $value);
+            $value = $this->getPipedValues($value);
         }
 
         $query->whereNotIn($field, $value);
