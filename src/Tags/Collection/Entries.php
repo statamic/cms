@@ -232,7 +232,7 @@ class Entries
 
     protected function queryStatus($query)
     {
-        if ($this->isQueryingCondition('status')) {
+        if ($this->isQueryingCondition('status') || $this->isQueryingCondition('published')) {
             return;
         }
 
