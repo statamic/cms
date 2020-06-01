@@ -145,6 +145,7 @@ return [
     'licensing_error_outside_license_range' => 'License valid for versions :start and :end',
     'licensing_error_no_site_key' => 'No site license key',
     'licensing_error_unknown_site' => 'Unknown site',
+    'licensing_utility_description' => 'View and resolve licensing details.',
     'max_items_instructions' => 'Set a maximum number of selectable items.',
     'navigation_configure_collections_instructions' => 'Enable linking to entries in these collections.',
     'expect_root_instructions' => 'Considered the first page in the tree a "root" or "home" page.',

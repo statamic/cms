@@ -3,6 +3,11 @@
 
 @section('content')
 
+    @include('statamic::partials.breadcrumb', [
+        'url' => cp_route('utilities.index'),
+        'title' => __('Utilities')
+    ])
+
     @if ($requestError)
 
         <div class="no-results md:pt-8 max-w-2xl mx-auto">
@@ -12,7 +17,7 @@
                     <p class="text-grey-70 leading-normal mb-4 text-lg antialiased">
                         {{ __('statamic::messages.outpost_issue_try_later') }}
                     </p>
-                    <a href="{{ cp_route('licensing.refresh') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
+                    <a href="{{ cp_route('statamic.cp.utilities.licensing.refresh') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
                 </div>
                 <div class="hidden md:block w-1/2 pl-6">
                     @svg('empty/navigation')
@@ -99,7 +104,7 @@
 
         <div class="mt-5 py-2 border-t flex items-center">
             <a href="{{ $site->url() }}" target="_blank" class="btn btn-primary mr-2">{{ __('Edit Site') }}</a>
-            <a href="{{ cp_route('licensing.refresh') }}" class="btn">{{ __('Sync') }}</a>
+            <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn">{{ __('Sync') }}</a>
             <p class="ml-2 text-2xs text-grey">{{ __('statamic::messages.licensing_sync_instructions') }}</p>
         </div>
 

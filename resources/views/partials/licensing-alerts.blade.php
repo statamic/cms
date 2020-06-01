@@ -22,10 +22,10 @@
             @if ($licenses->isOnTestDomain())
                 <b>{{ __('Trial Mode') }}:</b>
                 {{ __('statamic::messages.licensing_trial_mode_alert') }}
-                <a href="{{ cp_route('licensing') }}" class="text-blue-200">{{ __('View details') }}</a>
+                @can('access licensing utility') <a href="{{ cp_route('statamic.cp.utilities.licensing') }}" class="text-blue-200">{{ __('View details') }}</a> @endcan
             @else
                 {{ __('statamic::messages.licensing_production_alert') }}
-                <a href="{{ cp_route('licensing') }}" class="text-white underline">{{ __('View details') }}</a>
+                @can('access licensing utility') <a href="{{ cp_route('statamic.cp.utilities.licensing') }}" class="text-white underline">{{ __('View details') }}</a> @endcan
             @endif
         </div>
     @endif
