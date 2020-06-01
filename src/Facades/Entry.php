@@ -21,7 +21,6 @@ use Statamic\Contracts\Entries\EntryRepository;
  *
  * @see \Statamic\Entries\EntryCollection
  * @see \Statamic\Stache\Repositories\EntryRepository
- *
  */
 class Entry extends Facade
 {
