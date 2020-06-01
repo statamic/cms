@@ -143,11 +143,19 @@ trait QueriesConditions
 
     protected function queryInCondition($query, $field, $value)
     {
+        if (is_string($value)) {
+            $value = explode('|', $value);
+        }
+
         $query->whereIn($field, $value);
     }
 
     protected function queryNotInCondition($query, $field, $value)
     {
+        if (is_string($value)) {
+            $value = explode('|', $value);
+        }
+
         $query->whereNotIn($field, $value);
     }
 
