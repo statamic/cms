@@ -104,6 +104,7 @@ class Translate extends Command
         collect($this->files->files(getcwd().'/resources/lang/'.$lang))
             ->filter(function ($file) {
                 $filename = substr($file->getBasename(), 0, -4); // without extension
+
                 return ! in_array($filename, $this->excluded);
             })
             ->each(function ($file) use ($lang) {
