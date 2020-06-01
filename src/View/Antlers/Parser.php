@@ -1182,7 +1182,7 @@ class Parser
         }
 
         // If there was no scope glue, there's nothing more we can check.
-        if (! str_contains($key, [':', '.'])) {
+        if (! Str::contains($key, [':', '.'])) {
             return [false, null];
         }
 
