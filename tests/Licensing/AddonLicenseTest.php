@@ -52,10 +52,23 @@ class AddonLicenseTest extends TestCase
             'range' => ['2', '4'],
         ]);
 
-        $message = trans('statamic::messages.licensing_error_outside_license_range', [
-            'start' => '2', 'end' => '4',
+        $key = 'statamic::messages.licensing_error_outside_license_range';
+        $message = trans($key, ['start' => '2', 'end' => '4']);
+        $this->assertNotEquals($key, $message);
+        $this->assertEquals($message, $license->invalidReason());
+    }
+
+    /** @test */
+    public function it_gets_the_invalid_reason_for_a_edition_issue()
+    {
+        $license = $this->license([
+            'reason' => 'invalid_edition',
+            'edition' => 'one',
         ]);
 
+        $key = 'statamic::messages.licensing_error_invalid_edition';
+        $message = trans($key, ['edition' => 'one']);
+        $this->assertNotEquals($key, $message);
         $this->assertEquals($message, $license->invalidReason());
     }
 }

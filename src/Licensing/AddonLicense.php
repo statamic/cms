@@ -39,10 +39,14 @@ class AddonLicense extends License
 
     public function invalidReason()
     {
-        if (Arr::get($this->response, 'reason') === 'outside_license_range') {
-            [$start, $end] = $this->response['range'];
+        switch (Arr::get($this->response, 'reason')) {
+            case 'outside_license_range':
+                [$start, $end] = $this->response['range'];
 
-            return trans('statamic::messages.licensing_error_outside_license_range', compact('start', 'end'));
+                return trans('statamic::messages.licensing_error_outside_license_range', compact('start', 'end'));
+
+            case 'invalid_edition':
+                return trans('statamic::messages.licensing_error_invalid_edition', ['edition' => $this->response['edition']]);
         }
 
         return parent::invalidReason();

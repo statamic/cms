@@ -140,6 +140,7 @@ return [
     'licensing_sync_instructions' => 'Data from statamic.com is synced once per hour. Force a sync to see any changes you\'ve made.',
     'licensing_error_unlicensed' => 'Unlicensed',
     'licensing_error_invalid_domain' => 'Invalid domain',
+    'licensing_error_invalid_edition' => 'License is for :edition edition',
     'licensing_error_no_domains' => 'No domains defined',
     'licensing_error_outside_license_range' => 'License valid for versions :start and :end',
     'licensing_error_no_site_key' => 'No site license key',
