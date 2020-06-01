@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Statamic\Console\RunsInPlease;
+use Symfony\Component\Console\Input\InputOption;
 
 class MakeFieldtype extends GeneratorCommand
 {
@@ -47,7 +48,9 @@ class MakeFieldtype extends GeneratorCommand
             return false;
         }
 
-        $this->generateVueComponent();
+        if (! $this->option('php')) {
+            $this->generateVueComponent();
+        }
     }
 
     /**
@@ -84,5 +87,17 @@ class MakeFieldtype extends GeneratorCommand
         $component = str_replace('dummy_name', snake_case($name), $component);
 
         return $component;
+    }
+
+    /**
+     * Get the console command options.
+     *
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return array_merge(parent::getOptions(), [
+            ['php', '', InputOption::VALUE_NONE, 'Create only the PHP class for the field type and skip the VueJS component'],
+        ]);
     }
 }
