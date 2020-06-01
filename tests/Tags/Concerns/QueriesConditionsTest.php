@@ -113,6 +113,12 @@ class QueriesConditionsTest extends TestCase
         $this->assertEquals(['tiger', 'cat', 'lion'], $this->getEntries(['type:in' => ['feline']])->map->slug()->all());
         $this->assertEquals(['dog', 'wolf', 'tiger', 'cat', 'lion'], $this->getEntries(['type:in' => ['canine', 'feline']])->map->slug()->all());
         $this->assertEquals(['horse'], $this->getEntries(['type:in' => ['equine']])->map->slug()->all());
+
+        // Handles pipe array syntax
+        $this->assertEquals(
+            ['dog', 'wolf', 'tiger', 'cat', 'lion'],
+            $this->getEntries(['type:in' => 'canine|feline'])->map->slug()->all()
+        );
     }
 
     /** @test */
@@ -142,6 +148,12 @@ class QueriesConditionsTest extends TestCase
         $this->assertEquals(
             ['dog', 'wolf', 'tiger', 'cat', 'lion', 'bigfoot'],
             $this->getEntries(['type:not_in' => ['equine']])->map->slug()->all()
+        );
+
+        // Handles pipe array syntax
+        $this->assertEquals(
+            ['horse', 'bigfoot'],
+            $this->getEntries(['type:not_in' => 'canine|feline'])->map->slug()->all()
         );
     }
 

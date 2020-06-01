@@ -10,6 +10,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Config;
@@ -1025,6 +1026,8 @@ class Parser
             return $value->count();
         } elseif ($value instanceof Collection) {
             return $value->isEmpty() ? 'false' : 'true';
+        } elseif ($value instanceof ViewErrorBag) {
+            return $value->getBags() ? 'true' : 'false';
         } elseif (is_array($value)) {
             return ! empty($value) ? 'true' : 'false';
         } elseif (is_object($value) and is_callable([$value, '__toString'])) {
@@ -1179,7 +1182,7 @@ class Parser
         }
 
         // If there was no scope glue, there's nothing more we can check.
-        if (! str_contains($key, [':', '.'])) {
+        if (! Str::contains($key, [':', '.'])) {
             return [false, null];
         }
 

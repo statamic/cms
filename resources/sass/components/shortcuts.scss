@@ -3,23 +3,26 @@
    ========================================================================== */
 
 .shortcut-pair {
-    @apply mb-2 antialiased flex items-center;
+    @apply pb-1 mb-1 antialiased flex items-center justify-between;
+    &:not(:last-child) {
+        @apply border-b;
+    }
 }
 
 .shortcut {
-    @apply bg-white text-2xs rounded border border-grey-40 inline-block align-middle text-grey-80 text-center;
-    border-width: 1px 2px 2px 1px;
-    min-width: 28px;
-    padding: 3px 4px;
+    @apply flex items-center justify-center text-3xs;
+    border-radius: 3px;
+    background: linear-gradient(-225deg,#d5dbe4,#f8f8f8);
+    box-shadow: inset 0 -2px 0 0 #cdcde6, inset 0 0 1px 1px #fff, 0 1px 2px 1px rgba(30,35,90,.4);
+    color: #8d949e;
+    min-width: 18px;
+    height: 18px;
+    margin: 0 .25em;
+    padding: 0 2px 2px 2px;
 }
 
-.shortcut-key {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 70%;
-    margin-right: 15px;
-    float: left;
+.shortcut-combo {
+    @apply flex order-2;
 }
 
 .shortcut-joiner {
@@ -27,10 +30,5 @@
 }
 
 .shortcut-value {
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    display: block;
-    padding: 4px 0;
-    font-size: 16px;
+    @apply whitespace-no-wrap py-sm text-sm;
 }

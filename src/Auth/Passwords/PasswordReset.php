@@ -4,14 +4,21 @@ namespace Statamic\Auth\Passwords;
 
 class PasswordReset
 {
+    const BROKER_RESETS = 'resets';
+    const BROKER_ACTIVATIONS = 'activations';
+
     protected static $url;
     protected static $redirect;
 
-    public static function url($token)
+    public static function url($token, $broker)
     {
+        $route = $broker === self::BROKER_ACTIVATIONS ? 'statamic.account.activate' : 'statamic.password.reset';
+
+        $defaultUrl = route($route, $token);
+
         $url = static::$url
             ? sprintf('%s?token=%s', static::$url, $token)
-            : route('statamic.password.reset', $token);
+            : $defaultUrl;
 
         parse_str(parse_url($url, PHP_URL_QUERY) ?: '', $query);
 

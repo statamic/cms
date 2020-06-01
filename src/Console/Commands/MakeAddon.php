@@ -6,6 +6,7 @@ use Facades\Statamic\Console\Processes\Composer;
 use Statamic\Console\RunsInPlease;
 use Statamic\Console\ValidatesInput;
 use Statamic\Rules\ComposerPackage;
+use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -191,7 +192,7 @@ class MakeAddon extends GeneratorCommand
             return $this->outputFromSymfonyProcess($output);
         });
 
-        if (! str_contains($output, "Discovered Addon: {$this->package}")) {
+        if (! Str::contains($output, "Discovered Addon: {$this->package}")) {
             $this->error('An error was encountered while installing your addon!');
         }
 

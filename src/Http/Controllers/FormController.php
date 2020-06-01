@@ -4,61 +4,59 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Crypt;
 use Illuminate\Support\MessageBag;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Exceptions\PublishException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Form;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class FormController extends Controller
 {
     /**
-     * Handle a create form submission request.
+     * Handle a form submission request.
      *
      * @return mixed
      */
-    public function store()
+    public function submit($form)
     {
-        $fields = request()->all();
+        $data = request()->all();
 
-        if (! $params = request()->input('_params')) {
-            return response('Invalid request.', 400);
-        }
-
-        $params = Crypt::decrypt($params);
-        unset($fields['_params']);
-
-        $handle = array_get($params, 'form');
-        $form = Form::find($handle);
+        $params = collect($data)
+            ->filter(function ($value, $key) {
+                return Str::startsWith($key, '_');
+            })
+            ->all();
 
         $submission = $form->createSubmission();
 
         if ($form->sanitize()) {
-            $fields = Arr::sanitize($fields);
+            $data = Arr::sanitize($data);
         }
 
         try {
-            $submission->data($fields);
+            $submission->data($data);
             $submission->uploadFiles();
 
             // Allow addons to prevent the submission of the form, return
             // their own errors, and modify the submission.
             [$errors, $submission] = $this->runCreatingEvent($submission);
         } catch (PublishException $e) {
-            return $this->formFailure($params, $e->getErrors(), $handle);
+            return $this->formFailure($params, $e->getErrors(), $form->handle());
         } catch (SilentFormFailureException $e) {
             return $this->formSuccess($params, $submission);
         }
 
         if ($errors) {
-            return $this->formFailure($params, $errors, $handle);
+            return $this->formFailure($params, $errors, $form->handle());
         }
 
-        $submission->save();
+        if ($form->store()) {
+            $submission->save();
+            event('Form.submission.saved', $submission); // TODO: Refactor for Spock v3
+        }
 
-        // Emit an event after the submission has been created.
         event('Form.submission.created', $submission);
 
         return $this->formSuccess($params, $submission);
@@ -82,11 +80,11 @@ class FormController extends Controller
             ]);
         }
 
-        $redirect = array_get($params, 'redirect');
+        $redirect = Arr::get($params, '_redirect');
 
-        $response = ($redirect) ? redirect($redirect) : back();
+        $response = $redirect ? redirect($redirect) : back();
 
-        session()->flash("form.{$submission->form()->handle()}.success", true);
+        session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
         session()->flash('submission', $submission);
 
         return $response;
@@ -108,14 +106,11 @@ class FormController extends Controller
             ], 400);
         }
 
-        // Set up where to be taken in the event of an error.
-        if ($error_redirect = array_get($params, 'error_redirect')) {
-            $error_redirect = redirect($error_redirect);
-        } else {
-            $error_redirect = back();
-        }
+        $redirect = Arr::get($params, '_error_redirect');
 
-        return $error_redirect->withInput()->withErrors($errors, 'form.'.$form);
+        $response = $redirect ? redirect($redirect) : back();
+
+        return $response->withInput()->withErrors($errors, 'form.'.$form);
     }
 
     /**

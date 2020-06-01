@@ -314,6 +314,7 @@ class URL
     public function getDefaultUri($locale, $uri)
     {
         return $uri; // TODO
+
         return app(ContentService::class)->defaultUri($locale, $uri);
     }
 
