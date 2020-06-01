@@ -5,7 +5,6 @@ namespace Statamic\Facades;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Actions\ActionRepository;
 
-
 /**
  * @method static mixed get($action)
  * @method static mixed all()
