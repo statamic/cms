@@ -19,7 +19,7 @@
         "league/glide": "^1.1",
         "pixelfear/composer-dist-plugin": "^0.1.0",
         "scrumpy/html-to-prosemirror": "^0.6.0",
-        "scrumpy/prosemirror-to-html": "^0.8.0",
+        "scrumpy/prosemirror-to-html": "^0.9.0",
         "spatie/blink": "^1.1.2",
         "statamic/stringy": "^3.1",
         "symfony/var-exporter": "^4.3",
