@@ -40,7 +40,7 @@ class FrontendController extends Controller
             $url = str_after($url, '/'.config('statamic.amp.route'));
         }
 
-        if (str_contains($url, '?')) {
+        if (Arr::contains($url, '?')) {
             $url = substr($url, 0, strpos($url, '?'));
         }
 

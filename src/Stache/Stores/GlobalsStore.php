@@ -33,7 +33,7 @@ class GlobalsStore extends BasicStore
 
         // If it's a variables file that was requested, instead assume that the
         // base file was requested. The variables will get made as part of it.
-        if (Site::hasMultiple() && str_contains($relative, '/')) {
+        if (Site::hasMultiple() && Arr::contains($relative, '/')) {
             $handle = pathinfo($relative, PATHINFO_FILENAME);
             $path = $this->directory.$handle.'.yaml';
             $data = YAML::file($path)->parse();
@@ -118,7 +118,7 @@ class GlobalsStore extends BasicStore
         }
 
         // Given a path to a variables file, get the key based on its base global set path.
-        if (str_contains($relative = str_after($path, $this->directory), '/')) {
+        if (Arr::contains($relative = str_after($path, $this->directory), '/')) {
             $handle = pathinfo($relative, PATHINFO_FILENAME);
             $path = $this->directory.$handle.'.yaml';
 

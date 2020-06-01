@@ -91,7 +91,8 @@ class Generate extends Command
         }
 
         $this->files->put($fullPath, $json);
-        $this->output->writeln($exists
+        $this->output->writeln(
+            $exists
             ? "<info>[✓] Translation file for <comment>$lang</comment> merged into <comment>$path</comment></info>"
             : "<info>[✓] Translation file for <comment>$lang</comment> created at <comment>$path</comment></info>"
         );
@@ -106,7 +107,7 @@ class Generate extends Command
             ->map(function ($string) {
                 [$file, $string] = explode('.', $string, 2);
 
-                if (! str_contains($file, '::')) {
+                if (! Arr::contains($file, '::')) {
                     $file = 'statamic::'.$file;
                 }
 
@@ -159,7 +160,8 @@ class Generate extends Command
         $this->files->makeDirectory(dirname($fullPath), 0755, true, true);
         $this->files->put($fullPath, $contents);
 
-        $this->output->writeln($exists
+        $this->output->writeln(
+            $exists
             ? "<info>[✓] Translation file for <comment>$lang/$file</comment> merged into <comment>$path</comment></info>"
             : "<info>[✓] Translation file for <comment>$lang/$file</comment> created at <comment>$path</comment></info>"
         );

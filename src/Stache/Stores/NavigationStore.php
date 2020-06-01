@@ -7,6 +7,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
 use Symfony\Component\Finder\SplFileInfo;
 
 class NavigationStore extends BasicStore
@@ -32,7 +33,7 @@ class NavigationStore extends BasicStore
 
         // If it's a tree file that was requested, instead assume that the
         // base file was requested. The tree will get made as part of it.
-        if (Site::hasMultiple() && str_contains($relative, '/')) {
+        if (Site::hasMultiple() && Arr::contains($relative, '/')) {
             [$site, $relative] = explode('/', $relative, 2);
             $handle = str_before($relative, '.yaml');
             $path = $this->directory.$handle.'.yaml';

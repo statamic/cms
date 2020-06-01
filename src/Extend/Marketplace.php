@@ -8,6 +8,7 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Addon as AddonAPI;
+use Statamic\Support\Arr;
 
 class Marketplace
 {
@@ -331,7 +332,7 @@ class Marketplace
         return collect(explode(' ', $this->searchQuery))
             ->filter()
             ->map(function ($term) use ($property) {
-                return str_contains(strtolower($property), $term);
+                return Arr::contains(strtolower($property), $term);
             })
             ->filter()
             ->isNotEmpty();

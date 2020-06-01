@@ -3,6 +3,7 @@
 namespace Statamic\Translator\Commands;
 
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Translator\MethodDiscovery;
 use Statamic\Translator\Util;
@@ -75,7 +76,7 @@ class Stats extends Command
 
         if ($filter = $input->getOption('filter')) {
             $rows = $rows->filter(function ($item) use ($filter) {
-                return str_contains(strtolower($item['string']), strtolower($filter));
+                return Arr::contains(strtolower($item['string']), strtolower($filter));
             });
         }
 

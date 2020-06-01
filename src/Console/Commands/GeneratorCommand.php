@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Exception;
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Console\GeneratorCommand as IlluminateGeneratorCommand;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
@@ -142,7 +143,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
         }
 
         // Ensure we don't use addon path if within composer vendor files.
-        if ($pathIsInVendor = str_contains($path, base_path('vendor'))) {
+        if ($pathIsInVendor = Arr::contains($path, base_path('vendor'))) {
             $path = $fallbackPath;
         }
 

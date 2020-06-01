@@ -8,6 +8,7 @@ use Illuminate\Contracts\Auth\Authenticatable;
 use Illuminate\Contracts\Auth\CanResetPassword as CanResetPasswordContract;
 use Illuminate\Foundation\Auth\Access\Authorizable;
 use Illuminate\Notifications\Notifiable;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
@@ -55,7 +56,7 @@ abstract class User implements
     {
         $surname = '';
         if ($name = $this->get('name')) {
-            if (str_contains($name, ' ')) {
+            if (Arr::contains($name, ' ')) {
                 [$name, $surname] = explode(' ', $name);
             }
         } else {

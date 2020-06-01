@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Statamic\Extensions\FileStore;
 use Statamic\Facades\File;
 use Statamic\Stache\Stores\Store;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Wilderborn\Partyline\Facade as Partyline;
 
@@ -61,7 +62,7 @@ class Stache
 
     public function store($key)
     {
-        if (str_contains($key, '::')) {
+        if (Arr::contains($key, '::')) {
             [$parent, $child] = explode('::', $key);
 
             return $this->stores()->get($parent)->store($child);

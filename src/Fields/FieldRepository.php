@@ -2,6 +2,8 @@
 
 namespace Statamic\Fields;
 
+use Statamic\Support\Arr;
+
 class FieldRepository
 {
     protected $fieldsets;
@@ -13,7 +15,7 @@ class FieldRepository
 
     public function find(string $field): ?Field
     {
-        if (! str_contains($field, '.')) {
+        if (! Arr::contains($field, '.')) {
             return null;
         }
 

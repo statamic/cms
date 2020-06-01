@@ -8,6 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Statamic\Facades\Config;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Site;
+use Statamic\Support\Arr;
 
 class Email extends Mailable
 {
@@ -105,7 +106,7 @@ class Email extends Mailable
             $name = null;
             $email = trim($address);
 
-            if (str_contains($email, '<')) {
+            if (Arr::contains($email, '<')) {
                 preg_match('/^(.*) \<(.*)\>$/', $email, $matches);
                 $name = $matches[1];
                 $email = $matches[2];

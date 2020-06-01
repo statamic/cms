@@ -85,7 +85,7 @@ class Index extends BaseIndex
 
     private function handleAlgoliaException($e)
     {
-        if (str_contains($e->getMessage(), "Index {$this->name} does not exist")) {
+        if (Arr::contains($e->getMessage(), "Index {$this->name} does not exist")) {
             throw new IndexNotFoundException("Index [{$this->name}] does not exist.");
         }
 
