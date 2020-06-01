@@ -106,7 +106,7 @@ class Generate extends Command
             ->map(function ($string) {
                 [$file, $string] = explode('.', $string, 2);
 
-                if (! str_contains($file, '::')) {
+                if (! Str::contains($file, '::')) {
                     $file = 'statamic::'.$file;
                 }
 

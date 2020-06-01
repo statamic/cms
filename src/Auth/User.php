@@ -21,6 +21,7 @@ use Statamic\Fields\Value;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 
 abstract class User implements
     UserContract,
@@ -55,7 +56,7 @@ abstract class User implements
     {
         $surname = '';
         if ($name = $this->get('name')) {
-            if (str_contains($name, ' ')) {
+            if (Str::contains($name, ' ')) {
                 [$name, $surname] = explode(' ', $name);
             }
         } else {

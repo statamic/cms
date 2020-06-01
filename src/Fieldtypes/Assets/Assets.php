@@ -7,6 +7,7 @@ use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Fieldtype;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
+use Statamic\Support\Str;
 
 class Assets extends Fieldtype
 {
@@ -82,7 +83,7 @@ class Assets extends Fieldtype
 
     protected function valueToId($value)
     {
-        if (str_contains($value, '::')) {
+        if (Str::contains($value, '::')) {
             return $value;
         }
 

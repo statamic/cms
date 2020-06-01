@@ -2180,22 +2180,22 @@ class CoreModifiers extends Modifier
      */
     public function embedUrl($url)
     {
-        if (str_contains($url, 'youtube')) {
+        if (Str::contains($url, 'youtube')) {
             return str_replace('watch?v=', 'embed/', $url);
         }
 
-        if (str_contains($url, 'youtu.be')) {
+        if (Str::contains($url, 'youtu.be')) {
             $url = str_replace('youtu.be', 'www.youtube.com/embed', $url);
 
             // Check for start at point and replace it with correct parameter.
-            if (str_contains($url, '?t=')) {
+            if (Str::contains($url, '?t=')) {
                 $url = str_replace('?t=', '?start=', $url);
             }
 
             return $url;
         }
 
-        if (str_contains($url, 'vimeo')) {
+        if (Str::contains($url, 'vimeo')) {
             return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
         }
 

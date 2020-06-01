@@ -8,6 +8,7 @@ use GuzzleHttp\Exception\ConnectException;
 use Illuminate\Support\Arr;
 use Statamic\Search\Documents;
 use Statamic\Search\Index as BaseIndex;
+use Statamic\Support\Str;
 
 class Index extends BaseIndex
 {
@@ -85,7 +86,7 @@ class Index extends BaseIndex
 
     private function handleAlgoliaException($e)
     {
-        if (str_contains($e->getMessage(), "Index {$this->name} does not exist")) {
+        if (Str::contains($e->getMessage(), "Index {$this->name} does not exist")) {
             throw new IndexNotFoundException("Index [{$this->name}] does not exist.");
         }
 

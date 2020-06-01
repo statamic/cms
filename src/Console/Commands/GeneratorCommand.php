@@ -142,7 +142,7 @@ abstract class GeneratorCommand extends IlluminateGeneratorCommand
         }
 
         // Ensure we don't use addon path if within composer vendor files.
-        if ($pathIsInVendor = str_contains($path, base_path('vendor'))) {
+        if ($pathIsInVendor = Str::contains($path, base_path('vendor'))) {
             $path = $fallbackPath;
         }
 

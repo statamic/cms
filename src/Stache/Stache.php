@@ -61,7 +61,7 @@ class Stache
 
     public function store($key)
     {
-        if (str_contains($key, '::')) {
+        if (Str::contains($key, '::')) {
             [$parent, $child] = explode('::', $key);
 
             return $this->stores()->get($parent)->store($child);
