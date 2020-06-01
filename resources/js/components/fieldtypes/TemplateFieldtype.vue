@@ -5,6 +5,7 @@
             :name="name"
             @input="update"
             :clearable="config.clearable"
+            :placeholder="config.placeholder"
             :disabled="isReadOnly"
             :options="options"
             :reduce="selection => selection.value"
@@ -40,10 +41,7 @@ export default {
             }
 
             // Set default
-            var options = [{
-                label: __('Inherit (Default)'),
-                value: null
-            }];
+            var options = [];
 
             _.each(templates, function(template) {
                 options.push({
