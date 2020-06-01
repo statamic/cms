@@ -25,6 +25,49 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
+    public function it_can_make_an_action()
+    {
+        $path = $this->preparePath('app/Actions/Delete.php');
+
+        $this->assertFileNotExists($path);
+
+        $this->artisan('statamic:make:action', ['name' => 'Delete']);
+
+        $this->assertFileExists($path);
+        $this->assertStringContainsString('namespace App\Actions;', $this->files->get($path));
+    }
+
+    /** @test */
+    public function it_will_not_overwrite_an_existing_action()
+    {
+        $path = $this->preparePath('app/Actions/Delete.php');
+
+        $this->artisan('statamic:make:action', ['name' => 'Delete']);
+        $this->files->put($path, 'overwritten stuff');
+
+        $this->assertStringContainsString('overwritten stuff', $this->files->get($path));
+
+        $this->artisan('statamic:make:action', ['name' => 'Delete']);
+
+        $this->assertStringContainsString('overwritten stuff', $this->files->get($path));
+    }
+
+    /** @test */
+    public function using_force_option_will_overwrite_original_action()
+    {
+        $path = $this->preparePath('app/Actions/Delete.php');
+
+        $this->artisan('statamic:make:action', ['name' => 'Delete']);
+        $this->files->put($path, 'overwritten stuff');
+
+        $this->assertStringContainsString('overwritten stuff', $this->files->get($path));
+
+        $this->artisan('statamic:make:action', ['name' => 'Delete', '--force' => null]);
+
+        $this->assertStringNotContainsString('overwritten stuff', $this->files->get($path));
+    }
+
+    /** @test */
     public function it_can_make_a_fieldtype()
     {
         $path = $this->preparePath('app/Fieldtypes/Cat.php');
@@ -274,6 +317,7 @@ class ExtensionGeneratorTest extends TestCase
 
         $dirs = [
             base_path('addons'),
+            base_path('app/Actions'),
             base_path('app/Fieldtypes'),
             base_path('app/Scopes'),
             base_path('app/Tags'),
