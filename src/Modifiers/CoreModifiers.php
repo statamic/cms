@@ -722,7 +722,7 @@ class CoreModifiers extends Modifier
         // Workaround to support pipe characters. If there are multiple params
         // that means a pipe was used. We'll just join them for now.
         if (count($params) > 1) {
-            $params = [join('|', $params)];
+            $params = [implode('|', $params)];
         }
 
         return implode(Arr::get($params, 0, ', '), $value);
@@ -1289,7 +1289,7 @@ class CoreModifiers extends Modifier
     public function optionList($value, $params)
     {
         if (count($params) > 1) {
-            $params = [join('|', $params)];
+            $params = [implode('|', $params)];
         }
 
         return implode(Arr::get($params, 0, '|'), $value);
@@ -1300,11 +1300,15 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return array
+     * @return array|Collection
      */
     public function offset($value, $params)
     {
-        return array_slice($value, Arr::get($params, 0, 0));
+        $isArray = is_array($value);
+
+        $value = collect($value)->slice(Arr::get($params, 0, 0))->values();
+
+        return $isArray ? $value->all() : $value;
     }
 
     /**
