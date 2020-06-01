@@ -126,6 +126,13 @@ final class Addon
     protected $isCommercial = false;
 
     /**
+     * Available editions.
+     *
+     * @var array|null
+     */
+    protected $editions = [];
+
+    /**
      * @param string $id
      */
     public function __construct($id)
@@ -154,7 +161,7 @@ final class Addon
         $instance = self::make($package['id']);
 
         $keys = [
-            'id', 'slug', 'marketplaceId', 'marketplaceSlug', 'marketplaceSellerSlug', 'name', 'namespace', 'directory',
+            'id', 'slug', 'editions', 'marketplaceId', 'marketplaceSlug', 'marketplaceSellerSlug', 'name', 'namespace', 'directory',
             'autoload', 'description', 'package', 'version', 'latestVersion', 'url', 'developer', 'developerUrl', 'isCommercial',
         ];
 
@@ -397,6 +404,23 @@ final class Addon
 
     public function edition()
     {
-        return config('statamic.editions.addons.'.$this->package());
+        $configured = config('statamic.editions.addons.'.$this->package());
+
+        if ($configured && ! $this->editions()->contains($configured)) {
+            throw new \Exception("Invalid edition [$configured] for addon ".$this->package());
+        }
+
+        return $configured ?? $this->editions()->first();
+    }
+
+    public function editions($editions = null)
+    {
+        if (func_num_args() === 0) {
+            return collect($this->editions);
+        }
+
+        $this->editions = $editions;
+
+        return $this;
     }
 }

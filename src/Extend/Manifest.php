@@ -52,6 +52,7 @@ class Manifest extends PackageManifest
         return [
             'id' => $package['name'],
             'slug' => $statamic['slug'] ?? null,
+            'editions' => $statamic['editions'] ?? [],
             'marketplaceId' => data_get($marketplaceData, 'id', null),
             'marketplaceSlug' => data_get($marketplaceData, 'slug', null),
             'marketplaceSellerSlug' => data_get($marketplaceData, 'seller', null),
