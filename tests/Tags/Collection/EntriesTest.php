@@ -243,7 +243,7 @@ class EntriesTest extends TestCase
         $this->makeEntry('b')->date('2019-03-10')->published(false)->save(); // today
         $this->makeEntry('c')->date('2019-03-11')->published(true)->save(); // definitely in future, so status will not be 'published'
 
-        $this->assertCount(2, $this->getEntries());
+        $this->assertCount(1, $this->getEntries()); // defaults to 'published'
         $this->assertCount(1, $this->getEntries(['status:is' => 'published']));
         $this->assertCount(2, $this->getEntries(['status:not' => 'published']));
         $this->assertCount(1, $this->getEntries(['status:is' => 'scheduled']));

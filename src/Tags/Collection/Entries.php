@@ -145,6 +145,7 @@ class Entries
             ->whereIn('collection', $this->collections->map->handle()->all());
 
         $this->querySite($query);
+        $this->queryStatus($query);
         $this->queryPastFuture($query);
         $this->querySinceUntil($query);
         $this->queryTaxonomies($query);
@@ -227,6 +228,15 @@ class Entries
         }
 
         return $query->where('site', $site);
+    }
+
+    protected function queryStatus($query)
+    {
+        if ($this->isQueryingCondition('status')) {
+            return;
+        }
+
+        return $query->where('status', 'published');
     }
 
     protected function queryPastFuture($query)
