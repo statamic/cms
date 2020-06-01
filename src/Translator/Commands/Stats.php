@@ -75,7 +75,7 @@ class Stats extends Command
 
         if ($filter = $input->getOption('filter')) {
             $rows = $rows->filter(function ($item) use ($filter) {
-                return str_contains(strtolower($item['string']), strtolower($filter));
+                return Str::contains(strtolower($item['string']), strtolower($filter));
             });
         }
 

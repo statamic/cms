@@ -9,6 +9,7 @@ use Statamic\Facades\Site;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\View\View;
 
 /**
@@ -40,7 +41,7 @@ class FrontendController extends Controller
             $url = str_after($url, '/'.config('statamic.amp.route'));
         }
 
-        if (str_contains($url, '?')) {
+        if (Str::contains($url, '?')) {
             $url = substr($url, 0, strpos($url, '?'));
         }
 
