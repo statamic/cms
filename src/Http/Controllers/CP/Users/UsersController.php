@@ -86,6 +86,7 @@ class UsersController extends CpController
             'actions' => [
                 'save' => cp_route('users.store'),
             ],
+            'expiry' => config('auth.passwords.'.PasswordReset::BROKER_ACTIVATIONS.'.expire') / 60,
         ];
 
         if ($request->wantsJson()) {
