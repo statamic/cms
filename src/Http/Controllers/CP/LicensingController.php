@@ -22,7 +22,7 @@ class LicensingController extends CpController
         $licenses->refresh();
 
         return redirect()
-            ->cpRoute('licensing')
+            ->cpRoute('utilities.licensing')
             ->with('success', __('Data updated'));
     }
 }

@@ -63,7 +63,7 @@ class CoreUtilities
             ->description(__('statamic::messages.licensing_utility_description'))
             ->docsUrl(Statamic::docsUrl('licensing'))
             ->routes(function ($router) {
-                $router->post('refresh', [LicensingController::class, 'refresh'])->name('refresh');
+                $router->get('refresh', [LicensingController::class, 'refresh'])->name('refresh');
             })
             ->register();
     }
