@@ -36,7 +36,7 @@ class GlideClear extends Command
      */
     public function handle()
     {
-        // Get the glide server cache path.
+        // Get the cache disk.
         $cacheDisk = Storage::disk(Config::get('statamic.assets.image_manipulation.cache_disk'));
 
         // Delete the cached images.

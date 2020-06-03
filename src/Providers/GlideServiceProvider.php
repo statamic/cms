@@ -45,12 +45,11 @@ class GlideServiceProvider extends ServiceProvider
 
     private function getBuilder()
     {
-        $route = Config::get('statamic.assets.image_manipulation.route');
-
         if (Config::get('statamic.assets.image_manipulation.cache')) {
             $route = $this->app->make(\Illuminate\Contracts\Filesystem\Factory::class)
-                          ->disk(Config::get('statamic.assets.image_manipulation.cache_disk'))
-                          ->url('');
+                ->disk(Config::get('statamic.assets.image_manipulation.cache_disk'))
+                ->url('');
+
             return new StaticUrlBuilder($this->app->make(ImageGenerator::class), [
                 'route' => $route,
             ]);
@@ -58,7 +57,7 @@ class GlideServiceProvider extends ServiceProvider
 
         return new GlideUrlBuilder([
             'key' => (Config::get('statamic.assets.image_manipulation.secure')) ? Config::getAppKey() : null,
-            'route' => $route,
+            'route' => Config::get('statamic.assets.image_manipulation.route'),
         ]);
     }
 
