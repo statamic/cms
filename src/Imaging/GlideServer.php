@@ -2,10 +2,10 @@
 
 namespace Statamic\Imaging;
 
+use Illuminate\Support\Facades\Storage;
 use League\Glide\ServerFactory;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
-use Illuminate\Support\Facades\Storage;
 use Statamic\Imaging\ResponseFactory as LaravelResponseFactory;
 
 class GlideServer

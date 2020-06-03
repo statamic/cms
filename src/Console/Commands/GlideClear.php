@@ -2,13 +2,10 @@
 
 namespace Statamic\Console\Commands;
 
-use Facades\Statamic\Imaging\GlideServer;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Console\RunsInPlease;
-use Statamic\Facades\File;
-use Statamic\Facades\Folder;
 use Statamic\Facades\Config;
 
 class GlideClear extends Command
