@@ -48,8 +48,11 @@ class GlideServiceProvider extends ServiceProvider
         $route = Config::get('statamic.assets.image_manipulation.route');
 
         if (Config::get('statamic.assets.image_manipulation.cache')) {
+            $route = $this->app->make(\Illuminate\Contracts\Filesystem\Factory::class)
+                          ->disk(Config::get('statamic.assets.image_manipulation.cache_disk'))
+                          ->url('');
             return new StaticUrlBuilder($this->app->make(ImageGenerator::class), [
-                'route' => URL::prependSiteUrl($route),
+                'route' => $route,
             ]);
         }
 

@@ -5,6 +5,7 @@ namespace Statamic\Imaging;
 use League\Glide\ServerFactory;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
+use Illuminate\Support\Facades\Storage;
 use Statamic\Imaging\ResponseFactory as LaravelResponseFactory;
 
 class GlideServer
@@ -18,7 +19,7 @@ class GlideServer
     {
         return ServerFactory::create([
             'source'   => base_path(), // this gets overriden on the fly by the image generator
-            'cache'    => $this->cachePath(),
+            'cache'    => $this->cacheDisk(),
             'response' => new LaravelResponseFactory(app('request')),
             'driver'   => Config::get('statamic.assets.image_manipulation.driver'),
             'cache_with_file_extensions' => true,
@@ -27,14 +28,14 @@ class GlideServer
     }
 
     /**
-     * Get glide cache path.
+     * Get glide cache.
      *
-     * @return string
+     * @return string|\League\Flysystem\Filesystem
      */
-    public function cachePath()
+    public function cacheDisk()
     {
         return Config::get('statamic.assets.image_manipulation.cache')
-            ? Config::get('statamic.assets.image_manipulation.cache_path')
+            ? Storage::disk(Config::get('statamic.assets.image_manipulation.cache_disk'))->getDriver()
             : storage_path('statamic/glide');
     }
 
