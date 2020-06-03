@@ -60,7 +60,7 @@ return [
 
     'commands' => [
         'cd {{ cwd }}',
-        'git add {{ path }}',
+        'git add {{ paths }}',
         'git commit -m "{{ message }}" -c "user.name={{ name }}" -c "user.email={{ email }}"',
     ],
 
