@@ -4,10 +4,10 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Automatic Git Integration
+    | Git Integration
     |--------------------------------------------------------------------------
     |
-    | Whether automatic git integration should be enabled. This feature
+    | Whether Statamic's git integration should be enabled. This feature
     | assumes that git is already installed and accessible by your
     | PHP process' server user. For more info, see the docs at:
     |
@@ -16,6 +16,20 @@ return [
     */
 
     'enabled' => env('STATAMIC_GIT_ENABLED', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Automatically Run
+    |--------------------------------------------------------------------------
+    |
+    | By default, git commands will be run automatically after `DataSaved`
+    | events are fired. If you prefer users to manually trigger the git
+    | commands, set this to `false` and your users will be presented
+    | with the relevant GUI to commit the changes as they see fit.
+    |
+    */
+
+    'automatic' => env('STATAMIC_GIT_AUTOMATIC', true),
 
     /*
     |--------------------------------------------------------------------------
