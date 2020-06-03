@@ -29,8 +29,8 @@ return [
     */
 
     'user' => [
-        'name' => env('STATAMIC_GIT_USER_NAME', '{current_user_name}'),
-        'email' => env('STATAMIC_GIT_USER_EMAIL', '{current_user_email}'),
+        'name' => env('STATAMIC_GIT_USER_NAME', '{{ current_user_name }}'),
+        'email' => env('STATAMIC_GIT_USER_EMAIL', '{{ current_user_email }}'),
     ],
 
     /*
@@ -45,9 +45,9 @@ return [
     */
 
     'commands' => [
-        'cd {cwd}',
-        'git add {path}',
-        'git commit -m "{message}" -c "user.name={name}" -c "user.email={email}"',
+        'cd {{ cwd }}',
+        'git add {{ path }}',
+        'git commit -m "{{ message }}" -c "user.name={{ name }}" -c "user.email={{ email }}"',
     ],
 
     /*
