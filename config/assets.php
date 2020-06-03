@@ -53,7 +53,7 @@ return [
         */
 
         'cache' => false,
-        'cache_path' => public_path('img'),
+        'cache_disk' => 'manipulation_cache',
 
         /*
         |--------------------------------------------------------------------------
