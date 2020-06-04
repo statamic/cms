@@ -127,14 +127,7 @@ class Assets extends Fieldtype
 
     public function shallowAugment($value)
     {
-        $assets = $this->getAssetsForAugmentation($value)->map(function ($asset) {
-            return [
-                'id' => $asset->id(),
-                'url' => $asset->url(),
-                'permalink' => $asset->absoluteUrl(),
-                'api_url' => $asset->apiUrl(),
-            ];
-        });
+        $assets = $this->getAssetsForAugmentation($value)->map->toShallowAugmentedCollection();
 
         return $this->config('max_files') === 1 ? $assets->first() : $assets;
     }

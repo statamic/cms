@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
+use Statamic\Data\AugmentedCollection;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Taxonomy;
@@ -70,6 +71,7 @@ class TaxonomyTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $augmented);
         $this->assertNotInstanceOf(TermCollection::class, $augmented);
+        $this->assertEveryItemIsInstanceOf(AugmentedCollection::class, $augmented);
         $this->assertCount(2, $augmented);
         $this->assertEquals([
             [
@@ -88,7 +90,7 @@ class TaxonomyTest extends TestCase
                 'permalink' => 'http://localhost/tags/two',
                 'api_url' => 'http://localhost/api/taxonomies/tags/terms/two',
             ],
-        ], $augmented->all());
+        ], $augmented->toArray());
     }
 
     /** @test */
@@ -96,6 +98,7 @@ class TaxonomyTest extends TestCase
     {
         $augmented = $this->fieldtype(['taxonomy' => 'tags', 'max_items' => 1])->shallowAugment(['one']);
 
+        $this->assertInstanceOf(AugmentedCollection::class, $augmented);
         $this->assertEquals([
             'id' => 'tags::one',
             'title' => 'one',
@@ -103,7 +106,7 @@ class TaxonomyTest extends TestCase
             'url' => '/tags/one',
             'permalink' => 'http://localhost/tags/one',
             'api_url' => 'http://localhost/api/taxonomies/tags/terms/one',
-        ], $augmented);
+        ], $augmented->toArray());
     }
 
     public function fieldtype($config = [])
