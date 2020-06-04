@@ -49,17 +49,36 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Tracked Paths
+    |--------------------------------------------------------------------------
+    |
+    | Define the tracked paths to be considered when staging changes. Default
+    | stache and file locations are already set up for you, but feel free
+    | to modify these paths to suit your storage config. Absolute paths
+    | are valid when referencing content stored in external repos.
+    |
+    */
+
+    'paths' => [
+        'content',
+        'users',
+        'resources/users',
+        'public/assets',
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
     | Commands
     |--------------------------------------------------------------------------
     |
-    | Define the commands to be run when `DataSaved` events are fired. By
-    | default this will `git add` your changes, and `git commit` them
-    | to the git repository relative to your working directory.
+    | Define a list commands to be run when Statamic is ready to `git add`
+    | and `git commit` your changes. These commands will be run once
+    | per repo, attempting to consolidate commits where possible.
     |
     */
 
     'commands' => [
-        'cd {{ cwd }}',
+        'cd {{ git_root }}',
         'git add {{ paths }}',
         'git commit -m "{{ message }}" -c "user.name={{ name }}" -c "user.email={{ email }}"',
     ],
