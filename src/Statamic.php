@@ -39,7 +39,7 @@ class Statamic
 
     public static function script($name, $path)
     {
-        static::$scripts[$name] = str_finish($path, '.js');
+        static::$scripts[$name][] = str_finish($path, '.js');
 
         return new static;
     }
@@ -58,7 +58,7 @@ class Statamic
 
     public static function style($name, $path)
     {
-        static::$styles[$name] = str_finish($path, '.css');
+        static::$styles[$name][] = str_finish($path, '.css');
 
         return new static;
     }
