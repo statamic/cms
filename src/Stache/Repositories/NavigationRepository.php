@@ -47,11 +47,18 @@ class NavigationRepository implements RepositoryContract
 
     public function make(string $handle = null): Nav
     {
-        return (new \Statamic\Structures\Nav)->handle($handle);
+        return app(Nav::class)->handle($handle);
     }
 
     public function updateEntryUris(Nav $nav)
     {
         $this->store->index('uri')->updateItem($nav);
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            Nav::class => \Statamic\Structures\Nav::class,
+        ];
     }
 }

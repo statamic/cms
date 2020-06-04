@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Facades\Preference;
 use Statamic\Sites\Sites;
+use Statamic\Structures\UriCache;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -87,12 +88,16 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Entries\CollectionRepository::class => \Statamic\Stache\Repositories\CollectionRepository::class,
             \Statamic\Contracts\Globals\GlobalRepository::class => \Statamic\Stache\Repositories\GlobalRepository::class,
             \Statamic\Contracts\Assets\AssetContainerRepository::class => \Statamic\Stache\Repositories\AssetContainerRepository::class,
-            \Statamic\Contracts\Data\Repositories\ContentRepository::class => \Statamic\Stache\Repositories\ContentRepository::class,
             \Statamic\Contracts\Structures\StructureRepository::class => \Statamic\Structures\StructureRepository::class,
             \Statamic\Contracts\Structures\NavigationRepository::class => \Statamic\Stache\Repositories\NavigationRepository::class,
             \Statamic\Contracts\Assets\AssetRepository::class => \Statamic\Assets\AssetRepository::class,
+            \Statamic\Contracts\Forms\FormRepository::class => \Statamic\Forms\FormRepository::class,
         ])->each(function ($concrete, $abstract) {
             $this->app->singleton($abstract, $concrete);
+
+            foreach ($concrete::bindings() as $abstract => $concrete) {
+                $this->app->bind($abstract, $concrete);
+            }
         });
 
         $this->app->singleton(\Statamic\Contracts\Data\DataRepository::class, function ($app) {
@@ -114,6 +119,10 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\Statamic\Fields\FieldsetRepository::class, function ($app) {
             return (new \Statamic\Fields\FieldsetRepository($app['files']))
                 ->setDirectory(resource_path('fieldsets'));
+        });
+
+        $this->app->singleton(UriCache::class, function () {
+            return new UriCache;
         });
     }
 

@@ -45,4 +45,9 @@ class StructureRepository implements RepositoryContract
     {
         return (new \Statamic\Structures\Structure)->handle($handle);
     }
+
+    public static function bindings(): array
+    {
+        return [];
+    }
 }
