@@ -41,11 +41,6 @@ class StructureRepository implements RepositoryContract
         $this->store->delete($structure);
     }
 
-    public function make(string $handle = null): Structure
-    {
-        return (new \Statamic\Structures\Structure)->handle($handle);
-    }
-
     public static function bindings(): array
     {
         return [];
