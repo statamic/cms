@@ -5,6 +5,7 @@ namespace Tests\Fieldtypes;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Contracts\Assets\Asset;
+use Statamic\Data\AugmentedCollection;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Assets\Assets;
@@ -53,6 +54,7 @@ class AssetsTest extends TestCase
         $augmented = $this->fieldtype()->shallowAugment(['foo/one.txt', 'bar/two.txt', 'unknown.txt']);
 
         $this->assertInstanceOf(Collection::class, $augmented);
+        $this->assertEveryItemIsInstanceOf(AugmentedCollection::class, $augmented);
         $this->assertEquals([
             [
                 'id' => 'test::foo/one.txt',
@@ -66,7 +68,7 @@ class AssetsTest extends TestCase
                 'permalink' => 'http://localhost/assets/bar/two.txt',
                 'api_url' => 'http://localhost/api/assets/test/bar/two.txt',
             ],
-        ], $augmented->all());
+        ], $augmented->toArray());
     }
 
     /** @test */
@@ -74,12 +76,13 @@ class AssetsTest extends TestCase
     {
         $augmented = $this->fieldtype(['max_files' => 1])->shallowAugment(['foo/one.txt']);
 
+        $this->assertInstanceOf(AugmentedCollection::class, $augmented);
         $this->assertEquals([
             'id' => 'test::foo/one.txt',
             'url' => '/assets/foo/one.txt',
             'permalink' => 'http://localhost/assets/foo/one.txt',
             'api_url' => 'http://localhost/api/assets/test/foo/one.txt',
-        ], $augmented);
+        ], $augmented->toArray());
     }
 
     public function fieldtype($config = [])

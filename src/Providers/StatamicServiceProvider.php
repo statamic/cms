@@ -18,7 +18,6 @@ class StatamicServiceProvider extends AggregateServiceProvider
         ConsoleServiceProvider::class,
         CollectionsServiceProvider::class,
         CacheServiceProvider::class,
-        DataServiceProvider::class,
         FilesystemServiceProvider::class,
         ExtensionServiceProvider::class,
         EventServiceProvider::class,

@@ -178,13 +178,7 @@ class Entries extends Relationship
 
     protected function shallowAugmentValue($value)
     {
-        return [
-            'id' => $value->id(),
-            'title' => $value->value('title'),
-            'url' => $value->url(),
-            'permalink' => $value->absoluteUrl(),
-            'api_url' => $value->apiUrl(),
-        ];
+        return $value->toShallowAugmentedCollection();
     }
 
     public function getSelectionFilters()

@@ -117,4 +117,12 @@ class AssetRepository implements Contract
     {
         $asset->writeMeta($asset->generateMeta());
     }
+
+    public static function bindings(): array
+    {
+        return [
+            Asset::class => \Statamic\Assets\Asset::class,
+            QueryBuilder::class => \Statamic\Assets\QueryBuilder::class,
+        ];
+    }
 }

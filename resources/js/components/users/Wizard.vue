@@ -189,7 +189,8 @@ export default {
         route: { type: String },
         usersCreateUrl: { type: String },
         usersIndexUrl: { type: String },
-        canCreateSupers: { type: Boolean }
+        canCreateSupers: { type: Boolean },
+        activationExpiry: { type: Number },
     },
 
     data() {
@@ -204,7 +205,7 @@ export default {
             invitation: {
                 send: true,
                 subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
-                message: __('messages.user_wizard_invitation_body', { site: window.location.hostname }),
+                message: __('messages.user_wizard_invitation_body', { site: window.location.hostname, expiry: this.activationExpiry }),
             },
             userExists: false,
             completed: false,
