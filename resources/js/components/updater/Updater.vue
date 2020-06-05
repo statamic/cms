@@ -110,7 +110,7 @@
             },
 
             onLatestVersion() {
-                return this.currentVersion == this.latestVersion;
+                return this.currentVersion && this.currentVersion == this.latestVersion;
             },
 
             licensedReleases() {
