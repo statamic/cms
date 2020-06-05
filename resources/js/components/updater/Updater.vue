@@ -26,26 +26,31 @@
             <svg-icon name="marketing/tooter-nay" class="w-16 h-16" />
         </div>
 
-        <div v-for="release in changelog" class="card update-release mb-5">
-            <div class="flex justify-between mb-4">
-                <div>
-                    <h1>{{ release.version }}</h1>
-                    <h5 class="date">Released on {{ release.date }}</h5>
-                </div>
-                <div v-if="showActions">
-                    <button v-if="release.type === 'current'" class="btn opacity-50" disabled>Current Version</button>
-                    <button v-else-if="release.latest" @click="updateToLatest()" class="btn">Update to Latest</button>
-                    <button v-else @click="installExplicitVersion(release.version)" class="btn">
-                        <template v-if="release.type === 'upgrade'">Upgrade to</template>
-                        <template v-if="release.type === 'downgrade'">Downgrade to</template>
-                        {{ release.version }}
-                    </button>
-                </div>
+        <div class="bg-yellow border-yellow-dark border-dashed p-2 text-xs border mb-3 rounded cursor-pointer flex items-center justify-between"
+            v-if="!showingUnlicensedReleases"
+            @click="showingUnlicensedReleases = true"
+        >
+            <div>
+                <h4>This addon has more releases beyond your licensed limit.</h4>
+                <p>You may update, but will need to upgrade or purchase a new license.</p>
             </div>
-            <div class="card-body">
-                <div v-html="release.body"></div>
-            </div>
+            <button class="btn btn-sm">View additional releases</button>
         </div>
+
+        <release
+            v-if="showingUnlicensedReleases"
+            v-for="release in unlicensedReleases"
+            :key="release.version"
+            :release="release"
+            :show-actions="showActions"
+        />
+
+        <release
+            v-for="release in licensedReleases"
+            :key="release.version"
+            :release="release"
+            :show-actions="showActions"
+        />
 
         <modal
             v-if="modalOpen"
@@ -64,7 +69,14 @@
 </template>
 
 <script>
+    import Release from './Release.vue';
+
     export default {
+
+        components: {
+            Release
+        },
+
         props: [
             'slug',
             'package',
@@ -78,7 +90,8 @@
                 currentVersion: null,
                 lastInstallLog: null,
                 modalOpen: false,
-                latestVersion: null
+                latestVersion: null,
+                showingUnlicensedReleases: false,
             };
         },
 
@@ -97,6 +110,14 @@
 
             onLatestVersion() {
                 return this.currentVersion == this.latestVersion;
+            },
+
+            licensedReleases() {
+                return this.changelog.filter(release => release.licensed);
+            },
+
+            unlicensedReleases() {
+                return this.changelog.filter(release => !release.licensed);
             }
         },
 

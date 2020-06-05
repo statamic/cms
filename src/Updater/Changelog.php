@@ -34,6 +34,7 @@ abstract class Changelog
                 'version' => $release['version'],
                 'type' => $this->parseReleaseType($release['version'], $index),
                 'latest' => $index === 0,
+                'licensed' => $this->isLicensed($release['version']),
                 'date' => Carbon::parse($release['date'])->format('F jS, Y'),
                 'body' => (string) new GithubReleasePresenter($release['changelog']),
             ];
@@ -77,5 +78,10 @@ abstract class Changelog
         }
 
         return 'downgrade';
+    }
+
+    protected function isLicensed($version)
+    {
+        return true;
     }
 }

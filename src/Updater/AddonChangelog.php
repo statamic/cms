@@ -13,11 +13,16 @@ class AddonChangelog extends Changelog
 
     public function item()
     {
-        return $this->addon->marketplaceSellerSlug().'/'.$this->addon->marketplaceSlug();
+        return $this->addon->package();
     }
 
     public function currentVersion()
     {
         return $this->addon->version();
+    }
+
+    protected function isLicensed($version)
+    {
+        return version_compare($version, $this->addon->license()->versionLimit(), '<');
     }
 }

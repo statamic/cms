@@ -2,6 +2,7 @@
 
 namespace Statamic\Extend;
 
+use Facades\Statamic\Licensing\LicenseManager;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
@@ -372,6 +373,11 @@ final class Addon
         }
 
         return version_compare($this->version, $this->latestVersion, '=');
+    }
+
+    public function license()
+    {
+        return LicenseManager::addons()->get($this->package());
     }
 
     /**

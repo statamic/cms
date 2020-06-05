@@ -26,7 +26,7 @@ class Marketplace
 
     public function releases($package)
     {
-        $uri = "releases/$package";
+        $uri = "packages/$package/releases";
 
         return Cache::rememberWithExpiration("marketplace-$uri", function () use ($uri) {
             try {

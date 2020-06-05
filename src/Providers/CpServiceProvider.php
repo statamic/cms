@@ -13,7 +13,7 @@ use Statamic\Facades\User;
 use Statamic\Http\View\Composers\FieldComposer;
 use Statamic\Http\View\Composers\JavascriptComposer;
 use Statamic\Http\View\Composers\SessionExpiryComposer;
-use Statamic\Licensing\Licenses;
+use Statamic\Licensing\LicenseManager;
 use Statamic\Licensing\Outpost;
 
 class CpServiceProvider extends ServiceProvider
@@ -50,8 +50,8 @@ class CpServiceProvider extends ServiceProvider
             return new UtilityRepository;
         });
 
-        $this->app->singleton(Licenses::class, function ($app) {
-            return new Licenses(new Outpost);
+        $this->app->singleton(LicenseManager::class, function ($app) {
+            return new LicenseManager($app[Outpost::class]);
         });
     }
 

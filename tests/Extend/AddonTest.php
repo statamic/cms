@@ -2,6 +2,7 @@
 
 namespace Statamic\Testing\Extend;
 
+use Facades\Statamic\Licensing\LicenseManager;
 use Illuminate\Support\Collection;
 use Statamic\Extend\Addon;
 use Statamic\Facades\File;
@@ -225,6 +226,16 @@ class AddonTest extends TestCase
         $addon = $this->makeFromPackage(['autoload' => 'src']);
 
         $this->assertEquals('src', $addon->autoload());
+    }
+
+    /** @test */
+    public function it_gets_the_license()
+    {
+        LicenseManager::shouldReceive('addons')->once()->andReturn(collect([
+            'foo/bar' => 'the license',
+        ]));
+
+        $this->assertEquals('the license', Addon::make('foo/bar')->license());
     }
 
     private function makeFromPackage($attributes)

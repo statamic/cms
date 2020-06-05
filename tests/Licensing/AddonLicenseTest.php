@@ -71,6 +71,14 @@ class AddonLicenseTest extends TestCase
         $this->assertNotEquals($key, $message);
         $this->assertEquals($message, $license->invalidReason());
     }
+
+    /** @test */
+    public function it_gets_the_version_limit()
+    {
+        $license = $this->license(['version_limit' => 4]);
+
+        $this->assertEquals(4, $license->versionLimit());
+    }
 }
 
 class FakeAddonLicenseAddon

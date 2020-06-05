@@ -27,6 +27,11 @@ class AddonLicense extends License
         return $this->addon->version();
     }
 
+    public function versionLimit()
+    {
+        return $this->response['version_limit'] ?? null;
+    }
+
     public function edition()
     {
         return $this->addon->edition();

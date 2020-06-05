@@ -13,30 +13,34 @@ trait ChangelogTests
     public function it_can_get_changelog_contents()
     {
         Client::shouldReceive('request')
-            ->andReturn($this->fakeMarketplaceReleasesResponse(['1.0.3', '1.0.2', '1.0.1', '1.0.0']));
+            ->andReturn($this->fakeMarketplaceReleasesResponse(['2.0.0', '1.0.3', '1.0.2', '1.0.1', '1.0.0']));
 
         $changelog = $this->changelog();
 
         $contents = $changelog->get();
 
-        $this->assertCount(4, $contents);
-        $this->assertEquals(2, $changelog->availableUpdatesCount());
+        $this->assertCount(5, $contents);
+        $this->assertEquals(3, $changelog->availableUpdatesCount());
 
-        $this->assertEquals('1.0.3', $contents[0]->version);
+        $this->assertEquals('2.0.0', $contents[0]->version);
         $this->assertEquals('upgrade', $contents[0]->type);
         $this->assertTrue($contents[0]->latest);
 
-        $this->assertEquals('1.0.2', $contents[1]->version);
+        $this->assertEquals('1.0.3', $contents[1]->version);
         $this->assertEquals('upgrade', $contents[1]->type);
         $this->assertFalse($contents[1]->latest);
 
-        $this->assertEquals('1.0.1', $contents[2]->version);
-        $this->assertEquals('current', $contents[2]->type);
+        $this->assertEquals('1.0.2', $contents[2]->version);
+        $this->assertEquals('upgrade', $contents[2]->type);
         $this->assertFalse($contents[2]->latest);
 
-        $this->assertEquals('1.0.0', $contents[3]->version);
-        $this->assertEquals('downgrade', $contents[3]->type);
+        $this->assertEquals('1.0.1', $contents[3]->version);
+        $this->assertEquals('current', $contents[3]->type);
         $this->assertFalse($contents[3]->latest);
+
+        $this->assertEquals('1.0.0', $contents[4]->version);
+        $this->assertEquals('downgrade', $contents[4]->type);
+        $this->assertFalse($contents[4]->latest);
 
         collect($contents)->each(function ($release) {
             $this->assertEquals('November 6th, 2018', $release->date);
