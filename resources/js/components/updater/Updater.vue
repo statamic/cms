@@ -27,7 +27,7 @@
         </div>
 
         <div class="bg-yellow border-yellow-dark border-dashed p-2 text-xs border mb-3 rounded cursor-pointer flex items-center justify-between"
-            v-if="!showingUnlicensedReleases"
+            v-if="!showingUnlicensedReleases && hasUnlicensedReleases"
             @click="showingUnlicensedReleases = true"
         >
             <div>
@@ -119,6 +119,10 @@
 
             unlicensedReleases() {
                 return this.changelog.filter(release => !release.licensed);
+            },
+
+            hasUnlicensedReleases() {
+                return this.unlicensedReleases.length > 0;
             }
         },
 
