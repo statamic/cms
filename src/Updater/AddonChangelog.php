@@ -23,6 +23,6 @@ class AddonChangelog extends Changelog
 
     protected function isLicensed($version)
     {
-        return version_compare($version, $this->addon->license()->versionLimit(), '<');
+        return version_compare($version, $this->addon->license()->versionLimit() ?? 999999, '<');
     }
 }
