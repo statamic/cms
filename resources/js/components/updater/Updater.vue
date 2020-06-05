@@ -1,8 +1,9 @@
 <template>
     <div>
-        <div class="flex mb-3">
-            <h1 v-if="currentVersion" class="flex-1">
-                {{ __('Current') }}: <span class="font-normal">{{ currentVersion }}</span>
+        <div class="flex items-center mb-3">
+            <h1 class="flex-1">
+                <span v-text="name" />
+                <span v-if="currentVersion" class="font-normal text-grey-70">{{ currentVersion }}</span>
             </h1>
             <button v-if="(composer.processing || lastInstallLog) && ! modalOpen" class="btn" @click="modalOpen = true">
                 <template v-if="composer.processing">
@@ -12,18 +13,11 @@
                 <template v-else>Last Install Log</template>
             </button>
             <button v-if="showActions && ! onLatestVersion" class="btn-primary ml-2" @click="updateToLatest()">{{ __('Update to Latest') }}</button>
+            <div v-if="onLatestVersion" v-text="__('Up to date')" />
         </div>
 
         <div v-if="gettingChangelog" class="card p-3 text-center">
             <loading-graphic  />
-        </div>
-
-        <div class="card mb-5 flex items-center" v-if="onLatestVersion">
-            <div>
-                <h1 class="mb-sm">You are running the latest version.</h1>
-                <h3>Version: {{ currentVersion }}</h3>
-            </div>
-            <svg-icon name="marketing/tooter-nay" class="w-16 h-16" />
         </div>
 
         <div class="bg-yellow border-yellow-dark border-dashed p-2 text-xs border mb-3 rounded cursor-pointer flex items-center justify-between"

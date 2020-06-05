@@ -3,7 +3,9 @@
 
 @section('content')
 
-    @include('statamic::updater.partials.header')
+    <div class="flex mb-3">
+        <h1 class="flex-1">{{ __('Updates') }}</h1>
+    </div>
 
     <h6 class="mt-4">Core</h6>
     <div class="card p-0 mt-1">
@@ -36,5 +38,10 @@
             @endforeach
         </table>
     </div>
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Updates'),
+        'url' => 'updates'
+    ])
 
 @endsection
