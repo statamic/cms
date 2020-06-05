@@ -86,7 +86,7 @@
 
         data() {
             return {
-                gettingChangelog: false,
+                gettingChangelog: true,
                 changelog: [],
                 currentVersion: null,
                 lastInstallLog: null,
