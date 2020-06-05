@@ -37,13 +37,14 @@
             <button class="btn btn-sm">View additional releases</button>
         </div>
 
-        <release
-            v-if="showingUnlicensedReleases"
-            v-for="release in unlicensedReleases"
-            :key="release.version"
-            :release="release"
-            :show-actions="showActions"
-        />
+        <template v-if="showingUnlicensedReleases">
+            <release
+                v-for="release in unlicensedReleases"
+                :key="release.version"
+                :release="release"
+                :show-actions="showActions"
+            />
+        </template>
 
         <release
             v-for="release in licensedReleases"
