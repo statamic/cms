@@ -11,7 +11,7 @@
                     'has-error': sectionHasError(section.handle)
                 }"
                 @click.prevent="active = section.handle"
-                v-text="section.display || `${section.handle[0].toUpperCase()}${section.handle.slice(1)}`"
+                v-text="__(section.display) || __(`${section.handle[0].toUpperCase()}${section.handle.slice(1)}`)"
             ></a>
         </div>
 

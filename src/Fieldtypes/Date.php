@@ -19,9 +19,9 @@ class Date extends Fieldtype
                 'default' => 'single',
                 'width' => 50,
                 'options' => [
-                    'single' => 'Single',
-                    // 'multiple' => 'Multiple',
-                    'range' => 'Range',
+                    'single' => __('Single'),
+                    // 'multiple' => __('Multiple'),
+                    'range' => __('Range'),
                 ],
             ],
             'time_enabled'  => [
@@ -42,7 +42,7 @@ class Date extends Fieldtype
                 'display' => __('Earliest Date'),
                 'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
                 'type' => 'text',
-                'default' => '1900-01-01',
+                'default' => __('1900-01-01'),
                 'width' => 50,
             ],
             'format' => [

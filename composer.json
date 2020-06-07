@@ -26,7 +26,8 @@
         "symfony/yaml": "^4.1@dev",
         "twistor/flysystem-guzzle": "^6.0",
         "webuni/commonmark-attributes-extension": "^1.0",
-        "wilderborn/partyline": "^1.0"
+        "wilderborn/partyline": "^1.0",
+        "ext-json": "*"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",

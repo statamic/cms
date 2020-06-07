@@ -195,7 +195,7 @@ class FormsController extends CpController
                     'email' => [
                         'type' => 'grid',
                         'mode' => 'stacked',
-                        'add_row' => 'Add Email',
+                        'add_row' => __('Add Email'),
                         'instructions' => __('statamic::messages.form_configure_email_instructions'),
                         'fields' => [
                             [

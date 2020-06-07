@@ -85,7 +85,7 @@ class AssetContainersController extends CpController
 
         // return $container->toArray();
 
-        session()->flash('success', 'Asset container updated');
+        session()->flash('success', __('Asset container updated'));
 
         return ['redirect' => $container->showUrl()];
     }
@@ -132,7 +132,7 @@ class AssetContainersController extends CpController
 
         $container->save();
 
-        session()->flash('success', 'Asset container created');
+        session()->flash('success', __('Asset container created'));
 
         return ['redirect' => $container->showUrl()];
     }
