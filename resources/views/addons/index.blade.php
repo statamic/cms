@@ -7,6 +7,6 @@
         <h1 class="flex-1">{{ __('Addons') }}</h1>
     </div>
 
-    <addon-list></addon-list>
+    <addon-list :install-count="{{ $addonCount }}"></addon-list>
 
 @endsection

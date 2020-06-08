@@ -22,7 +22,10 @@
                             class="data-list-filter-link"
                             :class="{ active: filter === 'installed' }"
                             @click="filter = 'installed'"
-                            v-text="__('Installed')" />
+                        >
+                            {{ __('Installed') }}
+                            <span class="badge" v-if="installCount">{{ installCount }}</span>
+                        </button>
                     </div>
 
                     <div class="p-1">
@@ -73,7 +76,8 @@
 
         props: [
             'domain',
-            'endpoints'
+            'endpoints',
+            'installCount',
         ],
 
         data() {
