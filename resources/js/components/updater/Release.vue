@@ -8,8 +8,8 @@
             </div>
             <div v-if="showActions">
                 <button v-if="release.type === 'current'" class="btn opacity-50" disabled>Current Version</button>
-                <button v-else-if="release.latest" @click="updateToLatest()" class="btn">Update to Latest</button>
-                <button v-else @click="installExplicitVersion(release.version)" class="btn">
+                <button v-else-if="release.latest" @click="$emit('install')" class="btn">Update to Latest</button>
+                <button v-else @click="$emit('install')" class="btn">
                     <template v-if="release.type === 'upgrade'">Upgrade to</template>
                     <template v-if="release.type === 'downgrade'">Downgrade to</template>
                     {{ release.version }}

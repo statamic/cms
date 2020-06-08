@@ -37,6 +37,7 @@
                 :key="release.version"
                 :release="release"
                 :show-actions="showActions"
+                @install="installExplicitVersion(release.version)"
             />
         </template>
 
@@ -45,6 +46,7 @@
             :key="release.version"
             :release="release"
             :show-actions="showActions"
+            @install="installExplicitVersion(release.version)"
         />
 
         <modal
