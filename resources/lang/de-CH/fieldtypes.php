@@ -41,6 +41,7 @@ return [
     'date.config.rows' => 'Mehrere Monate gleichzeitig in verschiedenen Zeilen anzeigen.',
     'date.config.time_enabled' => 'Aktiviert den Timepicker.',
     'date.config.time_required' => 'Benötigt zusätzlich zum Datum eine Zeitangabe.',
+    'form.config.max_items' => 'Maximale Anzahl auswählbarer Formulare.',
     'grid.config.add_row' => 'Beschriftung des Buttons «Zeile hinzufügen» festlegen.',
     'grid.config.fields' => 'Im Tabellenmodus wird jedes Feld zu einer Spalte.',
     'grid.config.max_rows' => 'Maximale Anzahl möglicher Zeilen festlegen.',
