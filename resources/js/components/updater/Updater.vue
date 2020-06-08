@@ -51,16 +51,24 @@
 
         <modal
             v-if="modalOpen"
-            name="output-modal"
-            height="auto"
-            :scrollable="true"
-            :pivotY=".1"
-            width="760px"
-            :click-to-close="true"
+            name="updater-composer-output"
+            v-slot="{ close: closeModal }"
+            :close-on-click="!composer.processing"
+            :pivot-y="0.5"
+            :overflow="false"
+            width="75%"
             @opened="$events.$emit('start-composer')"
             @closed="modalOpen = false"
         >
-            <composer-output :package="package" class="m-3"></composer-output>
+            <div class="p-3 relative">
+                <composer-output :package="package" />
+                <button
+                    v-if="!composer.processing"
+                    class="btn-close absolute top-0 right-0 mt-2 mr-2"
+                    aria-label="Close"
+                    @click="closeModal"
+                    v-html="'&times'" />
+            </div>
         </modal>
     </div>
 </template>
