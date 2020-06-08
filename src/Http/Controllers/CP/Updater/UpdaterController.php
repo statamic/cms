@@ -24,9 +24,11 @@ class UpdaterController extends CpController
             return redirect()->route('statamic.cp.updater.product', Statamic::CORE_SLUG);
         }
 
-        $statamic = Marketplace::statamic()->changelog();
-
-        return view('statamic::updater.index', compact('statamic', 'addons'));
+        return view('statamic::updater.index', [
+            'statamic' => Marketplace::statamic()->changelog(),
+            'addons' => Addon::all()->filter->existsOnMarketplace(),
+            'unlistedAddons' => Addon::all()->reject->existsOnMarketplace(),
+        ]);
     }
 
     /**
