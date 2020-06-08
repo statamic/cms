@@ -23,6 +23,11 @@ class Process
     protected $output;
 
     /**
+     * @var bool
+     */
+    protected $colorized = false;
+
+    /**
      * Instantiate process.
      *
      * @param mixed $basePath
@@ -86,10 +91,10 @@ class Process
         $this->output = null;
 
         $process->run(function ($type, $buffer) use (&$output) {
-            $this->output .= $this->plainText($buffer);
+            $this->output .= $buffer;
         });
 
-        return $this->output;
+        return $this->normalizeOutput($this->output);
     }
 
     /**
@@ -107,7 +112,7 @@ class Process
         $this->appendOutputToCache($cacheKey, null);
 
         $process->run(function ($type, $buffer) use ($cacheKey) {
-            $this->appendOutputToCache($cacheKey, $this->plainText($buffer));
+            $this->appendOutputToCache($cacheKey, $buffer);
         });
 
         $this->setCompletedOnCache($cacheKey);
@@ -148,7 +153,11 @@ class Process
      */
     public function cachedOutput(string $cacheKey)
     {
-        return Cache::get($cacheKey) ?? ['output' => false];
+        $cache = Cache::get($cacheKey) ?? ['output' => false];
+
+        $cache['output'] = $this->normalizeOutput($cache['output']);
+
+        return $cache;
     }
 
     /**
@@ -184,15 +193,24 @@ class Process
         @set_time_limit(config('statamic.system.php_max_execution_time'));
     }
 
+    public function colorized()
+    {
+        $this->colorized = true;
+
+        return $this;
+    }
+
     /**
-     * Convert output to plain text.
+     * Normalize output.
      *
      * @param string $output
      */
-    private function plainText(string $output)
+    private function normalizeOutput(string $output)
     {
-        // Remove terminal color codes.
-        $output = preg_replace('/\\e\[[0-9]+m/', '', $output);
+        if (! $this->colorized) {
+            // Remove terminal color codes.
+            $output = preg_replace('/\\e\[[0-9]+m/', '', $output);
+        }
 
         return $output;
     }
