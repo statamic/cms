@@ -187,6 +187,7 @@ class Composer extends Process
             $this->phpBinary(),
             "-d memory_limit={$this->memoryLimit}",
             'vendor/bin/composer',
+            '--ansi',
         ], $parts);
     }
 
