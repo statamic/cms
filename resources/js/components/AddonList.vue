@@ -1,5 +1,19 @@
 <template>
     <div>
+        <div class="breadcrumb flex">
+            <button
+                @click="showingAddon = false"
+                class="flex-initial flex p-1 -m-1 items-center text-xs text-grey-70 hover:text-grey-90"
+            >
+                <svg-icon name="chevron-right" class="h-6 rotate-180" />
+                <span v-text="__('Addons')" />
+            </button>
+        </div>
+
+        <div class="flex mb-3" v-if="!showingAddon">
+            <h1 class="flex-1" v-text="__('Addons')" />
+        </div>
+
         <div v-if="error" class="card text-sm">
             {{ __('messages.addon_list_loading_error') }}
         </div>
@@ -8,7 +22,7 @@
             <loading-graphic  />
         </div>
 
-        <data-list :rows="rows" v-if="loaded">
+        <data-list :rows="rows" v-if="loaded && !showingAddon">
             <div class="" slot-scope="{ rows: addons }">
 
                 <div class="card p-0">
@@ -43,7 +57,8 @@
                             <a :href="addon.seller.website" class="relative">
                                 <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 z-30 bg-white relative -mt-4 border-2 border-white inline">
                             </a>
-                            <div class="addon-card-title mb-2 text-lg font-bold text-center">{{ addon.name }}</div>
+                            <div class="addon-card-title mb-1 text-lg font-bold text-center">{{ addon.name }}</div>
+                            <p class="text-grey mb-2" v-text="getPriceRange(addon)" />
                             <p v-text="addon.summary" class="text-sm"></p>
                         </div>
                     </div>
@@ -51,14 +66,14 @@
                 </div>
 
                 <data-list-pagination :resource-meta="meta" @page-selected="setPage"></data-list-pagination>
-
-                <modal v-if="showingAddon" name="addon-modal" width="760px" :click-to-close="true" :scrollable="true" @closed="showingAddon = false">
-                    <addon-details
-                        :addon="showingAddon"
-                        :cover="getCover(showingAddon)" />
-                </modal>
             </div>
         </data-list>
+
+
+        <addon-details
+            v-if="showingAddon"
+            :addon="showingAddon"
+            :cover="getCover(showingAddon)" />
     </div>
 </template>
 
@@ -169,12 +184,16 @@
                     : 'https://statamic.com/images/img/marketplace/placeholder-addon.png';
             },
 
+            getPriceRange(addon) {
+                let [low, high] = addon.price_range;
+                low = low ? `$${low}` : 'Free';
+                high = high ? `$${high}` : 'Free';
+                return (low == high) ? low : `${low} - ${high}`;
+            },
+
             showAddon(addon) {
                 this.showingAddon = addon;
-
-                this.$nextTick(() => {
-                    this.$modal.show('addon-modal');
-                });
+                window.scrollTo(0, 0);
             },
         }
     }

@@ -1,16 +1,50 @@
 <template>
     <div>
-        <img :src="cover" class="rounded-t">
-        <div class="flex items-center justify-between px-4 py-2 mb-2 border-b">
-            <a :href="addon.seller.website" class="relative flex items-center">
-                <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 mr-2">
-                <span class="font-bold">{{ addon.seller.name }}</span>
-            </a>
+        <div class="flex items-center mb-3">
+            <h1 class="flex-1" v-text="addon.name" />
             <button v-if="addon.installed" class="btn" :disabled="processing" @click="uninstall">Uninstall Addon</button>
-            <button v-else class="btn" :disabled="processing" @click="install">Install Addon</button>
+            <button v-else class="btn btn-primary" :disabled="processing" @click="install">Install Addon</button>
         </div>
-        <composer-output v-show="composer.status" :package="package" class="m-3"></composer-output>
-        <div v-if="! composer.status" class="p-4 content" v-html="description" />
+        <modal
+            name="addon-composer-output"
+            v-if="showComposer"
+            v-slot="{ close: closeModal }"
+            :close-on-click="!composer.processing"
+            :pivot-y="0.5"
+            :overflow="false"
+            width="75%"
+            @closed="showComposer = false"
+        >
+            <div class="p-3 relative">
+                <composer-output :package="package" />
+                <button
+                    v-if="!composer.processing"
+                    class="btn-close absolute top-0 right-0 mt-2 mr-2"
+                    aria-label="Close"
+                    @click="closeModal"
+                    v-html="'&times'" />
+            </div>
+        </modal>
+        <div>
+            <div class="card mb-3 flex items-center">
+                <div class="flex-1 text-lg">
+                    <div class="little-heading p-0 mb-1 text-grey-70">Price</div>
+                    <div class="font-bold" v-text="priceRange" />
+                </div>
+                <div class="flex-1 text-lg">
+                    <div class="little-heading p-0 mb-1 text-grey-70">Seller</div>
+                    <a :href="addon.seller.website" class="relative flex items-center">
+                        <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full w-6 mr-1">
+                        <span class="font-bold">{{ addon.seller.name }}</span>
+                    </a>
+                </div>
+                <div class="flex-1 text-lg">
+                    <div class="little-heading p-0 mb-1 text-grey-70">Downloads</div>
+                    <div class="font-bold">1,234</div>
+                </div>
+            </div>
+            <div class="card content p-4" v-html="description" />
+        </div>
     </div>
 </template>
 
@@ -18,12 +52,12 @@
     export default {
         props: [
             'addon',
-            'cover',
         ],
 
         data() {
             return {
                 waitingForRefresh: false,
+                showComposer: false
             }
         },
 
@@ -46,7 +80,14 @@
 
             description() {
                 return markdown(this.addon.description);
-            }
+            },
+
+            priceRange() {
+                let [low, high] = this.addon.price_range;
+                low = low ? `$${low}` : 'Free';
+                high = high ? `$${high}` : 'Free';
+                return (low == high) ? low : `${low} - ${high}`;
+            },
         },
 
         created() {
@@ -60,6 +101,7 @@
                 this.$axios.post(cp_url('addons/install'), {'addon': this.package}, this.toEleven);
 
                 this.waitingForRefresh = true;
+                this.showComposer = true;
 
                 this.$store.commit('statamic/composer', {
                     processing: true,
@@ -67,13 +109,14 @@
                     package: this.package,
                 });
 
-                this.$events.$emit('start-composer');
+                setTimeout(() => this.$events.$emit('start-composer'), 100);
             },
 
             uninstall() {
                 this.$axios.post(cp_url('addons/uninstall'), {'addon': this.package}, this.toEleven);
 
                 this.waitingForRefresh = true;
+                this.showComposer = true;
 
                 this.$store.commit('statamic/composer', {
                     processing: true,
@@ -81,7 +124,7 @@
                     package: this.package,
                 });
 
-                this.$events.$emit('start-composer');
+                setTimeout(() => this.$events.$emit('start-composer'), 100);
             },
 
             composerFinished() {
