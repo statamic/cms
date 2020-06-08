@@ -205,7 +205,7 @@ class Process
      *
      * @param string $output
      */
-    private function normalizeOutput(string $output)
+    public function normalizeOutput(string $output)
     {
         if (! $this->colorized) {
             // Remove terminal color codes.
