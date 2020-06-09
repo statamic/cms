@@ -2,7 +2,6 @@
 
 namespace Statamic\Console;
 
-use Illuminate\Contracts\Console\Kernel;
 use Statamic\Support\Str;
 
 trait RunsInPlease
