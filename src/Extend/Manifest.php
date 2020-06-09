@@ -22,7 +22,7 @@ class Manifest extends PackageManifest
         }
 
         $this->write(collect($packages)->filter(function ($package) {
-            return array_get($package, 'type') === 'statamic-addon';
+            return Arr::has($package, 'extra.statamic');
         })->keyBy('name')->map(function ($package) {
             return $this->formatPackage($package);
         })->filter()->all());
