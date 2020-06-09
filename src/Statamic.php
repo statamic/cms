@@ -21,6 +21,7 @@ class Statamic
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
+    protected static $bootedCallbacks = [];
 
     public static function version()
     {
@@ -226,5 +227,17 @@ class Statamic
     public static function docsUrl($url)
     {
         return URL::tidy('https://statamic.dev/'.$url);
+    }
+
+    public static function booted(Closure $callback)
+    {
+        static::$bootedCallbacks[] = $callback;
+    }
+
+    public static function runBootedCallbacks()
+    {
+        foreach (static::$bootedCallbacks as $callback) {
+            $callback();
+        }
     }
 }
