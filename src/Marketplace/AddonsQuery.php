@@ -10,6 +10,7 @@ use Statamic\Facades\Addon;
 class AddonsQuery
 {
     protected $search;
+    protected $installed = false;
     protected $page = 1;
 
     public function search($search)
@@ -51,21 +52,29 @@ class AddonsQuery
             $params['filter']['products'] = $installed->join(',');
         }
 
-        $addons = Client::get('addons', $params)['data'];
+        $response = Client::get('addons', $params);
 
-        return collect($addons)->map(function ($addon) use ($installed) {
+        $response['data'] = collect($response['data'])->map(function ($addon) use ($installed) {
             return $addon + [
                 'installed' => $installed->contains($addon['id']),
                 'edition' => Addon::get($addon['package'])->edition(),
             ];
-        });
+        })->all();
+
+        return $response;
     }
 
     public function paginate()
     {
-        return new LengthAwarePaginator($items = $this->get(), $items->count(), 15, $this->page, [
-            'path' => Paginator::resolveCurrentPath(),
-        ]);
+        $response = $this->get();
+
+        return new LengthAwarePaginator(
+            $response['data'],
+            $response['meta']['total'],
+            $response['meta']['per_page'],
+            $this->page,
+            ['path' => Paginator::resolveCurrentPath()]
+        );
     }
 
     private function installedProducts()
