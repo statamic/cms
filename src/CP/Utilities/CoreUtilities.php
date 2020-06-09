@@ -54,5 +54,18 @@ class CoreUtilities
                 $router->post('/', [EmailController::class, 'send']);
             })
             ->register();
+
+        if (config('statamic.git.enabled')) {
+            Utility::make('git')
+                ->view('statamic::utilities.git')
+                ->title(__('Git'))
+                ->icon('email-utility') // TODO: Find better icon
+                ->description(__('Manage git tracked content.')) // TODO: Move into language files
+                ->docsUrl(Statamic::docsUrl('utilities/git'))
+                ->routes(function ($router) {
+                    // $router->post('/', [EmailController::class, 'send']);
+                })
+                ->register();
+        }
     }
 }
