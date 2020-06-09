@@ -173,7 +173,7 @@
             },
 
             refreshShowingAddon() {
-                this.showingAddon.installed = _.findWhere(this.rows, { id: this.showingAddon.id }).installed;
+                this.showingAddon = _.findWhere(this.rows, { id: this.showingAddon.id });
 
                 this.$events.$emit('addon-refreshed');
             },

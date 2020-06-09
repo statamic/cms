@@ -54,7 +54,10 @@ class AddonsQuery
         $addons = Client::get('addons', $params)['data'];
 
         return collect($addons)->map(function ($addon) use ($installed) {
-            return $addon + ['installed' => $installed->contains($addon['id'])];
+            return $addon + [
+                'installed' => $installed->contains($addon['id']),
+                'edition' => Addon::get($addon['package'])->edition(),
+            ];
         });
     }
 

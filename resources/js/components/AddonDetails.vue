@@ -43,13 +43,20 @@
                     <div class="font-bold">1,234</div>
                 </div>
             </div>
+            <addon-editions v-if="addon.editions.length" :addon="addon" />
             <div class="card content p-4" v-html="description" />
         </div>
     </div>
 </template>
 
 <script>
+import AddonEditions from './addons/Editions.vue';
+
     export default {
+        components: {
+            AddonEditions,
+        },
+
         props: [
             'addon',
         ],

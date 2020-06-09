@@ -150,6 +150,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('addons', 'AddonsController@index')->name('addons.index');
     Route::post('addons/install', 'AddonsController@install');
     Route::post('addons/uninstall', 'AddonsController@uninstall');
+    Route::post('addons/editions', 'AddonEditionsController');
 
     Route::group(['namespace' => 'Forms'], function () {
         Route::post('forms/{form}/submissions/actions', 'SubmissionActionController@run')->name('forms.submissions.actions.run');
