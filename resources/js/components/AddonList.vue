@@ -69,6 +69,19 @@
             </div>
         </data-list>
 
+        <template v-if="unlisted.length">
+            <h6 class="mt-4">{{ __('Unlisted Addons') }}</h6>
+            <div class="card p-0 mt-1">
+                <table class="data-table">
+                    <tbody>
+                        <tr v-for="addon in unlisted" :key="addon.package">
+                            <td v-text="addon.name" />
+                            <td v-text="addon.package" />
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </template>
 
         <addon-details
             v-if="showingAddon"
@@ -105,6 +118,7 @@
                 page: 1,
                 showingAddon: false,
                 error: false,
+                unlisted: [],
             }
         },
 
@@ -157,6 +171,7 @@
                     this.loading = false;
                     this.rows = response.data.data;
                     this.meta = response.data.meta;
+                    this.unlisted = response.data.unlisted ?? [];
 
                     if (this.showingAddon) {
                         this.refreshShowingAddon();
