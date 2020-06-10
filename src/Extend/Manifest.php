@@ -18,7 +18,8 @@ class Manifest extends PackageManifest
         $packages = [];
 
         if ($this->files->exists($path = $this->vendorPath.'/composer/installed.json')) {
-            $packages = json_decode($this->files->get($path), true);
+            $installed = json_decode($this->files->get($path), true);
+            $packages = $installed['packages'] ?? $installed;
         }
 
         $this->write(collect($packages)->filter(function ($package) {
