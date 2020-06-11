@@ -16,9 +16,7 @@ class EmailAvailable implements Rule
      */
     public function passes($attribute, $value)
     {
-        return ! User::all()->first(function ($user) use ($value) {
-            return $user->email() === trim($value);
-        });
+        return User::query()->where('email', trim($value))->count() === 0;
     }
 
     /**
