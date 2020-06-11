@@ -2,6 +2,8 @@
 
 namespace Statamic\Console;
 
+use Statamic\Support\Str;
+
 trait RunsInPlease
 {
     /**
@@ -43,5 +45,14 @@ trait RunsInPlease
         if (isset($this->hiddenInPlease)) {
             $this->setHidden($this->hiddenInPlease);
         }
+    }
+
+    protected function resolveCommand($command)
+    {
+        if ($this->runningInPlease && Str::startsWith($command, 'statamic:')) {
+            $command = Str::after($command, 'statamic:');
+        }
+
+        return parent::resolveCommand($command);
     }
 }

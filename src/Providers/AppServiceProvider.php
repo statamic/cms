@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Facades\Preference;
 use Statamic\Sites\Sites;
+use Statamic\Statamic;
 use Statamic\Structures\UriCache;
 
 class AppServiceProvider extends ServiceProvider
@@ -21,14 +22,15 @@ class AppServiceProvider extends ServiceProvider
 
     public function boot()
     {
+        $this->app->booted(function () {
+            Statamic::runBootedCallbacks();
+            $this->loadRoutesFrom("{$this->root}/routes/routes.php");
+        });
+
         $this->registerMiddlewareGroup();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
              ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class);
-
-        $this->app->booted(function () {
-            $this->loadRoutesFrom("{$this->root}/routes/routes.php");
-        });
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
