@@ -32,7 +32,7 @@ class Composer extends Process
      */
     public function installed()
     {
-        return collect(json_decode($this->runComposerCommand('show', '--direct', '--format=json'))->installed)
+        return collect(json_decode($this->runComposerCommand('show', '--direct', '--format=json', '--no-plugins'))->installed)
             ->keyBy('name')
             ->map(function ($package) {
                 $package->version = $this->normalizeVersion($package->version);
@@ -67,7 +67,7 @@ class Composer extends Process
      */
     public function installedPath(string $package)
     {
-        return collect(json_decode($this->runComposerCommand('show', '--direct', '--path', '--format=json'))->installed)
+        return collect(json_decode($this->runComposerCommand('show', '--direct', '--path', '--format=json', '--no-plugins'))->installed)
             ->keyBy('name')
             ->get($package)
             ->path;
