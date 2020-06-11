@@ -7,22 +7,20 @@ use Statamic\Jobs\RunComposer;
 
 class Composer extends Process
 {
-    public $memoryLimit;
+    private $composerCommand;
 
     /**
      * Instantiate composer process.
      *
      * @param mixed $basePath
      */
-    public function __construct($basePath = null)
+    public function __construct($basePath = null, $command = 'composer')
     {
         parent::__construct($basePath);
 
-        // Set this process to eleven.
-        $this->toEleven();
+        $this->composerCommand = $command;
 
-        // Set memory limit for child process to eleven.
-        $this->memoryLimit = config('statamic.system.php_memory_limit');
+        $this->toEleven();
     }
 
     /**
@@ -183,11 +181,7 @@ class Composer extends Process
      */
     private function prepareProcessArguments($parts)
     {
-        return array_merge([
-            $this->phpBinary(),
-            "-d memory_limit={$this->memoryLimit}",
-            'vendor/bin/composer',
-        ], $parts);
+        return array_merge([$this->composerCommand], $parts);
     }
 
     /**
