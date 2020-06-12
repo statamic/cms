@@ -1479,7 +1479,7 @@ License: MIT
 
       // On resize, scroll, input, click, mousedown + mousemove, call EQCSS.throttle.
       window.addEventListener('resize', EQCSS.throttle)
-      window.addEventListener('input', EQCSS.throttle)
+      // window.addEventListener('input', EQCSS.throttle)
       window.addEventListener('click', EQCSS.throttle)
 
       window.addEventListener('mousedown', function(e) {
