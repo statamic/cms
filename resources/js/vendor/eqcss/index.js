@@ -1300,8 +1300,9 @@ License: MIT
 
         try {
 
-          // with() is necessary for implicit 'this'!
-          with ($it) { ret = eval(string.slice(1, -1)) }
+        //   // with() is necessary for implicit 'this'!
+        //   with ($it) { ret = eval(string.slice(1, -1)) }
+        ret = eval(string.slice(1, -1));
 
         }
 
