@@ -22,6 +22,7 @@ class Session extends Tags
     public function value()
     {
         $key = $this->params->get('key');
+
         return session()->get($key, $this->params->get('default'));
     }
 
