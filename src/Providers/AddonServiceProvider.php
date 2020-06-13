@@ -277,7 +277,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function bootViews()
     {
         $this->loadViewsFrom(
-            $this->getAddon()->directory().'/../resources/views',
+            $this->getAddon()->directory().'resources/views',
             $this->viewNamespace ?? $this->getAddon()->packageName()
         );
 
