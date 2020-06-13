@@ -19,6 +19,12 @@ class Session extends Tags
         dump(session()->all());
     }
 
+    public function value()
+    {
+        $key = $this->params->get('key');
+        return session()->get($key, $this->params->get('default'));
+    }
+
     public function set()
     {
         foreach ($this->params as $key => $value) {
