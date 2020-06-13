@@ -172,11 +172,14 @@ class Cascade
             'old' => Arr::sanitize(old(null, [])),
 
             // Site
-            'site' => $siteHandle = $this->site->handle(),
-            'site_name' => $siteName = $this->site->name(),
-            'site_locale' => $siteLocale = $this->site->locale(),
-            'site_short_locale' => $this->site->shortLocale(),
-            'site_url' => $siteUrl = $this->site->url(),
+            'site' => [
+                'handle' => $siteHandle = $this->site->handle(),
+                'name' => $siteName = $this->site->name(),
+                'locale' => $siteLocale = $this->site->locale(),
+                'short_locale' => $this->site->shortLocale(),
+                'url' => $siteUrl = $this->site->url(),
+            ],
+
             'homepage' => $siteUrl,
             'locale' => $siteHandle,
             'locale_name' => $siteName,

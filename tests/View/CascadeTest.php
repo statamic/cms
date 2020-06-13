@@ -137,11 +137,12 @@ class CascadeTest extends TestCase
         tap($cascade->hydrate()->toArray(), function ($cascade) {
             $this->assertEquals('http://test.com', $cascade['homepage']);
 
-            $this->assertEquals('en', $cascade['site']);
-            $this->assertEquals('English', $cascade['site_name']);
-            $this->assertEquals('en_US', $cascade['site_locale']);
-            $this->assertEquals('en', $cascade['site_short_locale']);
-            $this->assertEquals('http://test.com', $cascade['site_url']);
+            $this->assertIsArray($cascade['site']);
+            $this->assertEquals('en', $cascade['site']['handle']);
+            $this->assertEquals('English', $cascade['site']['name']);
+            $this->assertEquals('en_US', $cascade['site']['locale']);
+            $this->assertEquals('en', $cascade['site']['short_locale']);
+            $this->assertEquals('http://test.com', $cascade['site']['url']);
 
             $this->assertEquals('en', $cascade['locale']);
             $this->assertEquals('English', $cascade['locale_name']);
@@ -158,11 +159,11 @@ class CascadeTest extends TestCase
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
             $this->assertEquals('http://fr.test.com', $cascade['homepage']);
 
-            $this->assertEquals('fr', $cascade['site']);
-            $this->assertEquals('French', $cascade['site_name']);
-            $this->assertEquals('fr_FR', $cascade['site_locale']);
-            $this->assertEquals('fr', $cascade['site_short_locale']);
-            $this->assertEquals('http://fr.test.com', $cascade['site_url']);
+            $this->assertEquals('fr', $cascade['site']['handle']);
+            $this->assertEquals('French', $cascade['site']['name']);
+            $this->assertEquals('fr_FR', $cascade['site']['locale']);
+            $this->assertEquals('fr', $cascade['site']['short_locale']);
+            $this->assertEquals('http://fr.test.com', $cascade['site']['url']);
 
             $this->assertEquals('fr', $cascade['locale']);
             $this->assertEquals('French', $cascade['locale_name']);
@@ -179,11 +180,11 @@ class CascadeTest extends TestCase
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
             $this->assertEquals('http://test.com/de', $cascade['homepage']);
 
-            $this->assertEquals('de', $cascade['site']);
-            $this->assertEquals('German', $cascade['site_name']);
-            $this->assertEquals('de_DE', $cascade['site_locale']);
-            $this->assertEquals('de', $cascade['site_short_locale']);
-            $this->assertEquals('http://test.com/de', $cascade['site_url']);
+            $this->assertEquals('de', $cascade['site']['handle']);
+            $this->assertEquals('German', $cascade['site']['name']);
+            $this->assertEquals('de_DE', $cascade['site']['locale']);
+            $this->assertEquals('de', $cascade['site']['short_locale']);
+            $this->assertEquals('http://test.com/de', $cascade['site']['url']);
 
             $this->assertEquals('de', $cascade['locale']);
             $this->assertEquals('German', $cascade['locale_name']);
