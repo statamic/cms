@@ -25,7 +25,7 @@ class CollectionEntriesStore extends ChildStore
     public function getFileFilter(SplFileInfo $file)
     {
         $dir = str_finish($this->directory(), '/');
-        $relative = $file->getPathname();
+        $relative = Path::tidy($file->getPathname());
 
         if (substr($relative, 0, strlen($dir)) == $dir) {
             $relative = substr($relative, strlen($dir));
