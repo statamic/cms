@@ -22,6 +22,7 @@ class Taxonomy extends Relationship
             'taxonomies' => [
                 'display' => __('Taxonomies'),
                 'type' => 'taxonomies',
+                'mode' => 'select',
             ],
         ]);
     }
