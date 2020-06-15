@@ -189,6 +189,11 @@ abstract class Relationship extends Fieldtype
         return [];
     }
 
+    public function getSelectionFilters()
+    {
+        return collect();
+    }
+
     protected function getCreatables()
     {
         return [];
