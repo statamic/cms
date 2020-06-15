@@ -2,20 +2,46 @@
 
 namespace Tests\Tags;
 
-use Statamic\Facades\Parse;
+use Statamic\Facades\Antlers;
 use Tests\TestCase;
 
 class SessionTagTest extends TestCase
 {
-    private function tag($tag)
+    /** @test */
+    public function it_gets_session_value()
     {
-        return Parse::template($tag, []);
+        session()->put('nineties', 'rad');
+
+        $this->assertEquals('rad', Antlers::parse('{{ session:value key="nineties" }}'));
     }
 
     /** @test */
-    public function it_gets_session_key()
+    public function it_gets_session_array_value()
     {
-        session()->put('the-90s-are', 'rad');
-        $this->assertEquals('rad', $this->tag('{{ session:value key="the-90s-are" }}'));
+        session()->put('things', ['nineties' => 'rad']);
+
+        $this->assertEquals('rad', Antlers::parse('{{ session:value key="things.nineties" }}'));
+        $this->assertEquals('rad', Antlers::parse('{{ session:value key="things:nineties" }}'));
+    }
+
+    /** @test */
+    public function it_gets_session_value_using_wildcard()
+    {
+        session()->put('nineties', 'rad');
+
+        $this->assertEquals('rad', Antlers::parse('{{ session:nineties }}'));
+        $this->assertEquals('rad', Antlers::parse('{{ session:key }}', ['key' => 'nineties']));
+        $this->assertEquals('rad', Antlers::parse('{{ session:key }}', ['key' => 'nineties']));
+    }
+
+    /** @test */
+    public function it_gets_session_array_value_using_wildcard()
+    {
+        session()->put('things', ['nineties' => 'rad']);
+
+        $this->assertEquals('rad', Antlers::parse('{{ session:things.nineties }}'));
+        $this->assertEquals('rad', Antlers::parse('{{ session:things:nineties }}'));
+        $this->assertEquals('rad', Antlers::parse('{{ session:key }}', ['key' => 'things.nineties']));
+        $this->assertEquals('rad', Antlers::parse('{{ session:key }}', ['key' => 'things:nineties']));
     }
 }
