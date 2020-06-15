@@ -89,7 +89,8 @@ class TermQueryBuilder extends Builder
             });
 
             // Perform the filtering, and get the keys (the references, we don't care about the values).
-            $keys = $this->filterWhereBasic($items, $where)->keys();
+            $method = 'filterWhere'.$where['type'];
+            $keys = $this->{$method}($items, $where)->keys();
 
             // Continue intersecting the keys across the where clauses.
             // If a key exists in the reduced array but not in the current iteration, it should be removed.
