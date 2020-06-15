@@ -15,7 +15,7 @@ class AddRequestMessage
      */
     public function handle(ViewRendered $event)
     {
-        if (! app()->bound('debugbar')) {
+        if (! debugbar()->isEnabled()) {
             return;
         }
 
@@ -31,9 +31,9 @@ class AddRequestMessage
     protected function label($item)
     {
         if ($item instanceof Route) {
-            return 'Route ' . $item->url();
+            return 'Route '.$item->url();
         }
 
-        return class_basename($item) . ' ' . $item->id();
+        return class_basename($item).' '.$item->id();
     }
 }

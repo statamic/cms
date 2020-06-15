@@ -97,7 +97,7 @@ class Parser
         return $this->newInstance([
             'renderer' => [
                 'soft_break' => "<br />\n",
-            ]
+            ],
         ]);
     }
 

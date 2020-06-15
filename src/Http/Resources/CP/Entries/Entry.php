@@ -2,9 +2,9 @@
 
 namespace Statamic\Http\Resources\CP\Entries;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class Entry extends Resource
+class Entry extends JsonResource
 {
     public function toArray($request)
     {
@@ -15,6 +15,10 @@ class Entry extends Resource
             'published' => $this->resource->published(),
             'private' => $this->resource->private(),
             'edit_url' => $this->resource->editUrl(),
+            'collection' => [
+                'title' => $this->resource->collection()->title(),
+                'handle' => $this->resource->collection()->handle(),
+            ],
         ];
     }
 }

@@ -3,12 +3,12 @@
    ========================================================================== */
 
 .nav-main {
-    @apply select-none bg-white shadow h-screen fixed pin-l overflow-scroll w-full;
+    @apply hidden select-none bg-white shadow h-screen absolute left-0 overflow-scroll w-56;
     transition: all .3s;
     z-index: 9998;
 
     ul {
-        @apply list-reset mt-0 mb-3;
+        @apply list-none p-0 mt-0 mb-3;
     }
 
     li {
@@ -62,7 +62,7 @@
 
 @screen md {
     .nav-main {
-        @apply flex bg-transparent shadow-none overflow-auto w-56 border-r;
+        @apply fixed flex bg-transparent shadow-none overflow-auto border-r;
         z-index: 1;
         height: calc(100% - 52px);
     }

@@ -1,0 +1,18 @@
+<?php
+
+namespace DummyNamespace;
+
+use Statamic\Actions\Action;
+
+class DummyClass extends Action
+{
+    /**
+     * The run method
+     *
+     * @return void
+     */
+    public function run($items, $values)
+    {
+        // Your code
+    }
+}

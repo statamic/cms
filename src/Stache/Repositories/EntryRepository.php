@@ -2,12 +2,11 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\Stache\Stache;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
 use Statamic\Entries\EntryCollection;
 use Statamic\Stache\Query\EntryQueryBuilder;
-use Statamic\Contracts\Structures\StructureRepository;
-use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
+use Statamic\Stache\Stache;
 
 class EntryRepository implements RepositoryContract
 {
@@ -52,11 +51,18 @@ class EntryRepository implements RepositoryContract
     {
         $site = $site ?? $this->stache->sites()->first();
 
-        return app(StructureRepository::class)->findEntryByUri($uri, $site)
-            ?? $this->query()
+        $entry = $this->query()
                 ->where('uri', $uri)
                 ->where('site', $site)
                 ->first();
+
+        if (! $entry) {
+            return null;
+        }
+
+        return $entry->hasStructure()
+            ? $entry->structure()->in($site)->page($entry->id())
+            : $entry;
     }
 
     public function save($entry)
@@ -65,19 +71,11 @@ class EntryRepository implements RepositoryContract
             $entry->id($this->stache->generateId());
         }
 
-        if ($entry->collection()->orderable()) {
-            $this->ensureEntryPosition($entry);
-        }
-
         $this->store->store($entry->collectionHandle())->save($entry);
     }
 
     public function delete($entry)
     {
-        if ($entry->collection()->orderable()) {
-            $this->removeEntryPosition($entry);
-        }
-
         $this->store->store($entry->collectionHandle())->delete($entry);
     }
 
@@ -88,7 +86,7 @@ class EntryRepository implements RepositoryContract
 
     public function make(): Entry
     {
-        return new \Statamic\Entries\Entry;
+        return app(Entry::class);
     }
 
     public function taxonomize($entry)
@@ -98,20 +96,6 @@ class EntryRepository implements RepositoryContract
                 ->store($taxonomy = $taxonomy->handle())
                 ->sync($entry, $entry->value($taxonomy));
         });
-    }
-
-    protected function ensureEntryPosition($entry)
-    {
-        if (! $entry->collection()->getEntryPosition($entry->id())) {
-            $entry->collection()->appendEntryPosition($entry->id())->save();
-        }
-    }
-
-    protected function removeEntryPosition($entry)
-    {
-        if ($entry->collection()->getEntryPosition($entry->id())) {
-            $entry->collection()->removeEntryPosition($entry->id())->save();
-        }
     }
 
     public function createRules($collection, $site)
@@ -127,6 +111,13 @@ class EntryRepository implements RepositoryContract
         return [
             'title' => 'required',
             'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id().','.$entry->locale(),
+        ];
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            Entry::class => \Statamic\Entries\Entry::class,
         ];
     }
 }

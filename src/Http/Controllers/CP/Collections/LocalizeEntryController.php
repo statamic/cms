@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\Facades\User;
 use Illuminate\Http\Request;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
 class LocalizeEntryController extends CpController

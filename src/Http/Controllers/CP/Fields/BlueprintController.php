@@ -2,19 +2,18 @@
 
 namespace Statamic\Http\Controllers\CP\Fields;
 
-use Statamic\Facades;
-use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Illuminate\Http\Request;
+use Statamic\Facades;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Str;
 
 class BlueprintController extends CpController
 {
     public function __construct()
     {
-        $this->middleware('can:configure fields');
+        $this->middleware(\Illuminate\Auth\Middleware\Authorize::class.':configure fields');
     }
 
     public function index()
@@ -42,22 +41,28 @@ class BlueprintController extends CpController
     public function store(Request $request)
     {
         $request->validate([
-            'title' => 'required'
+            'title' => 'required',
         ]);
 
+        $handle = Str::snake($request->title);
+
+        if (Facades\Blueprint::find($handle)) {
+            return back()->withInput()->with('error', __('A blueprint with that name already exists.'));
+        }
+
         $blueprint = (new Blueprint)
-            ->setHandle(Str::snake($request->title))
+            ->setHandle($handle)
             ->setContents([
                 'title' => $request->title,
                 'sections' => [
                     'main' => [
                         'display' => 'Main',
-                        'fields' => []
-                    ]
-                ]
+                        'fields' => [],
+                    ],
+                ],
             ])->save();
 
-        return redirect($blueprint->editUrl())->with('message', __('Saved'));
+        return redirect($blueprint->editUrl())->with('success', __('Blueprint created'));
     }
 
     public function edit($blueprint)
@@ -66,7 +71,7 @@ class BlueprintController extends CpController
 
         return view('statamic::blueprints.edit', [
             'blueprint' => $blueprint,
-            'blueprintVueObject' => $this->toVueObject($blueprint)
+            'blueprintVueObject' => $this->toVueObject($blueprint),
         ]);
     }
 
@@ -82,12 +87,12 @@ class BlueprintController extends CpController
         $sections = collect($request->sections)->mapWithKeys(function ($section) {
             return [array_pull($section, 'handle') => [
                 'display' => $section['display'],
-                'fields' => $this->sectionFields($section['fields'])
+                'fields' => $this->sectionFields($section['fields']),
             ]];
         })->all();
         $blueprint->setContents([
             'title' => $request->title,
-            'sections' => $sections
+            'sections' => $sections,
         ])->save();
 
         return response('', 204);
@@ -107,7 +112,7 @@ class BlueprintController extends CpController
             'handle' => $blueprint->handle(),
             'sections' => $blueprint->sections()->map(function ($section, $i) {
                 return array_merge($this->sectionToVue($section), ['_id' => $i]);
-            })->values()->all()
+            })->values()->all(),
         ];
     }
 
@@ -118,7 +123,7 @@ class BlueprintController extends CpController
             'display' => $section->display(),
             'fields' => collect($section->contents()['fields'])->map(function ($field, $i) {
                 return array_merge(FieldTransformer::toVue($field), ['_id' => $i]);
-            })->all()
+            })->all(),
         ];
     }
 

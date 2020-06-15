@@ -3,11 +3,12 @@
 namespace Statamic\Yaml;
 
 use Exception;
-use Statamic\Facades\File;
 use ReflectionProperty;
+use Statamic\Facades\File;
 use Statamic\Facades\Pattern;
-use Symfony\Component\Yaml\Yaml as SymfonyYaml;
+use Statamic\Support\Str;
 use Statamic\Yaml\ParseException as StatamicParseException;
+use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 
 class Yaml
 {
@@ -21,7 +22,7 @@ class Yaml
     }
 
     /**
-     * Parse a string of raw YAML into an array
+     * Parse a string of raw YAML into an array.
      *
      * @param null|string $str  The YAML string
      * @return array
@@ -31,7 +32,7 @@ class Yaml
         $originalStr = $str;
 
         if (func_num_args() === 0) {
-            throw_if(!$this->file, new Exception('Cannot parse YAML without a file or string.'));
+            throw_if(! $this->file, new Exception('Cannot parse YAML without a file or string.'));
             $str = File::get($this->file);
         }
 
@@ -53,6 +54,7 @@ class Yaml
             throw $this->viewException($e, $str);
         }
 
+        $this->validateString($yaml, $str);
         $this->validateDocumentContent($yaml, $content, $originalStr);
 
         return isset($content)
@@ -61,7 +63,7 @@ class Yaml
     }
 
     /**
-     * Dump some YAML
+     * Dump some YAML.
      *
      * @param array        $data
      * @param string|bool  $content
@@ -81,7 +83,7 @@ class Yaml
     }
 
     /**
-     * Dump some YAML with fenced front-matter
+     * Dump some YAML with fenced front-matter.
      *
      * @param array        $data
      * @param string|bool  $content
@@ -89,12 +91,12 @@ class Yaml
      */
     public function dumpFrontMatter($data, $content = null)
     {
-        if ($content && !is_string($content)) {
+        if ($content && ! is_string($content)) {
             $data['content'] = $content;
             $content = '';
         }
 
-        return '---' . PHP_EOL . $this->dump($data) . '---' . PHP_EOL . $content;
+        return '---'.PHP_EOL.$this->dump($data).'---'.PHP_EOL.$content;
     }
 
     protected function viewException($e, $str, $line = null)
@@ -104,7 +106,7 @@ class Yaml
         $args = [
             $e->getMessage(), 0, 1, $path,
             $line ?? $e->getParsedLine(),
-            $e
+            $e,
         ];
 
         $exception = new StatamicParseException(...$args);
@@ -152,5 +154,18 @@ class Yaml
         }
 
         throw $this->viewException($e, $str, $line);
+    }
+
+    protected function validateString($parsed, $string)
+    {
+        if (! is_string($parsed)) {
+            return;
+        }
+
+        $snippet = Str::before($string, "\n");
+
+        $exception = new \Exception("Unable to parse (near \"$snippet\").");
+
+        throw $this->viewException($exception, $string, 1);
     }
 }

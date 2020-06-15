@@ -2,7 +2,6 @@
 
 namespace Statamic\Revisions;
 
-use Statamic\Statamic;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Contracts\Revisions\RevisionRepository as RevisionRepositoryContract;
 

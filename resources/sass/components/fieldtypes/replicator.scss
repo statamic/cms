@@ -7,7 +7,7 @@
 }
 
 .replicator-set {
-    @apply mb-4 shadow-button rounded bg-white outline-none relative;
+    @apply mb-4 shadow-set rounded bg-white outline-none relative;
 }
 
 .replicator-set-header {
@@ -39,7 +39,7 @@
 }
 
 .replicator-set-picker-between {
-    @apply absolute pin-b w-full text-center;
+    @apply absolute bottom-0 w-full text-center;
     margin-bottom: -35px;
 }
 

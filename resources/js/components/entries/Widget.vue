@@ -8,8 +8,6 @@
             v-if="!initializing"
             :rows="items"
             :columns="cols"
-            :search="false"
-            :search-query="searchQuery"
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
@@ -24,9 +22,10 @@
                     </template>
                 </data-list-table>
                 <data-list-pagination
+                    v-if="meta.last_page != 1"
                     class="py-1 border-t bg-grey-20 rounded-b-lg text-sm"
                     :resource-meta="meta"
-                    @page-selected="page = $event"
+                    @page-selected="selectPage"
                 />
             </div>
         </data-list>

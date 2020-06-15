@@ -2,21 +2,48 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\CP\Column;
 use Statamic\Facades;
+use Statamic\Facades\Site;
+use Statamic\Facades\Term;
+use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Facades\Term;
-use Statamic\CP\Column;
 use Statamic\Taxonomies\TermCollection;
-use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
-use Statamic\Statamic;
 
 class Taxonomy extends Relationship
 {
     protected $statusIcons = false;
     protected $taggable = true;
 
+    protected function configFieldItems(): array
+    {
+        return array_merge(parent::configFieldItems(), [
+            'taxonomies' => [
+                'display' => __('Taxonomies'),
+                'type' => 'taxonomies',
+                'mode' => 'select',
+            ],
+        ]);
+    }
+
     public function augment($value)
+    {
+        $terms = $this->getTermsForAugmentation($value);
+
+        return $this->config('max_items') === 1 ? $terms->first() : $terms;
+    }
+
+    public function shallowAugment($value)
+    {
+        $terms = $this->getTermsForAugmentation($value);
+
+        $terms = collect($terms)->map->toShallowAugmentedCollection();
+
+        return $this->config('max_items') === 1 ? $terms->first() : $terms;
+    }
+
+    private function getTermsForAugmentation($value)
     {
         $handle = $taxonomy = null;
 
@@ -25,7 +52,7 @@ class Taxonomy extends Relationship
             $taxonomy = Facades\Taxonomy::findByHandle($handle);
         }
 
-        $terms = (new TermCollection(Arr::wrap($value)))
+        return (new TermCollection(Arr::wrap($value)))
             ->map(function ($value) use ($handle, $taxonomy) {
                 if ($taxonomy) {
                     $slug = $value;
@@ -43,24 +70,16 @@ class Taxonomy extends Relationship
 
                 $entry = $this->field->parent();
 
-                return $term
-                    ->collection($entry->collection())
-                    ->in($entry->locale());
+                if ($entry && $this->field->handle() === $taxonomy->handle()) {
+                    $term->collection($entry->collection());
+                }
+
+                $locale = $entry
+                    ? $entry->locale()
+                    : Site::current()->locale();
+
+                return $term->in($locale);
             });
-
-        if (Statamic::shallowAugmentationEnabled()) {
-            $terms = collect($terms->map(function ($term) {
-                return [
-                    'id' => $term->id(),
-                    'slug' => $term->slug(),
-                    'url' => $term->url(),
-                    'permalink' => $term->absoluteUrl(),
-                    'api_url' => $term->apiUrl(),
-                ];
-            }));
-        }
-
-        return $this->config('max_items') === 1 ? $terms->first() : $terms;
     }
 
     public function process($data)
@@ -114,8 +133,7 @@ class Taxonomy extends Relationship
     {
         return (new TermsResource($items))
             ->blueprint($this->getBlueprint($request))
-            ->columnPreferenceKey("taxonomies.{$this->getFirstTaxonomyFromRequest($request)->handle()}.columns")
-            ->additional(['meta' => ['sortColumn' => $this->getSortColumn($request)]]);
+            ->columnPreferenceKey("taxonomies.{$this->getFirstTaxonomyFromRequest($request)->handle()}.columns");
     }
 
     protected function getBlueprint($request)
@@ -134,7 +152,7 @@ class Taxonomy extends Relationship
     {
         $column = $request->get('sort');
 
-        if (!$column && !$request->search) {
+        if (! $column && ! $request->search) {
             $column = 'title'; // todo: get from taxonomy or config
         }
 
@@ -145,7 +163,7 @@ class Taxonomy extends Relationship
     {
         $order = $request->get('order', 'asc');
 
-        if (!$request->sort && !$request->search) {
+        if (! $request->sort && ! $request->search) {
             // $order = 'asc'; // todo: get from taxonomy or config
         }
 
@@ -161,7 +179,7 @@ class Taxonomy extends Relationship
 
     protected function toItemArray($id)
     {
-        if ($this->usingSingleTaxonomy() && !Str::contains($id, '::')) {
+        if ($this->usingSingleTaxonomy() && ! Str::contains($id, '::')) {
             $id = "{$this->taxonomies()[0]}::{$id}";
         }
 

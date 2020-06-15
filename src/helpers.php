@@ -1,5 +1,6 @@
 <?php
 
+use Barryvdh\Debugbar\LaravelDebugbar;
 use Statamic\Facades\Path;
 use Statamic\Statamic;
 
@@ -10,12 +11,12 @@ function cp_route($route, $params = [])
 
 function statamic_path($path = null)
 {
-    return Path::tidy(__DIR__ . '/../' . $path);
+    return Path::tidy(__DIR__.'/../'.$path);
 }
 
 if (! function_exists('debugbar')) {
     function debugbar()
     {
-        return optional();
+        return app()->bound(LaravelDebugbar::class) ? app(LaravelDebugbar::class) : optional();
     }
 }

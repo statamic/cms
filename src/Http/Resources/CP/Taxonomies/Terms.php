@@ -3,8 +3,6 @@
 namespace Statamic\Http\Resources\CP\Taxonomies;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Statamic\Http\Resources\CP\Assets\Asset;
-use Statamic\Http\Resources\CP\Assets\Folder;
 
 class Terms extends ResourceCollection
 {

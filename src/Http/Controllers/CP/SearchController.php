@@ -2,10 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\Facades\Search;
-use Statamic\Facades\Content;
 use Illuminate\Http\Request;
-use Statamic\Search\IndexNotFoundException;
+use Statamic\Facades\Search;
 
 class SearchController extends CpController
 {
@@ -16,6 +14,11 @@ class SearchController extends CpController
             ->search($request->query('q'))
             ->limit(10)
             ->get()
-            ->toAugmentedArray();
+            ->toAugmentedCollection([
+                'title', 'edit_url',
+                'collection', 'is_entry',
+                'taxonomy', 'is_term',
+                'container', 'is_asset',
+            ]);
     }
 }

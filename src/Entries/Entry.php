@@ -2,42 +2,39 @@
 
 namespace Statamic\Entries;
 
-use ArrayAccess;
-use Statamic\Facades;
-use Statamic\Statamic;
-use Statamic\Support\Arr;
-use Statamic\Facades\Site;
-use Statamic\Facades\User;
-use Statamic\Facades\Blink;
-use Statamic\Facades\Stache;
-use Statamic\Facades\Blueprint;
-use Statamic\Routing\Routable;
-use Statamic\Facades\Collection;
+use Facades\Statamic\View\Cascade;
+use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Entries\Entry as Contract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Revisions\Revisable;
-use Facades\Statamic\View\Cascade;
-use Statamic\Events\Data\EntrySaved;
-use Statamic\Events\Data\EntrySaving;
-use Illuminate\Contracts\Support\Responsable;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Entries\Entry as Contract;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Data\HasOrigin;
-use Statamic\Contracts\Data\Localization;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Events\Data\EntrySaved;
+use Statamic\Events\Data\EntrySaving;
+use Statamic\Facades;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Facades\User;
+use Statamic\Revisions\Revisable;
+use Statamic\Routing\Routable;
+use Statamic\Statamic;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAccess
+class Entry implements Contract, Augmentable, Responsable, Localization
 {
     use Routable {
         uri as routableUri;
     }
 
     use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns;
-
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -49,6 +46,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
     protected $date;
     protected $locale;
     protected $localizations;
+    protected $afterSaveCallbacks = [];
 
     public function __construct()
     {
@@ -123,6 +121,22 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function delete()
     {
+        if ($this->hasStructure()) {
+            tap($this->structure(), function ($structure) {
+                $structure->trees()->each(function ($tree) {
+                    // Ugly, but it's moving all the child pages to the parent. TODO: Tidy.
+                    $parent = $this->parent();
+                    if (optional($parent)->isRoot()) {
+                        $parent = null;
+                    }
+                    $this->page()->pages()->all()->each(function ($child) use ($tree, $parent) {
+                        $tree->move($child->id(), optional($parent)->id());
+                    });
+                    $tree->remove($this);
+                });
+            })->save();
+        }
+
         Facades\Entry::delete($this);
 
         return true;
@@ -130,9 +144,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function editUrl()
     {
-        return $this->hasStructure()
-            ? $this->cpUrl('structures.entries.edit')
-            : $this->cpUrl('collections.entries.edit');
+        return $this->cpUrl('collections.entries.edit');
     }
 
     public function updateUrl()
@@ -167,7 +179,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function livePreviewUrl()
     {
-        return $this->cpUrl('collections.entries.preview.edit');
+        return $this->collection()->route($this->locale())
+            ? $this->cpUrl('collections.entries.preview.edit')
+            : null;
     }
 
     protected function cpUrl($route)
@@ -191,17 +205,29 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function defaultBlueprint()
     {
-        if ($blueprint = $this->value('blueprint')) {
-            return $this->collection()->ensureEntryBlueprintFields(
-                Blueprint::find($blueprint)
-            );
-        }
+        return Blink::once("entry-{$this->id()}-default-blueprint", function () {
+            if ($blueprint = $this->value('blueprint')) {
+                return $this->collection()->ensureEntryBlueprintFields(
+                    Blueprint::find($blueprint)
+                );
+            }
 
-        return $this->collection()->entryBlueprint();
+            return $this->collection()->entryBlueprint();
+        });
+    }
+
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
     }
 
     public function save()
     {
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
         if (EntrySaving::dispatch($this) === false) {
             return false;
         }
@@ -215,6 +241,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         $this->taxonomize();
 
         optional(Collection::findByMount($this))->updateEntryUris();
+
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
 
         EntrySaved::dispatch($this, []);  // TODO: Fix test
 
@@ -231,7 +261,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         $prefix = '';
 
         if ($this->hasDate()) {
-            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d') . '.';
+            $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d').'.';
         }
 
         return vsprintf('%s/%s/%s%s%s.%s', [
@@ -240,19 +270,20 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
             Site::hasMultiple() ? $this->locale().'/' : '',
             $prefix,
             $this->slug(),
-            $this->fileExtension()
+            $this->fileExtension(),
         ]);
     }
 
-    public function order($order = null)
+    public function order()
     {
-        if (func_num_args() === 0) {
-            return $this->collection()->getEntryOrder($this->id());
+        if (! $this->collection()->orderable()) {
+            return null;
         }
 
-        $this->collection()->setEntryPosition($this->id(), $order)->save();
-
-        return $this;
+        return $this->structure()->in($this->locale)
+            ->flattenedPages()
+            ->map->reference()
+            ->flip()->get($this->id) + 1;
     }
 
     public function template($template = null)
@@ -352,7 +383,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         return vsprintf('collections/%s/%s/%s', [
             $this->collectionHandle(),
             $this->locale(),
-            $this->id()
+            $this->id(),
         ]);
     }
 
@@ -391,7 +422,32 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function lastModifiedBy()
     {
-        return User::find($this->get('updated_by'));
+        return $this->has('updated_by')
+            ? User::find($this->get('updated_by'))
+            : null;
+    }
+
+    public function status()
+    {
+        $collection = $this->collection();
+
+        if (! $this->published()) {
+            return 'draft';
+        }
+
+        if (! $collection->dated() && $this->published()) {
+            return 'published';
+        }
+
+        if ($collection->futureDateBehavior() === 'private' && $this->date()->isFuture()) {
+            return 'scheduled';
+        }
+
+        if ($collection->pastDateBehavior() === 'private' && $this->date()->isPast()) {
+            return 'expired';
+        }
+
+        return 'published';
     }
 
     public function private()
@@ -490,6 +546,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
 
     public function parent()
     {
+        return optional($this->page())->parent();
+    }
+
+    public function page()
+    {
         if (! $this->hasStructure()) {
             return null;
         }
@@ -498,12 +559,12 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
             return null;
         }
 
-        return $this->structure()->in($this->locale())->page($id)->parent();
+        return $this->structure()->in($this->locale())->page($id);
     }
 
     public function route()
     {
-        return $this->collection()->route();
+        return $this->collection()->route($this->locale());
     }
 
     public function routeData()
@@ -555,26 +616,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
         return Facades\Entry::find($origin);
     }
 
-    public function offsetExists($key)
-    {
-        return $this->has($key);
-    }
-
-    public function offsetGet($key)
-    {
-        return $this->value($key);
-    }
-
-    public function offsetSet($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
-    }
-
     public function value($key)
     {
         return $this->originValue($key) ?? $this->collection()->cascade($key);
@@ -588,5 +629,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, ArrayAc
     public function defaultAugmentedArrayKeys()
     {
         return $this->selectedQueryColumns;
+    }
+
+    protected function shallowAugmentedArrayKeys()
+    {
+        return ['id', 'title', 'url', 'permalink', 'api_url'];
     }
 }

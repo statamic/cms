@@ -30,7 +30,7 @@
 
             @can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
                 <create-term-button
-                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]) }}"
+                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
                     :blueprints="{{ $blueprints->toJson() }}">
                 </create-term-button>
             @endcan
@@ -44,7 +44,8 @@
             initial-sort-column="{{ $taxonomy->sortField() }}"
             initial-sort-direction="{{ $taxonomy->sortDirection() }}"
             :filters="{{ $filters->toJson() }}"
-            action-url="{{ cp_route('taxonomies.terms.actions', $taxonomy->handle()) }}"
+            run-action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy->handle()) }}"
+            bulk-actions-url="{{ cp_route('taxonomies.terms.actions.bulk', $taxonomy->handle()) }}"
         ></term-list>
 
     @else
@@ -56,7 +57,7 @@
         ])
             @slot('button')
                 {{-- <create-term-button
-                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]) }}"
+                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
                     :blueprints="{{ $blueprints->toJson() }}">
                 </create-term-button> --}}
             @endslot

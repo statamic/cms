@@ -3,7 +3,6 @@
 namespace Statamic\Support;
 
 use Collator;
-use Statamic\Support\Str;
 use Statamic\Facades\Site;
 
 class Comparator
@@ -21,7 +20,7 @@ class Comparator
     }
 
     /**
-     * Compares two values
+     * Compares two values.
      *
      * Returns 1 if first is greater, -1 if second is, 0 if same
      */
@@ -29,9 +28,9 @@ class Comparator
     {
         // something is null
         if (is_null($one) || is_null($two)) {
-            if (is_null($one) && !is_null($two)) {
+            if (is_null($one) && ! is_null($two)) {
                 return 1;
-            } elseif (!is_null($one) && is_null($two)) {
+            } elseif (! is_null($one) && is_null($two)) {
                 return -1;
             }
 
@@ -40,9 +39,9 @@ class Comparator
 
         // something is an array
         if (is_array($one) || is_array($two)) {
-            if (is_array($one) && !is_array($two)) {
+            if (is_array($one) && ! is_array($two)) {
                 return 1;
-            } elseif (!is_array($one) && is_array($two)) {
+            } elseif (! is_array($one) && is_array($two)) {
                 return -1;
             }
 
@@ -51,9 +50,9 @@ class Comparator
 
         // something is an object
         if (is_object($one) || is_object($two)) {
-            if (is_object($one) && !is_object($two)) {
+            if (is_object($one) && ! is_object($two)) {
                 return 1;
-            } elseif (!is_object($one) && is_object($two)) {
+            } elseif (! is_object($one) && is_object($two)) {
                 return -1;
             }
 
@@ -62,9 +61,9 @@ class Comparator
 
         // something is a boolean
         if (is_bool($one) || is_bool($two)) {
-            if ($one && !$two) {
+            if ($one && ! $two) {
                 return 1;
-            } elseif (!$one && $two) {
+            } elseif (! $one && $two) {
                 return -1;
             }
 
@@ -72,7 +71,7 @@ class Comparator
         }
 
         // string based
-        if (!is_numeric($one) || !is_numeric($two)) {
+        if (! is_numeric($one) || ! is_numeric($two)) {
             return $this->strings($one, $two);
         }
 
@@ -80,7 +79,7 @@ class Comparator
     }
 
     /**
-     * Compares two strings
+     * Compares two strings.
      *
      * Returns 1 if first is greater, -1 if second is, 0 if same
      */
@@ -97,7 +96,7 @@ class Comparator
     }
 
     /**
-     * Compares two numbers
+     * Compares two numbers.
      *
      * Returns 1 if first is greater, -1 if second is, 0 if same
      */

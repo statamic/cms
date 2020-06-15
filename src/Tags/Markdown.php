@@ -3,7 +3,6 @@
 namespace Statamic\Tags;
 
 use Statamic\Support\Html;
-use Statamic\Tags\Tags;
 
 class Markdown extends Tags
 {
@@ -36,7 +35,7 @@ class Markdown extends Tags
         $md = $lines->map(function ($line) use ($maxTrim) {
             // Trim the appropriate amount of whitespace at the start of
             // each line.
-            return preg_replace('/^\s{0,' . $maxTrim . '}/', '', $line);
+            return preg_replace('/^\s{0,'.$maxTrim.'}/', '', $line);
         })->implode(PHP_EOL);
 
         return Html::markdown($md);

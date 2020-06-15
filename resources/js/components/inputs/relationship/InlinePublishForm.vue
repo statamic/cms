@@ -7,12 +7,12 @@
     >
     <div class="h-full overflow-auto p-3 bg-grey-30">
 
-        <div v-if="loading" class="absolute pin z-200 flex items-center justify-center text-center">
+        <div v-if="loading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
         </div>
 
         <component
-            class="max-w-2xl mx-auto"
+            class="max-w-3xl mx-auto"
             :is="component"
             v-if="!loading"
             v-bind="componentPropValues"
@@ -88,7 +88,7 @@ export default {
 
         shouldClose() {
             if (this.$dirty.has(this.publishContainer)) {
-                if (! confirm('Are you sure? Unsaved changes will be lost.')) {
+                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
                     return false;
                 }
             }

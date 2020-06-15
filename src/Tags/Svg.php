@@ -2,13 +2,22 @@
 
 namespace Statamic\Tags;
 
-use Stringy\StaticStringy;
 use Statamic\Facades\File;
-use Statamic\Support\Str;
 use Statamic\Facades\URL;
+use Statamic\Support\Str;
+use Stringy\StaticStringy;
 
 class Svg extends Tags
 {
+    use Concerns\RendersAttributes;
+
+    public function wildcard($src)
+    {
+        $this->params['src'] = $src;
+
+        return $this->index();
+    }
+
     public function index()
     {
         $name = Str::ensureRight($this->params->get('src'), '.svg');
@@ -32,27 +41,12 @@ class Svg extends Tags
             }
         }
 
+        $attributes = $this->renderAttributesFromParams(['src']);
+
         return str_replace(
             '<svg',
-            sprintf('<svg%s', $this->renderAttributes()),
+            collect(['<svg', $attributes])->filter()->implode(' '),
             $svg
         );
-    }
-
-    private function renderAttributes()
-    {
-        $attrs = collect($this->params->all())->except('src')->all();
-
-        if (count($attrs) == 0) {
-            return '';
-        }
-
-        return ' '.collect($attrs)->map(function ($value, $attr) {
-            if (is_int($attr)) {
-                return $value;
-            }
-
-            return sprintf('%s="%s"', $attr, $value);
-        })->implode(' ');
     }
 }

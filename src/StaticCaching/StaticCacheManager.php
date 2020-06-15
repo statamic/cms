@@ -2,13 +2,13 @@
 
 namespace Statamic\StaticCaching;
 
-use Statamic\Facades\Site;
-use Statamic\Support\Manager;
 use Illuminate\Cache\Repository;
-use Statamic\StaticCaching\Cachers\Writer;
+use Statamic\Facades\Site;
+use Statamic\StaticCaching\Cachers\ApplicationCacher;
 use Statamic\StaticCaching\Cachers\FileCacher;
 use Statamic\StaticCaching\Cachers\NullCacher;
-use Statamic\StaticCaching\Cachers\ApplicationCacher;
+use Statamic\StaticCaching\Cachers\Writer;
+use Statamic\Support\Manager;
 
 class StaticCacheManager extends Manager
 {
@@ -44,6 +44,7 @@ class StaticCacheManager extends Manager
         }
 
         return array_merge($config, [
+            'exclude' => $this->app['config']['statamic.static_caching.exclude'] ?? [],
             'base_url' => $this->app['request']->root(),
             'locale' => Site::current()->handle(),
         ]);

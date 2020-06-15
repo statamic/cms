@@ -6,7 +6,7 @@ use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Data\HasAugmentedData;
+use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\Data\AssetContainerDeleted;
 use Statamic\Events\Data\AssetContainerSaved;
 use Statamic\Facades;
@@ -14,18 +14,16 @@ use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
-use Statamic\Facades\Parse;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements AssetContainerContract, Augmentable
 {
-    use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedData;
+    use ExistsAsFile, FluentlyGetsAndSets, HasAugmentedInstance;
 
     protected $title;
     protected $handle;
@@ -69,7 +67,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     {
         return vsprintf('%s/%s.yaml', [
             rtrim(Stache::store('asset-containers')->directory(), '/'),
-            $this->handle()
+            $this->handle(),
         ]);
     }
 
@@ -86,7 +84,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Get the absolute URL to this location
+     * Get the absolute URL to this location.
      *
      * @return null|string
      */
@@ -96,7 +94,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Convert to an array
+     * Convert to an array.
      *
      * @return array
      */
@@ -123,16 +121,13 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $array;
     }
 
-    public function augmentedArrayData()
+    public function newAugmentedInstance()
     {
-        return array_merge($this->toArray(), [
-            'handle' => $this->handle(),
-            'assets' => $this->assets()
-        ]);
+        return new AugmentedAssetContainer($this);
     }
 
     /**
-     * Get the URL to edit in the CP
+     * Get the URL to edit in the CP.
      *
      * @return string
      */
@@ -151,8 +146,13 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return cp_route('assets.browse.show', $this->handle());
     }
 
+    public function apiUrl()
+    {
+        return null; // TODO
+    }
+
     /**
-     * Get or set the blueprint to be used by assets in this container
+     * Get or set the blueprint to be used by assets in this container.
      *
      * @param string $blueprint
      * @return \Statamic\Fields\Blueprint|$this
@@ -168,7 +168,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Save the container
+     * Save the container.
      *
      * @return void
      */
@@ -182,7 +182,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Delete the container
+     * Delete the container.
      *
      * @return void
      */
@@ -211,7 +211,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Get all the asset files in this container
+     * Get all the asset files in this container.
      *
      * @param string|null $folder Narrow down assets by folder
      * @param bool $recursive
@@ -237,7 +237,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Get all the subfolders in this container
+     * Get all the subfolders in this container.
      *
      * @param string|null $folder Narrow down subfolders by folder
      * @param bool $recursive
@@ -259,7 +259,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Get all the assets in this container
+     * Get all the assets in this container.
      *
      * @param string|null $folder Narrow down assets by folder
      * @param bool $recursive Whether to look for assets recursively
@@ -279,7 +279,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Get all the asset folders in this container
+     * Get all the asset folders in this container.
      *
      * @param string|null $folder Narrow down by folder
      */
@@ -293,7 +293,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Make an asset
+     * Make an asset.
      *
      * @param string $path
      * @return \Statamic\Assets\Asset
@@ -304,7 +304,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Find an asset
+     * Find an asset.
      *
      * @param string $path
      * @return \Statamic\Assets\Asset|null
@@ -323,7 +323,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Create an asset folder
+     * Create an asset folder.
      *
      * @param string $path
      * @return AssetFolder
@@ -343,7 +343,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Whether the container's assets are web-accessible
+     * Whether the container's assets are web-accessible.
      *
      * @return bool
      */
@@ -353,17 +353,17 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Whether the container's assets are not web-accessible
+     * Whether the container's assets are not web-accessible.
      *
      * @return bool
      */
     public function private()
     {
-        return !$this->accessible();
+        return ! $this->accessible();
     }
 
-     /**
-     * Enable the quick download button when editing files in this container
+    /**
+     * Enable the quick download button when editing files in this container.
      *
      * @param bool|null $allowDownloading
      * @return bool|$this

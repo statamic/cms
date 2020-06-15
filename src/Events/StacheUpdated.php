@@ -2,27 +2,27 @@
 
 namespace Statamic\Events;
 
-use Statamic\Stache\Stache;
 use Illuminate\Support\Collection;
+use Statamic\Stache\Stache;
 
 class StacheUpdated extends Event
 {
     /**
-     * The Stache
+     * The Stache.
      *
      * @var Stache
      */
     public $stache;
 
     /**
-     * The Stache repos that have been updated
+     * The Stache repos that have been updated.
      *
      * @var Collection
      */
     public $updates;
 
     /**
-     * Create a new event instance
+     * Create a new event instance.
      *
      * @param Collection $updates
      * @param Stache     $stache
@@ -34,7 +34,7 @@ class StacheUpdated extends Event
     }
 
     /**
-     * Determine if a given repo was updated
+     * Determine if a given repo was updated.
      *
      * @param string $repo
      * @return bool
@@ -45,7 +45,7 @@ class StacheUpdated extends Event
     }
 
     /**
-     * Determine if any given repos were updated
+     * Determine if any given repos were updated.
      *
      * @param array $repos
      * @return bool

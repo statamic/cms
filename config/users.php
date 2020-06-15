@@ -25,7 +25,7 @@ return [
                 'users' => base_path('users'),
                 'roles' => resource_path('users/roles.yaml'),
                 'groups' => resource_path('users/groups.yaml'),
-            ]
+            ],
         ],
 
         'eloquent' => [
@@ -47,5 +47,35 @@ return [
     */
 
     'avatars' => 'initials',
+
+    /*
+    |--------------------------------------------------------------------------
+    | New User Roles
+    |--------------------------------------------------------------------------
+    |
+    | When registering new users through the user:register_form tag, these
+    | roles will automatically be applied to your newly created users.
+    |
+    */
+
+    'new_user_roles' => [
+        //
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Password Brokers
+    |--------------------------------------------------------------------------
+    |
+    | When resetting passwords, Statamic uses an appropriate password broker.
+    | Here you may define which broker should be used for each situation.
+    | You may want a longer expiry for user activations, for example.
+    |
+    */
+
+    'passwords' => [
+        'resets' => config('auth.defaults.passwords'),
+        'activations' => config('auth.defaults.passwords'),
+    ],
 
 ];

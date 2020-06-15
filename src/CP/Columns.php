@@ -2,8 +2,8 @@
 
 namespace Statamic\CP;
 
-use Statamic\Facades\Preference;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Preference;
 
 class Columns extends Collection
 {
@@ -67,7 +67,8 @@ class Columns extends Collection
             ->values()
             ->keyBy(function ($column, $key) use ($preferred) {
                 $preferredKey = array_search($column->field(), $preferred ?? []);
-                return $preferredKey !== false ? '_' . $preferredKey : $key + 1;
+
+                return $preferredKey !== false ? '_'.$preferredKey : $key + 1;
             })
             ->sortKeys()
             ->map(function ($column) use ($preferred) {

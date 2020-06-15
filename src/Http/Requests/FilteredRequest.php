@@ -10,7 +10,7 @@ class FilteredRequest extends FormRequest
     {
         if ($filters = $this->filters) {
             $this->merge([
-                'filters' => collect(json_decode(base64_decode($filters), true))
+                'filters' => collect(json_decode(base64_decode($filters), true)),
             ]);
         }
     }

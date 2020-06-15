@@ -19,6 +19,7 @@
                 :meta="meta[row._id]"
                 :name="name"
                 :error-key-prefix="errorKeyPrefix"
+                :can-delete="canDeleteRows"
                 @updated="(row, value) => $emit('updated', row, value)"
                 @meta-updated="$emit('meta-updated', row._id, $event)"
                 @removed="(row) => $emit('removed', row)"

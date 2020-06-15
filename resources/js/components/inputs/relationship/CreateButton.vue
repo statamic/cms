@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <dropdown-list :show-dropdown-if="creatables.length > 1">
+        <dropdown-list :disabled="creatables.length === 1">
             <template #trigger>
                 <button
                     class="text-button text-blue hover:text-grey-80 mr-3 flex items-center outline-none"

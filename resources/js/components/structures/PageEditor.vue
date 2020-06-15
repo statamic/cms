@@ -16,16 +16,16 @@
 
                 <div class="publish-fields">
                     <form-group
-                        display="Title"
+                        :display="__('Title')"
                         handle="title"
-                        instructions="The link display text. Leave blank to use the URL."
                         v-model="title"
+                        :instructions="__('Link display text. Leave blank to use the URL.')"
                     />
                     <form-group
-                        display="URL"
-                        instructions="Enter any internal or external URL, or leave blank for a text-only item."
+                        :display="__('URL')"
                         handle="url"
                         v-model="url"
+                        :instructions="__('Enter any internal or external URL. Leave blank for a text-only item.')"
                     />
 
                 </div>
@@ -57,7 +57,6 @@ export default {
     },
 
     methods: {
-
         submit() {
             if (!this.title && !this.url) {
                 alert('You need at least a title or URL.');
@@ -69,8 +68,16 @@ export default {
                 url: this.url,
             });
         }
+    },
 
-    }
+    created() {
+        // Allow key commands with a focused input
+        this.$keys.stop(e => {
+            return ! ['enter'].includes(e.code.toLowerCase())
+        })
+
+        this.$keys.bind('enter', this.submit)
+    },
 
 }
 </script>

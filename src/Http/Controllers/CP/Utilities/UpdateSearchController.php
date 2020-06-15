@@ -2,8 +2,8 @@
 
 namespace Statamic\Http\Controllers\CP\Utilities;
 
-use Statamic\Facades\Search;
 use Illuminate\Http\Request;
+use Statamic\Facades\Search;
 use Statamic\Http\Controllers\CP\CpController;
 
 class UpdateSearchController extends CpController
@@ -11,7 +11,7 @@ class UpdateSearchController extends CpController
     public function index()
     {
         return view('statamic::utilities.search', [
-            'indexes' => Search::indexes()
+            'indexes' => Search::indexes(),
         ]);
     }
 
@@ -25,6 +25,6 @@ class UpdateSearchController extends CpController
             Search::index($index)->update();
         });
 
-        return back()->withSuccess('Indexes successfully updated.');
+        return back()->withSuccess(__('Indexes successfully updated.'));
     }
 }

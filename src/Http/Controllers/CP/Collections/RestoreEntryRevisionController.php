@@ -2,10 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\Facades\Entry;
 use Illuminate\Http\Request;
-use Statamic\Revisions\WorkingCopy;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Revisions\WorkingCopy;
 
 class RestoreEntryRevisionController extends CpController
 {

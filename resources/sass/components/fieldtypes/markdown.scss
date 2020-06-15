@@ -3,64 +3,78 @@
    ========================================================================== */
 
 .markdown-fieldtype-wrapper {
-
-    @apply .border .rounded .overflow-hidden relative;
+    @apply border rounded overflow-hidden relative;
 
     &:focus-within {
         @apply focus-outline;
     }
 
     .markdown-toolbar {
-        @apply .bg-white .shadow-none .border-b .text-sm .p-1 flex items-center justify-between;
-        padding: 8px 12px;
+        @apply .bg-white .shadow-none rounded-t .border-b .text-sm flex items-start justify-between;
+        padding: 4px 8px;
     }
 
-    .markdown-modes, .markdown-buttons {
-        @apply list-reset;
-
-        li {
-            display: inline-block;
-        }
+    .markdown-buttons {
+        @apply flex items-center;
     }
 
-    .markdown-modes {
-        @apply ml-1;
+    .markdown-buttons button {
+        @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center;
+        height: 32px;
+        width: 32px;
+        margin: 0 2px;
+    }
 
-        li {
-            @apply .mr-2
-        }
+    .markdown-buttons button:hover {
+        @apply bg-grey-20;
+    }
 
-        a {
-            @apply text-grey-50 outline-none;
+    .markdown-buttons button.active {
+        @apply bg-grey-30 text-black;
+    }
 
-            &:hover {
-                @apply text-blue;
-            }
-        }
+    .markdown-buttons button:focus {
+        @apply focus-outline;
+    }
 
-        .active a {
+    .markdown-buttons button:disabled {
+        @apply .opacity-50;
+        &:hover {
             @apply .text-grey-80;
         }
     }
 
-    .markdown-buttons li a {
-        @apply block px-sm;
+    .markdown-modes {
+        @apply ml-1 flex items-center h-full;
+
+        button {
+            @apply mr-2 text-grey-50 outline-none h-full;
+            padding: 6px 4px;
+
+            &:hover {
+                @apply text-blue;
+            }
+
+            &.active {
+                @apply text-grey-80;
+            }
+
+            &:focus {
+                @apply focus-outline;
+            }
+        }
     }
 
     .CodeMirror {
-        @apply .bg-grey-10 .shadow-inner .h-auto .font-mono .leading-normal .p-1.5 .text-xs;
+        @apply bg-grey-10 shadow-inner h-auto font-mono leading-normal p-1.5 text-xs;
         border-radius: 0 0 3px 3px;
 
         .cm-comment {
-            @apply .font-mono .text-sm
+            @apply font-mono text-sm
         }
     }
 
     .CodeMirror-code { min-height: 100px; }
-
-    .CodeMirror-lines {
-        max-width: 860px;
-    }
 
     .helpers {
         @apply border-t text-xs text-grey-80 flex items-center;
@@ -83,6 +97,50 @@
 
     .markdown-asset-helper {
         @apply py-1 px-2 inline-block;
+    }
+}
+
+
+/* Dark Mode
+  ========================================================================== */
+
+.markdown-fieldtype-wrapper.markdown-fullscreen.markdown-dark-mode {
+    @apply bg-grey-80 border-none;
+
+    .markdown-toolbar {
+        @apply text-white border-b border-grey-100 shadow-lg;
+        background: linear-gradient(180deg, theme('colors.grey-90'), hsl(210, 20%, 13%));
+    }
+
+    .helpers {
+        @apply bg-grey-90 text-white border-t border-grey-100;
+    }
+
+    .markdown-buttons button {
+        @apply text-grey-40;
+    }
+
+    .markdown-buttons button:hover {
+        @apply bg-grey-100 text-white;
+    }
+
+    .markdown-modes button {
+        @apply text-grey-70;
+        &.active {
+            @apply text-white;
+        }
+    }
+
+    .CodeMirror {
+        @apply text-white antialiased;
+    }
+
+    [class*="cm-"] {
+        color: white !important;
+    }
+
+    .CodeMirror-cursor {
+        border-left: 2px solid white;
     }
 }
 
@@ -110,100 +168,73 @@
 }
 
 
-/* Inside a Replicator fieldtype
+/* Writing Mode Typography
   ========================================================================== */
 
-  // .replicator-fieldtype .markdown-fieldtype,
-  // .grid-fieldtype .grid-stacked .markdown-fieldtype {
-  //     .CodeMirror {
-  //         background: #fff;
-  //     }
-  // }
+.markdown-fieldtype .cm-header {
+    @apply text-grey-80;
+
+    &.cm-header-1 {
+        @apply text-lg;
+    }
+
+    &.cm-header-2 {
+        @apply text-base;
+    }
+
+    &.cm-header-3 {
+        @apply text-sm;
+    }
+}
+
+.markdown-fieldtype .cm-quote {
+    @apply text-grey-80 italic text-sm;
+}
 
 
-
-/* Markdown Preview typography
+/* Preview Mode Typography
   ========================================================================== */
 
 .markdown-preview {
-    @apply px-2 py-4 mx-auto max-w-md;
+    @apply mx-auto;
+    padding: 16px 20px;
+    min-height: 167px; // @TODO Refactor to avoid a magic number.
 }
 
 .markdown-fieldtype-wrapper.markdown-fullscreen {
-    @apply fixed bg-white pin h-screen rounded-none;
-    z-index: 11;
+    @apply fixed bg-white inset-0 h-screen rounded-none;
+    padding-top: 52px; // offset the nav
+    z-index: 998;
     will-change: transform;
 
     .markdown-toolbar {
-        @apply shadow-sm bg-white;
+        @apply fixed top-0 w-full px-3 py-1 h-13 shadow text-base flex items-center justify-between;
+        background: linear-gradient(180deg, #fff, #f9fafb);
+        border-bottom: 1px solid #c4cdd6;
     }
 
-    .CodeMirror {
-        @apply bg-white max-w-xl mx-auto relative my-3 px-4 text-base overflow-scroll;
-        box-shadow: none !important;
-        min-height: calc(100vh - 100px);
-
-        .CodeMirror-code {
-            min-height: calc(100vh - 100px);
+    .mode-wrap {
+        height: calc(100vh - 88px); // sans toolbars
+        overflow-y: scroll;
+        cursor: text;
+        &.mode-preview {
+            height: calc(100vh - 52px); // no footer toolbar
         }
     }
 
+    .CodeMirror {
+        @apply max-w-xl bg-transparent mx-auto relative p-4 shadow-none text-base;
+
+        .CodeMirror-scroll {
+            @apply m-0;
+        }
+    }
+
+    .markdown-preview {
+        @apply max-w-xl bg-transparent mx-auto relative p-4 text-lg;
+    }
+
     .helpers {
-        @apply absolute pin-b pin-l pin-r bg-white;
+        @apply absolute bottom-0 inset-x-0 bg-white;
     }
 }
-
-
-/* @TODO make sure Sneak Peek mode looks good
-  ========================================================================== */
-
-// .sneak-peeking .markdown-fieldtype {
-//     .markdown-toolbar { padding: 9px 4px 7px; }
-//     .CodeMirror { font-size: 13px; }
-//     .markdown-preview { padding: 10px; }
-// }
-
-
-/* Reponsive Wangjangling
-  ========================================================================== */
-//
-// @media (max-width: 1180px) {
-//     .markdown-fieldtype .CodeMirror-lines { max-width: 700px; }
-// }
-//
-// @media (max-width: 1020px) {
-//     .markdown-fieldtype .CodeMirror-lines { max-width: 640px; }
-// }
-//
-// @media (min-width: 768px) and (max-width: 900px) {
-//     .markdown-fieldtype .CodeMirror-lines {
-//         max-width: 520px;
-//         border-right: none !important;
-//     }
-// }
-//
-// @media (max-width: 766px) {
-//     .markdown-fieldtype .CodeMirror-lines { max-width: 600px; }
-// }
-//
-// @media (max-width: 720px) {
-//     .markdown-fieldtype .CodeMirror-lines { max-width: 500px; }
-// }
-//
-// @media (max-width: 620px) {
-//     .markdown-fieldtype .CodeMirror-lines { max-width: 400px; }
-// }
-//
-// @media (max-width: 520px) {
-//     .markdown-fieldtype .CodeMirror-lines { max-width: 320px; }
-// }
-//
-// @media (max-width: 420px) {
-//     .markdown-fieldtype .CodeMirror-lines { max-width: 280px; }
-// }
-//
-// @media (min-width: 1366px) and (max-width: 1600px) {
-// .markdown-fieldtype .CodeMirror-lines {
-//         max-width: 720px;
-//     }
-// }

@@ -2,9 +2,9 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Statamic\Support\Arr;
-use Statamic\Fields\Fields;
 use Scrumpy\ProseMirrorToHtml\Renderer;
+use Statamic\Fields\Fields;
+use Statamic\Support\Arr;
 
 class Augmentor
 {
@@ -18,17 +18,23 @@ class Augmentor
         $this->fieldtype = $fieldtype;
     }
 
-    public function augment($value)
+    public function augment($value, $shallow = false)
     {
+        $hasSets = (bool) $this->fieldtype->config('sets');
+
+        if (! $value) {
+            return $hasSets ? [] : null;
+        }
+
         if (is_string($value)) {
             return $value;
         }
 
-        if (! $this->fieldtype->config('sets')) {
+        if (! $hasSets) {
             return $this->convertToHtml($value);
         }
 
-        if (!$this->includeDisabledSets) {
+        if (! $this->includeDisabledSets) {
             $value = $this->removeDisabledSets($value);
         }
 
@@ -37,7 +43,7 @@ class Augmentor
         $value = $this->convertToSets($value);
 
         if ($this->augmentSets) {
-            $value = $this->augmentSets($value);
+            $value = $this->augmentSets($value, $shallow);
         }
 
         return $value;
@@ -87,7 +93,7 @@ class Augmentor
 
         return $renderer->render([
             'type' => 'doc',
-            'content' => $value
+            'content' => $value,
         ]);
     }
 
@@ -104,14 +110,16 @@ class Augmentor
         });
     }
 
-    protected function augmentSets($value)
+    protected function augmentSets($value, $shallow)
     {
-        return $value->map(function ($set) {
+        $augmentMethod = $shallow ? 'shallowAugment' : 'augment';
+
+        return $value->map(function ($set) use ($augmentMethod) {
             if (! $config = $this->fieldtype->config("sets.{$set['type']}.fields")) {
                 return $set;
             }
 
-            $values = (new Fields($config))->addValues($set)->augment()->values()->all();
+            $values = (new Fields($config))->addValues($set)->{$augmentMethod}()->values()->all();
 
             return array_merge($values, ['type' => $set['type']]);
         })->all();

@@ -3,7 +3,6 @@
 namespace Statamic\Tags;
 
 use Statamic\Support\Arr;
-use Statamic\Tags\Tags;
 
 class Rotate extends Tags
 {
@@ -11,7 +10,7 @@ class Rotate extends Tags
     protected static $counts = [];
 
     /**
-     * The {{ rotate }} tag
+     * The {{ rotate }} tag.
      *
      * @return string
      */
@@ -57,12 +56,17 @@ class Rotate extends Tags
     {
         $vars = [];
 
-        foreach ($values as $value) {
-            $repeatingValues = explode(':', $value);
-            $count = Arr::get($repeatingValues, 1, 1);
+        foreach ($values as $initial_value) {
+            $bits = explode(':', $initial_value);
+
+            $value_bit = Arr::get($bits, 0);
+            $count_bit = Arr::get($bits, 1);
+
+            $value = is_numeric($count_bit) ? $value_bit : $initial_value;
+            $count = is_numeric($count_bit) ? $count_bit : 1;
 
             for ($i = 1; $i <= $count; $i++) {
-                $vars[] = $repeatingValues[0];
+                $vars[] = $value;
             }
         }
 

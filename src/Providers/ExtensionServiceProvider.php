@@ -2,23 +2,18 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Tags;
-use Statamic\Actions;
-use Statamic\Fieldtypes;
-use Statamic\Query\Scopes;
-use Statamic\Modifiers\Modifier;
-use Statamic\Extensions\FileStore;
-use Statamic\Modifiers\CoreModifiers;
 use Illuminate\Filesystem\Filesystem;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Actions;
 use Statamic\Extend\Manifest;
-use Illuminate\Console\DetectsApplicationNamespace;
+use Statamic\Fieldtypes;
+use Statamic\Modifiers\CoreModifiers;
+use Statamic\Modifiers\Modifier;
+use Statamic\Query\Scopes;
+use Statamic\Tags;
 
 class ExtensionServiceProvider extends ServiceProvider
 {
-    use DetectsApplicationNamespace;
-
     /**
      * Aliases for modifiers bundled with Statamic.
      *
@@ -57,7 +52,7 @@ class ExtensionServiceProvider extends ServiceProvider
      * @var array
      */
     protected $bundledWidgets = [
-        'getting-started', 'collection', 'template', 'updater', 'form'
+        'getting-started', 'collection', 'template', 'updater', 'form',
     ];
 
     protected $fieldtypes = [
@@ -67,16 +62,20 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Assets\Assets::class,
         Fieldtypes\Bard::class,
         Fieldtypes\Bard\Buttons::class,
+        Fieldtypes\ButtonGroup::class,
         Fieldtypes\Blueprints::class,
         Fieldtypes\Checkboxes::class,
         Fieldtypes\Code::class,
+        Fieldtypes\CollectionRoutes::class,
         Fieldtypes\Collections::class,
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
         Fieldtypes\Entries::class,
+        Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Hidden::class,
         Fieldtypes\Integer::class,
+        Fieldtypes\Link::class,
         Fieldtypes\Lists::class,
         Fieldtypes\Markdown::class,
         Fieldtypes\NestedFields::class,
@@ -87,8 +86,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Section::class,
         Fieldtypes\Select::class,
         Fieldtypes\Sets::class,
+        Fieldtypes\Sites::class,
         Fieldtypes\Structures::class,
-        Fieldtypes\StructureSites::class,
         Fieldtypes\Slug::class,
         Fieldtypes\Table::class,
         Fieldtypes\Tags::class,
@@ -119,6 +118,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\GetFiles::class,
         Tags\Glide::class,
         Tags\In::class,
+        Tags\Increment::class,
         Tags\Is::class,
         Tags\Iterate::class,
         Tags\Link::class,
@@ -132,7 +132,8 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\ParentTags::class,
         Tags\Partial::class,
         Tags\Path::class,
-        Tags\Query\Query::class,
+        Tags\Query::class,
+        Tags\Range::class,
         Tags\Redirect::class,
         Tags\Relate::class,
         Tags\Rotate::class,
@@ -140,6 +141,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Scope::class,
         Tags\Set::class,
         Tags\Section::class,
+        Tags\Session::class,
         Tags\Structure::class,
         Tags\Svg::class,
         Tags\Taxonomy\Taxonomy::class,
@@ -261,6 +263,8 @@ class ExtensionServiceProvider extends ServiceProvider
 
         $scopes = [
             Scopes\Filters\Fields::class,
+            Scopes\Filters\Blueprint::class,
+            Scopes\Filters\Status::class,
             Scopes\Filters\Site::class,
             Scopes\Filters\UserRole::class,
             Scopes\Filters\UserGroup::class,
@@ -384,7 +388,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
         foreach ($this->app['files']->files($path) as $file) {
             $class = $file->getBasename('.php');
-            $fqcn = $this->getAppNamespace() . "{$folder}\\{$class}";
+            $fqcn = $this->app->getNamespace()."{$folder}\\{$class}";
             if (is_subclass_of($fqcn, $requiredClass)) {
                 $fqcn::register();
             }

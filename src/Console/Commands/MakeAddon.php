@@ -2,12 +2,13 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Console\RunsInPlease;
-use Statamic\Rules\ComposerPackage;
-use Statamic\Console\ValidatesInput;
 use Facades\Statamic\Console\Processes\Composer;
-use Symfony\Component\Console\Input\InputOption;
+use Statamic\Console\RunsInPlease;
+use Statamic\Console\ValidatesInput;
+use Statamic\Rules\ComposerPackage;
+use Statamic\Support\Str;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
 class MakeAddon extends GeneratorCommand
 {
@@ -70,6 +71,7 @@ class MakeAddon extends GeneratorCommand
 
         if (! $this->option('force') && $this->addonAlreadyExists()) {
             $this->error('Addon already exists!');
+
             return;
         }
 
@@ -190,7 +192,7 @@ class MakeAddon extends GeneratorCommand
             return $this->outputFromSymfonyProcess($output);
         });
 
-        if (! str_contains($output, "Discovered Addon: {$this->package}")) {
+        if (! Str::contains($output, "Discovered Addon: {$this->package}")) {
             $this->error('An error was encountered while installing your addon!');
         }
 
@@ -232,7 +234,7 @@ class MakeAddon extends GeneratorCommand
      */
     protected function addonPath($file = null, $makeDirectory = true)
     {
-        $path = config('statamic.system.addons_path') . "/{$this->vendorSlug}/{$this->nameSlug}";
+        $path = config('statamic.system.addons_path')."/{$this->vendorSlug}/{$this->nameSlug}";
 
         if ($file) {
             $path .= "/{$file}";
@@ -252,7 +254,7 @@ class MakeAddon extends GeneratorCommand
      */
     protected function addonNamespace()
     {
-        return studly_case($this->vendorSlug) . '\\' . studly_case($this->nameSlug);
+        return studly_case($this->vendorSlug).'\\'.studly_case($this->nameSlug);
     }
 
     /**

@@ -2,12 +2,12 @@
 
 namespace Tests\Tags;
 
-use Tests\TestCase;
-use Statamic\Tags\Tags;
 use Statamic\Facades\Antlers;
-use Tests\TestDependency;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
+use Statamic\Tags\Tags;
+use Tests\TestCase;
+use Tests\TestDependency;
 
 class TagsTest extends TestCase
 {

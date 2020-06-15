@@ -64,13 +64,72 @@
     </div>
 
     <h2 class="mb-1">Buttons</h2>
-    <div class="shadow bg-white p-4 rounded-lg overflow-hidden mb-6">
+    <div class="shadow bg-white p-4 rounded-lg mb-6">
         <h6 class="mb-2">Flavors</h6>
         <div class="mb-4 flex">
             <button class="mr-2 btn">Default Button</button>
             <button class="mr-2 btn-primary">Primary Button</button>
             <button class="mr-2 btn-danger">Danger Button</button>
             <button class="btn-flat">Flat Button</button>
+        </div>
+        <h6 class="mb-2">With Dropdowns</h6>
+        <div class="mb-4 flex">
+            <div class="btn-group mr-2">
+                <button class="btn">Default Button</button>
+                <dropdown-list>
+                    <template v-slot:trigger>
+                        <button class="btn">
+                            <svg-icon name="chevron-down-xs" class="w-2" />
+                        </button>
+                    </template>
+                    <li>
+                        <dropdown-item text="Item 1" redirect="https://example.com"></dropdown-item>
+                        <dropdown-item text="Item 2" redirect="https://example2.com"></dropdown-item>
+                    </li>
+                </dropdown-list>
+            </div>
+            <div class="btn-group mr-2">
+                <button class="btn-primary">Default Button</button>
+                <dropdown-list>
+                    <template v-slot:trigger>
+                        <button class="btn-primary">
+                            <svg-icon name="chevron-down-xs" class="w-2" />
+                        </button>
+                    </template>
+                    <li>
+                        <dropdown-item text="Item 1" redirect="https://example.com"></dropdown-item>
+                        <dropdown-item text="Item 2" redirect="https://example2.com"></dropdown-item>
+                    </li>
+                </dropdown-list>
+            </div>
+            <div class="btn-group mr-2">
+                <button class="btn-danger">Default Button</button>
+                <dropdown-list>
+                    <template v-slot:trigger>
+                        <button class="btn-danger">
+                            <svg-icon name="chevron-down-xs" class="w-2" />
+                        </button>
+                    </template>
+                    <li>
+                        <dropdown-item text="Item 1" redirect="https://example.com"></dropdown-item>
+                        <dropdown-item text="Item 2" redirect="https://example2.com"></dropdown-item>
+                    </li>
+                </dropdown-list>
+            </div>
+            <div class="btn-group mr-2">
+                <button class="btn-flat">Default Button</button>
+                <dropdown-list>
+                    <template v-slot:trigger>
+                        <button class="btn-flat">
+                            <svg-icon name="chevron-down-xs" class="w-2" />
+                        </button>
+                    </template>
+                    <li>
+                        <dropdown-item text="Item 1" redirect="https://example.com"></dropdown-item>
+                        <dropdown-item text="Item 2" redirect="https://example2.com"></dropdown-item>
+                    </li>
+                </dropdown-list>
+            </div>
         </div>
         <h6 class="mb-2">Disabled States</h6>
         <div class="mb-4 flex">

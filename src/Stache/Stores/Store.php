@@ -102,6 +102,7 @@ abstract class Store
 
         if ($indexes->contains($index = $index->name())) {
             $this->usedIndexes = $indexes;
+
             return;
         }
 
@@ -216,6 +217,7 @@ abstract class Store
         $deleted->each(function ($path) {
             if ($key = $this->getKeyFromPath($path)) {
                 $this->forgetItem($key);
+                $this->handleDeletedItem($path, $key);
             }
         });
 
@@ -273,6 +275,11 @@ abstract class Store
         //
     }
 
+    protected function handleDeletedItem($item, $key)
+    {
+        //
+    }
+
     protected function adjustModifiedPaths($paths)
     {
         return $paths;
@@ -311,6 +318,7 @@ abstract class Store
         $paths = $files->mapWithKeys(function ($timestamp, $path) {
             $item = $this->makeItemFromFile($path, File::get($path));
             $this->cacheItem($item);
+
             return [$this->getItemKey($item) => $path];
         });
 

@@ -2,11 +2,11 @@
 
 namespace Tests\Feature\Collections;
 
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Statamic\Facades\User;
 use Statamic\Facades\Collection;
+use Statamic\Facades\User;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class EditCollectionTest extends TestCase
 {
@@ -14,7 +14,7 @@ class EditCollectionTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_shows_the_edit_page_if_you_have_permission()
+    public function it_shows_the_edit_page_if_you_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
         $user = User::make()->assignRole('test')->save();
@@ -29,7 +29,7 @@ class EditCollectionTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(User::make()->assignRole('test'))->save();

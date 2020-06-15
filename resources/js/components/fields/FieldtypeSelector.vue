@@ -6,7 +6,7 @@
             <button type="button" class="btn-close" @click="close">×</button>
         </div>
 
-        <div v-if="fieldtypesLoading" class="absolute pin z-200 flex items-center justify-center text-center">
+        <div v-if="fieldtypesLoading" class="absolute inset-0 z-200 flex items-center justify-center text-center">
             <loading-graphic />
         </div>
 
@@ -25,8 +25,8 @@
                 <div :class="['search', { 'is-searching': isSearching }]">
                     <input type="text" v-model="search" ref="search" @keydown.esc="cancelSearch" :placeholder="`${__('Search')}...`" />
                 </div>
-                <div class="flex flex-wrap -mx-1 fieldtype-list">
-                    <div class="w-1/2 sm:w-1/3 md:w-1/4 p-1" v-for="option in fieldtypeOptions">
+                <div class="fieldtype-list">
+                    <div class="p-1" v-for="option in fieldtypeOptions">
                         <a class="border flex items-center group w-full rounded shadow-sm py-1 px-2"
                             @click="select(option)">
                             <svg-icon class="h-4 w-4 text-grey-80 group-hover:text-blue" :name="option.icon"></svg-icon>

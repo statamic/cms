@@ -2,11 +2,9 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Facades\URL;
-use Statamic\Facades\Parse;
 use Statamic\Facades\Entry;
+use Statamic\Facades\URL;
 use Statamic\Support\Arr;
-use Statamic\Tags\Tags;
 use Stringy\StaticStringy as Stringy;
 
 class ParentTags extends Tags
@@ -14,7 +12,7 @@ class ParentTags extends Tags
     protected static $handle = 'parent';
 
     /**
-     * The {{ parent:[field] }} tag
+     * The {{ parent:[field] }} tag.
      *
      * Gets a specified field value from the parent.
      *
@@ -29,7 +27,7 @@ class ParentTags extends Tags
         $data = Arr::get($this->getParent(), $var_name);
 
         if ($this->isPair) {
-            $this->content = '{{'.$var_name.'}}' . $this->content . '{{/'.$var_name.'}}';
+            $this->content = '{{'.$var_name.'}}'.$this->content.'{{/'.$var_name.'}}';
 
             return $this->parse([$var_name => $data]);
         }
@@ -38,7 +36,7 @@ class ParentTags extends Tags
     }
 
     /**
-     * The {{ parent }} tag
+     * The {{ parent }} tag.
      *
      * On its own, it simply returns the URL of the parent for a single tag,
      * or makes all the parent values available within it for a tag pair.
@@ -55,7 +53,7 @@ class ParentTags extends Tags
     }
 
     /**
-     * Get the parent url
+     * Get the parent url.
      *
      * @return string
      */
@@ -67,7 +65,7 @@ class ParentTags extends Tags
     }
 
     /**
-     * Get the parent data
+     * Get the parent data.
      *
      * @return string
      */
@@ -95,7 +93,7 @@ class ParentTags extends Tags
         // Find the parent by stripping away URL segments
         foreach ($segment_urls as $segment_url) {
             if ($content = Entry::findByUri($segment_url)) {
-                return $content->toArray();
+                return $content->toAugmentedArray();
             }
         }
 

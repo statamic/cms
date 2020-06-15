@@ -2,7 +2,7 @@
 
 namespace Tests\Fakes\Composer;
 
-use Facades\Statamic\Updater\Updater;
+use Statamic\Support\Str;
 
 class Composer
 {
@@ -63,7 +63,7 @@ class Composer
 
         // Just like actual composer would resolve an x.x.* constraint to an actual version number,
         // Our fake composer instance will resolve to x.x.9 for the purposes of testing.
-        if (str_contains($version, '*')) {
+        if (Str::contains($version, '*')) {
             $version = str_replace('*', '9', $version);
         }
 

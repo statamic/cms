@@ -3,18 +3,17 @@
 namespace Statamic\Support;
 
 use Carbon\Carbon;
-use Statamic\Support\Str;
-use Statamic\Facades\URL;
-use Statamic\Facades\File;
-use Statamic\Facades\Compare;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Compare;
+use Statamic\Facades\File;
+use Statamic\Facades\URL;
 use Symfony\Component\Finder\Comparator\DateComparator;
 use Symfony\Component\Finder\Comparator\NumberComparator;
 
 class FileCollection extends Collection
 {
     /**
-     * Filter by size
+     * Filter by size.
      *
      * @param  string  $size  A size comparison, eg. "> 10K"
      * @return static
@@ -23,13 +22,13 @@ class FileCollection extends Collection
     {
         $comparator = new NumberComparator($size);
 
-        return $this->filter(function($path) use ($comparator) {
+        return $this->filter(function ($path) use ($comparator) {
             return $comparator->test(File::size($path));
         });
     }
 
     /**
-     * Filter by extension(s)
+     * Filter by extension(s).
      *
      * @param   string|array  $extensions  Extension or array of extensions
      * @return  static
@@ -38,13 +37,13 @@ class FileCollection extends Collection
     {
         $extensions = (array) $extensions;
 
-        return $this->filter(function($path) use ($extensions) {
+        return $this->filter(function ($path) use ($extensions) {
             return in_array(File::extension($path), $extensions);
         });
     }
 
     /**
-     * Reject by extension(s)
+     * Reject by extension(s).
      *
      * @param   string|array  $extensions  Extension or array of extensions
      * @return  static
@@ -53,33 +52,33 @@ class FileCollection extends Collection
     {
         $extensions = (array) $extensions;
 
-        return $this->reject(function($path) use ($extensions) {
+        return $this->reject(function ($path) use ($extensions) {
             return in_array(File::extension($path), $extensions);
         });
     }
 
     /**
-     * Filter by a regular expression
+     * Filter by a regular expression.
      *
      * @param   string  $regex    The regular expression to match against
      * @return  static
      */
     public function filterByRegex($regex)
     {
-        return $this->filter(function($path) use ($regex) {
+        return $this->filter(function ($path) use ($regex) {
             return preg_match($regex, $path);
         });
     }
 
     /**
-     * Reject by a regular expression
+     * Reject by a regular expression.
      *
      * @param   string  $regex    The regular expression to match against
      * @return  static
      */
     public function rejectByRegex($regex)
     {
-        return $this->reject(function($path) use ($regex) {
+        return $this->reject(function ($path) use ($regex) {
             return preg_match($regex, $path);
         });
     }
@@ -88,25 +87,25 @@ class FileCollection extends Collection
     {
         $comparator = new DateComparator($date);
 
-        return $this->filter(function($path) use ($comparator) {
+        return $this->filter(function ($path) use ($comparator) {
             return $comparator->test(File::lastModified($path));
         });
     }
 
     /**
-     * Remove hidden files (files starting with .)
+     * Remove hidden files (files starting with .).
      *
      * @return static
      */
     public function removeHidden()
     {
-        return $this->reject(function($path) {
+        return $this->reject(function ($path) {
             return Str::startsWith(pathinfo($path)['basename'], '.');
         });
     }
 
     /**
-     * Sort by multiple fields
+     * Sort by multiple fields.
      *
      * Accepts a string like "title:desc|foo:asc"
      * The keys are optional. "title:desc|foo" is fine.
@@ -126,7 +125,7 @@ class FileCollection extends Collection
                 $sort_by = $bits[0];
                 $sort_dir = array_get($bits, 1);
 
-                list($one, $two) = $this->getSortableValues($sort_by, $a, $b);
+                [$one, $two] = $this->getSortableValues($sort_by, $a, $b);
 
                 $result = Compare::values($one, $two);
 
@@ -142,7 +141,7 @@ class FileCollection extends Collection
     }
 
     /**
-     * Get the values from two files to be sorted against each other
+     * Get the values from two files to be sorted against each other.
      *
      * @param string  $sort  The field to be searched
      * @param array   $a     The first file
@@ -182,7 +181,7 @@ class FileCollection extends Collection
     }
 
     /**
-     * Convert to an array
+     * Convert to an array.
      *
      * @return array
      */
@@ -213,7 +212,7 @@ class FileCollection extends Collection
                 'size_mb'        => $kb,
                 'size_gb'        => $kb,
                 'is_file'        => File::isImage($path),
-                'last_modified'  => Carbon::createFromTimestamp(File::lastModified($path))
+                'last_modified'  => Carbon::createFromTimestamp(File::lastModified($path)),
             ];
         }
 

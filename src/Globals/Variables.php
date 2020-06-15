@@ -2,17 +2,17 @@
 
 namespace Statamic\Globals;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
-use Statamic\Facades\GlobalSet;
-use Statamic\Data\HasOrigin;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Globals\Variables as Contract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Contracts\Data\Localization;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Data\Augmentable;
-use Statamic\Contracts\Globals\Variables as Contract;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Data\HasOrigin;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Variables implements Contract, Localization, Augmentable
 {
@@ -58,23 +58,23 @@ class Variables implements Contract, Localization, Augmentable
             rtrim(Stache::store('globals')->directory(), '/'),
             Site::hasMultiple() ? $this->locale().'/' : '',
             $this->handle(),
-            'yaml'
+            'yaml',
         ]);
     }
 
     public function editUrl()
     {
-        return $this->cpUrl('globals.edit');
+        return $this->cpUrl('globals.variables.edit');
     }
 
     public function updateUrl()
     {
-        return $this->cpUrl('globals.update');
+        return $this->cpUrl('globals.variables.update');
     }
 
     protected function cpUrl($route)
     {
-        $params = [$this->id(), $this->handle()];
+        $params = [$this->handle()];
 
         if (Site::hasMultiple()) {
             $params['site'] = $this->locale();
@@ -110,7 +110,7 @@ class Variables implements Contract, Localization, Augmentable
 
     protected function fallbackBlueprint()
     {
-        $fields  = collect($this->values())
+        $fields = collect($this->values())
             ->except(['id', 'title', 'blueprint'])
             ->map(function ($field, $handle) {
                 return [
@@ -122,16 +122,16 @@ class Variables implements Contract, Localization, Augmentable
         return (new \Statamic\Fields\Blueprint)->setContents([
             'sections' => [
                 'main' => [
-                    'fields' => $fields->all()
-                ]
-            ]
+                    'fields' => $fields->all(),
+                ],
+            ],
         ]);
     }
 
     public function fileData()
     {
         return array_merge([
-            'origin' => $this->hasOrigin() ? $this->origin->locale() : null,
+            'origin' => $this->hasOrigin() ? $this->origin()->locale() : null,
         ], $this->data()->all());
     }
 

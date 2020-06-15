@@ -2,27 +2,27 @@
 
 namespace Statamic\Query\Scopes\Filters;
 
-use Statamic\Support\Str;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
 use Statamic\Query\Scopes\Filter;
+use Statamic\Support\Arr;
 
 class Fields extends Filter
 {
+    public static function title()
+    {
+        return __('Field');
+    }
+
     public function extra()
     {
-        return collect($this->context['blueprints'])
-            ->map(function ($blueprint) {
-                return Blueprint::find($blueprint);
-            })
-            ->mapWithKeys(function ($blueprint) {
-                return $blueprint->fields()->all()->filter->isFilterable()->map(function ($field) {
-                    return [
-                        'handle' => $field->handle(),
-                        'display' => $field->display(),
-                        'type' => $field->type(),
-                        'operators' => $field->fieldtype()->queryOperators(),
-                    ];
-                });
+        return $this->getFields()
+            ->map(function ($field) {
+                return [
+                    'handle' => $field->handle(),
+                    'display' => $field->display(),
+                    'fields' => $field->fieldtype()->filter()->fields()->toPublishArray(),
+                ];
             })
             ->values()
             ->all();
@@ -30,30 +30,51 @@ class Fields extends Filter
 
     public function apply($query, $values)
     {
-        collect($values)
-            ->reject(function ($where) {
-                return empty($where['value']);
+        $this->getFields()
+            ->filter(function ($field, $handle) use ($values) {
+                return isset($values[$handle]);
             })
-            ->map(function ($where) {
-                return $this->normalizeWhere($where);
-            })
-            ->each(function ($where, $column) use ($query) {
-                $query->where($column, $where['operator'], $where['value']);
+            ->each(function ($field, $handle) use ($query, $values) {
+                $field->fieldtype()->filter()->apply($query, $handle, $values[$handle]);
             });
     }
 
-    protected function normalizeWhere($where)
+    public function badge($values)
     {
-        if ($where['operator'] === 'like') {
-            $where['value'] = Str::ensureLeft($where['value'], '%');
-            $where['value'] = Str::ensureRight($where['value'], '%');
-        }
-
-        return $where;
+        return $this->getFields()
+            ->filter(function ($field, $handle) use ($values) {
+                return isset($values[$handle]);
+            })
+            ->map(function ($field, $handle) use ($values) {
+                return $field->fieldtype()->filter()->badge($values[$handle]);
+            })
+            ->all();
     }
 
     public function visibleTo($key)
     {
         return in_array($key, ['entries', 'entries-fieldtype', 'terms']);
+    }
+
+    protected function getFields()
+    {
+        return $this->getBlueprints()->flatMap(function ($blueprint) {
+            return $blueprint
+                ->fields()
+                ->all()
+                ->filter
+                ->isFilterable();
+        });
+    }
+
+    protected function getBlueprints()
+    {
+        if ($collection = Arr::get($this->context, 'collection')) {
+            return Collection::findByHandle($collection)->entryBlueprints();
+        }
+
+        return collect($this->context['blueprints'])->map(function ($blueprint) {
+            return Blueprint::find($blueprint);
+        });
     }
 }

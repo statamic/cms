@@ -2,11 +2,10 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\Stache\Stache;
-use Statamic\Globals\GlobalCollection;
-use Statamic\Contracts\Globals\GlobalSet;
-use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Globals\GlobalRepository as RepositoryContract;
+use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Globals\GlobalCollection;
+use Statamic\Stache\Stache;
 
 class GlobalRepository implements RepositoryContract
 {
@@ -21,7 +20,7 @@ class GlobalRepository implements RepositoryContract
 
     public function make($handle = null)
     {
-        return (new \Statamic\Globals\GlobalSet)->handle($handle);
+        return app(GlobalSet::class)->handle($handle);
     }
 
     public function all(): GlobalCollection
@@ -45,15 +44,18 @@ class GlobalRepository implements RepositoryContract
 
     public function save($global)
     {
-        if (! $global->id()) {
-            $global->id($this->stache->generateId());
-        }
-
         $this->store->save($global);
     }
 
     public function delete($global)
     {
         $this->store->delete($global);
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            GlobalSet::class => \Statamic\Globals\GlobalSet::class,
+        ];
     }
 }

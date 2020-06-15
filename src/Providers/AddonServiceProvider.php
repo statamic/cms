@@ -3,15 +3,15 @@
 namespace Statamic\Providers;
 
 use Closure;
-use Statamic\Support\Str;
-use Statamic\Statamic;
-use Statamic\Facades\Addon;
+use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Console\Scheduling\Schedule;
-use Illuminate\Support\Facades\Gate;
 use Statamic\Exceptions\NotBootedException;
+use Statamic\Facades\Addon;
+use Statamic\Statamic;
+use Statamic\Support\Str;
 
 abstract class AddonServiceProvider extends ServiceProvider
 {
@@ -28,11 +28,12 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $externalScripts = [];
     protected $publishables = [];
     protected $routes = [];
-    protected $middleware = [];
+    protected $middlewareGroups = [];
+    protected $viewNamespace;
 
     public function boot()
     {
-        $this->app->booted(function () {
+        Statamic::booted(function () {
             if (! $this->getAddon()) {
                 return;
             }
@@ -50,7 +51,8 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootScripts()
                 ->bootPublishables()
                 ->bootRoutes()
-                ->bootMiddleware();
+                ->bootMiddleware()
+                ->bootViews();
         });
     }
 
@@ -158,7 +160,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootPublishables()
     {
-        $package = $this->getAddon()->id();
+        $package = $this->getAddon()->packageName();
 
         $publishables = collect($this->publishables)
             ->mapWithKeys(function ($destination, $origin) use ($package) {
@@ -196,7 +198,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerWebRoutes($routes)
     {
         Statamic::pushWebRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace())->group($routes);
+            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')->group($routes);
         });
     }
 
@@ -209,7 +211,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerCpRoutes($routes)
     {
         Statamic::pushCpRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace())->group($routes);
+            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')->group($routes);
         });
     }
 
@@ -222,7 +224,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     public function registerActionRoutes($routes)
     {
         Statamic::pushActionRoutes(function () use ($routes) {
-            Route::namespace('\\'.$this->namespace())
+            Route::namespace('\\'.$this->namespace().'\\Http\\Controllers')
                 ->prefix($this->getAddon()->slug())
                 ->group($routes);
         });
@@ -257,24 +259,34 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function routeGroupAttributes($overrides = [])
     {
         return array_merge($overrides, [
-            'namespace' => $this->getAddon()->namespace()
+            'namespace' => $this->getAddon()->namespace(),
         ]);
     }
 
     protected function bootMiddleware()
     {
-        foreach (array_get($this->middleware, 'web', []) as $middleware) {
-            Statamic::pushWebMiddleware($middleware);
+        foreach ($this->middlewareGroups as $group => $middleware) {
+            foreach ($middleware as $class) {
+                $this->app['router']->pushMiddlewareToGroup($group, $class);
+            }
         }
 
-        foreach (array_get($this->middleware, 'cp', []) as $middleware) {
-            Statamic::pushCpMiddleware($middleware);
-        }
+        return $this;
+    }
+
+    protected function bootViews()
+    {
+        $this->loadViewsFrom(
+            $this->getAddon()->directory().'resources/views',
+            $this->viewNamespace ?? $this->getAddon()->packageName()
+        );
+
+        return $this;
     }
 
     public function registerScript(string $path)
     {
-        $name = $this->getAddon()->id();
+        $name = $this->getAddon()->packageName();
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([
@@ -291,7 +303,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function registerStylesheet(string $path)
     {
-        $name = $this->getAddon()->id();
+        $name = $this->getAddon()->packageName();
         $filename = pathinfo($path, PATHINFO_FILENAME);
 
         $this->publishes([

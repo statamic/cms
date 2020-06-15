@@ -2,11 +2,13 @@
 
 namespace Statamic\Forms;
 
+use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Contracts\Forms\FormRepository as Contract;
+use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
-use Statamic\Contracts\Forms\Form as FormContract;
 
-class FormRepository
+class FormRepository implements Contract
 {
     /**
      * Find a form.
@@ -52,5 +54,13 @@ class FormRepository
         }
 
         return $form;
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            FormContract::class => Form::class,
+            SubmissionContract::class => Submission::class,
+        ];
     }
 }

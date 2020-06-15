@@ -2,10 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP\Users;
 
-use Statamic\Facades\Role;
-use Statamic\CP\Column;
 use Illuminate\Http\Request;
+use Statamic\CP\Column;
 use Statamic\Facades\Permission;
+use Statamic\Facades\Role;
 use Statamic\Http\Controllers\CP\CpController;
 
 class RolesController extends CpController
@@ -65,6 +65,8 @@ class RolesController extends CpController
             ->permissions($request->super ? ['super'] : $request->permissions)
             ->save();
 
+        session()->flash('success', __('Role created'));
+
         return ['redirect' => cp_route('roles.index', $role->handle())];
     }
 
@@ -104,6 +106,8 @@ class RolesController extends CpController
             ->permissions($request->super ? ['super'] : $request->permissions)
             ->save();
 
+        session()->flash('success', __('Role updated'));
+
         return ['redirect' => cp_route('roles.index', $role->handle())];
     }
 
@@ -124,7 +128,7 @@ class RolesController extends CpController
     {
         return $tree->map(function ($group) use ($role) {
             return array_merge($group, [
-                'permissions' => $this->updatePermissions($group['permissions'], $role)
+                'permissions' => $this->updatePermissions($group['permissions'], $role),
             ]);
         });
     }

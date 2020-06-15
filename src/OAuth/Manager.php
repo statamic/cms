@@ -9,7 +9,7 @@ class Manager
     public function enabled()
     {
         return config('statamic.oauth.enabled')
-            && !empty(config('statamic.oauth.providers'));
+            && ! empty(config('statamic.oauth.providers'));
     }
 
     public function provider($provider)

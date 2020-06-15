@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\Role;
+use Statamic\Facades\Scope;
 
 class UserRoles extends Relationship
 {
@@ -22,6 +23,18 @@ class UserRoles extends Relationship
         return $this->invalidItemArray($id);
     }
 
+    public function preProcessIndex($data)
+    {
+        $roles = collect($data)
+            ->filter(function ($id) {
+                return Role::exists($id);
+            })
+            ->values()
+            ->all();
+
+        return parent::preProcessIndex($roles);
+    }
+
     public function getIndexItems($request)
     {
         return Role::all()->map(function ($role) {
@@ -35,5 +48,10 @@ class UserRoles extends Relationship
     protected function augmentValue($value)
     {
         return Role::find($value);
+    }
+
+    public function getSelectionFilters()
+    {
+        return Scope::filters('user-roles-fieldtype', []);
     }
 }

@@ -2,8 +2,8 @@
 
 namespace Statamic\Extensions;
 
-use Illuminate\Contracts\Cache\Store;
 use Illuminate\Cache\FileStore as LaravelFileStore;
+use Illuminate\Contracts\Cache\Store;
 
 class FileStore extends LaravelFileStore implements Store
 {
@@ -29,7 +29,7 @@ class FileStore extends LaravelFileStore implements Store
     }
 
     /**
-     * Stache keys will get stored without being hashed
+     * Stache keys will get stored without being hashed.
      *
      * @param string $key
      * @return string

@@ -2,10 +2,8 @@
 
 namespace Statamic\Auth\Protect;
 
-use Statamic\Facades\URL;
 use InvalidArgumentException;
-use Statamic\Auth\Protect\Protectors\NullProtector;
-use Statamic\Auth\Protect\Protectors\FallbackProtector;
+use Statamic\Facades\URL;
 
 class Protection
 {
@@ -45,6 +43,7 @@ class Protection
             return $this->manager->driver($scheme);
         } catch (InvalidArgumentException $e) {
             $this->log($e->getMessage());
+
             return $this->manager->createFallbackDriver();
         }
     }
@@ -66,7 +65,7 @@ class Protection
     {
         \Log::debug(vsprintf('%s Denying access to %s.', [
             $message,
-            $this->url()
+            $this->url(),
         ]));
     }
 }

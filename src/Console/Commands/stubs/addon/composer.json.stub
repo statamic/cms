@@ -1,6 +1,5 @@
 {
     "name": "dummy/package",
-    "type": "statamic-addon",
     "autoload": {
         "psr-4": {
             "DummyNamespace\\": "src"

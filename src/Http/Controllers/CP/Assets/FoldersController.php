@@ -2,11 +2,10 @@
 
 namespace Statamic\Http\Controllers\CP\Assets;
 
-use Statamic\Facades\Path;
 use Illuminate\Http\Request;
-use Statamic\Facades\AssetContainer;
-use Statamic\Http\Controllers\CP\CpController;
 use Illuminate\Validation\ValidationException;
+use Statamic\Facades\Path;
+use Statamic\Http\Controllers\CP\CpController;
 
 class FoldersController extends CpController
 {

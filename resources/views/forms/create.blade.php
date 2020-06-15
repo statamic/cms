@@ -2,16 +2,7 @@
 @section('title', __('Create Form'))
 
 @section('content')
-
-    <form-wizard
+    <form-create-form
         route="{{ cp_route('forms.store') }}">
-    </form-wizard>
-
-    {{--
-    <formset-builder :create="true"
-                     save-method="post"
-                     save-url="{{ cp_route('forms.store') }}">
-    </formset-builder>
-    --}}
-
-@endsection
+    </form-create-form>
+@stop

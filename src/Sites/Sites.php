@@ -3,7 +3,6 @@
 namespace Statamic\Sites;
 
 use Statamic\Support\Str;
-use Statamic\Statamic;
 
 class Sites
 {
@@ -41,7 +40,7 @@ class Sites
         $url = Str::ensureRight($url, '/');
 
         return collect($this->sites)->filter(function ($site) use ($url) {
-            return Str::startsWith($url, $site->absoluteUrl());
+            return Str::startsWith($url, Str::ensureRight($site->absoluteUrl(), '/'));
         })->sortByDesc->url()->first();
     }
 

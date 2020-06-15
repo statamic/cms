@@ -5,12 +5,12 @@ namespace Statamic\Auth;
 use Statamic\Data\DataCollection;
 
 /**
- * A collection of Users
+ * A collection of Users.
  */
 class UserCollection extends DataCollection
 {
     /**
-     * Get the collection as an array
+     * Get the collection as an array.
      *
      * @param bool $supplement
      * @return array

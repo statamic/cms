@@ -2,9 +2,9 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Console\Commands;
-use Illuminate\Support\ServiceProvider;
 use Illuminate\Console\Application as Artisan;
+use Illuminate\Support\ServiceProvider;
+use Statamic\Console\Commands;
 
 class ConsoleServiceProvider extends ServiceProvider
 {
@@ -14,10 +14,12 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\AssetsMeta::class,
         Commands\GlideClear::class,
         Commands\Install::class,
+        Commands\MakeAction::class,
         Commands\MakeAddon::class,
         Commands\MakeFieldtype::class,
         Commands\MakeModifier::class,
         Commands\MakeScope::class,
+        Commands\MakeFilter::class,
         Commands\MakeTag::class,
         Commands\MakeWidget::class,
         Commands\MakeUser::class,

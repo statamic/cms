@@ -2,10 +2,10 @@
 
 namespace Statamic\Events\Data;
 
-use Statamic\Facades\File;
+use Statamic\Contracts\Data\DataSavedEvent;
 use Statamic\Data\Data;
 use Statamic\Events\Event;
-use Statamic\Contracts\Data\DataSavedEvent;
+use Statamic\Facades\File;
 
 class DataSaved extends Event implements DataSavedEvent
 {
@@ -59,7 +59,7 @@ class DataSaved extends Event implements DataSavedEvent
         return collect([$this->oldPath, $this->data->path()])
             ->filter()
             ->map(function ($path) use ($pathPrefix) {
-                return $pathPrefix . $path;
+                return $pathPrefix.$path;
             })
             ->all();
     }

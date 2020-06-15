@@ -11,6 +11,8 @@
             @confirm="confirm"
             @cancel="cancel"
         >
+            <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-2': action.fields.length }" />
+
             <publish-container
                 v-if="action.fields.length"
                 name="confirm-action"
@@ -18,11 +20,15 @@
                 :values="values"
                 :meta="action.meta"
                 :errors="errors"
+                @updated="values = $event"
             >
-                <publish-fields :fields="action.fields" @updated="valueUpdated" />
+                <publish-fields
+                    slot-scope="{ setFieldValue, setFieldMeta }"
+                    :fields="action.fields"
+                    @updated="setFieldValue"
+                    @meta-updated="setFieldMeta"
+                />
             </publish-container>
-
-            <div v-else v-text="confirmationText" />
         </confirmation-modal>
     </span>
 
@@ -53,7 +59,7 @@ export default {
         return {
             confirming: false,
             fieldset: {sections:[{fields:this.action.fields}]},
-            values: {},
+            values: this.action.values,
             errors: {},
         }
     },
@@ -61,6 +67,8 @@ export default {
     computed: {
 
         confirmationText() {
+            if (! this.action.confirmationText) return;
+
             return __n(this.action.confirmationText, this.selections);
         },
 
@@ -83,10 +91,6 @@ export default {
 
         cancel() {
             this.confirming = false;
-        },
-
-        valueUpdated(field, value) {
-            this.values[field] = value;
         }
     }
 

@@ -2,16 +2,16 @@
 
 namespace Tests\Stache;
 
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Mockery;
-use Tests\TestCase;
+use PHPUnit\Framework\Assert as PHPUnit;
 use Statamic\Facades\Path;
 use Statamic\Stache\Stache;
-use Statamic\Stache\Traverser;
-use Illuminate\Support\Collection;
-use Illuminate\Filesystem\Filesystem;
 use Statamic\Stache\Stores\BasicStore;
-use PHPUnit\Framework\Assert as PHPUnit;
+use Statamic\Stache\Traverser;
 use Symfony\Component\Finder\SplFileInfo;
+use Tests\TestCase;
 
 class TraverserTest extends TestCase
 {
@@ -32,7 +32,7 @@ class TraverserTest extends TestCase
     }
 
     /** @test */
-    function throws_exception_if_store_doesnt_have_a_directory_defined()
+    public function throws_exception_if_store_doesnt_have_a_directory_defined()
     {
         $this->expectException('Exception');
         $this->expectExceptionMessage('Store [test] does not have a directory defined.');
@@ -45,7 +45,7 @@ class TraverserTest extends TestCase
     }
 
     /** @test */
-    function it_gets_no_files_if_directory_doesnt_exist()
+    public function it_gets_no_files_if_directory_doesnt_exist()
     {
         $store = Mockery::mock();
         $store->shouldReceive('directory')->andReturn($this->tempDir.'/non-existent');
@@ -58,7 +58,7 @@ class TraverserTest extends TestCase
     }
 
     /** @test */
-    function gets_files_in_a_stores_directory()
+    public function gets_files_in_a_stores_directory()
     {
         mkdir($this->tempDir.'/nested');
         touch($this->tempDir.'/one.txt', 1234567891);
@@ -85,7 +85,7 @@ class TraverserTest extends TestCase
     }
 
     /** @test */
-    function files_can_be_filtered()
+    public function files_can_be_filtered()
     {
         touch($this->tempDir.'/one.txt', 1234567891);
         touch($this->tempDir.'/two.yaml', 1234567892);
@@ -94,13 +94,19 @@ class TraverserTest extends TestCase
         $stache = Mockery::mock(Stache::class);
         $stache->shouldReceive('sites')->andReturn(collect(['en']));
         $store = new class($stache, app('files')) extends BasicStore {
-            public function key() { }
-            public function makeItemFromFile($path, $contents) { }
+            public function key()
+            {
+            }
+
+            public function makeItemFromFile($path, $contents)
+            {
+            }
         };
         $store->directory($this->tempDir);
 
-        $filter = function($file) {
+        $filter = function ($file) {
             PHPUnit::assertInstanceOf(SplFileInfo::class, $file);
+
             return $file->getExtension() === 'txt';
         };
 
@@ -110,7 +116,7 @@ class TraverserTest extends TestCase
         $dir = Path::tidy($this->tempDir);
         $this->assertEquals([
             $dir.'/one.txt' => 1234567891,
-            $dir.'/three.txt' => 1234567893
+            $dir.'/three.txt' => 1234567893,
         ], $files->all());
     }
 }

@@ -2,61 +2,68 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
-use Statamic\Assets\AssetCollection;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
-use Statamic\Facades\Helper;
 use Statamic\Fields\Fieldtype;
-use Statamic\Support\Arr;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
-use Statamic\Statamic;
+use Statamic\Support\Str;
 
 class Assets extends Fieldtype
 {
     protected $categories = ['media', 'relationship'];
     protected $defaultValue = [];
 
-    protected $configFields = [
-        'container' => [
-            'type' => 'asset_container',
-            'max_items' => 1,
-            'instructions' => 'The asset container to work with.',
-            'width' => 50
-        ],
-        'mode' => [
-            'type' => 'select',
-            'default' => 'grid',
-            'options' => [
-                'grid' => 'Grid',
-                'list' => 'List',
+    protected function configFieldItems(): array
+    {
+        return [
+            'mode' => [
+                'display' => __('Mode'),
+                'instructions' => __('statamic::fieldtypes.assets.config.mode'),
+                'type' => 'select',
+                'default' => 'grid',
+                'options' => [
+                    'grid' => __('Grid'),
+                    'list' => __('List'),
+                ],
+                'width' => 50,
             ],
-            'instructions' => 'Default layout interface.',
-            'width' => 50
-        ],
-        'folder' => [
-            'type' => 'asset_folder',
-            'max_items' => 1,
-            'instructions' => 'The folder to begin browsing in.',
-            'width' => 50
-        ],
-        'restrict' => [
-            'type' => 'toggle',
-            'instructions' => 'Prevent users from navigating to other folders.',
-            'width' => 50
-        ],
-        'allow_uploads' => [
-            'type' => 'toggle',
-            'default' => true,
-            'instructions' => 'Allow new files to be uploaded?',
-            'width' => 50
-        ],
-         'max_files' => [
-            'type' => 'integer',
-            'instructions' => 'The maximum number of selectable assets.',
-            'width' => 50
-        ],
-    ];
+            'container' => [
+                'display' => __('Container'),
+                'instructions' => __('statamic::fieldtypes.assets.config.container'),
+                'type' => 'asset_container',
+                'max_items' => 1,
+                'mode' => 'select',
+                'width' => 50,
+            ],
+            'folder' => [
+                'display' => __('Folder'),
+                'instructions' => __('statamic::fieldtypes.assets.config.folder'),
+                'type' => 'asset_folder',
+                'max_items' => 1,
+                'width' => 50,
+            ],
+            'restrict' => [
+                'display' => __('Restrict'),
+                'instructions' => __('statamic::fieldtypes.assets.config.restrict'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
+            'allow_uploads' => [
+                'display' => __('Allow Uploads'),
+                'instructions' => __('statamic::fieldtypes.assets.config.allow_uploads'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
+            'max_files' => [
+                'display' => __('Max Files'),
+                'instructions' => __('statamic::fieldtypes.assets.config.max_files'),
+                'type' => 'integer',
+                'width' => 50,
+            ],
+        ];
+    }
 
     public function canHaveDefault()
     {
@@ -76,7 +83,7 @@ class Assets extends Fieldtype
 
     protected function valueToId($value)
     {
-        if (str_contains($value, '::')) {
+        if (Str::contains($value, '::')) {
             return $value;
         }
 
@@ -113,22 +120,23 @@ class Assets extends Fieldtype
 
     public function augment($value)
     {
-        $assets = collect($value)->map(function ($path) {
-            return $this->container()->asset($path);
-        })->filter()->values();
-
-        if (Statamic::shallowAugmentationEnabled()) {
-            $assets = $assets->map(function ($asset) {
-                return [
-                    'id' => $asset->id(),
-                    'url' => $asset->url(),
-                    'permalink' => $asset->absoluteUrl(),
-                    'api_url' => $asset->apiUrl(),
-                ];
-            });
-        }
+        $assets = $this->getAssetsForAugmentation($value);
 
         return $this->config('max_files') === 1 ? $assets->first() : $assets;
+    }
+
+    public function shallowAugment($value)
+    {
+        $assets = $this->getAssetsForAugmentation($value)->map->toShallowAugmentedCollection();
+
+        return $this->config('max_files') === 1 ? $assets->first() : $assets;
+    }
+
+    private function getAssetsForAugmentation($value)
+    {
+        return collect($value)->map(function ($path) {
+            return $this->container()->asset($path);
+        })->filter()->values();
     }
 
     protected function container()
@@ -153,7 +161,7 @@ class Assets extends Fieldtype
         $rules = ['array'];
 
         if ($max = $this->config('max_files')) {
-            $rules[] = 'max:' . $max;
+            $rules[] = 'max:'.$max;
         }
 
         return $rules;

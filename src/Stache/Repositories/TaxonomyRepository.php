@@ -84,4 +84,11 @@ class TaxonomyRepository implements RepositoryContract
 
         return $this->findByHandle($key)->collection($collection);
     }
+
+    public static function bindings(): array
+    {
+        return [
+            Taxonomy::class => \Statamic\Taxonomies\Taxonomy::class,
+        ];
+    }
 }

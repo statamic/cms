@@ -2,28 +2,20 @@
 
 namespace Statamic\Structures;
 
+use Illuminate\Support\Traits\Tappable;
+use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Facades;
 use Statamic\Support\Str;
-use Statamic\Facades\Site;
-use Statamic\Facades\Entry;
-use Statamic\Facades\Stache;
-use Statamic\Facades\Collection;
-use Statamic\Data\ExistsAsFile;
-use Illuminate\Support\Traits\Tappable;
-use Statamic\Facades\Structure as StructureAPI;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Structures\Structure as StructureContract;
-use Statamic\Facades\Blink;
 
-class Structure implements StructureContract
+abstract class Structure implements StructureContract
 {
-    use FluentlyGetsAndSets, ExistsAsFile, Tappable;
+    use FluentlyGetsAndSets, Tappable;
 
     protected $title;
     protected $handle;
-    protected $sites;
     protected $trees;
-    protected $collections;
+    protected $collection;
     protected $maxDepth;
     protected $expectsRoot = false;
 
@@ -34,7 +26,7 @@ class Structure implements StructureContract
 
     public function handle($handle = null)
     {
-        if (is_null($handle)) {
+        if (func_num_args() === 0) {
             return $this->handle;
         }
 
@@ -50,76 +42,6 @@ class Structure implements StructureContract
             ->getter(function ($title) {
                 return $title ?: Str::humanize($this->handle());
             })->args(func_get_args());
-    }
-
-    public function sites($sites = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('sites')
-            ->getter(function ($sites) {
-                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
-            })
-            ->args(func_get_args());
-    }
-
-    public function showUrl()
-    {
-        return cp_route('structures.show', $this->handle());
-    }
-
-    public function editUrl()
-    {
-        return cp_route('structures.edit', $this->handle());
-    }
-
-    public function deleteUrl()
-    {
-        return cp_route('structures.destroy', $this->handle());
-    }
-
-    public function save()
-    {
-        StructureAPI::save($this);
-    }
-
-    public function toCacheableArray()
-    {
-        return [
-            'title' => $this->title,
-            'handle' => $this->handle,
-            'sites' => $this->sites,
-            'expects_root' => $this->expectsRoot,
-            'path' => $this->initialPath() ?? $this->path(),
-            'max_depth' => $this->maxDepth,
-            'collections' => $this->collections,
-            'trees' => $this->trees()->map->toCacheableArray()->all()
-        ];
-    }
-
-    public function path()
-    {
-        return vsprintf('%s/%s.yaml', [
-            rtrim(Stache::store('structures')->directory(), '/'),
-            $this->handle
-        ]);
-    }
-
-    public function fileData()
-    {
-        $data = [
-            'title' => $this->title,
-            'collections' => $this->collections,
-            'max_depth' => $this->maxDepth,
-            'expects_root' => $this->expectsRoot ?: null,
-        ];
-
-        if (Site::hasMultiple()) {
-            $data['sites'] = $this->sites;
-        } else {
-            $data = array_merge($data, $this->in(Site::default()->handle())->fileData());
-        }
-
-        return $data;
     }
 
     public function expectsRoot($expectsRoot = null)
@@ -165,35 +87,7 @@ class Structure implements StructureContract
         return $this->trees[$site] ?? null;
     }
 
-    public function collections($collections = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('collections')
-            ->getter(function ($collections) {
-                if ($collection = $this->collection()) {
-                    return collect([$collection]);
-                }
-
-                return collect($collections)->map(function ($collection) {
-                    return Collection::findByHandle($collection);
-                });
-            })
-            ->args(func_get_args());
-    }
-
-    public function collection()
-    {
-        return Blink::once('structure-collection-'.$this->handle, function () {
-            return Collection::all()->first(function ($collection) {
-                return $collection->structureHandle() === $this->handle();
-            });
-        });
-    }
-
-    public function isCollectionBased()
-    {
-        return $this->collection() !== null;
-    }
+    abstract public function collections($collections = null);
 
     public function maxDepth($maxDepth = null)
     {
@@ -204,28 +98,39 @@ class Structure implements StructureContract
             })->args(func_get_args());
     }
 
-    public function delete()
+    public function validateTree(array $tree, string $locale): array
     {
-        StructureAPI::delete($this);
+        if (! $this->expectsRoot()) {
+            return $tree;
+        }
 
-        return true;
+        if (! empty($tree) && ! isset($tree[0]['entry'])) {
+            throw new \Exception('Root page must be an entry');
+        }
+
+        throw_if(isset($tree[0]['children']), new \Exception('Root page cannot have children'));
+
+        return $tree;
     }
 
-    public function entryUri($entry)
+    public function route(string $site): ?string
     {
-        $page = $this->in($entry->locale())
-            ->flattenedPages()
-            ->keyBy->reference()
-            ->get($entry->id());
-
-        return optional($page)->uri();
+        return null;
     }
 
-    public function updateEntryUris()
+    public function showUrl($params = [])
     {
-        StructureAPI::updateEntryUris($this);
+        //
+    }
 
-        return $this;
+    public function editUrl()
+    {
+        //
+    }
+
+    public function deleteUrl()
+    {
+        //
     }
 
     public static function __callStatic($method, $parameters)

@@ -6,14 +6,13 @@ use Facades\Statamic\Stache\Traverser;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Contracts\Auth\User;
 use Statamic\Facades\Path;
-use Statamic\Facades\User as UserAPI;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\UsersStore;
 use Tests\TestCase;
 
 class UsersStoreTest extends TestCase
 {
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -23,14 +22,14 @@ class UsersStoreTest extends TestCase
         $this->store = (new UsersStore($stache, app('files')))->directory($this->tempDir);
     }
 
-    function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
     /** @test */
-    function it_gets_yaml_files()
+    public function it_gets_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
         touch($this->tempDir.'/two.yaml', 1234567890);
@@ -55,7 +54,7 @@ class UsersStoreTest extends TestCase
     }
 
     /** @test */
-    function it_makes_user_instances_from_files()
+    public function it_makes_user_instances_from_files()
     {
         $item = $this->store->makeItemFromFile($this->tempDir.'/john@example.com.yaml', "id: 123\nname: John Doe\nemail: john@example.com");
 
@@ -67,7 +66,7 @@ class UsersStoreTest extends TestCase
     }
 
     /** @test */
-    function it_uses_the_id_as_the_item_key()
+    public function it_uses_the_id_as_the_item_key()
     {
         $user = \Mockery::mock();
         $user->shouldReceive('id')->andReturn('123');

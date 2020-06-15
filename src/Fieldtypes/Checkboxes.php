@@ -6,17 +6,24 @@ use Statamic\Fields\Fieldtype;
 
 class Checkboxes extends Fieldtype
 {
-    protected $configFields = [
-        'options' => [
-            'type' => 'array',
-            'value_header' => 'Label',
-            'instructions' => 'Set the array keys and their optional labels.'
-        ],
-        'inline' => [
-            'type' => 'toggle',
-            'instructions' => 'Show the checkboxes in a row.'
-        ]
-    ];
+    protected function configFieldItems(): array
+    {
+        return [
+            'inline' => [
+                'display' => __('Inline'),
+                'instructions' => __('statamic::fieldtypes.checkboxes.config.inline'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
+            'options' => [
+                'display' => __('Options'),
+                'instructions' => __('statamic::fieldtypes.checkboxes.config.options'),
+                'type' => 'array',
+                'key_header' => __('Key (Value)'),
+                'value_header' => __('Label'),
+            ],
+        ];
+    }
 
     public function augment($values)
     {
@@ -28,7 +35,7 @@ class Checkboxes extends Fieldtype
             return [
                 'key' => $value,
                 'value' => $value,
-                'label' => array_get($this->config('options'), $value, $value)
+                'label' => array_get($this->config('options'), $value, $value),
             ];
         })->all();
     }

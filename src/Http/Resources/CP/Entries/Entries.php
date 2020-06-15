@@ -3,8 +3,6 @@
 namespace Statamic\Http\Resources\CP\Entries;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
-use Statamic\Http\Resources\CP\Assets\Asset;
-use Statamic\Http\Resources\CP\Assets\Folder;
 
 class Entries extends ResourceCollection
 {

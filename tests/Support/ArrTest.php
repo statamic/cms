@@ -8,7 +8,7 @@ use Statamic\Support\Arr;
 class ArrTest extends TestCase
 {
     /** @test */
-    function it_adds_scope_to_associative_array()
+    public function it_adds_scope_to_associative_array()
     {
         $arr = [
             'foo' => 'bar',
@@ -21,14 +21,14 @@ class ArrTest extends TestCase
             'myscope' => [
                 'foo' => 'bar',
                 'baz' => 'qux',
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, Arr::addScope($arr, 'myscope'));
     }
 
     /** @test */
-    function it_adds_scope_to_multidimensional_array()
+    public function it_adds_scope_to_multidimensional_array()
     {
         $arr = [
             [
@@ -48,7 +48,7 @@ class ArrTest extends TestCase
                 'myscope' => [
                     'foo' => 'bar',
                     'baz' => 'qux',
-                ]
+                ],
             ],
             [
                 'foo' => 'bar2',
@@ -56,7 +56,7 @@ class ArrTest extends TestCase
                 'myscope' => [
                     'foo' => 'bar2',
                     'baz' => 'qux2',
-                ]
+                ],
             ],
         ];
 
@@ -64,7 +64,7 @@ class ArrTest extends TestCase
     }
 
     /** @test */
-    function it_doesnt_add_scope_to_lists()
+    public function it_doesnt_add_scope_to_lists()
     {
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Scopes can only be added to associative or multidimensional arrays.');
@@ -73,7 +73,7 @@ class ArrTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_first_non_null_value()
+    public function it_gets_the_first_non_null_value()
     {
         $this->assertEquals('one', Arr::getFirst([
             'foo' => 'one',

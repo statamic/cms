@@ -2,8 +2,6 @@
 
 namespace Statamic\Auth\Protect\Protectors\Password;
 
-use Statamic\Auth\Protect\Protectors\Password\Guard;
-use Statamic\Auth\Protect\Protectors\PasswordProtector;
 use Statamic\Http\Controllers\Controller as BaseController;
 
 class Controller extends BaseController
@@ -18,7 +16,7 @@ class Controller extends BaseController
     public function store()
     {
         $this->password = request('password');
-        $this->tokenData = session('statamic:protect:password.tokens.' . request('token'));
+        $this->tokenData = session('statamic:protect:password.tokens.'.request('token'));
 
         if (! $this->tokenData) {
             return back()->withErrors(['token' => 'Invalid or expired token.'], 'passwordProtect');

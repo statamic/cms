@@ -2,14 +2,15 @@
 
 namespace Statamic\Http\Responses;
 
+use Facades\Statamic\View\Cascade;
+use Illuminate\Contracts\Support\Responsable;
+use Statamic\Auth\Protect\Protection;
+use Statamic\Events\ResponseCreated;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
+use Statamic\Routing\ResolveRedirect;
 use Statamic\Statamic;
 use Statamic\View\View;
-use Facades\Statamic\View\Cascade;
-use Statamic\Events\ResponseCreated;
-use Statamic\Auth\Protect\Protection;
-use Illuminate\Contracts\Support\Responsable;
-use Statamic\Exceptions\NotFoundHttpException;
 
 class DataResponse implements Responsable
 {
@@ -60,9 +61,9 @@ class DataResponse implements Responsable
 
         $paths = collect($finder->getPaths())->flatMap(function ($path) use ($site, $amp) {
             return [
-                $amp ? $path . '/' . $site . '/amp' : null,
-                $path . '/' . $site,
-                $amp ? $path . '/amp' : null,
+                $amp ? $path.'/'.$site.'/amp' : null,
+                $path.'/'.$site,
+                $amp ? $path.'/amp' : null,
                 $path,
             ];
         })->filter()->values()->all();
@@ -87,6 +88,8 @@ class DataResponse implements Responsable
             return;
         }
 
+        $redirect = (new ResolveRedirect)($redirect, $this->data);
+
         if ($redirect == '404') {
             throw new NotFoundHttpException;
         }
@@ -109,11 +112,13 @@ class DataResponse implements Responsable
             return $this;
         }
 
-        if (!$this->isLivePreview() && !$this->data->published()) {
+        if (! $this->isLivePreview() && ! $this->data->published()) {
             throw new NotFoundHttpException;
         }
 
-        $this->headers['X-Statamic-Draft'] = true;
+        if ($this->isLivePreview()) {
+            $this->headers['X-Statamic-Draft'] = true;
+        }
 
         return $this;
     }

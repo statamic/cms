@@ -6,19 +6,42 @@ use Statamic\Data\AbstractAugmented;
 
 class AugmentedTerm extends AbstractAugmented
 {
-    protected function keys()
+    public function keys()
     {
         return $this->data->data()->keys()
-            ->merge([
-                'id',
-                'slug',
-                'uri',
-                'url',
-                'title',
-                'is_term',
-                'entries',
-                'entries_count',
-            ])->all();
+            ->merge($this->commonKeys())
+            ->merge($this->blueprintFields()->keys())
+            ->unique()->sort()->values()->all();
+    }
+
+    private function commonKeys()
+    {
+        return [
+            'id',
+            'slug',
+            'uri',
+            'url',
+            'permalink',
+            'title',
+            'is_term',
+            'entries',
+            'entries_count',
+            'api_url',
+            'taxonomy',
+            'edit_url',
+            'updated_at',
+            'updated_by',
+        ];
+    }
+
+    protected function updatedBy()
+    {
+        return $this->data->lastModifiedBy();
+    }
+
+    protected function updatedAt()
+    {
+        return $this->data->lastModified();
     }
 
     protected function entries()
@@ -34,5 +57,10 @@ class AugmentedTerm extends AbstractAugmented
     protected function isTerm()
     {
         return true;
+    }
+
+    protected function permalink()
+    {
+        return $this->get('absolute_url');
     }
 }

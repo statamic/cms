@@ -2,17 +2,17 @@
 
 namespace Tests\Composer;
 
-use Tests\TestCase;
-use Statamic\Statamic;
-use GuzzleHttp\Psr7\Response;
 use Facades\GuzzleHttp\Client;
 use Facades\Statamic\Updater\Changelog;
+use GuzzleHttp\Psr7\Response;
+use Statamic\Statamic;
 use Statamic\Updater\Changelog as RealChangelog;
+use Tests\TestCase;
 
 class ChangelogTest extends TestCase
 {
     /** @test */
-    function it_can_get_statamic_changelog_from_core_slug()
+    public function it_can_get_statamic_changelog_from_core_slug()
     {
         Client::shouldReceive('get')
             ->andReturn($this->fakeCoreChangelogResponse(['3.0.2', '3.0.1', '3.0.0']));
@@ -44,7 +44,7 @@ class ChangelogTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_addon_changelog_from_product_slug()
+    public function it_can_get_addon_changelog_from_product_slug()
     {
         Client::shouldReceive('request')
             ->andReturn($this->fakeMarketplaceShowResponse(['1.0.2', '1.0.1', '1.0.0']));
@@ -76,7 +76,7 @@ class ChangelogTest extends TestCase
     }
 
     /** @test */
-    function it_can_get_latest_release()
+    public function it_can_get_latest_release()
     {
         Client::shouldReceive('request')
             ->andReturn($this->fakeMarketplaceShowResponse(['1.0.2', '1.0.1', '1.0.0']));
@@ -95,7 +95,7 @@ class ChangelogTest extends TestCase
     private function fakeCoreChangelogResponse($versions)
     {
         return new Response(200, [], json_encode([
-            'data' => $this->fakeReleasesData($versions)
+            'data' => $this->fakeReleasesData($versions),
         ]));
     }
 
@@ -104,9 +104,9 @@ class ChangelogTest extends TestCase
         return new Response(200, [], json_encode([
             'data' => [
                 'variants' => [
-                    ['releases' => $this->fakeReleasesData($versions)]
-                ]
-            ]
+                    ['releases' => $this->fakeReleasesData($versions)],
+                ],
+            ],
         ]));
     }
 
@@ -121,5 +121,3 @@ class ChangelogTest extends TestCase
         })->all();
     }
 }
-
-

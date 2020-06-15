@@ -4,13 +4,12 @@ namespace Statamic\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Statamic\Http\Controllers\Controller;
-use Statamic\Statamic;
 use Statamic\Support\Str;
-use Statamic\Tags\Query\HasConditions;
+use Statamic\Tags\Concerns\QueriesConditions;
 
 class ApiController extends Controller
 {
-    use HasConditions;
+    use QueriesConditions;
 
     /**
      * @var \Illuminate\Http\Request
@@ -18,14 +17,12 @@ class ApiController extends Controller
     protected $request;
 
     /**
-     * Create a new CpController
+     * Create a new CpController.
      *
      * @param \Illuminate\Http\Request $request
      */
     public function __construct(Request $request)
     {
-        Statamic::enableShallowAugmentation();
-
         $this->request = $request;
     }
 

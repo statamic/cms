@@ -7,35 +7,41 @@ use Statamic\Query\Scopes\Filter;
 
 class UserGroup extends Filter
 {
+    public static function title()
+    {
+        return __('Group');
+    }
+
     public function fieldItems()
     {
         return [
-            'value' => [
-                'display' => __('User Group'),
+            'group' => [
                 'type' => 'select',
-                'options' => $this->options()
-            ]
+                'placeholder' => __('Select Group'),
+                'options' => $this->options()->all(),
+            ],
         ];
     }
 
     public function apply($query, $values)
     {
-        $query->where('group', $values['value']);
+        $query->where('group', $values['group']);
+    }
+
+    public function badge($values)
+    {
+        return __('is in').' '.strtolower($this->options()->get($values['group']));
     }
 
     public function visibleTo($key)
     {
-        if (empty($this->options())) {
-            return false;
-        }
-
-        return $key === 'users';
+        return $key === 'users' && $this->options()->isNotEmpty();
     }
 
     protected function options()
     {
         return Facades\UserGroup::all()->mapWithKeys(function ($group) {
             return [$group->handle() => $group->title()];
-        })->all();
+        });
     }
 }

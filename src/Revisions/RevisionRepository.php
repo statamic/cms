@@ -2,14 +2,14 @@
 
 namespace Statamic\Revisions;
 
-use Statamic\Support\Str;
-use Statamic\Facades\File;
-use Statamic\Facades\YAML;
-use Statamic\Facades\Folder;
 use Illuminate\Support\Carbon;
-use Statamic\Support\FileCollection;
 use Statamic\Contracts\Revisions\Revision as RevisionContract;
 use Statamic\Contracts\Revisions\RevisionRepository as Contract;
+use Statamic\Facades\File;
+use Statamic\Facades\Folder;
+use Statamic\Facades\YAML;
+use Statamic\Support\FileCollection;
+use Statamic\Support\Str;
 
 class RevisionRepository implements Contract
 {
@@ -25,7 +25,7 @@ class RevisionRepository implements Contract
 
     public function whereKey($key)
     {
-        $directory = $this->directory() . '/' . $key;
+        $directory = $this->directory().'/'.$key;
 
         $files = Folder::getFiles($directory);
 
@@ -40,7 +40,7 @@ class RevisionRepository implements Contract
 
     public function findWorkingCopyByKey($key)
     {
-        $path = $this->directory() . '/' . $key . '/working.yaml';
+        $path = $this->directory().'/'.$key.'/working.yaml';
 
         if (! File::exists($path)) {
             return null;

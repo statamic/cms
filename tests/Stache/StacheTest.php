@@ -2,13 +2,13 @@
 
 namespace Tests\Stache;
 
-use Statamic\Stache\Stache;
-use PHPUnit\Framework\TestCase;
-use Illuminate\Support\Collection;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
+use PHPUnit\Framework\TestCase;
+use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\ChildStore;
-use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\CollectionsStore;
+use Statamic\Stache\Stores\EntriesStore;
 
 class StacheTest extends TestCase
 {
@@ -18,7 +18,7 @@ class StacheTest extends TestCase
     }
 
     /** @test */
-    function sites_can_be_defined_and_retrieved()
+    public function sites_can_be_defined_and_retrieved()
     {
         $this->assertNull($this->stache->sites());
 
@@ -30,7 +30,7 @@ class StacheTest extends TestCase
     }
 
     /** @test */
-    function default_site_can_be_retrieved()
+    public function default_site_can_be_retrieved()
     {
         $this->stache->sites(['foo', 'bar']);
 
@@ -38,7 +38,7 @@ class StacheTest extends TestCase
     }
 
     /** @test */
-    function stores_can_be_registered()
+    public function stores_can_be_registered()
     {
         $this->stache->sites(['en']); // store expects the stache to have site(s)
         $this->assertTrue($this->stache->stores()->isEmpty());
@@ -57,14 +57,14 @@ class StacheTest extends TestCase
     }
 
     /** @test */
-    function multiple_stores_can_be_registered_at_once()
+    public function multiple_stores_can_be_registered_at_once()
     {
         $this->stache->sites(['en']); // store expects the stache to have site(s)
         $this->assertTrue($this->stache->stores()->isEmpty());
 
         $return = $this->stache->registerStores([
             new CollectionsStore($this->stache, \Mockery::mock(Filesystem::class)),
-            new EntriesStore($this->stache, \Mockery::mock(Filesystem::class))
+            new EntriesStore($this->stache, \Mockery::mock(Filesystem::class)),
         ]);
 
         $this->assertEquals($this->stache, $return);
@@ -79,7 +79,7 @@ class StacheTest extends TestCase
     }
 
     /** @test */
-    function an_aggregate_stores_child_store_can_be_retrieved_directly()
+    public function an_aggregate_stores_child_store_can_be_retrieved_directly()
     {
         $this->stache->sites(['en']); // stores expect the stache to have site(s)
         $store = (new EntriesStore($this->stache, \Mockery::mock(Filesystem::class)))->setChildStoreCreator(function () {
@@ -94,31 +94,31 @@ class StacheTest extends TestCase
     }
 
     /** @test */
-    function it_generates_an_id()
+    public function it_generates_an_id()
     {
         $this->markTestIncomplete();
     }
 
     /** @test */
-    function it_clears_its_cache()
+    public function it_clears_its_cache()
     {
         $this->markTestIncomplete();
     }
 
     /** @test */
-    function it_refreshes_itself()
+    public function it_refreshes_itself()
     {
         $this->markTestIncomplete();
     }
 
     /** @test */
-    function it_gets_its_cache_file_size()
+    public function it_gets_its_cache_file_size()
     {
         $this->markTestIncomplete();
     }
 
     /** @test */
-    function it_can_record_its_build_time()
+    public function it_can_record_its_build_time()
     {
         $this->markTestIncomplete();
     }

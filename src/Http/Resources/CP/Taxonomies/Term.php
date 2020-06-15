@@ -2,9 +2,9 @@
 
 namespace Statamic\Http\Resources\CP\Taxonomies;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class Term extends Resource
+class Term extends JsonResource
 {
     public function toArray($request)
     {

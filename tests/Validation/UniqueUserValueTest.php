@@ -10,7 +10,7 @@ class UniqueUserValueTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_fails_when_theres_a_duplicate_user_value()
+    public function it_fails_when_theres_a_duplicate_user_value()
     {
         User::make()->email('foo@bar.com')->save();
 
@@ -26,7 +26,7 @@ class UniqueUserValueTest extends TestCase
     }
 
     /** @test */
-    function it_passes_when_updating()
+    public function it_passes_when_updating()
     {
         User::make()->email('foo@bar.com')->id('123')->save();
 

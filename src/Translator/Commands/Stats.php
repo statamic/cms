@@ -61,8 +61,9 @@ class Stats extends Command
                 throw new \LogicException('Invalid type. Allowed: "key" or "string"');
             }
             $rows = $rows->filter(function ($item) use ($type) {
-                $isKey = Util::isKey($item['string']);;
-                return $type === 'key' ? $isKey : !$isKey;
+                $isKey = Util::isKey($item['string']);
+
+                return $type === 'key' ? $isKey : ! $isKey;
             });
         }
 
@@ -74,7 +75,7 @@ class Stats extends Command
 
         if ($filter = $input->getOption('filter')) {
             $rows = $rows->filter(function ($item) use ($filter) {
-                return str_contains(strtolower($item['string']), strtolower($filter));
+                return Str::contains(strtolower($item['string']), strtolower($filter));
             });
         }
 
@@ -95,6 +96,7 @@ class Stats extends Command
         $dir = getcwd();
         $paths = [$dir.'/src', $dir.'/resources'];
         $discovery = new MethodDiscovery(new Filesystem, $paths);
+
         return $discovery->discover();
     }
 }

@@ -1,7 +1,8 @@
 export default {
 
     props: {
-        actionUrl: String,
+        runActionUrl: String,
+        bulkActionsUrl: String,
     },
 
     methods: {
@@ -11,7 +12,10 @@ export default {
         },
 
         actionCompleted() {
+            this.$events.$emit('clear-selections');
+
             this.$toast.success(__('Action completed'));
+
             this.request();
         }
 

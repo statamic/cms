@@ -3,11 +3,10 @@
 namespace Statamic\Extend;
 
 use Facades\Statamic\Extend\Marketplace;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Foundation\PackageManifest;
 use ReflectionClass;
-use Statamic\Support\Arr;
 use Statamic\Facades\File;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Manifest extends PackageManifest
@@ -19,11 +18,12 @@ class Manifest extends PackageManifest
         $packages = [];
 
         if ($this->files->exists($path = $this->vendorPath.'/composer/installed.json')) {
-            $packages = json_decode($this->files->get($path), true);
+            $installed = json_decode($this->files->get($path), true);
+            $packages = $installed['packages'] ?? $installed;
         }
 
         $this->write(collect($packages)->filter(function ($package) {
-            return array_get($package, 'type') === 'statamic-addon';
+            return Arr::has($package, 'extra.statamic');
         })->keyBy('name')->map(function ($package) {
             return $this->formatPackage($package);
         })->filter()->all());
@@ -60,7 +60,7 @@ class Manifest extends PackageManifest
             'marketplaceProductId' => data_get($marketplaceData, 'id', null),
             'marketplaceVariantId' => data_get($installedVariant, 'id', null),
             'marketplaceSlug' => data_get($marketplaceData, 'slug', null),
-            'version' => $package['version'], // Is this syncronized with git tag?
+            'version' => $package['version'], // Is this synchronized with git tag?
             'namespace' => $namespace,
             'directory' => $directory,
             'autoload' => $autoload,

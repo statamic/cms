@@ -8,6 +8,10 @@
     left: 32px !important;
 }
 
+.toasted-container {
+    @apply items-start;
+}
+
 .toasted-container .toasted.statamic {
     @apply bg-white text-grey-80 mt-2 text-base rounded shadow p-0;
     height: 48px;
@@ -22,6 +26,10 @@
 
     &.error i {
         @apply bg-red;
+    }
+
+    &.default i {
+        @apply bg-grey-80;
     }
 
     .action {

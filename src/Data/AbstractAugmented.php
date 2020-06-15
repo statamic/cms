@@ -23,40 +23,47 @@ abstract class AbstractAugmented implements Augmented
 
     public function except($keys)
     {
-        return $this->select(array_diff($this->augmentableKeys(), Arr::wrap($keys)));
+        return $this->select(array_diff($this->keys(), Arr::wrap($keys)));
     }
 
     public function select($keys = null)
     {
         $arr = [];
 
-        $keys = Arr::wrap($keys ?: $this->augmentableKeys());
+        $keys = Arr::wrap($keys ?: $this->keys());
 
         foreach ($keys as $key) {
             $arr[$key] = $this->get($key);
         }
 
-        return $arr;
+        return new AugmentedCollection($arr);
     }
 
-    abstract protected function keys();
+    abstract public function keys();
 
     public function get($handle)
     {
-        if (method_exists($this, $method = Str::camel($handle)) && !in_array($method, ['select', 'except'])) {
+        $method = Str::camel($handle);
+
+        if ($this->methodExistsOnThisClass($method)) {
             return $this->$method();
         }
 
-        if (method_exists($this->data, $method = Str::camel($handle))) {
+        if (method_exists($this->data, $method)) {
             return $this->wrapValue($this->data->$method(), $handle);
         }
 
         return $this->wrapValue($this->getFromData($handle), $handle);
     }
 
+    private function methodExistsOnThisClass($method)
+    {
+        return method_exists($this, $method) && ! in_array($method, ['select', 'except']);
+    }
+
     protected function getFromData($handle)
     {
-        $value = $this->data->get($handle);
+        $value = method_exists($this->data, 'value') ? $this->data->value($handle) : $this->data->get($handle);
 
         if (method_exists($this->data, 'getSupplement')) {
             $value = $this->data->getSupplement($handle) ?? $value;
@@ -81,15 +88,10 @@ abstract class AbstractAugmented implements Augmented
         );
     }
 
-    private function blueprintFields()
+    protected function blueprintFields()
     {
         return (method_exists($this->data, 'blueprint') && $blueprint = $this->data->blueprint())
             ? $blueprint->fields()->all()
             : collect();
-    }
-
-    protected function augmentableKeys()
-    {
-        return $this->blueprintFields()->keys()->merge($this->keys())->all();
     }
 }

@@ -2,13 +2,13 @@
 
 namespace Statamic\Auth;
 
-use Statamic\Facades;
-use Statamic\Support\Arr;
-use Statamic\Facades\File;
-use Statamic\Facades\YAML;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Auth\Role;
 use Statamic\Contracts\Auth\RoleRepository as RepositoryContract;
+use Statamic\Facades;
+use Statamic\Facades\File;
+use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
 
 abstract class RoleRepository implements RepositoryContract
 {
@@ -58,7 +58,7 @@ abstract class RoleRepository implements RepositoryContract
         $roles->put($role->handle(), Arr::removeNullValues([
             'title' => $role->title(),
             'permissions' => $role->permissions()->all(),
-            'preferences' => $role->preferences()
+            'preferences' => $role->preferences(),
         ]));
 
         if ($role->handle() !== $role->originalHandle()) {

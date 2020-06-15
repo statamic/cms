@@ -11,7 +11,7 @@ window.Statamic = Statamic;
 window._ = require('underscore');
 window.$ = window.jQuery = require('jquery');
 window.rangy = require('rangy');
-window.EQCSS = require('eqcss');
+window.EQCSS = require('./vendor/eqcss');
 
 require('./bootstrap/globals');
 require('./bootstrap/polyfills');
@@ -102,8 +102,7 @@ Statamic.app({
 
     components: {
         GlobalSearch: require('./components/GlobalSearch.vue').default,
-        SiteSelector: require('./components/SiteSelector.vue').default,
-        PageTree: require('./components/structures/PageTree.vue').default,
+        GlobalSiteSelector: require('./components/GlobalSiteSelector.vue').default,
         Login: require('./components/login/login'),
         LoginModal: require('./components/login/LoginModal.vue').default,
         BaseEntryCreateForm: require('./components/entries/BaseCreateForm.vue').default,
@@ -114,9 +113,11 @@ Statamic.app({
         FieldsetEditForm: require('./components/fieldsets/EditForm.vue').default,
         BlueprintListing: require('./components/blueprints/Listing.vue').default,
         BlueprintBuilder: require('./components/blueprints/Builder.vue').default,
+        FormCreateForm: require('./components/forms/CreateForm.vue').default,
         FormListing: require('./components/forms/Listing.vue').default,
         FormSubmissionListing: require('./components/forms/SubmissionListing.vue').default,
         GlobalListing: require('./components/globals/Listing.vue').default,
+        GlobalEditForm: require('./components/globals/EditForm.vue').default,
         GlobalPublishForm: require('./components/globals/PublishForm.vue').default,
         GlobalCreateForm: require('./components/globals/Create.vue').default,
         UserListing: require('./components/users/Listing.vue').default,
@@ -128,21 +129,23 @@ Statamic.app({
         CollectionCreateForm: require('./components/collections/CreateForm.vue').default,
         CollectionScaffolder: require('./components/collections/Scaffolder.vue').default,
         CollectionEditForm: require('./components/collections/EditForm.vue').default,
+        CollectionView: require('./components/collections/View.vue').default,
         SessionExpiry: require('./components/SessionExpiry.vue').default,
-        StructureWizard: require('./components/structures/Wizard.vue').default,
-        StructureListing: require('./components/structures/Listing.vue').default,
-        StructureEditForm: require('./components/structures/EditForm.vue').default,
+        NavigationListing: require('./components/navigation/Listing.vue').default,
+        NavigationCreateForm: require('./components/navigation/CreateForm.vue').default,
+        NavigationEditForm: require('./components/navigation/EditForm.vue').default,
+        NavigationView: require('./components/navigation/View.vue').default,
         Stacks: require('./components/stacks/Stacks.vue').default,
-        TaxonomyWizard: require('./components/taxonomies/Wizard.vue').default,
+        TaxonomyCreateForm: require('./components/taxonomies/CreateForm.vue').default,
         TaxonomyEditForm: require('./components/taxonomies/EditForm.vue').default,
         AssetContainerCreateForm: require('./components/asset-containers/CreateForm.vue').default,
         AssetContainerEditForm: require('./components/asset-containers/EditForm.vue').default,
-        FormWizard: require('./components/forms/Wizard.vue').default,
     },
 
     data: {
         showLoginModal: false,
         navOpen: true,
+        mobileNavOpen: false,
         modals: [],
         stacks: [],
         panes: [],
@@ -155,14 +158,12 @@ Statamic.app({
             return Statamic.$config.get('version');
         },
 
-        computedNavOpen() {
-            // if (this.stackCount > 0) return false;
-
-            return this.navOpen;
-        },
-
         stackCount() {
             return this.$stacks.count();
+        },
+
+        wrapperClass() {
+            return this.$config.get('wrapperClass', 'max-w-xl');
         }
 
     },
@@ -202,6 +203,10 @@ Statamic.app({
         toggleNav() {
             this.navOpen = ! this.navOpen;
             localStorage.setItem('statamic.nav', this.navOpen ? 'open' : 'closed');
+        },
+
+        toggleMobileNav() {
+            this.mobileNavOpen = ! this.mobileNavOpen;
         }
     }
 

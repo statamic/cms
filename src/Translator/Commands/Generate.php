@@ -58,7 +58,7 @@ class Generate extends Command
     protected function generateStringFiles()
     {
         $strings = $this->discovered->filter(function ($string) {
-            return !Str::startsWith($string, $this->ignored) && Util::isString($string);
+            return ! Str::startsWith($string, $this->ignored) && Util::isString($string);
         })->merge($this->additionalStrings)->sortBy(function ($string) {
             return strtolower($string);
         })->unique();
@@ -86,6 +86,7 @@ class Generate extends Command
 
         if ($json === ($existingJson ?? null)) {
             $this->output->writeln("<comment>[!]</comment> Translation file for <comment>$lang</comment> not written because there are no changes.");
+
             return;
         }
 
@@ -105,7 +106,7 @@ class Generate extends Command
             ->map(function ($string) {
                 [$file, $string] = explode('.', $string, 2);
 
-                if (! str_contains($file, '::')) {
+                if (! Str::contains($file, '::')) {
                     $file = 'statamic::'.$file;
                 }
 
@@ -129,6 +130,7 @@ class Generate extends Command
                     $this->generateKeyFile($lang, $file, function ($existing) use ($strings) {
                         return $strings->mapWithKeys(function ($key) use ($existing) {
                             $translation = $existing[$key] ?? '';
+
                             return [$key => $translation];
                         })->all();
                     });
@@ -139,7 +141,7 @@ class Generate extends Command
     protected function generateKeyFile($lang, $file, $translationCallback)
     {
         $path = 'resources/lang/'.$lang.'/'.$file.'.php';
-        $fullPath =__DIR__.'/../../../'.$path;
+        $fullPath = __DIR__.'/../../../'.$path;
 
         $exists = file_exists($fullPath);
         $existing = $exists ? require $fullPath : [];
@@ -148,10 +150,11 @@ class Generate extends Command
 
         if ($translations === $existing) {
             $this->output->writeln("<comment>[!]</comment> Translation file for <comment>$lang/$file</comment> not written because there are no changes.");
+
             return;
         }
 
-        $contents = "<?php\n\nreturn " . VarExporter::export($translations) . ";\n";
+        $contents = "<?php\n\nreturn ".VarExporter::export($translations).";\n";
 
         $this->files->makeDirectory(dirname($fullPath), 0755, true, true);
         $this->files->put($fullPath, $contents);
@@ -187,6 +190,7 @@ class Generate extends Command
     {
         if (is_array($value)) {
             $existing = $existing[$key] ?? [];
+
             return collect($value)->map(function ($v, $k) use ($existing) {
                 return $this->getManualKeyFileTranslation($k, $v, $existing);
             })->all();
@@ -214,6 +218,7 @@ class Generate extends Command
     {
         if (! $this->input->getOption('translate')) {
             $this->output->writeln('Run `php translator translate` to translate any missing lines using Google Translate.');
+
             return;
         }
 

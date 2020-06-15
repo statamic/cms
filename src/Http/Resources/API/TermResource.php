@@ -2,9 +2,9 @@
 
 namespace Statamic\Http\Resources\API;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class TermResource extends Resource
+class TermResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,8 +14,14 @@ class TermResource extends Resource
      */
     public function toArray($request)
     {
-        return array_merge($this->resource->toAugmentedArray(), [
-            'api_url' => $this->resource->apiUrl(),
-        ]);
+        $fields = $this->resource->selectedQueryColumns() ?? $this->resource->augmented()->keys();
+
+        // Don't want the 'entries' variable in API requests.
+        $fields = array_diff($fields, ['entries']);
+
+        return $this->resource
+            ->toAugmentedCollection($fields)
+            ->withShallowNesting()
+            ->toArray();
     }
 }

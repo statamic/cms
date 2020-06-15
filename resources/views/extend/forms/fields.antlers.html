@@ -1,0 +1,9 @@
+{{ fields }}
+    <div class="p-2">
+        <label>{{ display }}</label>
+        <div class="p-1">{{ field }}</div>
+        {{ if error }}
+            <p class="text-gray-500">{{ error }}</p>
+        {{ /if }}
+    </div>
+{{ /fields }}

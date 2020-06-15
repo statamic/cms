@@ -2,10 +2,10 @@
 
 namespace Statamic\Updater\Core;
 
-use Statamic\Statamic;
 use Facades\GuzzleHttp\Client;
-use Illuminate\Support\Facades\Cache;
 use GuzzleHttp\Exception\RequestException;
+use Illuminate\Support\Facades\Cache;
+use Statamic\Statamic;
 use Statamic\Updater\Changelog as BaseChangelog;
 
 class Changelog extends BaseChangelog
@@ -70,6 +70,7 @@ class Changelog extends BaseChangelog
         return Cache::rememberWithExpiration('statamic/changelog', function () {
             try {
                 $payload = collect(json_decode($this->queryApi()->getBody(), true)['data']);
+
                 return [static::CACHE_FOR_MINUTES => $payload];
             } catch (RequestException $exception) {
                 return [5 => collect()];

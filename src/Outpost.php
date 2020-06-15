@@ -2,23 +2,23 @@
 
 namespace Statamic;
 
-use Log;
 use GuzzleHttp\Client;
-use Statamic\Facades\Addon;
-use Statamic\Facades\Config;
+use GuzzleHttp\Exception\RequestException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
-use GuzzleHttp\Exception\RequestException;
+use Log;
+use Statamic\Facades\Addon;
+use Statamic\Facades\Config;
 
 class Outpost
 {
     /**
-     * The URL of the Outpost
+     * The URL of the Outpost.
      */
     const ENDPOINT = 'https://outpost.statamic.com/v2/query';
 
     /**
-     * Where the cached response will be stored
+     * Where the cached response will be stored.
      */
     const RESPONSE_CACHE_KEY = 'outpost_response';
 
@@ -33,7 +33,7 @@ class Outpost
     private $response;
 
     /**
-     * Create a new Outpost instance
+     * Create a new Outpost instance.
      *
      * @param Request $request
      */
@@ -43,7 +43,7 @@ class Outpost
     }
 
     /**
-     * Radio into the Outpost
+     * Radio into the Outpost.
      *
      * Tampering with outgoing API call will cause Statamic to consider your license invalid.
      * We’ll also send our flying police monkeys to your office to throw poop at you. Maybe.
@@ -82,7 +82,7 @@ class Outpost
     /**
      * Is the site's license key valid?
      *
-     * @return boolean
+     * @return bool
      */
     public function isLicenseValid()
     {
@@ -120,13 +120,13 @@ class Outpost
             return false;
         }
 
-        return !$this->isOnPublicDomain();
+        return ! $this->isOnPublicDomain();
     }
 
     /**
      * Is the site on a publicly accessible domain?
      *
-     * @return boolean
+     * @return bool
      */
     public function isOnPublicDomain()
     {
@@ -136,7 +136,7 @@ class Outpost
     /**
      * Is the site on their designated licensed domain?
      *
-     * @return boolean
+     * @return bool
      */
     public function isOnCorrectDomain()
     {
@@ -155,7 +155,7 @@ class Outpost
     /**
      * Is there an update available?
      *
-     * @return boolean
+     * @return bool
      */
     public function isUpdateAvailable()
     {
@@ -183,7 +183,7 @@ class Outpost
     }
 
     /**
-     * Perform the request to the Outpost
+     * Perform the request to the Outpost.
      *
      * @return void
      */
@@ -199,7 +199,7 @@ class Outpost
         } catch (RequestException $e) {
             Log::notice("Couldn't reach the Statamic Outpost.");
         } catch (Exception $e) {
-            Log::error("Ran into an issue when contacting the Statamic Outpost.");
+            Log::error('Ran into an issue when contacting the Statamic Outpost.');
         }
 
         $this->response = $response;
@@ -218,7 +218,7 @@ class Outpost
     /**
      * Check if a response has been cached, and whether it should be used.
      *
-     * @return boolean
+     * @return bool
      */
     private function hasCachedResponse()
     {
@@ -236,7 +236,7 @@ class Outpost
     }
 
     /**
-     * Get the cached response
+     * Get the cached response.
      *
      * @return array
      */
@@ -251,7 +251,7 @@ class Outpost
     }
 
     /**
-     * Get a default response to use if the request can't be made
+     * Get a default response to use if the request can't be made.
      *
      * @return array
      */
@@ -263,12 +263,12 @@ class Outpost
             'latest_version'   => Statamic::version(),
             'update_available' => false,
             'update_count'     => 0,
-            'license_valid'    => false
+            'license_valid'    => false,
         ];
     }
 
     /**
-     * Get the payload to be sent to the Outpost
+     * Get the payload to be sent to the Outpost.
      *
      * @return array
      */
@@ -281,20 +281,20 @@ class Outpost
             'request'     => [
                 'domain'  => request()->server('HTTP_HOST'),
                 'ip'      => request()->ip(),
-                'port'    => request()->getPort()
+                'port'    => request()->getPort(),
             ],
-            'addons' => $this->getAddonsPayload()
+            'addons' => $this->getAddonsPayload(),
         ];
     }
 
     private function getAddonsPayload()
     {
         return Addon::all()->map(function ($addon) {
-             return [
-                 'addon' => $addon->id(),
-                 'version' => $addon->version(),
-                 'license_key' => $addon->licenseKey(),
-             ];
+            return [
+                'addon' => $addon->id(),
+                'version' => $addon->version(),
+                'license_key' => $addon->licenseKey(),
+            ];
         })->all();
     }
 }

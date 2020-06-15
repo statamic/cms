@@ -2,12 +2,12 @@
 
 namespace Tests\Feature\Fieldsets;
 
-use Tests\TestCase;
-use Tests\FakesRoles;
+use Facades\Statamic\Fields\FieldsetRepository;
 use Statamic\Facades;
 use Tests\Fakes\FakeFieldsetRepository;
-use Facades\Statamic\Fields\FieldsetRepository;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class StoreFieldsetTest extends TestCase
 {
@@ -22,7 +22,7 @@ class StoreFieldsetTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();
@@ -33,7 +33,7 @@ class StoreFieldsetTest extends TestCase
             ->post(cp_route('fieldsets.store'), [
                 'handle' => 'Test',
                 'title' => 'Updated',
-                'fields' => []
+                'fields' => [],
             ])
             ->assertRedirect('/original')
             ->assertSessionHas('error');
@@ -42,7 +42,7 @@ class StoreFieldsetTest extends TestCase
     }
 
     /** @test */
-    function fieldset_gets_created()
+    public function fieldset_gets_created()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Fieldset::all());
@@ -51,17 +51,17 @@ class StoreFieldsetTest extends TestCase
             ->actingAs($user)
             ->post(cp_route('fieldsets.store'), ['title' => 'Test'])
             ->assertRedirect(cp_route('fieldsets.edit', 'test'))
-            ->assertSessionHas('message', __('Saved'));
+            ->assertSessionHas('success');
 
         $this->assertCount(1, Facades\Fieldset::all());
         $this->assertEquals([
             'title' => 'Test',
-            'fields' => []
+            'fields' => [],
         ], Facades\Fieldset::find('test')->contents());
     }
 
     /** @test */
-    function title_is_required()
+    public function title_is_required()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Fieldset::all());

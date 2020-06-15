@@ -17,6 +17,14 @@ class Value extends Index
     {
         $method = Str::camel($this->name);
 
+        if ($method === 'blueprint') {
+            return $item->blueprint()->handle();
+        }
+
+        if ($method === 'entriesCount') {
+            return $item->queryEntries()->count();
+        }
+
         return method_exists($item, $method)
             ? $item->{$method}()
             : $item->value($this->name);

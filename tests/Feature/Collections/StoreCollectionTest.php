@@ -2,36 +2,30 @@
 
 namespace Tests\Feature\Collections;
 
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Statamic\Facades\User;
 use Statamic\Facades\Collection;
+use Statamic\Facades\User;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class StoreCollectionTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->markTestIncomplete(); // TODO: implementation was changed, tests werent.
-    }
-
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this
             ->from('/original')
             ->actingAs($this->userWithoutPermission())
             ->post(cp_route('collections.store'))
             ->assertRedirect('/original')
-            ->assertSessionHas('error');
+            ->assertSessionHas('error', 'You are not authorized to create collections.');
     }
 
     /** @test */
-    function it_stores_a_collection()
+    public function it_stores_a_collection()
     {
         $this->assertCount(0, Collection::all());
 
@@ -44,17 +38,13 @@ class StoreCollectionTest extends TestCase
         $this->assertCount(1, Collection::all());
         $collection = Collection::all()->first();
         $this->assertEquals('test', $collection->handle());
-        $this->assertEquals([
-            'title' => 'Test Collection',
-            'template' => 'test-template',
-            'fieldset' => 'test-fieldset',
-            'route' => 'test-route',
-            'order' => 'number',
-        ], $collection->data());
+        $this->assertEquals('Test Collection', $collection->title());
+        $this->assertEquals('public', $collection->pastDateBehavior());
+        $this->assertEquals('private', $collection->futureDateBehavior());
     }
 
     /** @test */
-    function title_is_required()
+    public function title_is_required()
     {
         $this->assertCount(0, Collection::all());
 
@@ -62,7 +52,7 @@ class StoreCollectionTest extends TestCase
             ->from('/original')
             ->actingAs($this->userWithPermission())
             ->post(cp_route('collections.store'), $this->validParams([
-                'title' => ''
+                'title' => '',
             ]))
             ->assertRedirect('/original')
             ->assertSessionHasErrors('title');
@@ -71,7 +61,7 @@ class StoreCollectionTest extends TestCase
     }
 
     /** @test */
-    function handle_must_be_alpha_dash()
+    public function handle_must_be_alpha_dash()
     {
         $this->assertCount(0, Collection::all());
 
@@ -79,7 +69,7 @@ class StoreCollectionTest extends TestCase
             ->from('/original')
             ->actingAs($this->userWithPermission())
             ->post(cp_route('collections.store'), $this->validParams([
-                'handle' => 'there are spaces in here'
+                'handle' => 'there are spaces in here',
             ]))
             ->assertRedirect('/original')
             ->assertSessionHasErrors('handle');
@@ -88,7 +78,7 @@ class StoreCollectionTest extends TestCase
     }
 
     /** @test */
-    function handle_is_a_slugified_title_if_not_provided()
+    public function handle_is_a_slugified_title_if_not_provided()
     {
         $this->assertCount(0, Collection::all());
 
@@ -97,7 +87,7 @@ class StoreCollectionTest extends TestCase
             ->actingAs($this->userWithPermission())
             ->post(cp_route('collections.store'), $this->validParams([
                 'title' => 'An Example Collection',
-                'handle' => ''
+                'handle' => '',
             ]));
 
         $this->assertCount(1, Collection::all());
@@ -110,10 +100,6 @@ class StoreCollectionTest extends TestCase
         return array_merge([
             'title' => 'Test Collection',
             'handle' => 'test',
-            'template' => 'test-template',
-            'fieldset' => 'test-fieldset',
-            'route' => 'test-route',
-            'order' => 'number'
         ], $overrides);
     }
 
@@ -121,13 +107,13 @@ class StoreCollectionTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp']]);
 
-        return User::make()->assignRole('test');
+        return tap(User::make()->assignRole('test'))->save();
     }
 
     private function userWithPermission()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
 
-        return User::make()->assignRole('test');
+        return tap(User::make()->assignRole('test'))->save();
     }
 }

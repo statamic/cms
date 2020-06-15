@@ -2,6 +2,7 @@
 
 namespace Statamic\Extensions\Pagination;
 
+use Illuminate\Http\Resources\Json\PaginatedResourceResponse;
 use Illuminate\Pagination\LengthAwarePaginator as BasePaginator;
 
 class LengthAwarePaginator extends BasePaginator
@@ -30,6 +31,10 @@ class LengthAwarePaginator extends BasePaginator
      */
     public function __call($method, $parameters)
     {
+        if ($this->isApiPluckingResource($method, $parameters)) {
+            return $this->pluckResourcesForApi();
+        }
+
         if (! in_array($method, static::CHAINABLE_METHODS)) {
             return parent::__call($method, $parameters);
         }
@@ -37,5 +42,23 @@ class LengthAwarePaginator extends BasePaginator
         $this->forwardCallTo($this->getCollection(), $method, $parameters);
 
         return $this;
+    }
+
+    private function isApiPluckingResource($method, $parameters)
+    {
+        if ($method !== 'pluck' && $parameters !== ['resource']) {
+            return false;
+        }
+
+        return collect(debug_backtrace(DEBUG_BACKTRACE_PROVIDE_OBJECT, 5))
+            ->pluck('class')
+            ->contains(PaginatedResourceResponse::class);
+    }
+
+    private function pluckResourcesForApi()
+    {
+        return $this->getCollection()->map(function ($item) {
+            return $item->resource;
+        });
     }
 }

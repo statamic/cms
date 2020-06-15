@@ -7,28 +7,34 @@ use Statamic\Query\Scopes\Filter;
 
 class UserRole extends Filter
 {
+    public static function title()
+    {
+        return __('Role');
+    }
+
     public function fieldItems()
     {
         return [
-            'value' => [
-                'display' => __('User Role'),
+            'role' => [
                 'type' => 'select',
-                'options' => $this->options()
-            ]
+                'placeholder' => __('Select Role'),
+                'options' => $this->options()->all(),
+            ],
         ];
     }
 
     public function apply($query, $values)
     {
-        $query->where('role', $values['value']);
+        $query->where('role', $values['role']);
+    }
+
+    public function badge($values)
+    {
+        return __('is').' '.strtolower($this->options()->get($values['role']));
     }
 
     public function visibleTo($key)
     {
-        if (empty($this->options())) {
-            return false;
-        }
-
         return $key === 'users';
     }
 
@@ -36,6 +42,6 @@ class UserRole extends Filter
     {
         return Role::all()->mapWithKeys(function ($role) {
             return [$role->handle() => $role->title()];
-        })->prepend('Super', 'super')->all();
+        })->prepend('Super', 'super');
     }
 }

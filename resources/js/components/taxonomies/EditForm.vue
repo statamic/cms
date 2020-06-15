@@ -11,20 +11,16 @@
         :errors="errors"
         @updated="values = $event"
     >
-        <div slot-scope="{ setFieldValue }">
+        <div slot-scope="{ setFieldValue, setFieldMeta }">
+            <configure-sections
+                @updated="setFieldValue"
+                @meta-updated="setFieldMeta"
+                :enable-sidebar="false"/>
 
-            <div class="flex items-center mb-3">
-                <h1 class="flex-1">
-                    <small class="subhead block">
-                        <a :href="listingUrl" v-text="__('Taxonomies')" />
-                    </small>
-
-                    {{ title }}
-                </h1>
+            <div class="py-2 border-t flex justify-between">
+                <a :href="url" class="btn" v-text="__('Cancel') "/>
                 <button type="submit" class="btn-primary" @click="submit">{{ __('Save') }}</button>
             </div>
-
-            <publish-sections @updated="setFieldValue" :enable-sidebar="false"/>
         </div>
     </publish-container>
 
@@ -37,14 +33,11 @@ export default {
         blueprint: Object,
         initialValues: Object,
         meta: Object,
-        initialTitle: String,
         url: String,
-        listingUrl: String,
     },
 
     data() {
         return {
-            title: this.initialTitle,
             values: this.initialValues,
             error: null,
             errors: {},
@@ -64,7 +57,6 @@ export default {
 
             this.$axios.patch(this.url, this.values).then(response => {
                 this.saving = false;
-                this.title = response.data.title;
                 this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
             }).catch(e => this.handleAxiosError(e));

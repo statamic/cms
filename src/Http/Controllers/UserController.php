@@ -2,43 +2,32 @@
 
 namespace Statamic\Http\Controllers;
 
-use Statamic\Facades\User;
-use Statamic\Auth\PasswordReset;
-use Statamic\Auth\UserRegistrar;
-use Illuminate\Support\MessageBag;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\MessageBag;
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\User;
 
 class UserController extends Controller
 {
     private $request;
 
-    public function login()
+    public function login(Request $request)
     {
-        $validator = \Validator::make(request()->all(), [
-            'username' => 'required',
-            'password' => 'required'
-        ], [], [
-            'username' => 'username field',
-            'password' => 'password field',
+        $request->validate([
+            'email' => 'required',
+            'password' => 'required',
         ]);
 
-        if ($validator->fails()) {
-            return back()->withInput()->withErrors($validator);
-        }
-
-        $logged_in = Auth::attempt(
-            request()->only('username', 'password'),
-            request()->has('remember')
+        $loggedIn = Auth::attempt(
+            $request->only('email', 'password'),
+            $request->has('remember')
         );
 
-        if (! $logged_in) {
-            return back()->withInput()->withErrors('Invalid credentials.');
-        }
-
-        $redirect = request()->input('redirect', '/');
-
-        return redirect($redirect);
+        return $loggedIn
+            ? redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'))
+            : back()->withInput()->withErrors(__('Invalid credentials.'));
     }
 
     public function logout()
@@ -48,35 +37,43 @@ class UserController extends Controller
         return redirect(request()->get('redirect', '/'));
     }
 
-    public function register()
+    public function register(Request $request)
     {
-        $registrar = new UserRegistrar(request());
+        $blueprint = Blueprint::find('user');
 
-        $validator = $registrar->validator();
+        $fields = $blueprint->fields()->addValues($request->all());
 
-        if ($validator->fails()) {
-            return back()->withInput()->withErrors($validator);
+        $fieldRules = $fields->validator()->withRules([
+            'email' => 'required|email|unique_user_value',
+            'password' => 'required|confirmed',
+        ])->rules();
+
+        $this->validateWithBag('user.register', $request, $fieldRules);
+
+        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+
+        $user = User::make()
+            ->email($request->email)
+            ->password($request->password)
+            ->data($values);
+
+        if ($roles = config('statamic.users.new_user_roles')) {
+            $user->roles($roles);
         }
 
-        $user = $registrar->create();
-
-        // Allow addons to prevent the submission of the form, return
-        // their own errors, and modify the user.
-        $errors = $this->runRegisteringEvent($user);
-
-        if (! $errors->isEmpty()) {
-            return back()->withInput()->withErrors($errors);
-        }
+        // TODO: Registering event
 
         $user->save();
 
-        event('user.registered', $user);
+        // TODO: Registered event
 
         Auth::login($user);
 
-        $redirect = request()->input('redirect', '/');
+        $response = $request->has('_redirect') ? redirect($request->get('_redirect')) : back();
 
-        return redirect($redirect);
+        session()->flash('user.register.success', __('Registration successful.'));
+
+        return $response;
     }
 
     /**

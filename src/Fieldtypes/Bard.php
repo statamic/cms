@@ -2,92 +2,117 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Fields\Fields;
 use Scrumpy\ProseMirrorToHtml\Renderer;
+use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
 
 class Bard extends Replicator
 {
     public $category = ['text', 'structured'];
     protected $defaultValue = '[]';
 
-    protected $configFields = [
-        'sets' => ['type' => 'sets'],
-        'buttons' => [
-            'type' => 'bard_buttons_setting',
-            'instructions' => 'Choose which buttons to show in the toolbar.',
-            'default' => [
-                'h2',
-                'h3',
-                'bold',
-                'italic',
-                'unorderedlist',
-                'orderedlist',
-                'removeformat',
-                'quote',
-                'anchor',
-                'image',
-                'table',
-            ]
-        ],
-        'container' => [
-            'type' => 'asset_container',
-            'instructions' => 'Set the asset container used with the Image button',
-            'max_items' => 1,
-            'if' => [
-                'buttons' => 'contains image'
-            ]
-        ],
-        'save_html' => [
-            'type' => 'toggle',
-            'display' => 'Save HTML',
-            'instructions' => 'Save HTML instead of structured data. This simplifies but limits control of your template markup.'
-        ],
-        'toolbar_mode' => [
-            'type' => 'select',
-            'default' => 'fixed',
-            'options' => [
-                'fixed' => 'Fixed',
-                'floating' => 'Floating',
+    protected function configFieldItems(): array
+    {
+        return [
+            'sets' => [
+                'display' => __('Sets'),
+                'instructions' => __('statamic::fieldtypes.bard.config.sets'),
+                'type' => 'sets',
             ],
-            'instructions' => 'Choose which style of toolbar you prefer.'
-        ],
-        'link_noopener' => [
-            'type' => 'toggle',
-            'default' => false,
-            'width' => 50,
-            'instructions' => 'Set `rel="noopener` on all links.'
-        ],
-        'link_noreferrer' => [
-            'type' => 'toggle',
-            'default' => false,
-            'width' => 50,
-            'instructions' => 'Set `rel="noreferrer` on all links.'
-        ],
-        'target_blank' => [
-            'type' => 'toggle',
-            'default' => false,
-            'width' => 50,
-            'instructions' => 'Set `target="_blank` on all links.'
-        ],
-        'reading_time' => [
-            'type' => 'toggle',
-            'default' => false,
-            'instructions' => 'Show estimated reading time at the bottom of the field.'
-        ],
-        'fullscreen' => [
-            'type' => 'toggle',
-            'default' => true,
-            'instructions' => 'Enable the option to toggle into fullscreen mode'
-        ],
-        'allow_source' => [
-            'type' => 'toggle',
-            'default' => true,
-            'instructions' => 'Enable the option to view the HTML source code while writing.'
-        ]
-    ];
+            'buttons' => [
+                'display' => __('Buttons'),
+                'instructions' => __('statamic::fieldtypes.bard.config.buttons'),
+                'type' => 'bard_buttons_setting',
+                'default' => [
+                    'h2',
+                    'h3',
+                    'bold',
+                    'italic',
+                    'unorderedlist',
+                    'orderedlist',
+                    'removeformat',
+                    'quote',
+                    'anchor',
+                    'image',
+                    'table',
+                ],
+            ],
+            'container' => [
+                'display' => __('Container'),
+                'instructions' => __('statamic::fieldtypes.bard.config.container'),
+                'type' => 'asset_container',
+                'max_items' => 1,
+                'if' => [
+                    'buttons' => 'contains image',
+                ],
+            ],
+            'save_html' => [
+                'display' => __('Display HTML'),
+                'instructions' => __('statamic::fieldtypes.bard.config.save_html'),
+                'type' => 'toggle',
+            ],
+            'toolbar_mode' => [
+                'display' => __('Toolbar Mode'),
+                'instructions' => __('statamic::fieldtypes.bard.config.toolbar_mode'),
+                'type' => 'select',
+                'default' => 'fixed',
+                'options' => [
+                    'fixed' => __('Fixed'),
+                    'floating' => __('Floating'),
+                ],
+                'width' => 50,
+            ],
+            'link_noopener' => [
+                'display' => __('Link Noopener'),
+                'instructions' => __('statamic::fieldtypes.bard.config.link_noopener'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'link_noreferrer' => [
+                'display' => __('Link Noreferrer'),
+                'instructions' => __('statamic::fieldtypes.bard.config.link_noreferrer'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'target_blank' => [
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+                'instructions' => __('statamic::fieldtypes.bard.config.target_blank'),
+            ],
+            'reading_time' => [
+                'display' => __('Show Reading Time'),
+                'instructions' => __('statamic::fieldtypes.bard.config.reading_time'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'fullscreen' => [
+                'display' => __('Allow Fullscreen Mode'),
+                'instructions' => __('statamic::fieldtypes.bard.config.fullscreen'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
+            'allow_source' => [
+                'display' => __('Allow Source Mode'),
+                'instructions' => __('statamic::fieldtypes.bard.config.allow_source'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
+        ];
+    }
 
-    public function augment($value)
+    public function filter()
+    {
+        return new BardFilter($this);
+    }
+
+    protected function performAugmentation($value, $shallow)
     {
         if ($this->shouldSaveHtml()) {
             return $value;
@@ -97,7 +122,7 @@ class Bard extends Replicator
             $value = $this->convertLegacyData($value);
         }
 
-        return (new Augmentor($this))->augment($value);
+        return (new Augmentor($this))->augment($value, $shallow);
     }
 
     public function process($value)
@@ -114,6 +139,14 @@ class Bard extends Replicator
 
         if ($this->shouldSaveHtml()) {
             return (new Augmentor($this))->convertToHtml($structure);
+        }
+
+        if ($structure === [['type' => 'paragraph']]) {
+            return null;
+        }
+
+        if ($structure === []) {
+            return null;
         }
 
         return $structure;
@@ -150,7 +183,7 @@ class Bard extends Replicator
         if (is_string($value)) {
             $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($value);
             $value = $doc['content'];
-        } else if ($this->isLegacyData($value)) {
+        } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
         }
 
@@ -175,7 +208,7 @@ class Bard extends Replicator
                 'id' => "set-$index",
                 'enabled' => array_pull($values, 'enabled', true),
                 'values' => $values,
-            ]
+            ],
         ];
     }
 
@@ -193,7 +226,7 @@ class Bard extends Replicator
 
         return $renderer->render([
             'type' => 'doc',
-            'content' => $data
+            'content' => $data,
         ]);
     }
 
@@ -207,6 +240,7 @@ class Bard extends Replicator
             return $set['type'] === 'set';
         })->map(function ($set, $index) {
             $set = $set['attrs']['values'];
+
             return $this->setRules($set['type'], $set, $index);
         })->reduce(function ($carry, $rules) {
             return $carry->merge($rules);
@@ -243,6 +277,7 @@ class Bard extends Replicator
                     return;
                 }
                 $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($set['text']);
+
                 return $doc['content'];
             }
 
@@ -252,8 +287,8 @@ class Bard extends Replicator
                     'attrs' => [
                         'id' => "set-$i",
                         'values' => $set,
-                    ]
-                ]
+                    ],
+                ],
             ];
         })->all();
     }
@@ -267,6 +302,7 @@ class Bard extends Replicator
         })->mapWithKeys(function ($set) {
             $values = $set['attrs']['values'];
             $config = $this->config("sets.{$values['type']}.fields", []);
+
             return [$set['attrs']['id'] => (new Fields($config))->addValues($values)->meta()];
         })->toArray();
 

@@ -3,11 +3,11 @@
 namespace Statamic\OAuth;
 
 use Closure;
-use Statamic\Support\Str;
+use Laravel\Socialite\Contracts\User as SocialiteUser;
+use Statamic\Contracts\Auth\User as StatamicUser;
 use Statamic\Facades\File;
 use Statamic\Facades\User;
-use Statamic\Contracts\Auth\User as StatamicUser;
-use Laravel\Socialite\Contracts\User as SocialiteUser;
+use Statamic\Support\Str;
 
 class Provider
 {
@@ -22,7 +22,7 @@ class Provider
     }
 
     /**
-     * Get a Statamic user ID from an OAuth user ID
+     * Get a Statamic user ID from an OAuth user ID.
      *
      * @param string $id  User ID from an OAuth provider
      * @return string|null  A Statamic user ID
@@ -42,7 +42,7 @@ class Provider
     }
 
     /**
-     * Create a Statamic user from a Socialite user
+     * Create a Statamic user from a Socialite user.
      *
      * @param SocialiteUser $socialite
      * @return StatamicUser
@@ -115,7 +115,7 @@ class Provider
 
     protected function setIds($ids)
     {
-        $contents = '<?php return ' . var_export($ids, true) . ';';
+        $contents = '<?php return '.var_export($ids, true).';';
 
         File::put($this->storagePath(), $contents);
     }

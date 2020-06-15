@@ -10,12 +10,54 @@ use Tests\TestCase;
 class ValueTest extends TestCase
 {
     /** @test */
-    function it_converts_to_string_using_the_augmented_value()
+    public function it_augments_through_the_fieldtype()
     {
         $fieldtype = new class extends Fieldtype {
             public function augment($data)
             {
-                return strtoupper($data) . '!';
+                return strtoupper($data).'!';
+            }
+
+            public function shallowAugment($data)
+            {
+                return $data.' shallow';
+            }
+        };
+
+        $value = new Value('test', null, $fieldtype);
+
+        $this->assertEquals('TEST!', $value->value());
+    }
+
+    /** @test */
+    public function it_shallow_augments_through_the_fieldtype()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($data)
+            {
+                return strtoupper($data).'!';
+            }
+
+            public function shallowAugment($data)
+            {
+                return $data.' shallow';
+            }
+        };
+
+        $value = new Value('test', null, $fieldtype);
+
+        $this->assertNotSame($value, $value->shallow());
+        $this->assertInstanceOf(Value::class, $value->shallow());
+        $this->assertEquals('test shallow', $value->shallow()->value());
+    }
+
+    /** @test */
+    public function it_converts_to_string_using_the_augmented_value()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($data)
+            {
+                return strtoupper($data).'!';
             }
         };
 
@@ -25,13 +67,13 @@ class ValueTest extends TestCase
     }
 
     /** @test */
-    function it_converts_to_json_using_the_augmented_value()
+    public function it_converts_to_json_using_the_augmented_value()
     {
         $fieldtype = new class extends Fieldtype {
             public function augment($data)
             {
                 return array_map(function ($item) {
-                    return strtoupper($item) . '!';
+                    return strtoupper($item).'!';
                 }, $data);
             }
         };
@@ -42,13 +84,13 @@ class ValueTest extends TestCase
     }
 
     /** @test */
-    function it_converts_to_json_and_augments_child_values()
+    public function it_converts_to_json_and_augments_child_values()
     {
         $fieldtype = new class extends Fieldtype {
             public function augment($data)
             {
                 return array_map(function ($item) {
-                    return is_string($item) ? strtoupper($item) . '!' : $item;
+                    return is_string($item) ? strtoupper($item).'!' : $item;
                 }, $data);
             }
         };
@@ -100,4 +142,4 @@ class DummyAugmentable implements \Statamic\Contracts\Data\Augmentable
             'title' => 'Title for '.$this->id,
         ];
     }
-};
+}

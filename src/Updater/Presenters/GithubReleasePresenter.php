@@ -2,8 +2,8 @@
 
 namespace Statamic\Updater\Presenters;
 
-use Statamic\Support\Str;
 use Statamic\Support\Html;
+use Statamic\Support\Str;
 
 class GithubReleasePresenter
 {

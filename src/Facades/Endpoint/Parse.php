@@ -2,9 +2,9 @@
 
 namespace Statamic\Facades\Endpoint;
 
-use Statamic\Support\Str;
-use Statamic\Facades\YAML;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\YAML;
+use Statamic\Support\Str;
 
 /**
  * Parsing things. Templates, Markdown, YAML, etc.
@@ -12,7 +12,7 @@ use Statamic\Facades\Antlers;
 class Parse
 {
     /**
-     * Parse a string/template
+     * Parse a string/template.
      *
      * @param       $str        String to parse
      * @param array $variables  Variables to use
@@ -26,7 +26,7 @@ class Parse
     }
 
     /**
-     * Iterate over an array and parse the string/template for each
+     * Iterate over an array and parse the string/template for each.
      *
      * @param string  $content     String to parse
      * @param array   $data        Variables to use, in a multidimensional array
@@ -41,7 +41,7 @@ class Parse
     }
 
     /**
-     * Parse a string of raw YAML into an array
+     * Parse a string of raw YAML into an array.
      *
      * @param string $str  The YAML string
      * @return array
@@ -52,7 +52,7 @@ class Parse
     }
 
     /**
-     * Checks for and parses front matter
+     * Checks for and parses front matter.
      *
      * @param string  $string  Content to parse
      * @return array
@@ -62,7 +62,7 @@ class Parse
         $data = [];
         $content = $string;
 
-        if (Str::startsWith($string, "---".PHP_EOL)) {
+        if (Str::startsWith($string, '---'.PHP_EOL)) {
             $data = self::YAML($string);
             $content = $data['content'];
             unset($data['content']);
@@ -72,7 +72,7 @@ class Parse
     }
 
     /**
-     * Parse environment variable placeholders with the actual values
+     * Parse environment variable placeholders with the actual values.
      *
      * @param   mixed  $val  The value to parse
      * @return  mixed

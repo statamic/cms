@@ -32,7 +32,7 @@ return [
 
         'ip_address' => [
             'driver' => 'ip_address',
-            'allowed' => ['127.0.0.1']
+            'allowed' => ['127.0.0.1'],
         ],
 
         'logged_in' => [

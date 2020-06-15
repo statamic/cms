@@ -2,15 +2,13 @@
 
 namespace Tests\Feature\Fieldsets;
 
-use Mockery;
-use Statamic\Facades;
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Statamic\Fields\Fieldset;
-use Statamic\Entries\Collection;
-use Tests\Fakes\FakeFieldsetRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
+use Statamic\Facades;
+use Statamic\Fields\Fieldset;
+use Tests\Fakes\FakeFieldsetRepository;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class UpdateFieldsetTest extends TestCase
 {
@@ -25,7 +23,7 @@ class UpdateFieldsetTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();
@@ -43,7 +41,7 @@ class UpdateFieldsetTest extends TestCase
     }
 
     /** @test */
-    function fieldset_gets_saved()
+    public function fieldset_gets_saved()
     {
         $this->withoutExceptionHandling();
         $user = tap(Facades\User::make()->makeSuper())->save();
@@ -55,49 +53,52 @@ class UpdateFieldsetTest extends TestCase
                 'title' => 'Updated title',
                 'fields' => [
                     [
-                        '_id' => 'id-one',
-                        'handle' => 'one',
-                        'type' => 'textarea',
-                        'display' => 'First Field',
-                        'instructions' => 'First field instructions',
-                        'foo' => 'bar',
-                        'width' => 50,
+                        '_id' => 'id-s1-f1',
+                        'handle' => 'one-one',
+                        'type' => 'reference',
+                        'field_reference' => 'somefieldset.somefield',
+                        'config' => [
+                            'foo' => 'bar',
+                            'baz' => 'qux', // not in config_overrides so it shouldn't get saved
+                        ],
+                        'config_overrides' => ['foo'],
                     ],
                     [
-                        '_id' => 'id-two',
-                        'handle' => 'two',
-                        'type' => 'text',
-                        'display' => 'Second Field',
-                        'instructions' => 'Second field instructions',
-                        'baz' => 'qux',
-                        'width' => 100,
+                        '_id' => 'id-s1-f1',
+                        'handle' => 'one-two',
+                        'type' => 'inline',
+                        'config' => [
+                            'type' => 'text',
+                            'foo' => 'bar',
+                        ],
                     ],
-                ]
+                ],
             ])
             ->assertStatus(204);
 
         $this->assertEquals([
             'title' => 'Updated title',
             'fields' => [
-                'one' => [
-                    'type' => 'textarea',
-                    'display' => 'First Field',
-                    'instructions' => 'First field instructions',
-                    'foo' => 'bar',
-                    'width' => 50,
+                [
+                    'handle' => 'one-one',
+                    'field' => 'somefieldset.somefield',
+                    'config' => [
+                        'foo' => 'bar',
+                    ],
                 ],
-                'two' => [
-                    'type' => 'text',
-                    'display' => 'Second Field',
-                    'instructions' => 'Second field instructions',
-                    'baz' => 'qux'
-                ]
-            ]
+                [
+                    'handle' => 'one-two',
+                    'field' => [
+                        'type' => 'text',
+                        'foo' => 'bar',
+                    ],
+                ],
+            ],
         ], Facades\Fieldset::find('test')->contents());
     }
 
     /** @test */
-    function title_is_required()
+    public function title_is_required()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Fieldset::all());
@@ -114,13 +115,15 @@ class UpdateFieldsetTest extends TestCase
     }
 
     /** @test */
-    function fields_are_required()
+    public function fields_are_required()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
-            'fields' => ['foo' => 'bar']
+            'fields' => [
+                ['handle' => 'foo', 'field' => ['type' => 'bar']],
+            ],
         ])->save();
 
         $this
@@ -134,13 +137,15 @@ class UpdateFieldsetTest extends TestCase
     }
 
     /** @test */
-    function fields_must_be_an_array()
+    public function fields_must_be_an_array()
     {
         $user = tap(Facades\User::make()->makeSuper())->save();
         $this->assertCount(0, Facades\Fieldset::all());
         $fieldset = (new Fieldset)->setHandle('test')->setContents($originalContents = [
             'title' => 'Test',
-            'fields' => ['foo' => 'bar']
+            'fields' => [
+                ['handle' => 'foo', 'field' => 'bar'],
+            ],
         ])->save();
 
         $this

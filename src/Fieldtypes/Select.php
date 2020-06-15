@@ -8,50 +8,69 @@ use Statamic\Support\Arr;
 
 class Select extends Fieldtype
 {
-    protected $configFields = [
-        'options' => [
-            'type' => 'array',
-            'key_header' => 'Key',
-            'value_header' => 'Label',
-            'instructions' => 'Set the keys and their optional labels.',
-            'add_button' => 'Add Option'
-        ],
-        'placeholder' => [
-            'type' => 'text',
-            'default' => '',
-            'instructions' => 'Set default, non-selectable placeholder text.'
-        ],
-        'clearable' => [
-            'type' => 'toggle',
-            'default' => false,
-            'instructions' => 'Enable to allow deselecting your option.'
-        ],
-        'multiple' => [
-            'type' => 'toggle',
-            'default' => false,
-            'instructions' => 'Allow multiple selections.'
-        ],
-        'searchable' => [
-            'type' => 'toggle',
-            'default' => true,
-            'instructions' => 'Enable searching through possible options.'
-        ],
-        'taggable' => [
-            'type' => 'toggle',
-            'default' => false,
-            'instructions' => 'Use a "tag" style interface for multiple selections.'
-        ],
-        'push_tags' => [
-            'type' => 'toggle',
-            'default' => false,
-            'instructions' => 'Add newly created tags to the options list.'
-        ],
-        'cast_booleans' => [
-            'type' => 'toggle',
-            'default' => false,
-            'instructions' => 'Options with values of true and false will be saved as booleans.'
-        ]
-    ];
+    protected function configFieldItems(): array
+    {
+        return [
+            'placeholder' => [
+                'display' => __('Placeholder'),
+                'instructions' => __('statamic::fieldtypes.select.config.placeholder'),
+                'type' => 'text',
+                'default' => '',
+                'width' => 50,
+            ],
+            'options' => [
+                'display' => __('Options'),
+                'instructions' => __('statamic::fieldtypes.select.config.options'),
+                'type' => 'array',
+                'key_header' => __('Key'),
+                'value_header' => __('Label'),
+                'add_button' => __('Add Option'),
+            ],
+            'clearable' => [
+                'display' => __('Clearable'),
+                'instructions' => __('statamic::fieldtypes.select.config.clearable'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'multiple' => [
+                'display' => __('Multiple'),
+                'instructions' => __('statamic::fieldtypes.select.config.multiple'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'searchable' => [
+                'display' => __('Searchable'),
+                'instructions' => __('statamic::fieldtypes.select.config.searchable'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
+            'taggable' => [
+                'display' => __('Taggable'),
+                'instructions' => __('statamic::fieldtypes.select.config.taggable'),
+                'type' => 'toggle',
+                'default' => false,
+                'display' => __('Allow additions'),
+                'width' => 50,
+            ],
+            'push_tags' => [
+                'display' => __('Push Tags'),
+                'instructions' => __('statamic::fieldtypes.select.config.push_tags'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+            'cast_booleans' => [
+                'display' => __('Cast Booleans'),
+                'instructions' => __('statamic::fieldtypes.select.config.cast_booleans'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
+        ];
+    }
 
     protected $indexComponent = 'tags';
 
@@ -68,6 +87,18 @@ class Select extends Fieldtype
 
     public function augment($value)
     {
+        if ($this->config('multiple')) {
+            return collect($value)->map(function ($value) {
+                return [
+                    'key' => $value,
+                    'value' => $value,
+                    'label' => array_get($this->config('options'), $value, $value),
+                ];
+            })->all();
+        }
+
+        throw_if(is_array($value), new MultipleValuesEncounteredException($this));
+
         $label = is_null($value) ? null : array_get($this->config('options'), $value, $value);
 
         return new LabeledValue($value, $label);

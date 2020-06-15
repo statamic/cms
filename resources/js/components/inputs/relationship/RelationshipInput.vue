@@ -12,6 +12,8 @@
             :read-only="readOnly"
             :url="selectionsUrl"
             @input="selectFieldSelected"
+            @focus="$emit('focus')"
+            @blur="$emit('blur')"
         />
 
         <loading-graphic v-if="initializing" :inline="true" />
@@ -61,7 +63,8 @@
             <stack name="item-selector" v-if="isSelecting" @closed="isSelecting = false">
                 <item-selector
                     slot-scope="{ close }"
-                    :url="selectionsUrl"
+                    :filters-url="filtersUrl"
+                    :selections-url="selectionsUrl"
                     :site="site"
                     initial-sort-column="title"
                     initial-sort-direction="asc"
@@ -81,7 +84,6 @@
 </template>
 
 <script>
-import Popper from 'vue-popperjs';
 import RelatedItem from './Item.vue';
 import ItemSelector from './Selector.vue';
 import CreateButton from './CreateButton.vue';
@@ -101,6 +103,7 @@ export default {
             default: 'RelatedItem',
         },
         itemDataUrl: String,
+        filtersUrl: String,
         selectionsUrl: String,
         statusIcons: Boolean,
         site: String,
@@ -121,7 +124,6 @@ export default {
     },
 
     components: {
-        Popper,
         ItemSelector,
         RelatedItem,
         CreateButton,

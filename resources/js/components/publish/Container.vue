@@ -40,7 +40,11 @@ export default {
         },
         isRoot: {
             // intentionally not a boolean. we rely on it being undefined in places.
-        }
+        },
+        trackDirtyState: {
+            type: Boolean,
+            default: true,
+        },
     },
 
     data() {
@@ -203,7 +207,7 @@ export default {
         },
 
         dirty() {
-            this.$dirty.add(this.name);
+            if (this.trackDirtyState) this.$dirty.add(this.name);
         }
 
     },

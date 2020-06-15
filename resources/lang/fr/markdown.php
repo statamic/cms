@@ -52,6 +52,6 @@ this: is some yaml
 <pre class="language-markdown"><code>First Header  | Second Header
 ------------- | -------------
 Content Cell  | Content Cell
-Content Cell  | Content Cell</code></pre>'
+Content Cell  | Content Cell</code></pre>',
 
 ];

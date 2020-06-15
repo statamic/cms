@@ -3,10 +3,9 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\Resource;
+use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
-use Statamic\Facades\Action;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
@@ -15,9 +14,12 @@ use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Requests\FilteredRequest;
 use Statamic\Http\Resources\CP\Users\Users;
 use Statamic\Notifications\ActivateAccount;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class UsersController extends CpController
 {
+    use QueriesFilters;
+
     /**
      * @var UserContract
      */
@@ -44,7 +46,7 @@ class UsersController extends CpController
             ? UserGroup::find($request->group)->queryUsers()
             : User::query();
 
-        $this->filter($query, $request->filters);
+        $activeFilterBadges = $this->queryFilters($query, $request->filters);
 
         $users = $query
             ->orderBy($sort = request('sort', 'email'), request('order', 'asc'))
@@ -59,22 +61,12 @@ class UsersController extends CpController
                 Column::make('last_login')->label(__('Last Login'))->sortable(false),
             ])
             ->additional(['meta' => [
-                'filters' => $request->filters,
-                'sortColumn' => $sort,
+                'activeFilterBadges' => $activeFilterBadges,
             ]]);
     }
 
-    protected function filter($query, $filters)
-    {
-        foreach ($filters as $handle => $values) {
-            $class = app('statamic.scopes')->get($handle);
-            $filter = app($class);
-            $filter->apply($query, $values);
-        }
-    }
-
     /**
-     * Create a new user
+     * Create a new user.
      *
      * @return \Illuminate\View\View
      */
@@ -94,6 +86,7 @@ class UsersController extends CpController
             'actions' => [
                 'save' => cp_route('users.store'),
             ],
+            'expiry' => config('auth.passwords.'.PasswordReset::BROKER_ACTIVATIONS.'.expire') / 60,
         ];
 
         if ($request->wantsJson()) {
@@ -109,7 +102,7 @@ class UsersController extends CpController
 
         $blueprint = Blueprint::find('user');
 
-        $fields = $blueprint->fields()->addValues($request->all());
+        $fields = $blueprint->fields()->only(['email', 'name'])->addValues($request->all());
 
         $fields->validate(['email' => 'required|email|unique_user_value']);
 
@@ -136,12 +129,15 @@ class UsersController extends CpController
         if ($request->invitation['send']) {
             ActivateAccount::subject($request->invitation['subject']);
             ActivateAccount::body($request->invitation['message']);
-            $user->generateTokenAndSendPasswordResetNotification();
+            $user->generateTokenAndSendActivateAccountNotification();
+            $url = null;
+        } else {
+            $url = PasswordReset::url($user->generateActivateAccountToken(), PasswordReset::BROKER_ACTIVATIONS);
         }
 
         return [
             'redirect' => $user->editUrl(),
-            'activationUrl' => $request->invitation['send'] ? null : $user->getPasswordResetUrl(),
+            'activationUrl' => $url,
         ];
     }
 
@@ -160,6 +156,8 @@ class UsersController extends CpController
         }
 
         $fields = $blueprint
+            ->removeField('password')
+            ->removeField('password_confirmation')
             ->fields()
             ->addValues($user->data()->merge(['email' => $user->email()])->all())
             ->preProcess();
@@ -174,7 +172,7 @@ class UsersController extends CpController
                 'save' => $user->updateUrl(),
                 'password' => cp_route('users.password.update', $user->id()),
             ],
-            'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user)
+            'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
         ];
 
         if ($request->wantsJson()) {
@@ -184,15 +182,13 @@ class UsersController extends CpController
         return view('statamic::users.edit', $viewData);
     }
 
-    public function update(Request $request, $id)
+    public function update(Request $request, $user)
     {
-        $user = User::find($id);
-
         $this->authorize('edit', $user);
 
-        $fields = $user->blueprint()->fields()->addValues($request->all());
+        $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->all());
 
-        $fields->validate(['email' => 'required|unique_user_value:'.$id]);
+        $fields->validate(['email' => 'required|unique_user_value:'.$user->id()]);
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
@@ -201,11 +197,11 @@ class UsersController extends CpController
         }
         $user->email($request->email);
 
-        if ($request->roles && User::current()->can('edit roles')) {
+        if (User::current()->can('edit roles')) {
             $user->roles($request->roles);
         }
 
-        if ($request->groups && User::current()->can('edit user groups')) {
+        if (User::current()->can('edit user groups')) {
             $user->groups($request->groups);
         }
 

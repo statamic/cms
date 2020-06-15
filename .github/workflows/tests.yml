@@ -12,21 +12,18 @@ jobs:
 
         strategy:
             matrix:
-                php: [7.4, 7.3, 7.2, 7.1]
-                laravel: [6.*, 5.8.*]
+                php: [7.4, 7.3, 7.2]
+                laravel: [7.*, 6.*]
                 dependency-version: [prefer-lowest, prefer-stable]
                 os: [ubuntu-latest]
                 include:
+                    - laravel: 7.*
+                      testbench: 5.*
                     - laravel: 6.*
                       testbench: 4.*
-                    - laravel: 5.8.*
-                      testbench: 3.8.*
                     - php: 7.4
                       dependency-version: prefer-lowest
-                      additional-deps: '"mockery/mockery:1.2.3"'
-                exclude:
-                    - laravel: 6.*
-                      php: 7.1
+                      additional-deps: '"mockery/mockery:>=1.2.3"'
 
         name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
 
@@ -48,7 +45,6 @@ jobs:
 
             - name: Execute tests
               run: vendor/bin/phpunit
-              continue-on-error: ${{ matrix.laravel == '5.8.*' }}
 
             - name: Send Slack notification
               uses: 8398a7/action-slack@v2

@@ -3,7 +3,6 @@
 namespace Statamic\Modifiers;
 
 use Statamic\Support\Str;
-use Statamic\Modifiers\ModifierNotFoundException;
 
 class Loader
 {
@@ -19,7 +18,7 @@ class Loader
         }
 
         if (Str::contains($class = $modifiers->get($name), 'CoreModifiers@')) {
-            list($class, $method) = explode('@', $class);
+            [$class, $method] = explode('@', $class);
         }
 
         return [app($class), $method ?? 'index'];

@@ -2,23 +2,20 @@
 
 namespace Statamic\Tags\Taxonomy;
 
-use Closure;
-use Statamic\Facades;
-use Statamic\Support\Arr;
-use Statamic\Facades\Site;
-use Statamic\Facades\Term;
-use Statamic\Tags\Query;
-use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Collection;
-use Illuminate\Support\Carbon;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
+use Statamic\Tags\Concerns;
 use Statamic\Taxonomies\TermCollection;
 
 class Terms
 {
-    use Query\HasConditions,
-        Query\HasScopes,
-        Query\HasOrderBys,
-        Query\GetsResults;
+    use Concerns\QueriesConditions,
+        Concerns\QueriesScopes,
+        Concerns\QueriesOrderBys,
+        Concerns\GetsQueryResults;
 
     protected $ignoredParams = ['as'];
     protected $parameters;
@@ -71,13 +68,14 @@ class Terms
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
+        $this->queryMinimumEntries($query);
 
         return $query;
     }
 
     protected function parseParameters($params)
     {
-        $this->parameters = Arr::except($params->all(), $this->ignoredParams);
+        $this->parameters = $params->except($this->ignoredParams);
         $this->taxonomies = $this->parseTaxonomies();
         $this->orderBys = $this->parseOrderBys();
         $this->collections = $this->parseCollections();
@@ -99,6 +97,7 @@ class Terms
             ->map(function ($handle) {
                 $taxonomy = Taxonomy::findByHandle($handle);
                 throw_unless($taxonomy, new \Statamic\Exceptions\TaxonomyNotFoundException($handle));
+
                 return $taxonomy;
             })
             ->values();
@@ -116,6 +115,7 @@ class Terms
             ->map(function ($handle) {
                 $collection = Collection::findByHandle($handle);
                 throw_unless($collection, new \Statamic\Exceptions\CollectionNotFoundException("Collection [{$handle}] does not exist."));
+
                 return $collection;
             })
             ->values();
@@ -124,5 +124,20 @@ class Terms
     protected function defaultOrderBy()
     {
         return 'title:asc';
+    }
+
+    protected function queryMinimumEntries($query)
+    {
+        $isQueryingEntriesCount = $this->parameters->first(function ($v, $k) {
+            return Str::startsWith($k, 'entries_count:');
+        });
+
+        if ($isQueryingEntriesCount) {
+            return;
+        }
+
+        if ($count = $this->parameters->int('min_count')) {
+            $query->where('entries_count', '>=', $count);
+        }
     }
 }

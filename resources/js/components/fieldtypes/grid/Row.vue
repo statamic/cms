@@ -23,7 +23,7 @@
         <td class="row-controls" v-if="!grid.isReadOnly">
             <dropdown-list>
                 <dropdown-item :text="__('Duplicate Row')" @click="$emit('duplicate', index)" />
-                <dropdown-item :text="__('Delete Row')" class="warning" @click="$emit('removed', index)" />
+                <dropdown-item v-if="canDelete" :text="__('Delete Row')" class="warning" @click="$emit('removed', index)" />
             </dropdown-list>
         </td>
     </tr>
@@ -69,7 +69,11 @@ export default {
         },
         errorKeyPrefix: {
             type: String
-        }
+        },
+        canDelete: {
+            type: Boolean,
+            default: true
+        },
     },
 
     inject: [

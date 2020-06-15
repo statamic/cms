@@ -26,12 +26,13 @@ trait HasOrigin
                 if (is_string($origin)) {
                     $this->origin = $origin = $this->getOriginByString($origin);
                 }
+
                 return $origin;
             })
             ->args(func_get_args());
     }
 
-    abstract function getOriginByString($origin);
+    abstract public function getOriginByString($origin);
 
     public function hasOrigin()
     {
@@ -40,7 +41,7 @@ trait HasOrigin
 
     public function isRoot()
     {
-        return !$this->hasOrigin();
+        return ! $this->hasOrigin();
     }
 
     public function root()

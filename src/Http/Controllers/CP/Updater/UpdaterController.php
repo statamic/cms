@@ -2,12 +2,12 @@
 
 namespace Statamic\Http\Controllers\CP\Updater;
 
-use Statamic\Statamic;
-use Statamic\Facades\Addon;
-use Illuminate\Http\Request;
-use Statamic\Updater\Changelog;
 use Facades\Statamic\Updater\UpdatesOverview;
+use Illuminate\Http\Request;
+use Statamic\Facades\Addon;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Statamic;
+use Statamic\Updater\Changelog;
 
 class UpdaterController extends CpController
 {

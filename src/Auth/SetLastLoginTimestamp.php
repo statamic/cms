@@ -2,9 +2,9 @@
 
 namespace Statamic\Auth;
 
+use Illuminate\Auth\Events\Login;
 use Statamic\Contracts\Auth\User as StatamicUser;
 use Statamic\Facades\User;
-use Illuminate\Auth\Events\Login;
 
 class SetLastLoginTimestamp
 {

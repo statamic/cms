@@ -3,19 +3,17 @@
 namespace Statamic\Tags;
 
 use Statamic\Facades\User;
-use Statamic\Facades\UserGroup;
-use Statamic\Tags\Query;
 
 class Users extends Tags
 {
-    use Query\HasConditions,
-        Query\HasScopes,
-        Query\HasOrderBys,
-        Query\GetsResults,
-        OutputsItems;
+    use Concerns\QueriesConditions,
+        Concerns\QueriesScopes,
+        Concerns\QueriesOrderBys,
+        Concerns\GetsQueryResults,
+        Concerns\OutputsItems;
 
     /**
-     * {{ get_content from="" }} ... {{ /get_content }}
+     * {{ get_content from="" }} ... {{ /get_content }}.
      */
     public function index()
     {

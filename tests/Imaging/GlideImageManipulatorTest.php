@@ -1,10 +1,12 @@
-<?php namespace Tests;
+<?php
+
+namespace Tests\Imaging;
 
 use Mockery;
-use Tests\TestCase;
 use Statamic\Assets\Asset;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Imaging\GlideImageManipulator;
+use Tests\TestCase;
 
 class GlideImageManipulatorTest extends TestCase
 {

@@ -10,9 +10,13 @@ abstract class Index
     protected $config;
 
     abstract public function search($query);
+
     abstract public function delete($document);
+
     abstract public function exists();
+
     abstract protected function insertDocuments(Documents $documents);
+
     abstract protected function deleteIndex();
 
     public function __construct($name, array $config)

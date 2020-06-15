@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use Statamic\Facades\OAuth;
+use Statamic\Statamic;
 
 Route::name('statamic.')->group(function () {
     /**
@@ -14,19 +16,22 @@ Route::name('statamic.')->group(function () {
     });
 
     Route::group(['prefix' => config('statamic.routes.action')], function () {
-        Route::post('forms', 'FormController@store')->name('forms.store');
+        Route::post('forms/{form}', 'FormController@submit')->name('forms.submit');
 
         Route::get('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@show')->name('protect.password.show');
         Route::post('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@store')->name('protect.password.store');
 
         Route::group(['prefix' => 'auth'], function () {
-            Route::post('login', 'UserController@login');
+            Route::post('login', 'UserController@login')->name('login');
             Route::get('logout', 'UserController@logout')->name('logout');
-            Route::post('register', 'UserController@register');
+            Route::post('register', 'UserController@register')->name('register');
 
             Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.email');
             Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset');
             Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.action');
+
+            Route::get('activate/{token}', 'ActivateAccountController@showResetForm')->name('account.activate');
+            Route::post('activate', 'ActivateAccountController@reset')->name('account.activate.action');
         });
 
         Statamic::additionalActionRoutes();
@@ -44,5 +49,6 @@ Statamic::additionalWebRoutes();
  * Front-end
  * All front-end website requests go through a single controller method.
  */
-Route::any('/{segments?}', 'FrontendController@index')->where('segments', '.*')->name('statamic.site')
-     ->middleware(Statamic::webMiddleware());
+Route::any('/{segments?}', 'FrontendController@index')
+    ->where('segments', '.*')
+    ->name('statamic.site');

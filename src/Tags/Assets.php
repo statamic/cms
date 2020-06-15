@@ -2,13 +2,11 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Fields\Value;
-use Statamic\Facades\Asset;
-use Statamic\Support\Arr;
-use Statamic\Tags\Tags;
-use Statamic\Facades\Helper;
-use Statamic\Facades\AssetContainer;
 use Statamic\Assets\AssetCollection;
+use Statamic\Facades\Asset;
+use Statamic\Facades\AssetContainer;
+use Statamic\Fields\Value;
+use Statamic\Support\Arr;
 
 class Assets extends Tags
 {
@@ -18,7 +16,7 @@ class Assets extends Tags
     private $assets;
 
     /**
-     * Iterate over multiple Assets' data from a value
+     * Iterate over multiple Assets' data from a value.
      *
      * Usage:
      * {{ asset:[variable] }}
@@ -45,7 +43,7 @@ class Assets extends Tags
     }
 
     /**
-     * Iterate over all assets in a container and optionally by folder
+     * Iterate over all assets in a container and optionally by folder.
      *
      * Usage:
      * {{ assets path="assets" }}
@@ -59,8 +57,9 @@ class Assets extends Tags
         $id = $this->get(['container', 'handle', 'id']);
         $path = $this->get('path');
 
-        if (!$id && !$path) {
+        if (! $id && ! $path) {
             \Log::debug('No asset container ID or path was specified.');
+
             return;
         }
 
@@ -80,7 +79,7 @@ class Assets extends Tags
     }
 
     /**
-     * Perform the asset lookups
+     * Perform the asset lookups.
      *
      * @param string|array $urls  One URL, or array of URLs.
      * @return string
@@ -104,7 +103,7 @@ class Assets extends Tags
         $this->assets->supplement(function ($asset) {
             return [
                 'width'  => $asset->width(),
-                'height' => $asset->height()
+                'height' => $asset->height(),
             ];
         });
 
@@ -127,7 +126,7 @@ class Assets extends Tags
     }
 
     /**
-     * Limit and offset the asset collection
+     * Limit and offset the asset collection.
      *
      * @return array
      */

@@ -2,8 +2,6 @@
 
 namespace Statamic\Structures;
 
-use Statamic\Structures\Page;
-
 class Pages
 {
     protected $tree;

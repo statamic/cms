@@ -2,7 +2,6 @@
 
 namespace Statamic\Providers;
 
-use Illuminate\Foundation\AliasLoader;
 use Illuminate\Support\AggregateServiceProvider;
 
 class StatamicServiceProvider extends AggregateServiceProvider
@@ -19,7 +18,6 @@ class StatamicServiceProvider extends AggregateServiceProvider
         ConsoleServiceProvider::class,
         CollectionsServiceProvider::class,
         CacheServiceProvider::class,
-        DataServiceProvider::class,
         FilesystemServiceProvider::class,
         ExtensionServiceProvider::class,
         EventServiceProvider::class,

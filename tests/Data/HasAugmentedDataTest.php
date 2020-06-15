@@ -1,29 +1,32 @@
 <?php
 
-namespace Tests;
+namespace Tests\Data;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Blueprint;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
+use Tests\TestCase;
 
 class HasAugmentedDataTest extends TestCase
 {
     /** @test */
-    function it_makes_an_augmented_instance()
+    public function it_makes_an_augmented_instance()
     {
         FieldtypeRepository::shouldReceive('find')->with('test')->andReturn($fieldtype = new class extends Fieldtype {
             public function augment($value)
             {
-                return 'AUGMENTED ' . $value;
+                return 'AUGMENTED '.$value;
             }
         });
 
-        $thing = new class {
+        $thing = new class implements Augmentable {
             use HasAugmentedData, ContainsData;
+
             public function __construct()
             {
                 $this->data = [
@@ -31,13 +34,14 @@ class HasAugmentedDataTest extends TestCase
                     'bar' => 'BAR',
                 ];
             }
+
             public function blueprint()
             {
                 return Blueprint::make()->setContents([
                     'fields' => [
                         ['handle' => 'foo', 'field' => ['type' => 'test']],
                         ['handle' => 'baz', 'field' => ['type' => 'test']],
-                    ]
+                    ],
                 ]);
             }
         };
@@ -59,16 +63,15 @@ class HasAugmentedDataTest extends TestCase
         $expectedArr = [
             'foo' => new Value('FOO', 'foo', $fieldtype, $thing),
             'bar' => 'BAR',
-            'baz' => new Value(null, 'baz', $fieldtype, $thing),
         ];
-        $this->assertEquals($expectedArr, $thing->augmented()->all());
+        $this->assertEquals($expectedArr, $thing->augmented()->all()->all());
         $this->assertEquals($expectedArr, $thing->toAugmentedArray());
 
         $expectedSelectArr = [
             'foo' => new Value('FOO', 'foo', $fieldtype, $thing),
             'bar' => 'BAR',
         ];
-        $this->assertEquals($expectedSelectArr, $thing->augmented()->select(['foo', 'bar']));
+        $this->assertEquals($expectedSelectArr, $thing->augmented()->select(['foo', 'bar'])->all());
         $this->assertEquals($expectedSelectArr, $thing->toAugmentedArray(['foo', 'bar']));
     }
 }

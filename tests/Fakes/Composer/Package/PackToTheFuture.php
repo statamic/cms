@@ -27,23 +27,22 @@ class PackToTheFuture
     public static function setAddon(string $package, string $version)
     {
         static::generateComposerJson($package, $version, [
-            'type' => 'statamic-addon',
-            "autoload" => [
-                "psr-4" => [
-                    "Statamic\\Providers\\" => "src"
-                ]
-            ],
-            "extra" => [
-                "statamic" => [
-                    "name" => "Example",
-                    "description" => "Example addon"
+            'autoload' => [
+                'psr-4' => [
+                    'Statamic\\Providers\\' => 'src',
                 ],
-                "laravel" => [
-                    "providers" => [
-                        "Statamic\\Providers\\StatamicServiceProvider"
-                    ]
-                ]
-            ]
+            ],
+            'extra' => [
+                'statamic' => [
+                    'name' => 'Example',
+                    'description' => 'Example addon',
+                ],
+                'laravel' => [
+                    'providers' => [
+                        'Statamic\\Providers\\StatamicServiceProvider',
+                    ],
+                ],
+            ],
         ]);
     }
 

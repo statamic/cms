@@ -2,10 +2,9 @@
 
 namespace Statamic\Fields;
 
-use Statamic\Support\Str;
-use Statamic\CP\FieldtypeFactory;
-use Illuminate\Contracts\Support\Arrayable;
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Support\Str;
 
 class Field implements Arrayable
 {
@@ -49,7 +48,7 @@ class Field implements Arrayable
 
     public function display()
     {
-        return array_get($this->config, 'display', Str::slugToTitle($this->handle));
+        return array_get($this->config, 'display', __(Str::slugToTitle($this->handle)));
     }
 
     public function instructions()
@@ -154,7 +153,7 @@ class Field implements Arrayable
             'type' => $this->type(),
             'display' => $this->display(),
             'instructions' => $this->instructions(),
-            'config' => array_except($this->preProcessedConfig(), 'type')
+            'config' => array_except($this->preProcessedConfig(), 'type'),
         ];
     }
 
@@ -229,11 +228,18 @@ class Field implements Arrayable
         );
     }
 
+    public function shallowAugment()
+    {
+        return $this->newInstance()->setValue(
+            (new Value($this->value, $this->handle, $this->fieldtype(), $this->parent))->shallow()
+        );
+    }
+
     public function toArray()
     {
         return array_merge($this->config, [
             'handle' => $this->handle,
-            'width' => $this->config['width'] ?? 100
+            'width' => $this->config['width'] ?? 100,
         ]);
     }
 

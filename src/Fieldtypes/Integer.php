@@ -6,6 +6,8 @@ use Statamic\Fields\Fieldtype;
 
 class Integer extends Fieldtype
 {
+    protected $rules = ['integer'];
+
     public function preProcess($data)
     {
         if ($data === null) {

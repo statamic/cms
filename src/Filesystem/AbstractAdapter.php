@@ -2,11 +2,8 @@
 
 namespace Statamic\Filesystem;
 
-use Statamic\Support\Str;
-use Statamic\Facades\Path;
-use Statamic\Facades\Helper;
-use Statamic\Filesystem\Filesystem;
 use Statamic\Support\FileCollection;
+use Statamic\Support\Str;
 
 abstract class AbstractAdapter implements Filesystem
 {
@@ -168,7 +165,7 @@ abstract class AbstractAdapter implements Filesystem
     public function isDirectory($path)
     {
         return $this->filesystem->exists($this->normalizePath($path))
-            && !$this->extension($path);
+            && ! $this->extension($path);
     }
 
     public function deleteEmptySubfolders($path)

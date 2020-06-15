@@ -2,9 +2,9 @@
 
 namespace Statamic\Search\Commands;
 
-use Statamic\Facades\Search;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Search;
 
 class Update extends Command
 {
@@ -30,6 +30,7 @@ class Update extends Command
             if (! $this->indexExists($index)) {
                 throw new \InvalidArgumentException("Index [$index] does not exist.");
             }
+
             return [$index];
         }
 

@@ -2,19 +2,19 @@
 
 namespace Statamic\Extend;
 
-use Statamic\Support\Arr;
-use Statamic\Facades\URL;
-use Statamic\Support\Str;
-use Statamic\Facades\Path;
 use Statamic\Facades\File;
+use Statamic\Facades\Path;
+use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Updater\Changelog;
 
 final class Addon
 {
     /**
      * The identifier.
-     * Typically a composer package name. eg. statamic/bloodhound
+     * Typically a composer package name. eg. statamic/bloodhound.
      *
      * @var string
      */
@@ -42,29 +42,28 @@ final class Addon
     protected $marketplaceSlug;
 
     /**
-     *
-     * The addon's namespace. eg. "Statamic\Addons\Bloodhound"
+     * The addon's namespace. eg. "Statamic\Addons\Bloodhound".
      *
      * @var string
      */
     protected $namespace;
 
     /**
-     * The directory the package is located within. eg. "/path/to/vendor/statamic/bloodhound"
+     * The directory the package is located within. eg. "/path/to/vendor/statamic/bloodhound".
      *
      * @var string
      */
     protected $directory;
 
     /**
-     * The autoloaded directory, relative to the addon root. eg. "src" or ""
+     * The autoloaded directory, relative to the addon root. eg. "src" or "".
      *
      * @var string
      */
     protected $autoload;
 
     /**
-     * The name of the addon. eg. "Bloodhound Search"
+     * The name of the addon. eg. "Bloodhound Search".
      *
      * @var string
      */
@@ -106,7 +105,7 @@ final class Addon
     protected $developer;
 
     /**
-     * The developer's URL
+     * The developer's URL.
      *
      * @var string
      */
@@ -162,7 +161,7 @@ final class Addon
 
     /**
      * The ID (in a vendor/package format)
-     * eg. statamic/bloodhound
+     * eg. statamic/bloodhound.
      *
      * @return string
      */
@@ -173,12 +172,35 @@ final class Addon
 
     /**
      * The composer package string
+     * eg. statamic/bloodhound.
      *
      * @return string
      */
     public function package()
     {
         return $this->id();
+    }
+
+    /**
+     * The composer package name string
+     * eg. in statamic/blodhound, it's bloodhound.
+     *
+     * @return string
+     */
+    public function packageName()
+    {
+        return explode('/', $this->package())[1];
+    }
+
+    /**
+     * The composer vendor name string
+     * eg. in statamic/blodhound, it's statamic.
+     *
+     * @return string
+     */
+    public function vendorName()
+    {
+        return explode('/', $this->package())[0];
     }
 
     /**

@@ -10,7 +10,7 @@ class WorkingCopy extends Revision
     {
         return vsprintf('%s/%s/working.yaml', [
             Revisions::directory(),
-            $this->key()
+            $this->key(),
         ]);
     }
 

@@ -2,14 +2,13 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Facades\Site;
-use Statamic\Statamic;
-use Statamic\View\Store;
+use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
-use Statamic\View\Cascade;
+use Statamic\Facades\Site;
 use Statamic\View\Antlers\Engine;
 use Statamic\View\Antlers\Parser;
-use Illuminate\Support\ServiceProvider;
+use Statamic\View\Cascade;
+use Statamic\View\Store;
 
 class ViewServiceProvider extends ServiceProvider
 {
@@ -54,5 +53,7 @@ class ViewServiceProvider extends ServiceProvider
             $view->addExtension('antlers.html', 'antlers', $resolver);
             $view->addExtension('antlers.php', 'antlers', $resolver);
         });
+
+        ini_set('pcre.backtrack_limit', config('statamic.system.pcre_backtrack_limit', -1));
     }
 }
