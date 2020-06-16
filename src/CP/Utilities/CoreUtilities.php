@@ -5,6 +5,7 @@ namespace Statamic\CP\Utilities;
 use Statamic\Facades\Utility;
 use Statamic\Http\Controllers\CP\Utilities\CacheController;
 use Statamic\Http\Controllers\CP\Utilities\EmailController;
+use Statamic\Http\Controllers\CP\Utilities\GitController;
 use Statamic\Http\Controllers\CP\Utilities\PhpInfoController;
 use Statamic\Http\Controllers\CP\Utilities\UpdateSearchController;
 use Statamic\Statamic;
@@ -57,13 +58,13 @@ class CoreUtilities
 
         if (config('statamic.git.enabled')) {
             Utility::make('git')
-                ->view('statamic::utilities.git')
+                ->action([GitController::class, 'index'])
                 ->title(__('Git'))
                 ->icon('email-utility') // TODO: Find better icon
                 ->description(__('Manage git tracked content.')) // TODO: Move into language files
                 ->docsUrl(Statamic::docsUrl('utilities/git'))
                 ->routes(function ($router) {
-                    // $router->post('/', [EmailController::class, 'send']);
+                    $router->post('/', [GitController::class, 'commit'])->name('commit');
                 })
                 ->register();
         }
