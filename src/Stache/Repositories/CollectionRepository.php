@@ -3,8 +3,8 @@
 namespace Statamic\Stache\Repositories;
 
 use Illuminate\Support\Collection as IlluminateCollection;
+use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
-use Statamic\Entries\Collection;
 use Statamic\Events\Data\CollectionDeleted;
 use Statamic\Events\Data\CollectionSaved;
 use Statamic\Facades\Blink;
@@ -92,5 +92,12 @@ class CollectionRepository implements RepositoryContract
     public function whereStructured(): IlluminateCollection
     {
         return $this->all()->filter->hasStructure();
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            Collection::class => \Statamic\Entries\Collection::class,
+        ];
     }
 }

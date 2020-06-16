@@ -24,7 +24,6 @@
     "dmuploader": "file:resources/js/vendor/dmuploader",
     "dropzone": "^4.0.1",
     "element-resize-detector": "^1.2.1",
-    "eqcss": "^1.9.2",
     "fuse.js": "^3.4.6",
     "generate-password": "^1.5.1",
     "highlight.js": "^9.18.1",

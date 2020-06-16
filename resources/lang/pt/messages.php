@@ -147,7 +147,7 @@ return [
     'user_wizard_account_created' => 'A conta do utilizador foi criada.',
     'user_wizard_email_instructions' => 'O endereço de email também serve como nome de utilizador e deve ser exclusivo.',
     'user_wizard_intro' => 'Os utilizadores podem ser atribuídos a funções que personalizam as suas permissões, acesso e habilidades em todo o Painel de Controlo.',
-    'user_wizard_invitation_body' => 'Active a sua nova conta Statamic em :site para começar a gerir este site. Para sua segurança, o link abaixo expira após 1 hora. Depois disso, entre em contacto com o administrador do site para obter uma nova senha.',
+    'user_wizard_invitation_body' => 'Active a sua nova conta Statamic em :site para começar a gerir este site. Para sua segurança, o link abaixo expira após :expiry horas. Depois disso, entre em contacto com o administrador do site para obter uma nova senha.',
     'user_wizard_invitation_intro' => 'Envie um email de boas-vindas com detalhes de activação da conta para o novo utilizador.',
     'user_wizard_invitation_share' => 'Copie essas credenciais e partilhe-as com <code>:email</code> através do seu método preferido.',
     'user_wizard_invitation_share_before' => 'Depois de criar o utilizador, receberá detalhes para partilhar com <code>:email</code> através do seu método preferido.',

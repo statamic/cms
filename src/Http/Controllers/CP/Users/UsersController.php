@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
+use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
 use Statamic\Facades\Blueprint;
@@ -85,6 +86,7 @@ class UsersController extends CpController
             'actions' => [
                 'save' => cp_route('users.store'),
             ],
+            'expiry' => config('auth.passwords.'.PasswordReset::BROKER_ACTIVATIONS.'.expire') / 60,
         ];
 
         if ($request->wantsJson()) {
@@ -127,12 +129,15 @@ class UsersController extends CpController
         if ($request->invitation['send']) {
             ActivateAccount::subject($request->invitation['subject']);
             ActivateAccount::body($request->invitation['message']);
-            $user->generateTokenAndSendPasswordResetNotification();
+            $user->generateTokenAndSendActivateAccountNotification();
+            $url = null;
+        } else {
+            $url = PasswordReset::url($user->generateActivateAccountToken(), PasswordReset::BROKER_ACTIVATIONS);
         }
 
         return [
             'redirect' => $user->editUrl(),
-            'activationUrl' => $request->invitation['send'] ? null : $user->getPasswordResetUrl(),
+            'activationUrl' => $url,
         ];
     }
 

@@ -397,6 +397,11 @@ class LocalizedTerm implements Term, Responsable, Augmentable
         return $this->selectedQueryColumns;
     }
 
+    protected function shallowAugmentedArrayKeys()
+    {
+        return ['id', 'title', 'slug', 'url', 'permalink', 'api_url'];
+    }
+
     public function lastModified()
     {
         return $this->has('updated_at')

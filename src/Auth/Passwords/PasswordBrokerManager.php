@@ -18,6 +18,7 @@ class PasswordBrokerManager extends BaseManager
         return new TokenRepository(
             $this->app['files'],
             $this->app['hash'],
+            $config['table'],
             $key,
             $config['expire'],
             $config['throttle'] ?? 0

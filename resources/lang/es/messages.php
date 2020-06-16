@@ -147,7 +147,7 @@ return [
     'user_wizard_account_created' => 'La cuenta de usuario ha sido creada.',
     'user_wizard_email_instructions' => 'La dirección de email también sirve como nombre de usuario y debe ser única.',
     'user_wizard_intro' => 'Los usuarios pueden ser asignados a roles que personalizan sus permisos, acceso y habilidades en todo el Panel de control.',
-    'user_wizard_invitation_body' => 'Activa tu nueva cuenta en :site para comenzar a administrar este sitio web. Para tu seguridad, el siguiente enlace caduca después de 48 horas. Después de eso, comunícate con el administrador del sitio para obtener una nueva contraseña.',
+    'user_wizard_invitation_body' => 'Activa tu nueva cuenta en :site para comenzar a administrar este sitio web. Para tu seguridad, el siguiente enlace caduca después de :expiry horas. Después de eso, comunícate con el administrador del sitio para obtener una nueva contraseña.',
     'user_wizard_invitation_intro' => 'Envía un correo de bienvenida con detalles de la actividad de la cuenta al nuevo usuario.',
     'user_wizard_invitation_share' => 'Copia estas credenciales y compártelas con <code>:email</code> a través de tu método preferido.',
     'user_wizard_invitation_share_before' => 'Después de crear el usuario, se darán detalles para compartir <code>:email</code> través de su método preferido.',

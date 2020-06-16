@@ -6,6 +6,8 @@ use Facades\Statamic\Fields\FieldtypeRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\MessageBag;
+use Illuminate\Support\ViewErrorBag;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Antlers;
@@ -1643,6 +1645,18 @@ EOT;
         $template = '{{ if stuff }}yes{{ else }}no{{ /if }}';
         $this->assertEquals('no', Antlers::parse($template, ['stuff' => collect()]));
         $this->assertEquals('yes', Antlers::parse($template, ['stuff' => collect(['one'])]));
+    }
+
+    /** @test */
+    public function empty_view_error_bags_are_considered_empty_in_conditions()
+    {
+        $template = '{{ if errors}}yes{{ else }}no{{ /if }}';
+        $viewErrorBag = new ViewErrorBag;
+        $messageBag = new MessageBag;
+
+        $this->assertEquals('no', Antlers::parse($template, ['errors' => $viewErrorBag]));
+        $this->assertEquals('yes', Antlers::parse($template, ['errors' => $viewErrorBag->put('default', new MessageBag)]));
+        $this->assertEquals('yes', Antlers::parse($template, ['errors' => $viewErrorBag->put('form.contact', new MessageBag)]));
     }
 
     /** @test */

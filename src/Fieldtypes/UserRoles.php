@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\Facades\Role;
+use Statamic\Facades\Scope;
 
 class UserRoles extends Relationship
 {
@@ -47,5 +48,10 @@ class UserRoles extends Relationship
     protected function augmentValue($value)
     {
         return Role::find($value);
+    }
+
+    public function getSelectionFilters()
+    {
+        return Scope::filters('user-roles-fieldtype', []);
     }
 }

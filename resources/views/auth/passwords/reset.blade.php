@@ -3,11 +3,11 @@
 
 @section('content')
 
-    <h1 class="mb-3 pt-7 text-center text-grey-80">{{ __('Reset Password') }}</h1>
+    <h1 class="mb-3 pt-7 text-center text-grey-80">{{ $title }}</h1>
 
     <div class="card auth-card mx-auto">
 
-        <form method="POST" action="{{ route('statamic.password.reset.action') }}">
+        <form method="POST" action="{{ $action }}">
             @csrf
 
             <input type="hidden" name="token" value="{{ $token }}">
@@ -42,9 +42,7 @@
                 <input id="password-confirm" type="password" class="input-text input-text" name="password_confirmation" required>
             </div>
 
-            <button type="submit" class="btn-primary">
-                {{ __('Reset Password') }}
-            </button>
+            <button type="submit" class="btn-primary">{{ $title }}</button>
 
         </form>
 

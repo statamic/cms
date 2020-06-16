@@ -13,6 +13,4 @@ interface StructureRepository
     public function findByHandle($handle): ?Structure;
 
     public function save(Structure $structure);
-
-    public function make(string $handle = null): Structure;
 }

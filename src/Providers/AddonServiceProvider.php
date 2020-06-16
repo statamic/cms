@@ -33,7 +33,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     public function boot()
     {
-        $this->app->booted(function () {
+        Statamic::booted(function () {
             if (! $this->getAddon()) {
                 return;
             }

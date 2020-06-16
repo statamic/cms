@@ -27,7 +27,6 @@ class PackToTheFuture
     public static function setAddon(string $package, string $version)
     {
         static::generateComposerJson($package, $version, [
-            'type' => 'statamic-addon',
             'autoload' => [
                 'psr-4' => [
                     'Statamic\\Providers\\' => 'src',

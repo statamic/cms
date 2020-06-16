@@ -6,6 +6,9 @@
         <small v-if="hasExcessRows" class="help-block text-red">
             {{ __('Max Rows') }}: {{ maxRows }}
         </small>
+        <small v-else-if="hasNotEnoughRows" class="help-block text-red">
+            {{ __('Min Rows') }}: {{ minRows }}
+        </small>
 
         <component
             :is="component"
@@ -13,6 +16,7 @@
             :rows="value"
             :meta="meta.existing"
             :name="name"
+            :can-delete-rows="canDeleteRows"
             @updated="updated"
             @meta-updated="updateRowMeta"
             @removed="removed"
@@ -72,12 +76,20 @@ export default {
             return this.config.fields;
         },
 
+        minRows() {
+            return this.config.min_rows || 0;
+        },
+
         maxRows() {
             return this.config.max_rows || Infinity;
         },
 
         canAddRows() {
-            return !this.isReadOnly && this.value.length < this.maxRows;
+            return ! this.isReadOnly && this.value.length < this.maxRows;
+        },
+
+        canDeleteRows() {
+            return ! this.isReadOnly && this.value.length > this.minRows;
         },
 
         addRowButtonLabel() {
@@ -89,8 +101,11 @@ export default {
         },
 
         hasExcessRows() {
-            if (! this.hasMaxRows) return false;
             return (this.value.length - this.maxRows) > 0;
+        },
+
+        hasNotEnoughRows() {
+            return (this.value.length - this.minRows) < 0;
         },
 
         isReorderable() {

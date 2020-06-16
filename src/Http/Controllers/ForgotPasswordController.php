@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\SendsPasswordResetEmails;
 use Statamic\Facades\URL;
@@ -31,5 +32,10 @@ class ForgotPasswordController extends Controller
         }
 
         return $this->traitSendResetLinkEmail($request);
+    }
+
+    public function broker()
+    {
+        return Password::broker(PasswordReset::BROKER_RESETS);
     }
 }

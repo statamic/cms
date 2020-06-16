@@ -21,6 +21,7 @@ use Statamic\Fields\Value;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
 use Statamic\Statamic;
+use Statamic\Support\Str;
 
 abstract class User implements
     UserContract,
@@ -55,7 +56,7 @@ abstract class User implements
     {
         $surname = '';
         if ($name = $this->get('name')) {
-            if (str_contains($name, ' ')) {
+            if (Str::contains($name, ' ')) {
                 [$name, $surname] = explode(' ', $name);
             }
         } else {
@@ -182,11 +183,12 @@ abstract class User implements
 
     public function sendPasswordResetNotification($token)
     {
-        $notification = $this->password()
-            ? new PasswordResetNotification($token)
-            : new ActivateAccountNotification($token);
+        $this->notify(new PasswordResetNotification($token));
+    }
 
-        $this->notify($notification);
+    public function sendActivateAccountNotification($token)
+    {
+        $this->notify(new ActivateAccountNotification($token));
     }
 
     public function generateTokenAndSendPasswordResetNotification()
@@ -194,14 +196,23 @@ abstract class User implements
         $this->sendPasswordResetNotification($this->generatePasswordResetToken());
     }
 
-    public function getPasswordResetUrl()
+    public function generateTokenAndSendActivateAccountNotification()
     {
-        return PasswordReset::url($this->generatePasswordResetToken());
+        $this->sendActivateAccountNotification($this->generateActivateAccountToken());
     }
 
     public function generatePasswordResetToken()
     {
-        return Password::broker()->createToken($this);
+        $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_RESETS);
+
+        return Password::broker($broker)->createToken($this);
+    }
+
+    public function generateActivateAccountToken()
+    {
+        $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
+
+        return Password::broker($broker)->createToken($this);
     }
 
     public static function __callStatic($method, $parameters)

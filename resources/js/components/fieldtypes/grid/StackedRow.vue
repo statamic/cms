@@ -9,7 +9,7 @@
             :class="{ [sortableHandleClass]: grid.isReorderable, 'hidden': ! grid.isReorderable }"
         >
             {{ index }}
-            <span class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" />
+            <span v-if="canDelete" class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" />
         </div>
         <div class="publish-fields">
             <publish-field

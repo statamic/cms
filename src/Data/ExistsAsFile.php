@@ -64,11 +64,14 @@ trait ExistsAsFile
 
     public function writeFile()
     {
-        File::put($path = $this->path(), $this->fileContents());
+        $path = $this->path();
+        $initial = $this->initialPath();
 
-        if (($initial = $this->initialPath()) && $path !== $initial) {
+        if ($initial && $path !== $initial) {
             File::delete($this->initialPath());
         }
+
+        File::put($path, $this->fileContents());
 
         $this->initialPath($path);
     }
