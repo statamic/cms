@@ -38,13 +38,15 @@ return [
     |
     | The git user that will be used when committing changes to your repo.
     | By default, the currently authenticated user name and email will
-    | be used. However, this can be overridden to something global.
+    | be used, otherwise it will fall back to the below user info.
     |
     */
 
+    'use_authenticated' => true,
+
     'user' => [
-        'name' => env('STATAMIC_GIT_USER_NAME', '{{ current_user_name }}'),
-        'email' => env('STATAMIC_GIT_USER_EMAIL', '{{ current_user_email }}'),
+        'name' => env('STATAMIC_GIT_USER_NAME', 'Spock'),
+        'email' => env('STATAMIC_GIT_USER_EMAIL', 'spock@example.com'),
     ],
 
     /*
@@ -78,9 +80,8 @@ return [
     */
 
     'commands' => [
-        'cd {{ git_root }}',
         'git add {{ paths }}',
-        'git commit -m "{{ message }}" -c "user.name={{ name }}" -c "user.email={{ email }}"',
+        'git -c "user.name={{ name }}" -c "user.email={{ email }}" commit -m "{{ message }}"',
     ],
 
     /*
