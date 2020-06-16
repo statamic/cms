@@ -2,6 +2,7 @@
 
 namespace Statamic\Modifiers;
 
+use Statamic\Extend\HasAliases;
 use Statamic\Extend\HasHandle;
 use Statamic\Support\Str;
 
@@ -10,7 +11,7 @@ use Statamic\Support\Str;
  */
 class Modifier
 {
-    use HasHandle;
+    use HasHandle, HasAliases;
 
     protected static $binding = 'modifiers';
 
