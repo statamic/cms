@@ -5,24 +5,56 @@ namespace Statamic\Console\Processes;
 class Git extends Process
 {
     /**
-     * Get git status.
-     *
-     * @param string|null $path
-     * @return string
-     */
-    public function status($path = null)
-    {
-        return $this->runGitCommand('status', '-s', $path);
-    }
-
-    /**
-     * Get git root at current path.
+     * Get git root.
      *
      * @return string
      */
     public function root()
     {
         return $this->runGitCommand('rev-parse', '--show-toplevel');
+    }
+
+    /**
+     * Get git status.
+     *
+     * @param mixed $subPaths
+     * @return string
+     */
+    public function status($subPaths = null)
+    {
+        return $this->runGitCommand('status', '-s', $subPaths);
+    }
+
+    /**
+     * Git add.
+     *
+     * @param mixed $subPaths
+     * @return $this
+     */
+    public function add($subPaths)
+    {
+        return $this->runGitCommand('add', $subPaths);
+    }
+
+    /**
+     * Git commit.
+     *
+     * @param mixed $subPaths
+     * @return null
+     */
+    public function commit($message)
+    {
+        return $this->runGitCommand('commit', '-m', $message);
+    }
+
+    /**
+     * Git push.
+     *
+     * @return null
+     */
+    public function push()
+    {
+        return $this->runGitCommand('push');
     }
 
     /**
@@ -58,6 +90,12 @@ class Git extends Process
      */
     private function prepareProcessArguments($parts)
     {
-        return array_merge(['git'], $parts);
+        return collect(['git'])
+            ->merge($parts)
+            ->flatten()
+            ->reject(function ($part) {
+                return is_null($part);
+            })
+            ->all();
     }
 }
