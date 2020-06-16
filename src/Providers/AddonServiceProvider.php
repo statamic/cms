@@ -75,6 +75,10 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         foreach ($this->tags as $class) {
             $class::register();
+            
+            foreach ($class::aliases() as $alias) {
+                $this->app['statamic.tags'][$alias] = $class;
+            }
         }
 
         return $this;
@@ -93,6 +97,10 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         foreach ($this->modifiers as $class) {
             $class::register();
+            
+            foreach ($class::aliases() as $alias) {
+                $this->app['statamic.modifiers'][$alias] = $class;
+            }
         }
 
         return $this;
@@ -102,6 +110,10 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         foreach ($this->widgets as $class) {
             $class::register();
+            
+            foreach ($class::aliases() as $alias) {
+                $this->app['statamic.widgets'][$alias] = $class;
+            }
         }
 
         return $this;
