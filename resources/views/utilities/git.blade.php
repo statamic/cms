@@ -11,19 +11,14 @@
 
         <div class="flex items-center justify-between">
             <h1>{{ __('Git') }}</h1>
-            @if($statuses)
-                <form method="POST" action="{{ cp_route('utilities.git.commit') }}">
-                    @csrf
 
-                    <div class="flex items-center">
-                        <button type="submit" class="btn-primary">{{ __('Commit All Content Changes') }}</button>
-                    </div>
-                    @if ($errors->has('email'))
-                        <p class="mt-1"><small class="help-block text-red">{{ $errors->first('email') }}</small></p>
-                    @endif
-                </form>
-            @endif
-        </div>
+            <form method="POST" action="{{ cp_route('utilities.git.commit') }}">
+                @csrf
+
+                <div class="flex items-center">
+                    <button type="submit" class="btn-primary" {{ $statuses ? '': 'disabled' }}>{{ __('Commit All Content Changes') }}</button>
+                </div>
+            </form>
     </header>
 
     <div class="card p-0">
