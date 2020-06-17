@@ -241,7 +241,10 @@ class Process
      */
     protected function newSymfonyProcess($command, $path = null)
     {
-        $process = new SymfonyProcess($command, $this->basePath);
+        // Handle both string and array command formats.
+        $process = is_string($command)
+            ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath)
+            : new SymfonyProcess($command, $path ?? $this->basePath);
 
         $process->setTimeout(null);
 
