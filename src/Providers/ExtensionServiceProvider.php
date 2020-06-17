@@ -254,19 +254,15 @@ class ExtensionServiceProvider extends ServiceProvider
 
     protected function registerCoreModifiers()
     {
-        $methods = array_diff(
-            get_class_methods(CoreModifiers::class),
-            get_class_methods(Modifier::class)
-        );
-
         $modifiers = collect();
+        $methods = array_diff(get_class_methods(CoreModifiers::class), get_class_methods(Modifier::class));
 
         foreach ($methods as $method) {
-            $modifiers[Str::snake($method)] = "Statamic\\Modifiers\\CoreModifiers@{$method}";
+            $modifiers[Str::snake($method)] = CoreModifiers::class.'@'.$method;
         }
 
         foreach ($this->modifierAliases as $alias => $actual) {
-            $modifiers[$alias] = "Statamic\\Modifiers\\CoreModifiers@{$actual}";
+            $modifiers[$alias] = CoreModifiers::class.'@'.$actual;
         }
 
         $this->app['statamic.extensions'][Modifier::class] = collect()
