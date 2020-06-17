@@ -1262,7 +1262,7 @@ EOT;
             'augmented the value with howdy in it',
             (string) Antlers::parse('{{ test }}', [
                 'test' => $value,
-                'var' => 'howdy'
+                'var' => 'howdy',
             ])
         );
     }
@@ -1285,7 +1285,7 @@ EOT;
             'augmented the value with howdy in it',
             (string) Antlers::parse('{{ test }}', [
                 'test' => $value,
-                'var' => 'howdy'
+                'var' => 'howdy',
             ])
         );
     }
