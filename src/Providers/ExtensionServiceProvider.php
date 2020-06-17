@@ -252,6 +252,21 @@ class ExtensionServiceProvider extends ServiceProvider
         }
     }
 
+    protected function registerAppExtensions($folder, $requiredClass)
+    {
+        if (! $this->app['files']->exists($path = app_path($folder))) {
+            return;
+        }
+
+        foreach ($this->app['files']->files($path) as $file) {
+            $class = $file->getBasename('.php');
+            $fqcn = $this->app->getNamespace()."{$folder}\\{$class}";
+            if (is_subclass_of($fqcn, $requiredClass)) {
+                $fqcn::register();
+            }
+        }
+    }
+
     protected function registerCoreModifiers()
     {
         $modifiers = collect();
@@ -268,20 +283,5 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app['statamic.extensions'][Modifier::class] = collect()
             ->merge($this->app['statamic.extensions'][Modifier::class] ?? [])
             ->merge($modifiers);
-    }
-
-    protected function registerAppExtensions($folder, $requiredClass)
-    {
-        if (! $this->app['files']->exists($path = app_path($folder))) {
-            return;
-        }
-
-        foreach ($this->app['files']->files($path) as $file) {
-            $class = $file->getBasename('.php');
-            $fqcn = $this->app->getNamespace()."{$folder}\\{$class}";
-            if (is_subclass_of($fqcn, $requiredClass)) {
-                $fqcn::register();
-            }
-        }
     }
 }
