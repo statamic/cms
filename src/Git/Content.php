@@ -40,7 +40,7 @@ class Content
             ->filter
             ->totalCount;
 
-         return $statuses->isNotEmpty() ? $statuses : null;
+        return $statuses->isNotEmpty() ? $statuses : null;
     }
 
     /**
