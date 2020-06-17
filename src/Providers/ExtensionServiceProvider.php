@@ -16,6 +16,7 @@ use Statamic\Query\Scopes\Scope;
 use Statamic\Support\Str;
 use Statamic\Tags;
 use Statamic\Widgets;
+use Statamic\Widgets\Widget;
 
 class ExtensionServiceProvider extends ServiceProvider
 {
@@ -177,58 +178,81 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Forms\Widget::class,
     ];
 
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
     public function register()
+    {
+        $this->registerExtensions();
+        $this->registerAddonManifest();
+    }
+
+    protected function registerAddonManifest()
     {
         $this->app->instance(Manifest::class, new Manifest(
             new Filesystem,
             $this->app->basePath(),
             $this->app->bootstrapPath().'/cache/addons.php'
         ));
-
-        $this->app->instance('statamic.extensions', collect());
-
-        collect([
-            'fieldtypes' => Fieldtype::class,
-            'modifiers' => Modifier::class,
-            'tags' => Tags\Tags::class,
-            'scopes' => Scope::class,
-            'actions' => Action::class,
-        ])->each(function ($class, $key) {
-            return $this->app->bind('statamic.'.$key, function ($app) use ($class) {
-                return $app['statamic.extensions'][$class];
-            });
-        });
-
-        collect()
-            ->merge($this->tags)
-            ->merge($this->fieldtypes)
-            ->merge($this->scopes)
-            ->merge($this->actions)
-            ->merge($this->widgets)
-            ->each(function ($class) {
-                $class::register();
-            });
-
-        collect([
-            'Tags' => Tags::class,
-            'Modifiers' => Modifier::class,
-            'Fieldtypes' => Fieldtype::class,
-            'Scopes' => Scopes::class,
-            'Actions' => Action::class,
-            'Widgets' => Widget::class,
-        ])->each(function ($class, $dir) {
-            $this->registerExtensionsInAppFolder($dir, $class);
-        });
-
-        $this->registerBundledModifiers();
     }
 
-    protected function registerBundledModifiers()
+    protected function registerExtensions()
+    {
+        $this->app->instance('statamic.extensions', collect());
+
+        $types = [
+            'actions' => [
+                'class' => Action::class,
+                'directory' => 'Actions',
+                'extensions' => $this->actions,
+            ],
+            'fieldtypes' => [
+                'class' => Fieldtype::class,
+                'directory' => 'Fieldtypes',
+                'extensions' => $this->fieldtypes,
+            ],
+            'modifiers' => [
+                'class' => Modifier::class,
+                'directory' => 'Modifiers',
+            ],
+            'scopes' => [
+                'class' => Scope::class,
+                'directory' => 'Scopes',
+                'extensions' => $this->scopes,
+            ],
+            'tags' => [
+                'class' => Tags\Tags::class,
+                'directory' => 'Tags',
+                'extensions' => $this->tags,
+            ],
+            'widgets' => [
+                'class' => Widget::class,
+                'directory' => 'Widgets',
+                'extensions' => $this->widgets,
+            ],
+        ];
+
+        foreach ($types as $key => $type) {
+            $this->registerBindingAlias($key, $type['class']);
+            $this->registerCoreExtensions($type['extensions'] ?? []);
+            $this->registerAppExtensions($type['directory'], $type['class']);
+        }
+
+        $this->registerCoreModifiers();
+    }
+
+    protected function registerBindingAlias($key, $class)
+    {
+        return $this->app->bind('statamic.'.$key, function ($app) use ($class) {
+            return $app['statamic.extensions'][$class];
+        });
+    }
+
+    protected function registerCoreExtensions($extensions)
+    {
+        foreach ($extensions as $extension) {
+            $extension::register();
+        }
+    }
+
+    protected function registerCoreModifiers()
     {
         $methods = array_diff(
             get_class_methods(CoreModifiers::class),
@@ -250,16 +274,7 @@ class ExtensionServiceProvider extends ServiceProvider
             ->merge($modifiers);
     }
 
-    /**
-     * Register extensions in a specific app folder.
-     *
-     * This prevents requiring users to manually bind their extensions.
-     *
-     * @param string $folder
-     * @param string $requiredClass
-     * @return void
-     */
-    protected function registerExtensionsInAppFolder($folder, $requiredClass)
+    protected function registerAppExtensions($folder, $requiredClass)
     {
         if (! $this->app['files']->exists($path = app_path($folder))) {
             return;
