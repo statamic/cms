@@ -2,8 +2,8 @@
 
 namespace Tests\Git;
 
-use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Git\Content;
+use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Processes\Git;
 use Statamic\Console\Processes\Process;
 use Statamic\Facades\Config;
@@ -183,7 +183,7 @@ EOT,
         $this->files->put($logFile = $this->basePath('temp/log.txt'), '');
 
         Config::set('statamic.git.commands', [
-            'echo "{{ name }} committed." >> ' . $logFile
+            'echo "{{ name }} committed." >> '.$logFile,
         ]);
 
         Content::commit();

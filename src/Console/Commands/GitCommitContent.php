@@ -2,8 +2,8 @@
 
 namespace Statamic\Console\Commands;
 
-use Illuminate\Console\Command;
 use Facades\Statamic\Git\Content;
+use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 
 class GitCommitContent extends Command
