@@ -242,7 +242,7 @@ class Process
     protected function newSymfonyProcess($command, $path = null)
     {
         // Handle both string and array command formats.
-        $process = is_string($command)
+        $process = is_string($command) && method_exists(SymfonyProcess::class, 'fromShellCommandLine')
             ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath)
             : new SymfonyProcess($command, $path ?? $this->basePath);
 
