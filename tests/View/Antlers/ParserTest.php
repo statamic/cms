@@ -241,7 +241,7 @@ EOT;
     {
         $template = '{{ missing|upper }}';
 
-        $this->assertEquals(null, Antlers::parse($template, $this->variables));
+        $this->assertEquals('', Antlers::parse($template, $this->variables));
     }
 
     public function testUnclosedArrayVariablePairsShouldBeNull()
@@ -251,7 +251,7 @@ EOT;
 
         $template = '{{ simple }}';
 
-        $this->assertEquals(null, Antlers::parse($template, $this->variables));
+        $this->assertEquals('', Antlers::parse($template, $this->variables));
     }
 
     public function testSingleCondition()
@@ -274,7 +274,7 @@ EOT;
         $should_fail = '{{ if string == "failure" or string == "womp" }}yes{{ endif }}';
 
         $this->assertEquals('yes', Antlers::parse($should_pass, $this->variables));
-        $this->assertEquals(null, Antlers::parse($should_fail, $this->variables));
+        $this->assertEquals('', Antlers::parse($should_fail, $this->variables));
     }
 
     public function testOrExistanceConditions()
@@ -286,8 +286,8 @@ EOT;
 
         $this->assertEquals('yes', Antlers::parse($should_pass, $this->variables));
         $this->assertEquals('yes', Antlers::parse($should_also_pass, $this->variables));
-        $this->assertEquals(null, Antlers::parse($should_fail, $this->variables));
-        $this->assertEquals(null, Antlers::parse($should_also_fail, $this->variables));
+        $this->assertEquals('', Antlers::parse($should_fail, $this->variables));
+        $this->assertEquals('', Antlers::parse($should_also_fail, $this->variables));
     }
 
     public function testConditionsOnOverlappingVariableNames()
@@ -377,18 +377,18 @@ EOT;
     {
         $this->assertEquals('Pass', Antlers::parse('{{ string ?= "Pass" }}', $this->variables));
         $this->assertEquals('Pass', Antlers::parse('{{ associative:one ?= "Pass" }}', $this->variables));
-        $this->assertEquals(null, Antlers::parse('{{ missing ?= "Pass" }}', $this->variables));
-        $this->assertEquals(null, Antlers::parse('{{ missing:thing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', Antlers::parse('{{ missing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', Antlers::parse('{{ missing:thing ?= "Pass" }}', $this->variables));
 
         // Negating with !
-        $this->assertEquals(null, Antlers::parse('{{ !string ?= "Pass" }}', $this->variables));
-        $this->assertEquals(null, Antlers::parse('{{ !associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', Antlers::parse('{{ !string ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', Antlers::parse('{{ !associative:one ?= "Pass" }}', $this->variables));
         $this->assertEquals('Pass', Antlers::parse('{{ !missing ?= "Pass" }}', $this->variables));
         $this->assertEquals('Pass', Antlers::parse('{{ !missing:thing ?= "Pass" }}', $this->variables));
 
         // and with spaces
-        $this->assertEquals(null, Antlers::parse('{{ ! string ?= "Pass" }}', $this->variables));
-        $this->assertEquals(null, Antlers::parse('{{ ! associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', Antlers::parse('{{ ! string ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', Antlers::parse('{{ ! associative:one ?= "Pass" }}', $this->variables));
         $this->assertEquals('Pass', Antlers::parse('{{ ! missing ?= "Pass" }}', $this->variables));
         $this->assertEquals('Pass', Antlers::parse('{{ ! missing:thing ?= "Pass" }}', $this->variables));
     }
@@ -446,14 +446,14 @@ EOT;
     {
         $template = '{{ simple|length }}';
 
-        $this->assertEquals(3, Antlers::parse($template, $this->variables));
+        $this->assertEquals('3', Antlers::parse($template, $this->variables));
     }
 
     public function testSingleStandardArrayModifierRelaxed()
     {
         $template = '{{ simple | length }}';
 
-        $this->assertEquals(3, Antlers::parse($template, $this->variables));
+        $this->assertEquals('3', Antlers::parse($template, $this->variables));
     }
 
     public function testChainedStandardArrayModifiersTightOnContent()
