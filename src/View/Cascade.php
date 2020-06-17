@@ -171,20 +171,12 @@ class Cascade
             'post' => $this->request->isMethod('post') ? Arr::sanitize($this->request->request->all()) : [],
             'old' => Arr::sanitize(old(null, [])),
 
-            // Site
-            'site' => [
-                'handle' => $siteHandle = $this->site->handle(),
-                'name' => $siteName = $this->site->name(),
-                'locale' => $siteLocale = $this->site->locale(),
-                'short_locale' => $this->site->shortLocale(),
-                'url' => $siteUrl = $this->site->url(),
-            ],
-
-            'homepage' => $siteUrl,
-            'locale' => $siteHandle,
-            'locale_name' => $siteName,
-            'locale_full' => $siteLocale,
-            'locale_url' => $siteUrl,
+            'site' => $this->site,
+            'homepage' => $this->site->url(),
+            'locale' => $this->site->handle(),
+            'locale_name' => $this->site->name(),
+            'locale_full' => $this->site->locale(),
+            'locale_url' => $this->site->url(),
             'cp_url' => cp_route('index'),
         ];
     }
