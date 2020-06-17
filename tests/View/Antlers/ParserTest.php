@@ -13,6 +13,7 @@ use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Entry;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
@@ -619,36 +620,28 @@ EOT;
     }
 
     /** @test */
-    public function it_doesnt_parse_noparse_tags_and_requires_extractions_to_be_reinjected()
+    public function it_doesnt_parse_noparse_tags()
     {
-        $parser = Antlers::parser();
+        $parsed = Antlers::parse('{{ noparse }}{{ string }}{{ /noparse }} {{ string }}', $this->variables);
 
-        $parsed = $parser->parse('{{ noparse }}{{ string }}{{ /noparse }} {{ string }}', $this->variables);
-
-        $this->assertEquals('noparse_ac3458695912d204af897d3c67f93cbe Hello wilderness', $parsed);
-
-        $this->assertEquals('{{ string }} Hello wilderness', $parser->injectNoparse($parsed));
+        $this->assertEquals('{{ string }} Hello wilderness', $parsed);
     }
 
     /** @test */
-    public function it_doesnt_parse_data_in_noparse_modifiers_and_requires_extractions_to_be_reinjected()
+    public function it_doesnt_parse_data_in_noparse_modifiers()
     {
-        $parser = Antlers::parser();
-
         $variables = [
             'string' => 'hello',
             'content' => 'before {{ string }} after',
         ];
 
-        $parsed = $parser->parse('{{ content | noparse }} {{ string }}', $variables);
+        $parsed = Antlers::parse('{{ content | noparse }} {{ string }}', $variables);
 
-        $this->assertEquals('noparse_6d6accbda6a2c1f2e7dd3932dcc70012 hello', $parsed);
-
-        $this->assertEquals('before {{ string }} after hello', $parser->injectNoparse($parsed));
+        $this->assertEquals('before {{ string }} after hello', $parsed);
     }
 
     /** @test */
-    public function it_doesnt_parse_data_in_noparse_modifiers_with_null_coalescence_and_requires_extractions_to_be_reinjected()
+    public function it_doesnt_parse_data_in_noparse_modifiers_with_null_coalescence()
     {
         $parser = Antlers::parser();
 
@@ -657,12 +650,11 @@ EOT;
             'content' => 'before {{ string }} after',
         ];
         $parsed = $parser->parse('{{ missing or content | noparse }} {{ string }}', $variables);
-        $this->assertEquals('noparse_6d6accbda6a2c1f2e7dd3932dcc70012 hello', $parsed);
-        $this->assertEquals('before {{ string }} after hello', $parser->injectNoparse($parsed));
+        $this->assertEquals('before {{ string }} after hello', $parsed);
     }
 
     /** @test */
-    public function it_doesnt_parse_noparse_tags_inside_callbacks_and_requires_extractions_to_be_reinjected()
+    public function it_doesnt_parse_noparse_tags_inside_callbacks()
     {
         (new class extends Tags {
             public static $handle = 'tag';
@@ -690,25 +682,18 @@ EOT;
 {{ /tag:loop }}
 EOT;
 
-        $expectedBeforeInjection = <<<'EOT'
-noparse_ac3458695912d204af897d3c67f93cbe
-    0 noparse_ac3458695912d204af897d3c67f93cbe One
-    1 noparse_ac3458695912d204af897d3c67f93cbe Two
-EOT;
-
-        $expectedAfterInjection = <<<'EOT'
+        $expected = <<<'EOT'
 {{ string }}
     0 {{ string }} One
     1 {{ string }} Two
 EOT;
 
         $parsed = $parser->parse($template, $this->variables);
-        $this->assertEquals($expectedBeforeInjection, trim($parsed));
-        $this->assertEquals($expectedAfterInjection, trim($parser->injectNoparse($parsed)));
+        $this->assertEquals($expected, trim($parsed));
     }
 
     /** @test */
-    public function it_doesnt_parse_data_in_noparse_modifiers_inside_callbacks_and_requires_extractions_to_be_reinjected()
+    public function it_doesnt_parse_data_in_noparse_modifiers_inside_callbacks()
     {
         $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
 
@@ -747,21 +732,14 @@ EOT;
 {{ /tag:loop }}
 EOT;
 
-        $expectedBeforeInjection = <<<'EOT'
-noparse_0548be789865a16ab6e495f84a3080c0
-    1 noparse_aa4a7fa8e2faf61751b68038fee92c4d One
-    2 noparse_aa4a7fa8e2faf61751b68038fee92c4d Two
-EOT;
-
-        $expectedAfterInjection = <<<'EOT'
+        $expected = <<<'EOT'
 beforesingle {{ string }} aftersingle
     1 beforepair {{ string }} afterpair One
     2 beforepair {{ string }} afterpair Two
 EOT;
 
         $parsed = $parser->parse($template);
-        $this->assertEquals($expectedBeforeInjection, trim($parsed));
-        $this->assertEquals($expectedAfterInjection, trim($parser->injectNoparse($parsed)));
+        $this->assertEquals($expected, trim($parsed));
     }
 
     /** @test */
@@ -954,7 +932,7 @@ EOT;
 
         $expected = <<<'EOT'
 augmented before hello after
-augmented before  after
+augmented before {{ string }} after
 EOT;
 
         $variables = [
@@ -963,11 +941,27 @@ EOT;
             'string' => 'hello',
         ];
 
-        $this->assertEquals($expected, Antlers::parse($template, $variables));
-        $this->assertEquals('AUGMENTED BEFORE HELLO AFTER', Antlers::parse('{{ parseable | upper }}', $variables));
-        $this->assertEquals('AUGMENTED BEFORE  AFTER', Antlers::parse('{{ non_parseable | upper }}', $variables));
-        $this->assertEquals('AUGMENTED BEFORE HELLO AFTER', Antlers::parse('{{ parseable upper="true" }}', $variables));
-        $this->assertEquals('AUGMENTED BEFORE  AFTER', Antlers::parse('{{ non_parseable upper="true" }}', $variables));
+        $this->assertEquals($expected, (string) Antlers::parse($template, $variables));
+
+        $this->assertEquals(
+            'shmaugmented before hello after',
+            (string) Antlers::parse('{{ parseable | replace:aug:shmaug }}', $variables)
+        );
+
+        $this->assertEquals(
+            'shmaugmented before {{ string }} after',
+            (string) Antlers::parse('{{ non_parseable | replace:aug:shmaug }}', $variables)
+        );
+
+        $this->assertEquals(
+            'shmaugmented before hello after',
+            (string) Antlers::parse('{{ parseable replace="aug|shmaug" }}', $variables)
+        );
+
+        $this->assertEquals(
+            'shmaugmented before {{ string }} after',
+            (string) Antlers::parse('{{ non_parseable replace="aug|shmaug" }}', $variables)
+        );
     }
 
     /** @test */
@@ -1172,6 +1166,128 @@ Hello wilderness
 EOT;
 
         $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+    }
+
+    /** @test */
+    public function callback_tags_that_return_value_objects_gets_parsed()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+
+            public function index()
+            {
+                $fieldtype = new class extends Fieldtype {
+                    public function augment($value)
+                    {
+                        return 'augmented '.$value;
+                    }
+                };
+
+                return new Value('the value', null, $fieldtype);
+            }
+        })::register();
+
+        $this->assertEquals('augmented the value', Antlers::parse('{{ tag }}'));
+    }
+
+    /** @test */
+    public function callback_tags_that_return_value_objects_with_antlers_gets_parsed()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+
+            public function index()
+            {
+                $fieldtype = new class extends Fieldtype {
+                    public function augment($value)
+                    {
+                        return 'augmented '.$value;
+                    }
+                };
+
+                $fieldtype->setField(new Field('test', ['antlers' => true]));
+
+                return new Value('the value with {{ var }} in it', null, $fieldtype);
+            }
+        })::register();
+
+        $this->assertEquals(
+            'augmented the value with howdy in it',
+            (string) Antlers::parse('{{ tag }}', ['var' => 'howdy'])
+        );
+    }
+
+    /** @test */
+    public function callback_tags_that_return_value_objects_with_antlers_disabled_does_not_get_parsed()
+    {
+        (new class extends Tags {
+            public static $handle = 'tag';
+
+            public function index()
+            {
+                $fieldtype = new class extends Fieldtype {
+                    public function augment($value)
+                    {
+                        return 'augmented '.$value;
+                    }
+                };
+
+                $fieldtype->setField(new Field('test', ['antlers' => false]));
+
+                return new Value('the value with {{ var }} in it', null, $fieldtype);
+            }
+        })::register();
+
+        $this->assertEquals(
+            'augmented the value with {{ var }} in it',
+            (string) Antlers::parse('{{ tag }}', ['var' => 'howdy'])
+        );
+    }
+
+    /** @test */
+    public function value_objects_with_antlers_gets_parsed()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($value)
+            {
+                return 'augmented '.$value;
+            }
+        };
+
+        $fieldtype->setField(new Field('test', ['antlers' => true]));
+
+        $value = new Value('the value with {{ var }} in it', null, $fieldtype);
+
+        $this->assertEquals(
+            'augmented the value with howdy in it',
+            (string) Antlers::parse('{{ test }}', [
+                'test' => $value,
+                'var' => 'howdy'
+            ])
+        );
+    }
+
+    /** @test */
+    public function value_objects_with_antlers_disabled_do_not_get_parsed()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function augment($value)
+            {
+                return 'augmented '.$value;
+            }
+        };
+
+        $fieldtype->setField(new Field('test', ['antlers' => false]));
+
+        $value = new Value('the value with {{ var }} in it', null, $fieldtype);
+
+        $this->assertEquals(
+            'augmented the value with howdy in it',
+            (string) Antlers::parse('{{ test }}', [
+                'test' => $value,
+                'var' => 'howdy'
+            ])
+        );
     }
 
     /** @test */

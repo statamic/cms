@@ -9,6 +9,7 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Exceptions;
 use Statamic\Facades\Parse;
+use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Tags\Loader as TagLoader;
@@ -87,11 +88,11 @@ class Engine implements EngineInterface
 
         $contents = $parser->parseView($path, $contents, $data);
 
-        if (array_pop($this->injectExtractions) !== false) {
-            $contents = $parser->injectNoparse($contents);
+        if (array_pop($this->injectExtractions) === false) {
+            $contents->withoutExtractions();
         }
 
-        return $contents;
+        return (string) $contents;
     }
 
     protected function getContents($path)
@@ -165,6 +166,10 @@ class Engine implements EngineInterface
                 } else {
                     $output = Arr::assoc($output) ? $tag->parse($output) : $tag->parseLoop($output);
                 }
+            }
+
+            if ($output instanceof Value) {
+                $output = $output->antlersValue($parser, $context);
             }
 
             return $output;
