@@ -141,10 +141,6 @@ class Modify implements \IteratorAggregate
         // We should make sure it's always an array.
         $params = (array) $params;
 
-        // Templates will use snake_case to specify modifiers, so we'll
-        // convert them to the correct PSR-2 modifier method name.
-        $modifier = Str::camel($modifier);
-
         try {
             // Attempt to run the modifier. If it worked, awesome,
             // we'll have successfully returned a modified value.
