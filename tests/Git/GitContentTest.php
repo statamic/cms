@@ -68,18 +68,17 @@ class GitContentTest extends TestCase
         $contentStatus = $statuses->get(Path::resolve(base_path('content')));
         $assetsStatus = $statuses->get($this->basePath('temp/assets'));
 
-        $this->assertEquals(<<<'EOT'
+        $expectedContentStatus = <<<'EOT'
  M collections/pages.yaml
 ?? taxonomies/tags.yaml
-EOT,
-            $contentStatus->status
-        );
+EOT;
 
-        $this->assertEquals(<<<'EOT'
+        $expectedAssetsStatus = <<<'EOT'
  M statement.txt
-EOT,
-            $assetsStatus->status
-        );
+EOT;
+
+        $this->assertEquals($expectedContentStatus, $contentStatus->status);
+        $this->assertEquals($expectedAssetsStatus, $assetsStatus->status);
 
         $this->assertEquals(2, $contentStatus->totalCount);
         $this->assertEquals(1, $contentStatus->addedCount);
@@ -128,19 +127,18 @@ EOT,
         $this->files->put(base_path('content/untracked.yaml'), 'title: Untracked File');
         $this->files->put($this->basePath('temp/assets/statement.txt'), 'Change statement.');
 
-        $this->assertEquals(<<<'EOT'
+        $expectedContentStatus = <<<'EOT'
  M collections/pages.yaml
 ?? taxonomies/tags.yaml
 ?? untracked.yaml
-EOT,
-            Git::create(Path::resolve(base_path('content')))->status()
-        );
+EOT;
 
-        $this->assertEquals(<<<'EOT'
+        $expectedAssetsStatus = <<<'EOT'
  M statement.txt
-EOT,
-            Git::create($this->basePath('temp/assets'))->status()
-        );
+EOT;
+
+        $this->assertEquals($expectedContentStatus, Git::create(Path::resolve(base_path('content')))->status());
+        $this->assertEquals($expectedAssetsStatus, Git::create($this->basePath('temp/assets'))->status());
 
         $this->assertStringContainsString('Initial commit.', $this->showLastCommit(base_path('content')));
         $this->assertStringContainsString('Initial commit.', $this->showLastCommit($this->basePath('temp/assets')));
@@ -188,13 +186,13 @@ EOT,
 
         Content::commit();
 
-        $this->assertEquals(<<<'EOT'
+        $expectedLog = <<<'EOT'
 Spock committed.
 Spock committed.
 
-EOT,
-            $this->files->get($logFile)
-        );
+EOT;
+
+        $this->assertEquals($expectedLog, $this->files->get($logFile));
     }
 
     /** @test */

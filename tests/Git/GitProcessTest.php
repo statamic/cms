@@ -69,14 +69,13 @@ class GitProcessTest extends TestCase
         $this->files->put($this->basePath('temp/content/collections/new.yaml'), 'title: New Collection');
         $this->files->put($this->basePath('temp/content/taxonomies/topics.yaml'), 'title: Topics Title Changed');
 
-        $this->assertEquals(<<<'EOT'
+        $expectedContentStatus = <<<'EOT'
  M collections/pages.yaml
  M taxonomies/topics.yaml
 ?? collections/new.yaml
-EOT,
-            Git::create($this->basePath('temp/content'))->status()
-        );
+EOT;
 
+        $this->assertEquals($expectedContentStatus, Git::create($this->basePath('temp/content'))->status());
         $this->assertNull(Git::create($this->basePath('temp/assets'))->status());
     }
 
@@ -90,26 +89,24 @@ EOT,
         $this->files->put($this->basePath('temp/content/collections/new.yaml'), 'title: New Collection');
         $this->files->put($this->basePath('temp/content/taxonomies/topics.yaml'), 'title: Topics Title Changed');
 
-        $this->assertEquals(<<<'EOT'
+        $expectedCollectionsStatus = <<<'EOT'
  M collections/pages.yaml
 ?? collections/new.yaml
-EOT,
-            Git::create($this->basePath('temp/content'))->status('collections')
-        );
+EOT;
 
-        $this->assertEquals(<<<'EOT'
+        $expectedTaxonomiesStatus = <<<'EOT'
  M taxonomies/topics.yaml
-EOT,
-            Git::create($this->basePath('temp/content'))->status('taxonomies')
-        );
+EOT;
 
-        $this->assertEquals(<<<'EOT'
+        $expectedCombinedStatus = <<<'EOT'
  M collections/pages.yaml
  M taxonomies/topics.yaml
 ?? collections/new.yaml
-EOT,
-            Git::create($this->basePath('temp/content'))->status(['collections', 'taxonomies'])
-        );
+EOT;
+
+        $this->assertEquals($expectedCollectionsStatus, Git::create($this->basePath('temp/content'))->status('collections'));
+        $this->assertEquals($expectedTaxonomiesStatus, Git::create($this->basePath('temp/content'))->status('taxonomies'));
+        $this->assertEquals($expectedCombinedStatus, Git::create($this->basePath('temp/content'))->status(['collections', 'taxonomies']));
     }
 
     /**
@@ -126,14 +123,14 @@ EOT,
 
         Git::create($this->basePath('temp/content'))->add('--all');
 
-        $this->assertEquals(<<<'EOT'
+        $expectedContentStatus = <<<'EOT'
 A  collections/new.yaml
 M  collections/pages.yaml
 M  taxonomies/topics.yaml
 A  unrelated.yaml
-EOT,
-            Git::create($this->basePath('temp/content'))->status()
-        );
+EOT;
+
+        $this->assertEquals($expectedContentStatus, Git::create($this->basePath('temp/content'))->status());
     }
 
     /**
@@ -149,14 +146,14 @@ EOT,
 
         Git::create($this->basePath('temp/content'))->add('collections');
 
-        $this->assertEquals(<<<'EOT'
+        $expectedContentStatus = <<<'EOT'
 A  collections/new.yaml
 M  collections/pages.yaml
  M taxonomies/topics.yaml
 ?? unrelated.yaml
-EOT,
-            Git::create($this->basePath('temp/content'))->status()
-        );
+EOT;
+
+        $this->assertEquals($expectedContentStatus, Git::create($this->basePath('temp/content'))->status());
     }
 
     /**
@@ -173,12 +170,12 @@ EOT,
         Git::create($this->basePath('temp/content'))->add('collections');
         Git::create($this->basePath('temp/content'))->commit('Test commit.');
 
-        $this->assertEquals(<<<'EOT'
+        $expectedContentStatus = <<<'EOT'
  M taxonomies/topics.yaml
 ?? unrelated.yaml
-EOT,
-            Git::create($this->basePath('temp/content'))->status()
-        );
+EOT;
+
+        $this->assertEquals($expectedContentStatus, Git::create($this->basePath('temp/content'))->status());
 
         $this->assertStringContainsString('Test commit.', $this->showLastCommit($this->basePath('temp/content')));
         $this->assertStringNotContainsString('Test commit.', $this->showLastCommit($this->basePath('temp/assets')));
