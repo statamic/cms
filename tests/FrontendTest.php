@@ -157,8 +157,8 @@ class FrontendTest extends TestCase
         $response = $this->get('about')->assertStatus(200);
 
         $keys = [
-            'site_url', 'homepage', 'current_url', 'current_uri', 'current_date', 'now', 'today', 'locale',
-            'locale_name', 'locale_full', 'locale_url', 'get', 'post', 'get_post', 'old', 'response_code',
+            'site', 'homepage', 'current_url', 'current_uri', 'current_date', 'now', 'today',
+            'get', 'post', 'get_post', 'old', 'response_code',
             'logged_in', 'logged_out', 'environment', 'xml_header', 'csrf_token', 'csrf_field', 'config',
         ];
 
@@ -329,7 +329,7 @@ class FrontendTest extends TestCase
     {
         $this->withFakeViews();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
-        $this->viewShouldReturnRaw('errors.404', 'Not found {{ response_code }} {{ site }}');
+        $this->viewShouldReturnRaw('errors.404', 'Not found {{ response_code }} {{ site:handle }}');
 
         $this->get('unknown')->assertNotFound()->assertSee('Not found 404 en');
 
