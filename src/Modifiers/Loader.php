@@ -13,11 +13,13 @@ class Loader
      */
     public function load($name)
     {
-        if (! ($modifiers = app('statamic.modifiers'))->has($name)) {
+        $key = Str::snake($name);
+
+        if (! ($modifiers = app('statamic.modifiers'))->has($key)) {
             throw new ModifierNotFoundException($name);
         }
 
-        if (Str::contains($class = $modifiers->get($name), 'CoreModifiers@')) {
+        if (Str::contains($class = $modifiers->get($key), 'CoreModifiers@')) {
             [$class, $method] = explode('@', $class);
         }
 
