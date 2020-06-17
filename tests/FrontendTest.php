@@ -157,8 +157,8 @@ class FrontendTest extends TestCase
         $response = $this->get('about')->assertStatus(200);
 
         $keys = [
-            'site', 'homepage', 'current_url', 'current_uri', 'current_date', 'now', 'today', 'locale',
-            'locale_name', 'locale_full', 'locale_url', 'get', 'post', 'get_post', 'old', 'response_code',
+            'site', 'homepage', 'current_url', 'current_uri', 'current_date', 'now', 'today',
+            'get', 'post', 'get_post', 'old', 'response_code',
             'logged_in', 'logged_out', 'environment', 'xml_header', 'csrf_token', 'csrf_field', 'config',
         ];
 

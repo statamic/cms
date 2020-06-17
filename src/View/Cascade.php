@@ -173,10 +173,6 @@ class Cascade
 
             'site' => $this->site,
             'homepage' => $this->site->url(),
-            'locale' => $this->site->handle(),
-            'locale_name' => $this->site->name(),
-            'locale_full' => $this->site->locale(),
-            'locale_url' => $this->site->url(),
             'cp_url' => cp_route('index'),
         ];
     }

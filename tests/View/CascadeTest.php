@@ -146,11 +146,6 @@ class CascadeTest extends TestCase
             $this->assertEquals('en_US', $site['locale']);
             $this->assertEquals('en', $site['short_locale']);
             $this->assertEquals('http://test.com', $site['url']);
-
-            $this->assertEquals('en', $cascade['locale']);
-            $this->assertEquals('English', $cascade['locale_name']);
-            $this->assertEquals('en_US', $cascade['locale_full']);
-            $this->assertEquals('http://test.com', $cascade['locale_url']);
         });
     }
 
@@ -170,11 +165,6 @@ class CascadeTest extends TestCase
             $this->assertEquals('fr_FR', $site['locale']);
             $this->assertEquals('fr', $site['short_locale']);
             $this->assertEquals('http://fr.test.com', $site['url']);
-
-            $this->assertEquals('fr', $cascade['locale']);
-            $this->assertEquals('French', $cascade['locale_name']);
-            $this->assertEquals('fr_FR', $cascade['locale_full']);
-            $this->assertEquals('http://fr.test.com', $cascade['locale_url']);
         });
     }
 
@@ -194,11 +184,6 @@ class CascadeTest extends TestCase
             $this->assertEquals('de_DE', $site['locale']);
             $this->assertEquals('de', $site['short_locale']);
             $this->assertEquals('http://test.com/de', $site['url']);
-
-            $this->assertEquals('de', $cascade['locale']);
-            $this->assertEquals('German', $cascade['locale_name']);
-            $this->assertEquals('de_DE', $cascade['locale_full']);
-            $this->assertEquals('http://test.com/de', $cascade['locale_url']);
         });
     }
 
