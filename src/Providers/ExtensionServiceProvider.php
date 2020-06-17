@@ -174,7 +174,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Widgets\Header::class,
         Widgets\Template::class,
         Widgets\Updater::class,
-        Forms\Widget::class,
+        \Statamic\Forms\Widget::class,
     ];
 
     /**
