@@ -2,11 +2,11 @@
 
 namespace Tests\Git;
 
-use Statamic\Facades\Git;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Processes\Git as GitProcess;
 use Statamic\Console\Processes\Process;
 use Statamic\Facades\Config;
+use Statamic\Facades\Git;
 use Statamic\Facades\Path;
 use Statamic\Facades\User;
 use Tests\TestCase;
