@@ -2,6 +2,7 @@
 
 namespace Statamic\Events\Data;
 
-class UserGroupDeleted extends DataDeleted
+class UserGroupDeleted extends Deleted
 {
+    //
 }

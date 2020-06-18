@@ -2,6 +2,7 @@
 
 namespace Statamic\Events\Data;
 
-class EntryDeleted extends DataDeleted
+class EntryDeleted extends Deleted
 {
+    //
 }

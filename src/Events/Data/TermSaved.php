@@ -2,7 +2,7 @@
 
 namespace Statamic\Events\Data;
 
-class TermDeleted extends Deleted
+class TermSaved extends Saved
 {
     //
 }

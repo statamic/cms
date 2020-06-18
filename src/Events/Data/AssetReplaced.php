@@ -2,20 +2,15 @@
 
 namespace Statamic\Events\Data;
 
-use Statamic\Contracts\Assets\Asset;
-
-class AssetReplaced
+class AssetReplaced extends Saved
 {
     /**
-     * @var Asset
+     * To sentence.
+     *
+     * @return string
      */
-    public $asset;
-
-    /**
-     * @param Asset $asset
-     */
-    public function __construct(Asset $asset)
+    public function toSentence()
     {
-        $this->asset = $asset;
+        return __(':item replaced.', ['item' => 'Asset']);
     }
 }

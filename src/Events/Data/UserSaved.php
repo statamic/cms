@@ -2,6 +2,7 @@
 
 namespace Statamic\Events\Data;
 
-class GlobalsDeleted extends DataDeleted
+class UserSaved extends Saved
 {
+    //
 }

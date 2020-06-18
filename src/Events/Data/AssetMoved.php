@@ -2,7 +2,7 @@
 
 namespace Statamic\Events\Data;
 
-class AssetUploaded extends Saved
+class AssetMoved extends Saved
 {
     /**
      * To sentence.
@@ -11,6 +11,6 @@ class AssetUploaded extends Saved
      */
     public function toSentence()
     {
-        return __(':item uploaded.', ['item' => 'Asset']);
+        return __(':item moved.', ['item' => 'Asset']);
     }
 }

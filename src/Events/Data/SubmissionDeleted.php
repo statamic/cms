@@ -2,7 +2,7 @@
 
 namespace Statamic\Events\Data;
 
-class ContentSaving extends DataSaving
+class SubmissionDeleted extends Deleted
 {
     //
 }
