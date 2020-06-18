@@ -5,7 +5,6 @@ namespace Statamic\Modifiers;
 use ArrayIterator;
 use Exception;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class Modify implements \IteratorAggregate
 {
