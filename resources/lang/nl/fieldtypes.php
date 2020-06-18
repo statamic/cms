@@ -40,7 +40,7 @@ return [
     ],
     'code' => [
         'config' => [
-            'indent_size' => 'Stel in hoevel indentatie je wilt (in spaties).',
+            'indent_size' => 'Stel in hoeveel indentatie je wilt (in spaties).',
             'indent_type' => 'Stel in welke indentatietype je voorkeur heeft.',
             'key_map' => 'Kies een voorkeursset met toetsenbord sneltoetsen.',
             'mode' => 'Kies de taal voor syntax highlighting.',
