@@ -38,8 +38,6 @@ class GitProcessTest extends TestCase
      */
     public function it_can_get_git_root()
     {
-        $this->assertEquals(Path::resolve(base_path()), Git::create()->root());
-
         $this->assertEquals(
             Path::resolve($this->basePath('temp/content')),
             Git::create($this->basePath('temp/content/collections'))->root()
