@@ -4,7 +4,6 @@ namespace Tests\Composer;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Facades\Cache;
-use Statamic\Support\Str;
 use Symfony\Component\Process\Process;
 use Tests\Fakes\Composer\Package\PackToTheFuture;
 use Tests\TestCase;
