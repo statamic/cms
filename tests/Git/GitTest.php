@@ -11,7 +11,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\User;
 use Tests\TestCase;
 
-class GitContentTest extends TestCase
+class GitTest extends TestCase
 {
     use Concerns\PreparesTempRepos;
 
@@ -51,7 +51,7 @@ class GitContentTest extends TestCase
     {
         Config::set('statamic.git.enabled', false);
 
-        $this->expectExceptionMessageRegExp('/.*git integration.*/');
+        $this->expectExceptionMessage('Statamic git integration is currently disabled.');
 
         Git::anything();
     }
