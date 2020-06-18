@@ -2,13 +2,14 @@
 
 namespace Statamic\Git;
 
-use Statamic\Console\Processes\Git;
+use Statamic\Console\Processes\Git as GitProcess;
+use Statamic\Events\Event;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Path;
 use Statamic\Facades\User;
 use Statamic\Support\Str;
 
-class Content
+class Git
 {
     /**
      * Instantiate git tracked content manager.
@@ -21,6 +22,16 @@ class Content
     }
 
     /**
+     * Listen to custom addon event.
+     *
+     * @param string $event
+     */
+    public function listen($event)
+    {
+        \Illuminate\Support\Facades\Event::listen($event, Subscriber::class.'@commit');
+    }
+
+    /**
      * Get statuses of tracked content paths.
      *
      * @return \Illuminate\Support\Collection|null
@@ -30,7 +41,7 @@ class Content
         $statuses = $this
             ->groupTrackedContentPathsByRepo()
             ->map(function ($paths, $gitRoot) {
-                return Git::create($gitRoot)
+                return GitProcess::create($gitRoot)
                     ->colorized(true) // TODO: Why is it not colorizing?
                     ->status($paths);
             })
@@ -46,10 +57,10 @@ class Content
     /**
      * Git add and commit all tracked content, using configured commands.
      */
-    public function commit($message = 'Content saved.')
+    public function commit($message = null)
     {
         $this->groupTrackedContentPathsByRepo()->each(function ($paths, $gitRoot) use ($message) {
-            $this->runConfiguredCommands($gitRoot, $paths, $message);
+            $this->runConfiguredCommands($gitRoot, $paths, $message ?? __(':item saved.', ['item' => 'Content']));
         });
     }
 
@@ -59,7 +70,7 @@ class Content
     public function push()
     {
         $this->groupTrackedContentPathsByRepo()->each(function ($paths, $gitRoot) use ($message) {
-            Git::create($gitRoot)->push();
+            GitProcess::create($gitRoot)->push();
         });
     }
 
@@ -111,7 +122,7 @@ class Content
                 return $this->ensureAbsolutePath($path);
             })
             ->groupBy(function ($path) {
-                return Git::create($path)->root();
+                return GitProcess::create($path)->root();
             });
     }
 
@@ -167,7 +178,7 @@ class Content
     protected function runConfiguredCommands($gitRoot, $paths, $message)
     {
         $this->getParsedCommands($paths, $message)->each(function ($command) use ($gitRoot) {
-            Git::create($gitRoot)->run($command);
+            GitProcess::create($gitRoot)->run($command);
         });
 
         if (config('statamic.git.push')) {
