@@ -25,7 +25,7 @@
         @forelse($statuses ?? [] as $path => $status)
             <div class="p-2 {{ $loop->first ? '' : 'border-t' }}">
                 <h2 class="font-bold">{{ __('Repository path') }}: <code class="font-normal italic">{{ $path }}</code></h2>
-                <pre class="mt-2 p-2 rounded text-sm font-mono bg-grey-30 text-grey-70"><ansi-colored-output text="{{ $status->status }}" /> </pre>
+                <pre class="mt-2 p-2 rounded text-sm font-mono bg-grey-30 text-grey-70">{{ $status->status }}</pre>
                 <div class="mt-2 text-sm text-grey flex">
                     <div class="mr-2 badge-pill-sm"><span class="text-grey-80 font-medium">{{ __('Affected files') }}:</span> {{ $status->totalCount }}</div>
                     @if ($status->addedCount)
