@@ -2,6 +2,7 @@
 
 namespace Statamic\Git;
 
+use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Processes\Git as GitProcess;
 use Statamic\Events\Event;
 use Statamic\Facades\Antlers;
@@ -120,6 +121,9 @@ class Git
         return collect(config('statamic.git.paths'))
             ->map(function ($path) {
                 return $this->ensureAbsolutePath($path);
+            })
+            ->filter(function ($path) {
+                return app(Filesystem::class)->exists($path);
             })
             ->groupBy(function ($path) {
                 return GitProcess::create($path)->root();
