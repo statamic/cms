@@ -1,12 +1,12 @@
 <?php
 
-namespace Statamic\Console\Commands;
+namespace Statamic\Git;
 
-use Facades\Statamic\Git\Content;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Git;
 
-class GitCommitContent extends Command
+class CommitCommand extends Command
 {
     use RunsInPlease;
 
@@ -35,11 +35,11 @@ class GitCommitContent extends Command
             return $this->info(__('Statamic git integration is currently disabled.'));
         }
 
-        if (! Content::statuses()) {
+        if (! Git::statuses()) {
             return $this->info(__('Nothing to commit, content paths clean!'));
         }
 
-        Content::commit();
+        Git::commit();
 
         return $this->info(__('Content committed.'));
     }
