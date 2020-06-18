@@ -102,7 +102,7 @@ class ComposerTest extends TestCase
         $this->assertTrue($installed->keys()->contains('test/package'));
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
-        $this->assertTrue(Str::contains(Cache::get('composer.test/package')['output'], "Installing \e[32mtest/package"));
+        $this->assertStringContainsString('Installing test/package', Cache::get('composer.test/package')['output']);
 
         // Test that we can update the package...
 
@@ -113,7 +113,7 @@ class ComposerTest extends TestCase
         $this->assertTrue($installed->keys()->contains('test/package'));
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.1', $installed->get('test/package')->version);
-        $this->assertTrue(Str::contains(Cache::get('composer.test/package')['output'], "Updating \e[32mtest/package"));
+        $this->assertStringContainsString('Updating test/package', Cache::get('composer.test/package')['output']);
 
         // Test that we can downgrade to a specific version...
 
@@ -124,7 +124,7 @@ class ComposerTest extends TestCase
         $this->assertTrue($installed->keys()->contains('test/package'));
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
-        $this->assertTrue(Str::contains(Cache::get('composer.test/package')['output'], "Downgrading \e[32mtest/package"));
+        $this->assertStringContainsString('Downgrading test/package', Cache::get('composer.test/package')['output']);
 
         // Test that we can remove the package...
 
@@ -132,7 +132,7 @@ class ComposerTest extends TestCase
 
         $this->assertStringNotContainsString('test/package', Composer::installed()->keys());
         $this->assertFileNotExists($this->basePath('vendor/test/package'));
-        $this->assertTrue(Str::contains(Cache::get('composer.test/package')['output'], "Removing \e[32mtest/package"));
+        $this->assertStringContainsString('Removing test/package', Cache::get('composer.test/package')['output']);
     }
 
     private function basePath($path = null)
