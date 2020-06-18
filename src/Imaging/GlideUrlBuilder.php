@@ -37,13 +37,13 @@ class GlideUrlBuilder extends ImageUrlBuilder
 
         switch ($this->itemType()) {
             case 'url':
-                $path = 'http/'.base64_encode($item);
+                $path = 'http/' . base64_encode($item);
                 break;
             case 'asset':
-                $path = 'asset/'.base64_encode($this->item->containerId().'/'.$this->item->path());
+                $path = 'asset/' . base64_encode($this->item->containerId() . '/' . $this->item->path());
                 break;
             case 'id':
-                $path = 'asset/'.base64_encode(str_replace('::', '/', $this->item));
+                $path = 'asset/' . base64_encode(str_replace('::', '/', $this->item));
                 break;
             case 'path':
                 $path = URL::encode($this->item);
@@ -58,6 +58,10 @@ class GlideUrlBuilder extends ImageUrlBuilder
             $path .= Str::ensureLeft(URL::encode($filename), '/');
         }
 
-        return URL::prependSiteRoot($builder->getUrl($path, $params));
+        if (config('statamic.site.glide_prepend_siteroot')) {
+            return URL::prependSiteRoot($builder->getUrl($path, $params));
+        } else {
+            return $builder->getUrl($path, $params);
+        }
     }
 }
