@@ -2,9 +2,9 @@
 
 namespace Tests\Git;
 
-use Facades\Statamic\Git\Content;
+use Statamic\Facades\Git;
 use Illuminate\Filesystem\Filesystem;
-use Statamic\Console\Processes\Git;
+use Statamic\Console\Processes\Git as GitProcess;
 use Statamic\Console\Processes\Process;
 use Statamic\Facades\Config;
 use Statamic\Facades\Path;
@@ -53,7 +53,7 @@ class GitContentTest extends TestCase
 
         $this->expectExceptionMessageRegExp('/.*git integration.*/');
 
-        Content::anything();
+        Git::anything();
     }
 
     /** @test */
@@ -64,7 +64,7 @@ class GitContentTest extends TestCase
         $this->files->put(base_path('content/untracked.yaml'), 'title: Untracked File');
         $this->files->put($this->basePath('temp/assets/statement.txt'), 'Change statement.');
 
-        $statuses = Content::statuses();
+        $statuses = Git::statuses();
         $contentStatus = $statuses->get(Path::resolve(base_path('content')));
         $assetsStatus = $statuses->get($this->basePath('temp/assets'));
 
@@ -94,29 +94,29 @@ EOT;
     /** @test */
     public function it_returns_null_when_statuses_are_clean()
     {
-        $this->assertNull(Content::statuses());
+        $this->assertNull(Git::statuses());
     }
 
     /** @test */
     public function it_gets_git_user_info()
     {
-        $this->assertEquals('Spock', Content::gitUserName());
-        $this->assertEquals('spock@example.com', Content::gitUserEmail());
+        $this->assertEquals('Spock', Git::gitUserName());
+        $this->assertEquals('spock@example.com', Git::gitUserEmail());
 
-        $chewy = User::make()
-            ->email('chew@bacca.com')
-            ->data(['name' => 'Chewy'])
-            ->makeSuper();
+        $this->actingAs(
+            User::make()
+                ->email('chew@bacca.com')
+                ->data(['name' => 'Chewy'])
+                ->makeSuper()
+        );
 
-        $this->actingAs($chewy);
-
-        $this->assertEquals('Chewy', Content::gitUserName());
-        $this->assertEquals('chew@bacca.com', Content::gitUserEmail());
+        $this->assertEquals('Chewy', Git::gitUserName());
+        $this->assertEquals('chew@bacca.com', Git::gitUserEmail());
 
         Config::set('statamic.git.use_authenticated', false);
 
-        $this->assertEquals('Spock', Content::gitUserName());
-        $this->assertEquals('spock@example.com', Content::gitUserEmail());
+        $this->assertEquals('Spock', Git::gitUserName());
+        $this->assertEquals('spock@example.com', Git::gitUserEmail());
     }
 
     /** @test */
@@ -137,13 +137,13 @@ EOT;
  M statement.txt
 EOT;
 
-        $this->assertEquals($expectedContentStatus, Git::create(Path::resolve(base_path('content')))->status());
-        $this->assertEquals($expectedAssetsStatus, Git::create($this->basePath('temp/assets'))->status());
+        $this->assertEquals($expectedContentStatus, GitProcess::create(Path::resolve(base_path('content')))->status());
+        $this->assertEquals($expectedAssetsStatus, GitProcess::create($this->basePath('temp/assets'))->status());
 
         $this->assertStringContainsString('Initial commit.', $this->showLastCommit(base_path('content')));
         $this->assertStringContainsString('Initial commit.', $this->showLastCommit($this->basePath('temp/assets')));
 
-        Content::commit();
+        Git::commit();
 
         $this->assertStringContainsString('Content saved.', $commit = $this->showLastCommit(base_path('content')));
         $this->assertStringContainsString('Spock <spock@example.com>', $commit);
@@ -160,7 +160,7 @@ EOT;
     {
         $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
 
-        Content::commit('Pages changed.');
+        Git::commit('Pages changed.');
 
         $this->assertStringContainsString('Pages changed.', $commit = $this->showLastCommit(base_path('content')));
         $this->assertStringContainsString('collections/pages.yaml', $commit);
@@ -184,7 +184,7 @@ EOT;
             'echo "{{ name }} committed." >> '.$logFile,
         ]);
 
-        Content::commit();
+        Git::commit();
 
         $expectedLog = <<<'EOT'
 Spock committed.
@@ -198,21 +198,21 @@ EOT;
     /** @test */
     public function it_doesnt_push_by_default()
     {
-        Content::shouldReceive('push')->never();
-        Content::makePartial();
+        Git::shouldReceive('push')->never();
+        Git::makePartial();
 
-        Content::commit();
+        Git::commit();
     }
 
     /** @test */
     public function it_can_push_when_enabled()
     {
-        Content::shouldReceive('push')->times(2);
-        Content::makePartial();
+        Git::shouldReceive('push')->times(2);
+        Git::makePartial();
 
         Config::set('statamic.git.push', true);
 
-        Content::commit();
+        Git::commit();
     }
 
     private function showLastCommit($path)
