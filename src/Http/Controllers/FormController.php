@@ -31,10 +31,6 @@ class FormController extends Controller
 
         $submission = $form->createSubmission();
 
-        if ($form->sanitize()) {
-            $data = Arr::sanitize($data);
-        }
-
         try {
             $submission->data($data);
             $submission->uploadFiles();

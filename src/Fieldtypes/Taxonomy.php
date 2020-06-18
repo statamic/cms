@@ -22,6 +22,7 @@ class Taxonomy extends Relationship
             'taxonomies' => [
                 'display' => __('Taxonomies'),
                 'type' => 'taxonomies',
+                'mode' => 'select',
             ],
         ]);
     }
@@ -37,16 +38,7 @@ class Taxonomy extends Relationship
     {
         $terms = $this->getTermsForAugmentation($value);
 
-        $terms = collect($terms->map(function ($term) {
-            return [
-                'id' => $term->id(),
-                'title' => $term->title(),
-                'slug' => $term->slug(),
-                'url' => $term->url(),
-                'permalink' => $term->absoluteUrl(),
-                'api_url' => $term->apiUrl(),
-            ];
-        }));
+        $terms = collect($terms)->map->toShallowAugmentedCollection();
 
         return $this->config('max_items') === 1 ? $terms->first() : $terms;
     }

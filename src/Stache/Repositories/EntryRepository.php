@@ -86,7 +86,7 @@ class EntryRepository implements RepositoryContract
 
     public function make(): Entry
     {
-        return new \Statamic\Entries\Entry;
+        return app(Entry::class);
     }
 
     public function taxonomize($entry)
@@ -111,6 +111,13 @@ class EntryRepository implements RepositoryContract
         return [
             'title' => 'required',
             'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id().','.$entry->locale(),
+        ];
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            Entry::class => \Statamic\Entries\Entry::class,
         ];
     }
 }

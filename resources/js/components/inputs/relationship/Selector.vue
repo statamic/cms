@@ -198,6 +198,8 @@ export default {
     methods: {
 
         getFilters() {
+            if (!this.filtersUrl) return Promise.resolve();
+
             return this.$axios.get(this.filtersUrl).then(response => {
                 this.filters = response.data;
             });

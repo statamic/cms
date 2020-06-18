@@ -24,7 +24,7 @@ class ComposerTest extends TestCase
         copy($this->basePath('composer.lock'), $this->basePath('composer.lock.bak'));
         Cache::forget('composer.test/package');
 
-        Composer::swap(new \Statamic\Console\Processes\Composer($this->basePath()));
+        Composer::swap(new \Statamic\Console\Processes\Composer($this->basePath(), 'vendor/bin/composer'));
     }
 
     public function tearDown(): void

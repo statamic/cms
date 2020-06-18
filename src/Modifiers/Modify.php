@@ -5,7 +5,6 @@ namespace Statamic\Modifiers;
 use ArrayIterator;
 use Exception;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class Modify implements \IteratorAggregate
 {
@@ -140,10 +139,6 @@ class Modify implements \IteratorAggregate
         // Blade and/or raw PHP usage might pass a single parameter.
         // We should make sure it's always an array.
         $params = (array) $params;
-
-        // Templates will use snake_case to specify modifiers, so we'll
-        // convert them to the correct PSR-2 modifier method name.
-        $modifier = Str::camel($modifier);
 
         try {
             // Attempt to run the modifier. If it worked, awesome,

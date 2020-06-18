@@ -3,7 +3,10 @@
 namespace Statamic\Fieldtypes\Bard;
 
 use Scrumpy\ProseMirrorToHtml\Renderer;
+use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
+use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
 
 class Augmentor
@@ -106,8 +109,17 @@ class Augmentor
                 return $this->sets[$matches[1]];
             }
 
-            return ['type' => 'text', 'text' => $html];
+            return ['type' => 'text', 'text' => $this->textValue($html)];
         });
+    }
+
+    protected function textValue($value)
+    {
+        $fieldtype = (new Text)->setField(new Field('text', [
+            'antlers' => $this->fieldtype->config('antlers'),
+        ]));
+
+        return new Value($value, 'text', $fieldtype);
     }
 
     protected function augmentSets($value, $shallow)

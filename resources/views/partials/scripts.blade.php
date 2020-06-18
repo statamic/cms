@@ -6,8 +6,10 @@
     <script src="{{ $url }}"></script>
 @endforeach
 
-@foreach (Statamic::availableScripts(request()) as $package => $path)
-    <script src="{{ Statamic::vendorAssetUrl("$package/js/$path") }}"></script>
+@foreach (Statamic::availableScripts(request()) as $package => $paths)
+    @foreach ($paths as $path)
+        <script src="{{ Statamic::vendorAssetUrl("$package/js/$path") }}"></script>
+    @endforeach
 @endforeach
 
 <script>
