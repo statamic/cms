@@ -22,10 +22,9 @@ return [
     | Automatically Run
     |--------------------------------------------------------------------------
     |
-    | By default, git commands will be run automatically after `DataSaved`
-    | events are fired. If you prefer users to manually trigger the git
-    | commands, set this to `false` and your users will be presented
-    | with the relevant GUI to commit the changes as they see fit.
+    | By default, git will automatically commit when `Saved` or `Deleted`
+    | events are fired. If you prefer users to manually trigger git
+    | commits using the `Git` utility GUI, set this to `false`.
     |
     */
 
@@ -56,16 +55,18 @@ return [
     |
     | Define the tracked paths to be considered when staging changes. Default
     | stache and file locations are already set up for you, but feel free
-    | to modify these paths to suit your storage config. Absolute paths
-    | are valid when referencing content stored in external repos.
+    | to modify these paths to suit your storage config. Referencing
+    | absolute paths to external repos is also completely valid.
     |
     */
 
     'paths' => [
-        'content',
-        'users',
-        'resources/users',
-        'public/assets',
+        base_path('content'),
+        base_path('resources/blueprints'),
+        base_path('resources/fieldsets'),
+        base_path('resources/forms'),
+        base_path('resources/users'),
+        base_path('users'),
     ],
 
     /*
@@ -102,14 +103,14 @@ return [
     | Ignored Events
     |--------------------------------------------------------------------------
     |
-    | Statamic will listen on all `DataSaved` compatible events, as well as
-    | any `DataSaved` events registered by installed addons. If you wish
-    | to ignore any specific events, you may reference them here.
+    | Statamic will listen on all `Saved` and `Deleted` events, as well
+    | as any events registered by installed addons. If you wish to
+    | ignore any specific events, you may reference them here.
     |
     */
 
     'ignored_events' => [
-        // \Statamic\Events\UserSaved::class,
+        // \Statamic\Events\Data\UserSaved::class,
     ],
 
 ];
