@@ -4,7 +4,7 @@ return [
     'array' => [
         'config' => [
             'keys' => 'Stel de array keys (variabelen) en optionele labels in.',
-            'mode' => 'Dynamische modus geeft de gebruike rcontroler over de data terwijl keyed modus dat niet doet.',
+            'mode' => 'Dynamische modus geeft de gebruiker controle over de data terwijl keyed modus dat niet doet.',
         ],
     ],
     'assets' => [
