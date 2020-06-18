@@ -33,7 +33,6 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\AuthMigration::class,
         Commands\Multisite::class,
         Commands\SiteClear::class,
-        Commands\GitCommitContent::class,
     ];
 
     public function boot()
