@@ -137,4 +137,14 @@ return [
             'prepend' => 'Voeg tekst toe aan het begin (linkerkant) van de tekstinput.',
         ],
     ],
+    'textarea' => [
+        'config' => [
+            'character_limit' => 'Stel een maximum aan het aantal toegestane karakters.',
+        ],
+    ],
+    'relationship' => [
+        'config' => [
+            'mode' => 'Kies de UI-stijl die je voorkeur heeft.',
+        ],
+    ],
 ];
