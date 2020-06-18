@@ -73,15 +73,11 @@ class CollectionRepository implements RepositoryContract
         if ($collection->orderable()) {
             $this->stache->store('entries')->store($collection->handle())->index('order')->update();
         }
-
-        CollectionSaved::dispatch($collection);
     }
 
     public function delete(Collection $collection)
     {
         $this->store->delete($collection);
-
-        CollectionDeleted::dispatch($collection);
     }
 
     public function updateEntryUris(Collection $collection)

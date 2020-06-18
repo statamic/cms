@@ -4,6 +4,8 @@ namespace Statamic\Globals;
 
 use Statamic\Contracts\Globals\GlobalSet as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Events\Data\GlobalSetDeleted;
+use Statamic\Events\Data\GlobalSetSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;
@@ -62,12 +64,16 @@ class GlobalSet implements Contract
     {
         Facades\GlobalSet::save($this);
 
+        GlobalSetSaved::dispatch($this);
+
         return $this;
     }
 
     public function delete()
     {
         Facades\GlobalSet::delete($this);
+
+        GlobalSetDeleted::dispatch($this);
 
         return true;
     }

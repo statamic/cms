@@ -11,6 +11,8 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\ContainsData;
 use Statamic\Data\Data;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Events\Data\AssetDeleted;
+use Statamic\Events\Data\AssetMoved;
 use Statamic\Events\Data\AssetReplaced;
 use Statamic\Events\Data\AssetUploaded;
 use Statamic\Facades;
@@ -374,6 +376,8 @@ class Asset implements AssetContract, Augmentable
         $this->disk()->delete($this->path());
         $this->disk()->delete($this->metaPath());
 
+        AssetDeleted::dispatch($this);
+
         return $this;
     }
 
@@ -446,6 +450,8 @@ class Asset implements AssetContract, Augmentable
             $this->disk()->rename($oldMetaPath, $this->metaPath());
             $this->save();
         }
+
+        AssetMoved::dispatch($this);
 
         return $this;
     }
@@ -566,7 +572,7 @@ class Asset implements AssetContract, Augmentable
 
         $this->path($path);
 
-        event(new AssetUploaded($this));
+        AssetUploaded::dispatch($this);
 
         return $this;
     }
@@ -596,7 +602,7 @@ class Asset implements AssetContract, Augmentable
     {
         $this->disk()->put($this->path(), $contents);
 
-        event(new AssetReplaced($this));
+        AssetReplaced::dispatch($this);
     }
 
     /**

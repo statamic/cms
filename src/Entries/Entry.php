@@ -14,6 +14,7 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Events\Data\EntryDeleted;
 use Statamic\Events\Data\EntrySaved;
 use Statamic\Events\Data\EntrySaving;
 use Statamic\Facades;
@@ -139,6 +140,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization
 
         Facades\Entry::delete($this);
 
+        EntryDeleted::dispatch($this);
+
         return true;
     }
 
@@ -246,7 +249,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
             $callback($this);
         }
 
-        EntrySaved::dispatch($this, []);  // TODO: Fix test
+        EntrySaved::dispatch($this);
 
         return true;
     }

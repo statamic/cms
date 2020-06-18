@@ -5,6 +5,8 @@ namespace Statamic\Forms;
 use Carbon\Carbon;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
+use Statamic\Events\Data\SubmissionDeleted;
+use Statamic\Events\Data\SubmissionSaved;
 use Statamic\Exceptions\PublishException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\File;
@@ -254,6 +256,8 @@ class Submission implements SubmissionContract
     public function save()
     {
         File::put($this->getPath(), YAML::dump($this->data()));
+
+        SubmissionSaved::dispatch($this);
     }
 
     /**
@@ -262,6 +266,8 @@ class Submission implements SubmissionContract
     public function delete()
     {
         File::delete($this->getPath());
+
+        SubmissionDeleted::dispatch($this);
     }
 
     /**

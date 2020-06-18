@@ -4,6 +4,8 @@ namespace Statamic\Forms;
 
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Events\Data\FormDeleted;
+use Statamic\Events\Data\FormSaved;
 use Statamic\Facades;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
@@ -158,6 +160,8 @@ class Form implements FormContract
         }
 
         File::put($this->path(), YAML::dump($data));
+
+        FormSaved::dispatch($this);
     }
 
     /**
@@ -168,6 +172,8 @@ class Form implements FormContract
         $this->submissions()->each->delete();
 
         File::delete($this->path());
+
+        FormDeleted::dispatch($this);
     }
 
     /**

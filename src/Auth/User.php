@@ -14,6 +14,8 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Events\Data\UserDeleted;
+use Statamic\Events\Data\UserSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\URL;
@@ -157,7 +159,7 @@ abstract class User implements
     {
         Facades\User::save($this);
 
-        // TODO: dispatch event
+        UserSaved::dispatch($this);
 
         return $this;
     }
@@ -166,7 +168,7 @@ abstract class User implements
     {
         Facades\User::delete($this);
 
-        // TODO: dispatch event
+        UserDeleted::dispatch($this);
 
         return $this;
     }

@@ -7,6 +7,8 @@ use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\Data\TaxonomyDeleted;
+use Statamic\Events\Data\TaxonomySaved;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
@@ -136,6 +138,8 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     {
         Facades\Taxonomy::save($this);
 
+        TaxonomySaved::dispatch($this);
+
         return true;
     }
 
@@ -144,6 +148,8 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         $this->queryTerms()->get()->each->delete();
 
         Facades\Taxonomy::delete($this);
+
+        TaxonomyDeleted::dispatch($this);
 
         return true;
     }

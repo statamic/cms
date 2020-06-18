@@ -8,6 +8,8 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\Data\BlueprintDeleted;
+use Statamic\Events\Data\BlueprintSaved;
 use Statamic\Facades;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -146,12 +148,16 @@ class Blueprint implements Augmentable
     {
         BlueprintRepository::save($this);
 
+        BlueprintSaved::dispatch($this);
+
         return $this;
     }
 
     public function delete()
     {
         BlueprintRepository::delete($this);
+
+        BlueprintDeleted::dispatch($this);
 
         return true;
     }
