@@ -37,17 +37,6 @@ class Git extends Process
     }
 
     /**
-     * Git commit.
-     *
-     * @param mixed $subPaths
-     * @return null
-     */
-    public function commit($message)
-    {
-        return $this->runGitCommand('commit', '-m', $message);
-    }
-
-    /**
      * Git push.
      *
      * @return null

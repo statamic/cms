@@ -154,31 +154,6 @@ EOT;
         $this->assertEquals($expectedContentStatus, Git::create($this->basePath('temp/content'))->status());
     }
 
-    /**
-     * @group integration
-     * @test
-     */
-    public function it_can_git_commit()
-    {
-        $this->files->put($this->basePath('temp/content/collections/pages.yaml'), 'title: Pages Title Changed');
-        $this->files->put($this->basePath('temp/content/collections/new.yaml'), 'title: New Collection');
-        $this->files->put($this->basePath('temp/content/taxonomies/topics.yaml'), 'title: Topics Title Changed');
-        $this->files->put($this->basePath('temp/content/unrelated.yaml'), 'title: Unrelated Content');
-
-        Git::create($this->basePath('temp/content'))->add('collections');
-        Git::create($this->basePath('temp/content'))->commit('Test commit.');
-
-        $expectedContentStatus = <<<'EOT'
- M taxonomies/topics.yaml
-?? unrelated.yaml
-EOT;
-
-        $this->assertEquals($expectedContentStatus, Git::create($this->basePath('temp/content'))->status());
-
-        $this->assertStringContainsString('Test commit.', $this->showLastCommit($this->basePath('temp/content')));
-        $this->assertStringNotContainsString('Test commit.', $this->showLastCommit($this->basePath('temp/assets')));
-    }
-
     private function showLastCommit($path)
     {
         return Process::create($path)->run('git show');
