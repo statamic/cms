@@ -71,7 +71,7 @@ return [
     'mimes' => 'Moet een bestand zijn van het type: :values.',
     'mimetypes' => 'Moet een bestand zijn van het type: values.',
     'min' => [
-        'numeric' => 'Moet minimal :min zijn.',
+        'numeric' => 'Moet minimaal :min zijn.',
         'file' => 'Moet minimaal :min kilobytes zijn.',
         'string' => 'Moet minimaal :min karakters lang zijn.',
         'array' => 'Moet minimaal :min items bevatten.',
