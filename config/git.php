@@ -62,11 +62,11 @@ return [
 
     'paths' => [
         base_path('content'),
-        base_path('resources/blueprints'),
-        base_path('resources/fieldsets'),
-        base_path('resources/forms'),
-        base_path('resources/users'),
         base_path('users'),
+        resource_path('blueprints'),
+        resource_path('fieldsets'),
+        resource_path('forms'),
+        resource_path('users'),
     ],
 
     /*
