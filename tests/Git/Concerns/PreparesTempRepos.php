@@ -33,6 +33,6 @@ trait PreparesTempRepos
 
         $process->run('git init');
         $process->run('git add --all');
-        $process->run('git commit -m "Initial commit."');
+        $process->run('git -c "user.name=Tests" -c "user.email=tests@example.com" commit -m "Initial commit."');
     }
 }
