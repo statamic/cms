@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\CP\Utilities;
 
-use Facades\Statamic\Git\Content;
+use Statamic\Facades\Git;
 use Statamic\Http\Controllers\CP\CpController;
 
 class GitController extends CpController
@@ -10,13 +10,13 @@ class GitController extends CpController
     public function index()
     {
         return view('statamic::utilities.git', [
-            'statuses' => Content::statuses(),
+            'statuses' => Git::statuses(),
         ]);
     }
 
     public function commit()
     {
-        Content::commit();
+        Git::commit();
 
         return back()->withSuccess(__('Content committed.'));
     }
