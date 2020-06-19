@@ -108,6 +108,6 @@ class Subscriber
      */
     protected function statusIsClean()
     {
-        return (bool) Git::statuses();
+        return is_null(Git::statuses());
     }
 }
