@@ -70,7 +70,7 @@ class Subscriber
      */
     public function commit($event)
     {
-        if ($this->automaticGitIsDisabled() || $this->eventIsIgnored($event) || $this->statusIsClean()) {
+        if ($this->automaticGitIsDisabled() || $this->eventIsIgnored($event)) {
             return;
         }
 
@@ -100,15 +100,5 @@ class Subscriber
     protected function eventIsIgnored($event)
     {
         return collect(config('statamic.git.ignored_events'))->contains(get_class($event));
-    }
-
-    /**
-     * Check if git status is clean.
-     *
-     * @return bool
-     */
-    protected function statusIsClean()
-    {
-        return is_null(Git::statuses());
     }
 }

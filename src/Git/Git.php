@@ -125,6 +125,9 @@ class Git
             ->filter(function ($path) {
                 return app(Filesystem::class)->exists($path);
             })
+            ->filter(function ($path) {
+                return GitProcess::create($path)->status();
+            })
             ->groupBy(function ($path) {
                 return GitProcess::create($path)->root();
             });
