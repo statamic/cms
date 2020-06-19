@@ -14,6 +14,7 @@ use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\Data\AssetDeleted;
 use Statamic\Events\Data\AssetMoved;
 use Statamic\Events\Data\AssetReplaced;
+use Statamic\Events\Data\AssetSaved;
 use Statamic\Events\Data\AssetUploaded;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
@@ -355,13 +356,16 @@ class Asset implements AssetContract, Augmentable
     /**
      * Save the asset.
      *
+     * @param bool $dispatchEvent
      * @return void
      */
-    public function save()
+    public function save($dispatchEvent = true)
     {
         Facades\Asset::save($this);
 
-        event('asset.saved', $this);
+        if ($dispatchEvent) {
+            AssetSaved::dispatch($this);
+        }
 
         return true;
     }
@@ -444,12 +448,14 @@ class Asset implements AssetContract, Augmentable
         $oldMetaPath = $this->metaPath();
         $newPath = Str::removeLeft(Path::tidy($folder.'/'.$filename.'.'.pathinfo($oldPath, PATHINFO_EXTENSION)), '/');
 
-        if ($oldPath !== $newPath) {
-            $this->disk()->rename($oldPath, $newPath);
-            $this->path($newPath);
-            $this->disk()->rename($oldMetaPath, $this->metaPath());
-            $this->save();
+        if ($oldPath === $newPath) {
+            return $this;
         }
+
+        $this->disk()->rename($oldPath, $newPath);
+        $this->path($newPath);
+        $this->disk()->rename($oldMetaPath, $this->metaPath());
+        $this->save(false);
 
         AssetMoved::dispatch($this);
 

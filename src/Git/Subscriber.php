@@ -19,6 +19,7 @@ class Subscriber
         \Statamic\Events\Data\AssetFolderSaved::class,
         \Statamic\Events\Data\AssetMoved::class,
         \Statamic\Events\Data\AssetReplaced::class,
+        \Statamic\Events\Data\AssetSaved::class,
         \Statamic\Events\Data\AssetUploaded::class,
         \Statamic\Events\Data\BlueprintDeleted::class,
         \Statamic\Events\Data\BlueprintSaved::class,
