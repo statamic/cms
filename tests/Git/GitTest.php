@@ -205,12 +205,25 @@ EOT;
     }
 
     /** @test */
-    public function it_can_push_when_enabled()
+    public function it_doesnt_push_when_there_was_nothing_to_commit()
     {
-        Git::shouldReceive('push')->times(2);
+        Git::shouldReceive('push')->never();
         Git::makePartial();
 
         Config::set('statamic.git.push', true);
+
+        Git::commit();
+    }
+
+    /** @test */
+    public function it_can_push_after_a_commit()
+    {
+        Git::shouldReceive('push')->once();
+        Git::makePartial();
+
+        Config::set('statamic.git.push', true);
+
+        $this->files->put(base_path('content/collections/pages.yaml'), 'title: Pages Title Changed');
 
         Git::commit();
     }
