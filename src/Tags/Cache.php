@@ -17,7 +17,7 @@ class Cache extends Tags
             return $cached;
         }
 
-        LaraCache::put($key, $html = $this->parse([]), $this->getCacheLength());
+        LaraCache::put($key, $html = (string) $this->parse([]), $this->getCacheLength());
 
         return $html;
     }
