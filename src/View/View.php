@@ -60,7 +60,7 @@ class View
         return $this;
     }
 
-    public function render()
+    public function render(): string
     {
         $cascade = $this->gatherData();
 

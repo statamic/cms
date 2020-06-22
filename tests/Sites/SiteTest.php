@@ -2,6 +2,8 @@
 
 namespace Tests\Sites;
 
+use Statamic\Data\AugmentedCollection;
+use Statamic\Facades\Antlers;
 use Statamic\Sites\Site;
 use Tests\TestCase;
 
@@ -215,5 +217,43 @@ class SiteTest extends TestCase
             $this->assertEquals('/foo/bar', $site->relativePath('http://absolute-url-resolved-from-request.com/fr/foo/bar'));
             $this->assertEquals('/foo/bar', $site->relativePath('http://absolute-url-resolved-from-request.com/fr/foo/bar/'));
         });
+    }
+
+    /** @test */
+    public function it_is_augmentable()
+    {
+        $site = new Site('test', [
+            'name' => 'Test',
+            'url' => 'http://test.com',
+            'locale' => 'en_US',
+        ]);
+
+        $values = $site->augmented()->all();
+        $this->assertInstanceOf(AugmentedCollection::class, $values);
+        $this->assertEquals([
+            'handle' => 'test',
+            'name' => 'Test',
+            'locale' => 'en_US',
+            'short_locale' => 'en',
+            'url' => 'http://test.com',
+        ], $values->all());
+
+        $this->assertEquals(
+            'test Test en_US en http://test.com',
+            Antlers::parse('{{ site }}{{ handle }} {{ name }} {{ locale }} {{ short_locale }} {{ url }}{{ /site }}', ['site' => $site])
+        );
+        $this->assertEquals(
+            'test Test en_US en http://test.com',
+            Antlers::parse('{{ site:handle }} {{ site:name }} {{ site:locale }} {{ site:short_locale }} {{ site:url }}', ['site' => $site])
+        );
+    }
+
+    /** @test */
+    public function it_casts_the_handle_to_a_string()
+    {
+        $site = new Site('test', []);
+
+        $this->assertSame('test', (string) $site);
+        $this->assertEquals('test', Antlers::parse('{{ site }}', ['site' => $site]));
     }
 }

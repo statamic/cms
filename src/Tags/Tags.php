@@ -105,7 +105,7 @@ abstract class Tags
 
     public function setContext($context)
     {
-        $this->context = (new Context($context))->setParser($this->parser);
+        $this->context = new Context($context);
 
         return $this;
     }
@@ -150,7 +150,9 @@ abstract class Tags
         }
 
         return Antlers::usingParser($this->parser, function ($antlers) use ($data) {
-            return $antlers->parse($this->content, array_merge($this->context->all(), $data));
+            return $antlers
+                ->parse($this->content, array_merge($this->context->all(), $data))
+                ->withoutExtractions();
         });
     }
 
@@ -172,7 +174,9 @@ abstract class Tags
         }
 
         return Antlers::usingParser($this->parser, function ($antlers) use ($data, $supplement) {
-            return $antlers->parseLoop($this->content, $data, $supplement, $this->context->all());
+            return $antlers
+                ->parseLoop($this->content, $data, $supplement, $this->context->all())
+                ->withoutExtractions();
         });
     }
 

@@ -143,7 +143,7 @@ class Parser
      *
      * @param  string        $text      Text to parse
      * @param  array|object  $data      Array or object to use
-     * @return string
+     * @return AntlersString
      */
     public function parse($text, $data = [])
     {
@@ -182,7 +182,7 @@ class Parser
             $text = $this->parseCallbackTags($text, $data, null);
         }
 
-        return $text;
+        return new AntlersString($text, $this);
     }
 
     protected function normalizeData($data)
@@ -1045,7 +1045,7 @@ class Parser
      * @param  string $text The text to extract from
      * @return string
      */
-    protected function extractNoparse($text)
+    public function extractNoparse($text)
     {
         // Ignore @{{ tags }} so we don't have to write JavaScript like animals.
         if ($this->preg_match_all($this->ignoreRegex, $text, $matches, PREG_SET_ORDER)) {
@@ -1161,7 +1161,7 @@ class Parser
         }
 
         if ($data instanceof Value) {
-            $data = $data->parseUsing($this, $context)->value();
+            $data = $data->antlersValue($this, $context);
         }
 
         return $data;
@@ -1381,7 +1381,7 @@ class Parser
             return $data->value();
         }
 
-        $value = $data->parseUsing($this, $context)->value();
+        $value = $data->antlersValue($this, $context);
 
         if (Str::startsWith($modifier, ':')) {
             $parameters = array_map(function ($param) use ($context) {

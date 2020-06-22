@@ -338,13 +338,6 @@ class Form implements FormContract
         // return $this->formset()->get('date_format', 'M j, Y @ h:i');
     }
 
-    public function sanitize()
-    {
-        // TODO: This was a form.yaml config option?
-        // ie. formset()->get('sanitize', true)
-        return true;
-    }
-
     /**
      * Convert to an array.
      *
