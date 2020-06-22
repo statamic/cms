@@ -7,7 +7,7 @@
 }
 
 .replicator-set {
-    @apply mb-4 shadow-set rounded bg-white outline-none relative;
+    @apply mb-5 shadow-set rounded bg-white outline-none relative;
 }
 
 .replicator-set-header {
@@ -40,7 +40,7 @@
 
 .replicator-set-picker-between {
     @apply absolute bottom-0 w-full text-center;
-    margin-bottom: -35px;
+    margin-bottom: -32px;
 }
 
 // Extra contrast when full width
