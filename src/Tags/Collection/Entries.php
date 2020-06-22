@@ -154,10 +154,6 @@ class Entries
         $this->queryScopes($query);
         $this->queryOrderBys($query);
 
-        if ($this->parameters->has(['paginate', 'offset'])) {
-            $this->queryPaginationFriendlyOffset($query);
-        }
-
         return $query;
     }
 
@@ -364,17 +360,6 @@ class Entries
         if (! $this->parameters->bool(['redirects', 'links'], false)) {
             $query->where('redirect', '=', null);
         }
-    }
-
-    protected function queryPaginationFriendlyOffset($query)
-    {
-        $offsetIds = (clone $query)
-            ->limit($this->parameters->get('offset'))
-            ->get('id')
-            ->map->id()
-            ->all();
-
-        $this->queryNotInCondition($query, 'id', $offsetIds);
     }
 
     protected function queryableConditionParams()
