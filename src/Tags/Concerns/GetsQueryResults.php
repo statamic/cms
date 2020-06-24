@@ -6,33 +6,47 @@ trait GetsQueryResults
 {
     protected function results($query)
     {
-        $params = $this->parsePaginationParameters();
+        $this->setPaginationParameterPrecedence();
 
-        if ($paginate = $params['paginate']) {
-            return $query->paginate($paginate);
+        if ($paginate = $this->parameters->get('paginate')) {
+            return $this->paginatedResults($query, $paginate);
         }
 
-        if ($limit = $params['limit']) {
+        if ($limit = $this->parameters->get('limit')) {
             $query->limit($limit);
         }
 
-        if ($offset = $params['offset']) {
+        if ($offset = $this->parameters->get('offset')) {
             $query->offset($offset);
         }
 
         return $query->get();
     }
 
-    protected function parsePaginationParameters()
+    protected function setPaginationParameterPrecedence()
     {
-        $paginate = $this->parameters->get('paginate');
-        $limit = $this->parameters->get('limit');
-        $offset = $this->parameters->get('offset');
+        if ($this->parameters->get('paginate') === true) {
+            $this->parameters->put('paginate', $this->parameters->get('limit'));
+        }
+    }
 
-        if ($paginate === true) {
-            $paginate = $limit;
+    protected function paginatedResults($query, $perPage)
+    {
+        if ($offset = $this->parameters->get('offset')) {
+            $this->queryPaginationFriendlyOffset($query, $offset);
         }
 
-        return compact('paginate', 'limit', 'offset');
+        return $query->paginate($perPage);
+    }
+
+    protected function queryPaginationFriendlyOffset($query, $offset)
+    {
+        $offsetIds = (clone $query)
+            ->limit($offset)
+            ->get('id')
+            ->map->id()
+            ->all();
+
+        $query->whereNotin('id', $offsetIds);
     }
 }

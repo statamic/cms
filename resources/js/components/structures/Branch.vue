@@ -27,6 +27,7 @@
                     <slot name="branch-options"
                         :branch="page"
                         :depth="depth"
+                        :isRoot="isRoot"
                         :remove-branch="remove"
                         :orphan-children="orphanChildren"
                     />
