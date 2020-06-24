@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\StaticCaching\Cacher as StaticCacher;
+use Symfony\Component\Finder\Exception\DirectoryNotFoundException;
 
 class StaticClear extends Command
 {
@@ -31,7 +32,11 @@ class StaticClear extends Command
      */
     public function handle()
     {
-        app(StaticCacher::class)->flush();
+        try {
+            app(StaticCacher::class)->flush();
+        } catch (DirectoryNotFoundException $e) {
+            // Catch the exception but don't do anything with it
+        }
 
         $this->info('Your static page cache is now so very, very empty.');
     }
