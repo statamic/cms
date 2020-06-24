@@ -171,7 +171,6 @@ export default {
         runActionUrl: { type: String, required: true },
         bulkActionsUrl: { type: String, required: true },
         reorderUrl: { type: String, required: true },
-        blueprints: { type: Array, required: true },
         site: { type: String, required: true },
         structurePagesUrl: { type: String },
         structureSubmitUrl: { type: String },
