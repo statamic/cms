@@ -26,17 +26,6 @@ class Git extends Process
     }
 
     /**
-     * Git add.
-     *
-     * @param mixed $subPaths
-     * @return $this
-     */
-    public function add($subPaths)
-    {
-        return $this->runGitCommand('add', $subPaths);
-    }
-
-    /**
      * Git push.
      *
      * @return null

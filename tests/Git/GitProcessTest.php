@@ -107,53 +107,6 @@ EOT;
         $this->assertEquals($expectedCombinedStatus, Git::create($this->basePath('temp/content'))->status(['collections', 'taxonomies']));
     }
 
-    /**
-     * @group integration
-     * @test
-     */
-    public function it_can_git_add_all_files()
-    {
-        $this->files->put($this->basePath('temp/content/collections/pages.yaml'), 'title: Pages Title Changed');
-        $this->files->put($this->basePath('temp/content/collections/new.yaml'), 'title: New Collection');
-        $this->files->put($this->basePath('temp/content/taxonomies/topics.yaml'), 'title: Topics Title Changed');
-        $this->files->put($this->basePath('temp/content/unrelated.yaml'), 'title: Unrelated Content');
-        $this->files->put($this->basePath('temp/assets/statement.md'), 'Unrelated Content');
-
-        Git::create($this->basePath('temp/content'))->add('--all');
-
-        $expectedContentStatus = <<<'EOT'
-A  collections/new.yaml
-M  collections/pages.yaml
-M  taxonomies/topics.yaml
-A  unrelated.yaml
-EOT;
-
-        $this->assertEquals($expectedContentStatus, Git::create($this->basePath('temp/content'))->status());
-    }
-
-    /**
-     * @group integration
-     * @test
-     */
-    public function it_can_git_add_specific_paths()
-    {
-        $this->files->put($this->basePath('temp/content/collections/pages.yaml'), 'title: Pages Title Changed');
-        $this->files->put($this->basePath('temp/content/collections/new.yaml'), 'title: New Collection');
-        $this->files->put($this->basePath('temp/content/taxonomies/topics.yaml'), 'title: Topics Title Changed');
-        $this->files->put($this->basePath('temp/content/unrelated.yaml'), 'title: Unrelated Content');
-
-        Git::create($this->basePath('temp/content'))->add('collections');
-
-        $expectedContentStatus = <<<'EOT'
-A  collections/new.yaml
-M  collections/pages.yaml
- M taxonomies/topics.yaml
-?? unrelated.yaml
-EOT;
-
-        $this->assertEquals($expectedContentStatus, Git::create($this->basePath('temp/content'))->status());
-    }
-
     private function showLastCommit($path)
     {
         return Process::create($path)->run('git show');
