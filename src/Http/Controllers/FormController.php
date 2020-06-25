@@ -50,10 +50,7 @@ class FormController extends Controller
 
         if ($form->store()) {
             $submission->save();
-            event('Form.submission.saved', $submission); // TODO: Refactor for Spock v3
         }
-
-        event('Form.submission.created', $submission);
 
         return $this->formSuccess($params, $submission);
     }
