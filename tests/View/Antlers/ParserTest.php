@@ -78,10 +78,6 @@ before
 
 
 {{ /simple }}
-{{ associative[default_key] }}
-{{ associative[first_key][second_key] }}
-{{ associative['three'][second_key] }}
-{{ associative["three"][second_key] }}
 after
 EOT;
 
@@ -97,14 +93,17 @@ before
     last
 
 
-wilderness
-Very deep
-Very deep
-Very deep
 after
 EOT;
 
         $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+
+        $this->assertEquals('wilderness', Antlers::parse('{{ associative[default_key] }}', $this->variables));
+        $this->assertEquals('Very deep', Antlers::parse('{{ associative[first_key][second_key] }}', $this->variables));
+        $this->assertEquals('Very deep', Antlers::parse('{{ associative[\'three\'][second_key] }}', $this->variables));
+        $this->assertEquals('Very deep', Antlers::parse('{{ associative["three"][second_key] }}', $this->variables));
+        $this->assertEquals('Very deep', Antlers::parse('{{ associative.three[second_key] }}', $this->variables));
+        $this->assertEquals('Very deep', Antlers::parse('{{ associative:three[second_key] }}', $this->variables));
     }
 
     public function testComplexArrayVariable()
