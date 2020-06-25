@@ -982,7 +982,6 @@ class Parser
 
         $value = $this->getVariable($var, $this->conditionalData, '__processConditionVar__');
 
-
         // if the resulting value of a variable is a string that contains another variable,
         // let's find that variable's value as well
         if (is_string($value)) {
