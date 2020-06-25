@@ -196,6 +196,14 @@ EOT;
     }
 
     /** @test */
+    public function it_dispatches_commit_job()
+    {
+        $this->expectsJobs(\Statamic\Git\CommitJob::class);
+
+        Git::dispatchCommit();
+    }
+
+    /** @test */
     public function it_doesnt_push_by_default()
     {
         Git::shouldReceive('push')->never();
