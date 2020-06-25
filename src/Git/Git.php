@@ -66,6 +66,14 @@ class Git
     }
 
     /**
+     * Dispatch commit job to queue.
+     */
+    public function dispatchCommit($message = null)
+    {
+        CommitJob::dispatch($message);
+    }
+
+    /**
      * Git push all tracked content.
      */
     public function push()

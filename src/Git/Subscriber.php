@@ -74,7 +74,7 @@ class Subscriber
             return;
         }
 
-        Git::commit(
+        Git::dispatchCommit(
             method_exists($event, 'toSentence')
                 ? $event->toSentence()
                 : null

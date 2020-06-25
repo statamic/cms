@@ -362,6 +362,18 @@ class GitEventTest extends TestCase
         $folder->delete();
     }
 
+    /** @test */
+    public function it_dispatches_job_when_subscribed_event_is_fired()
+    {
+        Git::makePartial();
+
+        $this->expectsJobs(\Statamic\Git\CommitJob::class);
+
+        $blueprint = Facades\Blueprint::make('post');
+
+        $blueprint->save();
+    }
+
     private function uploadAsset()
     {
         Git::shouldReceive('commit')->with('Asset container saved.')->once();
