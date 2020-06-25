@@ -11,6 +11,6 @@ class NavSaved extends Saved
      */
     public function toSentence()
     {
-        return __(':item saved.', ['item' => 'Navigation']);
+        return __('Navigation saved.');
     }
 }

@@ -11,6 +11,6 @@ class AssetMoved extends Saved
      */
     public function toSentence()
     {
-        return __(':item moved.', ['item' => 'Asset']);
+        return __('Asset moved.');
     }
 }

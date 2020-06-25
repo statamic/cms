@@ -11,6 +11,6 @@ class NavDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __(':item deleted.', ['item' => 'Navigation']);
+        return __('Navigation deleted.');
     }
 }

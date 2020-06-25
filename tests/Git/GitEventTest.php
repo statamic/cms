@@ -89,15 +89,12 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_custom_addon_events_are_registered()
     {
-        Git::shouldReceive('dispatchCommit')->with(null)->once(); // JokeSaved doesn't define `toSentence()`.
-        Git::shouldReceive('dispatchCommit')->with('Pun saved.')->once(); // PunSaved extends our event with `toSentence()`.
+        Git::shouldReceive('dispatchCommit')->with('Pun saved.')->once();
         Git::makePartial();
 
-        Git::listen(JokeSaved::class);
         Git::listen(PunSaved::class);
 
         try {
-            JokeSaved::dispatch(new \stdClass);
             PunSaved::dispatch(new \stdClass);
         } catch (\Exception $exception) {
             // Not worried about other errors for the purpose of this test.
@@ -378,12 +375,10 @@ class GitEventTest extends TestCase
     }
 }
 
-class JokeSaved extends \Statamic\Events\Event
-{
-    //
-}
-
 class PunSaved extends \Statamic\Events\Data\Saved
 {
-    //
+    public function toSentence()
+    {
+        return __('Pun saved.');
+    }
 }

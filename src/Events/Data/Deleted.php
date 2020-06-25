@@ -3,7 +3,6 @@
 namespace Statamic\Events\Data;
 
 use Statamic\Events\Event;
-use Statamic\Support\Str;
 
 abstract class Deleted extends Event
 {
@@ -24,13 +23,5 @@ abstract class Deleted extends Event
      *
      * @return string
      */
-    public function toSentence()
-    {
-        $class = (new \ReflectionClass($this))->getShortName();
-
-        $noun = str_replace('Deleted', '', $class);
-        $noun = Str::snake($noun, ' ');
-
-        return __(':item deleted.', ['item' => ucfirst($noun)]);
-    }
+    abstract public function toSentence();
 }

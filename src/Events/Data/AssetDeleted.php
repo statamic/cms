@@ -11,6 +11,6 @@ class AssetDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __(':item deleted.', ['item' => 'Asset']);
+        return __('Asset deleted.');
     }
 }
