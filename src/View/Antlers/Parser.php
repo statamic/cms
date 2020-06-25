@@ -766,9 +766,6 @@ class Parser
      */
     public function processCondition($condition, $data, $isTagPair = true)
     {
-        // replace dynamic array keys with their actual values
-        $condition = $this->replaceDynamicArrayKeys($condition, $data);
-
         if (strpos($condition, ' | ') !== false) {
             $condition = str_replace(' | ', '|', $condition);
         }
@@ -803,7 +800,7 @@ class Parser
         // also pass in the current callback (for later processing callback tags); also setting
         // $ref so that we can use it within the anonymous function
         $ref = $this;
-        $condition = $this->preg_replace_callback('/\b('.$this->variableRegex.')\b/', function ($match) use ($ref) {
+        $condition = $this->preg_replace_callback('/(\b'.$this->variableRegex.'[\b\]])/', function ($match) use ($ref) {
             return $ref->processConditionVar($match);
         }, $condition);
 
@@ -967,7 +964,7 @@ class Parser
      */
     public function processConditionVar($match)
     {
-        $var = is_array($match) ? $match[0] : $match;
+        $var = trim(is_array($match) ? $match[0] : $match);
 
         if (in_array(strtolower($var), ['true', 'false', 'null', 'or', 'and']) or
             strpos($var, '__cond_str') === 0 or
@@ -984,6 +981,7 @@ class Parser
         $var = $this->injectExtractions($var, '__cond_callbacks');
 
         $value = $this->getVariable($var, $this->conditionalData, '__processConditionVar__');
+
 
         // if the resulting value of a variable is a string that contains another variable,
         // let's find that variable's value as well
@@ -1180,7 +1178,11 @@ class Parser
      */
     protected function getVariableExistenceAndValue($key, $context)
     {
-        $key = $this->replaceDynamicArrayKeys($key, $context);
+        try {
+            $key = $this->replaceDynamicArrayKeys($key, $context);
+        } catch (ArrayKeyNotFoundException $exception) {
+            return [false, null];
+        }
 
         // If the key exists in the context, great, we're done.
         if (Arr::has($context, $key)) {
@@ -1258,37 +1260,30 @@ class Parser
      *
      *      {{ old[key] }} or {{ if old[key] }} ...
      *
-     * Returns '__lex_no_value__' if the key could not be found.
-     *
      * @param string $key
      * @param array $context
+     * @throws ArrayKeyNotFoundException
      *
      * @return string
      */
     protected function replaceDynamicArrayKeys($key, $context)
     {
-        $key = trim($key);
-
         if (! Str::containsAll($key, ['[', ']'])) {
             return $key;
         }
 
-        try {
-            // If the key contains dynamic array keys, let's replace them with their actual value.
-            return $this->preg_replace_callback('/\[(.*)\]/', function ($matches) use ($context) {
-                $value = Arr::get($context, $matches[1]);
+        // If the key contains dynamic array keys, let's replace them with their actual value.
+        return trim($this->preg_replace_callback('/\[(.*)\]/', function ($matches) use ($context) {
+            $value = Arr::get($context, $matches[1]);
 
-                if (! $value) {
-                    // If the variable does not exist in the context the replacement should not
-                    // return a value to prevent unexpected behaviour.
-                    throw new ArrayKeyNotFoundException();
-                }
+            if (! (is_string($value) || is_numeric($value))) {
+                // If the variable does not exist in the context or the value is not a valid key
+                // the replacement should not return a value to prevent unexpected behaviour.
+                throw new ArrayKeyNotFoundException();
+            }
 
-                return '.'.$value;
-            }, $key);
-        } catch (ArrayKeyNotFoundException $exception) {
-            return Str::startsWith($key, '!') ? '!__lex_no_value__' : '__lex_no_value__';
-        }
+            return '.'.$value;
+        }, $key));
     }
 
     /**
