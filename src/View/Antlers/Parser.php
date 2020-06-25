@@ -1272,8 +1272,14 @@ class Parser
         }
 
         // If the key contains dynamic array keys, let's replace them with their actual value.
-        return trim($this->preg_replace_callback('/\[([\w\d-]*)\]/', function ($matches) use ($context) {
-            $value = Arr::get($context, $matches[1]);
+        return trim($this->preg_replace_callback('/\[([\'"\w\d-]*)\]/', function ($matches) use ($context) {
+            $key = $matches[1];
+
+            if ($this->isLiteralString($key)) {
+                return '.'.trim($key, '"\'');
+            }
+
+            $value = Arr::get($context, $key);
 
             if (! (is_string($value) || is_numeric($value))) {
                 // If the variable does not exist in the context or the value is not a valid key

@@ -46,7 +46,7 @@ class ParserTest extends TestCase
                 'one' => 'hello',
                 'two' => 'wilderness',
                 'three' => [
-                    'deep' => 'Very deep'
+                    'deep' => 'Very deep',
                 ]
             ],
             'date' => 'June 19 2012',
@@ -98,6 +98,8 @@ before
 
 
 wilderness
+Very deep
+Very deep
 Very deep
 after
 EOT;
