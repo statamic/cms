@@ -833,6 +833,7 @@ class Parser
         // next, the original re-processing callback
         $correct_regex = (strpos($condition, '(') === 0) ? $this->looseVariableRegex : $this->variableRegex;
 
+        $condition = $this->replaceDynamicArrayKeys($condition, $data);
         $condition = $this->preg_replace_callback('/\b('.$correct_regex.')\b/', [$this, 'processConditionVar'], $condition);
 
         // finally, replacing our placeholders with the original values
@@ -1181,6 +1182,8 @@ class Parser
             return [true, Arr::get($context, $key)];
         }
 
+        $key = $this->replaceDynamicArrayKeys($key, $context);
+
         // If there was no scope glue, there's nothing more we can check.
         if (! Str::contains($key, [':', '.'])) {
             return [false, null];
@@ -1239,6 +1242,41 @@ class Parser
         }
 
         return [false, null];
+    }
+
+    /**
+     * Replaces a dynamic array key access with the actual value.
+     *
+     * Example:
+     *
+     * The context contains a variable 'key' with the value 'foo' and there is an
+     * array 'old' containing a key 'foo'. The value of the array with the key 'foo'
+     * can be accessed using the variable 'key' like this inside the template:
+     *
+     *      {{ old[key] }} or {{ if old[key] }} ...
+     *
+     *
+     * @param $key
+     * @param $context
+     *
+     * @return string|string[]|null
+     */
+    protected function replaceDynamicArrayKeys($key, $context)
+    {
+        // If the key contains dynamic array keys, let's replace them with their actual value.
+        if (Str::contains($key, '[') && Str::contains($key, ']')) {
+            $key = $this->preg_replace_callback('/\[(.*)\]/', function ($matches) use ($context, $key) {
+                $subKey = $matches[1];
+
+                if (Arr::has($context, $subKey)) {
+                    return '.' . Arr::get($context, $subKey);
+                }
+
+                return $key;
+            }, $key);
+        }
+
+        return $key;
     }
 
     /**
