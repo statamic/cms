@@ -14,6 +14,7 @@ use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Config;
+use Statamic\Exceptions\ArrayKeyNotFoundException;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Ignition\Value as IgnitionViewValue;
@@ -1257,28 +1258,35 @@ class Parser
      *
      *      {{ old[key] }} or {{ if old[key] }} ...
      *
+     * Returns '__lex_no_value__' if the key could not be found.
      *
-     * @param $key
-     * @param $context
+     * @param string $key
+     * @param array $context
      *
-     * @return string|string[]|null
+     * @return string
      */
     protected function replaceDynamicArrayKeys($key, $context)
     {
-        // If the key contains dynamic array keys, let's replace them with their actual value.
-        if (Str::contains($key, '[') && Str::contains($key, ']')) {
-            $key = $this->preg_replace_callback('/\[(.*)\]/', function ($matches) use ($context, $key) {
-                $subKey = $matches[1];
-
-                if (Arr::has($context, $subKey)) {
-                    return '.' . Arr::get($context, $subKey);
-                }
-
-                return $key;
-            }, $key);
+        if (! Str::containsAll($key, ['[', ']'])) {
+            return $key;
         }
 
-        return $key;
+        try {
+            // If the key contains dynamic array keys, let's replace them with their actual value.
+            return $this->preg_replace_callback('/\[(.*)\]/', function ($matches) use ($context) {
+                $value = Arr::get($context, $matches[1]);
+
+                if (! $value) {
+                    // If the variable does not exist in the context the replacement should not
+                    // return a value to prevent unexpected behaviour.
+                    throw new ArrayKeyNotFoundException();
+                }
+
+                return '.'.$value;
+            }, $key);
+        } catch (ArrayKeyNotFoundException $exception) {
+            return '__lex_no_value__';
+        }
     }
 
     /**
