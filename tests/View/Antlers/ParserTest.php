@@ -1752,7 +1752,7 @@ EOT;
 
         $vars = [
             'string' => new Value('foo', 'string', $fieldtype),
-            'nully' => new Value(null, 'nully', $fieldtype)
+            'nully' => new Value(null, 'nully', $fieldtype),
         ];
 
         $this->assertEquals('true', Antlers::parse('{{ if string }}true{{ else }}false{{ /if }}', $vars));
