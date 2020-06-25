@@ -47,7 +47,7 @@ class ParserTest extends TestCase
                 'two' => 'wilderness',
                 'three' => [
                     'deep' => 'Very deep',
-                ]
+                ],
             ],
             'date' => 'June 19 2012',
             'content' => 'Paragraph',
