@@ -765,6 +765,9 @@ class Parser
      */
     public function processCondition($condition, $data, $isTagPair = true)
     {
+        // replace dynamic array keys with their actual values
+        $condition = $this->replaceDynamicArrayKeys($condition, $data);
+
         if (strpos($condition, ' | ') !== false) {
             $condition = str_replace(' | ', '|', $condition);
         }
@@ -833,7 +836,6 @@ class Parser
         // next, the original re-processing callback
         $correct_regex = (strpos($condition, '(') === 0) ? $this->looseVariableRegex : $this->variableRegex;
 
-        $condition = $this->replaceDynamicArrayKeys($condition, $data);
         $condition = $this->preg_replace_callback('/\b('.$correct_regex.')\b/', [$this, 'processConditionVar'], $condition);
 
         // finally, replacing our placeholders with the original values
@@ -1177,12 +1179,12 @@ class Parser
      */
     protected function getVariableExistenceAndValue($key, $context)
     {
+        $key = $this->replaceDynamicArrayKeys($key, $context);
+
         // If the key exists in the context, great, we're done.
         if (Arr::has($context, $key)) {
             return [true, Arr::get($context, $key)];
         }
-
-        $key = $this->replaceDynamicArrayKeys($key, $context);
 
         // If there was no scope glue, there's nothing more we can check.
         if (! Str::contains($key, [':', '.'])) {
