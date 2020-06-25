@@ -181,7 +181,7 @@ class Git
      */
     protected function ensureAbsolutePath($path)
     {
-        $absolute = Path::isAbsolute(Path::tidy($path), '/')
+        $absolute = Path::isAbsolute(Path::tidy($path))
             ? $path
             : base_path($path);
 
