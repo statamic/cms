@@ -51,9 +51,9 @@ return [
     | Git User
     |--------------------------------------------------------------------------
     |
-    | The git user that will be used when committing changes to your repo.
-    | By default, the currently authenticated user name and email will
-    | be used, otherwise it will fall back to the below user info.
+    | The git user that will be used when committing changes. By default, it
+    | will attempt to commit with the authenticated user's name and email
+    | when possible, falling back to the below user when not available.
     |
     */
 
