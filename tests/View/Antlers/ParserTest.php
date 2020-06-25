@@ -32,6 +32,7 @@ class ParserTest extends TestCase
         parent::setUp();
 
         $this->variables = [
+            'default_key' => 'two',
             'string' => 'Hello wilderness',
             'simple' => ['one', 'two', 'three'],
             'complex' => [
@@ -72,6 +73,7 @@ before
 
 
 {{ /simple }}
+{{ associative[default_key] }}
 after
 EOT;
 
@@ -87,6 +89,7 @@ before
     last
 
 
+wilderness
 after
 EOT;
 
@@ -312,6 +315,13 @@ EOT;
         $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
     }
 
+    public function testTernaryConditionWithDynamicArray()
+    {
+        $template = '{{ associative[default_key] ? "Pass" : "Fail" }}';
+
+        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
+    }
+
     public function testTernaryConditionIsntTooGreedy()
     {
         $template = '{{ content }} {{ string ? "Pass" : "Fail" }} {{ content }}';
@@ -331,6 +341,13 @@ EOT;
         $template = '{{ string ? string | upper : "Fail" }}';
 
         $this->assertEquals('HELLO WILDERNESS', Antlers::parse($template, $this->variables));
+    }
+
+    public function testTernaryConditionWithModifiersAndDynamicArray()
+    {
+        $template = '{{ string ? associative[default_key] | upper : "Fail" }}';
+
+        $this->assertEquals('WILDERNESS', Antlers::parse($template, $this->variables));
     }
 
     public function testTernaryConditionWithMultipleLines()
@@ -369,29 +386,42 @@ EOT;
         $this->assertEquals('Hello wilderness', Antlers::parse('{{ string or "Pass" }}', $this->variables));
         $this->assertEquals('Hello wilderness', Antlers::parse('{{ string ?: "Pass" }}', $this->variables));
         $this->assertEquals('Hello wilderness', Antlers::parse('{{ string ?? "Pass" }}', $this->variables));
+        $this->assertEquals('wilderness', Antlers::parse('{{ associative[default_key] or "Pass" }}', $this->variables));
+        $this->assertEquals('wilderness', Antlers::parse('{{ associative[default_key] ?: "Pass" }}', $this->variables));
+        $this->assertEquals('wilderness', Antlers::parse('{{ associative[default_key] ?? "Pass" }}', $this->variables));
+
         $this->assertEquals('Pass', Antlers::parse('{{ missing or "Pass" }}', $this->variables));
         $this->assertEquals('Pass', Antlers::parse('{{ missing ?: "Pass" }}', $this->variables));
         $this->assertEquals('Pass', Antlers::parse('{{ missing ?? "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ missing[thing] or "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ missing[thing] ?: "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ missing[thing] ?? "Pass" }}', $this->variables));
     }
 
     public function testTruthCoalescing()
     {
         $this->assertEquals('Pass', Antlers::parse('{{ string ?= "Pass" }}', $this->variables));
         $this->assertEquals('Pass', Antlers::parse('{{ associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ associative[default_key] ?= "Pass" }}', $this->variables));
         $this->assertEquals('', Antlers::parse('{{ missing ?= "Pass" }}', $this->variables));
         $this->assertEquals('', Antlers::parse('{{ missing:thing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', Antlers::parse('{{ missing[thing] ?= "Pass" }}', $this->variables));
 
         // Negating with !
         $this->assertEquals('', Antlers::parse('{{ !string ?= "Pass" }}', $this->variables));
         $this->assertEquals('', Antlers::parse('{{ !associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', Antlers::parse('{{ !associative[default_key] ?= "Pass" }}', $this->variables));
         $this->assertEquals('Pass', Antlers::parse('{{ !missing ?= "Pass" }}', $this->variables));
         $this->assertEquals('Pass', Antlers::parse('{{ !missing:thing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ !missing[thing] ?= "Pass" }}', $this->variables));
 
         // and with spaces
         $this->assertEquals('', Antlers::parse('{{ ! string ?= "Pass" }}', $this->variables));
         $this->assertEquals('', Antlers::parse('{{ ! associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', Antlers::parse('{{ ! associative[default_key] ?= "Pass" }}', $this->variables));
         $this->assertEquals('Pass', Antlers::parse('{{ ! missing ?= "Pass" }}', $this->variables));
         $this->assertEquals('Pass', Antlers::parse('{{ ! missing:thing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', Antlers::parse('{{ ! missing[thing] ?= "Pass" }}', $this->variables));
     }
 
     public function testTruthCoalescingInsideLoop()
@@ -1722,7 +1752,7 @@ EOT;
 
         $vars = [
             'string' => new Value('foo', 'string', $fieldtype),
-            'nully' => new Value(null, 'nully', $fieldtype),
+            'nully' => new Value(null, 'nully', $fieldtype)
         ];
 
         $this->assertEquals('true', Antlers::parse('{{ if string }}true{{ else }}false{{ /if }}', $vars));

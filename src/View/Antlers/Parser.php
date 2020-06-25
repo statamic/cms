@@ -1267,6 +1267,8 @@ class Parser
      */
     protected function replaceDynamicArrayKeys($key, $context)
     {
+        $key = trim($key);
+
         if (! Str::containsAll($key, ['[', ']'])) {
             return $key;
         }
@@ -1285,7 +1287,7 @@ class Parser
                 return '.'.$value;
             }, $key);
         } catch (ArrayKeyNotFoundException $exception) {
-            return '__lex_no_value__';
+            return Str::startsWith($key, '!') ? '!__lex_no_value__' : '__lex_no_value__';
         }
     }
 
