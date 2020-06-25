@@ -1272,7 +1272,7 @@ class Parser
         }
 
         // If the key contains dynamic array keys, let's replace them with their actual value.
-        return trim($this->preg_replace_callback('/\[(.*)\]/', function ($matches) use ($context) {
+        return trim($this->preg_replace_callback('/\[([\w\d-]*)\]/', function ($matches) use ($context) {
             $value = Arr::get($context, $matches[1]);
 
             if (! (is_string($value) || is_numeric($value))) {

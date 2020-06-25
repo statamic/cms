@@ -33,6 +33,8 @@ class ParserTest extends TestCase
 
         $this->variables = [
             'default_key' => 'two',
+            'first_key' => 'three',
+            'second_key' => 'deep',
             'string' => 'Hello wilderness',
             'simple' => ['one', 'two', 'three'],
             'complex' => [
@@ -43,6 +45,9 @@ class ParserTest extends TestCase
             'associative' => [
                 'one' => 'hello',
                 'two' => 'wilderness',
+                'three' => [
+                    'deep' => 'Very deep'
+                ]
             ],
             'date' => 'June 19 2012',
             'content' => 'Paragraph',
@@ -74,6 +79,9 @@ before
 
 {{ /simple }}
 {{ associative[default_key] }}
+{{ associative[first_key][second_key] }}
+{{ associative['three'][second_key] }}
+{{ associative["three"][second_key] }}
 after
 EOT;
 
@@ -90,6 +98,7 @@ before
 
 
 wilderness
+Very deep
 after
 EOT;
 
