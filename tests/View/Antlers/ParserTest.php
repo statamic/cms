@@ -354,7 +354,7 @@ EOT;
 
     public function testTernaryConditionInsideParameter()
     {
-        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+        $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
 
         $template = "{{ test variable='{{ true ? 'Hello wilderness' : 'fail' }}' }}";
 
@@ -495,7 +495,7 @@ EOT;
     public function testTagsWithCurliesInParamsGetsParsed()
     {
         // the variables are inside Test@index
-        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+        $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
 
         $template = "{{ test variable='{string}' }}";
 
@@ -519,7 +519,7 @@ EOT;
     public function testRecursiveChildren()
     {
         // the variables are inside RecursiveChildren@index
-        $this->app['statamic.tags']['recursive_children'] = \Foo\Bar\Tags\RecursiveChildren::class;
+        $this->app['statamic.tags']['recursive_children'] = \Tests\Fixtures\Addon\Tags\RecursiveChildren::class;
 
         $template = '<ul>{{ recursive_children }}<li>{{ title }}{{ if children }}<ul>{{ *recursive children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
 
@@ -531,7 +531,7 @@ EOT;
     public function testRecursiveChildrenWithScope()
     {
         // the variables are inside RecursiveChildren@index
-        $this->app['statamic.tags']['recursive_children'] = \Foo\Bar\Tags\RecursiveChildren::class;
+        $this->app['statamic.tags']['recursive_children'] = \Tests\Fixtures\Addon\Tags\RecursiveChildren::class;
 
         $template = '<ul>{{ recursive_children scope="item" }}<li>{{ item:title }}{{ if item:children }}<ul>{{ *recursive item:children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
 
@@ -563,7 +563,7 @@ EOT;
     public function testEmptyValuesAreNotOverriddenByPreviousIterationWithParsing()
     {
         // the variables are inside Test@some_parsing
-        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+        $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
 
         $variables = [
             'loop' => [
@@ -695,7 +695,7 @@ EOT;
     /** @test */
     public function it_doesnt_parse_data_in_noparse_modifiers_inside_callbacks()
     {
-        $this->app['statamic.tags']['test'] = \Foo\Bar\Tags\Test::class;
+        $this->app['statamic.tags']['test'] = \Tests\Fixtures\Addon\Tags\Test::class;
 
         (new class extends Tags {
             public static $handle = 'tag';
