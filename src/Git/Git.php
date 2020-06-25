@@ -70,7 +70,12 @@ class Git
      */
     public function dispatchCommit($message = null)
     {
-        CommitJob::dispatch($message);
+        if ($delay = config('statamic.git.dispatch_delay')) {
+            $delayInMinutes = now()->addMinutes($delay);
+            $message = null;
+        }
+
+        CommitJob::dispatch($message)->delay($delayInMinutes ?? null);
     }
 
     /**

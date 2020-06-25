@@ -22,13 +22,27 @@ return [
     | Automatically Run
     |--------------------------------------------------------------------------
     |
-    | By default, git will automatically commit when `Saved` or `Deleted`
-    | events are fired. If you prefer users to manually trigger git
-    | commits using the `Git` utility GUI, set this to `false`.
+    | By default, commits are automatically queued when `Saved` or `Deleted`
+    | events are fired. If you prefer users to manually trigger commits
+    | using the `Git` utility interface, you may set this to `false`.
     |
     */
 
     'automatic' => env('STATAMIC_GIT_AUTOMATIC', true),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Dispatch Delay
+    |--------------------------------------------------------------------------
+    |
+    | When `Saved` and `Deleted` events queue up commits, you may wish to
+    | set a delay time in minutes for each queued job. This can allow
+    | for more consolidated commits when you have multiple users
+    | making simultaneous content changes to your repository.
+    |
+    */
+
+    'dispatch_delay' => env('STATAMIC_GIT_DISPATCH_DELAY', 0),
 
     /*
     |--------------------------------------------------------------------------
@@ -91,7 +105,7 @@ return [
     |--------------------------------------------------------------------------
     |
     | Determine whether `git push` should be run after the commands above
-    | have finished.  This is disabled by default, but can be enabled
+    | have finished. This is disabled by default, but can be enabled
     | globally, or per environment using the provided variable.
     |
     */
