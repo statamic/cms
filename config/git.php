@@ -40,6 +40,8 @@ return [
     | for more consolidated commits when you have multiple users
     | making simultaneous content changes to your repository.
     |
+    | Note: Not supported by default `sync` queue driver.
+    |
     */
 
     'dispatch_delay' => env('STATAMIC_GIT_DISPATCH_DELAY', 0),
