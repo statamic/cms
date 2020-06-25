@@ -11,6 +11,7 @@ class Nav
 {
     protected $items = [];
     protected $extensions = [];
+    protected $built;
 
     /**
      * Register a nav extension closure.
@@ -100,7 +101,11 @@ class Nav
      */
     public function build()
     {
-        return $this
+        if ($this->built) {
+            return $this->built;
+        }
+
+        return $this->built = $this
             ->makeDefaultItems()
             ->buildExtensions()
             ->buildChildren()
