@@ -11,7 +11,7 @@ class Structure extends Tags
 {
     public function wildcard($tag)
     {
-        $handle = $this->context->get($tag, $tag);
+        $handle = $this->context->value($tag, $tag);
 
         // Allow {{ structure:collection:pages }} rather than needing to use the double colon.
         if (is_string($handle)) {
