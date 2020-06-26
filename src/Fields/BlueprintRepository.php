@@ -37,6 +37,7 @@ class BlueprintRepository
 
         if ($cached = array_get($this->blueprints, $handle)) {
             event(new BlueprintFoundOnFile($cached));
+
             return $cached;
         }
 
