@@ -43,7 +43,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_all_parameters()
+    public function it_gets_all_items()
     {
         $this->assertSame([
             'string' => 'hello',
@@ -99,7 +99,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_values()
+    public function it_gets_an_augmented_value()
     {
         $this->assertSame('hello', $this->context->value('string'));
         $this->assertSame('augmented foo', $this->context->value('value'));
