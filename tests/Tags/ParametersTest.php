@@ -2,7 +2,7 @@
 
 namespace Tests\Tags;
 
-use Statamic\Fields\Fieldtype;
+use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
@@ -21,6 +21,13 @@ class ParametersTest extends TestCase
             ],
         ]);
 
+        $fieldtype = new class extends \Statamic\Fields\Fieldtype {
+            public function augment($value)
+            {
+                return 'augmented '.$value;
+            }
+        };
+
         $this->params = Parameters::make([
             'string' => 'hello',
             'array' => ['one', 'two'],
@@ -35,6 +42,17 @@ class ParametersTest extends TestCase
             'truthy' => 'true',
             'falsey' => 'false',
             'list' => 'one|two',
+            'value' => $this->value = new Value('foo', 'value', $fieldtype),
+            'antlersValue' => $this->antlersValue = new Value(
+                'parse {{ string }} antlers',
+                'antlersValue',
+                (clone $fieldtype)->setField(new Field('antlersValue', ['antlers' => true]))
+            ),
+            'nonAntlersValue' => $this->nonAntlersValue = new Value(
+                'dont parse {{ string }} antlers',
+                'nonAntlersValue',
+                (clone $fieldtype)->setField(new Field('nonAntlersValue', ['antlers' => false]))
+            ),
         ], $context);
     }
 
@@ -55,6 +73,9 @@ class ParametersTest extends TestCase
             'truthy' => true,
             'falsey' => false,
             'list' => 'one|two',
+            'value' => 'augmented foo',
+            'antlersValue' => 'augmented parse {{ string }} antlers',
+            'nonAntlersValue' => 'augmented dont parse {{ string }} antlers',
         ], $this->params->all());
     }
 
@@ -72,19 +93,9 @@ class ParametersTest extends TestCase
         $this->assertEquals(true, $this->params->get('truthy'));
         $this->assertEquals(false, $this->params->get('falsey'));
         $this->assertEquals('one|two', $this->params->get('list'));
-    }
-
-    /** @test */
-    public function it_gets_a_value_objects_value()
-    {
-        $fieldtype = $this->partialMock(Fieldtype::class);
-        $fieldtype->shouldReceive('augment')->with('the raw value')->andReturn('the augmented value');
-        $value = new Value('the raw value', 'test', $fieldtype);
-
-        $params = Parameters::make(['test' => $value], new Context);
-
-        $this->assertIsString($params->get('test'));
-        $this->assertSame('the augmented value', $params->get('test'));
+        $this->assertSame('augmented foo', $this->params->get('value'));
+        $this->assertSame('augmented parse {{ string }} antlers', $this->params->get('antlersValue'));
+        $this->assertSame('augmented dont parse {{ string }} antlers', $this->params->get('nonAntlersValue'));
     }
 
     /** @test */
@@ -197,6 +208,9 @@ class ParametersTest extends TestCase
             'truthy' => true,
             'falsey' => false,
             'list' => 'one|two',
+            'value' => 'augmented foo',
+            'antlersValue' => 'augmented parse {{ string }} antlers',
+            'nonAntlersValue' => 'augmented dont parse {{ string }} antlers',
         ];
 
         $actual = [];
