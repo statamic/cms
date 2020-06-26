@@ -3,6 +3,7 @@
 namespace Statamic\Fields;
 
 use Illuminate\Support\Collection;
+use Statamic\Events\Data\BlueprintFoundOnFile;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
@@ -35,6 +36,7 @@ class BlueprintRepository
         }
 
         if ($cached = array_get($this->blueprints, $handle)) {
+            event(new BlueprintFoundOnFile($cached));
             return $cached;
         }
 
@@ -47,6 +49,8 @@ class BlueprintRepository
         $blueprint = (new Blueprint)
             ->setHandle($handle)
             ->setContents(YAML::parse(File::get($path)));
+
+        event(new BlueprintFoundOnFile($blueprint));
 
         $this->blueprints[$handle] = $blueprint;
 
