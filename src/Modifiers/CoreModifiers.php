@@ -1716,6 +1716,21 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Strip whitespace from HTML.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function spaceless($value, $params)
+    {
+        $nolb = str_replace(["\r", "\n"], '', $value);
+        $nospaces = preg_replace('/\s+/', ' ', $nolb);
+
+        return preg_replace('/>\s+</', '><', $nospaces);
+    }
+
+    /**
      * Returns true if the string starts with a given substring ($params[0]), false otherwise.
      * The comparison is case-insensitive.
      *
