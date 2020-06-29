@@ -31,7 +31,6 @@
         "fzaninotto/faker": "~1.4",
         "google/cloud-translate": "^1.6",
         "mockery/mockery": "~1.0",
-        "nunomaduro/collision": "3.0 || ^4.1",
         "orchestra/testbench": "^4.0 || ^5.0"
     },
     "config": {
