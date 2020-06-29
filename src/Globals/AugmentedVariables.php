@@ -10,4 +10,11 @@ class AugmentedVariables extends AbstractAugmented
     {
         return $this->data->values()->keys()->all();
     }
+
+    public function site()
+    {
+        if ($site = $this->data->value('site')) {
+            return $this->wrapValue($site, 'site');
+        }
+    }
 }
