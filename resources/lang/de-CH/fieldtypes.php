@@ -72,11 +72,11 @@ return [
     'select.config.searchable' => 'Die Suche durch verfügbare Optionen aktivieren.',
     'select.config.taggable' => 'Das Hinzufügen neuer Optionen zusätzlich zu den vordefinierten zulassen.',
     'template.config.hide_partials' => 'Partials sind selten als Templates vorgesehen.',
-    'text.config.append' => 'Zusätzlichen Text rechts vom eigentlichen Text voranstellen.',
+    'text.config.append' => 'Zusätzlichen Text rechts vom eigentlichen Text anhängen.',
     'text.config.character_limit' => 'Maximale Anzahl der möglichen Zeichen festlegen.',
     'text.config.input_type' => 'HTML5 Inputtyp festlegen.',
     'text.config.placeholder' => 'Standard-Platzhaltertext festlegen.',
-    'text.config.prepend' => 'Zusätzlichen Text links vom eigentlichen Text anhängen.',
+    'text.config.prepend' => 'Zusätzlichen Text links vom eigentlichen Text voranstellen.',
     'textarea.config.character_limit' => 'Maximale Anzahl der möglichen Zeichen festlegen.',
     'relationship.config.mode' => 'Bevorzugten UI Stil auswählen.',
 ];
