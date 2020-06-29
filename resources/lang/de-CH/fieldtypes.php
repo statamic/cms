@@ -51,7 +51,7 @@ return [
     'markdown.config.automatic_line_breaks' => 'Aktiviert automatische Zeilenumbrüche.',
     'markdown.config.automatic_links' => 'Aktiviert die automatische Verlinkung beliebiger URLs.',
     'markdown.config.container' => 'Datei-Container für dieses Feld auswählen.',
-    'markdown.config.escape_markup' => 'Entfernt Inline-HTML-Auszeichnung (z.B. `<div>` to `&lt;div&gt;`).',
+    'markdown.config.escape_markup' => 'Entfernt Inline-HTML-Auszeichnung (z.B. `<div>` zu `&lt;div&gt;`).',
     'markdown.config.folder' => 'In diesem Ordner soll das Durchsuchen der Dateien beginnen.',
     'markdown.config.parser' => 'Der Name eines benutzerdefinierten Markdown-Parser. Für die Standardeinstellung Feld leer lassen.',
     'markdown.config.restrict' => 'Verhindern, dass Benutzer*innen zu anderen Ordnern navigieren können.',
