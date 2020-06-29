@@ -17,6 +17,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -2273,9 +2274,11 @@ class CoreModifiers extends Modifier
 
         // If the number is already a number, use that. Otherwise, attempt to resolve it
         // from a value in the context. This allows users to specify a variable name.
-        return (is_numeric($number))
+        $number = (is_numeric($number))
             ? $number
-            : Arr::get($context, $number, $number)->value() ?? Arr::get($context, $number, $number);
+            : Arr::get($context, $number, $number);
+
+        return ($number instanceof Value) ? $number->value() : $number;
     }
 
     private function carbon($value)
