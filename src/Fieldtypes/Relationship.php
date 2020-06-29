@@ -237,7 +237,7 @@ abstract class Relationship extends Fieldtype
             return $this->augmentValue($value);
         });
 
-        $values = $values->map(function ($value) {
+        $values = $values->filter()->map(function ($value) {
             return $this->shallowAugmentValue($value);
         });
 
