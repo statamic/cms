@@ -2096,7 +2096,9 @@ class CoreModifiers extends Modifier
             $value = Arr::get($value, 0);
         }
 
-        return optional(Data::find($value))->url();
+        $item = is_string($value) ? optional(Data::find($value)) : $value;
+
+        return $item->url();
     }
 
     /**
