@@ -11,6 +11,11 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class AssetContainersController extends CpController
 {
+    public function show($container)
+    {
+        return redirect()->cpRoute('assets.browse.show', $container->handle());
+    }
+
     public function index(Request $request)
     {
         $containers = AssetContainer::all()->filter(function ($container) {
