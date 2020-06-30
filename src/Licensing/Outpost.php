@@ -12,7 +12,7 @@ use Statamic\Statamic;
 
 class Outpost
 {
-    const ENDPOINT = 'https://outpost.statamic.test/v3/query';
+    const ENDPOINT = 'https://outpost.statamic.com/v3/query';
     const REQUEST_TIMEOUT = 5;
     const CACHE_KEY = 'statamic.outpost.response';
 
@@ -60,7 +60,6 @@ class Outpost
             'headers' => ['accept' => 'application/json'],
             'json' => $this->payload(),
             'timeout' => self::REQUEST_TIMEOUT,
-            'verify' => false,
         ]);
 
         return json_decode($response->getBody()->getContents(), true);
