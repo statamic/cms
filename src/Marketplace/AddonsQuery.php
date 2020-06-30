@@ -46,7 +46,7 @@ class AddonsQuery
 
         if ($this->installed) {
             if ($installed->isEmpty()) {
-                return collect();
+                return ['data' => [], 'meta' => ['total' => 0, 'per_page' => 15]];
             }
 
             $params['filter']['products'] = $installed->join(',');
