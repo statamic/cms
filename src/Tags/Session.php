@@ -6,7 +6,11 @@ class Session extends Tags
 {
     public function wildcard($tag)
     {
-        return session()->get($tag, $this->params->get('default'));
+        $key = $this->context->value($tag, $tag);
+
+        $key = str_replace(':', '.', $key);
+
+        return session()->get($key, $this->params->get('default'));
     }
 
     public function index()
@@ -17,6 +21,15 @@ class Session extends Tags
     public function dump()
     {
         dump(session()->all());
+    }
+
+    public function value()
+    {
+        $key = $this->params->get('key');
+
+        $key = str_replace(':', '.', $key);
+
+        return session()->get($key, $this->params->get('default'));
     }
 
     public function set()

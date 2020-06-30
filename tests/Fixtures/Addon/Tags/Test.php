@@ -1,6 +1,6 @@
 <?php
 
-namespace Foo\Bar\Tags;
+namespace Tests\Fixtures\Addon\Tags;
 
 use Statamic\Tags\Tags;
 

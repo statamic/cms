@@ -48,6 +48,7 @@ class Entries extends Relationship
             'collections' => [
                 'display' => __('Collections'),
                 'type' => 'collections',
+                'mode' => 'select',
             ],
         ]);
     }

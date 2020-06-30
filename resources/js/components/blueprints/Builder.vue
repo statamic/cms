@@ -37,7 +37,6 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
 import Sections from './Sections.vue';
 
 export default {

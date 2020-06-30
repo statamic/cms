@@ -17,6 +17,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -1716,6 +1717,21 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Strip whitespace from HTML.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function spaceless($value, $params)
+    {
+        $nolb = str_replace(["\r", "\n"], '', $value);
+        $nospaces = preg_replace('/\s+/', ' ', $nolb);
+
+        return preg_replace('/>\s+</', '><', $nospaces);
+    }
+
+    /**
      * Returns true if the string starts with a given substring ($params[0]), false otherwise.
      * The comparison is case-insensitive.
      *
@@ -2080,7 +2096,9 @@ class CoreModifiers extends Modifier
             $value = Arr::get($value, 0);
         }
 
-        return optional(Data::find($value))->url();
+        $item = is_string($value) ? optional(Data::find($value)) : $value;
+
+        return $item->url();
     }
 
     /**
@@ -2258,9 +2276,11 @@ class CoreModifiers extends Modifier
 
         // If the number is already a number, use that. Otherwise, attempt to resolve it
         // from a value in the context. This allows users to specify a variable name.
-        return (is_numeric($number))
+        $number = (is_numeric($number))
             ? $number
-            : Arr::get($context, $number, $number)->value() ?? Arr::get($context, $number, $number);
+            : Arr::get($context, $number, $number);
+
+        return ($number instanceof Value) ? $number->value() : $number;
     }
 
     private function carbon($value)

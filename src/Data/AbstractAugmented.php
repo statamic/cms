@@ -72,7 +72,7 @@ abstract class AbstractAugmented implements Augmented
         return $value;
     }
 
-    private function wrapValue($value, $handle)
+    protected function wrapValue($value, $handle)
     {
         $fields = $this->blueprintFields();
 

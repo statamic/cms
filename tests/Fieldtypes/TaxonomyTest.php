@@ -109,6 +109,24 @@ class TaxonomyTest extends TestCase
         ], $augmented->toArray());
     }
 
+    /** @test */
+    public function it_can_be_configured_with_either_taxonomy_or_taxonomies()
+    {
+        $this->assertEquals(['tags'], $this->fieldtype(['taxonomy' => 'tags'])->taxonomies());
+        $this->assertEquals(['tags'], $this->fieldtype(['taxonomies' => 'tags'])->taxonomies());
+
+        $this->assertEquals(['tags', 'categories'], $this->fieldtype(['taxonomy' => ['tags', 'categories']])->taxonomies());
+        $this->assertEquals(['tags', 'categories'], $this->fieldtype(['taxonomies' => ['tags', 'categories']])->taxonomies());
+    }
+
+    /** @test */
+    public function using_both_taxonomy_and_taxonomies_throws_an_exception()
+    {
+        $this->expectExceptionMessage('A taxonomy fieldtype cannot define both "taxonomy" and "taxonomies". Use one or the other.');
+
+        $this->fieldtype(['taxonomy' => 'categories', 'taxonomies' => 'tags'])->taxonomies();
+    }
+
     public function fieldtype($config = [])
     {
         $field = new Field('test', array_merge([

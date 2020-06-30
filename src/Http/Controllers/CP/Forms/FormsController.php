@@ -172,6 +172,7 @@ class FormsController extends CpController
                         'type' => 'blueprints',
                         'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
                         'max_items' => 1,
+                        'mode' => 'select',
                     ],
                     'honeypot' => [
                         'type' => 'text',

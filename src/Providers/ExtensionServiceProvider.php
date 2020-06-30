@@ -5,54 +5,28 @@ namespace Statamic\Providers;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Actions;
+use Statamic\Actions\Action;
 use Statamic\Extend\Manifest;
+use Statamic\Fields\Fieldtype;
 use Statamic\Fieldtypes;
 use Statamic\Modifiers\CoreModifiers;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes;
+use Statamic\Query\Scopes\Scope;
+use Statamic\Support\Str;
 use Statamic\Tags;
+use Statamic\Widgets;
+use Statamic\Widgets\Widget;
 
 class ExtensionServiceProvider extends ServiceProvider
 {
-    /**
-     * Aliases for modifiers bundled with Statamic.
-     *
-     * @var array
-     */
-    protected $bundledModifierAliases = [
-        '+' => 'add',
-        '-' => 'subtract',
-        '*' => 'multiply',
-        '/' => 'divide',
-        '%' => 'mod',
-        '^' => 'exponent',
-        'ago' => 'relative',
-        'until' => 'relative',
-        'since' => 'relative',
-        'specialchars' => 'sanitize',
-        'htmlspecialchars' => 'sanitize',
-        'striptags' => 'stripTags',
-        'join' => 'joinplode',
-        'implode' => 'joinplode',
-        'list' => 'joinplode',
-        'piped' => 'optionList',
-        'json' => 'toJson',
-        'email' => 'obfuscateEmail',
-        'l10n' => 'formatLocalized',
-        'lowercase' => 'lower',
-        'tz' => 'timezone',
-        'inFuture' => 'isFuture',
-        'inPast' => 'isPast',
-        'as' => 'alias',
-    ];
-
-    /**
-     * Widgets bundled with Statamic.
-     *
-     * @var array
-     */
-    protected $bundledWidgets = [
-        'getting-started', 'collection', 'template', 'updater', 'form',
+    protected $actions = [
+        Actions\Delete::class,
+        Actions\Publish::class,
+        Actions\Unpublish::class,
+        Actions\SendPasswordReset::class,
+        Actions\MoveAsset::class,
+        Actions\RenameAsset::class,
     ];
 
     protected $fieldtypes = [
@@ -104,6 +78,43 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Video::class,
         Fieldtypes\Yaml::class,
         \Statamic\Forms\Fieldtype::class,
+    ];
+
+    protected $modifierAliases = [
+        '+' => 'add',
+        '-' => 'subtract',
+        '*' => 'multiply',
+        '/' => 'divide',
+        '%' => 'mod',
+        '^' => 'exponent',
+        'ago' => 'relative',
+        'until' => 'relative',
+        'since' => 'relative',
+        'specialchars' => 'sanitize',
+        'htmlspecialchars' => 'sanitize',
+        'striptags' => 'stripTags',
+        'join' => 'joinplode',
+        'implode' => 'joinplode',
+        'list' => 'joinplode',
+        'piped' => 'optionList',
+        'json' => 'toJson',
+        'email' => 'obfuscateEmail',
+        'l10n' => 'formatLocalized',
+        'lowercase' => 'lower',
+        'tz' => 'timezone',
+        'inFuture' => 'isFuture',
+        'inPast' => 'isPast',
+        'as' => 'alias',
+    ];
+
+    protected $scopes = [
+        Scopes\Filters\Fields::class,
+        Scopes\Filters\Blueprint::class,
+        Scopes\Filters\Status::class,
+        Scopes\Filters\Site::class,
+        Scopes\Filters\UserRole::class,
+        Scopes\Filters\UserGroup::class,
+        Scopes\Filters\Collection::class,
     ];
 
     protected $tags = [
@@ -158,229 +169,90 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Search\Tags::class,
     ];
 
-    /**
-     * Register any application services.
-     *
-     * @return void
-     */
+    protected $widgets = [
+        Widgets\Collection::class,
+        Widgets\GettingStarted::class,
+        Widgets\Header::class,
+        Widgets\Template::class,
+        Widgets\Updater::class,
+        \Statamic\Forms\Widget::class,
+    ];
+
     public function register()
+    {
+        $this->registerExtensions();
+        $this->registerAddonManifest();
+    }
+
+    protected function registerAddonManifest()
     {
         $this->app->instance(Manifest::class, new Manifest(
             new Filesystem,
             $this->app->basePath(),
             $this->app->bootstrapPath().'/cache/addons.php'
         ));
-
-        $this->registerTags();
-        $this->registerModifiers();
-        $this->registerFieldtypes();
-        $this->registerScopes();
-        $this->registerActions();
-        $this->registerWidgets();
     }
 
-    /**
-     * Register tags.
-     *
-     * @return void
-     */
-    protected function registerTags()
+    protected function registerExtensions()
     {
-        $parent = 'statamic.tags';
+        $this->app->instance('statamic.extensions', collect());
 
-        $this->registerParent($parent);
-
-        foreach ($this->tags as $tag) {
-            $this->registerExtension($tag, $parent);
-            $this->registerAliases($tag, $parent);
-        }
-
-        $this->registerExtensionsInAppFolder('Tags', \Statamic\Tags\Tags::class);
-    }
-
-    /**
-     * Register modifiers.
-     *
-     * @return void
-     */
-    protected function registerModifiers()
-    {
-        $parent = 'statamic.modifiers';
-
-        $this->registerParent($parent);
-        $this->registerBundledModifiers($parent);
-        $this->registerExtensionsInAppFolder('Modifiers', \Statamic\Modifiers\Modifier::class);
-    }
-
-    /**
-     * Register bundled modifiers.
-     *
-     * @param string $parent
-     * @return void
-     */
-    protected function registerBundledModifiers($parent)
-    {
-        $methods = array_diff(
-            get_class_methods(CoreModifiers::class),
-            get_class_methods(Modifier::class)
-        );
-
-        foreach ($methods as $method) {
-            $this->app[$parent][$method] = "Statamic\\Modifiers\\CoreModifiers@{$method}";
-        }
-
-        foreach ($this->bundledModifierAliases as $alias => $actual) {
-            $this->app[$parent][$alias] = "Statamic\\Modifiers\\CoreModifiers@{$actual}";
-        }
-    }
-
-    /**
-     * Register fieldtypes.
-     *
-     * @return void
-     */
-    protected function registerFieldtypes()
-    {
-        $parent = 'statamic.fieldtypes';
-
-        $this->registerParent($parent);
-
-        foreach ($this->fieldtypes as $fieldtype) {
-            $this->registerExtension($fieldtype, $parent);
-        }
-
-        $this->registerExtensionsInAppFolder('Fieldtypes', \Statamic\Fields\Fieldtype::class);
-    }
-
-    /**
-     * Register scopes.
-     *
-     * @return void
-     */
-    protected function registerScopes()
-    {
-        $parent = 'statamic.scopes';
-
-        $scopes = [
-            Scopes\Filters\Fields::class,
-            Scopes\Filters\Blueprint::class,
-            Scopes\Filters\Status::class,
-            Scopes\Filters\Site::class,
-            Scopes\Filters\UserRole::class,
-            Scopes\Filters\UserGroup::class,
-            Scopes\Filters\Collection::class,
+        $types = [
+            'actions' => [
+                'class' => Action::class,
+                'directory' => 'Actions',
+                'extensions' => $this->actions,
+            ],
+            'fieldtypes' => [
+                'class' => Fieldtype::class,
+                'directory' => 'Fieldtypes',
+                'extensions' => $this->fieldtypes,
+            ],
+            'modifiers' => [
+                'class' => Modifier::class,
+                'directory' => 'Modifiers',
+            ],
+            'scopes' => [
+                'class' => Scope::class,
+                'directory' => 'Scopes',
+                'extensions' => $this->scopes,
+            ],
+            'tags' => [
+                'class' => Tags\Tags::class,
+                'directory' => 'Tags',
+                'extensions' => $this->tags,
+            ],
+            'widgets' => [
+                'class' => Widget::class,
+                'directory' => 'Widgets',
+                'extensions' => $this->widgets,
+            ],
         ];
 
-        $this->registerParent($parent);
-
-        foreach ($scopes as $scope) {
-            $this->registerExtension($scope, $parent);
+        foreach ($types as $key => $type) {
+            $this->registerBindingAlias($key, $type['class']);
+            $this->registerCoreExtensions($type['extensions'] ?? []);
+            $this->registerAppExtensions($type['directory'], $type['class']);
         }
 
-        $this->registerExtensionsInAppFolder('Scopes', \Statamic\Query\Scopes\Scope::class);
+        $this->registerCoreModifiers();
     }
 
-    /**
-     * Register actions.
-     *
-     * @return void
-     */
-    protected function registerActions()
+    protected function registerBindingAlias($key, $class)
     {
-        $parent = 'statamic.actions';
-
-        $actions = [
-            Actions\Delete::class,
-            Actions\Publish::class,
-            Actions\Unpublish::class,
-            Actions\SendPasswordReset::class,
-            Actions\MoveAsset::class,
-            Actions\RenameAsset::class,
-        ];
-
-        $this->registerParent($parent);
-
-        foreach ($actions as $action) {
-            $this->registerExtension($action, $parent);
-        }
-
-        $this->registerExtensionsInAppFolder('Actions', \Statamic\Actions\Action::class);
+        return $this->app->bind('statamic.'.$key, function ($app) use ($class) {
+            return $app['statamic.extensions'][$class];
+        });
     }
 
-    /**
-     * Register widgets.
-     *
-     * @return void
-     */
-    protected function registerWidgets()
+    protected function registerCoreExtensions($extensions)
     {
-        $parent = 'statamic.widgets';
-
-        $widgets = [
-            \Statamic\Widgets\Collection::class,
-            \Statamic\Widgets\GettingStarted::class,
-            \Statamic\Widgets\Header::class,
-            \Statamic\Widgets\Template::class,
-            \Statamic\Widgets\Updater::class,
-            \Statamic\Forms\Widget::class,
-        ];
-
-        $this->registerParent($parent);
-
-        foreach ($widgets as $widget) {
-            $this->registerExtension($widget, $parent);
-        }
-
-        $this->registerExtensionsInAppFolder('Widgets', \Statamic\Widgets\Widget::class);
-    }
-
-    /**
-     * Register parent.
-     *
-     * @param string $parent
-     * @return void
-     */
-    protected function registerParent($parent)
-    {
-        $this->app->instance($parent, collect());
-    }
-
-    /**
-     * Register extension.
-     *
-     * @param string $extension
-     * @param string $parent
-     * @return void
-     */
-    protected function registerExtension($extension, $parent)
-    {
-        $this->app[$parent][$extension::handle()] = $extension;
-    }
-
-    /**
-     * Register aliases.
-     *
-     * @param string $extension
-     * @param string $parent
-     * @return void
-     */
-    protected function registerAliases($extension, $parent)
-    {
-        foreach ($extension::aliases() as $alias) {
-            $this->app[$parent][$alias] = $extension;
+        foreach ($extensions as $extension) {
+            $extension::register();
         }
     }
 
-    /**
-     * Register extensions in a specific app folder.
-     *
-     * This prevents requiring users to manually bind their extensions.
-     *
-     * @param string $folder
-     * @param string $requiredClass
-     * @return void
-     */
-    protected function registerExtensionsInAppFolder($folder, $requiredClass)
+    protected function registerAppExtensions($folder, $requiredClass)
     {
         if (! $this->app['files']->exists($path = app_path($folder))) {
             return;
@@ -393,5 +265,23 @@ class ExtensionServiceProvider extends ServiceProvider
                 $fqcn::register();
             }
         }
+    }
+
+    protected function registerCoreModifiers()
+    {
+        $modifiers = collect();
+        $methods = array_diff(get_class_methods(CoreModifiers::class), get_class_methods(Modifier::class));
+
+        foreach ($methods as $method) {
+            $modifiers[Str::snake($method)] = CoreModifiers::class.'@'.$method;
+        }
+
+        foreach ($this->modifierAliases as $alias => $actual) {
+            $modifiers[$alias] = CoreModifiers::class.'@'.$actual;
+        }
+
+        $this->app['statamic.extensions'][Modifier::class] = collect()
+            ->merge($this->app['statamic.extensions'][Modifier::class] ?? [])
+            ->merge($modifiers);
     }
 }
