@@ -102,6 +102,15 @@ class Locales extends Tags
      */
     private function getLocalizedData($locale)
     {
+        /**
+         * This will prevent throwing an error, in case no localized data is available.
+         *
+         * An edge case like this does happen, when displaying a 404 page.
+         */
+        if ($this->getData() === null) {
+            return null;
+        }
+        
         return $this->getData()->in($locale)->toAugmentedArray();
     }
 
