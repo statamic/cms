@@ -24,10 +24,10 @@ class DefaultInvalidator implements Invalidator
             $this->cacher->invalidateUrl($url);
         }
 
-        if($this->rules['rules'] !== 'all' && !empty($this->rules['rules']['collections'])) {
+        if($this->rules['rules'] !== 'all' && ! empty($this->rules['rules']['collections'])) {
             $invalidateUrls = $this->rules['rules']['collections'][$item->collectionHandle()]['urls'];
 
-            if(is_array($invalidateUrls) && !empty($invalidateUrls)) {
+            if(is_array($invalidateUrls) && ! empty($invalidateUrls)) {
                 foreach($invalidateUrls as $urlToInvalidate) {
                     $this->cacher->invalidateUrl($urlToInvalidate);
                 }
