@@ -38,9 +38,9 @@
                         <span class="font-bold">{{ addon.seller.name }}</span>
                     </a>
                 </div>
-                <div class="flex-1 text-lg">
+                <div class="flex-1 text-lg" v-if="downloads">
                     <div class="little-heading p-0 mb-1 text-grey-70">Downloads</div>
-                    <div class="font-bold">1,234</div>
+                    <div class="font-bold">{{ downloads }}</div>
                 </div>
             </div>
             <addon-editions v-if="addon.editions.length" :addon="addon" />
@@ -64,7 +64,8 @@ import AddonEditions from './addons/Editions.vue';
         data() {
             return {
                 waitingForRefresh: false,
-                showComposer: false
+                showComposer: false,
+                downloads: null,
             }
         },
 
@@ -101,6 +102,7 @@ import AddonEditions from './addons/Editions.vue';
             this.$events.$on('composer-finished', this.composerFinished);
             this.$events.$on('addon-refreshed', this.addonRefreshed);
             this.$store.commit('statamic/composer', {});
+            this.getDownloadCount();
         },
 
         methods: {
@@ -145,6 +147,12 @@ import AddonEditions from './addons/Editions.vue';
             addonRefreshed() {
                 this.waitingForRefresh = false;
             },
+
+            getDownloadCount() {
+                this.$axios.get(`https://packagist.org/packages/${this.addon.package}.json`).then(response => {
+                    this.downloads = response.data.package.downloads.total;
+                });
+            }
         }
     }
 </script>
