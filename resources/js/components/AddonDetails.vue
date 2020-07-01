@@ -142,6 +142,8 @@ import AddonEditions from './addons/Editions.vue';
                     status: 'Operation complete!',
                     package: this.package,
                 });
+
+                this.$toast.success('Operation complete!');
             },
 
             addonRefreshed() {
