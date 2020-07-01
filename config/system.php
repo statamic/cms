@@ -44,21 +44,6 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Maximum PHP memory limit
-    |--------------------------------------------------------------------------
-    |
-    | The maximum memory that will be used when performing intensive operations
-    | like image manipulation. Leave blank to use as much as possible. You
-    | may either specify bytes or PHP recognized shorthand values.
-    |
-    | http://php.net/manual/en/faq.using.php#faq.using.shorthandbytes
-    |
-    */
-
-    'php_max_memory_limit' => null,
-
-    /*
-    |--------------------------------------------------------------------------
     | Default Date Format
     |--------------------------------------------------------------------------
     |
@@ -70,11 +55,6 @@ return [
 
     'charset' => 'UTF-8',
     'timezone' => 'UTC',
-    'protect' => [],
-
-    'stache' => [
-        'always_update' => true,
-    ],
 
     /*
     |--------------------------------------------------------------------------
