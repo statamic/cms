@@ -1998,7 +1998,7 @@ class CoreModifiers extends Modifier
      */
     public function timezone($value, $params)
     {
-        $timezone = Arr::get($params, 0, Config::get('statamic.system.timezone'));
+        $timezone = Arr::get($params, 0, Config::get('app.timezone'));
 
         return $this->carbon($value)->tz($timezone);
     }
