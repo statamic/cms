@@ -47,11 +47,24 @@ return [
     | Default Date Format
     |--------------------------------------------------------------------------
     |
-    | Any time Carbon is cast to a string in views, it should use this format.
+    | Any time a Carbon date is cast to a string, it should use this format.
+    | You can customize this format using PHP's date string constants.
+    |
+    | https://www.php.net/manual/en/function.date.php
     |
     */
 
     'date_format' => 'F jS, Y',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Default Character Set
+    |--------------------------------------------------------------------------
+    |
+    | Statamic will use this character set when performing specific string
+    | encoding and decoding operations; This does not apply everywhere.
+    |
+    */
 
     'charset' => 'UTF-8',
 
