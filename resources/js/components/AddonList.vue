@@ -167,6 +167,8 @@
 
         methods: {
             getAddons() {
+                this.loading = true;
+
                 this.$axios.get(window.Statamic.$config.get('cpRoot')+'/api/addons', {'params': this.params}).then(response => {
                     this.loading = false;
                     this.rows = response.data.data;
