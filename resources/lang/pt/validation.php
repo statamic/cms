@@ -1,18 +1,6 @@
 <?php
 
 return [
-
-    /*
-    |--------------------------------------------------------------------------
-    | Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines contain the default error messages used by
-    | the validator class. Some of these rules have multiple versions such
-    | as the size rules. Feel free to tweak each of these messages here.
-    |
-    */
-
     'accepted' => 'deverá ser aceite.',
     'active_url' => 'não contém um URL válido.',
     'after' => 'deverá conter uma data posterior a :date.',
@@ -112,47 +100,14 @@ return [
     'unique' => 'Este valor já foi usado.',
     'uploaded' => 'Falha no carregamento.',
     'url' => 'formato é inválido.',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Statamic Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | Here you may validation messages for the custom rules provided by Statamic.
-    |
-    */
-
     'unique_entry_value' => 'Este valor já foi usado.',
     'unique_user_value' => 'Este valor já foi usado.',
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Validation Language Lines
-    |--------------------------------------------------------------------------
-    |
-    | Here you may specify custom validation messages for attributes using the
-    | convention "attribute.rule" to name the lines. This makes it quick to
-    | specify a specific custom language line for a given attribute rule.
-    |
-    */
-
+    'one_site_without_origin' => '',
+    'origin_cannot_be_disabled' => '',
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'custom-message',
         ],
     ],
-
-    /*
-    |--------------------------------------------------------------------------
-    | Custom Validation Attributes
-    |--------------------------------------------------------------------------
-    |
-    | The following language lines are used to swap attribute place-holders
-    | with something more reader friendly such as E-Mail Address instead
-    | of "email". This simply helps us make messages a little cleaner.
-    |
-    */
-
     'attributes' => [],
-
 ];

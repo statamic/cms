@@ -102,6 +102,8 @@ return [
     'url' => 'Il formato non è valido.',
     'unique_entry_value' => 'Questo valore è già stato preso.',
     'unique_user_value' => 'Questo valore è già stato preso.',
+    'one_site_without_origin' => '',
+    'origin_cannot_be_disabled' => '',
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'custom-messaggio',
