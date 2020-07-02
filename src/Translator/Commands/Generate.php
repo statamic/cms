@@ -118,7 +118,7 @@ class Generate extends Command
 
                 $file = explode('::', $file, 2)[1];
 
-                if (Str::startsWith($file, $this->manualFiles)) {
+                if (Str::startsWith($file, $this->manualFiles) || in_array($file, ['auth'])) {
                     return null;
                 }
 
