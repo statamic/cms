@@ -19,6 +19,7 @@ class ControlPanelExceptionHandler extends Handler
     protected function convertValidationExceptionToResponse(ValidationException $e, $request)
     {
         $response = parent::convertValidationExceptionToResponse($e, $request);
+
         if ($response instanceof JsonResponse) {
             $original = $response->getOriginalContent();
             $original['message'] = __($original['message']);
