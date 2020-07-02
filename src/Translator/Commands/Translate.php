@@ -151,7 +151,7 @@ class Translate extends Command
         $bar->finish();
         $this->output->writeln('');
 
-        $contents = "<?php\n\nreturn ".VarExporter::export(Arr::undot($translations)).";\n";
+        $contents = "<?php\n\nreturn ".VarExporter::export($translations).";\n";
 
         $this->files->put($fullPath, $contents);
 
