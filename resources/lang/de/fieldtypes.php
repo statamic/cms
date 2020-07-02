@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'array.config.mode' => 'Der dynamische Modus gibt der Benutzer*in die Kontrolle über die Daten, während der geschlossene Modus dies nicht tut.',
     'array.config.keys' => 'Arrayschlüssel (Variablen) und optionale Beschriftungen festlegen.',
+    'array.config.mode' => 'Der dynamische Modus gibt der Benutzer*in die Kontrolle über die Daten, während der geschlossene Modus dies nicht tut.',
     'assets.config.allow_uploads' => 'Das Hochladen neuer Dateien zulassen.',
     'assets.config.container' => 'Datei-Container für dieses Feld auswählen.',
     'assets.config.folder' => 'In diesem Ordner soll das Durchsuchen der Dateien beginnen.',
@@ -63,6 +63,7 @@ return [
     'range.config.min' => 'Am weitesten links liegender minimaler Wert.',
     'range.config.prepend' => 'Text auf der linke Seite des Schiebereglers hinzufügen.',
     'range.config.step' => 'Mindestgrösse zwischen den Werten.',
+    'relationship.config.mode' => 'Bevorzugten UI Stil auswählen.',
     'select.config.cast_booleans' => 'Optionen mit den Werten *true* und *false* als Booleans speichern.',
     'select.config.clearable' => 'Die Möglichkeit zum Abwählen der Auswahl aktivieren.',
     'select.config.multiple' => 'Mehrfachauswahl zulassen.',
@@ -77,6 +78,4 @@ return [
     'text.config.input_type' => 'HTML5 Inputtyp festlegen.',
     'text.config.placeholder' => 'Standard-Platzhaltertext festlegen.',
     'text.config.prepend' => 'Zusätzlichen Text links vom eigentlichen Text anhängen.',
-    'textarea.config.character_limit' => 'Maximale Anzahl der möglichen Zeichen festlegen.',
-    'relationship.config.mode' => 'Bevorzugten UI Stil auswählen.',
 ];

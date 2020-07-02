@@ -36,6 +36,7 @@ abstract class Relationship extends Fieldtype
             ],
             'mode' => [
                 'display' => __('Mode'),
+                'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
                 'type' => 'radio',
                 'default' => 'default',
                 'options' => [

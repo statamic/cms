@@ -63,6 +63,7 @@ return [
     'range.config.min' => 'Het minimum, de meest linker waarde.',
     'range.config.prepend' => 'Voeg tekst toe aan het begin (linkerkant) van de slider.',
     'range.config.step' => 'De minimumafstand tussen waardes.',
+    'relationship.config.mode' => 'Kies de UI-stijl die je voorkeur heeft.',
     'select.config.cast_booleans' => 'Opties met de waarde true en false worden ogeslagen als booleans.',
     'select.config.clearable' => 'Schakel in om het deselecteren van een optie toe te staan.',
     'select.config.multiple' => 'Sta meerdere selecties toe',
@@ -77,6 +78,4 @@ return [
     'text.config.input_type' => 'Stel de HTML5 input type in.',
     'text.config.placeholder' => 'Stel de standaard placeholdertekst in.',
     'text.config.prepend' => 'Voeg tekst toe aan het begin (linkerkant) van de tekstinput.',
-    'textarea.config.character_limit' => 'Stel een maximum aan het aantal toegestane karakters.',
-    'relationship.config.mode' => 'Kies de UI-stijl die je voorkeur heeft.',
 ];
