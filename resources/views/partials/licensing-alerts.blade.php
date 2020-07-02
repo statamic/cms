@@ -14,19 +14,35 @@
     </div>
 @else
     @if ($licenses->invalid())
-        <div class="
-            p-1 px-4 text-sm w-full
-            @if ($licenses->isOnTestDomain()) bg-blue-900 text-grey-30 @endif
-            @if ($licenses->isOnPublicDomain()) bg-red text-white @endif
-        ">
-            @if ($licenses->isOnTestDomain())
-                <b>{{ __('Trial Mode') }}:</b>
-                {{ __('statamic::messages.licensing_trial_mode_alert') }}
-                @can('access licensing utility') <a href="{{ cp_route('utilities.licensing') }}" class="text-blue-200">{{ __('View details') }}</a> @endcan
-            @else
-                {{ __('statamic::messages.licensing_production_alert') }}
-                @can('access licensing utility') <a href="{{ cp_route('utilities.licensing') }}" class="text-white underline">{{ __('View details') }}</a> @endcan
-            @endif
+        <div class="p-1 w-full fixed bottom-0 z-max">
+            <div class="
+                py-1.5 px-2 text-sm w-full rounded-md
+                @if ($licenses->isOnTestDomain()) bg-grey-80 text-grey-30 @endif
+                @if ($licenses->isOnPublicDomain()) bg-red text-white @endif
+            ">
+                @if ($licenses->isOnTestDomain())
+                    <div class="flex items-center justify-between">
+                        <span>
+                            <b class="mr-1">{{ __('Trial Mode') }}:</b>
+                            {{ __('statamic::messages.licensing_trial_mode_alert') }}
+                        </span>
+                        @can('access licensing utility')
+                        <a href="{{ cp_route('utilities.licensing') }}" class="text-white hover:text-yellow flex items-center">
+                            @svg('arrow-right')
+                        </a>
+                        @endcan
+                    </div>
+                @else
+                    <div class="flex items-center justify-between">
+                        {{ __('statamic::messages.licensing_production_alert') }}
+                        @can('access licensing utility')
+                            <a href="{{ cp_route('utilities.licensing') }}" class="text-white hover:text-yellow flex items-center">
+                                @svg('arrow-right')
+                            </a>
+                        @endcan
+                    </div>
+                @endif
+            </div>
         </div>
     @endif
 @endif
