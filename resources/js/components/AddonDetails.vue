@@ -105,6 +105,11 @@ import AddonEditions from './addons/Editions.vue';
             this.getDownloadCount();
         },
 
+        destroyed() {
+            this.$events.$off('composer-finished', this.composerFinished);
+            this.$events.$off('addon-refreshed', this.addonRefreshed);
+        },
+
         methods: {
             install() {
                 this.$axios.post(cp_url('addons/install'), {'addon': this.package}, this.toEleven);
