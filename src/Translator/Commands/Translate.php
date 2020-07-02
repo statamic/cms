@@ -44,6 +44,8 @@ class Translate extends Command
         foreach ($this->languages() as $lang) {
             $this->translateFiles($lang);
         }
+
+        return 0;
     }
 
     protected function translateFiles($lang)

@@ -53,6 +53,8 @@ class Generate extends Command
         $this->generateManualKeyFiles();
 
         $this->translate();
+
+        return 0;
     }
 
     protected function generateStringFiles()
