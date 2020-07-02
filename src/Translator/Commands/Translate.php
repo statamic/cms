@@ -205,6 +205,8 @@ class Translate extends Command
 
     protected function translate($string, $lang)
     {
+        $lang = explode('-', str_replace('_', '-', $lang))[0];
+
         $response = $this->client->translate($string, ['target' => $lang]);
 
         return (new Placeholders)->unwrap($response['text']);
