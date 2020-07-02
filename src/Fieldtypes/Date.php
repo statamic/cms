@@ -42,7 +42,7 @@ class Date extends Fieldtype
                 'display' => __('Earliest Date'),
                 'instructions' => __('statamic::fieldtypes.date.config.earliest_date'),
                 'type' => 'text',
-                'default' => __('1900-01-01'),
+                'default' => '1900-01-01',
                 'width' => 50,
             ],
             'format' => [
