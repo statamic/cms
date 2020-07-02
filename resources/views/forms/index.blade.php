@@ -19,7 +19,7 @@
 
         @include('statamic::partials.empty-state', [
             'resource' => 'Form',
-            'description' => __('statamic::messages.form_wizard_intro'),
+            'description' => __('statamic::messages.form_configure_intro'),
             'svg' => 'empty/form',
             'route' => cp_route('forms.create')
         ])
