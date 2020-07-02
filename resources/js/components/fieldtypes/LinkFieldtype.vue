@@ -10,7 +10,11 @@
                 :options="options"
                 :clearable="false"
                 :reduce="(option) => option.value"
-            />
+            >
+                <template #option="{ label }">
+                  {{ __(label) }}
+                </template>
+            </v-select>
         </div>
         <div class="flex-1">
             <text-input
