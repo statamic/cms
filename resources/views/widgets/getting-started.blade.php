@@ -2,7 +2,7 @@
     <div class="py-3 px-4 border-b">
         <h1>{{ __('statamic::messages.getting_started_widget_header') }}</h1>
         <p>{{ __('statamic::messages.getting_started_widget_intro') }}
-            Please remember: <b>Statamic is commercial software</b> and you may need to purchase an appropriate license to continue using Statamic after the beta period has ended.
+            {!! __('statamic::messages.getting_started_widget_reminder') !!}
         </p>
     </div>
     <div class="flex flex-wrap p-2">

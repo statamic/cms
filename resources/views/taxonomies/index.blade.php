@@ -23,7 +23,7 @@
 
         @include('statamic::partials.empty-state', [
             'resource' => 'Taxonomy',
-            'description' => __('statamic::messages.taxonomy_wizard_intro'),
+            'description' => __('statamic::messages.taxonomy_configure_intro'),
             'svg' => 'empty/taxonomy',
             'route' => cp_route('taxonomies.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')

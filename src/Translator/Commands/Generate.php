@@ -3,6 +3,7 @@
 namespace Statamic\Translator\Commands;
 
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Translator\MethodDiscovery;
 use Statamic\Translator\Util;
@@ -118,7 +119,7 @@ class Generate extends Command
 
                 $file = explode('::', $file, 2)[1];
 
-                if (Str::startsWith($file, $this->manualFiles)) {
+                if (Str::startsWith($file, $this->manualFiles) || in_array($file, ['auth'])) {
                     return null;
                 }
 
@@ -155,6 +156,8 @@ class Generate extends Command
 
             return;
         }
+
+        $translations = Arr::dot($translations);
 
         $contents = "<?php\n\nreturn ".VarExporter::export($translations).";\n";
 

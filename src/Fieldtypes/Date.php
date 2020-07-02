@@ -19,9 +19,9 @@ class Date extends Fieldtype
                 'default' => 'single',
                 'width' => 50,
                 'options' => [
-                    'single' => 'Single',
-                    // 'multiple' => 'Multiple',
-                    'range' => 'Range',
+                    'single' => __('Single'),
+                    // 'multiple' => __('Multiple'),
+                    'range' => __('Range'),
                 ],
             ],
             'time_enabled'  => [
