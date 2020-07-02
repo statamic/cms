@@ -15,7 +15,7 @@
 
             <option
                 v-if="placeholder"
-                v-text="__(placeholder)"
+                v-text="placeholder"
                 value=""
                 disabled
                 :selected="value === null" />
