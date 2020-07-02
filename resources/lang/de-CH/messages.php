@@ -85,7 +85,7 @@ return [
     'getting_started_widget_header' => 'Erste Schritte mit Statamic 3',
     'getting_started_widget_intro' => 'Wir empfehlen dir beim Aufbau deiner neuen Statamic 3 Webseite mit diesen Schritten zu beginnen.',
     'getting_started_widget_navigation' => 'Erstelle mehrstufige Listen mit Links, die für die Gestaltung von Navbars, Fuszeilen etc. verwendet werden können.',
-    'getting_started_widget_reminder' => '',
+    'getting_started_widget_reminder' => 'Bitte denken Sie daran: <b>Statamic ist kommerzielle Software</b> und Sie müssen möglicherweise eine entsprechende Lizenz erwerben, um Statamic nach Ablauf der Beta-Phase weiter nutzen zu können.',
     'global_search_open_using_slash' => 'Starte die globale Suche mit der Taste <kbd>/</kbd>',
     'global_set_config_intro' => 'Globale Sets verwalten Inhalte, die auf der gesamten Webseite verfügbar sind, wie z.B. Firmendetails, Kontaktinformationen oder Frontend-Einstellungen.',
     'globals_blueprint_instructions' => 'Das Blueprint steuert die Felder, die beim Bearbeiten der Variablen angezeigt werden sollen.',

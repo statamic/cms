@@ -102,8 +102,8 @@ return [
     'url' => 'formato é inválido.',
     'unique_entry_value' => 'Este valor já foi usado.',
     'unique_user_value' => 'Este valor já foi usado.',
-    'one_site_without_origin' => '',
-    'origin_cannot_be_disabled' => '',
+    'one_site_without_origin' => 'Pelo menos um site não deve ter uma origem.',
+    'origin_cannot_be_disabled' => 'Não é possível selecionar uma origem desativada.',
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'custom-message',

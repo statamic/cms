@@ -102,8 +102,8 @@ return [
     'url' => 'El formato no es válido',
     'unique_entry_value' => 'Este valor ya ha sido tomado.',
     'unique_user_value' => 'Este valor ya ha sido tomado.',
-    'one_site_without_origin' => '',
-    'origin_cannot_be_disabled' => '',
+    'one_site_without_origin' => 'Al menos un sitio no debe tener un origen.',
+    'origin_cannot_be_disabled' => 'No se puede seleccionar un origen deshabilitado.',
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'mensaje personalizado',
