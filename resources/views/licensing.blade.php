@@ -17,7 +17,7 @@
                     <p class="text-grey-70 leading-normal mb-4 text-lg antialiased">
                         {{ __('statamic::messages.outpost_issue_try_later') }}
                     </p>
-                    <a href="{{ cp_route('statamic.cp.utilities.licensing.refresh') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
+                    <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
                 </div>
                 <div class="hidden md:block w-1/2 pl-6">
                     @svg('empty/navigation')
