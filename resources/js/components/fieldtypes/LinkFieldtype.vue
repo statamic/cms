@@ -47,9 +47,9 @@ export default {
             enabled: this.value != null,
             option: 'url',
             options: [
-                {label: 'URL', value: 'url'},
-                {label: 'First Child', value: 'first-child'},
-                {label: 'Entry', value: 'entry'}
+                {label: __('URL'), value: 'url'},
+                {label: __('First Child'), value: 'first-child'},
+                {label: __('Entry'), value: 'entry'}
             ],
             entriesValue: [],
         }
