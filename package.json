@@ -48,7 +48,7 @@
     "striptags": "^3.1.1",
     "sweetalert": "~1.0.1",
     "tiptap-extensions": "^1.28.6",
-    "underscore": "^1.9.2",
+    "underscore": "~1.9.2",
     "uniqid": "^5.2.0",
     "v-calendar": "^1.0.1",
     "v-tooltip": "^2.0.3",
