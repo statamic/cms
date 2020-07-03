@@ -3,7 +3,7 @@
 
         <div class="rounded p-3 lg:px-7 lg:py-5 shadow bg-white">
             <header class="text-center mb-6">
-                <h1 class="mb-3">{{ __('Create a new Collection') }}</h1>
+                <h1 class="mb-3">{{ __('Create Collection') }}</h1>
                 <p class="text-grey" v-text="__('messages.collection_configure_intro')" />
             </header>
             <div class="mb-5">
