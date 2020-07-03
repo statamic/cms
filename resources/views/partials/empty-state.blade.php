@@ -21,9 +21,4 @@
             @svg($svg ?? 'empty/content')
         </div>
     </div>
-    @if ($docs_link ?? false)
-        <div class="flex justify-center text-center mt-8">
-            <div class="bg-white rounded-full px-3 py-1 shadow-sm text-sm text-grey-70">{{ __('Learn more about') }} <a href="{{ $docs_link }}" class="text-blue hover:text-blue-dark">{{ Statamic\Support\Str::plural($resource) }}</a>.</div>
-        </div>
-    @endif
 </div>
