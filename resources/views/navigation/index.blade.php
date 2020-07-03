@@ -31,7 +31,7 @@
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Navigation'),
-        'url' => 'navigation'
+        'url' => Statamic::docsUrl('navigation')
     ])
 
 @endsection

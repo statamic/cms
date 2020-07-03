@@ -33,7 +33,7 @@
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Collections'),
-        'url' => 'collections-and-entries'
+        'url' => Statamic::docsUrl('collections-and-entries')
     ])
 
 @endsection

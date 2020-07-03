@@ -28,7 +28,7 @@
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Global Variables'),
-        'url' => 'globals'
+        'url' => Statamic::docsUrl('globals')
     ])
 
 @endsection

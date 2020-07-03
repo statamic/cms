@@ -33,7 +33,7 @@
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Taxonomies'),
-        'url' => 'taxonomies'
+        'url' => Statamic::docsUrl('taxonomies')
     ])
 
 @endsection

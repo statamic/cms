@@ -28,7 +28,8 @@
     @endunless
 
     @include('statamic::partials.docs-callout', [
-        'topic' => __('Fieldsets'), 'url' => 'fieldsets'
+        'topic' => __('Fieldsets'),
+        'url' => Statamic::docsUrl('fieldsets')
     ])
 
 @endsection

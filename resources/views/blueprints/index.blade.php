@@ -29,7 +29,7 @@
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Blueprints'),
-        'url' => 'blueprints'
+        'url' => Statamic::docsUrl('blueprints')
     ])
 
 @endsection

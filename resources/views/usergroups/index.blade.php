@@ -27,7 +27,7 @@
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('User Groups'),
-        'url' => 'users#user-groups'
+        'url' => Statamic::docsUrl('users#user-groups')
     ])
 
 @endsection
