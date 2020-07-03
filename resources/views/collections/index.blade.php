@@ -22,10 +22,11 @@
     @else
 
         @include('statamic::partials.empty-state', [
-            'resource' => 'Collection',
+            'title' => __('Collections'),
             'description' => __('statamic::messages.collection_configure_intro'),
             'svg' => 'empty/content',
-            'route' => cp_route('collections.create'),
+            'button_text' => __('Create Collection'),
+            'button_url' => cp_route('collections.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Entries\Collection')
         ])
 

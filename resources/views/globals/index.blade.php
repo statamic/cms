@@ -17,10 +17,11 @@
     @else
 
         @include('statamic::partials.empty-state', [
-            'resource' => 'Global Set',
+            'title' => __('Globals'),
             'description' => __('statamic::messages.global_set_config_intro'),
             'svg' => 'empty/content',
-            'route' => cp_route('globals.create'),
+            'button_url' => cp_route('globals.create'),
+            'button_text' => __('Create Global Set'),
             'can' => $user->can('create', 'Statamic\Contracts\Globals\GlobalSet')
         ])
 

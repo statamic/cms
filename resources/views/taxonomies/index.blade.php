@@ -22,10 +22,11 @@
     @else
 
         @include('statamic::partials.empty-state', [
-            'resource' => 'Taxonomy',
+            'title' => __('Taxonomies'),
             'description' => __('statamic::messages.taxonomy_configure_intro'),
             'svg' => 'empty/taxonomy',
-            'route' => cp_route('taxonomies.create'),
+            'button_text' => __('Create Taxonomy'),
+            'button_url' => cp_route('taxonomies.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')
         ])
 

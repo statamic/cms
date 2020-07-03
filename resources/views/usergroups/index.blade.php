@@ -17,10 +17,11 @@
     @else
 
         @include('statamic::partials.empty-state', [
-            'resource' => 'User Group',
+            'title' => __('User Groups'),
             'description' => __('statamic::messages.user_groups_intro'),
             'svg' => 'empty/users',
-            'route' => cp_route('user-groups.create')
+            'button_text' => __('Create User Group'),
+            'button_url' => cp_route('user-groups.create'),
         ])
 
     @endunless

@@ -18,10 +18,12 @@
     @else
 
         @include('statamic::partials.empty-state', [
-            'resource' => 'Form',
+            'title' => __('Forms'),
             'description' => __('statamic::messages.form_configure_intro'),
             'svg' => 'empty/form',
-            'route' => cp_route('forms.create')
+            'button_text' => __('Create Form'),
+            'button_url' => cp_route('forms.create'),
+            'can' => $user->can('create', 'Statamic\Contracts\Forms\Form')
         ])
 
     @endunless

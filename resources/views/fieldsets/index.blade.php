@@ -18,10 +18,11 @@
     @else
 
         @include('statamic::partials.empty-state', [
-            'resource' => 'Fieldset',
+            'title' => __('Fieldsets'),
             'description' => __('statamic::messages.fieldset_intro'),
             'svg' => 'empty/form',
-            'route' => cp_route('fieldsets.create'),
+            'button_text' => __('Create Fieldset'),
+            'button_url' => cp_route('fieldsets.create'),
             'can' => $user->can('create', 'Statamic\Fields\Fieldset')
         ])
 

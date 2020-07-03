@@ -20,10 +20,11 @@
     @else
 
         @include('statamic::partials.empty-state', [
-            'resource' => 'Navigation',
+            'title' => __('Navigation'),
             'description' => __('statamic::messages.navigation_configure_intro'),
             'svg' => 'empty/navigation',
-            'route' => cp_route('navigation.create'),
+            'button_text' => __('Create Navigation'),
+            'button_url' => cp_route('navigation.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Structures\Nav')
         ])
 
