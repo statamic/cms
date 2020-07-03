@@ -7,7 +7,6 @@ return [
     'asset_container_create_folder_instructions' => 'La capacidad de crear carpetas en este contenedor.',
     'asset_container_disk_instructions' => 'El disco del sistema de archivos que usará este contenedor.',
     'asset_container_handle_instructions' => 'Se usa para hacer referencia a este contenedor en la interfaz. No es trivial cambiar más tarde.',
-    'asset_container_intro' => 'Los archivos multimedia y de documentos viven en carpetas en el servidor u otros servicios de almacenamiento de archivos. Cada una de estas ubicaciones se llama contenedor.',
     'asset_container_move_instructions' => 'La capacidad de mover archivos en este contenedor.',
     'asset_container_quick_download_instructions' => 'Habilita el botón de descarga rápida al editar archivos.',
     'asset_container_rename_instructions' => 'La capacidad de renombrar archivos en este contenedor.',

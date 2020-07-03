@@ -7,7 +7,6 @@ return [
     'asset_container_create_folder_instructions' => 'A capacidade de criar pastas nesta biblioteca.',
     'asset_container_disk_instructions' => 'O disco do sistema que esta biblioteca usará.',
     'asset_container_handle_instructions' => 'Utilizado para referenciar este contentor no front-end. É não trivial mudar mais tarde.',
-    'asset_container_intro' => 'Os arquivos de mídia e documento vivem em pastas no servidor ou em outros serviços de armazenamento de arquivos. Cada um desses locais é chamado de contêiner.',
     'asset_container_move_instructions' => 'A capacidade de mover arquivos nesta biblioteca.',
     'asset_container_quick_download_instructions' => 'Active o botão de download rápido quando editar arquivos.',
     'asset_container_rename_instructions' => 'A capacidade de renomear arquivos nesta biblioteca.',

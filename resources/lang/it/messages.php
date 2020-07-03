@@ -7,7 +7,6 @@ return [
     'asset_container_create_folder_instructions' => 'La possibilità di creare cartelle in questo contenitore.',
     'asset_container_disk_instructions' => 'Il disco del filesystem che verrà utilizzato da questo contenitore.',
     'asset_container_handle_instructions' => 'Utilizzato per fare riferimento a questo contenitore sul frontend. Non è banale cambiare in seguito.',
-    'asset_container_intro' => 'I file multimediali e di documenti vivono in cartelle sul server o altri servizi di archiviazione dei file. Ognuna di queste posizioni è chiamata contenitore.',
     'asset_container_move_instructions' => 'La possibilità di spostare i file in questo contenitore.',
     'asset_container_quick_download_instructions' => 'Abilita il pulsante di download rapido durante la modifica dei file.',
     'asset_container_rename_instructions' => 'La possibilità di rinominare i file in questo contenitore.',
