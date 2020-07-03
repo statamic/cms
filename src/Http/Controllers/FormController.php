@@ -99,6 +99,9 @@ class FormController extends Controller
         if (request()->ajax()) {
             return response([
                 'errors' => (new MessageBag($errors))->all(),
+                'error' => collect($errors)->map(function ($errors, $field) {
+                    return $errors[0];
+                })->all(),
             ], 400);
         }
 
