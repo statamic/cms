@@ -41,7 +41,7 @@ return [
     'date.config.rows' => 'Afficher plusieurs mois à la fois, en lignes et en colonnes.',
     'date.config.time_enabled' => 'Activez le sélecteur d’horaire.',
     'date.config.time_required' => 'Exiger l’horodatage en plus de la date.',
-    'form.config.max_items' => '',
+    'form.config.max_items' => 'Le nombre maximum de formulaires sélectionnables.',
     'grid.config.add_row' => 'Définissez le libellé du bouton "Ajouter une ligne".',
     'grid.config.fields' => 'Chaque champ devient une colonne dans la table de grille.',
     'grid.config.max_rows' => 'Définissez un nombre maximal de lignes pouvant être créées.',
