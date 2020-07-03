@@ -7,6 +7,7 @@ return [
     'asset_container_create_folder_instructions' => 'When enabled will give users the ability to create folders in this container.',
     'asset_container_disk_instructions' => 'Filesystem disks specify where files are stored — either locally or in a remote location like Amazon S3. They can be configured in `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Used to reference this container on the frontend. It\'s non-trivial to change later.',
+    'asset_container_intro' => 'Media and document files live in folders on the server or other file storage services. Each of these locations is called a container.',
     'asset_container_move_instructions' => 'When enabled will allow users to move files around inside this container.',
     'asset_container_quick_download_instructions' => 'When enabled will add a quick download button in the Asset Manager.',
     'asset_container_rename_instructions' => 'When enabled will allow users to rename the files in this container.',

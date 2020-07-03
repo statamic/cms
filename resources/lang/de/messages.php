@@ -7,6 +7,7 @@ return [
     'asset_container_create_folder_instructions' => 'Ist diese Option aktiviert, können Benutzer*innen Ordner in diesem Container erstellen.',
     'asset_container_disk_instructions' => 'Dateisystem-Laufwerke legen fest, wo Dateien gespeichert werden sollen – entweder lokal oder an einem entfernten Ort wie Amazon S3. Sie können in `config/filesystems.php` konfiguriert werden.',
     'asset_container_handle_instructions' => 'Der Handle verweist im Frontend auf diesen Container. Er kann nicht einfach geändert werden.',
+    'asset_container_intro' => 'Mediendateien und Dokumente befinden sich in Ordnern auf dem Server oder anderen Speicherdiensten. Jeder dieser Speicherorte wird als Container bezeichnet.',
     'asset_container_move_instructions' => 'Ist diese Option aktiviert, können Benutzer*innen Dateien innerhalb diesem Container verschieben.',
     'asset_container_quick_download_instructions' => 'Ist diese Option aktiviert, wird im Dateimanager ein Button zum Downloaden hinzugefügt.',
     'asset_container_rename_instructions' => 'Wenn diese Option aktiviert ist, können Benutzer*innen Dateien in diesem Container umbenennen.',

@@ -7,6 +7,7 @@ return [
     'asset_container_create_folder_instructions' => 'Si activé, donne la possibilité aux utilisateurs de créer des dossiers dans ce conteneur.',
     'asset_container_disk_instructions' => 'Les disques du système de fichiers vous permettent de préciser où seront stockés les fichiers, soit localement, soit sur un emplacement externe comme Amazon S3. Ils peuvent être configurés dans `config/filesystems.php`',
     'asset_container_handle_instructions' => 'Comment vous allez faire référence à ce conteneur sur le frontal. Ne peut pas être facilement changé.',
+    'asset_container_intro' => 'Les fichiers media et documents sont stockés dans des répertoires sur votre serveur ou dans d’autres services de stockage de fichiers. Chacun de ces emplacements est appelé un conteneur.',
     'asset_container_move_instructions' => 'Si activé, donne la possibilité aux utilisateurs de déplacer les fichiers au sein de ce conteneur.',
     'asset_container_quick_download_instructions' => 'Si activé, ajoute un bouton de téléchargement rapide dans le Gestionnaire de Ressources.',
     'asset_container_rename_instructions' => 'Si activé, donne la possibilité aux utilisateurs de renommer les fichiers dans ce conteneur.',
