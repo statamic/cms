@@ -202,8 +202,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_global_set_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Global set saved')->once();
-        Git::shouldReceive('dispatchCommit')->with('Global set deleted')->once();
+        Git::shouldReceive('dispatchCommit')->with('Global Set saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Global Set deleted')->once();
 
         $set = Facades\GlobalSet::make('main');
         $set->addLocalization($set->makeLocalization(Facades\Site::default()->handle()));
