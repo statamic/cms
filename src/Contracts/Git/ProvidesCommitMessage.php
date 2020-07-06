@@ -5,7 +5,7 @@ namespace Statamic\Contracts\Git;
 interface ProvidesCommitMessage
 {
     /**
-     * Get the Git commit message
+     * Get the Git commit message.
      *
      * @return string
      */
