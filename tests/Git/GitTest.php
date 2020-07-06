@@ -145,13 +145,13 @@ EOT;
 
         Git::commit();
 
-        $this->assertStringContainsString('Content saved.', $commit = $this->showLastCommit(base_path('content')));
+        $this->assertStringContainsString('Content saved', $commit = $this->showLastCommit(base_path('content')));
         $this->assertStringContainsString('Spock <spock@example.com>', $commit);
         $this->assertStringContainsString('collections/pages.yaml', $commit);
         $this->assertStringContainsString('taxonomies/tags.yaml', $commit);
         $this->assertStringNotContainsString('untracked.yaml', $commit);
 
-        $this->assertStringContainsString('Content saved.', $commit = $this->showLastCommit($this->basePath('temp/assets')));
+        $this->assertStringContainsString('Content saved', $commit = $this->showLastCommit($this->basePath('temp/assets')));
         $this->assertStringContainsString('statement.txt', $commit);
     }
 
