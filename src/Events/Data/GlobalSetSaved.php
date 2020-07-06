@@ -11,6 +11,6 @@ class GlobalSetSaved extends Saved
      */
     public function toSentence()
     {
-        return __('Global set saved.');
+        return __('Global Set saved');
     }
 }

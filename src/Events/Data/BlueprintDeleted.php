@@ -11,6 +11,6 @@ class BlueprintDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Blueprint deleted.');
+        return __('Blueprint deleted');
     }
 }

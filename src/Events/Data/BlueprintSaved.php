@@ -11,6 +11,6 @@ class BlueprintSaved extends Saved
      */
     public function toSentence()
     {
-        return __('Blueprint saved.');
+        return __('Blueprint saved');
     }
 }

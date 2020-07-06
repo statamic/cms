@@ -11,6 +11,6 @@ class NavDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Navigation deleted.');
+        return __('Navigation deleted');
     }
 }

@@ -61,7 +61,7 @@ class Git
     public function commit($message = null)
     {
         $this->groupTrackedContentPathsByRepo()->each(function ($paths, $gitRoot) use ($message) {
-            $this->runConfiguredCommands($gitRoot, $paths, $message ?? __(':item saved.', ['item' => 'Content']));
+            $this->runConfiguredCommands($gitRoot, $paths, $message ?? __('Content saved'));
         });
     }
 

@@ -11,6 +11,6 @@ class AssetFolderSaved extends Saved
      */
     public function toSentence()
     {
-        return __('Asset folder saved.');
+        return __('Asset folder saved');
     }
 }

@@ -11,6 +11,6 @@ class RoleDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Role deleted.');
+        return __('Role deleted');
     }
 }

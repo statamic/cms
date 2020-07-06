@@ -11,6 +11,6 @@ class FormDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Form deleted.');
+        return __('Form deleted');
     }
 }

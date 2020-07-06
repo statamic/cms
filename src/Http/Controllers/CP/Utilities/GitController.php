@@ -18,6 +18,6 @@ class GitController extends CpController
     {
         Git::commit();
 
-        return back()->withSuccess(__('Content committed.'));
+        return back()->withSuccess(__('Content committed'));
     }
 }

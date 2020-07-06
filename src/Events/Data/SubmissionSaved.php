@@ -11,6 +11,6 @@ class SubmissionSaved extends Saved
      */
     public function toSentence()
     {
-        return __('Submission saved.');
+        return __('Submission saved');
     }
 }

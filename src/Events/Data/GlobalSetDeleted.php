@@ -11,6 +11,6 @@ class GlobalSetDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Global set deleted.');
+        return __('Global Set deleted');
     }
 }

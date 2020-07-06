@@ -11,6 +11,6 @@ class NavSaved extends Saved
      */
     public function toSentence()
     {
-        return __('Navigation saved.');
+        return __('Navigation saved');
     }
 }

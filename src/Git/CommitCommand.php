@@ -32,15 +32,15 @@ class CommitCommand extends Command
     public function handle()
     {
         if (! config('statamic.git.enabled')) {
-            return $this->info(__('Statamic git integration is currently disabled.'));
+            return $this->info(__('statamic::messages.git_disabled'));
         }
 
         if (! Git::statuses()) {
-            return $this->info(__('Nothing to commit, content paths clean!'));
+            return $this->info(__('statamic::messages.git_nothing_to_commit'));
         }
 
         Git::commit();
 
-        return $this->info(__('Content committed.'));
+        return $this->info(__('Content committed'));
     }
 }

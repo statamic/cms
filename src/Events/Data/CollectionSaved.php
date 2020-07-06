@@ -11,6 +11,6 @@ class CollectionSaved extends Saved
      */
     public function toSentence()
     {
-        return __('Collection saved.');
+        return __('Collection saved');
     }
 }

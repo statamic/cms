@@ -11,6 +11,6 @@ class AssetDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Asset deleted.');
+        return __('Asset deleted');
     }
 }

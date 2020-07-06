@@ -11,6 +11,6 @@ class TaxonomyDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Taxonomy deleted.');
+        return __('Taxonomy deleted');
     }
 }

@@ -11,6 +11,6 @@ class SubmissionDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Submission deleted.');
+        return __('Submission deleted');
     }
 }

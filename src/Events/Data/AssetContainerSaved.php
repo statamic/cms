@@ -11,6 +11,6 @@ class AssetContainerSaved extends Saved
      */
     public function toSentence()
     {
-        return __('Asset container saved.');
+        return __('Asset container saved');
     }
 }

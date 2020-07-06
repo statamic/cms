@@ -11,6 +11,6 @@ class FieldsetSaved extends Saved
      */
     public function toSentence()
     {
-        return __('Fieldset saved.');
+        return __('Fieldset saved');
     }
 }

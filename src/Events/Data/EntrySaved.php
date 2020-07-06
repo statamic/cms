@@ -11,6 +11,6 @@ class EntrySaved extends Saved
      */
     public function toSentence()
     {
-        return __('Entry saved.');
+        return __('Entry saved');
     }
 }

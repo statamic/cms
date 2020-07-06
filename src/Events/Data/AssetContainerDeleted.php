@@ -11,6 +11,6 @@ class AssetContainerDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Asset container deleted.');
+        return __('Asset container deleted');
     }
 }

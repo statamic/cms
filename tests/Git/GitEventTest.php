@@ -45,8 +45,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_doesnt_commit_when_git_is_disabled()
     {
-        Git::shouldReceive('dispatchCommit')->with('Collection saved.')->never();
-        Git::shouldReceive('dispatchCommit')->with('Collection deleted.')->never();
+        Git::shouldReceive('dispatchCommit')->with('Collection saved')->never();
+        Git::shouldReceive('dispatchCommit')->with('Collection deleted')->never();
 
         Config::set('statamic.git.enabled', false);
 
@@ -59,8 +59,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_doesnt_commit_when_automatic_is_disabled()
     {
-        Git::shouldReceive('dispatchCommit')->with('Collection saved.')->never();
-        Git::shouldReceive('dispatchCommit')->with('Collection deleted.')->never();
+        Git::shouldReceive('dispatchCommit')->with('Collection saved')->never();
+        Git::shouldReceive('dispatchCommit')->with('Collection deleted')->never();
 
         Config::set('statamic.git.automatic', false);
 
@@ -73,8 +73,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_doesnt_commit_ignored_events()
     {
-        Git::shouldReceive('dispatchCommit')->with('Collection saved.')->never();
-        Git::shouldReceive('dispatchCommit')->with('Collection deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Collection saved')->never();
+        Git::shouldReceive('dispatchCommit')->with('Collection deleted')->once();
 
         Config::set('statamic.git.ignored_events', [
             \Statamic\Events\Data\CollectionSaved::class,
@@ -89,7 +89,7 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_custom_addon_events_are_registered()
     {
-        Git::shouldReceive('dispatchCommit')->with('Pun saved.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Pun saved')->once();
         Git::makePartial();
 
         Git::listen(PunSaved::class);
@@ -104,8 +104,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_blueprint_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Blueprint saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Blueprint deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Blueprint saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Blueprint deleted')->once();
 
         $blueprint = Facades\Blueprint::make('post');
 
@@ -116,8 +116,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_fieldset_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Fieldset saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Fieldset deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Fieldset saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Fieldset deleted')->once();
 
         $fieldset = Facades\Fieldset::make('address');
 
@@ -128,8 +128,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_collection_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Collection saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Collection deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Collection saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Collection deleted')->once();
 
         $collection = Facades\Collection::make('pages');
 
@@ -140,9 +140,9 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_entry_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Collection saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Entry saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Entry deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Collection saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Entry saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Entry deleted')->once();
 
         $collection = Facades\Collection::make('pages');
         $collection->save();
@@ -158,8 +158,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_navigation_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Navigation saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Navigation deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Navigation saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Navigation deleted')->once();
 
         $nav = Facades\Nav::make()->handle('footer');
         $nav->addTree($nav->makeTree(Facades\Site::default()->handle()));
@@ -171,8 +171,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_taxonomy_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Taxonomy saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Taxonomy deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Taxonomy saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Taxonomy deleted')->once();
 
         $taxonomy = Facades\Taxonomy::make('topics');
 
@@ -183,9 +183,9 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_term_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Taxonomy saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Term saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Term deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Taxonomy saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Term saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Term deleted')->once();
 
         $taxonomy = Facades\Taxonomy::make('topics');
         $taxonomy->save();
@@ -202,8 +202,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_global_set_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Global set saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Global set deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Global set saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Global set deleted')->once();
 
         $set = Facades\GlobalSet::make('main');
         $set->addLocalization($set->makeLocalization(Facades\Site::default()->handle()));
@@ -215,8 +215,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_form_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Form saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Form deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Form saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Form deleted')->once();
 
         $form = Facades\Form::make('main');
 
@@ -227,10 +227,10 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_form_submission_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Blueprint saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Form saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Submission saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Submission deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Blueprint saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Form saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Submission saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Submission deleted')->once();
 
         $blueprint = Facades\Blueprint::make('post');
         $blueprint->save();
@@ -248,8 +248,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_user_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('User saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('User deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('User saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('User deleted')->once();
 
         $user = Facades\User::make();
 
@@ -260,8 +260,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_user_role_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Role saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Role deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Role saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Role deleted')->once();
 
         $role = Facades\Role::make()->handle('author');
 
@@ -272,8 +272,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_user_group_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('User group saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('User group deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('User group saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('User group deleted')->once();
 
         $group = Facades\UserGroup::make()->handle('admin');
 
@@ -284,8 +284,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_asset_container_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Asset container saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Asset container deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Asset container saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Asset container deleted')->once();
 
         $container = Facades\AssetContainer::make()->handle('assets');
 
@@ -296,7 +296,7 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_asset_is_uploaded()
     {
-        Git::shouldReceive('dispatchCommit')->with('Asset saved.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
 
         $this->makeAsset()->upload(
             UploadedFile::fake()->create('asset.txt')
@@ -306,7 +306,7 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_asset_is_saved()
     {
-        Git::shouldReceive('dispatchCommit')->with('Asset saved.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Asset saved')->once();
 
         $this->makeAsset()->data(['bar' => 'baz'])->save();
     }
@@ -314,7 +314,7 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_asset_is_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Asset deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Asset deleted')->once();
 
         $this->makeAsset()->delete();
     }
@@ -322,7 +322,7 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_asset_folder_is_saved()
     {
-        Git::shouldReceive('dispatchCommit')->with('Asset folder saved.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Asset folder saved')->once();
 
         $this
             ->makeAsset()
@@ -334,8 +334,8 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_asset_folder_is_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Asset folder saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Asset folder deleted.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Asset folder saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Asset folder deleted')->once();
 
         $folder = $this
             ->makeAsset()
@@ -348,7 +348,7 @@ class GitEventTest extends TestCase
 
     private function makeAsset()
     {
-        Git::shouldReceive('dispatchCommit')->with('Asset container saved.')->once();
+        Git::shouldReceive('dispatchCommit')->with('Asset container saved')->once();
 
         $container = Facades\AssetContainer::make()->handle('assets')->disk('test');
         $container->save();
@@ -364,6 +364,6 @@ class PunSaved extends \Statamic\Events\Data\Saved
 {
     public function toSentence()
     {
-        return __('Pun saved.');
+        return __('Pun saved');
     }
 }

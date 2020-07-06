@@ -11,6 +11,6 @@ class TermDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Term deleted.');
+        return __('Term deleted');
     }
 }

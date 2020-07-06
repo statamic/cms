@@ -11,6 +11,6 @@ class FormSaved extends Saved
      */
     public function toSentence()
     {
-        return __('Form saved.');
+        return __('Form saved');
     }
 }

@@ -11,6 +11,6 @@ class UserSaved extends Saved
      */
     public function toSentence()
     {
-        return __('User saved.');
+        return __('User saved');
     }
 }

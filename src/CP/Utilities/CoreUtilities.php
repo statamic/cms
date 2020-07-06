@@ -59,9 +59,9 @@ class CoreUtilities
         if (config('statamic.git.enabled')) {
             Utility::make('git')
                 ->action([GitController::class, 'index'])
-                ->title(__('Git'))
+                ->title('Git')
                 ->icon('email-utility') // TODO: Find better icon
-                ->description(__('Manage git tracked content.')) // TODO: Move into language files
+                ->description(__('statamic::messages.git_utility_description'))
                 ->docsUrl(Statamic::docsUrl('utilities/git'))
                 ->routes(function ($router) {
                     $router->post('/', [GitController::class, 'commit'])->name('commit');

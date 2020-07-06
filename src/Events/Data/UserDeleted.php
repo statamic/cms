@@ -11,6 +11,6 @@ class UserDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('User deleted.');
+        return __('User deleted');
     }
 }

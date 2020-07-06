@@ -11,6 +11,6 @@ class TermSaved extends Saved
      */
     public function toSentence()
     {
-        return __('Term saved.');
+        return __('Term saved');
     }
 }

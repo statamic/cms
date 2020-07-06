@@ -11,6 +11,6 @@ class UserGroupSaved extends Saved
      */
     public function toSentence()
     {
-        return __('User group saved.');
+        return __('User group saved');
     }
 }

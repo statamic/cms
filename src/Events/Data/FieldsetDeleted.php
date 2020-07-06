@@ -11,6 +11,6 @@ class FieldsetDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Fieldset deleted.');
+        return __('Fieldset deleted');
     }
 }

@@ -11,6 +11,6 @@ class TaxonomySaved extends Saved
      */
     public function toSentence()
     {
-        return __('Taxonomy saved.');
+        return __('Taxonomy saved');
     }
 }

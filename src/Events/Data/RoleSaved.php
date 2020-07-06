@@ -11,6 +11,6 @@ class RoleSaved extends Saved
      */
     public function toSentence()
     {
-        return __('Role saved.');
+        return __('Role saved');
     }
 }

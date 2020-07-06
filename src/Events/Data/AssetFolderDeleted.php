@@ -11,6 +11,6 @@ class AssetFolderDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Asset folder deleted.');
+        return __('Asset folder deleted');
     }
 }

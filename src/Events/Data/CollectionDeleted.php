@@ -11,6 +11,6 @@ class CollectionDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Collection deleted.');
+        return __('Collection deleted');
     }
 }

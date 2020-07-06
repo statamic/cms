@@ -1,5 +1,5 @@
 @extends('statamic::layout')
-@section('title', Statamic::crumb(__('Git'), __('Utilities')))
+@section('title', Statamic::crumb('Git', __('Utilities')))
 
 @section('content')
 
@@ -10,13 +10,13 @@
         ])
 
         <div class="flex items-center justify-between">
-            <h1>{{ __('Git') }}</h1>
+            <h1>Git</h1>
 
             <form method="POST" action="{{ cp_route('utilities.git.commit') }}">
                 @csrf
 
                 <div class="flex items-center">
-                    <button type="submit" class="btn-primary" {{ $statuses ? '': 'disabled' }}>{{ __('Commit All Changes') }}</button>
+                    <button type="submit" class="btn-primary" {{ $statuses ? '': 'disabled' }}>{{ __('Commit') }}</button>
                 </div>
             </form>
     </header>
@@ -40,7 +40,7 @@
                 </div>
             </div>
         @empty
-            <p class="p-3 italic text-grey-60">{{ __('Nothing to commit, content paths clean!') }}</p>
+            <p class="p-3 italic text-grey-60">{{ __('statamic::messages.git_nothing_to_commit') }}</p>
         @endforelse
     </div>
 

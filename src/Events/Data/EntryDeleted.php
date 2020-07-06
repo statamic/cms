@@ -11,6 +11,6 @@ class EntryDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('Entry deleted.');
+        return __('Entry deleted');
     }
 }

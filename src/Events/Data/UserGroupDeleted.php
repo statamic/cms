@@ -11,6 +11,6 @@ class UserGroupDeleted extends Deleted
      */
     public function toSentence()
     {
-        return __('User group deleted.');
+        return __('User group deleted');
     }
 }
