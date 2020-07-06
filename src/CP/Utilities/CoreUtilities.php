@@ -60,7 +60,7 @@ class CoreUtilities
             Utility::make('git')
                 ->action([GitController::class, 'index'])
                 ->title('Git')
-                ->icon('email-utility') // TODO: Find better icon
+                ->icon('git')
                 ->description(__('statamic::messages.git_utility_description'))
                 ->docsUrl(Statamic::docsUrl('utilities/git'))
                 ->routes(function ($router) {
