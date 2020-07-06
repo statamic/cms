@@ -362,7 +362,7 @@ class GitEventTest extends TestCase
 
 class PunSaved extends \Statamic\Events\Data\Saved
 {
-    public function toSentence()
+    public function commitMessage()
     {
         return __('Pun saved');
     }

@@ -4,12 +4,7 @@ namespace Statamic\Events\Data;
 
 class FormSaved extends Saved
 {
-    /**
-     * To sentence.
-     *
-     * @return string
-     */
-    public function toSentence()
+    public function commitMessage()
     {
         return __('Form saved');
     }

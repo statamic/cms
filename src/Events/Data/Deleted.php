@@ -2,9 +2,10 @@
 
 namespace Statamic\Events\Data;
 
+use Statamic\Contracts\Git\ProvidesCommitMessage;
 use Statamic\Events\Event;
 
-abstract class Deleted extends Event
+abstract class Deleted extends Event implements ProvidesCommitMessage
 {
     public $item;
 
@@ -17,11 +18,4 @@ abstract class Deleted extends Event
     {
         $this->item = $item;
     }
-
-    /**
-     * To sentence.
-     *
-     * @return string
-     */
-    abstract public function toSentence();
 }

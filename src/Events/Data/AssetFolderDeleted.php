@@ -4,12 +4,7 @@ namespace Statamic\Events\Data;
 
 class AssetFolderDeleted extends Deleted
 {
-    /**
-     * To sentence.
-     *
-     * @return string
-     */
-    public function toSentence()
+    public function commitMessage()
     {
         return __('Asset folder deleted');
     }

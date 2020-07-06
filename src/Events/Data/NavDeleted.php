@@ -4,12 +4,7 @@ namespace Statamic\Events\Data;
 
 class NavDeleted extends Deleted
 {
-    /**
-     * To sentence.
-     *
-     * @return string
-     */
-    public function toSentence()
+    public function commitMessage()
     {
         return __('Navigation deleted');
     }

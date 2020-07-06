@@ -4,12 +4,7 @@ namespace Statamic\Events\Data;
 
 class RoleSaved extends Saved
 {
-    /**
-     * To sentence.
-     *
-     * @return string
-     */
-    public function toSentence()
+    public function commitMessage()
     {
         return __('Role saved');
     }

@@ -4,12 +4,7 @@ namespace Statamic\Events\Data;
 
 class AssetContainerSaved extends Saved
 {
-    /**
-     * To sentence.
-     *
-     * @return string
-     */
-    public function toSentence()
+    public function commitMessage()
     {
         return __('Asset container saved');
     }

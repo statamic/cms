@@ -4,12 +4,7 @@ namespace Statamic\Events\Data;
 
 class CollectionDeleted extends Deleted
 {
-    /**
-     * To sentence.
-     *
-     * @return string
-     */
-    public function toSentence()
+    public function commitMessage()
     {
         return __('Collection deleted');
     }

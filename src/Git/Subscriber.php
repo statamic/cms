@@ -2,6 +2,7 @@
 
 namespace Statamic\Git;
 
+use Statamic\Contracts\Git\ProvidesCommitMessage;
 use Statamic\Facades\Git;
 
 class Subscriber
@@ -72,8 +73,8 @@ class Subscriber
         }
 
         Git::dispatchCommit(
-            method_exists($event, 'toSentence')
-                ? $event->toSentence()
+            $event instanceof ProvidesCommitMessage
+                ? $event->commitMessage()
                 : null
         );
     }

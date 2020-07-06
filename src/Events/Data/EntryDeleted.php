@@ -4,12 +4,7 @@ namespace Statamic\Events\Data;
 
 class EntryDeleted extends Deleted
 {
-    /**
-     * To sentence.
-     *
-     * @return string
-     */
-    public function toSentence()
+    public function commitMessage()
     {
         return __('Entry deleted');
     }
