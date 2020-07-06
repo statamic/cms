@@ -12,8 +12,6 @@ use Statamic\Data\ContainsData;
 use Statamic\Data\Data;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\Data\AssetDeleted;
-use Statamic\Events\Data\AssetMoved;
-use Statamic\Events\Data\AssetReplaced;
 use Statamic\Events\Data\AssetSaved;
 use Statamic\Events\Data\AssetUploaded;
 use Statamic\Facades;
@@ -356,16 +354,13 @@ class Asset implements AssetContract, Augmentable
     /**
      * Save the asset.
      *
-     * @param bool $dispatchEvent
      * @return void
      */
-    public function save($dispatchEvent = true)
+    public function save()
     {
         Facades\Asset::save($this);
 
-        if ($dispatchEvent) {
-            AssetSaved::dispatch($this);
-        }
+        AssetSaved::dispatch($this);
 
         return true;
     }
@@ -455,9 +450,7 @@ class Asset implements AssetContract, Augmentable
         $this->disk()->rename($oldPath, $newPath);
         $this->path($newPath);
         $this->disk()->rename($oldMetaPath, $this->metaPath());
-        $this->save(false);
-
-        AssetMoved::dispatch($this);
+        $this->save();
 
         return $this;
     }
@@ -578,6 +571,8 @@ class Asset implements AssetContract, Augmentable
 
         $this->path($path);
 
+        $this->save();
+
         AssetUploaded::dispatch($this);
 
         return $this;
@@ -597,18 +592,6 @@ class Asset implements AssetContract, Augmentable
         }
 
         return (string) $str;
-    }
-
-    /**
-     * Replace the file.
-     *
-     * @param string|resource $contents  Either raw contents of a file, or a resource stream
-     */
-    public function replace($contents)
-    {
-        $this->disk()->put($this->path(), $contents);
-
-        AssetReplaced::dispatch($this);
     }
 
     /**

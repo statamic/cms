@@ -296,8 +296,11 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_asset_is_uploaded()
     {
-        // The assertion happens within `uploadAsset()`.
-        $this->uploadAsset();
+        Git::shouldReceive('dispatchCommit')->with('Asset saved.')->once();
+
+        $this->makeAsset()->upload(
+            UploadedFile::fake()->create('asset.txt')
+        );
     }
 
     /** @test */
@@ -305,23 +308,7 @@ class GitEventTest extends TestCase
     {
         Git::shouldReceive('dispatchCommit')->with('Asset saved.')->once();
 
-        $this->uploadAsset()->data(['bar' => 'baz'])->save();
-    }
-
-    /** @test */
-    public function it_commits_when_asset_is_moved()
-    {
-        Git::shouldReceive('dispatchCommit')->with('Asset moved.')->once();
-
-        $this->uploadAsset()->move('somewhere', 'asset');
-    }
-
-    /** @test */
-    public function it_commits_when_asset_is_replaced()
-    {
-        Git::shouldReceive('dispatchCommit')->with('Asset replaced.')->once();
-
-        $this->uploadAsset()->replace('new');
+        $this->makeAsset()->data(['bar' => 'baz'])->save();
     }
 
     /** @test */
@@ -329,7 +316,7 @@ class GitEventTest extends TestCase
     {
         Git::shouldReceive('dispatchCommit')->with('Asset deleted.')->once();
 
-        $this->uploadAsset()->delete();
+        $this->makeAsset()->delete();
     }
 
     /** @test */
@@ -338,7 +325,7 @@ class GitEventTest extends TestCase
         Git::shouldReceive('dispatchCommit')->with('Asset folder saved.')->once();
 
         $this
-            ->uploadAsset()
+            ->makeAsset()
             ->container()
             ->assetFolder('somewhere')
             ->save();
@@ -351,7 +338,7 @@ class GitEventTest extends TestCase
         Git::shouldReceive('dispatchCommit')->with('Asset folder deleted.')->once();
 
         $folder = $this
-            ->uploadAsset()
+            ->makeAsset()
             ->container()
             ->assetFolder('somewhere');
 
@@ -359,10 +346,9 @@ class GitEventTest extends TestCase
         $folder->delete();
     }
 
-    private function uploadAsset()
+    private function makeAsset()
     {
         Git::shouldReceive('dispatchCommit')->with('Asset container saved.')->once();
-        Git::shouldReceive('dispatchCommit')->with('Asset uploaded.')->once();
 
         $container = Facades\AssetContainer::make()->handle('assets')->disk('test');
         $container->save();
@@ -370,8 +356,7 @@ class GitEventTest extends TestCase
         return (new Asset)
             ->container($container->handle())
             ->path('asset.txt')
-            ->data(['foo' => 'bar'])
-            ->upload(UploadedFile::fake()->create('asset.txt'));
+            ->data(['foo' => 'bar']);
     }
 }
 
