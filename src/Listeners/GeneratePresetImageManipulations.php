@@ -3,7 +3,6 @@
 namespace Statamic\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Statamic\Events\Data\AssetReplaced;
 use Statamic\Events\Data\AssetUploaded;
 use Statamic\Facades\Folder;
 use Statamic\Facades\Path;
@@ -32,17 +31,16 @@ class GeneratePresetImageManipulations implements ShouldQueue
     public function subscribe($events)
     {
         $events->listen(AssetUploaded::class, self::class.'@handle');
-        $events->listen(AssetReplaced::class, self::class.'@handle');
     }
 
     /**
      * Handle the events.
      *
-     * @param AssetUploaded|AssetReplaced $event
+     * @param AssetUploaded $event
      */
     public function handle($event)
     {
-        $asset = $event->asset;
+        $asset = $event->item;
 
         if (! $asset->isImage()) {
             return;

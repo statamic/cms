@@ -2,20 +2,15 @@
 
 namespace Statamic\Events\Data;
 
-use Statamic\Contracts\Assets\AssetContainer;
-
-class AssetContainerSaved
+class AssetContainerSaved extends Saved
 {
     /**
-     * @var AssetContainer
+     * To sentence.
+     *
+     * @return string
      */
-    public $container;
-
-    /**
-     * @param AssetContainer $container
-     */
-    public function __construct(AssetContainer $container)
+    public function toSentence()
     {
-        $this->container = $container;
+        return __('Asset container saved');
     }
 }

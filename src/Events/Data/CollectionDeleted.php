@@ -2,25 +2,15 @@
 
 namespace Statamic\Events\Data;
 
-use Statamic\Events\Event;
-
-class CollectionDeleted extends Event
+class CollectionDeleted extends Deleted
 {
     /**
-     * The collection handle to be removed from the routes.
+     * To sentence.
      *
-     * @var string
+     * @return string
      */
-    public $collection;
-
-    /**
-     * Create a new CollectionDeleted instance.
-     *
-     * @param  string  $collection
-     * @return CollectionDeleted
-     */
-    public function __construct($collection)
+    public function toSentence()
     {
-        $this->collection = $collection;
+        return __('Collection deleted');
     }
 }

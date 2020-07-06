@@ -2,24 +2,15 @@
 
 namespace Statamic\Events\Data;
 
-use Statamic\Events\Event;
-
-class TaxonomyDeleted extends Event
+class TaxonomyDeleted extends Deleted
 {
     /**
-     * The taxonomy handle to be removed from the routes.
+     * To sentence.
      *
-     * @var string
+     * @return string
      */
-    public $taxonomy;
-
-    /**
-     * Create a new CollectionDeleted instance.
-     *
-     * @param  string  $taxonomy
-     */
-    public function __construct($taxonomy)
+    public function toSentence()
     {
-        $this->taxonomy = $taxonomy;
+        return __('Taxonomy deleted');
     }
 }

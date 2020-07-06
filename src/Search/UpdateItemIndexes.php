@@ -16,7 +16,7 @@ class UpdateItemIndexes
 
     public function update($event)
     {
-        $item = $event->data;
+        $item = $event->item;
 
         $this->indexes($item)->each(function ($index) use ($item) {
             $index->exists() ? $index->insert($item) : $index->update();
@@ -25,7 +25,7 @@ class UpdateItemIndexes
 
     public function delete($event)
     {
-        $item = $event->data;
+        $item = $event->item;
 
         $this->indexes($item)->each->delete($item);
     }

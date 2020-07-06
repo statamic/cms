@@ -4,19 +4,18 @@ namespace Statamic\Events\Data;
 
 use Statamic\Events\Event;
 
-class DataSaving extends Event
+abstract class Saving extends Event
 {
-    /**
-     * @var \Statamic\Data\Data
-     */
-    public $data;
+    public $item;
 
     /**
-     * @param \Statamic\Data\Data $data
+     * Instantiate saving event.
+     *
+     * @param mixed $item
      */
-    public function __construct($data)
+    public function __construct($item)
     {
-        $this->data = $data;
+        $this->item = $item;
     }
 
     /**

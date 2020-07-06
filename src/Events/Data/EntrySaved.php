@@ -2,7 +2,15 @@
 
 namespace Statamic\Events\Data;
 
-class EntrySaved extends ContentSaved
+class EntrySaved extends Saved
 {
-    //
+    /**
+     * To sentence.
+     *
+     * @return string
+     */
+    public function toSentence()
+    {
+        return __('Entry saved');
+    }
 }

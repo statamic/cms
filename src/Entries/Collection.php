@@ -6,6 +6,8 @@ use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\Data\CollectionDeleted;
+use Statamic\Events\Data\CollectionSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
@@ -295,6 +297,8 @@ class Collection implements Contract, AugmentableContract
             $this->updateEntryUris();
         }
 
+        CollectionSaved::dispatch($this);
+
         return $this;
     }
 
@@ -545,6 +549,8 @@ class Collection implements Contract, AugmentableContract
         $this->queryEntries()->get()->each->delete();
 
         Facades\Collection::delete($this);
+
+        CollectionDeleted::dispatch($this);
 
         return true;
     }
