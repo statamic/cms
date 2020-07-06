@@ -85,7 +85,7 @@ return [
     'getting_started_widget_header' => 'Starten met Statamic 3',
     'getting_started_widget_intro' => 'Om te beginnen met het bouwen van je nieuwe Statamic 3 site, raden we je aan om met deze stappen te beginnen.',
     'getting_started_widget_navigation' => 'Creëer multi-level lijsten van links die gebruik kunnen worden om navigaties, footers etc. te genereren.',
-    'getting_started_widget_reminder' => 'Onthoud: <b>Statamic is commerciële software</b> en mogelijk moet u een geschikte licentie aanschaffen om Statamic te blijven gebruiken nadat de bètaperiode is verstreken.',
+    'getting_started_widget_reminder' => 'Belangrijk: <b>Statamic is commerciële software</b> en mogelijk moet u een geldige licentie aanschaffen om Statamic te blijven gebruiken nadat de bètaperiode is verstreken.',
     'global_search_open_using_slash' => 'Focus zoekveld met de <kbd>/</kbd> toets',
     'global_set_config_intro' => 'Met globalsets kun je content beheren die sitebreed beschikbaar moet zijn, zoals bedrijfsgegevens, contactinformatie of frontend-settings.',
     'globals_blueprint_instructions' => 'Welke velden weergegeven moeten worden als de variabelen worden bewerkt.',
