@@ -56,7 +56,7 @@ class BlueprintController extends CpController
                 'title' => $request->title,
                 'sections' => [
                     'main' => [
-                        'display' => 'Main',
+                        'display' => __('Main'),
                         'fields' => [],
                     ],
                 ],

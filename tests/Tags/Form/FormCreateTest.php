@@ -181,6 +181,47 @@ EOT
         $this->assertStringContainsString($expectedErrorRedirect, $output);
     }
 
+    /** @test */
+    public function it_can_render_an_inline_error_when_multiple_rules_fail()
+    {
+        $this->withoutExceptionHandling();
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        $this
+            ->post('/!/forms/contact', ['name' => '$'])
+            ->assertSessionHasErrors(['name', 'email', 'message'], null, 'form.contact')
+            ->assertLocation('/');
+
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        $output = $this->tag(<<<'EOT'
+{{ form:contact }}
+    {{ errors }}
+        <p class="error">{{ value }}</p>
+    {{ /errors }}
+    <p class="inline-error">{{ error:name }}</p>
+{{ /form:contact }}
+EOT
+        );
+
+        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+        preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
+
+        $expected = [
+            'The Full Name must be at least 3 characters.',
+            'The Full Name may only contain letters and numbers.',
+            'The Email Address field is required.',
+            'The Message field is required.',
+        ];
+
+        $expectedInline = [
+            'The Full Name must be at least 3 characters.',
+        ];
+
+        $this->assertEquals($expected, $errors[1]);
+        $this->assertEquals($expectedInline, $inlineErrors[1]);
+    }
+
     private function createContactForm()
     {
         $blueprint = Blueprint::make()->setContents([
@@ -190,6 +231,7 @@ EOT
                     'field' => [
                         'type' => 'text',
                         'display' => 'Full Name',
+                        'validate' => 'min:3|alpha_num',
                     ],
                 ],
                 [

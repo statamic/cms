@@ -36,6 +36,7 @@ abstract class Relationship extends Fieldtype
             ],
             'mode' => [
                 'display' => __('Mode'),
+                'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
                 'type' => 'radio',
                 'default' => 'default',
                 'options' => [
@@ -237,7 +238,7 @@ abstract class Relationship extends Fieldtype
             return $this->augmentValue($value);
         });
 
-        $values = $values->map(function ($value) {
+        $values = $values->filter()->map(function ($value) {
             return $this->shallowAugmentValue($value);
         });
 

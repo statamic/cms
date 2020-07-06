@@ -5,7 +5,7 @@
 
                 <v-select
                     ref="fieldSelect"
-                    :placeholder="__('Select Field')"
+                    :placeholder="__('Select field')"
                     :options="fieldOptions"
                     :reduce="option => option.value"
                     :value="field"

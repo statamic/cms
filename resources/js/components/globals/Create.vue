@@ -3,7 +3,7 @@
 
         <div class="rounded p-3 lg:px-7 lg:py-5 shadow bg-white">
             <header class="text-center mb-6">
-                <h1 class="mb-3">{{ __('Create a new Global Set') }}</h1>
+                <h1 class="mb-3">{{ __('Create Global Set') }}</h1>
                 <p class="text-grey" v-text="__('messages.globals_configure_intro')" />
             </header>
             <div class="mb-5">

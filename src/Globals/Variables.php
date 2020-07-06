@@ -7,7 +7,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Globals\Variables as Contract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Data\HasAugmentedData;
+use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
@@ -16,7 +16,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Variables implements Contract, Localization, Augmentable
 {
-    use ExistsAsFile, ContainsData, HasAugmentedData, HasOrigin, FluentlyGetsAndSets;
+    use ExistsAsFile, ContainsData, HasAugmentedInstance, HasOrigin, FluentlyGetsAndSets;
 
     protected $set;
     protected $locale;
@@ -143,5 +143,10 @@ class Variables implements Contract, Localization, Augmentable
     protected function getOriginByString($origin)
     {
         return $this->globalSet()->in($origin);
+    }
+
+    public function newAugmentedInstance()
+    {
+        return new AugmentedVariables($this);
     }
 }

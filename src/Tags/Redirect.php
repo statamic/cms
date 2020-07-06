@@ -10,7 +10,7 @@ class Redirect extends Tags
     public function wildcard($tag)
     {
         return $this->redirect(
-            $this->context->get($tag)
+            $this->context->value($tag)
         );
     }
 

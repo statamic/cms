@@ -25,7 +25,7 @@
         <select-input
             v-model="predefinedRule"
             :options="predefinedRules"
-            placeholder="Add Rule"
+            :placeholder="__('Add Rule')"
             @input="add"
             class="inline-block mt-3" />
     </div>
