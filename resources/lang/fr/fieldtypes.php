@@ -41,6 +41,7 @@ return [
     'date.config.rows' => 'Afficher plusieurs mois à la fois, en lignes et en colonnes.',
     'date.config.time_enabled' => 'Activez le sélecteur d’horaire.',
     'date.config.time_required' => 'Exiger l’horodatage en plus de la date.',
+    'form.config.max_items' => 'Le nombre maximum de formulaires sélectionnables.',
     'grid.config.add_row' => 'Définissez le libellé du bouton "Ajouter une ligne".',
     'grid.config.fields' => 'Chaque champ devient une colonne dans la table de grille.',
     'grid.config.max_rows' => 'Définissez un nombre maximal de lignes pouvant être créées.',
@@ -62,6 +63,7 @@ return [
     'range.config.min' => 'La valeur minimale (la plus à gauche).',
     'range.config.prepend' => 'Ajoutez du texte au début (côté gauche) du curseur.',
     'range.config.step' => 'La taille minimale entre les valeurs.',
+    'relationship.config.mode' => 'Choisissez votre style d’interface utilisateur préféré.',
     'select.config.cast_booleans' => 'Les options avec des valeurs true (vrai) et false (faux) seront enregistrées en tant que booléens.',
     'select.config.clearable' => 'Activez pour permettre de désélectionner votre option.',
     'select.config.multiple' => 'Autorisez des sélections multiples.',
@@ -76,6 +78,4 @@ return [
     'text.config.input_type' => 'Définissez le type d’entrée HTML5.',
     'text.config.placeholder' => 'Définissez un texte d’espace réservé par défaut, non sélectionnable.',
     'text.config.prepend' => 'Ajoutez du texte avant (à gauche de) la saisie de texte.',
-    'textarea.config.character_limit' => 'Définissez le nombre maximum de caractères saisissables.',
-    'relationship.config.mode' => 'Choisissez votre style d’interface utilisateur préféré.',
 ];
