@@ -35,10 +35,10 @@ export default {
 
     mixins: [Listing],
 
-    props: [
-        'initial-rows',
-        'initial-columns',
-    ],
+    props: {
+        initialRows: Array,
+        initialColumns: Array,
+    },
 
     data() {
         return {

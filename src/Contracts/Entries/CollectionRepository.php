@@ -3,7 +3,6 @@
 namespace Statamic\Contracts\Entries;
 
 use Illuminate\Support\Collection as IlluminateCollection;
-use Statamic\Entries\Collection;
 
 interface CollectionRepository
 {

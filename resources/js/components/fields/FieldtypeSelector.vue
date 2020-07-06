@@ -66,7 +66,15 @@ export default {
         return {
             isActive: false,
             filterBy: 'all',
-            filters: ['Text', 'Media', 'Pickable', 'Structured', 'Relationship', 'Special', 'System'],
+            filters: [
+                __('Text'),
+                __('Media'),
+                __('Pickable'),
+                __('Structured'),
+                __('Relationship'),
+                __('Special'),
+                __('System')
+            ],
             search: '',
             isSearchOpen: false
         }

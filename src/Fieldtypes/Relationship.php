@@ -36,6 +36,7 @@ abstract class Relationship extends Fieldtype
             ],
             'mode' => [
                 'display' => __('Mode'),
+                'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
                 'type' => 'radio',
                 'default' => 'default',
                 'options' => [
@@ -109,6 +110,7 @@ abstract class Relationship extends Fieldtype
         return [
             'data' => $this->getItemData($this->field->value())->all(),
             'itemDataUrl' => $this->getItemDataUrl(),
+            'filtersUrl' => $this->getFiltersUrl(),
             'baseSelectionsUrl' => $this->getBaseSelectionsUrl(),
             'getBaseSelectionsUrlParameters' => $this->getBaseSelectionsUrlParameters(),
             'itemComponent' => $this->getItemComponent(),
@@ -173,6 +175,11 @@ abstract class Relationship extends Fieldtype
         return cp_route('relationship.data');
     }
 
+    protected function getFiltersUrl()
+    {
+        return cp_route('relationship.filters');
+    }
+
     protected function getBaseSelectionsUrl()
     {
         return cp_route('relationship.index');
@@ -181,6 +188,11 @@ abstract class Relationship extends Fieldtype
     protected function getBaseSelectionsUrlParameters()
     {
         return [];
+    }
+
+    public function getSelectionFilters()
+    {
+        return collect();
     }
 
     protected function getCreatables()
@@ -226,7 +238,7 @@ abstract class Relationship extends Fieldtype
             return $this->augmentValue($value);
         });
 
-        $values = $values->map(function ($value) {
+        $values = $values->filter()->map(function ($value) {
             return $this->shallowAugmentValue($value);
         });
 

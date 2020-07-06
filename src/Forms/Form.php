@@ -11,6 +11,7 @@ use Statamic\Facades\Folder;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -110,16 +111,7 @@ class Form implements FormContract
      */
     public function email($emails = null)
     {
-        return $this->fluentlyGetOrSet('email')
-            ->setter(function ($emails) {
-                return collect($emails)
-                    ->map(function ($email) {
-                        return collect($email)->only(['to', 'from', 'reply_to', 'subject', 'template'])->filter()->all();
-                    })
-                    ->filter()
-                    ->all();
-            })
-            ->args(func_get_args());
+        return $this->fluentlyGetOrSet('email')->args(func_get_args());
     }
 
     /**
@@ -155,7 +147,9 @@ class Form implements FormContract
             'title' => $this->title,
             'blueprint' => $this->blueprint,
             'honeypot' => $this->honeypot,
-            'email' => $this->email,
+            'email' => collect($this->email)->map(function ($email) {
+                return Arr::removeNullValues($email);
+            })->all(),
             'metrics' => $this->metrics,
         ])->filter()->all();
 
@@ -339,16 +333,9 @@ class Form implements FormContract
     public function dateFormat()
     {
         // TODO: Should this be a form.yaml config, a config/forms.php config, or a global config?
-        return 'M j, Y @ h:m';
+        return 'M j, Y @ h:i';
 
-        // return $this->formset()->get('date_format', 'M j, Y @ h:m');
-    }
-
-    public function sanitize()
-    {
-        // TODO: This was a form.yaml config option?
-        // ie. formset()->get('sanitize', true)
-        return true;
+        // return $this->formset()->get('date_format', 'M j, Y @ h:i');
     }
 
     /**

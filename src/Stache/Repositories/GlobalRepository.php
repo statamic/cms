@@ -20,7 +20,7 @@ class GlobalRepository implements RepositoryContract
 
     public function make($handle = null)
     {
-        return (new \Statamic\Globals\GlobalSet)->handle($handle);
+        return app(GlobalSet::class)->handle($handle);
     }
 
     public function all(): GlobalCollection
@@ -50,5 +50,12 @@ class GlobalRepository implements RepositoryContract
     public function delete($global)
     {
         $this->store->delete($global);
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            GlobalSet::class => \Statamic\Globals\GlobalSet::class,
+        ];
     }
 }

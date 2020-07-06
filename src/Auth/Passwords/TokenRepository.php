@@ -17,7 +17,7 @@ class TokenRepository extends DatabaseTokenRepository
     protected $expires;
     protected $path;
 
-    public function __construct(Filesystem $files, HasherContract $hasher, $hashKey, $expires = 60, $throttle = 60)
+    public function __construct(Filesystem $files, HasherContract $hasher, $table, $hashKey, $expires = 60, $throttle = 60)
     {
         $this->files = $files;
         $this->hasher = $hasher;
@@ -25,7 +25,7 @@ class TokenRepository extends DatabaseTokenRepository
         $this->expires = $expires * 60;
         $this->throttle = $throttle;
 
-        $this->path = storage_path('statamic/password_resets.yaml');
+        $this->path = storage_path("statamic/password_resets/$table.yaml");
     }
 
     public function create(CanResetPasswordContract $user)
@@ -92,6 +92,10 @@ class TokenRepository extends DatabaseTokenRepository
 
     protected function putResets($resets)
     {
+        if (! $this->files->isDirectory($dir = dirname($this->path))) {
+            $this->files->makeDirectory($dir);
+        }
+
         $this->files->put($this->path, YAML::dump($resets->all()));
     }
 }

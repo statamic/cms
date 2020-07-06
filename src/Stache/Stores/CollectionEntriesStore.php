@@ -10,6 +10,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes;
 use Statamic\Structures\CollectionStructure;
+use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class CollectionEntriesStore extends ChildStore
@@ -24,7 +25,7 @@ class CollectionEntriesStore extends ChildStore
     public function getFileFilter(SplFileInfo $file)
     {
         $dir = str_finish($this->directory(), '/');
-        $relative = $file->getPathname();
+        $relative = Path::tidy($file->getPathname());
 
         if (substr($relative, 0, strlen($dir)) == $dir) {
             $relative = substr($relative, strlen($dir));
@@ -103,7 +104,7 @@ class CollectionEntriesStore extends ChildStore
         }
 
         // Support entries within subdirectories at any level.
-        if (str_contains($collection, '/')) {
+        if (Str::contains($collection, '/')) {
             $collection = str_before($collection, '/');
         }
 

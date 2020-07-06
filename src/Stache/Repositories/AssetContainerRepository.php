@@ -47,4 +47,11 @@ class AssetContainerRepository implements RepositoryContract
     {
         $this->store->delete($container);
     }
+
+    public static function bindings(): array
+    {
+        return [
+            AssetContainer::class => \Statamic\Assets\AssetContainer::class,
+        ];
+    }
 }

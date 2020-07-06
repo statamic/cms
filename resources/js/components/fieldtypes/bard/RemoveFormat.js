@@ -1,5 +1,4 @@
 import { Extension } from 'tiptap';
-import { Transform } from 'prosemirror-transform';
 
 export default class RemoveFormat extends Extension {
 

@@ -30,7 +30,7 @@ class Collection extends Tags
     public function index()
     {
         if (! $this->params->hasAny(['from', 'in', 'folder', 'use', 'collection'])) {
-            return $this->context->get('collection');
+            return $this->context->value('collection');
         }
 
         return $this->output(

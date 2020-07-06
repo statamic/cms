@@ -20,6 +20,10 @@
 	padding-left: 56px;
 }
 
+.mode-grid .data-list-bulk-actions {
+	@apply bg-white w-full pt-2 z-10 pl-2 static;
+}
+
 .data-list-footer {
     @apply py-1.5 pr-2 flex items-center border-t;
 }

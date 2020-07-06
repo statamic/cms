@@ -11,11 +11,11 @@ use Statamic\Support\Str;
 
 trait QueriesConditions
 {
+    use GetsPipedArrayValues;
+
     protected function queryConditions($query)
     {
-        $this->parameters->filter(function ($value, $param) {
-            return Str::contains($param, ':');
-        })->each(function ($value, $param) use ($query) {
+        $this->queryableConditionParams()->each(function ($value, $param) use ($query) {
             $this->queryCondition(
                 $query,
                 $field = explode(':', $param)[0],
@@ -23,6 +23,22 @@ trait QueriesConditions
                 $this->getQueryConditionValue($value, $field)
             );
         });
+    }
+
+    protected function queryableConditionParams()
+    {
+        return $this->parameters->filter(function ($value, $param) {
+            return Str::contains($param, ':');
+        });
+    }
+
+    protected function isQueryingCondition($field)
+    {
+        return $this->queryableConditionParams()
+            ->map(function ($value, $param) {
+                return explode(':', $param)[0];
+            })
+            ->contains($field);
     }
 
     protected function queryCondition($query, $field, $condition, $value)
@@ -129,11 +145,19 @@ trait QueriesConditions
 
     protected function queryInCondition($query, $field, $value)
     {
+        if (is_string($value)) {
+            $value = $this->getPipedValues($value);
+        }
+
         $query->whereIn($field, $value);
     }
 
     protected function queryNotInCondition($query, $field, $value)
     {
+        if (is_string($value)) {
+            $value = $this->getPipedValues($value);
+        }
+
         $query->whereNotIn($field, $value);
     }
 

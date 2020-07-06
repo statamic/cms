@@ -44,6 +44,8 @@ class Translate extends Command
         foreach ($this->languages() as $lang) {
             $this->translateFiles($lang);
         }
+
+        return 0;
     }
 
     protected function translateFiles($lang)
@@ -104,6 +106,7 @@ class Translate extends Command
         collect($this->files->files(getcwd().'/resources/lang/'.$lang))
             ->filter(function ($file) {
                 $filename = substr($file->getBasename(), 0, -4); // without extension
+
                 return ! in_array($filename, $this->excluded);
             })
             ->each(function ($file) use ($lang) {
@@ -148,7 +151,7 @@ class Translate extends Command
         $bar->finish();
         $this->output->writeln('');
 
-        $contents = "<?php\n\nreturn ".VarExporter::export(Arr::undot($translations)).";\n";
+        $contents = "<?php\n\nreturn ".VarExporter::export($translations).";\n";
 
         $this->files->put($fullPath, $contents);
 
@@ -202,6 +205,8 @@ class Translate extends Command
 
     protected function translate($string, $lang)
     {
+        $lang = explode('-', str_replace('_', '-', $lang))[0];
+
         $response = $this->client->translate($string, ['target' => $lang]);
 
         return (new Placeholders)->unwrap($response['text']);

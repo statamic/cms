@@ -5,6 +5,7 @@ namespace Tests\Fieldtypes;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Data\AugmentedCollection;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Entries;
@@ -49,6 +50,7 @@ class EntriesTest extends TestCase
         $augmented = $this->fieldtype()->shallowAugment(['123', '456']);
 
         $this->assertInstanceOf(Collection::class, $augmented);
+        $this->assertEveryItemIsInstanceOf(AugmentedCollection::class, $augmented);
         $this->assertEquals([
             [
                 'id' => '123',
@@ -64,7 +66,7 @@ class EntriesTest extends TestCase
                 'permalink' => 'http://localhost/blog/two',
                 'api_url' => 'http://localhost/api/collections/blog/entries/456',
             ],
-        ], $augmented->all());
+        ], $augmented->toArray());
     }
 
     /** @test */
@@ -72,13 +74,14 @@ class EntriesTest extends TestCase
     {
         $augmented = $this->fieldtype(['max_items' => 1])->shallowAugment(['123']);
 
+        $this->assertInstanceOf(AugmentedCollection::class, $augmented);
         $this->assertEquals([
             'id' => '123',
             'title' => 'One',
             'url' => '/blog/one',
             'permalink' => 'http://localhost/blog/one',
             'api_url' => 'http://localhost/api/collections/blog/entries/123',
-        ], $augmented);
+        ], $augmented->toArray());
     }
 
     public function fieldtype($config = [])

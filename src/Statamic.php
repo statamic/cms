@@ -21,6 +21,7 @@ class Statamic
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
+    protected static $bootedCallbacks = [];
 
     public static function version()
     {
@@ -39,7 +40,7 @@ class Statamic
 
     public static function script($name, $path)
     {
-        static::$scripts[$name] = str_finish($path, '.js');
+        static::$scripts[$name][] = str_finish($path, '.js');
 
         return new static;
     }
@@ -58,7 +59,7 @@ class Statamic
 
     public static function style($name, $path)
     {
-        static::$styles[$name] = str_finish($path, '.css');
+        static::$styles[$name][] = str_finish($path, '.css');
 
         return new static;
     }
@@ -189,7 +190,7 @@ class Statamic
         }
 
         $svg = StaticStringy::collapseWhitespace(
-            File::get(statamic_path("resources/dist/svg/{$name}.svg"))
+            File::get(public_path("vendor/statamic/cp/svg/{$name}.svg"))
         );
 
         return str_replace('<svg', sprintf('<svg%s', $attrs), $svg);
@@ -226,5 +227,17 @@ class Statamic
     public static function docsUrl($url)
     {
         return URL::tidy('https://statamic.dev/'.$url);
+    }
+
+    public static function booted(Closure $callback)
+    {
+        static::$bootedCallbacks[] = $callback;
+    }
+
+    public static function runBootedCallbacks()
+    {
+        foreach (static::$bootedCallbacks as $callback) {
+            $callback();
+        }
     }
 }

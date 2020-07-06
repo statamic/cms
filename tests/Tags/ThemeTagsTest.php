@@ -18,7 +18,7 @@ class ThemeTagsTest extends TestCase
         parent::setUp();
     }
 
-    private function tag($tag)
+    private function tag($tag): string
     {
         return Parse::template($tag, []);
     }
@@ -113,16 +113,20 @@ class ThemeTagsTest extends TestCase
 
     public function testOutputsFileContents()
     {
-        $contents = File::get('site/themes/redwood/package.json');
+        File::shouldReceive('disk')->andReturn($disk = \Mockery::mock());
+        $disk->shouldReceive('exists')->with('test.txt')->once()->andReturnTrue();
+        $disk->shouldReceive('get')->with('test.txt')->andReturn('contents');
 
         $this->assertEquals(
-            $contents,
-            $this->tag('{{ theme:output src="package.json" }}')
+            'contents',
+            $this->tag('{{ theme:output src="test.txt" }}')
         );
     }
 
     public function testAppendsTimestampForCacheBusting()
     {
+        File::shouldReceive('exists')->with(public_path('/js/foo.js'))->andReturnTrue();
+
         File::shouldReceive('lastModified')
             ->withArgs(function ($arg) {
                 return Path::tidy(public_path('/js/foo.js')) === Path::tidy($arg);

@@ -3,17 +3,20 @@
 namespace Tests\Tags\Collection;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Term;
 use Statamic\Fields\Value;
 use Statamic\Query\Scopes\Scope;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Tags\Collection\Entries;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
+use Statamic\Taxonomies\TermCollection;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -60,6 +63,11 @@ class EntriesTest extends TestCase
         return (new Entries($params))->get();
     }
 
+    protected function getEntryIds($params = [])
+    {
+        return collect($this->getEntries($params)->items())->map->id()->values()->all();
+    }
+
     /** @test */
     public function it_gets_entries_in_a_collection()
     {
@@ -80,10 +88,38 @@ class EntriesTest extends TestCase
         $this->makeEntry('e')->save();
 
         $this->assertCount(5, $this->getEntries());
-        $this->assertCount(3, $this->getEntries(['paginate' => 3]));
+        $this->assertCount(3, $this->getEntries(['paginate' => 3])); // recommended v3 style
         $this->assertCount(4, $this->getEntries(['paginate' => true, 'limit' => 4])); // v2 style
-        $this->assertCount(3, $this->getEntries(['paginate' => 3, 'limit' => 4])); // precedence
+        $this->assertCount(3, $this->getEntries(['paginate' => 3, 'limit' => 4])); // precedence test
         $this->assertCount(5, $this->getEntries(['paginate' => true])); // ignore if no perPage set
+
+        $this->assertEquals(['a', 'b', 'c'], $this->getEntryIds(['paginate' => 3]));
+
+        Paginator::currentPageResolver(function () {
+            return 2;
+        });
+
+        $this->assertEquals(['d', 'e'], $this->getEntryIds(['paginate' => 3]));
+    }
+
+    /** @test */
+    public function it_gets_offset_paginated_entries_in_a_collection()
+    {
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('d')->save();
+        $this->makeEntry('e')->save();
+        $this->makeEntry('f')->save();
+        $this->makeEntry('g')->save();
+
+        $this->assertEquals(['c', 'd', 'e'], $this->getEntryIds(['paginate' => 3, 'offset' => 2]));
+
+        Paginator::currentPageResolver(function () {
+            return 2;
+        });
+
+        $this->assertEquals(['f', 'g'], $this->getEntryIds(['paginate' => 3, 'offset' => 2]));
     }
 
     /** @test */
@@ -151,21 +187,6 @@ class EntriesTest extends TestCase
             ['B', 'C', 'D'],
             $this->getEntries(['limit' => 3, 'offset' => new Value(1)])->map->get('title')->values()->all()
         );
-    }
-
-    /** @test */
-    public function it_filters_by_publish_status()
-    {
-        $this->makeEntry('o')->published(true)->save();
-        $this->makeEntry('b')->published(true)->save();
-        $this->makeEntry('c')->published(false)->save();
-
-        $this->assertCount(2, $this->getEntries());
-        $this->assertCount(2, $this->getEntries(['show_unpublished' => false]));
-        $this->assertCount(3, $this->getEntries(['show_unpublished' => true]));
-        $this->assertCount(2, $this->getEntries(['show_published' => true]));
-        $this->assertCount(0, $this->getEntries(['show_published' => false]));
-        $this->assertCount(1, $this->getEntries(['show_published' => false, 'show_unpublished' => true]));
     }
 
     /** @test */
@@ -244,6 +265,39 @@ class EntriesTest extends TestCase
         $this->assertCount(7, $this->getEntries(['show_future' => true, 'since' => '-2 days']));
         $this->assertCount(4, $this->getEntries(['show_future' => true, 'until' => 'now']));
         $this->assertCount(6, $this->getEntries(['show_future' => true, 'until' => 'tomorrow']));
+    }
+
+    /** @test */
+    public function it_filters_by_status()
+    {
+        $this->collection->dated(true)->futureDateBehavior('private')->pastDateBehavior('public')->save();
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+
+        $this->makeEntry('a')->date('2019-03-08')->published(true)->save(); // definitely in past
+        $this->makeEntry('b')->date('2019-03-09')->published(false)->save(); // definitely in past
+        $this->makeEntry('c')->date('2019-03-10')->published(false)->save(); // today
+        $this->makeEntry('d')->date('2019-03-11')->published(true)->save(); // definitely in future, so status will not be 'published'
+
+        $this->assertCount(1, $this->getEntries()); // defaults to 'published'
+        $this->assertCount(1, $this->getEntries(['status:is' => 'published']));
+        $this->assertCount(3, $this->getEntries(['status:not' => 'published']));
+        $this->assertCount(3, $this->getEntries(['status:in' => 'published|draft']));
+    }
+
+    /** @test */
+    public function it_filters_by_published_boolean()
+    {
+        $this->collection->dated(true)->futureDateBehavior('private')->pastDateBehavior('public')->save();
+        Carbon::setTestNow(Carbon::parse('2019-03-10 13:00'));
+
+        $this->makeEntry('a')->date('2019-03-08')->published(true)->save(); // definitely in past
+        $this->makeEntry('b')->date('2019-03-09')->published(false)->save(); // definitely in past
+        $this->makeEntry('c')->date('2019-03-10')->published(false)->save(); // today
+        $this->makeEntry('d')->date('2019-03-11')->published(true)->save(); // definitely in future, so status will not be 'published'
+
+        $this->assertCount(1, $this->getEntries()); // defaults to 'published'
+        $this->assertCount(1, $this->getEntries(['published:is' => true]));
+        $this->assertCount(2, $this->getEntries(['published:not' => true]));
     }
 
     /** @test */
@@ -372,6 +426,7 @@ class EntriesTest extends TestCase
         $this->makeEntry('3')->data(['tags' => ['meh']])->save();
 
         $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags' => 'rad'])->map->slug()->all());
+        $this->assertEquals([1, 2], $this->getEntries(['taxonomy:tags' => TermCollection::make([Term::make('rad')->taxonomy('tags')])])->map->slug()->all());
     }
 
     /** @test */

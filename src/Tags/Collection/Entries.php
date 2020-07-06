@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection as IlluminateCollection;
 use InvalidArgumentException;
+use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -16,9 +17,11 @@ use Statamic\Tags\Concerns;
 
 class Entries
 {
-    use Concerns\QueriesConditions,
-        Concerns\QueriesScopes,
+    use Concerns\QueriesScopes,
         Concerns\GetsQueryResults;
+    use Concerns\QueriesConditions {
+        queryableConditionParams as traitQueryableConditionParams;
+    }
     use Concerns\QueriesOrderBys {
         queryOrderBys as traitQueryOrderBys;
     }
@@ -142,7 +145,7 @@ class Entries
             ->whereIn('collection', $this->collections->map->handle()->all());
 
         $this->querySite($query);
-        $this->queryPublished($query);
+        $this->queryStatus($query);
         $this->queryPastFuture($query);
         $this->querySinceUntil($query);
         $this->queryTaxonomies($query);
@@ -161,8 +164,6 @@ class Entries
         $this->collections = $this->parseCollections();
         $this->orderBys = $this->parseOrderBys();
         $this->site = $this->parameters->get(['site', 'locale']);
-        $this->showPublished = $this->parameters->get('show_published', true);
-        $this->showUnpublished = $this->parameters->get('show_unpublished', false);
         $this->since = $this->parameters->get('since');
         $this->until = $this->parameters->get('until');
     }
@@ -229,22 +230,20 @@ class Entries
         return $query->where('site', $site);
     }
 
-    protected function queryPublished($query)
+    protected function queryStatus($query)
     {
-        if ($this->showPublished && $this->showUnpublished) {
+        if ($this->isQueryingCondition('status') || $this->isQueryingCondition('published')) {
             return;
-        } elseif ($this->showPublished && ! $this->showUnpublished) {
-            return $query->where('published', true);
-        } elseif (! $this->showPublished && $this->showUnpublished) {
-            return $query->where('published', false);
         }
 
-        throw new NoResultsExpected;
+        return $query->where('status', 'published');
     }
 
     protected function queryPastFuture($query)
     {
         if (! $this->allCollectionsAreDates()) {
+            return;
+        } elseif ($this->isQueryingCondition('status')) {
             return;
         }
 
@@ -311,6 +310,10 @@ class Entries
             }
 
             $values = collect($values)->map(function ($term) use ($taxonomy) {
+                if ($term instanceof Term) {
+                    return $term->id();
+                }
+
                 return Str::contains($term, '::') ? $term : $taxonomy.'::'.$term;
             });
 
@@ -357,5 +360,12 @@ class Entries
         if (! $this->parameters->bool(['redirects', 'links'], false)) {
             $query->where('redirect', '=', null);
         }
+    }
+
+    protected function queryableConditionParams()
+    {
+        return $this->traitQueryableConditionParams()->reject(function ($value, $key) {
+            return Str::startsWith($key, 'taxonomy:');
+        });
     }
 }

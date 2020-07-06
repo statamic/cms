@@ -44,13 +44,17 @@ class QueriesConditionsTest extends TestCase
     /** @test */
     public function it_filters_by_is_condition()
     {
-        $this->makeEntry('dog1')->set('title', 'Dog')->save();
-        $this->makeEntry('cat1')->set('title', 'Cat')->save();
-        $this->makeEntry('tiger1')->set('title', 'Tiger')->save();
+        $this->makeEntry('dog')->set('title', 'Dog')->save();
+        $this->makeEntry('cat')->set('title', 'Cat')->save();
+        $this->makeEntry('tiger')->set('title', 'Tiger')->save();
+        $this->makeEntry('rat')->set('featured', true)->save();
+        $this->makeEntry('bat')->set('featured', false)->save();
 
-        $this->assertCount(3, $this->getEntries());
+        $this->assertCount(5, $this->getEntries());
         $this->assertCount(1, $this->getEntries(['title:is' => 'dog']));
         $this->assertCount(1, $this->getEntries(['title:equals' => 'dog']));
+        $this->assertCount(1, $this->getEntries(['featured:is' => true]));
+        $this->assertCount(4, $this->getEntries(['featured:is' => false]));
     }
 
     /** @test */
@@ -59,12 +63,16 @@ class QueriesConditionsTest extends TestCase
         $this->makeEntry('dog')->set('title', 'Dog')->save();
         $this->makeEntry('cat')->set('title', 'Cat')->save();
         $this->makeEntry('tiger')->set('title', 'Tiger')->save();
+        $this->makeEntry('rat')->set('featured', true)->save();
+        $this->makeEntry('bat')->set('featured', false)->save();
 
-        $this->assertCount(3, $this->getEntries());
-        $this->assertCount(2, $this->getEntries(['title:not' => 'dog']));
-        $this->assertCount(2, $this->getEntries(['title:isnt' => 'dog']));
-        $this->assertCount(2, $this->getEntries(['title:aint' => 'dog']));
-        $this->assertCount(2, $this->getEntries(['title:¯\\_(ツ)_/¯' => 'dog']));
+        $this->assertCount(5, $this->getEntries());
+        $this->assertCount(4, $this->getEntries(['title:not' => 'dog']));
+        $this->assertCount(4, $this->getEntries(['title:isnt' => 'dog']));
+        $this->assertCount(4, $this->getEntries(['title:aint' => 'dog']));
+        $this->assertCount(4, $this->getEntries(['title:¯\\_(ツ)_/¯' => 'dog']));
+        $this->assertCount(4, $this->getEntries(['featured:not' => true]));
+        $this->assertCount(4, $this->getEntries(['featured:not' => false]));
     }
 
     /** @test */
@@ -105,6 +113,12 @@ class QueriesConditionsTest extends TestCase
         $this->assertEquals(['tiger', 'cat', 'lion'], $this->getEntries(['type:in' => ['feline']])->map->slug()->all());
         $this->assertEquals(['dog', 'wolf', 'tiger', 'cat', 'lion'], $this->getEntries(['type:in' => ['canine', 'feline']])->map->slug()->all());
         $this->assertEquals(['horse'], $this->getEntries(['type:in' => ['equine']])->map->slug()->all());
+
+        // Handles pipe array syntax
+        $this->assertEquals(
+            ['dog', 'wolf', 'tiger', 'cat', 'lion'],
+            $this->getEntries(['type:in' => 'canine|feline'])->map->slug()->all()
+        );
     }
 
     /** @test */
@@ -134,6 +148,12 @@ class QueriesConditionsTest extends TestCase
         $this->assertEquals(
             ['dog', 'wolf', 'tiger', 'cat', 'lion', 'bigfoot'],
             $this->getEntries(['type:not_in' => ['equine']])->map->slug()->all()
+        );
+
+        // Handles pipe array syntax
+        $this->assertEquals(
+            ['horse', 'bigfoot'],
+            $this->getEntries(['type:not_in' => 'canine|feline'])->map->slug()->all()
         );
     }
 
@@ -446,7 +466,7 @@ class QueriesConditionsTest extends TestCase
         $this->makeEntry('a')->set('sub_title', 'Has sub-title')->save();
         $this->makeEntry('b')->set('sub_title', '')->save();
         $this->makeEntry('c')->set('sub_title', null)->save();
-        $this->makeEntry('d')->save();
+        $this->makeEntry('e')->save();
 
         $this->assertCount(4, $this->getEntries());
         $this->assertCount(3, $this->getEntries(['sub_title:is_empty' => true]));

@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags\Concerns;
 
+use Illuminate\Support\MessageBag;
 use Statamic\Extend\HasParameters;
 
 trait RendersForms
@@ -42,6 +43,15 @@ trait RendersForms
         return $html;
     }
 
+    protected function formMetaFields($meta)
+    {
+        return collect($meta)
+            ->map(function ($value, $key) {
+                return sprintf('<input type="hidden" name="_%s" value="%s" />', $key, $value);
+            })
+            ->implode("\n");
+    }
+
     /**
      * Close a form.
      *
@@ -50,5 +60,25 @@ trait RendersForms
     protected function formClose()
     {
         return '</form>';
+    }
+
+    /**
+     * Get field with extra data for rendering.
+     *
+     * @param \Statamic\Fields\Field $field
+     * @return array
+     */
+    protected function getRenderableField($field, $errorBag = 'default')
+    {
+        $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
+
+        $data = array_merge($field->toArray(), [
+            'error' => $errors->first($field->handle()) ?: null,
+            'old' => old($field->handle()),
+        ]);
+
+        $data['field'] = view($field->fieldtype()->view(), $data);
+
+        return $data;
     }
 }

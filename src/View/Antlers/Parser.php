@@ -10,6 +10,7 @@ use Illuminate\Http\Exceptions\HttpResponseException;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Str;
+use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Config;
@@ -142,7 +143,7 @@ class Parser
      *
      * @param  string        $text      Text to parse
      * @param  array|object  $data      Array or object to use
-     * @return string
+     * @return AntlersString
      */
     public function parse($text, $data = [])
     {
@@ -181,7 +182,7 @@ class Parser
             $text = $this->parseCallbackTags($text, $data, null);
         }
 
-        return $text;
+        return new AntlersString($text, $this);
     }
 
     protected function normalizeData($data)
@@ -497,6 +498,8 @@ class Parser
      */
     public function parseCallbackTags($text, $data)
     {
+        $text = $this->injectExtractions($text, 'tag_pair');
+
         $inCondition = $this->inCondition;
 
         // if there are no instances of a tag, abort
@@ -1023,6 +1026,8 @@ class Parser
             return $value->count();
         } elseif ($value instanceof Collection) {
             return $value->isEmpty() ? 'false' : 'true';
+        } elseif ($value instanceof ViewErrorBag) {
+            return $value->getBags() ? 'true' : 'false';
         } elseif (is_array($value)) {
             return ! empty($value) ? 'true' : 'false';
         } elseif (is_object($value) and is_callable([$value, '__toString'])) {
@@ -1040,7 +1045,7 @@ class Parser
      * @param  string $text The text to extract from
      * @return string
      */
-    protected function extractNoparse($text)
+    public function extractNoparse($text)
     {
         // Ignore @{{ tags }} so we don't have to write JavaScript like animals.
         if ($this->preg_match_all($this->ignoreRegex, $text, $matches, PREG_SET_ORDER)) {
@@ -1156,7 +1161,7 @@ class Parser
         }
 
         if ($data instanceof Value) {
-            $data = $data->parseUsing($this, $context)->value();
+            $data = $data->antlersValue($this, $context);
         }
 
         return $data;
@@ -1177,7 +1182,7 @@ class Parser
         }
 
         // If there was no scope glue, there's nothing more we can check.
-        if (! str_contains($key, [':', '.'])) {
+        if (! Str::contains($key, [':', '.'])) {
             return [false, null];
         }
 
@@ -1376,7 +1381,7 @@ class Parser
             return $data->value();
         }
 
-        $value = $data->parseUsing($this, $context)->value();
+        $value = $data->antlersValue($this, $context);
 
         if (Str::startsWith($modifier, ':')) {
             $parameters = array_map(function ($param) use ($context) {

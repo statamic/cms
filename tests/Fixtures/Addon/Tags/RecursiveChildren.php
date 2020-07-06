@@ -1,6 +1,6 @@
 <?php
 
-namespace Foo\Bar\Tags;
+namespace Tests\Fixtures\Addon\Tags;
 
 class RecursiveChildren extends \Statamic\Tags\Tags
 {

@@ -334,6 +334,17 @@ class BardTest extends TestCase
         $this->assertEquals($expected, json_decode($bard->preProcess($data), true));
     }
 
+    /** @test */
+    public function it_saves_an_empty_field_as_null()
+    {
+        // When a Bard field is emptied and submitted, it's not actually null, it's a single empty paragraph.
+        $bard = new Bard;
+        $this->assertNull($bard->process('[{"type":"paragraph"}]'));
+
+        // When it is actually null (eg. when it was not in the front matter to begin with, and was never touched), it's an empty array.
+        $this->assertNull($bard->process('[]'));
+    }
+
     private function bard($config = [])
     {
         return (new Bard)->setField(new Field('test', array_merge(['type' => 'bard', 'sets' => ['one' => []]], $config)));

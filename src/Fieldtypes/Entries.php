@@ -48,14 +48,8 @@ class Entries extends Relationship
             'collections' => [
                 'display' => __('Collections'),
                 'type' => 'collections',
+                'mode' => 'select',
             ],
-        ]);
-    }
-
-    public function preload()
-    {
-        return array_merge(parent::preload(), [
-            'filters' => $this->getSelectionFilters(),
         ]);
     }
 
@@ -185,16 +179,10 @@ class Entries extends Relationship
 
     protected function shallowAugmentValue($value)
     {
-        return [
-            'id' => $value->id(),
-            'title' => $value->value('title'),
-            'url' => $value->url(),
-            'permalink' => $value->absoluteUrl(),
-            'api_url' => $value->apiUrl(),
-        ];
+        return $value->toShallowAugmentedCollection();
     }
 
-    protected function getSelectionFilters()
+    public function getSelectionFilters()
     {
         return Scope::filters('entries-fieldtype', $this->getSelectionFilterContext());
     }

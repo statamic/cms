@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
 use Statamic\Facades;
+use Statamic\Facades\Site;
 use Statamic\Facades\Term;
 use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
 use Statamic\Support\Arr;
@@ -21,6 +22,7 @@ class Taxonomy extends Relationship
             'taxonomies' => [
                 'display' => __('Taxonomies'),
                 'type' => 'taxonomies',
+                'mode' => 'select',
             ],
         ]);
     }
@@ -36,16 +38,7 @@ class Taxonomy extends Relationship
     {
         $terms = $this->getTermsForAugmentation($value);
 
-        $terms = collect($terms->map(function ($term) {
-            return [
-                'id' => $term->id(),
-                'title' => $term->title(),
-                'slug' => $term->slug(),
-                'url' => $term->url(),
-                'permalink' => $term->absoluteUrl(),
-                'api_url' => $term->apiUrl(),
-            ];
-        }));
+        $terms = collect($terms)->map->toShallowAugmentedCollection();
 
         return $this->config('max_items') === 1 ? $terms->first() : $terms;
     }
@@ -77,9 +70,15 @@ class Taxonomy extends Relationship
 
                 $entry = $this->field->parent();
 
-                return $term
-                    ->collection($entry->collection())
-                    ->in($entry->locale());
+                if ($entry && $this->field->handle() === $taxonomy->handle()) {
+                    $term->collection($entry->collection());
+                }
+
+                $locale = $entry
+                    ? $entry->locale()
+                    : Site::current()->locale();
+
+                return $term->in($locale);
             });
     }
 
@@ -96,6 +95,10 @@ class Taxonomy extends Relationship
 
                 return explode('::', $id, 2)[1];
             })->all();
+        }
+
+        if ($this->field->get('max_items') === 1) {
+            return $data[0];
         }
 
         return $data;
@@ -231,9 +234,16 @@ class Taxonomy extends Relationship
         return $query;
     }
 
-    protected function taxonomies()
+    public function taxonomies()
     {
-        return Arr::wrap($this->config('taxonomy'));
+        $taxonomy = $this->config('taxonomy');
+        $taxonomies = $this->config('taxonomies');
+
+        if ($taxonomy && $taxonomies) {
+            throw new \Exception('A taxonomy fieldtype cannot define both "taxonomy" and "taxonomies". Use one or the other.');
+        }
+
+        return Arr::wrap($taxonomy ?? $taxonomies);
     }
 
     protected function usingSingleTaxonomy()

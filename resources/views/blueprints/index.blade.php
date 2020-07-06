@@ -18,10 +18,11 @@
     @else
 
         @include('statamic::partials.empty-state', [
-            'resource' => 'Blueprint',
+            'title' => __('Blueprints'),
             'description' => __('statamic::messages.blueprints_intro'),
             'svg' => 'empty/form',
-            'route' => cp_route('blueprints.create'),
+            'button_text' => __('Create Blueprint'),
+            'button_url' => cp_route('blueprints.create'),
             'can' => $user->can('create', 'Statamic\Fields\Blueprint')
         ])
 
@@ -29,7 +30,7 @@
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Blueprints'),
-        'url' => 'blueprints'
+        'url' => Statamic::docsUrl('blueprints')
     ])
 
 @endsection

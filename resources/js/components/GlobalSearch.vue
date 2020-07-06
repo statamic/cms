@@ -12,8 +12,7 @@
             v-model="query"
             @keydown.up.prevent="moveUp"
             @keydown.down.prevent="moveDown"
-            @keydown.meta.enter.prevent="hitNewWindow"
-            @keyup.enter.prevent="hit"
+            @keydown.enter.prevent="hit"
             @keydown.esc.prevent="reset"
             @focus="focused = true"
             :placeholder="placeholder"
@@ -137,20 +136,14 @@ export default {
             this.focused = true;
         },
 
-        hit() {
-            if (this.hasResults) {
-                window.location.href = this.results[this.current].edit_url;
-            } else {
-                window.location.href = `${this.$config.get('cpRoot')}/${this.favorites[this.current].url}`;
-            }
-        },
+        hit($event) {
+            const item = this.hasResults ? this.results[this.current] : this.favorites[this.current];
 
-        hitNewWindow() {
-            if (this.hasResults) {
-                var win = window.open(this.results[this.current].edit_url, '_blank').focus();
-            } else {
-                window.open(this.results[this.current].url, '_blank').focus();
-            }
+            if (!item) return;
+
+            const url = this.hasResults ? item.edit_url : `${this.$config.get('cpRoot')}/${item.url}`;
+
+            $event.metaKey ? window.open(url) : window.location = url;
         },
 
         moveUp() {

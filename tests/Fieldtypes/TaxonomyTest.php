@@ -4,6 +4,7 @@ namespace Tests\Fieldtypes;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Collection;
+use Statamic\Data\AugmentedCollection;
 use Statamic\Facades;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Taxonomy;
@@ -70,25 +71,26 @@ class TaxonomyTest extends TestCase
 
         $this->assertInstanceOf(Collection::class, $augmented);
         $this->assertNotInstanceOf(TermCollection::class, $augmented);
+        $this->assertEveryItemIsInstanceOf(AugmentedCollection::class, $augmented);
         $this->assertCount(2, $augmented);
         $this->assertEquals([
             [
                 'id' => 'tags::one',
                 'slug' => 'one',
                 'title' => 'one',
-                'url' => '/blog/tags/one',
-                'permalink' => 'http://localhost/blog/tags/one',
+                'url' => '/tags/one',
+                'permalink' => 'http://localhost/tags/one',
                 'api_url' => 'http://localhost/api/taxonomies/tags/terms/one',
             ],
             [
                 'id' => 'tags::two',
                 'slug' => 'two',
                 'title' => 'two',
-                'url' => '/blog/tags/two',
-                'permalink' => 'http://localhost/blog/tags/two',
+                'url' => '/tags/two',
+                'permalink' => 'http://localhost/tags/two',
                 'api_url' => 'http://localhost/api/taxonomies/tags/terms/two',
             ],
-        ], $augmented->all());
+        ], $augmented->toArray());
     }
 
     /** @test */
@@ -96,14 +98,33 @@ class TaxonomyTest extends TestCase
     {
         $augmented = $this->fieldtype(['taxonomy' => 'tags', 'max_items' => 1])->shallowAugment(['one']);
 
+        $this->assertInstanceOf(AugmentedCollection::class, $augmented);
         $this->assertEquals([
             'id' => 'tags::one',
             'title' => 'one',
             'slug' => 'one',
-            'url' => '/blog/tags/one',
-            'permalink' => 'http://localhost/blog/tags/one',
+            'url' => '/tags/one',
+            'permalink' => 'http://localhost/tags/one',
             'api_url' => 'http://localhost/api/taxonomies/tags/terms/one',
-        ], $augmented);
+        ], $augmented->toArray());
+    }
+
+    /** @test */
+    public function it_can_be_configured_with_either_taxonomy_or_taxonomies()
+    {
+        $this->assertEquals(['tags'], $this->fieldtype(['taxonomy' => 'tags'])->taxonomies());
+        $this->assertEquals(['tags'], $this->fieldtype(['taxonomies' => 'tags'])->taxonomies());
+
+        $this->assertEquals(['tags', 'categories'], $this->fieldtype(['taxonomy' => ['tags', 'categories']])->taxonomies());
+        $this->assertEquals(['tags', 'categories'], $this->fieldtype(['taxonomies' => ['tags', 'categories']])->taxonomies());
+    }
+
+    /** @test */
+    public function using_both_taxonomy_and_taxonomies_throws_an_exception()
+    {
+        $this->expectExceptionMessage('A taxonomy fieldtype cannot define both "taxonomy" and "taxonomies". Use one or the other.');
+
+        $this->fieldtype(['taxonomy' => 'categories', 'taxonomies' => 'tags'])->taxonomies();
     }
 
     public function fieldtype($config = [])

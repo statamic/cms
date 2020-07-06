@@ -35,6 +35,10 @@ class SendPasswordReset extends Action
 
     public function run($users, $values)
     {
-        $users->each->generateTokenAndSendPasswordResetNotification();
+        $users->each(function ($user) {
+            $user->password()
+                ? $user->generateTokenAndSendPasswordResetNotification()
+                : $user->generateTokenAndSendActivateAccountNotification();
+        });
     }
 }

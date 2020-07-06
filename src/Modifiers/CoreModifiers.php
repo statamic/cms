@@ -4,6 +4,7 @@ namespace Statamic\Modifiers;
 
 use Carbon\Carbon;
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
@@ -16,6 +17,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -721,7 +723,7 @@ class CoreModifiers extends Modifier
         // Workaround to support pipe characters. If there are multiple params
         // that means a pipe was used. We'll just join them for now.
         if (count($params) > 1) {
-            $params = [join('|', $params)];
+            $params = [implode('|', $params)];
         }
 
         return implode(Arr::get($params, 0, ', '), $value);
@@ -1288,7 +1290,7 @@ class CoreModifiers extends Modifier
     public function optionList($value, $params)
     {
         if (count($params) > 1) {
-            $params = [join('|', $params)];
+            $params = [implode('|', $params)];
         }
 
         return implode(Arr::get($params, 0, '|'), $value);
@@ -1299,11 +1301,15 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return array
+     * @return array|Collection
      */
     public function offset($value, $params)
     {
-        return array_slice($value, Arr::get($params, 0, 0));
+        $isArray = is_array($value);
+
+        $value = collect($value)->slice(Arr::get($params, 0, 0))->values();
+
+        return $isArray ? $value->all() : $value;
     }
 
     /**
@@ -1314,7 +1320,7 @@ class CoreModifiers extends Modifier
      */
     public function output($value)
     {
-        if (! is_string($value)) {
+        if (! is_string($value) && ! $value instanceof AssetContract) {
             return $value;
         }
 
@@ -1478,9 +1484,12 @@ class CoreModifiers extends Modifier
      * @param $params
      * @return string
      */
-    public function repeat($value, $params)
+    public function repeat($value, $params, $context)
     {
-        return str_repeat($value, (int) Arr::get($params, 0, 1));
+        $times = Arr::get($params, 0, 1);
+        $times = is_numeric($times) ? $times : Arr::get($context, $times);
+
+        return str_repeat($value, $times);
     }
 
     /**
@@ -1705,6 +1714,21 @@ class CoreModifiers extends Modifier
         }
 
         return $is_descending ? $value->sortByDesc($key) : $value->sortBy($key);
+    }
+
+    /**
+     * Strip whitespace from HTML.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function spaceless($value, $params)
+    {
+        $nolb = str_replace(["\r", "\n"], '', $value);
+        $nospaces = preg_replace('/\s+/', ' ', $nolb);
+
+        return preg_replace('/>\s+</', '><', $nospaces);
     }
 
     /**
@@ -1974,7 +1998,7 @@ class CoreModifiers extends Modifier
      */
     public function timezone($value, $params)
     {
-        $timezone = Arr::get($params, 0, Config::get('statamic.system.timezone'));
+        $timezone = Arr::get($params, 0, Config::get('app.timezone'));
 
         return $this->carbon($value)->tz($timezone);
     }
@@ -2072,7 +2096,9 @@ class CoreModifiers extends Modifier
             $value = Arr::get($value, 0);
         }
 
-        return optional(Data::find($value))->url();
+        $item = is_string($value) ? optional(Data::find($value)) : $value;
+
+        return $item->url();
     }
 
     /**
@@ -2176,22 +2202,22 @@ class CoreModifiers extends Modifier
      */
     public function embedUrl($url)
     {
-        if (str_contains($url, 'youtube')) {
+        if (Str::contains($url, 'youtube')) {
             return str_replace('watch?v=', 'embed/', $url);
         }
 
-        if (str_contains($url, 'youtu.be')) {
+        if (Str::contains($url, 'youtu.be')) {
             $url = str_replace('youtu.be', 'www.youtube.com/embed', $url);
 
             // Check for start at point and replace it with correct parameter.
-            if (str_contains($url, '?t=')) {
+            if (Str::contains($url, '?t=')) {
                 $url = str_replace('?t=', '?start=', $url);
             }
 
             return $url;
         }
 
-        if (str_contains($url, 'vimeo')) {
+        if (Str::contains($url, 'vimeo')) {
             return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
         }
 
@@ -2207,6 +2233,18 @@ class CoreModifiers extends Modifier
     public function isEmbeddable($url)
     {
         return Str::contains($url, ['youtu.be', 'youtube', 'vimeo']);
+    }
+
+    /**
+     * Converts a string to a Carbon instance and formats it with ISO formats.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function isoFormat($value, $params)
+    {
+        return $this->carbon($value)->isoFormat(Arr::get($params, 0));
     }
 
     // ------------------------------------
@@ -2238,9 +2276,11 @@ class CoreModifiers extends Modifier
 
         // If the number is already a number, use that. Otherwise, attempt to resolve it
         // from a value in the context. This allows users to specify a variable name.
-        return (is_numeric($number))
+        $number = (is_numeric($number))
             ? $number
             : Arr::get($context, $number, $number);
+
+        return ($number instanceof Value) ? $number->value() : $number;
     }
 
     private function carbon($value)

@@ -3,10 +3,13 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 
 class Install extends Command
 {
+    use RunsInPlease;
+
     /**
      * The name and signature of the console command.
      *
@@ -54,9 +57,7 @@ class Install extends Command
         ];
 
         $gitignores = [
-            storage_path('statamic/users'),
-            storage_path('statamic/search'),
-            storage_path('statamic/revisions'),
+            storage_path('statamic'),
         ];
 
         foreach ($gitkeeps as $dir) {

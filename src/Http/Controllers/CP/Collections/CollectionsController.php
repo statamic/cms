@@ -151,7 +151,7 @@ class CollectionsController extends CpController
     {
         $this->authorize('store', CollectionContract::class, __('You are not authorized to create collections.'));
 
-        $data = $request->validate([
+        $request->validate([
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
         ]);
@@ -168,13 +168,15 @@ class CollectionsController extends CpController
             ->pastDateBehavior('public')
             ->futureDateBehavior('private');
 
+        if (Site::hasMultiple()) {
+            $collection->sites([Site::default()->handle()]);
+        }
+
         $collection->save();
 
         session()->flash('success', __('Collection created'));
 
-        return [
-            'redirect' => route('statamic.cp.collections.show', $handle),
-        ];
+        return ['redirect' => $collection->showUrl()];
     }
 
     public function update(Request $request, $collection)
@@ -355,6 +357,7 @@ class CollectionsController extends CpController
                         'display' => __('Template'),
                         'instructions' => __('statamic::messages.collection_configure_template_instructions'),
                         'type' => 'template',
+                        'placeholder' => __('System default'),
                     ],
                     'layout' => [
                         'display' => __('Layout'),

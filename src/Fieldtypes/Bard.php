@@ -141,6 +141,14 @@ class Bard extends Replicator
             return (new Augmentor($this))->convertToHtml($structure);
         }
 
+        if ($structure === [['type' => 'paragraph']]) {
+            return null;
+        }
+
+        if ($structure === []) {
+            return null;
+        }
+
         return $structure;
     }
 

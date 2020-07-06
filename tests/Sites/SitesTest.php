@@ -117,6 +117,11 @@ class SitesTest extends TestCase
         $this->assertEquals('de', $this->sites->findByUrl('http://test.com/de/something')->handle());
         $this->assertEquals('fr', $this->sites->findByUrl('http://fr.test.com/something')->handle());
         $this->assertNull($this->sites->findByUrl('http://unknownsite.com'));
+
+        // Make sure that urls that begin with one of the subdirectories (eg. /de) don't get misinterpreted.
+        // https://github.com/statamic/cms/issues/1874
+        $this->assertEquals('en', $this->sites->findByUrl('http://test.com/delightful')->handle());
+        $this->assertEquals('de', $this->sites->findByUrl('http://test.com/de')->handle());
     }
 
     /** @test */

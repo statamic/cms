@@ -1,4 +1,4 @@
-import { Node, Plugin } from 'tiptap'
+import { Node } from 'tiptap'
 import Image from './Image.vue';
 
 export default class ImageNode extends Node {

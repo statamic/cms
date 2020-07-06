@@ -26,7 +26,7 @@ class Glide extends Tags
     {
         $tag = explode(':', $this->tag, 2)[1];
 
-        $item = $this->context->get($tag);
+        $item = $this->context->value($tag);
 
         if ($this->isPair) {
             return $this->generate($item);

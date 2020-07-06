@@ -110,7 +110,7 @@ class TermRepository implements RepositoryContract
 
     public function make(string $slug = null): Term
     {
-        return (new \Statamic\Taxonomies\Term)->slug($slug);
+        return app(Term::class)->slug($slug);
     }
 
     protected function ensureAssociations()
@@ -118,5 +118,12 @@ class TermRepository implements RepositoryContract
         Taxonomy::all()->each(function ($taxonomy) {
             $this->store->store($taxonomy->handle())->index('associations');
         });
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            Term::class => \Statamic\Taxonomies\Term::class,
+        ];
     }
 }

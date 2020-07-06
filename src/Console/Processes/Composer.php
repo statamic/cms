@@ -7,22 +7,20 @@ use Statamic\Jobs\RunComposer;
 
 class Composer extends Process
 {
-    public $memoryLimit;
+    private $composerCommand;
 
     /**
      * Instantiate composer process.
      *
      * @param mixed $basePath
      */
-    public function __construct($basePath = null)
+    public function __construct($basePath = null, $command = 'composer')
     {
         parent::__construct($basePath);
 
-        // Set this process to eleven.
-        $this->toEleven();
+        $this->composerCommand = $command;
 
-        // Set memory limit for child process to eleven.
-        $this->memoryLimit = config('statamic.system.php_memory_limit');
+        $this->toEleven();
     }
 
     /**
@@ -32,7 +30,7 @@ class Composer extends Process
      */
     public function installed()
     {
-        return collect(json_decode($this->runComposerCommand('show', '--direct', '--format=json'))->installed)
+        return collect(json_decode($this->runComposerCommand('show', '--direct', '--format=json', '--no-plugins'))->installed)
             ->keyBy('name')
             ->map(function ($package) {
                 $package->version = $this->normalizeVersion($package->version);
@@ -67,7 +65,7 @@ class Composer extends Process
      */
     public function installedPath(string $package)
     {
-        return collect(json_decode($this->runComposerCommand('show', '--direct', '--path', '--format=json'))->installed)
+        return collect(json_decode($this->runComposerCommand('show', '--direct', '--path', '--format=json', '--no-plugins'))->installed)
             ->keyBy('name')
             ->get($package)
             ->path;
@@ -183,11 +181,7 @@ class Composer extends Process
      */
     private function prepareProcessArguments($parts)
     {
-        return array_merge([
-            $this->phpBinary(),
-            "-d memory_limit={$this->memoryLimit}",
-            'vendor/bin/composer',
-        ], $parts);
+        return array_merge([$this->composerCommand], $parts);
     }
 
     /**
