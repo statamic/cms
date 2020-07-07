@@ -22,7 +22,7 @@ class Git extends Process
      */
     public function status($subPaths = null)
     {
-        return $this->runGitCommand('status', '-s', $subPaths);
+        return $this->runGitCommand('status', '--porcelain', $subPaths);
     }
 
     /**
