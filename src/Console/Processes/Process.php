@@ -3,6 +3,7 @@
 namespace Statamic\Console\Processes;
 
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Log;
 use Statamic\Support\Arr;
 use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\PhpExecutableFinder;
@@ -83,6 +84,7 @@ class Process
         $this->output = null;
 
         $process->run(function ($type, $buffer) use (&$output, $operateOnOutput) {
+            $this->logErrorOutput($type, $buffer);
             $this->output .= $operateOnOutput($buffer);
         });
 
@@ -100,6 +102,7 @@ class Process
         $this->output = null;
 
         $process->run(function ($type, $buffer) use (&$output) {
+            $this->logErrorOutput($type, $buffer);
             $this->output .= $buffer;
         });
 
@@ -121,10 +124,28 @@ class Process
         $this->appendOutputToCache($cacheKey, null);
 
         $process->run(function ($type, $buffer) use ($cacheKey) {
+            $this->logErrorOutput($type, $buffer);
             $this->appendOutputToCache($cacheKey, $buffer);
         });
 
         $this->setCompletedOnCache($cacheKey);
+    }
+
+    /**
+     * Log error output.
+     *
+     * @param string $type
+     * @param string $buffer
+     */
+    private function logErrorOutput($type, $buffer)
+    {
+        if ($type !== 'err') {
+            return;
+        }
+
+        $process = (new \ReflectionClass($this))->getShortName();
+
+        Log::error("{$process} Process: {$buffer}");
     }
 
     /**
