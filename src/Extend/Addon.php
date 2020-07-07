@@ -347,16 +347,6 @@ final class Addon
     }
 
     /**
-     * Get the license key as provided by the user.
-     *
-     * @return string|null
-     */
-    public function licenseKey()
-    {
-        return array_get($this->config(), 'license_key');
-    }
-
-    /**
      * Get addon changelog.
      *
      * @return AddonChangelog|null

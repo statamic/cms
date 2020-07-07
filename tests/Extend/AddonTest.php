@@ -213,14 +213,6 @@ class AddonTest extends TestCase
         $this->assertFalse($this->makeFromPackage([])->isCommercial());
     }
 
-    /** @test */
-    public function it_gets_the_license_key()
-    {
-        config(['test_addon' => ['license_key' => 'TESTLICENSEKEY']]);
-
-        $this->assertEquals('TESTLICENSEKEY', Addon::make('vendor/test-addon')->licenseKey());
-    }
-
     public function it_gets_the_autoloaded_directory()
     {
         $addon = $this->makeFromPackage(['autoload' => 'src']);
