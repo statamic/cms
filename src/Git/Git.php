@@ -83,7 +83,7 @@ class Git
      */
     public function push()
     {
-        $this->groupTrackedContentPathsByRepo()->each(function ($paths, $gitRoot) use ($message) {
+        $this->groupTrackedContentPathsByRepo()->each(function ($paths, $gitRoot) {
             GitProcess::create($gitRoot)->push();
         });
     }
