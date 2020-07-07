@@ -45,6 +45,8 @@ class Review extends Command
         }
 
         $this->reviewStringFile($lang);
+
+        return 0;
     }
 
     protected function reviewStringFile($lang)

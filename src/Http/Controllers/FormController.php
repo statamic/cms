@@ -50,10 +50,7 @@ class FormController extends Controller
 
         if ($form->store()) {
             $submission->save();
-            event('Form.submission.saved', $submission); // TODO: Refactor for Spock v3
         }
-
-        event('Form.submission.created', $submission);
 
         return $this->formSuccess($params, $submission);
     }
@@ -99,6 +96,9 @@ class FormController extends Controller
         if (request()->ajax()) {
             return response([
                 'errors' => (new MessageBag($errors))->all(),
+                'error' => collect($errors)->map(function ($errors, $field) {
+                    return $errors[0];
+                })->all(),
             ], 400);
         }
 
@@ -126,6 +126,7 @@ class FormController extends Controller
     {
         $errors = [];
 
+        // TODO: Replace with `Saving` class-based event (see EntrySaving).
         $responses = event('Form.submission.creating', $submission);
 
         foreach ($responses as $response) {

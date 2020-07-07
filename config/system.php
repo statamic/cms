@@ -44,37 +44,29 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Maximum PHP memory limit
-    |--------------------------------------------------------------------------
-    |
-    | The maximum memory that will be used when performing intensive operations
-    | like image manipulation. Leave blank to use as much as possible. You
-    | may either specify bytes or PHP recognized shorthand values.
-    |
-    | http://php.net/manual/en/faq.using.php#faq.using.shorthandbytes
-    |
-    */
-
-    'php_max_memory_limit' => null,
-
-    /*
-    |--------------------------------------------------------------------------
     | Default Date Format
     |--------------------------------------------------------------------------
     |
-    | Any time Carbon is cast to a string in views, it should use this format.
+    | Any time a Carbon date is cast to a string, it should use this format.
+    | You can customize this format using PHP's date string constants.
+    |
+    | https://www.php.net/manual/en/function.date.php
     |
     */
 
     'date_format' => 'F jS, Y',
 
-    'charset' => 'UTF-8',
-    'timezone' => 'UTC',
-    'protect' => [],
+    /*
+    |--------------------------------------------------------------------------
+    | Default Character Set
+    |--------------------------------------------------------------------------
+    |
+    | Statamic will use this character set when performing specific string
+    | encoding and decoding operations; This does not apply everywhere.
+    |
+    */
 
-    'stache' => [
-        'always_update' => true,
-    ],
+    'charset' => 'UTF-8',
 
     /*
     |--------------------------------------------------------------------------

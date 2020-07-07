@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
+use Statamic\Events\Data\AssetSaved;
 use Statamic\Events\Data\AssetUploaded;
 use Statamic\Facades;
 use Statamic\Facades\YAML;
@@ -34,6 +35,7 @@ class AssetTest extends TestCase
             ->disk('test');
 
         Storage::fake('test');
+        Storage::fake('dimensions-cache');
     }
 
     /** @test */
@@ -331,6 +333,7 @@ class AssetTest extends TestCase
     /** @test */
     public function it_saves()
     {
+        Event::fake();
         Storage::fake('test');
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo.jpg');
@@ -340,7 +343,9 @@ class AssetTest extends TestCase
 
         $this->assertTrue($return);
 
-        // TODO: Assert about event
+        Event::assertDispatched(AssetSaved::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
 
         // Assertion about the meta file is in the AssetRepository test
     }
@@ -367,6 +372,7 @@ class AssetTest extends TestCase
     /** @test */
     public function it_can_be_moved_to_another_folder()
     {
+        Event::fake();
         Storage::fake('local');
         $disk = Storage::disk('local');
         $disk->put('old/asset.txt', 'The asset contents');
@@ -394,6 +400,7 @@ class AssetTest extends TestCase
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
+        Event::assertDispatched(AssetSaved::class);
     }
 
     /** @test */
@@ -431,6 +438,7 @@ class AssetTest extends TestCase
     /** @test */
     public function it_renames()
     {
+        Event::fake();
         $disk = Storage::fake('local');
         $disk->put('old/asset.txt', 'The asset contents');
         $container = Facades\AssetContainer::make('test')->disk('local');
@@ -457,6 +465,7 @@ class AssetTest extends TestCase
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
+        Event::assertDispatched(AssetSaved::class);
     }
 
     /** @test */
@@ -568,7 +577,7 @@ class AssetTest extends TestCase
         $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg');
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
-        $return = $asset->upload(UploadedFile::fake()->create('asset.jpg'));
+        $return = $asset->upload(UploadedFile::fake()->image('asset.jpg'));
 
         $this->assertEquals($asset, $return);
         Storage::disk('test')->assertExists('path/to/asset.jpg');
@@ -576,6 +585,7 @@ class AssetTest extends TestCase
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
             return $event->asset = $asset;
         });
+        Event::assertDispatched(AssetSaved::class);
     }
 
     /** @test */
@@ -587,19 +597,13 @@ class AssetTest extends TestCase
         Storage::disk('test')->put('path/to/asset.jpg', '');
         Storage::disk('test')->assertExists('path/to/asset.jpg');
 
-        $asset->upload(UploadedFile::fake()->create('asset.jpg'));
+        $asset->upload(UploadedFile::fake()->image('asset.jpg'));
 
         Storage::disk('test')->assertExists('path/to/asset-1549914700.jpg');
         $this->assertEquals('path/to/asset-1549914700.jpg', $asset->path());
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
             return $event->asset = $asset;
         });
-    }
-
-    /** @test */
-    public function it_can_replace_the_file()
-    {
-        $this->markTestIncomplete();
     }
 
     /** @test */

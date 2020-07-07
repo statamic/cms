@@ -176,7 +176,7 @@ class Composer extends Process
     }
 
     /**
-     * Propare process arguments.
+     * Prepare process arguments.
      *
      * @param array $parts
      * @return array

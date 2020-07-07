@@ -11,7 +11,7 @@ class UtilitiesController extends CpController
     public function index()
     {
         return view('statamic::utilities.index', [
-            'utilities' => Utility::authorized(),
+            'utilities' => Utility::authorized()->sortBy->title(),
         ]);
     }
 

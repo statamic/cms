@@ -1,8 +1,6 @@
 <?php
 
-namespace Statamic\Events\Data;
-
-use Statamic\Events\Event;
+namespace Statamic\Events;
 
 class PublishBlueprintFound extends Event
 {

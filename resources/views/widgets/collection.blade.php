@@ -1,4 +1,4 @@
-<div class="card p-0 rounded-lg">
+<div class="card p-0 rounded-lg overflow-hidden">
     <div class="flex justify-between items-center p-2">
         <h2>{{ $title }}</h2>
         <a href="{{ $collection->createEntryUrl() }}" class="text-blue hover:text-blue-dark text-sm">{{ $button }}</a>

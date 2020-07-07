@@ -22,10 +22,11 @@
     @else
 
         @include('statamic::partials.empty-state', [
-            'resource' => 'Taxonomy',
-            'description' => __('statamic::messages.taxonomy_wizard_intro'),
+            'title' => __('Taxonomies'),
+            'description' => __('statamic::messages.taxonomy_configure_intro'),
             'svg' => 'empty/taxonomy',
-            'route' => cp_route('taxonomies.create'),
+            'button_text' => __('Create Taxonomy'),
+            'button_url' => cp_route('taxonomies.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Taxonomies\Taxonomy')
         ])
 
@@ -33,7 +34,7 @@
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Taxonomies'),
-        'url' => 'taxonomies'
+        'url' => Statamic::docsUrl('taxonomies')
     ])
 
 @endsection

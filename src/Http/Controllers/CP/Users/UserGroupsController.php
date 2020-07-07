@@ -84,7 +84,7 @@ class UserGroupsController extends CpController
             ->roles($request->roles)
             ->save();
 
-        session()->flash('success', 'User group updated');
+        session()->flash('success', __('User group updated'));
 
         return ['redirect' => cp_route('user-groups.show', $group->handle())];
     }

@@ -6,6 +6,7 @@ use Statamic\Facades\Utility;
 use Statamic\Http\Controllers\CP\LicensingController;
 use Statamic\Http\Controllers\CP\Utilities\CacheController;
 use Statamic\Http\Controllers\CP\Utilities\EmailController;
+use Statamic\Http\Controllers\CP\Utilities\GitController;
 use Statamic\Http\Controllers\CP\Utilities\PhpInfoController;
 use Statamic\Http\Controllers\CP\Utilities\UpdateSearchController;
 use Statamic\Statamic;
@@ -66,5 +67,18 @@ class CoreUtilities
                 $router->get('refresh', [LicensingController::class, 'refresh'])->name('refresh');
             })
             ->register();
+
+        if (config('statamic.git.enabled')) {
+            Utility::make('git')
+                ->action([GitController::class, 'index'])
+                ->title('Git')
+                ->icon('git')
+                ->description(__('statamic::messages.git_utility_description'))
+                ->docsUrl(Statamic::docsUrl('utilities/git'))
+                ->routes(function ($router) {
+                    $router->post('/', [GitController::class, 'commit'])->name('commit');
+                })
+                ->register();
+        }
     }
 }

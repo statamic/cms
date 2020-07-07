@@ -18,17 +18,18 @@
     @else
 
         @include('statamic::partials.empty-state', [
-            'resource' => 'Role',
+            'title' => __('Roles & Permissions'),
             'description' => __('statamic::messages.role_intro'),
             'svg' => 'empty/users',
-            'route' => cp_route('roles.create')
+            'button_text' => __('Create Role'),
+            'button_url' => cp_route('roles.create'),
         ])
 
     @endunless
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Roles & Permissions'),
-        'url' => 'users#permissions'
+        'url' => Statamic::docsUrl('users#permissions')
     ])
 
 @endsection

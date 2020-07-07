@@ -28,13 +28,24 @@ class Process
     protected $colorized = false;
 
     /**
-     * Instantiate process.
+     * Create new process on path.
      *
-     * @param mixed $basePath
+     * @param string|null $basePath
      */
     public function __construct($basePath = null)
     {
         $this->basePath = str_finish($basePath ?? base_path(), '/');
+    }
+
+    /**
+     * Create new process on path.
+     *
+     * @param string|null $basePath
+     * @return static
+     */
+    public static function create($basePath = null)
+    {
+        return new static($basePath);
     }
 
     /**
@@ -47,8 +58,7 @@ class Process
      */
     public function run($command, $cacheKey = null)
     {
-        $process = new SymfonyProcess($command, $this->basePath);
-        $process->setTimeout(null);
+        $process = $this->newSymfonyProcess($command, $this->basePath);
 
         if ($cacheKey) {
             $this->runAndCacheOutput($process, $cacheKey);
@@ -68,8 +78,7 @@ class Process
      */
     public function runAndOperateOnOutput($command, $operateOnOutput)
     {
-        $process = new SymfonyProcess($command, $this->basePath);
-        $process->setTimeout(null);
+        $process = $this->newSymfonyProcess($command, $this->basePath);
 
         $this->output = null;
 
@@ -203,15 +212,47 @@ class Process
     /**
      * Normalize output.
      *
-     * @param string $output
+     * @param mixed $output
+     * @return mixed
      */
-    public function normalizeOutput(string $output)
+    public function normalizeOutput($output)
     {
+        if (is_null($output)) {
+            return $output;
+        }
+
+        // Remove terminal color codes.
         if (! $this->colorized) {
-            // Remove terminal color codes.
             $output = preg_replace('/\\e\[[0-9]+m/', '', $output);
         }
 
+        // Remove trailing new line.
+        $output = preg_replace('/\\n$/', '', $output);
+
         return $output;
+    }
+
+    /**
+     * New symfony process.
+     *
+     * @param string $command
+     * @param string|null $path
+     * @return SymfonyProcess
+     */
+    protected function newSymfonyProcess($command, $path = null)
+    {
+        // Ensure command is either an array or string.
+        if (! is_array($command)) {
+            $command = (string) $command;
+        }
+
+        // Handle both string and array command formats.
+        $process = is_string($command) && method_exists(SymfonyProcess::class, 'fromShellCommandLine')
+            ? SymfonyProcess::fromShellCommandline($command, $path ?? $this->basePath)
+            : new SymfonyProcess($command, $path ?? $this->basePath);
+
+        $process->setTimeout(null);
+
+        return $process;
     }
 }

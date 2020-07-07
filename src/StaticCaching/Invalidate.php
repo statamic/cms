@@ -27,6 +27,6 @@ class Invalidate implements ShouldQueue
 
     public function handle($event)
     {
-        $this->invalidator->invalidate($event->data);
+        $this->invalidator->invalidate($event->item);
     }
 }

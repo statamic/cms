@@ -3,6 +3,8 @@
 namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldsetRepository;
+use Statamic\Events\Data\FieldsetDeleted;
+use Statamic\Events\Data\FieldsetSaved;
 use Statamic\Facades;
 use Statamic\Support\Str;
 
@@ -77,12 +79,16 @@ class Fieldset
     {
         FieldsetRepository::save($this);
 
+        FieldsetSaved::dispatch($this);
+
         return $this;
     }
 
     public function delete()
     {
         FieldsetRepository::delete($this);
+
+        FieldsetDeleted::dispatch($this);
 
         return true;
     }
