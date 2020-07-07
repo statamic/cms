@@ -32,7 +32,7 @@ class Git extends Process
      */
     public function push()
     {
-        return $this->runGitCommand('push');
+        return $this->runGitCommand('push', '--porcelain');
     }
 
     /**
