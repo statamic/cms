@@ -10,7 +10,7 @@
                     {{ composer.status }}
                     <loading-graphic />
                 </template>
-                <template v-else>Last Install Log</template>
+                <template v-else>{{ __('Last Install Log' ) }}</template>
             </button>
             <button v-if="showActions && ! onLatestVersion" class="btn-primary ml-2" @click="updateToLatest()">{{ __('Update to Latest') }}</button>
             <div v-if="onLatestVersion" v-text="__('Up to date')" />
@@ -25,10 +25,10 @@
             @click="showingUnlicensedReleases = true"
         >
             <div>
-                <h4>This addon has more releases beyond your licensed limit.</h4>
-                <p>You may update, but will need to upgrade or purchase a new license.</p>
+                <h4 v-text="__('messages.addon_has_more_releases_beyond_license_heading')" />
+                <p v-text="__('messages.addon_has_more_releases_beyond_license_body')" />
             </div>
-            <button class="btn btn-sm">View additional releases</button>
+            <button class="btn btn-sm" v-text="__('View additional releases')" />
         </div>
 
         <template v-if="showingUnlicensedReleases">
@@ -65,7 +65,7 @@
                 <button
                     v-if="!composer.processing"
                     class="btn-close absolute top-0 right-0 mt-2 mr-2"
-                    aria-label="Close"
+                    :aria-label="__('Close')"
                     @click="closeModal"
                     v-html="'&times'" />
             </div>

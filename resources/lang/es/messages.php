@@ -3,6 +3,8 @@
 return [
     'activate_account_notification_body' => 'Enviamos este correo porque recibimos una solicitud de restablecimiento de contraseña para tu cuenta.',
     'activate_account_notification_subject' => 'Activa tu cuenta',
+    'addon_has_more_releases_beyond_license_body' => 'Puede actualizar, pero deberá actualizar o comprar una nueva licencia.',
+    'addon_has_more_releases_beyond_license_heading' => 'Este complemento tiene más versiones más allá de su límite de licencia.',
     'addon_list_loading_error' => 'Algo salió mal al cargar complementos. Intenta nuevamente más tarde.',
     'asset_container_blueprint_instructions' => 'La capacidad de subir a este contenedor.',
     'asset_container_create_folder_instructions' => 'La capacidad de crear carpetas en este contenedor.',

@@ -3,6 +3,8 @@
 return [
     'activate_account_notification_body' => 'Je ontvangt deze e-mail, omdat we een verzoek ontvangen hebben om je wachtwoord te resetten.',
     'activate_account_notification_subject' => 'Activeer je account',
+    'addon_has_more_releases_beyond_license_body' => 'U kunt bijwerken, maar u moet een nieuwe licentie upgraden of aanschaffen.',
+    'addon_has_more_releases_beyond_license_heading' => 'Deze add-on heeft meer releases dan uw gelicentieerde limiet.',
     'addon_list_loading_error' => 'Er is iets misgegaan bij het laden van add-ons. Probeer het later opnieuw.',
     'asset_container_blueprint_instructions' => 'Blueprints definiëren aanvullende aangepaste velden die te gebruiken zijn als je assets bewerkt.',
     'asset_container_create_folder_instructions' => 'Indien ingeschakeld kunnen gebruikers mappen aanmaken in deze container.',

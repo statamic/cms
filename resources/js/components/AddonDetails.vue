@@ -2,8 +2,8 @@
     <div>
         <div class="flex items-center mb-3">
             <h1 class="flex-1" v-text="addon.name" />
-            <button v-if="addon.installed" class="btn" :disabled="processing" @click="uninstall">Uninstall Addon</button>
-            <button v-else class="btn btn-primary" :disabled="processing" @click="install">Install Addon</button>
+            <button v-if="addon.installed" class="btn" :disabled="processing" @click="uninstall" v-text="__('Uninstall')" />
+            <button v-else class="btn btn-primary" :disabled="processing" @click="install" v-text="__('Install')" />
         </div>
         <modal
             name="addon-composer-output"
@@ -28,18 +28,18 @@
         <div>
             <div class="card mb-3 flex items-center">
                 <div class="flex-1 text-lg">
-                    <div class="little-heading p-0 mb-1 text-grey-70">Price</div>
+                    <div class="little-heading p-0 mb-1 text-grey-70" v-text="__('Price')" />
                     <div class="font-bold" v-text="priceRange" />
                 </div>
                 <div class="flex-1 text-lg">
-                    <div class="little-heading p-0 mb-1 text-grey-70">Seller</div>
+                    <div class="little-heading p-0 mb-1 text-grey-70" v-text="__('Seller')" />
                     <a :href="addon.seller.website" class="relative flex items-center">
                         <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full w-6 mr-1">
                         <span class="font-bold">{{ addon.seller.name }}</span>
                     </a>
                 </div>
                 <div class="flex-1 text-lg" v-if="downloads">
-                    <div class="little-heading p-0 mb-1 text-grey-70">Downloads</div>
+                    <div class="little-heading p-0 mb-1 text-grey-70" v-text="__('Downloads')" />
                     <div class="font-bold">{{ downloads }}</div>
                 </div>
             </div>
@@ -92,8 +92,8 @@ import AddonEditions from './addons/Editions.vue';
 
             priceRange() {
                 let [low, high] = this.addon.price_range;
-                low = low ? `$${low}` : 'Free';
-                high = high ? `$${high}` : 'Free';
+                low = low ? `$${low}` : __('Free');
+                high = high ? `$${high}` : __('Free');
                 return (low == high) ? low : `${low} - ${high}`;
             },
         },
@@ -119,7 +119,7 @@ import AddonEditions from './addons/Editions.vue';
 
                 this.$store.commit('statamic/composer', {
                     processing: true,
-                    status: 'Installing ' + this.package,
+                    status: __('Installing :package', { package: this.package }),
                     package: this.package,
                 });
 
@@ -134,7 +134,7 @@ import AddonEditions from './addons/Editions.vue';
 
                 this.$store.commit('statamic/composer', {
                     processing: true,
-                    status: 'Uninstalling ' + this.package,
+                    status: __('Uninstalling :package', { package: this.package }),
                     package: this.package,
                 });
 
@@ -144,11 +144,11 @@ import AddonEditions from './addons/Editions.vue';
             composerFinished() {
                 this.$store.commit('statamic/composer', {
                     processing: false,
-                    status: 'Operation complete!',
+                    status: __('Operation complete'),
                     package: this.package,
                 });
 
-                this.$toast.success('Operation complete!');
+                this.$toast.success(__('Operation complete'));
             },
 
             addonRefreshed() {

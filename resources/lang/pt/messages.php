@@ -3,6 +3,8 @@
 return [
     'activate_account_notification_body' => 'Enviamos este email porque recebemos uma solicitação de alteração de senha para sua conta.',
     'activate_account_notification_subject' => 'Active a sua conta',
+    'addon_has_more_releases_beyond_license_body' => 'Você pode atualizar, mas precisará atualizar ou adquirir uma nova licença.',
+    'addon_has_more_releases_beyond_license_heading' => 'Este complemento tem mais lançamentos além do seu limite licenciado.',
     'addon_list_loading_error' => 'Ocorreu um erro ao carregar addons. Tente mais tarde.',
     'asset_container_blueprint_instructions' => 'A capacidade de carregar para esta biblioteca.',
     'asset_container_create_folder_instructions' => 'A capacidade de criar pastas nesta biblioteca.',

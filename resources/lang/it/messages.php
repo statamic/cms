@@ -3,6 +3,8 @@
 return [
     'activate_account_notification_body' => 'Ricevi questa email perché abbiamo ricevuto una richiesta di reimpostazione della password per il tuo account.',
     'activate_account_notification_subject' => 'Attiva il tuo account',
+    'addon_has_more_releases_beyond_license_body' => 'È possibile aggiornare, ma sarà necessario aggiornare o acquistare una nuova licenza.',
+    'addon_has_more_releases_beyond_license_heading' => 'Questo componente aggiuntivo ha più versioni oltre il limite di licenza.',
     'addon_list_loading_error' => 'Si è verificato un errore durante il caricamento dei componenti aggiuntivi. Riprovare più tardi.',
     'asset_container_blueprint_instructions' => 'La possibilità di caricare in questo contenitore.',
     'asset_container_create_folder_instructions' => 'La possibilità di creare cartelle in questo contenitore.',

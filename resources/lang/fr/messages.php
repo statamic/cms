@@ -3,6 +3,8 @@
 return [
     'activate_account_notification_body' => 'Vous recevez cet email car nous avons reçu une demande de réinitialisation du mot de passe pour votre compte.',
     'activate_account_notification_subject' => 'Activez votre compte',
+    'addon_has_more_releases_beyond_license_body' => 'Vous pouvez mettre à jour, mais devrez mettre à niveau ou acheter une nouvelle licence.',
+    'addon_has_more_releases_beyond_license_heading' => 'Cet addon a plus de versions au-delà de votre limite de licence.',
     'addon_list_loading_error' => 'Une erreur s&#39;est produite lors du chargement des modules complémentaires. Réessayez plus tard.',
     'asset_container_blueprint_instructions' => 'Les Blueprints définissent les champs personnalisés additionnels disponibles lors de la modification des ressources.',
     'asset_container_create_folder_instructions' => 'Si activé, donne la possibilité aux utilisateurs de créer des dossiers dans ce conteneur.',

@@ -3,6 +3,8 @@
 return [
     'activate_account_notification_body' => 'Du erhältst diese E-Mail, weil wir für dein Konto eine Anfrage zum Zurücksetzen des Passworts für Ihr Konto erhalten haben.',
     'activate_account_notification_subject' => 'Aktiviere deinen Account',
+    'addon_has_more_releases_beyond_license_body' => 'Sie können aktualisieren, müssen jedoch ein Upgrade durchführen oder eine neue Lizenz erwerben.',
+    'addon_has_more_releases_beyond_license_heading' => 'Dieses Addon enthält mehr Releases, die über Ihr Lizenzlimit hinausgehen.',
     'addon_list_loading_error' => 'Beim Laden von Addons ist ein Fehler aufgetreten. Versuchen Sie es später noch einmal.',
     'asset_container_blueprint_instructions' => 'Blueprints enthalten zusätzliche benutzerdefinierte Felder, die beim Bearbeiten der Dateien verfügbar sind.',
     'asset_container_create_folder_instructions' => 'Ist diese Option aktiviert, können Benutzer*innen Ordner in diesem Container erstellen.',

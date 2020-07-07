@@ -4,15 +4,14 @@
         <div class="flex justify-between mb-4">
             <div>
                 <h1>{{ release.version }}</h1>
-                <h5 class="date">Released on {{ release.date }}</h5>
+                <h5 class="date" v-text="__('Released on :date', { date: release.date })" />
             </div>
             <div v-if="showActions">
-                <button v-if="release.type === 'current'" class="btn opacity-50" disabled>Current Version</button>
-                <button v-else-if="release.latest" @click="$emit('install')" class="btn">Update to Latest</button>
+                <button v-if="release.type === 'current'" class="btn opacity-50" disabled v-text="__('Current Version')" />
+                <button v-else-if="release.latest" @click="$emit('install')" class="btn" v-text="__('Update to Latest')" />
                 <button v-else @click="$emit('install')" class="btn">
-                    <template v-if="release.type === 'upgrade'">Upgrade to</template>
-                    <template v-if="release.type === 'downgrade'">Downgrade to</template>
-                    {{ release.version }}
+                    <template v-if="release.type === 'upgrade'">{{ __('Update to :version', { version: release.version }) }}</template>
+                    <template v-if="release.type === 'downgrade'">{{ __('Downgrade to :version', { version: release.version }) }}</template>
                 </button>
             </div>
         </div>
