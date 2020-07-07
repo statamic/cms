@@ -47,20 +47,6 @@ class Git extends Process
     }
 
     /**
-     * Queue git command.
-     *
-     * @param string $command
-     * @param string $package
-     * @param mixed $extraParams
-     */
-    // private function queueGitCommand($command, $package, ...$extraParams)
-    // {
-    //     $parts = array_merge([$command, $package], $extraParams);
-
-    //     dispatch(new RunComposer($this->prepareProcessArguments($parts), $this->getCacheKey($package)));
-    // }
-
-    /**
      * Prepare process arguments.
      *
      * @param array $parts
