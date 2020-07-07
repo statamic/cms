@@ -79,16 +79,6 @@ class Git
     }
 
     /**
-     * Git push all tracked content.
-     */
-    public function push()
-    {
-        $this->groupTrackedContentPathsByRepo()->each(function ($paths, $gitRoot) {
-            GitProcess::create($gitRoot)->push();
-        });
-    }
-
-    /**
      * Get git user name.
      *
      * @return string
@@ -202,7 +192,7 @@ class Git
         });
 
         if (config('statamic.git.push')) {
-            $this->push();
+            $this->push($gitRoot);
         }
     }
 
@@ -236,5 +226,13 @@ class Git
             'name' => $this->gitUserName(),
             'email' => $this->gitUserEmail(),
         ];
+    }
+
+    /**
+     * Git push tracked content for a specific repo.
+     */
+    protected function push($gitRoot)
+    {
+        GitProcess::create($gitRoot)->push();
     }
 }
