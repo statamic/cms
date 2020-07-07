@@ -18,7 +18,7 @@ class Git
     public function __construct()
     {
         if (! config('statamic.git.enabled')) {
-            throw new \Exception('Statamic git integration is currently disabled.');
+            throw new \Exception(__('statamic::messages.git_disabled'));
         }
     }
 
