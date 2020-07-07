@@ -4,7 +4,7 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
-use Statamic\Events\Data\PublishBlueprintFound;
+use Statamic\Events\PublishBlueprintFound;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;

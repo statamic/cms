@@ -176,7 +176,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     {
         Facades\AssetContainer::save($this);
 
-        // event(new AssetContainerSaved($this));
+        AssetContainerSaved::dispatch($this);
 
         return $this;
     }
@@ -190,7 +190,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     {
         Facades\AssetContainer::delete($this);
 
-        // event(new AssetContainerDeleted($id, $path));
+        AssetContainerDeleted::dispatch($this);
 
         return true;
     }
