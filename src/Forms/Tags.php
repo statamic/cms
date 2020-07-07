@@ -58,7 +58,7 @@ class Tags extends BaseTags
         $data = $this->getFormSession($sessionHandle);
         $data['fields'] = $this->getFields($sessionHandle);
 
-        $this->addToDebugBar($formHandle, $data);
+        $this->addToDebugBar($data, $formHandle);
 
         $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect']);
 
@@ -211,7 +211,7 @@ class Tags extends BaseTags
      */
     protected function addToDebugBar($data, $formHandle)
     {
-        if (! function_exists('debugbar')) {
+        if (! function_exists('debugbar') || ! class_exists(ConfigCollector::class)) {
             return;
         }
 
