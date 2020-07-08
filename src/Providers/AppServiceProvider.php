@@ -75,6 +75,8 @@ class AppServiceProvider extends ServiceProvider
                 Preference::get('date_format', config('statamic.cp.date_format'))
             );
         });
+
+        $this->checkMultisiteFeature();
     }
 
     public function register()
@@ -134,5 +136,16 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\Localize::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ]);
+    }
+
+    protected function checkMultisiteFeature()
+    {
+        if (Statamic::pro()) {
+            return;
+        }
+
+        $sites = config('statamic.sites.sites');
+
+        throw_if(count($sites) > 1, new \Exception('Statamic Pro is required to use multiple sites.'));
     }
 }
