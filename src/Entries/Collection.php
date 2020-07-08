@@ -18,6 +18,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Structure;
 use Statamic\Facades\Taxonomy;
+use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -462,7 +463,7 @@ class Collection implements Contract, AugmentableContract
         return $this
             ->fluentlyGetOrSet('revisions')
             ->getter(function ($enabled) {
-                if (! config('statamic.revisions.enabled')) {
+                if (! config('statamic.revisions.enabled') || ! Statamic::pro()) {
                     return false;
                 }
 
