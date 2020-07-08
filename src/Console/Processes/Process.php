@@ -132,7 +132,7 @@ class Process
     }
 
     /**
-     * Log error output.
+     * Log error (stderr) output.
      *
      * @param string $type
      * @param string $buffer
