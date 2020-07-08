@@ -8,6 +8,7 @@
     <div id="statamic" :style="{ marginRight: panes.length ? `24rem` : null }">
 
       @include('statamic::partials.session-expiry')
+      @include('statamic::partials.licensing-alerts')
       @include('statamic::partials.global-header')
 
       <div id="main" class="@yield('content-class')" :class="{'nav-closed': ! navOpen, 'nav-mobile-open': mobileNavOpen}">

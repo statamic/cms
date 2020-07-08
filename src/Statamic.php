@@ -12,7 +12,7 @@ use Stringy\StaticStringy;
 class Statamic
 {
     const CORE_SLUG = 'statamic';
-    const CORE_REPO = 'statamic/cms';
+    const PACKAGE = 'statamic/cms';
 
     protected static $scripts = [];
     protected static $externalScripts = [];
@@ -26,6 +26,11 @@ class Statamic
     public static function version()
     {
         return \Facades\Statamic\Version::get();
+    }
+
+    public static function pro()
+    {
+        return config('statamic.editions.pro');
     }
 
     public static function availableScripts(Request $request)

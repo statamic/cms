@@ -47,9 +47,28 @@ $additionalStrings = [
     'The given data was invalid.',
 ];
 
+// Additional keys to be translated that aren't picked up by the scanner.
+// eg. concatenated keys, like licensing errors.
+$additionalKeys = [
+    'messages' => [
+        'licensing_error_unlicensed',
+        'licensing_error_invalid_domain',
+        'licensing_error_no_domains',
+        'licensing_error_outside_license_range',
+        'licensing_error_no_site_key',
+        'licensing_error_unknown_site',
+    ],
+];
+
+// Translation keys that may get picked up but shouldn't.
+// Really just a way to prevent parts of concatenated keys from being included.
+$excludedKeys = [
+    'messages' => ['licensing_error_'],
+];
+
 $app = new Symfony\Component\Console\Application('Statamic Translator');
 $app->add(new Statamic\Translator\Commands\Stats($discovery, $ignoredSubstrings));
-$app->add(new Statamic\Translator\Commands\Generate($discovery, $files, $manualFiles, $ignoredSubstrings, $additionalStrings));
+$app->add(new Statamic\Translator\Commands\Generate($discovery, $files, $manualFiles, $ignoredSubstrings, $additionalStrings, $additionalKeys, $excludedKeys));
 $app->add(new Statamic\Translator\Commands\Translate($files, $dontTranslate));
 $app->add(new Statamic\Translator\Commands\Review($files));
 

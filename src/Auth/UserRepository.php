@@ -24,6 +24,11 @@ abstract class UserRepository implements RepositoryContract
         return $this->fromUser($user);
     }
 
+    public function count()
+    {
+        return $this->query()->count();
+    }
+
     public function roleRepository()
     {
         return app($this->roleRepository)->path(

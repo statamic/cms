@@ -2,12 +2,12 @@
 
 namespace Statamic\Http\Controllers\CP\Updater;
 
+use Facades\Statamic\Marketplace\Marketplace;
 use Facades\Statamic\Updater\UpdatesOverview;
 use Illuminate\Http\Request;
 use Statamic\Facades\Addon;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Statamic;
-use Statamic\Updater\Changelog;
 
 class UpdaterController extends CpController
 {
@@ -24,9 +24,11 @@ class UpdaterController extends CpController
             return redirect()->route('statamic.cp.updater.product', Statamic::CORE_SLUG);
         }
 
-        $statamicChangelog = Changelog::product(Statamic::CORE_SLUG);
-
-        return view('statamic::updater.index', compact('statamicChangelog', 'addons'));
+        return view('statamic::updater.index', [
+            'statamic' => Marketplace::statamic()->changelog(),
+            'addons' => Addon::all()->filter->existsOnMarketplace(),
+            'unlistedAddons' => Addon::all()->reject->existsOnMarketplace(),
+        ]);
     }
 
     /**

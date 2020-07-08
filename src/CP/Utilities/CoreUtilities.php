@@ -3,6 +3,7 @@
 namespace Statamic\CP\Utilities;
 
 use Statamic\Facades\Utility;
+use Statamic\Http\Controllers\CP\LicensingController;
 use Statamic\Http\Controllers\CP\Utilities\CacheController;
 use Statamic\Http\Controllers\CP\Utilities\EmailController;
 use Statamic\Http\Controllers\CP\Utilities\GitController;
@@ -53,6 +54,17 @@ class CoreUtilities
             ->docsUrl(Statamic::docsUrl('utilities/email'))
             ->routes(function ($router) {
                 $router->post('/', [EmailController::class, 'send']);
+            })
+            ->register();
+
+        Utility::make('licensing')
+            ->action([LicensingController::class, 'show'])
+            ->title(__('Licensing'))
+            ->icon('licensing')
+            ->description(__('statamic::messages.licensing_utility_description'))
+            ->docsUrl(Statamic::docsUrl('licensing'))
+            ->routes(function ($router) {
+                $router->get('refresh', [LicensingController::class, 'refresh'])->name('refresh');
             })
             ->register();
 

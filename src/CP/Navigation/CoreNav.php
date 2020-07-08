@@ -170,11 +170,16 @@ class CoreNav
                 });
             });
 
-        // Nav::tools('Updates')
-        //     ->route('updater')
-        //     ->icon('loading-bar')
-        //     ->view('statamic::nav.updates')
-        //     ->can('view updates');
+        Nav::tools('Updates')
+            ->route('updater')
+            ->icon('loading-bar')
+            ->view('statamic::nav.updates')
+            ->can('view updates');
+
+        Nav::tools('Addons')
+            ->route('addons.index')
+            ->icon('addons')
+            ->can('configure addons');
 
         $this->makeUtilitiesSection();
 
@@ -241,11 +246,6 @@ class CoreNav
      */
     protected function makeUnusedSection()
     {
-        // Nav::site('Addons')
-        //     ->route('addons.index')
-        //     ->icon('addons')
-        //     ->can('configure addons');
-
         // Nav::site('Preferences')
         //     ->route('')
         //     ->icon('hammer-wrench');

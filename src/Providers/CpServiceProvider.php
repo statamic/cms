@@ -14,6 +14,8 @@ use Statamic\Http\View\Composers\FieldComposer;
 use Statamic\Http\View\Composers\JavascriptComposer;
 use Statamic\Http\View\Composers\NavComposer;
 use Statamic\Http\View\Composers\SessionExpiryComposer;
+use Statamic\Licensing\LicenseManager;
+use Statamic\Licensing\Outpost;
 
 class CpServiceProvider extends ServiceProvider
 {
@@ -49,6 +51,10 @@ class CpServiceProvider extends ServiceProvider
         $this->app->singleton(UtilityRepository::class, function () {
             return new UtilityRepository;
         });
+
+        $this->app->singleton(LicenseManager::class, function ($app) {
+            return new LicenseManager($app[Outpost::class]);
+        });
     }
 
     protected function registerMiddlewareGroups()
@@ -62,6 +68,7 @@ class CpServiceProvider extends ServiceProvider
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Statamic\Http\Middleware\CP\ContactOutpost::class,
         ]);
 
         $router->middlewareGroup('statamic.cp.authenticated', [

@@ -7,7 +7,6 @@ Vue.component('v-select', vSelect)
 // Core
 Vue.component('asset-manager', require('../components/assets/AssetManager.vue').default);
 Vue.component('asset-browser', require('../components/assets/Browser/Browser.vue').default);
-Vue.component('updater', require('../components/Updater.vue').default);
 Vue.component('updates-badge', require('../components/UpdatesBadge.vue').default);
 Vue.component('composer-output', require('../components/ComposerOutput.vue').default);
 
