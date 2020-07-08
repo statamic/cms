@@ -8,6 +8,7 @@ use Statamic\Console\ValidatesInput;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Statamic\Rules\EmailAvailable;
+use Statamic\Statamic;
 use Symfony\Component\Console\Input\InputArgument;
 
 class MakeUser extends Command
@@ -49,6 +50,10 @@ class MakeUser extends Command
      */
     public function handle()
     {
+        if (! Statamic::pro() && User::query()->count() > 0) {
+            return $this->error(__('Statamic Pro is required.'));
+        }
+
         // If email argument exists, non-interactively create user.
         if ($this->email = $this->argument('email')) {
             return $this->createUser();

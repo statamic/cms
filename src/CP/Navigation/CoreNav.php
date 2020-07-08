@@ -20,6 +20,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Utility;
+use Statamic\Statamic;
 
 class CoreNav
 {
@@ -209,6 +210,10 @@ class CoreNav
      */
     protected function makeUsersSection()
     {
+        if (! Statamic::pro()) {
+            return $this;
+        }
+
         Nav::users('Users')
             ->route('users.index')
             ->icon('users-box')

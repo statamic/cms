@@ -30,8 +30,8 @@
                         </template>
                         <template slot="cell-roles" slot-scope="{ row: user, value: roles }">
                             <span v-if="user.super" class="badge-pill-sm mr-sm">{{ __('Super Admin') }}</span>
-                            <span v-if="roles.length === 0" />
-                            <span v-for="role in roles" class="badge-pill-sm mr-sm">{{ role.title }}</span>
+                            <span v-if="!roles || roles.length === 0" />
+                            <span v-for="role in (roles || [])" class="badge-pill-sm mr-sm">{{ role.title }}</span>
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
                             <dropdown-list>

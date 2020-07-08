@@ -9,9 +9,9 @@
             {{ __('Users') }}
         </h1>
 
-        @can('create', 'Statamic\Contracts\Auth\User')
+        @if (Statamic::pro() && $user->can('create', 'Statamic\Contracts\Auth\User'))
             <a href="{{ cp_route('users.create') }}" class="btn-primary">{{ __('Create User') }}</a>
-        @endcan
+        @endif
     </header>
 
     <user-listing
