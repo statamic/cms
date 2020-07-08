@@ -68,7 +68,7 @@ class CoreUtilities
             })
             ->register();
 
-        if (config('statamic.git.enabled')) {
+        if (config('statamic.git.enabled') && Statamic::pro()) {
             Utility::make('git')
                 ->action([GitController::class, 'index'])
                 ->title('Git')
