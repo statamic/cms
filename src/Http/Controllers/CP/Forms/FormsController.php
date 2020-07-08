@@ -75,6 +75,8 @@ class FormsController extends CpController
 
     public function create()
     {
+        $this->authorizeProIf(Form::all()->count() >= 1);
+
         $this->authorize('create', FormContract::class);
 
         return view('statamic::forms.create');
@@ -82,6 +84,8 @@ class FormsController extends CpController
 
     public function store(Request $request)
     {
+        $this->authorizeProIf(Form::all()->count() >= 1);
+
         $this->authorize('create', FormContract::class, __('You are not authorized to create forms.'));
 
         $request->validate([
