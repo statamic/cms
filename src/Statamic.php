@@ -138,7 +138,7 @@ class Statamic
 
     public static function isApiRoute()
     {
-        if (! config('statamic.api.enabled')) {
+        if (! config('statamic.api.enabled') || ! static::pro()) {
             return false;
         }
 
@@ -147,7 +147,7 @@ class Statamic
 
     public static function apiRoute($route, $params = [])
     {
-        if (! config('statamic.api.enabled')) {
+        if (! config('statamic.api.enabled') || ! static::pro()) {
             return null;
         }
 
