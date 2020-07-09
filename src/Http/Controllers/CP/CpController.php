@@ -95,7 +95,7 @@ class CpController extends Controller
         }
     }
 
-    public function authorizePro($message = null)
+    public function authorizePro()
     {
         if (! Statamic::pro()) {
             throw new AuthorizationException(__('Statamic Pro is required.'));
