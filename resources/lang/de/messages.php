@@ -13,7 +13,7 @@ return [
     'asset_container_intro' => 'Mediendateien und Dokumente befinden sich in Ordnern auf dem Server oder anderen Speicherdiensten. Jeder dieser Speicherorte wird als Container bezeichnet.',
     'asset_container_move_instructions' => 'Ist diese Option aktiviert, können Benutzer*innen Dateien innerhalb diesem Container verschieben.',
     'asset_container_quick_download_instructions' => 'Ist diese Option aktiviert, wird im Dateimanager ein Button zum Downloaden hinzugefügt.',
-    'asset_container_rename_instructions' => 'Wenn diese Option aktiviert ist, können Benutzer*innen Dateien in diesem Container umbenennen.',
+    'asset_container_rename_instructions' => 'Ist diese Option aktiviert, können Benutzer*innen Dateien in diesem Container umbenennen.',
     'asset_container_title_instructions' => 'Gewöhnlich ein Substantiv im Plural, wie z.B. Bilder oder Dokumente.',
     'asset_folders_directory_instructions' => 'Wir empfehlen Leer- und Sonderzeichen zu vermeiden, damit die URLs korrekt bleiben.',
     'blueprints_intro' => 'Blueprints definieren und organisieren Felder, mit denen die Inhaltsmodelle von Sammlungen, Formularen und anderen Datentypen erstellt werden.',

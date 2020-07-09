@@ -102,8 +102,8 @@ return [
     'url' => 'Das Format ist ungültig.',
     'unique_entry_value' => 'Dieser Wert wurde bereits vergeben.',
     'unique_user_value' => 'Dieser Wert wurde bereits vergeben.',
-    'one_site_without_origin' => 'Mindestens eine Website darf keinen Ursprung enthalten.',
-    'origin_cannot_be_disabled' => 'Kann keinen deaktivierten Ursprung auswählen.',
+    'one_site_without_origin' => 'Mindestens eine Webseite darf keine Quelle enthalten.',
+    'origin_cannot_be_disabled' => 'Kann keine deaktivierte Quelle auswählen.',
     'custom' => [
         'attribute-name' => [
             'rule-name' => 'benutzerdefinierte Nachricht',
