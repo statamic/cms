@@ -23,7 +23,7 @@ class ServiceProvider extends LaravelServiceProvider
 
             return new $class(
                 $app[Cacher::class],
-                $app['config']['statamic.static_caching.invalidation']
+                $app['config']['statamic.static_caching.invalidation.rules']
             );
         });
     }

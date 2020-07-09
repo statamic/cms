@@ -1,6 +1,7 @@
 <?php
 
 namespace Statamic\StaticCaching;
+use Illuminate\Support\Facades\Log;
 
 class DefaultInvalidator implements Invalidator
 {
@@ -15,7 +16,7 @@ class DefaultInvalidator implements Invalidator
 
     public function invalidate($item)
     {
-        if ($this->rules['rules'] === 'all') {
+        if ($this->rules === 'all') {
             return $this->cacher->flush();
         }
 
@@ -24,15 +25,18 @@ class DefaultInvalidator implements Invalidator
             $this->cacher->invalidateUrl($url);
         }
 
-        if($this->rules['rules'] !== 'all' && ! empty($this->rules['rules']['collections'])) {
-            $invalidateUrls = $this->rules['rules']['collections'][$item->collectionHandle()]['urls'];
+        if ($this->rules !== 'all' && !empty($this->rules['collections'])) {
+            if (!empty($this->rules['collections'][$item->collectionHandle()])) {
+                $invalidateUrls = $this->rules['collections'][$item->collectionHandle()]['urls'];
 
-            if(is_array($invalidateUrls) && ! empty($invalidateUrls)) {
-                foreach($invalidateUrls as $urlToInvalidate) {
-                    $this->cacher->invalidateUrl($urlToInvalidate);
+                if (is_array($invalidateUrls) && !empty($invalidateUrls)) {
+                    foreach ($invalidateUrls as $urlToInvalidate) {
+                        $this->cacher->invalidateUrl($urlToInvalidate);
+                    }
                 }
             }
         }
 
     }
+
 }
