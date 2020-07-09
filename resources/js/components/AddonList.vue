@@ -18,11 +18,11 @@
             {{ __('messages.addon_list_loading_error') }}
         </div>
 
-        <div v-if="loading" class="card p-3 text-center">
+        <div v-if="initializing" class="card p-3 text-center">
             <loading-graphic  />
         </div>
 
-        <data-list :rows="rows" v-if="loaded && !showingAddon">
+        <data-list :rows="rows" v-if="!initializing && !showingAddon">
             <div class="" slot-scope="{ rows: addons }">
 
                 <div class="card p-0">
@@ -49,7 +49,7 @@
                     </div>
                 </div>
 
-                <div class="addon-grid my-4">
+                <div class="addon-grid my-4" :class="{ 'opacity-50': loading }">
                     <div class="addon-card bg-white text-grey-80 h-full shadow rounded cursor-pointer relative" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
                         <span class="badge absolute top-0 left-0 mt-1 ml-1" v-if="addon.installed">Installed</span>
                         <div class="h-64 rounded-t bg-cover" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
@@ -110,6 +110,7 @@
 
         data() {
             return {
+                initializing: true,
                 loading: true,
                 rows: [],
                 meta: {},
@@ -171,6 +172,7 @@
 
                 this.$axios.get(window.Statamic.$config.get('cpRoot')+'/api/addons', {'params': this.params}).then(response => {
                     this.loading = false;
+                    this.initializing = false;
                     this.rows = response.data.data;
                     this.meta = response.data.meta;
                     this.unlisted = response.data.unlisted ?? [];
