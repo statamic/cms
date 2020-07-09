@@ -9,6 +9,7 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Exceptions\PublishException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Form;
+use Statamic\Forms\SendEmails;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -51,6 +52,8 @@ class FormController extends Controller
         if ($form->store()) {
             $submission->save();
         }
+
+        SendEmails::dispatch($submission);
 
         return $this->formSuccess($params, $submission);
     }
