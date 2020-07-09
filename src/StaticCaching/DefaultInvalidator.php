@@ -1,7 +1,6 @@
 <?php
 
 namespace Statamic\StaticCaching;
-use Illuminate\Support\Facades\Log;
 
 class DefaultInvalidator implements Invalidator
 {
@@ -25,11 +24,11 @@ class DefaultInvalidator implements Invalidator
             $this->cacher->invalidateUrl($url);
         }
 
-        if ($this->rules !== 'all' && !empty($this->rules['collections'])) {
+        if ($this->rules !== 'all' && ! empty($this->rules['collections'])) {
             if (!empty($this->rules['collections'][$item->collectionHandle()])) {
                 $invalidateUrls = $this->rules['collections'][$item->collectionHandle()]['urls'];
 
-                if (is_array($invalidateUrls) && !empty($invalidateUrls)) {
+                if (is_array($invalidateUrls) && ! empty($invalidateUrls)) {
                     foreach ($invalidateUrls as $urlToInvalidate) {
                         $this->cacher->invalidateUrl($urlToInvalidate);
                     }
