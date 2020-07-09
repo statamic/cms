@@ -209,6 +209,8 @@ class Translate extends Command
 
         $response = $this->client->translate($string, ['target' => $lang]);
 
-        return (new Placeholders)->unwrap($response['text']);
+        $translation = (new Placeholders)->unwrap($response['text']);
+
+        return str_replace('&#39;', "'", $translation);
     }
 }

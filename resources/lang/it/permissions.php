@@ -30,7 +30,7 @@ return [
     'reorder_{taxonomy}_terms' => 'Riordina i termini',
     'group_navigation' => 'Navigazione',
     'configure_navs' => 'Configura la navigazione',
-    'configure_navs_desc' => 'Concede l&#39;accesso a tutte le autorizzazioni relative alla navigazione',
+    'configure_navs_desc' => 'Concede l\'accesso a tutte le autorizzazioni relative alla navigazione',
     'view_{nav}_nav' => 'Visualizza :nav navigazione :nav',
     'edit_{nav}_nav' => 'Modifica navigazione',
     'group_globals' => 'globale',
