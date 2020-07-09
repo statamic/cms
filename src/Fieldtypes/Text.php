@@ -2,7 +2,6 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\CP\Column;
 use Statamic\Fields\Fieldtype;
 
 class Text extends Fieldtype
@@ -59,7 +58,7 @@ class Text extends Fieldtype
     public function preProcessIndex($value)
     {
         if ($value) {
-            return $this->config('prefix') . $value . $this->config('suffix');
+            return $this->config('prefix').$value.$this->config('suffix');
         }
     }
 }
