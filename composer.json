@@ -9,6 +9,7 @@
     ],
     "license": "proprietary",
     "require": {
+        "composer/composer": "^1.10",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3",
         "laravel/framework": "^6.0 || ^7.0",
@@ -27,7 +28,6 @@
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
-        "composer/composer": "^1.7",
         "fzaninotto/faker": "~1.4",
         "google/cloud-translate": "^1.6",
         "mockery/mockery": "~1.0",

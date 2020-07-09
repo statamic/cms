@@ -1,23 +1,36 @@
 <?php
 
-namespace Statamic\Forms\Listeners;
+namespace Statamic\Forms;
 
+use Illuminate\Bus\Queueable;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
-use Statamic\Forms\Email;
 
-class SendEmails
+class SendEmails implements ShouldQueue
 {
+    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+
+    protected $submission;
+
+    public function __construct(Submission $submission)
+    {
+        $this->submission = $submission;
+    }
+
     /**
      * Send form submission emails.
      *
      * @param Submission $submission
      */
-    public function handle(Submission $submission)
+    public function handle()
     {
-        $this->parseEmailConfigs($submission)->each(function ($config) use ($submission) {
-            Mail::send(new Email($submission, $config));
+        $this->parseEmailConfigs($this->submission)->each(function ($config) {
+            Mail::send(new Email($this->submission, $config));
         });
     }
 

@@ -15,6 +15,7 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Statamic;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Taxonomy implements Contract, Responsable, AugmentableContract
@@ -201,7 +202,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         return $this
             ->fluentlyGetOrSet('revisions')
             ->getter(function ($enabled) {
-                if (! config('statamic.revisions.enabled')) {
+                if (! config('statamic.revisions.enabled') || ! Statamic::pro()) {
                     return false;
                 }
 

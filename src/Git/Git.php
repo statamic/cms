@@ -18,7 +18,7 @@ class Git
     public function __construct()
     {
         if (! config('statamic.git.enabled')) {
-            throw new \Exception('Statamic git integration is currently disabled.');
+            throw new \Exception(__('statamic::messages.git_disabled'));
         }
     }
 
@@ -76,16 +76,6 @@ class Git
         }
 
         CommitJob::dispatch($message)->delay($delayInMinutes ?? null);
-    }
-
-    /**
-     * Git push all tracked content.
-     */
-    public function push()
-    {
-        $this->groupTrackedContentPathsByRepo()->each(function ($paths, $gitRoot) use ($message) {
-            GitProcess::create($gitRoot)->push();
-        });
     }
 
     /**
@@ -202,7 +192,7 @@ class Git
         });
 
         if (config('statamic.git.push')) {
-            $this->push();
+            $this->push($gitRoot);
         }
     }
 
@@ -236,5 +226,13 @@ class Git
             'name' => $this->gitUserName(),
             'email' => $this->gitUserEmail(),
         ];
+    }
+
+    /**
+     * Git push tracked content for a specific repo.
+     */
+    protected function push($gitRoot)
+    {
+        GitProcess::create($gitRoot)->push();
     }
 }

@@ -6,9 +6,15 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Scope;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Middleware\RequireStatamicPro;
 
 class UserGroupsController extends CpController
 {
+    public function __construct()
+    {
+        $this->middleware(RequireStatamicPro::class);
+    }
+
     public function index(Request $request)
     {
         $this->authorize('edit user groups');

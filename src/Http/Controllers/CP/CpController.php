@@ -9,6 +9,7 @@ use Statamic\Facades\File;
 use Statamic\Facades\Folder;
 use Statamic\Facades\YAML;
 use Statamic\Http\Controllers\Controller;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 
 /**
@@ -43,7 +44,7 @@ class CpController extends Controller
         foreach (Folder::disk('resources')->getFilesByTypeRecursively('templates', 'html') as $path) {
             $parts = explode('/', $path);
             array_shift($parts);
-            $templates[] = Str::removeRight(join('/', $parts), '.html');
+            $templates[] = Str::removeRight(implode('/', $parts), '.html');
         }
 
         return $templates;
@@ -87,10 +88,24 @@ class CpController extends Controller
         }
     }
 
-    public function authorizeIf($condition, ...$args)
+    public function authorizeIf($condition, $ability, $args = [], $message = null)
     {
         if ($condition) {
-            return $this->authorize(...$args);
+            return $this->authorize($ability, $args, $message);
+        }
+    }
+
+    public function authorizePro($message = null)
+    {
+        if (! Statamic::pro()) {
+            throw new AuthorizationException(__('Statamic Pro is required.'));
+        }
+    }
+
+    public function authorizeProIf($condition)
+    {
+        if ($condition) {
+            return $this->authorizePro();
         }
     }
 }

@@ -20,6 +20,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Utility;
+use Statamic\Statamic;
 
 class CoreNav
 {
@@ -170,11 +171,16 @@ class CoreNav
                 });
             });
 
-        // Nav::tools('Updates')
-        //     ->route('updater')
-        //     ->icon('loading-bar')
-        //     ->view('statamic::nav.updates')
-        //     ->can('view updates');
+        Nav::tools('Updates')
+            ->route('updater')
+            ->icon('loading-bar')
+            ->view('statamic::nav.updates')
+            ->can('view updates');
+
+        Nav::tools('Addons')
+            ->route('addons.index')
+            ->icon('addons')
+            ->can('configure addons');
 
         $this->makeUtilitiesSection();
 
@@ -204,6 +210,10 @@ class CoreNav
      */
     protected function makeUsersSection()
     {
+        if (! Statamic::pro()) {
+            return $this;
+        }
+
         Nav::users('Users')
             ->route('users.index')
             ->icon('users-box')
@@ -241,11 +251,6 @@ class CoreNav
      */
     protected function makeUnusedSection()
     {
-        // Nav::site('Addons')
-        //     ->route('addons.index')
-        //     ->icon('addons')
-        //     ->can('configure addons');
-
         // Nav::site('Preferences')
         //     ->route('')
         //     ->icon('hammer-wrench');
