@@ -59,7 +59,7 @@ class Text extends Fieldtype
     public function preProcessIndex($value)
     {
         if ($value) {
-            return $this->config('prefix') . $value . $this->config('suffix');
+            return $this->config('prepend') . $value . $this->config('append');
         }
     }
 }
