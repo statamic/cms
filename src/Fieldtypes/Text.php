@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\CP\Column;
 use Statamic\Fields\Fieldtype;
 
 class Text extends Fieldtype
@@ -53,5 +54,12 @@ class Text extends Fieldtype
                 'width' => 50,
             ],
         ];
+    }
+
+    public function preProcessIndex($value)
+    {
+        if ($value) {
+            return $this->config('prefix') . $value . $this->config('suffix');
+        }
     }
 }
