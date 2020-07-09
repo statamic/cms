@@ -6,6 +6,8 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
 use Illuminate\Support\MessageBag;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Events\Data\SubmissionCreated;
+use Statamic\Events\Data\SubmissionCreating;
 use Statamic\Exceptions\PublishException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Form;
@@ -53,6 +55,7 @@ class FormController extends Controller
             $submission->save();
         }
 
+        SubmissionCreated::dispatch($submission);
         SendEmails::dispatch($submission);
 
         return $this->formSuccess($params, $submission);
@@ -129,8 +132,7 @@ class FormController extends Controller
     {
         $errors = [];
 
-        // TODO: Replace with `Saving` class-based event (see EntrySaving).
-        $responses = event('Form.submission.creating', $submission);
+        $responses = SubmissionCreating::dispatch($submission);
 
         foreach ($responses as $response) {
             // Ignore any non-arrays
