@@ -61,6 +61,13 @@ class UserTags extends Tags
             }
         }
 
+        // Get a user by field, if the `field` parameter was used.
+        if ($field = $this->params->get('field')) {
+            if (! $user = User::findByField($field, $this->params->get('value'))) {
+                return $this->parseNoResults();
+            }
+        }
+
         // No user found? Get the current one.
         if (! $user) {
             if (! $user = User::current()) {
