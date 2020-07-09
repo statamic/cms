@@ -35,7 +35,5 @@ class DefaultInvalidator implements Invalidator
                 }
             }
         }
-
     }
-
 }
