@@ -25,7 +25,7 @@ class DefaultInvalidator implements Invalidator
         }
 
         if ($this->rules !== 'all' && ! empty($this->rules['collections'])) {
-            if (!empty($this->rules['collections'][$item->collectionHandle()])) {
+            if (! empty($this->rules['collections'][$item->collectionHandle()])) {
                 $invalidateUrls = $this->rules['collections'][$item->collectionHandle()]['urls'];
 
                 if (is_array($invalidateUrls) && ! empty($invalidateUrls)) {
