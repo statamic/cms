@@ -243,7 +243,6 @@ class Form implements FormContract
         return collect(Folder::getFilesByType($path, 'yaml'))->map(function ($file) {
             return $this->makeSubmission()
                 ->id(pathinfo($file)['filename'])
-                ->unguard()
                 ->data(YAML::parse(File::get($file)));
         });
     }

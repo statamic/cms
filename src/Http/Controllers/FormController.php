@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\MessageBag;
@@ -23,21 +24,20 @@ class FormController extends Controller
      *
      * @return mixed
      */
-    public function submit($form)
+    public function submit(Request $request, $form)
     {
-        $data = request()->all();
+        $params = collect($request->all())->filter(function ($value, $key) {
+            return Str::startsWith($key, '_');
+        })->all();
 
-        $params = collect($data)
-            ->filter(function ($value, $key) {
-                return Str::startsWith($key, '_');
-            })
-            ->all();
-
-        $submission = $form->makeSubmission();
+        $fields = $form->blueprint()->fields()->addValues($values = $request->all());
 
         try {
-            $submission->data($data);
-            $submission->uploadFiles();
+            throw_if(Arr::has($values, $form->honeypot()), new SilentFormFailureException);
+
+            $fields->validate();
+
+            $submission = $form->makeSubmission()->data($values)->uploadFiles();
 
             // If any event listeners return false, we'll do a silent failure.
             // If they want to add validation errors, they can throw an exception.
