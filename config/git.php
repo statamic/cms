@@ -83,6 +83,7 @@ return [
         resource_path('fieldsets'),
         resource_path('forms'),
         resource_path('users'),
+        storage_path('forms'),
     ],
 
     /*

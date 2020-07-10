@@ -239,7 +239,7 @@ class GitEventTest extends TestCase
 
         $form->save();
 
-        $submission = $form->createSubmission()->data([]);
+        $submission = $form->makeSubmission()->data([]);
 
         $submission->save();
         $submission->delete();

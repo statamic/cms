@@ -6,6 +6,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Exceptions\StatamicProRequiredException;
 use Statamic\Facades\Preference;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
@@ -146,6 +147,6 @@ class AppServiceProvider extends ServiceProvider
 
         $sites = config('statamic.sites.sites');
 
-        throw_if(count($sites) > 1, new \Exception('Statamic Pro is required to use multiple sites.'));
+        throw_if(count($sites) > 1, new StatamicProRequiredException('Statamic Pro is required to use multiple sites.'));
     }
 }

@@ -842,6 +842,17 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Return true if the string is an email address.
+     *
+     * @param $value
+     * @return bool
+     */
+    public function isEmail($value)
+    {
+        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
+    }
+
+    /**
      * Checks to see if an array is empty. Like, for realsies.
      *
      * @param $value
@@ -948,6 +959,17 @@ class CoreModifiers extends Modifier
     public function isUppercase($value)
     {
         return Stringy::isUpperCase($value);
+    }
+
+    /**
+     * Returns true if the string is a URL.
+     *
+     * @param $value
+     * @return bool
+     */
+    public function isUrl($value)
+    {
+        return filter_var($value, FILTER_VALIDATE_URL) !== false;
     }
 
     /**
