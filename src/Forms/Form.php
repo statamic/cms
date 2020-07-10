@@ -276,16 +276,6 @@ class Form implements FormContract
     }
 
     /**
-     * Delete a form submission.
-     */
-    public function deleteSubmission($id)
-    {
-        $submission = $this->submission($id);
-
-        $submission->delete();
-    }
-
-    /**
      * The URL to view form submissions in the CP.
      *
      * @return string
