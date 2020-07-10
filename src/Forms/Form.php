@@ -241,7 +241,7 @@ class Form implements FormContract
         $path = config('statamic.forms.submissions').'/'.$this->handle();
 
         return collect(Folder::getFilesByType($path, 'yaml'))->map(function ($file) {
-            return $this->createSubmission()
+            return $this->makeSubmission()
                 ->id(pathinfo($file)['filename'])
                 ->unguard()
                 ->data(YAML::parse(File::get($file)));
@@ -262,11 +262,11 @@ class Form implements FormContract
     }
 
     /**
-     * Create a form submission.
+     * Make a form submission.
      *
      * @return Submission
      */
-    public function createSubmission()
+    public function makeSubmission()
     {
         $submission = app(Submission::class);
 

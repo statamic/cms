@@ -34,7 +34,7 @@ class FormController extends Controller
             })
             ->all();
 
-        $submission = $form->createSubmission();
+        $submission = $form->makeSubmission();
 
         try {
             $submission->data($data);

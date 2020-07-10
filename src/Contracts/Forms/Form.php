@@ -47,11 +47,11 @@ interface Form extends Arrayable
     public function submission($id);
 
     /**
-     * Create a submission.
+     * Make a submission.
      *
      * @return Submission
      */
-    public function createSubmission();
+    public function makeSubmission();
 
     /**
      * Delete a submission.
