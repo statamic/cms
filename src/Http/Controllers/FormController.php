@@ -32,12 +32,14 @@ class FormController extends Controller
 
         $fields = $form->blueprint()->fields()->addValues($values = $request->all());
 
-        try {
-            throw_if(Arr::has($values, $form->honeypot()), new SilentFormFailureException);
+        $submission = $form->makeSubmission()->data($values);
 
+        try {
             $fields->validate();
 
-            $submission = $form->makeSubmission()->data($values)->uploadFiles();
+            throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
+
+            $submission->uploadFiles();
 
             // If any event listeners return false, we'll do a silent failure.
             // If they want to add validation errors, they can throw an exception.
