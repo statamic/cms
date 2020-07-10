@@ -10,7 +10,6 @@ use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\Data\FormSubmitted;
 use Statamic\Events\Data\SubmissionCreated;
-use Statamic\Events\Data\SubmissionCreating;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Form;
 use Statamic\Forms\SendEmails;
@@ -113,43 +112,5 @@ class FormController extends Controller
         $response = $redirect ? redirect($redirect) : back();
 
         return $response->withInput()->withErrors($errors, 'form.'.$form);
-    }
-
-    /**
-     * Run the `submission:creating` event.
-     *
-     * This allows the submission to be short-circuited before it gets saved and show errors.
-     * Or, a the submission may be modified. Lastly, an addon could just 'do something'
-     * here without modifying/stopping the submission.
-     *
-     * Expects an array of event responses (multiple listeners can listen for the same event).
-     * Each response in the array should be another array with either an `errors` or `submission` key.
-     *
-     * @param  Submission $submission
-     * @return array
-     */
-    private function runCreatingEvent($submission)
-    {
-        $errors = [];
-
-        $responses = SubmissionCreating::dispatch($submission);
-
-        foreach ($responses as $response) {
-            // Ignore any non-arrays
-            if (! is_array($response)) {
-                continue;
-            }
-
-            // If the event returned errors, tack those onto the array.
-            if ($response_errors = array_get($response, 'errors')) {
-                $errors = array_merge($response_errors, $errors);
-                continue;
-            }
-
-            // If the event returned a submission, we'll replace it with that.
-            $submission = array_get($response, 'submission');
-        }
-
-        return [$errors, $submission];
     }
 }
