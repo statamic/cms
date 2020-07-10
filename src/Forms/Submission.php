@@ -7,7 +7,6 @@ use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
 use Statamic\Events\Data\SubmissionDeleted;
 use Statamic\Events\Data\SubmissionSaved;
-use Statamic\Exceptions\PublishException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
@@ -125,7 +124,7 @@ class Submission implements SubmissionContract
      *
      * @param array|null $data
      * @return array
-     * @throws PublishException|HoneypotException
+     * @throws ValidationException|SilentFormFailureException
      */
     public function data($data = null)
     {
@@ -188,7 +187,7 @@ class Submission implements SubmissionContract
      * Validate an array of data against rules in the form blueprint.
      *
      * @param  array $data       Data to validate
-     * @throws PublishException  An exception will be thrown if it doesn't validate
+     * @throws ValidationException  An exception will be thrown if it doesn't validate
      * @return array
      */
     private function validate($data)
@@ -206,13 +205,7 @@ class Submission implements SubmissionContract
             $attributes[$field_name] = array_get($field_config, 'display', $field_name);
         }
 
-        $validator = app('validator')->make($data, $rules, [], $attributes);
-
-        if ($validator->fails()) {
-            $e = new PublishException;
-            $e->setErrors($validator->errors()->toArray());
-            throw $e;
-        }
+        app('validator')->make($data, $rules, [], $attributes)->validate();
 
         return $data;
     }

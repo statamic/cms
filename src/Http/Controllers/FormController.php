@@ -4,11 +4,13 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\MessageBag;
+use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Events\Data\FormSubmitted;
 use Statamic\Events\Data\SubmissionCreated;
 use Statamic\Events\Data\SubmissionCreating;
-use Statamic\Exceptions\PublishException;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Form;
 use Statamic\Forms\SendEmails;
@@ -38,17 +40,15 @@ class FormController extends Controller
             $submission->data($data);
             $submission->uploadFiles();
 
-            // Allow addons to prevent the submission of the form, return
-            // their own errors, and modify the submission.
-            [$errors, $submission] = $this->runCreatingEvent($submission);
-        } catch (PublishException $e) {
-            return $this->formFailure($params, $e->getErrors(), $form->handle());
+            // If any event listeners return false, we'll do a silent failure.
+            // If they want to add validation errors, they can throw an exception.
+            if (FormSubmitted::dispatch($submission) === false) {
+                throw new SilentFormFailureException;
+            }
+        } catch (ValidationException $e) {
+            return $this->formFailure($params, $e->errors(), $form->handle());
         } catch (SilentFormFailureException $e) {
             return $this->formSuccess($params, $submission);
-        }
-
-        if ($errors) {
-            return $this->formFailure($params, $errors, $form->handle());
         }
 
         if ($form->store()) {
