@@ -143,4 +143,15 @@ class UserTagsTest extends TestCase
 
         $this->assertEquals('foo@bar.com', $this->tag('{{ user email="foo@bar.com" }}{{email}}{{ /user }}'));
     }
+
+    /** @test */
+    public function it_can_load_user_by_field()
+    {
+        User::make()
+            ->email('foo@bar.com')
+            ->data(['field1' => 'foobar'])
+            ->save();
+
+        $this->assertEquals('foo@bar.com', $this->tag('{{ user field="field1" value="foobar" }}{{email}}{{ /user }}'));
+    }
 }
