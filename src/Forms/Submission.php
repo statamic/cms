@@ -7,8 +7,6 @@ use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
 use Statamic\Events\Data\SubmissionDeleted;
 use Statamic\Events\Data\SubmissionSaved;
-use Statamic\Exceptions\PublishException;
-use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -16,11 +14,6 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 class Submission implements SubmissionContract
 {
     use ContainsData, FluentlyGetsAndSets;
-
-    /**
-     * @var bool
-     */
-    private $guard = true;
 
     /**
      * @var string
@@ -101,47 +94,18 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Disable validation.
-     */
-    public function unguard()
-    {
-        $this->guard = false;
-
-        return $this;
-    }
-
-    /**
-     * Enable validation.
-     */
-    public function guard()
-    {
-        $this->guard = true;
-
-        return $this;
-    }
-
-    /**
      * Get or set the data.
      *
      * @param array|null $data
      * @return array
-     * @throws PublishException|HoneypotException
      */
     public function data($data = null)
     {
-        if (is_null($data)) {
+        if (func_num_args() === 0) {
             return $this->data;
         }
 
-        // If a honeypot exists, throw an exception.
-        if (array_get($data, $this->form()->honeypot())) {
-            throw new SilentFormFailureException('Honeypot field has been populated.');
-        }
-
-        // Validate and remove any fields that aren't present in the form blueprint.
-        if ($this->guard) {
-            $data = collect($this->validate($data))->intersectByKeys($this->fields())->all();
-        }
+        $data = collect($data)->intersectByKeys($this->fields())->all();
 
         $this->data = $data;
 
@@ -182,39 +146,8 @@ class Submission implements SubmissionContract
             // Add the resulting paths to our submission
             array_set($this->data, $arr['field'], $data);
         });
-    }
 
-    /**
-     * Validate an array of data against rules in the form blueprint.
-     *
-     * @param  array $data       Data to validate
-     * @throws PublishException  An exception will be thrown if it doesn't validate
-     * @return array
-     */
-    private function validate($data)
-    {
-        $rules = [];
-        $attributes = [];
-
-        // Merge in field rules
-        foreach ($this->fields() as $field_name => $field_config) {
-            if ($field_rules = array_get($field_config, 'validate')) {
-                $rules[$field_name] = $field_rules;
-            }
-
-            // Define the attribute (friendly name) so it doesn't appear as field.fieldname
-            $attributes[$field_name] = array_get($field_config, 'display', $field_name);
-        }
-
-        $validator = app('validator')->make($data, $rules, [], $attributes);
-
-        if ($validator->fails()) {
-            $e = new PublishException;
-            $e->setErrors($validator->errors()->toArray());
-            throw $e;
-        }
-
-        return $data;
+        return $this;
     }
 
     /**

@@ -8,6 +8,8 @@ return [
     'access_cp_desc' => 'Permite el acceso al ^Panel de control, pero no garantiza que se pueda hacer nada una vez dentro.',
     'configure_fields' => 'Configurar campos',
     'configure_fields_desc' => 'Capacidad para editar planos, conjuntos de campos y sus campos.',
+    'configure_addons' => 'Configurar complementos',
+    'configure_addons_desc' => 'Posibilidad de acceder al área de complementos para instalar y desinstalar complementos.',
     'group_collections' => 'Colecciones',
     'configure_collections' => 'Configurar colecciones',
     'configure_collections_desc' => 'Otorga acceso a todos los permisos relacionados con las colecciones',

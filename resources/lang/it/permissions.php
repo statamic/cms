@@ -8,6 +8,8 @@ return [
     'access_cp_desc' => 'Consente l\'accesso al pannello di controllo, ma non garantisce che nulla possa essere fatto una volta dentro.',
     'configure_fields' => 'Configura campi',
     'configure_fields_desc' => 'Possibilità di modificare progetti, set di campi e relativi campi.',
+    'configure_addons' => 'Configura componenti aggiuntivi',
+    'configure_addons_desc' => 'Possibilità di accedere all\'area dei componenti aggiuntivi per installare e disinstallare i componenti aggiuntivi.',
     'group_collections' => 'collezioni',
     'configure_collections' => 'Configura raccolte',
     'configure_collections_desc' => 'Concede l\'accesso a tutte le autorizzazioni relative alla raccolta',
