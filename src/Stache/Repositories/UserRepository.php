@@ -47,11 +47,6 @@ class UserRepository extends BaseRepository
         return $this->query()->where('email', $email)->first();
     }
 
-    public function findByField(string $field, string $value): ?User
-    {
-        return $this->query()->where($field, $value)->first();
-    }
-
     public function query()
     {
         return new UserQueryBuilder($this->store);
