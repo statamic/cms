@@ -6,7 +6,7 @@ use Illuminate\Support\Facades\Facade;
 use Statamic\CP\Navigation\Nav as Navigation;
 
 /**
- * @method static void extend(Closure $callback)
+ * @method static void extend(\Closure $callback)
  * @method static \Statamic\CP\Navigation\NavItem create($name)
  * @method static mixed item($name)
  * @method static mixed findOrCreate($section, $name)
