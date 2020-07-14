@@ -4,6 +4,8 @@ namespace Statamic\Forms;
 
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Events\Data\FormDeleted;
+use Statamic\Events\Data\FormSaved;
 use Statamic\Facades;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
@@ -158,6 +160,8 @@ class Form implements FormContract
         }
 
         File::put($this->path(), YAML::dump($data));
+
+        FormSaved::dispatch($this);
     }
 
     /**
@@ -168,6 +172,8 @@ class Form implements FormContract
         $this->submissions()->each->delete();
 
         File::delete($this->path());
+
+        FormDeleted::dispatch($this);
     }
 
     /**
@@ -235,9 +241,8 @@ class Form implements FormContract
         $path = config('statamic.forms.submissions').'/'.$this->handle();
 
         return collect(Folder::getFilesByType($path, 'yaml'))->map(function ($file) {
-            return $this->createSubmission()
+            return $this->makeSubmission()
                 ->id(pathinfo($file)['filename'])
-                ->unguard()
                 ->data(YAML::parse(File::get($file)));
         });
     }
@@ -256,27 +261,17 @@ class Form implements FormContract
     }
 
     /**
-     * Create a form submission.
+     * Make a form submission.
      *
      * @return Submission
      */
-    public function createSubmission()
+    public function makeSubmission()
     {
         $submission = app(Submission::class);
 
         $submission->form($this);
 
         return $submission;
-    }
-
-    /**
-     * Delete a form submission.
-     */
-    public function deleteSubmission($id)
-    {
-        $submission = $this->submission($id);
-
-        $submission->delete();
     }
 
     /**
@@ -336,13 +331,6 @@ class Form implements FormContract
         return 'M j, Y @ h:i';
 
         // return $this->formset()->get('date_format', 'M j, Y @ h:i');
-    }
-
-    public function sanitize()
-    {
-        // TODO: This was a form.yaml config option?
-        // ie. formset()->get('sanitize', true)
-        return true;
     }
 
     /**

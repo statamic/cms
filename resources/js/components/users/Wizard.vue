@@ -12,7 +12,7 @@
         <!-- Step 1 -->
         <div v-if="!completed && currentStep === 0">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">{{ __('Create a New User') }}</h1>
+                <h1 class="mb-3">{{ __('Create User') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_intro')" />
             </div>
 

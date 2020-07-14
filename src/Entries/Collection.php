@@ -6,6 +6,8 @@ use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\Data\CollectionDeleted;
+use Statamic\Events\Data\CollectionSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
@@ -16,6 +18,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\Structure;
 use Statamic\Facades\Taxonomy;
+use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
@@ -295,6 +298,8 @@ class Collection implements Contract, AugmentableContract
             $this->updateEntryUris();
         }
 
+        CollectionSaved::dispatch($this);
+
         return $this;
     }
 
@@ -458,7 +463,7 @@ class Collection implements Contract, AugmentableContract
         return $this
             ->fluentlyGetOrSet('revisions')
             ->getter(function ($enabled) {
-                if (! config('statamic.revisions.enabled')) {
+                if (! config('statamic.revisions.enabled') || ! Statamic::pro()) {
                     return false;
                 }
 
@@ -545,6 +550,8 @@ class Collection implements Contract, AugmentableContract
         $this->queryEntries()->get()->each->delete();
 
         Facades\Collection::delete($this);
+
+        CollectionDeleted::dispatch($this);
 
         return true;
     }

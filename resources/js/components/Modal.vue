@@ -19,7 +19,8 @@ export default {
         pivotY: { type: Number, default: 0.1 },
         height: { default: 'auto' },
         width: {},
-        overflow: { type: Boolean, default: true}
+        overflow: { type: Boolean, default: true},
+        scrollable: { type: Boolean, default: false}
     },
 
     data() {
@@ -38,7 +39,8 @@ export default {
                 draggable: this.draggable,
                 height: this.height,
                 pivotY: this.pivotY,
-                width: this.width
+                width: this.width,
+                scrollable: this.scrollable,
             }
         }
 

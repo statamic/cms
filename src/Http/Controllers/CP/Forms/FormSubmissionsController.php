@@ -7,6 +7,7 @@ use Statamic\Facades\Config;
 use Statamic\Forms\Presenters\UploadedFilePresenter;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Submissions\Submissions;
+use Statamic\Support\Html;
 use Statamic\Support\Str;
 
 class FormSubmissionsController extends CpController
@@ -60,6 +61,10 @@ class FormSubmissionsController extends CpController
 
     private function sanitizeField($value, $submission)
     {
+        if (is_null($value)) {
+            return null;
+        }
+
         $is_arr = is_array($value);
 
         $values = (array) $value;
@@ -67,8 +72,8 @@ class FormSubmissionsController extends CpController
         foreach ($values as &$value) {
             if (is_array($value)) {
                 $value = json_encode($value);
-            } elseif (! $submission->form()->sanitize()) {
-                $value = sanitize($value);
+            } else {
+                $value = Html::sanitize($value);
             }
         }
 

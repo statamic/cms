@@ -4,6 +4,8 @@ namespace Statamic\Taxonomies;
 
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Events\Data\TermDeleted;
+use Statamic\Events\Data\TermSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
@@ -152,12 +154,16 @@ class Term implements TermContract
     {
         Facades\Term::save($this);
 
+        TermSaved::dispatch($this);
+
         return true;
     }
 
     public function delete()
     {
         Facades\Term::delete($this);
+
+        TermDeleted::dispatch($this);
 
         return true;
     }

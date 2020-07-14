@@ -2,7 +2,7 @@
 
 namespace Statamic\Events\Data;
 
-class EntrySaving extends ContentSaving
+class EntrySaving extends Saving
 {
     //
 }

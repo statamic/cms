@@ -1,14 +1,20 @@
 <template>
     <div>
-        <p class="mb-2 font-bold flex items-center justify-between">
+        <p class="font-bold flex items-center justify-between">
             <template v-if="composer.status">{{ composer.status }}</template>
             <loading-graphic v-if="polling" text="" class="h-6 w-6"/>
         </p>
-        <pre v-if="output" class="p-1 rounded bg-grey-30 text-grey text-sm clearfix">{{ output }}</pre>
+        <div class="mt-2 p-2 rounded text-sm font-mono bg-black text-white">
+            <div
+                ref="output"
+                class="whitespace-pre-wrap h-96 overflow-auto" v-html="coloredOutput" />
+        </div>
     </div>
 </template>
 
 <script>
+    const ansi = require('ansi-to-html');
+
     export default {
         props: {
             package: {
@@ -27,6 +33,13 @@
         watch: {
             polling(polling) {
                 this.$progress.loading('composer-installing', polling);
+            },
+
+            output() {
+                this.$nextTick(() => {
+                    const div = this.$refs.output;
+                    div.scrollTop = div.scrollHeight - div.clientHeight;
+                });
             }
         },
 
@@ -37,6 +50,17 @@
 
             params() {
                 return {package: this.package};
+            },
+
+            coloredOutput() {
+                return new ansi({
+                    fg: "#c7c7c7",
+                    bg: "#000000",
+                    colors: [
+                        '#000000', '#c91b00', '#00c200', '#c7c400', '#0225c7', '#c930c7', '#00c5c7', '#c7c7c7',
+                        '#676767', '#ff6d67', '#5ff967', '#fefb67', '#6871ff', '#ff76ff', '#5ffdff', '#feffff',
+                    ]
+                }).toHtml(this.output || '');
             }
         },
 

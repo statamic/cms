@@ -144,14 +144,13 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::get('updater/count', 'UpdaterController@count');
         Route::get('updater/{product}', 'UpdateProductController@show')->name('updater.product');
         Route::get('updater/{product}/changelog', 'UpdateProductController@changelog');
-        Route::post('updater/{product}/update', 'UpdateProductController@update');
-        Route::post('updater/{product}/update-to-latest', 'UpdateProductController@updateToLatest');
-        Route::post('updater/{product}/install-explicit-version', 'UpdateProductController@installExplicitVersion');
+        Route::post('updater/{product}/install', 'UpdateProductController@install');
     });
 
     Route::get('addons', 'AddonsController@index')->name('addons.index');
     Route::post('addons/install', 'AddonsController@install');
     Route::post('addons/uninstall', 'AddonsController@uninstall');
+    Route::post('addons/editions', 'AddonEditionsController');
 
     Route::group(['namespace' => 'Forms'], function () {
         Route::post('forms/{form}/submissions/actions', 'SubmissionActionController@run')->name('forms.submissions.actions.run');

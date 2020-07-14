@@ -7,12 +7,15 @@ use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\Data\TaxonomyDeleted;
+use Statamic\Events\Data\TaxonomySaved;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Statamic;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Taxonomy implements Contract, Responsable, AugmentableContract
@@ -136,6 +139,8 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     {
         Facades\Taxonomy::save($this);
 
+        TaxonomySaved::dispatch($this);
+
         return true;
     }
 
@@ -144,6 +149,8 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         $this->queryTerms()->get()->each->delete();
 
         Facades\Taxonomy::delete($this);
+
+        TaxonomyDeleted::dispatch($this);
 
         return true;
     }
@@ -195,7 +202,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         return $this
             ->fluentlyGetOrSet('revisions')
             ->getter(function ($enabled) {
-                if (! config('statamic.revisions.enabled')) {
+                if (! config('statamic.revisions.enabled') || ! Statamic::pro()) {
                     return false;
                 }
 

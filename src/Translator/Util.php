@@ -2,6 +2,8 @@
 
 namespace Statamic\Translator;
 
+use Statamic\Support\Str;
+
 class Util
 {
     public static function isKey($string)
@@ -9,9 +11,9 @@ class Util
         // It's considered a translation key if:
         // - it has a dot (eg. "foo.bar")
         // - the dot is *not* at the end of the string (eg. "Hello.")
-        // - there's not a space after the dot (eg. "No. Forking. Way.")
+        // - there's no spaces (eg. "No. Forking. Way.")
         // - there's not another dot after the dot. (eg. "What...")
-        return preg_match('/\.(?![\.\s]).+/', $string);
+        return ! Str::contains($string, ' ') && preg_match('/\.(?![\.]).+/', $string);
     }
 
     public static function isString($string)

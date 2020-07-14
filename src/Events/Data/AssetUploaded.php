@@ -2,20 +2,10 @@
 
 namespace Statamic\Events\Data;
 
-use Statamic\Contracts\Assets\Asset;
-
-class AssetUploaded
+class AssetUploaded extends Saved
 {
-    /**
-     * @var Asset
-     */
-    public $asset;
-
-    /**
-     * @param Asset $asset
-     */
-    public function __construct(Asset $asset)
+    public function commitMessage()
     {
-        $this->asset = $asset;
+        return __('Asset uploaded');
     }
 }

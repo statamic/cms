@@ -6,14 +6,14 @@
 
 <script>
     export default {
-        props: {
-            initialCount: Number
-        },
-
         data() {
             return {
-                count: this.initialCount,
+                count: 0,
             };
+        },
+
+        mounted() {
+            this.getCount();
         },
 
         created() {

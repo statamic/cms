@@ -167,7 +167,7 @@ class GlobalsController extends CpController
                 ],
             ],
             'content_model' => [
-                'display' => 'Content Model',
+                'display' => __('Content Model'),
                 'fields' => [
                     'blueprint' => [
                         'type' => 'blueprints',

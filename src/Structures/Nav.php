@@ -4,6 +4,8 @@ namespace Statamic\Structures;
 
 use Statamic\Contracts\Structures\Nav as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Events\Data\NavDeleted;
+use Statamic\Events\Data\NavSaved;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
@@ -19,12 +21,16 @@ class Nav extends Structure implements Contract
     {
         Facades\Nav::save($this);
 
+        NavSaved::dispatch($this);
+
         return true;
     }
 
     public function delete()
     {
         Facades\Nav::delete($this);
+
+        NavDeleted::dispatch($this);
 
         return true;
     }

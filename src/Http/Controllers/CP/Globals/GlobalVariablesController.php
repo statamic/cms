@@ -3,7 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Globals;
 
 use Illuminate\Http\Request;
-use Statamic\Events\Data\PublishBlueprintFound;
+use Statamic\Events\PublishBlueprintFound;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;

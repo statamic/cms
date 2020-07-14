@@ -47,18 +47,11 @@ interface Form extends Arrayable
     public function submission($id);
 
     /**
-     * Create a submission.
+     * Make a submission.
      *
      * @return Submission
      */
-    public function createSubmission();
-
-    /**
-     * Delete a submission.
-     *
-     * @return bool
-     */
-    public function deleteSubmission($id);
+    public function makeSubmission();
 
     /**
      * Get or set the honeypot field.

@@ -11,6 +11,11 @@ use Statamic\Http\Controllers\CP\CpController;
 
 class AssetContainersController extends CpController
 {
+    public function show($container)
+    {
+        return redirect()->cpRoute('assets.browse.show', $container->handle());
+    }
+
     public function index(Request $request)
     {
         $containers = AssetContainer::all()->filter(function ($container) {
@@ -85,7 +90,7 @@ class AssetContainersController extends CpController
 
         // return $container->toArray();
 
-        session()->flash('success', 'Asset container updated');
+        session()->flash('success', __('Asset container updated'));
 
         return ['redirect' => $container->showUrl()];
     }
@@ -132,7 +137,7 @@ class AssetContainersController extends CpController
 
         $container->save();
 
-        session()->flash('success', 'Asset container created');
+        session()->flash('success', __('Asset container created'));
 
         return ['redirect' => $container->showUrl()];
     }

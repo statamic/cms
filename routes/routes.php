@@ -3,9 +3,13 @@
 use Illuminate\Support\Facades\Route;
 use Statamic\Http\Middleware\API\SwapExceptionHandler as SwapAPIExceptionHandler;
 use Statamic\Http\Middleware\CP\SwapExceptionHandler as SwapCpExceptionHandler;
+use Statamic\Http\Middleware\RequireStatamicPro;
 
 if (config('statamic.api.enabled')) {
-    Route::middleware(SwapApiExceptionHandler::class)->group(function () {
+    Route::middleware([
+        SwapApiExceptionHandler::class,
+        RequireStatamicPro::class,
+    ])->group(function () {
         Route::middleware(config('statamic.api.middleware'))
             ->name('statamic.api.')
             ->prefix(config('statamic.api.route'))
