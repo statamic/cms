@@ -8,6 +8,7 @@ use Illuminate\Support\MessageBag;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
+use Illuminate\Validation\ValidationException;
 
 class UserController extends Controller
 {
@@ -15,10 +16,7 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
-            'email' => 'required',
-            'password' => 'required',
-        ]);
+        $this->validateLogin($request);
 
         $loggedIn = Auth::attempt(
             $request->only('email', 'password'),
@@ -27,7 +25,7 @@ class UserController extends Controller
 
         return $loggedIn
             ? redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'))
-            : back()->withInput()->withErrors(__('Invalid credentials.'));
+            : $this->getLoginFailureRedirect($request->input('_error_redirect', null));
     }
 
     public function logout()
@@ -109,5 +107,31 @@ class UserController extends Controller
         }
 
         return new MessageBag($errors);
+    }
+
+    protected function validateLogin(Request $request)
+    {
+        try {
+            $request->validate([
+                'email' => 'required',
+                'password' => 'required',
+            ]);
+        } catch (ValidationException  $throwable) {
+            if ($request->has('_error_redirect')) {
+                $throwable->redirectTo($request->get('_error_redirect'));
+            }
+            throw $throwable;
+        }
+        return true;
+    }
+
+    protected function getLoginFailureRedirect($errorRedirect = null)
+    {
+        return ($errorRedirect !== null
+            ? redirect($errorRedirect)
+            : back()
+        )
+            ->withInput()
+            ->withErrors(__('Invalid credentials.'));
     }
 }
