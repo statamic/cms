@@ -2,10 +2,10 @@
 
 namespace Statamic\Fields;
 
-use Illuminate\Support\Collection;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
+use Statamic\Support\Str;
 
 class BlueprintRepository
 {
@@ -28,49 +28,37 @@ class BlueprintRepository
         return $this;
     }
 
-    public function find($handle): ?Blueprint
+    public function find($blueprint): ?Blueprint
     {
-        if (! $handle) {
+        if (! $blueprint) {
             return null;
         }
 
-        if ($cached = array_get($this->blueprints, $handle)) {
+        $path = str_replace('.', '/', $blueprint);
+
+        if ($cached = array_get($this->blueprints, $path)) {
             return $cached;
         }
 
-        if (! File::exists($path = "{$this->directory}/{$handle}.yaml")) {
-            if (! File::exists($path = "{$this->fallbackDirectory}/{$handle}.yaml")) {
+        if (! File::exists($file = "{$this->directory}/{$path}.yaml")) {
+            if (! File::exists($file = "{$this->fallbackDirectory}/{$path}.yaml")) {
                 return null;
             }
         }
 
+        $str = str_replace('/', '.', $path);
+        $parts = explode('.', $str);
+        $handle = array_pop($parts);
+        $namespace = implode('.', $parts);
+
         $blueprint = (new Blueprint)
             ->setHandle($handle)
-            ->setContents(YAML::parse(File::get($path)));
+            ->setNamespace(empty($namespace) ? null : $namespace)
+            ->setContents(YAML::file($file)->parse());
 
         $this->blueprints[$handle] = $blueprint;
 
         return $blueprint;
-    }
-
-    public function all(): Collection
-    {
-        if (! File::exists($this->directory)) {
-            return collect();
-        }
-
-        return File::withAbsolutePaths()
-            ->getFilesByTypeRecursively($this->directory, 'yaml')
-            ->map(function ($file) {
-                $basename = str_after($file, str_finish($this->directory, '/'));
-                $handle = str_before($basename, '.yaml');
-                $handle = str_replace('/', '.', $handle);
-
-                return (new Blueprint)
-                    ->setHandle($handle)
-                    ->setContents(YAML::file($file)->parse());
-            })
-            ->keyBy->handle();
     }
 
     public function save(Blueprint $blueprint)
@@ -79,15 +67,21 @@ class BlueprintRepository
             File::makeDirectory($this->directory);
         }
 
-        File::put(
-            "{$this->directory}/{$blueprint->handle()}.yaml",
-            YAML::dump($blueprint->contents())
-        );
+        File::put($this->path($blueprint), YAML::dump($blueprint->contents()));
     }
 
     public function delete(Blueprint $blueprint)
     {
-        File::delete("{$this->directory}/{$blueprint->handle()}.yaml");
+        File::delete($this->path($blueprint));
+    }
+
+    private function path($blueprint)
+    {
+        return Path::tidy(vsprintf('%s/%s/%s.yaml', [
+            $this->directory,
+            str_replace('.', '/', $blueprint->namespace()),
+            $blueprint->handle(),
+        ]));
     }
 
     public function make($handle = null)
@@ -123,5 +117,29 @@ class BlueprintRepository
         })->all();
 
         return (new Blueprint)->setContents(compact('sections'));
+    }
+
+    public function in(string $namespace)
+    {
+        $namespace = str_replace('/', '.', $namespace);
+        $dir = str_replace('.', '/', $namespace);
+        $path = $this->directory.'/'.$dir;
+
+        if (! File::exists($path)) {
+            return collect();
+        }
+
+        return File::withAbsolutePaths()
+            ->getFilesByType($path, 'yaml')
+            ->map(function ($file) use ($dir, $namespace) {
+                $basename = Str::after($file, Str::finish($dir, '/'));
+                $handle = Str::before($basename, '.yaml');
+
+                return (new Blueprint)
+                    ->setHandle($handle)
+                    ->setNamespace($namespace)
+                    ->setContents(YAML::file($file)->parse());
+            })
+            ->keyBy->handle();
     }
 }

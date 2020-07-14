@@ -19,6 +19,7 @@ class Blueprint implements Augmentable
     use HasAugmentedData;
 
     protected $handle;
+    protected $namespace;
     protected $contents = [];
     protected $fieldsCache;
 
@@ -32,6 +33,18 @@ class Blueprint implements Augmentable
     public function handle(): ?string
     {
         return $this->handle;
+    }
+
+    public function setNamespace(?string $namespace)
+    {
+        $this->namespace = $namespace;
+
+        return $this;
+    }
+
+    public function namespace(): ?string
+    {
+        return $this->namespace;
     }
 
     public function setContents(array $contents)
@@ -132,16 +145,6 @@ class Blueprint implements Augmentable
             'sections' => $this->sections()->map->toPublishArray()->values()->all(),
             'empty' => $this->isEmpty(),
         ];
-    }
-
-    public function editUrl()
-    {
-        return $this->handle() ? cp_route('blueprints.edit', $this->handle()) : null;
-    }
-
-    public function deleteUrl()
-    {
-        return $this->handle() ? cp_route('blueprints.destroy', $this->handle()) : null;
     }
 
     public function save()

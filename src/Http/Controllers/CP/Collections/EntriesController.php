@@ -96,7 +96,7 @@ class EntriesController extends CpController
                 'revisions' => $entry->revisionsUrl(),
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),
-                'editBlueprint' => $blueprint->editUrl(),
+                'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
@@ -206,9 +206,7 @@ class EntriesController extends CpController
     {
         $this->authorize('create', [EntryContract::class, $collection]);
 
-        $blueprint = $request->blueprint
-            ? $collection->ensureEntryBlueprintFields(Blueprint::find($request->blueprint))
-            : $collection->entryBlueprint();
+        $blueprint = $collection->entryBlueprint($request->blueprint);
 
         if (! $blueprint) {
             throw new \Exception(__('A valid blueprint is required.'));

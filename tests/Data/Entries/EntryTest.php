@@ -539,10 +539,12 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_the_blueprint_based_on_the_collection()
     {
-        BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint = new Blueprint);
-        BlueprintRepository::shouldReceive('find')->with('another')->andReturn(new Blueprint);
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
+            $blueprint = new Blueprint,
+            new Blueprint,
+        ]));
 
-        $collection = tap(Collection::make('test')->entryBlueprints(['test', 'another']))->save();
+        $collection = tap(Collection::make('test'))->save();
         $entry = (new Entry)->collection($collection);
 
         $this->assertEquals($blueprint, $entry->blueprint());

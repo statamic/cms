@@ -191,35 +191,39 @@ class Collection implements Contract, AugmentableContract
         return Facades\Entry::query()->where('collection', $this->handle());
     }
 
-    public function entryBlueprints($blueprints = null)
+    public function entryBlueprints()
     {
-        return $this
-            ->fluentlyGetOrSet('blueprints')
-            ->getter(function ($blueprints) {
-                $blueprints = $blueprints ?? [$this->fallbackEntryBlueprint()->handle()];
+        $blueprints = Blueprint::in('collections/'.$this->handle());
 
-                return collect($blueprints)->map(function ($handle) {
-                    throw_unless($blueprint = Blueprint::find($handle), new \Exception("Blueprint [$handle] not found"));
+        if ($blueprints->isEmpty()) {
+            $blueprints = collect([$this->fallbackEntryBlueprint()]);
+        }
 
-                    return $this->ensureEntryBlueprintFields($blueprint);
-                });
-            })
-            ->setter(function ($blueprints) {
-                return empty($blueprints) ? null : $blueprints;
-            })
-            ->args(func_get_args());
+        return $blueprints->values()->map(function ($blueprint) {
+            return $this->ensureEntryBlueprintFields($blueprint);
+        });
     }
 
-    public function entryBlueprint()
+    public function entryBlueprint($blueprint = null)
     {
-        return $this->ensureEntryBlueprintFields(
-            $this->entryBlueprints()->first() ?? $this->fallbackEntryBlueprint()
-        );
+        $blueprint = is_null($blueprint)
+            ? $this->entryBlueprints()->first()
+            : $this->entryBlueprints()->keyBy->handle()->get($blueprint);
+
+        return $blueprint ? $this->ensureEntryBlueprintFields($blueprint) : null;
     }
 
     public function fallbackEntryBlueprint()
     {
-        return Blueprint::find('default');
+        $blueprint = Blueprint::find('default')
+            ->setHandle($this->handle())
+            ->setNamespace('collections.'.$this->handle());
+
+        $contents = $blueprint->contents();
+        $contents['title'] = $this->title();
+        $blueprint->setContents($contents);
+
+        return $blueprint;
     }
 
     public function ensureEntryBlueprintFields($blueprint)

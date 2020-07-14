@@ -2,7 +2,7 @@
 @section('title', __('Create Blueprint'))
 
 @section('content')
-<form action="{{ cp_route('blueprints.store') }}" method="POST">
+<form action="{{ $action }}" method="POST">
     @csrf
     <div class="max-w-lg mt-2 mx-auto">
         <div class="rounded p-3 lg:px-7 lg:py-5 shadow bg-white">

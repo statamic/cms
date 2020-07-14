@@ -22,7 +22,7 @@ class FrontendTest extends TestCase
     {
         parent::setUp();
 
-        Blueprint::shouldReceive('find')->with('empty')->andReturn(new \Statamic\Fields\Blueprint);
+        Blueprint::shouldReceive('in')->withAnyArgs()->andReturn(collect([new \Statamic\Fields\Blueprint]));
         $this->addToAssertionCount(-1);
 
         $this->withStandardFakeViews();
@@ -370,12 +370,12 @@ class FrontendTest extends TestCase
         // The bug would happen if the non-routable collection happened to be created first. It's not
         // really specific to the naming. However when reading from files, it goes in alphabetical
         // order which makes it seem like it could be an alphabetical problem.
-        Collection::make('services')->entryBlueprints(['empty'])->structureContents([
+        Collection::make('services')->structureContents([
             'root' => true,
             'tree' => [['entry' => '2']],
         ])->save();
 
-        Collection::make('pages')->entryBlueprints(['empty'])->routes('{slug}')->structureContents([
+        Collection::make('pages')->routes('{slug}')->structureContents([
             'root' => true,
             'tree' => [['entry' => '1']],
         ])->save();
@@ -407,7 +407,6 @@ class FrontendTest extends TestCase
     {
         return Collection::make('pages')
             ->routes('{slug}')
-            ->template('default')
-            ->entryBlueprints(['empty']);
+            ->template('default');
     }
 }

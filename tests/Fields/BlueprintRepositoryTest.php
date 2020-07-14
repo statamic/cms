@@ -38,6 +38,36 @@ EOT;
 
         $this->assertInstanceOf(Blueprint::class, $blueprint);
         $this->assertEquals('test', $blueprint->handle());
+        $this->assertNull($blueprint->namespace());
+        $this->assertEquals([
+            'title' => 'Test',
+            'sections' => [
+                'main' => [
+                    'fields' => ['one', 'two'],
+                ],
+            ],
+        ], $blueprint->contents());
+    }
+
+    /** @test */
+    public function it_gets_a_blueprint_in_a_namespace()
+    {
+        $contents = <<<'EOT'
+title: Test
+sections:
+  main:
+    fields:
+      - one
+      - two
+EOT;
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/baz.yaml')->once()->andReturnTrue();
+        File::shouldReceive('get')->with('/path/to/resources/blueprints/foo/bar/baz.yaml')->once()->andReturn($contents);
+
+        $blueprint = $this->repo->find('foo.bar.baz');
+
+        $this->assertInstanceOf(Blueprint::class, $blueprint);
+        $this->assertEquals('baz', $blueprint->handle());
+        $this->assertEquals('foo.bar', $blueprint->namespace());
         $this->assertEquals([
             'title' => 'Test',
             'sections' => [
@@ -72,68 +102,6 @@ EOT;
 
         $this->assertInstanceOf(Blueprint::class, $blueprint);
         $this->assertEquals('Fallback Blueprint', $blueprint->title());
-    }
-
-    /** @test */
-    public function it_gets_all_blueprints()
-    {
-        $firstContents = <<<'EOT'
-title: First Blueprint
-sections:
-  main:
-    fields:
-      - one
-      - two
-EOT;
-
-        $secondContents = <<<'EOT'
-title: Second Blueprint
-sections:
-  main:
-    fields:
-      - two
-      - one
-EOT;
-
-        $thirdContents = <<<'EOT'
-title: Third Blueprint
-sections:
-  main:
-    fields:
-      - two
-      - one
-EOT;
-
-        File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
-        File::shouldReceive('exists')->with('/path/to/resources/blueprints')->once()->andReturnTrue();
-        File::shouldReceive('getFilesByTypeRecursively')->with('/path/to/resources/blueprints', 'yaml')->once()->andReturn(new FileCollection([
-            '/path/to/resources/blueprints/first.yaml',
-            '/path/to/resources/blueprints/second.yaml',
-            '/path/to/resources/blueprints/sub/third.yaml',
-        ]));
-        File::shouldReceive('get')->with('/path/to/resources/blueprints/first.yaml')->once()->andReturn($firstContents);
-        File::shouldReceive('get')->with('/path/to/resources/blueprints/second.yaml')->once()->andReturn($secondContents);
-        File::shouldReceive('get')->with('/path/to/resources/blueprints/sub/third.yaml')->once()->andReturn($thirdContents);
-
-        $all = $this->repo->all();
-
-        $this->assertInstanceOf(Collection::class, $all);
-        $this->assertCount(3, $all);
-        $this->assertEveryItemIsInstanceOf(Blueprint::class, $all);
-        $this->assertEquals(['first', 'second', 'sub.third'], $all->keys()->all());
-        $this->assertEquals(['first', 'second', 'sub.third'], $all->map->handle()->values()->all());
-        $this->assertEquals(['First Blueprint', 'Second Blueprint', 'Third Blueprint'], $all->map->title()->values()->all());
-    }
-
-    /** @test */
-    public function it_returns_empty_collection_if_blueprint_directory_doesnt_exist()
-    {
-        File::shouldReceive('exists')->with('/path/to/resources/blueprints')->once()->andReturnFalse();
-
-        $all = $this->repo->all();
-
-        $this->assertInstanceOf(Collection::class, $all);
-        $this->assertCount(0, $all);
     }
 
     /** @test */
@@ -192,5 +160,39 @@ EOT;
         ]);
 
         $this->repo->save($blueprint);
+    }
+
+    /** @test */
+    public function it_gets_blueprints_in_a_namespace()
+    {
+        $dir = '/path/to/resources/blueprints/collections/blog';
+        File::shouldReceive('withAbsolutePaths')->once()->andReturnSelf();
+        File::shouldReceive('exists')->with($dir)->once()->andReturnTrue();
+        File::shouldReceive('getFilesByType')->with($dir, 'yaml')->once()->andReturn(
+            new FileCollection([$dir.'/first.yaml', $dir.'/second.yaml'])
+        );
+        File::shouldReceive('get')->with($dir.'/first.yaml')->once()->andReturn('title: First Blueprint');
+        File::shouldReceive('get')->with($dir.'/second.yaml')->once()->andReturn('title: Second Blueprint');
+
+        $blueprints = $this->repo->in('collections.blog');
+
+        $this->assertInstanceOf(Collection::class, $blueprints);
+        $this->assertCount(2, $blueprints);
+        $this->assertEveryItemIsInstanceOf(Blueprint::class, $blueprints);
+        $this->assertEquals(['first', 'second'], $blueprints->keys()->all());
+        $this->assertEquals(['first', 'second'], $blueprints->map->handle()->values()->all());
+        $this->assertEquals(['collections.blog', 'collections.blog'], $blueprints->map->namespace()->values()->all());
+        $this->assertEquals(['First Blueprint', 'Second Blueprint'], $blueprints->map->title()->values()->all());
+    }
+
+    /** @test */
+    public function it_returns_empty_collection_if_directory_doesnt_exist()
+    {
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/test')->once()->andReturnFalse();
+
+        $all = $this->repo->in('test');
+
+        $this->assertInstanceOf(Collection::class, $all);
+        $this->assertCount(0, $all);
     }
 }

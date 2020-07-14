@@ -30,6 +30,7 @@ class CollectionsController extends CpController
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
+                'blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
                 'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),
                 'deleteable' => User::current()->can('delete', $collection),
             ];
@@ -120,10 +121,7 @@ class CollectionsController extends CpController
             'sort_direction' => $collection->sortDirection(),
             'max_depth' => optional($collection->structure())->maxDepth(),
             'expects_root' => optional($collection->structure())->expectsRoot(),
-            'blueprints' => $collection->entryBlueprints()->map->handle()->reject(function ($handle) {
-                return $handle == 'entry_link';
-            })->all(),
-            'links' => $collection->entryBlueprints()->map->handle()->contains('entry_link'),
+            'links' => $collection->entryBlueprints()->map->handle()->contains('link'),
             'taxonomies' => $collection->taxonomies()->map->handle()->all(),
             'default_publish_state' => $collection->defaultPublishState(),
             'template' => $collection->template(),
@@ -189,12 +187,7 @@ class CollectionsController extends CpController
 
         $values = $fields->process()->values()->all();
 
-        $blueprints = collect($values['blueprints']);
-        if ($values['links']) {
-            $blueprints->push('entry_link')->unique();
-        } elseif ($blueprints->contains('entry_link')) {
-            $blueprints->diff(['entry_link'])->values();
-        }
+        $this->updateLinkBlueprint($values['links'], $collection);
 
         $collection
             ->title($values['title'])
@@ -205,7 +198,6 @@ class CollectionsController extends CpController
             ->defaultPublishState($values['default_publish_state'])
             ->sortDirection($values['sort_direction'])
             ->ampable($values['amp'])
-            ->entryBlueprints($blueprints->all())
             ->mount($values['mount'] ?? null)
             ->taxonomies($values['taxonomies'] ?? [])
             ->futureDateBehavior(array_get($values, 'future_date_behavior'))
@@ -225,6 +217,34 @@ class CollectionsController extends CpController
         $collection->save();
 
         return $collection->toArray();
+    }
+
+    protected function updateLinkBlueprint($shouldExist, $collection)
+    {
+        $namespace = 'collections.'.$collection->handle();
+        $alreadyExists = Blueprint::in($namespace)->has('link');
+
+        if ($shouldExist && ! $alreadyExists) {
+            $this->createLinkBlueprint($namespace);
+        }
+
+        if (! $shouldExist && $alreadyExists) {
+            Blueprint::find($namespace.'.link')->delete();
+        }
+    }
+
+    protected function createLinkBlueprint($namespace)
+    {
+        Blueprint::make('link')
+            ->setNamespace($namespace)
+            ->setContents([
+                'title' => __('Link'),
+                'fields' => [
+                    ['handle' => 'title', 'field' => ['type' => 'text']],
+                    ['handle' => 'redirect', 'field' => ['type' => 'link', 'required' => true]],
+                ],
+            ])
+            ->save();
     }
 
     protected function makeStructure($collection, $maxDepth, $expectsRoot, $sites)
@@ -330,13 +350,13 @@ class CollectionsController extends CpController
             'content_model' => [
                 'display' => __('Content Model'),
                 'fields' => [
-                    'blueprints' => [
-                        'display' => __('Blueprints'),
-                        'instructions' => __('statamic::messages.collections_blueprint_instructions'),
-                        'type' => 'blueprints',
-                        'validate' => 'array',
-                        'mode' => 'select',
-                    ],
+                    // 'blueprints' => [
+                    //     'display' => __('Blueprints'),
+                    //     'instructions' => __('statamic::messages.collections_blueprint_instructions'),
+                    //     'type' => 'blueprints',
+                    //     'validate' => 'array',
+                    //     'mode' => 'select',
+                    // ],
                     'links' => [
                         'display' => __('Links'),
                         'instructions' => __('statamic::messages.collections_links_instructions'),
