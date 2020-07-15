@@ -99,7 +99,7 @@ class BlueprintRepository
     {
         $fields = collect($fields)->map(function ($field, $handle) {
             return compact('handle', 'field');
-        })->values();
+        })->values()->all();
 
         return (new Blueprint)->setContents(['fields' => $fields]);
     }

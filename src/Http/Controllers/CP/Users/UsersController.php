@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
@@ -54,7 +53,7 @@ class UsersController extends CpController
             ->paginate(request('perPage'));
 
         return (new Users($users))
-            ->blueprint(Blueprint::find('user'))
+            ->blueprint(User::blueprint())
             ->columns(collect([
                 Column::make('email')->label(__('Email')),
                 Column::make('name')->label(__('Name')),
@@ -76,7 +75,7 @@ class UsersController extends CpController
         $this->authorizePro();
         $this->authorize('create', UserContract::class);
 
-        $blueprint = Blueprint::find('user');
+        $blueprint = User::blueprint();
 
         $fields = $blueprint->fields()->preProcess();
 
@@ -103,7 +102,7 @@ class UsersController extends CpController
         $this->authorizePro();
         $this->authorize('create', UserContract::class);
 
-        $blueprint = Blueprint::find('user');
+        $blueprint = User::blueprint();
 
         $fields = $blueprint->fields()->only(['email', 'name'])->addValues($request->all());
 
