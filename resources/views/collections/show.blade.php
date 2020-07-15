@@ -32,7 +32,7 @@
             @can('edit', $collection)
                 <dropdown-item :text="__('Edit Collection')" redirect="{{ $collection->editUrl() }}"></dropdown-item>
             @endcan
-            @can('configure fields', $collection)
+            @can('configure fields')
                 <dropdown-item :text="__('Edit Blueprints')" redirect="{{ cp_route('collections.blueprints.index', $collection) }}"></dropdown-item>
             @endcan
             @can('edit', $collection)
