@@ -164,6 +164,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::resource('forms', 'FormsController');
         Route::resource('forms.submissions', 'FormSubmissionsController');
         Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
+        Route::get('forms/{form}/blueprint', 'FormBlueprintController@edit')->name('forms.blueprint.edit');
+        Route::patch('forms/{form}/blueprint', 'FormBlueprintController@update')->name('forms.blueprint.update');
     });
 
     Route::group(['namespace' => 'Users'], function () {

@@ -28,6 +28,7 @@ class FormsController extends CpController
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
                     'delete_url' => $form->deleteUrl(),
+                    'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
                     'deleteable' => User::current()->can('delete', $form),
                 ];
             })
@@ -137,7 +138,6 @@ class FormsController extends CpController
 
         $form
             ->title($values['title'])
-            ->blueprint($values['blueprint'])
             ->honeypot($values['honeypot'])
             ->store($values['store'])
             ->email($values['email']);
@@ -172,12 +172,12 @@ class FormsController extends CpController
             'fields' => [
                 'display' => __('Fields'),
                 'fields' => [
-                    'blueprint' => [
-                        'type' => 'blueprints',
-                        'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
-                        'max_items' => 1,
-                        'mode' => 'select',
-                    ],
+                    // 'blueprint' => [
+                    //     'type' => 'blueprints',
+                    //     'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
+                    //     'max_items' => 1,
+                    //     'mode' => 'select',
+                    // ],
                     'honeypot' => [
                         'type' => 'text',
                         'instructions' => __('statamic::messages.form_configure_honeypot_instructions'),

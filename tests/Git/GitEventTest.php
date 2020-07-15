@@ -227,15 +227,11 @@ class GitEventTest extends TestCase
     /** @test */
     public function it_commits_when_form_submission_is_saved_and_deleted()
     {
-        Git::shouldReceive('dispatchCommit')->with('Blueprint saved')->once();
         Git::shouldReceive('dispatchCommit')->with('Form saved')->once();
         Git::shouldReceive('dispatchCommit')->with('Submission saved')->once();
         Git::shouldReceive('dispatchCommit')->with('Submission deleted')->once();
 
-        $blueprint = Facades\Blueprint::make('post');
-        $blueprint->save();
-
-        $form = Facades\Form::make('contact')->blueprint($blueprint);
+        $form = Facades\Form::make('contact');
 
         $form->save();
 
