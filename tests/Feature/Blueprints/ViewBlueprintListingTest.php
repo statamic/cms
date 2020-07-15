@@ -16,7 +16,14 @@ class ViewBlueprintListingTest extends TestCase
     /** @test */
     public function it_shows_a_list_of_blueprints()
     {
-        $this->markTestIncomplete();
+        $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
+
+        $this
+            ->actingAs($user)
+            ->get(cp_route('blueprints.index'))
+            ->assertOk()
+            ->assertViewIs('statamic::blueprints.index');
     }
 
     /** @test */

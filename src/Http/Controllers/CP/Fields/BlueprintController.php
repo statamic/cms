@@ -13,8 +13,6 @@ class BlueprintController extends CpController
 
     public function index()
     {
-        // TODO
-
-        return view('statamic::blueprints.index', compact('blueprints'));
+        return view('statamic::blueprints.index');
     }
 }
