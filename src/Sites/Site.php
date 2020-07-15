@@ -38,6 +38,11 @@ class Site implements Augmentable
     {
         return explode('-', str_replace('_', '-', $this->locale()))[0];
     }
+    
+    public function hyphenedLocale()
+    {
+        return str_replace('_', '-', $this->locale());
+    }
 
     public function url()
     {
@@ -84,6 +89,7 @@ class Site implements Augmentable
             'name' => $this->name(),
             'locale' => $this->locale(),
             'short_locale' => $this->shortLocale(),
+            'hyphened_locale' => $this->hyphenedLocale(),
             'url' => $this->url(),
         ];
     }
