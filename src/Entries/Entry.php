@@ -98,6 +98,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
             })
             ->setter(function ($blueprint) use ($key) {
                 Blink::forget($key);
+
                 return $blueprint;
             })
             ->args(func_get_args());
