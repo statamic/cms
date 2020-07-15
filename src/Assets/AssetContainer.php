@@ -28,7 +28,6 @@ class AssetContainer implements AssetContainerContract, Augmentable
     protected $title;
     protected $handle;
     protected $disk;
-    protected $blueprint;
     protected $private;
     protected $allowUploads;
     protected $allowDownloading;
@@ -104,7 +103,6 @@ class AssetContainer implements AssetContainerContract, Augmentable
             'title' => $this->title,
             'handle' => $this->handle,
             'disk' => $this->disk,
-            'blueprint' => $this->blueprint,
             'search_index' => $this->searchIndex,
             'allow_uploads' => $this->allowUploads,
             'allow_downloading' => $this->allowDownloading,
@@ -152,19 +150,19 @@ class AssetContainer implements AssetContainerContract, Augmentable
     }
 
     /**
-     * Get or set the blueprint to be used by assets in this container.
+     * Get the blueprint to be used by assets in this container.
      *
-     * @param string $blueprint
-     * @return \Statamic\Fields\Blueprint|$this
+     * @return \Statamic\Fields\Blueprint
      */
-    public function blueprint($blueprint = null)
+    public function blueprint()
     {
-        return $this
-            ->fluentlyGetOrSet('blueprint')
-            ->getter(function ($blueprint) {
-                return Blueprint::find($blueprint ?? 'asset');
-            })
-            ->args(func_get_args());
+        return Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
+            'alt' => [
+                'type' => 'text',
+                'display' => 'Alt Text',
+                'instructions' => 'Description of the image',
+            ],
+        ])->setHandle($this->handle())->setNamespace('assets');
     }
 
     /**

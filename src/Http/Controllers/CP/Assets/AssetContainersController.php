@@ -31,6 +31,7 @@ class AssetContainersController extends CpController
                 'create_folders' => $container->createFolders(),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
+                'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
                 'can_edit' => User::current()->can('edit', $container),
                 'can_delete' => User::current()->can('delete', $container),
             ];
@@ -79,7 +80,6 @@ class AssetContainersController extends CpController
         $container
             ->title($values['title'])
             ->disk($values['disk'])
-            ->blueprint($values['blueprint'])
             ->allowDownloading($values['allow_downloading'])
             ->allowRenaming($values['allow_renaming'])
             ->allowMoving($values['allow_moving'])
@@ -131,7 +131,6 @@ class AssetContainersController extends CpController
         $container = AssetContainer::make($values['handle'])
             ->title($values['title'])
             ->disk($values['disk'])
-            ->blueprint($values['blueprint'])
             ->allowUploads($values['allow_uploads'])
             ->createFolders($values['create_folders']);
 
@@ -191,18 +190,18 @@ class AssetContainersController extends CpController
                     ],
                 ],
             ],
-            'fields' => [
-                'display' => __('Fields'),
-                'fields' => [
-                    'blueprint' => [
-                        'type' => 'blueprints',
-                        'display' => __('Blueprint'),
-                        'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
-                        'mode' => 'select',
-                        'max_items' => 1,
-                    ],
-                ],
-            ],
+            // 'fields' => [
+            //     'display' => __('Fields'),
+            //     'fields' => [
+            //         'blueprint' => [
+            //             'type' => 'blueprints',
+            //             'display' => __('Blueprint'),
+            //             'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
+            //             'mode' => 'select',
+            //             'max_items' => 1,
+            //         ],
+            //     ],
+            // ],
             'settings' => [
                 'display' => __('Settings'),
                 'fields' => [

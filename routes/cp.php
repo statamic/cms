@@ -115,6 +115,8 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::resource('asset-containers', 'AssetContainersController');
         Route::post('asset-containers/{asset_container}/folders', 'FoldersController@store');
         Route::patch('asset-containers/{asset_container}/folders/{path}', 'FoldersController@update')->where('path', '.*');
+        Route::get('asset-containers/{asset_container}/blueprint', 'AssetContainerBlueprintController@edit')->name('asset-containers.blueprint.edit');
+        Route::patch('asset-containers/{asset_container}/blueprint', 'AssetContainerBlueprintController@update')->name('asset-containers.blueprint.update');
         Route::post('assets/actions', 'ActionController@run')->name('assets.actions.run');
         Route::get('assets/actions', 'ActionController@bulkActions')->name('assets.actions.bulk');
         Route::get('assets/browse', 'BrowserController@index')->name('assets.browse.index');
@@ -139,7 +141,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::post('fieldsets/{fieldset}/fields', 'FieldsetFieldController@store');
         Route::resource('blueprints', 'BlueprintController');
         Route::get('fieldtypes', 'FieldtypesController@index');
-        Route::get('publish-blueprints/{blueprint}', 'PublishBlueprintController@show');
     });
 
     Route::get('composer/check', 'ComposerOutputController@check');
