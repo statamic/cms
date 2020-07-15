@@ -5,6 +5,7 @@ namespace Tests\Data\Entries;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
+use Mockery;
 use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
 use Statamic\Events\Data\EntrySaved;
@@ -525,29 +526,77 @@ class EntryTest extends TestCase
     /** @test */
     public function it_gets_the_blueprint_when_defined_on_itself()
     {
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'first' => $first = (new Blueprint)->setHandle('first'),
+            'second' => $second = (new Blueprint)->setHandle('second'),
+        ]));
         Collection::make('blog')->save();
-        BlueprintRepository::shouldReceive('find')->with('default')->andReturn($default = new Blueprint);
-        BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint = new Blueprint);
-        $entry = (new Entry)
-            ->collection('blog')
-            ->blueprint('test');
+        $entry = (new Entry)->collection('blog')->blueprint('second');
 
-        $this->assertSame($blueprint, $entry->blueprint());
-        $this->assertNotSame($default, $entry->blueprint());
+        $this->assertSame($second, $entry->blueprint());
+        $this->assertNotSame($first, $second);
     }
 
     /** @test */
-    public function it_gets_the_blueprint_based_on_the_collection()
+    public function it_gets_the_blueprint_when_defined_in_a_value()
     {
-        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect([
-            $blueprint = new Blueprint,
-            new Blueprint,
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'first' => $first = (new Blueprint)->setHandle('first'),
+            'second' => $second = (new Blueprint)->setHandle('second'),
         ]));
+        Collection::make('blog')->save();
+        $entry = (new Entry)->collection('blog')->set('blueprint', 'second');
 
-        $collection = tap(Collection::make('test'))->save();
+        $this->assertSame($second, $entry->blueprint());
+        $this->assertNotSame($first, $second);
+    }
+
+    /** @test */
+    public function it_gets_the_blueprint_when_defined_in_an_origin_value()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'first' => $first = (new Blueprint)->setHandle('first'),
+            'second' => $second = (new Blueprint)->setHandle('second'),
+        ]));
+        Collection::make('blog')->save();
+        $origin = (new Entry)->collection('blog')->set('blueprint', 'second');
+        $entry = (new Entry)->collection('blog')->origin($origin);
+
+        $this->assertSame($second, $entry->blueprint());
+        $this->assertNotSame($first, $second);
+    }
+
+    /** @test */
+    public function it_gets_the_default_collection_blueprint_when_undefined()
+    {
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'first' => $first = (new Blueprint)->setHandle('first'),
+            'second' => $second = (new Blueprint)->setHandle('second'),
+        ]));
+        $collection = tap(Collection::make('blog'))->save();
         $entry = (new Entry)->collection($collection);
 
-        $this->assertEquals($blueprint, $entry->blueprint());
+        $this->assertSame($first, $entry->blueprint());
+        $this->assertNotSame($first, $second);
+    }
+
+    /** @test */
+    public function the_blueprint_is_blinked_when_getting_and_flushed_when_setting()
+    {
+        $collection = Mockery::mock(Collection::make('blog'));
+        $collection->shouldReceive('entryBlueprint')->with(null)->once()->andReturn('the old blueprint');
+        $collection->shouldReceive('entryBlueprint')->with('new')->once()->andReturn('the new blueprint');
+        Collection::shouldReceive('findByHandle')->with('blog')->andReturn($collection);
+
+        $entry = (new Entry)->collection('blog');
+
+        $this->assertEquals('the old blueprint', $entry->blueprint());
+        $this->assertEquals('the old blueprint', $entry->blueprint());
+
+        $entry->blueprint('new');
+
+        $this->assertEquals('the new blueprint', $entry->blueprint());
+        $this->assertEquals('the new blueprint', $entry->blueprint());
     }
 
     /** @test */
