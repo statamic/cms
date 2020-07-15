@@ -139,7 +139,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
         Route::resource('fieldsets', 'FieldsetController');
         Route::post('fieldsets/quick', 'FieldsetController@quickStore');
         Route::post('fieldsets/{fieldset}/fields', 'FieldsetFieldController@store');
-        Route::resource('blueprints', 'BlueprintController');
+        Route::get('blueprints', 'BlueprintController@index')->name('blueprints.index');
         Route::get('fieldtypes', 'FieldtypesController@index');
     });
 
