@@ -3,19 +3,8 @@
 namespace Statamic\Events\Data;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
-use Statamic\Events\Event;
 
-abstract class Deleted extends Event implements ProvidesCommitMessage
+abstract class Deleted extends DataEvent implements ProvidesCommitMessage
 {
-    public $item;
-
-    /**
-     * Instantiate deleted event.
-     *
-     * @param mixed $item
-     */
-    public function __construct($item)
-    {
-        $this->item = $item;
-    }
+    //
 }
