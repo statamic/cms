@@ -166,18 +166,18 @@ class GlobalsController extends CpController
                     ],
                 ],
             ],
-            'content_model' => [
-                'display' => __('Content Model'),
-                'fields' => [
-                    'blueprint' => [
-                        'type' => 'blueprints',
-                        'instructions' => __('statamic::messages.globals_blueprint_instructions'),
-                        'validate' => 'array',
-                        'mode' => 'select',
-                        'max_items' => 1,
-                    ],
-                ],
-            ],
+            // 'content_model' => [
+            //     'display' => __('Content Model'),
+            //     'fields' => [
+            //         'blueprint' => [
+            //             'type' => 'blueprints',
+            //             'instructions' => __('statamic::messages.globals_blueprint_instructions'),
+            //             'validate' => 'array',
+            //             'mode' => 'select',
+            //             'max_items' => 1,
+            //         ],
+            //     ],
+            // ],
         ];
 
         if (Site::hasMultiple()) {

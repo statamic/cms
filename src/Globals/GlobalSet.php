@@ -19,7 +19,6 @@ class GlobalSet implements Contract
 
     protected $title;
     protected $handle;
-    protected $blueprint;
     protected $localizations;
 
     public function id()
@@ -42,13 +41,9 @@ class GlobalSet implements Contract
             ->args(func_get_args());
     }
 
-    public function blueprint($blueprint = null)
+    public function blueprint()
     {
-        return $this->fluentlyGetOrSet('blueprint')
-            ->getter(function ($blueprint) {
-                return Blueprint::find($blueprint);
-            })
-            ->args(func_get_args());
+        return Blueprint::find('globals.'.$this->handle());
     }
 
     public function path()
@@ -130,6 +125,11 @@ class GlobalSet implements Contract
     public function inCurrentSite()
     {
         return $this->in(Site::current()->handle());
+    }
+
+    public function inDefaultSite()
+    {
+        return $this->in(Site::default()->handle());
     }
 
     public function existsIn($locale)

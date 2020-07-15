@@ -29,21 +29,17 @@ trait ManagesBlueprints
 
     private function updateBlueprint(Request $request, Blueprint $blueprint)
     {
-        $request->validate([
-            'title' => 'required',
-            'sections' => 'array',
-        ]);
-
         $sections = collect($request->sections)->mapWithKeys(function ($section) {
             return [array_pull($section, 'handle') => [
                 'display' => $section['display'],
                 'fields' => $this->sectionFields($section['fields']),
             ]];
         })->all();
-        $blueprint->setContents([
+
+        $blueprint->setContents(array_filter([
             'title' => $request->title,
             'sections' => $sections,
-        ])->save();
+        ]))->save();
     }
 
     private function sectionFields(array $fields)

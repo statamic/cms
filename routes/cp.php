@@ -106,6 +106,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
         Route::get('globals/{global_set}', 'GlobalVariablesController@edit')->name('globals.variables.edit');
         Route::patch('globals/{global_set}/variables', 'GlobalVariablesController@update')->name('globals.variables.update');
+
+        Route::get('globals/{global_set}/blueprint', 'GlobalsBlueprintController@edit')->name('globals.blueprint.edit');
+        Route::patch('globals/{global_set}/blueprint', 'GlobalsBlueprintController@update')->name('globals.blueprint.update');
     });
 
     Route::group(['namespace' => 'Assets'], function () {

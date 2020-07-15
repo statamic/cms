@@ -47,11 +47,12 @@ class CollectionBlueprintsController extends CpController
 
     public function update(Request $request, $collection, $blueprint)
     {
-        $blueprint = $collection->entryBlueprint($blueprint);
+        $request->validate([
+            'title' => 'required',
+            'sections' => 'array',
+        ]);
 
-        $this->updateBlueprint($request, $blueprint);
-
-        $blueprint->save();
+        $this->updateBlueprint($request, $collection->entryBlueprint($blueprint));
     }
 
     public function create($collection)

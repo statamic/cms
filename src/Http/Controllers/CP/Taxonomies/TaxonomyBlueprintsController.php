@@ -47,11 +47,12 @@ class TaxonomyBlueprintsController extends CpController
 
     public function update(Request $request, $taxonomy, $blueprint)
     {
-        $blueprint = $taxonomy->termBlueprint($blueprint);
+        $request->validate([
+            'title' => 'required',
+            'sections' => 'array',
+        ]);
 
-        $this->updateBlueprint($request, $blueprint);
-
-        $blueprint->save();
+        $this->updateBlueprint($request, $taxonomy->termBlueprint($blueprint));
     }
 
     public function create($taxonomy)
