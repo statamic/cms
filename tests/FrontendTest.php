@@ -181,17 +181,10 @@ class FrontendTest extends TestCase
         $this->withoutExceptionHandling();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('default', '{{ augment_me }}{{ dont_augment_me }}');
-        Blueprint::shouldReceive('in')
-            ->with('collections/pages')
-            ->once()
-            ->andReturn(collect([(new \Statamic\Fields\Blueprint)
-                ->setHandle('test')
-                ->setContents(['fields' => [
-                    [
-                        'handle' => 'augment_me',
-                        'field' => ['type' => 'markdown'],
-                    ],
-                ]])]));
+        $blueprint = Blueprint::makeFromFields([
+            'augment_me' => ['type' => 'markdown'],
+        ])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/pages')->once()->andReturn(collect([$blueprint]));
 
         $this->createPage('about', [
             'path' => 'about.md',
