@@ -29,6 +29,7 @@ class TaxonomiesController extends CpController
                 'edit_url' => $taxonomy->editUrl(),
                 'delete_url' => $taxonomy->deleteUrl(),
                 'terms_url' => cp_route('taxonomies.show', $taxonomy->handle()),
+                'blueprints_url' => cp_route('taxonomies.blueprints.index', $taxonomy->handle()),
                 'deleteable' => User::current()->can('delete', $taxonomy),
             ];
         })->values();
@@ -142,9 +143,7 @@ class TaxonomiesController extends CpController
 
         $values = $fields->process()->values()->all();
 
-        $taxonomy
-            ->title($values['title'])
-            ->termBlueprints($values['blueprints']);
+        $taxonomy->title($values['title']);
 
         if ($sites = array_get($values, 'sites')) {
             $taxonomy->sites($sites);
@@ -205,13 +204,13 @@ class TaxonomiesController extends CpController
             'content_model' => [
                 'display' => __('Content Model'),
                 'fields' => [
-                    'blueprints' => [
-                        'display' => __('Blueprints'),
-                        'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
-                        'type' => 'blueprints',
-                        'validate' => 'array',
-                        'mode' => 'select',
-                    ],
+                    // 'blueprints' => [
+                    //     'display' => __('Blueprints'),
+                    //     'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
+                    //     'type' => 'blueprints',
+                    //     'validate' => 'array',
+                    //     'mode' => 'select',
+                    // ],
                     'collections' => [
                         'display' => __('Collections'),
                         'instructions' => __('statamic::messages.taxonomies_collections_instructions'),

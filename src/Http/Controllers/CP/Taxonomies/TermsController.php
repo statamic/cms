@@ -193,9 +193,7 @@ class TermsController extends CpController
     {
         $this->authorize('create', [TermContract::class, $taxonomy]);
 
-        $blueprint = $request->blueprint
-            ? $taxonomy->ensureTermBlueprintFields(Blueprint::find($request->blueprint))
-            : $taxonomy->termBlueprint();
+        $blueprint = $taxonomy->termBlueprint($request->blueprint);
 
         if (! $blueprint) {
             throw new \Exception('A valid blueprint is required.');
@@ -245,9 +243,7 @@ class TermsController extends CpController
     {
         $this->authorize('store', [TermContract::class, $taxonomy]);
 
-        $blueprint = $taxonomy->ensureTermBlueprintFields(
-            Blueprint::find($request->blueprint)
-        );
+        $blueprint = $taxonomy->termBlueprint($request->blueprint);
 
         $fields = $blueprint->fields()->addValues($request->all());
 

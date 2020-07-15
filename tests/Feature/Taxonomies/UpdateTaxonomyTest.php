@@ -51,26 +51,6 @@ class UpdateTaxonomyTest extends TestCase
     }
 
     /** @test */
-    public function it_updates_blueprints()
-    {
-        $mock = $this->partialMock(BlueprintRepository::class);
-        $mock->shouldReceive('find')->with('one')->andReturn(Blueprint::make('one'));
-        $mock->shouldReceive('find')->with('two')->andReturn(Blueprint::make('two'));
-        $mock->shouldReceive('find')->with('three')->andReturn(Blueprint::make('three'));
-        $mock->shouldReceive('find')->with('four')->andReturn(Blueprint::make('four'));
-
-        $taxonomy = tap(Taxonomy::make('test')->termBlueprints(['one', 'two']))->save();
-        $this->assertEquals(['one', 'two'], $taxonomy->termBlueprints()->map->handle()->all());
-
-        $this
-            ->actingAs($this->userWithPermission())
-            ->update($taxonomy, ['blueprints' => ['three', 'four']])
-            ->assertOk();
-
-        $this->assertEquals(['three', 'four'], Taxonomy::all()->first()->termBlueprints()->map->handle()->all());
-    }
-
-    /** @test */
     public function it_associates_taxonomies_with_collections()
     {
         $taxonomy = tap(Taxonomy::make('test'))->save();

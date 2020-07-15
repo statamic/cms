@@ -72,13 +72,20 @@ class Term implements TermContract
         ]);
     }
 
-    public function blueprint()
+    public function blueprint($blueprint = null)
     {
-        return $this->fluentlyGetOrSet('blueprint')
-            ->getter(function ($blueprint) {
-                return $blueprint
-                    ? $this->taxonomy()->ensureTermBlueprintFields(Blueprint::find($blueprint))
-                    : $this->taxonomy()->termBlueprint();
+        $key = "term-{$this->id()}-blueprint";
+
+        return $this
+            ->fluentlyGetOrSet('blueprint')
+            ->getter(function ($blueprint) use ($key) {
+                return Blink::once($key, function () use ($blueprint) {
+                    return $this->taxonomy()->termBlueprint($blueprint ?? $this->value('blueprint'));
+                });
+            })
+            ->setter(function ($blueprint) use ($key) {
+                Blink::forget($key);
+                return $blueprint;
             })
             ->args(func_get_args());
     }

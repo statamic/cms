@@ -25,8 +25,8 @@ class AugmentedTermTest extends AugmentedTestCase
         $blueprint = Blueprint::makeFromFields([
             'two' => ['type' => 'text'],
             'unused_in_bp' => ['type' => 'text'],
-        ]);
-        Blueprint::shouldReceive('find')->with('test')->andReturn($blueprint);
+        ])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('taxonomies/test')->andReturn(collect(['test' => $blueprint]));
 
         $taxonomy = tap(Taxonomy::make('test'))->save();
 
