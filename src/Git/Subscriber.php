@@ -45,8 +45,6 @@ class Subscriber
         \Statamic\Events\Data\UserGroupDeleted::class,
         \Statamic\Events\Data\UserGroupSaved::class,
         \Statamic\Events\Data\UserSaved::class,
-        // \Statamic\Events\Data\FileUploaded::class,
-        // \Statamic\Events\Data\PagesMoved::class,
     ];
 
     /**
