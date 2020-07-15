@@ -77,7 +77,6 @@ class GlobalSet implements Contract
     {
         $data = [
             'title' => $this->title(),
-            'blueprint' => $this->blueprint,
         ];
 
         if (! Site::hasMultiple()) {
