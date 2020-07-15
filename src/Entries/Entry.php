@@ -87,7 +87,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
 
     public function blueprint($blueprint = null)
     {
-        $key = "entry-{$this->id()}-default-blueprint";
+        $key = "entry-{$this->id()}-blueprint";
 
         return $this
             ->fluentlyGetOrSet('blueprint')
