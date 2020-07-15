@@ -22,15 +22,19 @@ class FrontendTest extends TestCase
     {
         parent::setUp();
 
+        $this->withStandardFakeViews();
+    }
+
+    private function withStandardBlueprints()
+    {
         Blueprint::shouldReceive('in')->withAnyArgs()->andReturn(collect([new \Statamic\Fields\Blueprint]));
         $this->addToAssertionCount(-1);
-
-        $this->withStandardFakeViews();
     }
 
     /** @test */
     public function page_is_displayed()
     {
+        $this->withStandardBlueprints();
         $this->withoutExceptionHandling();
         $this->withFakeViews();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
@@ -54,6 +58,7 @@ class FrontendTest extends TestCase
     /** @test */
     public function page_is_displayed_with_query_string()
     {
+        $this->withStandardBlueprints();
         $this->withFakeViews();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> <p>{{ content }}</p>');
@@ -83,6 +88,7 @@ class FrontendTest extends TestCase
     /** @test */
     public function drafts_are_visible_if_using_live_preview()
     {
+        $this->withStandardBlueprints();
         $this->setTestRoles(['draft_viewer' => ['view drafts on frontend']]);
         $user = User::make()->assignRole('draft_viewer');
 
@@ -172,18 +178,20 @@ class FrontendTest extends TestCase
     /** @test */
     public function fields_gets_augmented()
     {
+        $this->withoutExceptionHandling();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('default', '{{ augment_me }}{{ dont_augment_me }}');
-        Blueprint::shouldReceive('find')
-            ->with('test')
-            ->andReturn((new \Statamic\Fields\Blueprint)
+        Blueprint::shouldReceive('in')
+            ->with('collections/pages')
+            ->once()
+            ->andReturn(collect([(new \Statamic\Fields\Blueprint)
                 ->setHandle('test')
                 ->setContents(['fields' => [
                     [
                         'handle' => 'augment_me',
                         'field' => ['type' => 'markdown'],
                     ],
-                ]]));
+                ]])]));
 
         $this->createPage('about', [
             'path' => 'about.md',

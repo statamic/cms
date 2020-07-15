@@ -39,8 +39,8 @@ class AugmentedEntryTest extends AugmentedTestCase
             'four' => ['type' => 'text'],
             'six' => ['type' => 'text'],
             'unused_in_bp' => ['type' => 'text'],
-        ]);
-        Blueprint::shouldReceive('find')->with('test')->andReturn($blueprint);
+        ])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
 
         $collection = tap(Collection::make('test')
             ->routes('/test/{slug}')
