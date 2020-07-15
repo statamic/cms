@@ -85,6 +85,7 @@ class Term implements TermContract
             })
             ->setter(function ($blueprint) use ($key) {
                 Blink::forget($key);
+
                 return $blueprint;
             })
             ->args(func_get_args());

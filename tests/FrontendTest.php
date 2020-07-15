@@ -191,7 +191,7 @@ class FrontendTest extends TestCase
                         'handle' => 'augment_me',
                         'field' => ['type' => 'markdown'],
                     ],
-                ]])]));
+                ]]), ]));
 
         $this->createPage('about', [
             'path' => 'about.md',
