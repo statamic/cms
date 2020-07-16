@@ -9,6 +9,7 @@
     ])
 
     <blueprint-builder
+        show-title
         action="{{ cp_route('collections.blueprints.update', [$collection, $blueprint]) }}"
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
     ></blueprint-builder>

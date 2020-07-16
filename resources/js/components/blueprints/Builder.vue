@@ -9,7 +9,7 @@
             </div>
         </header>
 
-        <div class="publish-form card p-0">
+        <div class="publish-form card p-0" v-if="showTitle">
             <div class="form-group">
                 <label class="block">{{ __('Title') }}</label>
                 <small class="help-block">{{ __('messages.blueprints_title_instructions') }}</small>
@@ -43,11 +43,15 @@ export default {
         Sections,
     },
 
-    props: ['action', 'initialBlueprint'],
+    props: {
+        action: String,
+        initialBlueprint: Object,
+        showTitle: Boolean
+    },
 
     data() {
         return {
-            blueprint: clone(this.initialBlueprint),
+            blueprint: this.initializeBlueprint(),
             sections: [],
             errors: {}
         }
@@ -76,6 +80,14 @@ export default {
     },
 
     methods: {
+
+        initializeBlueprint() {
+            let blueprint = clone(this.initialBlueprint);
+
+            if (! this.showTitle) delete blueprint.title;
+
+            return blueprint;
+        },
 
         sectionsUpdated(sections) {
             this.sections = sections;
