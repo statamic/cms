@@ -4,7 +4,7 @@
 
         <header class="mb-3">
             <div class="flex items-center justify-between">
-                <h1>{{ initialTitle }}</h1>
+                <h1 v-text="__('Edit Blueprint')" />
                 <button type="submit" class="btn-primary" @click.prevent="save" v-text="__('Save')" />
             </div>
         </header>
@@ -49,7 +49,6 @@ export default {
         return {
             blueprint: clone(this.initialBlueprint),
             sections: [],
-            initialTitle: this.initialBlueprint.title,
             errors: {}
         }
     },
