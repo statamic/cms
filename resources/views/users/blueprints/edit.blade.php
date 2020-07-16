@@ -3,9 +3,13 @@
 
 @section('content')
 
+    @include('statamic::partials.breadcrumb', [
+        'url' => cp_route('users.index'),
+        'title' => __('Users'),
+    ])
+
     <blueprint-builder
         action="{{ cp_route('users.blueprint.update') }}"
-        breadcrumb-url="{{ cp_route('users.index') }}"
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
     ></blueprint-builder>
 

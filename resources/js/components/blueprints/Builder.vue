@@ -3,8 +3,6 @@
     <div class="blueprint-builder">
 
         <header class="mb-3">
-            <breadcrumb :url="breadcrumbUrl" :title="__('Blueprints')" />
-
             <div class="flex items-center justify-between">
                 <h1>{{ initialTitle }}</h1>
                 <button type="submit" class="btn-primary" @click.prevent="save" v-text="__('Save')" />
@@ -45,7 +43,7 @@ export default {
         Sections,
     },
 
-    props: ['action', 'initialBlueprint', 'breadcrumbUrl'],
+    props: ['action', 'initialBlueprint'],
 
     data() {
         return {
