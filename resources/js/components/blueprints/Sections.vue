@@ -9,11 +9,12 @@
                 v-for="(section, i) in sections"
                 :key="section._id"
                 :section="section"
+                :is-single="singleSection"
                 @updated="updateSection(i, $event)"
                 @deleted="deleteSection(i)"
             />
 
-            <div class="blueprint-add-section-container w-full md:w-1/2 2xl:w-1/3">
+            <div class="blueprint-add-section-container w-full md:w-1/2 2xl:w-1/3" v-if="!singleSection">
                 <button class="blueprint-add-section-button outline-none" @click="addSection">
                     <div class="text-center flex items-center leading-none">
                         <div class="text-2xl mr-1">+</div>
@@ -55,6 +56,10 @@ export default {
         newSectionText: {
             type: String,
             default: () => __('New Section')
+        },
+        singleSection: {
+            type: Boolean,
+            default: false
         }
     },
 
@@ -80,7 +85,8 @@ export default {
     methods: {
 
         makeSortable() {
-            this.makeSectionsSortable();
+            if (! this.singleSection) this.makeSectionsSortable();
+
             this.makeFieldsSortable();
         },
 

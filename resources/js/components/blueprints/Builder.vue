@@ -20,12 +20,13 @@
             </div>
         </div>
 
-        <div class="content mt-5 mb-2">
+        <div class="content mt-5 mb-2" v-if="useSections">
             <h2>{{ __('Tab Sections') }}</h2>
             <p class="max-w-lg">{{ __('messages.tab_sections_instructions') }}</p>
         </div>
 
         <sections
+            :single-section="!useSections"
             :initial-sections="blueprint.sections"
             @updated="sectionsUpdated"
         />
@@ -46,7 +47,8 @@ export default {
     props: {
         action: String,
         initialBlueprint: Object,
-        showTitle: Boolean
+        showTitle: Boolean,
+        useSections: { type: Boolean, default: true }
     },
 
     data() {
