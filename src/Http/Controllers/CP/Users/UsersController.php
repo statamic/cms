@@ -173,6 +173,7 @@ class UsersController extends CpController
             'actions' => [
                 'save' => $user->updateUrl(),
                 'password' => cp_route('users.password.update', $user->id()),
+                'editBlueprint' => cp_route('users.blueprint.edit'),
             ],
             'canEditPassword' => User::fromUser($request->user())->can('editPassword', $user),
         ];
