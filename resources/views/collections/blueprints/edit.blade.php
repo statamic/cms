@@ -14,4 +14,9 @@
         :initial-blueprint="{{ json_encode($blueprintVueObject) }}"
     ></blueprint-builder>
 
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Blueprints'),
+        'url' => Statamic::docsUrl('blueprints')
+    ])
+
 @endsection
