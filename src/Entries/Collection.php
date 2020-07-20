@@ -8,6 +8,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\CollectionDeleted;
 use Statamic\Events\CollectionSaved;
+use Statamic\Events\EntryBlueprintFound;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
@@ -204,13 +205,19 @@ class Collection implements Contract, AugmentableContract
         });
     }
 
-    public function entryBlueprint($blueprint = null)
+    public function entryBlueprint($blueprint = null, $entry = null)
     {
         $blueprint = is_null($blueprint)
             ? $this->entryBlueprints()->first()
             : $this->entryBlueprints()->keyBy->handle()->get($blueprint);
 
-        return $blueprint ? $this->ensureEntryBlueprintFields($blueprint) : null;
+        $blueprint = $blueprint ? $this->ensureEntryBlueprintFields($blueprint) : null;
+
+        if ($blueprint) {
+            EntryBlueprintFound::dispatch($blueprint, $entry);
+        }
+
+        return $blueprint;
     }
 
     public function fallbackEntryBlueprint()

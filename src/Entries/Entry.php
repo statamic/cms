@@ -93,7 +93,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
             ->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) use ($key) {
                 return Blink::once($key, function () use ($blueprint) {
-                    return $this->collection()->entryBlueprint($blueprint ?? $this->value('blueprint'));
+                    return $this->collection()->entryBlueprint($blueprint ?? $this->value('blueprint'), $this);
                 });
             })
             ->setter(function ($blueprint) use ($key) {

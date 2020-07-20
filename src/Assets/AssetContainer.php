@@ -7,6 +7,7 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Events\AssetContainerBlueprintFound;
 use Statamic\Events\AssetContainerDeleted;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Facades;
@@ -156,13 +157,17 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function blueprint()
     {
-        return Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
+        $blueprint = Blueprint::find('assets/'.$this->handle()) ?? Blueprint::makeFromFields([
             'alt' => [
                 'type' => 'text',
                 'display' => 'Alt Text',
                 'instructions' => 'Description of the image',
             ],
         ])->setHandle($this->handle())->setNamespace('assets');
+
+        AssetContainerBlueprintFound::dispatch($blueprint, $this);
+
+        return $blueprint;
     }
 
     /**

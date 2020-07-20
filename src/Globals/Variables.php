@@ -9,6 +9,7 @@ use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
+use Statamic\Events\GlobalVariablesBlueprintFound;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
@@ -105,7 +106,11 @@ class Variables implements Contract, Localization, Augmentable
 
     public function blueprint()
     {
-        return $this->globalSet()->blueprint() ?? $this->fallbackBlueprint();
+        $blueprint = $this->globalSet()->blueprint() ?? $this->fallbackBlueprint();
+
+        GlobalVariablesBlueprintFound::dispatch($blueprint, $this);
+
+        return $blueprint;
     }
 
     protected function fallbackBlueprint()

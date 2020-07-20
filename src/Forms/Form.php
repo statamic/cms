@@ -4,10 +4,11 @@ namespace Statamic\Forms;
 
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Facades\Blueprint;
+use Statamic\Events\FormBlueprintFound;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
 use Statamic\Facades;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
@@ -58,8 +59,12 @@ class Form implements FormContract
      */
     public function blueprint()
     {
-        return Blueprint::find('forms.'.$this->handle())
+        $blueprint = Blueprint::find('forms.'.$this->handle())
             ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('forms');
+
+        FormBlueprintFound::dispatch($blueprint, $this);
+
+        return $blueprint;
     }
 
     /**

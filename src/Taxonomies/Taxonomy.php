@@ -9,6 +9,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\TaxonomyDeleted;
 use Statamic\Events\TaxonomySaved;
+use Statamic\Events\TermBlueprintFound;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
@@ -87,13 +88,19 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         });
     }
 
-    public function termBlueprint($blueprint = null)
+    public function termBlueprint($blueprint = null, $term = null)
     {
         $blueprint = is_null($blueprint)
             ? $this->termBlueprints()->first()
             : $this->termBlueprints()->keyBy->handle()->get($blueprint);
 
-        return $blueprint ? $this->ensureTermBlueprintFields($blueprint) : null;
+        $blueprint ? $this->ensureTermBlueprintFields($blueprint) : null;
+
+        if ($blueprint) {
+            TermBlueprintFound::dispatch($blueprint, $term);
+        }
+
+        return $blueprint;
     }
 
     public function ensureTermBlueprintFields($blueprint)

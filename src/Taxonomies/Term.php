@@ -80,7 +80,7 @@ class Term implements TermContract
             ->fluentlyGetOrSet('blueprint')
             ->getter(function ($blueprint) use ($key) {
                 return Blink::once($key, function () use ($blueprint) {
-                    return $this->taxonomy()->termBlueprint($blueprint ?? $this->value('blueprint'));
+                    return $this->taxonomy()->termBlueprint($blueprint ?? $this->value('blueprint'), $this);
                 });
             })
             ->setter(function ($blueprint) use ($key) {
