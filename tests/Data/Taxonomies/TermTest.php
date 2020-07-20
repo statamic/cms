@@ -59,12 +59,11 @@ class TermTest extends TestCase
     /** @test */
     public function the_blueprint_is_blinked_when_getting_and_flushed_when_setting()
     {
-        $taxonomy = Mockery::mock(Taxonomy::make('tags'));
-        $taxonomy->shouldReceive('termBlueprint')->with(null)->once()->andReturn('the old blueprint');
-        $taxonomy->shouldReceive('termBlueprint')->with('new')->once()->andReturn('the new blueprint');
-        Taxonomy::shouldReceive('findByHandle')->with('tags')->andReturn($taxonomy);
-
         $term = (new Term)->taxonomy('tags');
+        $taxonomy = Mockery::mock(Taxonomy::make('tags'));
+        $taxonomy->shouldReceive('termBlueprint')->with(null, $term)->once()->andReturn('the old blueprint');
+        $taxonomy->shouldReceive('termBlueprint')->with('new', $term)->once()->andReturn('the new blueprint');
+        Taxonomy::shouldReceive('findByHandle')->with('tags')->andReturn($taxonomy);
 
         $this->assertEquals('the old blueprint', $term->blueprint());
         $this->assertEquals('the old blueprint', $term->blueprint());
