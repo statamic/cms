@@ -73,18 +73,7 @@ class Field implements Arrayable
 
     protected function addNullableRule($rules)
     {
-        $nullable = true;
-
-        foreach ($rules as $rule) {
-            if (preg_match('/^required_?/', $rule)) {
-                $nullable = false;
-                break;
-            }
-        }
-
-        if ($nullable) {
-            $rules[] = 'nullable';
-        }
+        $rules[] = 'nullable';
 
         return $rules;
     }
