@@ -80,7 +80,7 @@ class FieldTest extends TestCase
         ]);
 
         $this->assertEquals([
-            'test' => ['required', 'min:2'],
+            'test' => ['required', 'min:2', 'nullable'],
         ], $field->rules());
     }
 
@@ -119,7 +119,7 @@ class FieldTest extends TestCase
         ]);
 
         $this->assertEquals([
-            'test' => ['required', 'array', 'min:2', 'max:5'],
+            'test' => ['required', 'array', 'min:2', 'max:5', 'nullable'],
         ], $field->rules());
     }
 
@@ -143,8 +143,8 @@ class FieldTest extends TestCase
         ]);
 
         $this->assertEquals([
-            'test' => ['required'],
-            'test.*.one' => ['required', 'min:2'],
+            'test' => ['required', 'nullable'],
+            'test.*.one' => ['required', 'min:2', 'nullable'],
             'test.*.two' => ['max:2', 'nullable'],
         ], $field->rules());
     }
