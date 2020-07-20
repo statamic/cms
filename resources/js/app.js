@@ -130,6 +130,7 @@ Statamic.app({
         CollectionScaffolder: require('./components/collections/Scaffolder.vue').default,
         CollectionEditForm: require('./components/collections/EditForm.vue').default,
         CollectionView: require('./components/collections/View.vue').default,
+        CollectionBlueprintListing:  require('./components/collections/BlueprintListing.vue').default,
         SessionExpiry: require('./components/SessionExpiry.vue').default,
         NavigationListing: require('./components/navigation/Listing.vue').default,
         NavigationCreateForm: require('./components/navigation/CreateForm.vue').default,
