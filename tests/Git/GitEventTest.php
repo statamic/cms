@@ -5,6 +5,7 @@ namespace Tests\Git;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
+use Statamic\Events\Saved;
 use Statamic\Facades;
 use Statamic\Facades\Config;
 use Statamic\Facades\Git;
@@ -362,6 +363,13 @@ class GitEventTest extends TestCase
 
 class PunSaved extends \Statamic\Events\Saved
 {
+    public $item;
+
+    public function __construct($item)
+    {
+        $this->item = $item;
+    }
+
     public function commitMessage()
     {
         return __('Pun saved');
