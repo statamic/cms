@@ -227,7 +227,7 @@ class FieldTest extends TestCase
     }
 
     /** @test */
-    public function it_adds_nullable_rule_when_not_required()
+    public function it_adds_nullable_rule_by_default()
     {
         $fieldtype = new class extends Fieldtype {
             protected $rules = null;
@@ -259,9 +259,9 @@ class FieldTest extends TestCase
         ]);
 
         $this->assertEquals(['test' => ['min:2', 'nullable']], $nullableField->rules());
-        $this->assertEquals(['test' => ['required', 'min:2']], $booleanRequiredField->rules());
-        $this->assertEquals(['test' => ['required', 'min:2']], $validateRequiredField->rules());
-        $this->assertEquals(['test' => ['required_if:foo', 'min:2']], $validateRequiredIfField->rules());
+        $this->assertEquals(['test' => ['required', 'min:2', 'nullable']], $booleanRequiredField->rules());
+        $this->assertEquals(['test' => ['required', 'min:2', 'nullable']], $validateRequiredField->rules());
+        $this->assertEquals(['test' => ['required_if:foo', 'min:2', 'nullable']], $validateRequiredIfField->rules());
     }
 
     /** @test */
