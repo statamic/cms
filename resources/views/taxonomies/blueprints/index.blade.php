@@ -8,15 +8,36 @@
         'title' => $taxonomy->title()
     ])
 
-    <div class="flex justify-between items-center mb-3">
-        <h1>@yield('title')</h1>
+    <taxonomy-blueprint-listing
+        inline-template
+        :initial-rows="{{ json_encode($blueprints) }}"
+        reorder-url="{{ cp_route('taxonomies.blueprints.reorder', $taxonomy) }}"
+    >
+        <div>
+            <div class="flex justify-between items-center mb-3">
+                <h1>@yield('title')</h1>
 
-        @can('create', 'Statamic\Fields\Blueprint')
-            <a href="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}" class="btn-primary">{{ __('Create Blueprint') }}</a>
-        @endcan
-    </div>
+                <div>
+                    @if ($blueprints->count() > 1)
+                        <button
+                            class="btn"
+                            :class="{ 'disabled': !hasBeenReordered }"
+                            :disabled="!hasBeenReordered"
+                            @click="saveOrder"
+                        >{{ __('Save Order') }}</button>
+                    @endif
 
-    <blueprint-listing :initial-rows="{{ json_encode($blueprints) }}"></blueprint-listing>
+                    <a href="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}" class="btn-primary ml-1">{{ __('Create Blueprint') }}</a>
+                </div>
+            </div>
+
+            <blueprint-listing
+                :initial-rows="rows"
+                :reorderable="{{ $blueprints->count() > 1 ? 'true' : 'false' }}"
+                @reordered="reordered"
+            ></blueprint-listing>
+        </div>
+    </taxonomy-blueprint-listing>
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Blueprints'),

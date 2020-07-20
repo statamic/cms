@@ -70,6 +70,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::group(['namespace' => 'Taxonomies'], function () {
         Route::resource('taxonomies', 'TaxonomiesController');
         Route::resource('taxonomies.blueprints', 'TaxonomyBlueprintsController');
+        Route::post('taxonomies/{taxonomy}/blueprints/reorder', 'ReorderTaxonomyBlueprintsController')->name('taxonomies.blueprints.reorder');
 
         Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
             Route::get('/', 'TermsController@index')->name('taxonomies.terms.index');
