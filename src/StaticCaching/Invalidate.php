@@ -3,7 +3,7 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Statamic\Events\Data as DataEvents;
+use Statamic\Events as DataEvents;
 
 class Invalidate implements ShouldQueue
 {
@@ -27,6 +27,6 @@ class Invalidate implements ShouldQueue
 
     public function handle($event)
     {
-        $this->invalidator->invalidate($event->item);
+        $this->invalidator->invalidate($event->entry);
     }
 }

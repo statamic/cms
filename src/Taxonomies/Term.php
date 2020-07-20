@@ -4,8 +4,8 @@ namespace Statamic\Taxonomies;
 
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Events\Data\TermDeleted;
-use Statamic\Events\Data\TermSaved;
+use Statamic\Events\TermDeleted;
+use Statamic\Events\TermSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;

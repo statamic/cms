@@ -4,8 +4,8 @@ namespace Statamic\Structures;
 
 use Statamic\Contracts\Structures\Nav as Contract;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Events\Data\NavDeleted;
-use Statamic\Events\Data\NavSaved;
+use Statamic\Events\NavDeleted;
+use Statamic\Events\NavSaved;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;

@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Event;
 use Mockery;
 use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
-use Statamic\Events\Data\EntrySaved;
-use Statamic\Events\Data\EntrySaving;
+use Statamic\Events\EntrySaved;
+use Statamic\Events\EntrySaving;
 use Statamic\Facades;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
@@ -614,10 +614,10 @@ class EntryTest extends TestCase
 
         $this->assertTrue($return);
         Event::assertDispatched(EntrySaving::class, function ($event) use ($entry) {
-            return $event->item === $entry;
+            return $event->entry === $entry;
         });
         Event::assertDispatched(EntrySaved::class, function ($event) use ($entry) {
-            return $event->item === $entry;
+            return $event->entry === $entry;
         });
     }
 

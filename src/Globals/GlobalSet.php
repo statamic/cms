@@ -4,8 +4,8 @@ namespace Statamic\Globals;
 
 use Statamic\Contracts\Globals\GlobalSet as Contract;
 use Statamic\Data\ExistsAsFile;
-use Statamic\Events\Data\GlobalSetDeleted;
-use Statamic\Events\Data\GlobalSetSaved;
+use Statamic\Events\GlobalSetDeleted;
+use Statamic\Events\GlobalSetSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;

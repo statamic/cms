@@ -5,6 +5,8 @@ namespace Tests\Git;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+use Statamic\Events\Event;
 use Statamic\Facades;
 use Statamic\Facades\Config;
 use Statamic\Facades\Git;
@@ -77,7 +79,7 @@ class GitEventTest extends TestCase
         Git::shouldReceive('dispatchCommit')->with('Collection deleted')->once();
 
         Config::set('statamic.git.ignored_events', [
-            \Statamic\Events\Data\CollectionSaved::class,
+            \Statamic\Events\CollectionSaved::class,
         ]);
 
         $collection = Facades\Collection::make('pages');
@@ -356,8 +358,15 @@ class GitEventTest extends TestCase
     }
 }
 
-class PunSaved extends \Statamic\Events\Data\Saved
+class PunSaved extends Event implements ProvidesCommitMessage
 {
+    public $item;
+
+    public function __construct($item)
+    {
+        $this->item = $item;
+    }
+
     public function commitMessage()
     {
         return __('Pun saved');

@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\User;
@@ -14,19 +15,21 @@ class UserController extends Controller
 
     public function login(Request $request)
     {
-        $request->validate([
+        $validator = Validator::make($request->all(), [
             'email' => 'required',
             'password' => 'required',
         ]);
 
-        $loggedIn = Auth::attempt(
-            $request->only('email', 'password'),
-            $request->has('remember')
-        );
+        $loggedIn = $validator->passes()
+            ? Auth::attempt($request->only('email', 'password'), $request->has('remember'))
+            : false;
+
+        $response = redirect($request->input('_redirect', '/'));
+        $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
 
         return $loggedIn
-            ? redirect($request->input('_redirect', '/'))->withSuccess(__('Login successful.'))
-            : back()->withInput()->withErrors(__('Invalid credentials.'));
+            ? $response->withSuccess(__('Login successful.'))
+            : $errorResponse->withInput()->withErrors(__('Invalid credentials.'));
     }
 
     public function logout()
@@ -47,7 +50,13 @@ class UserController extends Controller
             'password' => 'required|confirmed',
         ])->rules();
 
-        $this->validateWithBag('user.register', $request, $fieldRules);
+        $validator = Validator::make($request->all(), $fieldRules);
+
+        $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
+
+        if ($validator->fails()) {
+            return $errorResponse->withErrors($validator->errors(), 'user.register');
+        }
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 

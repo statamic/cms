@@ -3,8 +3,8 @@
 namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldsetRepository;
-use Statamic\Events\Data\FieldsetDeleted;
-use Statamic\Events\Data\FieldsetSaved;
+use Statamic\Events\FieldsetDeleted;
+use Statamic\Events\FieldsetSaved;
 use Statamic\Facades;
 use Statamic\Support\Str;
 
