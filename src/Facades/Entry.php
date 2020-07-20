@@ -6,20 +6,21 @@ use Illuminate\Support\Facades\Facade;
 use Statamic\Contracts\Entries\EntryRepository;
 
 /**
- * @method static \Statamic\Contracts\Entries\EntryRepository all()
- * @method static \Statamic\Contracts\Entries\EntryRepository whereCollection(string $handle)
- * @method static \Statamic\Contracts\Entries\EntryRepository whereInCollection(array $handles);
- * @method static \Statamic\Contracts\Entries\EntryRepository find($id)
- * @method static \Statamic\Contracts\Entries\EntryRepository findByUri(string $uri)
- * @method static \Statamic\Contracts\Entries\EntryRepository findBySlug(string $slug, string $collection)
- * @method static \Statamic\Contracts\Entries\EntryRepository make()
- * @method static \Statamic\Contracts\Entries\EntryRepository query()
- * @method static \Statamic\Contracts\Entries\EntryRepository save($entry)
- * @method static \Statamic\Contracts\Entries\EntryRepository delete($entry)
- * @method static \Statamic\Contracts\Entries\EntryRepository createRules($collection, $site)
- * @method static \Statamic\Contracts\Entries\EntryRepository updateRules($collection, $entry)
+ * @method static \Statamic\Entries\EntryCollection all()
+ * @method static \Statamic\Entries\EntryCollection whereCollection(string $handle)
+ * @method static \Statamic\Entries\EntryCollection whereInCollection(array $handles)
+ * @method static null|\Statamic\Contracts\Entries\Entry find($id)
+ * @method static null|\Statamic\Contracts\Entries\Entry findByUri(string $uri)
+ * @method static null|\Statamic\Contracts\Entries\Entry findBySlug(string $slug, string $collection)
+ * @method static \Statamic\Entries\Entry make()
+ * @method static \Statamic\Stache\Query\EntryQueryBuilder query()
+ * @method static void save($entry)
+ * @method static void delete($entry)
+ * @method static array createRules($collection, $site)
+ * @method static array updateRules($collection, $entry)
  *
- * @see \Statamic\Contracts\Entries\EntryRepository;
+ * @see \Statamic\Entries\EntryCollection
+ * @see \Statamic\Stache\Repositories\EntryRepository
  */
 class Entry extends Facade
 {
