@@ -7,7 +7,6 @@ use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormBlueprintFound;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
-use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
