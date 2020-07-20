@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class FormDeleted extends Deleted
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class FormDeleted extends Event implements ProvidesCommitMessage
 {
     public $form;
 

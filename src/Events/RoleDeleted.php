@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class RoleDeleted extends Deleted
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class RoleDeleted extends Event implements ProvidesCommitMessage
 {
     public $role;
 

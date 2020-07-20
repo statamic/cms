@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class TaxonomyDeleted extends Deleted
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class TaxonomyDeleted extends Event implements ProvidesCommitMessage
 {
     public $taxonomy;
 

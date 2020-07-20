@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class BlueprintDeleted extends Deleted
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class BlueprintDeleted extends Event implements ProvidesCommitMessage
 {
     public $blueprint;
 

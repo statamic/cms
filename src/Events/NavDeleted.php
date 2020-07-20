@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class NavDeleted extends Deleted
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class NavDeleted extends Event implements ProvidesCommitMessage
 {
     public $nav;
 

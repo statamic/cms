@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class GlobalSetDeleted extends Deleted
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class GlobalSetDeleted extends Event implements ProvidesCommitMessage
 {
     public $globals;
 

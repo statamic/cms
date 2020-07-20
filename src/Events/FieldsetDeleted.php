@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class FieldsetDeleted extends Deleted
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class FieldsetDeleted extends Event implements ProvidesCommitMessage
 {
     public $fieldset;
 

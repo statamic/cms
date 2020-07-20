@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class UserGroupDeleted extends Deleted
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class UserGroupDeleted extends Event implements ProvidesCommitMessage
 {
     public $group;
 

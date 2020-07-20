@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class AssetFolderDeleted extends Deleted
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class AssetFolderDeleted extends Event implements ProvidesCommitMessage
 {
     public $folder;
 

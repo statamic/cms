@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class CollectionDeleted extends Deleted
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class CollectionDeleted extends Event implements ProvidesCommitMessage
 {
     public $collection;
 
