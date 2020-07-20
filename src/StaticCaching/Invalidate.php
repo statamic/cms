@@ -3,7 +3,7 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Statamic\Events\Data as DataEvents;
+use Statamic\Events as DataEvents;
 
 class Invalidate implements ShouldQueue
 {

@@ -3,7 +3,7 @@
 namespace Statamic\Listeners;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
-use Statamic\Events\Data\AssetUploaded;
+use Statamic\Events\AssetUploaded;
 use Statamic\Facades\Folder;
 use Statamic\Facades\Path;
 use Statamic\Imaging\PresetGenerator;

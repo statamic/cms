@@ -4,8 +4,8 @@ namespace Statamic\Auth;
 
 use Statamic\Contracts\Auth\Role;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
-use Statamic\Events\Data\UserGroupDeleted;
-use Statamic\Events\Data\UserGroupSaved;
+use Statamic\Events\UserGroupDeleted;
+use Statamic\Events\UserGroupSaved;
 use Statamic\Facades;
 use Statamic\Facades\Role as RoleAPI;
 

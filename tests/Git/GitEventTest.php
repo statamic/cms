@@ -77,7 +77,7 @@ class GitEventTest extends TestCase
         Git::shouldReceive('dispatchCommit')->with('Collection deleted')->once();
 
         Config::set('statamic.git.ignored_events', [
-            \Statamic\Events\Data\CollectionSaved::class,
+            \Statamic\Events\CollectionSaved::class,
         ]);
 
         $collection = Facades\Collection::make('pages');
@@ -360,7 +360,7 @@ class GitEventTest extends TestCase
     }
 }
 
-class PunSaved extends \Statamic\Events\Data\Saved
+class PunSaved extends \Statamic\Events\Saved
 {
     public function commitMessage()
     {

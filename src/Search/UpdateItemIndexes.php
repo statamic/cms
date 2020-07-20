@@ -2,8 +2,8 @@
 
 namespace Statamic\Search;
 
-use Statamic\Events\Data\EntryDeleted;
-use Statamic\Events\Data\EntrySaved;
+use Statamic\Events\EntryDeleted;
+use Statamic\Events\EntrySaved;
 use Statamic\Facades\Search;
 
 class UpdateItemIndexes
