@@ -9,7 +9,7 @@ use Statamic\Contracts\Entries\EntryRepository;
  * @method static \Statamic\Entries\EntryCollection all()
  * @method static \Statamic\Entries\EntryCollection whereCollection(string $handle)
  * @method static \Statamic\Entries\EntryCollection whereInCollection(array $handles)
- * @method static null|\Statamic\Contracts\Entries\Entry mixed find($id)
+ * @method static null|\Statamic\Contracts\Entries\Entry find($id)
  * @method static null|\Statamic\Contracts\Entries\Entry findByUri(string $uri)
  * @method static null|\Statamic\Contracts\Entries\Entry findBySlug(string $slug, string $collection)
  * @method static \Statamic\Entries\Entry make()
