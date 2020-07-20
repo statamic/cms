@@ -2,7 +2,13 @@
 
 namespace Statamic\Events;
 
-class SubmissionCreated extends DataEvent
+class SubmissionCreated extends Event
 {
     //
+    public $item;
+
+    public function __construct($item)
+    {
+        $this->item = $item;
+    }
 }
