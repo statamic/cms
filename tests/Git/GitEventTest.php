@@ -5,6 +5,8 @@ namespace Tests\Git;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+use Statamic\Events\Event;
 use Statamic\Facades;
 use Statamic\Facades\Config;
 use Statamic\Facades\Git;
@@ -360,7 +362,7 @@ class GitEventTest extends TestCase
     }
 }
 
-class PunSaved extends \Statamic\Events\Event
+class PunSaved extends Event implements ProvidesCommitMessage
 {
     public $item;
 
