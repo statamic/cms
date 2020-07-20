@@ -33,7 +33,9 @@ class ResolveRedirect
             $parent = $parent->page();
         }
 
-        $children = $parent->pages()->all();
+        $children = $parent->isRoot()
+            ? $parent->structure()->in($parent->locale())->pages()->all()->slice(1, 1)
+            : $parent->pages()->all();
 
         if ($children->isEmpty()) {
             return 404;
