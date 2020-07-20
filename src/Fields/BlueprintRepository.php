@@ -2,17 +2,17 @@
 
 namespace Statamic\Fields;
 
+use Closure;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class BlueprintRepository
 {
-    protected $blueprints = [];
-    protected $files;
     protected $directory;
-    protected $fallbackDirectory;
+    protected $fallbacks = [];
 
     public function setDirectory(string $directory)
     {
@@ -21,11 +21,9 @@ class BlueprintRepository
         return $this;
     }
 
-    public function setFallbackDirectory(string $directory)
+    public function directory()
     {
-        $this->fallbackDirectory = $directory;
-
-        return $this;
+        return $this->directory;
     }
 
     public function find($blueprint): ?Blueprint
@@ -34,54 +32,41 @@ class BlueprintRepository
             return null;
         }
 
-        $path = str_replace('.', '/', $blueprint);
+        $path = $this->directory.'/'.str_replace('.', '/', $blueprint).'.yaml';
 
-        if ($cached = array_get($this->blueprints, $path)) {
-            return $cached;
+        return File::exists($path)
+            ? $this->makeBlueprintFromFile($path)
+            : $this->findFallback($blueprint);
+    }
+
+    public function setFallback($handle, Closure $blueprint)
+    {
+        $handle = str_replace('/', '.', $handle);
+
+        $this->fallbacks[$handle] = $blueprint;
+
+        return $this;
+    }
+
+    public function findFallback($handle)
+    {
+        if (! $blueprint = $this->fallbacks[$handle] ?? null) {
+            return null;
         }
 
-        if (! File::exists($file = "{$this->directory}/{$path}.yaml")) {
-            if (! File::exists($file = "{$this->fallbackDirectory}/{$path}.yaml")) {
-                return null;
-            }
-        }
+        [$namespace, $handle] = $this->getNamespaceAndHandle($handle);
 
-        $str = str_replace('/', '.', $path);
-        $parts = explode('.', $str);
-        $handle = array_pop($parts);
-        $namespace = implode('.', $parts);
-
-        $blueprint = (new Blueprint)
-            ->setHandle($handle)
-            ->setNamespace(empty($namespace) ? null : $namespace)
-            ->setContents(YAML::file($file)->parse());
-
-        $this->blueprints[$handle] = $blueprint;
-
-        return $blueprint;
+        return $blueprint()->setHandle($handle)->setNamespace($namespace);
     }
 
     public function save(Blueprint $blueprint)
     {
-        if (! File::exists($this->directory)) {
-            File::makeDirectory($this->directory);
-        }
-
-        File::put($this->path($blueprint), YAML::dump($blueprint->contents()));
+        $blueprint->writeFile();
     }
 
     public function delete(Blueprint $blueprint)
     {
-        File::delete($this->path($blueprint));
-    }
-
-    private function path($blueprint)
-    {
-        return Path::tidy(vsprintf('%s/%s/%s.yaml', [
-            $this->directory,
-            str_replace('.', '/', $blueprint->namespace()),
-            $blueprint->handle(),
-        ]));
+        $blueprint->deleteFile();
     }
 
     public function make($handle = null)
@@ -121,25 +106,59 @@ class BlueprintRepository
 
     public function in(string $namespace)
     {
-        $namespace = str_replace('/', '.', $namespace);
-        $dir = str_replace('.', '/', $namespace);
-        $path = $this->directory.'/'.$dir;
+        return $this
+            ->filesIn($namespace)
+            ->map(function ($file) {
+                return $this->makeBlueprintFromFile($file);
+            })
+            ->sort(function ($a, $b) {
+                $orderA = $a->order() ?? 99999;
+                $orderB = $b->order() ?? 99999;
 
-        if (! File::exists($path)) {
+                return $orderA === $orderB
+                    ? $a->title() <=> $b->title()
+                    : $orderA <=> $orderB;
+            })
+            ->keyBy->handle();
+    }
+
+    private function filesIn($namespace)
+    {
+        $namespace = str_replace('/', '.', $namespace);
+        $namespaceDir = str_replace('.', '/', $namespace);
+        $directory = $this->directory.'/'.$namespaceDir;
+
+        if (! File::exists(Str::removeRight($directory, '/'))) {
             return collect();
         }
 
-        return File::withAbsolutePaths()
-            ->getFilesByType($path, 'yaml')
-            ->map(function ($file) use ($dir, $namespace) {
-                $basename = Str::after($file, Str::finish($dir, '/'));
-                $handle = Str::before($basename, '.yaml');
+        return File::withAbsolutePaths()->getFilesByType($directory, 'yaml');
+    }
 
-                return (new Blueprint)
-                    ->setHandle($handle)
-                    ->setNamespace($namespace)
-                    ->setContents(YAML::file($file)->parse());
-            })
-            ->keyBy->handle();
+    private function makeBlueprintFromFile($path)
+    {
+        [$namespace, $handle] = $this->getNamespaceAndHandle(
+            Str::after(Str::before($path, '.yaml'), $this->directory.'/')
+        );
+
+        $contents = YAML::file($path)->parse();
+
+        return (new Blueprint)
+            ->setOrder(Arr::pull($contents, 'order'))
+            ->setInitialPath($path)
+            ->setHandle($handle)
+            ->setNamespace($namespace ?? null)
+            ->setContents($contents);
+    }
+
+    private function getNamespaceAndHandle($blueprint)
+    {
+        $blueprint = str_replace('/', '.', $blueprint);
+        $parts = explode('.', $blueprint);
+        $handle = array_pop($parts);
+        $namespace = implode('.', $parts);
+        $namespace = empty($namespace) ? null : $namespace;
+
+        return [$namespace, $handle];
     }
 }

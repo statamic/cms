@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Illuminate\Support\Collection;
+use Statamic\Facades;
 use Statamic\Facades\File;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\BlueprintRepository;
@@ -16,8 +17,9 @@ class BlueprintRepositoryTest extends TestCase
         parent::setUp();
 
         $this->repo = app(BlueprintRepository::class)
-            ->setDirectory('/path/to/resources/blueprints')
-            ->setFallbackDirectory('/path/to/vendor/fallbacks');
+            ->setDirectory('/path/to/resources/blueprints');
+
+        Facades\Blueprint::swap($this->repo);
     }
 
     /** @test */
@@ -82,26 +84,59 @@ EOT;
     public function it_returns_null_if_blueprint_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/blueprints/unknown.yaml')->once()->andReturnFalse();
-        File::shouldReceive('exists')->with('/path/to/vendor/fallbacks/unknown.yaml')->once()->andReturnFalse();
 
         $this->assertNull($this->repo->find('unknown'));
     }
 
     /** @test */
+    public function it_returns_null_if_blueprint_doesnt_exist_in_a_namespace()
+    {
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/unknown.yaml')->once()->andReturnFalse();
+
+        $this->assertNull($this->repo->find('foo.bar.unknown'));
+    }
+
+    /** @test */
     public function it_gets_fallback_blueprint()
     {
-        $contents = <<<'EOT'
-title: Fallback Blueprint
-sections: []
-EOT;
-        File::shouldReceive('exists')->with('/path/to/resources/blueprints/test.yaml')->once()->andReturnFalse();
-        File::shouldReceive('exists')->with('/path/to/vendor/fallbacks/test.yaml')->once()->andReturnTrue();
-        File::shouldReceive('get')->with('/path/to/vendor/fallbacks/test.yaml')->once()->andReturn($contents);
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/unknown.yaml')->once()->andReturnFalse();
 
-        $blueprint = $this->repo->find('test');
+        $fallback = $this->repo->make();
+        $this->repo->setFallback('unknown', function () use ($fallback) {
+            return $fallback;
+        });
 
-        $this->assertInstanceOf(Blueprint::class, $blueprint);
-        $this->assertEquals('Fallback Blueprint', $blueprint->title());
+        $this->assertSame($fallback, $this->repo->find('unknown'));
+        $this->assertEquals('unknown', $fallback->handle());
+        $this->assertNull($fallback->namespace());
+    }
+
+    /** @test */
+    public function it_gets_namespaced_fallback_blueprint()
+    {
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/unknown.yaml')->once()->andReturnNull();
+
+        $fallback = $this->repo->make();
+        $this->repo->setFallback('foo.bar.unknown', function () use ($fallback) {
+            return $fallback;
+        });
+
+        $this->assertSame($fallback, $this->repo->find('foo.bar.unknown'));
+        $this->assertEquals('unknown', $fallback->handle());
+        $this->assertEquals('foo.bar', $fallback->namespace());
+    }
+
+    /** @test */
+    public function getting_a_non_existent_namespaced_blueprint_will_not_return_the_non_namespaced_fallback()
+    {
+        File::shouldReceive('exists')->with('/path/to/resources/blueprints/foo/bar/unknown.yaml')->once()->andReturnNull();
+
+        $fallback = $this->repo->make();
+        $this->repo->setFallback('unknown', function () use ($fallback) {
+            return $fallback;
+        });
+
+        $this->assertNull($this->repo->find('foo.bar.unknown'));
     }
 
     /** @test */
@@ -128,8 +163,6 @@ sections:
 
 EOT;
 
-        File::shouldReceive('exists')->with('/path/to/resources/blueprints')->once()->andReturnFalse();
-        File::shouldReceive('makeDirectory')->with('/path/to/resources/blueprints')->once();
         File::shouldReceive('put')->with('/path/to/resources/blueprints/the_test_blueprint.yaml', $expectedYaml)->once();
 
         $blueprint = (new Blueprint)->setHandle('the_test_blueprint')->setContents([
