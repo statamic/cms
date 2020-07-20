@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class BlueprintSaved extends Saved
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class BlueprintSaved extends Event implements ProvidesCommitMessage
 {
     public $blueprint;
 

@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class TaxonomySaved extends Saved
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class TaxonomySaved extends Event implements ProvidesCommitMessage
 {
     public $taxonomy;
 

@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class NavSaved extends Saved
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class NavSaved extends Event implements ProvidesCommitMessage
 {
     public $nav;
 

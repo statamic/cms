@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class UserSaved extends Saved
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class UserSaved extends Event implements ProvidesCommitMessage
 {
     public $user;
 

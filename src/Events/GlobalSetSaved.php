@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class GlobalSetSaved extends Saved
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class GlobalSetSaved extends Event implements ProvidesCommitMessage
 {
     public $globals;
 

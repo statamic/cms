@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class AssetContainerSaved extends Saved
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class AssetContainerSaved extends Event implements ProvidesCommitMessage
 {
     public $container;
 

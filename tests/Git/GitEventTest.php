@@ -5,7 +5,6 @@ namespace Tests\Git;
 use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
-use Statamic\Events\Saved;
 use Statamic\Facades;
 use Statamic\Facades\Config;
 use Statamic\Facades\Git;
@@ -361,7 +360,7 @@ class GitEventTest extends TestCase
     }
 }
 
-class PunSaved extends \Statamic\Events\Saved
+class PunSaved extends \Statamic\Events\Event
 {
     public $item;
 

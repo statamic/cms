@@ -2,7 +2,9 @@
 
 namespace Statamic\Events;
 
-class FieldsetSaved extends Saved
+use Statamic\Contracts\Git\ProvidesCommitMessage;
+
+class FieldsetSaved extends Event implements ProvidesCommitMessage
 {
     public $fieldset;
 
