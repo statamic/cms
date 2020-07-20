@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class TaxonomySaved extends Saved
 {
-    public $item;
+    public $taxonomy;
 
-    public function __construct($item)
+    public function __construct($taxonomy)
     {
-        $this->item = $item;
+        $this->taxonomy = $taxonomy;
     }
 
     public function commitMessage()

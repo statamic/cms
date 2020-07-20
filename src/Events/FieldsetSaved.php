@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class FieldsetSaved extends Saved
 {
-    public $item;
+    public $fieldset;
 
-    public function __construct($item)
+    public function __construct($fieldset)
     {
-        $this->item = $item;
+        $this->fieldset = $fieldset;
     }
 
     public function commitMessage()

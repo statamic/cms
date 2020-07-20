@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class FormDeleted extends Deleted
 {
-    public $item;
+    public $form;
 
-    public function __construct($item)
+    public function __construct($form)
     {
-        $this->item = $item;
+        $this->form = $form;
     }
 
     public function commitMessage()

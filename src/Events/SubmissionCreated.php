@@ -4,11 +4,10 @@ namespace Statamic\Events;
 
 class SubmissionCreated extends Event
 {
-    //
-    public $item;
+    public $submission;
 
-    public function __construct($item)
+    public function __construct($submission)
     {
-        $this->item = $item;
+        $this->submission = $submission;
     }
 }

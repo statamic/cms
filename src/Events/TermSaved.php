@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class TermSaved extends Saved
 {
-    public $item;
+    public $term;
 
-    public function __construct($item)
+    public function __construct($term)
     {
-        $this->item = $item;
+        $this->term = $term;
     }
 
     public function commitMessage()

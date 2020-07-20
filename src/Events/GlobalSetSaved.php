@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class GlobalSetSaved extends Saved
 {
-    public $item;
+    public $globals;
 
-    public function __construct($item)
+    public function __construct($globals)
     {
-        $this->item = $item;
+        $this->globals = $globals;
     }
 
     public function commitMessage()

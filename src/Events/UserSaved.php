@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class UserSaved extends Saved
 {
-    public $item;
+    public $user;
 
-    public function __construct($item)
+    public function __construct($user)
     {
-        $this->item = $item;
+        $this->user = $user;
     }
 
     public function commitMessage()

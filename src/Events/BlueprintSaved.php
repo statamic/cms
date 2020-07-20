@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class BlueprintSaved extends Saved
 {
-    public $item;
+    public $blueprint;
 
-    public function __construct($item)
+    public function __construct($blueprint)
     {
-        $this->item = $item;
+        $this->blueprint = $blueprint;
     }
 
     public function commitMessage()

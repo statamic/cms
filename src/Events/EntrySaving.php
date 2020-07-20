@@ -4,10 +4,10 @@ namespace Statamic\Events;
 
 class EntrySaving extends Saving
 {
-    public $item;
+    public $entry;
 
-    public function __construct($item)
+    public function __construct($entry)
     {
-        $this->item = $item;
+        $this->entry = $entry;
     }
 }

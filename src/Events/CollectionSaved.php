@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class CollectionSaved extends Saved
 {
-    public $item;
+    public $collection;
 
-    public function __construct($item)
+    public function __construct($collection)
     {
-        $this->item = $item;
+        $this->collection = $collection;
     }
 
     public function commitMessage()

@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class NavSaved extends Saved
 {
-    public $item;
+    public $nav;
 
-    public function __construct($item)
+    public function __construct($nav)
     {
-        $this->item = $item;
+        $this->nav = $nav;
     }
 
     public function commitMessage()

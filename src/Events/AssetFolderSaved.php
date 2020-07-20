@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class AssetFolderSaved extends Saved
 {
-    public $item;
+    public $folder;
 
-    public function __construct($item)
+    public function __construct($folder)
     {
-        $this->item = $item;
+        $this->folder = $folder;
     }
 
     public function commitMessage()

@@ -40,7 +40,7 @@ class GeneratePresetImageManipulations implements ShouldQueue
      */
     public function handle($event)
     {
-        $asset = $event->item;
+        $asset = $event->asset;
 
         if (! $asset->isImage()) {
             return;

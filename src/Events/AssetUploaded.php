@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class AssetUploaded extends Saved
 {
-    public $item;
+    public $asset;
 
-    public function __construct($item)
+    public function __construct($asset)
     {
-        $this->item = $item;
+        $this->asset = $asset;
     }
 
     public function commitMessage()

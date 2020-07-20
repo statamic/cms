@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class GlobalSetDeleted extends Deleted
 {
-    public $item;
+    public $globals;
 
-    public function __construct($item)
+    public function __construct($globals)
     {
-        $this->item = $item;
+        $this->globals = $globals;
     }
 
     public function commitMessage()

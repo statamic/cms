@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class AssetContainerDeleted extends Deleted
 {
-    public $item;
+    public $container;
 
-    public function __construct($item)
+    public function __construct($container)
     {
-        $this->item = $item;
+        $this->container = $container;
     }
 
     public function commitMessage()

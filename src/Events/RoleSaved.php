@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class RoleSaved extends Saved
 {
-    public $item;
+    public $role;
 
-    public function __construct($item)
+    public function __construct($role)
     {
-        $this->item = $item;
+        $this->role = $role;
     }
 
     public function commitMessage()

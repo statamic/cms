@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class UserGroupDeleted extends Deleted
 {
-    public $item;
+    public $group;
 
-    public function __construct($item)
+    public function __construct($group)
     {
-        $this->item = $item;
+        $this->group = $group;
     }
 
     public function commitMessage()

@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class UserDeleted extends Deleted
 {
-    public $item;
+    public $user;
 
-    public function __construct($item)
+    public function __construct($user)
     {
-        $this->item = $item;
+        $this->user = $user;
     }
 
     public function commitMessage()

@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class SubmissionSaved extends Saved
 {
-    public $item;
+    public $submission;
 
-    public function __construct($item)
+    public function __construct($submission)
     {
-        $this->item = $item;
+        $this->submission = $submission;
     }
 
     public function commitMessage()

@@ -563,10 +563,10 @@ class EntryTest extends TestCase
 
         $this->assertTrue($return);
         Event::assertDispatched(EntrySaving::class, function ($event) use ($entry) {
-            return $event->item === $entry;
+            return $event->entry === $entry;
         });
         Event::assertDispatched(EntrySaved::class, function ($event) use ($entry) {
-            return $event->item === $entry;
+            return $event->entry === $entry;
         });
     }
 
