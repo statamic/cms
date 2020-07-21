@@ -156,7 +156,13 @@ class TermsController extends CpController
             'slug' => 'required|alpha_dash',
         ]);
 
-        $values = $fields->process()->values()->except(['slug', 'date']);
+        $values = $fields->process()->values();
+
+        if ($explicitBlueprint = $values->pull('blueprint')) {
+            $term->blueprint($explicitBlueprint);
+        }
+
+        $values = $values->except(['slug', 'date']);
 
         if ($term->hasOrigin()) {
             $term->data($values->only($request->input('_localized')));
@@ -239,7 +245,7 @@ class TermsController extends CpController
     {
         $this->authorize('store', [TermContract::class, $taxonomy]);
 
-        $blueprint = $taxonomy->termBlueprint($request->blueprint);
+        $blueprint = $taxonomy->termBlueprint($request->_blueprint);
 
         $fields = $blueprint->fields()->addValues($request->all());
 
@@ -252,7 +258,7 @@ class TermsController extends CpController
 
         $term = Term::make()
             ->taxonomy($taxonomy)
-            ->blueprint($request->blueprint)
+            ->blueprint($request->_blueprint)
             ->in($site->handle());
 
         $term
