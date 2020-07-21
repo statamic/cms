@@ -34,6 +34,7 @@ Vue.component('global_set_sites-fieldtype', require('../components/globals/Sites
 Vue.component('grid-fieldtype', require('../components/fieldtypes/grid/Grid.vue').default);
 Vue.component('grid-fieldtype-index', require('../components/fieldtypes/grid/GridIndex.vue').default);
 Vue.component('hidden-fieldtype', require('../components/fieldtypes/HiddenFieldtype.vue').default);
+Vue.component('html-fieldtype', require('../components/fieldtypes/HtmlFieldtype.vue').default);
 Vue.component('integer-fieldtype', require('../components/fieldtypes/IntegerFieldtype.vue').default);
 Vue.component('link-fieldtype', require('../components/fieldtypes/LinkFieldtype.vue').default);
 Vue.component('list-fieldtype', require('../components/fieldtypes/ListFieldtype.vue').default);

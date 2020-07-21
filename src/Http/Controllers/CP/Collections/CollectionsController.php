@@ -132,7 +132,7 @@ class CollectionsController extends CpController
             'mount' => optional($collection->mount())->id(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint())
+        $fields = ($blueprint = $this->editFormBlueprint($collection))
             ->fields()
             ->addValues($values)
             ->preProcess();
@@ -181,7 +181,7 @@ class CollectionsController extends CpController
     {
         $this->authorize('update', $collection, __('You are not authorized to edit this collection.'));
 
-        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
+        $fields = $this->editFormBlueprint($collection)->fields()->addValues($request->all());
 
         $fields->validate();
 
@@ -269,7 +269,7 @@ class CollectionsController extends CpController
         $collection->delete();
     }
 
-    protected function editFormBlueprint()
+    protected function editFormBlueprint($collection)
     {
         $fields = [
             'name' => [
@@ -354,13 +354,16 @@ class CollectionsController extends CpController
             'content_model' => [
                 'display' => __('Content Model'),
                 'fields' => [
-                    // 'blueprints' => [
-                    //     'display' => __('Blueprints'),
-                    //     'instructions' => __('statamic::messages.collections_blueprint_instructions'),
-                    //     'type' => 'blueprints',
-                    //     'validate' => 'array',
-                    //     'mode' => 'select',
-                    // ],
+                    'blueprints' => [
+                        'display' => __('Blueprints'),
+                        'instructions' => __('statamic::messages.collections_blueprint_instructions'),
+                        'type' => 'html',
+                        'html' => ''.
+                            '<div class="text-xs">'.
+                            '   <span class="mr-2">'.$collection->entryBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <a href="'.cp_route('collections.blueprints.index', $collection).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>',
+                    ],
                     'links' => [
                         'display' => __('Links'),
                         'instructions' => __('statamic::messages.collections_links_instructions'),

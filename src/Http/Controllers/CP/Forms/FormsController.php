@@ -113,7 +113,7 @@ class FormsController extends CpController
 
         $values = $form->toArray();
 
-        $fields = ($blueprint = $this->editFormBlueprint())
+        $fields = ($blueprint = $this->editFormBlueprint($form))
             ->fields()
             ->addValues($values)
             ->preProcess();
@@ -130,7 +130,7 @@ class FormsController extends CpController
     {
         $this->authorize('edit', $form);
 
-        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
+        $fields = $this->editFormBlueprint($form)->fields()->addValues($request->all());
 
         $fields->validate();
 
@@ -156,7 +156,7 @@ class FormsController extends CpController
         $form->delete();
     }
 
-    protected function editFormBlueprint()
+    protected function editFormBlueprint($form)
     {
         return Blueprint::makeFromSections([
             'name' => [
@@ -172,12 +172,14 @@ class FormsController extends CpController
             'fields' => [
                 'display' => __('Fields'),
                 'fields' => [
-                    // 'blueprint' => [
-                    //     'type' => 'blueprints',
-                    //     'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
-                    //     'max_items' => 1,
-                    //     'mode' => 'select',
-                    // ],
+                    'blueprint' => [
+                        'type' => 'html',
+                        'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
+                        'html' => ''.
+                            '<div class="text-xs">'.
+                            '   <a href="'.cp_route('forms.blueprint.edit', $form->handle()).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>',
+                    ],
                     'honeypot' => [
                         'type' => 'text',
                         'instructions' => __('statamic::messages.form_configure_honeypot_instructions'),

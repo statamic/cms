@@ -47,6 +47,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Hidden::class,
+        Fieldtypes\Html::class,
         Fieldtypes\Integer::class,
         Fieldtypes\Link::class,
         Fieldtypes\Lists::class,

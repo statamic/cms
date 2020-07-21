@@ -120,7 +120,7 @@ class TaxonomiesController extends CpController
             'sites' => $taxonomy->sites()->all(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint())
+        $fields = ($blueprint = $this->editFormBlueprint($taxonomy))
             ->fields()
             ->addValues($values)
             ->preProcess();
@@ -137,7 +137,7 @@ class TaxonomiesController extends CpController
     {
         $this->authorize('update', $taxonomy, __('You are not authorized to edit this taxonomy.'));
 
-        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
+        $fields = $this->editFormBlueprint($taxonomy)->fields()->addValues($request->all());
 
         $fields->validate();
 
@@ -189,7 +189,7 @@ class TaxonomiesController extends CpController
         $taxonomy->delete();
     }
 
-    protected function editFormBlueprint()
+    protected function editFormBlueprint($taxonomy)
     {
         $fields = [
             'name' => [
@@ -204,13 +204,16 @@ class TaxonomiesController extends CpController
             'content_model' => [
                 'display' => __('Content Model'),
                 'fields' => [
-                    // 'blueprints' => [
-                    //     'display' => __('Blueprints'),
-                    //     'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
-                    //     'type' => 'blueprints',
-                    //     'validate' => 'array',
-                    //     'mode' => 'select',
-                    // ],
+                    'blueprints' => [
+                        'display' => __('Blueprints'),
+                        'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
+                        'type' => 'html',
+                        'html' => ''.
+                            '<div class="text-xs">'.
+                            '   <span class="mr-2">'.$taxonomy->termBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <a href="'.cp_route('taxonomies.blueprints.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>',
+                    ],
                     'collections' => [
                         'display' => __('Collections'),
                         'instructions' => __('statamic::messages.taxonomies_collections_instructions'),
