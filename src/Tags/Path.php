@@ -5,6 +5,7 @@ namespace Statamic\Tags;
 use Statamic\Facades\Config;
 use Statamic\Facades\Path as PathAPI;
 use Statamic\Facades\URL;
+use Statamic\Support\Str;
 
 class Path extends Tags
 {
@@ -20,7 +21,7 @@ class Path extends Tags
             return array_get($this->context, 'path');
         }
 
-        $url = PathAPI::tidy(Config::getSiteUrl().$src);
+        $url = PathAPI::tidy(Str::ensureRight(Config::getSiteUrl(), '/').$src);
 
         if ($this->getBool('absolute', false)) {
             $url = URL::makeAbsolute($url);
