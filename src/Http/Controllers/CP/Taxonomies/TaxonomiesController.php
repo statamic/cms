@@ -29,6 +29,7 @@ class TaxonomiesController extends CpController
                 'edit_url' => $taxonomy->editUrl(),
                 'delete_url' => $taxonomy->deleteUrl(),
                 'terms_url' => cp_route('taxonomies.show', $taxonomy->handle()),
+                'blueprints_url' => cp_route('taxonomies.blueprints.index', $taxonomy->handle()),
                 'deleteable' => User::current()->can('delete', $taxonomy),
             ];
         })->values();
@@ -119,7 +120,7 @@ class TaxonomiesController extends CpController
             'sites' => $taxonomy->sites()->all(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint())
+        $fields = ($blueprint = $this->editFormBlueprint($taxonomy))
             ->fields()
             ->addValues($values)
             ->preProcess();
@@ -136,15 +137,13 @@ class TaxonomiesController extends CpController
     {
         $this->authorize('update', $taxonomy, __('You are not authorized to edit this taxonomy.'));
 
-        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
+        $fields = $this->editFormBlueprint($taxonomy)->fields()->addValues($request->all());
 
         $fields->validate();
 
         $values = $fields->process()->values()->all();
 
-        $taxonomy
-            ->title($values['title'])
-            ->termBlueprints($values['blueprints']);
+        $taxonomy->title($values['title']);
 
         if ($sites = array_get($values, 'sites')) {
             $taxonomy->sites($sites);
@@ -190,7 +189,7 @@ class TaxonomiesController extends CpController
         $taxonomy->delete();
     }
 
-    protected function editFormBlueprint()
+    protected function editFormBlueprint($taxonomy)
     {
         $fields = [
             'name' => [
@@ -208,9 +207,12 @@ class TaxonomiesController extends CpController
                     'blueprints' => [
                         'display' => __('Blueprints'),
                         'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
-                        'type' => 'blueprints',
-                        'validate' => 'array',
-                        'mode' => 'select',
+                        'type' => 'html',
+                        'html' => ''.
+                            '<div class="text-xs">'.
+                            '   <span class="mr-2">'.$taxonomy->termBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <a href="'.cp_route('taxonomies.blueprints.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>',
                     ],
                     'collections' => [
                         'display' => __('Collections'),

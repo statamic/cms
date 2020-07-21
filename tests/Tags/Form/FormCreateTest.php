@@ -324,10 +324,10 @@ EOT
         ]);
 
         Blueprint::shouldReceive('find')
-            ->with('contact')
+            ->with('forms.contact')
             ->andReturn($blueprint);
 
-        $form = Form::make()->handle('contact')->blueprint('contact');
+        $form = Form::make()->handle('contact');
 
         Form::shouldReceive('find')
             ->with('contact')

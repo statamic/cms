@@ -146,13 +146,9 @@ abstract class User implements
      * @param string|null|bool
      * @return \Statamic\Fields\Blueprint
      */
-    public function blueprint($blueprint = null)
+    public function blueprint()
     {
-        if (is_null($blueprint)) {
-            return Blueprint::find('user');
-        }
-
-        $this->set('blueprint', $blueprint);
+        return Facades\User::blueprint();
     }
 
     public function save()

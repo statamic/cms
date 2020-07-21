@@ -81,7 +81,6 @@ class GlobalsStore extends BasicStore
         return GlobalSet::make()
             ->handle($handle)
             ->title($data['title'] ?? null)
-            ->blueprint($data['blueprint'] ?? null)
             ->initialPath($path);
     }
 

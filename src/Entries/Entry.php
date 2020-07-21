@@ -85,13 +85,21 @@ class Entry implements Contract, Augmentable, Responsable, Localization
             ->args(func_get_args());
     }
 
-    public function blueprint()
+    public function blueprint($blueprint = null)
     {
-        return $this->fluentlyGetOrSet('blueprint')
-            ->getter(function ($blueprint) {
-                return $blueprint
-                    ? $this->collection()->ensureEntryBlueprintFields(Blueprint::find($blueprint))
-                    : $this->defaultBlueprint();
+        $key = "entry-{$this->id()}-blueprint";
+
+        return $this
+            ->fluentlyGetOrSet('blueprint')
+            ->getter(function ($blueprint) use ($key) {
+                return Blink::once($key, function () use ($blueprint) {
+                    return $this->collection()->entryBlueprint($blueprint ?? $this->value('blueprint'), $this);
+                });
+            })
+            ->setter(function ($blueprint) use ($key) {
+                Blink::forget($key);
+
+                return $blueprint;
             })
             ->args(func_get_args());
     }
@@ -204,19 +212,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization
     public function reference()
     {
         return "entry::{$this->id()}";
-    }
-
-    public function defaultBlueprint()
-    {
-        return Blink::once("entry-{$this->id()}-default-blueprint", function () {
-            if ($blueprint = $this->value('blueprint')) {
-                return $this->collection()->ensureEntryBlueprintFields(
-                    Blueprint::find($blueprint)
-                );
-            }
-
-            return $this->collection()->entryBlueprint();
-        });
     }
 
     public function afterSave($callback)

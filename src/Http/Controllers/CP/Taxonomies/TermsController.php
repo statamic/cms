@@ -4,9 +4,7 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
-use Statamic\Events\PublishBlueprintFound;
 use Statamic\Facades\Asset;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -78,8 +76,6 @@ class TermsController extends CpController
         $term = $term->fromWorkingCopy();
 
         $blueprint = $term->blueprint();
-
-        event(new PublishBlueprintFound($blueprint, 'term', $term));
 
         [$values, $meta] = $this->extractFromFields($term, $blueprint);
 
@@ -193,9 +189,7 @@ class TermsController extends CpController
     {
         $this->authorize('create', [TermContract::class, $taxonomy]);
 
-        $blueprint = $request->blueprint
-            ? $taxonomy->ensureTermBlueprintFields(Blueprint::find($request->blueprint))
-            : $taxonomy->termBlueprint();
+        $blueprint = $taxonomy->termBlueprint($request->blueprint);
 
         if (! $blueprint) {
             throw new \Exception('A valid blueprint is required.');
@@ -245,9 +239,7 @@ class TermsController extends CpController
     {
         $this->authorize('store', [TermContract::class, $taxonomy]);
 
-        $blueprint = $taxonomy->ensureTermBlueprintFields(
-            Blueprint::find($request->blueprint)
-        );
+        $blueprint = $taxonomy->termBlueprint($request->blueprint);
 
         $fields = $blueprint->fields()->addValues($request->all());
 

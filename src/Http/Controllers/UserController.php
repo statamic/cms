@@ -7,7 +7,6 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
 use Statamic\Contracts\Auth\User as UserContract;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 
 class UserController extends Controller
@@ -42,7 +41,7 @@ class UserController extends Controller
 
     public function register(Request $request)
     {
-        $blueprint = Blueprint::find('user');
+        $blueprint = User::blueprint();
 
         $fields = $blueprint->fields()->addValues($request->all());
 

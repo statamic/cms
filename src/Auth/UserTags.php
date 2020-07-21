@@ -469,7 +469,7 @@ class UserTags extends Tags
      */
     protected function getRequiredRegistrationFields()
     {
-        $blueprintFields = Blueprint::find('user')->fields()->all()
+        $blueprintFields = User::blueprint()->fields()->all()
             ->keyBy->handle()
             ->filter(function ($field, $handle) {
                 return in_array($handle, ['email', 'password']);
@@ -506,7 +506,7 @@ class UserTags extends Tags
      */
     protected function getAdditionalRegistrationFields()
     {
-        return Blueprint::find('user')->fields()->all()
+        return User::blueprint()->fields()->all()
             ->reject(function ($field) {
                 return in_array($field->handle(), ['email', 'password', 'password_confirmation', 'roles', 'groups']);
             })

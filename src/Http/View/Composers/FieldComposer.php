@@ -10,7 +10,7 @@ use Statamic\Statamic;
 class FieldComposer
 {
     const VIEWS = [
-        'statamic::blueprints.edit',
+        'statamic::*.blueprints.edit',
         'statamic::fieldsets.edit',
     ];
 

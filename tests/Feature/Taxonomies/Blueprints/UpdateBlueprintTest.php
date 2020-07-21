@@ -1,9 +1,10 @@
 <?php
 
-namespace Tests\Feature\Blueprints;
+namespace Tests\Feature\Taxonomies\Blueprints;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades;
+use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
 use Tests\Fakes\FakeBlueprintRepository;
 use Tests\FakesRoles;
@@ -19,7 +20,7 @@ class UpdateBlueprintTest extends TestCase
     {
         parent::setUp();
 
-        BlueprintRepository::swap(new FakeBlueprintRepository);
+        BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
     }
 
     /** @test */
@@ -27,12 +28,13 @@ class UpdateBlueprintTest extends TestCase
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();
+        $collection = tap(Taxonomy::make('test'))->save();
         $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($blueprint)
+            ->submit($collection, $blueprint)
             ->assertRedirect('/original')
             ->assertSessionHas('error');
 
@@ -43,12 +45,14 @@ class UpdateBlueprintTest extends TestCase
     /** @test */
     public function blueprint_gets_saved()
     {
-        $user = tap(Facades\User::make()->makeSuper())->save();
-        $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
+        $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
+        $collection = tap(Taxonomy::make('test'))->save();
+        $blueprint = (new Blueprint)->setNamespace('taxonomies.test')->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
             ->actingAs($user)
-            ->submit($blueprint, [
+            ->submit($collection, $blueprint, [
                 'title' => 'Updated title',
                 'sections' => [
                     [
@@ -80,7 +84,7 @@ class UpdateBlueprintTest extends TestCase
                     ],
                 ],
             ])
-            ->assertStatus(204);
+            ->assertOk();
 
         $this->assertEquals([
             'title' => 'Updated title',
@@ -105,75 +109,79 @@ class UpdateBlueprintTest extends TestCase
                     ],
                 ],
             ],
-        ], Facades\Blueprint::find('test')->contents());
+        ], Facades\Blueprint::find('taxonomies.test.test')->contents());
     }
 
     /** @test */
     public function title_is_required()
     {
-        $user = tap(Facades\User::make()->makeSuper())->save();
-        $this->assertCount(0, Facades\Blueprint::all());
-        $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
+        $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
+        $collection = tap(Taxonomy::make('test'))->save();
+        $this->assertCount(0, Facades\Blueprint::in('taxonomies/test'));
+        $blueprint = (new Blueprint)->setNamespace('taxonomies.test')->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($blueprint, ['title' => ''])
+            ->submit($collection, $blueprint, ['title' => ''])
             ->assertRedirect('/original')
             ->assertSessionHasErrors('title');
 
-        $this->assertEquals('Test', Facades\Blueprint::find('test')->title());
+        $this->assertEquals('Test', Facades\Blueprint::find('taxonomies.test.test')->title());
     }
 
     /** @test */
     public function sections_are_required()
     {
-        $user = tap(Facades\User::make()->makeSuper())->save();
-        $this->assertCount(0, Facades\Blueprint::all());
-        $blueprint = (new Blueprint)->setHandle('test')->setContents($originalContents = [
-            'title' => 'Test',
-            'sections' => ['foo' => 'bar'],
-        ])->save();
+        $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
+        $collection = tap(Taxonomy::make('test'))->save();
+        $this->assertCount(0, Facades\Blueprint::in('taxonomies/test'));
+        $blueprint = tap($collection->termBlueprint())->save();
+        $originalContents = $blueprint->contents();
 
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($blueprint, ['sections' => ''])
+            ->submit($collection, $blueprint, ['sections' => ''])
             ->assertRedirect('/original')
             ->assertSessionHasErrors('sections');
 
-        $this->assertEquals($originalContents, Facades\Blueprint::find('test')->contents());
+        $this->assertEquals($originalContents, Facades\Blueprint::find('taxonomies.test.test')->contents());
     }
 
     /** @test */
     public function sections_must_be_an_array()
     {
-        $user = tap(Facades\User::make()->makeSuper())->save();
-        $this->assertCount(0, Facades\Blueprint::all());
-        $blueprint = (new Blueprint)->setHandle('test')->setContents($originalContents = [
-            'title' => 'Test',
-            'sections' => ['foo' => 'bar'],
-        ])->save();
+        $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
+        $collection = tap(Taxonomy::make('test'))->save();
+        $this->assertCount(0, Facades\Blueprint::in('taxonomies/test'));
+        $blueprint = tap($collection->termBlueprint())->save();
+        $originalContents = $blueprint->contents();
 
         $this
             ->from('/original')
             ->actingAs($user)
-            ->submit($blueprint, ['sections' => 'string'])
+            ->submit($collection, $blueprint, ['sections' => 'string'])
             ->assertRedirect('/original')
             ->assertSessionHasErrors('sections');
 
-        $this->assertEquals($originalContents, Facades\Blueprint::find('test')->contents());
+        $this->assertEquals($originalContents, Facades\Blueprint::find('taxonomies.test.test')->contents());
     }
 
     /** @test */
     public function width_of_100_gets_stripped_out_for_inline_fields_but_left_in_for_reference_fields_with_config_overrides()
     {
-        $user = tap(Facades\User::make()->makeSuper())->save();
-        $blueprint = (new Blueprint)->setHandle('test')->setContents(['title' => 'Test'])->save();
+        $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
+        $collection = tap(Taxonomy::make('test'))->save();
+        $blueprint = (new Blueprint)->setNamespace('taxonomies.test')->setHandle('test')->setContents(['title' => 'Test'])->save();
 
         $this
             ->actingAs($user)
-            ->submit($blueprint, [
+            ->submit($collection, $blueprint, [
                 'title' => 'Updated title',
                 'sections' => [
                     [
@@ -214,7 +222,7 @@ class UpdateBlueprintTest extends TestCase
                     ],
                 ],
             ])
-            ->assertStatus(204);
+            ->assertOk();
 
         $this->assertEquals([
             'title' => 'Updated title',
@@ -245,13 +253,13 @@ class UpdateBlueprintTest extends TestCase
                     ],
                 ],
             ],
-        ], Facades\Blueprint::find('test')->contents());
+        ], Facades\Blueprint::find('taxonomies.test.test')->contents());
     }
 
-    private function submit($blueprint, $params = [])
+    private function submit($collection, $blueprint, $params = [])
     {
         return $this->patch(
-            cp_route('blueprints.update', $blueprint->handle()),
+            cp_route('taxonomies.blueprints.update', [$collection, $blueprint]),
             $this->validParams($params)
         );
     }
