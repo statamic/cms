@@ -420,7 +420,7 @@ export default {
             // Once the hook has completed, we need to make the actual request.
             // We build the payload here because the before hook may have modified values.
             const payload = { ...this.values, ...{
-                blueprint: this.fieldset.handle,
+                _blueprint: this.fieldset.handle,
                 _localized: this.localizedFields,
             }};
 

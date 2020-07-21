@@ -156,6 +156,10 @@ class EntriesController extends CpController
 
         $parent = $values->pull('parent');
 
+        if ($explicitBlueprint = $values->pull('blueprint')) {
+            $entry->blueprint($explicitBlueprint);
+        }
+
         $values = $values->except(['slug', 'date']);
 
         if ($entry->hasOrigin()) {
@@ -265,7 +269,7 @@ class EntriesController extends CpController
     {
         $this->authorize('store', [EntryContract::class, $collection]);
 
-        $blueprint = $collection->entryBlueprint($request->blueprint);
+        $blueprint = $collection->entryBlueprint($request->_blueprint);
 
         $fields = $blueprint->fields()->addValues($request->all());
 
@@ -275,7 +279,7 @@ class EntriesController extends CpController
 
         $entry = Entry::make()
             ->collection($collection)
-            ->blueprint($request->blueprint)
+            ->blueprint($request->_blueprint)
             ->locale($site->handle())
             ->published($request->get('published'))
             ->slug($request->slug)
