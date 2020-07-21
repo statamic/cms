@@ -222,9 +222,13 @@ class CollectionsController extends CpController
     protected function updateLinkBlueprint($shouldExist, $collection)
     {
         $namespace = 'collections.'.$collection->handle();
-        $alreadyExists = Blueprint::in($namespace)->has('link');
+        $blueprints = Blueprint::in($namespace);
+        $alreadyExists = $blueprints->has('link');
 
         if ($shouldExist && ! $alreadyExists) {
+            if ($blueprints->count() === 0) {
+                $collection->entryBlueprint()->save();
+            }
             $this->createLinkBlueprint($namespace);
         }
 

@@ -91,18 +91,19 @@ class UpdateCollectionTest extends TestCase
         BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
 
         $collection = tap(Collection::make('test'))->save();
-        $this->assertCount(0, Blueprint::in('collections.test'));
+        Blueprint::make('not_link')->setNamespace('collections.test')->save();
+        $this->assertCount(1, Blueprint::in('collections.test'));
 
         $this
             ->actingAs($this->userWithPermission())
             ->update($collection, ['links' => true])
             ->assertOk();
 
-        $this->assertCount(1, Blueprint::in('collections.test'));
+        $this->assertCount(2, Blueprint::in('collections.test'));
     }
 
     /** @test */
-    public function setting_links_to_true_will_do_nothing_if_a_blueprint_already_exists()
+    public function setting_links_to_true_will_do_nothing_if_an_existing_link_blueprint_already_exists()
     {
         BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
 
@@ -134,6 +135,25 @@ class UpdateCollectionTest extends TestCase
             ->assertOk();
 
         $this->assertCount(0, Blueprint::in('collections.test'));
+    }
+
+    /** @test */
+    public function settings_links_to_true_will_also_create_the_default_blueprint_if_none_exist()
+    {
+        // this is so that you aren't left in awkward situation where there's only a links blueprint.
+
+        BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
+
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertCount(0, Blueprint::in('collections.test'));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection, ['links' => true])
+            ->assertOk();
+
+        $this->assertCount(2, $blueprints = Blueprint::in('collections.test'));
+        $this->assertEquals(['test', 'link'], $blueprints->map->handle()->values()->all());
     }
 
     private function userWithoutPermission()
