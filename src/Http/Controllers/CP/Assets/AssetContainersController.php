@@ -189,7 +189,7 @@ class AssetContainersController extends CpController
                         'validate' => 'required',
                     ],
                 ],
-            ]
+            ],
         ];
 
         if ($container) {
