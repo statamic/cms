@@ -14,23 +14,25 @@
                 </button>
             </template>
 
-            <h6 class="p-1">{{ __('Collections') }}</h6>
             @foreach (Statamic\Facades\Collection::all() as $collection)
+                @if ($loop->first)<h6 class="p-1">{{ __('Collections') }}</h6>@endif
                 <dropdown-item redirect="{{ cp_route('collections.blueprints.create', $collection) }}">{{ $collection->title() }}</dropdown-item>
             @endforeach
 
-            <h6 class="p-1 mt-2">{{ __('Taxonomies') }}</h6>
             @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
+                @if ($loop->first)<h6 class="p-1 mt-2">{{ __('Taxonomies') }}</h6>@endif
                 <dropdown-item redirect="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}">{{ $taxonomy->title() }}</dropdown-item>
             @endforeach
         </dropdown-list>
         </div>
     </div>
 
-    <h3 class="little-heading pl-0 mb-1">{{ __('Collections') }}</h3>
-    <div class="card p-0 mb-2">
-        <table class="data-table">
-            @foreach (Statamic\Facades\Collection::all() as $collection)
+    @foreach (Statamic\Facades\Collection::all() as $collection)
+        @if ($loop->first)
+        <h3 class="little-heading pl-0 mb-1">{{ __('Collections') }}</h3>
+        <div class="card p-0 mb-2">
+            <table class="data-table">
+        @endif
                 @foreach ($collection->entryBlueprints() as $blueprint)
                     <tr>
                         <td>
@@ -42,14 +44,18 @@
                         <td class="text-right text-2xs">{{ $collection->title() }}</td>
                     </tr>
                 @endforeach
-            @endforeach
-        </table>
-    </div>
+        @if ($loop->last)
+            </table>
+        </div>
+        @endif
+    @endforeach
 
-    <h3 class="little-heading pl-0 mb-1">{{ __('Taxonomies') }}</h3>
-    <div class="card p-0 mb-2">
-        <table class="data-table">
-            @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
+    @foreach (Statamic\Facades\Taxonomy::all() as $taxonomy)
+        @if ($loop->first)
+        <h3 class="little-heading pl-0 mb-1">{{ __('Taxonomies') }}</h3>
+        <div class="card p-0 mb-2">
+            <table class="data-table">
+        @endif
                 @foreach ($taxonomy->termBlueprints() as $blueprint)
                     <tr>
                         <td>
@@ -61,14 +67,18 @@
                         <td class="text-right text-2xs">{{ $taxonomy->title() }}</td>
                     </tr>
                 @endforeach
-            @endforeach
-        </table>
-    </div>
+        @if ($loop->last)
+            </table>
+        </div>
+        @endif
+    @endforeach
 
-    <h3 class="little-heading pl-0 mb-1">{{ __('Globals') }}</h3>
-    <div class="card p-0 mb-2">
-        <table class="data-table">
-            @foreach (Statamic\Facades\GlobalSet::all() as $set)
+    @foreach (Statamic\Facades\GlobalSet::all() as $set)
+        @if ($loop->first)
+        <h3 class="little-heading pl-0 mb-1">{{ __('Globals') }}</h3>
+        <div class="card p-0 mb-2">
+            <table class="data-table">
+        @endif
                 <tr>
                     <td>
                         <div class="flex items-center">
@@ -77,14 +87,18 @@
                         </div>
                     </td>
                 </tr>
-            @endforeach
-        </table>
-    </div>
+        @if ($loop->last)
+            </table>
+        </div>
+        @endif
+    @endforeach
 
-    <h3 class="little-heading pl-0 mb-1">{{ __('Asset Containers') }}</h3>
-    <div class="card p-0 mb-2">
-        <table class="data-table">
-            @foreach (Statamic\Facades\AssetContainer::all() as $container)
+    @foreach (Statamic\Facades\AssetContainer::all() as $container)
+        @if ($loop->first)
+        <h3 class="little-heading pl-0 mb-1">{{ __('Asset Containers') }}</h3>
+        <div class="card p-0 mb-2">
+            <table class="data-table">
+        @endif
                 <tr>
                     <td>
                         <div class="flex items-center">
@@ -93,14 +107,18 @@
                         </div>
                     </td>
                 </tr>
-            @endforeach
-        </table>
-    </div>
+        @if ($loop->last)
+            </table>
+        </div>
+        @endif
+    @endforeach
 
-    <h3 class="little-heading pl-0 mb-1">{{ __('Forms') }}</h3>
-    <div class="card p-0 mb-2">
-        <table class="data-table">
-            @foreach (Statamic\Facades\Form::all() as $form)
+    @foreach (Statamic\Facades\Form::all() as $form)
+        @if ($loop->first)
+        <h3 class="little-heading pl-0 mb-1">{{ __('Forms') }}</h3>
+        <div class="card p-0 mb-2">
+            <table class="data-table">
+        @endif
                 <tr>
                     <td>
                         <div class="flex items-center">
@@ -108,10 +126,12 @@
                             <a href="{{ cp_route('forms.blueprint.edit', $form->handle()) }}">{{ $form->title() }}</a>
                         </div>
                     </td>
+        @if ($loop->last)
                 </tr>
-            @endforeach
         </table>
+        @endif
     </div>
+    @endforeach
 
     <h3 class="little-heading pl-0 mb-1">{{ __('Other') }}</h3>
     <div class="card p-0 mb-2">
