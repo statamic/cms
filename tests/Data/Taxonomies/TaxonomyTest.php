@@ -13,6 +13,45 @@ class TaxonomyTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
+    public function it_stores_cascading_data_in_a_collection()
+    {
+        $taxonomy = new Taxonomy;
+        $this->assertInstanceOf(\Illuminate\Support\Collection::class, $taxonomy->cascade());
+        $this->assertTrue($taxonomy->cascade()->isEmpty());
+
+        $taxonomy->cascade()->put('foo', 'bar');
+
+        $this->assertTrue($taxonomy->cascade()->has('foo'));
+        $this->assertEquals('bar', $taxonomy->cascade()->get('foo'));
+    }
+
+    /** @test */
+    public function it_sets_all_the_cascade_data_when_passing_an_array()
+    {
+        $taxonomy = new Taxonomy;
+
+        $return = $taxonomy->cascade($arr = ['foo' => 'bar', 'baz' => 'qux']);
+        $this->assertEquals($taxonomy, $return);
+        $this->assertEquals($arr, $taxonomy->cascade()->all());
+
+        // test that passing an empty array is not treated as passing null
+        $return = $taxonomy->cascade([]);
+        $this->assertEquals($taxonomy, $return);
+        $this->assertEquals([], $taxonomy->cascade()->all());
+    }
+
+    /** @test */
+    public function it_gets_values_from_the_cascade_with_fallbacks()
+    {
+        $taxonomy = new Taxonomy;
+        $taxonomy->cascade(['foo' => 'bar']);
+
+        $this->assertEquals('bar', $taxonomy->cascade('foo'));
+        $this->assertNull($taxonomy->cascade('baz'));
+        $this->assertEquals('qux', $taxonomy->cascade('baz', 'qux'));
+    }
+
+    /** @test */
     public function it_gets_term_blueprints()
     {
         $taxonomy = (new Taxonomy)->handle('tags');

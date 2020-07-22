@@ -5,6 +5,7 @@ namespace Statamic\Taxonomies;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
+use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\TaxonomyDeleted;
@@ -21,7 +22,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Taxonomy implements Contract, Responsable, AugmentableContract
 {
-    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData;
+    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
 
     protected $handle;
     protected $title;
@@ -31,6 +32,11 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     protected $defaultPublishState = true;
     protected $revisions = false;
     protected $searchIndex;
+
+    public function __construct()
+    {
+        $this->cascade = collect();
+    }
 
     public function id()
     {

@@ -70,14 +70,18 @@ class LocalizedTerm implements Term, Responsable, Augmentable
 
     public function values()
     {
-        return $this->term
+        $values = $this->term
             ->dataForLocale($this->defaultLocale())
             ->merge($this->data());
+
+        return $this->taxonomy()->cascade()->merge($values);
     }
 
     public function value($key)
     {
-        return $this->get($key) ?? $this->inDefaultLocale()->get($key);
+        return $this->get($key)
+            ?? $this->inDefaultLocale()->get($key)
+            ?? $this->taxonomy()->cascade($key);
     }
 
     public function site()

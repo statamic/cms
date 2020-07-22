@@ -40,6 +40,7 @@ class TaxonomiesStore extends BasicStore
 
         return Taxonomy::make($handle)
             ->title(array_get($data, 'title'))
+            ->cascade(array_get($data, 'inject', []))
             ->revisionsEnabled(array_get($data, 'revisions', false))
             ->searchIndex(array_get($data, 'search_index'))
             ->defaultPublishState($this->getDefaultPublishState($data))

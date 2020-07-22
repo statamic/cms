@@ -4,6 +4,7 @@ namespace Statamic\Entries;
 
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Entries\Collection as Contract;
+use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\CollectionDeleted;
@@ -26,7 +27,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Collection implements Contract, AugmentableContract
 {
-    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData;
+    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
 
     protected $handle;
     protected $routes = [];
@@ -49,7 +50,6 @@ class Collection implements Contract, AugmentableContract
     protected $structure;
     protected $structureContents;
     protected $taxonomies = [];
-    protected $cascade;
 
     public function __construct()
     {
@@ -342,21 +342,6 @@ class Collection implements Contract, AugmentableContract
     public function hasSearchIndex()
     {
         return $this->searchIndex() !== null;
-    }
-
-    public function cascade($key = null, $default = null)
-    {
-        if (is_null($key)) {
-            return $this->cascade;
-        }
-
-        if (is_array($key)) {
-            $this->cascade = collect($key);
-
-            return $this;
-        }
-
-        return $this->cascade->get($key, $default);
     }
 
     public function fileData()

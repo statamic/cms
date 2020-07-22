@@ -28,7 +28,9 @@ class AugmentedTermTest extends AugmentedTestCase
         ])->setHandle('test');
         Blueprint::shouldReceive('in')->with('taxonomies/test')->andReturn(collect(['test' => $blueprint]));
 
-        $taxonomy = tap(Taxonomy::make('test'))->save();
+        $taxonomy = tap(Taxonomy::make('test')
+            ->cascade(['three' => 'the "three" value from the taxonomy'])
+        )->save();
 
         $term = Term::make()
             ->taxonomy('test')
@@ -59,6 +61,7 @@ class AugmentedTermTest extends AugmentedTestCase
             'entries'       => ['type' => EntryQueryBuilder::class],
             'one'           => ['type' => 'string', 'value' => 'the "one" value on the term'],
             'two'           => ['type' => Value::class, 'value' => 'the "two" value on the term and in the blueprint'],
+            'three'         => ['type' => 'string', 'value' => 'the "three" value from the taxonomy'],
             'unused_in_bp'  => ['type' => Value::class, 'value' => null],
             'updated_at'    => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
             'updated_by'    => ['type' => UserContract::class, 'value' => 'test-user'],
