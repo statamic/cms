@@ -189,13 +189,7 @@ class Entries extends Relationship
 
     protected function getSelectionFilterContext()
     {
-        $collections = $this->getConfiguredCollections();
-
-        $blueprints = collect($collections)->flatMap(function ($collection) {
-            return Collection::findByHandle($collection)->entryBlueprints()->map->handle();
-        })->all();
-
-        return compact('collections', 'blueprints');
+        return ['collections' => $this->getConfiguredCollections()];
     }
 
     protected function getConfiguredCollections()
