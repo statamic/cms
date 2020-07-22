@@ -16,7 +16,7 @@ class Glide extends Tags
 {
     /**
      * Allowed file formats for the gd image manipulation driver in combinatino with glide.
-     
+     *
      * Glide does use the intervention package under the hood.
      * See http://image.intervention.io/getting_started/formats for mor information.
      */
@@ -24,7 +24,7 @@ class Glide extends Tags
 
     /**
      * Allowed file formats for the imagick image manipulation driver in combination with glide.
-     * 
+     *
      * Glide does use the intervention package under the hood.
      * See http://image.intervention.io/getting_started/formats for mor information.
      */
