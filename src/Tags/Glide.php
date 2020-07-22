@@ -7,12 +7,27 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
+use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
 
 class Glide extends Tags
 {
+    /**
+     * Allowed file extension for the gd image manipulation driver.
+     * (Glide does rely on the intervention package)
+     * http://image.intervention.io/getting_started/formats
+     */
+    const ALLOWED_FILE_FORMATS_GD = ['jpeg', 'jpg', 'png', 'gif', 'webp'];
+
+    /**
+     * Allowed file extension for the imagick image manipulation driver in combination with glide.
+     * (Glide does rely on the intervention package)
+     * http://image.intervention.io/getting_started/formats
+     */
+    const ALLOWED_FILE_FORMATS_IMAGICK = ['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'];
+    
     /**
      * Maps to {{ glide:[field] }}.
      *
@@ -156,7 +171,9 @@ class Glide extends Tags
     private function generateGlideUrl($item)
     {
         try {
-            $url = $this->getManipulator($item)->build();
+            // In case the given item extension is not supported by glide
+            // and herby not resizable, the original path  will be returned.
+            $url = $this->isResizable($item) ? $this->getManipulator($item)->build() : $this->normalizeItem($item);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
 
@@ -264,5 +281,37 @@ class Glide extends Tags
     private function getServer()
     {
         return app(Server::class);
+    }
+    
+    
+    /**
+     * Checking against a whitelist of allowed file extensions.
+     *
+     * @param string $item
+     * @return bool
+     */
+    private function isResizable($item)
+    {
+        return in_array(strtolower(Path::extension($item)), $this->allowedFileFormats());
+    }
+
+    /**
+     * The whitelist with allowed file extensiosn will be returned,
+     * depending on the chosen image manipulation driver.
+     *
+     * @throws \Exception
+     * @return array
+     */
+    private function allowedFileFormats()
+    {
+        if (extension_loaded('gd')) {
+            return self::ALLOWED_FILE_FORMATS_GD;
+        }
+
+        if (extension_loaded('imagick')) {
+            return self::ALLOWED_FILE_FORMATS_IMAGICK;
+        }
+
+        throw new \Exception('To use glide, you need to have GD or Imagick installed.');
     }
 }
