@@ -15,19 +15,21 @@ use Statamic\Support\Str;
 class Glide extends Tags
 {
     /**
-     * Allowed file extension for the gd image manipulation driver.
-     * (Glide does rely on the intervention package)
-     * http://image.intervention.io/getting_started/formats
+     * Allowed file formats for the gd image manipulation driver in combinatino with glide.
+     
+     * Glide does use the intervention package under the hood.
+     * See http://image.intervention.io/getting_started/formats for mor information.
      */
     const ALLOWED_FILE_FORMATS_GD = ['jpeg', 'jpg', 'png', 'gif', 'webp'];
 
     /**
-     * Allowed file extension for the imagick image manipulation driver in combination with glide.
-     * (Glide does rely on the intervention package)
-     * http://image.intervention.io/getting_started/formats
+     * Allowed file formats for the imagick image manipulation driver in combination with glide.
+     * 
+     * Glide does use the intervention package under the hood.
+     * See http://image.intervention.io/getting_started/formats for mor information.
      */
     const ALLOWED_FILE_FORMATS_IMAGICK = ['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'];
-    
+
     /**
      * Maps to {{ glide:[field] }}.
      *
@@ -282,8 +284,7 @@ class Glide extends Tags
     {
         return app(Server::class);
     }
-    
-    
+
     /**
      * Checking against a whitelist of allowed file extensions.
      *
