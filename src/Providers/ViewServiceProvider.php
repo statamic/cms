@@ -2,6 +2,7 @@
 
 namespace Statamic\Providers;
 
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\View\View;
 use Statamic\Facades\Site;
@@ -55,5 +56,18 @@ class ViewServiceProvider extends ServiceProvider
         });
 
         ini_set('pcre.backtrack_limit', config('statamic.system.pcre_backtrack_limit', -1));
+
+        $this->bootDirectives();
+    }
+
+    private function bootDirectives()
+    {
+        Blade::directive('collection', function ($handle) {
+            return "<?php foreach (Statamic\Facades\Collection::find(${handle})->queryEntries()->get()->toAugmentedArray() as \$entry) { ?>";
+        });
+
+        Blade::directive('endcollection', function () {
+            return '<?php } ?>';
+        });
     }
 }
