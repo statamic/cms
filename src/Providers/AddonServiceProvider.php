@@ -30,6 +30,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $routes = [];
     protected $middlewareGroups = [];
     protected $viewNamespace;
+    protected $publishAfterInstall = true;
 
     public function boot()
     {
@@ -52,7 +53,8 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootPublishables()
                 ->bootRoutes()
                 ->bootMiddleware()
-                ->bootViews();
+                ->bootViews()
+                ->bootPublishAfterInstall();
         });
     }
 
@@ -167,7 +169,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 return [$origin => public_path("vendor/{$package}/{$destination}")];
             });
 
-        $this->publishes($publishables->all());
+        $this->publishes($publishables->all(), $this->getAddon()->slug());
 
         return $this;
     }
@@ -291,7 +293,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
         $this->publishes([
             $path => public_path("vendor/{$name}/js/{$filename}.js"),
-        ]);
+        ], $this->getAddon()->slug());
 
         Statamic::script($name, $filename);
     }
@@ -308,7 +310,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
         $this->publishes([
             $path => public_path("vendor/{$name}/css/{$filename}.css"),
-        ]);
+        ], $this->getAddon()->slug());
 
         Statamic::style($name, $filename);
     }
@@ -332,5 +334,21 @@ abstract class AddonServiceProvider extends ServiceProvider
         return Addon::all()->first(function ($addon) use ($class) {
             return Str::startsWith($class, $addon->namespace());
         });
+    }
+
+    protected function bootPublishAfterInstall()
+    {
+        if (! $this->publishAfterInstall) {
+            return $this;
+        }
+
+        Statamic::afterInstalled(function ($command) {
+            $command->call('vendor:publish', [
+                '--tag' => $this->getAddon()->slug(),
+                '--force' => true
+            ]);
+        });
+
+        return $this;
     }
 }
