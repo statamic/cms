@@ -183,6 +183,8 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
             $data['sites'] = $this->sites;
         }
 
+        $data['inject'] = $this->cascade->all();
+
         return $data;
     }
 
