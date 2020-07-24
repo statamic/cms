@@ -345,7 +345,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         Statamic::afterInstalled(function ($command) {
             $command->call('vendor:publish', [
                 '--tag' => $this->getAddon()->slug(),
-                '--force' => true
+                '--force' => true,
             ]);
         });
 
