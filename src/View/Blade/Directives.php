@@ -27,7 +27,7 @@ class Directives
     {
         if ($where = Arr::get($this->params, 'where')) {
             foreach (explode(',', $where) as $condition) {
-                list($field, $value) = explode(':', $condition);
+                [$field, $value] = explode(':', $condition);
 
                 $this->collectionQuery->where(trim($field), trim($value));
             }
