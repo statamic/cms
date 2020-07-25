@@ -22,6 +22,7 @@ class Statamic
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
     protected static $bootedCallbacks = [];
+    protected static $afterInstalledCallbacks = [];
 
     public static function version()
     {
@@ -243,6 +244,18 @@ class Statamic
     {
         foreach (static::$bootedCallbacks as $callback) {
             $callback();
+        }
+    }
+
+    public static function afterInstalled(Closure $callback)
+    {
+        static::$afterInstalledCallbacks[] = $callback;
+    }
+
+    public static function runAfterInstalledCallbacks($command)
+    {
+        foreach (static::$afterInstalledCallbacks as $callback) {
+            $callback($command);
         }
     }
 }
