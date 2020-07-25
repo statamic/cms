@@ -4,16 +4,11 @@ namespace Tests\View\Blade;
 
 class DirectivesTest extends TestCase
 {
-    public function setUp(): void
-    {
-        parent::setUp();
-    }
-
     /** @test */
-    public function combines_two_views()
+    public function does_display_correctly()
     {
         $blade = "@collection('foo')";
-        $expected = "<?php foreach (Statamic\Facades\Collection::find('foo')->queryEntries()->get()->toAugmentedArray() as \$entry) { ?>";
+        $expected = "<?php foreach (Statamic\Facades\Blade::collection('foo') as \$entry) { ?>";
 
         $this->assertSame($expected, $this->blade->compileString($blade));
     }
