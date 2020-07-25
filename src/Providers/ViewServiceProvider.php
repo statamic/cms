@@ -62,8 +62,8 @@ class ViewServiceProvider extends ServiceProvider
 
     private function bootDirectives()
     {
-        Blade::directive('collection', function ($handle) {
-            return "<?php foreach (Statamic\Facades\Collection::find(${handle})->queryEntries()->get()->toAugmentedArray() as \$entry) { ?>";
+        Blade::directive('collection', function ($expression) {
+            return "<?php foreach (Statamic\Facades\Blade::collection(${expression}) as \$entry) { ?>";
         });
 
         Blade::directive('endcollection', function () {
