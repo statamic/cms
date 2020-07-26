@@ -5,6 +5,7 @@ namespace Statamic\Providers;
 use Closure;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -27,6 +28,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $scripts = [];
     protected $externalScripts = [];
     protected $publishables = [];
+    protected $configs = [];
     protected $routes = [];
     protected $middlewareGroups = [];
     protected $viewNamespace;
@@ -51,6 +53,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootStylesheets()
                 ->bootScripts()
                 ->bootPublishables()
+                ->bootConfigs()
                 ->bootRoutes()
                 ->bootMiddleware()
                 ->bootViews()
@@ -155,6 +158,15 @@ abstract class AddonServiceProvider extends ServiceProvider
 
         foreach ($this->externalScripts as $path) {
             $this->registerExternalScript($path);
+        }
+
+        return $this;
+    }
+
+    protected function bootConfigs()
+    {
+        foreach ($this->configs as $origin) {
+            $this->registerConfigs($origin);
         }
 
         return $this;
@@ -313,6 +325,20 @@ abstract class AddonServiceProvider extends ServiceProvider
         ], $this->getAddon()->slug());
 
         Statamic::style($name, $filename);
+    }
+
+    protected function registerConfigs(string $origin)
+    {
+        $filename = pathinfo($origin, PATHINFO_FILENAME);
+        $destination = config_path("{$filename}.php");
+
+        if (File::exists($destination)) {
+            return;
+        }
+
+        $this->publishes([
+            $origin => $destination,
+        ], $this->getAddon()->slug());
     }
 
     protected function schedule($schedule)
