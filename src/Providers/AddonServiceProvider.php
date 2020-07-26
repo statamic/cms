@@ -29,6 +29,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $externalScripts = [];
     protected $publishables = [];
     protected $configs = [];
+    protected $languages = [];
     protected $routes = [];
     protected $middlewareGroups = [];
     protected $viewNamespace;
@@ -54,6 +55,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootScripts()
                 ->bootPublishables()
                 ->bootConfigs()
+                ->bootLanguages()
                 ->bootRoutes()
                 ->bootMiddleware()
                 ->bootViews()
@@ -167,6 +169,15 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         foreach ($this->configs as $origin) {
             $this->registerConfigs($origin);
+        }
+
+        return $this;
+    }
+
+    protected function bootLanguages()
+    {
+        foreach ($this->languages as $origin) {
+            $this->registerLanguages($origin);
         }
 
         return $this;
@@ -339,6 +350,29 @@ abstract class AddonServiceProvider extends ServiceProvider
         $this->publishes([
             $origin => $destination,
         ], $this->getAddon()->slug());
+    }
+
+    protected function registerLanguages(string $origin)
+    {
+        $package = $this->getAddon()->packageName(); 
+        $destination = resource_path("lang/vendor/{$package}");
+
+        $originLanguages = collect(File::allFiles($origin))->map(function ($language) {
+            return $language->getRelativePathname();
+        });
+
+        if (File::isDirectory($destination)) {
+            $destinationLanguages = collect(File::allFiles($destination))->map(function ($language) {
+                return $language->getRelativePathname();
+            });
+        }
+        
+        $languages = $originLanguages->diff($destinationLanguages ?? collect())
+            ->mapWithKeys(function ($language) use ($origin, $destination) {
+                return ["{$origin}/$language" => "{$destination}/{$language}"];
+            });
+        
+        $this->publishes($languages->all(), $this->getAddon()->slug());
     }
 
     protected function schedule($schedule)
