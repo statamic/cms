@@ -5,7 +5,6 @@ namespace Statamic\Providers;
 use Closure;
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Facades\File;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
@@ -28,12 +27,12 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $scripts = [];
     protected $externalScripts = [];
     protected $publishables = [];
-    protected $configs = [];
-    protected $translations = [];
     protected $routes = [];
     protected $middlewareGroups = [];
     protected $viewNamespace;
     protected $publishAfterInstall = true;
+    protected $mergeAndPublishConfig = true;
+    protected $loadAndPublishTranslations = true;
 
     public function boot()
     {
@@ -167,18 +166,39 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootConfigs()
     {
-        foreach ($this->configs as $origin) {
-            $this->registerConfigs($origin);
+        if (! $this->mergeAndPublishConfig) {
+            return $this;
         }
+
+        $filename = $this->getAddon()->slug();
+        $directory = $this->getAddon()->directory();
+        $origin = "{$directory}config/{$filename}.php";
+
+        $this->mergeConfigFrom($origin, $filename);
+
+        $this->publishes([
+            $origin => config_path("{$filename}.php")
+        ], "{$filename}-config");
 
         return $this;
     }
 
     protected function bootTranslations()
     {
-        foreach ($this->translations as $origin) {
-            $this->registerTranslations($origin);
+        if (! $this->loadAndPublishTranslations) {
+            return $this;
         }
+
+        $package = $this->getAddon()->packageName();
+        $slug = $this->getAddon()->slug();
+        $directory = $this->getAddon()->directory();
+        $origin = "{$directory}resources/lang";
+
+        $this->loadTranslationsFrom($origin, $slug);
+
+        $this->publishes([
+            $origin => resource_path("lang/vendor/{$package}")
+        ], "{$slug}-translations");
 
         return $this;
     }
@@ -336,43 +356,6 @@ abstract class AddonServiceProvider extends ServiceProvider
         ], $this->getAddon()->slug());
 
         Statamic::style($name, $filename);
-    }
-
-    protected function registerConfigs(string $origin)
-    {
-        $filename = pathinfo($origin, PATHINFO_FILENAME);
-        $destination = config_path("{$filename}.php");
-
-        if (File::exists($destination)) {
-            return;
-        }
-
-        $this->publishes([
-            $origin => $destination,
-        ], $this->getAddon()->slug());
-    }
-
-    protected function registerTranslations(string $origin)
-    {
-        $package = $this->getAddon()->packageName(); 
-        $destination = resource_path("lang/vendor/{$package}");
-
-        $originTranslations = collect(File::allFiles($origin))->map(function ($translation) {
-            return $translation->getRelativePathname();
-        });
-
-        if (File::isDirectory($destination)) {
-            $destinationTranslations = collect(File::allFiles($destination))->map(function ($translation) {
-                return $translation->getRelativePathname();
-            });
-        }
-        
-        $translations = $originTranslations->diff($destinationTranslations ?? collect())
-            ->mapWithKeys(function ($translation) use ($origin, $destination) {
-                return ["{$origin}/$translation" => "{$destination}/{$translation}"];
-            });
-        
-        $this->publishes($translations->all(), $this->getAddon()->slug());
     }
 
     protected function schedule($schedule)
