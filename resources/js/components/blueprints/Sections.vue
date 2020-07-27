@@ -70,6 +70,7 @@ export default {
     },
 
     mounted() {
+        this.ensureSection();
         this.makeSortable();
     },
 
@@ -164,10 +165,18 @@ export default {
 
         deleteSection(i) {
             this.sections.splice(i, 1);
+
+            this.ensureSection();
         },
 
         updateSection(i, section) {
             this.sections.splice(i, 1, section);
+        },
+
+        ensureSection() {
+            if (this.sections.length === 0) {
+                this.addSection();
+            }
         }
 
     }

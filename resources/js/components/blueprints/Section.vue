@@ -124,7 +124,9 @@ export default {
         },
 
         focus() {
-            this.$refs.displayInput.select();
+            if (this.$refs.displayInput) {
+                this.$refs.displayInput.select();
+            }
         },
 
         toggleEditing() {
