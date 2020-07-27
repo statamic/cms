@@ -176,7 +176,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootTranslations()
     {
-        foreach ($this->translation as $origin) {
+        foreach ($this->translations as $origin) {
             $this->registerTranslations($origin);
         }
 
