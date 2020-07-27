@@ -29,7 +29,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $externalScripts = [];
     protected $publishables = [];
     protected $configs = [];
-    protected $languages = [];
+    protected $translations = [];
     protected $routes = [];
     protected $middlewareGroups = [];
     protected $viewNamespace;
@@ -55,7 +55,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootScripts()
                 ->bootPublishables()
                 ->bootConfigs()
-                ->bootLanguages()
+                ->bootTranslations()
                 ->bootRoutes()
                 ->bootMiddleware()
                 ->bootViews()
@@ -174,10 +174,10 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
-    protected function bootLanguages()
+    protected function bootTranslations()
     {
-        foreach ($this->languages as $origin) {
-            $this->registerLanguages($origin);
+        foreach ($this->translation as $origin) {
+            $this->registerTranslations($origin);
         }
 
         return $this;
@@ -352,27 +352,27 @@ abstract class AddonServiceProvider extends ServiceProvider
         ], $this->getAddon()->slug());
     }
 
-    protected function registerLanguages(string $origin)
+    protected function registerTranslations(string $origin)
     {
         $package = $this->getAddon()->packageName(); 
         $destination = resource_path("lang/vendor/{$package}");
 
-        $originLanguages = collect(File::allFiles($origin))->map(function ($language) {
-            return $language->getRelativePathname();
+        $originTranslations = collect(File::allFiles($origin))->map(function ($translation) {
+            return $translation->getRelativePathname();
         });
 
         if (File::isDirectory($destination)) {
-            $destinationLanguages = collect(File::allFiles($destination))->map(function ($language) {
-                return $language->getRelativePathname();
+            $destinationTranslations = collect(File::allFiles($destination))->map(function ($translation) {
+                return $translation->getRelativePathname();
             });
         }
         
-        $languages = $originLanguages->diff($destinationLanguages ?? collect())
-            ->mapWithKeys(function ($language) use ($origin, $destination) {
-                return ["{$origin}/$language" => "{$destination}/{$language}"];
+        $translations = $originTranslations->diff($destinationTranslations ?? collect())
+            ->mapWithKeys(function ($translation) use ($origin, $destination) {
+                return ["{$origin}/$translation" => "{$destination}/{$translation}"];
             });
         
-        $this->publishes($languages->all(), $this->getAddon()->slug());
+        $this->publishes($translations->all(), $this->getAddon()->slug());
     }
 
     protected function schedule($schedule)
