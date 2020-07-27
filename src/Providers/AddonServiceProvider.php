@@ -31,8 +31,8 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $middlewareGroups = [];
     protected $viewNamespace;
     protected $publishAfterInstall = true;
-    protected $mergeAndPublishConfig = true;
-    protected $loadAndPublishTranslations = true;
+    protected $config = true;
+    protected $translations = true;
 
     public function boot()
     {
@@ -53,7 +53,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootStylesheets()
                 ->bootScripts()
                 ->bootPublishables()
-                ->bootConfigs()
+                ->bootConfig()
                 ->bootTranslations()
                 ->bootRoutes()
                 ->bootMiddleware()
@@ -164,9 +164,9 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
-    protected function bootConfigs()
+    protected function bootConfig()
     {
-        if (! $this->mergeAndPublishConfig) {
+        if (! $this->config) {
             return $this;
         }
 
@@ -185,11 +185,10 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootTranslations()
     {
-        if (! $this->loadAndPublishTranslations) {
+        if (! $this->translations) {
             return $this;
         }
 
-        $package = $this->getAddon()->packageName();
         $slug = $this->getAddon()->slug();
         $directory = $this->getAddon()->directory();
         $origin = "{$directory}resources/lang";
@@ -197,7 +196,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom($origin, $slug);
 
         $this->publishes([
-            $origin => resource_path("lang/vendor/{$package}")
+            $origin => resource_path("lang/vendor/{$slug}")
         ], "{$slug}-translations");
 
         return $this;
