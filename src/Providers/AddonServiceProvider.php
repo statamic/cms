@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Exceptions\NotBootedException;
+use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -329,10 +330,20 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         throw_unless($this->app->isBooted(), new NotBootedException);
 
-        $class = get_class($this);
+        if (! $addon = $this->getAddonByServiceProvider()) {
+            // No addon? Then we're trying to boot one that hasn't been discovered yet.
+            // Probably just installed and we're inside the statamic:install command.
+            $this->app[Manifest::class]->build();
+            $addon = $this->getAddonByServiceProvider();
+        }
 
-        return Addon::all()->first(function ($addon) use ($class) {
-            return Str::startsWith($class, $addon->namespace());
+        return $addon;
+    }
+
+    private function getAddonByServiceProvider()
+    {
+        return Addon::all()->first(function ($addon) {
+            return Str::startsWith(get_class($this), $addon->namespace());
         });
     }
 
