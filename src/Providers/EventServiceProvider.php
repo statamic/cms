@@ -7,9 +7,6 @@ use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvi
 class EventServiceProvider extends ServiceProvider
 {
     protected $listen = [
-        'Form.submission.created' => [
-            \Statamic\Forms\Listeners\SendEmails::class,
-        ],
         \Statamic\View\Events\ViewRendered::class => [
             \Statamic\View\Debugbar\AddVariables::class,
             \Statamic\View\Debugbar\AddRequestMessage::class,

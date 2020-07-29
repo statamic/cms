@@ -2,11 +2,9 @@
 
 namespace Tests\Feature\Taxonomies;
 
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\User;
-use Statamic\Fields\BlueprintRepository;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -48,26 +46,6 @@ class UpdateTaxonomyTest extends TestCase
 
         $this->assertCount(1, Taxonomy::all());
         $this->assertEquals('Updated title', $taxonomy->title());
-    }
-
-    /** @test */
-    public function it_updates_blueprints()
-    {
-        $mock = $this->partialMock(BlueprintRepository::class);
-        $mock->shouldReceive('find')->with('one')->andReturn(Blueprint::make('one'));
-        $mock->shouldReceive('find')->with('two')->andReturn(Blueprint::make('two'));
-        $mock->shouldReceive('find')->with('three')->andReturn(Blueprint::make('three'));
-        $mock->shouldReceive('find')->with('four')->andReturn(Blueprint::make('four'));
-
-        $taxonomy = tap(Taxonomy::make('test')->termBlueprints(['one', 'two']))->save();
-        $this->assertEquals(['one', 'two'], $taxonomy->termBlueprints()->map->handle()->all());
-
-        $this
-            ->actingAs($this->userWithPermission())
-            ->update($taxonomy, ['blueprints' => ['three', 'four']])
-            ->assertOk();
-
-        $this->assertEquals(['three', 'four'], Taxonomy::all()->first()->termBlueprints()->map->handle()->all());
     }
 
     /** @test */

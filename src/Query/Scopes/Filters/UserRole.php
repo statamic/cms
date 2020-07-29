@@ -30,7 +30,7 @@ class UserRole extends Filter
 
     public function badge($values)
     {
-        return __('is').' '.strtolower($this->options()->get($values['role']));
+        return __('Role').': '.strtolower($this->options()->get($values['role']));
     }
 
     public function visibleTo($key)

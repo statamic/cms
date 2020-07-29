@@ -4,6 +4,8 @@ namespace Statamic\Taxonomies;
 
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Events\TermDeleted;
+use Statamic\Events\TermSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
@@ -70,13 +72,21 @@ class Term implements TermContract
         ]);
     }
 
-    public function blueprint()
+    public function blueprint($blueprint = null)
     {
-        return $this->fluentlyGetOrSet('blueprint')
-            ->getter(function ($blueprint) {
-                return $blueprint
-                    ? $this->taxonomy()->ensureTermBlueprintFields(Blueprint::find($blueprint))
-                    : $this->taxonomy()->termBlueprint();
+        $key = "term-{$this->id()}-blueprint";
+
+        return $this
+            ->fluentlyGetOrSet('blueprint')
+            ->getter(function ($blueprint) use ($key) {
+                return Blink::once($key, function () use ($blueprint) {
+                    return $this->taxonomy()->termBlueprint($blueprint ?? $this->value('blueprint'), $this);
+                });
+            })
+            ->setter(function ($blueprint) use ($key) {
+                Blink::forget($key);
+
+                return $blueprint;
             })
             ->args(func_get_args());
     }
@@ -152,12 +162,16 @@ class Term implements TermContract
     {
         Facades\Term::save($this);
 
+        TermSaved::dispatch($this);
+
         return true;
     }
 
     public function delete()
     {
         Facades\Term::delete($this);
+
+        TermDeleted::dispatch($this);
 
         return true;
     }

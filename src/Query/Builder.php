@@ -203,7 +203,7 @@ abstract class Builder
 
     protected function filterTestLike($item, $like)
     {
-        $pattern = '/^'.str_replace(['%', '_'], ['.*', '.'], preg_quote($like)).'$/im';
+        $pattern = '/^'.str_replace(['%', '_'], ['.*', '.'], preg_quote($like, '/')).'$/im';
 
         if (is_array($item)) {
             $item = json_encode($item);

@@ -10,7 +10,11 @@
                 :options="options"
                 :clearable="false"
                 :reduce="(option) => option.value"
-            />
+            >
+                <template #option="{ label }">
+                  {{ __(label) }}
+                </template>
+            </v-select>
         </div>
         <div class="flex-1">
             <text-input
@@ -43,9 +47,9 @@ export default {
             enabled: this.value != null,
             option: 'url',
             options: [
-                {label: 'URL', value: 'url'},
-                {label: 'First Child', value: 'first-child'},
-                {label: 'Entry', value: 'entry'}
+                {label: __('URL'), value: 'url'},
+                {label: __('First Child'), value: 'first-child'},
+                {label: __('Entry'), value: 'entry'}
             ],
             entriesValue: [],
         }

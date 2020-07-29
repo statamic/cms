@@ -58,16 +58,29 @@ a:not([class*="btn"]) {
         @apply .mb-1 font-bold;
     }
 
-    p {
+    p, ol, ul, pre {
         @apply text-grey-70 text-sm leading-normal mb-1;
-        &:last-child {
-            @apply .mb-0;
-        }
+
         a {
             @apply text-blue;
             &:hover {
                 @apply underline;
             }
+        }
+    }
+
+    p {
+        &:last-child {
+            @apply .mb-0;
+        }
+    }
+
+    pre {
+        background-color: #f9f2f4;
+        @apply p-1;
+
+        code {
+            @apply p-0;
         }
     }
 }

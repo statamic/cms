@@ -1,9 +1,14 @@
 <template>
 
-    <div class="blueprint-section w-full md:w-1/2 2xl:w-1/3" :class="{ 'w-full': isEditing }">
+    <div class="blueprint-section"
+        :class="{
+            'w-full md:w-1/2 2xl:w-1/3': !isEditing && !isSingle,
+            'w-full': isEditing || isSingle
+        }"
+    >
         <div class="blueprint-section-card card p-0 h-full flex flex-col">
 
-            <div class="bg-grey-20 border-b text-sm flex rounded-t;">
+            <div class="bg-grey-20 border-b text-sm flex rounded-t;" v-if="!isSingle">
                 <div class="blueprint-drag-handle blueprint-section-drag-handle w-4 border-r"></div>
                 <div class="p-1.5 py-1 flex-1">
                     <span class="font-medium mr-1">
@@ -25,7 +30,7 @@
                 class="p-2"
                 :fields="section.fields"
                 :editing-field="editingField"
-                :is-section-expanded="isEditing"
+                :is-section-expanded="isEditing || isSingle"
                 :suggestable-condition-fields="suggestableConditionFields"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
@@ -60,6 +65,10 @@ export default {
         section: {
             type: Object,
             required: true
+        },
+        isSingle: {
+            type: Boolean,
+            default: false
         }
     },
 
@@ -115,7 +124,9 @@ export default {
         },
 
         focus() {
-            this.$refs.displayInput.select();
+            if (this.$refs.displayInput) {
+                this.$refs.displayInput.select();
+            }
         },
 
         toggleEditing() {

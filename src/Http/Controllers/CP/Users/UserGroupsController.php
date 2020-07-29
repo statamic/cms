@@ -6,9 +6,15 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Scope;
 use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Middleware\RequireStatamicPro;
 
 class UserGroupsController extends CpController
 {
+    public function __construct()
+    {
+        $this->middleware(RequireStatamicPro::class);
+    }
+
     public function index(Request $request)
     {
         $this->authorize('edit user groups');
@@ -84,7 +90,7 @@ class UserGroupsController extends CpController
             ->roles($request->roles)
             ->save();
 
-        session()->flash('success', 'User group updated');
+        session()->flash('success', __('User group updated'));
 
         return ['redirect' => cp_route('user-groups.show', $group->handle())];
     }

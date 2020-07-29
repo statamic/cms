@@ -38,6 +38,9 @@
                                     <span v-text="option.label" />
                                 </div>
                             </template>
+                            <template v-slot:no-options>
+                               <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                           </template>
                         </v-select>
                         <button
                             class="btn-primary w-full mt-3"
@@ -48,7 +51,7 @@
                     </div>
                     <div class="my-2 flex items-center">
                         <div class="border-b border-grey-30 flex-1" />
-                        <div class="text-2xs text-grey-60 mx-2">or</div>
+                        <div class="text-2xs text-grey-60 mx-2" v-text="__('or')"></div>
                         <div class="border-b border-grey-30 flex-1" />
                     </div>
                     <div>
@@ -62,10 +65,14 @@
                             :searchable="true"
                             :reduce="(opt) => opt.value"
                             v-model="fieldset"
-                        />
+                        >
+                            <template v-slot:no-options>
+                                <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                            </template>
+                        </v-select>
                         <p class="text-sm font-medium mt-3 mb-1" v-text="__('Prefix')" />
                         <p class="text-2xs text-grey mb-1" v-text="__('messages.fieldset_link_fields_prefix_instructions')" />
-                        <text-input v-model="importPrefix" placeholder="eg. hero_" />
+                        <text-input v-model="importPrefix" :placeholder="__('e.g. hero_')" />
                         <button
                             class="btn-primary w-full mt-3"
                             :class="{ 'opacity-50': !fieldset }"

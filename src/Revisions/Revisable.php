@@ -4,6 +4,7 @@ namespace Statamic\Revisions;
 
 use Illuminate\Support\Carbon;
 use Statamic\Facades\Revision as Revisions;
+use Statamic\Statamic;
 
 trait Revisable
 {
@@ -137,7 +138,7 @@ trait Revisable
 
     public function revisionsEnabled()
     {
-        return config('statamic.revisions.enabled');
+        return config('statamic.revisions.enabled') || ! Statamic::pro();
     }
 
     abstract protected function revisionKey();

@@ -10,6 +10,8 @@ return [
     'access_cp_desc' => 'Allows access into control panel, but doesn\'t guarantee anything can be done once inside.',
     'configure_fields' => 'Configure Fields',
     'configure_fields_desc' => 'Ability to edit blueprints, fieldsets, and their fields.',
+    'configure_addons' => 'Configure Addons',
+    'configure_addons_desc' => 'Ability to access the addon area to install and uninstall addons.',
 
     'group_collections' => 'Collections',
     'configure_collections' => 'Configure Collections',

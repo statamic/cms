@@ -7,9 +7,15 @@ use Statamic\CP\Column;
 use Statamic\Facades\Permission;
 use Statamic\Facades\Role;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Middleware\RequireStatamicPro;
 
 class RolesController extends CpController
 {
+    public function __construct()
+    {
+        $this->middleware(RequireStatamicPro::class);
+    }
+
     public function index(Request $request)
     {
         $this->authorize('edit roles');

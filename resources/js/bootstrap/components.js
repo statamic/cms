@@ -7,7 +7,6 @@ Vue.component('v-select', vSelect)
 // Core
 Vue.component('asset-manager', require('../components/assets/AssetManager.vue').default);
 Vue.component('asset-browser', require('../components/assets/Browser/Browser.vue').default);
-Vue.component('updater', require('../components/Updater.vue').default);
 Vue.component('updates-badge', require('../components/UpdatesBadge.vue').default);
 Vue.component('composer-output', require('../components/ComposerOutput.vue').default);
 
@@ -15,6 +14,7 @@ Vue.component('composer-output', require('../components/ComposerOutput.vue').def
 Vue.component('publish-container', require('../components/publish/Container.vue').default);
 Vue.component('publish-form', require('../components/publish/PublishForm.vue').default);
 Vue.component('publish-fields', require('../components/publish/Fields.vue').default);
+Vue.component('publish-field', require('../components/publish/Field.vue').default);
 Vue.component('publish-field-meta', require('../components/publish/FieldMeta.vue').default);
 Vue.component('configure-sections', require('../components/configure/Sections.vue').default);
 Vue.component('publish-sections', require('../components/publish/Sections.vue').default);

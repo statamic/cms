@@ -2,7 +2,7 @@
     <div class="py-3 px-4 border-b">
         <h1>{{ __('statamic::messages.getting_started_widget_header') }}</h1>
         <p>{{ __('statamic::messages.getting_started_widget_intro') }}
-            Please remember: <b>Statamic is commercial software</b> and you may need to purchase an appropriate license to continue using Statamic after the beta period has ended.
+            {!! __('statamic::messages.getting_started_widget_reminder') !!}
         </p>
     </div>
     <div class="flex flex-wrap p-2">
@@ -24,7 +24,7 @@
                 <p>{{ __('statamic::messages.getting_started_widget_collections') }}</p>
             </div>
         </a>
-        <a href="{{ cp_route('blueprints.create') }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+        <a href="{{ cp_route('blueprints.index') }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
                 @svg('blueprints')
             </div>

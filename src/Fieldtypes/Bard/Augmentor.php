@@ -16,6 +16,9 @@ class Augmentor
     protected $includeDisabledSets = false;
     protected $augmentSets = true;
 
+    protected static $customMarks = [];
+    protected static $customNodes = [];
+
     public function __construct($fieldtype)
     {
         $this->fieldtype = $fieldtype;
@@ -94,10 +97,23 @@ class Augmentor
             SetNode::class,
         ]);
 
+        $renderer->addNodes(static::$customNodes);
+        $renderer->addMarks(static::$customMarks);
+
         return $renderer->render([
             'type' => 'doc',
             'content' => $value,
         ]);
+    }
+
+    public static function addNode($node)
+    {
+        static::$customNodes[] = $node;
+    }
+
+    public static function addMark($mark)
+    {
+        static::$customMarks[] = $mark;
     }
 
     protected function convertToSets($html)

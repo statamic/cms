@@ -3,27 +3,24 @@
 namespace Statamic\Extend;
 
 use Facades\Statamic\Console\Processes\Composer;
-use Facades\Statamic\Extend\Marketplace;
+use Facades\Statamic\Marketplace\Marketplace;
 
 class AddonInstaller
 {
     /**
-     * Get installable addons.
+     * Check if an addon is installable.
      */
-    public function installable()
+    private function isInstallable(string $package)
     {
-        return $this->approvedAddons()->diff($this->installed());
+        return (bool) Marketplace::package($package);
     }
 
     /**
-     * List installed addons.
+     * Check if an addon is installed.
      */
-    public function installed()
+    private function isInstalled(string $package)
     {
-        return Composer::installed()
-            ->keys()
-            ->intersect($this->approvedAddons())
-            ->values();
+        return Composer::installed()->has($package);
     }
 
     /**
@@ -33,8 +30,8 @@ class AddonInstaller
      */
     public function install(string $addon)
     {
-        if (! $this->installable()->contains($addon)) {
-            throw new \Exception("{$addon} is not an installable package");
+        if (! $this->isInstallable($addon)) {
+            throw new \Exception("{$addon} is not an installable package.");
         }
 
         return Composer::require($addon);
@@ -47,28 +44,10 @@ class AddonInstaller
      */
     public function uninstall(string $addon)
     {
-        if (! $this->installed()->contains($addon)) {
-            throw new \Exception("{$addon} is not an uninstallable package");
+        if (! $this->isInstalled($addon)) {
+            throw new \Exception("{$addon} is not installed.");
         }
 
         return Composer::remove($addon);
-    }
-
-    /**
-     * Get approved addon repositories.
-     *
-     * @return Illuminate\Support\Collection
-     */
-    protected function approvedAddons()
-    {
-        return collect(Marketplace::get()['data'])
-            ->pluck('variants.*.package')
-            ->flatten()
-            ->unique()
-            ->filter();
-
-        // Todo: doesn't currently output local addons!
-        // Can we check for path repository maybe?
-        // This is okay though, for now they can just manually composer require local addons.
     }
 }

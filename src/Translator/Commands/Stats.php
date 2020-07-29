@@ -89,6 +89,8 @@ class Stats extends Command
         $table->setHeaders(['String', 'Usages']);
         $table->setRows($rows->values()->all());
         $table->render();
+
+        return 0;
     }
 
     protected function discover()

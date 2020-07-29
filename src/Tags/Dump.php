@@ -17,6 +17,6 @@ class Dump extends Tags
      */
     public function wildcard($var)
     {
-        dump($this->context->get($var));
+        dump($this->context->value($var));
     }
 }

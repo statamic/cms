@@ -1,6 +1,6 @@
 <nav class="nav-main nav-mobile" v-cloak>
     <div class="nav-main-inner">
-        @foreach (Statamic\Facades\CP\Nav::build() as $section => $items)
+        @foreach ($nav as $section => $items)
             @if ($section !== 'Top Level')
                 <h6>{{ __($section) }}</h6>
             @endif

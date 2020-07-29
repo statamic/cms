@@ -274,6 +274,52 @@ EOT
     }
 
     /** @test */
+    public function it_wont_register_user_and_follow_custom_redirect_with_errors()
+    {
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
+
+        $this
+            ->post('/!/auth/register', [
+                '_error_redirect' => '/registration-error',
+            ])
+            ->assertSessionHasErrors([
+                'email',
+                'password',
+            ], null, 'user.register')
+            ->assertLocation('/registration-error');
+
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
+
+        $output = $this->tag(<<<'EOT'
+{{ user:register_form }}
+    <p class="success">{{ success }}</p>
+    {{ errors }}
+        <p class="error">{{ value }}</p>
+    {{ /errors }}
+    {{ fields }}
+        <p class="inline-error">{{ error }}</p>
+    {{ /fields }}
+{{ /user:register_form }}
+EOT
+        );
+
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+        preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
+
+        $expected = [
+            'The email field is required.',
+            'The password field is required.',
+        ];
+
+        $this->assertEmpty($success[1]);
+        $this->assertEquals($expected, $errors[1]);
+        $this->assertEquals($expected, $inlineErrors[1]);
+    }
+
+    /** @test */
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=registration-successful&error_redirect=registration-failure');

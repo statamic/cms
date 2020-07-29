@@ -4,6 +4,7 @@ namespace Statamic\Auth;
 
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Auth\UserRepository as RepositoryContract;
+use Statamic\Facades\Blueprint;
 
 abstract class UserRepository implements RepositoryContract
 {
@@ -24,6 +25,11 @@ abstract class UserRepository implements RepositoryContract
         return $this->fromUser($user);
     }
 
+    public function count()
+    {
+        return $this->query()->count();
+    }
+
     public function roleRepository()
     {
         return app($this->roleRepository)->path(
@@ -36,5 +42,15 @@ abstract class UserRepository implements RepositoryContract
         return app($this->userGroupRepository)->path(
             $this->config['paths']['groups'] ?? resource_path('users/groups.yaml')
         );
+    }
+
+    public function blueprint()
+    {
+        return Blueprint::find('user') ?? Blueprint::makeFromFields([
+            'name' => ['type' => 'text', 'display' => 'Name'],
+            'email' => ['type' => 'text', 'input_type' => 'email', 'display' => 'Email Address'],
+            'roles' => ['type' => 'user_roles', 'width' => 50],
+            'groups' => ['type' => 'user_groups', 'width' => 50],
+        ])->setHandle('user');
     }
 }

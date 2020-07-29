@@ -61,6 +61,13 @@ class UserTags extends Tags
             }
         }
 
+        // Get a user by field, if the `field` parameter was used.
+        if ($field = $this->params->get('field')) {
+            if (! $user = User::query()->where($field, $this->params->get('value'))->first()) {
+                return $this->parseNoResults();
+            }
+        }
+
         // No user found? Get the current one.
         if (! $user) {
             if (! $user = User::current()) {
@@ -462,7 +469,7 @@ class UserTags extends Tags
      */
     protected function getRequiredRegistrationFields()
     {
-        $blueprintFields = Blueprint::find('user')->fields()->all()
+        $blueprintFields = User::blueprint()->fields()->all()
             ->keyBy->handle()
             ->filter(function ($field, $handle) {
                 return in_array($handle, ['email', 'password']);
@@ -499,7 +506,7 @@ class UserTags extends Tags
      */
     protected function getAdditionalRegistrationFields()
     {
-        return Blueprint::find('user')->fields()->all()
+        return User::blueprint()->fields()->all()
             ->reject(function ($field) {
                 return in_array($field->handle(), ['email', 'password', 'password_confirmation', 'roles', 'groups']);
             })

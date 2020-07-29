@@ -28,6 +28,7 @@ class FormsController extends CpController
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
                     'delete_url' => $form->deleteUrl(),
+                    'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
                     'deleteable' => User::current()->can('delete', $form),
                 ];
             })
@@ -75,6 +76,8 @@ class FormsController extends CpController
 
     public function create()
     {
+        $this->authorizeProIf(Form::all()->count() >= 1);
+
         $this->authorize('create', FormContract::class);
 
         return view('statamic::forms.create');
@@ -82,6 +85,8 @@ class FormsController extends CpController
 
     public function store(Request $request)
     {
+        $this->authorizeProIf(Form::all()->count() >= 1);
+
         $this->authorize('create', FormContract::class, __('You are not authorized to create forms.'));
 
         $request->validate([
@@ -108,7 +113,7 @@ class FormsController extends CpController
 
         $values = $form->toArray();
 
-        $fields = ($blueprint = $this->editFormBlueprint())
+        $fields = ($blueprint = $this->editFormBlueprint($form))
             ->fields()
             ->addValues($values)
             ->preProcess();
@@ -125,7 +130,7 @@ class FormsController extends CpController
     {
         $this->authorize('edit', $form);
 
-        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
+        $fields = $this->editFormBlueprint($form)->fields()->addValues($request->all());
 
         $fields->validate();
 
@@ -133,7 +138,6 @@ class FormsController extends CpController
 
         $form
             ->title($values['title'])
-            ->blueprint($values['blueprint'])
             ->honeypot($values['honeypot'])
             ->store($values['store'])
             ->email($values['email']);
@@ -152,7 +156,7 @@ class FormsController extends CpController
         $form->delete();
     }
 
-    protected function editFormBlueprint()
+    protected function editFormBlueprint($form)
     {
         return Blueprint::makeFromSections([
             'name' => [
@@ -169,10 +173,12 @@ class FormsController extends CpController
                 'display' => __('Fields'),
                 'fields' => [
                     'blueprint' => [
-                        'type' => 'blueprints',
+                        'type' => 'html',
                         'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
-                        'max_items' => 1,
-                        'mode' => 'select',
+                        'html' => ''.
+                            '<div class="text-xs">'.
+                            '   <a href="'.cp_route('forms.blueprint.edit', $form->handle()).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>',
                     ],
                     'honeypot' => [
                         'type' => 'text',
@@ -196,7 +202,7 @@ class FormsController extends CpController
                     'email' => [
                         'type' => 'grid',
                         'mode' => 'stacked',
-                        'add_row' => 'Add Email',
+                        'add_row' => __('Add Email'),
                         'instructions' => __('statamic::messages.form_configure_email_instructions'),
                         'fields' => [
                             [

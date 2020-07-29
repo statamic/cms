@@ -6,7 +6,7 @@ class Session extends Tags
 {
     public function wildcard($tag)
     {
-        $key = $this->context->get($tag, $tag);
+        $key = $this->context->value($tag, $tag);
 
         $key = str_replace(':', '.', $key);
 

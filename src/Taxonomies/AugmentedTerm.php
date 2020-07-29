@@ -8,7 +8,7 @@ class AugmentedTerm extends AbstractAugmented
 {
     public function keys()
     {
-        return $this->data->data()->keys()
+        return $this->data->values()->keys()
             ->merge($this->commonKeys())
             ->merge($this->blueprintFields()->keys())
             ->unique()->sort()->values()->all();

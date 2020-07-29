@@ -61,6 +61,10 @@ class FormSubmissionsController extends CpController
 
     private function sanitizeField($value, $submission)
     {
+        if (is_null($value)) {
+            return null;
+        }
+
         $is_arr = is_array($value);
 
         $values = (array) $value;

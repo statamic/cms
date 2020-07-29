@@ -28,7 +28,6 @@ class Users extends Relationship
                 'display' => __('Max Items'),
                 'instructions' => __('statamic::messages.max_items_instructions'),
                 'type' => 'integer',
-                'default' => 1,
             ],
             'mode' => [
                 'display' => __('Mode'),

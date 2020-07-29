@@ -124,6 +124,8 @@ return [
 
     'unique_entry_value' => 'Cette valeur a déjà été prise.',
     'unique_user_value' => 'Cette valeur a déjà été prise.',
+    'one_site_without_origin' => 'Au moins un site ne doit pas avoir d’origine.',
+    'origin_cannot_be_disabled' => 'Impossible de sélectionner une origine désactivée.',
 
     /*
     |--------------------------------------------------------------------------

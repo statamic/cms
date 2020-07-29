@@ -43,7 +43,7 @@ class ContextTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_all_parameters()
+    public function it_gets_all_items()
     {
         $this->assertSame([
             'string' => 'hello',
@@ -69,11 +69,18 @@ class ContextTest extends TestCase
         $this->assertEquals(true, $this->context->get('true'));
         $this->assertEquals(false, $this->context->get('false'));
         $this->assertEquals('one|two', $this->context->get('list'));
-        $this->assertEquals('augmented foo', $this->context->get('value'));
+
+        tap($this->context->get('value'), function ($value) {
+            $this->assertInstanceOf(Value::class, $value);
+            $this->assertSame('augmented foo', $value->value());
+            $this->assertSame('foo', $value->raw());
+        });
+
         tap($this->context->get('antlersValue'), function ($value) {
             $this->assertEquals('parse {{ string }} antlers', $value->raw());
             $this->assertEquals('augmented parse {{ string }} antlers', $value->value());
         });
+
         tap($this->context->get('nonAntlersValue'), function ($value) {
             $this->assertEquals('dont parse {{ string }} antlers', $value->raw());
             $this->assertEquals('augmented dont parse {{ string }} antlers', $value->value());
@@ -89,6 +96,15 @@ class ContextTest extends TestCase
         $this->assertSame('dont parse {{ string }} antlers', $this->context->raw('nonAntlersValue'));
         $this->assertNull($this->context->raw('unknown'));
         $this->assertSame('fallback', $this->context->raw('unknown', 'fallback'));
+    }
+
+    /** @test */
+    public function it_gets_an_augmented_value()
+    {
+        $this->assertSame('hello', $this->context->value('string'));
+        $this->assertSame('augmented foo', $this->context->value('value'));
+        $this->assertSame('augmented parse {{ string }} antlers', $this->context->value('antlersValue'));
+        $this->assertSame('augmented dont parse {{ string }} antlers', $this->context->value('nonAntlersValue'));
     }
 
     /** @test */

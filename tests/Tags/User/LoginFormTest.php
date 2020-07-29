@@ -39,7 +39,7 @@ class LoginFormTest extends TestCase
     /** @test */
     public function it_renders_form_with_redirects_to_anchor()
     {
-        $output = $this->tag('{{ user:register_form redirect="#form" error_redirect="#form" }}{{ /user:register_form }}');
+        $output = $this->tag('{{ user:login_form redirect="#form" error_redirect="#form" }}{{ /user:login_form }}');
 
         $this->assertStringContainsString('<input type="hidden" name="_redirect" value="http://localhost#form" />', $output);
         $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="http://localhost#form" />', $output);
@@ -154,6 +154,44 @@ EOT
 
         $this->assertEmpty($errors[1]);
         $this->assertEquals(['Login successful.'], $success[1]);
+    }
+
+    /** @test */
+    public function it_wont_log_user_in_and_follow_custom_error_redirect_with_errors()
+    {
+        $this->assertFalse(auth()->check());
+
+        User::make()
+            ->email('san@holo.com')
+            ->password('chewy')
+            ->save();
+
+        $this
+            ->post('/!/auth/login', [
+                'token' => 'test-token',
+                'email' => 'san@holo.com',
+                'password' => 'wrong',
+                '_error_redirect' => '/login-error',
+            ])
+            ->assertLocation('/login-error');
+
+        $this->assertFalse(auth()->check());
+
+        $output = $this->tag(<<<'EOT'
+{{ user:login_form }}
+    {{ errors }}
+        <p class="error">{{ value }}</p>
+    {{ /errors }}
+    <p class="success">{{ success }}</p>
+{{ /user:login_form }}
+EOT
+        );
+
+        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+
+        $this->assertEquals(['Invalid credentials.'], $errors[1]);
+        $this->assertEmpty($success[1]);
     }
 
     /** @test */

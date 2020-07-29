@@ -5,9 +5,7 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
-use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Facades\Asset;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -77,8 +75,6 @@ class EntriesController extends CpController
 
         $blueprint = $entry->blueprint();
 
-        event(new PublishBlueprintFound($blueprint, 'entry', $entry));
-
         [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
         if ($hasOrigin = $entry->hasOrigin()) {
@@ -96,7 +92,7 @@ class EntriesController extends CpController
                 'revisions' => $entry->revisionsUrl(),
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),
-                'editBlueprint' => $blueprint->editUrl(),
+                'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
@@ -206,9 +202,7 @@ class EntriesController extends CpController
     {
         $this->authorize('create', [EntryContract::class, $collection]);
 
-        $blueprint = $request->blueprint
-            ? $collection->ensureEntryBlueprintFields(Blueprint::find($request->blueprint))
-            : $collection->entryBlueprint();
+        $blueprint = $collection->entryBlueprint($request->blueprint);
 
         if (! $blueprint) {
             throw new \Exception(__('A valid blueprint is required.'));
@@ -271,9 +265,7 @@ class EntriesController extends CpController
     {
         $this->authorize('store', [EntryContract::class, $collection]);
 
-        $blueprint = $collection->ensureEntryBlueprintFields(
-            Blueprint::find($request->blueprint)
-        );
+        $blueprint = $collection->entryBlueprint($request->blueprint);
 
         $fields = $blueprint->fields()->addValues($request->all());
 

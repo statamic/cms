@@ -2,10 +2,11 @@
 
 namespace Tests\Feature\Collections;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
-use Statamic\Fields\BlueprintRepository;
+use Tests\Fakes\FakeBlueprintRepository;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -31,6 +32,7 @@ class UpdateCollectionTest extends TestCase
     /** @test */
     public function it_updates_a_collection()
     {
+        $this->withoutExceptionHandling();
         config(['statamic.amp.enabled' => true]);
 
         $collection = tap(
@@ -80,28 +82,78 @@ class UpdateCollectionTest extends TestCase
         $this->assertFalse($updated->defaultPublishState());
         $this->assertEquals('desc', $updated->sortDirection());
         $this->assertTrue($updated->ampable());
-        // $this->assertEquals(['three', 'four'], $updated->entryBlueprints());
         // structure
     }
 
     /** @test */
-    public function it_updates_blueprints()
+    public function setting_links_to_true_will_create_a_blueprint_if_it_doesnt_already_exist()
     {
-        $mock = $this->partialMock(BlueprintRepository::class);
-        $mock->shouldReceive('find')->with('one')->andReturn(Blueprint::make('one'));
-        $mock->shouldReceive('find')->with('two')->andReturn(Blueprint::make('two'));
-        $mock->shouldReceive('find')->with('three')->andReturn(Blueprint::make('three'));
-        $mock->shouldReceive('find')->with('four')->andReturn(Blueprint::make('four'));
+        BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
 
-        $collection = tap(Collection::make('test')->entryBlueprints(['one', 'two']))->save();
-        $this->assertEquals(['one', 'two'], $collection->entryBlueprints()->map->handle()->all());
+        $collection = tap(Collection::make('test'))->save();
+        Blueprint::make('not_link')->setNamespace('collections.test')->save();
+        $this->assertCount(1, Blueprint::in('collections.test'));
 
         $this
             ->actingAs($this->userWithPermission())
-            ->update($collection, ['blueprints' => ['three', 'four']])
+            ->update($collection, ['links' => true])
             ->assertOk();
 
-        $this->assertEquals(['three', 'four'], Collection::all()->first()->entryBlueprints()->map->handle()->all());
+        $this->assertCount(2, Blueprint::in('collections.test'));
+    }
+
+    /** @test */
+    public function setting_links_to_true_will_do_nothing_if_an_existing_link_blueprint_already_exists()
+    {
+        BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
+
+        $collection = tap(Collection::make('test'))->save();
+        Blueprint::make('link')->setNamespace('collections.test')->setContents(['title' => 'Existing'])->save();
+        $this->assertCount(1, Blueprint::in('collections.test'));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection, ['links' => true])
+            ->assertOk();
+
+        $this->assertCount(1, Blueprint::in('collections.test'));
+        $this->assertEquals('Existing', Blueprint::find('collections.test.link')->title());
+    }
+
+    /** @test */
+    public function setting_links_to_false_will_delete_the_blueprint_if_exists()
+    {
+        BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
+
+        $collection = tap(Collection::make('test'))->save();
+        Blueprint::make('link')->setNamespace('collections.test')->save();
+        $this->assertCount(1, Blueprint::in('collections.test'));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection, ['links' => false])
+            ->assertOk();
+
+        $this->assertCount(0, Blueprint::in('collections.test'));
+    }
+
+    /** @test */
+    public function settings_links_to_true_will_also_create_the_default_blueprint_if_none_exist()
+    {
+        // this is so that you aren't left in awkward situation where there's only a links blueprint.
+
+        BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
+
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertCount(0, Blueprint::in('collections.test'));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection, ['links' => true])
+            ->assertOk();
+
+        $this->assertCount(2, $blueprints = Blueprint::in('collections.test'));
+        $this->assertEquals(['test', 'link'], $blueprints->map->handle()->values()->all());
     }
 
     private function userWithoutPermission()

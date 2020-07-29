@@ -3,6 +3,7 @@
 namespace Statamic\Support;
 
 use Illuminate\Support\HtmlString;
+use Statamic\Facades\Config;
 use Statamic\Facades\Markdown;
 
 class Html
@@ -83,7 +84,7 @@ class Html
      */
     public static function decode($value)
     {
-        return html_entity_decode($value, ENT_QUOTES, 'UTF-8');
+        return html_entity_decode($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'));
     }
 
     /**
@@ -95,7 +96,7 @@ class Html
      */
     public static function entities($value)
     {
-        return htmlentities($value, ENT_QUOTES, 'UTF-8', false);
+        return htmlentities($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), false);
     }
 
     /**

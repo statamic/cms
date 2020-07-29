@@ -7,16 +7,23 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
+use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\BlueprintDeleted;
+use Statamic\Events\BlueprintSaved;
 use Statamic\Facades;
+use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Blueprint implements Augmentable
 {
-    use HasAugmentedData;
+    use HasAugmentedData, ExistsAsFile;
 
     protected $handle;
+    protected $namespace;
+    protected $order;
+    protected $initialPath;
     protected $contents = [];
     protected $fieldsCache;
 
@@ -30,6 +37,55 @@ class Blueprint implements Augmentable
     public function handle(): ?string
     {
         return $this->handle;
+    }
+
+    public function setNamespace(?string $namespace)
+    {
+        $this->namespace = $namespace;
+
+        return $this;
+    }
+
+    public function namespace(): ?string
+    {
+        return $this->namespace;
+    }
+
+    public function setOrder($order)
+    {
+        if (! is_null($order)) {
+            $order = (int) $order;
+        }
+
+        $this->order = $order;
+
+        return $this;
+    }
+
+    public function order()
+    {
+        return $this->order;
+    }
+
+    public function setInitialPath(string $path)
+    {
+        $this->initialPath = $path;
+
+        return $this;
+    }
+
+    public function initialPath()
+    {
+        return $this->initialPath;
+    }
+
+    public function path()
+    {
+        return Path::tidy(vsprintf('%s/%s/%s.yaml', [
+            Facades\Blueprint::directory(),
+            str_replace('.', '/', $this->namespace()),
+            $this->handle(),
+        ]));
     }
 
     public function setContents(array $contents)
@@ -47,7 +103,14 @@ class Blueprint implements Augmentable
 
     public function contents(): array
     {
-        return $this->contents;
+        return array_filter(
+            array_merge(['order' => $this->order], $this->contents)
+        );
+    }
+
+    public function fileData()
+    {
+        return $this->contents();
     }
 
     public function sections(): Collection
@@ -132,19 +195,11 @@ class Blueprint implements Augmentable
         ];
     }
 
-    public function editUrl()
-    {
-        return $this->handle() ? cp_route('blueprints.edit', $this->handle()) : null;
-    }
-
-    public function deleteUrl()
-    {
-        return $this->handle() ? cp_route('blueprints.destroy', $this->handle()) : null;
-    }
-
     public function save()
     {
         BlueprintRepository::save($this);
+
+        BlueprintSaved::dispatch($this);
 
         return $this;
     }
@@ -152,6 +207,8 @@ class Blueprint implements Augmentable
     public function delete()
     {
         BlueprintRepository::delete($this);
+
+        BlueprintDeleted::dispatch($this);
 
         return true;
     }

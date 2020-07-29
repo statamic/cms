@@ -6,6 +6,7 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
+use Statamic\Exceptions\StatamicProRequiredException;
 use Statamic\Facades\Preference;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
@@ -16,7 +17,7 @@ class AppServiceProvider extends ServiceProvider
     protected $root = __DIR__.'/../..';
 
     protected $configFiles = [
-        'amp', 'api', 'assets', 'cp', 'forms', 'live_preview', 'oauth', 'protect', 'revisions',
+        'amp', 'api', 'assets', 'cp', 'editions', 'forms', 'git', 'live_preview', 'oauth', 'protect', 'revisions',
         'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'users',
     ];
 
@@ -75,6 +76,8 @@ class AppServiceProvider extends ServiceProvider
                 Preference::get('date_format', config('statamic.cp.date_format'))
             );
         });
+
+        $this->checkMultisiteFeature();
     }
 
     public function register()
@@ -115,7 +118,11 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\Statamic\Fields\BlueprintRepository::class, function ($app) {
             return (new \Statamic\Fields\BlueprintRepository($app['files']))
                 ->setDirectory(resource_path('blueprints'))
-                ->setFallbackDirectory(__DIR__.'/../../resources/blueprints');
+                ->setFallback('default', function () {
+                    return \Statamic\Facades\Blueprint::makeFromFields([
+                        'content' => ['type' => 'markdown', 'localizable' => true],
+                    ]);
+                });
         });
 
         $this->app->bind(\Statamic\Fields\FieldsetRepository::class, function ($app) {
@@ -134,5 +141,16 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\Localize::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ]);
+    }
+
+    protected function checkMultisiteFeature()
+    {
+        if (Statamic::pro()) {
+            return;
+        }
+
+        $sites = config('statamic.sites.sites');
+
+        throw_if(count($sites) > 1, new StatamicProRequiredException('Statamic Pro is required to use multiple sites.'));
     }
 }

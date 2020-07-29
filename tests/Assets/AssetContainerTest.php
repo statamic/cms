@@ -141,23 +141,12 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_and_sets_blueprint()
+    public function it_gets_the_blueprint()
     {
-        BlueprintRepository::shouldReceive('find')
-            ->with('asset')
-            ->andReturn($defaultBlueprint = new Blueprint);
+        BlueprintRepository::shouldReceive('find')->with('assets/main')->andReturn($blueprint = new Blueprint);
 
-        BlueprintRepository::shouldReceive('find')
-            ->with('custom')
-            ->andReturn($customBlueprint = new Blueprint);
-
-        $container = new AssetContainer;
-        $this->assertEquals($defaultBlueprint, $container->blueprint());
-
-        $return = $container->blueprint('custom');
-
-        $this->assertEquals($container, $return);
-        $this->assertEquals($customBlueprint, $container->blueprint());
+        $container = (new AssetContainer)->handle('main');
+        $this->assertEquals($blueprint, $container->blueprint());
     }
 
     /** @test */
