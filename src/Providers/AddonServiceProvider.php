@@ -166,13 +166,13 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootConfig()
     {
-        if (! $this->config) {
-            return $this;
-        }
-
         $filename = $this->getAddon()->slug();
         $directory = $this->getAddon()->directory();
         $origin = "{$directory}config/{$filename}.php";
+
+        if (! $this->config || ! file_exists($origin)) {
+            return $this;
+        }
 
         $this->mergeConfigFrom($origin, $filename);
 
@@ -185,13 +185,13 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootTranslations()
     {
-        if (! $this->translations) {
-            return $this;
-        }
-
         $slug = $this->getAddon()->slug();
         $directory = $this->getAddon()->directory();
         $origin = "{$directory}resources/lang";
+
+        if (! $this->translations || ! file_exists($origin)) {
+            return $this;
+        }
 
         $this->loadTranslationsFrom($origin, $slug);
 
