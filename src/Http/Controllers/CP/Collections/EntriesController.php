@@ -323,7 +323,14 @@ class EntriesController extends CpController
 
     protected function extractFromFields($entry, $blueprint)
     {
-        $values = $entry->values()->all();
+        // The values should only be data merged with the origin data.
+        // We don't want injected collection values, which $entry->values() would have given us.
+        $values = $entry->data();
+        while ($entry->hasOrigin()) {
+            $entry = $entry->origin();
+            $values = $entry->data()->merge($values);
+        }
+        $values = $values->all();
 
         if ($entry->hasStructure()) {
             $values['parent'] = array_filter([optional($entry->parent())->id()]);
