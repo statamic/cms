@@ -1493,15 +1493,14 @@ License: MIT
 
       })
 
-      window.addEventListener('mousemove', function() {
-
-        if (EQCSS_mouse_down) {
-
-          EQCSS.throttle()
-
-        }
-
-      })
+      // Disable this listener for performance.
+      // Ref: https://github.com/statamic/cms/issues/2147
+      //
+      // window.addEventListener('mousemove', function() {
+      //   if (EQCSS_mouse_down) {
+      //     EQCSS.throttle()
+      //   }
+      // })
 
       window.addEventListener('mouseup', function() {
 
