@@ -1,1 +1,6 @@
-<input type="checkbox" name="{{ handle }}" {{ old ?= "checked" }}>
+{{ foreach:options }}
+    <label>
+        <input type="checkbox" name="{{ handle }}[{{ key }}]" {{ old | contains:key ?= "checked" }}>
+        {{ value }}
+    </label>
+{{ /foreach:options }}
