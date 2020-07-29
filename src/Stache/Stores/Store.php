@@ -263,7 +263,7 @@ abstract class Store
         });
 
         // Update modified items in every index.
-        $indexes->each(function ($index) use ($modified, $pathMap) {
+        $indexes->each(function ($index) use ($modified) {
             $modified->each(function ($item) use ($index) {
                 $index->updateItem($item);
             });
