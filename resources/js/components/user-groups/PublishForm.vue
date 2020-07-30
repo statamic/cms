@@ -1,7 +1,7 @@
 <template>
 
         <div>
-            <div class="card p-0 mb-3 publish-fields">
+            <publish-fields-container class="card p-0 mb-3">
 
                 <form-group
                     :display="__('Title')"
@@ -48,7 +48,7 @@
                     <small class="help-block text-red mt-1 mb-0" v-if="errors.roles" v-text="errors.roles[0]" />
                 </div>
 
-            </div>
+            </publish-fields-container>
             <div class="py-2 border-t flex justify-between">
                 <a :href="action" class="btn" v-text="__('Cancel') "/>
                 <button type="submit" class="btn-primary" @click="save">{{ __('Save') }}</button>
