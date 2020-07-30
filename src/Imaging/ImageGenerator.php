@@ -146,7 +146,7 @@ class ImageGenerator
 
         $path = $this->server->makeImage($image, $this->params);
 
-        GlideImageGenerated::dispatch($path);
+        GlideImageGenerated::dispatch($path, $this->params);
 
         return $path;
     }
