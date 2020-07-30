@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\Filesystem;
 use League\Glide\Server;
+use Statamic\Events\GlideImageGenerated;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Twistor\Flysystem\GuzzleAdapter;
@@ -145,7 +146,7 @@ class ImageGenerator
 
         $path = $this->server->makeImage($image, $this->params);
 
-        // TODO: GlideImageGenerated event
+        GlideImageGenerated::dispatch($path);
 
         return $path;
     }
