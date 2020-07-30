@@ -1,4 +1,5 @@
 <template>
+    <element-container @resized="containerWidth = $event.width">
     <div class="datetime">
 
         <button type="button" class="btn flex mb-1 md:mb-0 items-center pl-1.5" v-if="config.inline === false && !hasDate" @click="addDate" tabindex="0">
@@ -6,7 +7,10 @@
     		{{ __('Add Date') }}
     	</button>
 
-        <div class="date-time-container" v-if="hasDate || config.inline">
+        <div v-if="hasDate || config.inline"
+            class="date-time-container"
+            :class="{ 'narrow': containerWidth <= 260 }"
+        >
 
             <div class="flex-1 date-container" :class="{'input-group': !config.inline }">
                 <div class="input-group-prepend flex items-center" v-if="!config.inline">
@@ -45,6 +49,7 @@
 			</div>
         </div>
     </div>
+    </element-container>
 
 </template>
 
@@ -75,6 +80,7 @@ export default {
                     dates: new Date()
                 }
             ],
+            containerWidth: null
         }
     },
 
