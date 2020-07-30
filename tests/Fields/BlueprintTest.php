@@ -366,11 +366,28 @@ class BlueprintTest extends TestCase
     public function it_ensures_a_field_exists_if_it_doesnt()
     {
         FieldsetRepository::shouldReceive('find')
-            ->andReturn((new Fieldset)->setHandle('partial')->setContents([
-                'title' => 'Partial',
+            ->with('partial_one')
+            ->andReturn((new Fieldset)->setHandle('partial_one')->setContents([
+                'title' => 'Partial One',
                 'fields' => [
                     [
                         'handle' => 'three',
+                        'field' => ['type' => 'text'],
+                    ],
+                    [
+                        'handle' => 'six',
+                        'field' => ['type' => 'text'],
+                    ],
+                ],
+            ]));
+
+        FieldsetRepository::shouldReceive('find')
+            ->with('partial_two')
+            ->andReturn((new Fieldset)->setHandle('partial_two')->setContents([
+                'title' => 'Partial Two',
+                'fields' => [
+                    [
+                        'handle' => 'foo',
                         'field' => ['type' => 'text'],
                     ],
                 ],
@@ -387,7 +404,8 @@ class BlueprintTest extends TestCase
                 'section_two' => [
                     'fields' => [
                         ['handle' => 'two', 'field' => ['type' => 'text']],
-                        ['import' => 'partial'],
+                        ['import' => 'partial_one'],
+                        ['handle' => 'five', 'field' => 'partial_two.foo']
                     ],
                 ],
             ],
@@ -395,22 +413,55 @@ class BlueprintTest extends TestCase
         $this->assertFalse($blueprint->hasField('four'));
 
         $return = $blueprint
+            ->ensureField('six', ['type' => 'textarea', 'foo' => 'qux']) // field "six" exists in a partial
+            ->ensureField('five', ['type' => 'textarea', 'foo' => 'bar']) // field "five" is imported
             ->ensureField('four', ['type' => 'textarea']) // field "four" doesnt exist.
             ->ensureField('two', ['type' => 'textarea', 'foo' => 'bar'])  // field "two" exists in blueprint.
             ->ensureField('three', ['type' => 'textarea', 'foo' => 'baz']); // field "three" exists in partial.
 
         $this->assertEquals($blueprint, $return);
+        $this->assertTrue($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two'));
+        $this->assertTrue($blueprint->hasField('three'));
         $this->assertTrue($blueprint->hasField('four'));
+        $this->assertTrue($blueprint->hasField('five'));
+        $this->assertTrue($blueprint->hasField('six'));
         tap($blueprint->fields()->all(), function ($items) {
-            $this->assertCount(4, $items);
+            $this->assertCount(6, $items);
             $this->assertEveryItemIsInstanceOf(Field::class, $items);
             $this->assertEquals([
                 'one' => ['type' => 'text'],
                 'two' => ['type' => 'text', 'foo' => 'bar'], // config gets merged, but keys in the blueprint win.
                 'three' => ['type' => 'text', 'foo' => 'baz'], // config gets merged, but keys in partial win.
                 'four' => ['type' => 'textarea'], // field gets added.
+                'five' => ['type' => 'text', 'foo' => 'bar'], // config gets merged, but keys in the partial win
+                'six' => ['type' => 'text', 'foo' => 'qux'], // config gets merged, but keys in partial win.
             ], $items->map->config()->all());
         });
+        $this->assertEquals([
+            'title' => 'Test',
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                        ['handle' => 'four', 'field' => ['type' => 'textarea']],
+                    ],
+                ],
+                'section_two' => [
+                    'fields' => [
+                        ['handle' => 'two', 'field' => ['type' => 'text', 'foo' => 'bar']],
+                        [
+                            'import' => 'partial_one',
+                            'config' => [
+                                'three' => ['foo' => 'baz'],
+                                'six' => ['foo' => 'qux'],
+                            ]
+                        ],
+                        ['handle' => 'five', 'field' => 'partial_two.foo', 'config' => ['foo' => 'bar']]
+                    ],
+                ],
+            ],
+        ], $blueprint->contents());
     }
 
     /** @test */
