@@ -96,8 +96,8 @@ class UpdateBlueprintTest extends TestCase
                             'handle' => 'title',
                             'field' => [
                                 'type' => 'text',
-                                'required' => true
-                            ]
+                                'required' => true,
+                            ],
                         ],
                         [
                             'handle' => 'one-one',
@@ -122,11 +122,11 @@ class UpdateBlueprintTest extends TestCase
                             'field' => [
                                 'type' => 'slug',
                                 'localizable' => true,
-                                'required' => true
-                            ]
+                                'required' => true,
+                            ],
                         ],
-                    ]
-                ]
+                    ],
+                ],
             ],
         ], Facades\Blueprint::find('collections.test.test')->contents());
     }
@@ -253,8 +253,8 @@ class UpdateBlueprintTest extends TestCase
                             'handle' => 'title',
                             'field' => [
                                 'type' => 'text',
-                                'required' => true
-                            ]
+                                'required' => true,
+                            ],
                         ],
                         [
                             'handle' => 'one-one',
@@ -285,12 +285,12 @@ class UpdateBlueprintTest extends TestCase
                             'field' => [
                                 'type' => 'slug',
                                 'localizable' => true,
-                                'required' => true
-                            ]
+                                'required' => true,
+                            ],
                         ],
-                    ]
-                ]
-            ]
+                    ],
+                ],
+            ],
         ], Facades\Blueprint::find('collections.test.test')->contents());
     }
 
