@@ -96,8 +96,8 @@ class UpdateBlueprintTest extends TestCase
                             'handle' => 'title',
                             'field' => [
                                 'type' => 'text',
-                                'required' => true
-                            ]
+                                'required' => true,
+                            ],
                         ],
                         [
                             'handle' => 'one-one',
@@ -121,8 +121,8 @@ class UpdateBlueprintTest extends TestCase
                             'handle' => 'slug',
                             'field' => [
                                 'type' => 'slug',
-                                'required' => true
-                            ]
+                                'required' => true,
+                            ],
                         ],
                     ],
                 ],
@@ -252,8 +252,8 @@ class UpdateBlueprintTest extends TestCase
                             'handle' => 'title',
                             'field' => [
                                 'type' => 'text',
-                                'required' => true
-                            ]
+                                'required' => true,
+                            ],
                         ],
                         [
                             'handle' => 'one-one',
@@ -283,8 +283,8 @@ class UpdateBlueprintTest extends TestCase
                             'handle' => 'slug',
                             'field' => [
                                 'type' => 'slug',
-                                'required' => true
-                            ]
+                                'required' => true,
+                            ],
                         ],
                     ],
                 ],
