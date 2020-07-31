@@ -19,7 +19,7 @@ class OutpostTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        Carbon::setTestNow();
+        Carbon::setTestNow(now()->startOfMinute());
     }
 
     /** @test */
