@@ -93,6 +93,13 @@ class UpdateBlueprintTest extends TestCase
                     'display' => 'Section One',
                     'fields' => [
                         [
+                            'handle' => 'title',
+                            'field' => [
+                                'type' => 'text',
+                                'required' => true
+                            ]
+                        ],
+                        [
                             'handle' => 'one-one',
                             'field' => 'somefieldset.somefield',
                             'config' => [
@@ -108,6 +115,18 @@ class UpdateBlueprintTest extends TestCase
                         ],
                     ],
                 ],
+                'sidebar' => [
+                    'fields' => [
+                        [
+                            'handle' => 'slug',
+                            'field' => [
+                                'type' => 'slug',
+                                'localizable' => true,
+                                'required' => true
+                            ]
+                        ],
+                    ]
+                ]
             ],
         ], Facades\Blueprint::find('collections.test.test')->contents());
     }
@@ -231,6 +250,13 @@ class UpdateBlueprintTest extends TestCase
                     'display' => 'Section One',
                     'fields' => [
                         [
+                            'handle' => 'title',
+                            'field' => [
+                                'type' => 'text',
+                                'required' => true
+                            ]
+                        ],
+                        [
                             'handle' => 'one-one',
                             'field' => 'somefieldset.somefield',
                             'config' => [
@@ -252,7 +278,19 @@ class UpdateBlueprintTest extends TestCase
                         ],
                     ],
                 ],
-            ],
+                'sidebar' => [
+                    'fields' => [
+                        [
+                            'handle' => 'slug',
+                            'field' => [
+                                'type' => 'slug',
+                                'localizable' => true,
+                                'required' => true
+                            ]
+                        ],
+                    ]
+                ]
+            ]
         ], Facades\Blueprint::find('collections.test.test')->contents());
     }
 

@@ -93,6 +93,13 @@ class UpdateBlueprintTest extends TestCase
                     'display' => 'Section One',
                     'fields' => [
                         [
+                            'handle' => 'title',
+                            'field' => [
+                                'type' => 'text',
+                                'required' => true
+                            ]
+                        ],
+                        [
                             'handle' => 'one-one',
                             'field' => 'somefieldset.somefield',
                             'config' => [
@@ -105,6 +112,17 @@ class UpdateBlueprintTest extends TestCase
                                 'type' => 'text',
                                 'foo' => 'bar',
                             ],
+                        ],
+                    ],
+                ],
+                'sidebar' => [
+                    'fields' => [
+                        [
+                            'handle' => 'slug',
+                            'field' => [
+                                'type' => 'slug',
+                                'required' => true
+                            ]
                         ],
                     ],
                 ],
@@ -231,6 +249,13 @@ class UpdateBlueprintTest extends TestCase
                     'display' => 'Section One',
                     'fields' => [
                         [
+                            'handle' => 'title',
+                            'field' => [
+                                'type' => 'text',
+                                'required' => true
+                            ]
+                        ],
+                        [
                             'handle' => 'one-one',
                             'field' => 'somefieldset.somefield',
                             'config' => [
@@ -249,6 +274,17 @@ class UpdateBlueprintTest extends TestCase
                                 'type' => 'text',
                                 'width' => 50,
                             ],
+                        ],
+                    ],
+                ],
+                'sidebar' => [
+                    'fields' => [
+                        [
+                            'handle' => 'slug',
+                            'field' => [
+                                'type' => 'slug',
+                                'required' => true
+                            ]
                         ],
                     ],
                 ],

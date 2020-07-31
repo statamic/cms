@@ -192,6 +192,12 @@ class Fields
 
         $fields = $fieldset->fields()->all();
 
+        if ($overrides = $config['config'] ?? null) {
+            $fields = $fields->map(function ($field, $handle) use ($overrides) {
+                return $field->setConfig(array_merge($field->config(), $overrides[$handle] ?? []));
+            });
+        }
+
         if ($prefix = array_get($config, 'prefix')) {
             $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
                 $handle = $prefix.$field->handle();

@@ -35,7 +35,7 @@ class BlueprintTest extends TestCase
     public function it_gets_contents()
     {
         $blueprint = new Blueprint;
-        $this->assertEquals([], $blueprint->contents());
+        $this->assertEquals(['sections' => ['main' => ['fields' => []]]], $blueprint->contents());
 
         $contents = [
             'sections' => [
@@ -77,7 +77,7 @@ class BlueprintTest extends TestCase
         $blueprint = new Blueprint;
         tap($blueprint->sections(), function ($sections) {
             $this->assertInstanceOf(Collection::class, $sections);
-            $this->assertCount(0, $sections);
+            $this->assertCount(1, $sections);
         });
 
         $contents = [
@@ -104,7 +104,7 @@ class BlueprintTest extends TestCase
     public function it_puts_top_level_fields_into_a_main_section()
     {
         $blueprint = new Blueprint;
-        $this->assertEquals([], $blueprint->contents());
+        $this->assertEquals(['sections' => ['main' => ['fields' => []]]], $blueprint->contents());
 
         $blueprint->setContents([
             'fields' => ['one' => ['type' => 'text']],
@@ -363,54 +363,184 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
-    public function it_ensures_a_field_exists_if_it_doesnt()
+    public function it_ensures_a_field_exists()
     {
-        FieldsetRepository::shouldReceive('find')
-            ->andReturn((new Fieldset)->setHandle('partial')->setContents([
-                'title' => 'Partial',
+        $blueprint = (new Blueprint)->setContents(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'existing', 'field' => ['type' => 'text']],
+                ],
+            ],
+        ]]);
+
+        $return = $blueprint->ensureField('new', ['type' => 'textarea']);
+
+        $this->assertEquals($blueprint, $return);
+        $this->assertTrue($blueprint->hasField('existing'));
+        $this->assertTrue($blueprint->hasField('new'));
+        $this->assertEquals(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'existing', 'field' => ['type' => 'text']],
+                    ['handle' => 'new', 'field' => ['type' => 'textarea']],
+                ],
+            ],
+        ]], $blueprint->contents());
+        $this->assertEquals(['type' => 'textarea'], $blueprint->fields()->get('new')->config());
+    }
+
+    /** @test */
+    public function it_ensures_a_field_exists_in_a_specific_section()
+    {
+        $blueprint = (new Blueprint)->setContents(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'existing', 'field' => ['type' => 'text']],
+                ],
+            ],
+        ]]);
+
+        $return = $blueprint->ensureField('new', ['type' => 'textarea'], 'section_two');
+
+        $this->assertEquals($blueprint, $return);
+        $this->assertTrue($blueprint->hasField('existing'));
+        $this->assertTrue($blueprint->hasField('new'));
+        $this->assertEquals(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'existing', 'field' => ['type' => 'text']],
+                ],
+            ],
+            'section_two' => [
+                'fields' => [
+                    ['handle' => 'new', 'field' => ['type' => 'textarea']],
+                ],
+            ],
+        ]], $blueprint->contents());
+        $this->assertEquals(['type' => 'textarea'], $blueprint->fields()->get('new')->config());
+    }
+
+    /** @test */
+    public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_a_field_exists_and_it_already_exists()
+    {
+        $blueprint = (new Blueprint)->setContents(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'existing', 'field' => ['type' => 'text']],
+                ],
+            ],
+        ]]);
+
+        $return = $blueprint->ensureField('existing', ['type' => 'textarea', 'foo' => 'bar']);
+
+        $this->assertEquals($blueprint, $return);
+        $this->assertTrue($blueprint->hasField('existing'));
+        $this->assertEquals(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'existing', 'field' => ['type' => 'text', 'foo' => 'bar']],
+                ],
+            ],
+        ]], $blueprint->contents());
+        $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $blueprint->fields()->get('existing')->config());
+    }
+
+    /** @test */
+    public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_a_field_exists_and_it_already_exists_in_a_specific_section()
+    {
+        $blueprint = (new Blueprint)->setContents(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'existing', 'field' => ['type' => 'text']],
+                ],
+            ],
+        ]]);
+
+        $return = $blueprint->ensureField('existing', ['type' => 'textarea', 'foo' => 'bar'], 'another_section');
+
+        $this->assertEquals($blueprint, $return);
+        $this->assertTrue($blueprint->hasField('existing'));
+        $this->assertEquals(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'existing', 'field' => ['type' => 'text', 'foo' => 'bar']],
+                ],
+            ],
+        ]], $blueprint->contents());
+        $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $blueprint->fields()->get('existing')->config());
+    }
+
+    /** @test */
+    public function it_merges_config_overrides_for_previously_undefined_keys_when_ensuring_a_field_and_it_already_exists_as_a_reference()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                [
+                    'handle' => 'the_field',
+                    'field' => ['type' => 'text'],
+                ],
+            ]])
+        );
+
+        $blueprint = (new Blueprint)->setContents(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'from_partial', 'field' => 'the_partial.the_field'],
+                ],
+            ],
+        ]]);
+
+        $return = $blueprint->ensureField('from_partial', ['type' => 'textarea', 'foo' => 'bar']);
+
+        $this->assertEquals($blueprint, $return);
+        $this->assertTrue($blueprint->hasField('from_partial'));
+        $this->assertEquals(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'from_partial', 'field' => 'the_partial.the_field', 'config' => ['foo' => 'bar']],
+                ],
+            ],
+        ]], $blueprint->contents());
+        $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $blueprint->fields()->get('from_partial')->config());
+    }
+
+    /** @test */
+    public function it_merges_undefined_config_overrides_when_ensuring_a_field_that_already_exists_inside_an_imported_fieldset()
+    {
+        FieldsetRepository::shouldReceive('find')->with('the_partial')->andReturn(
+            (new Fieldset)->setContents(['fields' => [
+                [
+                    'handle' => 'one',
+                    'field' => ['type' => 'text'],
+                ],
+            ]])
+        );
+
+        $blueprint = (new Blueprint)->setContents(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['import' => 'the_partial'],
+                ],
+            ],
+        ]]);
+
+        $return = $blueprint->ensureField('one', ['type' => 'textarea', 'foo' => 'bar']);
+
+        $this->assertEquals($blueprint, $return);
+        $this->assertTrue($blueprint->hasField('one'));
+        $this->assertEquals(['sections' => [
+            'section_one' => [
                 'fields' => [
                     [
-                        'handle' => 'three',
-                        'field' => ['type' => 'text'],
-                    ],
-                ],
-            ]));
-
-        $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
-            'title' => 'Test',
-            'sections' => [
-                'section_one' => [
-                    'fields' => [
-                        ['handle' => 'one', 'field' => ['type' => 'text']],
-                    ],
-                ],
-                'section_two' => [
-                    'fields' => [
-                        ['handle' => 'two', 'field' => ['type' => 'text']],
-                        ['import' => 'partial'],
+                        'import' => 'the_partial',
+                        'config' => [
+                            'one' => ['foo' => 'bar']
+                        ]
                     ],
                 ],
             ],
-        ]);
-        $this->assertFalse($blueprint->hasField('four'));
-
-        $return = $blueprint
-            ->ensureField('four', ['type' => 'textarea']) // field "four" doesnt exist.
-            ->ensureField('two', ['type' => 'textarea', 'foo' => 'bar'])  // field "two" exists in blueprint.
-            ->ensureField('three', ['type' => 'textarea', 'foo' => 'baz']); // field "three" exists in partial.
-
-        $this->assertEquals($blueprint, $return);
-        $this->assertTrue($blueprint->hasField('four'));
-        tap($blueprint->fields()->all(), function ($items) {
-            $this->assertCount(4, $items);
-            $this->assertEveryItemIsInstanceOf(Field::class, $items);
-            $this->assertEquals([
-                'one' => ['type' => 'text'],
-                'two' => ['type' => 'text', 'foo' => 'bar'], // config gets merged, but keys in the blueprint win.
-                'three' => ['type' => 'text', 'foo' => 'baz'], // config gets merged, but keys in partial win.
-                'four' => ['type' => 'textarea'], // field gets added.
-            ], $items->map->config()->all());
-        });
+        ]], $blueprint->contents());
+        $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $blueprint->fields()->get('one')->config());
     }
 
     /** @test */
