@@ -145,6 +145,7 @@ class Blueprint implements Augmentable
                 return (isset($field['import'])) ? 'import:'.$field['import'] : $field['handle'];
             })->map(function ($field) use ($sectionHandle) {
                 $field['section'] = $sectionHandle;
+
                 return $field;
             });
         });

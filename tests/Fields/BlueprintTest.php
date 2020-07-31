@@ -534,8 +534,8 @@ class BlueprintTest extends TestCase
                     [
                         'import' => 'the_partial',
                         'config' => [
-                            'one' => ['foo' => 'bar']
-                        ]
+                            'one' => ['foo' => 'bar'],
+                        ],
                     ],
                 ],
             ],
