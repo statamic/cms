@@ -109,6 +109,7 @@ class AppServiceProvider extends ServiceProvider
             return (new \Statamic\Data\DataRepository)
                 ->setRepository('entry', \Statamic\Contracts\Entries\EntryRepository::class)
                 ->setRepository('term', \Statamic\Contracts\Taxonomies\TermRepository::class)
+                ->setRepository('collection', \Statamic\Contracts\Entries\CollectionRepository::class)
                 ->setRepository('taxonomy', \Statamic\Contracts\Taxonomies\TaxonomyRepository::class)
                 ->setRepository('global', \Statamic\Contracts\Globals\GlobalRepository::class)
                 ->setRepository('asset', \Statamic\Contracts\Assets\AssetRepository::class)
