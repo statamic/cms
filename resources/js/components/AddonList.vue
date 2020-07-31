@@ -170,7 +170,7 @@
             getAddons() {
                 this.loading = true;
 
-                this.$axios.get(cp_url('api/addons'), {'params': this.params}).then(response => {
+                this.$axios.get(cp_url('/api/addons'), {'params': this.params}).then(response => {
                     this.loading = false;
                     this.initializing = false;
                     this.rows = response.data.data;
