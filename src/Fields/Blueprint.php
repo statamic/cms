@@ -25,7 +25,7 @@ class Blueprint implements Augmentable
     protected $namespace;
     protected $order;
     protected $initialPath;
-    protected $contents = [];
+    protected $contents;
     protected $fieldsCache;
     protected $ensuredFields = [];
 
@@ -107,6 +107,10 @@ class Blueprint implements Augmentable
     {
         $contents = $this->contents;
 
+        $contents['sections'] = $contents['sections'] ?? [
+            'main' => ['fields' => []],
+        ];
+
         if ($this->ensuredFields) {
             $contents = $this->addEnsuredFieldsToContents($contents, $this->ensuredFields);
         }
@@ -130,15 +134,22 @@ class Blueprint implements Augmentable
         $imported = false;
         $handle = $ensured['handle'];
         $config = $ensured['config'];
-        $section = $ensured['section'];
+        $section = $ensured['section'] ?? array_keys($contents['sections'])[0] ?? 'main';
         $prepend = $ensured['prepend'];
 
-        $sectionContents = $contents['sections'][$section] ?? [];
-        $fields = collect($sectionContents['fields'] ?? [])->keyBy(function ($field) {
-            return (isset($field['import'])) ? 'import:'.$field['import'] : $field['handle'];
+        $sections = collect($contents['sections']);
+
+        // Get all the fields, and mark which section they're in.
+        $allFields = $sections->flatMap(function ($section, $sectionHandle) {
+            return collect($section['fields'] ?? [])->keyBy(function ($field) {
+                return (isset($field['import'])) ? 'import:'.$field['import'] : $field['handle'];
+            })->map(function ($field) use ($sectionHandle) {
+                $field['section'] = $sectionHandle;
+                return $field;
+            });
         });
 
-        $importedFields = $fields->filter(function ($field, $key) {
+        $importedFields = $allFields->filter(function ($field, $key) {
             return Str::startsWith($key, 'import:');
         })->keyBy->import->mapWithKeys(function ($field, $partial) {
             return (new Fields([$field]))->all()->map(function ($field) use ($partial) {
@@ -147,8 +158,11 @@ class Blueprint implements Augmentable
         });
 
         // If a field with that handle is in the contents, its either an inline field or a referenced field...
-        $existingField = $fields->get($handle);
+        $existingField = $allFields->get($handle);
         if ($exists = $existingField !== null) {
+            // Since it already exists, maintain the position in that section.
+            $section = $existingField['section'];
+
             if (is_string($existingField['field'])) {
                 // If it's a string, then it's a reference field. We should merge any ensured config into the 'config'
                 // override array, but only keys that don't already exist in the actual partial field's config.
@@ -165,14 +179,23 @@ class Blueprint implements Augmentable
             }
         }
 
+        $fields = collect($sections[$section]['fields'] ?? [])->keyBy(function ($field) {
+            return (isset($field['import'])) ? 'import:'.$field['import'] : $field['handle'];
+        });
+
         if (! $exists) {
             if ($importedField = $importedFields->get($handle)) {
                 $importKey = 'import:'.$importedField['partial'];
-                $field = $fields->get($importKey);
+                $field = $allFields->get($importKey);
+                $section = $field['section'];
+                $fields = collect($sections[$section]['fields'])->keyBy(function ($field) {
+                    return (isset($field['import'])) ? 'import:'.$field['import'] : $field['handle'];
+                });
                 $importedConfig = $importedField['field']->config();
                 $config = array_merge($config, $importedConfig);
                 $config = Arr::except($config, array_keys($importedConfig));
                 $field['config'][$handle] = $config;
+                unset($field['section']);
                 $fields->put($importKey, $field);
                 $imported = true;
             } else {
@@ -305,18 +328,6 @@ class Blueprint implements Augmentable
 
     public function ensureField($handle, $fieldConfig, $section = null, $prepend = false)
     {
-        // If blueprint already has field, merge it's config in the field's current section.
-        if ($this->hasField($handle)) {
-            foreach ($this->sections()->keys() as $sectionKey) {
-                if ($this->hasFieldInSection($handle, $sectionKey)) {
-                    return $this->ensureFieldInSection($handle, $fieldConfig, $sectionKey);
-                }
-            }
-        }
-
-        // If a section hasn't been provided we'll just use the first section, or default.
-        $section = $section ?? $this->sections()->keys()->first() ?? 'main';
-
         return $this->ensureFieldInSection($handle, $fieldConfig, $section, $prepend);
     }
 

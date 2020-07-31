@@ -35,7 +35,7 @@ class BlueprintTest extends TestCase
     public function it_gets_contents()
     {
         $blueprint = new Blueprint;
-        $this->assertEquals([], $blueprint->contents());
+        $this->assertEquals(['sections' => ['main' => ['fields' => []]]], $blueprint->contents());
 
         $contents = [
             'sections' => [
@@ -77,7 +77,7 @@ class BlueprintTest extends TestCase
         $blueprint = new Blueprint;
         tap($blueprint->sections(), function ($sections) {
             $this->assertInstanceOf(Collection::class, $sections);
-            $this->assertCount(0, $sections);
+            $this->assertCount(1, $sections);
         });
 
         $contents = [
@@ -104,7 +104,7 @@ class BlueprintTest extends TestCase
     public function it_puts_top_level_fields_into_a_main_section()
     {
         $blueprint = new Blueprint;
-        $this->assertEquals([], $blueprint->contents());
+        $this->assertEquals(['sections' => ['main' => ['fields' => []]]], $blueprint->contents());
 
         $blueprint->setContents([
             'fields' => ['one' => ['type' => 'text']],
