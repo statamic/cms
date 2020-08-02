@@ -65,10 +65,14 @@ class Email extends Mailable
         }
 
         if ($text) {
-            $this->text($text);
+            $this->text((string) $text);
         }
 
-        return $this->view($html);
+        if ($html) {
+            $this->view((string) $html);
+        }
+
+        return $this;
     }
 
     protected function addData()
