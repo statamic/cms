@@ -4,7 +4,6 @@ namespace Statamic\Tags;
 
 use Statamic\Extend\HasAliases;
 use Statamic\Extend\HasHandle;
-use Statamic\Extend\HasParameters;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Parse;
@@ -12,7 +11,7 @@ use Statamic\Support\Arr;
 
 abstract class Tags
 {
-    use HasHandle, HasAliases, HasParameters, RegistersItself;
+    use HasHandle, HasAliases, RegistersItself;
 
     protected static $binding = 'tags';
 
@@ -115,7 +114,6 @@ abstract class Tags
         $this->params = Parameters::make($parameters, $this->context);
 
         // Temporary BC alias.
-        // TODO: Remove with HasParameters trait
         $this->parameters = $this->params;
 
         return $this;

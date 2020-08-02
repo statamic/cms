@@ -3,11 +3,10 @@
 namespace Statamic\Tags\Concerns;
 
 use Illuminate\Support\MessageBag;
-use Statamic\Extend\HasParameters;
 
 trait RendersForms
 {
-    use HasParameters, RendersAttributes;
+    use RendersAttributes;
 
     /**
      * Open a form.
