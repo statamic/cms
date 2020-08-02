@@ -27,7 +27,7 @@ trait QueriesConditions
 
     protected function queryableConditionParams()
     {
-        return $this->params->filter(function ($value, $param) {
+        return $this->parameters->filter(function ($value, $param) {
             return Str::contains($param, ':');
         });
     }

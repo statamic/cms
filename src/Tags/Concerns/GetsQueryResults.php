@@ -8,15 +8,15 @@ trait GetsQueryResults
     {
         $this->setPaginationParameterPrecedence();
 
-        if ($paginate = $this->params->get('paginate')) {
+        if ($paginate = $this->parameters->get('paginate')) {
             return $this->paginatedResults($query, $paginate);
         }
 
-        if ($limit = $this->params->get('limit')) {
+        if ($limit = $this->parameters->get('limit')) {
             $query->limit($limit);
         }
 
-        if ($offset = $this->params->get('offset')) {
+        if ($offset = $this->parameters->get('offset')) {
             $query->offset($offset);
         }
 
@@ -25,14 +25,14 @@ trait GetsQueryResults
 
     protected function setPaginationParameterPrecedence()
     {
-        if ($this->params->get('paginate') === true) {
-            $this->params->put('paginate', $this->params->get('limit'));
+        if ($this->parameters->get('paginate') === true) {
+            $this->parameters->put('paginate', $this->parameters->get('limit'));
         }
     }
 
     protected function paginatedResults($query, $perPage)
     {
-        if ($offset = $this->params->get('offset')) {
+        if ($offset = $this->parameters->get('offset')) {
             $this->queryPaginationFriendlyOffset($query, $offset);
         }
 
