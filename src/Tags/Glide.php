@@ -237,7 +237,7 @@ class Glide extends Tags
     {
         $params = collect();
 
-        foreach ($this->parameters as $param => $value) {
+        foreach ($this->params as $param => $value) {
             if (! in_array($param, ['src', 'id', 'path', 'tag', 'alt', 'absolute'])) {
                 $params->put($param, $value);
             }

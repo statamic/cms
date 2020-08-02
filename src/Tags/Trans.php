@@ -13,6 +13,6 @@ class Trans extends Tags
     {
         $key = $this->params->get('key', $tag);
 
-        return trans($key, $this->parameters->all());
+        return trans($key, $this->params->all());
     }
 }

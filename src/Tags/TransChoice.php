@@ -14,6 +14,6 @@ class TransChoice extends Tags
         $key = $this->params->get('key', $tag);
         $count = $this->params->get('count', 1);
 
-        return trans_choice($key, $count, $this->parameters->all());
+        return trans_choice($key, $count, $this->params->all());
     }
 }

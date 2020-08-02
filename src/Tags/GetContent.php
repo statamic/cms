@@ -22,7 +22,7 @@ class GetContent extends Collection
             $from = implode('|', $from);
         }
 
-        $this->parameters['from'] = $from;
+        $this->params['from'] = $from;
 
         return $this->index();
     }
@@ -49,8 +49,8 @@ class GetContent extends Collection
             throw new \Exception('The get_content tag currently only supports getting a single item by ID.');
         }
 
-        $this->parameters['id:matches'] = $from[0];
-        $this->parameters['from'] = '*';
+        $this->params['id:matches'] = $from[0];
+        $this->params['from'] = '*';
 
         return parent::index();
     }
