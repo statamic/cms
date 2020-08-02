@@ -113,9 +113,6 @@ abstract class Tags
     {
         $this->params = Parameters::make($parameters, $this->context);
 
-        // Temporary BC alias.
-        $this->parameters = $this->params;
-
         return $this;
     }
 
