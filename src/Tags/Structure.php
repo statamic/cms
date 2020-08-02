@@ -51,7 +51,7 @@ class Structure extends Tags
                 return null;
             }
 
-            if (! $this->get('show_unpublished') && $page->entry() && ! $page->entry()->published()) {
+            if (! $this->params->get('show_unpublished') && $page->entry() && ! $page->entry()->published()) {
                 return null;
             }
 
