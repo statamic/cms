@@ -32,7 +32,7 @@ class GetContent extends Collection
      */
     public function index()
     {
-        $from = $this->getList(['from', 'id']);
+        $from = $this->params->explode(['from', 'id']);
 
         if (Str::startsWith($from[0], '/')) {
             $site = $this->params->get(['site', 'locale'], Site::current()->handle());
