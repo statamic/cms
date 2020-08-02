@@ -156,7 +156,7 @@
             },
 
             installExplicitVersion(version) {
-                this.$axios.post(`/cp/updater/${this.slug}/install`, {'version': version}, this.toEleven);
+                this.$axios.post(cp_url(`/updater/${this.slug}/install`), {'version': version}, this.toEleven);
 
                 this.$store.commit('statamic/composer', {
                     processing: true,
