@@ -35,7 +35,7 @@ class GetContent extends Collection
         $from = $this->getList(['from', 'id']);
 
         if (Str::startsWith($from[0], '/')) {
-            $site = $this->get(['site', 'locale'], Site::current()->handle());
+            $site = $this->params->get(['site', 'locale'], Site::current()->handle());
 
             $entries = EntryCollection::make($from)->map(function ($item) use ($site) {
                 return Entry::findByUri($item, $site);

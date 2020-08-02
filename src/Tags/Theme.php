@@ -27,7 +27,7 @@ class Theme extends Tags
 
     private function path($dir = null)
     {
-        $src = $this->get('src');
+        $src = $this->params->get('src');
 
         $path = $dir.'/'.$src;
 
@@ -53,15 +53,15 @@ class Theme extends Tags
      */
     public function img()
     {
-        $src = $this->get('src');
+        $src = $this->params->get('src');
 
         $path = 'img/'.$src;
 
         $url = $this->themeUrl($path);
 
-        $alt = $this->get('alt');
+        $alt = $this->params->get('alt');
 
-        if ($this->getBool('tag')) {
+        if ($this->params->get('tag')) {
             return "<img src=\"$url\" alt=\"$alt\" />";
         }
 
@@ -75,13 +75,13 @@ class Theme extends Tags
      */
     public function js()
     {
-        $src = $this->get('src', 'app');
+        $src = $this->params->get('src', 'app');
 
         $path = 'js/'.Str::ensureRight($src, '.js');
 
         $url = $this->themeUrl($path);
 
-        if ($this->getBool('tag')) {
+        if ($this->params->get('tag')) {
             return '<script src="'.$url.'"></script>';
         }
 
@@ -95,13 +95,13 @@ class Theme extends Tags
      */
     public function css()
     {
-        $src = $this->get('src', 'app');
+        $src = $this->params->get('src', 'app');
 
         $path = 'css/'.Str::ensureRight($src, '.css');
 
         $url = $this->themeUrl($path);
 
-        if ($this->getBool('tag')) {
+        if ($this->params->get('tag')) {
             return '<link rel="stylesheet" href="'.$url.'" />';
         }
 
@@ -117,7 +117,7 @@ class Theme extends Tags
      */
     public function output()
     {
-        $src = $this->get('src');
+        $src = $this->params->get('src');
 
         // Output nothing if the file doesn't exist.
         if (! File::disk('resources')->exists($src)) {
@@ -129,7 +129,7 @@ class Theme extends Tags
         // If its a tag pair, the contents should be inserted into a variable.
         // {{ output_contents }} by default, but can be changed using `as`.
         if ($this->content) {
-            return [$this->get('as', 'output_contents') => $contents];
+            return [$this->params->get('as', 'output_contents') => $contents];
         }
 
         return $contents;
@@ -137,23 +137,23 @@ class Theme extends Tags
 
     private function themeUrl($path)
     {
-        if ($this->getBool('version')) {
+        if ($this->params->get('version')) {
             $pi = pathinfo($path);
             $path = $this->versioned($pi['extension'], $pi['filename']);
         }
 
         $url = URL::prependSiteUrl(
             $path,
-            $this->get('locale', Config::getDefaultLocale()),
+            $this->params->get('locale', Config::getDefaultLocale()),
             false
         );
 
-        if ($this->getBool('cache_bust')) {
+        if ($this->params->get('cache_bust')) {
             throw_if(! File::exists($path = public_path($path)), new \Exception("File $path does not exist."));
             $url .= '?v='.File::lastModified($path);
         }
 
-        if (! $this->getBool('absolute')) {
+        if (! $this->params->get('absolute')) {
             $url = URL::makeRelative($url);
         }
 

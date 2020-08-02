@@ -54,8 +54,8 @@ class Assets extends Tags
      */
     public function index()
     {
-        $id = $this->get(['container', 'handle', 'id']);
-        $path = $this->get('path');
+        $id = $this->params->get(['container', 'handle', 'id']);
+        $path = $this->params->get('path');
 
         if (! $id && ! $path) {
             \Log::debug('No asset container ID or path was specified.');
@@ -73,7 +73,7 @@ class Assets extends Tags
             return $this->parseNoResults();
         }
 
-        $this->assets = $container->assets($this->get('folder'), $this->getBool('recursive', false));
+        $this->assets = $container->assets($this->params->get('folder'), $this->params->get('recursive', false));
 
         return $this->output();
     }
@@ -120,7 +120,7 @@ class Assets extends Tags
 
     private function sort()
     {
-        if ($sort = $this->get('sort')) {
+        if ($sort = $this->params->get('sort')) {
             $this->assets = $this->assets->multisort($sort);
         }
     }
@@ -132,9 +132,9 @@ class Assets extends Tags
      */
     private function limit()
     {
-        $limit = $this->getInt('limit');
+        $limit = $this->params->get('limit');
         $limit = ($limit == 0) ? $this->assets->count() : $limit;
-        $offset = $this->getInt('offset');
+        $offset = $this->params->get('offset');
 
         $this->assets = $this->assets->splice($offset, $limit);
     }

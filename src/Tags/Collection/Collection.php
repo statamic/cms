@@ -101,6 +101,6 @@ class Collection extends Tags
 
     protected function currentEntry()
     {
-        return Entry::find($this->get('current', $this->context->get('id')));
+        return Entry::find($this->params->get('current', $this->context->get('id')));
     }
 }

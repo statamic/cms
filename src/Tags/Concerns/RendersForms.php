@@ -24,7 +24,7 @@ trait RendersForms
             'action' => $action,
         ];
 
-        if ($this->getBool('files')) {
+        if ($this->params->get('files')) {
             $defaultAttrs['enctype'] = 'multipart/form-data';
         }
 

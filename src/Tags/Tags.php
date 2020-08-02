@@ -145,7 +145,7 @@ abstract class Tags
      */
     public function parse($data = [])
     {
-        if ($scope = $this->get('scope')) {
+        if ($scope = $this->params->get('scope')) {
             $data = Arr::addScope($data, $scope);
         }
 
@@ -169,7 +169,7 @@ abstract class Tags
             return $this->parse([$as => $data]);
         }
 
-        if ($scope = $this->get('scope')) {
+        if ($scope = $this->params->get('scope')) {
             $data = Arr::addScope($data, $scope);
         }
 

@@ -11,7 +11,7 @@ class Trans extends Tags
      */
     public function wildcard($tag)
     {
-        $key = $this->get('key', $tag);
+        $key = $this->params->get('key', $tag);
 
         return trans($key, $this->parameters->all());
     }

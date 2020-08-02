@@ -16,7 +16,7 @@ class Rotate extends Tags
      */
     public function index()
     {
-        if (! $between = $this->get('between')) {
+        if (! $between = $this->params->get('between')) {
             // No 'between' parameter? Why are you using this tag?
             return null;
         }
