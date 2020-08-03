@@ -19,7 +19,7 @@
                     <button @click.prevent="toggleEditing" class="text-grey-60 hover:text-grey-100 mr-1">
                         <svg-icon :name="isEditing ? 'shrink' : 'expand'" />
                     </button>
-                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100">
+                    <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100" v-if="deletable">
                         <svg-icon name="trash" />
                     </button>
                 </div>
@@ -69,6 +69,10 @@ export default {
         isSingle: {
             type: Boolean,
             default: false
+        },
+        deletable: {
+            type: Boolean,
+            default: true
         }
     },
 
