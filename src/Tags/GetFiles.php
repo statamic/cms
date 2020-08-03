@@ -39,7 +39,7 @@ class GetFiles extends Tags
     private function getFiles()
     {
         $folders = $this->params->get(['in', 'from']);
-        $depth = $this->params->get('depth', 1);
+        $depth = $this->params->int('depth', 1);
 
         $this->files = new FileCollection;
 
@@ -139,9 +139,9 @@ class GetFiles extends Tags
 
     private function limit()
     {
-        $limit = $this->params->get('limit');
+        $limit = $this->params->int('limit');
         $limit = ($limit == 0) ? $this->files->count() : $limit;
-        $offset = $this->params->get('offset');
+        $offset = $this->params->int('offset');
 
         $this->files = $this->files->splice($offset, $limit);
     }

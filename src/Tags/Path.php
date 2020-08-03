@@ -22,7 +22,7 @@ class Path extends Tags
 
         $url = PathAPI::tidy(Config::getSiteUrl().$src);
 
-        if ($this->params->get('absolute', false)) {
+        if ($this->params->bool('absolute', false)) {
             $url = URL::makeAbsolute($url);
         }
 

@@ -61,7 +61,7 @@ class Theme extends Tags
 
         $alt = $this->params->get('alt');
 
-        if ($this->params->get('tag')) {
+        if ($this->params->bool('tag')) {
             return "<img src=\"$url\" alt=\"$alt\" />";
         }
 
@@ -81,7 +81,7 @@ class Theme extends Tags
 
         $url = $this->themeUrl($path);
 
-        if ($this->params->get('tag')) {
+        if ($this->params->bool('tag')) {
             return '<script src="'.$url.'"></script>';
         }
 
@@ -101,7 +101,7 @@ class Theme extends Tags
 
         $url = $this->themeUrl($path);
 
-        if ($this->params->get('tag')) {
+        if ($this->params->bool('tag')) {
             return '<link rel="stylesheet" href="'.$url.'" />';
         }
 
@@ -137,7 +137,7 @@ class Theme extends Tags
 
     private function themeUrl($path)
     {
-        if ($this->params->get('version')) {
+        if ($this->params->bool('version')) {
             $pi = pathinfo($path);
             $path = $this->versioned($pi['extension'], $pi['filename']);
         }
@@ -148,12 +148,12 @@ class Theme extends Tags
             false
         );
 
-        if ($this->params->get('cache_bust')) {
+        if ($this->params->bool('cache_bust')) {
             throw_if(! File::exists($path = public_path($path)), new \Exception("File $path does not exist."));
             $url .= '?v='.File::lastModified($path);
         }
 
-        if (! $this->params->get('absolute')) {
+        if (! $this->params->bool('absolute')) {
             $url = URL::makeRelative($url);
         }
 

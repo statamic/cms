@@ -134,7 +134,7 @@ class Locales extends Tags
             $locales = ($dir === 'asc') ? $locales->sortBy($sort) : $locales->sortByDesc($sort);
         }
 
-        if ($this->params->get('current_first', true)) {
+        if ($this->params->bool('current_first', true)) {
             $locales = $this->moveCurrentLocaleToFront($locales);
         }
 

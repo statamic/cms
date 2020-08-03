@@ -132,9 +132,9 @@ class Assets extends Tags
      */
     private function limit()
     {
-        $limit = $this->params->get('limit');
+        $limit = $this->params->int('limit');
         $limit = ($limit == 0) ? $this->assets->count() : $limit;
-        $offset = $this->params->get('offset');
+        $offset = $this->params->int('offset');
 
         $this->assets = $this->assets->splice($offset, $limit);
     }

@@ -140,7 +140,7 @@ class Glide extends Tags
                 compact('url', 'width', 'height')
             );
         }
-        if ($this->params->get('tag')) {
+        if ($this->params->bool('tag')) {
             return "<img src=\"$url\" alt=\"{$this->params->get('alt')}\" />";
         }
 
@@ -163,7 +163,7 @@ class Glide extends Tags
             return;
         }
 
-        $url = ($this->params->get('absolute')) ? URL::makeAbsolute($url) : URL::makeRelative($url);
+        $url = ($this->params->bool('absolute')) ? URL::makeAbsolute($url) : URL::makeRelative($url);
 
         return $url;
     }
