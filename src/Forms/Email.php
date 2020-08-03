@@ -65,11 +65,11 @@ class Email extends Mailable
         }
 
         if ($text) {
-            $this->text((string) $text);
+            $this->text($text);
         }
 
         if ($html) {
-            $this->view((string) $html);
+            $this->view($html);
         }
 
         return $this;
@@ -128,7 +128,7 @@ class Email extends Mailable
         $data = $this->submission->toArray();
 
         return collect($config)->map(function ($value) use ($data) {
-            return Parse::template(Parse::env($value), $data);
+            return (string) Parse::template(Parse::env($value), $data);
         });
     }
 }
