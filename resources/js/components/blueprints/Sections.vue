@@ -60,6 +60,10 @@ export default {
         singleSection: {
             type: Boolean,
             default: false
+        },
+        requireSection: {
+            type: Boolean,
+            default: true
         }
     },
 
@@ -174,7 +178,7 @@ export default {
         },
 
         ensureSection() {
-            if (this.sections.length === 0) {
+            if (this.requireSection && this.sections.length === 0) {
                 this.addSection();
             }
         }
