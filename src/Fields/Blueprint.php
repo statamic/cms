@@ -27,6 +27,7 @@ class Blueprint implements Augmentable
     protected $initialPath;
     protected $contents;
     protected $fieldsCache;
+    protected $parent;
     protected $ensuredFields = [];
 
     public function setHandle(string $handle)
@@ -227,6 +228,13 @@ class Blueprint implements Augmentable
         return $this->contents();
     }
 
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+
+        return $this;
+    }
+
     public function sections(): Collection
     {
         return collect(Arr::get($this->contents(), 'sections', []))->map(function ($contents, $handle) {
@@ -242,7 +250,7 @@ class Blueprint implements Augmentable
 
         $this->validateUniqueHandles();
 
-        $fields = new Fields($this->sections()->map->fields()->flatMap->items());
+        $fields = new Fields($this->sections()->map->fields()->flatMap->items(), $this->parent);
 
         $this->fieldsCache = $fields;
 

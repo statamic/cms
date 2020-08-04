@@ -11,10 +11,13 @@ class Fields
 {
     protected $items;
     protected $fields;
+    protected $parent;
 
-    public function __construct($items = [])
+    public function __construct($items = [], $parent = null)
     {
-        $this->setItems($items);
+        $this
+            ->setParent($parent)
+            ->setItems($items);
     }
 
     public function setItems($items)
@@ -35,6 +38,13 @@ class Fields
     public function setFields($fields)
     {
         $this->fields = $fields;
+
+        return $this;
+    }
+
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
 
         return $this;
     }
@@ -62,6 +72,7 @@ class Fields
     public function newInstance()
     {
         return (new static)
+            ->setParent($this->parent)
             ->setItems($this->items)
             ->setFields($this->fields);
     }
@@ -168,7 +179,7 @@ class Fields
 
     protected function newField($handle, $config)
     {
-        return new Field($handle, $config);
+        return (new Field($handle, $config))->setParent($this->parent);
     }
 
     private function getReferencedField(array $config): Field
