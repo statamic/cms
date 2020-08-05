@@ -6,7 +6,6 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Statamic\Exceptions\StatamicProRequiredException;
 use Statamic\Facades\Preference;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
@@ -31,7 +30,8 @@ class AppServiceProvider extends ServiceProvider
         $this->registerMiddlewareGroup();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
-             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class);
+            ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
+            ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
@@ -76,8 +76,6 @@ class AppServiceProvider extends ServiceProvider
                 Preference::get('date_format', config('statamic.cp.date_format'))
             );
         });
-
-        $this->checkMultisiteFeature();
     }
 
     public function register()
@@ -142,16 +140,5 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\Localize::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ]);
-    }
-
-    protected function checkMultisiteFeature()
-    {
-        if (Statamic::pro()) {
-            return;
-        }
-
-        $sites = config('statamic.sites.sites');
-
-        throw_if(count($sites) > 1, new StatamicProRequiredException('Statamic Pro is required to use multiple sites.'));
     }
 }
