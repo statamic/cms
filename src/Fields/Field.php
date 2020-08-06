@@ -262,6 +262,13 @@ class Field implements Arrayable
         return array_get($this->config, $key, $fallback);
     }
 
+    public function set(string $key, $value)
+    {
+        array_set($this->config, $key, $value);
+        
+        return $this;
+    }
+
     private function preProcessedConfig()
     {
         $fieldtype = $this->fieldtype();
