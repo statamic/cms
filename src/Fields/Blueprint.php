@@ -12,6 +12,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\BlueprintDeleted;
 use Statamic\Events\BlueprintSaved;
+use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Facades;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
@@ -401,7 +402,7 @@ class Blueprint implements Augmentable
         })->filter();
 
         if ($field = $handles->duplicates()->first()) {
-            throw new \Exception("Duplicate field [{$field}] on blueprint [{$this->handle}].");
+            throw new DuplicateFieldException($field, $this);
         }
     }
 
