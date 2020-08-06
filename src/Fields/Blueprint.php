@@ -393,7 +393,7 @@ class Blueprint implements Augmentable
         return $this->resetFieldsCache();
     }
 
-    protected function validateUniqueHandles()
+    public function validateUniqueHandles()
     {
         $handles = $this->sections()->map->contents()->flatMap(function ($contents) {
             return array_get($contents, 'fields', []);

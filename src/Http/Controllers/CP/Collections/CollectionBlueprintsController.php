@@ -52,7 +52,11 @@ class CollectionBlueprintsController extends CpController
             'sections' => 'array',
         ]);
 
-        $this->updateBlueprint($request, $collection->entryBlueprint($blueprint));
+        $blueprint = $this->setBlueprintContents($request, $collection->entryBlueprint($blueprint));
+
+        $this->validateUniqueHandles($blueprint);
+
+        $blueprint->save();
     }
 
     public function create($collection)
