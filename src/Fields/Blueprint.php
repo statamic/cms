@@ -137,6 +137,7 @@ class Blueprint implements Augmentable
         $config = $ensured['config'];
         $section = $ensured['section'] ?? array_keys($contents['sections'])[0] ?? 'main';
         $prepend = $ensured['prepend'];
+        $override = $ensured['override'];
 
         $sections = collect($contents['sections']);
 
@@ -176,7 +177,11 @@ class Blueprint implements Augmentable
             } else {
                 // If it's not a string, then it's an inline field. We'll just merge the
                 // config right into the field key, with the user defined config winning.
-                $config = array_merge($config, $existingField['field']);
+                if ($override) {
+                    $config = array_merge($existingField['field'], $config);
+                } else {
+                    $config = array_merge($config, $existingField['field']);
+                }
                 $field = ['handle' => $handle, 'field' => $config];
             }
         }
@@ -335,14 +340,14 @@ class Blueprint implements Augmentable
         return true;
     }
 
-    public function ensureField($handle, $fieldConfig, $section = null, $prepend = false)
+    public function ensureField($handle, $fieldConfig, $section = null, $prepend = false, $override = false)
     {
-        return $this->ensureFieldInSection($handle, $fieldConfig, $section, $prepend);
+        return $this->ensureFieldInSection($handle, $fieldConfig, $section, $prepend, $override);
     }
 
-    public function ensureFieldInSection($handle, $config, $section, $prepend = false)
+    public function ensureFieldInSection($handle, $config, $section, $prepend = false, $override = false)
     {
-        $this->ensuredFields[] = compact('handle', 'section', 'prepend', 'config');
+        $this->ensuredFields[] = compact('handle', 'section', 'prepend', 'override', 'config');
 
         $this->resetFieldsCache();
 
@@ -352,6 +357,11 @@ class Blueprint implements Augmentable
     public function ensureFieldPrepended($handle, $field, $section = null)
     {
         return $this->ensureField($handle, $field, $section, true);
+    }
+
+    public function mergeField($handle, $fieldConfig)
+    {
+        return $this->ensureFieldInSection($handle, $fieldConfig, null, false, true);
     }
 
     public function removeField($handle, $section = null)
