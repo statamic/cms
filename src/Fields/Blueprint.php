@@ -395,11 +395,9 @@ class Blueprint implements Augmentable
 
     public function validateUniqueHandles()
     {
-        $handles = $this->sections()->map->contents()->flatMap(function ($contents) {
-            return array_get($contents, 'fields', []);
-        })->map(function ($item) {
-            return $item['handle'] ?? null;
-        })->filter();
+        $fields = $this->fieldsCache ?? new Fields($this->sections()->map->fields()->flatMap->items());
+
+        $handles = $fields->resolveFields()->map->handle()->values();
 
         if ($field = $handles->duplicates()->first()) {
             throw new DuplicateFieldException($field, $this);
