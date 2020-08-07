@@ -56,6 +56,15 @@ trait ManagesBlueprints
         }
     }
 
+    private function updateBlueprint($request, $blueprint)
+    {
+        $this->setBlueprintContents($request, $blueprint);
+
+        $this->validateUniqueHandles($blueprint);
+
+        $blueprint->save();
+    }
+
     private function sectionFields(array $fields)
     {
         return collect($fields)->map(function ($field) {
