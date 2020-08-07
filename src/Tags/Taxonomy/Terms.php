@@ -18,13 +18,13 @@ class Terms
         Concerns\GetsQueryResults;
 
     protected $ignoredParams = ['as'];
-    protected $parameters;
+    protected $params;
     protected $taxonomies;
     protected $collections;
 
-    public function __construct($parameters)
+    public function __construct($params)
     {
-        $this->parseParameters($parameters);
+        $this->parseParameters($params);
     }
 
     public function get()
@@ -75,7 +75,7 @@ class Terms
 
     protected function parseParameters($params)
     {
-        $this->parameters = $params->except($this->ignoredParams);
+        $this->params = $params->except($this->ignoredParams);
         $this->taxonomies = $this->parseTaxonomies();
         $this->orderBys = $this->parseOrderBys();
         $this->collections = $this->parseCollections();
@@ -83,8 +83,8 @@ class Terms
 
     protected function parseTaxonomies()
     {
-        $from = Arr::getFirst($this->parameters, ['from', 'in', 'folder', 'use', 'taxonomy']);
-        $not = Arr::getFirst($this->parameters, ['not_from', 'not_in', 'not_folder', 'dont_use', 'not_taxonomy']);
+        $from = Arr::getFirst($this->params, ['from', 'in', 'folder', 'use', 'taxonomy']);
+        $not = Arr::getFirst($this->params, ['not_from', 'not_in', 'not_folder', 'dont_use', 'not_taxonomy']);
 
         $taxonomies = $from === '*'
             ? collect(Taxonomy::handles())
@@ -105,7 +105,7 @@ class Terms
 
     protected function parseCollections()
     {
-        $collections = Arr::getFirst($this->parameters, ['collection', 'collections']);
+        $collections = Arr::getFirst($this->params, ['collection', 'collections']);
 
         if (! $collections) {
             return collect();
@@ -128,7 +128,7 @@ class Terms
 
     protected function queryMinimumEntries($query)
     {
-        $isQueryingEntriesCount = $this->parameters->first(function ($v, $k) {
+        $isQueryingEntriesCount = $this->params->first(function ($v, $k) {
             return Str::startsWith($k, 'entries_count:');
         });
 
@@ -136,7 +136,7 @@ class Terms
             return;
         }
 
-        if ($count = $this->parameters->int('min_count')) {
+        if ($count = $this->params->int('min_count')) {
             $query->where('entries_count', '>=', $count);
         }
     }

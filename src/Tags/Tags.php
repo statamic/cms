@@ -82,7 +82,7 @@ abstract class Tags
         $this->setParser($properties['parser']);
         $this->setContent($properties['content']);
         $this->setContext($properties['context']);
-        $this->setParameters($properties['parameters']);
+        $this->setParameters($properties['params']);
         $this->tag = array_get($properties, 'tag');
         $this->method = array_get($properties, 'tag_method');
     }

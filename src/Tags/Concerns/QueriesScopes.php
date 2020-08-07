@@ -15,13 +15,13 @@ trait QueriesScopes
             ->filter()
             ->each(function ($class) use ($query) {
                 $scope = app($class);
-                $scope->apply($query, $this->parameters);
+                $scope->apply($query, $this->params);
             });
     }
 
     protected function parseQueryScopes()
     {
-        $scopes = Arr::getFirst($this->parameters, ['query_scope', 'filter']);
+        $scopes = Arr::getFirst($this->params, ['query_scope', 'filter']);
 
         return collect(explode('|', $scopes));
     }

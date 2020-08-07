@@ -116,7 +116,7 @@ class Locales extends Tags
             return $this->data;
         }
 
-        $id = $this->get('id', $this->context->get('id'));
+        $id = $this->params->get('id', $this->context->get('id'));
 
         return $this->data = Entry::find($id);
     }

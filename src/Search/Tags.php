@@ -15,16 +15,16 @@ class Tags extends BaseTags
 
     public function results()
     {
-        if (! $query = request($this->get('query', 'q'))) {
+        if (! $query = request($this->params->get('query', 'q'))) {
             return $this->parseNoResults();
         }
 
-        $builder = Search::index($this->get('index'))
+        $builder = Search::index($this->params->get('index'))
             ->ensureExists()
             ->search($query)
-            ->withData($this->get('supplement_data', true))
-            ->limit($this->get('limit'))
-            ->offset($this->get('offset'));
+            ->withData($this->params->get('supplement_data', true))
+            ->limit($this->params->get('limit'))
+            ->offset($this->params->get('offset'));
 
         $this->queryConditions($builder);
 
