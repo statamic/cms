@@ -28,7 +28,7 @@ class Tags extends BaseTags
      */
     public function loginUrl()
     {
-        return $this->generateLoginUrl($this->get(['provider', 'for']));
+        return $this->generateLoginUrl($this->params->get(['provider', 'for']));
     }
 
     /**
@@ -41,7 +41,7 @@ class Tags extends BaseTags
     {
         $url = OAuth::provider($provider)->loginUrl();
 
-        if ($redirect = $this->get('redirect')) {
+        if ($redirect = $this->params->get('redirect')) {
             $url .= "?redirect=$redirect";
         }
 
