@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\Fieldset;
 use Tests\Fakes\FakeBlueprintRepository;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -49,6 +50,19 @@ class UpdateBlueprintTest extends TestCase
         $user = tap(Facades\User::make()->assignRole('test'))->save();
         $collection = tap(Collection::make('test'))->save();
         $blueprint = (new Blueprint)->setNamespace('collections.test')->setHandle('test')->setContents(['title' => 'Test'])->save();
+
+        $fieldset = (new Fieldset)->setContents([
+            'fields' => [
+                [
+                    'handle' => 'somefield',
+                    'field' => [],
+                ],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')
+            ->with('somefieldset')
+            ->andReturn($fieldset);
 
         $this
             ->actingAs($user)
@@ -197,6 +211,19 @@ class UpdateBlueprintTest extends TestCase
         $user = tap(Facades\User::make()->assignRole('test'))->save();
         $collection = tap(Collection::make('test'))->save();
         $blueprint = (new Blueprint)->setNamespace('collections.test')->setHandle('test')->setContents(['title' => 'Test'])->save();
+
+        $fieldset = (new Fieldset)->setContents([
+            'fields' => [
+                [
+                    'handle' => 'somefield',
+                    'field' => [],
+                ],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')
+            ->with('somefieldset')
+            ->andReturn($fieldset);
 
         $this
             ->actingAs($user)

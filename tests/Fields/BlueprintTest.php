@@ -9,7 +9,7 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
-use Statamic\Facades\Antlers;
+use Statamic\Facades;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
@@ -706,6 +706,40 @@ class BlueprintTest extends TestCase
                 'section_one' => [
                     'fields' => [
                         ['handle' => 'one', 'field' => ['type' => 'text']],
+                    ],
+                ],
+                'section_two' => [
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->expectException(\Exception::class);
+        $this->expectExceptionMessage('Duplicate field [one] on blueprint [test].');
+
+        $blueprint->fields();
+    }
+
+    /** @test */
+    public function it_validates_unique_handles_between_blueprint_and_imported_fieldset()
+    {
+        $fieldset = (new Fieldset)->setContents([
+            'fields' => [
+                ['handle' => 'one', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')
+            ->with('test')
+            ->andReturn($fieldset);
+
+        $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
+            'title' => 'Test',
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
                         ['import' => 'test'],
                     ],
                 ],
@@ -748,8 +782,8 @@ class BlueprintTest extends TestCase
     {
         $blueprint = (new Blueprint)->setHandle('test');
 
-        $this->assertEquals('test', Antlers::parse('{{ blueprint }}', ['blueprint' => $blueprint]));
+        $this->assertEquals('test', Facades\Antlers::parse('{{ blueprint }}', ['blueprint' => $blueprint]));
 
-        $this->assertEquals('test Test', Antlers::parse('{{ blueprint }}{{ handle }} {{ title }}{{ /blueprint }}', ['blueprint' => $blueprint]));
+        $this->assertEquals('test Test', Facades\Antlers::parse('{{ blueprint }}{{ handle }} {{ title }}{{ /blueprint }}', ['blueprint' => $blueprint]));
     }
 }
