@@ -159,7 +159,7 @@ class Fields
     {
         return $this->items->flatMap(function ($config) {
             return $this->createFields($config);
-        });
+        })->values();
     }
 
     public function createFields(array $config): array

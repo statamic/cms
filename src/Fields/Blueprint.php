@@ -397,7 +397,7 @@ class Blueprint implements Augmentable
     {
         $fields = $this->fieldsCache ?? new Fields($this->sections()->map->fields()->flatMap->items());
 
-        $handles = $fields->resolveFields()->map->handle()->values();
+        $handles = $fields->resolveFields()->map->handle();
 
         if ($field = $handles->duplicates()->first()) {
             throw new DuplicateFieldException($field, $this);
