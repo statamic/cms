@@ -28,9 +28,7 @@ class Fields
 
         $this->items = collect($items);
 
-        $this->fields = $this->items->flatMap(function ($config) {
-            return $this->createFields($config);
-        })->keyBy->handle();
+        $this->fields = $this->resolveFields()->keyBy->handle();
 
         return $this;
     }
@@ -155,6 +153,13 @@ class Fields
         return $this->newInstance()->setFields(
             $this->fields->map->shallowAugment()
         );
+    }
+
+    public function resolveFields()
+    {
+        return $this->items->flatMap(function ($config) {
+            return $this->createFields($config);
+        });
     }
 
     public function createFields(array $config): array
