@@ -16,13 +16,13 @@ class Path extends Tags
     public function index()
     {
         // If no src param was used, we will treat this as a regular `path` variable.
-        if (! $src = $this->get(['src', 'to'])) {
+        if (! $src = $this->params->get(['src', 'to'])) {
             return array_get($this->context, 'path');
         }
 
         $url = PathAPI::tidy(Config::getSiteUrl().$src);
 
-        if ($this->getBool('absolute', false)) {
+        if ($this->params->bool('absolute', false)) {
             $url = URL::makeAbsolute($url);
         }
 
