@@ -31,10 +31,9 @@ class AssetUploader extends Uploader
     {
         $path = Path::assemble($this->config->get('folder'), $file->getClientOriginalName());
 
-        $asset = Asset::create()
+        $asset = Asset::make()
                       ->container($this->config->get('container'))
-                      ->path(ltrim($path, '/'))
-                      ->get();
+                      ->path(ltrim($path, '/'));
 
         $asset->upload($file);
 
