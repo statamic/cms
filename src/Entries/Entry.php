@@ -13,6 +13,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
+use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
@@ -23,7 +24,6 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Facades\User;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
@@ -35,7 +35,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns;
+    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified;
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -409,20 +409,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization
             ->published($attrs['published'])
             ->data($attrs['data'])
             ->slug($attrs['slug']);
-    }
-
-    public function lastModified()
-    {
-        return $this->has('updated_at')
-            ? Carbon::createFromTimestamp($this->get('updated_at'))
-            : $this->fileLastModified();
-    }
-
-    public function lastModifiedBy()
-    {
-        return $this->has('updated_by')
-            ? User::find($this->get('updated_by'))
-            : null;
     }
 
     public function status()
