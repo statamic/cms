@@ -176,10 +176,7 @@ class TermsController extends CpController
                 $term->published($request->published);
             }
 
-            $term
-                ->set('updated_by', User::fromUser($request->user())->id())
-                ->set('updated_at', now()->timestamp)
-                ->save();
+            $term->updateLastModified()->save();
         }
 
         return new TermResource($term);
@@ -266,10 +263,7 @@ class TermsController extends CpController
                 'user' => User::fromUser($request->user()),
             ]);
         } else {
-            $term
-                ->set('updated_by', User::fromUser($request->user())->id())
-                ->set('updated_at', now()->timestamp)
-                ->save();
+            $term->updateLastModified()->save();
         }
 
         return ['data' => ['redirect' => $term->editUrl()]];

@@ -189,10 +189,7 @@ class EntriesController extends CpController
                 $entry->published($request->published);
             }
 
-            $entry
-                ->set('updated_by', User::fromUser($request->user())->id())
-                ->set('updated_at', now()->timestamp)
-                ->save();
+            $entry->updateLastModified()->save();
         }
 
         return new EntryResource($entry->fresh());
@@ -299,10 +296,7 @@ class EntriesController extends CpController
                 'user' => User::fromUser($request->user()),
             ]);
         } else {
-            $entry
-                ->set('updated_by', User::fromUser($request->user())->id())
-                ->set('updated_at', now()->timestamp)
-                ->save();
+            $entry->updateLastModified()->save();
         }
 
         return new EntryResource($entry);
