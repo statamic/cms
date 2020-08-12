@@ -144,7 +144,7 @@ class Blueprint implements Augmentable
         // Get all the fields, and mark which section they're in.
         $allFields = $sections->flatMap(function ($section, $sectionHandle) {
             return collect($section['fields'] ?? [])->keyBy(function ($field) {
-                return (isset($field['import'])) ? 'import:'.$field['import'] : $field['handle'];
+                return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
             })->map(function ($field) use ($sectionHandle) {
                 $field['section'] = $sectionHandle;
 
@@ -154,7 +154,9 @@ class Blueprint implements Augmentable
 
         $importedFields = $allFields->filter(function ($field, $key) {
             return Str::startsWith($key, 'import:');
-        })->keyBy->import->mapWithKeys(function ($field, $partial) {
+        })->keyBy(function ($field) {
+            return ($field['prefix'] ?? null).$field['import'];
+        })->mapWithKeys(function ($field, $partial) {
             return (new Fields([$field]))->all()->map(function ($field) use ($partial) {
                 return compact('partial', 'field');
             });
@@ -181,9 +183,8 @@ class Blueprint implements Augmentable
                 $field = ['handle' => $handle, 'field' => $config];
             }
         }
-
         $fields = collect($sections[$section]['fields'] ?? [])->keyBy(function ($field) {
-            return (isset($field['import'])) ? 'import:'.$field['import'] : $field['handle'];
+            return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
         });
 
         if (! $exists) {

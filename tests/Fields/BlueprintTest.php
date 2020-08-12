@@ -758,6 +758,37 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function it_can_import_the_same_fieldset_twice_with_different_prefixes()
+    {
+        $fieldset = (new Fieldset)->setContents([
+            'fields' => [
+                ['handle' => 'one', 'field' => ['type' => 'text']],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')
+            ->with('test')
+            ->andReturn($fieldset);
+
+        $blueprint = (new Blueprint)->setHandle('test')
+            ->setContents($contents = [
+                'title' => 'Test',
+                'sections' => [
+                    'section_one' => [
+                        'fields' => [
+                            ['import' => 'test', 'prefix' => 'first_'],
+                            ['import' => 'test', 'prefix' => 'second_'],
+                        ],
+                    ],
+                ],
+            ])
+            ->ensureField('test', ['type' => 'text']); // This was screwing with multiple imports of the same fieldset.
+
+        $this->assertTrue($blueprint->hasField('first_one'));
+        $this->assertTrue($blueprint->hasField('second_one'));
+    }
+
+    /** @test */
     public function it_gets_the_handle_when_casting_to_a_string()
     {
         $blueprint = (new Blueprint)->setHandle('test');
