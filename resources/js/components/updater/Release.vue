@@ -1,7 +1,7 @@
 <template>
 
     <div class="card update-release mb-5">
-        <div class="flex justify-between mb-4">
+        <div class="flex justify-between mb-3">
             <div>
                 <h1>{{ release.version }}</h1>
                 <h5 class="date" v-text="__('Released on :date', { date: release.date })" />
