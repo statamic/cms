@@ -434,7 +434,7 @@ export default {
         loadContainers() {
             this.$axios.get(cp_url('asset-containers')).then(response => {
                 this.containers = _.chain(response.data).indexBy('id').value();
-                this.container = this.containers[this.selectedContainer];
+                this.container = this.selectedContainer != undefined ? this.containers[this.selectedContainer] : this.containers[Object.keys(this.containers)[0]];
                 this.mode = this.$preferences.get(`assets.${this.container.id}.mode`, this.mode);
             });
         },
