@@ -9,6 +9,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 
 class Outpost
 {
@@ -107,7 +108,14 @@ class Outpost
             return false;
         }
 
-        return $cached['payload'] === $this->payload();
+        return ! $this->payloadHasChanged($cached['payload'], $this->payload());
+    }
+
+    private function payloadHasChanged($previous, $current)
+    {
+        $exclude = ['ip'];
+
+        return Arr::except($previous, $exclude) !== Arr::except($current, $exclude);
     }
 
     private function getCachedResponse()
