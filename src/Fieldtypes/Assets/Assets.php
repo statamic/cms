@@ -35,6 +35,7 @@ class Assets extends Fieldtype
                 'max_items' => 1,
                 'mode' => 'select',
                 'width' => 50,
+                'validate' => 'required',
             ],
             'folder' => [
                 'display' => __('Folder'),
