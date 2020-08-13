@@ -8,9 +8,9 @@ return [
     |--------------------------------------------------------------------------
     |
     | The license key for the corresponding domain from your Statamic account.
-    | Without a key entered, you will considered to be in Trial Mode.
+    | Without a key entered, your app will considered to be in Trial Mode.
     |
-    | https://docs.statamic.com/knowledge-base/trial-mode
+    | https://statamic.dev/licensing#trial-mode
     |
     */
 
