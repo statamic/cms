@@ -12,8 +12,8 @@ class DebugCommand extends Command
 {
     use RunsInPlease;
 
-    protected $signature = 'statamic:debug';
-    protected $description = 'Displays debug information about Statamic';
+    protected $signature = 'statamic:support:details';
+    protected $description = 'Outpots details helpful for support requests.';
 
     public function handle()
     {
