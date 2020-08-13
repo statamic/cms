@@ -114,7 +114,7 @@ class TracksLastModifiedTest extends TestCase
         $this->assertFalse($this->entry->has('updated_at'));
         $this->assertFalse($this->entry->has('updated_by'));
 
-        Facades\Config::set('statamic.cp.track_last_update', false);
+        Facades\Config::set('statamic.system.track_last_update', false);
 
         $this->entry->updateLastModified()->save();
         $this->entry->touch();

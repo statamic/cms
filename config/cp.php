@@ -75,16 +75,4 @@ return [
 
     'link_to_docs' => true,
 
-    /*
-    |--------------------------------------------------------------------------
-    | Track Last Update
-    |--------------------------------------------------------------------------
-    |
-    | Automatically sets "updated_by" user id and "updated_at" timestamp
-    | when content is updated.
-    |
-    */
-
-    'track_last_update' => true,
-
 ];

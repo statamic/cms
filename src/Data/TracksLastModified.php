@@ -23,7 +23,7 @@ trait TracksLastModified
 
     public function updateLastModified($user = null)
     {
-        if (! config('statamic.cp.track_last_update')) {
+        if (! config('statamic.system.track_last_update')) {
             return $this;
         }
 

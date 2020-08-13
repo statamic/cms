@@ -70,6 +70,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Track Last Update
+    |--------------------------------------------------------------------------
+    |
+    | Statamic will automatically set an `updated_at` timestamp (along with
+    | `updated_by`, where applicable) when specific content is updated.
+    | In some situations, you may wish disable this functionality.
+    |
+    */
+
+    'track_last_update' => true,
+
+    /*
+    |--------------------------------------------------------------------------
     | Intensive Operations
     |--------------------------------------------------------------------------
     |
