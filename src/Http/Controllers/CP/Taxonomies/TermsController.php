@@ -99,7 +99,7 @@ class TermsController extends CpController
             'meta' => $meta,
             'taxonomy' => $this->taxonomyToArray($taxonomy),
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => User::fromUser($request->user())->cant('edit', $term),
+            'readOnly' => User::current()->cant('edit', $term),
             'published' => $term->published(),
             'locale' => $term->locale(),
             'localizedFields' => $term->data()->keys()->all(),
@@ -169,14 +169,14 @@ class TermsController extends CpController
         if ($term->revisionsEnabled() && $term->published()) {
             $term
                 ->makeWorkingCopy()
-                ->user(User::fromUser($request->user()))
+                ->user(User::current())
                 ->save();
         } else {
             if (! $term->revisionsEnabled()) {
                 $term->published($request->published);
             }
 
-            $term->updateLastModified(User::fromUser($request->user()))->save();
+            $term->updateLastModified(User::current())->save();
         }
 
         return new TermResource($term);
@@ -260,10 +260,10 @@ class TermsController extends CpController
         if ($term->revisionsEnabled()) {
             $term->store([
                 'message' => $request->message,
-                'user' => User::fromUser($request->user()),
+                'user' => User::current(),
             ]);
         } else {
-            $term->updateLastModified(User::fromUser($request->user()))->save();
+            $term->updateLastModified(User::current())->save();
         }
 
         return ['data' => ['redirect' => $term->editUrl()]];

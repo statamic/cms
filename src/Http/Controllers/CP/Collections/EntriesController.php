@@ -98,7 +98,7 @@ class EntriesController extends CpController
             'meta' => $meta,
             'collection' => $collection->handle(),
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => User::fromUser($request->user())->cant('edit', $entry),
+            'readOnly' => User::current()->cant('edit', $entry),
             'locale' => $entry->locale(),
             'localizedFields' => $entry->data()->keys()->all(),
             'isRoot' => $entry->isRoot(),
@@ -182,14 +182,14 @@ class EntriesController extends CpController
         if ($entry->revisionsEnabled() && $entry->published()) {
             $entry
                 ->makeWorkingCopy()
-                ->user(User::fromUser($request->user()))
+                ->user(User::current())
                 ->save();
         } else {
             if (! $entry->revisionsEnabled()) {
                 $entry->published($request->published);
             }
 
-            $entry->updateLastModified(User::fromUser($request->user()))->save();
+            $entry->updateLastModified(User::current())->save();
         }
 
         return new EntryResource($entry->fresh());
@@ -293,10 +293,10 @@ class EntriesController extends CpController
         if ($entry->revisionsEnabled()) {
             $entry->store([
                 'message' => $request->message,
-                'user' => User::fromUser($request->user()),
+                'user' => User::current(),
             ]);
         } else {
-            $entry->updateLastModified(User::fromUser($request->user()))->save();
+            $entry->updateLastModified(User::current())->save();
         }
 
         return new EntryResource($entry);
