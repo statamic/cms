@@ -28,12 +28,12 @@ trait TracksLastModified
         }
 
         return $this
-            ->set('updated_by', optional($user ?: User::current())->id())
+            ->set('updated_by', optional($user)->id())
             ->set('updated_at', Carbon::now()->timestamp);
     }
 
-    public function touch()
+    public function touch($user = null)
     {
-        $this->updateLastModified()->save();
+        $this->updateLastModified($user)->save();
     }
 }

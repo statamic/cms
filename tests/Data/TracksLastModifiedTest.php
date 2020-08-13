@@ -39,35 +39,37 @@ class TracksLastModifiedTest extends TestCase
     }
 
     /** @test */
-    public function it_updates_and_gets_last_updated_at_from_data()
+    public function it_updates_and_gets_last_updated_with_user()
     {
         $this->assertFalse($this->entry->has('updated_at'));
+        $this->assertNull($this->entry->lastModifiedBy());
 
-        $this->entry->updateLastModified()->save();
+        $this->entry->updateLastModified($this->user)->save();
 
         $this->assertTrue($this->entry->has('updated_at'));
         $this->assertEquals(Carbon::parse($this->entry->get('updated_at'))->timestamp, $this->entry->lastModified()->timestamp);
-    }
-
-    /** @test */
-    public function it_updates_and_gets_last_updated_by()
-    {
-        $this->assertNull($this->entry->lastModifiedBy());
-
-        $this->actingAs($this->user);
-
-        $this->entry->updateLastModified()->save();
-
         $this->assertTrue($this->entry->has('updated_by'));
         $this->assertEquals('hoff@baywatch.com', $this->entry->lastModifiedBy()->email());
     }
 
     /** @test */
-    public function it_updates_last_modified_with_custom_user()
+    public function it_updates_and_gets_last_updated_without_user()
     {
-        $this->actingAs($this->user);
+        $this->assertFalse($this->entry->has('updated_at'));
+        $this->assertNull($this->entry->lastModifiedBy());
 
         $this->entry->updateLastModified()->save();
+
+        $this->assertTrue($this->entry->has('updated_at'));
+        $this->assertEquals(Carbon::parse($this->entry->get('updated_at'))->timestamp, $this->entry->lastModified()->timestamp);
+        $this->assertFalse($this->entry->has('updated_by'));
+        $this->assertNull($this->entry->lastModifiedBy());
+    }
+
+    /** @test */
+    public function it_updates_and_changes_last_updated_by_user()
+    {
+        $this->entry->set('updated_by', $this->user->id())->save();
 
         $this->assertEquals('hoff@baywatch.com', $this->entry->lastModifiedBy()->email());
 
@@ -79,9 +81,11 @@ class TracksLastModifiedTest extends TestCase
     }
 
     /** @test */
-    public function it_doesnt_get_last_updated_by_when_there_is_no_user_in_data()
+    public function it_updates_and_nulls_last_updated_by_user()
     {
-        $this->assertNull($this->entry->lastModifiedBy());
+        $this->entry->set('updated_by', $this->user->id())->save();
+
+        $this->assertEquals('hoff@baywatch.com', $this->entry->lastModifiedBy()->email());
 
         $this->entry->updateLastModified()->save();
 
@@ -92,8 +96,6 @@ class TracksLastModifiedTest extends TestCase
     /** @test */
     public function it_can_touch_item_similar_to_eloquent()
     {
-        $this->actingAs($this->user);
-
         $this->assertFalse($this->entry->has('updated_at'));
         $this->assertFalse($this->entry->has('updated_by'));
 
@@ -101,23 +103,36 @@ class TracksLastModifiedTest extends TestCase
 
         $this->assertNull($touched);
         $this->assertTrue($this->entry->has('updated_at'));
-        $this->assertTrue($this->entry->has('updated_by'));
         $this->assertEquals(Carbon::parse($this->entry->get('updated_at'))->timestamp, $this->entry->lastModified()->timestamp);
+        $this->assertFalse($this->entry->has('updated_by'));
+        $this->assertNull($this->entry->lastModifiedBy());
+    }
+
+    /** @test */
+    public function it_can_touch_item_with_user()
+    {
+        $this->assertFalse($this->entry->has('updated_at'));
+        $this->assertFalse($this->entry->has('updated_by'));
+
+        $touched = $this->entry->touch($this->user);
+
+        $this->assertNull($touched);
+        $this->assertTrue($this->entry->has('updated_at'));
+        $this->assertEquals(Carbon::parse($this->entry->get('updated_at'))->timestamp, $this->entry->lastModified()->timestamp);
+        $this->assertTrue($this->entry->has('updated_by'));
         $this->assertEquals('hoff@baywatch.com', $this->entry->lastModifiedBy()->email());
     }
 
     /** @test */
-    public function it_will_not_update_when_config_is_last_modified()
+    public function it_will_not_update_when_config_disables_last_update_tracking()
     {
-        $this->actingAs($this->user);
-
         $this->assertFalse($this->entry->has('updated_at'));
         $this->assertFalse($this->entry->has('updated_by'));
 
         Facades\Config::set('statamic.system.track_last_update', false);
 
-        $this->entry->updateLastModified()->save();
-        $this->entry->touch();
+        $this->entry->updateLastModified($this->user)->save();
+        $this->entry->touch($this->user);
 
         $this->assertFalse($this->entry->has('updated_at'));
         $this->assertFalse($this->entry->has('updated_by'));
