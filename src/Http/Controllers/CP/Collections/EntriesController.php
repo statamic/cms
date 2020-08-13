@@ -189,7 +189,7 @@ class EntriesController extends CpController
                 $entry->published($request->published);
             }
 
-            $entry->updateLastModified()->save();
+            $entry->updateLastModified(User::fromUser($request->user()))->save();
         }
 
         return new EntryResource($entry->fresh());
@@ -296,7 +296,7 @@ class EntriesController extends CpController
                 'user' => User::fromUser($request->user()),
             ]);
         } else {
-            $entry->updateLastModified()->save();
+            $entry->updateLastModified(User::fromUser($request->user()))->save();
         }
 
         return new EntryResource($entry);

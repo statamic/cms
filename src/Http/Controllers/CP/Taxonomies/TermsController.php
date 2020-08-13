@@ -176,7 +176,7 @@ class TermsController extends CpController
                 $term->published($request->published);
             }
 
-            $term->updateLastModified()->save();
+            $term->updateLastModified(User::fromUser($request->user()))->save();
         }
 
         return new TermResource($term);
@@ -263,7 +263,7 @@ class TermsController extends CpController
                 'user' => User::fromUser($request->user()),
             ]);
         } else {
-            $term->updateLastModified()->save();
+            $term->updateLastModified(User::fromUser($request->user()))->save();
         }
 
         return ['data' => ['redirect' => $term->editUrl()]];
