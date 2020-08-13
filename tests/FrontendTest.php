@@ -320,6 +320,18 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
+    public function a_redirect_key_with_an_entry_should_redirect_to_the_entry()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
+    public function a_redirect_key_with_an_unknown_entry_should_404()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
     public function debug_bar_shows_cascade_variables_if_enabled()
     {
         $this->markTestIncomplete();
