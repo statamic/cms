@@ -90,7 +90,7 @@ class DataResponse implements Responsable
 
         $redirect = (new ResolveRedirect)($redirect, $this->data);
 
-        if ($redirect == '404' || is_null($redirect)) {
+        if ($redirect == '404') {
             throw new NotFoundHttpException;
         }
 

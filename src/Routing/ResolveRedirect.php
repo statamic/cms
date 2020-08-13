@@ -17,7 +17,7 @@ class ResolveRedirect
 
         if (Str::startsWith($redirect, 'entry::')) {
             $id = Str::after($redirect, 'entry::');
-            $redirect = optional(Facades\Entry::find($id))->url();
+            $redirect = optional(Facades\Entry::find($id))->url() ?? 404;
         }
 
         return is_numeric($redirect) ? (int) $redirect : $redirect;
