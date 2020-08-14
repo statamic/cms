@@ -26,7 +26,6 @@ class SupportDetails extends Command
     private function addons()
     {
         $addons = Addon::all();
-        $addons = collect();
 
         if ($addons->isEmpty()) {
             return $this->line('No addons installed');
