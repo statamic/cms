@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Blueprint;
+use Statamic\Fields\Fieldset;
 use Tests\Fakes\FakeBlueprintRepository;
 use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -50,6 +51,19 @@ class UpdateBlueprintTest extends TestCase
         $collection = tap(Collection::make('test'))->save();
         $blueprint = (new Blueprint)->setNamespace('collections.test')->setHandle('test')->setContents(['title' => 'Test'])->save();
 
+        $fieldset = (new Fieldset)->setContents([
+            'fields' => [
+                [
+                    'handle' => 'somefield',
+                    'field' => [],
+                ],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')
+            ->with('somefieldset')
+            ->andReturn($fieldset);
+
         $this
             ->actingAs($user)
             ->submit($collection, $blueprint, [
@@ -93,6 +107,13 @@ class UpdateBlueprintTest extends TestCase
                     'display' => 'Section One',
                     'fields' => [
                         [
+                            'handle' => 'title',
+                            'field' => [
+                                'type' => 'text',
+                                'required' => true,
+                            ],
+                        ],
+                        [
                             'handle' => 'one-one',
                             'field' => 'somefieldset.somefield',
                             'config' => [
@@ -104,6 +125,18 @@ class UpdateBlueprintTest extends TestCase
                             'field' => [
                                 'type' => 'text',
                                 'foo' => 'bar',
+                            ],
+                        ],
+                    ],
+                ],
+                'sidebar' => [
+                    'fields' => [
+                        [
+                            'handle' => 'slug',
+                            'field' => [
+                                'type' => 'slug',
+                                'localizable' => true,
+                                'required' => true,
                             ],
                         ],
                     ],
@@ -179,6 +212,19 @@ class UpdateBlueprintTest extends TestCase
         $collection = tap(Collection::make('test'))->save();
         $blueprint = (new Blueprint)->setNamespace('collections.test')->setHandle('test')->setContents(['title' => 'Test'])->save();
 
+        $fieldset = (new Fieldset)->setContents([
+            'fields' => [
+                [
+                    'handle' => 'somefield',
+                    'field' => [],
+                ],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')
+            ->with('somefieldset')
+            ->andReturn($fieldset);
+
         $this
             ->actingAs($user)
             ->submit($collection, $blueprint, [
@@ -231,6 +277,13 @@ class UpdateBlueprintTest extends TestCase
                     'display' => 'Section One',
                     'fields' => [
                         [
+                            'handle' => 'title',
+                            'field' => [
+                                'type' => 'text',
+                                'required' => true,
+                            ],
+                        ],
+                        [
                             'handle' => 'one-one',
                             'field' => 'somefieldset.somefield',
                             'config' => [
@@ -248,6 +301,18 @@ class UpdateBlueprintTest extends TestCase
                             'field' => [
                                 'type' => 'text',
                                 'width' => 50,
+                            ],
+                        ],
+                    ],
+                ],
+                'sidebar' => [
+                    'fields' => [
+                        [
+                            'handle' => 'slug',
+                            'field' => [
+                                'type' => 'slug',
+                                'localizable' => true,
+                                'required' => true,
                             ],
                         ],
                     ],

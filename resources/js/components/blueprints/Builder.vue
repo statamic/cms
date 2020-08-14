@@ -23,6 +23,9 @@
         <div class="content mt-5 mb-2" v-if="useSections">
             <h2>{{ __('Tab Sections') }}</h2>
             <p class="max-w-lg">{{ __('messages.tab_sections_instructions') }}</p>
+            <div v-if="errors.sections">
+                <small class="help-block text-red" v-for="(error, i) in errors.sections" :key="i" v-text="error" />
+            </div>
         </div>
 
         <sections

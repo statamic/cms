@@ -51,7 +51,7 @@
                 :is-root="true"
                 @updated="values = $event"
             >
-                <div class="publish-fields" v-show="activeTab === 'settings'" slot-scope="{ setFieldValue }">
+                <div v-show="activeTab === 'settings'" slot-scope="{ setFieldValue }">
 
                     <publish-fields
                         v-if="blueprint.sections.length"

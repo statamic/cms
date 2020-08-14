@@ -116,7 +116,7 @@ class Locales extends Tags
             return $this->data;
         }
 
-        $id = $this->get('id', $this->context->get('id'));
+        $id = $this->params->get('id', $this->context->get('id'));
 
         return $this->data = Entry::find($id);
     }
@@ -129,12 +129,12 @@ class Locales extends Tags
      */
     private function sort($locales)
     {
-        if ($sort = $this->get('sort')) {
+        if ($sort = $this->params->get('sort')) {
             [$sort, $dir] = $this->getSort($sort);
             $locales = ($dir === 'asc') ? $locales->sortBy($sort) : $locales->sortByDesc($sort);
         }
 
-        if ($this->getBool('current_first', true)) {
+        if ($this->params->bool('current_first', true)) {
             $locales = $this->moveCurrentLocaleToFront($locales);
         }
 

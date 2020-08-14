@@ -216,6 +216,10 @@ class CoreModifiers extends Modifier
         $needle = Arr::get($context, $params[0], $params[0]);
 
         if (is_array($haystack)) {
+            if (Arr::isAssoc($haystack)) {
+                return Arr::exists($haystack, $needle);
+            }
+
             return in_array($needle, $haystack);
         }
 
@@ -736,7 +740,7 @@ class CoreModifiers extends Modifier
      * @param $params
      * @return bool
      */
-    public function inArray($value, $params, $context)
+    public function inArray($haystack, $params, $context)
     {
         $needle = Arr::get($context, $params[0], $params);
 
@@ -744,7 +748,11 @@ class CoreModifiers extends Modifier
             $needle = $needle[0];
         }
 
-        return in_array($needle, $value);
+        if (Arr::isAssoc($haystack)) {
+            return Arr::exists($haystack, $needle);
+        }
+
+        return in_array($needle, $haystack);
     }
 
     /**

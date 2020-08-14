@@ -126,6 +126,7 @@ export default {
         fieldCreated(created) {
             let handle = created.handle;
             delete created.handle;
+            delete created.isNew;
 
             let field = {
                 ...this.pendingCreatedField,

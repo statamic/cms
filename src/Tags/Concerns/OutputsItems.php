@@ -12,7 +12,7 @@ trait OutputsItems
             return $this->paginatedOutput($items);
         }
 
-        if ($as = $this->get('as')) {
+        if ($as = $this->params->get('as')) {
             return array_merge([$as => $items], $this->extraOutput($items));
         }
 
@@ -34,7 +34,7 @@ trait OutputsItems
 
     protected function paginatedOutput($paginator)
     {
-        $as = $this->get('as', $this->defaultAsKey ?? 'results');
+        $as = $this->params->get('as', $this->defaultAsKey ?? 'results');
         $items = $paginator->getCollection()->supplement('total_results', $paginator->total());
 
         return array_merge([

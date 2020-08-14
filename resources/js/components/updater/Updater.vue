@@ -142,7 +142,7 @@
             getChangelog() {
                 this.gettingChangelog = true;
 
-                this.$axios.get(`/cp/updater/${this.slug}/changelog`).then(response => {
+                this.$axios.get(cp_url(`/updater/${this.slug}/changelog`)).then(response => {
                     this.gettingChangelog = false;
                     this.changelog = response.data.changelog;
                     this.currentVersion = response.data.currentVersion;
@@ -156,7 +156,7 @@
             },
 
             installExplicitVersion(version) {
-                this.$axios.post(`/cp/updater/${this.slug}/install`, {'version': version}, this.toEleven);
+                this.$axios.post(cp_url(`/updater/${this.slug}/install`), {'version': version}, this.toEleven);
 
                 this.$store.commit('statamic/composer', {
                     processing: true,

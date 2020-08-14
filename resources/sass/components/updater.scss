@@ -50,43 +50,46 @@
 .update-release {
 
     .date {
-		@apply .font-normal .text-grey;
+		@apply font-normal text-grey;
 	}
 
 	p {
-        @apply .my-4;
-    }
+        @apply my-4;
+	}
+
+	h2 {
+		@apply font-black text-xl mb-0 py-1;
+	}
+
+	h3, h4, h5, h6 {
+		@apply font-bold;
+	}
 
 	ul {
-		margin: 0;
-		padding: 0;
+		@apply p-0;
 
 		li {
-            border-bottom: 1px solid #eee;
-			list-style: none;
-			font-size: 14px;
-			margin-bottom: 8px;
-            padding-bottom: 8px;
-            position: relative;
-            padding-left: 80px;
+			@apply my-1 pb-1 relative text-base pl-3;
+		}
 
-			&:last-child {
-				border-bottom: 0;
-				margin-bottom: 0;
-			}
+		li:before {
+			@apply absolute rounded-full bg-grey-90;
+			height: 6px;
+			width: 6px;
+			content: "";
+			top: 7px;
+			left: 4px;
+
 		}
 
         li a { color: $brand-primary; }
 
 		.label {
-			display: inline-block;
-			font-size: 11px;
-			margin-right: 10px;
-			text-transform: uppercase;
-			width: 60px;
-            position: absolute;
-            top: 0;
-            left: 0;
+			@apply text-3xs relative inline-block mr-1 uppercase text-center text-white rounded;
+			padding: 2px;
+			width: 54px;
+			top: -2px;
+			line-height: 1;
 		}
 	}
 }

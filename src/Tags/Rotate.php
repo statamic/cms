@@ -16,7 +16,7 @@ class Rotate extends Tags
      */
     public function index()
     {
-        if (! $between = $this->get('between')) {
+        if (! $between = $this->params->get('between')) {
             // No 'between' parameter? Why are you using this tag?
             return null;
         }
@@ -26,7 +26,7 @@ class Rotate extends Tags
 
         // Create a unique hash based on the parameters to provide users
         // a method of using multiple switch tags in a single template.
-        $hash = md5(implode(',', $this->parameters->all()));
+        $hash = md5(implode(',', $this->params->all()));
 
         if (! isset(static::$counts[$hash])) {
             static::$counts[$hash] = 0;
