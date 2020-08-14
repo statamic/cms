@@ -11,7 +11,9 @@ class Link extends Fieldtype
 {
     public function augment($value)
     {
-        return (new ResolveRedirect)($value, $this->field->parent());
+        $redirect = (new ResolveRedirect)($value, $this->field->parent());
+
+        return $redirect === 404 ? null : $redirect;
     }
 
     public function preload()

@@ -14,6 +14,7 @@ Vue.component('composer-output', require('../components/ComposerOutput.vue').def
 Vue.component('publish-container', require('../components/publish/Container.vue').default);
 Vue.component('publish-form', require('../components/publish/PublishForm.vue').default);
 Vue.component('publish-fields', require('../components/publish/Fields.vue').default);
+Vue.component('publish-fields-container', require('../components/publish/FieldsContainer.vue').default);
 Vue.component('publish-field', require('../components/publish/Field.vue').default);
 Vue.component('publish-field-meta', require('../components/publish/FieldMeta.vue').default);
 Vue.component('configure-sections', require('../components/configure/Sections.vue').default);

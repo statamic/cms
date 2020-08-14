@@ -19,7 +19,7 @@ class OutpostTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        Carbon::setTestNow();
+        Carbon::setTestNow(now()->startOfMinute());
     }
 
     /** @test */
@@ -89,7 +89,7 @@ class OutpostTest extends TestCase
     /** @test */
     public function the_cached_response_is_ignored_if_the_payload_is_different()
     {
-        $this->setCachedResponse(['payload' => 'old']);
+        $this->setCachedResponse(['payload' => ['old' => 'stuff']]);
         $outpost = $this->outpostWithJsonResponse(['newer' => 'response']);
 
         $expectedResponse = [

@@ -8,7 +8,7 @@
             'url' => cp_route('forms.show', $submission->form->handle()),
             'title' =>  $submission->form->title()
         ])
-        <h1>{{ $submission->date()->format('M j, Y @ h:i') }}</h1>
+        <h1>{{ $submission->date()->format('M j, Y @ H:i') }}</h1>
     </header>
 
     <div class="card" v-pre>

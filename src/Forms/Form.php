@@ -323,7 +323,7 @@ class Form implements FormContract
     public function dateFormat()
     {
         // TODO: Should this be a form.yaml config, a config/forms.php config, or a global config?
-        return 'M j, Y @ h:i';
+        return 'M j, Y @ H:i';
 
         // return $this->formset()->get('date_format', 'M j, Y @ h:i');
     }

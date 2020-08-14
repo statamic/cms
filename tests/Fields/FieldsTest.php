@@ -221,6 +221,43 @@ class FieldsTest extends TestCase
     }
 
     /** @test */
+    public function it_can_override_the_config_for_fields_in_an_imported_fieldset()
+    {
+        $fieldset = (new Fieldset)->setHandle('partial')->setContents([
+            'fields' => [
+                [
+                    'handle' => 'one',
+                    'field' => ['type' => 'text', 'foo' => 'original'],
+                ],
+                [
+                    'handle' => 'two',
+                    'field' => ['type' => 'textarea', 'foo' => 'original'],
+                ],
+                [
+                    'handle' => 'three',
+                    'field' => ['type' => 'textarea', 'foo' => 'original'],
+                ],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('partial')->once()->andReturn($fieldset);
+
+        $fields = (new Fields)->createFields([
+            'import' => 'partial',
+            'config' => [
+                'one' => ['foo' => 'custom'],
+                'three' => ['foo' => 'another custom'],
+            ],
+            // use a prefix to make sure they work together, without needing to write an almost identical test
+            'prefix' => 'prefix_',
+        ]);
+
+        $this->assertEquals(['type' => 'text', 'foo' => 'custom'], $fields['prefix_one']->config());
+        $this->assertEquals(['type' => 'textarea', 'foo' => 'original'], $fields['prefix_two']->config());
+        $this->assertEquals(['type' => 'textarea', 'foo' => 'another custom'], $fields['prefix_three']->config());
+    }
+
+    /** @test */
     public function it_checks_if_a_given_field_exists()
     {
         $fields = new Fields([

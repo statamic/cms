@@ -39,4 +39,6 @@ class Checkboxes extends Fieldtype
             ];
         })->all();
     }
+
+    protected $view = 'statamic::forms.fields.checkboxes';
 }

@@ -14,7 +14,7 @@
 
             <div class="flex-1 overflow-auto">
 
-                <div class="publish-fields">
+                <publish-fields-container>
                     <form-group
                         :display="__('Title')"
                         handle="title"
@@ -28,7 +28,7 @@
                         :instructions="__('Enter any internal or external URL. Leave blank for a text-only item.')"
                     />
 
-                </div>
+                </publish-fields-container>
 
                 <div class="p-3">
                     <button @click="submit" class="btn-primary w-full">{{ __('Submit') }}</button>

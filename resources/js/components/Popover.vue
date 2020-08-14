@@ -54,6 +54,13 @@ export default {
                         options: {
                             offset: this.offset
                         }
+                    },
+                    {
+                        name: 'eventListeners',
+                        options: {
+                            scroll: false,
+                            resize: true
+                        }
                     }
                 ]
             })

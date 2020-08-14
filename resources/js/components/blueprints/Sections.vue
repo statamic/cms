@@ -10,6 +10,7 @@
                 :key="section._id"
                 :section="section"
                 :is-single="singleSection"
+                :deletable="isSectionDeletable(i)"
                 @updated="updateSection(i, $event)"
                 @deleted="deleteSection(i)"
             />
@@ -60,6 +61,10 @@ export default {
         singleSection: {
             type: Boolean,
             default: false
+        },
+        requireSection: {
+            type: Boolean,
+            default: true
         }
     },
 
@@ -174,9 +179,17 @@ export default {
         },
 
         ensureSection() {
-            if (this.sections.length === 0) {
+            if (this.requireSection && this.sections.length === 0) {
                 this.addSection();
             }
+        },
+
+        isSectionDeletable(i) {
+            if (this.sections.length > 1) return true;
+
+            if (i > 0) return true;
+
+            return !this.requireSection;
         }
 
     }
