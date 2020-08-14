@@ -47,7 +47,7 @@ class Sites
     public function current()
     {
         return $this->current
-            ?? $this->findByUrl(substr(request()->getUri(), 0, strpos(request()->getUri(), '?')))
+            ?? $this->findByUrl(request()->getUri())
             ?? $this->default();
     }
 
