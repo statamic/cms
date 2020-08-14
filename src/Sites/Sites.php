@@ -20,7 +20,8 @@ class Sites
         return $this->sites;
     }
 
-    public function default()
+    public function
+    default()
     {
         return $this->sites->first();
     }
