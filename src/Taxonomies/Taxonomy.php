@@ -103,7 +103,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         $blueprint ? $this->ensureTermBlueprintFields($blueprint) : null;
 
         if ($blueprint) {
-            TermBlueprintFound::dispatch($blueprint, $term);
+            TermBlueprintFound::dispatch($blueprint->setParent($term), $term);
         }
 
         return $blueprint;
