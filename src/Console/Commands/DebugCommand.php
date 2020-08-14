@@ -17,15 +17,23 @@ class DebugCommand extends Command
 
     public function handle()
     {
-        $this->line('Statamic version: '.Statamic::version());
-        $this->line('PHP version: '.phpversion());
-        $this->line('Laravel version: '.Application::VERSION);
-        $this->line('Statamic Pro: '.(Statamic::pro() === 1 ? 'True' : 'False'));
-        $this->line('');
-        $this->info('Installed Addons');
+        $this->line(sprintf('<info>Statamic</info> %s %s', Statamic::version(), Statamic::pro() ? 'Pro' : 'Solo'));
+        $this->line('<info>Laravel</info> '.Application::VERSION);
+        $this->line('<info>PHP</info> '.phpversion());
+        $this->addons();
+    }
 
-        foreach (Addon::all() as $addon) {
-            $this->line($addon->name().' - '.$addon->version());
+    private function addons()
+    {
+        $addons = Addon::all();
+        $addons = collect();
+
+        if ($addons->isEmpty()) {
+            return $this->line('No addons installed');
+        }
+
+        foreach ($addons as $addon) {
+            $this->line(sprintf('<info>%s</info> %s', $addon->package(), $addon->version()));
         }
     }
 }
