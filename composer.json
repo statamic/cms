@@ -24,7 +24,7 @@
         "symfony/yaml": "^4.1@dev",
         "twistor/flysystem-guzzle": "^6.0",
         "ueberdosis/html-to-prosemirror": "^0.7.0",
-        "ueberdosis/prosemirror-to-html": "^0.10.0",
+        "ueberdosis/prosemirror-to-html": "^1.0",
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
