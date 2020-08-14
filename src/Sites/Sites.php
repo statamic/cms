@@ -46,8 +46,15 @@ class Sites
 
     public function current()
     {
+        // check if the URI has request parameters and strip them
+        if (Str::contains(request()->getUri(), '?')) {
+            $url = substr(request()->getUri(), 0, strpos(request()->getUri(), '?'));
+        } else {
+            $url = request()->getUri();
+        }
+
         return $this->current
-            ?? $this->findByUrl(substr(request()->getUri(), 0, strpos(request()->getUri(), '?')))
+            ?? $this->findByUrl($url)
             ?? $this->default();
     }
 
