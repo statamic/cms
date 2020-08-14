@@ -8,7 +8,7 @@ use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Addon;
 use Statamic\Statamic;
 
-class DebugCommand extends Command
+class SupportDetails extends Command
 {
     use RunsInPlease;
 
