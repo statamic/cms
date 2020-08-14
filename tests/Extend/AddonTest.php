@@ -2,6 +2,8 @@
 
 namespace Statamic\Testing\Extend;
 
+use Facades\Statamic\Licensing\LicenseManager;
+use Illuminate\Support\Collection;
 use Statamic\Extend\Addon;
 use Statamic\Facades\File;
 use Tests\TestCase;
@@ -60,6 +62,35 @@ class AddonTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_editions()
+    {
+        $addon = Addon::make('foo/bar');
+
+        $this->assertInstanceOf(Collection::class, $addon->editions());
+        $this->assertEquals([], $addon->editions()->all());
+        $this->assertNull($addon->edition());
+
+        $return = $addon->editions(['free', 'pro']);
+        $this->assertEquals($addon, $return);
+
+        $this->assertEquals(['free', 'pro'], $addon->editions()->all());
+        $this->assertEquals('free', $addon->edition());
+
+        config(['statamic.editions.addons.foo/bar' => 'pro']);
+        $this->assertEquals('pro', $addon->edition());
+    }
+
+    /** @test */
+    public function it_throws_exception_for_invalid_edition()
+    {
+        $this->expectExceptionMessage('Invalid edition [rad] for addon foo/bar');
+
+        config(['statamic.editions.addons.foo/bar' => 'rad']);
+
+        $this->makeFromPackage(['id' => 'foo/bar', 'editions' => []])->edition();
+    }
+
+    /** @test */
     public function it_creates_an_instance_from_a_package()
     {
         $addon = $this->makeFromPackage([]);
@@ -74,6 +105,7 @@ class AddonTest extends TestCase
         $this->assertEquals('Test Developer LLC', $addon->developer());
         $this->assertEquals('http://test-developer.com', $addon->developerUrl());
         $this->assertEquals('1.0', $addon->version());
+        $this->assertEquals(['foo', 'bar'], $addon->editions()->all());
     }
 
     /** @test */
@@ -181,19 +213,21 @@ class AddonTest extends TestCase
         $this->assertFalse($this->makeFromPackage([])->isCommercial());
     }
 
-    /** @test */
-    public function it_gets_the_license_key()
-    {
-        config(['test_addon' => ['license_key' => 'TESTLICENSEKEY']]);
-
-        $this->assertEquals('TESTLICENSEKEY', Addon::make('vendor/test-addon')->licenseKey());
-    }
-
     public function it_gets_the_autoloaded_directory()
     {
         $addon = $this->makeFromPackage(['autoload' => 'src']);
 
         $this->assertEquals('src', $addon->autoload());
+    }
+
+    /** @test */
+    public function it_gets_the_license()
+    {
+        LicenseManager::shouldReceive('addons')->once()->andReturn(collect([
+            'foo/bar' => 'the license',
+        ]));
+
+        $this->assertEquals('the license', Addon::make('foo/bar')->license());
     }
 
     private function makeFromPackage($attributes)
@@ -209,6 +243,7 @@ class AddonTest extends TestCase
             'developer' => 'Test Developer LLC',
             'developerUrl' => 'http://test-developer.com',
             'version' => '1.0',
+            'editions' => ['foo', 'bar'],
         ], $attributes));
     }
 }

@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP;
 
 use Facades\Statamic\Extend\AddonInstaller;
 use Illuminate\Http\Request;
+use Statamic\Facades\Addon;
 
 class AddonsController extends CpController
 {
@@ -16,6 +17,7 @@ class AddonsController extends CpController
     {
         return view('statamic::addons.index', [
             'title' => __('Addons'),
+            'addonCount' => Addon::all()->count(),
         ]);
     }
 

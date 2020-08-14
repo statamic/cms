@@ -163,6 +163,75 @@ EOT
     }
 
     /** @test */
+    public function it_will_submit_form_and_follow_custom_redirect_with_success()
+    {
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        $this
+            ->post('/!/forms/contact', [
+                'email' => 'san@holo.com',
+                'message' => 'hello',
+                '_redirect' => '/submission-successful',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/submission-successful');
+
+        $this->assertCount(1, Form::find('contact')->submissions());
+
+        $output = $this->tag(<<<'EOT'
+{{ form:contact }}
+    {{ errors }}
+        <p class="error">{{ value }}</p>
+    {{ /errors }}
+    <p class="success">{{ success }}</p>
+{{ /form:contact }}
+EOT
+        );
+
+        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+
+        $this->assertEmpty($errors[1]);
+        $this->assertEquals(['Submission successful.'], $success[1]);
+    }
+
+    /** @test */
+    public function it_wont_submit_form_and_follow_custom_redirect_with_errors()
+    {
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        $this
+            ->post('/!/forms/contact', [
+                '_error_redirect' => '/submission-error',
+            ])
+            ->assertSessionHasErrors(['email', 'message'], null, 'form.contact')
+            ->assertLocation('/submission-error');
+
+        $this->assertCount(0, Form::find('contact')->submissions());
+
+        $output = $this->tag(<<<'EOT'
+{{ form:contact }}
+    {{ errors }}
+        <p class="error">{{ value }}</p>
+    {{ /errors }}
+    <p class="success">{{ success }}</p>
+{{ /form:contact }}
+EOT
+        );
+
+        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+
+        $expected = [
+            'The Email Address field is required.',
+            'The Message field is required.',
+        ];
+
+        $this->assertEquals($expected, $errors[1]);
+        $this->assertEmpty($success[1]);
+    }
+
+    /** @test */
     public function it_will_use_redirect_query_param_off_url()
     {
         $this->get('/?redirect=submission-successful&error_redirect=submission-failure');
@@ -181,6 +250,47 @@ EOT
         $this->assertStringContainsString($expectedErrorRedirect, $output);
     }
 
+    /** @test */
+    public function it_can_render_an_inline_error_when_multiple_rules_fail()
+    {
+        $this->withoutExceptionHandling();
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        $this
+            ->post('/!/forms/contact', ['name' => '$'])
+            ->assertSessionHasErrors(['name', 'email', 'message'], null, 'form.contact')
+            ->assertLocation('/');
+
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        $output = $this->tag(<<<'EOT'
+{{ form:contact }}
+    {{ errors }}
+        <p class="error">{{ value }}</p>
+    {{ /errors }}
+    <p class="inline-error">{{ error:name }}</p>
+{{ /form:contact }}
+EOT
+        );
+
+        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+        preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
+
+        $expected = [
+            'The Full Name must be at least 3 characters.',
+            'The Full Name may only contain letters and numbers.',
+            'The Email Address field is required.',
+            'The Message field is required.',
+        ];
+
+        $expectedInline = [
+            'The Full Name must be at least 3 characters.',
+        ];
+
+        $this->assertEquals($expected, $errors[1]);
+        $this->assertEquals($expectedInline, $inlineErrors[1]);
+    }
+
     private function createContactForm()
     {
         $blueprint = Blueprint::make()->setContents([
@@ -190,6 +300,7 @@ EOT
                     'field' => [
                         'type' => 'text',
                         'display' => 'Full Name',
+                        'validate' => 'min:3|alpha_num',
                     ],
                 ],
                 [
@@ -213,10 +324,10 @@ EOT
         ]);
 
         Blueprint::shouldReceive('find')
-            ->with('contact')
+            ->with('forms.contact')
             ->andReturn($blueprint);
 
-        $form = Form::make()->handle('contact')->blueprint('contact');
+        $form = Form::make()->handle('contact');
 
         Form::shouldReceive('find')
             ->with('contact')

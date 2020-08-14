@@ -7,7 +7,7 @@
     <div class="max-w-lg mt-2 mx-auto">
         <div class="rounded p-3 lg:px-7 lg:py-5 shadow bg-white">
             <header class="text-center mb-6">
-                <h1 class="mb-3">{{ __('Create a Fieldset') }}</h1>
+                <h1 class="mb-3">{{ __('Create Fieldset') }}</h1>
                 <p class="text-grey">{{ __('statamic::messages.fields_fieldsets_description') }}</p>
             </header>
             <div class="mb-5">

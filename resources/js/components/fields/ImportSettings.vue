@@ -5,10 +5,9 @@
         <div class="flex items-center mb-3 -mt-1">
             <h1 class="flex-1">
                 <small class="block text-xs text-grey-70 font-medium leading-none mt-1 flex items-center">
-                    <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-70" name="paperclip"></svg-icon>
-                    linked fieldset
+                    <svg-icon class="h-4 w-4 mr-1 inline-block text-grey-70" name="paperclip"/>{{ __('Linked fieldset') }}
                 </small>
-                Fieldset
+                {{ __('Fieldset') }}
             </h1>
             <button
                 class="text-grey-50 hover:text-grey-80 mr-3 text-sm"
@@ -24,7 +23,7 @@
 
         <div class="card">
 
-            <div class="publish-fields">
+            <publish-fields-container>
 
                 <form-group
                     handle="fieldset"
@@ -43,7 +42,7 @@
                     @input="updateField('prefix', $event)"
                 />
 
-            </div>
+            </publish-fields-container>
         </div>
     </div>
 

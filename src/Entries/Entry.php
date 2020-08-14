@@ -13,16 +13,17 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
+use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
-use Statamic\Events\Data\EntrySaved;
-use Statamic\Events\Data\EntrySaving;
+use Statamic\Events\EntryDeleted;
+use Statamic\Events\EntrySaved;
+use Statamic\Events\EntrySaving;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Facades\User;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
@@ -34,7 +35,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns;
+    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified;
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -84,13 +85,21 @@ class Entry implements Contract, Augmentable, Responsable, Localization
             ->args(func_get_args());
     }
 
-    public function blueprint()
+    public function blueprint($blueprint = null)
     {
-        return $this->fluentlyGetOrSet('blueprint')
-            ->getter(function ($blueprint) {
-                return $blueprint
-                    ? $this->collection()->ensureEntryBlueprintFields(Blueprint::find($blueprint))
-                    : $this->defaultBlueprint();
+        $key = "entry-{$this->id()}-blueprint";
+
+        return $this
+            ->fluentlyGetOrSet('blueprint')
+            ->getter(function ($blueprint) use ($key) {
+                return Blink::once($key, function () use ($blueprint) {
+                    return $this->collection()->entryBlueprint($blueprint ?? $this->value('blueprint'), $this);
+                });
+            })
+            ->setter(function ($blueprint) use ($key) {
+                Blink::forget($key);
+
+                return $blueprint;
             })
             ->args(func_get_args());
     }
@@ -138,6 +147,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization
         }
 
         Facades\Entry::delete($this);
+
+        EntryDeleted::dispatch($this);
 
         return true;
     }
@@ -203,19 +214,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization
         return "entry::{$this->id()}";
     }
 
-    public function defaultBlueprint()
-    {
-        return Blink::once("entry-{$this->id()}-default-blueprint", function () {
-            if ($blueprint = $this->value('blueprint')) {
-                return $this->collection()->ensureEntryBlueprintFields(
-                    Blueprint::find($blueprint)
-                );
-            }
-
-            return $this->collection()->entryBlueprint();
-        });
-    }
-
     public function afterSave($callback)
     {
         $this->afterSaveCallbacks[] = $callback;
@@ -246,7 +244,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
             $callback($this);
         }
 
-        EntrySaved::dispatch($this, []);  // TODO: Fix test
+        EntrySaved::dispatch($this);
 
         return true;
     }
@@ -411,20 +409,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization
             ->published($attrs['published'])
             ->data($attrs['data'])
             ->slug($attrs['slug']);
-    }
-
-    public function lastModified()
-    {
-        return $this->has('updated_at')
-            ? Carbon::createFromTimestamp($this->get('updated_at'))
-            : $this->fileLastModified();
-    }
-
-    public function lastModifiedBy()
-    {
-        return $this->has('updated_by')
-            ? User::find($this->get('updated_by'))
-            : null;
     }
 
     public function status()

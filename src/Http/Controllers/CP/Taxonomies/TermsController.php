@@ -4,9 +4,7 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
-use Statamic\Events\Data\PublishBlueprintFound;
 use Statamic\Facades\Asset;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
 use Statamic\Facades\User;
@@ -79,8 +77,6 @@ class TermsController extends CpController
 
         $blueprint = $term->blueprint();
 
-        event(new PublishBlueprintFound($blueprint, 'term', $term));
-
         [$values, $meta] = $this->extractFromFields($term, $blueprint);
 
         if ($hasOrigin = $term->hasOrigin()) {
@@ -103,7 +99,7 @@ class TermsController extends CpController
             'meta' => $meta,
             'taxonomy' => $this->taxonomyToArray($taxonomy),
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => User::fromUser($request->user())->cant('edit', $term),
+            'readOnly' => User::current()->cant('edit', $term),
             'published' => $term->published(),
             'locale' => $term->locale(),
             'localizedFields' => $term->data()->keys()->all(),
@@ -173,17 +169,14 @@ class TermsController extends CpController
         if ($term->revisionsEnabled() && $term->published()) {
             $term
                 ->makeWorkingCopy()
-                ->user(User::fromUser($request->user()))
+                ->user(User::current())
                 ->save();
         } else {
             if (! $term->revisionsEnabled()) {
                 $term->published($request->published);
             }
 
-            $term
-                ->set('updated_by', User::fromUser($request->user())->id())
-                ->set('updated_at', now()->timestamp)
-                ->save();
+            $term->updateLastModified(User::current())->save();
         }
 
         return new TermResource($term);
@@ -193,9 +186,7 @@ class TermsController extends CpController
     {
         $this->authorize('create', [TermContract::class, $taxonomy]);
 
-        $blueprint = $request->blueprint
-            ? $taxonomy->ensureTermBlueprintFields(Blueprint::find($request->blueprint))
-            : $taxonomy->termBlueprint();
+        $blueprint = $taxonomy->termBlueprint($request->blueprint);
 
         if (! $blueprint) {
             throw new \Exception('A valid blueprint is required.');
@@ -245,9 +236,7 @@ class TermsController extends CpController
     {
         $this->authorize('store', [TermContract::class, $taxonomy]);
 
-        $blueprint = $taxonomy->ensureTermBlueprintFields(
-            Blueprint::find($request->blueprint)
-        );
+        $blueprint = $taxonomy->termBlueprint($request->blueprint);
 
         $fields = $blueprint->fields()->addValues($request->all());
 
@@ -271,13 +260,10 @@ class TermsController extends CpController
         if ($term->revisionsEnabled()) {
             $term->store([
                 'message' => $request->message,
-                'user' => User::fromUser($request->user()),
+                'user' => User::current(),
             ]);
         } else {
-            $term
-                ->set('updated_by', User::fromUser($request->user())->id())
-                ->set('updated_at', now()->timestamp)
-                ->save();
+            $term->updateLastModified(User::current())->save();
         }
 
         return ['data' => ['redirect' => $term->editUrl()]];
@@ -294,9 +280,15 @@ class TermsController extends CpController
 
     protected function extractFromFields($term, $blueprint)
     {
+        // The values should only be data merged with the origin data.
+        // We don't want injected taxonomy values, which $term->values() would have given us.
+        $values = $term->inDefaultLocale()->data()->merge(
+            $term->data()
+        );
+
         $fields = $blueprint
             ->fields()
-            ->addValues($term->values()->all())
+            ->addValues($values->all())
             ->preProcess();
 
         $values = $fields->values()->merge([

@@ -149,14 +149,30 @@ class Entries extends Relationship
 
         $collections = $this->getConfiguredCollections();
 
-        return collect($collections)->map(function ($collection) {
+        return collect($collections)->flatMap(function ($collection) use ($collections) {
             $collection = Collection::findByHandle($collection);
+            $blueprints = $collection->entryBlueprints();
 
-            return [
-                'title' => $collection->title(),
-                'url' => $collection->createEntryUrl(Site::selected()->handle()),
-            ];
+            return $blueprints->map(function ($blueprint) use ($collection, $collections, $blueprints) {
+                return [
+                    'title' => $this->getCreatableTitle($collection, $blueprint, count($collections), $blueprints->count()),
+                    'url' => $collection->createEntryUrl(Site::selected()->handle()).'?blueprint='.$blueprint->handle(),
+                ];
+            });
         })->all();
+    }
+
+    private function getCreatableTitle($collection, $blueprint, $collectionCount, $blueprintCount)
+    {
+        if ($collectionCount > 1 && $blueprintCount === 1) {
+            return $collection->title();
+        }
+
+        if ($collectionCount > 1 && $blueprintCount > 1) {
+            return $collection->title().': '.$blueprint->title();
+        }
+
+        return $blueprint->title();
     }
 
     protected function toItemArray($id)
@@ -189,13 +205,7 @@ class Entries extends Relationship
 
     protected function getSelectionFilterContext()
     {
-        $collections = $this->getConfiguredCollections();
-
-        $blueprints = collect($collections)->flatMap(function ($collection) {
-            return Collection::findByHandle($collection)->entryBlueprints()->map->handle();
-        })->all();
-
-        return compact('collections', 'blueprints');
+        return ['collections' => $this->getConfiguredCollections()];
     }
 
     protected function getConfiguredCollections()

@@ -48,15 +48,22 @@ class UserTags extends Tags
         $user = null;
 
         // Get a user by ID, if the `id` parameter was used.
-        if ($id = $this->get('id')) {
+        if ($id = $this->params->get('id')) {
             if (! $user = User::find($id)) {
                 return $this->parseNoResults();
             }
         }
 
         // Get a user by email, if the `email` parameter was used.
-        if ($email = $this->get('email')) {
+        if ($email = $this->params->get('email')) {
             if (! $user = User::findByEmail($email)) {
+                return $this->parseNoResults();
+            }
+        }
+
+        // Get a user by field, if the `field` parameter was used.
+        if ($field = $this->params->get('field')) {
+            if (! $user = User::query()->where($field, $this->params->get('value'))->first()) {
                 return $this->parseNoResults();
             }
         }
@@ -172,7 +179,7 @@ class UserTags extends Tags
     {
         $queryParams = [];
 
-        if ($redirect = $this->get('redirect')) {
+        if ($redirect = $this->params->get('redirect')) {
             $queryParams['redirect'] = $redirect;
         }
 
@@ -188,7 +195,7 @@ class UserTags extends Tags
     {
         auth()->logout();
 
-        abort(redirect($this->get('redirect', '/'), $this->get('response', 302)));
+        abort(redirect($this->params->get('redirect', '/'), $this->params->get('response', 302)));
     }
 
     /**
@@ -220,7 +227,7 @@ class UserTags extends Tags
             $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
         }
 
-        if ($reset_url = $this->get('reset_url')) {
+        if ($reset_url = $this->params->get('reset_url')) {
             $html .= '<input type="hidden" name="reset_url" value="'.$reset_url.'" />';
         }
 
@@ -258,7 +265,7 @@ class UserTags extends Tags
 
         $html .= '<input type="hidden" name="token" value="'.request('token').'" />';
 
-        if ($redirect = $this->get('redirect')) {
+        if ($redirect = $this->params->get('redirect')) {
             $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
         }
 
@@ -433,9 +440,9 @@ class UserTags extends Tags
      */
     protected function getRedirectUrl()
     {
-        $return = $this->get('redirect');
+        $return = $this->params->get('redirect');
 
-        if ($this->getBool('allow_request_redirect')) {
+        if ($this->params->bool('allow_request_redirect', false)) {
             $return = request()->input('redirect', $return);
         }
 
@@ -462,7 +469,7 @@ class UserTags extends Tags
      */
     protected function getRequiredRegistrationFields()
     {
-        $blueprintFields = Blueprint::find('user')->fields()->all()
+        $blueprintFields = User::blueprint()->fields()->all()
             ->keyBy->handle()
             ->filter(function ($field, $handle) {
                 return in_array($handle, ['email', 'password']);
@@ -499,7 +506,7 @@ class UserTags extends Tags
      */
     protected function getAdditionalRegistrationFields()
     {
-        return Blueprint::find('user')->fields()->all()
+        return User::blueprint()->fields()->all()
             ->reject(function ($field) {
                 return in_array($field->handle(), ['email', 'password', 'password_confirmation', 'roles', 'groups']);
             })

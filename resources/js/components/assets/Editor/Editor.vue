@@ -259,20 +259,8 @@ export default {
                 this.meta = data.meta;
                 this.runActionUrl = data.runActionUrl;
                 this.actions = data.actions;
-                this.getFieldset();
-            });
-        },
 
-        /**
-         * Load the fieldset
-         */
-        getFieldset() {
-            const url = cp_url(`fields/publish-blueprints/${this.asset.blueprint}`);
-
-            this.$axios.get(url).then(response => {
-                this.fieldset = response.data;
-
-                // Flatten fields from all sections into one array.
+                this.fieldset = data.blueprint;
                 this.fields = _.chain(this.fieldset.sections)
                     .map(section => section.fields)
                     .flatten(true)

@@ -23,7 +23,7 @@
             <div class="pr-1 flex items-center">
                 <slot name="branch-icon" :branch="page" />
 
-                <dropdown-list class="ml-2">
+                <dropdown-list class="ml-2" v-if="!isRoot">
                     <slot name="branch-options"
                         :branch="page"
                         :depth="depth"

@@ -17,7 +17,7 @@ class ResolveRedirect
 
         if (Str::startsWith($redirect, 'entry::')) {
             $id = Str::after($redirect, 'entry::');
-            $redirect = Facades\Entry::find($id)->url();
+            $redirect = optional(Facades\Entry::find($id))->url() ?? 404;
         }
 
         return is_numeric($redirect) ? (int) $redirect : $redirect;
@@ -33,7 +33,9 @@ class ResolveRedirect
             $parent = $parent->page();
         }
 
-        $children = $parent->pages()->all();
+        $children = $parent->isRoot()
+            ? $parent->structure()->in($parent->locale())->pages()->all()->slice(1, 1)
+            : $parent->pages()->all();
 
         if ($children->isEmpty()) {
             return 404;

@@ -15,7 +15,7 @@ class Query extends Tags
      */
     public function index()
     {
-        return $this->evaluate($this->parameters->get('builder'));
+        return $this->evaluate($this->params->get('builder'));
     }
 
     /**
@@ -23,7 +23,7 @@ class Query extends Tags
      */
     public function wildcard($tag)
     {
-        return $this->evaluate($this->context->get($tag));
+        return $this->evaluate($this->context->value($tag));
     }
 
     protected function evaluate($query)

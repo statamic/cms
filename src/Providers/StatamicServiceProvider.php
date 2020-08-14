@@ -33,5 +33,6 @@ class StatamicServiceProvider extends AggregateServiceProvider
         RouteServiceProvider::class,
         BroadcastServiceProvider::class,
         ApiServiceProvider::class,
+        \Statamic\Git\ServiceProvider::class,
     ];
 }

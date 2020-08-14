@@ -3,7 +3,9 @@
 namespace Statamic\Query\Scopes\Filters;
 
 use Statamic\Facades\Collection;
+use Statamic\Facades\Taxonomy;
 use Statamic\Query\Scopes\Filter;
+use Statamic\Support\Arr;
 
 class Blueprint extends Filter
 {
@@ -30,17 +32,24 @@ class Blueprint extends Filter
 
     public function badge($values)
     {
-        return __('blueprint is').' '.$values['blueprint'];
+        return __('Blueprint').': '.$values['blueprint'];
     }
 
     public function visibleTo($key)
     {
-        return $key === 'entries' && $this->blueprints()->count() > 1;
+        return in_array($key, ['entries', 'terms'])
+            && $this->blueprints()->count() > 1;
     }
 
     public function blueprints()
     {
-        return Collection::findByHandle($this->context['collection'])->entryBlueprints();
+        if ($collection = Arr::get($this->context, 'collection')) {
+            return Collection::findByHandle($collection)->entryBlueprints();
+        }
+
+        if ($taxonomy = Arr::get($this->context, 'taxonomy')) {
+            return Taxonomy::findByHandle($taxonomy)->termBlueprints();
+        }
     }
 
     protected function options()

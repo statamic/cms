@@ -4,7 +4,8 @@ namespace Statamic\Assets;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Assets\AssetFolder as Contract;
-use Statamic\Events\Data\AssetFolderDeleted;
+use Statamic\Events\AssetFolderDeleted;
+use Statamic\Events\AssetFolderSaved;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
@@ -124,6 +125,8 @@ class AssetFolder implements Contract, Arrayable
             $this->disk()->put($path, YAML::dump($arr));
         }
 
+        AssetFolderSaved::dispatch($this);
+
         return $this;
     }
 
@@ -143,7 +146,7 @@ class AssetFolder implements Contract, Arrayable
         // Delete the actual folder that'll be leftover. It'll include any empty subfolders.
         $this->disk()->delete($this->path());
 
-        event(new AssetFolderDeleted($this->container(), $this->path(), $paths));
+        AssetFolderDeleted::dispatch($this);
 
         return $this;
     }

@@ -6,6 +6,7 @@ use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
+use Statamic\Support\Arr;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
@@ -25,7 +26,7 @@ class Tags extends BaseTags
      */
     public function __call($method, $args)
     {
-        $this->parameters['form'] = $this->method;
+        $this->params['form'] = $this->method;
 
         return $this->create();
     }
@@ -39,7 +40,7 @@ class Tags extends BaseTags
      */
     public function set()
     {
-        $this->context['form'] = $this->getParam(static::HANDLE_PARAM);
+        $this->context['form'] = $this->params->get(static::HANDLE_PARAM);
 
         return [];
     }
@@ -162,7 +163,7 @@ class Tags extends BaseTags
      */
     protected function getSortOrder()
     {
-        return $this->get('sort', 'date');
+        return $this->params->get('sort', 'date');
     }
 
     /**
@@ -172,7 +173,7 @@ class Tags extends BaseTags
      */
     protected function getForm()
     {
-        if (! $form = $this->get(static::HANDLE_PARAM, array_get($this->context, 'form'))) {
+        if (! $form = $this->params->get(static::HANDLE_PARAM, Arr::get($this->context, 'form'))) {
             throw new \Exception('A form handle is required on Form tags. Please refer to the docs for more information.');
         }
 

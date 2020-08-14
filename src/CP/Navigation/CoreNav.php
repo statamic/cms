@@ -20,6 +20,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Facades\UserGroup as UserGroupAPI;
 use Statamic\Facades\Utility;
+use Statamic\Statamic;
 
 class CoreNav
 {
@@ -71,7 +72,7 @@ class CoreNav
             ->icon('content-writing')
             ->can('index', Collection::class)
             ->children(function () {
-                return CollectionAPI::all()->map(function ($collection) {
+                return CollectionAPI::all()->sortBy->title()->map(function ($collection) {
                     return Nav::item($collection->title())
                               ->url($collection->showUrl())
                               ->can('view', $collection);
@@ -83,7 +84,7 @@ class CoreNav
             ->icon('hierarchy-files')
             ->can('index', NavContract::class)
             ->children(function () {
-                return NavAPI::all()->map(function ($nav) {
+                return NavAPI::all()->sortBy->title()->map(function ($nav) {
                     return Nav::item($nav->title())
                               ->url($nav->showUrl())
                               ->can('view', $nav);
@@ -95,7 +96,7 @@ class CoreNav
             ->icon('tags')
             ->can('index', Taxonomy::class)
             ->children(function () {
-                return TaxonomyAPI::all()->map(function ($taxonomy) {
+                return TaxonomyAPI::all()->sortBy->title()->map(function ($taxonomy) {
                     return Nav::item($taxonomy->title())
                               ->url($taxonomy->showUrl())
                               ->can('view', $taxonomy);
@@ -107,7 +108,7 @@ class CoreNav
             ->icon('assets')
             ->can('index', AssetContainer::class)
             ->children(function () {
-                return AssetContainerAPI::all()->map(function ($assetContainer) {
+                return AssetContainerAPI::all()->sortBy->title()->map(function ($assetContainer) {
                     return Nav::item($assetContainer->title())
                         ->url($assetContainer->showUrl())
                         ->can('view', $assetContainer);
@@ -119,7 +120,7 @@ class CoreNav
             ->icon('earth')
             ->can('index', GlobalSet::class)
             ->children(function () {
-                return GlobalSetAPI::all()->map(function ($globalSet) {
+                return GlobalSetAPI::all()->sortBy->title()->map(function ($globalSet) {
                     $globalSet = $globalSet->in(Site::selected()->handle());
 
                     return Nav::item($globalSet->title())
@@ -163,18 +164,23 @@ class CoreNav
             ->icon('drawer-file')
             ->can('index', Form::class)
             ->children(function () {
-                return FormAPI::all()->map(function ($form) {
+                return FormAPI::all()->sortBy->title()->map(function ($form) {
                     return Nav::item($form->title())
                         ->url($form->showUrl())
                         ->can('view', $form);
                 });
             });
 
-        // Nav::tools('Updates')
-        //     ->route('updater')
-        //     ->icon('loading-bar')
-        //     ->view('statamic::nav.updates')
-        //     ->can('view updates');
+        Nav::tools('Updates')
+            ->route('updater')
+            ->icon('loading-bar')
+            ->view('statamic::nav.updates')
+            ->can('view updates');
+
+        Nav::tools('Addons')
+            ->route('addons.index')
+            ->icon('addons')
+            ->can('configure addons');
 
         $this->makeUtilitiesSection();
 
@@ -183,7 +189,7 @@ class CoreNav
 
     protected function makeUtilitiesSection()
     {
-        $utilities = Utility::authorized()->map(function ($utility) {
+        $utilities = Utility::authorized()->sortBy->navTitle()->map(function ($utility) {
             return Nav::item($utility->navTitle())->url($utility->url());
         });
 
@@ -204,6 +210,10 @@ class CoreNav
      */
     protected function makeUsersSection()
     {
+        if (! Statamic::pro()) {
+            return $this;
+        }
+
         Nav::users('Users')
             ->route('users.index')
             ->icon('users-box')
@@ -214,7 +224,7 @@ class CoreNav
             ->icon('users-multiple')
             ->can('edit user groups')
             ->children(function () {
-                return UserGroupAPI::all()->map(function ($userGroup) {
+                return UserGroupAPI::all()->sortBy->title()->map(function ($userGroup) {
                     return Nav::item($userGroup->title())
                               ->url($userGroup->showUrl());
                 });
@@ -225,7 +235,7 @@ class CoreNav
             ->icon('shield-key')
             ->can('edit roles')
             ->children(function () {
-                return RoleAPI::all()->map(function ($role) {
+                return RoleAPI::all()->sortBy->title()->map(function ($role) {
                     return Nav::item($role->title())
                         ->url($role->editUrl());
                 });
@@ -241,11 +251,6 @@ class CoreNav
      */
     protected function makeUnusedSection()
     {
-        // Nav::site('Addons')
-        //     ->route('addons.index')
-        //     ->icon('addons')
-        //     ->can('configure addons');
-
         // Nav::site('Preferences')
         //     ->route('')
         //     ->icon('hammer-wrench');

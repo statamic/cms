@@ -41,10 +41,12 @@ class Review extends Command
         $lang = $input->getArgument('lang');
 
         if ($file = $input->getArgument('file')) {
-            return $this->reviewKeyFile($lang, $file);
+            $this->reviewKeyFile($lang, $file);
+        } else {
+            $this->reviewStringFile($lang);
         }
 
-        $this->reviewStringFile($lang);
+        return 0;
     }
 
     protected function reviewStringFile($lang)

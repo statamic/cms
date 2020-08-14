@@ -3,6 +3,7 @@
 namespace Statamic\Translator\Commands;
 
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Translator\MethodDiscovery;
 use Statamic\Translator\Util;
@@ -21,14 +22,18 @@ class Generate extends Command
     protected $files;
     protected $ignored;
     protected $additionalStrings;
+    protected $additionalKeys;
+    protected $excludedKeys;
 
-    public function __construct(MethodDiscovery $discovery, Filesystem $files, array $manualFiles, array $ignored, array $additionalStrings)
+    public function __construct(MethodDiscovery $discovery, Filesystem $files, array $manualFiles, array $ignored, array $additionalStrings, array $additionalKeys, array $excludedKeys)
     {
         $this->discovery = $discovery;
         $this->files = $files;
         $this->manualFiles = $manualFiles;
         $this->ignored = $ignored;
         $this->additionalStrings = $additionalStrings;
+        $this->additionalKeys = $additionalKeys;
+        $this->excludedKeys = $excludedKeys;
         parent::__construct();
     }
 
@@ -53,6 +58,8 @@ class Generate extends Command
         $this->generateManualKeyFiles();
 
         $this->translate();
+
+        return 0;
     }
 
     protected function generateStringFiles()
@@ -116,7 +123,7 @@ class Generate extends Command
 
                 $file = explode('::', $file, 2)[1];
 
-                if (Str::startsWith($file, $this->manualFiles)) {
+                if (Str::startsWith($file, $this->manualFiles) || in_array($file, ['auth'])) {
                     return null;
                 }
 
@@ -126,9 +133,12 @@ class Generate extends Command
             ->groupBy('file')
             ->each(function ($items, $file) {
                 foreach ($this->languages() as $lang) {
-                    $strings = $items->map->string->sort()->values();
-                    $this->generateKeyFile($lang, $file, function ($existing) use ($strings) {
-                        return $strings->mapWithKeys(function ($key) use ($existing) {
+                    $keys = $items->map->string
+                        ->merge($this->additionalKeys[$file] ?? [])
+                        ->diff($this->excludedKeys[$file] ?? [])
+                        ->sort()->values();
+                    $this->generateKeyFile($lang, $file, function ($existing) use ($keys) {
+                        return $keys->mapWithKeys(function ($key) use ($existing) {
                             $translation = $existing[$key] ?? '';
 
                             return [$key => $translation];
@@ -153,6 +163,8 @@ class Generate extends Command
 
             return;
         }
+
+        $translations = Arr::dot($translations);
 
         $contents = "<?php\n\nreturn ".VarExporter::export($translations).";\n";
 

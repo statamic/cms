@@ -4,11 +4,11 @@
 @section('content')
 
     @include('statamic::partials.empty-state', [
-        'resource' => 'Asset Container',
-        'title' => __('Create an Asset Container'),
+        'title' => __('Asset Containers'),
         'description' => __('statamic::messages.asset_container_intro'),
         'svg' => 'empty/asset-container',
-        'route' => cp_route('asset-containers.create'),
+        'button_text' => __('Create Asset Container'),
+        'button_url' => cp_route('asset-containers.create'),
         'can' => $user->can('create', \Statamic\Contracts\Assets\AssetContainer::class)
     ])
 

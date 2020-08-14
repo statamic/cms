@@ -64,7 +64,7 @@
     .nav-main {
         @apply fixed flex bg-transparent shadow-none overflow-auto border-r;
         z-index: 1;
-        height: calc(100% - 52px);
+        height: calc(100% - 100px);
     }
 }
 

@@ -11,7 +11,7 @@
             {{ index }}
             <span v-if="canDelete" class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" />
         </div>
-        <div class="publish-fields">
+        <publish-fields-container>
             <publish-field
                 v-for="field in fields"
                 :key="field.handle"
@@ -27,7 +27,7 @@
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
             />
-        </div>
+        </publish-fields-container>
     </div>
 
 </template>

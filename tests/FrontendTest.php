@@ -22,15 +22,19 @@ class FrontendTest extends TestCase
     {
         parent::setUp();
 
-        Blueprint::shouldReceive('find')->with('empty')->andReturn(new \Statamic\Fields\Blueprint);
-        $this->addToAssertionCount(-1);
-
         $this->withStandardFakeViews();
+    }
+
+    private function withStandardBlueprints()
+    {
+        Blueprint::shouldReceive('in')->withAnyArgs()->andReturn(collect([new \Statamic\Fields\Blueprint]));
+        $this->addToAssertionCount(-1);
     }
 
     /** @test */
     public function page_is_displayed()
     {
+        $this->withStandardBlueprints();
         $this->withoutExceptionHandling();
         $this->withFakeViews();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
@@ -54,6 +58,7 @@ class FrontendTest extends TestCase
     /** @test */
     public function page_is_displayed_with_query_string()
     {
+        $this->withStandardBlueprints();
         $this->withFakeViews();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> <p>{{ content }}</p>');
@@ -83,6 +88,7 @@ class FrontendTest extends TestCase
     /** @test */
     public function drafts_are_visible_if_using_live_preview()
     {
+        $this->withStandardBlueprints();
         $this->setTestRoles(['draft_viewer' => ['view drafts on frontend']]);
         $user = User::make()->assignRole('draft_viewer');
 
@@ -172,18 +178,13 @@ class FrontendTest extends TestCase
     /** @test */
     public function fields_gets_augmented()
     {
+        $this->withoutExceptionHandling();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('default', '{{ augment_me }}{{ dont_augment_me }}');
-        Blueprint::shouldReceive('find')
-            ->with('test')
-            ->andReturn((new \Statamic\Fields\Blueprint)
-                ->setHandle('test')
-                ->setContents(['fields' => [
-                    [
-                        'handle' => 'augment_me',
-                        'field' => ['type' => 'markdown'],
-                    ],
-                ]]));
+        $blueprint = Blueprint::makeFromFields([
+            'augment_me' => ['type' => 'markdown'],
+        ])->setHandle('test');
+        Blueprint::shouldReceive('in')->with('collections/pages')->once()->andReturn(collect([$blueprint]));
 
         $this->createPage('about', [
             'path' => 'about.md',
@@ -319,6 +320,18 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
+    public function a_redirect_key_with_an_entry_should_redirect_to_the_entry()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
+    public function a_redirect_key_with_an_unknown_entry_should_404()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
     public function debug_bar_shows_cascade_variables_if_enabled()
     {
         $this->markTestIncomplete();
@@ -370,12 +383,12 @@ class FrontendTest extends TestCase
         // The bug would happen if the non-routable collection happened to be created first. It's not
         // really specific to the naming. However when reading from files, it goes in alphabetical
         // order which makes it seem like it could be an alphabetical problem.
-        Collection::make('services')->entryBlueprints(['empty'])->structureContents([
+        Collection::make('services')->structureContents([
             'root' => true,
             'tree' => [['entry' => '2']],
         ])->save();
 
-        Collection::make('pages')->entryBlueprints(['empty'])->routes('{slug}')->structureContents([
+        Collection::make('pages')->routes('{slug}')->structureContents([
             'root' => true,
             'tree' => [['entry' => '1']],
         ])->save();
@@ -407,7 +420,6 @@ class FrontendTest extends TestCase
     {
         return Collection::make('pages')
             ->routes('{slug}')
-            ->template('default')
-            ->entryBlueprints(['empty']);
+            ->template('default');
     }
 }

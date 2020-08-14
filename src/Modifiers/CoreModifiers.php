@@ -17,6 +17,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -215,6 +216,10 @@ class CoreModifiers extends Modifier
         $needle = Arr::get($context, $params[0], $params[0]);
 
         if (is_array($haystack)) {
+            if (Arr::isAssoc($haystack)) {
+                return Arr::exists($haystack, $needle);
+            }
+
             return in_array($needle, $haystack);
         }
 
@@ -735,7 +740,7 @@ class CoreModifiers extends Modifier
      * @param $params
      * @return bool
      */
-    public function inArray($value, $params, $context)
+    public function inArray($haystack, $params, $context)
     {
         $needle = Arr::get($context, $params[0], $params);
 
@@ -743,7 +748,11 @@ class CoreModifiers extends Modifier
             $needle = $needle[0];
         }
 
-        return in_array($needle, $value);
+        if (Arr::isAssoc($haystack)) {
+            return Arr::exists($haystack, $needle);
+        }
+
+        return in_array($needle, $haystack);
     }
 
     /**
@@ -838,6 +847,17 @@ class CoreModifiers extends Modifier
     public function isBlank($value)
     {
         return Stringy::isBlank($value);
+    }
+
+    /**
+     * Return true if the string is an email address.
+     *
+     * @param $value
+     * @return bool
+     */
+    public function isEmail($value)
+    {
+        return filter_var($value, FILTER_VALIDATE_EMAIL) !== false;
     }
 
     /**
@@ -947,6 +967,17 @@ class CoreModifiers extends Modifier
     public function isUppercase($value)
     {
         return Stringy::isUpperCase($value);
+    }
+
+    /**
+     * Returns true if the string is a URL.
+     *
+     * @param $value
+     * @return bool
+     */
+    public function isUrl($value)
+    {
+        return filter_var($value, FILTER_VALIDATE_URL) !== false;
     }
 
     /**
@@ -1716,6 +1747,21 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Strip whitespace from HTML.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function spaceless($value, $params)
+    {
+        $nolb = str_replace(["\r", "\n"], '', $value);
+        $nospaces = preg_replace('/\s+/', ' ', $nolb);
+
+        return preg_replace('/>\s+</', '><', $nospaces);
+    }
+
+    /**
      * Returns true if the string starts with a given substring ($params[0]), false otherwise.
      * The comparison is case-insensitive.
      *
@@ -1982,7 +2028,7 @@ class CoreModifiers extends Modifier
      */
     public function timezone($value, $params)
     {
-        $timezone = Arr::get($params, 0, Config::get('statamic.system.timezone'));
+        $timezone = Arr::get($params, 0, Config::get('app.timezone'));
 
         return $this->carbon($value)->tz($timezone);
     }
@@ -2080,7 +2126,9 @@ class CoreModifiers extends Modifier
             $value = Arr::get($value, 0);
         }
 
-        return optional(Data::find($value))->url();
+        $item = is_string($value) ? optional(Data::find($value)) : $value;
+
+        return $item->url();
     }
 
     /**
@@ -2258,9 +2306,11 @@ class CoreModifiers extends Modifier
 
         // If the number is already a number, use that. Otherwise, attempt to resolve it
         // from a value in the context. This allows users to specify a variable name.
-        return (is_numeric($number))
+        $number = (is_numeric($number))
             ? $number
-            : Arr::get($context, $number, $number)->value() ?? Arr::get($context, $number, $number);
+            : Arr::get($context, $number, $number);
+
+        return ($number instanceof Value) ? $number->value() : $number;
     }
 
     private function carbon($value)

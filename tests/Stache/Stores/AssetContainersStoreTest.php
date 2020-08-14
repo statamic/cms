@@ -60,10 +60,6 @@ class AssetContainersStoreTest extends TestCase
     {
         config(['filesystems.disks.test' => ['driver' => 'local', 'root' => __DIR__.'/../../Assets/__fixtures__/container']]);
 
-        Facades\Blueprint::shouldReceive('find')
-            ->with('test')->once()
-            ->andReturn($blueprint = new \Statamic\Fields\Blueprint);
-
         $contents = <<<'EOL'
 disk: test
 title: Example
@@ -75,7 +71,6 @@ EOL;
         $this->assertEquals(File::disk('test'), $item->disk());
         $this->assertEquals('example', $item->handle());
         $this->assertEquals('Example', $item->title());
-        $this->assertEquals($blueprint, $item->blueprint());
         tap($item->assets(), function ($assets) {
             $this->assertEveryItemIsInstanceOf(Asset::class, $assets);
             $this->assertEquals([
@@ -111,14 +106,12 @@ EOL;
             ->andReturnTrue(); // irrelevant for this test but it gets called during saving
 
         $container = Facades\AssetContainer::make('new')
-            ->title('New Container')
-            ->blueprint('foo');
+            ->title('New Container');
 
         $this->store->save($container);
 
         $expected = <<<'EOT'
 title: 'New Container'
-blueprint: foo
 
 EOT;
         $this->assertStringEqualsFile($this->tempDir.'/new.yaml', $expected);
@@ -127,7 +120,6 @@ EOT;
 
         $expected = <<<'EOT'
 title: 'New Container'
-blueprint: foo
 allow_uploads: false
 create_folders: false
 

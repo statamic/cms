@@ -68,7 +68,9 @@ class Validator
     {
         return LaravelValidator::validate(
             $this->fields->preProcessValidatables()->values()->all(),
-            $this->rules()
+            $this->rules(),
+            [],
+            $this->fields->all()->map->display()->all()
         );
     }
 

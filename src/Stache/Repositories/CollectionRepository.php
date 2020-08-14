@@ -5,8 +5,6 @@ namespace Statamic\Stache\Repositories;
 use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\CollectionRepository as RepositoryContract;
-use Statamic\Events\Data\CollectionDeleted;
-use Statamic\Events\Data\CollectionSaved;
 use Statamic\Facades\Blink;
 use Statamic\Stache\Stache;
 
@@ -73,15 +71,11 @@ class CollectionRepository implements RepositoryContract
         if ($collection->orderable()) {
             $this->stache->store('entries')->store($collection->handle())->index('order')->update();
         }
-
-        CollectionSaved::dispatch($collection);
     }
 
     public function delete(Collection $collection)
     {
         $this->store->delete($collection);
-
-        CollectionDeleted::dispatch($collection);
     }
 
     public function updateEntryUris(Collection $collection)

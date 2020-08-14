@@ -26,7 +26,7 @@ class Glide extends Tags
     {
         $tag = explode(':', $this->tag, 2)[1];
 
-        $item = $this->context->get($tag);
+        $item = $this->context->value($tag);
 
         if ($this->isPair) {
             return $this->generate($item);
@@ -48,7 +48,7 @@ class Glide extends Tags
             return $this->generate();
         }
 
-        $item = $this->get(['src', 'id', 'path']);
+        $item = $this->params->get(['src', 'id', 'path']);
 
         return $this->output($this->generateGlideUrl($item));
     }
@@ -91,7 +91,7 @@ class Glide extends Tags
      */
     public function generate($items = null)
     {
-        $items = $items ?? $this->get(['src', 'id', 'path']);
+        $items = $items ?? $this->params->get(['src', 'id', 'path']);
 
         $items = is_iterable($items) ? collect($items) : collect([$items]);
 
@@ -140,8 +140,8 @@ class Glide extends Tags
                 compact('url', 'width', 'height')
             );
         }
-        if ($this->getBool('tag')) {
-            return "<img src=\"$url\" alt=\"{$this->get('alt')}\" />";
+        if ($this->params->bool('tag')) {
+            return "<img src=\"$url\" alt=\"{$this->params->get('alt')}\" />";
         }
 
         return $url;
@@ -163,7 +163,7 @@ class Glide extends Tags
             return;
         }
 
-        $url = ($this->getBool('absolute')) ? URL::makeAbsolute($url) : URL::makeRelative($url);
+        $url = ($this->params->bool('absolute')) ? URL::makeAbsolute($url) : URL::makeRelative($url);
 
         return $url;
     }
@@ -237,7 +237,7 @@ class Glide extends Tags
     {
         $params = collect();
 
-        foreach ($this->parameters as $param => $value) {
+        foreach ($this->params as $param => $value) {
             if (! in_array($param, ['src', 'id', 'path', 'tag', 'alt', 'absolute'])) {
                 $params->put($param, $value);
             }

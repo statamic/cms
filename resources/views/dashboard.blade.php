@@ -13,7 +13,7 @@
 
     @include('statamic::partials.docs-callout', [
         'topic' => __('Widgets'),
-        'url' => 'widgets'
+        'url' => Statamic::docsUrl('widgets')
     ])
 
 @stop

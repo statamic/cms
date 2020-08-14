@@ -116,7 +116,6 @@
 
             <template #branch-options="{ branch, removeBranch, orphanChildren, depth }">
                 <template v-if="depth < structureMaxDepth">
-
                     <h6 class="px-1" v-text="__('Create Child Entry')" v-if="blueprints.length > 1" />
                     <li class="divider" v-if="blueprints.length > 1" />
                     <dropdown-item
@@ -171,7 +170,6 @@ export default {
         runActionUrl: { type: String, required: true },
         bulkActionsUrl: { type: String, required: true },
         reorderUrl: { type: String, required: true },
-        blueprints: { type: Array, required: true },
         site: { type: String, required: true },
         structurePagesUrl: { type: String },
         structureSubmitUrl: { type: String },

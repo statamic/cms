@@ -3,74 +3,24 @@
 namespace Statamic\Updater;
 
 use Carbon\Carbon;
-use Facades\Statamic\Extend\Marketplace;
-use Statamic\Facades\Addon;
-use Statamic\Statamic;
-use Statamic\Updater\Core\Changelog as CoreChangelog;
+use Facades\Statamic\Marketplace\Marketplace;
 use Statamic\Updater\Presenters\GithubReleasePresenter;
 
-class Changelog
+abstract class Changelog
 {
-    /**
-     * @var string
-     */
-    protected $slug;
-
-    /**
-     * @var string
-     */
-    protected $currentVersion;
-
-    /**
-     * @var \Statamic\Extend\Addon
-     */
-    protected $installedAddon;
-
-    /**
-     * Instantiate product changelog.
-     *
-     * @param string $slug
-     */
-    public function __construct(string $slug)
-    {
-        $this->slug = $slug;
-    }
-
-    /**
-     * Instantiate product changelog.
-     *
-     * @param string $slug
-     * @return static
-     */
-    public static function product(string $slug)
-    {
-        if ($slug === Statamic::CORE_SLUG) {
-            return new CoreChangelog($slug);
-        }
-
-        return new static($slug);
-    }
-
     /**
      * Get installed version.
      *
      * @return string
      */
-    public function currentVersion()
-    {
-        return $this->currentVersion
-            ?? $this->currentVersion = $this->installedAddon()->version();
-    }
+    abstract public function currentVersion();
 
     /**
-     * Get composer package.
+     * Get the marketplace item (seller slug + product slug).
      *
      * @return string
      */
-    public function composerPackage()
-    {
-        return $this->installedAddon()->package();
-    }
+    abstract public function item();
 
     /**
      * Get changelog, sorted from newest to oldest.
@@ -79,11 +29,12 @@ class Changelog
      */
     public function get()
     {
-        return $this->getReleases()->map(function ($release, $index) {
+        return Marketplace::releases($this->item())->map(function ($release, $index) {
             return (object) [
                 'version' => $release['version'],
                 'type' => $this->parseReleaseType($release['version'], $index),
                 'latest' => $index === 0,
+                'licensed' => $this->isLicensed($release['version']),
                 'date' => Carbon::parse($release['date'])->format('F jS, Y'),
                 'body' => (string) new GithubReleasePresenter($release['changelog']),
             ];
@@ -113,31 +64,6 @@ class Changelog
     }
 
     /**
-     * Get installed addon instance.
-     *
-     * @return \Statamic\Extend\Addon
-     */
-    protected function installedAddon()
-    {
-        return $this->installedAddon
-            ?? $this->installedAddon = Addon::all()->first(function ($addon) {
-                return $addon->marketplaceSlug() === $this->slug;
-            });
-    }
-
-    /**
-     * Get releases.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    protected function getReleases()
-    {
-        return collect(Marketplace::show($this->slug)['data']['variants'])
-            ->pluck('releases')
-            ->flatten(1);
-    }
-
-    /**
      * Parse release type.
      *
      * @param string $releaseVersion
@@ -152,5 +78,10 @@ class Changelog
         }
 
         return 'downgrade';
+    }
+
+    protected function isLicensed($version)
+    {
+        return true;
     }
 }

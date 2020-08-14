@@ -3,22 +3,33 @@
 namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Statamic\Fields\FieldRepository;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\CP\Column;
 use Statamic\CP\Columns;
+use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\BlueprintDeleted;
+use Statamic\Events\BlueprintSaved;
+use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Facades;
+use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Blueprint implements Augmentable
 {
-    use HasAugmentedData;
+    use HasAugmentedData, ExistsAsFile;
 
     protected $handle;
-    protected $contents = [];
+    protected $namespace;
+    protected $order;
+    protected $initialPath;
+    protected $contents;
     protected $fieldsCache;
+    protected $parent;
+    protected $ensuredFields = [];
 
     public function setHandle(string $handle)
     {
@@ -30,6 +41,55 @@ class Blueprint implements Augmentable
     public function handle(): ?string
     {
         return $this->handle;
+    }
+
+    public function setNamespace(?string $namespace)
+    {
+        $this->namespace = $namespace;
+
+        return $this;
+    }
+
+    public function namespace(): ?string
+    {
+        return $this->namespace;
+    }
+
+    public function setOrder($order)
+    {
+        if (! is_null($order)) {
+            $order = (int) $order;
+        }
+
+        $this->order = $order;
+
+        return $this;
+    }
+
+    public function order()
+    {
+        return $this->order;
+    }
+
+    public function setInitialPath(string $path)
+    {
+        $this->initialPath = $path;
+
+        return $this;
+    }
+
+    public function initialPath()
+    {
+        return $this->initialPath;
+    }
+
+    public function path()
+    {
+        return Path::tidy(vsprintf('%s/%s/%s.yaml', [
+            Facades\Blueprint::directory(),
+            str_replace('.', '/', $this->namespace()),
+            $this->handle(),
+        ]));
     }
 
     public function setContents(array $contents)
@@ -47,12 +107,139 @@ class Blueprint implements Augmentable
 
     public function contents(): array
     {
-        return $this->contents;
+        $contents = $this->contents;
+
+        $contents['sections'] = $contents['sections'] ?? [
+            'main' => ['fields' => []],
+        ];
+
+        if ($this->ensuredFields) {
+            $contents = $this->addEnsuredFieldsToContents($contents, $this->ensuredFields);
+        }
+
+        return array_filter(
+            array_merge(['order' => $this->order], $contents)
+        );
+    }
+
+    private function addEnsuredFieldsToContents($contents, $ensuredFields)
+    {
+        foreach ($ensuredFields as $field) {
+            $contents = $this->addEnsuredFieldToContents($contents, $field);
+        }
+
+        return $contents;
+    }
+
+    private function addEnsuredFieldToContents($contents, $ensured)
+    {
+        $imported = false;
+        $handle = $ensured['handle'];
+        $config = $ensured['config'];
+        $section = $ensured['section'] ?? array_keys($contents['sections'])[0] ?? 'main';
+        $prepend = $ensured['prepend'];
+
+        $sections = collect($contents['sections']);
+
+        // Get all the fields, and mark which section they're in.
+        $allFields = $sections->flatMap(function ($section, $sectionHandle) {
+            return collect($section['fields'] ?? [])->keyBy(function ($field) {
+                return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
+            })->map(function ($field) use ($sectionHandle) {
+                $field['section'] = $sectionHandle;
+
+                return $field;
+            });
+        });
+
+        $importedFields = $allFields->filter(function ($field, $key) {
+            return Str::startsWith($key, 'import:');
+        })->keyBy(function ($field) {
+            return ($field['prefix'] ?? null).$field['import'];
+        })->mapWithKeys(function ($field, $partial) {
+            return (new Fields([$field]))->all()->map(function ($field) use ($partial) {
+                return compact('partial', 'field');
+            });
+        });
+
+        // If a field with that handle is in the contents, its either an inline field or a referenced field...
+        $existingField = $allFields->get($handle);
+        if ($exists = $existingField !== null) {
+            // Since it already exists, maintain the position in that section.
+            $section = $existingField['section'];
+
+            if (is_string($existingField['field'])) {
+                // If it's a string, then it's a reference field. We should merge any ensured config into the 'config'
+                // override array, but only keys that don't already exist in the actual partial field's config.
+                $referencedField = FieldRepository::find($existingField['field']);
+                $referencedFieldConfig = $referencedField->config();
+                $config = array_merge($config, $referencedFieldConfig);
+                $config = Arr::except($config, array_keys($referencedFieldConfig));
+                $field = ['handle' => $handle, 'field' => $existingField['field'], 'config' => $config];
+            } else {
+                // If it's not a string, then it's an inline field. We'll just merge the
+                // config right into the field key, with the user defined config winning.
+                $config = array_merge($config, $existingField['field']);
+                $field = ['handle' => $handle, 'field' => $config];
+            }
+        }
+        $fields = collect($sections[$section]['fields'] ?? [])->keyBy(function ($field) {
+            return (isset($field['import'])) ? 'import:'.($field['prefix'] ?? null).$field['import'] : $field['handle'];
+        });
+
+        if (! $exists) {
+            if ($importedField = $importedFields->get($handle)) {
+                $importKey = 'import:'.$importedField['partial'];
+                $field = $allFields->get($importKey);
+                $section = $field['section'];
+                $fields = collect($sections[$section]['fields'])->keyBy(function ($field) {
+                    return (isset($field['import'])) ? 'import:'.$field['import'] : $field['handle'];
+                });
+                $importedConfig = $importedField['field']->config();
+                $config = array_merge($config, $importedConfig);
+                $config = Arr::except($config, array_keys($importedConfig));
+                $field['config'][$handle] = $config;
+                unset($field['section']);
+                $fields->put($importKey, $field);
+                $imported = true;
+            } else {
+                $field = ['handle' => $handle, 'field' => $config];
+            }
+        }
+
+        // Set the field config in it's proper place.
+        if (! $imported) {
+            if ($prepend && $exists) {
+                $fields->forget($handle)->prepend($field);
+            } elseif ($prepend && ! $exists) {
+                $fields->prepend($field);
+            } elseif ($exists) {
+                $fields->put($handle, $field);
+            } else {
+                $fields->push($field);
+            }
+        }
+
+        $contents['sections'][$section]['fields'] = $fields->values()->all();
+
+        return $contents;
+    }
+
+    public function fileData()
+    {
+        return $this->contents();
+    }
+
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
+
+        return $this;
     }
 
     public function sections(): Collection
     {
-        return collect(Arr::get($this->contents, 'sections', []))->map(function ($contents, $handle) {
+        return collect(Arr::get($this->contents(), 'sections', []))->map(function ($contents, $handle) {
             return (new Section($handle))->setContents($contents);
         });
     }
@@ -65,7 +252,7 @@ class Blueprint implements Augmentable
 
         $this->validateUniqueHandles();
 
-        $fields = new Fields($this->sections()->map->fields()->flatMap->items());
+        $fields = new Fields($this->sections()->map->fields()->flatMap->items(), $this->parent);
 
         $this->fieldsCache = $fields;
 
@@ -132,19 +319,11 @@ class Blueprint implements Augmentable
         ];
     }
 
-    public function editUrl()
-    {
-        return $this->handle() ? cp_route('blueprints.edit', $this->handle()) : null;
-    }
-
-    public function deleteUrl()
-    {
-        return $this->handle() ? cp_route('blueprints.destroy', $this->handle()) : null;
-    }
-
     public function save()
     {
         BlueprintRepository::save($this);
+
+        BlueprintSaved::dispatch($this);
 
         return $this;
     }
@@ -153,67 +332,23 @@ class Blueprint implements Augmentable
     {
         BlueprintRepository::delete($this);
 
+        BlueprintDeleted::dispatch($this);
+
         return true;
     }
 
     public function ensureField($handle, $fieldConfig, $section = null, $prepend = false)
     {
-        // If blueprint already has field, merge it's config in the field's current section.
-        if ($this->hasField($handle)) {
-            foreach ($this->sections()->keys() as $sectionKey) {
-                if ($this->hasFieldInSection($handle, $sectionKey)) {
-                    return $this->ensureFieldInSection($handle, $fieldConfig, $sectionKey);
-                }
-            }
-        }
-
-        // If a section hasn't been provided we'll just use the first section, or default.
-        $section = $section ?? $this->sections()->keys()->first() ?? 'main';
-
         return $this->ensureFieldInSection($handle, $fieldConfig, $section, $prepend);
     }
 
-    public function ensureFieldInSection($handle, $fieldConfig, $section, $prepend = false)
+    public function ensureFieldInSection($handle, $config, $section, $prepend = false)
     {
-        // Ensure section exists.
-        if (! isset($this->contents['sections'][$section])) {
-            $this->contents['sections'][$section] = [];
-        }
+        $this->ensuredFields[] = compact('handle', 'section', 'prepend', 'config');
 
-        // Get fields from section, including imported fields.
-        $fields = $this->sections()->get($section)->fields()->all()->map(function ($field, $handle) {
-            return [
-                'handle' => $handle,
-                'field' => $field->config(),
-            ];
-        });
+        $this->resetFieldsCache();
 
-        // If it already exists, merge field config.
-        if ($exists = $this->hasFieldInSection($handle, $section)) {
-            $fieldConfig = array_merge($fieldConfig, $fields[$handle]['field']);
-        }
-
-        // Combine handle and field config.
-        $field = [
-            'handle' => $handle,
-            'field' => $fieldConfig,
-        ];
-
-        // Set the field config in it's proper place.
-        if ($prepend && $exists) {
-            $fields->forget($handle)->prepend($field);
-        } elseif ($prepend && ! $exists) {
-            $fields->prepend($field);
-        } elseif ($exists) {
-            $fields->put($handle, $field);
-        } else {
-            $fields->push($field);
-        }
-
-        // Set fields back into blueprint contents.
-        $this->contents['sections'][$section]['fields'] = $fields->values()->all();
-
-        return $this->resetFieldsCache();
+        return $this;
     }
 
     public function ensureFieldPrepended($handle, $field, $section = null)
@@ -259,16 +394,14 @@ class Blueprint implements Augmentable
         return $this->resetFieldsCache();
     }
 
-    protected function validateUniqueHandles()
+    public function validateUniqueHandles()
     {
-        $handles = $this->sections()->map->contents()->flatMap(function ($contents) {
-            return array_get($contents, 'fields', []);
-        })->map(function ($item) {
-            return $item['handle'] ?? null;
-        })->filter();
+        $fields = $this->fieldsCache ?? new Fields($this->sections()->map->fields()->flatMap->items());
+
+        $handles = $fields->resolveFields()->map->handle();
 
         if ($field = $handles->duplicates()->first()) {
-            throw new \Exception("Duplicate field [{$field}] on blueprint [{$this->handle}].");
+            throw new DuplicateFieldException($field, $this);
         }
     }
 

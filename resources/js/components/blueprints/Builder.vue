@@ -3,15 +3,13 @@
     <div class="blueprint-builder">
 
         <header class="mb-3">
-            <breadcrumb :url="breadcrumbUrl" :title="__('Blueprints')" />
-
             <div class="flex items-center justify-between">
-                <h1>{{ initialTitle }}</h1>
+                <h1 v-text="__('Edit Blueprint')" />
                 <button type="submit" class="btn-primary" @click.prevent="save" v-text="__('Save')" />
             </div>
         </header>
 
-        <div class="publish-form card p-0">
+        <div class="publish-form card p-0" v-if="showTitle">
             <div class="form-group">
                 <label class="block">{{ __('Title') }}</label>
                 <small class="help-block">{{ __('messages.blueprints_title_instructions') }}</small>
@@ -22,12 +20,16 @@
             </div>
         </div>
 
-        <div class="content mt-5 mb-2">
+        <div class="content mt-5 mb-2" v-if="useSections">
             <h2>{{ __('Tab Sections') }}</h2>
             <p class="max-w-lg">{{ __('messages.tab_sections_instructions') }}</p>
+            <div v-if="errors.sections">
+                <small class="help-block text-red" v-for="(error, i) in errors.sections" :key="i" v-text="error" />
+            </div>
         </div>
 
         <sections
+            :single-section="!useSections"
             :initial-sections="blueprint.sections"
             @updated="sectionsUpdated"
         />
@@ -37,7 +39,6 @@
 </template>
 
 <script>
-import uniqid from 'uniqid';
 import Sections from './Sections.vue';
 
 export default {
@@ -46,13 +47,17 @@ export default {
         Sections,
     },
 
-    props: ['action', 'initialBlueprint', 'breadcrumbUrl'],
+    props: {
+        action: String,
+        initialBlueprint: Object,
+        showTitle: Boolean,
+        useSections: { type: Boolean, default: true }
+    },
 
     data() {
         return {
-            blueprint: clone(this.initialBlueprint),
+            blueprint: this.initializeBlueprint(),
             sections: [],
-            initialTitle: this.initialBlueprint.title,
             errors: {}
         }
     },
@@ -80,6 +85,14 @@ export default {
     },
 
     methods: {
+
+        initializeBlueprint() {
+            let blueprint = clone(this.initialBlueprint);
+
+            if (! this.showTitle) delete blueprint.title;
+
+            return blueprint;
+        },
 
         sectionsUpdated(sections) {
             this.sections = sections;

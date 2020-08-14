@@ -12,6 +12,10 @@
                     :redirect="container.edit_url">
                 </dropdown-item>
                 <dropdown-item
+                    v-text="__('Edit Blueprint')"
+                    :redirect="container.blueprint_url">
+                </dropdown-item>
+                <dropdown-item
                     v-if="container.can_delete"
                     v-text="__('Delete Container')"
                     class="warning"

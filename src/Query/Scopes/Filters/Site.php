@@ -39,7 +39,7 @@ class Site extends Filter
 
     public function badge($values)
     {
-        return __('in site').': '.strtolower($values['site']);
+        return __('Site').': '.strtolower($values['site']);
     }
 
     public function visibleTo($key)

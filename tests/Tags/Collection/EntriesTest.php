@@ -3,6 +3,7 @@
 namespace Tests\Tags\Collection;
 
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Carbon;
 use InvalidArgumentException;
 use Statamic\Facades;
@@ -62,6 +63,11 @@ class EntriesTest extends TestCase
         return (new Entries($params))->get();
     }
 
+    protected function getEntryIds($params = [])
+    {
+        return collect($this->getEntries($params)->items())->map->id()->values()->all();
+    }
+
     /** @test */
     public function it_gets_entries_in_a_collection()
     {
@@ -82,10 +88,38 @@ class EntriesTest extends TestCase
         $this->makeEntry('e')->save();
 
         $this->assertCount(5, $this->getEntries());
-        $this->assertCount(3, $this->getEntries(['paginate' => 3]));
+        $this->assertCount(3, $this->getEntries(['paginate' => 3])); // recommended v3 style
         $this->assertCount(4, $this->getEntries(['paginate' => true, 'limit' => 4])); // v2 style
-        $this->assertCount(3, $this->getEntries(['paginate' => 3, 'limit' => 4])); // precedence
+        $this->assertCount(3, $this->getEntries(['paginate' => 3, 'limit' => 4])); // precedence test
         $this->assertCount(5, $this->getEntries(['paginate' => true])); // ignore if no perPage set
+
+        $this->assertEquals(['a', 'b', 'c'], $this->getEntryIds(['paginate' => 3]));
+
+        Paginator::currentPageResolver(function () {
+            return 2;
+        });
+
+        $this->assertEquals(['d', 'e'], $this->getEntryIds(['paginate' => 3]));
+    }
+
+    /** @test */
+    public function it_gets_offset_paginated_entries_in_a_collection()
+    {
+        $this->makeEntry('a')->save();
+        $this->makeEntry('b')->save();
+        $this->makeEntry('c')->save();
+        $this->makeEntry('d')->save();
+        $this->makeEntry('e')->save();
+        $this->makeEntry('f')->save();
+        $this->makeEntry('g')->save();
+
+        $this->assertEquals(['c', 'd', 'e'], $this->getEntryIds(['paginate' => 3, 'offset' => 2]));
+
+        Paginator::currentPageResolver(function () {
+            return 2;
+        });
+
+        $this->assertEquals(['f', 'g'], $this->getEntryIds(['paginate' => 3, 'offset' => 2]));
     }
 
     /** @test */

@@ -17,7 +17,7 @@ class Cache extends Tags
             return $cached;
         }
 
-        LaraCache::put($key, $html = $this->parse([]), $this->getCacheLength());
+        LaraCache::put($key, $html = (string) $this->parse([]), $this->getCacheLength());
 
         return $html;
     }
@@ -37,7 +37,7 @@ class Cache extends Tags
             'params' => $this->params->all(),
         ];
 
-        if ($this->get('scope', 'site') === 'page') {
+        if ($this->params->get('scope', 'site') === 'page') {
             $hash['url'] = URL::makeAbsolute(URL::getCurrent());
         }
 
@@ -46,7 +46,7 @@ class Cache extends Tags
 
     private function getCacheLength()
     {
-        if (! $length = $this->get('for')) {
+        if (! $length = $this->params->get('for')) {
             return null;
         }
 

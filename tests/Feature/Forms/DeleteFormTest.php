@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Feature\forms;
+namespace Tests\Feature\Forms;
 
 use Statamic\Facades\form;
 use Statamic\Facades\User;

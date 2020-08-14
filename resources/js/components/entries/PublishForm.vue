@@ -552,11 +552,11 @@ export default {
 
         publishActionCompleted({ published, isWorkingCopy, response }) {
             this.saving = false;
-            this.$refs.container.saved();
             if (published !== undefined) {
                 this.$refs.container.setFieldValue('published', published);
                 this.initialPublished = published;
             }
+            this.$refs.container.saved();
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
             this.title = response.data.data.title;

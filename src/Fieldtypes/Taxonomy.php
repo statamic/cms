@@ -7,6 +7,7 @@ use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
 use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
+use Statamic\Query\Scopes\Filters\Fields\Taxonomy as TaxonomyFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Taxonomies\TermCollection;
@@ -25,6 +26,11 @@ class Taxonomy extends Relationship
                 'mode' => 'select',
             ],
         ]);
+    }
+
+    public function filter()
+    {
+        return new TaxonomyFilter($this);
     }
 
     public function augment($value)
@@ -76,7 +82,7 @@ class Taxonomy extends Relationship
 
                 $locale = $entry
                     ? $entry->locale()
-                    : Site::current()->locale();
+                    : Site::current()->handle();
 
                 return $term->in($locale);
             });
@@ -95,6 +101,10 @@ class Taxonomy extends Relationship
 
                 return explode('::', $id, 2)[1];
             })->all();
+        }
+
+        if ($this->field->get('max_items') === 1) {
+            return $data[0];
         }
 
         return $data;
@@ -230,9 +240,16 @@ class Taxonomy extends Relationship
         return $query;
     }
 
-    protected function taxonomies()
+    public function taxonomies()
     {
-        return Arr::wrap($this->config('taxonomy'));
+        $taxonomy = $this->config('taxonomy');
+        $taxonomies = $this->config('taxonomies');
+
+        if ($taxonomy && $taxonomies) {
+            throw new \Exception('A taxonomy fieldtype cannot define both "taxonomy" and "taxonomies". Use one or the other.');
+        }
+
+        return Arr::wrap($taxonomy ?? $taxonomies);
     }
 
     protected function usingSingleTaxonomy()

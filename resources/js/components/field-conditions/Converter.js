@@ -1,4 +1,4 @@
-import { KEYS, OPERATORS, ALIASES } from './Constants.js';
+import { OPERATORS, ALIASES } from './Constants.js';
 
 export default class {
 

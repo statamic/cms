@@ -4,6 +4,8 @@ namespace Statamic\Auth;
 
 use Statamic\Contracts\Auth\Role;
 use Statamic\Contracts\Auth\UserGroup as UserGroupContract;
+use Statamic\Events\UserGroupDeleted;
+use Statamic\Events\UserGroupSaved;
 use Statamic\Facades;
 use Statamic\Facades\Role as RoleAPI;
 
@@ -129,12 +131,16 @@ abstract class UserGroup implements UserGroupContract
     {
         Facades\UserGroup::save($this);
 
+        UserGroupSaved::dispatch($this);
+
         return true;
     }
 
     public function delete()
     {
         Facades\UserGroup::delete($this);
+
+        UserGroupDeleted::dispatch($this);
 
         return true;
     }
