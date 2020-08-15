@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Facades\Fieldset;
 use Statamic\Support\Arr;
 
@@ -75,7 +76,8 @@ class FieldTransformer
             'field_reference' => $field['field'],
             'config' => $mergedConfig,
             'config_overrides' => array_keys($config),
-            'fieldtype' => $fieldsetField['type'],
+            'fieldtype' => $type = $fieldsetField['type'],
+            'icon' => FieldtypeRepository::find($type)->icon(),
         ];
     }
 
@@ -88,7 +90,8 @@ class FieldTransformer
             'handle' => $field['handle'],
             'type' => 'inline',
             'config' => $config,
-            'fieldtype' => $config['type'] ?? 'text',
+            'fieldtype' => $type = $config['type'] ?? 'text',
+            'icon' => FieldtypeRepository::find($type)->icon(),
         ];
     }
 
