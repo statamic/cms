@@ -31,6 +31,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $routes = [];
     protected $middlewareGroups = [];
     protected $viewNamespace;
+    protected $hasPublishables = false;
     protected $publishAfterInstall = true;
 
     public function boot()
@@ -171,6 +172,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             });
 
         if ($publishables->count() >= 1) {
+            $this->publishables = true;
             $this->publishes($publishables->all(), $this->getAddon()->slug());
         }
 
@@ -351,7 +353,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
     protected function bootPublishAfterInstall()
     {
-        if (! $this->publishAfterInstall) {
+        if (! $this->publishAfterInstall || ! $this->hasPublishables) {
             return $this;
         }
 
