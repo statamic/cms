@@ -170,7 +170,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 return [$origin => public_path("vendor/{$package}/{$destination}")];
             });
 
-        if ($publishables->count() >= 1) {}
+        if ($publishables->count() >= 1) {
             $this->publishes($publishables->all(), $this->getAddon()->slug());
         }
 
