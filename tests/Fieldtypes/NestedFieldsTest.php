@@ -94,7 +94,7 @@ class NestedFieldsTest extends TestCase
             [
                 'handle' => 'one',
                 'field' => [
-                    'type' => 'plain',
+                    'type' => 'text',
                     'display' => 'First Field',
                 ],
             ],
@@ -120,11 +120,12 @@ class NestedFieldsTest extends TestCase
                 'handle' => 'one',
                 'type' => 'inline',
                 'config' => [
-                    'type' => 'plain',
+                    'type' => 'text',
                     'display' => 'First Field',
                     'width' => 100,
                 ],
-                'fieldtype' => 'plain',
+                'fieldtype' => 'text',
+                'icon' => 'text',
                 '_id' => 0,
             ],
             [
@@ -143,6 +144,7 @@ class NestedFieldsTest extends TestCase
                 ],
                 'config_overrides' => ['width', 'display'],
                 'fieldtype' => 'text',
+                'icon' => 'text',
                 '_id' => 1,
             ],
             [
