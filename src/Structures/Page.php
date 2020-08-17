@@ -302,6 +302,16 @@ class Page implements Entry, Augmentable, Responsable
         return $this->entry()->routeData();
     }
 
+    public function published()
+    {
+        return $this->entry()->published();
+    }
+
+    public function private()
+    {
+        return $this->entry()->private();
+    }
+
     public function blueprint()
     {
         return optional($this->entry())->blueprint();
