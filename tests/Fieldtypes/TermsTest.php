@@ -7,13 +7,13 @@ use Illuminate\Support\Collection;
 use Statamic\Data\AugmentedCollection;
 use Statamic\Facades;
 use Statamic\Fields\Field;
-use Statamic\Fieldtypes\Taxonomy;
+use Statamic\Fieldtypes\Terms;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
-class TaxonomyTest extends TestCase
+class TermsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -101,7 +101,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function using_both_taxonomy_and_taxonomies_throws_an_exception()
     {
-        $this->expectExceptionMessage('A taxonomy fieldtype cannot define both `taxonomy` and `taxonomies`. Use `taxonomies`.');
+        $this->expectExceptionMessage('A terms fieldtype cannot define both `taxonomy` and `taxonomies`. Use `taxonomies`.');
 
         $this->fieldtype(['taxonomy' => 'categories', 'taxonomies' => 'tags'])->taxonomies();
     }
@@ -109,7 +109,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function having_taxonomy_defined_but_not_taxonomies_throws_an_exception()
     {
-        $this->expectExceptionMessage('A taxonomy fieldtype configures its available taxonomies using the `taxonomies` option, but only found `taxonomy`.');
+        $this->expectExceptionMessage('A terms fieldtype configures its available taxonomies using the `taxonomies` option, but only found `taxonomy`.');
 
         $this->fieldtype(['taxonomy' => 'categories'])->taxonomies();
     }
@@ -117,11 +117,11 @@ class TaxonomyTest extends TestCase
     public function fieldtype($config = [])
     {
         $field = new Field('test', array_merge([
-            'type' => 'taxonomy',
+            'type' => 'terms',
         ], $config));
 
         $field->setParent(EntryFactory::collection('blog')->create());
 
-        return (new Taxonomy)->setField($field);
+        return (new Terms)->setField($field);
     }
 }

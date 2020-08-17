@@ -65,7 +65,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Slug::class,
         Fieldtypes\Table::class,
         Fieldtypes\Tags::class,
-        Fieldtypes\Taxonomy::class,
+        Fieldtypes\Terms::class,
         Fieldtypes\Taxonomies::class,
         Fieldtypes\Template::class,
         Fieldtypes\Text::class,

@@ -3,8 +3,8 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
-use Statamic\Exceptions\TaxonomyFieldtypeBothOptionsUsedException;
-use Statamic\Exceptions\TaxonomyFieldtypeTaxonomyOptionUsed;
+use Statamic\Exceptions\TermsFieldtypeBothOptionsUsedException;
+use Statamic\Exceptions\TermsFieldtypeTaxonomyOptionUsed;
 use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
@@ -14,10 +14,16 @@ use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Taxonomies\TermCollection;
 
-class Taxonomy extends Relationship
+class Terms extends Relationship
 {
     protected $statusIcons = false;
     protected $taggable = true;
+    protected $icon = 'taxonomy';
+
+    public static function title()
+    {
+        return __('Taxonomy Terms');
+    }
 
     protected function configFieldItems(): array
     {
@@ -248,11 +254,11 @@ class Taxonomy extends Relationship
         $taxonomies = $this->config('taxonomies');
 
         if ($taxonomy && $taxonomies) {
-            throw new TaxonomyFieldtypeBothOptionsUsedException;
+            throw new TermsFieldtypeBothOptionsUsedException;
         }
 
         if ($taxonomy && ! $taxonomies) {
-            throw new TaxonomyFieldtypeTaxonomyOptionUsed;
+            throw new TermsFieldtypeTaxonomyOptionUsed;
         }
 
         return Arr::wrap($taxonomies);
