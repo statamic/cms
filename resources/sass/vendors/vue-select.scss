@@ -220,20 +220,8 @@
 	flex-grow: 1
 }
 
-.vs__search::-webkit-input-placeholder {
-	color: inherit
-}
-
-.vs__search:-ms-input-placeholder {
-	color: inherit
-}
-
-.vs__search::-ms-input-placeholder {
-	color: inherit
-}
-
 .vs__search::placeholder {
-	color: inherit
+	@apply text-grey-60;
 }
 
 .vs--unsearchable .vs__search {
