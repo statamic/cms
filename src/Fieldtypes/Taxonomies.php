@@ -11,6 +11,7 @@ class Taxonomies extends Relationship
     protected $canCreate = false;
     protected $canSearch = false;
     protected $statusIcons = false;
+    protected $icon = 'taxonomy';
 
     protected function toItemArray($id, $site = null)
     {
