@@ -31,6 +31,7 @@ class UsersStore extends BasicStore
         $data = YAML::file($path)->parse($contents);
 
         if (! $id = array_pull($data, 'id')) {
+            $idGenerated = true;
             $id = app('stache')->generateId();
         }
 
@@ -41,7 +42,7 @@ class UsersStore extends BasicStore
             ->preferences(array_pull($data, 'preferences', []))
             ->data($data);
 
-        if (array_get($data, 'password')) {
+        if (array_get($data, 'password') || isset($idGenerated)) {
             $user->save();
         }
 
