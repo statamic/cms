@@ -28,7 +28,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_augments_slugs_to_a_collection_of_terms_when_using_a_single_taxonomy()
     {
-        $augmented = $this->fieldtype(['taxonomy' => 'tags'])->augment(['one', 'two']);
+        $augmented = $this->fieldtype(['taxonomies' => 'tags'])->augment(['one', 'two']);
 
         $this->assertInstanceOf(TermCollection::class, $augmented);
         $this->assertCount(2, $augmented);
@@ -37,28 +37,17 @@ class TaxonomyTest extends TestCase
     }
 
     /** @test */
-    public function it_augments_ids_to_a_collection_of_terms_when_using_multiple_taxonomies()
-    {
-        $augmented = $this->fieldtype(['taxonomy' => ['tags', 'categories']])->augment(['tags::one', 'categories::two']);
-
-        $this->assertInstanceOf(TermCollection::class, $augmented);
-        $this->assertCount(2, $augmented);
-        $this->assertEveryItemIsInstanceOf(LocalizedTerm::class, $augmented);
-        $this->assertEquals(['tags::one', 'categories::two'], $augmented->map->id()->all());
-    }
-
-    /** @test */
     public function it_throws_an_exception_when_augmenting_a_slug_when_using_multiple_taxonomies()
     {
         $this->expectExceptionMessage('Ambigious taxonomy term value [one]. Field [test] is configured with multiple taxonomies.');
 
-        $this->fieldtype(['taxonomy' => ['tags', 'categories']])->augment(['one', 'two']);
+        $this->fieldtype(['taxonomies' => ['tags', 'categories']])->augment(['one', 'two']);
     }
 
     /** @test */
     public function it_augments_to_a_single_term_when_max_items_is_one()
     {
-        $augmented = $this->fieldtype(['taxonomy' => 'tags', 'max_items' => 1])->augment(['one']);
+        $augmented = $this->fieldtype(['taxonomies' => 'tags', 'max_items' => 1])->augment(['one']);
 
         $this->assertInstanceOf(LocalizedTerm::class, $augmented);
         $this->assertEquals('tags::one', $augmented->id());
@@ -67,7 +56,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_shallow_augments_slugs_to_a_collection_of_terms_when_using_a_single_taxonomy()
     {
-        $augmented = $this->fieldtype(['taxonomy' => 'tags'])->shallowAugment(['one', 'two']);
+        $augmented = $this->fieldtype(['taxonomies' => 'tags'])->shallowAugment(['one', 'two']);
 
         $this->assertInstanceOf(Collection::class, $augmented);
         $this->assertNotInstanceOf(TermCollection::class, $augmented);
@@ -96,7 +85,7 @@ class TaxonomyTest extends TestCase
     /** @test */
     public function it_shallow_augments_to_a_single_term_when_max_items_is_one()
     {
-        $augmented = $this->fieldtype(['taxonomy' => 'tags', 'max_items' => 1])->shallowAugment(['one']);
+        $augmented = $this->fieldtype(['taxonomies' => 'tags', 'max_items' => 1])->shallowAugment(['one']);
 
         $this->assertInstanceOf(AugmentedCollection::class, $augmented);
         $this->assertEquals([
@@ -110,21 +99,19 @@ class TaxonomyTest extends TestCase
     }
 
     /** @test */
-    public function it_can_be_configured_with_either_taxonomy_or_taxonomies()
+    public function using_both_taxonomy_and_taxonomies_throws_an_exception()
     {
-        $this->assertEquals(['tags'], $this->fieldtype(['taxonomy' => 'tags'])->taxonomies());
-        $this->assertEquals(['tags'], $this->fieldtype(['taxonomies' => 'tags'])->taxonomies());
+        $this->expectExceptionMessage('A taxonomy fieldtype cannot define both `taxonomy` and `taxonomies`. Use `taxonomies`.');
 
-        $this->assertEquals(['tags', 'categories'], $this->fieldtype(['taxonomy' => ['tags', 'categories']])->taxonomies());
-        $this->assertEquals(['tags', 'categories'], $this->fieldtype(['taxonomies' => ['tags', 'categories']])->taxonomies());
+        $this->fieldtype(['taxonomy' => 'categories', 'taxonomies' => 'tags'])->taxonomies();
     }
 
     /** @test */
-    public function using_both_taxonomy_and_taxonomies_throws_an_exception()
+    public function having_taxonomy_defined_but_not_taxonomies_throws_an_exception()
     {
-        $this->expectExceptionMessage('A taxonomy fieldtype cannot define both "taxonomy" and "taxonomies". Use one or the other.');
+        $this->expectExceptionMessage('A taxonomy fieldtype configures its available taxonomies using the `taxonomies` option, but only found `taxonomy`.');
 
-        $this->fieldtype(['taxonomy' => 'categories', 'taxonomies' => 'tags'])->taxonomies();
+        $this->fieldtype(['taxonomy' => 'categories'])->taxonomies();
     }
 
     public function fieldtype($config = [])

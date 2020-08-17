@@ -3,6 +3,8 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
+use Statamic\Exceptions\TaxonomyFieldtypeBothOptionsUsedException;
+use Statamic\Exceptions\TaxonomyFieldtypeTaxonomyOptionUsed;
 use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
@@ -246,10 +248,14 @@ class Taxonomy extends Relationship
         $taxonomies = $this->config('taxonomies');
 
         if ($taxonomy && $taxonomies) {
-            throw new \Exception('A taxonomy fieldtype cannot define both "taxonomy" and "taxonomies". Use one or the other.');
+            throw new TaxonomyFieldtypeBothOptionsUsedException;
         }
 
-        return Arr::wrap($taxonomy ?? $taxonomies);
+        if ($taxonomy && ! $taxonomies) {
+            throw new TaxonomyFieldtypeTaxonomyOptionUsed;
+        }
+
+        return Arr::wrap($taxonomies);
     }
 
     protected function usingSingleTaxonomy()
