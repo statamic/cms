@@ -2,9 +2,8 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Facades\Config;
-use Statamic\Facades\Path as PathAPI;
-use Statamic\Facades\URL;
+use Statamic\Facades;
+use Statamic\Facades\Site;
 
 class Path extends Tags
 {
@@ -17,15 +16,15 @@ class Path extends Tags
     {
         // If no src param was used, we will treat this as a regular `path` variable.
         if (! $src = $this->params->get(['src', 'to'])) {
-            return array_get($this->context, 'path');
+            return $this->context->get('path');
         }
 
-        $url = PathAPI::tidy(Config::getSiteUrl().$src);
+        $site = Site::current();
 
-        if ($this->params->bool('absolute', false)) {
-            $url = URL::makeAbsolute($url);
-        }
+        $url = $this->params->bool('absolute', false)
+            ? $site->absoluteUrl().'/'.$src
+            : $site->relativePath($src);
 
-        return $url;
+        return Facades\Path::tidy($url);
     }
 }
