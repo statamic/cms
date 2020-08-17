@@ -67,7 +67,7 @@
                 </div>
 
                 <create-entry-button
-                    v-if="!reordering"
+                    v-if="!reordering && canCreate"
                     button-class="btn-primary"
                     :url="createUrl"
                     :blueprints="blueprints" />
