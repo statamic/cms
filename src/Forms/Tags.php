@@ -4,6 +4,7 @@ namespace Statamic\Forms;
 
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
 use Statamic\Support\Arr;
@@ -58,7 +59,7 @@ class Tags extends BaseTags
         $data = $this->getFormSession($sessionHandle);
         $data['fields'] = $this->getFields($sessionHandle);
 
-        $this->addToDebugBar($formHandle, $data);
+        $this->addToDebugBar($data, $formHandle);
 
         $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect']);
 
@@ -211,24 +212,21 @@ class Tags extends BaseTags
      */
     protected function addToDebugBar($data, $formHandle)
     {
-        if (! function_exists('debug_bar')) {
+        if (! function_exists('debugbar') || ! class_exists(ConfigCollector::class)) {
             return;
         }
 
-        $debug = [];
-        $debug[$formHandle] = $data;
+        $blink = Blink::store();
 
-        if ($this->blink->exists('debug_bar_data')) {
-            $debug = array_merge($debug, $this->blink->get('debug_bar_data'));
-        }
+        $debug = array_merge([$formHandle => $data], $blink->get('debug_bar_data', []));
 
-        $this->blink->put('debug_bar_data', $debug);
+        $blink->put('debug_bar_data', $debug);
 
         try {
             debugbar()->getCollector('Forms')->setData($debug);
         } catch (DebugBarException $e) {
             // Collector doesn't exist yet. We'll create it.
-            $collector = debugbar()->addCollector(new ConfigCollector($debug, 'Forms'));
+            debugbar()->addCollector(new ConfigCollector($debug, 'Forms'));
         }
     }
 
