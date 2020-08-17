@@ -4,9 +4,9 @@ namespace Tests\StaticCaching;
 
 use Statamic\Contracts\Data\Content\Content;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
 use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
-use Statamic\Contracts\Taxonomies\Term;
 
 class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
 {
@@ -57,10 +57,10 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
                 'blog' => [
                     'urls' => [
                         '/blog/one',
-                        '/blog/two'
-                    ]
+                        '/blog/two',
+                    ],
                 ],
-            ]
+            ],
         ]);
 
         $entry = tap(\Mockery::mock(Entry::class), function ($m) {
@@ -73,7 +73,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $cacher->shouldNotHaveReceived('flush');
         $cacher->shouldHaveReceived('invalidateUrls')->once()->with([
             '/blog/one',
-            '/blog/two'
+            '/blog/two',
         ]);
     }
 
@@ -86,10 +86,10 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
                 'tags' => [
                     'urls' => [
                         '/tags/one',
-                        '/tags/two'
-                    ]
+                        '/tags/two',
+                    ],
                 ],
-            ]
+            ],
         ]);
 
         $entry = tap(\Mockery::mock(Term::class), function ($m) {
@@ -102,7 +102,7 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
         $cacher->shouldNotHaveReceived('flush');
         $cacher->shouldHaveReceived('invalidateUrls')->once()->with([
             '/tags/one',
-            '/tags/two'
+            '/tags/two',
         ]);
     }
 }

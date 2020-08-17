@@ -3,8 +3,8 @@
 namespace Statamic\StaticCaching;
 
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Support\Arr;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Support\Arr;
 
 class DefaultInvalidator implements Invalidator
 {
