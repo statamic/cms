@@ -161,9 +161,15 @@ class LocalizedTerm implements Term, Responsable, Augmentable
         return $this;
     }
 
-    public function blueprint()
+    public function blueprint($blueprint = null)
     {
-        return $this->term->blueprint();
+        if (func_num_args() === 0) {
+            return $this->term->blueprint();
+        }
+
+        $this->term->blueprint($blueprint);
+
+        return $this;
     }
 
     public function reference()
