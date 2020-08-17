@@ -255,7 +255,7 @@ class Collection implements Contract, AugmentableContract
         foreach ($this->taxonomies() as $taxonomy) {
             $blueprint->ensureField($taxonomy->handle(), [
                 'type' => 'taxonomy',
-                'taxonomy' => $taxonomy->handle(),
+                'taxonomies' => [$taxonomy->handle()],
                 'display' => $taxonomy->title(),
                 'mode' => 'select',
             ], 'sidebar');
