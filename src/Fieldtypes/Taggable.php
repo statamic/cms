@@ -4,8 +4,11 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\Fields\Fieldtype;
 
-class Tags extends Fieldtype
+class Taggable extends Fieldtype
 {
+    protected $component = 'tags';
+    protected $icon = 'tags';
+
     protected function configFieldItems(): array
     {
         return [
