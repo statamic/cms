@@ -174,7 +174,7 @@ class URL
     {
         $parsed = parse_url($url);
 
-        $url = $parsed['path'];
+        $url = $parsed['path'] ?? '/';
 
         if (isset($parsed['query'])) {
             $url .= '?'.$parsed['query'];

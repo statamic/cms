@@ -81,4 +81,66 @@ class UrlTest extends TestCase
         $this->assertFalse(URL::isExternal('http://this-site.com/'));
         $this->assertFalse(URL::isExternal('http://this-site.com/some-slug'));
     }
+
+    /**
+     * @test
+     * @dataProvider relativeProvider
+     **/
+    public function makes_urls_relative($url, $expected)
+    {
+        $this->assertSame($expected, URL::makeRelative($url));
+    }
+
+    public function relativeProvider()
+    {
+        return [
+            ['http://example.com', '/'],
+            ['http://example.com/', '/'],
+            ['http://example.com/foo', '/foo'],
+            ['http://example.com/foo/', '/foo/'],
+            ['http://example.com/foo/bar', '/foo/bar'],
+            ['http://example.com/foo/bar/', '/foo/bar/'],
+            ['/', '/'],
+            ['/foo', '/foo'],
+            ['/foo/', '/foo/'],
+            ['/foo/bar', '/foo/bar'],
+            ['/foo/bar/', '/foo/bar/'],
+
+            ['http://example.com?bar=baz', '/?bar=baz'],
+            ['http://example.com/?bar=baz', '/?bar=baz'],
+            ['http://example.com/foo?bar=baz', '/foo?bar=baz'],
+            ['http://example.com/foo/?bar=baz', '/foo/?bar=baz'],
+            ['http://example.com/foo/bar?bar=baz', '/foo/bar?bar=baz'],
+            ['http://example.com/foo/bar/?bar=baz', '/foo/bar/?bar=baz'],
+            ['/?bar=baz', '/?bar=baz'],
+            ['/foo?bar=baz', '/foo?bar=baz'],
+            ['/foo/?bar=baz', '/foo/?bar=baz'],
+            ['/foo/bar?bar=baz', '/foo/bar?bar=baz'],
+            ['/foo/bar/?bar=baz', '/foo/bar/?bar=baz'],
+
+            ['http://example.com#fragment', '/#fragment'],
+            ['http://example.com/#fragment', '/#fragment'],
+            ['http://example.com/foo#fragment', '/foo#fragment'],
+            ['http://example.com/foo/#fragment', '/foo/#fragment'],
+            ['http://example.com/foo/bar#fragment', '/foo/bar#fragment'],
+            ['http://example.com/foo/bar/#fragment', '/foo/bar/#fragment'],
+            ['/#fragment', '/#fragment'],
+            ['/foo#fragment', '/foo#fragment'],
+            ['/foo/#fragment', '/foo/#fragment'],
+            ['/foo/bar#fragment', '/foo/bar#fragment'],
+            ['/foo/bar/#fragment', '/foo/bar/#fragment'],
+
+            ['http://example.com?bar=baz#fragment', '/?bar=baz#fragment'],
+            ['http://example.com/?bar=baz#fragment', '/?bar=baz#fragment'],
+            ['http://example.com/foo?bar=baz#fragment', '/foo?bar=baz#fragment'],
+            ['http://example.com/foo/?bar=baz#fragment', '/foo/?bar=baz#fragment'],
+            ['http://example.com/foo/bar?bar=baz#fragment', '/foo/bar?bar=baz#fragment'],
+            ['http://example.com/foo/bar/?bar=baz#fragment', '/foo/bar/?bar=baz#fragment'],
+            ['/?bar=baz#fragment', '/?bar=baz#fragment'],
+            ['/foo?bar=baz#fragment', '/foo?bar=baz#fragment'],
+            ['/foo/?bar=baz#fragment', '/foo/?bar=baz#fragment'],
+            ['/foo/bar?bar=baz#fragment', '/foo/bar?bar=baz#fragment'],
+            ['/foo/bar/?bar=baz#fragment', '/foo/bar/?bar=baz#fragment'],
+        ];
+    }
 }
