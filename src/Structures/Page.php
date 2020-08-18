@@ -197,7 +197,6 @@ class Page implements Entry, Augmentable, Responsable
                 ltrim($this->uri(), '/'),
             ]);
 
-
             return $url === '/' ? $url : rtrim($url, '/');
         }
     }
