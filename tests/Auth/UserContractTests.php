@@ -2,16 +2,16 @@
 
 namespace Tests\Auth;
 
-use Statamic\Facades;
+use Illuminate\Support\Facades\Hash;
 use Statamic\Auth\File\Role;
 use Statamic\Auth\File\UserGroup;
-use Illuminate\Support\Facades\Hash;
+use Statamic\Facades;
 
 trait UserContractTests
 {
-    abstract function makeUser();
+    abstract public function makeUser();
 
-    function user()
+    public function user()
     {
         return $this->makeUser()
             ->id(123)
@@ -29,13 +29,13 @@ trait UserContractTests
     }
 
     /** @test */
-    function it_gets_email()
+    public function it_gets_email()
     {
         $this->assertEquals('john@example.com', $this->user()->email());
     }
 
     /** @test */
-    function gets_the_name()
+    public function gets_the_name()
     {
         $this->assertEquals('John', $this->makeUser()->set('name', 'John')->name());
         $this->assertEquals('John Smith', $this->makeUser()->set('name', 'John Smith')->name());
@@ -45,7 +45,7 @@ trait UserContractTests
     }
 
     /** @test */
-    function it_gets_data()
+    public function it_gets_data()
     {
         $this->assertEquals(array_merge([
             'name' => 'John Smith',
@@ -58,35 +58,35 @@ trait UserContractTests
             'groups' => [
                 'group_one',
                 'group_two',
-            ]
+            ],
         ], $this->additionalDataValues()), $this->user()->data()->all());
     }
 
-    function additionalDataValues()
+    public function additionalDataValues()
     {
         return [];
     }
 
     /** @test */
-    function it_gets_id()
+    public function it_gets_id()
     {
         $this->assertEquals('123', $this->user()->id());
     }
 
     /** @test */
-    function it_gets_initials_from_name()
+    public function it_gets_initials_from_name()
     {
         $this->assertEquals('JS', $this->user()->initials());
     }
 
     /** @test */
-    function it_gets_initials_from_name_with_no_surname()
+    public function it_gets_initials_from_name_with_no_surname()
     {
         $this->assertEquals('J', $this->user()->set('name', 'John')->initials());
     }
 
     /** @test */
-    function it_gets_initials_from_email_if_name_doesnt_exist()
+    public function it_gets_initials_from_email_if_name_doesnt_exist()
     {
         $user = $this->user()->remove('name');
 
@@ -94,7 +94,7 @@ trait UserContractTests
     }
 
     /** @test */
-    function it_gets_avatar_from_gravatar_if_config_allows()
+    public function it_gets_avatar_from_gravatar_if_config_allows()
     {
         config(['statamic.users.avatars' => 'gravatar']);
 
@@ -113,7 +113,7 @@ trait UserContractTests
     }
 
     /** @test */
-    function it_encrypts_a_password()
+    public function it_encrypts_a_password()
     {
         $user = $this->user();
 
@@ -127,7 +127,7 @@ trait UserContractTests
     }
 
     /** @test */
-    function it_encrypts_a_password_when_set_through_data()
+    public function it_encrypts_a_password_when_set_through_data()
     {
         $user = $this->user();
 
@@ -145,7 +145,7 @@ trait UserContractTests
     }
 
     /** @test */
-    function converts_to_array()
+    public function converts_to_array()
     {
         Role::shouldReceive('all')->andReturn(collect([
             $this->createRole('role_one'),
@@ -173,7 +173,7 @@ trait UserContractTests
             'id' => 123,
             'roles' => [
                 'role_one',
-                'role_two'
+                'role_two',
             ],
             'groups' => [
                 'group_one',
@@ -192,10 +192,11 @@ trait UserContractTests
             'title' => 'john@example.com',
             'edit_url' => 'http://localhost/cp/users/123/edit',
             'last_login' => null,
+            'api_url' => 'http://localhost/api/users/123',
         ], $this->additionalToArrayValues()), $arr);
     }
 
-    function additionalToArrayValues()
+    public function additionalToArrayValues()
     {
         return [];
     }
@@ -203,7 +204,10 @@ trait UserContractTests
     private function createRole($handle)
     {
         $class = new class($handle) extends Role {
-            public function __construct($handle) { $this->handle = $handle; }
+            public function __construct($handle)
+            {
+                $this->handle = $handle;
+            }
         };
 
         Facades\Role::shouldReceive('find')
@@ -216,7 +220,10 @@ trait UserContractTests
     private function createGroup($handle)
     {
         $class = new class($handle) extends UserGroup {
-            public function __construct($handle) { $this->handle = $handle; }
+            public function __construct($handle)
+            {
+                $this->handle = $handle;
+            }
         };
 
         Facades\UserGroup::shouldReceive('find')

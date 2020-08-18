@@ -5,6 +5,7 @@
             :name="name"
             @input="update"
             :clearable="config.clearable"
+            :placeholder="config.placeholder"
             :disabled="isReadOnly"
             :options="options"
             :reduce="selection => selection.value"
@@ -35,15 +36,12 @@ export default {
             // Filter out partials
             if (this.config.hide_partials) {
                 templates = _.reject(templates, function(template) {
-                    return template.match(/(^_.*|\/_.*|._.*)/g);
+                    return template.match(/(^_.*|\/_.*|\._.*)/g);
                 });
             }
 
             // Set default
-            var options = [{
-                label: __('Inherit (Default)'),
-                value: null
-            }];
+            var options = [];
 
             _.each(templates, function(template) {
                 options.push({

@@ -38,6 +38,5 @@ class AddonsDiscover extends Command
         }
 
         $this->info('Addon manifest generated successfully.');
-
     }
 }

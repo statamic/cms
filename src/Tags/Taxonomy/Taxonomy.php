@@ -14,23 +14,23 @@ class Taxonomy extends Tags
     protected $defaultAsKey = 'terms';
 
     /**
-     * {{ taxonomy:* }} ... {{ /taxonomy:* }}
+     * {{ taxonomy:* }} ... {{ /taxonomy:* }}.
      */
     public function wildcard($tag)
     {
-        $this->parameters['from'] = $tag;
+        $this->params['from'] = $tag;
 
         return $this->index();
     }
 
     /**
-     * {{ taxonomy from="" }} ... {{ /taxonomy }}
+     * {{ taxonomy from="" }} ... {{ /taxonomy }}.
      */
     public function index()
     {
         $terms = $this->terms()->get();
 
-        $site = Arr::getFirst($this->parameters, ['site', 'locale'], Site::current()->handle());
+        $site = Arr::getFirst($this->params, ['site', 'locale'], Site::current()->handle());
 
         $terms = $terms->map->in($site);
 
@@ -39,6 +39,6 @@ class Taxonomy extends Tags
 
     protected function terms()
     {
-        return new Terms($this->parameters);
+        return new Terms($this->params);
     }
 }

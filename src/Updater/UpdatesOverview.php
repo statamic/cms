@@ -3,9 +3,10 @@
 namespace Statamic\Updater;
 
 use Carbon\Carbon;
-use Statamic\Statamic;
-use Statamic\Facades\Addon;
+use Facades\Statamic\Marketplace\Marketplace;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Facades\Addon;
+use Statamic\Statamic;
 
 class UpdatesOverview
 {
@@ -97,7 +98,7 @@ class UpdatesOverview
      */
     protected function checkForStatamicUpdates()
     {
-        if (Changelog::product(Statamic::CORE_SLUG)->latest()->type === 'upgrade') {
+        if (Marketplace::statamic()->changelog()->latest()->type === 'upgrade') {
             $this->statamic = true;
             $this->count++;
         }
@@ -113,11 +114,7 @@ class UpdatesOverview
     protected function checkForAddonUpdates()
     {
         Addon::all()
-            ->filter
-            ->marketplaceSlug()
-            ->filter(function ($addon) {
-                return Changelog::product($addon->marketplaceSlug())->latest()->type === 'upgrade';
-            })
+            ->reject->isLatestVersion()
             ->each(function ($addon) {
                 $this->addons[$addon->marketplaceSlug()] = $addon->name();
                 $this->count++;

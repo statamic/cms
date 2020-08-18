@@ -8,7 +8,7 @@ use Tests\TestCase;
 class IsEmptyTest extends TestCase
 {
     /** @test */
-    function it_checks_if_its_empty()
+    public function it_checks_if_its_empty()
     {
         $this->assertTrue($this->modify('')); // empty string is empty
         $this->assertTrue($this->modify([])); // empty array is empty
@@ -29,7 +29,7 @@ class IsEmptyTest extends TestCase
         $this->assertFalse($this->modify(['foo' => ['bar' => ['baz' => null]]]));
     }
 
-    function modify($arr)
+    public function modify($arr)
     {
         return Modify::value($arr)->isEmpty()->fetch();
     }

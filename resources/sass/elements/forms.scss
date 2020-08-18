@@ -16,6 +16,14 @@ label {
 
 input[type="checkbox"] {
     font-size: 18px;
+    position: relative;
+    top: -1px;
+}
+
+input[type="radio"] {
+    font-size: 18px;
+    position: relative;
+    top: 1px;
 }
 
 select {
@@ -66,16 +74,16 @@ input.input-text-minimal:read-only,
     @apply appearance-none text-grey-80 w-full p-0 rounded flex items-center;
     height: 38px;
 
-    &:focus, &:focus-within {
+    &:not(.focus-within-only):focus, &:not(.focus-within-only):focus-within {
         @apply focus-outline;
+
+        .input-text:focus, .input-group-prepend:focus, .input-group-append:focus, .input-group-item:focus {
+            @apply focus-none;
+        }
     }
 
     .input-text {
         @apply .flex-1 border-grey-50;
-
-        &:focus, &:focus-within {
-            @apply focus-none;
-        }
     }
 
     .input-text:not(:first-child) {
@@ -86,16 +94,59 @@ input.input-text-minimal:read-only,
         @apply rounded-r-none border-r-0;
     }
 
-    .input-group-prepend {
-        @apply rounded-l bg-grey-30 px-1 border border-grey-50 text-sm;
+    .input-group-prepend, .input-group-append, .input-group-item {
+        @apply rounded-l px-1 border text-sm text-grey-80 select-none;
+        background: linear-gradient(180deg, #fff, #f9fafb);
+        border: 1px solid #c4cdd6;
+        box-shadow: 0 1px 0 0 rgba(25,30,35,.05);
         height: 38px;
         line-height: 36px;
+
+        &button {
+            @apply cursor-pointer;
+        }
+    }
+
+    &.focus-within-only {
+        .input-text:focus, .input-group-prepend:focus, .input-group-append:focus, .input-group-item:focus {
+            @apply focus-outline;
+            z-index: 1;
+        }
+    }
+
+    .input-group-item {
+        @apply rounded-l-none -mx-px;
+    }
+
+    button.input-group-item:hover:not(:disabled),
+    button.input-group-item:active:not(:disabled),
+    button.input-group-prepend:hover:not(:disabled),
+    button.input-group-prepend:active:not(:disabled),
+    button.input-group-append:hover:not(:disabled),
+    button.input-group-append:active:not(:disabled) {
+        background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+        border-color: #c4cdd5;
     }
 
     .input-group-append {
-        @apply rounded-r bg-grey-30 px-1 border border-grey-50 text-sm;
-        height: 38px;
-        line-height: 36px;
+        @apply rounded-l-none border-r-0; // Rounded on the right side
+        &:last-child { @apply rounded-r border-r; }
+    }
+
+    > *:last-child[class*="input-group-"],
+    > *:last-child [class*="input-group-"] {
+        @apply rounded-r;
+    }
+
+}
+
+.input-group.input-group-sm {
+    height: 1.625rem;
+    .input-group-prepend, .input-group-append, .input-group-item {
+        @apply text-xs;
+        height: 1.625rem;
+        line-height: 25px;
+        padding: 0 12px;
     }
 }
 
@@ -105,14 +156,14 @@ input.input-text-minimal:read-only,
 
 .radio-fieldtype .option,
 .checkboxes-fieldtype .option {
-    @apply mb-1 flex items-center;
+    @apply mt-1.5 flex items-center;
 
     input {
-        @apply leading-normal;
+        @apply leading-normal mr-1 relative;
     }
 
     label {
-        @apply .font-normal .ml-1 .mt-sm leading-normal;
+        @apply font-normal leading-none block;
     }
 }
 
@@ -121,7 +172,7 @@ input.input-text-minimal:read-only,
     @apply flex items-center;
 
     .option {
-        @apply mr-2;
+        @apply mr-2 mb-1.5;
     }
 }
 
@@ -136,24 +187,39 @@ input.input-text-minimal:read-only,
 /* Select Fields
   ========================================================================== */
   .select-input-container {
-      @apply rounded relative;
+    @apply rounded relative;
 
-      &:focus, &:focus-within {
-          @apply focus-outline;
-      }
+    &:focus, &:focus-within {
+        @apply focus-outline;
+    }
 
-      select {
-          @include button(#fff, config('colors.grey-80'));
-          @apply block appearance-none pl-1.5 text-left pr-4 bg-white cursor-pointer w-full h-full relative shadow-button;
-      }
+    select {
+        @apply text-sm text-grey-80 shadow-button cursor-pointer block w-full h-full text-left relative max-w-full;
+        @apply select-none rounded leading-normal align-middle whitespace-no-wrap appearance-none subpixel-antialiased;
 
-      .select-input-toggle {
-          @apply pointer-events-none absolute pin-y pin-r flex items-center px-1 text-grey-90;
+        background: linear-gradient(180deg, #fff, #f9fafb);
+        border: 1px solid #c4cdd6;
+        height: 2.375rem; // 38px
+        letter-spacing: -0.01em;
+        padding: .475rem 1.75rem .475rem .75rem;
 
-          svg {
-              @apply fill-current h-4 w-4;
-          }
-      }
+        &:focus {
+            @apply focus-outline;
+        }
+
+        &:hover:not(:disabled), &:active:not(:disabled) {
+            background: linear-gradient(180deg, #f9fafb, #f4f6f8);
+            border-color: #c4cdd5;
+        }
+    }
+
+    .select-input-toggle {
+        @apply pointer-events-none absolute inset-y-0 right-0 flex items-center px-1 text-grey-90;
+
+        svg {
+            @apply fill-current h-4 w-4;
+        }
+    }
   }
 
 

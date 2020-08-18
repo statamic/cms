@@ -11,10 +11,13 @@ class Fields
 {
     protected $items;
     protected $fields;
+    protected $parent;
 
-    public function __construct($items = [])
+    public function __construct($items = [], $parent = null)
     {
-        $this->setItems($items);
+        $this
+            ->setParent($parent)
+            ->setItems($items);
     }
 
     public function setItems($items)
@@ -25,9 +28,7 @@ class Fields
 
         $this->items = collect($items);
 
-        $this->fields = $this->items->flatMap(function ($config) {
-            return $this->createFields($config);
-        })->keyBy->handle();
+        $this->fields = $this->resolveFields()->keyBy->handle();
 
         return $this;
     }
@@ -35,6 +36,13 @@ class Fields
     public function setFields($fields)
     {
         $this->fields = $fields;
+
+        return $this;
+    }
+
+    public function setParent($parent)
+    {
+        $this->parent = $parent;
 
         return $this;
     }
@@ -62,6 +70,7 @@ class Fields
     public function newInstance()
     {
         return (new static)
+            ->setParent($this->parent)
             ->setItems($this->items)
             ->setFields($this->fields);
     }
@@ -139,6 +148,20 @@ class Fields
         );
     }
 
+    public function shallowAugment()
+    {
+        return $this->newInstance()->setFields(
+            $this->fields->map->shallowAugment()
+        );
+    }
+
+    public function resolveFields()
+    {
+        return $this->items->flatMap(function ($config) {
+            return $this->createFields($config);
+        })->values();
+    }
+
     public function createFields(array $config): array
     {
         if (isset($config['import'])) {
@@ -161,7 +184,7 @@ class Fields
 
     protected function newField($handle, $config)
     {
-        return new Field($handle, $config);
+        return (new Field($handle, $config))->setParent($this->parent);
     }
 
     private function getReferencedField(array $config): Field
@@ -185,9 +208,16 @@ class Fields
 
         $fields = $fieldset->fields()->all();
 
+        if ($overrides = $config['config'] ?? null) {
+            $fields = $fields->map(function ($field, $handle) use ($overrides) {
+                return $field->setConfig(array_merge($field->config(), $overrides[$handle] ?? []));
+            });
+        }
+
         if ($prefix = array_get($config, 'prefix')) {
             $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
-                $handle = $prefix . $field->handle();
+                $handle = $prefix.$field->handle();
+
                 return [$handle => $field->setHandle($handle)];
             });
         }

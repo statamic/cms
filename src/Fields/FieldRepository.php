@@ -2,7 +2,7 @@
 
 namespace Statamic\Fields;
 
-use Statamic\Facades\YAML;
+use Statamic\Support\Str;
 
 class FieldRepository
 {
@@ -15,11 +15,11 @@ class FieldRepository
 
     public function find(string $field): ?Field
     {
-        if (! str_contains($field, '.')) {
+        if (! Str::contains($field, '.')) {
             return null;
         }
 
-        list($fieldset, $handle) = explode('.', $field);
+        [$fieldset, $handle] = explode('.', $field);
 
         if (! $fieldset = $this->fieldsets->find($fieldset)) {
             return null;

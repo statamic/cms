@@ -2,20 +2,27 @@
 
 namespace Statamic\Taxonomies;
 
+use Illuminate\Contracts\Support\Responsable;
+use Statamic\Contracts\Data\Augmentable as AugmentableContract;
+use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
+use Statamic\Data\ContainsCascadingData;
+use Statamic\Data\ExistsAsFile;
+use Statamic\Data\HasAugmentedData;
+use Statamic\Events\TaxonomyDeleted;
+use Statamic\Events\TaxonomySaved;
+use Statamic\Events\TermBlueprintFound;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
-use Statamic\Support\Arr;
-use Statamic\Facades\Stache;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Statamic\Data\ExistsAsFile;
-use Illuminate\Contracts\Support\Responsable;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Statamic;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
-use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 
-class Taxonomy implements Contract, Responsable
+class Taxonomy implements Contract, Responsable, AugmentableContract
 {
-    use FluentlyGetsAndSets, ExistsAsFile;
+    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
 
     protected $handle;
     protected $title;
@@ -25,6 +32,11 @@ class Taxonomy implements Contract, Responsable
     protected $defaultPublishState = true;
     protected $revisions = false;
     protected $searchIndex;
+
+    public function __construct()
+    {
+        $this->cascade = collect();
+    }
 
     public function id()
     {
@@ -65,34 +77,36 @@ class Taxonomy implements Contract, Responsable
     {
         return vsprintf('%s/%s.yaml', [
             rtrim(Stache::store('taxonomies')->directory(), '/'),
-            $this->handle
+            $this->handle,
         ]);
     }
 
-    public function termBlueprints($blueprints = null)
+    public function termBlueprints()
     {
-        return $this
-            ->fluentlyGetOrSet('blueprints')
-            ->getter(function ($blueprints) {
-                if (is_null($blueprints)) {
-                    return collect([$this->fallbackTermBlueprint()]);
-                }
+        $blueprints = Blueprint::in('taxonomies/'.$this->handle());
 
-                return collect($blueprints)->map(function ($blueprint) {
-                    return Blueprint::find($blueprint);
-                });
-            })
-            ->setter(function ($blueprints) {
-                return empty($blueprints) ? null : $blueprints;
-            })
-            ->args(func_get_args());
+        if ($blueprints->isEmpty()) {
+            $blueprints = collect([$this->fallbackTermBlueprint()]);
+        }
+
+        return $blueprints->values()->map(function ($blueprint) {
+            return $this->ensureTermBlueprintFields($blueprint);
+        });
     }
 
-    public function termBlueprint()
+    public function termBlueprint($blueprint = null, $term = null)
     {
-        return $this->ensureTermBlueprintFields(
-            $this->termBlueprints()->first() ?? $this->fallbackTermBlueprint()
-        );
+        $blueprint = is_null($blueprint)
+            ? $this->termBlueprints()->first()
+            : $this->termBlueprints()->keyBy->handle()->get($blueprint);
+
+        $blueprint ? $this->ensureTermBlueprintFields($blueprint) : null;
+
+        if ($blueprint) {
+            TermBlueprintFound::dispatch($blueprint->setParent($term), $term);
+        }
+
+        return $blueprint;
     }
 
     public function ensureTermBlueprintFields($blueprint)
@@ -106,7 +120,15 @@ class Taxonomy implements Contract, Responsable
 
     public function fallbackTermBlueprint()
     {
-        return Blueprint::find('default');
+        $blueprint = Blueprint::find('default')
+            ->setHandle($this->handle())
+            ->setNamespace('taxonomies.'.$this->handle());
+
+        $contents = $blueprint->contents();
+        $contents['title'] = $this->title();
+        $blueprint->setContents($contents);
+
+        return $blueprint;
     }
 
     public function sortField()
@@ -134,6 +156,8 @@ class Taxonomy implements Contract, Responsable
     {
         Facades\Taxonomy::save($this);
 
+        TaxonomySaved::dispatch($this);
+
         return true;
     }
 
@@ -143,14 +167,25 @@ class Taxonomy implements Contract, Responsable
 
         Facades\Taxonomy::delete($this);
 
+        TaxonomyDeleted::dispatch($this);
+
         return true;
     }
 
     public function fileData()
     {
-        return Arr::except($this->toArray(), [
-            'handle',
-        ]);
+        $data = [
+            'title' => $this->title,
+            'blueprints' => $this->blueprints,
+        ];
+
+        if (Site::hasMultiple()) {
+            $data['sites'] = $this->sites;
+        }
+
+        $data['inject'] = $this->cascade->all();
+
+        return $data;
     }
 
     public function defaultPublishState($state = null)
@@ -172,7 +207,11 @@ class Taxonomy implements Contract, Responsable
         return $this
             ->fluentlyGetOrSet('sites')
             ->getter(function ($sites) {
-                return collect(Site::hasMultiple() ? $sites : [Site::default()->handle()]);
+                if (! Site::hasMultiple() || ! $sites) {
+                    $sites = [Site::default()->handle()];
+                }
+
+                return collect($sites);
             })
             ->args(func_get_args());
     }
@@ -182,7 +221,7 @@ class Taxonomy implements Contract, Responsable
         return $this
             ->fluentlyGetOrSet('revisions')
             ->getter(function ($enabled) {
-                if (! config('statamic.revisions.enabled')) {
+                if (! config('statamic.revisions.enabled') || ! Statamic::pro()) {
                     return false;
                 }
 
@@ -195,7 +234,7 @@ class Taxonomy implements Contract, Responsable
 
     public function uri()
     {
-        return '/' . $this->handle;
+        return '/'.$this->handle;
     }
 
     public function collection($collection = null)
@@ -215,6 +254,10 @@ class Taxonomy implements Contract, Responsable
 
     public function toResponse($request)
     {
+        if (! view()->exists($this->template())) {
+            throw new NotFoundHttpException;
+        }
+
         return (new \Statamic\Http\Responses\DataResponse($this))
             ->with([
                 'terms' => $termQuery = $this->queryTerms(),
@@ -231,7 +274,13 @@ class Taxonomy implements Contract, Responsable
 
     public function template()
     {
-        return $this->handle() . '.index';
+        $template = $this->handle().'.index';
+
+        if ($collection = $this->collection()) {
+            $template = $collection->handle().'.'.$template;
+        }
+
+        return $template;
     }
 
     public function layout()
@@ -244,7 +293,7 @@ class Taxonomy implements Contract, Responsable
         return $this
             ->fluentlyGetOrSet('searchIndex')
             ->getter(function ($index) {
-                return $index ?  Search::index($index) : null;
+                return $index ? Search::index($index) : null;
             })
             ->args(func_get_args());
     }
@@ -257,5 +306,18 @@ class Taxonomy implements Contract, Responsable
     public static function __callStatic($method, $parameters)
     {
         return Facades\Taxonomy::{$method}(...$parameters);
+    }
+
+    public function __toString()
+    {
+        return $this->handle();
+    }
+
+    public function augmentedArrayData()
+    {
+        return [
+            'title' => $this->title(),
+            'handle' => $this->handle(),
+        ];
     }
 }

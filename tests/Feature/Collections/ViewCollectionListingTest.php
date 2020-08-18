@@ -2,48 +2,63 @@
 
 namespace Tests\Feature\Collections;
 
-use Mockery;
-use Statamic\Facades;
-use Tests\TestCase;
-use Tests\FakesRoles;
+use Facades\Tests\Factories\EntryFactory;
 use Statamic\Auth\User;
 use Statamic\Entries\Collection;
+use Statamic\Facades;
+use Tests\FakesRoles;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class ViewCollectionListingTest extends TestCase
 {
     use FakesRoles;
-
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->markTestIncomplete(); // TODO. It's changed since we moved to a vue component.
-    }
+    use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_shows_a_list_of_collections()
+    public function it_shows_a_list_of_collections()
     {
-        Facades\Collection::shouldReceive('all')->andReturn(collect([
-            'foo' => $collectionA = $this->createCollection('foo'),
-            'bar' => $collectionB = $this->createCollection('bar')
-        ]));
+        $collectionA = $this->createCollection('foo');
+        $collectionB = $this->createCollection('bar');
+        EntryFactory::id('1')->collection($collectionB)->create();
 
-        $user = User::make()->makeSuper();
+        $user = tap(User::make()->makeSuper())->save();
 
         $response = $this
             ->actingAs($user)
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
             ->assertViewHas('collections', collect([
-                'foo' => $collectionA,
-                'bar' => $collectionB
+                [
+                    'id' => 'foo',
+                    'title' => 'Foo',
+                    'entries' => 0,
+                    'edit_url' => 'http://localhost/cp/collections/foo/edit',
+                    'delete_url' => 'http://localhost/cp/collections/foo',
+                    'entries_url' => 'http://localhost/cp/collections/foo',
+                    'blueprints_url' => 'http://localhost/cp/collections/foo/blueprints',
+                    'scaffold_url' => 'http://localhost/cp/collections/foo/scaffold',
+                    'deleteable' => true,
+                ],
+                [
+                    'id' => 'bar',
+                    'title' => 'Bar',
+                    'entries' => 1,
+                    'edit_url' => 'http://localhost/cp/collections/bar/edit',
+                    'delete_url' => 'http://localhost/cp/collections/bar',
+                    'entries_url' => 'http://localhost/cp/collections/bar',
+                    'blueprints_url' => 'http://localhost/cp/collections/bar/blueprints',
+                    'scaffold_url' => 'http://localhost/cp/collections/bar/scaffold',
+                    'deleteable' => true,
+                ],
             ]))
             ->assertDontSee('no-results');
     }
 
     /** @test */
-    function it_shows_no_results_when_there_are_no_collections()
+    public function it_shows_no_results_when_there_are_no_collections()
     {
-        $user = User::make()->makeSuper();
+        $user = tap(User::make()->makeSuper())->save();
 
         $response = $this
             ->actingAs($user)
@@ -54,56 +69,48 @@ class ViewCollectionListingTest extends TestCase
     }
 
     /** @test */
-    function it_filters_out_collections_the_user_cannot_access()
+    public function it_filters_out_collections_the_user_cannot_access()
     {
-        Facades\Collection::shouldReceive('all')->andReturn(collect([
-            'foo' => $collectionA = $this->createCollection('foo'),
-            'bar' => $collectionB = $this->createCollection('bar')
-        ]));
-        $this->setTestRoles(['test' => ['access cp', 'view bar collection']]);
-        $user = Facades\User::make()->assignRole('test');
+        $collectionA = $this->createCollection('foo');
+        $collectionB = $this->createCollection('bar');
+        $this->setTestRoles(['test' => ['access cp', 'view bar entries']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
 
         $response = $this
             ->actingAs($user)
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
-            ->assertViewHas('collections', collect([
-                'bar' => $collectionB
-            ]))
+            ->assertViewHas('collections', function ($collections) {
+                return count($collections) === 1 && $collections[0]['id'] === 'bar';
+            })
             ->assertDontSee('no-results');
     }
 
     /** @test */
-    function it_doesnt_filter_out_collections_if_they_have_permission_to_configure()
+    public function it_doesnt_filter_out_collections_if_they_have_permission_to_configure()
     {
-        Facades\Collection::shouldReceive('all')->andReturn(collect([
-            'foo' => $collectionA = $this->createCollection('foo'),
-            'bar' => $collectionB = $this->createCollection('bar')
-        ]));
-        $this->setTestRoles(['test' => ['access cp', 'configure collections', 'view bar collection']]);
-        $user = Facades\User::make()->assignRole('test');
+        $collectionA = $this->createCollection('foo');
+        $collectionB = $this->createCollection('bar');
+        $this->setTestRoles(['test' => ['access cp', 'configure collections', 'view bar entries']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
 
         $response = $this
             ->actingAs($user)
             ->get(cp_route('collections.index'))
             ->assertSuccessful()
-            ->assertViewHas('collections', collect([
-                'foo' => $collectionA,
-                'bar' => $collectionB
-            ]))
+            ->assertViewHas('collections', function ($collections) {
+                return $collections->map->id->all() === ['foo', 'bar'];
+            })
             ->assertDontSee('no-results');
     }
 
     /** @test */
-    function it_denies_access_when_there_are_no_permitted_collections()
+    public function it_denies_access_when_there_are_no_permitted_collections()
     {
-        Facades\Collection::shouldReceive('all')->andReturn(collect([
-            'foo' => $collectionA = $this->createCollection('foo'),
-            'bar' => $collectionB = $this->createCollection('bar')
-        ]));
-
+        $collectionA = $this->createCollection('foo');
+        $collectionB = $this->createCollection('bar');
         $this->setTestRoles(['test' => ['access cp']]);
-        $user = Facades\User::make()->assignRole('test');
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
 
         $response = $this
             ->from('/cp/original')
@@ -113,10 +120,10 @@ class ViewCollectionListingTest extends TestCase
     }
 
     /** @test */
-    function create_collection_button_is_visible_with_permission_to_configure()
+    public function create_collection_button_is_visible_with_permission_to_configure()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
-        $user = Facades\User::make()->assignRole('test');
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
 
         $response = $this
             ->actingAs($user)
@@ -125,51 +132,21 @@ class ViewCollectionListingTest extends TestCase
     }
 
     /** @test */
-    function create_collection_button_is_not_visible_without_permission_to_configure()
+    public function create_collection_button_is_not_visible_without_permission_to_configure()
     {
-        $this->setTestRoles(['test' => ['access cp']]);
-        $user = Facades\User::make()->assignRole('test');
+        $collectionA = $this->createCollection('foo');
+        $this->setTestRoles(['test' => ['access cp', 'view foo entries']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
 
         $response = $this
             ->actingAs($user)
             ->get(cp_route('collections.index'))
+            ->assertOk()
             ->assertDontSee('Create Collection');
-    }
-
-    /** @test */
-    function delete_button_is_visible_with_permission_to_configure()
-    {
-        Facades\Collection::shouldReceive('all')->andReturn(collect([
-            'foo' => $this->createCollection('foo'),
-        ]));
-
-        $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
-        $user = Facades\User::make()->assignRole('test');
-
-        $response = $this
-            ->actingAs($user)
-            ->get(cp_route('collections.index'))
-            ->assertSee('Delete');
-    }
-
-    /** @test */
-    function delete_button_is_not_visible_without_permission_to_configure()
-    {
-        Facades\Collection::shouldReceive('all')->andReturn(collect([
-            'foo' => $this->createCollection('foo'),
-        ]));
-
-        $this->setTestRoles(['test' => ['access cp', 'view foo collection']]);
-        $user = Facades\User::make()->assignRole('test');
-
-        $response = $this
-            ->actingAs($user)
-            ->get(cp_route('collections.index'))
-            ->assertDontSee('Delete');
     }
 
     private function createCollection($handle)
     {
-        return tap(new Collection)->path($handle);
+        return tap((new Collection)->handle($handle))->save();
     }
 }

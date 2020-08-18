@@ -3,7 +3,6 @@
 namespace Statamic\Stache\Query;
 
 use Statamic\Facades;
-use Statamic\Facades\Term;
 use Statamic\Facades\Taxonomy;
 use Statamic\Taxonomies\TermCollection;
 
@@ -16,11 +15,13 @@ class TermQueryBuilder extends Builder
     {
         if ($column === 'taxonomy') {
             $this->taxonomies[] = $operator;
+
             return $this;
         }
 
         if ($column === 'collection') {
             $this->collections[] = $operator;
+
             return $this;
         }
 
@@ -31,11 +32,13 @@ class TermQueryBuilder extends Builder
     {
         if (in_array($column, ['taxonomy', 'taxonomies'])) {
             $this->taxonomies = array_merge($this->taxonomies ?? [], $values);
+
             return $this;
         }
 
         if (in_array($column, ['collection', 'collections'])) {
             $this->collections = array_merge($this->collections ?? [], $values);
+
             return $this;
         }
 
@@ -86,7 +89,8 @@ class TermQueryBuilder extends Builder
             });
 
             // Perform the filtering, and get the keys (the references, we don't care about the values).
-            $keys = $this->filterWhereBasic($items, $where)->keys();
+            $method = 'filterWhere'.$where['type'];
+            $keys = $this->{$method}($items, $where)->keys();
 
             // Continue intersecting the keys across the where clauses.
             // If a key exists in the reduced array but not in the current iteration, it should be removed.
@@ -121,6 +125,7 @@ class TermQueryBuilder extends Builder
             foreach ($taxonomy as $sort => $values) {
                 $carry[$sort] = array_merge($carry[$sort] ?? [], $values);
             }
+
             return $carry;
         }, collect());
     }

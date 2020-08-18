@@ -2,17 +2,15 @@
 
 namespace Tests\View;
 
-use Mockery;
-use Tests\TestCase;
+use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Carbon;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Facades\File;
+use Statamic\Sites\Site as SiteInstance;
 use Statamic\View\Cascade;
-use Statamic\Facades\GlobalSet;
-use Statamic\Stache\Stache;
-use Illuminate\Support\Carbon;
-use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class CascadeTest extends TestCase
 {
@@ -36,13 +34,13 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_instance()
+    public function it_gets_the_instance()
     {
         $this->assertEquals($this->cascade(), $this->cascade()->instance());
     }
 
     /** @test */
-    function it_sets_and_gets_the_entire_cascade()
+    public function it_sets_and_gets_the_entire_cascade()
     {
         $this->assertEquals([], $this->cascade()->toArray());
 
@@ -52,7 +50,7 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_values()
+    public function it_gets_values()
     {
         $this->cascade()->data(['foo' => 'bar']);
 
@@ -60,7 +58,7 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_sets_values()
+    public function it_sets_values()
     {
         $this->assertEquals([], $this->cascade()->toArray());
 
@@ -73,7 +71,7 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_constants()
+    public function it_hydrates_constants()
     {
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
             $this->assertEquals(app()->environment(), $cascade['environment']);
@@ -88,7 +86,7 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_auth_when_logged_in()
+    public function it_hydrates_auth_when_logged_in()
     {
         $this->actingAs(User::make())->get('/');
 
@@ -99,7 +97,7 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_auth_when_logged_out()
+    public function it_hydrates_auth_when_logged_out()
     {
         $this->get('/');
 
@@ -110,7 +108,7 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_dates()
+    public function it_hydrates_dates()
     {
         Carbon::setTestNow($now = Carbon::create(2018, 2, 3, 19));
 
@@ -122,7 +120,7 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_request_variables()
+    public function it_hydrates_request_variables()
     {
         $this->get('/test');
 
@@ -133,75 +131,69 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_current_site_variables()
+    public function it_hydrates_current_site_variables()
     {
         $cascade = $this->cascade()->withSite(Site::get('en'));
 
         tap($cascade->hydrate()->toArray(), function ($cascade) {
-            $this->assertEquals('http://test.com/', $cascade['homepage']);
+            $this->assertEquals('http://test.com', $cascade['homepage']);
 
-            $this->assertEquals('en', $cascade['site']);
-            $this->assertEquals('English', $cascade['site_name']);
-            $this->assertEquals('en_US', $cascade['site_locale']);
-            $this->assertEquals('en', $cascade['site_short_locale']);
-            $this->assertEquals('http://test.com/', $cascade['site_url']);
-
-            $this->assertEquals('en', $cascade['locale']);
-            $this->assertEquals('English', $cascade['locale_name']);
-            $this->assertEquals('en_US', $cascade['locale_full']);
-            $this->assertEquals('http://test.com/', $cascade['locale_url']);
+            $site = $cascade['site'];
+            $this->assertInstanceOf(SiteInstance::class, $site);
+            $site = $site->augmentedArrayData();
+            $this->assertEquals('en', $site['handle']);
+            $this->assertEquals('English', $site['name']);
+            $this->assertEquals('en_US', $site['locale']);
+            $this->assertEquals('en', $site['short_locale']);
+            $this->assertEquals('http://test.com', $site['url']);
         });
     }
 
     /** @test */
-    function it_hydrates_current_site_variables_for_subdomain()
+    public function it_hydrates_current_site_variables_for_subdomain()
     {
         $cascade = $this->cascade()->withSite(Site::get('fr'));
 
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
-            $this->assertEquals('http://fr.test.com/', $cascade['homepage']);
+            $this->assertEquals('http://fr.test.com', $cascade['homepage']);
 
-            $this->assertEquals('fr', $cascade['site']);
-            $this->assertEquals('French', $cascade['site_name']);
-            $this->assertEquals('fr_FR', $cascade['site_locale']);
-            $this->assertEquals('fr', $cascade['site_short_locale']);
-            $this->assertEquals('http://fr.test.com/', $cascade['site_url']);
-
-            $this->assertEquals('fr', $cascade['locale']);
-            $this->assertEquals('French', $cascade['locale_name']);
-            $this->assertEquals('fr_FR', $cascade['locale_full']);
-            $this->assertEquals('http://fr.test.com/', $cascade['locale_url']);
+            $site = $cascade['site'];
+            $this->assertInstanceOf(SiteInstance::class, $site);
+            $site = $site->augmentedArrayData();
+            $this->assertEquals('fr', $site['handle']);
+            $this->assertEquals('French', $site['name']);
+            $this->assertEquals('fr_FR', $site['locale']);
+            $this->assertEquals('fr', $site['short_locale']);
+            $this->assertEquals('http://fr.test.com', $site['url']);
         });
     }
 
     /** @test */
-    function it_hydrates_current_site_variables_for_subdirectory()
+    public function it_hydrates_current_site_variables_for_subdirectory()
     {
         $cascade = $this->cascade()->withSite(Site::get('de'));
 
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
-            $this->assertEquals('http://test.com/de/', $cascade['homepage']);
+            $this->assertEquals('http://test.com/de', $cascade['homepage']);
 
-            $this->assertEquals('de', $cascade['site']);
-            $this->assertEquals('German', $cascade['site_name']);
-            $this->assertEquals('de_DE', $cascade['site_locale']);
-            $this->assertEquals('de', $cascade['site_short_locale']);
-            $this->assertEquals('http://test.com/de/', $cascade['site_url']);
-
-            $this->assertEquals('de', $cascade['locale']);
-            $this->assertEquals('German', $cascade['locale_name']);
-            $this->assertEquals('de_DE', $cascade['locale_full']);
-            $this->assertEquals('http://test.com/de/', $cascade['locale_url']);
+            $site = $cascade['site'];
+            $this->assertInstanceOf(SiteInstance::class, $site);
+            $site = $site->augmentedArrayData();
+            $this->assertEquals('de', $site['handle']);
+            $this->assertEquals('German', $site['name']);
+            $this->assertEquals('de_DE', $site['locale']);
+            $this->assertEquals('de', $site['short_locale']);
+            $this->assertEquals('http://test.com/de', $site['url']);
         });
     }
 
     /** @test */
-    function it_hydrates_sanitized_post_values()
+    public function it_hydrates_sanitized_post_values()
     {
         $this->post('/', [
             'foo' => 'bar',
             'script' => '<script>',
-            'tag' => '{{ foo }}'
+            'tag' => '{{ foo }}',
         ]);
 
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
@@ -213,7 +205,7 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_sanitized_get_values()
+    public function it_hydrates_sanitized_get_values()
     {
         $this->get('/?foo=bar&script=<script>&tag={{ foo }}');
 
@@ -226,12 +218,12 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_sanitized_get_and_post_values()
+    public function it_hydrates_sanitized_get_and_post_values()
     {
         $this->post('/?getfoo=bar&getscript=<script>&gettag={{ foo }}', [
             'postfoo' => 'bar',
             'postscript' => '<script>',
-            'posttag' => '{{ foo }}'
+            'posttag' => '{{ foo }}',
         ]);
 
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
@@ -244,12 +236,12 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_sanitized_old_values()
+    public function it_hydrates_sanitized_old_values()
     {
         session()->put('_old_input', [
             'foo' => 'bar',
             'script' => '<script>',
-            'tag' => '{{ foo }}'
+            'tag' => '{{ foo }}',
         ]);
 
         $this->get('/');
@@ -261,7 +253,7 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_segments()
+    public function it_hydrates_segments()
     {
         $this->get('/one/two/three/four/five');
 
@@ -279,7 +271,7 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_segments_in_subdirectory_site()
+    public function it_hydrates_segments_in_subdirectory_site()
     {
         $this->get('/de/one/two/three/four/five');
 
@@ -297,7 +289,59 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_page_data()
+    public function it_hydrates_segments_on_the_home_page()
+    {
+        $this->get('/');
+
+        $cascade = $this->cascade()->withSite(Site::get('en'));
+
+        tap($cascade->hydrate()->toArray(), function ($cascade) {
+            $this->assertArrayNotHasKey('segment_1', $cascade);
+            $this->assertArrayNotHasKey('last_segment', $cascade);
+        });
+    }
+
+    /** @test */
+    public function it_hydrates_segments_on_the_home_page_in_subdirectory_site()
+    {
+        $this->get('de');
+
+        $cascade = $this->cascade()->withSite(Site::get('de'));
+
+        tap($cascade->hydrate()->toArray(), function ($cascade) {
+            $this->assertArrayNotHasKey('segment_1', $cascade);
+            $this->assertArrayNotHasKey('last_segment', $cascade);
+        });
+    }
+
+    /** @test */
+    public function last_segment_doesnt_contain_query_params()
+    {
+        $this->get('/foo?bar=baz');
+
+        $cascade = $this->cascade()->withSite(Site::get('en'));
+
+        tap($cascade->hydrate()->toArray(), function ($cascade) {
+            $this->assertEquals('foo', $cascade['segment_1']);
+            $this->assertEquals('foo', $cascade['last_segment']);
+        });
+    }
+
+    /** @test */
+    public function last_segment_doesnt_contain_query_params_in_subdirectory_site()
+    {
+        $this->get('/de/foo?bar=baz');
+
+        $cascade = $this->cascade()->withSite(Site::get('de'));
+
+        tap($cascade->hydrate()->toArray(), function ($cascade) {
+            $this->assertEquals('foo', $cascade['segment_1']);
+            $this->assertEquals('foo', $cascade['last_segment']);
+        });
+    }
+
+    /** @test */
+    public function it_hydrates_page_data()
     {
         $vars = ['foo' => 'bar', 'baz' => 'qux'];
         $page = EntryFactory::id('test')
@@ -320,7 +364,7 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_globals()
+    public function it_hydrates_globals()
     {
         $this->createGlobal('global', $globals = ['foo' => 'bar']);
         $this->createGlobal('scoped_globals', $scopedGlobals = ['baz' => 'qux']);
@@ -340,7 +384,7 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function page_data_overrides_globals()
+    public function page_data_overrides_globals()
     {
         $this->withoutEvents(); // prevents taxonomy term tracker from kicking in.
 
@@ -361,7 +405,7 @@ class CascadeTest extends TestCase
     }
 
     /** @test */
-    function it_merges_view_model_data()
+    public function it_merges_view_model_data()
     {
         $page = EntryFactory::id('test')
             ->collection('example')
@@ -382,6 +426,7 @@ class CascadeTest extends TestCase
     private function fakeSiteConfig()
     {
         config(['app.url' => 'http://test.com']);
+        url()->forceRootUrl(config('app.url'));
         Site::setConfig([
             'default' => 'en',
             'sites' => [

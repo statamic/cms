@@ -3,8 +3,8 @@
 
 @section('content')
 
-    <taxonomy-wizard
+    <taxonomy-create-form
         route="{{ cp_route('taxonomies.store') }}">
-    </taxonomy-wizard>
+    </taxonomy-create-form>
 
 @endsection

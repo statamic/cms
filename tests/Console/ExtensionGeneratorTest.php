@@ -2,10 +2,9 @@
 
 namespace Tests\Console;
 
-use Tests\TestCase;
-use Illuminate\Filesystem\Filesystem;
 use Facades\Statamic\Console\Processes\Composer;
-use Tests\Console\Foundation\InteractsWithConsole;
+use Illuminate\Filesystem\Filesystem;
+use Tests\TestCase;
 
 class ExtensionGeneratorTest extends TestCase
 {
@@ -26,7 +25,50 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_can_make_a_fieldtype()
+    public function it_can_make_an_action()
+    {
+        $path = $this->preparePath('app/Actions/Delete.php');
+
+        $this->assertFileNotExists($path);
+
+        $this->artisan('statamic:make:action', ['name' => 'Delete']);
+
+        $this->assertFileExists($path);
+        $this->assertStringContainsString('namespace App\Actions;', $this->files->get($path));
+    }
+
+    /** @test */
+    public function it_will_not_overwrite_an_existing_action()
+    {
+        $path = $this->preparePath('app/Actions/Delete.php');
+
+        $this->artisan('statamic:make:action', ['name' => 'Delete']);
+        $this->files->put($path, 'overwritten stuff');
+
+        $this->assertStringContainsString('overwritten stuff', $this->files->get($path));
+
+        $this->artisan('statamic:make:action', ['name' => 'Delete']);
+
+        $this->assertStringContainsString('overwritten stuff', $this->files->get($path));
+    }
+
+    /** @test */
+    public function using_force_option_will_overwrite_original_action()
+    {
+        $path = $this->preparePath('app/Actions/Delete.php');
+
+        $this->artisan('statamic:make:action', ['name' => 'Delete']);
+        $this->files->put($path, 'overwritten stuff');
+
+        $this->assertStringContainsString('overwritten stuff', $this->files->get($path));
+
+        $this->artisan('statamic:make:action', ['name' => 'Delete', '--force' => null]);
+
+        $this->assertStringNotContainsString('overwritten stuff', $this->files->get($path));
+    }
+
+    /** @test */
+    public function it_can_make_a_fieldtype()
     {
         $path = $this->preparePath('app/Fieldtypes/Cat.php');
 
@@ -39,7 +81,7 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_can_make_a_scope()
+    public function it_can_make_a_scope()
     {
         $path = $this->preparePath('app/Scopes/Dog.php');
 
@@ -52,7 +94,7 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_can_make_a_modifier()
+    public function it_can_make_a_modifier()
     {
         $path = $this->preparePath('app/Modifiers/Giraffe.php');
 
@@ -65,7 +107,7 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_can_make_a_tag()
+    public function it_can_make_a_tag()
     {
         $path = $this->preparePath('app/Tags/Donkey.php');
 
@@ -78,7 +120,7 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_can_make_a_widget()
+    public function it_can_make_a_widget()
     {
         $path = $this->preparePath('app/Widgets/Sloth.php');
 
@@ -91,7 +133,7 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_will_not_overwrite_an_existing_extension()
+    public function it_will_not_overwrite_an_existing_extension()
     {
         $path = $this->preparePath('app/Widgets/Sloth.php');
 
@@ -106,7 +148,7 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function using_force_option_will_overwrite_original_extension()
+    public function using_force_option_will_overwrite_original_extension()
     {
         $path = $this->preparePath('app/Widgets/Sloth.php');
 
@@ -121,7 +163,7 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_can_make_an_addon()
+    public function it_can_make_an_addon()
     {
         $path = $this->preparePath('addons/erso/deaths-tar-vulnerability');
 
@@ -136,7 +178,7 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_cannot_make_addon_with_invalid_composer_package_name()
+    public function it_cannot_make_addon_with_invalid_composer_package_name()
     {
         if ($this->isRunningWindows()) {
             $this->markTestSkipped();
@@ -154,7 +196,7 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_will_not_overwrite_an_existing_addon()
+    public function it_will_not_overwrite_an_existing_addon()
     {
         if ($this->isRunningWindows()) {
             $this->markTestSkipped();
@@ -174,7 +216,7 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function using_force_option_will_overwrite_original_addon()
+    public function using_force_option_will_overwrite_original_addon()
     {
         if ($this->isRunningWindows()) {
             $this->markTestSkipped();
@@ -193,7 +235,7 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_can_make_an_addon_with_an_extension()
+    public function it_can_make_an_addon_with_an_extension()
     {
         if ($this->isRunningWindows()) {
             $this->markTestSkipped();
@@ -210,7 +252,7 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_can_make_an_addon_with_everything_including_the_kitchen_sink()
+    public function it_can_make_an_addon_with_everything_including_the_kitchen_sink()
     {
         if ($this->isRunningWindows()) {
             $this->markTestSkipped();
@@ -236,7 +278,7 @@ class ExtensionGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_can_make_an_extension_into_an_addon()
+    public function it_can_make_an_extension_into_an_addon()
     {
         if ($this->isRunningWindows()) {
             $this->markTestSkipped();
@@ -275,6 +317,7 @@ class ExtensionGeneratorTest extends TestCase
 
         $dirs = [
             base_path('addons'),
+            base_path('app/Actions'),
             base_path('app/Fieldtypes'),
             base_path('app/Scopes'),
             base_path('app/Tags'),

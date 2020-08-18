@@ -69,7 +69,7 @@
                     </div>
 
                     <div class="h-full" v-if="asset.isPreviewable && canUseGoogleDocsViewer">
-                        <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.url + '&embedded=true'"></iframe>
+                        <iframe class="h-full w-full" frameborder="0" :src="'https://docs.google.com/gview?url=' + asset.permalink + '&embedded=true'"></iframe>
                     </div>
 
                     <div class="editor-file-actions">
@@ -144,7 +144,7 @@
                 v-if="actions.length"
                 :id="id"
                 :actions="actions"
-                :url="actionUrl"
+                :url="runActionUrl"
                 @started="actionStarted"
                 @completed="actionCompleted" />
         </portal>
@@ -257,22 +257,10 @@ export default {
                 this.asset = data;
                 this.values = data.values;
                 this.meta = data.meta;
-                this.actionUrl = data.actionUrl;
+                this.runActionUrl = data.runActionUrl;
                 this.actions = data.actions;
-                this.getFieldset();
-            });
-        },
 
-        /**
-         * Load the fieldset
-         */
-        getFieldset() {
-            const url = cp_url(`fields/publish-blueprints/${this.asset.blueprint}`);
-
-            this.$axios.get(url).then(response => {
-                this.fieldset = response.data;
-
-                // Flatten fields from all sections into one array.
+                this.fieldset = data.blueprint;
                 this.fields = _.chain(this.fieldset.sections)
                     .map(section => section.fields)
                     .flatten(true)
@@ -348,7 +336,7 @@ export default {
 
         shouldClose() {
             if (this.$dirty.has(this.publishContainer)) {
-                if (! confirm('Are you sure? Unsaved changes will be lost.')) {
+                if (! confirm(__('Are you sure? Unsaved changes will be lost.'))) {
                     return false;
                 }
             }

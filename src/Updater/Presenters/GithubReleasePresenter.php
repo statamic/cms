@@ -2,8 +2,8 @@
 
 namespace Statamic\Updater\Presenters;
 
-use Statamic\Support\Str;
 use Statamic\Support\Html;
+use Statamic\Support\Str;
 
 class GithubReleasePresenter
 {
@@ -33,10 +33,10 @@ class GithubReleasePresenter
 
         // TODO: Move to blade or vue? Or leave in presenter?
         // TODO: Create tailwind classes for these labels.
-        $string = Str::replace($string, '[new]', '<span class="label block text-center text-white rounded" style="background: #5bc0de; padding: 2px; padding-bottom: 1px;">NEW</span>');
-        $string = Str::replace($string, '[fix]', '<span class="label block text-center text-white rounded" style="background: #5cb85c; padding: 2px; padding-bottom: 1px;">FIX</span>');
-        $string = Str::replace($string, '[break]', '<span class="label block text-center text-white rounded" style="background: #d9534f; padding: 2px; padding-bottom: 1px;">BREAK</span>');
-        $string = Str::replace($string, '[na]', '<span class="label block text-center text-white rounded" style="background: #e8e8e8; padding: 2px; padding-bottom: 1px;">N/A</span>');
+        $string = Str::replace($string, '[new]', '<span class="label" style="background: #5bc0de;">NEW</span>');
+        $string = Str::replace($string, '[fix]', '<span class="label" style="background: #5cb85c;">FIX</span>');
+        $string = Str::replace($string, '[break]', '<span class="label" style="background: #d9534f;">BREAK</span>');
+        $string = Str::replace($string, '[na]', '<span class="label" style="background: #e8e8e8;">N/A</span>');
 
         return $string;
     }

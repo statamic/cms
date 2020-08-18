@@ -12,8 +12,7 @@
             v-model="query"
             @keydown.up.prevent="moveUp"
             @keydown.down.prevent="moveDown"
-            @keydown.meta.enter.prevent="hitNewWindow"
-            @keyup.enter.prevent="hit"
+            @keydown.enter.prevent="hit"
             @keydown.esc.prevent="reset"
             @focus="focused = true"
             :placeholder="placeholder"
@@ -29,9 +28,10 @@
                 <svg-icon :name="getResultIcon(result)" class="icon"></svg-icon>
                 <div class="flex-1 ml-1 title" v-html="result.title"></div>
                 <span class="rounded px-sm py-px text-2xs uppercase bg-grey-20 text-grey">
-                    <template v-if="result.is_entry">{{ result.collection }}</template>
+                    <template v-if="result.is_entry">{{ result.collection.title }}</template>
+                    <template v-if="result.is_term">{{ result.taxonomy.title }}</template>
                     <template v-if="result.is_user">{{ __('User') }}</template>
-                    <template v-if="result.is_asset">{{ result.container }}</template>
+                    <template v-if="result.is_asset">{{ result.container.title }}</template>
                 </span>
             </div>
 
@@ -53,7 +53,7 @@
             </div>
         </div>
         <portal to="outside" v-if="focused">
-            <div class="absolute pin h-full w-full bg-darken-10 z-10"></div>
+            <div class="absolute inset-0 h-full w-full bg-darken-10 z-10"></div>
         </portal>
     </div>
 </template>
@@ -105,7 +105,7 @@ export default {
     methods: {
         update: _.debounce(function () {
             if (!this.query) {
-                this.reset();
+                this.results = [];
                 this.searching = false;
                 return;
             }
@@ -136,20 +136,14 @@ export default {
             this.focused = true;
         },
 
-        hit() {
-            if (this.hasResults) {
-                window.location.href = this.results[this.current].edit_url;
-            } else {
-                window.location.href = `${this.$config.get('cpRoot')}/${this.favorites[this.current].url}`;
-            }
-        },
+        hit($event) {
+            const item = this.hasResults ? this.results[this.current] : this.favorites[this.current];
 
-        hitNewWindow() {
-            if (this.hasResults) {
-                var win = window.open(this.results[this.current].edit_url, '_blank').focus();
-            } else {
-                window.open(this.results[this.current].url, '_blank').focus();
-            }
+            if (!item) return;
+
+            const url = this.hasResults ? item.edit_url : `${this.$config.get('cpRoot')}/${item.url}`;
+
+            $event.metaKey ? window.open(url) : window.location = url;
         },
 
         moveUp() {

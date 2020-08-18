@@ -2,10 +2,9 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\Facades\File;
 use Statamic\Facades\User;
-use Statamic\Facades\YAML;
 use Statamic\Facades\UserGroup;
+use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes\Users\Group;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -31,14 +30,19 @@ class UsersStore extends BasicStore
     {
         $data = YAML::file($path)->parse($contents);
 
+        if (! $id = array_pull($data, 'id')) {
+            $idGenerated = true;
+            $id = app('stache')->generateId();
+        }
+
         $user = User::make()
-            ->id(array_pull($data, 'id'))
+            ->id($id)
             ->initialPath($path)
             ->email(pathinfo($path, PATHINFO_FILENAME))
             ->preferences(array_pull($data, 'preferences', []))
             ->data($data);
 
-        if (array_get($data, 'password')) {
+        if (array_get($data, 'password') || isset($idGenerated)) {
             $user->save();
         }
 
@@ -51,29 +55,4 @@ class UsersStore extends BasicStore
     {
         return $file->getExtension() === 'yaml';
     }
-
-    // protected function queueGroups($user)
-    // {
-    //     if (! $groups = $user->get('groups')) {
-    //         return;
-    //     }
-
-    //     foreach ($groups as $group) {
-    //         $this->groups[$group][] = $user;
-    //     }
-    // }
-
-    // public function loadingComplete()
-    // {
-    //     foreach ($this->groups as $group => $users) {
-    //         if ($group = UserGroup::find($group)) {
-    //             $group->users($users)->resetOriginalUsers();
-    //         }
-    //     }
-    // }
-
-    // public function delete($user)
-    // {
-    //     File::delete($user->path());
-    // }
 }

@@ -2,14 +2,11 @@
 
 namespace Statamic\Tags\Taxonomy;
 
-use Closure;
-use Illuminate\Support\Carbon;
-use Statamic\Facades;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Tags\Concerns;
 use Statamic\Taxonomies\TermCollection;
 
@@ -21,13 +18,13 @@ class Terms
         Concerns\GetsQueryResults;
 
     protected $ignoredParams = ['as'];
-    protected $parameters;
+    protected $params;
     protected $taxonomies;
     protected $collections;
 
-    public function __construct($parameters)
+    public function __construct($params)
     {
-        $this->parseParameters($parameters);
+        $this->parseParameters($params);
     }
 
     public function get()
@@ -71,13 +68,14 @@ class Terms
         $this->queryConditions($query);
         $this->queryScopes($query);
         $this->queryOrderBys($query);
+        $this->queryMinimumEntries($query);
 
         return $query;
     }
 
     protected function parseParameters($params)
     {
-        $this->parameters = Arr::except($params->all(), $this->ignoredParams);
+        $this->params = $params->except($this->ignoredParams);
         $this->taxonomies = $this->parseTaxonomies();
         $this->orderBys = $this->parseOrderBys();
         $this->collections = $this->parseCollections();
@@ -85,8 +83,8 @@ class Terms
 
     protected function parseTaxonomies()
     {
-        $from = Arr::getFirst($this->parameters, ['from', 'in', 'folder', 'use', 'taxonomy']);
-        $not = Arr::getFirst($this->parameters, ['not_from', 'not_in', 'not_folder', 'dont_use', 'not_taxonomy']);
+        $from = Arr::getFirst($this->params, ['from', 'in', 'folder', 'use', 'taxonomy']);
+        $not = Arr::getFirst($this->params, ['not_from', 'not_in', 'not_folder', 'dont_use', 'not_taxonomy']);
 
         $taxonomies = $from === '*'
             ? collect(Taxonomy::handles())
@@ -99,6 +97,7 @@ class Terms
             ->map(function ($handle) {
                 $taxonomy = Taxonomy::findByHandle($handle);
                 throw_unless($taxonomy, new \Statamic\Exceptions\TaxonomyNotFoundException($handle));
+
                 return $taxonomy;
             })
             ->values();
@@ -106,7 +105,7 @@ class Terms
 
     protected function parseCollections()
     {
-        $collections = Arr::getFirst($this->parameters, ['collection', 'collections']);
+        $collections = Arr::getFirst($this->params, ['collection', 'collections']);
 
         if (! $collections) {
             return collect();
@@ -116,6 +115,7 @@ class Terms
             ->map(function ($handle) {
                 $collection = Collection::findByHandle($handle);
                 throw_unless($collection, new \Statamic\Exceptions\CollectionNotFoundException("Collection [{$handle}] does not exist."));
+
                 return $collection;
             })
             ->values();
@@ -124,5 +124,20 @@ class Terms
     protected function defaultOrderBy()
     {
         return 'title:asc';
+    }
+
+    protected function queryMinimumEntries($query)
+    {
+        $isQueryingEntriesCount = $this->params->first(function ($v, $k) {
+            return Str::startsWith($k, 'entries_count:');
+        });
+
+        if ($isQueryingEntriesCount) {
+            return;
+        }
+
+        if ($count = $this->params->int('min_count')) {
+            $query->where('entries_count', '>=', $count);
+        }
     }
 }

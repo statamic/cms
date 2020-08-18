@@ -2,15 +2,15 @@
 
 namespace Statamic\Http\View\Composers;
 
-use Statamic\Statamic;
 use Illuminate\View\View;
 use Statamic\Facades\Fieldset;
 use Statamic\Fields\FieldTransformer;
+use Statamic\Statamic;
 
 class FieldComposer
 {
     const VIEWS = [
-        'statamic::blueprints.edit',
+        'statamic::*.blueprints.edit',
         'statamic::fieldsets.edit',
     ];
 

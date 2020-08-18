@@ -20,11 +20,6 @@ export default {
         this.setInitialPerPage();
     },
 
-    created() {
-        this.$events.$on('per-page-changed', this.perPageChanged);
-        this.$events.$on('filter-changed', this.pageReset);
-    },
-
     methods: {
 
         setInitialPerPage() {
@@ -35,7 +30,7 @@ export default {
             this.perPage = this.getPreference('per_page') || this.initialPerPage;
         },
 
-        perPageChanged(perPage) {
+        changePerPage(perPage) {
             perPage = parseInt(perPage);
 
             let promise = this.hasPreferences
@@ -44,13 +39,17 @@ export default {
 
             promise.then(response => {
                 this.perPage = perPage;
-                this.pageReset();
+                this.resetPage();
             });
         },
 
-        pageReset() {
+        selectPage(page) {
+            this.page = page;
+        },
+
+        resetPage() {
             this.page = 1;
-        }
+        },
 
     }
 

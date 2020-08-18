@@ -16,14 +16,20 @@
 
     @else
 
-        @include('statamic::partials.create-first', [
-            'resource' => 'Global Set',
-            'description' => 'Global Sets contain content available across the entire site, like company details, contact information, or front-end settings.',
-            'svg' => 'empty/global',
-            'route' => cp_route('globals.create'),
+        @include('statamic::partials.empty-state', [
+            'title' => __('Globals'),
+            'description' => __('statamic::messages.global_set_config_intro'),
+            'svg' => 'empty/content',
+            'button_url' => cp_route('globals.create'),
+            'button_text' => __('Create Global Set'),
             'can' => $user->can('create', 'Statamic\Contracts\Globals\GlobalSet')
         ])
 
     @endunless
+
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Global Variables'),
+        'url' => Statamic::docsUrl('globals')
+    ])
 
 @endsection

@@ -2,11 +2,14 @@
 
 namespace Statamic\Sites;
 
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Support\Str;
 
-
-class Site
+class Site implements Augmentable
 {
+    use HasAugmentedData;
+
     protected $handle;
     protected $config;
 
@@ -38,20 +41,28 @@ class Site
 
     public function url()
     {
-        return $this->config['url'];
+        $url = $this->config['url'];
+
+        if ($url === '/') {
+            return '/';
+        }
+
+        return Str::removeRight($url, '/');
     }
 
     public function absoluteUrl()
     {
         if (Str::startsWith($url = $this->url(), '/')) {
-            return Str::ensureLeft($url, request()->getSchemeAndHttpHost());
+            $url = Str::ensureLeft($url, request()->getSchemeAndHttpHost());
         }
 
-        return $url;
+        return Str::removeRight($url, '/');
     }
 
     public function relativePath($url)
     {
+        $url = Str::ensureRight($url, '/');
+
         $path = Str::removeLeft($url, $this->absoluteUrl());
 
         $path = Str::removeRight(Str::ensureLeft($path, '/'), '/');
@@ -63,6 +74,22 @@ class Site
     {
         $parsed = parse_url($url);
 
-        return $parsed['scheme'] . '://' . $parsed['host'];
+        return $parsed['scheme'].'://'.$parsed['host'];
+    }
+
+    public function augmentedArrayData()
+    {
+        return [
+            'handle' => $this->handle(),
+            'name' => $this->name(),
+            'locale' => $this->locale(),
+            'short_locale' => $this->shortLocale(),
+            'url' => $this->url(),
+        ];
+    }
+
+    public function __toString()
+    {
+        return $this->handle();
     }
 }

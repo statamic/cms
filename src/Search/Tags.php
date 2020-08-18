@@ -8,25 +8,27 @@ use Statamic\Tags\Tags as BaseTags;
 
 class Tags extends BaseTags
 {
-    use Concerns\OutputsItems;
+    use Concerns\OutputsItems,
+        Concerns\QueriesConditions;
 
     protected static $handle = 'search';
 
     public function results()
     {
-        if (! $query = request($this->get('query', 'q'))) {
+        if (! $query = request($this->params->get('query', 'q'))) {
             return $this->parseNoResults();
         }
 
-        $results = Search::index($this->get('index'))
+        $builder = Search::index($this->params->get('index'))
             ->ensureExists()
             ->search($query)
-            ->withData($this->get('supplement_data', true))
-            ->limit($this->get('limit'))
-            ->offset($this->get('offset'))
-            ->get();
+            ->withData($this->params->get('supplement_data', true))
+            ->limit($this->params->get('limit'))
+            ->offset($this->params->get('offset'));
 
-        $results = $this->addResultTypes($results);
+        $this->queryConditions($builder);
+
+        $results = $this->addResultTypes($builder->get());
 
         return $this->output($results);
     }

@@ -1,52 +1,36 @@
 <template>
     <div>
-        <popper v-if="isNotYetFavorited" ref="popper" @show="shown" @hide="hidden" trigger="click" :append-to-body="true" :options="{ placement: 'bottom' }">
-
-            <div class="card p-0 shadow-lg z-top">
-                <div class="flex justify-between text-center">
-                    <h6 class="whitespace-no-wrap w-40 cursor-pointer p-1 border-r" :class="{'border-b bg-grey-10': ! showingPinTab }" @click="showingPinTab = true">
-                        {{ __('Pin to Favorites') }}
-                    </h6>
-                    <h6 class="whitespace-no-wrap w-40 cursor-pointer p-1" :class="{'border-b bg-grey-10': showingPinTab }" @click="showingPinTab = false">
-                        {{ __('Make Start Page') }}
-                    </h6>
-                </div>
-                <div class="p-2 flex items-center" v-if="showingPinTab">
-                    <input type="text" class="input-text" autofocus ref="fave" v-model="name" @keydown.enter="save">
+        <popover v-if="isNotYetFavorited" ref="popper" placement="bottom-end" :offset="[28, 10]">
+            <template slot="trigger">
+                <button slot="reference" class="h-6 w-6 block outline-none p-sm text-grey hover:text-grey-80" v-tooltip="__('Pin to Favorites')">
+                    <svg-icon name="pin"></svg-icon>
+                </button>
+            </template>
+            <div class="p-2 pb-1">
+                <h6 class="mb-1">{{ __('Pin to Favorites') }}</h6>
+                <div class="flex items-center">
+                    <input type="text" class="input-text w-auto" autofocus ref="fave" v-model="name" @keydown.enter="save">
                     <button @click="save" class="btn-primary ml-1">{{ __('Save') }}</button>
                 </div>
-                <div class="p-2" v-else>
-                    <button @click="makeStartPage" class="btn block w-full">{{ __('Start here when you sign in') }}</button>
-                </div>
+                <button @click="makeStartPage" class="mt-1 text-xs text-blue outline-none hover:text-blue-darker">{{ __('Set as start page') }} &rarr;</button>
             </div>
-
-            <button slot="reference" class="h-6 w-6 block outline-none p-sm text-grey hover:text-grey-80" v-tooltip="__('Pin to Favorites')">
-                <svg-icon name="pin"></svg-icon>
-            </button>
-        </popper>
+        </popover>
         <div v-else>
             <button @click="remove" class="h-6 w-6 block outline-none p-sm text-grey hover:text-grey-80" v-tooltip="__('Unpin from Favorites')">
-                <svg-icon name="pin"></svg-icon>
+                <svg-icon name="pin" class="text-green"></svg-icon>
             </button>
         </div>
     </div>
 </template>
 
 <script>
-import Popper from 'vue-popperjs';
 
 export default {
-
-    components: {
-        Popper
-    },
 
     data() {
         return {
             name: document.title.replace(' ‹ Statamic', ''),
-            currentUrl: this.$config.get('urlPath').substr(this.$config.get('cpRoot').length+1),
-            showingPinTab: true,
-            escBinding: null,
+            currentUrl: this.$config.get('urlPath')
         }
     },
 
@@ -71,20 +55,11 @@ export default {
 
     methods: {
         shown() {
-            this.escBinding = this.$keys.bindGlobal('esc', e => this.$refs.popper.doClose());
             this.highlight();
-        },
-
-        hidden() {
-            this.escBinding.destroy();
         },
 
         highlight() {
             setTimeout(() => this.$refs.fave.select(), 20);
-        },
-
-        toggleTab() {
-            this.showingPinTab = ! this.showingPinTab;
         },
 
         save() {
@@ -92,14 +67,14 @@ export default {
             this.$preferences.append('favorites', this.favorite).then(response => {
                 this.saving = false;
                 this.$toast.success(__('Favorite saved'));
-                this.$refs.popper.doClose();
+                this.$refs.popper.close();
                 this.$events.$emit('favorites.added');
             }).catch(e => {
                 this.saving = false;
                 if (e.response) {
                     this.$toast.error(e.response.data.message);
                 } else {
-                    this.$toast.error(__('Something went wrong'));
+                    this.$toast.error(__('Unable to save favorite'));
                 }
             });
         },
@@ -115,14 +90,14 @@ export default {
             this.$preferences.set('start_page', this.currentUrl).then(response => {
                 this.saving = false;
                 this.$toast.success(__('This is now your start page.'));
-                this.$refs.popper.doClose();
+                this.$refs.popper.close();
                 this.$events.$emit('start_page.saved');
             }).catch(e => {
                 this.saving = false;
                 if (e.response) {
                     this.$toast.error(e.response.data.message);
                 } else {
-                    this.$toast.error(__('Something went wrong'));
+                    this.$toast.error(__('Unable to save favorite'));
                 }
             });
         },

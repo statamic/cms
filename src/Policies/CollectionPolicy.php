@@ -2,8 +2,8 @@
 
 namespace Statamic\Policies;
 
-use Statamic\Facades\User;
 use Statamic\Facades\Collection;
+use Statamic\Facades\User;
 
 class CollectionPolicy
 {
@@ -65,6 +65,6 @@ class CollectionPolicy
     {
         $user = User::fromUser($user);
 
-        return $collection->orderable() && $user->hasPermission("reorder {$collection->handle()} entries");
+        return $collection->hasStructure() && $user->hasPermission("reorder {$collection->handle()} entries");
     }
 }

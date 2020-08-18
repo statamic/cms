@@ -7,6 +7,7 @@ use Illuminate\Support\Collection;
 use IteratorAggregate;
 use JsonSerializable;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Support\Str;
 use Statamic\View\Antlers\Parser;
 
 class Value implements IteratorAggregate, JsonSerializable
@@ -14,16 +15,16 @@ class Value implements IteratorAggregate, JsonSerializable
     protected $raw;
     protected $handle;
     protected $fieldtype;
-    protected $parser;
-    protected $context;
     protected $augmentable;
+    protected $shallow = false;
 
-    public function __construct($value, $handle = null, $fieldtype = null, $augmentable = null)
+    public function __construct($value, $handle = null, $fieldtype = null, $augmentable = null, $shallow = false)
     {
         $this->raw = $value;
         $this->handle = $handle;
         $this->fieldtype = $fieldtype;
         $this->augmentable = $augmentable;
+        $this->shallow = $shallow;
 
         if ($fieldtype && $fieldtype->field()) {
             $this->fieldtype->field()->setParent($augmentable);
@@ -41,11 +42,9 @@ class Value implements IteratorAggregate, JsonSerializable
             return $this->raw;
         }
 
-        $value = $this->fieldtype->augment($this->raw);
-
-        if ($this->shouldParse()) {
-            $value = $this->parse($value);
-        }
+        $value = $this->shallow
+            ? $this->fieldtype->shallowAugment($this->raw)
+            : $this->fieldtype->augment($this->raw);
 
         return $value;
     }
@@ -71,30 +70,26 @@ class Value implements IteratorAggregate, JsonSerializable
         return new ArrayIterator($this->value());
     }
 
-    public function parseUsing(Parser $parser, $context)
+    public function shouldParseAntlers()
     {
-        $this->parser = $parser;
-        $this->context = $context;
-
-        return $this;
+        return $this->fieldtype && $this->fieldtype->config('antlers');
     }
 
-    public function shouldParse()
+    public function antlersValue(Parser $parser, $variables)
     {
-        if (!$this->parser || !$this->fieldtype) {
-            return false;
+        $value = $this->value();
+
+        if (! is_string($value)) {
+            return $value;
         }
 
-        return $this->fieldtype->config('antlers');
-    }
+        if ($this->shouldParseAntlers()) {
+            return $parser->parse($value, $variables);
+        }
 
-    public function parse($value)
-    {
-        $value = $this->parser->parse($value, $this->context);
-
-        // After parsing, reset the values. Wherever the parser needs to
-        // parse this object, it would add itself and the contextual data.
-        $this->parser = $this->context = null;
+        if (Str::contains($value, '{')) {
+            return $parser->extractNoparse(str_replace('{{', '@{{', $value));
+        }
 
         return $value;
     }
@@ -112,5 +107,10 @@ class Value implements IteratorAggregate, JsonSerializable
     public function handle()
     {
         return $this->handle;
+    }
+
+    public function shallow()
+    {
+        return new static($this->raw, $this->handle, $this->fieldtype, $this->augmentable, true);
     }
 }

@@ -3,73 +3,33 @@
    ========================================================================== */
 
 .pagination {
-	margin: 0;
-	position: relative;
-	text-align: center;
-	width: 100%;
-    padding: 6px 0 1px;
-	border-top: 1px solid $border;
+	@apply flex justify-center shadow items-center list-none p-0 rounded overflow-hidden;
 
-	> li {
-		display: none;
+	li a {
+		@apply h-full px-1.5 py-1 border-r bg-white block text-grey-80;
 
-		&.previous,
-		&.next,
-		&.active,
-		&.active li {
-			display: inline-block;
-		}
-
-		&.previous,
-		&.next {
-			position: absolute;
-
-			a {
-				padding: 6px 0;
-			}
-		}
-		&.previous {
-			left: 0;
-		}
-		&.next {
-			right: 0;
-		}
-		&.active {
-			a {
-				&,
-				&:hover {
-					background: none;
-					color: $color_gray_dark;
-				}
-			}
-		}
-		&.disabled {
-			a {
-				opacity: .4;
-			}
-		}
-
-		> a {
-			border: none;
-
-			&,
-			&:hover {
-				background: none;
-			}
+		&:hover {
+			@apply bg-grey-10 text-grey-80;
 		}
 	}
 
-	.arrow {
-		color: $color_gray_light;
-		font-size: 26px;
-		line-height: 0;
-		vertical-align: -2px;
+	li > .unclickable {
+		@apply h-full px-1.5 py-1 border-r bg-white block text-grey-50;
+
+		&:hover {
+      cursor: text;
+		}
 	}
 
-	.previous .arrow {
-		margin-right: 5px;
+	li:last-child a {
+		@apply border-r-0;
 	}
-	.next .arrow {
-		margin-left: 5px;
+
+	li.current a {
+		@apply bg-grey-10 text-blue shadow-inner;
 	}
+}
+
+.pagination.pagination-inline {
+	@apply shadow-none rounded-none;
 }

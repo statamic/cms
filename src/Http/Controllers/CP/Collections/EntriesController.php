@@ -2,38 +2,38 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\Facades\Site;
+use Illuminate\Http\Request;
+use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\CP\Breadcrumbs;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
-use Statamic\CP\Column;
-use Statamic\CP\Breadcrumbs;
-use Statamic\Facades\Blueprint;
-use Statamic\Http\Resources\CP\Entries\Entries;
-use Illuminate\Http\Request;
-use Statamic\Facades\Collection;
-use Statamic\Facades\Preference;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Illuminate\Http\Resources\Json\Resource;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Events\Data\PublishBlueprintFound;
-use Statamic\Http\Requests\FilteredSiteRequest;
-use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Http\Requests\FilteredRequest;
+use Statamic\Http\Resources\CP\Entries\Entries;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
+use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
 
 class EntriesController extends CpController
 {
-    public function index(FilteredSiteRequest $request, $collection)
+    use QueriesFilters;
+
+    public function index(FilteredRequest $request, $collection)
     {
         $this->authorize('view', $collection);
 
         $query = $this->indexQuery($collection);
 
-        $this->filter($query, $request->filters);
+        $activeFilterBadges = $this->queryFilters($query, $request->filters, [
+            'collection' => $collection->handle(),
+            'blueprints' => $collection->entryBlueprints()->map->handle(),
+        ]);
 
         $sortField = request('sort');
         $sortDirection = request('order', 'asc');
 
-        if (!$sortField && !request('search')) {
+        if (! $sortField && ! request('search')) {
             $sortField = $collection->sortField();
             $sortDirection = $collection->sortDirection();
         }
@@ -48,18 +48,8 @@ class EntriesController extends CpController
             ->blueprint($collection->entryBlueprint())
             ->columnPreferenceKey("collections.{$collection->handle()}.columns")
             ->additional(['meta' => [
-                'filters' => $request->filters,
-                'sortColumn' => $sortField,
+                'activeFilterBadges' => $activeFilterBadges,
             ]]);
-    }
-
-    protected function filter($query, $filters)
-    {
-        foreach ($filters as $handle => $values) {
-            $class = app('statamic.scopes')->get($handle);
-            $filter = app($class);
-            $filter->apply($query, $values);
-        }
     }
 
     protected function indexQuery($collection)
@@ -79,17 +69,11 @@ class EntriesController extends CpController
 
     public function edit(Request $request, $collection, $entry)
     {
-        if ($collection->hasStructure() && $request->route()->getName() === 'statamic.cp.collections.entries.edit') {
-            return redirect()->to(cp_route('structures.entries.edit', [$collection->handle(), $entry->id(), $entry->slug()]));
-        }
-
         $this->authorize('view', $entry);
 
         $entry = $entry->fromWorkingCopy();
 
         $blueprint = $entry->blueprint();
-
-        event(new PublishBlueprintFound($blueprint, 'entry', $entry));
 
         [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
@@ -108,13 +92,13 @@ class EntriesController extends CpController
                 'revisions' => $entry->revisionsUrl(),
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),
-                'editBlueprint' => $blueprint->editUrl(),
+                'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
             'collection' => $collection->handle(),
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => User::fromUser($request->user())->cant('edit', $entry),
+            'readOnly' => User::current()->cant('edit', $entry),
             'locale' => $entry->locale(),
             'localizedFields' => $entry->data()->keys()->all(),
             'isRoot' => $entry->isRoot(),
@@ -125,6 +109,7 @@ class EntriesController extends CpController
             'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
+
                 return [
                     'handle' => $handle,
                     'name' => Site::get($handle)->name(),
@@ -133,6 +118,7 @@ class EntriesController extends CpController
                     'root' => $exists ? $localized->isRoot() : false,
                     'origin' => $exists ? $localized->id() === optional($entry->origin())->id() : null,
                     'published' => $exists ? $localized->published() : false,
+                    'status' => $exists ? $localized->status() : null,
                     'url' => $exists ? $localized->editUrl() : null,
                     'livePreviewUrl' => $exists ? $localized->livePreviewUrl() : null,
                 ];
@@ -152,7 +138,7 @@ class EntriesController extends CpController
         }
 
         return view('statamic::entries.edit', array_merge($viewData, [
-            'entry' => $entry
+            'entry' => $entry,
         ]));
     }
 
@@ -170,6 +156,10 @@ class EntriesController extends CpController
 
         $parent = $values->pull('parent');
 
+        if ($explicitBlueprint = $values->pull('blueprint')) {
+            $entry->blueprint($explicitBlueprint);
+        }
+
         $values = $values->except(['slug', 'date']);
 
         if ($entry->hasOrigin()) {
@@ -184,27 +174,26 @@ class EntriesController extends CpController
             $entry->date($this->formatDateForSaving($request->date));
         }
 
+        if ($collection->structure() && ! $collection->orderable()) {
+            $entry->afterSave(function ($entry) use ($parent) {
+                $entry->structure()
+                    ->in($entry->locale())
+                    ->move($entry->id(), $parent)
+                    ->save();
+            });
+        }
+
         if ($entry->revisionsEnabled() && $entry->published()) {
             $entry
                 ->makeWorkingCopy()
-                ->user(User::fromUser($request->user()))
+                ->user(User::current())
                 ->save();
         } else {
             if (! $entry->revisionsEnabled()) {
                 $entry->published($request->published);
             }
 
-            $entry
-                ->set('updated_by', User::fromUser($request->user())->id())
-                ->set('updated_at', now()->timestamp)
-                ->save();
-        }
-
-        if ($parent && ($structure = $collection->structure())) {
-            $structure
-                ->in($entry->locale())
-                ->move($entry->id(), $parent)
-                ->save();
+            $entry->updateLastModified(User::current())->save();
         }
 
         return new EntryResource($entry->fresh());
@@ -214,12 +203,10 @@ class EntriesController extends CpController
     {
         $this->authorize('create', [EntryContract::class, $collection]);
 
-        $blueprint = $request->blueprint
-            ? $collection->ensureEntryBlueprintFields(Blueprint::find($request->blueprint))
-            : $collection->entryBlueprint();
+        $blueprint = $collection->entryBlueprint($request->blueprint);
 
         if (! $blueprint) {
-            throw new \Exception('A valid blueprint is required.');
+            throw new \Exception(__('A valid blueprint is required.'));
         }
 
         $values = [];
@@ -236,7 +223,7 @@ class EntriesController extends CpController
         $values = $fields->values()->merge([
             'title' => null,
             'slug' => null,
-            'published' => $collection->defaultPublishState()
+            'published' => $collection->defaultPublishState(),
         ]);
 
         if ($collection->dated()) {
@@ -246,7 +233,7 @@ class EntriesController extends CpController
         $viewData = [
             'title' => __('Create Entry'),
             'actions' => [
-                'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()])
+                'save' => cp_route('collections.entries.store', [$collection->handle(), $site->handle()]),
             ],
             'values' => $values->all(),
             'meta' => $fields->meta(),
@@ -261,7 +248,7 @@ class EntriesController extends CpController
                     'exists' => false,
                     'published' => false,
                     'url' => cp_route('collections.entries.create', [$collection->handle(), $handle]),
-                    'livePreviewUrl' => cp_route('collections.entries.preview.create', [$collection->handle(), $handle]),
+                    'livePreviewUrl' => $collection->route($handle) ? cp_route('collections.entries.preview.create', [$collection->handle(), $handle]) : null,
                 ];
             })->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
@@ -279,9 +266,7 @@ class EntriesController extends CpController
     {
         $this->authorize('store', [EntryContract::class, $collection]);
 
-        $blueprint = $collection->ensureEntryBlueprintFields(
-            Blueprint::find($request->blueprint)
-        );
+        $blueprint = $collection->entryBlueprint($request->_blueprint);
 
         $fields = $blueprint->fields()->addValues($request->all());
 
@@ -291,7 +276,7 @@ class EntriesController extends CpController
 
         $entry = Entry::make()
             ->collection($collection)
-            ->blueprint($request->blueprint)
+            ->blueprint($request->_blueprint)
             ->locale($site->handle())
             ->published($request->get('published'))
             ->slug($request->slug)
@@ -301,28 +286,21 @@ class EntriesController extends CpController
             $entry->date($this->formatDateForSaving($request->date));
         }
 
+        if (($structure = $collection->structure()) && ! $collection->orderable()) {
+            $tree = $structure->in($site->handle());
+            $parent = $values['parent'] ?? null;
+            $entry->afterSave(function ($entry) use ($parent, $tree) {
+                $tree->appendTo($parent, $entry)->save();
+            });
+        }
+
         if ($entry->revisionsEnabled()) {
             $entry->store([
                 'message' => $request->message,
-                'user' => User::fromUser($request->user()),
+                'user' => User::current(),
             ]);
         } else {
-            $entry
-                ->set('updated_by', User::fromUser($request->user())->id())
-                ->set('updated_at', now()->timestamp)
-                ->save();
-        }
-
-        if ($structure = $collection->structure()) {
-            $tree = $structure->in($site->handle());
-
-            if ($request->parent) {
-                $tree->appendTo($values['parent'], $entry);
-            } else {
-                $tree->append($entry);
-            }
-
-            $tree->save();
+            $entry->updateLastModified(User::current())->save();
         }
 
         return new EntryResource($entry);
@@ -343,7 +321,14 @@ class EntriesController extends CpController
 
     protected function extractFromFields($entry, $blueprint)
     {
-        $values = $entry->values()->all();
+        // The values should only be data merged with the origin data.
+        // We don't want injected collection values, which $entry->values() would have given us.
+        $values = $entry->data();
+        while ($entry->hasOrigin()) {
+            $entry = $entry->origin();
+            $values = $entry->data()->merge($values);
+        }
+        $values = $values->all();
 
         if ($entry->hasStructure()) {
             $values['parent'] = array_filter([optional($entry->parent())->id()]);
@@ -377,6 +362,7 @@ class EntriesController extends CpController
             })
             ->map(function ($value) {
                 preg_match_all('/"asset::([^"]+)"/', $value, $matches);
+
                 return str_replace('\/', '/', $matches[1]) ?? null;
             })
             ->flatten(2)
@@ -403,13 +389,13 @@ class EntriesController extends CpController
     {
         return new Breadcrumbs([
             [
-                'text' => $collection->hasStructure() ? __('Structures') : __('Collections'),
-                'url' => $collection->hasStructure() ? cp_route('structures.index') : cp_route('collections.index'),
+                'text' => __('Collections'),
+                'url' => cp_route('collections.index'),
             ],
             [
                 'text' => $collection->title(),
-                'url' => $collection->hasStructure() ? $collection->structure()->showUrl() : $collection->showUrl(),
-            ]
+                'url' => $collection->showUrl(),
+            ],
         ]);
     }
 }

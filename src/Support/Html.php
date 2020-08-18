@@ -3,6 +3,7 @@
 namespace Statamic\Support;
 
 use Illuminate\Support\HtmlString;
+use Statamic\Facades\Config;
 use Statamic\Facades\Markdown;
 
 class Html
@@ -26,7 +27,7 @@ class Html
             }
         }
 
-        return count($html) > 0 ? ' ' . implode(' ', $html) : '';
+        return count($html) > 0 ? ' '.implode(' ', $html) : '';
     }
 
     /**
@@ -54,16 +55,16 @@ class Html
         }
 
         if (is_array($value) && $key === 'class') {
-            return 'class="' . implode(' ', $value) . '"';
+            return 'class="'.implode(' ', $value).'"';
         }
 
         if (! is_null($value)) {
-            return $key . '="' . e($value, false) . '"';
+            return $key.'="'.e($value, false).'"';
         }
     }
 
     /**
-     * Transform the string to an Html serializable object
+     * Transform the string to an Html serializable object.
      *
      * @param $html
      *
@@ -83,7 +84,7 @@ class Html
      */
     public static function decode($value)
     {
-        return html_entity_decode($value, ENT_QUOTES, 'UTF-8');
+        return html_entity_decode($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'));
     }
 
     /**
@@ -95,7 +96,7 @@ class Html
      */
     public static function entities($value)
     {
-        return htmlentities($value, ENT_QUOTES, 'UTF-8', false);
+        return htmlentities($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), false);
     }
 
     /**
@@ -196,7 +197,7 @@ class Html
         if (is_array($value)) {
             return static::nestedListing($key, $type, $value);
         } else {
-            return '<li>' . e($value, false) . '</li>';
+            return '<li>'.e($value, false).'</li>';
         }
     }
 
@@ -221,10 +222,10 @@ class Html
             // the randomly obfuscated letters out of the string on the responses.
             switch (rand(1, 3)) {
                 case 1:
-                    $safe .= '&#' . ord($letter) . ';';
+                    $safe .= '&#'.ord($letter).';';
                     break;
                 case 2:
-                    $safe .= '&#x' . dechex(ord($letter)) . ';';
+                    $safe .= '&#x'.dechex(ord($letter)).';';
                     break;
                 case 3:
                     $safe .= $letter;
@@ -249,7 +250,7 @@ class Html
             'href' => $url,
         ]);
 
-        return static::toHtmlString('<link' . $attributes . '>');
+        return static::toHtmlString('<link'.$attributes.'>');
     }
 
     /**
@@ -269,7 +270,7 @@ class Html
 
         $title = static::entities($title);
 
-        return static::toHtmlString('<a href="' . static::entities($url) . '"' . static::attributes($attributes) . '>' . $title . '</a>');
+        return static::toHtmlString('<a href="'.static::entities($url).'"'.static::attributes($attributes).'>'.$title.'</a>');
     }
 
     /**
@@ -292,9 +293,9 @@ class Html
             $title = static::entities($title);
         }
 
-        $email = static::obfuscate('mailto:') . $email;
+        $email = static::obfuscate('mailto:').$email;
 
-        return static::toHtmlString('<a href="' . $email . '"' . static::attributes($attributes) . '>' . $title . '</a>');
+        return static::toHtmlString('<a href="'.$email.'"'.static::attributes($attributes).'>'.$title.'</a>');
     }
 
     /**
@@ -315,7 +316,7 @@ class Html
     }
 
     /**
-     * Sanitizes a string
+     * Sanitizes a string.
      *
      * @param string|array $value  The value to sanitize
      * @param bool $antlers  Whether Antlers (curly braces) should be escaped.

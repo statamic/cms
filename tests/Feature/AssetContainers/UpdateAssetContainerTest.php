@@ -14,7 +14,7 @@ class UpdateAssetContainerTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = User::make()->assignRole('test')->save();
@@ -29,7 +29,7 @@ class UpdateAssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_updates_a_container()
+    public function it_updates_a_container()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure asset containers']]);
         $user = User::make()->assignRole('test')->save();
@@ -44,7 +44,7 @@ class UpdateAssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_fails_validation_without_required_fields()
+    public function it_fails_validation_without_required_fields()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure asset containers']]);
         $user = User::make()->assignRole('test')->save();
@@ -56,7 +56,7 @@ class UpdateAssetContainerTest extends TestCase
             ->assertJsonValidationErrors([
                 'title' => trans('statamic::validation.required'),
                 'handle' => trans('statamic::validation.required'),
-                'disk' => trans('statamic::validation.required')
+                'disk' => trans('statamic::validation.required'),
             ]);
 
         $this->assertEquals('Original Title', AssetContainer::find('test')->title());

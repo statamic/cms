@@ -3,8 +3,6 @@
 namespace Statamic\Tags;
 
 use Statamic\Facades\User;
-use Statamic\Facades\UserGroup;
-use Statamic\Tags\Concerns;
 
 class Users extends Tags
 {
@@ -15,17 +13,17 @@ class Users extends Tags
         Concerns\OutputsItems;
 
     /**
-     * {{ get_content from="" }} ... {{ /get_content }}
+     * {{ get_content from="" }} ... {{ /get_content }}.
      */
     public function index()
     {
         $query = $this->query();
 
-        if ($group = $this->get('group')) {
+        if ($group = $this->params->get('group')) {
             $query->where('group', $group);
         }
 
-        if ($role = $this->get('role')) {
+        if ($role = $this->params->get('role')) {
             $query->where('role', $role);
         }
 

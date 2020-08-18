@@ -8,6 +8,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
 class GlobalsStore extends BasicStore
@@ -22,6 +23,7 @@ class GlobalsStore extends BasicStore
         // The global sets themselves should only exist in the root
         // (ie. no slashes in the filename)
         $filename = str_after(Path::tidy($file->getPathName()), $this->directory);
+
         return substr_count($filename, '/') === 0 && $file->getExtension() === 'yaml';
     }
 
@@ -32,10 +34,11 @@ class GlobalsStore extends BasicStore
 
         // If it's a variables file that was requested, instead assume that the
         // base file was requested. The variables will get made as part of it.
-        if (Site::hasMultiple() && str_contains($relative, '/')) {
+        if (Site::hasMultiple() && Str::contains($relative, '/')) {
             $handle = pathinfo($relative, PATHINFO_FILENAME);
-            $path = $this->directory . $handle . '.yaml';
+            $path = $this->directory.$handle.'.yaml';
             $data = YAML::file($path)->parse();
+
             return $this->makeMultiSiteGlobalFromFile($handle, $path, $data);
         }
 
@@ -48,13 +51,11 @@ class GlobalsStore extends BasicStore
 
     protected function makeSingleSiteGlobalFromFile($handle, $path, $data)
     {
-        $set = $this
-            ->makeBaseGlobalFromFile($handle, $path, $data)
-            ->sites([$site = Site::default()->handle()]);
+        $set = $this->makeBaseGlobalFromFile($handle, $path, $data);
 
         return $set->addLocalization(
             $set
-                ->makeLocalization($site)
+                ->makeLocalization(Site::default()->handle())
                 ->initialPath($path)
                 ->data($data['data'] ?? [])
         );
@@ -64,7 +65,9 @@ class GlobalsStore extends BasicStore
     {
         $set = $this->makeBaseGlobalFromFile($handle, $path, $data);
 
-        $set->sites()->map(function ($site) use ($set) {
+        Site::all()->filter(function ($site) use ($handle) {
+            return File::exists($this->directory.$site->handle().'/'.$handle.'.yaml');
+        })->map->handle()->map(function ($site) use ($set) {
             return $this->makeVariables($set, $site);
         })->filter()->each(function ($variables) use ($set) {
             $set->addLocalization($variables);
@@ -76,11 +79,8 @@ class GlobalsStore extends BasicStore
     protected function makeBaseGlobalFromFile($handle, $path, $data)
     {
         return GlobalSet::make()
-            ->id($data['id'])
             ->handle($handle)
             ->title($data['title'] ?? null)
-            ->blueprint($data['blueprint'] ?? null)
-            ->sites($data['sites'] ?? null)
             ->initialPath($path);
     }
 
@@ -118,9 +118,10 @@ class GlobalsStore extends BasicStore
         }
 
         // Given a path to a variables file, get the key based on its base global set path.
-        if (str_contains($relative = str_after($path, $this->directory), '/')) {
+        if (Str::contains($relative = str_after($path, $this->directory), '/')) {
             $handle = pathinfo($relative, PATHINFO_FILENAME);
-            $path = $this->directory . $handle . '.yaml';
+            $path = $this->directory.$handle.'.yaml';
+
             return $this->paths()->flip()->get($path);
         }
     }
@@ -130,7 +131,10 @@ class GlobalsStore extends BasicStore
         parent::save($set);
 
         if (Site::hasMultiple()) {
-            $set->localizations()->each->writeFile();
+            Site::all()->each(function ($site) use ($set) {
+                $site = $site->handle();
+                $set->existsIn($site) ? $set->in($site)->writeFile() : $set->makeLocalization($site)->deleteFile();
+            });
         }
     }
 }

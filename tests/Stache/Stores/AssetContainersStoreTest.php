@@ -15,7 +15,7 @@ use Tests\TestCase;
 
 class AssetContainersStoreTest extends TestCase
 {
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -25,14 +25,14 @@ class AssetContainersStoreTest extends TestCase
         $this->store = (new AssetContainersStore($stache, app('files')))->directory($this->tempDir);
     }
 
-    function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
     /** @test */
-    function it_gets_yaml_files()
+    public function it_gets_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
         touch($this->tempDir.'/two.yaml', 1234567890);
@@ -56,15 +56,11 @@ class AssetContainersStoreTest extends TestCase
     }
 
     /** @test */
-    function it_makes_asset_container_instances_from_files()
+    public function it_makes_asset_container_instances_from_files()
     {
         config(['filesystems.disks.test' => ['driver' => 'local', 'root' => __DIR__.'/../../Assets/__fixtures__/container']]);
 
-        Facades\Blueprint::shouldReceive('find')
-            ->with('test')->once()
-            ->andReturn($blueprint = new \Statamic\Fields\Blueprint);
-
-$contents = <<<EOL
+        $contents = <<<'EOL'
 disk: test
 title: Example
 blueprint: test
@@ -75,7 +71,6 @@ EOL;
         $this->assertEquals(File::disk('test'), $item->disk());
         $this->assertEquals('example', $item->handle());
         $this->assertEquals('Example', $item->title());
-        $this->assertEquals($blueprint, $item->blueprint());
         tap($item->assets(), function ($assets) {
             $this->assertEveryItemIsInstanceOf(Asset::class, $assets);
             $this->assertEquals([
@@ -92,7 +87,7 @@ EOL;
     }
 
     /** @test */
-    function it_uses_the_handle_as_the_item_key()
+    public function it_uses_the_handle_as_the_item_key()
     {
         $this->assertEquals(
             'test',
@@ -101,7 +96,7 @@ EOL;
     }
 
     /** @test */
-    function it_saves_to_disk()
+    public function it_saves_to_disk()
     {
         Facades\Stache::shouldReceive('store')
             ->with('asset-containers')
@@ -111,23 +106,20 @@ EOL;
             ->andReturnTrue(); // irrelevant for this test but it gets called during saving
 
         $container = Facades\AssetContainer::make('new')
-            ->title('New Container')
-            ->blueprint('foo');
+            ->title('New Container');
 
         $this->store->save($container);
 
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 title: 'New Container'
-blueprint: foo
 
 EOT;
         $this->assertStringEqualsFile($this->tempDir.'/new.yaml', $expected);
 
         $container->allowUploads(false)->createFolders(false)->save();
 
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 title: 'New Container'
-blueprint: foo
 allow_uploads: false
 create_folders: false
 

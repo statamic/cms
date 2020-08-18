@@ -2,11 +2,10 @@
 
 namespace Statamic\Fieldtypes;
 
+use Illuminate\Http\Resources\Json\JsonResource as Resource;
 use Illuminate\Support\Arr;
 use Statamic\CP\Column;
 use Statamic\Fields\Fieldtype;
-use Illuminate\Http\Resources\Json\Resource;
-use Statamic\Statamic;
 
 abstract class Relationship extends Fieldtype
 {
@@ -23,27 +22,31 @@ abstract class Relationship extends Fieldtype
     protected $taggable = false;
     protected $defaultValue = [];
     protected $formComponentProps = [
-        '_' => '_' // forces an object in js
-    ];
-    protected $extraConfigFields = [];
-    protected $configFields = [
-        'max_items' => [
-            'type' => 'integer',
-            'instructions' => 'Set a maximum number of selectable items',
-        ],
-        'mode' => [
-            'type' => 'radio',
-            'options' => [
-                'default' => 'Stack Selector',
-                'select' => 'Select Dropdown',
-                'typeahead' => 'Typeahead Field'
-            ]
-        ]
+        '_' => '_', // forces an object in js
     ];
 
     protected function configFieldItems(): array
     {
-        return array_merge($this->configFields, $this->extraConfigFields);
+        return [
+            'max_items' => [
+                'display' => __('Max Items'),
+                'instructions' => __('statamic::messages.max_items_instructions'),
+                'type' => 'integer',
+                'width' => 50,
+            ],
+            'mode' => [
+                'display' => __('Mode'),
+                'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
+                'type' => 'radio',
+                'default' => 'default',
+                'options' => [
+                    'default' => __('Stack Selector'),
+                    'select' => __('Select Dropdown'),
+                    'typeahead' => __('Typeahead Field'),
+                ],
+                'width' => 50,
+            ],
+        ];
     }
 
     public function preProcess($data)
@@ -68,7 +71,7 @@ abstract class Relationship extends Fieldtype
             $items = collect([$items]);
         }
 
-        return $items->map(function ($item) use ($data) {
+        return $items->map(function ($item) {
             return [
                 'id' => method_exists($item, 'id') ? $item->id() : $item->handle(),
                 'title' => method_exists($item, 'title') ? $item->title() : $item->get('title'),
@@ -96,7 +99,7 @@ abstract class Relationship extends Fieldtype
         $rules = ['array'];
 
         if ($max = $this->config('max_items')) {
-            $rules[] = 'max:' . $max;
+            $rules[] = 'max:'.$max;
         }
 
         return $rules;
@@ -107,6 +110,7 @@ abstract class Relationship extends Fieldtype
         return [
             'data' => $this->getItemData($this->field->value())->all(),
             'itemDataUrl' => $this->getItemDataUrl(),
+            'filtersUrl' => $this->getFiltersUrl(),
             'baseSelectionsUrl' => $this->getBaseSelectionsUrl(),
             'getBaseSelectionsUrlParameters' => $this->getBaseSelectionsUrlParameters(),
             'itemComponent' => $this->getItemComponent(),
@@ -171,6 +175,11 @@ abstract class Relationship extends Fieldtype
         return cp_route('relationship.data');
     }
 
+    protected function getFiltersUrl()
+    {
+        return cp_route('relationship.filters');
+    }
+
     protected function getBaseSelectionsUrl()
     {
         return cp_route('relationship.index');
@@ -179,6 +188,11 @@ abstract class Relationship extends Fieldtype
     protected function getBaseSelectionsUrlParameters()
     {
         return [];
+    }
+
+    public function getSelectionFilters()
+    {
+        return collect();
     }
 
     protected function getCreatables()
@@ -205,7 +219,7 @@ abstract class Relationship extends Fieldtype
         return [
             'id' => $id,
             'title' => $id,
-            'invalid' => true
+            'invalid' => true,
         ];
     }
 
@@ -215,11 +229,18 @@ abstract class Relationship extends Fieldtype
             return $this->augmentValue($value);
         });
 
-        if (Statamic::shallowAugmentationEnabled()) {
-            $values = $values->map(function ($value) {
-                return $this->shallowAugmentValue($value);
-            });
-        }
+        return $this->config('max_items') === 1 ? $values->first() : $values;
+    }
+
+    public function shallowAugment($values)
+    {
+        $values = collect($values)->map(function ($value) {
+            return $this->augmentValue($value);
+        });
+
+        $values = $values->filter()->map(function ($value) {
+            return $this->shallowAugmentValue($value);
+        });
 
         return $this->config('max_items') === 1 ? $values->first() : $values;
     }
@@ -240,7 +261,6 @@ abstract class Relationship extends Fieldtype
     {
         return Resource::collection($items)->additional(['meta' => [
             'columns' => $this->getColumns(),
-            'sortColumn' => $this->getSortColumn($request),
         ]]);
     }
 

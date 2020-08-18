@@ -4,22 +4,26 @@ namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
 use Statamic\Exceptions\NotFoundHttpException;
-use Statamic\Facades\Content;
 use Statamic\Facades\Data;
 use Statamic\Facades\Site;
-use Statamic\Facades\URL;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\View\View;
 
 /**
- * The front-end controller
+ * The front-end controller.
  */
 class FrontendController extends Controller
 {
+    public function __construct()
+    {
+        $this->middleware('statamic.web');
+    }
+
     /**
-     * Handles all URLs
+     * Handles all URLs.
      *
      * @return string
      */
@@ -34,10 +38,10 @@ class FrontendController extends Controller
         }
 
         if (Statamic::isAmpRequest()) {
-            $url = str_after($url, '/' . config('statamic.amp.route'));
+            $url = str_after($url, '/'.config('statamic.amp.route'));
         }
 
-        if (str_contains($url, '?')) {
+        if (Str::contains($url, '?')) {
             $url = substr($url, 0, strpos($url, '?'));
         }
 
@@ -65,7 +69,7 @@ class FrontendController extends Controller
             ->render();
 
         return response($contents, 200, [
-            'Content-Type' => DataResponse::contentType($data['content_type'] ?? 'html')
+            'Content-Type' => DataResponse::contentType($data['content_type'] ?? 'html'),
         ]);
     }
 
@@ -77,9 +81,9 @@ class FrontendController extends Controller
 
         $paths = collect($finder->getPaths())->flatMap(function ($path) use ($site, $amp) {
             return [
-                $amp ? $path . '/' . $site . '/amp' : null,
-                $path . '/' . $site,
-                $amp ? $path . '/amp' : null,
+                $amp ? $path.'/'.$site.'/amp' : null,
+                $path.'/'.$site,
+                $amp ? $path.'/amp' : null,
                 $path,
             ];
         })->filter()->values()->all();

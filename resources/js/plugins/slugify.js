@@ -4,7 +4,8 @@ export default {
     install(Vue, options) {
         Vue.prototype.$slugify = function(text, glue) {
             return getSlug(text, {
-                separator: glue || '-'
+                separator: glue || '-',
+                lang: Statamic.$config.get('locale')
             });
         };
     }

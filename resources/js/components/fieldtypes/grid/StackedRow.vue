@@ -1,17 +1,17 @@
 <template>
 
     <div
-        class="bg-grey-20 shadow mb-2 rounded border"
+        class="bg-grey-10 shadow-sm mb-2 rounded border"
         :class="[sortableItemClass, { 'opacity-50': isExcessive }]"
     >
         <div
-            class="cursor-move bg-grey-30 border-b px-2 py-1 text-sm flex items-center justify-between outline-none"
-            :class="{ [sortableHandleClass]: grid.isReorderable }"
+            class="grid-item-header"
+            :class="{ [sortableHandleClass]: grid.isReorderable, 'hidden': ! grid.isReorderable }"
         >
             {{ index }}
-            <span class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" />
+            <span v-if="canDelete" class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" />
         </div>
-        <div class="publish-fields">
+        <publish-fields-container>
             <publish-field
                 v-for="field in fields"
                 :key="field.handle"
@@ -27,7 +27,7 @@
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
             />
-        </div>
+        </publish-fields-container>
     </div>
 
 </template>

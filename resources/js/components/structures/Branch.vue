@@ -1,60 +1,47 @@
 <template>
 
-    <div class="flex" :class="{ 'mb-1': isRoot }">
+    <div class="flex">
         <div class="page-move w-6" />
-
         <div class="flex items-center flex-1 p-1 ml-1 text-xs leading-normal">
-
             <div class="flex items-center flex-1">
-                <i v-if="isRoot" class="icon icon-home mr-1 opacity-25" />
-
-                <a v-if="!page.id" @click="edit" :class="{ 'text-sm font-medium': isTopLevel }">{{ page.title || page.url }}</a>
-                <a v-else :href="page.edit_url" :class="{ 'text-sm font-medium': isTopLevel }">{{ page.title || page.url }}</a>
+                <svg-icon name="home-page" class="mr-1 h-4 w-4 text-grey-80" v-if="isRoot" v-tooltip="__('This is the root page')" />
+                <a
+                    @click="$emit('edit', $event)"
+                    :class="{ 'text-sm font-medium': isTopLevel }"
+                    v-text="page.title || page.url" />
 
                 <div v-if="page.collection" class="ml-2 flex items-center">
                     <svg-icon name="content-writing" class="w-4 h-4" />
                     <div class="ml-sm">
-                        <a :href="page.collection.create_url">Add</a>
-                        <span class="text-grey">or</span>
-                        <a :href="page.collection.edit_url">Edit</a>
+                        <a :href="page.collection.create_url" v-text="__('Add')" />
+                        <span class="text-grey">/</span>
+                        <a :href="page.collection.edit_url" v-text="__('Edit')" />
                     </div>
                 </div>
             </div>
 
             <div class="pr-1 flex items-center">
-                <svg-icon v-if="isEntry" class="inline-block w-4 h-4 text-grey-50" name="hyperlink" v-tooltip="__('Entry link')" />
-                <svg-icon v-if="isLink" class="inline-block w-4 h-4 text-grey-50" name="external-link" v-tooltip="__('External link')" />
-                <svg-icon v-if="isText" class="inline-block w-4 h-4 text-grey-50" name="file-text" v-tooltip="__('Text')" />
+                <slot name="branch-icon" :branch="page" />
 
-                <dropdown-list class="ml-2">
-                    <dropdown-item :text="__('Add child link to URL')" @click="$emit('link-page')" />
-                    <dropdown-item :text="__('Add child link to entry')" @click="$emit('link-entries')" />
-                    <dropdown-item v-if="hasCollection" :text="__('Create Entry')" @click="$emit('create-entry', page.id)" />
-                    <dropdown-item :text="__('Remove')" class="warning" @click="remove" />
+                <dropdown-list class="ml-2" v-if="!isRoot">
+                    <slot name="branch-options"
+                        :branch="page"
+                        :depth="depth"
+                        :remove-branch="remove"
+                        :orphan-children="orphanChildren"
+                    />
                 </dropdown-list>
             </div>
 
         </div>
-
-        <page-editor
-            v-if="editing"
-            :initial-title="page.title"
-            :initial-url="page.url"
-            @closed="closeEditor"
-            @submitted="updatePage"
-        />
     </div>
 
 </template>
 
 <script>
-import PageEditor from './PageEditor.vue';
+import * as th from 'tree-helper';
 
 export default {
-
-    components: {
-        PageEditor,
-    },
 
     props: {
         page: Object,
@@ -102,30 +89,23 @@ export default {
     methods: {
 
         remove() {
-            let message = 'This will only remove the references (and any children) from the tree. No entries will be deleted.';
-
-            if (! confirm(message)) return;
-
             const store = this.page._vm.store;
             store.deleteNode(this.page);
             this.$emit('removed', store);
         },
 
-        edit() {
-            this.editing = true;
-        },
+        orphanChildren() {
+            const store = this.page._vm.store;
+            let children = this.vm.data.children;
+            let length = children.length;
+            for (let index = 0; index < length; index++) {
+                // As the item is moved out, the rest of the items are moved up an index.
+                // We always just want to move the first item.
+                th.appendTo(children[0], this.vm.data.parent);
+            }
 
-        closeEditor() {
-            this.editing = false;
-        },
-
-        updatePage(page) {
-            this.page.url = page.url;
-            this.page.title = page.title;
-            this.$emit('updated');
-            this.closeEditor();
+            this.$emit('children-orphaned', store);
         }
-
 
     }
 

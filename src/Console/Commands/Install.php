@@ -2,12 +2,15 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Facades\File;
 use Illuminate\Console\Command;
-use Illuminate\Filesystem\Filesystem;
+use Statamic\Console\RunsInPlease;
+use Statamic\Facades\File;
+use Statamic\Statamic;
 
 class Install extends Command
 {
+    use RunsInPlease;
+
     /**
      * The name and signature of the console command.
      *
@@ -32,6 +35,7 @@ class Install extends Command
         $this->addons()
              ->createFiles()
              ->publish()
+             ->runCallbacks()
              ->clearViews()
              ->clearCache();
     }
@@ -55,9 +59,7 @@ class Install extends Command
         ];
 
         $gitignores = [
-            storage_path('statamic/users'),
-            storage_path('statamic/search'),
-            storage_path('statamic/revisions'),
+            storage_path('statamic'),
         ];
 
         foreach ($gitkeeps as $dir) {
@@ -95,6 +97,13 @@ class Install extends Command
     protected function clearCache()
     {
         $this->call('cache:clear');
+
+        return $this;
+    }
+
+    protected function runCallbacks()
+    {
+        Statamic::runAfterInstalledCallbacks($this);
 
         return $this;
     }

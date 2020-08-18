@@ -2,8 +2,7 @@
 
 namespace Statamic\CP\Navigation;
 
-use Exception;
-use Statamic\Facades\Nav;
+use Statamic\Facades\CP\Nav;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -73,13 +72,13 @@ class NavItem
                     return url($url);
                 }
 
-                return url(config('statamic.cp.route') . '/' . $url);
+                return url(config('statamic.cp.route').'/'.$url);
             })
             ->afterSetter(function ($url) {
                 $cpUrl = url(config('statamic.cp.route')).'/';
 
                 if (! $this->active && Str::startsWith($url, $cpUrl)) {
-                    $this->active = str_replace($cpUrl, '', $url) . '(/(.*)?|$)';
+                    $this->active = str_replace($cpUrl, '', $url).'(/(.*)?|$)';
                 }
             })
             ->value($url);
@@ -110,6 +109,7 @@ class NavItem
 
         if (is_callable($items)) {
             $this->children = $items;
+
             return $this;
         }
 
@@ -179,7 +179,7 @@ class NavItem
      */
     public function isActive()
     {
-        $pattern = preg_quote(config('statamic.cp.route'), '#') . '/' . $this->active;
+        $pattern = preg_quote(config('statamic.cp.route'), '#').'/'.$this->active;
 
         return preg_match('#'.$pattern.'#', request()->decodedPath()) === 1;
     }

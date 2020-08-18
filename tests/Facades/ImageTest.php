@@ -1,9 +1,10 @@
 <?php
 
-namespace Tests;
+namespace Tests\Facades;
 
-use Statamic\Facades\Image;
 use Statamic\Contracts\Imaging\ImageManipulator;
+use Statamic\Facades\Image;
+use Tests\TestCase;
 
 class ImageTest extends TestCase
 {

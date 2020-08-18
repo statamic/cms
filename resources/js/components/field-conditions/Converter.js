@@ -1,4 +1,4 @@
-import { KEYS, OPERATORS } from './Constants.js';
+import { OPERATORS, ALIASES } from './Constants.js';
 
 export default class {
 
@@ -27,17 +27,23 @@ export default class {
     getOperatorFromRhs(condition) {
         let operator = '==';
 
-        _.chain(OPERATORS)
+        _.chain(this.getOperatorsAndAliases())
             .filter(value => new RegExp(`^${value} [^=]`).test(condition.toString()))
             .each(value => operator = value);
 
-        return operator;
+        return this.normalizeOperator(operator);
+    }
+
+    normalizeOperator(operator) {
+        return ALIASES[operator]
+            ? ALIASES[operator]
+            : operator;
     }
 
     getValueFromRhs(condition) {
         let rhs = condition.toString();
 
-        _.chain(OPERATORS)
+        _.chain(this.getOperatorsAndAliases())
             .filter(value => new RegExp(`^${value} [^=]`).test(rhs))
             .each(value => rhs = rhs.replace(new RegExp(`^${value}[ ]*`), ''));
 
@@ -49,5 +55,9 @@ export default class {
         let value = condition.value.trim();
 
         return `${operator} ${value}`.trim();
+    }
+
+    getOperatorsAndAliases() {
+        return OPERATORS.concat(Object.keys(ALIASES));
     }
 }

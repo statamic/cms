@@ -2,18 +2,18 @@
 
 namespace Tests\Fieldtypes;
 
-use Tests\TestCase;
-use Statamic\Fields\Field;
-use Statamic\Facades\Fieldset;
-use Statamic\Fields\Fieldtype;
-use Statamic\Fieldtypes\NestedFields;
 use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldtypeRepository;
+use Statamic\Facades\Fieldset;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fieldtype;
+use Statamic\Fieldtypes\NestedFields;
+use Tests\TestCase;
 
 class NestedFieldsTest extends TestCase
 {
     /** @test */
-    function it_preprocesses_each_value_when_used_for_config()
+    public function it_preprocesses_each_value_when_used_for_config()
     {
         FieldtypeRepository::shouldReceive('find')
             ->with('assets')
@@ -21,14 +21,15 @@ class NestedFieldsTest extends TestCase
                 protected $component = 'assets';
                 protected $configFields = [
                     'max_files' => ['type' => 'integer'],
-                    'container' => ['type' => 'plain']
+                    'container' => ['type' => 'plain'],
                 ];
             });
 
         FieldtypeRepository::shouldReceive('find')
             ->with('plain')
             ->andReturn(new class extends Fieldtype {
-                public function preProcess($data) {
+                public function preProcess($data)
+                {
                     return $data;
                 }
             });
@@ -36,7 +37,8 @@ class NestedFieldsTest extends TestCase
         FieldtypeRepository::shouldReceive('find')
             ->with('integer')
             ->andReturn(new class extends Fieldtype {
-                public function preProcess($data) {
+                public function preProcess($data)
+                {
                     return (int) $data;
                 }
             });
@@ -48,7 +50,7 @@ class NestedFieldsTest extends TestCase
                     'type' => 'assets',
                     'max_files' => '2', // corresponding fieldtype has preprocessing
                     'container' => 'main', // corresponding fieldtype has no preprocessing
-                    'foo' => 'bar' // no corresponding fieldtype, so theres no preprocessing
+                    'foo' => 'bar', // no corresponding fieldtype, so theres no preprocessing
                 ]);
             });
 
@@ -59,9 +61,9 @@ class NestedFieldsTest extends TestCase
                 'config' => [
                     'display' => 'Test Image Field',
                     'instructions' => 'Some instructions',
-                    'validate' => 'required'
-                ]
-            ]
+                    'validate' => 'required',
+                ],
+            ],
         ]);
 
         $this->assertSame([
@@ -76,15 +78,15 @@ class NestedFieldsTest extends TestCase
                 'component' => 'assets',
                 'handle' => 'image',
                 'required' => true,
-            ]
+            ],
         ], $actual);
     }
 
     /** @test */
-    function it_preprocesses_from_blueprint_format_to_vue()
+    public function it_preprocesses_from_blueprint_format_to_vue()
     {
         $testFieldset = Fieldset::make('test')->setContents(['fields' => [
-            'bar' => ['type' => 'text']
+            ['handle' => 'bar', 'field' => ['type' => 'text']],
         ]]);
         Fieldset::shouldReceive('all')->andReturn(collect([$testFieldset]));
 
@@ -92,9 +94,9 @@ class NestedFieldsTest extends TestCase
             [
                 'handle' => 'one',
                 'field' => [
-                    'type' => 'plain',
+                    'type' => 'text',
                     'display' => 'First Field',
-                ]
+                ],
             ],
             [
                 'handle' => 'two',
@@ -102,7 +104,7 @@ class NestedFieldsTest extends TestCase
                 'config' => [
                     'width' => 50,
                     'display' => 'Second Field',
-                ]
+                ],
             ],
             [
                 'import' => 'test',
@@ -110,7 +112,7 @@ class NestedFieldsTest extends TestCase
             ],
             [
                 'import' => 'test',
-            ]
+            ],
         ]);
 
         $this->assertSame([
@@ -118,11 +120,12 @@ class NestedFieldsTest extends TestCase
                 'handle' => 'one',
                 'type' => 'inline',
                 'config' => [
-                    'type' => 'plain',
+                    'type' => 'text',
                     'display' => 'First Field',
                     'width' => 100,
                 ],
-                'fieldtype' => 'plain',
+                'fieldtype' => 'text',
+                'icon' => 'text',
                 '_id' => 0,
             ],
             [
@@ -141,6 +144,7 @@ class NestedFieldsTest extends TestCase
                 ],
                 'config_overrides' => ['width', 'display'],
                 'fieldtype' => 'text',
+                'icon' => 'text',
                 '_id' => 1,
             ],
             [
@@ -154,12 +158,12 @@ class NestedFieldsTest extends TestCase
                 'fieldset' => 'test',
                 'prefix' => null,
                 '_id' => 3,
-            ]
+            ],
         ], $actual);
     }
 
     /** @test */
-    function it_processes_from_vue_to_blueprint_format()
+    public function it_processes_from_vue_to_blueprint_format()
     {
         $actual = (new NestedFields)->process([
             [
@@ -183,22 +187,22 @@ class NestedFieldsTest extends TestCase
                 'config' => [
                     'instructions' => null,
                     'width' => 50,
-                    'display' => 'Second Field'
+                    'display' => 'Second Field',
                 ],
-                'config_overrides' => ['display', 'width']
+                'config_overrides' => ['display', 'width'],
             ],
             [
                 '_id' => 'id-3',
                 'type' => 'import',
                 'fieldset' => 'test',
-                'prefix' => 'foo'
+                'prefix' => 'foo',
             ],
             [
                 '_id' => 'id-4',
                 'type' => 'import',
                 'fieldset' => 'test',
                 'prefix' => null,
-            ]
+            ],
         ]);
 
         $this->assertSame([
@@ -207,7 +211,7 @@ class NestedFieldsTest extends TestCase
                 'field' => [
                     'type' => 'plain',
                     'display' => 'First Field',
-                ]
+                ],
             ],
             [
                 'handle' => 'two',
@@ -215,7 +219,7 @@ class NestedFieldsTest extends TestCase
                 'config' => [
                     'width' => 50,
                     'display' => 'Second Field',
-                ]
+                ],
             ],
             [
                 'import' => 'test',
@@ -223,7 +227,7 @@ class NestedFieldsTest extends TestCase
             ],
             [
                 'import' => 'test',
-            ]
+            ],
         ], $actual);
     }
 }

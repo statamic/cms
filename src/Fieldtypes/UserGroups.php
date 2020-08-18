@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\Scope;
 use Statamic\Facades\UserGroup;
 
 class UserGroups extends Relationship
@@ -35,5 +36,10 @@ class UserGroups extends Relationship
     protected function augmentValue($value)
     {
         return UserGroup::find($value);
+    }
+
+    public function getSelectionFilters()
+    {
+        return Scope::filters('user-groups-fieldtype', []);
     }
 }

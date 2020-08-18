@@ -2,9 +2,9 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Facades\Stache;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Stache;
 
 class StacheClear extends Command
 {

@@ -2,20 +2,19 @@
 
 namespace Tests\Assets;
 
-use Statamic\Facades;
 use Carbon\Carbon;
-use Tests\TestCase;
-use Statamic\Facades\YAML;
-use Statamic\Assets\Asset;
-use Statamic\Fields\Blueprint;
 use Illuminate\Http\UploadedFile;
-use Statamic\Assets\AssetContainer;
-use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Facades\Event;
-use Facades\Statamic\Assets\Dimensions;
 use Illuminate\Support\Facades\Storage;
-use Statamic\Events\Data\AssetUploaded;
+use Statamic\Assets\Asset;
+use Statamic\Assets\AssetContainer;
+use Statamic\Events\AssetSaved;
+use Statamic\Events\AssetUploaded;
+use Statamic\Facades;
+use Statamic\Facades\YAML;
+use Statamic\Fields\Blueprint;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class AssetTest extends TestCase
 {
@@ -32,14 +31,14 @@ class AssetTest extends TestCase
 
         $this->container = (new AssetContainer)
             ->handle('test_container')
-            ->blueprint('test_blueprint')
             ->disk('test');
 
         Storage::fake('test');
+        Storage::fake('dimensions-cache');
     }
 
     /** @test */
-    function it_sets_and_gets_data_values()
+    public function it_sets_and_gets_data_values()
     {
         $asset = (new Asset)->container($this->container);
         $this->assertNull($asset->get('foo'));
@@ -53,7 +52,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_data_values_using_magic_properties()
+    public function it_gets_and_sets_data_values_using_magic_properties()
     {
         $asset = (new Asset)->container($this->container);
         $this->assertNull($asset->foo);
@@ -65,7 +64,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_all_data()
+    public function it_gets_and_sets_all_data()
     {
         $asset = (new Asset)->container($this->container);
         $this->assertEquals([], $asset->data()->all());
@@ -77,7 +76,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_sets_and_gets_the_container()
+    public function it_sets_and_gets_the_container()
     {
         $asset = new Asset;
         $this->assertNull($asset->container());
@@ -89,7 +88,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_container_if_provided_with_a_string()
+    public function it_gets_the_container_if_provided_with_a_string()
     {
         Facades\AssetContainer::shouldReceive('find')
             ->with('test')
@@ -101,7 +100,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_container_id()
+    public function it_gets_the_container_id()
     {
         $asset = (new Asset)->container(
             $container = (new AssetContainer)->handle('test')
@@ -111,7 +110,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_path()
+    public function it_gets_and_sets_the_path()
     {
         $asset = new Asset;
         $this->assertNull($asset->path());
@@ -127,7 +126,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_id_from_the_container_and_path()
+    public function it_gets_the_id_from_the_container_and_path()
     {
         $asset = (new Asset)
             ->container((new AssetContainer)->handle('123'))
@@ -138,7 +137,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_disk_from_the_container()
+    public function it_gets_the_disk_from_the_container()
     {
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('disk')->andReturn('test');
@@ -149,7 +148,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_checks_if_it_exists()
+    public function it_checks_if_it_exists()
     {
         $disk = Storage::fake('test');
         $disk->put('yes.txt', '');
@@ -163,25 +162,25 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_filename()
+    public function it_gets_the_filename()
     {
         $this->assertEquals('asset', (new Asset)->path('path/to/asset.jpg')->filename());
     }
 
     /** @test */
-    function it_gets_the_basename()
+    public function it_gets_the_basename()
     {
         $this->assertEquals('asset.jpg', (new Asset)->path('path/to/asset.jpg')->basename());
     }
 
     /** @test */
-    function it_gets_the_folder_name()
+    public function it_gets_the_folder_name()
     {
         $this->assertEquals('path/to', (new Asset)->path('path/to/asset.jpg')->folder());
     }
 
     /** @test */
-    function it_gets_the_resolved_path()
+    public function it_gets_the_resolved_path()
     {
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('diskPath')->andReturn('path/to/container');
@@ -192,7 +191,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_extension()
+    public function it_gets_the_extension()
     {
         $this->assertEquals('jpg', (new Asset)->path('asset.jpg')->extension());
         $this->assertEquals('txt', (new Asset)->path('asset.txt')->extension());
@@ -200,7 +199,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_checks_if_an_extension_matches()
+    public function it_checks_if_an_extension_matches()
     {
         $asset = (new Asset)->path('asset.jpg');
 
@@ -210,7 +209,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_checks_if_its_an_audio_file()
+    public function it_checks_if_its_an_audio_file()
     {
         $extensions = ['aac', 'flac', 'm4a', 'mp3', 'ogg', 'wav'];
 
@@ -218,11 +217,11 @@ class AssetTest extends TestCase
             $this->assertTrue((new Asset)->path("path/to/asset.$ext")->isAudio());
         }
 
-        $this->assertFalse((new Asset)->path("path/to/asset.jpg")->isAudio());
+        $this->assertFalse((new Asset)->path('path/to/asset.jpg')->isAudio());
     }
 
     /** @test */
-    function it_checks_if_its_a_video_file()
+    public function it_checks_if_its_a_video_file()
     {
         $extensions = ['h264', 'mp4', 'm4v', 'ogv', 'webm'];
 
@@ -230,11 +229,11 @@ class AssetTest extends TestCase
             $this->assertTrue((new Asset)->path("path/to/asset.$ext")->isVideo());
         }
 
-        $this->assertFalse((new Asset)->path("path/to/asset.jpg")->isVideo());
+        $this->assertFalse((new Asset)->path('path/to/asset.jpg')->isVideo());
     }
 
     /** @test */
-    function it_checks_if_its_an_image_file()
+    public function it_checks_if_its_an_image_file()
     {
         $extensions = ['jpg', 'jpeg', 'png', 'gif', 'webp'];
 
@@ -242,11 +241,11 @@ class AssetTest extends TestCase
             $this->assertTrue((new Asset)->path("path/to/asset.$ext")->isImage());
         }
 
-        $this->assertFalse((new Asset)->path("path/to/asset.txt")->isImage());
+        $this->assertFalse((new Asset)->path('path/to/asset.txt')->isImage());
     }
 
     /** @test */
-    function it_checks_if_it_can_be_previewed_in_google_docs_previewer()
+    public function it_checks_if_it_can_be_previewed_in_google_docs_previewer()
     {
         $extensions = [
             'doc', 'docx', 'pages', 'txt', 'ai', 'psd', 'eps', 'ps', 'css', 'html', 'php', 'c', 'cpp', 'h', 'hpp', 'js',
@@ -257,16 +256,16 @@ class AssetTest extends TestCase
             $this->assertTrue((new Asset)->path("path/to/asset.$ext")->isPreviewable());
         }
 
-        $this->assertFalse((new Asset)->path("path/to/asset.jpg")->isPreviewable());
+        $this->assertFalse((new Asset)->path('path/to/asset.jpg')->isPreviewable());
     }
 
     /** @test */
-    function it_gets_last_modified_time()
+    public function it_gets_last_modified_time()
     {
         Carbon::setTestNow('2017-01-02 14:35:00');
         Storage::disk('test')->put('test.txt', '');
         touch(
-            Storage::disk('test')->getAdapter()->getPathPrefix() . 'test.txt',
+            Storage::disk('test')->getAdapter()->getPathPrefix().'test.txt',
             Carbon::now()->timestamp
         );
 
@@ -278,7 +277,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_meta_data()
+    public function it_gets_meta_data()
     {
         Storage::fake('test');
         Storage::disk('test')->put('foo/test.txt', '');
@@ -294,14 +293,14 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_generates_meta_on_demand_if_it_doesnt_exist()
+    public function it_generates_meta_on_demand_if_it_doesnt_exist()
     {
         Storage::fake('test');
         Carbon::setTestNow(Carbon::parse('2012-01-02 5:00pm'));
 
         $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
         Storage::disk('test')->putFileAs('foo', $file, 'image.jpg');
-        $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix() . 'foo/image.jpg';
+        $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix().'foo/image.jpg';
         touch($realFilePath, Carbon::now()->subMinutes(3)->timestamp);
 
         $container = Facades\AssetContainer::make('test')->disk('test');
@@ -318,7 +317,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_hydrates_data_from_meta_file()
+    public function it_hydrates_data_from_meta_file()
     {
         $disk = Storage::fake('test');
         $disk->put('foo/test.txt', '');
@@ -331,8 +330,9 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_saves()
+    public function it_saves()
     {
+        Event::fake();
         Storage::fake('test');
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo.jpg');
@@ -342,13 +342,15 @@ class AssetTest extends TestCase
 
         $this->assertTrue($return);
 
-        // TODO: Assert about event
+        Event::assertDispatched(AssetSaved::class, function ($event) use ($asset) {
+            return $event->asset = $asset;
+        });
 
         // Assertion about the meta file is in the AssetRepository test
     }
 
     /** @test */
-    function it_deletes()
+    public function it_deletes()
     {
         Storage::fake('local');
         $disk = Storage::disk('local');
@@ -367,8 +369,9 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_can_be_moved_to_another_folder()
+    public function it_can_be_moved_to_another_folder()
     {
+        Event::fake();
         Storage::fake('local');
         $disk = Storage::disk('local');
         $disk->put('old/asset.txt', 'The asset contents');
@@ -379,7 +382,7 @@ class AssetTest extends TestCase
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
-            'old/asset.txt' => ['foo' => 'bar']
+            'old/asset.txt' => ['foo' => 'bar'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
@@ -392,14 +395,15 @@ class AssetTest extends TestCase
         $disk->assertExists('new/asset.txt');
         $disk->assertExists('new/.meta/asset.txt.yaml');
         $this->assertEquals([
-            'new/asset.txt' => ['foo' => 'bar']
+            'new/asset.txt' => ['foo' => 'bar'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
+        Event::assertDispatched(AssetSaved::class);
     }
 
     /** @test */
-    function it_can_be_moved_to_another_folder_with_a_new_filename()
+    public function it_can_be_moved_to_another_folder_with_a_new_filename()
     {
         Storage::fake('local');
         $disk = Storage::disk('local');
@@ -411,7 +415,7 @@ class AssetTest extends TestCase
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
-            'old/asset.txt' => ['foo' => 'bar']
+            'old/asset.txt' => ['foo' => 'bar'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
@@ -424,15 +428,16 @@ class AssetTest extends TestCase
         $disk->assertExists('new/newfilename.txt');
         $disk->assertExists('new/.meta/newfilename.txt.yaml');
         $this->assertEquals([
-            'new/newfilename.txt' => ['foo' => 'bar']
+            'new/newfilename.txt' => ['foo' => 'bar'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
     }
 
     /** @test */
-    function it_renames()
+    public function it_renames()
     {
+        Event::fake();
         $disk = Storage::fake('local');
         $disk->put('old/asset.txt', 'The asset contents');
         $container = Facades\AssetContainer::make('test')->disk('local');
@@ -442,7 +447,7 @@ class AssetTest extends TestCase
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
         $this->assertEquals([
-            'old/asset.txt' => ['foo' => 'bar']
+            'old/asset.txt' => ['foo' => 'bar'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
@@ -455,14 +460,15 @@ class AssetTest extends TestCase
         $disk->assertExists('old/newfilename.txt');
         $disk->assertExists('old/.meta/newfilename.txt.yaml');
         $this->assertEquals([
-            'old/newfilename.txt' => ['foo' => 'bar']
+            'old/newfilename.txt' => ['foo' => 'bar'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
+        Event::assertDispatched(AssetSaved::class);
     }
 
     /** @test */
-    function it_gets_dimensions()
+    public function it_gets_dimensions()
     {
         $file = UploadedFile::fake()->image('image.jpg', 30, 60);
         Storage::fake('test')->putFileAs('foo', $file, 'image.jpg');
@@ -474,7 +480,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_file_size_in_bytes()
+    public function it_gets_file_size_in_bytes()
     {
         $container = $this->container;
         $size = filesize($fixture = __DIR__.'/__fixtures__/container/a.txt');
@@ -488,11 +494,11 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_compiles_augmented_array_data()
+    public function it_compiles_augmented_array_data()
     {
-        Facades\Blueprint::shouldReceive('find')->once()
-            ->with('test_blueprint')
-            ->andReturn((new Blueprint)->setHandle('test_blueprint'));
+        Facades\Blueprint::shouldReceive('find')
+            ->with('assets/test_container')
+            ->andReturn($blueprint = (new Blueprint)->setHandle('test_container')->setNamespace('assets'));
 
         $asset = (new Asset)
             ->container($this->container)
@@ -500,7 +506,7 @@ class AssetTest extends TestCase
             ->setSupplement('foo', 'bar')
             ->path('path/to/asset.jpg');
 
-        $array = $asset->augmentedArrayData();
+        $array = $asset->toAugmentedArray();
 
         $this->assertArraySubset([
             'id' => 'test_container::path/to/asset.jpg',
@@ -511,8 +517,8 @@ class AssetTest extends TestCase
             'extension' => 'jpg',
             'is_asset' => true,
             'folder' => 'path/to',
-            'container' => 'test_container',
-            'blueprint' => 'test_blueprint',
+            'container' => $this->container,
+            'blueprint' => $blueprint,
             'foo' => 'bar',
         ], $array);
 
@@ -527,11 +533,11 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function data_keys_get_added_to_array()
+    public function data_keys_get_added_to_array()
     {
-        Facades\Blueprint::shouldReceive('find')->once()
-            ->with('test_blueprint')
-            ->andReturn((new Blueprint)->setHandle('test_blueprint'));
+        Facades\Blueprint::shouldReceive('find')
+            ->with('assets/test_container')
+            ->andReturn($blueprint = (new Blueprint)->setHandle('test_container')->setNamespace('assets'));
 
         $array = (new Asset)
             ->container($this->container)
@@ -539,38 +545,38 @@ class AssetTest extends TestCase
             ->path('path/to/asset.jpg')
             ->set('foo', 'bar')
             ->set('bar', 'baz')
-            ->augmentedArrayData();
+            ->toAugmentedArray();
 
         $this->assertEquals('bar', $array['foo']);
         $this->assertEquals('baz', $array['bar']);
     }
 
     /** @test */
-    function extra_keys_get_added_to_array_when_file_exists()
+    public function extra_keys_get_added_to_array_when_file_exists()
     {
-        Facades\Blueprint::shouldReceive('find')->once()
-            ->with('test_blueprint')
-            ->andReturn((new Blueprint)->setHandle('test_blueprint'));
+        Facades\Blueprint::shouldReceive('find')
+            ->with('assets/test_container')
+            ->andReturn($blueprint = (new Blueprint)->setHandle('test_container')->setNamespace('assets'));
 
         $container = $this->container;
         Storage::disk('test')->put('test.txt', '');
 
         $asset = (new Asset)->container($container)->path('test.txt');
 
-        $array = $asset->augmentedArrayData();
+        $array = $asset->toAugmentedArray();
         foreach ($this->toArrayKeysWhenFileExists() as $key) {
             $this->assertArrayHasKey($key, $array);
         }
     }
 
     /** @test */
-    function it_can_upload_a_file()
+    public function it_can_upload_a_file()
     {
         Event::fake();
         $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg');
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
 
-        $return = $asset->upload(UploadedFile::fake()->create('asset.jpg'));
+        $return = $asset->upload(UploadedFile::fake()->image('asset.jpg'));
 
         $this->assertEquals($asset, $return);
         Storage::disk('test')->assertExists('path/to/asset.jpg');
@@ -578,10 +584,11 @@ class AssetTest extends TestCase
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
             return $event->asset = $asset;
         });
+        Event::assertDispatched(AssetSaved::class);
     }
 
     /** @test */
-    function it_appends_timestamp_to_uploaded_files_filename_if_it_already_exists()
+    public function it_appends_timestamp_to_uploaded_files_filename_if_it_already_exists()
     {
         Event::fake();
         Carbon::setTestNow(Carbon::createFromTimestamp(1549914700));
@@ -589,7 +596,7 @@ class AssetTest extends TestCase
         Storage::disk('test')->put('path/to/asset.jpg', '');
         Storage::disk('test')->assertExists('path/to/asset.jpg');
 
-        $asset->upload(UploadedFile::fake()->create('asset.jpg'));
+        $asset->upload(UploadedFile::fake()->image('asset.jpg'));
 
         Storage::disk('test')->assertExists('path/to/asset-1549914700.jpg');
         $this->assertEquals('path/to/asset-1549914700.jpg', $asset->path());
@@ -599,13 +606,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_can_replace_the_file()
-    {
-        $this->markTestIncomplete();
-    }
-
-    /** @test */
-    function it_gets_the_url_when_the_container_has_a_relative_url()
+    public function it_gets_the_url_when_the_container_has_a_relative_url()
     {
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('private')->andReturnFalse();
@@ -617,7 +618,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_url_when_the_container_has_an_absolute_url()
+    public function it_gets_the_url_when_the_container_has_an_absolute_url()
     {
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('private')->andReturnFalse();
@@ -629,7 +630,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_absolute_url()
+    public function it_gets_the_absolute_url()
     {
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('private')->andReturnFalse();
@@ -640,7 +641,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    function there_is_no_url_for_a_private_asset()
+    public function there_is_no_url_for_a_private_asset()
     {
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('id')->andReturn('container-id');

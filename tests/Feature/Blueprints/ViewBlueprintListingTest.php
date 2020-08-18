@@ -2,14 +2,11 @@
 
 namespace Tests\Feature\Blueprints;
 
-use Mockery;
 use Statamic\Facades;
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Statamic\Auth\User;
 use Statamic\Fields\Blueprint;
-use Statamic\Entries\Collection;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class ViewBlueprintListingTest extends TestCase
 {
@@ -17,47 +14,20 @@ class ViewBlueprintListingTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_shows_a_list_of_fieldsets()
+    public function it_shows_a_list_of_blueprints()
     {
-        // When the CP header loads the avatar it reaches for the user blueprint.
-        Facades\Blueprint::shouldReceive('find')->with('user')->andReturn(new Blueprint);
+        $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
 
-        Facades\Blueprint::shouldReceive('all')->andReturn(collect([
-            'foo' => $blueprintA = $this->createBlueprint('foo'),
-            'bar' => $blueprintB = $this->createBlueprint('bar')
-        ]));
-
-        $user = Facades\User::make()->makeSuper()->save();
-
-        $response = $this
+        $this
             ->actingAs($user)
             ->get(cp_route('blueprints.index'))
-            ->assertSuccessful()
-            ->assertViewHas('blueprints', collect([
-                [
-                    'id' => 'foo',
-                    'handle' => 'foo',
-                    'title' => 'Foo',
-                    'sections' => 0,
-                    'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/fields/blueprints/foo/edit',
-                    'delete_url' => 'http://localhost/cp/fields/blueprints/foo',
-                ],
-                [
-                    'id' => 'bar',
-                    'handle' => 'bar',
-                    'title' => 'Bar',
-                    'sections' => 0,
-                    'fields' => 0,
-                    'edit_url' => 'http://localhost/cp/fields/blueprints/bar/edit',
-                    'delete_url' => 'http://localhost/cp/fields/blueprints/bar',
-                ],
-            ]))
-            ->assertDontSee('no-results');
+            ->assertOk()
+            ->assertViewIs('statamic::blueprints.index');
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();

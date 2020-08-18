@@ -2,16 +2,19 @@
 
 namespace Statamic\Http\Controllers\CP\Users;
 
-use Statamic\Facades\Role;
-use Statamic\Facades\User;
-use Statamic\Facades\Scope;
-use Statamic\Facades\Action;
-use Statamic\Facades\UserGroup;
 use Illuminate\Http\Request;
+use Statamic\Facades\Scope;
+use Statamic\Facades\UserGroup;
 use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Http\Middleware\RequireStatamicPro;
 
 class UserGroupsController extends CpController
 {
+    public function __construct()
+    {
+        $this->middleware(RequireStatamicPro::class);
+    }
+
     public function index(Request $request)
     {
         $this->authorize('edit user groups');
@@ -23,6 +26,7 @@ class UserGroupsController extends CpController
                 'handle' => $group->handle(),
                 'users' => $group->users()->count(),
                 'roles' => $group->roles()->count(),
+                'show_url' => $group->showUrl(),
                 'edit_url' => $group->editUrl(),
                 'delete_url' => $group->deleteUrl(),
             ];
@@ -33,7 +37,7 @@ class UserGroupsController extends CpController
         }
 
         return view('statamic::usergroups.index', [
-            'groups' => $groups
+            'groups' => $groups,
         ]);
     }
 
@@ -86,7 +90,7 @@ class UserGroupsController extends CpController
             ->roles($request->roles)
             ->save();
 
-        session()->flash('success', 'User group updated');
+        session()->flash('success', __('User group updated'));
 
         return ['redirect' => cp_route('user-groups.show', $group->handle())];
     }
@@ -111,10 +115,11 @@ class UserGroupsController extends CpController
         $group = UserGroup::make()
             ->title($request->title)
             ->handle($request->handle ?: snake_case($request->title))
-            ->roles($request->roles)
-            ->save();
+            ->roles($request->roles);
 
-        session()->flash('success', 'User group created');
+        $group->save();
+
+        session()->flash('success', __('User group created'));
 
         return ['redirect' => cp_route('user-groups.show', $group->handle())];
     }

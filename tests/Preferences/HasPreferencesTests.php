@@ -2,12 +2,10 @@
 
 namespace Tests\Preferences;
 
-use Statamic\Preferences\HasPreferences;
-
 trait HasPreferencesTests
 {
     /** @test */
-    function it_can_get_and_set_array_of_preferences()
+    public function it_can_get_and_set_array_of_preferences()
     {
         $preferences = ['language' => 'english'];
 
@@ -21,54 +19,54 @@ trait HasPreferencesTests
     }
 
     /** @test */
-    function it_can_set_array_of_preferences()
+    public function it_can_set_array_of_preferences()
     {
         $user = $this->makeUser();
 
         $user->preferences([
             'language' => 'english',
-            'color' => 'red'
+            'color' => 'red',
         ]);
 
         $user->setPreferences([
             'language' => 'french',
-            'music' => 'metal'
+            'music' => 'metal',
         ]);
 
         $expected = [
             'language' => 'french',
-            'music' => 'metal'
+            'music' => 'metal',
         ];
 
         $this->assertEquals($expected, $user->preferences());
     }
 
     /** @test */
-    function it_can_merge_array_of_preferences()
+    public function it_can_merge_array_of_preferences()
     {
         $user = $this->makeUser();
 
         $user->preferences([
             'language' => 'english',
-            'color' => 'red'
+            'color' => 'red',
         ]);
 
         $user->mergePreferences([
             'language' => 'french',
-            'music' => 'metal'
+            'music' => 'metal',
         ]);
 
         $expected = [
             'language' => 'french',
             'color' => 'red',
-            'music' => 'metal'
+            'music' => 'metal',
         ];
 
         $this->assertEquals($expected, $user->preferences());
     }
 
     /** @test */
-    function it_can_set_a_single_preference()
+    public function it_can_set_a_single_preference()
     {
         $user = $this->makeUser();
 
@@ -78,46 +76,16 @@ trait HasPreferencesTests
             'collection' => [
                 'columns' => [
                     'date',
-                    'title'
-                ]
-            ]
-        ];
-
-        $this->assertEquals($expected, $user->preferences());
-    }
-
-    /** @test */
-    function it_can_remove_a_single_preference()
-    {
-        $user = $this->makeUser();
-
-        $user->preferences([
-            'collection' => [
-                'columns' => [
-                    'date',
-                    'title'
+                    'title',
                 ],
-                'filters' => [
-                    'published'
-                ]
-            ]
-        ]);
-
-        $user->removePreference('collection.columns');
-
-        $expected = [
-            'collection' => [
-                'filters' => [
-                    'published'
-                ]
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $user->preferences());
     }
 
     /** @test */
-    function it_can_remove_a_single_preference_array_value()
+    public function it_can_remove_a_single_preference()
     {
         $user = $this->makeUser();
 
@@ -126,47 +94,77 @@ trait HasPreferencesTests
                 'columns' => [
                     'date',
                     'title',
-                    'slug'
+                ],
+                'filters' => [
+                    'published',
+                ],
+            ],
+        ]);
+
+        $user->removePreference('collection.columns');
+
+        $expected = [
+            'collection' => [
+                'filters' => [
+                    'published',
+                ],
+            ],
+        ];
+
+        $this->assertEquals($expected, $user->preferences());
+    }
+
+    /** @test */
+    public function it_can_remove_a_single_preference_array_value()
+    {
+        $user = $this->makeUser();
+
+        $user->preferences([
+            'collection' => [
+                'columns' => [
+                    'date',
+                    'title',
+                    'slug',
                 ],
             ],
             'favorites' => [
                 [
                     'name' => 'Updates',
-                    'url' => 'https://worldwideweb.com/cp/updater/statamic'
+                    'url' => 'https://worldwideweb.com/cp/updater/statamic',
                 ],
                 [
                     'name' => 'Blog',
-                    'url' => 'https://worldwideweb.com/cp/collections/blog'
-                ]
-            ]
+                    'url' => 'https://worldwideweb.com/cp/collections/blog',
+                ],
+            ],
         ]);
 
         $user->removePreference('collection.columns', 'date');
         $user->removePreference('collection.columns', 'slug');
         $user->removePreference('favorites', [
             'name' => 'Updates',
-            'url' => 'https://worldwideweb.com/cp/updater/statamic'
+            'url' => 'https://worldwideweb.com/cp/updater/statamic',
         ]);
 
         $expected = [
             'collection' => [
                 'columns' => [
-                    'title'
+                    'title',
                 ],
             ],
             'favorites' => [
                 [
                     'name' => 'Blog',
-                    'url' => 'https://worldwideweb.com/cp/collections/blog'
-                ]
-            ]
+                    'url' => 'https://worldwideweb.com/cp/collections/blog',
+                ],
+            ],
         ];
 
         $this->assertEquals($expected, $user->preferences());
     }
 
     /** @test */
-    function it_cleans_up_by_default_after_removing()
+    public function it_cleans_up_by_default_after_removing()
     {
         $user = $this->makeUser();
 
@@ -174,21 +172,21 @@ trait HasPreferencesTests
             'favorites' => [
                 [
                     'name' => 'Updates',
-                    'url' => 'https://worldwideweb.com/cp/updater/statamic'
-                ]
-            ]
+                    'url' => 'https://worldwideweb.com/cp/updater/statamic',
+                ],
+            ],
         ]);
 
         $user->removePreference('favorites', [
             'name' => 'Updates',
-            'url' => 'https://worldwideweb.com/cp/updater/statamic'
+            'url' => 'https://worldwideweb.com/cp/updater/statamic',
         ]);
 
         $this->assertEquals([], $user->preferences());
     }
 
     /** @test */
-    function it_can_remove_with_cleanup_disabled()
+    public function it_can_remove_with_cleanup_disabled()
     {
         $user = $this->makeUser();
 
@@ -196,34 +194,34 @@ trait HasPreferencesTests
             'favorites' => [
                 [
                     'name' => 'Updates',
-                    'url' => 'https://worldwideweb.com/cp/updater/statamic'
-                ]
-            ]
+                    'url' => 'https://worldwideweb.com/cp/updater/statamic',
+                ],
+            ],
         ]);
 
         $user->removePreference('favorites', [
             'name' => 'Updates',
-            'url' => 'https://worldwideweb.com/cp/updater/statamic'
+            'url' => 'https://worldwideweb.com/cp/updater/statamic',
         ], false);
 
         $expected = [
-            'favorites' => []
+            'favorites' => [],
         ];
 
         $this->assertEquals($expected, $user->preferences());
     }
 
     /** @test */
-    function it_can_get_a_single_preference()
+    public function it_can_get_a_single_preference()
     {
         $user = $this->makeUser();
 
         $user->preferences([
             'collection' => [
                 'filters' => [
-                    'published'
-                ]
-            ]
+                    'published',
+                ],
+            ],
         ]);
 
         $this->assertEquals(['filters' => ['published']], $user->getPreference('collection'));
@@ -232,16 +230,16 @@ trait HasPreferencesTests
     }
 
     /** @test */
-    function it_can_check_if_a_single_preference_exists()
+    public function it_can_check_if_a_single_preference_exists()
     {
         $user = $this->makeUser();
 
         $user->preferences([
             'collection' => [
                 'filters' => [
-                    'published'
-                ]
-            ]
+                    'published',
+                ],
+            ],
         ]);
 
         $this->assertTrue($user->hasPreference('collection'));
@@ -250,7 +248,7 @@ trait HasPreferencesTests
     }
 
     /** @test */
-    function it_can_modify_a_preference()
+    public function it_can_modify_a_preference()
     {
         $user = $this->makeUser();
 
@@ -264,7 +262,7 @@ trait HasPreferencesTests
     }
 
     /** @test */
-    function it_can_append_to_a_preference()
+    public function it_can_append_to_a_preference()
     {
         $user = $this->makeUser();
 
@@ -274,14 +272,14 @@ trait HasPreferencesTests
         $expected = [
             'pizza',
             'lasagna',
-            'rigatoni'
+            'rigatoni',
         ];
 
         $this->assertEquals($expected, $user->getPreference('favorite'));
     }
 
     /** @test */
-    function it_can_cleanup_a_preference()
+    public function it_can_cleanup_a_preference()
     {
         $user = $this->makeUser();
 
@@ -290,37 +288,37 @@ trait HasPreferencesTests
                 'example-one' => [
                     'deeply' => [
                         'nested' => [
-                            'empty-array' => []
-                        ]
-                    ]
+                            'empty-array' => [],
+                        ],
+                    ],
                 ],
                 'example-two' => [
                     'deeply' => [
                         'nested' => [
-                            'empty-string' => ''
-                        ]
-                    ]
+                            'empty-string' => '',
+                        ],
+                    ],
                 ],
                 'example-three' => [
                     'keep-example-three',
                     'deeply' => [
                         'nested' => [
-                            'null' => null
-                        ]
-                    ]
+                            'null' => null,
+                        ],
+                    ],
                 ],
                 'example-four' => [
-                    'integer' => 0
+                    'integer' => 0,
                 ],
                 'example-five' => [
                     'false' => false,
                 ],
                 'columns' => [
-                    'title'
-                ]
+                    'title',
+                ],
             ],
             'filled-top-level' => false,
-            'empty-top-level' => []
+            'empty-top-level' => [],
         ]);
 
         $expected = [
@@ -329,16 +327,16 @@ trait HasPreferencesTests
                     'keep-example-three',
                 ],
                 'example-four' => [
-                    'integer' => 0
+                    'integer' => 0,
                 ],
                 'example-five' => [
-                    'false' => false
+                    'false' => false,
                 ],
                 'columns' => [
-                    'title'
+                    'title',
                 ],
             ],
-            'filled-top-level' => false
+            'filled-top-level' => false,
         ];
 
         $user

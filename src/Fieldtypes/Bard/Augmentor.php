@@ -2,9 +2,12 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Statamic\Support\Arr;
-use Statamic\Fields\Fields;
 use Scrumpy\ProseMirrorToHtml\Renderer;
+use Statamic\Fields\Field;
+use Statamic\Fields\Fields;
+use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Text;
+use Statamic\Support\Arr;
 
 class Augmentor
 {
@@ -13,22 +16,31 @@ class Augmentor
     protected $includeDisabledSets = false;
     protected $augmentSets = true;
 
+    protected static $customMarks = [];
+    protected static $customNodes = [];
+
     public function __construct($fieldtype)
     {
         $this->fieldtype = $fieldtype;
     }
 
-    public function augment($value)
+    public function augment($value, $shallow = false)
     {
+        $hasSets = (bool) $this->fieldtype->config('sets');
+
+        if (! $value) {
+            return $hasSets ? [] : null;
+        }
+
         if (is_string($value)) {
             return $value;
         }
 
-        if (! $this->fieldtype->config('sets')) {
+        if (! $hasSets) {
             return $this->convertToHtml($value);
         }
 
-        if (!$this->includeDisabledSets) {
+        if (! $this->includeDisabledSets) {
             $value = $this->removeDisabledSets($value);
         }
 
@@ -37,7 +49,7 @@ class Augmentor
         $value = $this->convertToSets($value);
 
         if ($this->augmentSets) {
-            $value = $this->augmentSets($value);
+            $value = $this->augmentSets($value, $shallow);
         }
 
         return $value;
@@ -85,10 +97,23 @@ class Augmentor
             SetNode::class,
         ]);
 
+        $renderer->addNodes(static::$customNodes);
+        $renderer->addMarks(static::$customMarks);
+
         return $renderer->render([
             'type' => 'doc',
-            'content' => $value
+            'content' => $value,
         ]);
+    }
+
+    public static function addNode($node)
+    {
+        static::$customNodes[] = $node;
+    }
+
+    public static function addMark($mark)
+    {
+        static::$customMarks[] = $mark;
     }
 
     protected function convertToSets($html)
@@ -100,18 +125,29 @@ class Augmentor
                 return $this->sets[$matches[1]];
             }
 
-            return ['type' => 'text', 'text' => $html];
+            return ['type' => 'text', 'text' => $this->textValue($html)];
         });
     }
 
-    protected function augmentSets($value)
+    protected function textValue($value)
     {
-        return $value->map(function ($set) {
+        $fieldtype = (new Text)->setField(new Field('text', [
+            'antlers' => $this->fieldtype->config('antlers'),
+        ]));
+
+        return new Value($value, 'text', $fieldtype);
+    }
+
+    protected function augmentSets($value, $shallow)
+    {
+        $augmentMethod = $shallow ? 'shallowAugment' : 'augment';
+
+        return $value->map(function ($set) use ($augmentMethod) {
             if (! $config = $this->fieldtype->config("sets.{$set['type']}.fields")) {
                 return $set;
             }
 
-            $values = (new Fields($config))->addValues($set)->augment()->values()->all();
+            $values = (new Fields($config))->addValues($set)->{$augmentMethod}()->values()->all();
 
             return array_merge($values, ['type' => $set['type']]);
         })->all();

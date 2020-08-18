@@ -29,4 +29,15 @@ return [
 
     'action' => '!',
 
+    /*
+    |--------------------------------------------------------------------------
+    | Middleware
+    |--------------------------------------------------------------------------
+    |
+    | Define the middleware that will be applied to the web route group.
+    |
+    */
+
+    'middleware' => 'web',
+
 ];

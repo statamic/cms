@@ -1,6 +1,6 @@
 <template>
 
-    <div class="publish-fields">
+    <publish-fields-container>
 
         <publish-field
             v-for="field in fields"
@@ -12,6 +12,8 @@
             :errors="errors[field.handle]"
             :read-only="readOnly"
             :syncable="syncable"
+            :can-toggle-label="canToggleLabels"
+            :name-prefix="namePrefix"
             @input="$emit('updated', field.handle, $event)"
             @meta-updated="$emit('meta-updated', field.handle, $event)"
             @synced="$emit('synced', field.handle)"
@@ -20,7 +22,7 @@
             @blur="$emit('blur', field.handle)"
         />
 
-    </div>
+    </publish-fields-container>
 
 </template>
 
@@ -43,6 +45,8 @@ export default {
         },
         readOnly: Boolean,
         syncable: Boolean,
+        canToggleLabels: Boolean,
+        namePrefix: String,
     },
 
     computed: {

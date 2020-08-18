@@ -18,7 +18,7 @@ class ThemeTagsTest extends TestCase
         parent::setUp();
     }
 
-    private function tag($tag)
+    private function tag($tag): string
     {
         return Parse::template($tag, []);
     }
@@ -113,16 +113,20 @@ class ThemeTagsTest extends TestCase
 
     public function testOutputsFileContents()
     {
-        $contents = File::get('site/themes/redwood/package.json');
+        File::shouldReceive('disk')->andReturn($disk = \Mockery::mock());
+        $disk->shouldReceive('exists')->with('test.txt')->once()->andReturnTrue();
+        $disk->shouldReceive('get')->with('test.txt')->andReturn('contents');
 
         $this->assertEquals(
-            $contents,
-            $this->tag('{{ theme:output src="package.json" }}')
+            'contents',
+            $this->tag('{{ theme:output src="test.txt" }}')
         );
     }
 
     public function testAppendsTimestampForCacheBusting()
     {
+        File::shouldReceive('exists')->with(public_path('/js/foo.js'))->andReturnTrue();
+
         File::shouldReceive('lastModified')
             ->withArgs(function ($arg) {
                 return Path::tidy(public_path('/js/foo.js')) === Path::tidy($arg);
@@ -136,7 +140,7 @@ class ThemeTagsTest extends TestCase
     }
 
     /** @test */
-    function gets_versioned_filename_for_mix()
+    public function gets_versioned_filename_for_mix()
     {
         File::shouldReceive('get')
             ->with(public_path('mix-manifest.json'))
@@ -166,7 +170,7 @@ class ThemeTagsTest extends TestCase
     }
 
     /** @test */
-    function gets_regular_filename_if_file_isnt_in_mix_manifest()
+    public function gets_regular_filename_if_file_isnt_in_mix_manifest()
     {
         File::shouldReceive('get')
             ->with(public_path('mix-manifest.json'))
@@ -179,7 +183,7 @@ class ThemeTagsTest extends TestCase
     }
 
     /** @test */
-    function gets_regular_filename_if_file_isnt_in_elixir_manifest()
+    public function gets_regular_filename_if_file_isnt_in_elixir_manifest()
     {
         File::shouldReceive('get')
             ->with(public_path('mix-manifest.json'))
@@ -196,7 +200,7 @@ class ThemeTagsTest extends TestCase
     }
 
     /** @test */
-    function gets_regular_filename_if_manifests_dont_exist()
+    public function gets_regular_filename_if_manifests_dont_exist()
     {
         File::shouldReceive('get')
             ->with(public_path('mix-manifest.json'))

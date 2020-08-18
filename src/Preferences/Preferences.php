@@ -2,8 +2,8 @@
 
 namespace Statamic\Preferences;
 
-use Statamic\Facades\User;
 use Illuminate\Support\Arr;
+use Statamic\Facades\User;
 
 class Preferences
 {

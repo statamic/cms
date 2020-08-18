@@ -9,7 +9,7 @@ use Tests\TestCase;
 class PermissionTest extends TestCase
 {
     /** @test */
-    function it_makes_a_tree()
+    public function it_makes_a_tree()
     {
         $permission = (new Permission)->value('one');
 
@@ -19,20 +19,20 @@ class PermissionTest extends TestCase
                 'label' => 'one',
                 'description' => null,
                 'group' => null,
-                'children' => []
-            ]
+                'children' => [],
+            ],
         ], $permission->toTree());
     }
 
     /** @test */
-    function it_makes_tree_with_children()
+    public function it_makes_tree_with_children()
     {
         $permission = (new Permission)
             ->value('parent')
             ->group('foo');
 
         $permission->children([
-            (new Permission)->value('child')->label('Child!')
+            (new Permission)->value('child')->label('Child!'),
         ]);
 
         $this->assertEquals([
@@ -47,15 +47,15 @@ class PermissionTest extends TestCase
                         'label' => 'Child!',
                         'description' => null,
                         'group' => 'foo',
-                        'children' => []
+                        'children' => [],
                     ],
-                ]
-            ]
+                ],
+            ],
         ], $permission->toTree());
     }
 
     /** @test */
-    function it_adds_a_child()
+    public function it_adds_a_child()
     {
         $permission = (new Permission)->value('test')->group('testgroup');
         $this->assertEmpty($permission->children());
@@ -71,7 +71,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
-    function it_adds_a_label()
+    public function it_adds_a_label()
     {
         $permission = (new Permission)->value('test');
         $this->assertEquals('test', $permission->label());
@@ -85,7 +85,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
-    function it_adds_a_description()
+    public function it_adds_a_description()
     {
         $permission = (new Permission)->value('test');
         $this->assertNull($permission->description());
@@ -99,7 +99,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
-    function it_adds_a_group()
+    public function it_adds_a_group()
     {
         $permission = (new Permission)->value('test');
         $this->assertNull($permission->group());
@@ -113,7 +113,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_its_permissions_when_replacements_are_not_defined()
+    public function it_gets_its_permissions_when_replacements_are_not_defined()
     {
         $permission = (new Permission)->value('test');
 
@@ -122,7 +122,7 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
-    function it_gets_its_permissions_when_replacements_are_defined()
+    public function it_gets_its_permissions_when_replacements_are_defined()
     {
         $permission = (new Permission)
             ->value('view {handle} entries')
@@ -153,14 +153,14 @@ class PermissionTest extends TestCase
     }
 
     /** @test */
-    function it_combines_replacements_and_children()
+    public function it_combines_replacements_and_children()
     {
         $permission = (new Permission)
             ->value('view {handle} entries')
             ->group('test-group')
             ->children([
                 (new Permission)->value('edit {handle} entries')->children([
-                    (new Permission)->value('delete {handle} entries')
+                    (new Permission)->value('delete {handle} entries'),
                 ]),
                 (new Permission)->value('publish {handle} entries'),
             ])
@@ -207,17 +207,17 @@ class PermissionTest extends TestCase
                                 'description' => null,
                                 'group' => 'test-group',
                                 'children' => [],
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                     [
                         'value' => 'publish first entries',
                         'label' => 'publish FIRST entries',
                         'description' => null,
                         'group' => 'test-group',
-                        'children' => []
+                        'children' => [],
                     ],
-                ]
+                ],
             ],
             [
                 'value' => 'view second entries',
@@ -237,18 +237,18 @@ class PermissionTest extends TestCase
                                 'description' => null,
                                 'group' => 'test-group',
                                 'children' => [],
-                            ]
-                        ]
+                            ],
+                        ],
                     ],
                     [
                         'value' => 'publish second entries',
                         'label' => 'publish SECOND entries',
                         'description' => null,
                         'group' => 'test-group',
-                        'children' => []
+                        'children' => [],
                     ],
-                ]
-            ]
+                ],
+            ],
         ], $permission->toTree());
 
         $permission->label('Viewable :handle');

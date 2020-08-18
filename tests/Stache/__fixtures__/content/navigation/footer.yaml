@@ -1,0 +1,7 @@
+title: Footer
+root: pages-home
+tree:
+  -
+    entry: pages-about
+  -
+    entry: pages-contact

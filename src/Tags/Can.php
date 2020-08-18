@@ -2,14 +2,13 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tags;
-use Statamic\Support\Arr;
 use Statamic\Facades\User;
+use Statamic\Support\Arr;
 
 class Can extends Tags
 {
     /**
-     * Maps to {{ can:[permission] }}
+     * Maps to {{ can:[permission] }}.
      *
      * @param  string $method
      * @param  array $args

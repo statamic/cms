@@ -1,5 +1,6 @@
 <template>
-    <div>
+    <element-container @resized="containerWidth = $event.width">
+    <div :class="{ 'narrow': containerWidth < 500, 'really-narrow': containerWidth < 280 }">
 
         <uploader
             ref="uploader"
@@ -42,14 +43,11 @@
                             {{ __('Browse') }}
                         </button>
 
-                        <p class="ml-2 text-xs text-grey-60" v-if="config.allow_uploads">
-                            <button type="button" class="text-blue underline hover:text-blue-dark" @click.prevent="uploadFile">
-                                {{ __('Upload new file') }}
+                        <p class="asset-upload-control text-xs text-grey-60" v-if="config.allow_uploads">
+                            <button type="button" class="upload-text-button" @click.prevent="uploadFile">
+                                {{ __('Upload file') }}
                             </button>
                             <span class="drag-drop-text" v-text="__('or drag & drop here.')"></span>
-                        </p>
-                        <p class="ml-2 text-xs text-grey-60" v-else>
-                            {{ __('Uploads are disabled')}}
                         </p>
 
                         <button
@@ -94,7 +92,7 @@
 
                         <div class="asset-table-listing" v-if="displayMode === 'list'">
 
-                            <table>
+                            <table class="table-fixed">
                                 <sortable-list
                                     v-model="assets"
                                     :vertical="true"
@@ -151,6 +149,7 @@
             </selector>
         </stack>
     </div>
+    </element-container>
 </template>
 
 
@@ -211,7 +210,8 @@ export default {
             draggingFile: false,
             uploads: [],
             innerDragging: false,
-            displayMode: 'grid'
+            displayMode: 'grid',
+            containerWidth: null,
         };
     },
 

@@ -2,13 +2,13 @@
 
 namespace Tests\Stache\Repositories;
 
-use Tests\TestCase;
-use Statamic\Stache\Stache;
-use Statamic\Taxonomies\Taxonomy;
-use Statamic\Stache\Stores\TaxonomiesStore;
+use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Facades\Taxonomy as TaxonomyAPI;
 use Statamic\Stache\Repositories\TaxonomyRepository;
-use Illuminate\Support\Collection as IlluminateCollection;
+use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\TaxonomiesStore;
+use Statamic\Taxonomies\Taxonomy;
+use Tests\TestCase;
 
 class TaxonomyRepositoryTest extends TestCase
 {
@@ -25,7 +25,7 @@ class TaxonomyRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_taxonomies()
+    public function it_gets_all_taxonomies()
     {
         $taxonomies = $this->repo->all();
 
@@ -39,7 +39,7 @@ class TaxonomyRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_taxonomy_by_handle()
+    public function it_gets_a_taxonomy_by_handle()
     {
         tap($this->repo->findByHandle('categories'), function ($taxonomy) {
             $this->assertInstanceOf(Taxonomy::class, $taxonomy);
@@ -57,14 +57,16 @@ class TaxonomyRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_saves_a_taxonomy_to_the_stache_and_to_a_file()
+    public function it_saves_a_taxonomy_to_the_stache_and_to_a_file()
     {
         $taxonomy = TaxonomyAPI::make('new');
+        $taxonomy->cascade(['foo' => 'bar']);
         $this->assertNull($this->repo->findByHandle('new'));
 
         $this->repo->save($taxonomy);
 
-        $this->assertNotNull($this->repo->findByHandle('new'));
+        $this->assertNotNull($item = $this->repo->findByHandle('new'));
+        $this->assertEquals(['foo' => 'bar'], $item->cascade()->all());
         $this->assertTrue(file_exists($this->directory.'/new.yaml'));
         @unlink($this->directory.'/new.yaml');
     }

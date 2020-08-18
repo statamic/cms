@@ -7,17 +7,12 @@ use Illuminate\Http\Request;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
-use Statamic\Facades\User;
-use Statamic\Http\Middleware\CP\Authorize;
-use Statamic\Http\Middleware\Localize as LocalizeFrontend;
-use Statamic\Http\Middleware\CP\Localize as LocalizeCp;
-use Statamic\StaticCaching\Middleware\Cache;
 use Stringy\StaticStringy;
 
 class Statamic
 {
     const CORE_SLUG = 'statamic';
-    const CORE_REPO = 'statamic/cms';
+    const PACKAGE = 'statamic/cms';
 
     protected static $scripts = [];
     protected static $externalScripts = [];
@@ -26,19 +21,17 @@ class Statamic
     protected static $webRoutes = [];
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
-    protected static $webMiddleware = [
-        LocalizeFrontend::class,
-        Cache::class,
-    ];
-    protected static $cpMiddleware = [
-        Authorize::class,
-        LocalizeCp::class,
-    ];
-    protected static $shallowAugmentation = false;
+    protected static $bootedCallbacks = [];
+    protected static $afterInstalledCallbacks = [];
 
     public static function version()
     {
         return \Facades\Statamic\Version::get();
+    }
+
+    public static function pro()
+    {
+        return config('statamic.editions.pro');
     }
 
     public static function availableScripts(Request $request)
@@ -53,7 +46,7 @@ class Statamic
 
     public static function script($name, $path)
     {
-        static::$scripts[$name] = str_finish($path, '.js');
+        static::$scripts[$name][] = str_finish($path, '.js');
 
         return new static;
     }
@@ -72,7 +65,7 @@ class Statamic
 
     public static function style($name, $path)
     {
-        static::$styles[$name] = str_finish($path, '.css');
+        static::$styles[$name][] = str_finish($path, '.css');
 
         return new static;
     }
@@ -134,7 +127,7 @@ class Statamic
             return null;
         }
 
-        $route = route('statamic.cp.' . $route, $params);
+        $route = route('statamic.cp.'.$route, $params);
 
         // TODO: This is a temporary workaround to routes like
         // `route('assets.browse.edit', 'some/image.jpg')` outputting two slashes.
@@ -146,7 +139,7 @@ class Statamic
 
     public static function isApiRoute()
     {
-        if (! config('statamic.api.enabled')) {
+        if (! config('statamic.api.enabled') || ! static::pro()) {
             return false;
         }
 
@@ -155,11 +148,11 @@ class Statamic
 
     public static function apiRoute($route, $params = [])
     {
-        if (! config('statamic.api.enabled')) {
+        if (! config('statamic.api.enabled') || ! static::pro()) {
             return null;
         }
 
-        $route = route('statamic.api.' . $route, $params);
+        $route = route('statamic.api.'.$route, $params);
 
         // TODO: This is a temporary workaround to routes like
         // `route('assets.browse.edit', 'some/image.jpg')` outputting two slashes.
@@ -179,7 +172,7 @@ class Statamic
             str_finish(request()->getUri(), '/')
         );
 
-        return starts_with($url, '/' . config('statamic.amp.route'));
+        return starts_with($url, '/'.config('statamic.amp.route'));
     }
 
     public static function jsonVariables(Request $request)
@@ -203,7 +196,7 @@ class Statamic
         }
 
         $svg = StaticStringy::collapseWhitespace(
-            File::get(statamic_path("resources/dist/svg/{$name}.svg"))
+            File::get(public_path("vendor/statamic/cp/svg/{$name}.svg"))
         );
 
         return str_replace('<svg', sprintf('<svg%s', $attrs), $svg);
@@ -211,12 +204,12 @@ class Statamic
 
     public static function vendorAssetUrl($url = '/')
     {
-        return asset(URL::tidy('vendor/' . $url));
+        return asset(URL::tidy('vendor/'.$url));
     }
 
     public static function cpAssetUrl($url = '/')
     {
-        return static::vendorAssetUrl('statamic/cp/' . $url);
+        return static::vendorAssetUrl('statamic/cp/'.$url);
     }
 
     public static function flash()
@@ -234,46 +227,35 @@ class Statamic
 
     public static function crumb(...$values)
     {
-        return implode(' ‹ ', array_map("__", $values));
-    }
-
-    public static function cpMiddleware()
-    {
-        return static::$cpMiddleware;
-    }
-
-    public static function webMiddleware()
-    {
-        return static::$webMiddleware;
-    }
-
-    public static function pushCpMiddleware($middleware)
-    {
-        static::$cpMiddleware[] = $middleware;
-    }
-
-    public static function pushWebMiddleware($middleware)
-    {
-        static::$webMiddleware[] = $middleware;
+        return implode(' ‹ ', array_map('__', $values));
     }
 
     public static function docsUrl($url)
     {
-        return URL::tidy('https://statamic.dev/' . $url);
+        return URL::tidy('https://statamic.dev/'.$url);
     }
 
-    public static function enableShallowAugmentation()
+    public static function booted(Closure $callback)
     {
-        static::$shallowAugmentation = true;
+        static::$bootedCallbacks[] = $callback;
     }
 
-    public static function disableShallowAugmentation()
+    public static function runBootedCallbacks()
     {
-        static::$shallowAugmentation = false;
+        foreach (static::$bootedCallbacks as $callback) {
+            $callback();
+        }
     }
 
-    public static function shallowAugmentationEnabled()
+    public static function afterInstalled(Closure $callback)
     {
-        return static::$shallowAugmentation;
+        static::$afterInstalledCallbacks[] = $callback;
+    }
+
+    public static function runAfterInstalledCallbacks($command)
+    {
+        foreach (static::$afterInstalledCallbacks as $callback) {
+            $callback($command);
+        }
     }
 }

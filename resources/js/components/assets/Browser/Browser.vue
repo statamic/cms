@@ -38,28 +38,19 @@
                     :columns="columns"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
-                    :search="false"
                     :sort="false"
                     :sort-column="sortColumn"
                     :sort-direction="sortDirection"
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
                 >
-                    <div slot-scope="{ filteredRows: rows }">
+                    <div slot-scope="{ filteredRows: rows }" :class="modeClass">
                         <div class="card p-0" :class="{ 'rounded-tl-none': showContainerTabs }">
 
                             <div class="data-list-header">
-                                <data-list-toggle-all ref="toggleAll" v-if="!hasMaxFiles" />
                                 <data-list-search v-model="searchQuery" />
 
-                                <data-list-bulk-actions
-                                    :url="actionUrl"
-                                    :context="actionContext"
-                                    @started="actionStarted"
-                                    @completed="bulkActionsCompleted"
-                                />
-
                                 <template v-if="! hasSelections">
-                                    <button v-if="canCreateFolders" class="btn-flat btn-icon-only" @click="creatingFolder = true">
+                                    <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-2" @click="creatingFolder = true">
                                         <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
                                         <span>{{ __('Create Folder') }}</span>
                                     </button>
@@ -70,16 +61,23 @@
                                     </button>
                                 </template>
 
-                                <div class="btn-group-flat ml-2">
-                                    <button @click="setMode('grid')" :class="{'active': mode === 'grid'}">
+                                <div class="btn-group ml-2">
+                                    <button class="btn-flat px-2" @click="setMode('grid')" :class="{'active': mode === 'grid'}">
                                         <svg-icon name="assets-mode-grid" class="h-4 w-4"/>
                                     </button>
-                                    <button @click="setMode('table')" :class="{'active': mode === 'table'}">
+                                    <button class="btn-flat px-2" @click="setMode('table')" :class="{'active': mode === 'table'}">
                                         <svg-icon name="assets-mode-table" class="h-4 w-4" />
                                     </button>
                                 </div>
 
                             </div>
+
+                            <data-list-bulk-actions
+                                :url="bulkActionsUrl"
+                                :context="actionContext"
+                                @started="actionStarted"
+                                @completed="actionCompleted"
+                            />
 
                             <uploads
                                 v-if="uploads.length"
@@ -115,15 +113,17 @@
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
+                                        <td />
+                                        <td />
 
-                                        <td class="text-right" :colspan="columns.length">
+                                        <td class="actions-column" :colspan="columns.length">
                                             <dropdown-list v-if="folderActions(folder).length">
                                                 <!-- TODO: Do we want folder edit functionality for launch? -->
                                                 <!-- <dropdown-item :text="__('Edit')" @click="editedFolderPath = folder.path" /> -->
 
                                                 <data-list-inline-actions
                                                     :item="folder.path"
-                                                    :url="folderActionUrl"
+                                                    :url="runFolderActionUrl"
                                                     :actions="folderActions(folder)"
                                                     @started="actionStarted"
                                                     @completed="actionCompleted"
@@ -157,7 +157,7 @@
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
                                             :item="asset.id"
-                                            :url="actionUrl"
+                                            :url="runActionUrl"
                                             :actions="asset.actions"
                                             @started="actionStarted"
                                             @completed="actionCompleted"
@@ -173,7 +173,7 @@
                                     <!-- Parent Folder -->
                                     <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-if="folder.parent_path && !restrictFolderNavigation">
                                         <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="selectFolder(folder.parent_path)">
-                                            <div class="absolute pin flex items-center justify-center">
+                                            <div class="absolute inset-0 flex items-center justify-center">
                                                 <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue"></file-icon>
                                             </div>
                                         </div>
@@ -182,7 +182,7 @@
                                     <!-- Sub-Folders -->
                                     <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="selectFolder(folder.path)">
-                                            <div class="absolute pin flex items-center justify-center">
+                                            <div class="absolute inset-0 flex items-center justify-center">
                                                 <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue"></file-icon>
                                             </div>
                                         </div>
@@ -191,7 +191,7 @@
                                     <!-- Assets -->
                                     <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-for="asset in assets" :key="asset.id">
                                         <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="toggleSelection(asset.id)" @dblclick="$emit('edit-asset', asset)">
-                                            <div class="absolute pin flex items-center justify-center" :class="{ 'selected': isSelected(asset.id) }">
+                                            <div class="absolute inset-0 flex items-center justify-center" :class="{ 'selected': isSelected(asset.id) }">
                                                 <asset-thumbnail :asset="asset" class="h-full w-full" />
                                             </div>
                                         </div>
@@ -291,7 +291,9 @@ export default {
             sortColumn: 'basename',
             sortDirection: 'asc',
             mode: 'table',
-            folderActionUrl: null,
+            runActionUrl: null,
+            bulkActionsUrl: null,
+            runFolderActionUrl: null,
         }
     },
 
@@ -330,7 +332,7 @@ export default {
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders;
+            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation;
         },
 
         parameters() {
@@ -365,6 +367,10 @@ export default {
             let asset = _.find(this.assets, asset => asset.id == this.editedAssetId);
 
             return asset ? asset.basename : null;
+        },
+
+        modeClass() {
+            return 'mode-' + this.mode;
         }
 
     },
@@ -418,12 +424,11 @@ export default {
         },
 
         actionCompleted() {
-            this.loadAssets();
-        },
+            this.$toast.success(__('Action completed'));
 
-        bulkActionsCompleted() {
-            this.$refs.toggleAll.uncheckAllItems();
-            this.actionCompleted();
+            this.$events.$emit('clear-selections');
+
+            this.loadAssets();
         },
 
         loadContainers() {
@@ -452,8 +457,9 @@ export default {
                 } else {
                     this.folder = data.data.folder;
                     this.folders = data.data.folder.folders;
-                    this.actionUrl = data.links.asset_actions;
-                    this.folderActionUrl = data.links.folder_actions;
+                    this.runActionUrl = data.links.run_asset_action;
+                    this.bulkActionsUrl = data.links.bulk_asset_actions;
+                    this.runFolderActionUrl = data.links.run_folder_action;
                 }
 
                 this.loadingAssets = false;

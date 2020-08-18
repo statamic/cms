@@ -79,34 +79,34 @@ class Parser
         return $this->newInstance()->addExtensions(function () {
             return [
                 new \League\CommonMark\Extension\Table\TableExtension,
-                new \Webuni\CommonMark\AttributesExtension\AttributesExtension,
+                new \League\CommonMark\Extension\Attributes\AttributesExtension,
                 new \League\CommonMark\Extension\Strikethrough\StrikethroughExtension,
             ];
         });
     }
 
-    public function withAutoLinks(): Parser
+    public function withAutoLinks(): self
     {
         return $this->newInstance()->addExtension(function () {
             return new AutolinkExtension;
         });
     }
 
-    public function withAutoLineBreaks(): Parser
+    public function withAutoLineBreaks(): self
     {
         return $this->newInstance([
             'renderer' => [
                 'soft_break' => "<br />\n",
-            ]
+            ],
         ]);
     }
 
-    public function withMarkupEscaping(): Parser
+    public function withMarkupEscaping(): self
     {
         return $this->newInstance(['html_input' => 'escape']);
     }
 
-    public function withSmartPunctuation(): Parser
+    public function withSmartPunctuation(): self
     {
         return $this->newInstance()->addExtension(function () {
             return new SmartPunctExtension;

@@ -2,11 +2,11 @@
 
 namespace Statamic\Tags\Concerns;
 
-use Statamic\Extend\HasParameters;
+use Illuminate\Support\MessageBag;
 
 trait RendersForms
 {
-    use HasParameters;
+    use RendersAttributes;
 
     /**
      * Open a form.
@@ -14,31 +14,23 @@ trait RendersForms
      * @param string $action
      * @return string
      */
-    protected function formOpen($action, $method = 'POST')
+    protected function formOpen($action, $method = 'POST', $knownTagParams = [])
     {
         $formMethod = $method === 'GET' ? 'GET' : 'POST';
 
         $defaultAttrs = [
-            "method:{$formMethod}",
-            "action:{$action}",
+            'method' => $formMethod,
+            'action' => $action,
         ];
 
-        if ($this->getBool('files')) {
-            $defaultAttrs[] = 'enctype:multipart/form-data';
+        if ($this->params->bool('files')) {
+            $defaultAttrs['enctype'] = 'multipart/form-data';
         }
 
-        $attrs = collect($defaultAttrs)
-            ->merge($this->getList('attr'))
-            ->mapWithKeys(function ($attr) {
-                $bits = preg_split('/:(?!\/{2})/', $attr);
-                return [$bits[0] => $bits[1] ?? null];
-            })
-            ->map(function ($value, $attr) {
-                return $value ? "{$attr}=\"{$value}\"" : $attr;
-            })
-            ->implode(' ');
+        $defaultAttrs = $this->renderAttributes($defaultAttrs);
+        $additionalAttrs = $this->renderAttributesFromParams(array_merge(['method', 'action'], $knownTagParams));
 
-        $html = "<form {$attrs}>";
+        $html = collect(['<form', $defaultAttrs, $additionalAttrs])->filter()->implode(' ').'>';
         $html .= csrf_field();
 
         $method = strtoupper($method);
@@ -50,6 +42,15 @@ trait RendersForms
         return $html;
     }
 
+    protected function formMetaFields($meta)
+    {
+        return collect($meta)
+            ->map(function ($value, $key) {
+                return sprintf('<input type="hidden" name="_%s" value="%s" />', $key, $value);
+            })
+            ->implode("\n");
+    }
+
     /**
      * Close a form.
      *
@@ -58,5 +59,25 @@ trait RendersForms
     protected function formClose()
     {
         return '</form>';
+    }
+
+    /**
+     * Get field with extra data for rendering.
+     *
+     * @param \Statamic\Fields\Field $field
+     * @return array
+     */
+    protected function getRenderableField($field, $errorBag = 'default')
+    {
+        $errors = session('errors') ? session('errors')->getBag($errorBag) : new MessageBag;
+
+        $data = array_merge($field->toArray(), [
+            'error' => $errors->first($field->handle()) ?: null,
+            'old' => old($field->handle()),
+        ]);
+
+        $data['field'] = view($field->fieldtype()->view(), $data);
+
+        return $data;
     }
 }

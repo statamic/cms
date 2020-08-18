@@ -2,13 +2,13 @@
 
 namespace Statamic\Forms;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\Parse;
-use Statamic\Facades\Config;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
-use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\Facades\Config;
+use Statamic\Facades\Parse;
+use Statamic\Facades\Site;
+use Statamic\Support\Str;
 
 class Email extends Mailable
 {
@@ -60,7 +60,7 @@ class Email extends Mailable
         $html = array_get($this->config, 'html');
         $text = array_get($this->config, 'text');
 
-        if (!$text && !$html) {
+        if (! $text && ! $html) {
             return $this->automagic();
         }
 
@@ -68,7 +68,11 @@ class Email extends Mailable
             $this->text($text);
         }
 
-        return $this->view($html);
+        if ($html) {
+            $this->view($html);
+        }
+
+        return $this;
     }
 
     protected function addData()
@@ -79,7 +83,7 @@ class Email extends Mailable
             'now'        => now(),
             'today'      => now(),
             'site'       => $site = Site::current()->handle(),
-            'locale'     => $site
+            'locale'     => $site,
         ]);
 
         return $this->with($data);
@@ -89,6 +93,7 @@ class Email extends Mailable
     {
         $html = collect($this->submission->toArray())->map(function ($value, $key) {
             $value = is_array($value) ? json_encode($value) : $value;
+
             return "<b>{$key}:</b> {$value}";
         })->implode("<br>\n");
 
@@ -105,7 +110,7 @@ class Email extends Mailable
             $name = null;
             $email = trim($address);
 
-            if (str_contains($email, '<')) {
+            if (Str::contains($email, '<')) {
                 preg_match('/^(.*) \<(.*)\>$/', $email, $matches);
                 $name = $matches[1];
                 $email = $matches[2];
@@ -113,7 +118,7 @@ class Email extends Mailable
 
             return [
                 'email' => $email,
-                'name' => $name
+                'name' => $name,
             ];
         })->all();
     }
@@ -123,7 +128,7 @@ class Email extends Mailable
         $data = $this->submission->toArray();
 
         return collect($config)->map(function ($value) use ($data) {
-            return Parse::template(Parse::env($value), $data);
+            return (string) Parse::template(Parse::env($value), $data);
         });
     }
 }

@@ -2,10 +2,9 @@
 
 namespace Statamic\Http\Resources\API;
 
-use Illuminate\Http\Resources\Json\Resource;
-use Statamic\Statamic;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class UserResource extends Resource
+class UserResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -15,12 +14,14 @@ class UserResource extends Resource
      */
     public function toArray($request)
     {
-        return [
-            'id' => $this->resource->id(),
-            'email' => $this->resource->email(),
-            'name' => $this->resource->get('name'),
-            'is_super' => $this->resource->isSuper(),
-            'api_url' => Statamic::apiRoute('users.show', $this->resource->id()),
-        ];
+        $fields = ['id', 'email', 'name', 'is_super', 'api_url'];
+
+        // If fields have been selected, we want to only allow a subset of the allowed fields defined above.
+        if ($selected = $this->resource->selectedQueryColumns()) {
+            $diff = array_intersect($selected, $fields);
+            $fields = empty($diff) ? $fields : $diff;
+        }
+
+        return $this->resource->toAugmentedCollection($fields);
     }
 }

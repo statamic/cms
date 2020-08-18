@@ -2,23 +2,24 @@
 
 namespace Statamic\Auth;
 
-use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;
 use Statamic\Support\Arr;
-use Statamic\Tags\Tags;
 use Statamic\Tags\Concerns;
+use Statamic\Tags\Tags;
 
 class UserTags extends Tags
 {
-    use Concerns\RendersForms;
+    use Concerns\GetsFormSession,
+        Concerns\GetsRedirects,
+        Concerns\RendersForms;
 
     protected static $handle = 'user';
 
     /**
-     * Dynamically fetch a user's data by variable_name
+     * Dynamically fetch a user's data by variable_name.
      *
      * Maps to {{ user:variable_name }}
      *
@@ -36,7 +37,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Fetch a user
+     * Fetch a user.
      *
      * Maps to {{ user }}
      *
@@ -47,15 +48,22 @@ class UserTags extends Tags
         $user = null;
 
         // Get a user by ID, if the `id` parameter was used.
-        if ($id = $this->get('id')) {
+        if ($id = $this->params->get('id')) {
             if (! $user = User::find($id)) {
                 return $this->parseNoResults();
             }
         }
 
         // Get a user by email, if the `email` parameter was used.
-        if ($email = $this->get('email')) {
-            if (! $user = User::whereEmail($email)) {
+        if ($email = $this->params->get('email')) {
+            if (! $user = User::findByEmail($email)) {
+                return $this->parseNoResults();
+            }
+        }
+
+        // Get a user by field, if the `field` parameter was used.
+        if ($field = $this->params->get('field')) {
+            if (! $user = User::query()->where($field, $this->params->get('value'))->first()) {
                 return $this->parseNoResults();
             }
         }
@@ -89,13 +97,23 @@ class UserTags extends Tags
      */
     public function loginForm()
     {
-        $data = $this->setSessionData([]);
+        $data = $this->getFormSession();
 
-        $html = $this->formOpen(route('statamic.login'));
+        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
+
+        $html = $this->formOpen(route('statamic.login'), 'POST', $knownParams);
+
+        $params = [];
 
         if ($redirect = $this->getRedirectUrl()) {
-            $html .= '<input type="hidden" name="referer" value="'.$redirect.'" />';
+            $params['redirect'] = $this->parseRedirect($redirect);
         }
+
+        if ($errorRedirect = $this->getErrorRedirectUrl()) {
+            $params['error_redirect'] = $this->parseRedirect($errorRedirect);
+        }
+
+        $html .= $this->formMetaFields($params);
 
         $html .= $this->parse($data);
 
@@ -105,7 +123,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Output a registration form
+     * Output a registration form.
      *
      * Maps to {{ user:register_form }}
      *
@@ -113,15 +131,25 @@ class UserTags extends Tags
      */
     public function registerForm()
     {
-        $data = $this->setSessionData([]);
+        $data = $this->getFormSession('user.register');
 
         $data['fields'] = $this->getRegistrationFields();
 
-        $html = $this->formOpen(route('statamic.register'));
+        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect'];
+
+        $html = $this->formOpen(route('statamic.register'), 'POST', $knownParams);
+
+        $params = [];
 
         if ($redirect = $this->getRedirectUrl()) {
-            $html .= '<input type="hidden" name="referer" value="'.$redirect.'" />';
+            $params['redirect'] = $this->parseRedirect($redirect);
         }
+
+        if ($errorRedirect = $this->getErrorRedirectUrl()) {
+            $params['error_redirect'] = $this->parseRedirect($errorRedirect);
+        }
+
+        $html .= $this->formMetaFields($params);
 
         $html .= $this->parse($data);
 
@@ -131,7 +159,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Alias of {{ user:register_form }}
+     * Alias of {{ user:register_form }}.
      *
      * @return string
      */
@@ -141,7 +169,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Outputs a logout URL
+     * Outputs a logout URL.
      *
      * Maps to {{ user:logout_url }}
      *
@@ -151,7 +179,7 @@ class UserTags extends Tags
     {
         $queryParams = [];
 
-        if ($redirect = $this->get('redirect')) {
+        if ($redirect = $this->params->get('redirect')) {
             $queryParams['redirect'] = $redirect;
         }
 
@@ -159,7 +187,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Logs a user out and performs a redirect
+     * Logs a user out and performs a redirect.
      *
      * Maps to {{ user:logout }}
      */
@@ -167,11 +195,11 @@ class UserTags extends Tags
     {
         auth()->logout();
 
-        abort(redirect($this->get('redirect', '/'), $this->get('response', 302)));
+        abort(redirect($this->params->get('redirect', '/'), $this->params->get('response', 302)));
     }
 
     /**
-     * Output a forgot password form
+     * Output a forgot password form.
      *
      * Maps to {{ user:forgot_password_form }}
      *
@@ -191,13 +219,15 @@ class UserTags extends Tags
             $data['errors'] = session('errors')->all();
         }
 
-        $html = $this->formOpen(route('statamic.password.email'));
+        $knownParams = ['redirect', 'allow_request_redirect', 'reset_url'];
+
+        $html = $this->formOpen(route('statamic.password.email'), 'POST', $knownParams);
 
         if ($redirect = $this->getRedirectUrl()) {
             $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
         }
 
-        if ($reset_url = $this->get('reset_url')) {
+        if ($reset_url = $this->params->get('reset_url')) {
             $html .= '<input type="hidden" name="reset_url" value="'.$reset_url.'" />';
         }
 
@@ -209,7 +239,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Output a reset password form
+     * Output a reset password form.
      *
      * Maps to {{ user:reset_password_form }}
      *
@@ -229,11 +259,13 @@ class UserTags extends Tags
             $data['errors'] = session('errors')->all();
         }
 
-        $html = $this->formOpen(route('statamic.password.reset.action'));
+        $knownParams = ['redirect'];
+
+        $html = $this->formOpen(route('statamic.password.reset.action'), 'POST', $knownParams);
 
         $html .= '<input type="hidden" name="token" value="'.request('token').'" />';
 
-        if ($redirect = $this->get('redirect')) {
+        if ($redirect = $this->params->get('redirect')) {
             $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
         }
 
@@ -245,7 +277,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Displays content if a user has permission
+     * Displays content if a user has permission.
      *
      * Maps to {{ user:can }}
      *
@@ -267,7 +299,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Displays content if a user doesn't have permission
+     * Displays content if a user doesn't have permission.
      *
      * Maps to {{ user:cant }}
      *
@@ -294,7 +326,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Displays content if a user is a role
+     * Displays content if a user is a role.
      *
      * Maps to {{ user:is }}
      *
@@ -316,7 +348,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Displays content if a user is not a role
+     * Displays content if a user is not a role.
      *
      * Maps to {{ user:isnt }}
      *
@@ -343,7 +375,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Displays content if a user is in a group
+     * Displays content if a user is in a group.
      *
      * Maps to {{ user:in }}
      *
@@ -365,7 +397,7 @@ class UserTags extends Tags
     }
 
     /**
-     * Displays content if a user isn't in a group
+     * Displays content if a user isn't in a group.
      *
      * Maps to {{ user:not_in }}
      *
@@ -397,43 +429,24 @@ class UserTags extends Tags
     public function eventUrl($url, $relative = false)
     {
         return URL::prependSiteUrl(
-            config('statamic.routes.action') . '/user/' . $url
+            config('statamic.routes.action').'/user/'.$url
         );
     }
 
     /**
-     * Get the redirect URL
+     * Get the redirect URL.
      *
      * @return string
      */
     protected function getRedirectUrl()
     {
-        $return = $this->get('redirect');
+        $return = $this->params->get('redirect');
 
-        if ($this->getBool('allow_request_redirect')) {
+        if ($this->params->bool('allow_request_redirect', false)) {
             $return = request()->input('redirect', $return);
         }
 
         return $return;
-    }
-
-    /**
-     * Set session data.
-     *
-     * @param array $data
-     * @return array
-     */
-    protected function setSessionData($data)
-    {
-        if ($errors = session('errors')) {
-            $data['errors'] = $errors->all();
-        }
-
-        if ($success = session('success')) {
-            $data['success'] = $success;
-        }
-
-        return $data;
     }
 
     /**
@@ -456,7 +469,7 @@ class UserTags extends Tags
      */
     protected function getRequiredRegistrationFields()
     {
-        $blueprintFields = Blueprint::find('user')->fields()->all()
+        $blueprintFields = User::blueprint()->fields()->all()
             ->keyBy->handle()
             ->filter(function ($field, $handle) {
                 return in_array($handle, ['email', 'password']);
@@ -480,7 +493,7 @@ class UserTags extends Tags
             ]))
             ->merge($blueprintFields)
             ->map(function ($field) {
-                return $this->getRenderableField($field);
+                return $this->getRenderableField($field, 'user.register');
             })
             ->values()
             ->all();
@@ -493,34 +506,14 @@ class UserTags extends Tags
      */
     protected function getAdditionalRegistrationFields()
     {
-        return Blueprint::find('user')->fields()->all()
+        return User::blueprint()->fields()->all()
             ->reject(function ($field) {
                 return in_array($field->handle(), ['email', 'password', 'password_confirmation', 'roles', 'groups']);
             })
             ->map(function ($field) {
-                return $this->getRenderableField($field);
+                return $this->getRenderableField($field, 'user.register');
             })
             ->values()
             ->all();
-    }
-
-    /**
-     * Get field with extra data for rendering.
-     *
-     * @param \Statamic\Fields\Field $field
-     * @return array
-     */
-    protected function getRenderableField($field)
-    {
-        $errors = session('errors') ? session('errors')->all() : [];
-
-        $data = array_merge($field->toArray(), [
-            'error' => $errors[$field->handle()] ?? null,
-            'old' => old($field->handle()),
-        ]);
-
-        $data['field'] = view($field->fieldtype()->view(), $data);
-
-        return $data;
     }
 }

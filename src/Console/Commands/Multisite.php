@@ -2,17 +2,17 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Facades\File;
-use Statamic\Facades\Site;
-use Statamic\Facades\YAML;
-use Statamic\Facades\Stache;
 use Illuminate\Console\Command;
-use Statamic\Facades\GlobalSet;
-use Statamic\Facades\Structure;
-use Statamic\Facades\Collection;
-use Statamic\Console\RunsInPlease;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Console\EnhancesCommands;
+use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Collection;
+use Statamic\Facades\File;
+use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Nav;
+use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
+use Statamic\Facades\YAML;
 use Symfony\Component\VarExporter\VarExporter;
 
 class Multisite extends Command
@@ -37,6 +37,7 @@ class Multisite extends Command
 
         if (! $confirmed) {
             $this->crossLine('Change the site handle in <comment>config/statamic/sites.php</comment> then try this command again.');
+
             return;
         }
 
@@ -46,7 +47,7 @@ class Multisite extends Command
 
         Collection::all()->each(function ($collection) {
             $this->moveCollectionContent($collection);
-            $this->addSitesToCollection($collection);
+            $this->updateCollection($collection);
             $this->checkLine("Collection [<comment>{$collection->handle()}</comment>] updated.");
         });
 
@@ -55,9 +56,9 @@ class Multisite extends Command
             $this->checkLine("Global [<comment>{$set->handle()}</comment>] updated.");
         });
 
-        Structure::all()->each(function ($structure) {
-            $this->moveStructure($structure);
-            $this->checkLine("Structure [<comment>{$structure->handle()}</comment>] updated.");
+        Nav::all()->each(function ($nav) {
+            $this->moveNav($nav);
+            $this->checkLine("Nav [<comment>{$nav->handle()}</comment>] updated.");
         });
 
         Cache::clear();
@@ -98,9 +99,17 @@ class Multisite extends Command
         });
     }
 
-    protected function addSitesToCollection($collection)
+    protected function updateCollection($collection)
     {
-        $collection->sites([$this->siteOne, $this->siteTwo])->save();
+        $collection->sites([$this->siteOne, $this->siteTwo]);
+
+        if ($structure = $collection->structureContents()) {
+            $tree = $structure['tree'];
+            $structure['tree'] = [$this->siteOne => $tree];
+            $collection->structureContents($structure);
+        }
+
+        $collection->save();
     }
 
     protected function moveGlobalSet($set)
@@ -109,22 +118,19 @@ class Multisite extends Command
         $data = $yaml['data'] ?? [];
 
         $set
-            ->sites([$this->siteOne, $this->siteTwo])
             ->addLocalization($origin = $set->makeLocalization($this->siteOne)->data($data))
             ->addLocalization($set->makeLocalization($this->siteTwo)->origin($origin))
             ->save();
     }
 
-    protected function moveStructure($structure)
+    protected function moveNav($nav)
     {
-        $yaml = YAML::file($structure->path())->parse();
+        $yaml = YAML::file($nav->path())->parse();
         $tree = $yaml['tree'] ?? [];
-        $root = $yaml['root'] ?? null;
 
-        $structure
-            ->sites([$this->siteOne, $this->siteTwo])
-            ->addTree($structure->makeTree($this->siteOne)->tree($tree)->root($root))
-            ->addTree($structure->makeTree($this->siteTwo)->tree($tree)->root($root))
+        $nav
+            ->addTree($nav->makeTree($this->siteOne)->tree($tree))
+            ->addTree($nav->makeTree($this->siteTwo)->tree($tree))
             ->save();
     }
 
@@ -143,7 +149,7 @@ class Multisite extends Command
     {
         return $this->collectionsHaveBeenMoved()
             || $this->globalsHaveBeenMoved()
-            || $this->structuresHaveBeenMoved();
+            || $this->navsHaveBeenMoved();
     }
 
     protected function collectionsHaveBeenMoved()
@@ -160,8 +166,8 @@ class Multisite extends Command
         return File::isDirectory("content/globals/{$this->siteOne}");
     }
 
-    protected function structuresHaveBeenMoved()
+    protected function navsHaveBeenMoved()
     {
-        return File::isDirectory("content/structures/{$this->siteOne}");
+        return File::isDirectory("content/navigation/{$this->siteOne}");
     }
 }

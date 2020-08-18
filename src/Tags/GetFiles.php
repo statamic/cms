@@ -2,10 +2,8 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Arr;
-use Statamic\Tags\Tags;
 use Statamic\Facades\Folder;
-use Statamic\Facades\Helper;
+use Statamic\Support\Arr;
 use Statamic\Support\FileCollection;
 
 class GetFiles extends Tags
@@ -16,7 +14,7 @@ class GetFiles extends Tags
     private $files;
 
     /**
-     * The {{ get_files }} tag
+     * The {{ get_files }} tag.
      *
      * @return string
      */
@@ -34,14 +32,14 @@ class GetFiles extends Tags
     }
 
     /**
-     * Get all the files from the selected folders at the appropriate depth
+     * Get all the files from the selected folders at the appropriate depth.
      *
      * @return \Illuminate\Support\Collection
      */
     private function getFiles()
     {
-        $folders = $this->get(['in', 'from']);
-        $depth = $this->getInt('depth', 1);
+        $folders = $this->params->get(['in', 'from']);
+        $depth = $this->params->int('depth', 1);
 
         $this->files = new FileCollection;
 
@@ -71,7 +69,7 @@ class GetFiles extends Tags
     }
 
     /**
-     * Filter the files
+     * Filter the files.
      */
     private function filter()
     {
@@ -86,35 +84,35 @@ class GetFiles extends Tags
     }
 
     /**
-     * Filter out files from a requested folder
+     * Filter out files from a requested folder.
      */
     private function filterNotIn()
     {
-        if ($not_in = $this->get('not_in')) {
-            $regex = '#^(' . $not_in . ')#';
+        if ($not_in = $this->params->get('not_in')) {
+            $regex = '#^('.$not_in.')#';
 
-            $this->files = $this->files->reject(function($path) use ($regex) {
+            $this->files = $this->files->reject(function ($path) use ($regex) {
                 return preg_match($regex, $path);
             });
         }
     }
 
     /**
-     * Filter files by file size
+     * Filter files by file size.
      */
     private function filterSize()
     {
-        if ($size = $this->get('file_size')) {
+        if ($size = $this->params->get('file_size')) {
             $this->files = $this->files->filterBySize($size);
         }
     }
 
     /**
-     * Filter files by extension(s)
+     * Filter files by extension(s).
      */
     private function filterExtension()
     {
-        if ($extensions = $this->get(['extension', 'ext'])) {
+        if ($extensions = $this->params->get(['extension', 'ext'])) {
             $extensions = Arr::explodeOptions($extensions);
 
             $this->files = $this->files->filterByExtension($extensions);
@@ -123,34 +121,34 @@ class GetFiles extends Tags
 
     private function filterRegex()
     {
-        if ($include = $this->get(['include', 'match'])) {
+        if ($include = $this->params->get(['include', 'match'])) {
             $this->files = $this->files->filterByRegex($include);
         }
 
-        if ($exclude = $this->get('exclude')) {
+        if ($exclude = $this->params->get('exclude')) {
             $this->files = $this->files->rejectByRegex($exclude);
         }
     }
 
     private function filterDate()
     {
-        if ($date = $this->get('file_date')) {
+        if ($date = $this->params->get('file_date')) {
             $this->files = $this->files->filterByDate($date);
         }
     }
 
     private function limit()
     {
-        $limit = $this->getInt('limit');
+        $limit = $this->params->int('limit');
         $limit = ($limit == 0) ? $this->files->count() : $limit;
-        $offset = $this->getInt('offset');
+        $offset = $this->params->int('offset');
 
         $this->files = $this->files->splice($offset, $limit);
     }
 
     private function sort()
     {
-        if ($sort = $this->get('sort')) {
+        if ($sort = $this->params->get('sort')) {
             $this->files = $this->files->multisort($sort);
         }
     }

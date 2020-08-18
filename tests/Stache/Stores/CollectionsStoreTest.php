@@ -14,7 +14,7 @@ use Tests\TestCase;
 
 class CollectionsStoreTest extends TestCase
 {
-    function setUp(): void
+    public function setUp(): void
     {
         parent::setUp();
 
@@ -26,14 +26,14 @@ class CollectionsStoreTest extends TestCase
         $stache->registerStore($this->store = (new CollectionsStore($stache, app('files')))->directory($this->tempDir));
     }
 
-    function tearDown(): void
+    public function tearDown(): void
     {
         parent::tearDown();
         (new Filesystem)->deleteDirectory($this->tempDir);
     }
 
     /** @test */
-    function it_only_gets_top_level_yaml_files()
+    public function it_only_gets_top_level_yaml_files()
     {
         touch($this->tempDir.'/one.yaml', 1234567890);
         touch($this->tempDir.'/two.yaml', 1234567890);
@@ -56,9 +56,9 @@ class CollectionsStoreTest extends TestCase
     }
 
     /** @test */
-    function it_makes_collection_instances_from_files()
+    public function it_makes_collection_instances_from_files()
     {
-        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', "title: Example");
+        $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', 'title: Example');
 
         $this->assertInstanceOf(Collection::class, $item);
         $this->assertEquals('example', $item->handle());
@@ -66,7 +66,7 @@ class CollectionsStoreTest extends TestCase
     }
 
     /** @test */
-    function it_uses_the_filename_as_the_item_key()
+    public function it_uses_the_filename_as_the_item_key()
     {
         $this->assertEquals(
             'test',
@@ -75,7 +75,7 @@ class CollectionsStoreTest extends TestCase
     }
 
     /** @test */
-    function it_saves_to_disk()
+    public function it_saves_to_disk()
     {
         $collection = CollectionAPI::make('new');
 

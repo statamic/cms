@@ -10,7 +10,7 @@ use Tests\TestCase;
 class SelectTest extends TestCase
 {
     /** @test */
-    function it_augments_to_a_LabeledValue_object_with_options_with_keys()
+    public function it_augments_to_a_LabeledValue_object_with_options_with_keys()
     {
         $field = (new Select)->setField(new Field('test', [
             'type' => 'select',
@@ -18,7 +18,7 @@ class SelectTest extends TestCase
                 'au' => 'Australia',
                 'ca' => 'Canada',
                 'us' => 'USA',
-            ]
+            ],
         ]));
 
         $augmented = $field->augment('au');
@@ -28,7 +28,7 @@ class SelectTest extends TestCase
     }
 
     /** @test */
-    function it_augments_to_a_LabeledValue_object_with_options_without_keys()
+    public function it_augments_to_a_LabeledValue_object_with_options_without_keys()
     {
         $field = (new Select)->setField(new Field('test', [
             'type' => 'select',
@@ -36,7 +36,7 @@ class SelectTest extends TestCase
                 'Australia',
                 'Canada',
                 'USA',
-            ]
+            ],
         ]));
 
         $augmented = $field->augment('Australia');
@@ -46,7 +46,7 @@ class SelectTest extends TestCase
     }
 
     /** @test */
-    function it_augments_to_a_LabeledValue_object_with_a_null_value()
+    public function it_augments_to_a_LabeledValue_object_with_a_null_value()
     {
         $field = (new Select)->setField(new Field('test', [
             'type' => 'select',
@@ -54,12 +54,31 @@ class SelectTest extends TestCase
                 'au' => 'Australia',
                 'ca' => 'Canada',
                 'us' => 'USA',
-            ]
+            ],
         ]));
 
         $augmented = $field->augment(null);
         $this->assertInstanceOf(LabeledValue::class, $augmented);
         $this->assertNull($augmented->value());
         $this->assertNull($augmented->label());
+    }
+
+    /** @test */
+    public function it_augments_multiple_enabled_to_an_array_of_LabeledValue_equivalents()
+    {
+        $field = (new Select)->setField(new Field('test', [
+            'type' => 'select',
+            'multiple' => true,
+            'options' => [
+                'au' => 'Australia',
+                'ca' => 'Canada',
+                'us' => 'USA',
+            ],
+        ]));
+
+        $this->assertEquals([
+            ['key' => 'au', 'value' => 'au', 'label' => 'Australia'],
+            ['key' => 'us', 'value' => 'us', 'label' => 'USA'],
+        ], $field->augment(['au', 'us']));
     }
 }

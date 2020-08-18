@@ -1,6 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Utility;
+use Statamic\Statamic;
 
 Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
     Route::get('login', 'LoginController@showLoginForm')->name('login');
@@ -16,9 +18,7 @@ Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
     Route::get('unauthorized', 'UnauthorizedController')->name('unauthorized');
 });
 
-Route::group([
-    'middleware' => Statamic::cpMiddleware()
-], function () {
+Route::middleware('statamic.cp.authenticated')->group(function () {
     Statamic::additionalCpRoutes();
 
     Route::get('/', 'StartPageController')->name('index');
@@ -27,20 +27,22 @@ Route::group([
     Route::get('select-site/{handle}', 'SelectSiteController@select');
 
     Route::group(['namespace' => 'Structures'], function () {
-        Route::resource('structures', 'StructuresController');
+        Route::resource('navigation', 'NavigationController');
         Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
     });
 
-    Route::get('structures/{collection}/entries/{entry}/{slug}', 'Collections\EntriesController@edit')->name('structures.entries.edit');
-
     Route::group(['namespace' => 'Collections'], function () {
         Route::resource('collections', 'CollectionsController');
+        Route::post('collections/{collection}/structure', 'CollectionStructureController@update')->name('collections.structure.update');
         Route::get('collections/{collection}/scaffold', 'ScaffoldCollectionController@index')->name('collections.scaffold');
         Route::post('collections/{collection}/scaffold', 'ScaffoldCollectionController@create')->name('collections.scaffold.create');
+        Route::resource('collections.blueprints', 'CollectionBlueprintsController');
+        Route::post('collections/{collection}/blueprints/reorder', 'ReorderCollectionBlueprintsController')->name('collections.blueprints.reorder');
 
         Route::group(['prefix' => 'collections/{collection}/entries'], function () {
             Route::get('/', 'EntriesController@index')->name('collections.entries.index');
-            Route::post('actions', 'EntryActionController')->name('collections.entries.actions');
+            Route::post('actions', 'EntryActionController@run')->name('collections.entries.actions.run');
+            Route::get('actions', 'EntryActionController@bulkActions')->name('collections.entries.actions.bulk');
             Route::get('create/{site}', 'EntriesController@create')->name('collections.entries.create');
             Route::post('create/{site}/preview', 'EntryPreviewController@create')->name('collections.entries.preview.create');
             Route::post('reorder', 'ReorderEntriesController')->name('collections.entries.reorder');
@@ -67,10 +69,13 @@ Route::group([
 
     Route::group(['namespace' => 'Taxonomies'], function () {
         Route::resource('taxonomies', 'TaxonomiesController');
+        Route::resource('taxonomies.blueprints', 'TaxonomyBlueprintsController');
+        Route::post('taxonomies/{taxonomy}/blueprints/reorder', 'ReorderTaxonomyBlueprintsController')->name('taxonomies.blueprints.reorder');
 
         Route::group(['prefix' => 'taxonomies/{taxonomy}/terms'], function () {
             Route::get('/', 'TermsController@index')->name('taxonomies.terms.index');
-            Route::post('actions', 'TermActionController')->name('taxonomies.terms.actions');
+            Route::post('actions', 'TermActionController@run')->name('taxonomies.terms.actions.run');
+            Route::get('actions', 'TermActionController@bulkActions')->name('taxonomies.terms.actions.bulk');
             Route::get('create/{site}', 'TermsController@create')->name('taxonomies.terms.create');
             Route::post('create/{site}/preview', 'TermPreviewController@create')->name('taxonomies.terms.preview.create');
             Route::post('{site}', 'TermsController@store')->name('taxonomies.terms.store');
@@ -93,23 +98,32 @@ Route::group([
         });
     });
 
-    Route::get('globals', 'GlobalsController@index')->name('globals.index');
-    Route::get('globals/create', 'GlobalsController@create')->name('globals.create');
-    Route::post('globals', 'GlobalsController@store')->name('globals.store');
-    Route::patch('globals/{global}/meta', 'GlobalsController@updateMeta')->name('globals.update-meta');
-    Route::delete('globals/{id}', 'GlobalsController@destroy')->name('globals.destroy');
-    Route::get('globals/{id}/{handle}', 'GlobalsController@edit')->name('globals.edit');
-    Route::patch('globals/{id}/{handle}', 'GlobalsController@update')->name('globals.update');
-    Route::post('globals/{id}/{handle}/localize', 'Globals\LocalizeGlobalsController')->name('globals.localize');
+    Route::group(['namespace' => 'Globals'], function () {
+        Route::get('globals', 'GlobalsController@index')->name('globals.index');
+        Route::get('globals/create', 'GlobalsController@create')->name('globals.create');
+        Route::post('globals', 'GlobalsController@store')->name('globals.store');
+        Route::get('globals/{global_set}/edit', 'GlobalsController@edit')->name('globals.edit');
+        Route::patch('globals/{global_set}', 'GlobalsController@update')->name('globals.update');
+        Route::delete('globals/{global_set}', 'GlobalsController@destroy')->name('globals.destroy');
+
+        Route::get('globals/{global_set}', 'GlobalVariablesController@edit')->name('globals.variables.edit');
+        Route::patch('globals/{global_set}/variables', 'GlobalVariablesController@update')->name('globals.variables.update');
+
+        Route::get('globals/{global_set}/blueprint', 'GlobalsBlueprintController@edit')->name('globals.blueprint.edit');
+        Route::patch('globals/{global_set}/blueprint', 'GlobalsBlueprintController@update')->name('globals.blueprint.update');
+    });
 
     Route::group(['namespace' => 'Assets'], function () {
         Route::resource('asset-containers', 'AssetContainersController');
         Route::post('asset-containers/{asset_container}/folders', 'FoldersController@store');
         Route::patch('asset-containers/{asset_container}/folders/{path}', 'FoldersController@update')->where('path', '.*');
-        Route::post('assets/actions', 'ActionController')->name('assets.actions');
+        Route::get('asset-containers/{asset_container}/blueprint', 'AssetContainerBlueprintController@edit')->name('asset-containers.blueprint.edit');
+        Route::patch('asset-containers/{asset_container}/blueprint', 'AssetContainerBlueprintController@update')->name('asset-containers.blueprint.update');
+        Route::post('assets/actions', 'ActionController@run')->name('assets.actions.run');
+        Route::get('assets/actions', 'ActionController@bulkActions')->name('assets.actions.bulk');
         Route::get('assets/browse', 'BrowserController@index')->name('assets.browse.index');
         Route::get('assets/browse/search/{asset_container}', 'BrowserController@search');
-        Route::post('assets/browse/folders/{asset_container}/actions', 'FolderActionController')->name('assets.folders.actions');
+        Route::post('assets/browse/folders/{asset_container}/actions', 'FolderActionController@run')->name('assets.folders.actions.run');
         Route::get('assets/browse/folders/{asset_container}/{path?}', 'BrowserController@folder')->where('path', '.*');
         Route::get('assets/browse/{asset_container}/{path?}/edit', 'BrowserController@edit')->where('path', '.*')->name('assets.browse.edit');
         Route::get('assets/browse/{asset_container}/{path?}', 'BrowserController@show')->where('path', '.*')->name('assets.browse.show');
@@ -127,9 +141,8 @@ Route::group([
         Route::resource('fieldsets', 'FieldsetController');
         Route::post('fieldsets/quick', 'FieldsetController@quickStore');
         Route::post('fieldsets/{fieldset}/fields', 'FieldsetFieldController@store');
-        Route::resource('blueprints', 'BlueprintController');
+        Route::get('blueprints', 'BlueprintController@index')->name('blueprints.index');
         Route::get('fieldtypes', 'FieldtypesController@index');
-        Route::get('publish-blueprints/{blueprint}', 'PublishBlueprintController@show');
     });
 
     Route::get('composer/check', 'ComposerOutputController@check');
@@ -139,23 +152,29 @@ Route::group([
         Route::get('updater/count', 'UpdaterController@count');
         Route::get('updater/{product}', 'UpdateProductController@show')->name('updater.product');
         Route::get('updater/{product}/changelog', 'UpdateProductController@changelog');
-        Route::post('updater/{product}/update', 'UpdateProductController@update');
-        Route::post('updater/{product}/update-to-latest', 'UpdateProductController@updateToLatest');
-        Route::post('updater/{product}/install-explicit-version', 'UpdateProductController@installExplicitVersion');
+        Route::post('updater/{product}/install', 'UpdateProductController@install');
     });
 
     Route::get('addons', 'AddonsController@index')->name('addons.index');
     Route::post('addons/install', 'AddonsController@install');
     Route::post('addons/uninstall', 'AddonsController@uninstall');
+    Route::post('addons/editions', 'AddonEditionsController');
 
     Route::group(['namespace' => 'Forms'], function () {
+        Route::post('forms/{form}/submissions/actions', 'SubmissionActionController@run')->name('forms.submissions.actions.run');
+        Route::get('forms/{form}/submissions/actions', 'SubmissionActionController@bulkActions')->name('forms.submissions.actions.bulk');
         Route::resource('forms', 'FormsController');
         Route::resource('forms.submissions', 'FormSubmissionsController');
         Route::get('forms/{form}/export/{type}', 'FormExportController@export')->name('forms.export');
+        Route::get('forms/{form}/blueprint', 'FormBlueprintController@edit')->name('forms.blueprint.edit');
+        Route::patch('forms/{form}/blueprint', 'FormBlueprintController@update')->name('forms.blueprint.update');
     });
 
     Route::group(['namespace' => 'Users'], function () {
-        Route::post('users/actions', 'UserActionController')->name('users.actions');
+        Route::post('users/actions', 'UserActionController@run')->name('users.actions.run');
+        Route::get('users/actions', 'UserActionController@bulkActions')->name('users.actions.bulk');
+        Route::get('users/blueprint', 'UserBlueprintController@edit')->name('users.blueprint.edit');
+        Route::patch('users/blueprint', 'UserBlueprintController@update')->name('users.blueprint.update');
         Route::resource('users', 'UsersController');
         Route::patch('users/{user}/password', 'PasswordController@update')->name('users.password.update');
         Route::get('account', 'AccountController')->name('account');
@@ -175,6 +194,7 @@ Route::group([
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
         Route::get('relationship', 'RelationshipFieldtypeController@index')->name('relationship.index');
         Route::get('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
+        Route::get('relationship/filters', 'RelationshipFieldtypeController@filters')->name('relationship.filters');
     });
 
     Route::group(['prefix' => 'api', 'as' => 'api.', 'namespace' => 'API'], function () {

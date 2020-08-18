@@ -4,7 +4,6 @@ namespace Statamic\Tags;
 
 use Illuminate\Support\Facades\Cache as LaraCache;
 use Statamic\Facades\URL;
-use Statamic\Tags\Tags;
 
 class Cache extends Tags
 {
@@ -18,7 +17,7 @@ class Cache extends Tags
             return $cached;
         }
 
-        LaraCache::put($key, $html = $this->parse([]), $this->getCacheLength());
+        LaraCache::put($key, $html = (string) $this->parse([]), $this->getCacheLength());
 
         return $html;
     }
@@ -38,19 +37,19 @@ class Cache extends Tags
             'params' => $this->params->all(),
         ];
 
-        if ($this->get('scope', 'site') === 'page') {
+        if ($this->params->get('scope', 'site') === 'page') {
             $hash['url'] = URL::makeAbsolute(URL::getCurrent());
         }
 
-        return 'statamic.cache-tag.' . md5(json_encode($hash));
+        return 'statamic.cache-tag.'.md5(json_encode($hash));
     }
 
     private function getCacheLength()
     {
-        if (! $length = $this->get('for')) {
+        if (! $length = $this->params->get('for')) {
             return null;
         }
 
-        return now()->add('+' . $length);
+        return now()->add('+'.$length);
     }
 }

@@ -2,18 +2,16 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Arr;
-
 class Partial extends Tags
 {
     public function wildcard($tag)
     {
         // We pass the original non-studly case value in as
         // an argument, but fall back to the studly version just in case.
-        $partial = $this->get('src', $tag);
+        $partial = $this->params->get('src', $tag);
 
-        $variables = array_merge($this->context->all(), $this->parameters->all(), [
-            '__frontmatter' => $this->parameters->all()
+        $variables = array_merge($this->context->all(), $this->params->all(), [
+            '__frontmatter' => $this->params->all(),
         ]);
 
         return view($this->viewName($partial), $variables)
@@ -40,8 +38,8 @@ class Partial extends Tags
     {
         $bits = collect(explode('.', $partial));
 
-        $last = $bits->pull($bits->count()-1);
+        $last = $bits->pull($bits->count() - 1);
 
-        return $bits->implode('.') . '._' . $last;
+        return $bits->implode('.').'._'.$last;
     }
 }

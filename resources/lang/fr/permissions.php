@@ -3,13 +3,13 @@
 return [
     'super' => 'Super utilisateur',
     'super_desc' => 'Cela accorde à l’utilisateur un accès illimité à tout. Faites attention.',
-    
     'group_cp' => 'Panneau de contrôle',
     'access_cp' => 'Accéder au panneau de contrôle',
     'access_cp_desc' => 'Permet l’accès au panneau de contrôle, mais ne garantit pas que vous puissiez y faire quoi que ce soit une fois à l’intérieur !',
     'configure_fields' => 'Configurer les champs',
     'configure_fields_desc' => 'Capacité à modifier les Blueprints, les jeux de champs et leurs champs.',
-    
+    'configure_addons' => 'Configurer les modules complémentaires',
+    'configure_addons_desc' => 'Possibilité d\'accéder à la zone des modules complémentaires pour installer et désinstaller des modules complémentaires.',
     'group_collections' => 'Collections',
     'configure_collections' => 'Configurer les collections',
     'configure_collections_desc' => 'Permet d’accéder à toutes les autorisations liées à la collection.',
@@ -21,7 +21,6 @@ return [
     'publish_{collection}_entries_desc' => 'Possibilité de passer du brouillon au publié et vice versa',
     'reorder_{collection}_entries' => 'Réorganiser les entrées',
     'reorder_{collection}_entries_desc' => 'Active la réorganisation par glisser-déposer',
-    
     'group_taxonomies' => 'Taxonomies',
     'configure_taxonomies' => 'Configurer les taxonomies',
     'configure_taxonomies_desc' => 'Permet d’accéder à toutes les autorisations liées à la taxonomie',
@@ -31,18 +30,15 @@ return [
     'delete_{taxonomy}_terms' => 'Supprimer les termes',
     'publish_{taxonomy}_terms' => 'Gérer l’état de publication',
     'reorder_{taxonomy}_terms' => 'Réorganiser les termes',
-    
-    'group_structures' => 'Structures',
-    'configure_structures' => 'Configurer les structures',
-    'configure_structures_desc' => 'Permet d’accéder à toutes les autorisations liées à la structure',
-    'view_{structure}_structure' => 'Voir la structure :structure',
-    'edit_{structure}_structure' => 'Modifier la structure',
-    
+    'group_navigation' => 'Navigation',
+    'configure_navs' => 'Configurer la navigation',
+    'configure_navs_desc' => 'Permet d’accéder à toutes les autorisations liées à la navigation',
+    'view_{nav}_nav' => 'Voir la navigation :nav',
+    'edit_{nav}_nav' => 'Modifier la navigation',
     'group_globals' => 'Globales',
     'configure_globals' => 'Configurer les globales',
     'configure_globals_desc' => 'Permet d’accéder à toutes les autorisations liées aux globales.',
     'edit_{global}_globals' => 'Modifier les globales :global',
-    
     'group_assets' => 'Ressources',
     'configure_asset_containers' => 'Configurer les conteneurs de ressources',
     'configure_asset_containers_desc' => 'Permet d’accéder à toutes les autorisations liées aux ressources.',
@@ -52,13 +48,11 @@ return [
     'move_{container}_assets' => 'Déplacer des ressources',
     'rename_{container}_assets' => 'Renommer des ressources',
     'delete_{container}_assets' => 'Supprimer des ressources',
-    
     'group_forms' => 'Formulaires',
     'configure_forms' => 'Configurer les formulaires',
     'configure_forms_desc' => 'Permet d’accéder à toutes les autorisations liées aux formulaires.',
     'view_{form}_form_submissions' => 'Voir les soumissions de :form',
     'delete_{form}_form_submissions' => 'Supprimer les soumissions de :form',
-    
     'group_users' => 'Utilisateurs',
     'view_users' => 'Voir les utilisateurs',
     'edit_users' => 'Modifier les utilisateurs',
@@ -67,14 +61,11 @@ return [
     'change_passwords' => 'Changer les mots de passe',
     'edit_user_groups' => 'Modifier les groupes',
     'edit_roles' => 'Modifier les rôles',
-    
     'group_updates' => 'Mises à jour',
     'view_updates' => 'Voir les mises à jour',
     'perform_updates' => 'Effectuer des mises à jour',
-    
     'group_utilities' => 'Utilitaires',
     'access_utility' => ':title',
     'access_utility_desc' => 'Permet d’accéder à l’utilitaire :title',
-    
     'group_misc' => 'Divers',
 ];

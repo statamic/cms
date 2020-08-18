@@ -16,6 +16,9 @@
                 @can('edit', $taxonomy)
                     <dropdown-item :text="__('Edit Taxonomy')" redirect="{{ $taxonomy->editUrl() }}"></dropdown-item>
                 @endcan
+                @can('configure fields')
+                    <dropdown-item :text="__('Edit Blueprints')" redirect="{{ cp_route('taxonomies.blueprints.index', $taxonomy) }}"></dropdown-item>
+                @endcan
                 @can('delete', $taxonomy)
                     <dropdown-item :text="__('Delete Taxonomy')" class="warning" @click="$refs.deleter.confirm()">
                         <resource-deleter
@@ -30,7 +33,7 @@
 
             @can('create', ['Statamic\Contracts\Taxonomies\Term', $taxonomy])
                 <create-term-button
-                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]) }}"
+                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
                     :blueprints="{{ $blueprints->toJson() }}">
                 </create-term-button>
             @endcan
@@ -44,7 +47,8 @@
             initial-sort-column="{{ $taxonomy->sortField() }}"
             initial-sort-direction="{{ $taxonomy->sortDirection() }}"
             :filters="{{ $filters->toJson() }}"
-            action-url="{{ cp_route('taxonomies.terms.actions', $taxonomy->handle()) }}"
+            run-action-url="{{ cp_route('taxonomies.terms.actions.run', $taxonomy->handle()) }}"
+            bulk-actions-url="{{ cp_route('taxonomies.terms.actions.bulk', $taxonomy->handle()) }}"
         ></term-list>
 
     @else
@@ -56,7 +60,7 @@
         ])
             @slot('button')
                 {{-- <create-term-button
-                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site->handle()]) }}"
+                    url="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}"
                     :blueprints="{{ $blueprints->toJson() }}">
                 </create-term-button> --}}
             @endslot

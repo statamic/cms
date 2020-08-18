@@ -1,5 +1,5 @@
 <template>
-    <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode}">
+    <div class="markdown-fieldtype-wrapper" :class="{'markdown-fullscreen': fullScreenMode, 'markdown-dark-mode': darkMode }">
 
         <uploader
             ref="uploader"
@@ -22,6 +22,9 @@
                         <button @click="insertLink('')" v-tooltip="__('Insert Link')"><i class="fa fa-link"></i></button>
                         <button @click="addAsset" v-tooltip="__('Insert Asset')" v-if="assetsEnabled"><i class="fa fa-picture-o"></i></button>
                         <button @click="insertImage('')" v-tooltip="__('Insert Image')" v-else><i class="fa fa-picture-o"></i></button>
+                        <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" v-if="fullScreenMode">
+                            <svg-icon name="dark-mode" class="w-4 h-4" />
+                        </button>
                         <button @click="openFullScreen" v-tooltip="__('Fullscreen Mode')" v-if="! fullScreenMode">
                             <svg-icon name="expand" class="w-4 h-4" />
                         </button>
@@ -42,7 +45,7 @@
                     class="-mt-px"
                 />
 
-                <div :class="`mode-wrap mode-${mode}`">
+                <div :class="`mode-wrap mode-${mode}`" @click="focus">
                     <div class="markdown-writer"
                         ref="writer"
                         v-show="mode == 'write'"
@@ -95,7 +98,7 @@
 
         <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
             <div class="h-full overflow-auto p-3 bg-white relative">
-                <button class="btn-close absolute pin-t pin-r mt-2 mr-4" @click="showCheatsheet = false">&times;</button>
+                <button class="btn-close absolute top-0 right-0 mt-2 mr-4" @click="showCheatsheet = false">&times;</button>
                 <div class="max-w-md mx-auto my-4 clean-content">
                     <h2 v-text="__('Markdown Cheatsheet')"></h2>
                     <div v-html="__('markdown.cheatsheet')"></div>
@@ -157,6 +160,7 @@ export default {
             draggingFile: false,
             showCheatsheet: false,
             fullScreenMode: false,
+            darkMode: false,
             codemirror: null,       // The CodeMirror instance
             uploads: [],
             count: {},
@@ -195,6 +199,10 @@ export default {
             this.fullScreenMode = true;
             this.escBinding = this.$keys.bindGlobal('esc', this.closeFullScreen);
             this.trackHeightUpdates();
+        },
+
+        toggleDarkMode() {
+            this.darkMode = ! this.darkMode;
         },
 
         /**
@@ -268,7 +276,7 @@ export default {
             }
 
             if (! url) {
-                url = prompt('Enter URL', 'http://');
+                url = prompt(__('Enter URL'), 'http://');
                 if (! url) {
                     url = '';
                 }

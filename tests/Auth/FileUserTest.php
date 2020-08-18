@@ -17,24 +17,24 @@ class FileUserTest extends TestCase
 {
     use UserContractTests, PermissibleContractTests, PreventSavingStacheItemsToDisk;
 
-    function makeUser()
+    public function makeUser()
     {
         return new User;
     }
 
-    function createPermissible()
+    public function createPermissible()
     {
         return $this->makeUser();
     }
 
     /** @test */
-    function it_gets_path()
+    public function it_gets_path()
     {
-        $this->assertEquals($this->fakeStacheDirectory . '/users/john@example.com.yaml', $this->user()->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/users/john@example.com.yaml', $this->user()->path());
     }
 
     /** @test */
-    function hashed_password_gets_added_as_the_password()
+    public function hashed_password_gets_added_as_the_password()
     {
         $user = $this->user();
 
@@ -48,7 +48,7 @@ class FileUserTest extends TestCase
     }
 
     /** @test */
-    function it_gets_file_contents_for_saving()
+    public function it_gets_file_contents_for_saving()
     {
         Hash::shouldReceive('make')->with('secret')->andReturn('hashed-secret');
 
@@ -58,12 +58,12 @@ class FileUserTest extends TestCase
             'name' => 'John Smith',
             'foo' => 'bar',
             'roles' => [
-              'role_one',
-              'role_two',
+                'role_one',
+                'role_two',
             ],
             'groups' => [
-              'group_one',
-              'group_two',
+                'group_one',
+                'group_two',
             ],
             'id' => '123',
             'password_hash' => 'hashed-secret',
@@ -72,7 +72,7 @@ class FileUserTest extends TestCase
     }
 
     /** @test */
-    function it_gets_permissions_from_a_cache()
+    public function it_gets_permissions_from_a_cache()
     {
         $directRole = $this->mock(RoleContract::class);
         $userGroupRole = $this->mock(RoleContract::class);

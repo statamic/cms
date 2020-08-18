@@ -2,12 +2,10 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Str;
-use Statamic\Facades\Site;
-use Statamic\Facades\Entry;
-use Statamic\Tags\Tags;
-use Statamic\Facades\Config;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Entry;
+use Statamic\Facades\Site;
+use Statamic\Support\Str;
 
 class Locales extends Tags
 {
@@ -37,7 +35,9 @@ class Locales extends Tags
             throw new \Exception("Site [$key] does not exist.");
         }
 
-        $data = $this->getLocalizedData($key);
+        if (! $data = $this->getLocalizedData($key)) {
+            return '';
+        }
 
         $data['locale'] = $this->getLocale($site);
 
@@ -91,6 +91,7 @@ class Locales extends Tags
             $localized['locale'] = $locale;
             $localized['current'] = Site::current()->handle();
             $localized['is_current'] = $key === Site::current()->handle();
+
             return $localized;
         });
     }
@@ -103,11 +104,15 @@ class Locales extends Tags
      */
     private function getLocalizedData($locale)
     {
-        return $this->getData()->in($locale)->toAugmentedArray();
+        if (! $data = $this->getData()) {
+            return null;
+        }
+
+        return $data->in($locale)->toAugmentedArray();
     }
 
     /**
-     * Get the data / content object
+     * Get the data / content object.
      *
      * @return \Statamic\Contracts\Data\Content\Content
      */
@@ -117,7 +122,7 @@ class Locales extends Tags
             return $this->data;
         }
 
-        $id = $this->get('id', $this->context->get('id'));
+        $id = $this->params->get('id', $this->context->get('id'));
 
         return $this->data = Entry::find($id);
     }
@@ -130,12 +135,12 @@ class Locales extends Tags
      */
     private function sort($locales)
     {
-        if ($sort = $this->get('sort')) {
-            list($sort, $dir) = $this->getSort($sort);
+        if ($sort = $this->params->get('sort')) {
+            [$sort, $dir] = $this->getSort($sort);
             $locales = ($dir === 'asc') ? $locales->sortBy($sort) : $locales->sortByDesc($sort);
         }
 
-        if ($this->getBool('current_first', true)) {
+        if ($this->params->bool('current_first', true)) {
             $locales = $this->moveCurrentLocaleToFront($locales);
         }
 
@@ -153,7 +158,7 @@ class Locales extends Tags
         $dir = 'asc';
 
         if (Str::contains($sort, ':')) {
-            list($sort, $dir) = explode(':', $sort);
+            [$sort, $dir] = explode(':', $sort);
             $dir = ($dir === 'desc') ? 'desc' : 'asc';
         }
 
@@ -170,6 +175,7 @@ class Locales extends Tags
     {
         $key = Site::current()->handle();
         $current = $locales->pull($key);
+
         return collect([$key => $current])->merge($locales);
     }
 }

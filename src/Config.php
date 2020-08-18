@@ -2,16 +2,15 @@
 
 namespace Statamic;
 
-use Statamic\Support\Str;
 use Statamic\Facades\Site;
 
 /**
- * Interacting with the configuration
+ * Interacting with the configuration.
  */
 class Config
 {
     /**
-     * Get a config variable
+     * Get a config variable.
      *
      * @param string      $key      The name of the key
      * @param mixed|bool  $default  The fallback value
@@ -23,7 +22,7 @@ class Config
     }
 
     /**
-     * Set a config variable
+     * Set a config variable.
      *
      * @param string $key  The name of the key
      * @param mixed $value The value to set
@@ -34,7 +33,7 @@ class Config
     }
 
     /**
-     * Get all config values
+     * Get all config values.
      *
      * @return array
      */
@@ -44,7 +43,7 @@ class Config
     }
 
     /**
-     * Get the app key
+     * Get the app key.
      *
      * @return string
      */
@@ -54,7 +53,7 @@ class Config
     }
 
     /**
-     * Get the license key
+     * Get the license key.
      *
      * @return string|null
      */
@@ -75,7 +74,7 @@ class Config
     }
 
     /**
-     * Get the current locale's full code for date string translations
+     * Get the current locale's full code for date string translations.
      *
      * @param string|null $locale
      * @return string
@@ -86,7 +85,7 @@ class Config
     }
 
     /**
-     * Get the current locale's short code
+     * Get the current locale's short code.
      *
      * @param string|null $locale
      * @return string
@@ -97,7 +96,7 @@ class Config
     }
 
     /**
-     * Get the current locale's name
+     * Get the current locale's name.
      *
      * @param string|null $locale
      * @return string
@@ -108,7 +107,7 @@ class Config
     }
 
     /**
-     * Get the locale keys
+     * Get the locale keys.
      *
      * @return array
      */
@@ -118,7 +117,7 @@ class Config
     }
 
     /**
-     * Get the default locale
+     * Get the default locale.
      *
      * @return mixed
      */
@@ -128,7 +127,7 @@ class Config
     }
 
     /**
-     * Get the locales that aren't the current (or specified) one
+     * Get the locales that aren't the current (or specified) one.
      *
      * @param string|null $locale The locale to treat as the current one
      * @return array
@@ -143,7 +142,7 @@ class Config
     }
 
     /**
-     * Get the site URL
+     * Get the site URL.
      *
      * @param string|null $locale Optionally get the site url for a locale
      * @return mixed
@@ -154,7 +153,7 @@ class Config
     }
 
     /**
-     * Get the image manipulation presets
+     * Get the image manipulation presets.
      *
      * @return array
      */

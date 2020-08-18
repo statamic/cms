@@ -2,12 +2,8 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\Facades\File;
-use Statamic\Facades\YAML;
-use Statamic\Assets\Asset;
-use Statamic\Facades\Collection;
 use Statamic\Facades\AssetContainer;
-use Statamic\Contracts\Assets\AssetContainer as ContainerContract;
+use Statamic\Facades\YAML;
 
 class AssetContainersStore extends BasicStore
 {
@@ -24,7 +20,6 @@ class AssetContainersStore extends BasicStore
         return AssetContainer::make($handle)
             ->disk(array_get($data, 'disk'))
             ->title(array_get($data, 'title'))
-            ->blueprint(array_get($data, 'blueprint'))
             ->allowDownloading(array_get($data, 'allow_downloading'))
             ->allowMoving(array_get($data, 'allow_moving'))
             ->allowRenaming(array_get($data, 'allow_renaming'))

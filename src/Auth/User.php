@@ -2,7 +2,6 @@
 
 namespace Statamic\Auth;
 
-use ArrayAccess;
 use Illuminate\Auth\Passwords\CanResetPassword;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
 use Illuminate\Contracts\Auth\Authenticatable;
@@ -15,28 +14,34 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Events\UserDeleted;
+use Statamic\Events\UserSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\URL;
+use Statamic\Fields\Value;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
-use Statamic\Support\Arr;
-use Statamic\Fields\Value;
+use Statamic\Statamic;
+use Statamic\Support\Str;
 
 abstract class User implements
     UserContract,
     Authenticatable,
     CanResetPasswordContract,
     Augmentable,
-    ArrayAccess,
     AuthorizableContract
 {
     use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns;
 
     abstract public function get($key, $fallback = null);
+
     abstract public function value($key);
+
     abstract public function has($key);
+
     abstract public function set($key, $value);
+
     abstract public function remove($key);
 
     public function reference()
@@ -53,14 +58,14 @@ abstract class User implements
     {
         $surname = '';
         if ($name = $this->get('name')) {
-            if (str_contains($name, ' ')) {
-                list($name, $surname) = explode(' ', $name);
+            if (Str::contains($name, ' ')) {
+                [$name, $surname] = explode(' ', $name);
             }
         } else {
             $name = $this->email();
         }
 
-        return strtoupper(substr($name, 0, 1) . substr($surname, 0, 1));
+        return strtoupper(mb_substr($name, 0, 1).mb_substr($surname, 0, 1));
     }
 
     public function avatar($size = 64)
@@ -110,6 +115,11 @@ abstract class User implements
         return cp_route('users.update', $this->id());
     }
 
+    public function apiUrl()
+    {
+        return Statamic::apiRoute('users.show', $this->id());
+    }
+
     public function newAugmentedInstance()
     {
         return new AugmentedUser($this);
@@ -131,25 +141,21 @@ abstract class User implements
     }
 
     /**
-     * Get or set the blueprint
+     * Get or set the blueprint.
      *
      * @param string|null|bool
      * @return \Statamic\Fields\Blueprint
      */
-    public function blueprint($blueprint = null)
+    public function blueprint()
     {
-        if (is_null($blueprint)) {
-            return Blueprint::find('user');
-        }
-
-        $this->set('blueprint', $blueprint);
+        return Facades\User::blueprint();
     }
 
     public function save()
     {
         Facades\User::save($this);
 
-        // TODO: dispatch event
+        UserSaved::dispatch($this);
 
         return $this;
     }
@@ -158,7 +164,7 @@ abstract class User implements
     {
         Facades\User::delete($this);
 
-        // TODO: dispatch event
+        UserDeleted::dispatch($this);
 
         return $this;
     }
@@ -175,11 +181,12 @@ abstract class User implements
 
     public function sendPasswordResetNotification($token)
     {
-        $notification = $this->password()
-            ? new PasswordResetNotification($token)
-            : new ActivateAccountNotification($token);
+        $this->notify(new PasswordResetNotification($token));
+    }
 
-        $this->notify($notification);
+    public function sendActivateAccountNotification($token)
+    {
+        $this->notify(new ActivateAccountNotification($token));
     }
 
     public function generateTokenAndSendPasswordResetNotification()
@@ -187,39 +194,28 @@ abstract class User implements
         $this->sendPasswordResetNotification($this->generatePasswordResetToken());
     }
 
-    public function getPasswordResetUrl()
+    public function generateTokenAndSendActivateAccountNotification()
     {
-        return PasswordReset::url($this->generatePasswordResetToken());
+        $this->sendActivateAccountNotification($this->generateActivateAccountToken());
     }
 
     public function generatePasswordResetToken()
     {
-        return Password::broker()->createToken($this);
+        $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_RESETS);
+
+        return Password::broker($broker)->createToken($this);
+    }
+
+    public function generateActivateAccountToken()
+    {
+        $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
+
+        return Password::broker($broker)->createToken($this);
     }
 
     public static function __callStatic($method, $parameters)
     {
         return Facades\User::{$method}(...$parameters);
-    }
-
-    public function offsetExists($key)
-    {
-        return $this->has($key);
-    }
-
-    public function offsetGet($key)
-    {
-        return $this->value($key);
-    }
-
-    public function offsetSet($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
     }
 
     public function name()
@@ -230,7 +226,7 @@ abstract class User implements
 
         if ($name = $this->get('first_name')) {
             if ($lastName = $this->get('last_name')) {
-                $name .= ' ' . $lastName;
+                $name .= ' '.$lastName;
             }
 
             return $name;
@@ -242,5 +238,10 @@ abstract class User implements
     public function defaultAugmentedArrayKeys()
     {
         return $this->selectedQueryColumns;
+    }
+
+    protected function shallowAugmentedArrayKeys()
+    {
+        return ['id', 'name', 'email', 'api_url'];
     }
 }

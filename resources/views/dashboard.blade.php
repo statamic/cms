@@ -11,4 +11,9 @@
         @endforeach
     </div>
 
+    @include('statamic::partials.docs-callout', [
+        'topic' => __('Widgets'),
+        'url' => Statamic::docsUrl('widgets')
+    ])
+
 @stop

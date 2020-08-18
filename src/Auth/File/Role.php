@@ -2,14 +2,13 @@
 
 namespace Statamic\Auth\File;
 
-use Statamic\Facades;
-use Statamic\Support\Arr;
-use Illuminate\Support\Collection;
 use Statamic\Auth\PermissionCache;
 use Statamic\Auth\Role as BaseRole;
-use Statamic\Contracts\Auth\RoleRepository;
-use Statamic\Contracts\Auth\Role as RoleContract;
+use Statamic\Events\RoleDeleted;
+use Statamic\Events\RoleSaved;
+use Statamic\Facades;
 use Statamic\Preferences\HasPreferencesInProperty;
+use Statamic\Support\Arr;
 
 class Role extends BaseRole
 {
@@ -105,13 +104,21 @@ class Role extends BaseRole
 
     public function save()
     {
+        // TODO: Move this logic into \Statamic\Auth\Role.php to be consistent with \Statamic\Auth\UserGroup?
+
         Facades\Role::save($this);
+
+        RoleSaved::dispatch($this);
 
         return $this;
     }
 
     public function delete()
     {
+        // TODO: Move this logic into \Statamic\Auth\Role.php to be consistent with \Statamic\Auth\UserGroup?
+
         Facades\Role::delete($this);
+
+        RoleDeleted::dispatch($this);
     }
 }

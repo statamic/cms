@@ -2,9 +2,9 @@
 
 namespace Statamic\Forms\Metrics;
 
-use Statamic\Support\Str;
 use Statamic\Contracts\Forms\Form;
 use Statamic\Contracts\Forms\Metric;
+use Statamic\Support\Str;
 
 abstract class AbstractMetric implements Metric
 {
@@ -19,7 +19,7 @@ abstract class AbstractMetric implements Metric
     private $config;
 
     /**
-     * Create a new Metric
+     * Create a new Metric.
      *
      * @param Form $form
      * @param array $config
@@ -31,7 +31,7 @@ abstract class AbstractMetric implements Metric
     }
 
     /**
-     * Get the config
+     * Get the config.
      *
      * @return array
      */
@@ -41,7 +41,7 @@ abstract class AbstractMetric implements Metric
     }
 
     /**
-     * Get a value from the config
+     * Get a value from the config.
      *
      * @param  string $key
      * @param  mixed $default
@@ -53,7 +53,7 @@ abstract class AbstractMetric implements Metric
     }
 
     /**
-     * Get the form
+     * Get the form.
      *
      * @return Form
      */
@@ -63,7 +63,7 @@ abstract class AbstractMetric implements Metric
     }
 
     /**
-     * Get the form submissions
+     * Get the form submissions.
      *
      * @return Illuminate\Support\Collection
      */
@@ -73,7 +73,7 @@ abstract class AbstractMetric implements Metric
     }
 
     /**
-     * Get the metric label
+     * Get the metric label.
      *
      * @return string
      */
@@ -83,7 +83,7 @@ abstract class AbstractMetric implements Metric
     }
 
     /**
-     * Get the metric result
+     * Get the metric result.
      *
      * @return mixed
      */

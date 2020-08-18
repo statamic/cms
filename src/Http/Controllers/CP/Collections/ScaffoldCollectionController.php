@@ -2,31 +2,30 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\Facades;
-use Statamic\Support\Str;
-use Statamic\Facades\File;
 use Illuminate\Http\Request;
-use Statamic\Fields\Blueprint;
-use Statamic\Facades\Collection;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
+use Statamic\Facades;
+use Statamic\Facades\File;
+use Statamic\Fields\Blueprint;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Support\Str;
 
 class ScaffoldCollectionController extends CpController
 {
     public function index($collection)
     {
-        $this->authorize('view', $collection, 'You are not authorized to view this collection.');
+        $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
         return view('statamic::collections.scaffold', compact('collection'));
     }
 
-    public function create(Request $request)
+    public function create(Request $request, $collection)
     {
-        $this->authorize('store', CollectionContract::class, 'You are not authorized to scaffold resources.');
+        $this->authorize('store', CollectionContract::class, __('You are not authorized to scaffold resources.'));
 
         // Make the blueprint
         if ($blueprint = $this->request->get('blueprint')) {
-            $this->makeBlueprint($blueprint);
+            $this->makeBlueprint($blueprint, $collection);
         }
 
         // Make the index template
@@ -42,16 +41,13 @@ class ScaffoldCollectionController extends CpController
         session()->flash('success', __('Resources scaffolded'));
 
         return [
-            'redirect' => route('statamic.cp.collections.show', $request->collection->handle())
+            'redirect' => route('statamic.cp.collections.show', $request->collection->handle()),
         ];
     }
 
-    private function makeBlueprint($title)
+    private function makeBlueprint($title, $collection)
     {
         $handle = Str::snake($title);
-
-        // Set the blueprint
-        $this->request->collection->entryBlueprints($handle)->save();
 
         // Don't overwrite existing
         if (Facades\Blueprint::find($handle)) {
@@ -60,14 +56,15 @@ class ScaffoldCollectionController extends CpController
 
         $blueprint = (new Blueprint)
             ->setHandle($handle)
+            ->setNamespace('collections.'.$collection->handle())
             ->setContents([
                 'title' => $title,
                 'sections' => [
                     'main' => [
-                        'display' => 'Main',
-                        'fields' => []
-                    ]
-                ]
+                        'display' => __('Main'),
+                        'fields' => [],
+                    ],
+                ],
             ])->save();
     }
 

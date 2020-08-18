@@ -2,8 +2,10 @@
 
 namespace Statamic\Structures;
 
-use Statamic\Support\Arr;
+use Statamic\Contracts\Structures\Nav;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Structure;
+use Statamic\Support\Arr;
 
 class TreeBuilder
 {
@@ -13,13 +15,25 @@ class TreeBuilder
             return null;
         }
 
+        $from = $params['from'] ?? null;
+
+        if ($from && $structure instanceof Nav) {
+            throw new \Exception('Cannot get a nested starting position on a navigation structure.');
+        }
+
         if (! $tree = $structure->in($params['site'])) {
             return null;
         }
 
-        $pages = $tree->pages()
-            ->prependParent(Arr::get($params, 'include_home'))
-            ->all();
+        if ($from) {
+            $entry = Entry::findByUri($from);
+            $page = $tree->page($entry->id());
+            $pages = $page->pages()->all();
+        } else {
+            $pages = $tree->pages()
+                ->prependParent(Arr::get($params, 'include_home'))
+                ->all();
+        }
 
         return $this->toTree($pages, 1);
     }
@@ -27,14 +41,14 @@ class TreeBuilder
     protected function toTree($pages, $depth)
     {
         return $pages->map(function ($page) use ($depth) {
-            if ($page->reference() && !$page->referenceExists()) {
+            if ($page->reference() && ! $page->referenceExists()) {
                 return null;
             }
 
             return [
                 'page' => $page,
                 'depth' => $depth,
-                'children' => $this->toTree($page->pages()->all(), $depth + 1)
+                'children' => $this->toTree($page->pages()->all(), $depth + 1),
             ];
         })->filter()->values()->all();
     }
@@ -58,13 +72,14 @@ class TreeBuilder
                 'url'         => $page->url(),
                 'edit_url'    => $page->editUrl(),
                 'slug'        => $page->slug(),
-                'collection'  => !$collection ? null : [
+                'redirect'    => $page->reference() ? $page->entry()->get('redirect') : null,
+                'collection'  => ! $collection ? null : [
                     'handle' => $collection->handle(),
                     'title' => $collection->title(),
                     'edit_url' => $collection->showUrl(),
                     'create_url' => $collection->createEntryUrl(),
                 ],
-                'children'    => (! empty($item['children'])) ? $this->transformTreeForController($item['children']) : []
+                'children'    => (! empty($item['children'])) ? $this->transformTreeForController($item['children']) : [],
             ];
         })->values()->all();
     }

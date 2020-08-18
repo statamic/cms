@@ -2,9 +2,9 @@
 
 namespace Statamic\Console\Please;
 
-use Statamic\Statamic;
 use App\Console\Kernel as ConsoleKernel;
 use Statamic\Console\Please\Application as Please;
+use Statamic\Statamic;
 
 class Kernel extends ConsoleKernel
 {

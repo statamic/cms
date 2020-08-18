@@ -41,10 +41,12 @@ class Review extends Command
         $lang = $input->getArgument('lang');
 
         if ($file = $input->getArgument('file')) {
-            return $this->reviewKeyFile($lang, $file);
+            $this->reviewKeyFile($lang, $file);
+        } else {
+            $this->reviewStringFile($lang);
         }
 
-        $this->reviewStringFile($lang);
+        return 0;
     }
 
     protected function reviewStringFile($lang)
@@ -52,7 +54,7 @@ class Review extends Command
         $path = "resources/lang/$lang.json";
         $fullPath = getcwd().'/'.$path;
 
-        throw_if(!$this->files->exists($fullPath), new \Exception("$path does not exist."));
+        throw_if(! $this->files->exists($fullPath), new \Exception("$path does not exist."));
 
         $contents = $this->files->get($fullPath);
         $json = json_decode($contents, true);
@@ -84,7 +86,7 @@ EOL;
         $path = "resources/lang/$lang/$file.php";
         $fullPath = getcwd().'/'.$path;
 
-        throw_if(!$this->files->exists($fullPath), new \Exception("$path does not exist."));
+        throw_if(! $this->files->exists($fullPath), new \Exception("$path does not exist."));
 
         $translations = Arr::dot(require $fullPath);
 
@@ -106,7 +108,7 @@ EOL;
             }
             if ($replacement != $translation) {
                 $translations[$key] = $replacement;
-                $contents = "<?php\n\nreturn " . VarExporter::export(Arr::undot($translations)) . ";\n";
+                $contents = "<?php\n\nreturn ".VarExporter::export(Arr::undot($translations)).";\n";
                 $this->files->put($fullPath, $contents);
             }
             $this->output->writeln('');
@@ -126,6 +128,6 @@ EOL;
 
         $path = getcwd()."/resources/lang/en/{$file}.php";
 
-        return $this->englishTranslations[$file] = require($path);
+        return $this->englishTranslations[$file] = require $path;
     }
 }

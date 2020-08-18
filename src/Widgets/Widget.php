@@ -2,14 +2,15 @@
 
 namespace Statamic\Widgets;
 
-use Statamic\Support\Str;
-use Statamic\Extend\HasTitle;
+use Statamic\Extend\HasAliases;
 use Statamic\Extend\HasHandle;
+use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Support\Str;
 
 abstract class Widget
 {
-    use RegistersItself, HasTitle, HasHandle {
+    use RegistersItself, HasTitle, HasHandle, HasAliases {
         handle as protected traitHandle;
     }
 

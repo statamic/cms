@@ -2,25 +2,25 @@
 
     <div class="w-full flex">
 
-        <div class="flex-1"></div>
+        <div class="flex-1" v-if="! inline"></div>
 
-        <ul v-if="hasMultiplePages" class="flex justify-center items-center list-reset">
-            <li v-if="hasPrevious" class="mx-1">
-                <a @click.prevent="selectPreviousPage"><span>&laquo;</span></a>
+        <ul v-if="hasMultiplePages" class="pagination" :class="{'pagination-inline': inline}">
+
+            <li v-if="hasPrevious">
+                <a @click="selectPreviousPage"><span class="text-xs">&larr;</span></a>
             </li>
 
             <li
                 v-for="(page, i) in pages"
                 :key="i"
-                class="mx-1"
-                :class="{ 'font-bold': page == currentPage }"
+                :class="{ 'current': page == currentPage }"
             >
                 <span v-if="page === 'separator'">...</span>
-                <a v-else @click.prevent="selectPage(page)">{{ page }}</a>
+                <a v-else @click="selectPage(page)">{{ page }}</a>
             </li>
 
-            <li v-if="hasNext" class="mx-1">
-                <a @click.prevent="selectNextPage"><span>&raquo;</span></a>
+            <li v-if="hasNext">
+                <a @click="selectNextPage"><span class="text-xs">&rarr;</span></a>
             </li>
         </ul>
 
@@ -34,7 +34,7 @@
                 :placeholder="__('Per Page')"
                 :options="perPageOptions"
                 :value="perPage"
-                @input="$events.$emit('per-page-changed', $event)" />
+                @input="$emit('per-page-changed', $event)" />
         </div>
 
     </div>
@@ -51,12 +51,16 @@ export default {
     mixins: [HasInputOptions],
 
     props: {
-        resourceMeta: {
-            type: Object,
-            required: true
+        inline: {
+            type: Boolean,
+            default: false
         },
         perPage: {
             type: Number
+        },
+        resourceMeta: {
+            type: Object,
+            required: true
         }
     },
 
@@ -128,7 +132,7 @@ export default {
 
             options.push({
                 value: defaultPaginationSize,
-                label: `${defaultPaginationSize} (default)`
+                label: `${defaultPaginationSize}`
             });
 
             return _.sortBy(options, 'value');

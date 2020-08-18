@@ -2,123 +2,187 @@
 
 namespace Tests\Feature\Collections;
 
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Statamic\Facades\User;
+use Facades\Statamic\Fields\BlueprintRepository;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
-use Illuminate\Support\Facades\Event;
-use Statamic\Events\Data\CollectionSaved;
+use Statamic\Facades\User;
+use Tests\Fakes\FakeBlueprintRepository;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class UpdateCollectionTest extends TestCase
 {
     use FakesRoles;
     use PreventSavingStacheItemsToDisk;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-        $this->markTestIncomplete(); // TODO: implementation was changed, tests werent.
-    }
-
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $collection = Collection::make('test')->save();
 
         $this
             ->from('/original')
             ->actingAs($this->userWithoutPermission())
-            ->patch(cp_route('collections.update', $collection->handle()))
+            ->update($collection)
             ->assertRedirect('/original')
             ->assertSessionHas('error');
     }
 
     /** @test */
-    function it_updates_a_collection()
+    public function it_updates_a_collection()
     {
-        $collection = $this->createCollection();
-        Event::fake(); // Fake after the initial collection is created.
+        $this->withoutExceptionHandling();
+        config(['statamic.amp.enabled' => true]);
+
+        $collection = tap(
+            Collection::make('test')
+            ->title('Original title')
+            ->dated(false)
+            ->template('original-template')
+            ->layout('original-layout')
+            ->defaultPublishState(true)
+            ->sortDirection('asc')
+            ->ampable(false)
+        )->save();
         $this->assertCount(1, Collection::all());
+        $this->assertEquals('Original title', $collection->title());
+        $this->assertFalse($collection->dated());
+        $this->assertEquals('public', $collection->pastDateBehavior());
+        $this->assertEquals('public', $collection->futureDateBehavior());
+        $this->assertEquals('original-template', $collection->template());
+        $this->assertEquals('original-layout', $collection->layout());
+        $this->assertTrue($collection->defaultPublishState());
+        $this->assertEquals('asc', $collection->sortDirection());
+        $this->assertFalse($collection->ampable());
 
         $this
             ->actingAs($this->userWithPermission())
-            ->patch(cp_route('collections.update', $collection->handle()), $this->validParams())
-            ->assertJson(['redirect' => cp_route('collections.edit', $collection->handle())])
-            ->assertSessionHas('success');
+            ->update($collection, [
+                'title' => 'Updated title',
+                'dated' => true,
+                'past_date_behavior' => 'private',
+                'future_date_behavior' => 'hidden',
+                'template' => 'updated-template',
+                'layout' => 'updated-layout',
+                'default_publish_state' => false,
+                'sort_direction' => 'desc',
+                'amp' => true,
+            ])
+            ->assertOk();
 
         $this->assertCount(1, Collection::all());
-        $this->assertEquals([
-            'title' => 'Updated',
-            'template' => 'updated-template',
-            'fieldset' => 'updated-fieldset',
-            'route' => 'updated-route',
-            'order' => 'number'
-        ], $collection->data());
-
-        Event::assertDispatched(CollectionSaved::class, function ($event) use ($collection) {
-            return $event->collection === $collection;
-        });
+        $updated = Collection::all()->first();
+        $this->assertEquals('Updated title', $updated->title());
+        $this->assertTrue($updated->dated());
+        $this->assertEquals('private', $collection->pastDateBehavior());
+        $this->assertEquals('hidden', $collection->futureDateBehavior());
+        $this->assertEquals('updated-template', $updated->template());
+        $this->assertEquals('updated-layout', $updated->layout());
+        $this->assertFalse($updated->defaultPublishState());
+        $this->assertEquals('desc', $updated->sortDirection());
+        $this->assertTrue($updated->ampable());
+        // structure
     }
 
     /** @test */
-    function title_is_required()
+    public function setting_links_to_true_will_create_a_blueprint_if_it_doesnt_already_exist()
     {
-        $collection = $this->createCollection();
-        $this->assertCount(1, Collection::all());
+        BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
+
+        $collection = tap(Collection::make('test'))->save();
+        Blueprint::make('not_link')->setNamespace('collections.test')->save();
+        $this->assertCount(1, Blueprint::in('collections.test'));
 
         $this
-            ->from('/original')
             ->actingAs($this->userWithPermission())
-            ->patch(cp_route('collections.update', $collection->handle()), $this->validParams([
-                'title' => ''
-            ]))
-            ->assertRedirect('/original')
-            ->assertSessionHasErrors('title');
+            ->update($collection, ['links' => true])
+            ->assertOk();
 
-        $this->assertCollectionUnchanged($collection);
+        $this->assertCount(2, Blueprint::in('collections.test'));
     }
 
-    private function createCollection()
+    /** @test */
+    public function setting_links_to_true_will_do_nothing_if_an_existing_link_blueprint_already_exists()
     {
-        return tap(Collection::make('test'))->data([
-            'title' => 'Existing',
-            'template' => 'existing-template',
-            'fieldset' => 'existing-fieldset',
-            'route' => 'existing-route',
-            'order' => 'number',
-        ])->save();
+        BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
+
+        $collection = tap(Collection::make('test'))->save();
+        Blueprint::make('link')->setNamespace('collections.test')->setContents(['title' => 'Existing'])->save();
+        $this->assertCount(1, Blueprint::in('collections.test'));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection, ['links' => true])
+            ->assertOk();
+
+        $this->assertCount(1, Blueprint::in('collections.test'));
+        $this->assertEquals('Existing', Blueprint::find('collections.test.link')->title());
     }
 
-    private function validParams($overrides = [])
+    /** @test */
+    public function setting_links_to_false_will_delete_the_blueprint_if_exists()
     {
-        return array_merge([
-            'title' => 'Updated',
-            'template' => 'updated-template',
-            'fieldset' => 'updated-fieldset',
-            'route' => 'updated-route',
-        ], $overrides);
+        BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
+
+        $collection = tap(Collection::make('test'))->save();
+        Blueprint::make('link')->setNamespace('collections.test')->save();
+        $this->assertCount(1, Blueprint::in('collections.test'));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection, ['links' => false])
+            ->assertOk();
+
+        $this->assertCount(0, Blueprint::in('collections.test'));
+    }
+
+    /** @test */
+    public function settings_links_to_true_will_also_create_the_default_blueprint_if_none_exist()
+    {
+        // this is so that you aren't left in awkward situation where there's only a links blueprint.
+
+        BlueprintRepository::swap(new FakeBlueprintRepository(BlueprintRepository::getFacadeRoot()));
+
+        $collection = tap(Collection::make('test'))->save();
+        $this->assertCount(0, Blueprint::in('collections.test'));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->update($collection, ['links' => true])
+            ->assertOk();
+
+        $this->assertCount(2, $blueprints = Blueprint::in('collections.test'));
+        $this->assertEquals(['test', 'link'], $blueprints->map->handle()->values()->all());
     }
 
     private function userWithoutPermission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
 
-        return User::make()->assignRole('test');
+        return tap(User::make()->assignRole('test'))->save();
     }
 
     private function userWithPermission()
     {
         $this->setTestRoles(['test' => ['access cp', 'configure collections']]);
 
-        return User::make()->assignRole('test');
+        return tap(User::make()->assignRole('test'))->save();
     }
 
-    private function assertCollectionUnchanged($collection)
+    private function update($collection, $params = [])
     {
-        $this->assertEquals('Existing', $collection->get('title'));
-        $this->assertEquals('existing-template', $collection->get('template'));
-        $this->assertEquals('existing-fieldset', $collection->get('fieldset'));
-        $this->assertEquals('existing-route', $collection->get('route'));
+        $params = array_merge([
+            'title' => 'Updated title',
+            'dated' => false,
+            'past_date_behavior' => 'public',
+            'future_date_behavior' => 'public',
+            'template' => 'updated-template',
+            'layout' => 'updated-layout',
+            'default_publish_state' => true,
+            'ampable' => false,
+        ], $params);
+
+        return $this->patch(cp_route('collections.update', $collection->handle()), $params);
     }
 }

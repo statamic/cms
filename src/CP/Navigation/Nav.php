@@ -4,10 +4,8 @@ namespace Statamic\CP\Navigation;
 
 use Closure;
 use Exception;
-use Statamic\Support\Str;
 use Statamic\Facades\User;
-use Statamic\CP\Navigation\CoreNav;
-use Statamic\CP\Navigation\NavItem;
+use Statamic\Support\Str;
 
 class Nav
 {
@@ -102,7 +100,7 @@ class Nav
      */
     public function build()
     {
-        return $this
+        return $this->built = $this
             ->makeDefaultItems()
             ->buildExtensions()
             ->buildChildren()

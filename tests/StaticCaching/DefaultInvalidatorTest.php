@@ -2,10 +2,10 @@
 
 namespace Tests\StaticCaching;
 
-use Tests\TestCase;
-use Statamic\StaticCaching\Cacher;
-use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Data\Content\Content;
+use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\StaticCaching\Cacher;
 use Statamic\StaticCaching\DefaultInvalidator as Invalidator;
 
 class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
@@ -32,13 +32,14 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /** @test */
-    function the_items_url_gets_invalidated()
+    public function the_entrys_url_gets_invalidated()
     {
         $cacher = \Mockery::spy(Cacher::class);
         $invalidator = new Invalidator($cacher);
 
         $entry = tap(\Mockery::mock(Entry::class), function ($m) {
             $m->shouldReceive('url')->andReturn('/my/test/entry');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
         });
 
         $invalidator->invalidate($entry);
@@ -48,20 +49,60 @@ class DefaultInvalidatorTest extends \PHPUnit\Framework\TestCase
     }
 
     /** @test */
-    function collection_urls_can_be_invralidated()
+    public function collection_urls_can_be_invalidated()
     {
-        $this->markTestIncomplete();
+        $cacher = \Mockery::spy(Cacher::class);
+        $invalidator = new Invalidator($cacher, [
+            'collections' => [
+                'blog' => [
+                    'urls' => [
+                        '/blog/one',
+                        '/blog/two',
+                    ],
+                ],
+            ],
+        ]);
+
+        $entry = tap(\Mockery::mock(Entry::class), function ($m) {
+            $m->shouldReceive('url')->andReturn('/my/test/entry');
+            $m->shouldReceive('collectionHandle')->andReturn('blog');
+        });
+
+        $invalidator->invalidate($entry);
+
+        $cacher->shouldNotHaveReceived('flush');
+        $cacher->shouldHaveReceived('invalidateUrls')->once()->with([
+            '/blog/one',
+            '/blog/two',
+        ]);
     }
 
     /** @test */
-    function taxonomy_urls_can_be_invalidated()
+    public function taxonomy_urls_can_be_invalidated()
     {
-        $this->markTestIncomplete();
-    }
+        $cacher = \Mockery::spy(Cacher::class);
+        $invalidator = new Invalidator($cacher, [
+            'taxonomies' => [
+                'tags' => [
+                    'urls' => [
+                        '/tags/one',
+                        '/tags/two',
+                    ],
+                ],
+            ],
+        ]);
 
-    /** @test */
-    function page_urls_can_be_invalidated()
-    {
-        $this->markTestIncomplete();
+        $entry = tap(\Mockery::mock(Term::class), function ($m) {
+            $m->shouldReceive('url')->andReturn('/my/test/term');
+            $m->shouldReceive('taxonomyHandle')->andReturn('tags');
+        });
+
+        $invalidator->invalidate($entry);
+
+        $cacher->shouldNotHaveReceived('flush');
+        $cacher->shouldHaveReceived('invalidateUrls')->once()->with([
+            '/tags/one',
+            '/tags/two',
+        ]);
     }
 }

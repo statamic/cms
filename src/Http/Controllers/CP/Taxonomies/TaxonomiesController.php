@@ -2,16 +2,16 @@
 
 namespace Statamic\Http\Controllers\CP\Taxonomies;
 
-use Statamic\Facades\Site;
-use Statamic\Facades\User;
-use Statamic\Facades\Scope;
-use Statamic\CP\Column;
-use Statamic\Facades\Taxonomy;
-use Statamic\Facades\Blueprint;
 use Illuminate\Http\Request;
-use Statamic\Facades\Collection;
-use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Contracts\Taxonomies\Taxonomy as TaxonomyContract;
+use Statamic\CP\Column;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Scope;
+use Statamic\Facades\Site;
+use Statamic\Facades\Taxonomy;
+use Statamic\Facades\User;
+use Statamic\Http\Controllers\CP\CpController;
 
 class TaxonomiesController extends CpController
 {
@@ -29,7 +29,8 @@ class TaxonomiesController extends CpController
                 'edit_url' => $taxonomy->editUrl(),
                 'delete_url' => $taxonomy->deleteUrl(),
                 'terms_url' => cp_route('taxonomies.show', $taxonomy->handle()),
-                'deleteable' => User::current()->can('delete', $taxonomy)
+                'blueprints_url' => cp_route('taxonomies.blueprints.index', $taxonomy->handle()),
+                'deleteable' => User::current()->can('delete', $taxonomy),
             ];
         })->values();
 
@@ -53,63 +54,73 @@ class TaxonomiesController extends CpController
             ];
         });
 
-        return view('statamic::taxonomies.show', [
+        $viewData = [
             'taxonomy' => $taxonomy,
             'hasTerms' => true, // todo $taxonomy->queryTerms()->count(),
             'blueprints' => $blueprints,
-            'site' => Site::selected(),
+            'site' => Site::selected()->handle(),
             'filters' => Scope::filters('terms', [
                 'taxonomy' => $taxonomy->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-        ]);
+        ];
+
+        if ($taxonomy->queryTerms()->count() === 0) {
+            return view('statamic::taxonomies.empty', $viewData);
+        }
+
+        return view('statamic::taxonomies.show', $viewData);
     }
 
     public function create()
     {
-        $this->authorize('create', TaxonomyContract::class, 'You are not authorized to create taxonomies.');
+        $this->authorize('create', TaxonomyContract::class, __('You are not authorized to create taxonomies.'));
 
         return view('statamic::taxonomies.create');
     }
 
     public function store(Request $request)
     {
-        $this->authorize('store', TaxonomyContract::class, 'You are not authorized to create taxonomies.');
+        $this->authorize('store', TaxonomyContract::class, __('You are not authorized to create taxonomies.'));
 
-        $data = $request->validate([
+        $request->validate([
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
-            'blueprints' => 'array',
-            'collections' => 'array',
         ]);
 
         $handle = $request->handle ?? snake_case($request->title);
 
-        $taxonomy = $this->updateTaxonomy(Taxonomy::make($handle), $data);
+        if (Collection::find($handle)) {
+            throw new \Exception('Taxonomy already exists');
+        }
+
+        $taxonomy = Taxonomy::make($handle)->title($request->title);
+
+        if (Site::hasMultiple()) {
+            $taxonomy->sites([Site::default()->handle()]);
+        }
 
         $taxonomy->save();
-
-        foreach ($request->collections as $collection) {
-            $collection = Collection::findByHandle($collection);
-            $collection->taxonomies(
-                $collection->taxonomies()->map->handle()->push($handle)->unique()->all()
-            )->save();
-        }
 
         session()->flash('success', __('Taxonomy created'));
 
         return [
-            'redirect' => $taxonomy->showUrl()
+            'redirect' => $taxonomy->showUrl(),
         ];
     }
 
     public function edit($taxonomy)
     {
-        $this->authorize('edit', $taxonomy, 'You are not authorized to edit this taxonomy.');
+        $this->authorize('edit', $taxonomy, __('You are not authorized to edit this taxonomy.'));
 
-        $values = $taxonomy->toArray();
+        $values = [
+            'title' => $taxonomy->title(),
+            'blueprints' => $taxonomy->termBlueprints()->map->handle()->all(),
+            'collections' => $taxonomy->collections()->map->handle()->all(),
+            'sites' => $taxonomy->sites()->all(),
+        ];
 
-        $fields = ($blueprint = $this->editFormBlueprint())
+        $fields = ($blueprint = $this->editFormBlueprint($taxonomy))
             ->fields()
             ->addValues($values)
             ->preProcess();
@@ -124,53 +135,108 @@ class TaxonomiesController extends CpController
 
     public function update(Request $request, $taxonomy)
     {
-        $this->authorize('update', $taxonomy, 'You are not authorized to edit this taxonomy.');
+        $this->authorize('update', $taxonomy, __('You are not authorized to edit this taxonomy.'));
 
-        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
+        $fields = $this->editFormBlueprint($taxonomy)->fields()->addValues($request->all());
 
         $fields->validate();
 
-        $taxonomy = $this->updateTaxonomy($taxonomy, $fields->process()->values()->all());
+        $values = $fields->process()->values()->all();
+
+        $taxonomy->title($values['title']);
+
+        if ($sites = array_get($values, 'sites')) {
+            $taxonomy->sites($sites);
+        }
 
         $taxonomy->save();
+
+        $this->associateTaxonomyWithCollections($taxonomy, $values['collections']);
 
         return $taxonomy->toArray();
     }
 
+    protected function associateTaxonomyWithCollections($taxonomy, $collections)
+    {
+        $collections = collect($collections);
+        $existing = $taxonomy->collections()->map->handle();
+
+        $collections->diff($existing)->each(function ($collection) use ($taxonomy) {
+            $collection = Collection::findByHandle($collection);
+            $collection->taxonomies(
+                $collection->taxonomies()->map->handle()
+                    ->push($taxonomy->handle())
+                    ->unique()->all()
+            );
+            $collection->save();
+        });
+
+        $existing->diff($collections)->each(function ($collection) use ($taxonomy) {
+            $collection = Collection::findByHandle($collection);
+            $collection->taxonomies(
+                $collection->taxonomies()->map->handle()
+                    ->diff([$taxonomy->handle()])
+                    ->values()->all()
+            );
+            $collection->save();
+        });
+    }
+
     public function destroy($taxonomy)
     {
-        $this->authorize('delete', $taxonomy, 'You are not authorized to delete this taxonomy.');
+        $this->authorize('delete', $taxonomy, __('You are not authorized to delete this taxonomy.'));
 
         $taxonomy->delete();
     }
 
-    protected function updateTaxonomy($taxonomy, $data)
+    protected function editFormBlueprint($taxonomy)
     {
-        return $taxonomy
-            ->title($data['title'])
-            ->termBlueprints($data['blueprints']);
-    }
+        $fields = [
+            'name' => [
+                'display' => __('Name'),
+                'fields' => [
+                    'title' => [
+                        'type' => 'text',
+                        'validate' => 'required',
+                    ],
+                ],
+            ],
+            'content_model' => [
+                'display' => __('Content Model'),
+                'fields' => [
+                    'blueprints' => [
+                        'display' => __('Blueprints'),
+                        'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
+                        'type' => 'html',
+                        'html' => ''.
+                            '<div class="text-xs">'.
+                            '   <span class="mr-2">'.$taxonomy->termBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <a href="'.cp_route('taxonomies.blueprints.index', $taxonomy).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>',
+                    ],
+                    'collections' => [
+                        'display' => __('Collections'),
+                        'instructions' => __('statamic::messages.taxonomies_collections_instructions'),
+                        'type' => 'collections',
+                        'mode' => 'select',
+                    ],
+                ],
+            ],
+        ];
 
-    protected function editFormBlueprint()
-    {
-        return Blueprint::makeFromFields([
-            'title' => [
-                'type' => 'text',
-                'validate' => 'required',
-                'width' => 50,
-            ],
-            'handle' => [
-                'type' => 'text',
-                'validate' => 'required|alpha_dash',
-                'width' => 50,
-            ],
+        if (Site::hasMultiple()) {
+            $fields['sites'] = [
+                'display' => __('Sites'),
+                'fields' => [
+                    'sites' => [
+                        'type' => 'sites',
+                        'mode' => 'select',
+                        'required' => true,
+                    ],
+                ],
+            ];
+        }
 
-            'content_model' => ['type' => 'section'],
-            'blueprints' => [
-                'type' => 'blueprints',
-                'instructions' => __('statamic::messages.taxonomies_blueprints_instructions'),
-                'validate' => 'array',
-            ],
-        ]);
+        return Blueprint::makeFromSections($fields);
     }
 }

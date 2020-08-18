@@ -5,15 +5,17 @@
             :key="$index"
             class="option"
         >
-            <input type="radio"
-                :name="name"
-                @input="update($event.target.value)"
-                :value="option.value"
-                :id="name + $index"
-                :disabled="isReadOnly"
-                :checked="value === option.value"
-            />
-            <label :for="name + $index">{{ option.label || option.value }}</label>
+            <label>
+                <input type="radio"
+                    ref="radio"
+                    :name="name"
+                    @input="update($event.target.value)"
+                    :value="option.value"
+                    :disabled="isReadOnly"
+                    :checked="value === option.value"
+                />
+                {{ option.label || option.value }}
+            </label>
         </div>
     </div>
 </template>
@@ -38,7 +40,7 @@ export default {
     methods: {
 
         focus() {
-            document.getElementById(`${this.name}-0`).focus();
+            this.$refs.radio[0].focus();
         }
 
     }

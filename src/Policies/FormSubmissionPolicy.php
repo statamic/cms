@@ -2,7 +2,6 @@
 
 namespace Statamic\Policies;
 
-use Statamic\Facades\Form;
 use Statamic\Facades\User;
 
 class FormSubmissionPolicy

@@ -1,6 +1,7 @@
 <template>
 
     <relationship-input
+        ref="input"
         :name="name"
         :value="value"
         :mode="config.mode"
@@ -13,6 +14,7 @@
         :max-items="maxItems"
         :item-component="itemComponent"
         :item-data-url="itemDataUrl"
+        :filters-url="filtersUrl"
         :selections-url="selectionsUrl"
         :creatables="creatables"
         :form-component="formComponent"
@@ -65,6 +67,10 @@ export default {
 
         itemDataUrl() {
             return this.meta.itemDataUrl + '?' + qs.stringify({ config: this.configParameter });
+        },
+
+        filtersUrl() {
+            return this.meta.filtersUrl + '?' + qs.stringify({ config: this.configParameter });
         },
 
         selectionsUrl() {
@@ -140,6 +146,10 @@ export default {
             const meta = clone(this.meta);
             meta.data = data;
             this.updateMeta(meta);
+        },
+
+        linkExistingItem() {
+            this.$refs.input.$refs.existing.click();
         }
 
     }

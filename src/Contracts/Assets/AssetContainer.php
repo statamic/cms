@@ -5,7 +5,7 @@ namespace Statamic\Contracts\Assets;
 interface AssetContainer
 {
     /**
-     * Get or set the ID
+     * Get or set the ID.
      *
      * @param null|string $id
      * @return string
@@ -13,7 +13,7 @@ interface AssetContainer
     public function id($id = null);
 
     /**
-     * Get or set the handle
+     * Get or set the handle.
      *
      * @param null|string $handle
      * @return string
@@ -21,7 +21,7 @@ interface AssetContainer
     public function handle($handle = null);
 
     /**
-     * Get or set the title
+     * Get or set the title.
      *
      * @param null|string $title
      * @return string
@@ -29,14 +29,14 @@ interface AssetContainer
     public function title($title = null);
 
     /**
-     * Get the URL to this location
+     * Get the URL to this location.
      *
      * @return null|string
      */
     public function url();
 
     /**
-     * Create an asset
+     * Create an asset.
      *
      * @param string $path
      * @return \Statamic\Assets\Asset
@@ -44,7 +44,7 @@ interface AssetContainer
     public function asset($path);
 
     /**
-     * Get all the assets in this container
+     * Get all the assets in this container.
      *
      * @param string|null $folder Narrow down assets by folder
      * @param bool $recursive Whether to look for assets recursively
@@ -53,7 +53,7 @@ interface AssetContainer
     public function assets($folder = null, $recursive = false);
 
     /**
-     * Get all the asset files in this container
+     * Get all the asset files in this container.
      *
      * @param string|null $folder  Narrow down assets by folder
      * @return \Illuminate\Support\Collection
@@ -61,7 +61,7 @@ interface AssetContainer
     public function files($folder = null);
 
     /**
-     * Get all the subfolders in this container
+     * Get all the subfolders in this container.
      *
      * @param string|null $folder Narrow down subfolders by folder
      * @param bool $recursive
@@ -70,35 +70,33 @@ interface AssetContainer
     public function folders($folder = null, $recursive = false);
 
     /**
-     * Save the container
+     * Save the container.
      *
      * @return mixed
      */
     public function save();
 
     /**
-     * Delete the container
+     * Delete the container.
      *
      * @return mixed
      */
     public function delete();
 
     /**
-     * Get or set the blueprint to be used by assets in this container
-     *
-     * @param string $blueprint
+     * Get the blueprint to be used by assets in this container.
      */
-    public function blueprint($blueprint = null);
+    public function blueprint();
 
     /**
-     * Whether the container's assets are web-accessible
+     * Whether the container's assets are web-accessible.
      *
      * @return bool
      */
     public function accessible();
 
     /**
-     * Whether the container's assets are not web-accessible
+     * Whether the container's assets are not web-accessible.
      *
      * @return bool
      */

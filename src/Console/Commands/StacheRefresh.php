@@ -2,9 +2,9 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Facades\Stache;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
+use Statamic\Facades\Stache;
 use Wilderborn\Partyline\Facade as Partyline;
 
 class StacheRefresh extends Command

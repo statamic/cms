@@ -2,12 +2,13 @@
 
 namespace Statamic\Http\Controllers\CP\Forms;
 
+use Illuminate\Http\Request;
+use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\User;
-use Illuminate\Http\Request;
-use Statamic\Facades\Blueprint;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Support\Str;
 
 class FormsController extends CpController
 {
@@ -27,7 +28,8 @@ class FormsController extends CpController
                     'show_url' => $form->showUrl(),
                     'edit_url' => $form->editUrl(),
                     'delete_url' => $form->deleteUrl(),
-                    'deleteable' => User::current()->can('delete', $form)
+                    'blueprint_url' => cp_route('forms.blueprint.edit', $form->handle()),
+                    'deleteable' => User::current()->can('delete', $form),
                 ];
             })
             ->values();
@@ -55,14 +57,14 @@ class FormsController extends CpController
         foreach ($form->formset()->get('metrics', []) as $params) {
             $metric = [
                 'type' => $params['type'],
-                'label' => $params['label']
+                'label' => $params['label'],
             ];
             unset($params['type'], $params['label']);
 
             foreach ($params as $key => $value) {
                 $metric['params'][] = [
                     'value' => $key,
-                    'text' => $value
+                    'text' => $value,
                 ];
             }
 
@@ -74,6 +76,8 @@ class FormsController extends CpController
 
     public function create()
     {
+        $this->authorizeProIf(Form::all()->count() >= 1);
+
         $this->authorize('create', FormContract::class);
 
         return view('statamic::forms.create');
@@ -81,27 +85,26 @@ class FormsController extends CpController
 
     public function store(Request $request)
     {
-        $this->authorize('create', FormContract::class);
+        $this->authorizeProIf(Form::all()->count() >= 1);
 
-        $data = $request->validate([
+        $this->authorize('create', FormContract::class, __('You are not authorized to create forms.'));
+
+        $request->validate([
             'title' => 'required',
             'handle' => 'nullable|alpha_dash',
-            'blueprint' => 'nullable|array',
-            'store' => 'nullable|boolean',
-            'email' => 'nullable|string',
         ]);
 
-        $handle = $request->handle ?? snake_case($request->title);
+        $handle = $request->handle ?? Str::snake($request->title);
 
-        $form = $this->hydrateForm(Form::make($handle), $data);
-        $form->save();
+        if (Form::find($handle)) {
+            throw new \Exception(__('Form already exists'));
+        }
 
-        $this->success(__('Created'));
+        $form = tap(Form::make($handle)->title($request->title))->save();
 
-        return [
-            'success' => true,
-            'redirect' => $form->showUrl()
-        ];
+        session()->flash('success', __('Form created'));
+
+        return ['redirect' => $form->editUrl()];
     }
 
     public function edit($form)
@@ -110,7 +113,7 @@ class FormsController extends CpController
 
         $values = $form->toArray();
 
-        $fields = ($blueprint = $this->editFormBlueprint())
+        $fields = ($blueprint = $this->editFormBlueprint($form))
             ->fields()
             ->addValues($values)
             ->preProcess();
@@ -127,55 +130,23 @@ class FormsController extends CpController
     {
         $this->authorize('edit', $form);
 
-        $data = $request->validate([
-            'title' => 'required',
-            'handle' => 'nullable|alpha_dash',
-            'blueprint' => 'nullable|array',
-            'honeypot' => 'nullable|string',
-            'store' => 'nullable|boolean',
-            'email' => 'nullable|array',
-            'email.*.to' => 'required|email',
-            'email.*.from' => 'nullable|email',
-            'email.*.reply_to' => 'nullable|email',
-        ]);
+        $fields = $this->editFormBlueprint($form)->fields()->addValues($request->all());
 
-        $this->hydrateForm($form, $data);
+        $fields->validate();
+
+        $values = $fields->process()->values()->all();
+
+        $form
+            ->title($values['title'])
+            ->honeypot($values['honeypot'])
+            ->store($values['store'])
+            ->email($values['email']);
+
         $form->save();
 
         $this->success(__('Saved'));
 
         return $form->toArray();
-    }
-
-    protected function hydrateForm($form, $data)
-    {
-        if (is_string($data['email'])) {
-            $data['email'] = [['to' => $data['email']]];
-        }
-
-        return $form
-            ->title($data['title'])
-            ->handle($data['handle'])
-            ->blueprint(collect($data['blueprint'])->first())
-            ->honeypot($data['honeypot'] ?? null)
-            ->store($data['store'] ?? null)
-            ->email($data['email'] ?? null);
-    }
-
-    /**
-     * Clean up the email values from the Grid field
-     *
-     * @return array
-     */
-    private function prepareEmail()
-    {
-        $emails = [];
-
-        foreach ($this->request->input('formset.email') as $email) {
-            $emails[] = array_except(array_filter($email), '_id');
-        }
-
-        return $emails;
     }
 
     public function destroy($form)
@@ -185,7 +156,7 @@ class FormsController extends CpController
         $form->delete();
     }
 
-    protected function editFormBlueprint()
+    protected function editFormBlueprint($form)
     {
         return Blueprint::makeFromSections([
             'name' => [
@@ -196,21 +167,18 @@ class FormsController extends CpController
                         'validate' => 'required',
                         'instructions' => __('statamic::messages.form_configure_title_instructions'),
                     ],
-                    'handle' => [
-                        'type' => 'text',
-                        'validate' => 'required|alpha_dash',
-                        'instructions' => __('statamic::messages.form_configure_handle_instructions'),
-                    ],
                 ],
             ],
             'fields' => [
                 'display' => __('Fields'),
                 'fields' => [
                     'blueprint' => [
-                        'type' => 'blueprints',
+                        'type' => 'html',
                         'instructions' => __('statamic::messages.form_configure_blueprint_instructions'),
-                        'validate' => 'min:1',
-                        'max_items' => 1,
+                        'html' => ''.
+                            '<div class="text-xs">'.
+                            '   <a href="'.cp_route('forms.blueprint.edit', $form->handle()).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>',
                     ],
                     'honeypot' => [
                         'type' => 'text',
@@ -234,7 +202,7 @@ class FormsController extends CpController
                     'email' => [
                         'type' => 'grid',
                         'mode' => 'stacked',
-                        'add_row' => 'Add Email',
+                        'add_row' => __('Add Email'),
                         'instructions' => __('statamic::messages.form_configure_email_instructions'),
                         'fields' => [
                             [
@@ -246,15 +214,15 @@ class FormsController extends CpController
                                         'required',
                                     ],
                                     'instructions' => __('statamic::messages.form_configure_email_to_instructions'),
-                                ]
+                                ],
                             ],
                             [
                                 'handle' => 'from',
                                 'field' => [
                                     'type' => 'text',
                                     'display' => __('Sender (From)'),
-                                    'instructions' => __('statamic::messages.form_configure_email_from_instructions') . ' (' . config('mail.from.address') . ').',
-                                ]
+                                    'instructions' => __('statamic::messages.form_configure_email_from_instructions').' ('.config('mail.from.address').').',
+                                ],
                             ],
                             [
                                 'handle' => 'reply_to',
@@ -262,29 +230,35 @@ class FormsController extends CpController
                                     'type' => 'text',
                                     'display' => __('Reply To'),
                                     'instructions' => __('statamic::messages.form_configure_email_reply_to_instructions'),
-                                ]
+                                ],
                             ],
                             [
                                 'handle' => 'subject',
                                 'field' => [
                                     'type' => 'text',
                                     'instructions' => __('statamic::messages.form_configure_email_subject_instructions'),
-                                ]
+                                ],
                             ],
                             [
-                                'handle' => 'template',
+                                'handle' => 'html',
                                 'field' => [
                                     'type' => 'template',
-                                    'instructions' => __('statamic::messages.form_configure_email_template_instructions'),
-                                ]
+                                    'display' => __('HTML view'),
+                                    'instructions' => __('statamic::messages.form_configure_email_html_instructions'),
+                                ],
                             ],
-                        ]
+                            [
+                                'handle' => 'text',
+                                'field' => [
+                                    'type' => 'template',
+                                    'display' => __('Text view'),
+                                    'instructions' => __('statamic::messages.form_configure_email_text_instructions'),
+                                ],
+                            ],
+                        ],
                     ],
                 ],
             ],
-
-
-
 
             // metrics
         ]);

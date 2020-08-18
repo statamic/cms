@@ -6,8 +6,8 @@ use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Form;
 use Statamic\Facades\GlobalSet;
+use Statamic\Facades\Nav;
 use Statamic\Facades\Permission;
-use Statamic\Facades\Structure;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Utility;
 
@@ -18,14 +18,15 @@ class CorePermissions
         $this->group('cp', function () {
             $this->register('access cp');
             $this->register('configure fields');
+            $this->register('configure addons');
         });
 
         $this->group('collections', function () {
             $this->registerCollections();
         });
 
-        $this->group('structures', function () {
-            $this->registerStructures();
+        $this->group('navigation', function () {
+            $this->registerNavigation();
         });
 
         $this->group('globals', function () {
@@ -67,8 +68,8 @@ class CorePermissions
                     $this->permission('create {collection} entries'),
                     $this->permission('delete {collection} entries'),
                     $this->permission('publish {collection} entries'),
-                    $this->permission('reorder {collection} entries')
-                ])
+                    $this->permission('reorder {collection} entries'),
+                ]),
             ])->replacements('collection', function () {
                 return Collection::all()->map(function ($collection) {
                     return ['value' => $collection->handle(), 'label' => $collection->title()];
@@ -77,16 +78,16 @@ class CorePermissions
         });
     }
 
-    protected function registerStructures()
+    protected function registerNavigation()
     {
-        $this->register('configure structures');
+        $this->register('configure navs');
 
-        $this->register('view {structure} structure', function ($permission) {
+        $this->register('view {nav} nav', function ($permission) {
             $this->permission($permission)->children([
-                $this->permission('edit {structure} structure')
-            ])->replacements('structure', function () {
-                return Structure::all()->map(function ($structure) {
-                    return ['value' => $structure->handle(), 'label' => $structure->title()];
+                $this->permission('edit {nav} nav'),
+            ])->replacements('nav', function () {
+                return Nav::all()->map(function ($nav) {
+                    return ['value' => $nav->handle(), 'label' => $nav->title()];
                 });
             });
         });
@@ -113,8 +114,8 @@ class CorePermissions
             $this->permission($permission)->children([
                 $this->permission('edit {taxonomy} terms')->children([
                     $this->permission('create {taxonomy} terms'),
-                    $this->permission('delete {taxonomy} terms')
-                ])
+                    $this->permission('delete {taxonomy} terms'),
+                ]),
             ])->replacements('taxonomy', function () {
                 return Taxonomy::all()->map(function ($taxonomy) {
                     return ['value' => $taxonomy->handle(), 'label' => $taxonomy->title()];
@@ -133,8 +134,8 @@ class CorePermissions
                 $this->permission('edit {container} assets')->children([
                     $this->permission('move {container} assets'),
                     $this->permission('rename {container} assets'),
-                    $this->permission('delete {container} assets')
-                ])
+                    $this->permission('delete {container} assets'),
+                ]),
             ])->replacements('container', function () {
                 return AssetContainer::all()->map(function ($container) {
                     return ['value' => $container->handle(), 'label' => $container->title()];
@@ -173,7 +174,7 @@ class CorePermissions
 
         $this->register('view {form} form submissions', function ($permission) {
             $this->permission($permission)->children([
-                $this->permission('delete {form} form submissions')
+                $this->permission('delete {form} form submissions'),
             ])->replacements('form', function () {
                 return Form::all()->map(function ($form) {
                     return ['value' => $form->handle(), 'label' => $form->title()];

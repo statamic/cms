@@ -2,12 +2,11 @@
 
 namespace Statamic\Extend;
 
-use Facades\Statamic\Extend\Marketplace;
-use Illuminate\Filesystem\Filesystem;
+use Facades\Statamic\Marketplace\Marketplace;
 use Illuminate\Foundation\PackageManifest;
 use ReflectionClass;
-use Statamic\Support\Arr;
 use Statamic\Facades\File;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Manifest extends PackageManifest
@@ -19,11 +18,12 @@ class Manifest extends PackageManifest
         $packages = [];
 
         if ($this->files->exists($path = $this->vendorPath.'/composer/installed.json')) {
-            $packages = json_decode($this->files->get($path), true);
+            $installed = json_decode($this->files->get($path), true);
+            $packages = $installed['packages'] ?? $installed;
         }
 
         $this->write(collect($packages)->filter(function ($package) {
-            return array_get($package, 'type') === 'statamic-addon';
+            return Arr::has($package, 'extra.statamic');
         })->keyBy('name')->map(function ($package) {
             return $this->formatPackage($package);
         })->filter()->all());
@@ -39,28 +39,26 @@ class Manifest extends PackageManifest
 
         $reflector = new ReflectionClass($provider);
         $providerParts = explode('\\', $provider, -1);
-        $namespace = join('\\', $providerParts);
+        $namespace = implode('\\', $providerParts);
 
         $autoload = $package['autoload']['psr-4'][$namespace.'\\'];
-        $directory = Str::removeRight(dirname($reflector->getFileName()), $autoload);
+        $directory = Str::removeRight(dirname($reflector->getFileName()), rtrim($autoload, '/'));
 
         $json = json_decode(File::get($directory.'/composer.json'), true);
         $statamic = $json['extra']['statamic'] ?? [];
         $author = $json['authors'][0] ?? null;
 
-        $marketplaceData = Marketplace::withoutLocalData()->findByPackageName($package['name']);
-
-        $installedVariant = collect(data_get($marketplaceData, 'variants', []))->first(function ($variant) use ($package) {
-            return explode('.', $package['version'])[0] == $variant['number'];
-        });
+        $marketplaceData = Marketplace::package($package['name'], $package['version']);
 
         return [
             'id' => $package['name'],
             'slug' => $statamic['slug'] ?? null,
-            'marketplaceProductId' => data_get($marketplaceData, 'id', null),
-            'marketplaceVariantId' => data_get($installedVariant, 'id', null),
+            'editions' => $statamic['editions'] ?? [],
+            'marketplaceId' => data_get($marketplaceData, 'id', null),
             'marketplaceSlug' => data_get($marketplaceData, 'slug', null),
-            'version' => $package['version'], // Is this syncronized with git tag?
+            'marketplaceSellerSlug' => data_get($marketplaceData, 'seller', null),
+            'latestVersion' => data_get($marketplaceData, 'latest_version', null),
+            'version' => Str::removeLeft($package['version'], 'v'),
             'namespace' => $namespace,
             'directory' => $directory,
             'autoload' => $autoload,

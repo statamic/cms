@@ -2,15 +2,15 @@
 
 namespace Tests\Stache\Repositories;
 
-use Tests\TestCase;
-use Statamic\Stache\Stache;
+use Illuminate\Support\Collection as IlluminateCollection;
 use Statamic\Entries\Collection;
-use Statamic\Stache\Stores\EntriesStore;
-use Statamic\Stache\Stores\StructuresStore;
-use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Stache\Repositories\CollectionRepository;
-use Illuminate\Support\Collection as IlluminateCollection;
+use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\CollectionsStore;
+use Statamic\Stache\Stores\EntriesStore;
+use Statamic\Stache\Stores\NavigationStore;
+use Tests\TestCase;
 
 class CollectionRepositoryTest extends TestCase
 {
@@ -24,14 +24,14 @@ class CollectionRepositoryTest extends TestCase
         $stache->registerStores([
             (new CollectionsStore($stache, app('files')))->directory($this->directory),
             (new EntriesStore($stache, app('files')))->directory($this->directory),
-            (new StructuresStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/structures'),
+            (new NavigationStore($stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/navigation'),
         ]);
 
         $this->repo = new CollectionRepository($stache);
     }
 
     /** @test */
-    function it_gets_all_collections()
+    public function it_gets_all_collections()
     {
         $collections = $this->repo->all();
 
@@ -45,7 +45,7 @@ class CollectionRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_collection_by_handle()
+    public function it_gets_a_collection_by_handle()
     {
         tap($this->repo->findByHandle('alphabetical'), function ($collection) {
             $this->assertInstanceOf(Collection::class, $collection);
@@ -75,7 +75,7 @@ class CollectionRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_saves_a_collection_to_the_stache_and_to_a_file()
+    public function it_saves_a_collection_to_the_stache_and_to_a_file()
     {
         $collection = CollectionAPI::make('new');
         $collection->cascade(['foo' => 'bar']);

@@ -2,11 +2,11 @@
 
 namespace Statamic\Http\Resources\CP\Assets;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Statamic\Facades\Action;
 use Statamic\Support\Str;
 
-class Asset extends Resource
+class Asset extends JsonResource
 {
     public function toArray($request)
     {
@@ -15,9 +15,9 @@ class Asset extends Resource
             'path' => $this->path(),
             'filename' => $this->filename(),
             'basename' => $this->basename(),
-            'url' => $this->absoluteUrl(),
+            'url' => $this->url(),
+            'permalink' => $this->absoluteUrl(),
             'extension' => $this->extension(),
-            'blueprint' => $this->blueprint()->handle(),
             'downloadUrl' => cp_route('assets.download', base64_encode($this->id())),
             'size' => Str::fileSizeForHumans($this->size()),
             'lastModified' => $this->lastModified()->inPreferredFormat(),
@@ -40,8 +40,10 @@ class Asset extends Resource
             $this->merge($this->publishFormData()),
 
             'allowDownloading' => $this->container()->allowDownloading(),
-            'actionUrl' => cp_route('assets.actions'),
+            'runActionUrl' => cp_route('assets.actions.run'),
             'actions' => Action::for($this->resource, ['container' => $this->container()->handle()]),
+
+            'blueprint' => $this->blueprint()->toPublishArray(),
         ];
     }
 

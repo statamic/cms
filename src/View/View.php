@@ -60,18 +60,18 @@ class View
         return $this;
     }
 
-    public function render()
+    public function render(): string
     {
         $cascade = $this->gatherData();
 
-        $contents = view($this->template, $cascade);
+        $contents = view($this->templateViewName(), $cascade);
 
         // We only want the template-in-a-layout behavior if the template is Antlers.
         $isAntlers = Str::endsWith($contents->getPath(), ['.antlers.html', '.antlers.php']);
 
         if ($this->layout && $isAntlers) {
             $contents = view($this->layoutViewName(), array_merge($cascade, [
-                'template_content' => $contents->withoutExtractions()->render()
+                'template_content' => $contents->withoutExtractions()->render(),
             ]));
         }
 
@@ -109,6 +109,17 @@ class View
         $view = $this->layout;
 
         if (view()->exists($subdirectoried = 'layouts.'.$view)) {
+            return $subdirectoried;
+        }
+
+        return $view;
+    }
+
+    protected function templateViewName()
+    {
+        $view = $this->template;
+
+        if (view()->exists($subdirectoried = 'templates.'.$view)) {
             return $subdirectoried;
         }
 

@@ -2,14 +2,11 @@
 
 namespace Tests\Feature\Fieldsets;
 
-use Mockery;
 use Statamic\Facades;
-use Tests\TestCase;
-use Tests\FakesRoles;
-use Statamic\Auth\User;
 use Statamic\Fields\Fieldset;
-use Statamic\Entries\Collection;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class ViewFieldsetListingTest extends TestCase
 {
@@ -17,11 +14,11 @@ class ViewFieldsetListingTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_shows_a_list_of_fieldsets()
+    public function it_shows_a_list_of_fieldsets()
     {
         Facades\Fieldset::shouldReceive('all')->andReturn(collect([
             'foo' => $fieldsetA = $this->createfieldset('foo'),
-            'bar' => $fieldsetB = $this->createFieldset('bar')
+            'bar' => $fieldsetB = $this->createFieldset('bar'),
         ]));
 
         $user = Facades\User::make()->makeSuper()->save();
@@ -52,7 +49,7 @@ class ViewFieldsetListingTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();

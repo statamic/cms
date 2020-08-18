@@ -2,14 +2,14 @@
 
 namespace Statamic\Stache\Repositories;
 
-use Statamic\Support\Str;
-use Statamic\Stache\Stache;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Query\TermQueryBuilder;
+use Statamic\Stache\Stache;
+use Statamic\Support\Str;
 use Statamic\Taxonomies\TermCollection;
-use Statamic\Contracts\Taxonomies\Term;
-use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
 
 class TermRepository implements RepositoryContract
 {
@@ -110,7 +110,7 @@ class TermRepository implements RepositoryContract
 
     public function make(string $slug = null): Term
     {
-        return (new \Statamic\Taxonomies\Term)->slug($slug);
+        return app(Term::class)->slug($slug);
     }
 
     protected function ensureAssociations()
@@ -118,5 +118,12 @@ class TermRepository implements RepositoryContract
         Taxonomy::all()->each(function ($taxonomy) {
             $this->store->store($taxonomy->handle())->index('associations');
         });
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            Term::class => \Statamic\Taxonomies\Term::class,
+        ];
     }
 }

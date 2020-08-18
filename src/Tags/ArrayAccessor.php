@@ -2,14 +2,25 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Arr;
 use Illuminate\Support\Collection;
+use Statamic\Support\Arr;
 
 class ArrayAccessor extends Collection
 {
     public function get($key, $default = null)
     {
         return Arr::getFirst($this->items, Arr::wrap($key), $default);
+    }
+
+    public function hasAny(array $keys)
+    {
+        foreach ($keys as $key) {
+            if ($this->has($key)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function explode($key, $default = null)

@@ -6,12 +6,16 @@
     <script src="{{ $url }}"></script>
 @endforeach
 
-@foreach (Statamic::availableScripts(request()) as $name => $path)
-    <script src="{{ Statamic::vendorAssetUrl("$name/js/$path") }}"></script>
+@foreach (Statamic::availableScripts(request()) as $package => $paths)
+    @foreach ($paths as $path)
+        <script src="{{ Statamic::vendorAssetUrl("$package/js/$path") }}"></script>
+    @endforeach
 @endforeach
 
 <script>
-    Statamic.config(@json(Statamic::jsonVariables(request())));
+    Statamic.config(@json(array_merge(Statamic::jsonVariables(request()), [
+        'wrapperClass' => $__env->getSection('wrapper_class', 'max-w-xl')
+    ])));
     Statamic.start();
 </script>
 

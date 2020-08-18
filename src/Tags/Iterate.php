@@ -2,9 +2,6 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Arr;
-use Statamic\Tags\Tags;
-
 class Iterate extends Tags
 {
     protected static $aliases = ['foreach'];
@@ -46,7 +43,7 @@ class Iterate extends Tags
         if (count($as = $this->params->explode('as', [])) === 1) {
             $valueKey = $as[0];
         } elseif (count($as) > 1) {
-            list($keyKey, $valueKey) = $as;
+            [$keyKey, $valueKey] = $as;
         }
 
         // Remove the parameter so the native scoping doesn't kick in.

@@ -4,83 +4,78 @@ on:
   push:
   pull_request:
   schedule:
-      - cron: '0 0 * * *'
+    - cron: '0 0 * * *'
 
 jobs:
-    php-tests:
-        runs-on: ${{ matrix.os }}
+  php-tests:
+    runs-on: ${{ matrix.os }}
+    if: "!contains(github.event.head_commit.message, '[ci skip]')"
 
-        strategy:
-            matrix:
-                php: [7.4, 7.3, 7.2, 7.1]
-                laravel: [6.*, 5.8.*]
-                dependency-version: [prefer-lowest, prefer-stable]
-                os: [ubuntu-latest]
-                include:
-                    - laravel: 6.*
-                      testbench: 4.*
-                    - laravel: 5.8.*
-                      testbench: 3.8.*
-                    - php: 7.4
-                      dependency-version: prefer-lowest
-                      additional-deps: '"mockery/mockery:1.2.3"'
-                exclude:
-                    - laravel: 6.*
-                      php: 7.1
+    strategy:
+      matrix:
+        php: [7.4, 7.3, 7.2]
+        laravel: [7.*, 6.*]
+        dependency-version: [prefer-lowest, prefer-stable]
+        os: [ubuntu-latest]
+        include:
+          - laravel: 7.*
+            testbench: 5.*
+          - laravel: 6.*
+            testbench: 4.*
+          - php: 7.4
+            dependency-version: prefer-lowest
+            additional-deps: '"mockery/mockery:>=1.2.3"'
 
-        name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
 
-        steps:
-            - name: Checkout code
-              uses: actions/checkout@v1
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
 
-            - name: Setup PHP
-              uses: shivammathur/setup-php@v1
-              with:
-                  php-version: ${{ matrix.php }}
-                  extension-csv: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
-                  coverage: none
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v1
+        with:
+          php-version: ${{ matrix.php }}
+          extension-csv: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+          coverage: none
 
-            - name: Install dependencies
-              run: |
-                  composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" ${{ matrix.additional-deps }} --no-interaction --no-update
-                  composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
+      - name: Install dependencies
+        run: |
+          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" ${{ matrix.additional-deps }} --no-interaction --no-update
+          composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
 
-            - name: Execute tests
-              run: vendor/bin/phpunit
-              continue-on-error: ${{ matrix.laravel == '5.8.*' }}
+      - name: Execute tests
+        run: vendor/bin/phpunit
 
-            - name: Send Slack notification
-              uses: 8398a7/action-slack@v2
-              if: failure()
-              with:
-                  status: ${{ job.status }}
-                  author_name: ${{ github.actor }}
-              env:
-                SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  js-tests:
+    runs-on: ubuntu-latest
+    if: "!contains(github.event.head_commit.message, '[ci skip]')"
 
-    js-tests:
-        runs-on: ubuntu-latest
+    name: JavaScript tests
 
-        name: JavaScript tests
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v1
 
-        steps:
-            -   name: Checkout code
-                uses: actions/checkout@v1
+      - name: Install dependencies
+        run: npm install
 
-            -   name: Install dependencies
-                run: npm install
+      - name: Execute tests
+        run: npm run test
 
-            -   name: Execute tests
-                run: npm run test
-
-            - name: Send Slack notification
-              uses: 8398a7/action-slack@v2
-              if: failure()
-              with:
-                  status: ${{ job.status }}
-                  author_name: ${{ github.actor }}
-              env:
-                SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
-                GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  slack:
+    name: Slack Notification
+    runs-on: ubuntu-latest
+    needs: [php-tests, js-tests]
+    if: always()
+    steps:
+      - uses: technote-space/workflow-conclusion-action@v1
+      - name: Send Slack notification
+        uses: 8398a7/action-slack@v2
+        if: env.WORKFLOW_CONCLUSION == 'failure'
+        with:
+          status: failure
+          author_name: ${{ github.actor }}
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

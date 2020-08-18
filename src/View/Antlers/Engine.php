@@ -2,23 +2,23 @@
 
 namespace Statamic\View\Antlers;
 
+use Facades\Statamic\View\Cascade;
+use Illuminate\Contracts\View\Engine as EngineInterface;
+use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
+use Statamic\Contracts\Data\Augmentable;
+use Statamic\Exceptions;
+use Statamic\Facades\Parse;
+use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Facades\Path;
-use Statamic\Facades\Parse;
-use Statamic\Exceptions;
-use Illuminate\Support\Collection;
-use Facades\Statamic\View\Cascade;
-use Illuminate\Filesystem\Filesystem;
-use Statamic\Tags\TagNotFoundException;
-use Statamic\Contracts\Data\Augmentable;
 use Statamic\Tags\Loader as TagLoader;
-use Illuminate\Contracts\View\Engine as EngineInterface;
+use Statamic\Tags\TagNotFoundException;
 
 class Engine implements EngineInterface
 {
     /**
-     * The Antlers Parser
+     * The Antlers Parser.
      *
      * @return Parser
      */
@@ -39,7 +39,7 @@ class Engine implements EngineInterface
     private $injectExtractions = [];
 
     /**
-     * Create a new AntlersEngine instance
+     * Create a new AntlersEngine instance.
      *
      * @param Filesystem $filesystem
      * @param Parser $parser
@@ -88,11 +88,11 @@ class Engine implements EngineInterface
 
         $contents = $parser->parseView($path, $contents, $data);
 
-        if (array_pop($this->injectExtractions) !== false) {
-            $contents = $parser->injectNoparse($contents);
+        if (array_pop($this->injectExtractions) === false) {
+            $contents->withoutExtractions();
         }
 
-        return $contents;
+        return (string) $contents;
     }
 
     protected function getContents($path)
@@ -101,7 +101,7 @@ class Engine implements EngineInterface
     }
 
     /**
-     * Get the YAML front matter and contents from a view
+     * Get the YAML front matter and contents from a view.
      *
      * @param string $contents
      * @return array
@@ -127,14 +127,14 @@ class Engine implements EngineInterface
      */
     public static function renderTag(Parser $parser, $name, $parameters = [], $content = '', $context = [])
     {
-        $tag_measure = 'tag_' . $name . microtime();
-        debugbar()->startMeasure($tag_measure, 'Tag: ' . $name);
+        $tag_measure = 'tag_'.$name.microtime();
+        debugbar()->startMeasure($tag_measure, 'Tag: '.$name);
 
         // determine format
         if ($pos = strpos($name, ':')) {
-            $original_method  = substr($name, $pos + 1);
+            $original_method = substr($name, $pos + 1);
             $method = Str::camel($original_method);
-            $name    = substr($name, 0, $pos);
+            $name = substr($name, 0, $pos);
         } else {
             $method = $original_method = 'index';
         }
@@ -142,11 +142,11 @@ class Engine implements EngineInterface
         try {
             $tag = app(TagLoader::class)->load($name, [
                 'parser'     => $parser,
-                'parameters' => $parameters,
+                'params'     => $parameters,
                 'content'    => $content,
                 'context'    => $context,
-                'tag'        => $name . ':' . $original_method,
-                'tag_method' => $original_method
+                'tag'        => $name.':'.$original_method,
+                'tag_method' => $original_method,
             ]);
 
             $output = call_user_func([$tag, $method]);
@@ -166,6 +166,10 @@ class Engine implements EngineInterface
                 } else {
                     $output = Arr::assoc($output) ? $tag->parse($output) : $tag->parseLoop($output);
                 }
+            }
+
+            if ($output instanceof Value) {
+                $output = $output->antlersValue($parser, $context);
             }
 
             return $output;

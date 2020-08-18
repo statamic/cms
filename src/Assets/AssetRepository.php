@@ -2,15 +2,13 @@
 
 namespace Statamic\Assets;
 
-use Statamic\Support\Str;
-use Statamic\Facades\URL;
-use Statamic\Facades\Site;
-use Statamic\Facades\YAML;
-use Statamic\Facades\AssetContainer;
-use Statamic\Assets\AssetCollection;
 use Statamic\Contracts\Assets\Asset;
-use Statamic\Contracts\Assets\QueryBuilder;
 use Statamic\Contracts\Assets\AssetRepository as Contract;
+use Statamic\Contracts\Assets\QueryBuilder;
+use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Site;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 
 class AssetRepository implements Contract
 {
@@ -49,11 +47,11 @@ class AssetRepository implements Contract
         $containerUrl = $container->url();
 
         if (starts_with($containerUrl, '/')) {
-            $containerUrl = $siteUrl . $containerUrl;
+            $containerUrl = $siteUrl.$containerUrl;
         }
 
         if (starts_with($containerUrl, $siteUrl)) {
-            $url = $siteUrl . $url;
+            $url = $siteUrl.$url;
         }
 
         $path = str_after($url, $containerUrl);
@@ -78,7 +76,7 @@ class AssetRepository implements Contract
 
     public function findById(string $id)
     {
-        list($container_id, $path) = explode('::', $id);
+        [$container_id, $path] = explode('::', $id);
 
         // If a container can't be found, we'll assume there's no asset.
         if (! $container = AssetContainer::find($container_id)) {
@@ -118,5 +116,13 @@ class AssetRepository implements Contract
     public function save($asset)
     {
         $asset->writeMeta($asset->generateMeta());
+    }
+
+    public static function bindings(): array
+    {
+        return [
+            Asset::class => \Statamic\Assets\Asset::class,
+            QueryBuilder::class => \Statamic\Assets\QueryBuilder::class,
+        ];
     }
 }

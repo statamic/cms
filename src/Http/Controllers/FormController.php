@@ -2,69 +2,60 @@
 
 namespace Statamic\Http\Controllers;
 
-use Carbon\Carbon;
-use Statamic\Support\Arr;
-use Statamic\Facades\Form;
-use Statamic\Facades\Email;
-use Statamic\Facades\Parse;
-use Statamic\Facades\Config;
-use Illuminate\Http\Response;
-use Illuminate\Support\MessageBag;
 use Illuminate\Http\RedirectResponse;
-use Illuminate\Support\Facades\Crypt;
+use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Event;
+use Illuminate\Support\MessageBag;
+use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Exceptions\PublishException;
-use Statamic\Http\Controllers\Controller;
+use Statamic\Events\FormSubmitted;
+use Statamic\Events\SubmissionCreated;
 use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Facades\Form;
+use Statamic\Forms\SendEmails;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class FormController extends Controller
 {
     /**
-     * Handle a create form submission request
+     * Handle a form submission request.
      *
      * @return mixed
      */
-    public function store()
+    public function submit(Request $request, $form)
     {
-        $fields = request()->all();
+        $params = collect($request->all())->filter(function ($value, $key) {
+            return Str::startsWith($key, '_');
+        })->all();
 
-        if (! $params = request()->input('_params')) {
-            return response('Invalid request.', 400);
-        }
+        $fields = $form->blueprint()->fields()->addValues($values = $request->all());
 
-        $params = Crypt::decrypt($params);
-        unset($fields['_params']);
-
-        $handle = array_get($params, 'form');
-        $form = Form::find($handle);
-
-        $submission = $form->createSubmission();
-
-        if ($form->sanitize()) {
-            $fields = Arr::sanitize($fields);
-        }
+        $submission = $form->makeSubmission()->data($values);
 
         try {
-            $submission->data($fields);
+            $fields->validate();
+
+            throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
+
             $submission->uploadFiles();
 
-            // Allow addons to prevent the submission of the form, return
-            // their own errors, and modify the submission.
-            list($errors, $submission) = $this->runCreatingEvent($submission);
-        } catch (PublishException $e) {
-            return $this->formFailure($params, $e->getErrors(), $handle);
+            // If any event listeners return false, we'll do a silent failure.
+            // If they want to add validation errors, they can throw an exception.
+            throw_if(FormSubmitted::dispatch($submission) === false, new SilentFormFailureException);
+        } catch (ValidationException $e) {
+            return $this->formFailure($params, $e->errors(), $form->handle());
         } catch (SilentFormFailureException $e) {
             return $this->formSuccess($params, $submission);
         }
 
-        if ($errors) {
-            return $this->formFailure($params, $errors, $handle);
+        if ($form->store()) {
+            $submission->save();
         }
 
-        $submission->save();
-
-        // Emit an event after the submission has been created.
-        event('Form.submission.created', $submission);
+        SubmissionCreated::dispatch($submission);
+        SendEmails::dispatch($submission);
 
         return $this->formSuccess($params, $submission);
     }
@@ -83,15 +74,15 @@ class FormController extends Controller
         if (request()->ajax()) {
             return response([
                 'success' => true,
-                'submission' => $submission->data()
+                'submission' => $submission->data(),
             ]);
         }
 
-        $redirect = array_get($params, 'redirect');
+        $redirect = Arr::get($params, '_redirect');
 
-        $response = ($redirect) ? redirect($redirect) : back();
+        $response = $redirect ? redirect($redirect) : back();
 
-        session()->flash("form.{$submission->form()->handle()}.success", true);
+        session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
         session()->flash('submission', $submission);
 
         return $response;
@@ -109,55 +100,17 @@ class FormController extends Controller
     {
         if (request()->ajax()) {
             return response([
-                'errors' => (new MessageBag($errors))->all()
+                'errors' => (new MessageBag($errors))->all(),
+                'error' => collect($errors)->map(function ($errors, $field) {
+                    return $errors[0];
+                })->all(),
             ], 400);
         }
 
-        // Set up where to be taken in the event of an error.
-        if ($error_redirect = array_get($params, 'error_redirect')) {
-            $error_redirect = redirect($error_redirect);
-        } else {
-            $error_redirect = back();
-        }
+        $redirect = Arr::get($params, '_error_redirect');
 
-        return $error_redirect->withInput()->withErrors($errors, 'form.'.$form);
-    }
+        $response = $redirect ? redirect($redirect) : back();
 
-    /**
-     * Run the `submission:creating` event.
-     *
-     * This allows the submission to be short-circuited before it gets saved and show errors.
-     * Or, a the submission may be modified. Lastly, an addon could just 'do something'
-     * here without modifying/stopping the submission.
-     *
-     * Expects an array of event responses (multiple listeners can listen for the same event).
-     * Each response in the array should be another array with either an `errors` or `submission` key.
-     *
-     * @param  Submission $submission
-     * @return array
-     */
-    private function runCreatingEvent($submission)
-    {
-        $errors = [];
-
-        $responses = event('Form.submission.creating', $submission);
-
-        foreach ($responses as $response) {
-            // Ignore any non-arrays
-            if (! is_array($response)) {
-                continue;
-            }
-
-            // If the event returned errors, tack those onto the array.
-            if ($response_errors = array_get($response, 'errors')) {
-                $errors = array_merge($response_errors, $errors);
-                continue;
-            }
-
-            // If the event returned a submission, we'll replace it with that.
-            $submission = array_get($response, 'submission');
-        }
-
-        return [$errors, $submission];
+        return $response->withInput()->withErrors($errors, 'form.'.$form);
     }
 }

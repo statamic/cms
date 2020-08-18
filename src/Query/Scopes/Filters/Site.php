@@ -7,37 +7,50 @@ use Statamic\Query\Scopes\Filter;
 
 class Site extends Filter
 {
+    protected $pinned = true;
+
+    public static function title()
+    {
+        return __('Site');
+    }
+
     public function fieldItems()
     {
-        $options = Facades\Site::all()->mapWithKeys(function ($site) {
-            return [$site->handle() => $site->name()];
-        })->all();
-
         return [
-            'value' => [
+            'site' => [
                 'display' => __('Site'),
-                'type' => 'select',
-                'options' => $options
-            ]
+                'type' => 'radio',
+                'options' => $this->options()->all(),
+            ],
+        ];
+    }
+
+    public function autoApply()
+    {
+        return [
+            'site' => Facades\Site::selected()->handle(),
         ];
     }
 
     public function apply($query, $values)
     {
-        $query->where('site', $values['value']);
+        $query->where('site', $values['site']);
     }
 
-    public function required()
+    public function badge($values)
     {
-        return true;
+        return __('Site').': '.strtolower($values['site']);
     }
 
     public function visibleTo($key)
     {
-        if (! Facades\Site::hasMultiple()) {
-            return false;
-        }
+        return $key === 'entries' && Facades\Site::hasMultiple();
+    }
 
-        return $key === 'entries';
+    protected function options()
+    {
+        return Facades\Site::all()->mapWithKeys(function ($site) {
+            return [$site->handle() => $site->name()];
+        });
     }
 }

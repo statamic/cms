@@ -114,6 +114,8 @@ import Doc from './Doc';
 import BardSource from './Source.vue';
 import Link from './Link';
 import Image from './Image';
+import Subscript from './Subscript';
+import Superscript from './Superscript';
 import RemoveFormat from './RemoveFormat';
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
@@ -435,6 +437,8 @@ export default {
             if (btns.includes('italic')) exts.push(new Italic());
             if (btns.includes('strikethrough')) exts.push(new Strike());
             if (btns.includes('underline')) exts.push(new Underline());
+            if (btns.includes('subscript')) exts.push(new Subscript());
+            if (btns.includes('superscript')) exts.push(new Superscript());
             if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
             if (btns.includes('removeformat')) exts.push(new RemoveFormat());
             if (btns.includes('image')) exts.push(new Image({ bard: this }));

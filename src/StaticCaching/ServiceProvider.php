@@ -3,9 +3,8 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Support\Facades\Event;
-use Statamic\StaticCaching\Invalidator;
-use Statamic\StaticCaching\Middleware\Retrieve;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Statamic\StaticCaching\Middleware\Retrieve;
 
 class ServiceProvider extends LaravelServiceProvider
 {
@@ -22,9 +21,13 @@ class ServiceProvider extends LaravelServiceProvider
         $this->app->bind(Invalidator::class, function ($app) {
             $class = config('statamic.static_caching.invalidation.class') ?? DefaultInvalidator::class;
 
-            return new $class(
+            return $app[$class];
+        });
+
+        $this->app->bind(DefaultInvalidator::class, function ($app) {
+            return new DefaultInvalidator(
                 $app[Cacher::class],
-                $app['config']['statamic.static_caching.invalidation']
+                $app['config']['statamic.static_caching.invalidation.rules']
             );
         });
     }

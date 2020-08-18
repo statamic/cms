@@ -2,12 +2,39 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Tags;
+use Statamic\Exceptions\NotFoundHttpException;
+use Statamic\Fields\Value;
 
 class Redirect extends Tags
 {
+    public function wildcard($tag)
+    {
+        return $this->redirect(
+            $this->context->value($tag)
+        );
+    }
+
     public function index()
     {
-        abort(redirect($this->get(['to', 'url']), $this->get('response', 302)));
+        return $this->redirect(
+            $this->params->get(['to', 'url'])
+        );
+    }
+
+    protected function redirect($location)
+    {
+        if ($location instanceof Value) {
+            $location = $location->value();
+        }
+
+        if ($location === 404) {
+            throw new NotFoundHttpException;
+        }
+
+        if (! $location) {
+            return;
+        }
+
+        abort(redirect($location, $this->params->get('response', 302)));
     }
 }

@@ -2,10 +2,8 @@
 
 namespace Statamic\Search;
 
-use Statamic\Facades\Search;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
-use Statamic\Search\UpdateItemIndexes;
 
 class ServiceProvider extends LaravelServiceProvider
 {
@@ -21,7 +19,7 @@ class ServiceProvider extends LaravelServiceProvider
         if ($this->app->runningInConsole()) {
             $this->commands([
                 Commands\Insert::class,
-                Commands\Update::class
+                Commands\Update::class,
             ]);
         }
 

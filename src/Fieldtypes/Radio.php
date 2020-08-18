@@ -7,17 +7,23 @@ use Statamic\Fields\LabeledValue;
 
 class Radio extends Fieldtype
 {
-    protected $configFields = [
-        'options' => [
-            'type' => 'array',
-            'value_header' => 'Label',
-            'instructions' => 'Set the array keys and their optional labels.'
-        ],
-        'inline' => [
-            'type' => 'toggle',
-            'instructions' => 'Show the radio buttons in a row.'
-        ]
-    ];
+    protected function configFieldItems(): array
+    {
+        return [
+            'options' => [
+                'display' => __('Options'),
+                'instructions' => __('statamic::fieldtypes.radio.config.options'),
+                'type' => 'array',
+                'value_header' => __('Label'),
+            ],
+            'inline' => [
+                'display' => __('Inline'),
+                'instructions' => __('statamic::fieldtypes.radio.config.inline'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
+        ];
+    }
 
     public function augment($value)
     {

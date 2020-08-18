@@ -1,4 +1,4 @@
-@tailwind preflight;
+@tailwind base;
 
 @tailwind components;
 
@@ -76,6 +76,7 @@
 @import "components/fieldtypes/assets";
 @import "components/fieldtypes/bard";
 @import "components/fieldtypes/checkboxes";
+@import "components/fieldtypes/color";
 @import "components/fieldtypes/datetime";
 @import "components/fieldtypes/environment";
 @import "components/fieldtypes/grid";

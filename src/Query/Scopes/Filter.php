@@ -2,24 +2,16 @@
 
 namespace Statamic\Query\Scopes;
 
-use Statamic\Fields\Fields;
-use Statamic\Extend\HasTitle;
-use Statamic\Query\Scopes\Scope;
-use Statamic\Extend\RegistersItself;
 use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Extend\HasFields;
+use Statamic\Extend\HasTitle;
 
 abstract class Filter extends Scope implements Arrayable
 {
-    use HasTitle;
+    use HasTitle, HasFields;
 
     protected $context = [];
-    protected $field;
-    protected $fields = [];
-
-    public function required()
-    {
-        return false;
-    }
+    protected $pinned = false;
 
     public function visibleTo($key)
     {
@@ -38,24 +30,27 @@ abstract class Filter extends Scope implements Arrayable
         return [];
     }
 
-    public function fields()
-    {
-        $fields = collect($this->fieldItems())->map(function ($field, $handle) {
-            return compact('handle', 'field');
-        });
-
-        return new Fields($fields);
-    }
-
     protected function fieldItems()
     {
-        if ($this->fields) {
-            return $this->fields;
-        }
+        return [
+            'value' => [
+                'type' => 'text',
+            ],
+        ];
+    }
 
-        $field = $this->field ?? ['type' => 'text', 'display' => static::title()];
+    public function autoApply()
+    {
+        return [];
+    }
 
-        return ['value' => $field];
+    public function badge($values)
+    {
+        $valuesSummary = collect($values)
+            ->filter()
+            ->implode(', ');
+
+        return strtolower($this->title()).': '.$valuesSummary;
     }
 
     public function toArray()
@@ -64,10 +59,16 @@ abstract class Filter extends Scope implements Arrayable
             'handle' => $this->handle(),
             'title' => $this->title(),
             'extra' => $this->extra(),
-            'required' => $this->required(),
+            'pinned' => $this->pinned(),
+            'auto_apply' => $this->autoApply(),
             'fields' => $this->fields()->toPublishArray(),
             'meta' => $this->fields()->meta(),
             'values' => $this->fields()->all()->map->defaultValue(),
         ];
+    }
+
+    public function __call($method, $args)
+    {
+        return $this->{$method};
     }
 }

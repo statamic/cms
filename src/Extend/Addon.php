@@ -2,19 +2,20 @@
 
 namespace Statamic\Extend;
 
-use Statamic\Support\Arr;
-use Statamic\Facades\URL;
-use Statamic\Support\Str;
-use Statamic\Facades\Path;
+use Facades\Statamic\Licensing\LicenseManager;
 use Statamic\Facades\File;
+use Statamic\Facades\Path;
+use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
-use Statamic\Updater\Changelog;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
+use Statamic\Updater\AddonChangelog;
 
 final class Addon
 {
     /**
      * The identifier.
-     * Typically a composer package name. eg. statamic/bloodhound
+     * Typically a composer package name. eg. statamic/bloodhound.
      *
      * @var string
      */
@@ -25,14 +26,7 @@ final class Addon
      *
      * @var int
      */
-    protected $marketplaceProductId;
-
-    /**
-     * The marketplace variant ID of the addon.
-     *
-     * @var int
-     */
-    protected $marketplaceVariantId;
+    protected $marketplaceId;
 
     /**
      * The marketplace slug of the addon.
@@ -42,29 +36,35 @@ final class Addon
     protected $marketplaceSlug;
 
     /**
+     * The marketplace slug of the addon's seller.
      *
-     * The addon's namespace. eg. "Statamic\Addons\Bloodhound"
+     * @var int
+     */
+    protected $marketplaceSellerSlug;
+
+    /**
+     * The addon's namespace. eg. "Statamic\Addons\Bloodhound".
      *
      * @var string
      */
     protected $namespace;
 
     /**
-     * The directory the package is located within. eg. "/path/to/vendor/statamic/bloodhound"
+     * The directory the package is located within. eg. "/path/to/vendor/statamic/bloodhound".
      *
      * @var string
      */
     protected $directory;
 
     /**
-     * The autoloaded directory, relative to the addon root. eg. "src" or ""
+     * The autoloaded directory, relative to the addon root. eg. "src" or "".
      *
      * @var string
      */
     protected $autoload;
 
     /**
-     * The name of the addon. eg. "Bloodhound Search"
+     * The name of the addon. eg. "Bloodhound Search".
      *
      * @var string
      */
@@ -92,6 +92,13 @@ final class Addon
     protected $version;
 
     /**
+     * The latest version of the addon (via marketplace).
+     *
+     * @var string
+     */
+    protected $latestVersion;
+
+    /**
      * The marketing URL.
      *
      * @var string
@@ -106,7 +113,7 @@ final class Addon
     protected $developer;
 
     /**
-     * The developer's URL
+     * The developer's URL.
      *
      * @var string
      */
@@ -118,6 +125,13 @@ final class Addon
      * @var bool
      */
     protected $isCommercial = false;
+
+    /**
+     * Available editions.
+     *
+     * @var array|null
+     */
+    protected $editions = [];
 
     /**
      * @param string $id
@@ -148,8 +162,8 @@ final class Addon
         $instance = self::make($package['id']);
 
         $keys = [
-            'id', 'slug', 'marketplaceProductId', 'marketplaceVariantId', 'marketplaceSlug', 'name', 'namespace', 'directory',
-            'autoload', 'description', 'package', 'version', 'url', 'developer', 'developerUrl', 'isCommercial',
+            'id', 'slug', 'editions', 'marketplaceId', 'marketplaceSlug', 'marketplaceSellerSlug', 'name', 'namespace', 'directory',
+            'autoload', 'description', 'package', 'version', 'latestVersion', 'url', 'developer', 'developerUrl', 'isCommercial',
         ];
 
         foreach (Arr::only($package, $keys) as $key => $value) {
@@ -162,7 +176,7 @@ final class Addon
 
     /**
      * The ID (in a vendor/package format)
-     * eg. statamic/bloodhound
+     * eg. statamic/bloodhound.
      *
      * @return string
      */
@@ -173,6 +187,7 @@ final class Addon
 
     /**
      * The composer package string
+     * eg. statamic/bloodhound.
      *
      * @return string
      */
@@ -182,16 +197,25 @@ final class Addon
     }
 
     /**
-     * The marketplace variant ID of the addon.
+     * The composer package name string
+     * eg. in statamic/blodhound, it's bloodhound.
      *
-     * @param int $id
-     * @return int
+     * @return string
      */
-    public function marketplaceProductId($id = null)
+    public function packageName()
     {
-        return $id
-            ? $this->marketplaceProductId = $id
-            : $this->marketplaceProductId;
+        return explode('/', $this->package())[1];
+    }
+
+    /**
+     * The composer vendor name string
+     * eg. in statamic/blodhound, it's statamic.
+     *
+     * @return string
+     */
+    public function vendorName()
+    {
+        return explode('/', $this->package())[0];
     }
 
     /**
@@ -200,11 +224,11 @@ final class Addon
      * @param int $id
      * @return int
      */
-    public function marketplaceVariantId($id = null)
+    public function marketplaceId($id = null)
     {
         return $id
-            ? $this->marketplaceVariantId = $id
-            : $this->marketplaceVariantId;
+            ? $this->marketplaceId = $id
+            : $this->marketplaceId;
     }
 
     /**
@@ -323,23 +347,27 @@ final class Addon
     }
 
     /**
-     * Get the license key as provided by the user.
-     *
-     * @return string|null
-     */
-    public function licenseKey()
-    {
-        return array_get($this->config(), 'license_key');
-    }
-
-    /**
      * Get addon changelog.
      *
-     * @return Changelog|null
+     * @return AddonChangelog|null
      */
     public function changelog()
     {
-        return Changelog::product($this->marketplaceSlug());
+        return new AddonChangelog($this);
+    }
+
+    public function isLatestVersion()
+    {
+        if (! $this->latestVersion) {
+            return true;
+        }
+
+        return version_compare($this->version, $this->latestVersion, '=');
+    }
+
+    public function license()
+    {
+        return LicenseManager::addons()->get($this->package());
     }
 
     /**
@@ -361,6 +389,33 @@ final class Addon
         }
 
         $this->$method = $args[0];
+
+        return $this;
+    }
+
+    public function existsOnMarketplace()
+    {
+        return $this->marketplaceSlug() !== null;
+    }
+
+    public function edition()
+    {
+        $configured = config('statamic.editions.addons.'.$this->package());
+
+        if ($configured && ! $this->editions()->contains($configured)) {
+            throw new \Exception("Invalid edition [$configured] for addon ".$this->package());
+        }
+
+        return $configured ?? $this->editions()->first();
+    }
+
+    public function editions($editions = null)
+    {
+        if (func_num_args() === 0) {
+            return collect($this->editions);
+        }
+
+        $this->editions = $editions;
 
         return $this;
     }

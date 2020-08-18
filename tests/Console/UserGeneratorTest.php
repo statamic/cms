@@ -2,9 +2,9 @@
 
 namespace Tests\Console;
 
-use Tests\TestCase;
-use Statamic\Facades\User;
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Facades\User;
+use Tests\TestCase;
 
 class UserGeneratorTest extends TestCase
 {
@@ -20,7 +20,7 @@ class UserGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_can_make_a_user()
+    public function it_can_make_a_user()
     {
         $this->withoutMockingConsoleOutput();
 
@@ -35,7 +35,7 @@ class UserGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_can_make_a_user_interactively()
+    public function it_can_make_a_user_interactively()
     {
         $this->assertEmpty(User::all());
 
@@ -56,7 +56,7 @@ class UserGeneratorTest extends TestCase
     }
 
     /** @test */
-    function it_validates_email()
+    public function it_validates_email()
     {
         $this->assertEmpty(User::all());
 

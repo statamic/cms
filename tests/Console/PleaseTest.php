@@ -2,14 +2,14 @@
 
 namespace Tests\Console;
 
-use Tests\TestCase;
 use Statamic\Console\Please\Kernel;
 use Symfony\Component\Console\Exception\CommandNotFoundException;
+use Tests\TestCase;
 
 class PleaseTest extends TestCase
 {
     /** @test */
-    function it_can_run_an_artisan_command_with_statamic_prefix()
+    public function it_can_run_an_artisan_command_with_statamic_prefix()
     {
         $this->artisan('statamic:static:clear');
 
@@ -18,7 +18,7 @@ class PleaseTest extends TestCase
     }
 
     /** @test */
-    function it_can_run_a_please_command_without_statamic_prefix()
+    public function it_can_run_a_please_command_without_statamic_prefix()
     {
         $this->please('static:clear');
 

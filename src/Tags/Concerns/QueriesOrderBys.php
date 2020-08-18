@@ -2,8 +2,8 @@
 
 namespace Statamic\Tags\Concerns;
 
-use Statamic\Support\Arr;
 use Statamic\Query\OrderBy;
+use Statamic\Support\Arr;
 
 trait QueriesOrderBys
 {
@@ -28,7 +28,7 @@ trait QueriesOrderBys
             return $orderBys;
         }
 
-        $piped = Arr::getFirst($this->parameters, ['order_by', 'sort'], $this->defaultOrderBy());
+        $piped = Arr::getFirst($this->params, ['order_by', 'sort'], $this->defaultOrderBy());
 
         return collect(explode('|', $piped))->filter()->map(function ($orderBy) {
             return OrderBy::parse($orderBy);

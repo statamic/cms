@@ -2,10 +2,10 @@
 
 namespace Tests\StaticCaching;
 
-use Illuminate\Http\Request;
-use Tests\TestCase;
 use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Http\Request;
 use Statamic\StaticCaching\Cachers\ApplicationCacher;
+use Tests\TestCase;
 
 class ApplicationCacherTest extends TestCase
 {
@@ -26,7 +26,7 @@ class ApplicationCacherTest extends TestCase
         $cache = app(Repository::class);
         $cacher = new ApplicationCacher($cache, ['base_url' => 'http://example.com']);
         $cache->forever('static-cache:'.md5('http://example.com').'.urls', [
-            'one' => '/one', 'two' => '/two'
+            'one' => '/one', 'two' => '/two',
         ]);
         $cache->forever('static-cache:responses:one', 'html content');
 

@@ -2,9 +2,6 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Tags\Concerns;
-use Statamic\Tags\Tags;
-
 class Query extends Tags
 {
     use Concerns\QueriesConditions,
@@ -14,19 +11,19 @@ class Query extends Tags
         Concerns\OutputsItems;
 
     /**
-     * {{ query builder="" }} ... {{ /query }}
+     * {{ query builder="" }} ... {{ /query }}.
      */
     public function index()
     {
-        return $this->evaluate($this->parameters->get('builder'));
+        return $this->evaluate($this->params->get('builder'));
     }
 
     /**
-     * {{ query:* }} ... {{ /query:* }}
+     * {{ query:* }} ... {{ /query:* }}.
      */
     public function wildcard($tag)
     {
-        return $this->evaluate($this->context->get($tag));
+        return $this->evaluate($this->context->value($tag));
     }
 
     protected function evaluate($query)

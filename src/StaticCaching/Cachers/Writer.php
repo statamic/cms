@@ -12,7 +12,7 @@ class Writer
      *
      * @param string $path The path to the file.
      * @param string $content The content of the file.
-     * @param integer $lockFor
+     * @param int $lockFor
      * @return bool True if written, false if not.
      */
     public function write($path, $content, $lockFor = 0)
@@ -60,6 +60,10 @@ class Writer
 
     public function flush($path)
     {
+        if (! File::exists($path)) {
+            return;
+        }
+
         foreach (Folder::getFilesRecursively($path) as $file) {
             File::delete($file);
         }

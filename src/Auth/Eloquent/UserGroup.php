@@ -7,11 +7,9 @@ use Statamic\Facades\User;
 
 class UserGroup extends FileUserGroup
 {
-    public function users($users = null)
+    public function queryUsers()
     {
-        return User::query()
-            ->whereIn('id', $this->getUserIds())
-            ->get();
+        return User::query()->whereIn('id', $this->getUserIds());
     }
 
     protected function getUserIds()

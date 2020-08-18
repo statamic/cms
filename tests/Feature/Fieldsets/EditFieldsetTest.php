@@ -2,13 +2,13 @@
 
 namespace Tests\Feature\Fieldsets;
 
+use Facades\Statamic\Fields\FieldsetRepository;
 use Statamic\Facades;
-use Tests\TestCase;
-use Tests\FakesRoles;
 use Statamic\Fields\Fieldset;
 use Tests\Fakes\FakeFieldsetRepository;
+use Tests\FakesRoles;
 use Tests\PreventSavingStacheItemsToDisk;
-use Facades\Statamic\Fields\FieldsetRepository;
+use Tests\TestCase;
 
 class EditFieldsetTest extends TestCase
 {
@@ -23,7 +23,7 @@ class EditFieldsetTest extends TestCase
     }
 
     /** @test */
-    function it_denies_access_if_you_dont_have_permission()
+    public function it_denies_access_if_you_dont_have_permission()
     {
         $this->setTestRoles(['test' => ['access cp']]);
         $user = tap(Facades\User::make()->assignRole('test'))->save();
@@ -38,7 +38,7 @@ class EditFieldsetTest extends TestCase
     }
 
     /** @test */
-    function it_provides_the_fieldset()
+    public function it_provides_the_fieldset()
     {
         $this->withoutExceptionHandling();
         $user = Facades\User::make()->makeSuper()->save();

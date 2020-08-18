@@ -3,9 +3,9 @@
 namespace Statamic\Imaging;
 
 use Exception;
-use Statamic\Support\Str;
-use Statamic\Facades\URL;
 use League\Glide\Urls\UrlBuilderFactory;
+use Statamic\Facades\URL;
+use Statamic\Support\Str;
 
 class GlideUrlBuilder extends ImageUrlBuilder
 {
@@ -23,7 +23,7 @@ class GlideUrlBuilder extends ImageUrlBuilder
     }
 
     /**
-     * Build the URL
+     * Build the URL.
      *
      * @param \Statamic\Contracts\Assets\Asset|string $item
      * @param array                                   $params
@@ -37,19 +37,19 @@ class GlideUrlBuilder extends ImageUrlBuilder
 
         switch ($this->itemType()) {
             case 'url':
-                $path = 'http/' . base64_encode($item);
+                $path = 'http/'.base64_encode($item);
                 break;
             case 'asset':
-                $path = 'asset/' . base64_encode($this->item->containerId() . '/' . $this->item->path());
+                $path = 'asset/'.base64_encode($this->item->containerId().'/'.$this->item->path());
                 break;
             case 'id':
-                $path = 'asset/' . base64_encode(str_replace('::', '/', $this->item));
+                $path = 'asset/'.base64_encode(str_replace('::', '/', $this->item));
                 break;
             case 'path':
                 $path = URL::encode($this->item);
                 break;
             default:
-                throw new Exception("Cannot build a Glide URL without a URL, path, or asset.");
+                throw new Exception('Cannot build a Glide URL without a URL, path, or asset.');
         }
 
         $builder = UrlBuilderFactory::create($this->options['route'], $this->options['key']);

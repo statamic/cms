@@ -2,9 +2,9 @@
 
 namespace Tests\Forms;
 
-use Tests\TestCase;
 use Statamic\Facades\Form;
 use Statamic\Fields\Blueprint;
+use Tests\TestCase;
 
 class FormTest extends TestCase
 {
@@ -16,13 +16,12 @@ class FormTest extends TestCase
     }
 
     /** @test */
-    function it_saves_a_form()
+    public function it_saves_a_form()
     {
         $blueprint = (new Blueprint)->setHandle('post')->save();
 
         Form::make('contact_us')
             ->title('Contact Us')
-            ->blueprint($blueprint)
             ->honeypot('winnie')
             ->save();
 
@@ -30,12 +29,11 @@ class FormTest extends TestCase
 
         $this->assertEquals('contact_us', $form->handle());
         $this->assertEquals('Contact Us', $form->title());
-        $this->assertEquals('post', $form->blueprint()->handle());
         $this->assertEquals('winnie', $form->honeypot());
     }
 
     /** @test */
-    function it_gets_all_forms()
+    public function it_gets_all_forms()
     {
         $this->assertEmpty(Form::all());
 
@@ -46,7 +44,7 @@ class FormTest extends TestCase
     }
 
     /** @test */
-    function it_has_default_honeypot()
+    public function it_has_default_honeypot()
     {
         $form = Form::make('contact_us');
 

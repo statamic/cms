@@ -2,24 +2,25 @@
 
 namespace Statamic\Taxonomies;
 
-use ArrayAccess;
 use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Carbon;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
+use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
-use Statamic\Support\Arr;
 
-class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
+class LocalizedTerm implements Term, Responsable, Augmentable
 {
-    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns;
+    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified;
 
     protected $locale;
     protected $term;
@@ -69,14 +70,18 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
 
     public function values()
     {
-        return $this->term
+        $values = $this->term
             ->dataForLocale($this->defaultLocale())
             ->merge($this->data());
+
+        return $this->taxonomy()->cascade()->merge($values);
     }
 
     public function value($key)
     {
-        return $this->get($key) ?? $this->inDefaultLocale()->get($key);
+        return $this->get($key)
+            ?? $this->inDefaultLocale()->get($key)
+            ?? $this->taxonomy()->cascade($key);
     }
 
     public function site()
@@ -97,6 +102,7 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
             } elseif ($this->term->slug() !== $slug) {
                 $this->set('slug', $slug);
             }
+
             return $this;
         }
 
@@ -120,7 +126,7 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
 
     public function hasOrigin()
     {
-        return !$this->isDefaultLocale();
+        return ! $this->isDefaultLocale();
     }
 
     public function id()
@@ -155,9 +161,15 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
         return $this;
     }
 
-    public function blueprint()
+    public function blueprint($blueprint = null)
     {
-        return $this->term->blueprint();
+        if (func_num_args() === 0) {
+            return $this->term->blueprint();
+        }
+
+        $this->term->blueprint($blueprint);
+
+        return $this;
     }
 
     public function reference()
@@ -185,7 +197,7 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
         return vsprintf('taxonomies/%s/%s/%s', [
             $this->taxonomyHandle(),
             $this->locale(),
-            $this->slug()
+            $this->slug(),
         ]);
     }
 
@@ -291,33 +303,13 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
         return Statamic::apiRoute('taxonomies.terms.show', [$this->taxonomyHandle(), $this->slug()]);
     }
 
-    public function offsetExists($key)
-    {
-        return $this->has($key);
-    }
-
-    public function offsetGet($key)
-    {
-        return $this->value($key);
-    }
-
-    public function offsetSet($key, $value)
-    {
-        $this->set($key, $value);
-    }
-
-    public function offsetUnset($key)
-    {
-        $this->remove($key);
-    }
-
     public function route()
     {
-        $route = '/' . str_replace('_', '-', $this->taxonomyHandle()) . '/{slug}';
+        $route = '/'.str_replace('_', '-', $this->taxonomyHandle()).'/{slug}';
 
         if ($this->collection()) {
             $collectionUrl = $this->collection()->url() ?? $this->collection()->handle();
-            $route = $collectionUrl . $route;
+            $route = $collectionUrl.$route;
         }
 
         return $route;
@@ -333,6 +325,10 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
 
     public function toResponse($request)
     {
+        if (! view()->exists($this->template())) {
+            throw new NotFoundHttpException;
+        }
+
         return (new DataResponse($this))->toResponse($request);
     }
 
@@ -346,7 +342,13 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
     public function template($template = null)
     {
         if (func_num_args() === 0) {
-            return $this->get('template', $this->taxonomyHandle().'.show');
+            $defaultTemplate = $this->taxonomyHandle().'.show';
+
+            if ($collection = $this->collection()) {
+                $defaultTemplate = $collection->handle().'.'.$defaultTemplate;
+            }
+
+            return $this->get('template', $defaultTemplate);
         }
 
         return $this->set('template', $template);
@@ -403,5 +405,17 @@ class LocalizedTerm implements Term, ArrayAccess, Responsable, Augmentable
     public function defaultAugmentedArrayKeys()
     {
         return $this->selectedQueryColumns;
+    }
+
+    protected function shallowAugmentedArrayKeys()
+    {
+        return ['id', 'title', 'slug', 'url', 'permalink', 'api_url'];
+    }
+
+    public function lastModified()
+    {
+        return $this->has('updated_at')
+            ? Carbon::createFromTimestamp($this->get('updated_at'))
+            : $this->term->fileLastModified();
     }
 }

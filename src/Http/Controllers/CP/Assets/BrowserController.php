@@ -6,7 +6,6 @@ use Illuminate\Http\Request;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Exceptions\AuthorizationException;
 use Statamic\Facades\Asset;
-use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Assets\FolderAssetsCollection;
@@ -37,6 +36,7 @@ class BrowserController extends CpController
                 'title' => $container->title(),
                 'edit_url' => $container->editUrl(),
                 'delete_url' => $container->deleteUrl(),
+                'blueprint_url' => cp_route('asset-containers.blueprint.edit', $container->handle()),
                 'can_edit' => User::current()->can('edit', $container),
                 'can_delete' => User::current()->can('delete', $container),
             ],

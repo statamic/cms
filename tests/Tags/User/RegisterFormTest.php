@@ -18,7 +18,7 @@ class RegisterFormTest extends TestCase
     }
 
     /** @test */
-    function it_renders_form()
+    public function it_renders_form()
     {
         $output = $this->tag('{{ user:register_form }}{{ /user:register_form }}');
         $aliased = $this->tag('{{ user:registration_form }}{{ /user:registration_form }}');
@@ -32,18 +32,28 @@ class RegisterFormTest extends TestCase
     }
 
     /** @test */
-    function it_renders_form_with_params()
+    public function it_renders_form_with_params()
     {
-        $output = $this->tag('{{ user:register_form redirect="/registered" attr="class:form|id:form" }}{{ /user:register_form }}');
+        $output = $this->tag('{{ user:register_form redirect="/submitted" error_redirect="/errors" class="form" id="form" }}{{ /user:register_form }}');
 
         $this->assertStringStartsWith('<form method="POST" action="http://localhost/!/auth/register" class="form" id="form">', $output);
-        $this->assertStringContainsString('<input type="hidden" name="referer" value="/registered" />', $output);
+        $this->assertStringContainsString('<input type="hidden" name="_redirect" value="/submitted" />', $output);
+        $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="/errors" />', $output);
     }
 
     /** @test */
-    function it_renders_form_with_fields_array()
+    public function it_renders_form_with_redirects_to_anchor()
     {
-        $output = $this->tag(<<<EOT
+        $output = $this->tag('{{ user:register_form redirect="#form" error_redirect="#form" }}{{ /user:register_form }}');
+
+        $this->assertStringContainsString('<input type="hidden" name="_redirect" value="http://localhost#form" />', $output);
+        $this->assertStringContainsString('<input type="hidden" name="_error_redirect" value="http://localhost#form" />', $output);
+    }
+
+    /** @test */
+    public function it_renders_form_with_fields_array()
+    {
+        $output = $this->tag(<<<'EOT'
 {{ user:register_form }}
     {{ fields }}
         <label>{{ display }}</label>{{ field }}
@@ -65,11 +75,11 @@ EOT
     }
 
     /** @test */
-    function it_renders_form_with_fields_array_and_custom_blueprint()
+    public function it_renders_form_with_fields_array_and_custom_blueprint()
     {
         $this->useCustomBlueprint();
 
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:register_form }}
     {{ fields }}
         <label>{{ display }}</label>{{ field }}
@@ -93,48 +103,51 @@ EOT
     }
 
     /** @test */
-    function it_wont_register_user_and_renders_errors()
+    public function it_wont_register_user_and_renders_errors()
     {
         $this->assertNull(User::findByEmail('san@holo.com'));
         $this->assertFalse(auth()->check());
 
         $this
-            ->post('/!/auth/register', [
-                'token' => 'test-token',
-            ])
+            ->post('/!/auth/register', [])
             ->assertSessionHasErrors([
                 'email',
                 'password',
-            ])
+            ], null, 'user.register')
             ->assertLocation('/');
 
         $this->assertNull(User::findByEmail('san@holo.com'));
         $this->assertFalse(auth()->check());
 
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:register_form }}
+    <p class="success">{{ success }}</p>
     {{ errors }}
         <p class="error">{{ value }}</p>
     {{ /errors }}
-    <p class="success">{{ success }}</p>
+    {{ fields }}
+        <p class="inline-error">{{ error }}</p>
+    {{ /fields }}
 {{ /user:register_form }}
 EOT
         );
 
-        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
         preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+        preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
             'The email field is required.',
             'The password field is required.',
         ];
 
-        $this->assertEquals($expected, $errors[1]);
         $this->assertEmpty($success[1]);
+        $this->assertEquals($expected, $errors[1]);
+        $this->assertEquals($expected, $inlineErrors[1]);
     }
 
     /** @test */
-    function it_wont_register_user_and_renders_custom_validation_errors()
+    public function it_wont_register_user_and_renders_custom_validation_errors()
     {
         $this->useCustomBlueprint();
 
@@ -143,7 +156,6 @@ EOT
 
         $this
             ->post('/!/auth/register', [
-                'token' => 'test-token',
                 'email' => 'san@holo.com',
                 'password' => 'chewy',
                 'password_confirmation' => 'chewy',
@@ -151,43 +163,51 @@ EOT
             ->assertSessionHasErrors([
                 'password', // Should fail now because we've defined `min:8` as a rule.
                 'age', // An extra `required` field that we added.
-            ])
+            ], null, 'user.register')
             ->assertLocation('/');
 
         $this->assertNull(User::findByEmail('san@holo.com'));
         $this->assertFalse(auth()->check());
 
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:register_form }}
+    <p class="success">{{ success }}</p>
+    <p class="age-error">{{ error:age }}</p>
     {{ errors }}
         <p class="error">{{ value }}</p>
     {{ /errors }}
-    <p class="success">{{ success }}</p>
+    {{ fields }}
+        <p class="inline-error">{{ error }}</p>
+    {{ /fields }}
 {{ /user:register_form }}
 EOT
         );
 
-        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
         preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+        preg_match_all('/<p class="age-error">(.+)<\/p>/U', $output, $ageError);
+        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+        preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
+        // TODO: It seems
         $expected = [
             'The password must be at least 8 characters.',
             'The age field is required.',
         ];
 
-        $this->assertEquals($expected, $errors[1]);
         $this->assertEmpty($success[1]);
+        $this->assertEquals($expected, $errors[1]);
+        $this->assertEquals($expected[1], $errors[1][1]);
+        $this->assertEquals($expected, $inlineErrors[1]);
     }
 
     /** @test */
-    function it_will_register_user_and_render_success()
+    public function it_will_register_user_and_render_success()
     {
         $this->assertNull(User::findByEmail('san@holo.com'));
         $this->assertFalse(auth()->check());
 
         $this
             ->post('/!/auth/register', [
-                'token' => 'test-token',
                 'email' => 'san@holo.com',
                 'password' => 'chewy',
                 'password_confirmation' => 'chewy',
@@ -199,36 +219,40 @@ EOT
         $this->assertTrue(auth()->check());
         $this->assertEquals('san@holo.com', auth()->user()->email());
 
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:register_form }}
+    <p class="success">{{ success }}</p>
     {{ errors }}
         <p class="error">{{ value }}</p>
     {{ /errors }}
-    <p class="success">{{ success }}</p>
+    {{ fields }}
+        <p class="inline-error">{{ error }}</p>
+    {{ /fields }}
 {{ /user:register_form }}
 EOT
         );
 
-        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
         preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+        preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
-        $this->assertEmpty($errors[1]);
         $this->assertEquals(['Registration successful.'], $success[1]);
+        $this->assertEmpty($errors[1]);
+        $this->assertEmpty($inlineErrors[1]);
     }
 
     /** @test */
-    function it_will_register_user_and_follow_custom_redirect_with_success()
+    public function it_will_register_user_and_follow_custom_redirect_with_success()
     {
         $this->assertNull(User::findByEmail('san@holo.com'));
         $this->assertFalse(auth()->check());
 
         $this
             ->post('/!/auth/register', [
-                'token' => 'test-token',
                 'email' => 'san@holo.com',
                 'password' => 'chewy',
                 'password_confirmation' => 'chewy',
-                'referer' => '/registration-successful',
+                '_redirect' => '/registration-successful',
             ])
             ->assertSessionHasNoErrors()
             ->assertLocation('/registration-successful');
@@ -237,37 +261,81 @@ EOT
         $this->assertTrue(auth()->check());
         $this->assertEquals('san@holo.com', auth()->user()->email());
 
-        $output = $this->tag(<<<EOT
+        $output = $this->tag(<<<'EOT'
 {{ user:register_form }}
-    {{ errors }}
-        <p class="error">{{ value }}</p>
-    {{ /errors }}
     <p class="success">{{ success }}</p>
 {{ /user:register_form }}
 EOT
         );
 
-        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
         preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
 
-        $this->assertEmpty($errors[1]);
         $this->assertEquals(['Registration successful.'], $success[1]);
     }
 
     /** @test */
-    function it_will_use_redirect_query_param_off_url()
+    public function it_wont_register_user_and_follow_custom_redirect_with_errors()
     {
-        $this->get('/?redirect=login-successful');
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
 
-        $expected = '<input type="hidden" name="referer" value="login-successful" />';
+        $this
+            ->post('/!/auth/register', [
+                '_error_redirect' => '/registration-error',
+            ])
+            ->assertSessionHasErrors([
+                'email',
+                'password',
+            ], null, 'user.register')
+            ->assertLocation('/registration-error');
 
-        $output = $this->tag('{{ user:login_form }}{{ /user:login_form }}');
+        $this->assertNull(User::findByEmail('san@holo.com'));
+        $this->assertFalse(auth()->check());
 
-        $this->assertStringNotContainsString($expected, $output);
+        $output = $this->tag(<<<'EOT'
+{{ user:register_form }}
+    <p class="success">{{ success }}</p>
+    {{ errors }}
+        <p class="error">{{ value }}</p>
+    {{ /errors }}
+    {{ fields }}
+        <p class="inline-error">{{ error }}</p>
+    {{ /fields }}
+{{ /user:register_form }}
+EOT
+        );
 
-        $output = $this->tag('{{ user:login_form allow_request_redirect="true" }}{{ /user:login_form }}');
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+        preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
-        $this->assertStringContainsString($expected, $output);
+        $expected = [
+            'The email field is required.',
+            'The password field is required.',
+        ];
+
+        $this->assertEmpty($success[1]);
+        $this->assertEquals($expected, $errors[1]);
+        $this->assertEquals($expected, $inlineErrors[1]);
+    }
+
+    /** @test */
+    public function it_will_use_redirect_query_param_off_url()
+    {
+        $this->get('/?redirect=registration-successful&error_redirect=registration-failure');
+
+        $expectedRedirect = '<input type="hidden" name="_redirect" value="registration-successful" />';
+        $expectedErrorRedirect = '<input type="hidden" name="_error_redirect" value="registration-failure" />';
+
+        $output = $this->tag('{{ user:register_form }}{{ /user:register_form }}');
+
+        $this->assertStringNotContainsString($expectedRedirect, $output);
+        $this->assertStringNotContainsString($expectedErrorRedirect, $output);
+
+        $output = $this->tag('{{ user:register_form allow_request_redirect="true" }}{{ /user:register_form }}');
+
+        $this->assertStringContainsString($expectedRedirect, $output);
+        $this->assertStringContainsString($expectedErrorRedirect, $output);
     }
 
     private function useCustomBlueprint()
@@ -279,7 +347,7 @@ EOT
                     'field' => [
                         'type' => 'text',
                         'display' => 'Full Name',
-                    ]
+                    ],
                 ],
                 [
                     'handle' => 'password', // Field already exists, but we're defining custom validation rules.
@@ -288,14 +356,14 @@ EOT
                         'input_type' => 'password',
                         'display' => 'Password',
                         'validate' => 'min:8',
-                    ]
+                    ],
                 ],
                 [
                     'handle' => 'phone', // Adding custom phone field.
                     'field' => [
                         'type' => 'text',
                         'display' => 'Phone Number',
-                    ]
+                    ],
                 ],
                 [
                     'handle' => 'age', // Adding custom age field.
@@ -303,9 +371,9 @@ EOT
                         'type' => 'text',
                         'display' => 'Over 18 years of age?',
                         'validate' => 'required',
-                    ]
+                    ],
                 ],
-            ]
+            ],
         ]);
 
         Blueprint::shouldReceive('find')

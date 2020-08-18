@@ -12,7 +12,7 @@
                 v-html="'&times'" />
         </div>
 
-        <div class="publish-fields">
+        <publish-fields-container>
 
             <form-group
                 v-if="!initialDirectory"
@@ -33,7 +33,7 @@
                 />
             </div>
 
-        </div>
+        </publish-fields-container>
 
     </modal>
 
@@ -76,9 +76,9 @@ export default {
 
     created() {
         // Allow key commands with a focused input
-        this.$keys.prototype.stopCallback = (e) => {
-            return ! ['enter', 'escape'].includes(e.code.toLowerCase());
-        }
+        this.$keys.stop(e => {
+            return ! ['enter', 'escape'].includes(e.code.toLowerCase())
+        })
 
         this.$keys.bind('enter', this.submit)
         this.$keys.bind('esc', this.cancel)

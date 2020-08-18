@@ -6,6 +6,10 @@
             <breadcrumb :url="cp_url('users')" :title="__('Users')" />
             <div class="flex items-center">
                 <h1 class="flex-1" v-text="title" />
+                    <dropdown-list class="mr-2" v-if="canEditBlueprint">
+                        <dropdown-item :text="__('Edit Blueprint')" :redirect="actions.editBlueprint" />
+                    </dropdown-list>
+
                     <change-password
                         v-if="canEditPassword"
                         :save-url="actions.password"
@@ -32,10 +36,12 @@
             :errors="errors"
             @updated="values = $event"
         >
-            <div slot-scope="{ container, setFieldValue }">
+            <div slot-scope="{ container, setFieldValue, setFieldMeta }">
                 <publish-sections
                     :enable-sidebar="false"
+                    :can-toggle-labels="true"
                     @updated="setFieldValue"
+                    @meta-updated="setFieldMeta"
                     @focus="container.$emit('focus', $event)"
                     @blur="container.$emit('blur', $event)"
                 ></publish-sections>
@@ -65,6 +71,7 @@ export default {
         actions: Object,
         method: String,
         canEditPassword: Boolean,
+        canEditBlueprint: Boolean
     },
 
     data() {

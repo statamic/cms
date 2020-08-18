@@ -9,7 +9,7 @@
             :site="site"
             :item-data-url="itemDataUrl"
             :selections-url="selectionsUrl"
-            :exclusions="exclusions"
+            :filters-url="filtersUrl"
             :search="true"
             :columns="columns"
             :can-create="false"
@@ -27,13 +27,13 @@ export default {
     props: {
         site: String,
         collections: Array,
-        exclusions: Array,
     },
 
     data() {
         return {
             config: {
                 type: 'entries',
+                collections: this.collections,
             },
             columns: [
                 { label: __('Title'), field: 'title' },
@@ -52,6 +52,13 @@ export default {
 
         selectionsUrl() {
             return cp_url('fieldtypes/relationship') + '?' + qs.stringify({
+                config: this.configParameter,
+                collections: this.collections,
+            });
+        },
+
+        filtersUrl() {
+            return cp_url('fieldtypes/relationship/filters') + '?' + qs.stringify({
                 config: this.configParameter,
                 collections: this.collections,
             });

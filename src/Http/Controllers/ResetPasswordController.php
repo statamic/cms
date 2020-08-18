@@ -3,8 +3,9 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
-use Illuminate\Foundation\Auth\ResetsPasswords;
-use Statamic\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Password;
+use Statamic\Auth\Passwords\PasswordReset;
+use Statamic\Auth\ResetsPasswords;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
 
 class ResetPasswordController extends Controller
@@ -20,9 +21,22 @@ class ResetPasswordController extends Controller
 
     public function showResetForm(Request $request, $token = null)
     {
-        return view('statamic::auth.passwords.reset')->with(
-            ['token' => $token, 'email' => $request->email]
-        );
+        return view('statamic::auth.passwords.reset')->with([
+            'token' => $token,
+            'email' => $request->email,
+            'action' => $this->resetFormAction(),
+            'title' => $this->resetFormTitle(),
+        ]);
+    }
+
+    protected function resetFormAction()
+    {
+        return route('statamic.password.reset.action');
+    }
+
+    protected function resetFormTitle()
+    {
+        return __('Reset Password');
     }
 
     public function redirectPath()
@@ -38,5 +52,10 @@ class ResetPasswordController extends Controller
         $user->password($password);
 
         $this->traitResetPassword($user, $password);
+    }
+
+    public function broker()
+    {
+        return Password::broker(PasswordReset::BROKER_RESETS);
     }
 }

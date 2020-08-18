@@ -12,7 +12,7 @@
         <!-- Step 1 -->
         <div v-if="!completed && currentStep === 0">
             <div class="max-w-md mx-auto px-2 py-6 text-center">
-                <h1 class="mb-3">{{ __('Create a New User') }}</h1>
+                <h1 class="mb-3">{{ __('Create User') }}</h1>
                 <p class="text-grey" v-text="__('messages.user_wizard_intro')" />
             </div>
 
@@ -189,7 +189,8 @@ export default {
         route: { type: String },
         usersCreateUrl: { type: String },
         usersIndexUrl: { type: String },
-        canCreateSupers: { type: Boolean }
+        canCreateSupers: { type: Boolean },
+        activationExpiry: { type: Number },
     },
 
     data() {
@@ -204,7 +205,7 @@ export default {
             invitation: {
                 send: true,
                 subject: __('messages.user_wizard_invitation_subject', { site: window.location.hostname }),
-                message: __('messages.user_wizard_invitation_body', { site: window.location.hostname }),
+                message: __('messages.user_wizard_invitation_body', { site: window.location.hostname, expiry: this.activationExpiry }),
             },
             userExists: false,
             completed: false,

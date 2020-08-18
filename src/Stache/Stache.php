@@ -3,12 +3,11 @@
 namespace Statamic\Stache;
 
 use Carbon\Carbon;
-use Statamic\Support\Str;
-use Statamic\Facades\File;
-use Statamic\Facades\Helper;
-use Statamic\Stache\Stores\Store;
-use Statamic\Extensions\FileStore;
 use Illuminate\Support\Facades\Cache;
+use Statamic\Extensions\FileStore;
+use Statamic\Facades\File;
+use Statamic\Stache\Stores\Store;
+use Statamic\Support\Str;
 use Wilderborn\Partyline\Facade as Partyline;
 
 class Stache
@@ -62,8 +61,9 @@ class Stache
 
     public function store($key)
     {
-        if (str_contains($key, '::')) {
-            list($parent, $child) = explode('::', $key);
+        if (Str::contains($key, '::')) {
+            [$parent, $child] = explode('::', $key);
+
             return $this->stores()->get($parent)->store($child);
         }
 
@@ -120,7 +120,7 @@ class Stache
             return null;
         }
 
-        $files = File::getFiles($cache->getDirectory() . '/stache', true);
+        $files = File::getFiles($cache->getDirectory().'/stache', true);
 
         return collect($files)->reduce(function ($size, $path) {
             return $size + File::size($path);
@@ -142,7 +142,7 @@ class Stache
 
         Cache::forever('stache::timing', [
             'time' => floor((microtime(true) - $this->startTime) * 1000),
-            'date' => Carbon::now()->timestamp
+            'date' => Carbon::now()->timestamp,
         ]);
 
         return $this;
@@ -157,7 +157,7 @@ class Stache
     {
         if (! $cache = Cache::get('stache::timing')) {
             return null;
-        };
+        }
 
         return Carbon::createFromTimestamp($cache['date']);
     }

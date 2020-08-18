@@ -23,7 +23,7 @@
     min-height: 80px;
 }
 
-// Responise Wangjangling
+// Responive Wangjangling
 @screen md {
     .bard-editor .ProseMirror { @apply p-2; }
 }
@@ -33,7 +33,7 @@
     position: sticky;
     padding: 4px 8px;
     z-index: 5;
-    top: 52px; // below global nav
+    top:  52px;
 
     .bard-toolbar-button {
         @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center;
@@ -70,14 +70,10 @@
     @apply bg-black rounded-full shadow-lg px-2;
 
     button {
-        @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center bg-transparent;
+        @apply focus-none text-grey-70 rounded px-sm flex items-center justify-center text-base text-center bg-transparent;
         height: 32px;
         width: 32px;
         margin: 0 2px;
-    }
-
-    button:hover {
-        @apply text-blue;
     }
 
     button.active {
@@ -172,7 +168,7 @@
    ========================================================================== */
 
 .bard-fieldtype .bard-fullscreen {
-    @apply .fixed .bg-grey-20 .pin .min-h-screen .overflow-scroll rounded-none;
+    @apply fixed bg-grey-20 inset-0 min-h-screen overflow-scroll rounded-none;
     z-index: 998; // to appear over the top of the rest of the stuff on the page.
                 // too high and it'll be over the top of stacks, etc.
 
@@ -183,6 +179,8 @@
     .bard-fixed-toolbar {
         @apply shadow h-12 justify-center;
         padding: 7px 8px;
+        top: 0;
+        z-index: 999;
 
         button {
             @apply mx-sm;
@@ -203,7 +201,7 @@
     }
 
     .bard-field-options {
-        @apply .fixed .pin-t .pin-l .pin-r .bg-grey-70 .p-2 .w-full;
+        @apply fixed top-0 inset-x-0 bg-grey-70 p-2 w-full;
         text-align: right;
         z-index: 1; // to appear over the top of .bard-editor
 
@@ -245,7 +243,7 @@
         em, i { font-style: italic }
 
         a {
-            @apply text-blue no-underline;
+            @apply text-blue underline;
         }
 
         a:active,
@@ -317,6 +315,14 @@
         margin-top: 0;
     }
 
+    ul {
+        list-style-type: disc;
+    }
+
+    ol {
+        list-style-type: decimal;
+    }
+
     ol,
     ul {
         padding: 0;
@@ -331,6 +337,11 @@
     ul ul {
         margin-top: 0;
         margin-bottom: 0;
+        padding-left: 2em;
+    }
+
+    ul ul {
+        list-style-type: circle;
     }
 
     ol ol {
@@ -368,7 +379,7 @@
             @apply relative;
 
             &:after {
-                @apply bg-grey-40 absolute pin pointer-events-none opacity-25;
+                @apply bg-grey-40 absolute inset-0 pointer-events-none opacity-25;
                 content: '';
             }
         }
@@ -457,4 +468,11 @@
     top: 0;
     position: relative;
     z-index: 1;
+}
+
+/* Bard inside the live preview
+  ========================================================================== */
+
+  .live-preview-fields .bard-fixed-toolbar {
+    top: 0;
 }

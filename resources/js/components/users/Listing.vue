@@ -14,24 +14,13 @@
             :sort-direction="sortDirection"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0">
-                    <div class="data-list-header">
-                        <data-list-toggle-all ref="toggleAll" />
-                        <div class="flex-1" />
-                        <data-list-bulk-actions
-                            class="rounded-b"
-                            :url="actionUrl"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
-                        />
-                        <template v-if="!hasSelections">
-                            <data-list-filters
-                                :filters="filters"
-                                :active-filters="activeFilters"
-                                :active-count="activeFilterCount"
-                            />
-                        </template>
-                    </div>
+                <div class="card p-0 relative">
+                    <data-list-bulk-actions
+                        class="rounded"
+                        :url="bulkActionsUrl"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                    />
                     <data-list-table :allow-bulk-actions="true" @sorted="sorted">
                         <template slot="cell-email" slot-scope="{ row: user, value }">
                             <a :href="user.edit_url" class="flex items-center">
@@ -41,8 +30,8 @@
                         </template>
                         <template slot="cell-roles" slot-scope="{ row: user, value: roles }">
                             <span v-if="user.super" class="badge-pill-sm mr-sm">{{ __('Super Admin') }}</span>
-                            <span v-if="roles.length === 0" />
-                            <span v-for="role in roles" class="badge-pill-sm mr-sm">{{ role.title }}</span>
+                            <span v-if="!roles || roles.length === 0" />
+                            <span v-for="role in (roles || [])" class="badge-pill-sm mr-sm">{{ role.title }}</span>
                         </template>
                         <template slot="actions" slot-scope="{ row: user, index }">
                             <dropdown-list>
@@ -50,7 +39,7 @@
                                 <dropdown-item :text="__('View')" :redirect="user.edit_url" v-else />
                                 <data-list-inline-actions
                                     :item="user.id"
-                                    :url="actionUrl"
+                                    :url="runActionUrl"
                                     :actions="user.actions"
                                     @started="actionStarted"
                                     @completed="actionCompleted"
@@ -64,7 +53,8 @@
                     class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
-                    @page-selected="page = $event"
+                    @page-selected="selectPage"
+                    @per-page-changed="changePerPage"
                 />
             </div>
         </data-list>

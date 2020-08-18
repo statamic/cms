@@ -1,12 +1,15 @@
-<?php namespace Tests;
+<?php
+
+namespace Tests\Facades;
 
 use Statamic\Facades\Config;
 use Statamic\Sites\Site;
+use Tests\TestCase;
 
 class ConfigTest extends TestCase
 {
     /** @test */
-    function gets_config_var()
+    public function gets_config_var()
     {
         config(['foo' => 'bar']);
 
@@ -15,7 +18,7 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function gets_scoped_var()
+    public function gets_scoped_var()
     {
         config(['myscope' => ['baz' => 'qux']]);
 
@@ -23,7 +26,7 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function sets_var()
+    public function sets_var()
     {
         $this->assertEquals('doesnt exist', Config::get('foo', 'doesnt exist'));
 
@@ -33,7 +36,7 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function gets_all_variables()
+    public function gets_all_variables()
     {
         $this->app->instance('config', new \Illuminate\Config\Repository(['foo' => 'bar']));
 
@@ -41,7 +44,7 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function gets_app_key()
+    public function gets_app_key()
     {
         config(['app.key' => '123']);
 
@@ -49,7 +52,7 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function gets_license_key()
+    public function gets_license_key()
     {
         config(['statamic.system.license_key' => '123']);
         $this->assertEquals('123', Config::getLicenseKey());
@@ -62,7 +65,7 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function gets_site()
+    public function gets_site()
     {
         $this->fakeSiteConfig();
 
@@ -73,7 +76,7 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function gets_full_locale()
+    public function gets_full_locale()
     {
         $this->fakeSiteConfig();
 
@@ -84,7 +87,7 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function gets_short_locale()
+    public function gets_short_locale()
     {
         $this->fakeSiteConfig();
 
@@ -95,7 +98,7 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function gets_locale_name()
+    public function gets_locale_name()
     {
         $this->fakeSiteConfig();
 
@@ -106,7 +109,7 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function gets_locale_handles()
+    public function gets_locale_handles()
     {
         $this->fakeSiteConfig();
 
@@ -114,7 +117,7 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function gets_default_locale()
+    public function gets_default_locale()
     {
         $this->fakeSiteConfig();
 
@@ -122,7 +125,7 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function gets_other_locale_handles()
+    public function gets_other_locale_handles()
     {
         $this->fakeSiteConfig();
 
@@ -130,18 +133,18 @@ class ConfigTest extends TestCase
     }
 
     /** @test */
-    function gets_site_url()
+    public function gets_site_url()
     {
         $this->fakeSiteConfig();
 
-        $this->assertEquals('http://test.com/', Config::getSiteUrl());
-        $this->assertEquals('http://test.com/', Config::getSiteUrl('en'));
-        $this->assertEquals('http://fr.test.com/', Config::getSiteUrl('fr'));
-        $this->assertEquals('http://test.com/de/', Config::getSiteUrl('de'));
+        $this->assertEquals('http://test.com', Config::getSiteUrl());
+        $this->assertEquals('http://test.com', Config::getSiteUrl('en'));
+        $this->assertEquals('http://fr.test.com', Config::getSiteUrl('fr'));
+        $this->assertEquals('http://test.com/de', Config::getSiteUrl('de'));
     }
 
     /** @test */
-    function gets_image_manipulation_presets()
+    public function gets_image_manipulation_presets()
     {
         $presets = [
             'small' => ['w' => 100],
@@ -160,8 +163,8 @@ class ConfigTest extends TestCase
             'sites' => [
                 'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
                 'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
-                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/']
-            ]
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
         ]);
     }
 }

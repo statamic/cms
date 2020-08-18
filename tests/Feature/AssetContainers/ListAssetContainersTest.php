@@ -14,7 +14,7 @@ class ListAssetContainersTest extends TestCase
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_lists_containers_you_have_access_to_when_requested_as_json()
+    public function it_lists_containers_you_have_access_to_when_requested_as_json()
     {
         $this->setTestRoles(['test' => ['access cp', 'view two assets', 'view three assets']]);
         $user = User::make()->assignRole('test')->save();
@@ -30,7 +30,7 @@ class ListAssetContainersTest extends TestCase
     }
 
     /** @test */
-    function it_loads_a_view_when_requested_normally()
+    public function it_loads_a_view_when_requested_normally()
     {
         $this->setTestRoles(['test' => ['access cp', 'view two assets', 'view three assets']]);
         $user = User::make()->assignRole('test')->save();
@@ -46,7 +46,7 @@ class ListAssetContainersTest extends TestCase
             ->assertViewHas('containers', $this->containerArray());
     }
 
-    function containerArray()
+    public function containerArray()
     {
         return [
             [
@@ -59,6 +59,7 @@ class ListAssetContainersTest extends TestCase
                 'create_folders' => true,
                 'edit_url' => 'http://localhost/cp/asset-containers/two/edit',
                 'delete_url' => 'http://localhost/cp/asset-containers/two',
+                'blueprint_url' => 'http://localhost/cp/asset-containers/two/blueprint',
                 'can_edit' => false,
                 'can_delete' => false,
             ],
@@ -72,6 +73,7 @@ class ListAssetContainersTest extends TestCase
                 'create_folders' => true,
                 'edit_url' => 'http://localhost/cp/asset-containers/three/edit',
                 'delete_url' => 'http://localhost/cp/asset-containers/three',
+                'blueprint_url' => 'http://localhost/cp/asset-containers/three/blueprint',
                 'can_edit' => false,
                 'can_delete' => false,
             ],

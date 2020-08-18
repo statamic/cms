@@ -2,14 +2,13 @@
 
 namespace Tests\Stache\Repositories;
 
-use Tests\TestCase;
-use Statamic\Stache\Stache;
-use Statamic\Stache\Stores\GlobalsStore;
+use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Facades\GlobalSet as GlobalSetAPI;
 use Statamic\Globals\GlobalCollection;
-use Statamic\Contracts\Globals\GlobalSet;
 use Statamic\Stache\Repositories\GlobalRepository;
-use Illuminate\Support\Collection as IlluminateCollection;
+use Statamic\Stache\Stache;
+use Statamic\Stache\Stores\GlobalsStore;
+use Tests\TestCase;
 
 class GlobalRepositoryTest extends TestCase
 {
@@ -26,7 +25,7 @@ class GlobalRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_global_sets()
+    public function it_gets_all_global_sets()
     {
         $sets = $this->repo->all();
 
@@ -35,24 +34,24 @@ class GlobalRepositoryTest extends TestCase
         $this->assertEveryItemIsInstanceOf(GlobalSet::class, $sets);
 
         $ordered = $sets->sortBy->path()->values();
-        $this->assertEquals(['globals-contact', 'globals-global'], $ordered->map->id()->all());
+        $this->assertEquals(['contact', 'global'], $ordered->map->id()->all());
         $this->assertEquals(['contact', 'global'], $ordered->map->handle()->all());
         $this->assertEquals(['Contact Details', 'General'], $ordered->map->title()->all());
     }
 
     /** @test */
-    function it_gets_a_global_set_by_id()
+    public function it_gets_a_global_set_by_id()
     {
-        tap($this->repo->find('globals-global'), function ($set) {
+        tap($this->repo->find('global'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
-            $this->assertEquals('globals-global', $set->id());
+            $this->assertEquals('global', $set->id());
             $this->assertEquals('global', $set->handle());
             $this->assertEquals('General', $set->title());
         });
 
-        tap($this->repo->find('globals-contact'), function ($set) {
+        tap($this->repo->find('contact'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
-            $this->assertEquals('globals-contact', $set->id());
+            $this->assertEquals('contact', $set->id());
             $this->assertEquals('contact', $set->handle());
             $this->assertEquals('Contact Details', $set->title());
         });
@@ -61,18 +60,18 @@ class GlobalRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_gets_a_global_set_by_handle()
+    public function it_gets_a_global_set_by_handle()
     {
         tap($this->repo->findByHandle('global'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
-            $this->assertEquals('globals-global', $set->id());
+            $this->assertEquals('global', $set->id());
             $this->assertEquals('global', $set->handle());
             $this->assertEquals('General', $set->title());
         });
 
         tap($this->repo->findByHandle('contact'), function ($set) {
             $this->assertInstanceOf(GlobalSet::class, $set);
-            $this->assertEquals('globals-contact', $set->id());
+            $this->assertEquals('contact', $set->id());
             $this->assertEquals('contact', $set->handle());
             $this->assertEquals('Contact Details', $set->title());
         });
@@ -81,11 +80,9 @@ class GlobalRepositoryTest extends TestCase
     }
 
     /** @test */
-    function it_saves_a_global_to_the_stache_and_to_a_file()
+    public function it_saves_a_global_to_the_stache_and_to_a_file()
     {
-        $global = GlobalSetAPI::make()
-            ->id('id-new')
-            ->handle('new');
+        $global = GlobalSetAPI::make('new');
 
         $global->addLocalization(
             $global->makeLocalization('en')->data(['foo' => 'bar', 'baz' => 'qux'])
@@ -95,7 +92,7 @@ class GlobalRepositoryTest extends TestCase
 
         $this->repo->save($global);
 
-        $this->assertNotNull($item = $this->repo->find('id-new'));
+        $this->assertNotNull($item = $this->repo->find('new'));
         $this->assertEquals(['foo' => 'bar', 'baz' => 'qux'], $item->in('en')->data()->all());
         $this->assertFileExists($this->directory.'/new.yaml');
         @unlink($this->directory.'/new.yaml');

@@ -5,7 +5,6 @@ namespace Tests\Routing;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Entry;
 use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -37,22 +36,22 @@ class RoutesTest extends TestCase
 
             Route::statamic('/route-with-custom-layout', 'test', [
                 'layout' => 'custom-layout',
-                'hello' => 'world'
+                'hello' => 'world',
             ]);
 
             Route::statamic('/route-with-loaded-entry', 'test', [
                 'hello' => 'world',
-                'load' => 'pages-blog'
+                'load' => 'pages-blog',
             ]);
 
             Route::statamic('/route-with-loaded-entry-by-uri', 'test', [
                 'hello' => 'world',
-                'load' => '/blog'
+                'load' => '/blog',
             ]);
 
             Route::statamic('/route-with-custom-content-type', 'test', [
                 'hello' => 'world',
-                'content_type' => 'json'
+                'content_type' => 'json',
             ]);
 
             Route::amp(function () {
@@ -62,7 +61,7 @@ class RoutesTest extends TestCase
     }
 
     /** @test */
-    function it_renders_a_view()
+    public function it_renders_a_view()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
@@ -73,7 +72,7 @@ class RoutesTest extends TestCase
     }
 
     /** @test */
-    function it_renders_a_view_without_data()
+    public function it_renders_a_view_without_data()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('test', 'Hello {{ hello }}');
@@ -84,7 +83,7 @@ class RoutesTest extends TestCase
     }
 
     /** @test */
-    function it_renders_a_view_with_placeholders()
+    public function it_renders_a_view_with_placeholders()
     {
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
         $this->viewShouldReturnRaw('test', 'Hello {{ foo }} {{ bar }} {{ baz }}');
@@ -95,7 +94,7 @@ class RoutesTest extends TestCase
     }
 
     /** @test */
-    function it_renders_a_view_with_custom_layout()
+    public function it_renders_a_view_with_custom_layout()
     {
         $this->viewShouldReturnRaw('custom-layout', 'Custom layout {{ template_content }}');
         $this->viewShouldReturnRaw('layout', 'Default layout');
@@ -107,7 +106,7 @@ class RoutesTest extends TestCase
     }
 
     /** @test */
-    function it_loads_content()
+    public function it_loads_content()
     {
         EntryFactory::id('pages-blog')->collection('pages')->data(['title' => 'Blog'])->create();
 
@@ -120,9 +119,9 @@ class RoutesTest extends TestCase
     }
 
     /** @test */
-    function it_loads_content_by_uri()
+    public function it_loads_content_by_uri()
     {
-        $collection = Collection::make('pages')->route('/{slug}')->save();
+        $collection = Collection::make('pages')->routes('/{slug}')->save();
         EntryFactory::id('pages-blog')->collection($collection)->slug('blog')->data(['title' => 'Blog'])->create();
 
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');
@@ -134,7 +133,7 @@ class RoutesTest extends TestCase
     }
 
     /** @test */
-    function it_loads_amp_route()
+    public function it_loads_amp_route()
     {
         $this->viewShouldReturnRaw('layout', '');
         $this->viewShouldReturnRaw('test', '');
@@ -145,7 +144,7 @@ class RoutesTest extends TestCase
     }
 
     /** @test */
-    function it_renders_a_view_with_custom_content_type()
+    public function it_renders_a_view_with_custom_content_type()
     {
         $this->withoutExceptionHandling();
         $this->viewShouldReturnRaw('layout', '{{ template_content }}');

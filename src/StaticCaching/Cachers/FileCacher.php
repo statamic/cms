@@ -2,10 +2,10 @@
 
 namespace Statamic\StaticCaching\Cachers;
 
+use Illuminate\Contracts\Cache\Repository;
+use Illuminate\Http\Request;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
-use Illuminate\Http\Request;
-use Illuminate\Contracts\Cache\Repository;
 
 class FileCacher extends AbstractCacher
 {
@@ -27,7 +27,7 @@ class FileCacher extends AbstractCacher
     }
 
     /**
-     * Cache a page
+     * Cache a page.
      *
      * @param \Illuminate\Http\Request $request     Request associated with the page to be cached
      * @param string                   $content     The response content to be cached
@@ -57,15 +57,15 @@ class FileCacher extends AbstractCacher
      */
     public function getCachedPage(Request $request)
     {
-        $url  = $this->getUrl($request);
+        $url = $this->getUrl($request);
 
-        \Log::debug('Static cache loaded [' . $url . '] If you are seeing this, your server rewrite rules have not been set up correctly.');
+        \Log::debug('Static cache loaded ['.$url.'] If you are seeing this, your server rewrite rules have not been set up correctly.');
 
         return File::get($this->getFilePath($url));
     }
 
     /**
-     * Flush out the entire static cache
+     * Flush out the entire static cache.
      *
      * @return void
      */
@@ -79,7 +79,7 @@ class FileCacher extends AbstractCacher
     }
 
     /**
-     * Invalidate a URL
+     * Invalidate a URL.
      *
      * @param string $url
      * @return void
@@ -108,7 +108,7 @@ class FileCacher extends AbstractCacher
     }
 
     /**
-     * Get the path where static files are stored
+     * Get the path where static files are stored.
      *
      * @param string|null $locale  A specific locale's path.
      * @return string

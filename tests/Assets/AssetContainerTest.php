@@ -2,25 +2,25 @@
 
 namespace Tests\Assets;
 
-use Statamic\Facades;
-use Tests\TestCase;
-use Statamic\Assets\Asset;
-use Statamic\Fields\Blueprint;
+use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Collection;
-use Statamic\Assets\AssetContainer;
 use Illuminate\Support\Facades\Storage;
+use Statamic\Assets\Asset;
+use Statamic\Assets\AssetContainer;
+use Statamic\Contracts\Assets\Asset as AssetContract;
+use Statamic\Contracts\Assets\AssetFolder;
+use Statamic\Facades;
+use Statamic\Fields\Blueprint;
 use Statamic\Filesystem\FlysystemAdapter;
 use Tests\PreventSavingStacheItemsToDisk;
-use Statamic\Contracts\Assets\AssetFolder;
-use Facades\Statamic\Fields\BlueprintRepository;
-use Statamic\Contracts\Assets\Asset as AssetContract;
+use Tests\TestCase;
 
 class AssetContainerTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
     /** @test */
-    function it_gets_and_sets_the_id()
+    public function it_gets_and_sets_the_id()
     {
         $container = new AssetContainer;
         $this->assertNull($container->id());
@@ -32,7 +32,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_handle()
+    public function it_gets_and_sets_the_handle()
     {
         $container = new AssetContainer;
         $this->assertNull($container->handle());
@@ -44,7 +44,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_changes_the_handle_when_changing_the_id()
+    public function it_changes_the_handle_when_changing_the_id()
     {
         // only applies to a file implementation
 
@@ -54,7 +54,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_changes_the_id_when_changing_the_handle()
+    public function it_changes_the_id_when_changing_the_handle()
     {
         // only applies to a file implementation
 
@@ -64,7 +64,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_disk()
+    public function it_gets_and_sets_the_disk()
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
@@ -84,7 +84,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_url_from_the_disk_config()
+    public function it_gets_the_url_from_the_disk_config()
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
@@ -99,7 +99,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_url_from_the_disk_config_when_its_relative()
+    public function it_gets_the_url_from_the_disk_config_when_its_relative()
     {
         config(['filesystems.disks.test' => [
             'driver' => 'local',
@@ -114,7 +114,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function its_private_if_the_disk_has_no_url()
+    public function its_private_if_the_disk_has_no_url()
     {
         Storage::fake('test');
 
@@ -129,7 +129,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_the_title()
+    public function it_gets_and_sets_the_title()
     {
         $container = (new AssetContainer)->handle('main');
         $this->assertEquals('Main', $container->title());
@@ -141,27 +141,16 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_blueprint()
+    public function it_gets_the_blueprint()
     {
-        BlueprintRepository::shouldReceive('find')
-            ->with('asset')
-            ->andReturn($defaultBlueprint = new Blueprint);
+        BlueprintRepository::shouldReceive('find')->with('assets/main')->andReturn($blueprint = new Blueprint);
 
-        BlueprintRepository::shouldReceive('find')
-            ->with('custom')
-            ->andReturn($customBlueprint = new Blueprint);
-
-        $container = new AssetContainer;
-        $this->assertEquals($defaultBlueprint, $container->blueprint());
-
-        $return = $container->blueprint('custom');
-
-        $this->assertEquals($container, $return);
-        $this->assertEquals($customBlueprint, $container->blueprint());
+        $container = (new AssetContainer)->handle('main');
+        $this->assertEquals($blueprint, $container->blueprint());
     }
 
     /** @test */
-    function it_gets_and_sets_whether_uploads_are_allowed()
+    public function it_gets_and_sets_whether_uploads_are_allowed()
     {
         $container = new AssetContainer;
         $this->assertTrue($container->allowUploads());
@@ -173,7 +162,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_and_sets_whether_folders_can_be_created()
+    public function it_gets_and_sets_whether_folders_can_be_created()
     {
         $container = new AssetContainer;
         $this->assertTrue($container->createFolders());
@@ -185,7 +174,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_saves_the_container_through_the_api()
+    public function it_saves_the_container_through_the_api()
     {
         Facades\AssetContainer::spy();
 
@@ -198,7 +187,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_path_from_the_stache()
+    public function it_gets_the_path_from_the_stache()
     {
         $container = (new AssetContainer)->handle('test');
 
@@ -206,7 +195,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_files_by_default()
+    public function it_gets_all_files_by_default()
     {
         $this->assertEquals([
             'a.txt',
@@ -219,7 +208,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_files_in_a_folder()
+    public function it_gets_files_in_a_folder()
     {
         $this->assertEquals([
             'a.txt',
@@ -233,7 +222,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_files_in_a_folder_recursively()
+    public function it_gets_files_in_a_folder_recursively()
     {
         $this->assertEquals([
             'a.txt',
@@ -253,7 +242,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_folders_by_default()
+    public function it_gets_all_folders_by_default()
     {
         $this->assertEquals([
             'nested',
@@ -262,7 +251,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_folders_in_given_folder()
+    public function it_gets_folders_in_given_folder()
     {
         $this->assertEquals([
             'nested',
@@ -274,7 +263,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_folders_in_given_folder_recursively()
+    public function it_gets_folders_in_given_folder_recursively()
     {
         $this->assertEquals([
             'nested',
@@ -287,7 +276,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_an_asset()
+    public function it_gets_an_asset()
     {
         $asset = $this->containerWithDisk()->asset('a.txt');
 
@@ -295,7 +284,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_an_asset_with_data()
+    public function it_gets_an_asset_with_data()
     {
         $container = $this->containerWithDisk();
 
@@ -308,7 +297,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_makes_an_asset_at_given_path()
+    public function it_makes_an_asset_at_given_path()
     {
         $container = new AssetContainer;
         $asset = $container->makeAsset('path/to/test.txt');
@@ -319,7 +308,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_all_assets_by_default()
+    public function it_gets_all_assets_by_default()
     {
         $assets = $this->containerWithDisk()->assets();
 
@@ -337,7 +326,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_assets_in_a_folder()
+    public function it_gets_assets_in_a_folder()
     {
         tap($this->containerWithDisk()->assets('/'), function ($assets) {
             $this->assertInstanceOf(Collection::class, $assets);
@@ -353,7 +342,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_assets_in_a_folder_recursively()
+    public function it_gets_assets_in_a_folder_recursively()
     {
         tap($this->containerWithDisk()->assets('/', true), function ($assets) {
             $this->assertInstanceOf(Collection::class, $assets);
@@ -369,7 +358,7 @@ class AssetContainerTest extends TestCase
     }
 
     /** @test */
-    function it_gets_an_asset_folder()
+    public function it_gets_an_asset_folder()
     {
         Storage::fake('test');
         $container = $this->containerWithDisk();

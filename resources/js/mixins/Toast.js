@@ -24,6 +24,7 @@ export default {
 
         this.$events.$on('toast.success', this.setFlashSuccess);
         this.$events.$on('toast.error', this.setFlashError);
+        this.$events.$on('toast.info', this.setFlashInfo);
     },
 
     mounted() {
@@ -33,10 +34,30 @@ export default {
     methods: {
         flashExistingMessages() {
             this.flash.forEach(
-                ({ type, message }) => (type == 'error')
-                    ? this.setFlashError(message, { type: type })
-                    : this.setFlashSuccess(message, { type: type })
+                ({ type, message }) => {
+                    switch(type) {
+                        case 'error':
+                            this.setFlashError(message, { type: type })
+                            break;
+                        case 'success':
+                            this.setFlashSuccess(message, { type: type })
+                            break;
+                        default:
+                            this.setFlashInfo(message, { type: 'default' })
+                    }
+                }
             );
+        },
+
+        setFlashInfo(message, opts) {
+            opts = {
+                iconPack: 'callback',
+                icon: (el) => {
+                    el.innerHTML = '<svg viewBox="0 0 24 24" width="24" height="24"><g transform="matrix(1,0,0,1,0,0)"><path d="M 14.25,16.5H13.5c-0.828,0-1.5-0.672-1.5-1.5v-3.75c0-0.414-0.336-0.75-0.75-0.75H10.5 " stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M 11.625,6.75 c-0.207,0-0.375,0.168-0.375,0.375S11.418,7.5,11.625,7.5S12,7.332,12,7.125S11.832,6.75,11.625,6.75L11.625,6.75 " stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path><path d="M 12,0.75 c6.213,0,11.25,5.037,11.25,11.25S18.213,23.25,12,23.25S0.75,18.213,0.75,12S5.787,0.75,12,0.75z" stroke="currentColor" fill="none" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"></path></g></svg>';
+                    return el;
+                },
+            ...opts};
+            this.$toasted.show(message, opts)
         },
 
         setFlashSuccess(message, opts) {

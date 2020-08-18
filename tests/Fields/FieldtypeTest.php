@@ -3,17 +3,16 @@
 namespace Tests\Fields;
 
 use Mockery;
-use Tests\TestCase;
+use Statamic\Fields\ConfigFields;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
-use Statamic\Fields\ConfigFields;
-use Statamic\Addons\Text\TextFieldtype;
+use Tests\TestCase;
 
 class FieldtypeTest extends TestCase
 {
     /** @test */
-    function it_gets_the_field()
+    public function it_gets_the_field()
     {
         $fieldtype = new TestFieldtype;
         $field = new Field('test', ['foo' => 'bar']);
@@ -27,7 +26,7 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    function the_handle_is_snake_cased_from_the_class_by_default()
+    public function the_handle_is_snake_cased_from_the_class_by_default()
     {
         $this->assertEquals(
             'test_multi_word',
@@ -41,7 +40,7 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    function handle_can_be_defined_as_a_property()
+    public function handle_can_be_defined_as_a_property()
     {
         $fieldtype = new class extends Fieldtype {
             protected static $handle = 'example';
@@ -51,21 +50,21 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    function title_is_the_humanized_handle_by_default()
+    public function title_is_the_humanized_handle_by_default()
     {
         $this->assertEquals(
-            'Test multi word',
+            'Test Multi Word',
             (new TestMultiWordFieldtype)->title()
         );
 
         $this->assertEquals(
-            'Test multi word with no fieldtype suffix',
+            'Test Multi Word With No Fieldtype Suffix',
             (new TestMultiWordWithNoFieldtypeSuffix)->title()
         );
     }
 
     /** @test */
-    function title_can_be_defined_as_a_property()
+    public function title_can_be_defined_as_a_property()
     {
         $fieldtype = new class extends Fieldtype {
             protected static $title = 'Super Cool Example';
@@ -75,7 +74,7 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    function localization_can_be_disabled()
+    public function localization_can_be_disabled()
     {
         $this->assertTrue((new TestFieldtype)->localizable());
 
@@ -87,7 +86,7 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    function validation_can_be_disabled()
+    public function validation_can_be_disabled()
     {
         $this->assertTrue((new TestFieldtype)->validatable());
 
@@ -99,7 +98,7 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    function default_values_can_be_disabled()
+    public function default_values_can_be_disabled()
     {
         $this->assertTrue((new TestFieldtype)->defaultable());
 
@@ -111,7 +110,7 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    function it_belongs_to_the_text_category_by_default()
+    public function it_belongs_to_the_text_category_by_default()
     {
         $this->assertEquals(['text'], (new TestFieldtype)->categories());
 
@@ -123,7 +122,7 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    function it_can_be_flagged_as_hidden_from_the_fieldtype_selector()
+    public function it_can_be_flagged_as_hidden_from_the_fieldtype_selector()
     {
         $this->assertTrue((new TestFieldtype)->selectable());
 
@@ -135,7 +134,7 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    function converts_to_an_array()
+    public function converts_to_an_array()
     {
         $fieldtype = new TestFieldtype;
 
@@ -148,34 +147,38 @@ class FieldtypeTest extends TestCase
             'selectable' => true,
             'categories' => ['text'],
             'icon' => 'test',
-            'config' => []
+            'config' => [],
         ], $fieldtype->toArray());
     }
 
     /** @test */
-    function config_uses_publish_array_when_converting_to_array()
+    public function config_uses_publish_array_when_converting_to_array()
     {
         $fields = Mockery::mock(Fields::class);
         $fields->shouldReceive('toPublishArray')->once()->andReturn(['example', 'publish', 'array']);
 
         $fieldtype = new class($fields) extends Fieldtype {
             protected $mock;
+            protected static $handle = 'test';
+
             public function __construct($mock)
             {
                 $this->mock = $mock;
             }
-            public function configFields(): Fields {
+
+            public function configFields(): Fields
+            {
                 return $this->mock;
             }
         };
 
         $this->assertArraySubset([
-            'config' => ['example', 'publish', 'array']
+            'config' => ['example', 'publish', 'array'],
         ], $fieldtype->toArray());
     }
 
     /** @test */
-    function it_gets_custom_validation_rules_as_an_array()
+    public function it_gets_custom_validation_rules_as_an_array()
     {
         $this->assertEquals([], (new TestFieldtype)->rules());
 
@@ -191,35 +194,35 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_extra_custom_validation_rules_as_an_array()
+    public function it_gets_extra_custom_validation_rules_as_an_array()
     {
         $this->assertEquals([], (new TestFieldtype)->rules());
 
         $arrayDefined = new class extends Fieldtype {
             protected $extraRules = [
                 'extra.one' => ['required', 'min:2'],
-                'extra.two' => ['array']
+                'extra.two' => ['array'],
             ];
         };
         $this->assertEquals([
             'extra.one' => ['required', 'min:2'],
-            'extra.two' => ['array']
+            'extra.two' => ['array'],
         ], $arrayDefined->extraRules());
 
         $stringDefined = new class extends Fieldtype {
             protected $extraRules = [
                 'extra.one' => 'required|min:2',
-                'extra.two' => 'array'
+                'extra.two' => 'array',
             ];
         };
         $this->assertEquals([
             'extra.one' => ['required', 'min:2'],
-            'extra.two' => ['array']
+            'extra.two' => ['array'],
         ], $stringDefined->extraRules());
     }
 
     /** @test */
-    function it_can_have_a_default_value()
+    public function it_can_have_a_default_value()
     {
         $this->assertNull((new TestFieldtype)->defaultValue());
 
@@ -231,7 +234,7 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    function it_gets_the_config_fields()
+    public function it_gets_the_config_fields()
     {
         tap(new TestFieldtype, function ($fieldtype) {
             $fields = $fieldtype->configFields();
@@ -258,7 +261,7 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    function it_can_have_an_icon()
+    public function it_can_have_an_icon()
     {
         $this->assertEquals('test', (new TestFieldtype)->icon());
 
@@ -276,25 +279,25 @@ class FieldtypeTest extends TestCase
     }
 
     /** @test */
-    function no_processing_happens_by_default()
+    public function no_processing_happens_by_default()
     {
         $this->assertEquals('test', (new TestFieldtype)->process('test'));
     }
 
     /** @test */
-    function no_pre_processing_happens_by_default()
+    public function no_pre_processing_happens_by_default()
     {
         $this->assertEquals('test', (new TestFieldtype)->preProcess('test'));
     }
 
     /** @test */
-    function no_pre_processing_happens_by_default_for_the_index()
+    public function no_pre_processing_happens_by_default_for_the_index()
     {
         $this->assertEquals('test', (new TestFieldtype)->preProcessIndex('test'));
     }
 
     /** @test */
-    function it_gets_a_config_value()
+    public function it_gets_a_config_value()
     {
         $field = new Field('test', [
             'foo' => 'bar',

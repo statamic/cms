@@ -3,8 +3,10 @@
 namespace Statamic\CP\Utilities;
 
 use Statamic\Facades\Utility;
+use Statamic\Http\Controllers\CP\LicensingController;
 use Statamic\Http\Controllers\CP\Utilities\CacheController;
 use Statamic\Http\Controllers\CP\Utilities\EmailController;
+use Statamic\Http\Controllers\CP\Utilities\GitController;
 use Statamic\Http\Controllers\CP\Utilities\PhpInfoController;
 use Statamic\Http\Controllers\CP\Utilities\UpdateSearchController;
 use Statamic\Statamic;
@@ -54,5 +56,29 @@ class CoreUtilities
                 $router->post('/', [EmailController::class, 'send']);
             })
             ->register();
+
+        Utility::make('licensing')
+            ->action([LicensingController::class, 'show'])
+            ->title(__('Licensing'))
+            ->icon('licensing')
+            ->description(__('statamic::messages.licensing_utility_description'))
+            ->docsUrl(Statamic::docsUrl('licensing'))
+            ->routes(function ($router) {
+                $router->get('refresh', [LicensingController::class, 'refresh'])->name('refresh');
+            })
+            ->register();
+
+        if (config('statamic.git.enabled') && Statamic::pro()) {
+            Utility::make('git')
+                ->action([GitController::class, 'index'])
+                ->title('Git')
+                ->icon('git')
+                ->description(__('statamic::messages.git_utility_description'))
+                ->docsUrl(Statamic::docsUrl('utilities/git'))
+                ->routes(function ($router) {
+                    $router->post('/', [GitController::class, 'commit'])->name('commit');
+                })
+                ->register();
+        }
     }
 }

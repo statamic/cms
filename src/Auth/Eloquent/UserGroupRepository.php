@@ -2,7 +2,7 @@
 
 namespace Statamic\Auth\Eloquent;
 
-use Statamic\Auth\UserGroupRepository as BaseRepository;
+use Statamic\Auth\File\UserGroupRepository as BaseRepository;
 
 class UserGroupRepository extends BaseRepository
 {

@@ -2,19 +2,20 @@
 
 namespace Statamic\Forms;
 
-use Statamic\Facades;
-use Statamic\Support\Str;
-use Statamic\Facades\File;
-use Statamic\Facades\YAML;
-use Statamic\CP\Column;
-use Statamic\Facades\Config;
-use Statamic\Facades\Folder;
-use Statamic\Fields\Blueprint;
-use Statamic\Exceptions\FatalException;
-use Statamic\Contracts\Forms\Submission;
-use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Statamic\Contracts\Forms\Form as FormContract;
+use Statamic\Contracts\Forms\Submission;
+use Statamic\Events\FormBlueprintFound;
+use Statamic\Events\FormDeleted;
+use Statamic\Events\FormSaved;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Config;
+use Statamic\Facades\File;
+use Statamic\Facades\Folder;
+use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
+use Statamic\Support\Arr;
+use Statamic\Support\Str;
+use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Form implements FormContract
 {
@@ -51,21 +52,18 @@ class Form implements FormContract
     }
 
     /**
-     * Get or set the blueprint.
+     * Get the blueprint.
      *
-     * @param mixed $blueprint
      * @return mixed
      */
-    public function blueprint($blueprint = null)
+    public function blueprint()
     {
-        return $this->fluentlyGetOrSet('blueprint')
-            ->getter(function ($blueprint) {
-                return Facades\Blueprint::find($blueprint);
-            })
-            ->setter(function ($blueprint) {
-                return $blueprint instanceof Blueprint ? $blueprint->handle() : $blueprint;
-            })
-            ->args(func_get_args());
+        $blueprint = Blueprint::find('forms.'.$this->handle())
+            ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('forms');
+
+        FormBlueprintFound::dispatch($blueprint, $this);
+
+        return $blueprint;
     }
 
     /**
@@ -112,16 +110,7 @@ class Form implements FormContract
      */
     public function email($emails = null)
     {
-        return $this->fluentlyGetOrSet('email')
-            ->setter(function ($emails) {
-                return collect($emails)
-                    ->map(function ($email) {
-                        return collect($email)->only(['to', 'from', 'reply_to', 'subject', 'template'])->filter()->all();
-                    })
-                    ->filter()
-                    ->all();
-            })
-            ->args(func_get_args());
+        return $this->fluentlyGetOrSet('email')->args(func_get_args());
     }
 
     /**
@@ -145,7 +134,7 @@ class Form implements FormContract
      */
     public function path()
     {
-        return config('statamic.forms.forms') . "/{$this->handle()}.yaml";
+        return config('statamic.forms.forms')."/{$this->handle()}.yaml";
     }
 
     /**
@@ -155,9 +144,10 @@ class Form implements FormContract
     {
         $data = collect([
             'title' => $this->title,
-            'blueprint' => $this->blueprint,
             'honeypot' => $this->honeypot,
-            'email' => $this->email,
+            'email' => collect($this->email)->map(function ($email) {
+                return Arr::removeNullValues($email);
+            })->all(),
             'metrics' => $this->metrics,
         ])->filter()->all();
 
@@ -166,6 +156,8 @@ class Form implements FormContract
         }
 
         File::put($this->path(), YAML::dump($data));
+
+        FormSaved::dispatch($this);
     }
 
     /**
@@ -176,6 +168,8 @@ class Form implements FormContract
         $this->submissions()->each->delete();
 
         File::delete($this->path());
+
+        FormDeleted::dispatch($this);
     }
 
     /**
@@ -189,7 +183,6 @@ class Form implements FormContract
             ->filter(function ($value, $property) {
                 return in_array($property, [
                     'title',
-                    'blueprint',
                     'honeypot',
                     'store',
                     'email',
@@ -234,24 +227,23 @@ class Form implements FormContract
     }
 
     /**
-     * Get the submissions
+     * Get the submissions.
      *
      * @return \Illuminate\Support\Collection
      */
     public function submissions()
     {
-        $path = config('statamic.forms.submissions') . '/' . $this->handle();
+        $path = config('statamic.forms.submissions').'/'.$this->handle();
 
         return collect(Folder::getFilesByType($path, 'yaml'))->map(function ($file) {
-            return $this->createSubmission()
+            return $this->makeSubmission()
                 ->id(pathinfo($file)['filename'])
-                ->unguard()
                 ->data(YAML::parse(File::get($file)));
         });
     }
 
     /**
-     * Get a submission
+     * Get a submission.
      *
      * @param  string $id
      * @return Submission
@@ -264,27 +256,17 @@ class Form implements FormContract
     }
 
     /**
-     * Create a form submission.
+     * Make a form submission.
      *
      * @return Submission
      */
-    public function createSubmission()
+    public function makeSubmission()
     {
         $submission = app(Submission::class);
 
         $submission->form($this);
 
         return $submission;
-    }
-
-    /**
-     * Delete a form submission.
-     */
-    public function deleteSubmission($id)
-    {
-        $submission = $this->submission($id);
-
-        $submission->delete();
     }
 
     /**
@@ -341,16 +323,9 @@ class Form implements FormContract
     public function dateFormat()
     {
         // TODO: Should this be a form.yaml config, a config/forms.php config, or a global config?
-        return 'M j, Y @ h:m';
+        return 'M j, Y @ H:i';
 
-        // return $this->formset()->get('date_format', 'M j, Y @ h:m');
-    }
-
-    public function sanitize()
-    {
-        // TODO: This was a form.yaml config option?
-        // ie. formset()->get('sanitize', true)
-        return true;
+        // return $this->formset()->get('date_format', 'M j, Y @ h:i');
     }
 
     /**
@@ -363,7 +338,6 @@ class Form implements FormContract
         return [
             'handle' => $this->handle,
             'title' => $this->title,
-            'blueprint' => $this->blueprint,
             'honeypot' => $this->honeypot(),
             'store' => $this->store(),
             'email' => $this->email,

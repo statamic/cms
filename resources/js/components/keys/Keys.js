@@ -11,6 +11,10 @@ export default class Keys {
         return new Binding(this.bindings).bind(bindings, callback);
     }
 
+    stop(callback) {
+        return new Binding(this.bindings).stop(callback);
+    }
+
     bindGlobal(bindings, callback) {
         return new GlobalBinding(this.globals).bind(bindings, callback);
     }

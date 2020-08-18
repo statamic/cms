@@ -3,6 +3,7 @@
 namespace Statamic\Translator\Commands;
 
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Translator\MethodDiscovery;
 use Statamic\Translator\Util;
@@ -21,14 +22,18 @@ class Generate extends Command
     protected $files;
     protected $ignored;
     protected $additionalStrings;
+    protected $additionalKeys;
+    protected $excludedKeys;
 
-    public function __construct(MethodDiscovery $discovery, Filesystem $files, array $manualFiles, array $ignored, array $additionalStrings)
+    public function __construct(MethodDiscovery $discovery, Filesystem $files, array $manualFiles, array $ignored, array $additionalStrings, array $additionalKeys, array $excludedKeys)
     {
         $this->discovery = $discovery;
         $this->files = $files;
         $this->manualFiles = $manualFiles;
         $this->ignored = $ignored;
         $this->additionalStrings = $additionalStrings;
+        $this->additionalKeys = $additionalKeys;
+        $this->excludedKeys = $excludedKeys;
         parent::__construct();
     }
 
@@ -53,12 +58,14 @@ class Generate extends Command
         $this->generateManualKeyFiles();
 
         $this->translate();
+
+        return 0;
     }
 
     protected function generateStringFiles()
     {
         $strings = $this->discovered->filter(function ($string) {
-            return !Str::startsWith($string, $this->ignored) && Util::isString($string);
+            return ! Str::startsWith($string, $this->ignored) && Util::isString($string);
         })->merge($this->additionalStrings)->sortBy(function ($string) {
             return strtolower($string);
         })->unique();
@@ -86,6 +93,7 @@ class Generate extends Command
 
         if ($json === ($existingJson ?? null)) {
             $this->output->writeln("<comment>[!]</comment> Translation file for <comment>$lang</comment> not written because there are no changes.");
+
             return;
         }
 
@@ -105,7 +113,7 @@ class Generate extends Command
             ->map(function ($string) {
                 [$file, $string] = explode('.', $string, 2);
 
-                if (! str_contains($file, '::')) {
+                if (! Str::contains($file, '::')) {
                     $file = 'statamic::'.$file;
                 }
 
@@ -115,7 +123,7 @@ class Generate extends Command
 
                 $file = explode('::', $file, 2)[1];
 
-                if (Str::startsWith($file, $this->manualFiles)) {
+                if (Str::startsWith($file, $this->manualFiles) || in_array($file, ['auth'])) {
                     return null;
                 }
 
@@ -125,10 +133,14 @@ class Generate extends Command
             ->groupBy('file')
             ->each(function ($items, $file) {
                 foreach ($this->languages() as $lang) {
-                    $strings = $items->map->string->sort()->values();
-                    $this->generateKeyFile($lang, $file, function ($existing) use ($strings) {
-                        return $strings->mapWithKeys(function ($key) use ($existing) {
+                    $keys = $items->map->string
+                        ->merge($this->additionalKeys[$file] ?? [])
+                        ->diff($this->excludedKeys[$file] ?? [])
+                        ->sort()->values();
+                    $this->generateKeyFile($lang, $file, function ($existing) use ($keys) {
+                        return $keys->mapWithKeys(function ($key) use ($existing) {
                             $translation = $existing[$key] ?? '';
+
                             return [$key => $translation];
                         })->all();
                     });
@@ -139,7 +151,7 @@ class Generate extends Command
     protected function generateKeyFile($lang, $file, $translationCallback)
     {
         $path = 'resources/lang/'.$lang.'/'.$file.'.php';
-        $fullPath =__DIR__.'/../../../'.$path;
+        $fullPath = __DIR__.'/../../../'.$path;
 
         $exists = file_exists($fullPath);
         $existing = $exists ? require $fullPath : [];
@@ -148,10 +160,13 @@ class Generate extends Command
 
         if ($translations === $existing) {
             $this->output->writeln("<comment>[!]</comment> Translation file for <comment>$lang/$file</comment> not written because there are no changes.");
+
             return;
         }
 
-        $contents = "<?php\n\nreturn " . VarExporter::export($translations) . ";\n";
+        $translations = Arr::dot($translations);
+
+        $contents = "<?php\n\nreturn ".VarExporter::export($translations).";\n";
 
         $this->files->makeDirectory(dirname($fullPath), 0755, true, true);
         $this->files->put($fullPath, $contents);
@@ -187,6 +202,7 @@ class Generate extends Command
     {
         if (is_array($value)) {
             $existing = $existing[$key] ?? [];
+
             return collect($value)->map(function ($v, $k) use ($existing) {
                 return $this->getManualKeyFileTranslation($k, $v, $existing);
             })->all();
@@ -214,6 +230,7 @@ class Generate extends Command
     {
         if (! $this->input->getOption('translate')) {
             $this->output->writeln('Run `php translator translate` to translate any missing lines using Google Translate.');
+
             return;
         }
 

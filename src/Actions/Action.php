@@ -2,16 +2,15 @@
 
 namespace Statamic\Actions;
 
-use Statamic\Support\Str;
-use Statamic\Fields\Fields;
-use Statamic\Extend\HasTitle;
-use Statamic\Extend\HasHandle;
-use Statamic\Extend\RegistersItself;
 use Illuminate\Contracts\Support\Arrayable;
+use Statamic\Extend\HasFields;
+use Statamic\Extend\HasHandle;
+use Statamic\Extend\HasTitle;
+use Statamic\Extend\RegistersItself;
 
 abstract class Action implements Arrayable
 {
-    use HasHandle, HasTitle, RegistersItself;
+    use HasHandle, HasTitle, HasFields, RegistersItself;
 
     protected static $binding = 'actions';
 
@@ -20,9 +19,32 @@ abstract class Action implements Arrayable
     protected $fields = [];
     protected $context = [];
 
-    public function filter($item)
+    public function visibleTo($item)
     {
         return true;
+    }
+
+    public function visibleToBulk($items)
+    {
+        $allowedOnItems = $items->filter(function ($item) {
+            return $this->visibleTo($item);
+        });
+
+        return $items->count() === $allowedOnItems->count();
+    }
+
+    public function authorize($user, $item)
+    {
+        return true;
+    }
+
+    public function authorizeBulk($user, $items)
+    {
+        $authorizedOnItems = $items->filter(function ($item) use ($user) {
+            return $this->authorize($user, $item);
+        });
+
+        return $items->count() === $authorizedOnItems->count();
     }
 
     public function context($context)
@@ -32,23 +54,24 @@ abstract class Action implements Arrayable
         return $this;
     }
 
-    public function fields()
-    {
-        $fields = collect($this->fieldItems())->map(function ($field, $handle) {
-            return compact('handle', 'field');
-        });
-
-        return new Fields($fields);
-    }
-
     protected function fieldItems()
     {
         return $this->fields;
     }
 
-    public function authorize($user, $item)
+    public function run($items, $values)
     {
-        return true;
+        //
+    }
+
+    public function redirect($items, $values)
+    {
+        return false;
+    }
+
+    public function download($items, $values)
+    {
+        return false;
     }
 
     public function buttonText()
@@ -73,8 +96,9 @@ abstract class Action implements Arrayable
             'confirmationText' => $this->confirmationText(),
             'dangerous' => $this->dangerous,
             'fields' => $this->fields()->toPublishArray(),
+            'values' => $this->fields()->values(),
             'meta' => $this->fields()->meta(),
-            'context' => $this->context
+            'context' => $this->context,
         ];
     }
 }

@@ -1,5 +1,5 @@
 .live-preview {
-    @apply pin;
+    @apply inset-0;
     z-index: 998; // arbitrary under stacks.
 }
 
@@ -54,7 +54,7 @@
     @apply w-4 border-l border-r border-grey-30 shadow-sm;
     z-index: 1;
     cursor: ew-resize;
-    background: config('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
+    background: theme('colors.grey-20') url('../img/drag-dots.svg') center center no-repeat;
 }
 
 
@@ -112,10 +112,12 @@
 
 // Responsive
 
-@element .live-preview-fields and (min-width: 1000px) {
-    :self { @apply p-3 bg-grey-30; }
+// add grey bg and padding so that it looks like a publish form, when its wide enough.
+.live-preview-fields-wide {
+    @apply p-3 bg-grey-30;
 }
 
-@element .live-preview-fields and (max-width: 1000px) {
-    :self .publish-section { @apply shadow-none }
+// remove shadow of sections when its narrow enough to be no longer be displayed as sections.
+.live-preview-fields-narrow .publish-section {
+    @apply shadow-none
 }

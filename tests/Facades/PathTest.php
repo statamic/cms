@@ -1,13 +1,14 @@
 <?php
 
-namespace Tests;
+namespace Tests\Facades;
 
 use Statamic\Facades\Path;
+use Tests\TestCase;
 
 class PathTest extends TestCase
 {
     /** @test */
-    function makes_paths_relative()
+    public function makes_paths_relative()
     {
         $this->assertEquals('something', Path::makeRelative(base_path('something')));
     }

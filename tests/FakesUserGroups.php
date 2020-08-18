@@ -16,6 +16,7 @@ trait FakesUserGroups
             ->mapWithKeys(function ($roles, $handle) {
                 $handle = is_string($roles) ? $roles : $handle;
                 $roles = is_string($roles) ? [] : $roles;
+
                 return [$handle => $roles];
             })
             ->map(function ($roles, $handle) {
@@ -26,10 +27,14 @@ trait FakesUserGroups
 
         $fake = new class($groups) extends UserGroupRepository {
             protected $groups;
-            public function __construct($groups) {
+
+            public function __construct($groups)
+            {
                 $this->groups = $groups;
             }
-            public function all(): Collection {
+
+            public function all(): Collection
+            {
                 return $this->groups;
             }
         };

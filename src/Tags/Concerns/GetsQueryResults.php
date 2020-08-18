@@ -2,39 +2,51 @@
 
 namespace Statamic\Tags\Concerns;
 
-use Statamic\Support\Arr;
-
 trait GetsQueryResults
 {
     protected function results($query)
     {
-        $params = $this->parsePaginationParameters();
+        $this->setPaginationParameterPrecedence();
 
-        if ($paginate = $params['paginate']) {
-            return $query->paginate($paginate);
+        if ($paginate = $this->params->get('paginate')) {
+            return $this->paginatedResults($query, $paginate);
         }
 
-        if ($limit = $params['limit']) {
+        if ($limit = $this->params->get('limit')) {
             $query->limit($limit);
         }
 
-        if ($offset = $params['offset']) {
+        if ($offset = $this->params->get('offset')) {
             $query->offset($offset);
         }
 
         return $query->get();
     }
 
-    protected function parsePaginationParameters()
+    protected function setPaginationParameterPrecedence()
     {
-        $paginate = Arr::get($this->parameters, 'paginate');
-        $limit = Arr::get($this->parameters, 'limit');
-        $offset = Arr::get($this->parameters, 'offset');
+        if ($this->params->get('paginate') === true) {
+            $this->params->put('paginate', $this->params->get('limit'));
+        }
+    }
 
-        if ($paginate === true) {
-            $paginate = $limit;
+    protected function paginatedResults($query, $perPage)
+    {
+        if ($offset = $this->params->get('offset')) {
+            $this->queryPaginationFriendlyOffset($query, $offset);
         }
 
-        return compact('paginate', 'limit', 'offset');
+        return $query->paginate($perPage);
+    }
+
+    protected function queryPaginationFriendlyOffset($query, $offset)
+    {
+        $offsetIds = (clone $query)
+            ->limit($offset)
+            ->get('id')
+            ->map->id()
+            ->all();
+
+        $query->whereNotin('id', $offsetIds);
     }
 }

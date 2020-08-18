@@ -3,10 +3,10 @@
 namespace Statamic\Assets;
 
 use Exception;
-use Statamic\Facades;
 use Statamic\Contracts\Assets\AssetContainer;
-use Statamic\Query\IteratorBuilder as BaseQueryBuilder;
 use Statamic\Contracts\Assets\QueryBuilder as Contract;
+use Statamic\Facades;
+use Statamic\Query\IteratorBuilder as BaseQueryBuilder;
 
 class QueryBuilder extends BaseQueryBuilder implements Contract
 {
@@ -32,6 +32,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
         if ($column === 'container') {
             throw_if($this->container, new Exception('Only one asset container may be queried.'));
             $this->container = $operator;
+
             return $this;
         }
 

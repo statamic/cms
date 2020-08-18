@@ -3,11 +3,9 @@
 namespace Statamic\Notifications;
 
 use Illuminate\Bus\Queueable;
-use Statamic\Contracts\Auth\User;
-use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
-use Statamic\Auth\Passwords\PasswordReset as PasswordResetUrl;
+use Illuminate\Notifications\Notification;
+use Statamic\Auth\Passwords\PasswordReset as PasswordResetManager;
 
 class PasswordReset extends Notification
 {
@@ -42,7 +40,7 @@ class PasswordReset extends Notification
         return (new MailMessage)
             ->subject(__('statamic::messages.reset_password_notification_subject'))
             ->line(__('statamic::messages.reset_password_notification_body'))
-            ->action(__('Reset Password'), PasswordResetUrl::url($this->token))
+            ->action(__('Reset Password'), PasswordResetManager::url($this->token, PasswordResetManager::BROKER_RESETS))
             ->line(__('statamic::messages.reset_password_notification_no_action'));
     }
 

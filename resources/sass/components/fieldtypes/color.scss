@@ -1,0 +1,11 @@
+.color-fieldtype .pickr {
+    @include clickable;
+    @apply inline-block rounded p-sm;
+
+    .pcr-button {
+        @apply border-2 border-white;
+        &:focus {
+            @apply outline-none;
+        }
+    }
+}

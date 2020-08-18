@@ -2,24 +2,23 @@
 
 namespace Statamic\Http\Controllers\CP\Collections;
 
-use Statamic\Support\Str;
+use Illuminate\Http\Request;
+use Statamic\Contracts\Entries\Collection as CollectionContract;
+use Statamic\CP\Column;
+use Statamic\Facades\Blueprint;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
-use Statamic\Facades\Scope;
-use Statamic\CP\Column;
-use Statamic\Facades\Action;
-use Statamic\Facades\Blueprint;
-use Statamic\Facades\Structure;
-use Illuminate\Http\Request;
-use Statamic\Facades\Collection;
 use Statamic\Http\Controllers\CP\CpController;
-use Statamic\Contracts\Entries\Collection as CollectionContract;
+use Statamic\Structures\CollectionStructure;
+use Statamic\Support\Str;
 
 class CollectionsController extends CpController
 {
     public function index()
     {
-        $this->authorize('index', CollectionContract::class, 'You are not authorized to view any collections.');
+        $this->authorize('index', CollectionContract::class, __('You are not authorized to view collections.'));
 
         $collections = Collection::all()->filter(function ($collection) {
             return User::current()->can('view', $collection);
@@ -31,8 +30,9 @@ class CollectionsController extends CpController
                 'edit_url' => $collection->editUrl(),
                 'delete_url' => $collection->deleteUrl(),
                 'entries_url' => cp_route('collections.show', $collection->handle()),
+                'blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
                 'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),
-                'deleteable' => User::current()->can('delete', $collection)
+                'deleteable' => User::current()->can('delete', $collection),
             ];
         })->values();
 
@@ -45,11 +45,9 @@ class CollectionsController extends CpController
         ]);
     }
 
-    public function show($collection)
+    public function show(Request $request, $collection)
     {
-        $this->authorize('view', $collection, 'You are not authorized to view this collection.');
-
-        $view = $collection->queryEntries()->count() ? 'show' : 'empty';
+        $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
         $blueprints = $collection->entryBlueprints()->map(function ($blueprint) {
             return [
@@ -58,38 +56,83 @@ class CollectionsController extends CpController
             ];
         });
 
-        return view("statamic::collections.{$view}", [
+        $site = $request->site ? Site::get($request->site) : Site::selected();
+
+        $viewData = [
             'collection' => $collection,
             'blueprints' => $blueprints,
-            'site' => Site::selected(),
+            'site' => $site->handle(),
             'filters' => Scope::filters('entries', [
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
-        ]);
+        ];
+
+        if ($collection->queryEntries()->count() === 0) {
+            return view('statamic::collections.empty', $viewData);
+        }
+
+        if (! $collection->hasStructure()) {
+            return view('statamic::collections.show', $viewData);
+        }
+
+        $structure = $collection->structure();
+
+        return view('statamic::collections.show', array_merge($viewData, [
+            'structure' => $structure,
+            'expectsRoot' => $structure->expectsRoot(),
+            'structureSites' => $collection->sites()->map(function ($site) use ($structure) {
+                $tree = $structure->in($site);
+
+                return [
+                    'handle' => $tree->locale(),
+                    'name' => $tree->site()->name(),
+                    'url' => $tree->showUrl(),
+                ];
+            })->values()->all(),
+        ]));
     }
 
     public function create()
     {
-        $this->authorize('create', CollectionContract::class, 'You are not authorized to create collections.');
+        $this->authorize('create', CollectionContract::class, __('You are not authorized to create collections.'));
 
         return view('statamic::collections.create');
     }
 
     public function fresh($collection)
     {
-        $this->authorize('view', $collection, 'You are not authorized to view this collection.');
+        $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
         return view('statamic::collections.fresh');
     }
 
     public function edit($collection)
     {
-        $this->authorize('edit', $collection, 'You are not authorized to edit this collection.');
+        $this->authorize('edit', $collection, __('You are not authorized to edit this collection.'));
 
-        $values = $collection->toArray();
+        $values = [
+            'title' => $collection->title(),
+            'handle' => $collection->handle(),
+            'dated' => $collection->dated(),
+            'past_date_behavior' => $collection->pastDateBehavior(),
+            'future_date_behavior' => $collection->futureDateBehavior(),
+            'structured' => $collection->hasStructure(),
+            'sort_direction' => $collection->sortDirection(),
+            'max_depth' => optional($collection->structure())->maxDepth(),
+            'expects_root' => optional($collection->structure())->expectsRoot(),
+            'links' => $collection->entryBlueprints()->map->handle()->contains('link'),
+            'taxonomies' => $collection->taxonomies()->map->handle()->all(),
+            'default_publish_state' => $collection->defaultPublishState(),
+            'template' => $collection->template(),
+            'layout' => $collection->layout(),
+            'amp' => $collection->ampable(),
+            'sites' => $collection->sites()->all(),
+            'routes' => $collection->routes()->all(),
+            'mount' => optional($collection->mount())->id(),
+        ];
 
-        $fields = ($blueprint = $this->editFormBlueprint())
+        $fields = ($blueprint = $this->editFormBlueprint($collection))
             ->fields()
             ->addValues($values)
             ->preProcess();
@@ -104,17 +147,17 @@ class CollectionsController extends CpController
 
     public function store(Request $request)
     {
-        $this->authorize('store', CollectionContract::class, 'You are not authorized to create collections.');
+        $this->authorize('store', CollectionContract::class, __('You are not authorized to create collections.'));
 
-        $data = $request->validate([
+        $request->validate([
             'title' => 'required',
-            'handle' => 'nullable|alpha_dash'
+            'handle' => 'nullable|alpha_dash',
         ]);
 
-        $handle = $request->handle ?? snake_case($request->title);
+        $handle = $request->handle ?? Str::snake($request->title);
 
         if (Collection::find($handle)) {
-            throw new \Exception('Collection already exists');
+            throw new \Exception(__('Collection already exists'));
         }
 
         $collection = Collection::make($handle);
@@ -123,31 +166,52 @@ class CollectionsController extends CpController
             ->pastDateBehavior('public')
             ->futureDateBehavior('private');
 
+        if (Site::hasMultiple()) {
+            $collection->sites([Site::default()->handle()]);
+        }
+
         $collection->save();
 
         session()->flash('success', __('Collection created'));
 
-        return [
-            'redirect' => route('statamic.cp.collections.show', $handle)
-        ];
+        return ['redirect' => $collection->showUrl()];
     }
 
     public function update(Request $request, $collection)
     {
-        $this->authorize('update', $collection, 'You are not authorized to edit this collection.');
+        $this->authorize('update', $collection, __('You are not authorized to edit this collection.'));
 
-        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
+        $fields = $this->editFormBlueprint($collection)->fields()->addValues($request->all());
 
         $fields->validate();
 
-        $collection = $this->updateCollection($collection, $values = $fields->process()->values()->all());
+        $values = $fields->process()->values()->all();
 
-        if ($futureDateBehavior = array_get($values, 'future_date_behavior')) {
-            $collection->futureDateBehavior($futureDateBehavior);
+        $this->updateLinkBlueprint($values['links'], $collection);
+
+        $collection
+            ->title($values['title'])
+            ->routes($values['routes'])
+            ->dated($values['dated'])
+            ->template($values['template'])
+            ->layout($values['layout'])
+            ->defaultPublishState($values['default_publish_state'])
+            ->sortDirection($values['sort_direction'])
+            ->ampable($values['amp'])
+            ->mount($values['mount'] ?? null)
+            ->taxonomies($values['taxonomies'] ?? [])
+            ->futureDateBehavior(array_get($values, 'future_date_behavior'))
+            ->pastDateBehavior(array_get($values, 'past_date_behavior'))
+            ->mount(array_get($values, 'mount'));
+
+        if ($sites = array_get($values, 'sites')) {
+            $collection->sites($sites);
         }
 
-        if ($pastDateBehavior = array_get($values, 'past_date_behavior')) {
-            $collection->pastDateBehavior($pastDateBehavior);
+        if (! $values['structured']) {
+            $collection->structure(null);
+        } else {
+            $collection->structure($this->makeStructure($collection, $values['max_depth'], $values['expects_root'], $values['sites'] ?? null));
         }
 
         $collection->save();
@@ -155,164 +219,220 @@ class CollectionsController extends CpController
         return $collection->toArray();
     }
 
+    protected function updateLinkBlueprint($shouldExist, $collection)
+    {
+        $namespace = 'collections.'.$collection->handle();
+        $blueprints = Blueprint::in($namespace);
+        $alreadyExists = $blueprints->has('link');
+
+        if ($shouldExist && ! $alreadyExists) {
+            if ($blueprints->count() === 0) {
+                $collection->entryBlueprint()->save();
+            }
+            $this->createLinkBlueprint($namespace);
+        }
+
+        if (! $shouldExist && $alreadyExists) {
+            Blueprint::find($namespace.'.link')->delete();
+        }
+    }
+
+    protected function createLinkBlueprint($namespace)
+    {
+        Blueprint::make('link')
+            ->setNamespace($namespace)
+            ->setContents([
+                'title' => __('Link'),
+                'fields' => [
+                    ['handle' => 'title', 'field' => ['type' => 'text']],
+                    ['handle' => 'redirect', 'field' => ['type' => 'link', 'required' => true]],
+                ],
+            ])
+            ->save();
+    }
+
+    protected function makeStructure($collection, $maxDepth, $expectsRoot, $sites)
+    {
+        if (! $structure = $collection->structure()) {
+            $structure = (new CollectionStructure)->collection($collection);
+        }
+
+        return $structure
+            ->maxDepth($maxDepth)
+            ->expectsRoot($expectsRoot);
+    }
+
     public function destroy($collection)
     {
-        $this->authorize('delete', $collection, 'You are not authorized to delete this collection.');
+        $this->authorize('delete', $collection, __('You are not authorized to delete this collection.'));
 
         $collection->delete();
     }
 
-    protected function updateCollection($collection, $data)
+    protected function editFormBlueprint($collection)
     {
-        return $collection
-            ->title($data['title'])
-            ->route($data['route'])
-            ->dated($data['dated'])
-            ->template($data['template'])
-            ->layout($data['layout'])
-            ->structure($structure = array_get($data, 'structure'))
-            ->orderable($structure ? false : $data['orderable'])
-            ->defaultPublishState($data['default_publish_state'])
-            ->sortDirection($data['sort_direction'])
-            ->ampable($data['amp'])
-            ->entryBlueprints($data['blueprints'])
-            ->mount($data['mount'] ?? null)
-            ->taxonomies($data['taxonomies'] ?? []);
-    }
-
-    protected function ensureStructureExists($structure)
-    {
-        if (! $structure) {
-            return;
-        }
-
-        if (Structure::findByHandle($structure)) {
-            return;
-        }
-
-        Structure::make()
-            ->handle($handle = Str::snake($structure))
-            ->title($structure)
-            ->tap(function ($structure) {
-                $structure->addTree($structure->makeTree(Site::default()->handle()));
-            })->save();
-
-        return $handle;
-    }
-
-    protected function editFormBlueprint()
-    {
-        return Blueprint::makeFromSections([
+        $fields = [
             'name' => [
                 'display' => __('Name'),
                 'fields' => [
                     'title' => [
-                        'type' => 'text',
+                        'display' => __('Title'),
                         'instructions' => __('statamic::messages.collection_configure_title_instructions'),
+                        'type' => 'text',
                         'validate' => 'required',
                     ],
-                    'handle' => [
-                        'type' => 'text',
-                        'display' => __('Collection Handle'),
-                        'instructions' => __('statamic::messages.collection_configure_handle_instructions'),
-                        'validate' => 'required|alpha_dash',
-                    ],
-                ]
+                ],
             ],
             'dates' => [
                 'display' => __('Dates & Behaviors'),
                 'fields' => [
                     'dated' => [
-                        'type' => 'toggle',
                         'display' => __('Enable Publish Dates'),
-                        'instructions' => 'Publish dates can be used to schedule and expire content.'
+                        'instructions' => __('statamic::messages.collection_configure_dated_instructions'),
+                        'type' => 'toggle',
                     ],
                     'past_date_behavior' => [
-                        'type' => 'select',
                         'display' => __('Past Date Behavior'),
                         'instructions' => __('statamic::messages.collections_past_date_behavior_instructions'),
+                        'type' => 'select',
                         'options' => [
-                            'public' => 'Public - Always visible',
-                            'unlisted' => 'Unlisted - Hidden from listings, URLs visible',
-                            'private' => 'Private - Hidden from listings, URLs 404'
+                            'public' => __('statamic::messages.collection_configure_date_behavior_public'),
+                            'unlisted' => __('statamic::messages.collection_configure_date_behavior_unlisted'),
+                            'private' => __('statamic::messages.collection_configure_date_behavior_private'),
+                        ],
+                        'if' => [
+                            'dated' => true,
                         ],
                     ],
                     'future_date_behavior' => [
-                        'type' => 'select',
                         'display' => __('Future Date Behavior'),
                         'instructions' => __('statamic::messages.collections_future_date_behavior_instructions'),
+                        'type' => 'select',
                         'options' => [
-                            'public' => 'Public - Always visible',
-                            'unlisted' => 'Unlisted - Hidden from listings, URLs visible',
-                            'private' => 'Private - Hidden from listings, URLs 404'
+                            'public' => __('statamic::messages.collection_configure_date_behavior_public'),
+                            'unlisted' => __('statamic::messages.collection_configure_date_behavior_unlisted'),
+                            'private' => __('statamic::messages.collection_configure_date_behavior_private'),
+                        ],
+                        'if' => [
+                            'dated' => true,
                         ],
                     ],
                 ],
             ],
             'ordering' => [
+                'display' => __('Ordering'),
                 'fields' => [
-                    'orderable' => [
-                        'type' => 'toggle',
+                    'structured' => [
+                        'display' => __('Orderable'),
                         'instructions' => __('statamic::messages.collections_orderable_instructions'),
-                        'if' => ['structure' => 'empty']
+                        'type' => 'toggle',
                     ],
                     'sort_direction' => [
-                        'type' => 'select',
+                        'display' => __('Sort Direction'),
                         'instructions' => __('statamic::messages.collections_sort_direction_instructions'),
+                        'type' => 'select',
                         'options' => [
-                            'asc' => 'Ascending',
-                            'desc' => 'Descending'
+                            'asc' => __('Ascending'),
+                            'desc' => __('Descending'),
                         ],
-                        'if' => ['structure' => 'empty']
                     ],
-                    'structure' => [
-                        'type' => 'structures',
-                        'max_items' => 1,
-                        'instructions' => __('statamic::messages.collections_structure_instructions'),
+                    'max_depth' => [
+                        'display' => __('Max Depth'),
+                        'instructions' => __('statamic::messages.max_depth_instructions'),
+                        'type' => 'integer',
+                        'validate' => 'min:0',
+                        'if' => ['structured' => true],
+                    ],
+                    'expects_root' => [
+                        'display' => __('Expect a root page'),
+                        'instructions' => __('statamic::messages.expect_root_instructions'),
+                        'type' => 'toggle',
+                        'if' => ['structured' => true],
                     ],
                 ],
             ],
             'content_model' => [
-                'display' => 'Content Model',
+                'display' => __('Content Model'),
                 'fields' => [
                     'blueprints' => [
-                        'type' => 'blueprints',
+                        'display' => __('Blueprints'),
                         'instructions' => __('statamic::messages.collections_blueprint_instructions'),
-                        'validate' => 'array',
+                        'type' => 'html',
+                        'html' => ''.
+                            '<div class="text-xs">'.
+                            '   <span class="mr-2">'.$collection->entryBlueprints()->map->title()->join(', ').'</span>'.
+                            '   <a href="'.cp_route('collections.blueprints.index', $collection).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>',
+                    ],
+                    'links' => [
+                        'display' => __('Links'),
+                        'instructions' => __('statamic::messages.collections_links_instructions'),
+                        'type' => 'toggle',
                     ],
                     'taxonomies' => [
-                        'type' => 'taxonomies',
+                        'display' => __('Taxonomies'),
                         'instructions' => __('statamic::messages.collections_taxonomies_instructions'),
+                        'type' => 'taxonomies',
+                        'mode' => 'select',
                     ],
                     'default_publish_state' => [
                         'display' => __('Publish by Default'),
-                        'type' => 'toggle',
                         'instructions' => __('statamic::messages.collections_default_publish_state_instructions'),
+                        'type' => 'toggle',
                     ],
                     'template' => [
-                        'type' => 'template',
+                        'display' => __('Template'),
                         'instructions' => __('statamic::messages.collection_configure_template_instructions'),
+                        'type' => 'template',
+                        'placeholder' => __('System default'),
                     ],
                     'layout' => [
-                        'type' => 'template',
+                        'display' => __('Layout'),
                         'instructions' => __('statamic::messages.collection_configure_layout_instructions'),
+                        'type' => 'template',
                     ],
-                ]
+                ],
             ],
-            'routing' => [
-                'display' => 'Routing & URLs',
+        ];
+
+        if (Site::hasMultiple()) {
+            $fields['sites'] = [
+                'display' => __('Sites'),
                 'fields' => [
-                    'route' => [
-                        'type' => 'text',
+                    'sites' => [
+                        'type' => 'sites',
+                        'mode' => 'select',
+                        'required' => true,
+                    ],
+                ],
+            ];
+        }
+
+        $fields = array_merge($fields, [
+            'routing' => [
+                'display' => __('Routing & URLs'),
+                'fields' => [
+                    'routes' => [
+                        'display' => __('Route'),
                         'instructions' => __('statamic::messages.collections_route_instructions'),
+                        'type' => 'collection_routes',
+                    ],
+                    'mount' => [
+                        'display' => __('Mount'),
+                        'instructions' => __('statamic::messages.collections_mount_instructions'),
+                        'type' => 'entries',
+                        'max_items' => 1,
+                        'create' => false,
                     ],
                     'amp' => [
-                        'type' => 'toggle',
                         'display' => __('Enable AMP'),
-                        'instructions' => __('Enable Accelerated Mobile Pages (AMP). Automatically adds routes and URL for entries in this collection. Learn more in the [documentation](https://statamic.dev/amp).'),
+                        'instructions' => __('statamic::messages.collections_amp_instructions'),
+                        'type' => 'toggle',
                     ],
-                ]
-            ]
+                ],
+            ],
         ]);
+
+        return Blueprint::makeFromSections($fields);
     }
 }

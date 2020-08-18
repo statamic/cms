@@ -1,51 +1,59 @@
 <template>
-    <div>
-        <button class="btn-flat btn-icon-only dropdown-toggle" @click="customizing = !customizing">
-            <svg-icon name="settings-vertical" class="w-4 h-4 mr-1" />
-            <span>{{ __('Columns') }}</span>
-        </button>
+    <popover ref="popover">
 
-        <pane name="columns" v-if="customizing" @closed="dismiss">
-            <div class="flex flex-col h-full">
+        <template slot="trigger">
+            <button
+                v-tooltip="__('Customize Columns')"
+                class="btn btn-sm px-sm mt-1 py-sm -ml-sm cursor-pointer"
+            >
+                <svg-icon name="settings-horizontal" class="w-4" />
+            </button>
+        </template>
 
-                <div class="bg-grey-20 px-3 py-1 border-b border-grey-30 text-lg font-medium flex items-center justify-between">
-                    {{ __('Columns') }}
-                    <button
-                        type="button"
-                        class="btn-close"
-                        @click="dismiss"
-                        v-html="'&times'" />
-                </div>
-
-                <div class="pt-2 overflow-y-auto">
-
-                    <sortable-list
-                        v-model="columns"
-                        :vertical="true"
-                        item-class="column-picker-item"
-                        handle-class="column-picker-item"
-                    >
-                        <div>
-                            <div class="column-picker-item column px-3" v-for="column in sharedState.columns" :key="column.field">
-                                <label><input type="checkbox" v-model="column.visible" /> {{ column.label }}</label>
-                            </div>
-                        </div>
-                    </sortable-list>
-
-                    <div v-if="preferencesKey">
-                        <loading-graphic class="mt-3 ml-3" v-if="saving" :inline="true" :text="__('Saving')" />
-                        <template v-else>
-                            <div class="flex justify-center p-3">
-                                <button class="btn-flat w-full mr-sm block" @click="reset">{{ __('Reset') }}</button>
-                                <button class="btn-flat w-full ml-sm block" @click="save">{{ __('Save') }}</button>
-                            </div>
-                        </template>
+        <div class="column-picker">
+            <sortable-list
+                v-model="selectedColumns"
+                :vertical="true"
+                item-class="column-picker-item"
+                handle-class="column-picker-item"
+                append-to=".popover-content"
+            >
+                <div class="outline-none text-left px-1 py-1">
+                    <h6 v-text="__('Displayed Columns')" class="p-1"/>
+                    <div class="column-picker-item sortable" v-for="column in selectedColumns" :key="column.field">
+                        <label>
+                            <input type="checkbox" class="mr-1" v-model="column.visible" @change="columnToggled(column)" :disabled="selectedColumns.length === 1" />
+                            {{ column.label }}
+                        </label>
                     </div>
+                </div>
+            </sortable-list>
 
+            <div v-if="hiddenColumns.length" class="outline-none text-left px-1 pb-1">
+                <h6 v-text="__('Available Columns')" class="px-1 pb-1"/>
+                <div class="column-picker-item" v-for="column in hiddenColumns" :key="column.field">
+                    <label class="cursor-pointer">
+                        <input type="checkbox" class="mr-1" v-model="column.visible" @change="columnToggled(column) "/>
+                        {{ column.label }}
+                    </label>
                 </div>
             </div>
-        </pane>
-    </div>
+        </div>
+
+        <div class="flex border-t text-grey-80" v-if="preferencesKey">
+            <button
+                class="p-1 hover:bg-grey-10 rounded-bl text-xs flex-1"
+                v-text="__('Reset')"
+                @click="reset" :disabled="saving"
+            />
+            <button
+                class="p-1 hover:bg-grey-10 text-blue flex-1 rounded-br border-l text-xs"
+                v-text="__('Save')"
+                @click="save" :disabled="saving"
+            />
+        </div>
+
+    </popover>
 </template>
 
 <script>
@@ -61,75 +69,88 @@ export default {
         preferencesKey: String
     },
 
+    inject: ['sharedState'],
+
     data() {
         return {
-            customizing: false,
             saving: false,
+            selectedColumns: [],
+            hiddenColumns: [],
         }
     },
 
-    computed: {
+    created() {
+        this.setLocalColumns();
+    },
 
-        columns: {
-            get() {
-                return this.sharedState.columns;
-            },
-            set(columns) {
-                this.sharedState.columns = columns;
+    watch: {
+        selectedColumns: {
+            deep: true,
+            handler() {
+                this.setSharedStateColumns();
             }
-        },
-
-        selectedColumns() {
-            return this.sharedState.columns
-                .filter(column => column.visible)
-                .map(column => column.field);
         }
-
     },
-
-    inject: ['sharedState'],
 
     methods: {
 
-        dismiss() {
-            this.customizing = false
+        setLocalColumns() {
+            this.selectedColumns = this.sharedState.columns.filter(column => column.visible);
+            this.hiddenColumns = this.sharedState.columns.filter(column => ! column.visible);
+        },
+
+        setSharedStateColumns() {
+            this.sharedState.columns = [
+                ...this.selectedColumns,
+                ...this.hiddenColumns,
+            ];
+        },
+
+        columnToggled(column) {
+            let fromArray = column.visible ? this.hiddenColumns : this.selectedColumns;
+            let toArray = column.visible ? this.selectedColumns : this.hiddenColumns;
+            let currentIndex = _.findIndex(fromArray, { field: column.field });
+
+            toArray.push(fromArray[currentIndex]);
+            fromArray.splice(currentIndex, 1);
+
+            this.hiddenColumns = _.sortBy(this.hiddenColumns, column => column.defaultOrder);
         },
 
         save() {
-            if (! this.selectedColumns.length) {
-                return this.$toast.error(__('At least 1 column is required'));
-            }
-
             this.saving = true;
 
-            this.$preferences.set(this.preferencesKey, this.selectedColumns)
+            this.$preferences.set(this.preferencesKey, this.selectedColumns.map(column => column.field))
                 .then(response => {
                     this.saving = false;
-                    this.customizing = false;
-                    this.$toast.success(__('Columns saved'));
+                    this.$refs.popover.close();
+                    this.$toast.success(__('These are now your default columns.'));
                 })
                 .catch(error => {
                     this.saving = false;
-                    this.$toast.error(__('Something went wrong'));
+                    this.$toast.error(__('Unable to save column preferences.'));
                 });
         },
 
         reset() {
-            this.sharedState.columns.forEach(column => column.visible = column.visibleDefault);
+            this.sharedState.columns.forEach(column => column.visible = column.defaultVisibility);
+            this.sharedState.columns = _.sortBy(this.sharedState.columns, column => column.defaultOrder);
+            this.setLocalColumns();
 
             this.saving = true;
 
             this.$preferences.remove(this.preferencesKey)
                 .then(response => {
                     this.saving = false;
-                    this.customizing = false;
-                    this.$toast.success(__('Columns reset'));
+                    this.$refs.popover.close();
+                    this.$toast.success(__('Columns have been reset to their defaults.'));
                 })
                 .catch(error => {
                     this.saving = false;
-                    this.$toast.error(__('Something went wrong'));
+                    this.$toast.error(__('Unable to save column preferences.'));
                 });
-        }
+        },
+
     }
 }
 </script>

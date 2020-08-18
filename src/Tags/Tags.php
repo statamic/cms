@@ -2,28 +2,27 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Support\Arr;
-use Statamic\Facades\Parse;
-use Statamic\Facades\Antlers;
-use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasAliases;
-use Statamic\Extend\HasParameters;
+use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Facades\Antlers;
+use Statamic\Facades\Parse;
+use Statamic\Support\Arr;
 
 abstract class Tags
 {
-    use HasHandle, HasAliases, HasParameters, RegistersItself;
+    use HasHandle, HasAliases, RegistersItself;
 
     protected static $binding = 'tags';
 
     /**
-     * The content written between the tags (when a tag pair)
+     * The content written between the tags (when a tag pair).
      * @public string
      */
     public $content;
 
     /**
-     * The variable context around which this tag is positioned
+     * The variable context around which this tag is positioned.
      * @public array
      */
     public $context;
@@ -35,7 +34,7 @@ abstract class Tags
     public $params;
 
     /**
-     * The tag that was used
+     * The tag that was used.
      *
      * eg. For {{ ron:swanson foo="bar" }}, this would be `ron:swanson`
      *     and for {{ ron foo="bar" }} it would be `ron:index`
@@ -45,7 +44,7 @@ abstract class Tags
     public $tag;
 
     /**
-     * The tag method that was used
+     * The tag method that was used.
      *
      * eg. For {{ ron:swanson foo="bar" }}, this would be `swanson`
      *     and for {{ ron foo="bar" }}, it would `index`
@@ -55,7 +54,7 @@ abstract class Tags
     public $method;
 
     /**
-     * If is a tag pair
+     * If is a tag pair.
      * @var bool
      */
     public $isPair;
@@ -83,7 +82,7 @@ abstract class Tags
         $this->setParser($properties['parser']);
         $this->setContent($properties['content']);
         $this->setContext($properties['context']);
-        $this->setParameters($properties['parameters']);
+        $this->setParameters($properties['params']);
         $this->tag = array_get($properties, 'tag');
         $this->method = array_get($properties, 'tag_method');
     }
@@ -105,7 +104,7 @@ abstract class Tags
 
     public function setContext($context)
     {
-        $this->context = (new Context($context))->setParser($this->parser);
+        $this->context = new Context($context);
 
         return $this;
     }
@@ -113,10 +112,6 @@ abstract class Tags
     public function setParameters($parameters)
     {
         $this->params = Parameters::make($parameters, $this->context);
-
-        // Temporary BC alias.
-        // TODO: Remove with HasParameters trait
-        $this->parameters = $this->params;
 
         return $this;
     }
@@ -128,7 +123,7 @@ abstract class Tags
      */
     public function __call($method, $args)
     {
-        if ($this->wildcardHandled || !method_exists($this, $this->wildcardMethod)) {
+        if ($this->wildcardHandled || ! method_exists($this, $this->wildcardMethod)) {
             throw new \BadMethodCallException("Call to undefined method {$method}.");
         }
 
@@ -138,24 +133,26 @@ abstract class Tags
     }
 
     /**
-     * Parse the tag pair contents
+     * Parse the tag pair contents.
      *
      * @param array $data     Data to be parsed into template
      * @return string
      */
     public function parse($data = [])
     {
-        if ($scope = $this->get('scope')) {
+        if ($scope = $this->params->get('scope')) {
             $data = Arr::addScope($data, $scope);
         }
 
         return Antlers::usingParser($this->parser, function ($antlers) use ($data) {
-            return $antlers->parse($this->content, array_merge($this->context->all(), $data));
+            return $antlers
+                ->parse($this->content, array_merge($this->context->all(), $data))
+                ->withoutExtractions();
         });
     }
 
     /**
-     * Iterate over the data and parse the tag pair contents for each
+     * Iterate over the data and parse the tag pair contents for each.
      *
      * @param array|\Statamic\Data\DataCollection $data        Data to iterate over
      * @param bool                                $supplement  Whether to supplement with contextual values
@@ -167,17 +164,19 @@ abstract class Tags
             return $this->parse([$as => $data]);
         }
 
-        if ($scope = $this->get('scope')) {
+        if ($scope = $this->params->get('scope')) {
             $data = Arr::addScope($data, $scope);
         }
 
         return Antlers::usingParser($this->parser, function ($antlers) use ($data, $supplement) {
-            return $antlers->parseLoop($this->content, $data, $supplement, $this->context->all());
+            return $antlers
+                ->parseLoop($this->content, $data, $supplement, $this->context->all())
+                ->withoutExtractions();
         });
     }
 
     /**
-     * Parse with no results
+     * Parse with no results.
      *
      * @param array $data Extra data to merge
      * @return string

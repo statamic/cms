@@ -5,76 +5,51 @@ namespace Tests\Composer;
 use Exception;
 use Facades\Statamic\Console\Processes\Composer;
 use Facades\Statamic\Extend\AddonInstaller;
-use Facades\Statamic\Extend\Marketplace;
-use Tests\Fakes\Composer\Composer as FakeComposer;
-use Tests\Fakes\Composer\Marketplace as FakeMarketplace;
+use Facades\Statamic\Marketplace\Marketplace;
 use Tests\TestCase;
 
 class AddonInstallerTest extends TestCase
 {
-    public function setUp(): void
+    /** @test */
+    public function it_can_install_addon()
     {
-        parent::setUp();
+        Marketplace::shouldReceive('package')->with('addon/exists')->andReturn(['data' => ['product_id' => 1]]);
+        Composer::shouldReceive('require')->with('addon/exists')->once();
 
-        Marketplace::swap(new FakeMarketplace);
-        Composer::swap(new FakeComposer);
+        AddonInstaller::install('addon/exists');
     }
 
     /** @test */
-    function there_are_installable_addons_by_default()
+    public function it_will_not_install_addons_that_dont_exist_on_the_marketplace()
     {
-        $this->assertCount(3, AddonInstaller::installable());
-    }
+        Marketplace::shouldReceive('package')->with('addon/not-approved')->andReturnNull();
 
-    /** @test */
-    function there_are_no_installed_addons_by_default()
-    {
-        $this->assertCount(0, AddonInstaller::installed());
-    }
-
-    /** @test */
-    function it_can_install_addon()
-    {
-        AddonInstaller::install('addon/one');
-
-        $this->assertCount(1, AddonInstaller::installed());
-        $this->assertContains('addon/one', AddonInstaller::installed());
-    }
-
-    /** @test */
-    function it_can_uninstall_addon()
-    {
-        AddonInstaller::install('addon/one');
-
-        $this->assertCount(1, AddonInstaller::installed());
-
-        AddonInstaller::uninstall('addon/one');
-
-        $this->assertCount(0, AddonInstaller::installed());
-    }
-
-    /** @test */
-    function it_will_not_install_unapproved_addon()
-    {
         $this->expectException(Exception::class);
+        $this->expectExceptionMessage('addon/not-approved is not an installable package.');
 
         AddonInstaller::install('addon/not-approved');
-
-        $this->assertTrue($exception instanceof \Exception);
-        $this->assertCount(0, AddonInstaller::installed());
     }
 
     /** @test */
-    function it_will_not_uninstall_unapproved_addon()
+    public function it_can_uninstall_addon()
     {
-        AddonInstaller::install('addon/one');
+        Composer::shouldReceive('installed')->andReturn(collect([
+            'addon/one' => [],
+        ]));
 
-        $this->assertCount(1, AddonInstaller::installed());
+        Composer::shouldReceive('remove')->with('addon/one')->once();
+
+        AddonInstaller::uninstall('addon/one');
+    }
+
+    /** @test */
+    public function it_can_only_uninstall_installed_addons()
+    {
+        Composer::shouldReceive('installed')->andReturn(collect([]));
 
         $this->expectException(Exception::class);
+        $this->expectExceptionMessage('addon/not-installed is not installed.');
 
-        AddonInstaller::uninstall('addon/not-approved');
-
-        $this->assertCount(1, AddonInstaller::installed());
+        AddonInstaller::uninstall('addon/not-installed');
     }
 }

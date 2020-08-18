@@ -2,36 +2,36 @@
 
 namespace Statamic\Providers;
 
-use Statamic\Facades\File;
-use Statamic\Statamic;
-use Statamic\Sites\Sites;
-use Stringy\StaticStringy;
-use Statamic\Facades\Preference;
+use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
-use Statamic\Exceptions\Handler;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Contracts\Debug\ExceptionHandler;
+use Statamic\Facades\Preference;
+use Statamic\Sites\Sites;
+use Statamic\Statamic;
+use Statamic\Structures\UriCache;
 
 class AppServiceProvider extends ServiceProvider
 {
     protected $root = __DIR__.'/../..';
 
     protected $configFiles = [
-        'amp', 'api', 'assets', 'cp', 'forms', 'live_preview', 'oauth', 'protect', 'revisions',
-        'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'users'
+        'amp', 'api', 'assets', 'cp', 'editions', 'forms', 'git', 'live_preview', 'oauth', 'protect', 'revisions',
+        'routes', 'search', 'static_caching', 'sites', 'stache', 'system', 'users',
     ];
 
     public function boot()
     {
-        $this->swapSessionMiddleware();
-
-        $this->app[\Illuminate\Contracts\Http\Kernel::class]
-             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class);
-
         $this->app->booted(function () {
+            Statamic::runBootedCallbacks();
             $this->loadRoutesFrom("{$this->root}/routes/routes.php");
         });
+
+        $this->registerMiddlewareGroup();
+
+        $this->app[\Illuminate\Contracts\Http\Kernel::class]
+            ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
+            ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
@@ -45,20 +45,20 @@ class AppServiceProvider extends ServiceProvider
         ], 'statamic');
 
         $this->publishes([
-            "{$this->root}/resources/dist" => public_path('vendor/statamic/cp')
+            "{$this->root}/resources/dist" => public_path('vendor/statamic/cp'),
         ], 'statamic-cp');
 
         $this->loadTranslationsFrom("{$this->root}/resources/lang", 'statamic');
         $this->loadJsonTranslationsFrom("{$this->root}/resources/lang");
 
         $this->publishes([
-            "{$this->root}/resources/lang" => resource_path('lang/vendor/statamic')
+            "{$this->root}/resources/lang" => resource_path('lang/vendor/statamic'),
         ], 'statamic-translations');
 
         $this->loadViewsFrom("{$this->root}/resources/views/extend", 'statamic');
 
         $this->publishes([
-            "{$this->root}/resources/views/extend/forms" => resource_path('views/vendor/statamic/forms')
+            "{$this->root}/resources/views/extend/forms" => resource_path('views/vendor/statamic/forms'),
         ], 'statamic-forms');
 
         Blade::directive('svg', function ($expression) {
@@ -80,8 +80,6 @@ class AppServiceProvider extends ServiceProvider
 
     public function register()
     {
-        $this->app->singleton(ExceptionHandler::class, Handler::class);
-
         $this->app->singleton(Sites::class, function () {
             return new Sites(config('statamic.sites'));
         });
@@ -93,17 +91,23 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Entries\CollectionRepository::class => \Statamic\Stache\Repositories\CollectionRepository::class,
             \Statamic\Contracts\Globals\GlobalRepository::class => \Statamic\Stache\Repositories\GlobalRepository::class,
             \Statamic\Contracts\Assets\AssetContainerRepository::class => \Statamic\Stache\Repositories\AssetContainerRepository::class,
-            \Statamic\Contracts\Data\Repositories\ContentRepository::class => \Statamic\Stache\Repositories\ContentRepository::class,
-            \Statamic\Contracts\Structures\StructureRepository::class => \Statamic\Stache\Repositories\StructureRepository::class,
+            \Statamic\Contracts\Structures\StructureRepository::class => \Statamic\Structures\StructureRepository::class,
+            \Statamic\Contracts\Structures\NavigationRepository::class => \Statamic\Stache\Repositories\NavigationRepository::class,
             \Statamic\Contracts\Assets\AssetRepository::class => \Statamic\Assets\AssetRepository::class,
+            \Statamic\Contracts\Forms\FormRepository::class => \Statamic\Forms\FormRepository::class,
         ])->each(function ($concrete, $abstract) {
             $this->app->singleton($abstract, $concrete);
+
+            foreach ($concrete::bindings() as $abstract => $concrete) {
+                $this->app->bind($abstract, $concrete);
+            }
         });
 
         $this->app->singleton(\Statamic\Contracts\Data\DataRepository::class, function ($app) {
             return (new \Statamic\Data\DataRepository)
                 ->setRepository('entry', \Statamic\Contracts\Entries\EntryRepository::class)
                 ->setRepository('term', \Statamic\Contracts\Taxonomies\TermRepository::class)
+                ->setRepository('collection', \Statamic\Contracts\Entries\CollectionRepository::class)
                 ->setRepository('taxonomy', \Statamic\Contracts\Taxonomies\TaxonomyRepository::class)
                 ->setRepository('global', \Statamic\Contracts\Globals\GlobalRepository::class)
                 ->setRepository('asset', \Statamic\Contracts\Assets\AssetRepository::class)
@@ -113,20 +117,28 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\Statamic\Fields\BlueprintRepository::class, function ($app) {
             return (new \Statamic\Fields\BlueprintRepository($app['files']))
                 ->setDirectory(resource_path('blueprints'))
-                ->setFallbackDirectory(__DIR__.'/../../resources/blueprints');
+                ->setFallback('default', function () {
+                    return \Statamic\Facades\Blueprint::makeFromFields([
+                        'content' => ['type' => 'markdown', 'localizable' => true],
+                    ]);
+                });
         });
 
         $this->app->bind(\Statamic\Fields\FieldsetRepository::class, function ($app) {
             return (new \Statamic\Fields\FieldsetRepository($app['files']))
                 ->setDirectory(resource_path('fieldsets'));
         });
+
+        $this->app->singleton(UriCache::class, function () {
+            return new UriCache;
+        });
     }
 
-    protected function swapSessionMiddleware()
+    protected function registerMiddlewareGroup()
     {
-        $this->app->singleton(
-            \Illuminate\Session\Middleware\StartSession::class,
-            \Statamic\Http\Middleware\CP\StartSession::class
-        );
+        $this->app->make(Router::class)->middlewareGroup('statamic.web', [
+            \Statamic\Http\Middleware\Localize::class,
+            \Statamic\StaticCaching\Middleware\Cache::class,
+        ]);
     }
 }

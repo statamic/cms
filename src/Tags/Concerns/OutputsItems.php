@@ -12,7 +12,7 @@ trait OutputsItems
             return $this->paginatedOutput($items);
         }
 
-        if ($as = $this->get('as')) {
+        if ($as = $this->params->get('as')) {
             return array_merge([$as => $items], $this->extraOutput($items));
         }
 
@@ -34,12 +34,12 @@ trait OutputsItems
 
     protected function paginatedOutput($paginator)
     {
-        $as = $this->get('as', $this->defaultAsKey ?? 'results');
+        $as = $this->params->get('as', $this->defaultAsKey ?? 'results');
         $items = $paginator->getCollection()->supplement('total_results', $paginator->total());
 
         return array_merge([
             $as => $items,
-            'paginate' => $this->getPaginationData($paginator)
+            'paginate' => $this->getPaginationData($paginator),
         ], $this->extraOutput($items));
     }
 
@@ -53,7 +53,7 @@ trait OutputsItems
             'prev_page'      => $paginator->previousPageUrl(),
             'next_page'      => $paginator->nextPageUrl(),
             'auto_links'     => $paginator->render('pagination::default'),
-            'links'          => $paginator->renderArray()
+            'links'          => $paginator->renderArray(),
         ];
     }
 }

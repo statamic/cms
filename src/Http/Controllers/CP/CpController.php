@@ -2,17 +2,18 @@
 
 namespace Statamic\Http\Controllers\CP;
 
-use Statamic\Support\Str;
-use Statamic\Facades\File;
-use Statamic\Facades\YAML;
-use Statamic\Facades\Folder;
-use Illuminate\Http\Request;
-use Statamic\Http\Controllers\Controller;
-use Statamic\Exceptions\AuthorizationException;
 use Illuminate\Auth\Access\AuthorizationException as LaravelAuthException;
+use Illuminate\Http\Request;
+use Statamic\Exceptions\AuthorizationException;
+use Statamic\Facades\File;
+use Statamic\Facades\Folder;
+use Statamic\Facades\YAML;
+use Statamic\Http\Controllers\Controller;
+use Statamic\Statamic;
+use Statamic\Support\Str;
 
 /**
- * The base control panel controller
+ * The base control panel controller.
  */
 class CpController extends Controller
 {
@@ -22,7 +23,7 @@ class CpController extends Controller
     protected $request;
 
     /**
-     * Create a new CpController
+     * Create a new CpController.
      *
      * @param \Illuminate\Http\Request $request
      */
@@ -32,7 +33,7 @@ class CpController extends Controller
     }
 
     /**
-     * Get all the template names from the current theme
+     * Get all the template names from the current theme.
      *
      * @return array
      */
@@ -43,7 +44,7 @@ class CpController extends Controller
         foreach (Folder::disk('resources')->getFilesByTypeRecursively('templates', 'html') as $path) {
             $parts = explode('/', $path);
             array_shift($parts);
-            $templates[] = Str::removeRight(join('/', $parts), '.html');
+            $templates[] = Str::removeRight(implode('/', $parts), '.html');
         }
 
         return $templates;
@@ -69,15 +70,17 @@ class CpController extends Controller
     }
 
     /**
-     * 404
+     * 404.
      */
     public function pageNotFound()
     {
         return response()->view('statamic::errors.404', [], 404);
     }
 
-    public function authorize($ability, $args = [], $message = 'This action is unauthorized.')
+    public function authorize($ability, $args = [], $message = null)
     {
+        $message = $message ?? __('This action is unauthorized.');
+
         try {
             return parent::authorize($ability, $args);
         } catch (LaravelAuthException $e) {
@@ -85,10 +88,24 @@ class CpController extends Controller
         }
     }
 
-    public function authorizeIf($condition, ...$args)
+    public function authorizeIf($condition, $ability, $args = [], $message = null)
     {
         if ($condition) {
-            return $this->authorize(...$args);
+            return $this->authorize($ability, $args, $message);
+        }
+    }
+
+    public function authorizePro()
+    {
+        if (! Statamic::pro()) {
+            throw new AuthorizationException(__('Statamic Pro is required.'));
+        }
+    }
+
+    public function authorizeProIf($condition)
+    {
+        if ($condition) {
+            return $this->authorizePro();
         }
     }
 }

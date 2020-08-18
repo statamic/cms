@@ -2,9 +2,9 @@
 
 namespace Statamic\Http\Controllers\CP\Users;
 
-use Statamic\Facades\User;
 use Illuminate\Http\Request;
 use Statamic\Facades\Preference;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
 class PreferenceController extends CpController

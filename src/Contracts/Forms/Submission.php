@@ -7,7 +7,7 @@ use Illuminate\Contracts\Support\Arrayable;
 interface Submission extends Arrayable
 {
     /**
-     * Get or set the ID
+     * Get or set the ID.
      *
      * @param mixed|null
      * @return mixed
@@ -15,7 +15,7 @@ interface Submission extends Arrayable
     public function id($id = null);
 
     /**
-     * Get or set the form
+     * Get or set the form.
      *
      * @param Form|null $form
      * @return Form
@@ -23,28 +23,28 @@ interface Submission extends Arrayable
     public function form($form = null);
 
     /**
-     * Get the fields in the formset
+     * Get the fields in the formset.
      *
      * @return array
      */
     public function fields();
 
     /**
-     * Get the columns
+     * Get the columns.
      *
      * @return array
      */
     public function columns();
 
     /**
-     * Get the date when this was submitted
+     * Get the date when this was submitted.
      *
      * @return Carbon
      */
     public function date();
 
     /**
-     * Get or set the data
+     * Get or set the data.
      *
      * @param array|null $data
      * @return array
@@ -52,7 +52,7 @@ interface Submission extends Arrayable
     public function data($data = null);
 
     /**
-     * Get a value of a field
+     * Get a value of a field.
      *
      * @param  string $key
      * @return mixed
@@ -60,7 +60,7 @@ interface Submission extends Arrayable
     public function get($field);
 
     /**
-     * Set a value of a field
+     * Set a value of a field.
      *
      * @param string $field
      * @param mixed $value
@@ -69,7 +69,7 @@ interface Submission extends Arrayable
     public function set($field, $value);
 
     /**
-     * Delete sybmission
+     * Delete sybmission.
      *
      * @param  string $key
      * @return mixed
@@ -77,7 +77,7 @@ interface Submission extends Arrayable
     public function delete();
 
     /**
-     * Save the submission
+     * Save the submission.
      *
      * @return void
      */

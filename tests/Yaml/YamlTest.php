@@ -3,14 +3,14 @@
 namespace Tests\Yaml;
 
 use Exception;
-use Tests\TestCase;
 use Statamic\Facades\YAML;
 use Statamic\Yaml\ParseException;
+use Tests\TestCase;
 
 class YamlTest extends TestCase
 {
     /** @test */
-    function it_dumps_yaml()
+    public function it_dumps_yaml()
     {
         $array = [
             'foo' => 'bar',
@@ -19,7 +19,7 @@ class YamlTest extends TestCase
             'array' => ['one', 'two'],
         ];
 
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 foo: bar
 two_words: 'two words'
 multiline: |
@@ -35,9 +35,9 @@ EOT;
     }
 
     /** @test */
-    function it_dumps_with_front_matter_when_content_is_passed()
+    public function it_dumps_with_front_matter_when_content_is_passed()
     {
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 ---
 foo: bar
 ---
@@ -48,9 +48,9 @@ EOT;
     }
 
     /** @test */
-    function it_dumps_without_front_matter_when_content_is_an_array()
+    public function it_dumps_without_front_matter_when_content_is_an_array()
     {
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 foo: bar
 content:
   baz: qux
@@ -61,9 +61,9 @@ EOT;
     }
 
     /** @test */
-    function it_dumps_without_front_matter_when_content_is_null()
+    public function it_dumps_without_front_matter_when_content_is_null()
     {
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 foo: bar
 
 EOT;
@@ -73,9 +73,9 @@ EOT;
     }
 
     /** @test */
-    function it_explicitly_dumps_front_matter()
+    public function it_explicitly_dumps_front_matter()
     {
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 ---
 foo: bar
 ---
@@ -86,9 +86,9 @@ EOT;
     }
 
     /** @test */
-    function it_explicitly_dumps_front_matter_with_content()
+    public function it_explicitly_dumps_front_matter_with_content()
     {
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 ---
 foo: bar
 ---
@@ -99,9 +99,9 @@ EOT;
     }
 
     /** @test */
-    function it_explicitly_dumps_front_matter_including_content_when_its_an_array()
+    public function it_explicitly_dumps_front_matter_including_content_when_its_an_array()
     {
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 ---
 foo: bar
 content:
@@ -114,9 +114,9 @@ EOT;
     }
 
     /** @test */
-    function it_explicitly_dumps_front_matter_without_content_when_its_null()
+    public function it_explicitly_dumps_front_matter_without_content_when_its_null()
     {
-        $expected = <<<EOT
+        $expected = <<<'EOT'
 ---
 foo: bar
 ---
@@ -128,21 +128,21 @@ EOT;
     }
 
     /** @test */
-    function it_parses_a_string_of_yaml()
+    public function it_parses_a_string_of_yaml()
     {
         $this->assertEqualsIgnoringLineEndings(['foo' => 'bar'], YAML::parse('foo: bar'));
     }
 
     /** @test */
-    function it_parses_an_empty_string_of_yaml()
+    public function it_parses_an_empty_string_of_yaml()
     {
         $this->assertEqualsIgnoringLineEndings([], YAML::parse(''));
     }
 
     /** @test */
-    function it_parses_with_content_and_front_matter()
+    public function it_parses_with_content_and_front_matter()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 ---
 foo: bar
 ---
@@ -153,9 +153,9 @@ EOT;
     }
 
     /** @test */
-    function it_parses_with_content_when_its_in_the_front_matter()
+    public function it_parses_with_content_when_its_in_the_front_matter()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 ---
 foo: bar
 content: some content
@@ -166,9 +166,9 @@ EOT;
     }
 
     /** @test */
-    function it_throws_exception_when_there_is_a_content_var_and_a_content_area()
+    public function it_throws_exception_when_there_is_a_content_var_and_a_content_area()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 ---
 foo: bar
 content: some content
@@ -181,9 +181,9 @@ EOT;
     }
 
     /** @test */
-    function it_parses_a_file_when_no_argument_is_given()
+    public function it_parses_a_file_when_no_argument_is_given()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 ---
 foo: bar
 ---
@@ -201,7 +201,7 @@ EOT;
     }
 
     /** @test */
-    function it_throws_exception_when_parsing_without_an_argument_or_file()
+    public function it_throws_exception_when_parsing_without_an_argument_or_file()
     {
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Cannot parse YAML without a file or string.');
@@ -210,9 +210,9 @@ EOT;
     }
 
     /** @test */
-    function it_creates_parse_exception_pointing_to_temporary_file_when_no_file_is_provided()
+    public function it_creates_parse_exception_pointing_to_temporary_file_when_no_file_is_provided()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 ---
 foo: 'bar
 baz: 'qux'
@@ -227,6 +227,7 @@ EOT;
             $this->assertEquals('Unexpected characters near "qux\'" at line 3 (near "baz: \'qux\'").', $e->getMessage());
             $path = storage_path('statamic/tmp/yaml-'.md5("---\nfoo: 'bar\nbaz: 'qux'"));
             $this->assertEquals($path, $e->getFile());
+
             return;
         }
 
@@ -234,9 +235,9 @@ EOT;
     }
 
     /** @test */
-    function it_creates_parse_exception_pointing_to_actual_file_when_file_is_provided()
+    public function it_creates_parse_exception_pointing_to_actual_file_when_file_is_provided()
     {
-        $yaml = <<<EOT
+        $yaml = <<<'EOT'
 ---
 foo: 'bar
 baz: 'qux'
@@ -250,6 +251,7 @@ EOT;
             $this->assertInstanceOf(ParseException::class, $e);
             $this->assertEquals('Unexpected characters near "qux\'" at line 3 (near "baz: \'qux\'").', $e->getMessage());
             $this->assertEquals('path/to/file.yaml', $e->getFile());
+
             return;
         }
 
@@ -257,9 +259,9 @@ EOT;
     }
 
     /** @test */
-    function it_throws_an_exception_when_an_array_cannot_be_returned()
+    public function it_throws_an_exception_when_an_array_cannot_be_returned()
     {
-        $string = <<<EOT
+        $string = <<<'EOT'
 <<< HEAD
 An example when this happens
 ===
@@ -272,6 +274,7 @@ EOT;
         } catch (Exception $e) {
             $this->assertInstanceOf(ParseException::class, $e);
             $this->assertEquals('Unable to parse (near "<<< HEAD").', $e->getMessage());
+
             return;
         }
 

@@ -9,51 +9,57 @@
             v-if="!initializing"
             :rows="items"
             :columns="columns"
-            :search="false"
-            :search-query="searchQuery"
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
         >
             <div slot-scope="{ hasSelections }">
-                <div class="card p-0">
-                    <div class="data-list-header min-h-16">
-                        <data-list-toggle-all ref="toggleAll" />
-                        <data-list-search v-model="searchQuery" />
-                        <data-list-bulk-actions
-                            :url="actionUrl"
-                            @started="actionStarted"
-                            @completed="actionCompleted"
+                <div class="card p-0 relative">
+                    <data-list-filter-presets
+                        v-if="!reordering"
+                        ref="presets"
+                        :active-preset="activePreset"
+                        :preferences-prefix="preferencesPrefix"
+                        @selected="selectPreset"
+                        @reset="filtersReset"
+                    />
+                    <div class="data-list-header" v-if="!reordering">
+                        <data-list-filters
+                            :filters="filters"
+                            :active-preset="activePreset"
+                            :active-preset-payload="activePresetPayload"
+                            :active-filters="activeFilters"
+                            :active-filter-badges="activeFilterBadges"
+                            :active-count="activeFilterCount"
+                            :search-query="searchQuery"
+                            :saves-presets="true"
+                            :preferences-prefix="preferencesPrefix"
+                            @filter-changed="filterChanged"
+                            @search-changed="searchChanged"
+                            @saved="$refs.presets.setPreset($event)"
+                            @deleted="$refs.presets.refreshPresets()"
+                            @restore-preset="$refs.presets.viewPreset($event)"
+                            @reset="filtersReset"
                         />
-                        <template v-if="!hasSelections">
-                            <button class="btn-flat ml-1"
-                                v-if="showReorderButton"
-                                @click="reorder"
-                                v-text="__('Reorder')"
-                            />
-                            <template v-if="reordering">
-                                <button class="btn-flat ml-1" @click="saveOrder" v-text="__('Save Order')" />
-                                <button class="btn-flat ml-1" @click="cancelReordering" v-text="__('Cancel')" />
-                            </template>
-                            <data-list-filters
-                                class="ml-1"
-                                :filters="filters"
-                                :active-filters="activeFilters"
-                                :active-count="activeFilterCount"
-                                :preferences-key="preferencesKey('filters')" />
-                            <data-list-column-picker :preferences-key="preferencesKey('columns')" class="ml-1" />
-                        </template>
                     </div>
 
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
 
+                    <data-list-bulk-actions
+                        :url="bulkActionsUrl"
+                        @started="actionStarted"
+                        @completed="actionCompleted"
+                    />
+
                     <data-list-table
                         v-show="items.length"
-                        :allow-bulk-actions="true"
+                        :allow-bulk-actions="!reordering"
                         :loading="loading"
                         :reorderable="reordering"
                         :sortable="!reordering"
                         :toggle-selection-on-row-click="true"
+                        :allow-column-picker="true"
+                        :column-preferences-key="preferencesKey('columns')"
                         @sorted="sorted"
                         @reordered="reordered"
                     >
@@ -73,7 +79,7 @@
                                 <div class="divider" v-if="entry.actions.length" />
                                 <data-list-inline-actions
                                     :item="entry.id"
-                                    :url="actionUrl"
+                                    :url="runActionUrl"
                                     :actions="entry.actions"
                                     @started="actionStarted"
                                     @completed="actionCompleted"
@@ -83,11 +89,11 @@
                     </data-list-table>
                 </div>
                 <data-list-pagination
-                    v-if="! reordering"
                     class="mt-3"
                     :resource-meta="meta"
                     :per-page="perPage"
-                    @page-selected="page = $event"
+                    @page-selected="selectPage"
+                    @per-page-changed="changePerPage"
                 />
             </div>
         </data-list>
@@ -104,9 +110,9 @@ export default {
 
     props: {
         collection: String,
-        reorderable: Boolean,
+        reordering: Boolean,
         reorderUrl: String,
-        structureUrl: String,
+        site: String,
     },
 
     data() {
@@ -114,36 +120,22 @@ export default {
             listingKey: 'entries',
             preferencesPrefix: `collections.${this.collection}`,
             requestUrl: cp_url(`collections/${this.collection}/entries`),
-            reordering: false,
-            reorderingRequested: false,
-            initialOrder: null,
         }
     },
 
-    computed: {
-        showReorderButton() {
-            if (this.structureUrl) return true;
-            if (this.hasActiveFilters) return false;
+    watch: {
 
-            return this.reorderable && !this.reordering;
-        },
-
-        reorderingDisabled() {
-            return this.sortColumn !== 'order';
+        reordering(reordering, wasReordering) {
+            if (reordering === wasReordering) return;
+            reordering ? this.reorder() : this.cancelReordering();
         }
-    },
 
-    created() {
-        this.filtersChanged(this.$preferences.get(this.preferencesKey('filters')));
     },
 
     methods: {
 
-        afterRequestCompleted(response) {
-            if (this.reorderingRequested) this.reorder();
-        },
-
         getStatusClass(entry) {
+            // TODO: Replace with `entry.status` (will need to pass down)
             if (entry.published && entry.private) {
                 return 'bg-transparent border border-grey-60';
             } else if (entry.published) {
@@ -154,47 +146,37 @@ export default {
         },
 
         reorder() {
-            if (this.structureUrl) {
-                window.location = this.structureUrl;
-                return;
-            }
-
-            // If the listing isn't in order when attempting to reorder, things would get
-            // all jumbled up. We'll change the sort order, which triggers an async
-            // request. Once it's completed, reordering will be re-triggered.
-            if (this.sortColumn !== 'order') {
-                this.reorderingRequested = true;
-                this.sortColumn = 'order';
-                return;
-            }
-
-            this.reordering = true;
-            this.initialOrder = this.items.map(item => item.id);
-            this.reorderingRequested = false;
-        },
-
-        saveOrder() {
-            let ids = this.items.map(item => item.id);
-
-            this.$axios.post(this.reorderUrl, {ids})
-                .then(response => {
-                    this.reordering = false;
-                    this.$toast.success(__('Entries successfully reordered'))
-                })
-                .catch(e => {
-                    this.$toast.error(__('Something went wrong'));
-                });
+            this.filtersReset();
+            this.page = 1;
+            this.sortColumn = 'order';
         },
 
         cancelReordering() {
-            this.reordering = false;
-            this.items = this.initialOrder.map(id => _.findWhere(this.items, { id }));
-            this.initialOrder = null;
+            this.request();
         },
 
         reordered(items) {
             this.items = items;
-        }
+        },
+
+        saveOrder() {
+            const payload = {
+                ids: this.items.map(item => item.id),
+                page: this.page,
+                perPage: this.perPage,
+                site: this.site
+            };
+
+            this.$axios.post(this.reorderUrl, payload)
+                .then(response => {
+                    this.$emit('reordered');
+                    this.$toast.success(__('Entries successfully reordered'))
+                })
+                .catch(e => {
+                    console.log(e);
+                    this.$toast.error(__('Something went wrong'));
+                });
+        },
 
     }
 

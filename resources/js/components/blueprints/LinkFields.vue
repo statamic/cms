@@ -22,8 +22,8 @@
                 <div class="flex-1 overflow-auto p-3">
 
                     <div>
-                        <p class="text-sm font-medium mb-1">Link a single field</p>
-                        <p class="text-2xs text-grey mb-1">Changes to this field will stay in sync.</p>
+                        <p class="text-sm font-medium mb-1" v-text="__('Link a single field')" />
+                        <p class="text-2xs text-grey mb-1" v-text="__('Changes to this field will stay in sync.')" />
                         <v-select
                             name="field"
                             :placeholder="__('Fields')"
@@ -38,6 +38,9 @@
                                     <span v-text="option.label" />
                                 </div>
                             </template>
+                            <template v-slot:no-options>
+                               <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                           </template>
                         </v-select>
                         <button
                             class="btn-primary w-full mt-3"
@@ -48,12 +51,12 @@
                     </div>
                     <div class="my-2 flex items-center">
                         <div class="border-b border-grey-30 flex-1" />
-                        <div class="text-2xs text-grey-60 mx-2">or</div>
+                        <div class="text-2xs text-grey-60 mx-2" v-text="__('or')"></div>
                         <div class="border-b border-grey-30 flex-1" />
                     </div>
                     <div>
-                        <p class="text-sm font-medium mb-1">Link a fieldset</p>
-                        <p class="text-2xs text-grey mb-1">Changes to this fieldset will stay in sync.</p>
+                        <p class="text-sm font-medium mb-1" v-text="__('Link a fieldset')" />
+                        <p class="text-2xs text-grey mb-1" v-text="__('Changes to this fieldset will stay in sync.')" />
                         <v-select
                             name="field"
                             :placeholder="__('Fieldsets')"
@@ -62,10 +65,14 @@
                             :searchable="true"
                             :reduce="(opt) => opt.value"
                             v-model="fieldset"
-                        />
-                        <p class="text-sm font-medium mt-3 mb-1">Prefix</p>
-                        <p class="text-2xs text-grey mb-1">Every field in the linked fieldset will be prefixed with this. Useful if you want to import the same fields multiple times.</p>
-                        <text-input v-model="importPrefix" placeholder="eg. hero_" />
+                        >
+                            <template v-slot:no-options>
+                                <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
+                            </template>
+                        </v-select>
+                        <p class="text-sm font-medium mt-3 mb-1" v-text="__('Prefix')" />
+                        <p class="text-2xs text-grey mb-1" v-text="__('messages.fieldset_link_fields_prefix_instructions')" />
+                        <text-input v-model="importPrefix" :placeholder="__('e.g. hero_')" />
                         <button
                             class="btn-primary w-full mt-3"
                             :class="{ 'opacity-50': !fieldset }"
@@ -88,6 +95,10 @@ import uniqid from 'uniqid';
 
 export default {
 
+    props: {
+        excludeFieldset: String
+    },
+
     data() {
         let fields = this.$config.get('fieldsetFields');
         let fieldsets = this.$config.get('fieldsets');
@@ -97,14 +108,18 @@ export default {
             reference: null,
             fieldset: null,
             importPrefix: null,
-            fieldSuggestions: Object.values(fields).map(field => {
+            fieldSuggestions: Object.values(fields).filter(field => {
+                return field.fieldset.handle != this.excludeFieldset;
+            }).map(field => {
                 return {
                     value: `${field.fieldset.handle}.${field.handle}`,
                     label: field.display,
                     fieldset: fieldsets[field.fieldset.handle].title
                 };
             }),
-            fieldsetSuggestions: Object.values(fieldsets).map(fieldset => {
+            fieldsetSuggestions: Object.values(fieldsets).filter(fieldset => {
+                return fieldset.handle != this.excludeFieldset;
+            }).map(fieldset => {
                 return {
                     value: fieldset.handle,
                     label: fieldset.title,

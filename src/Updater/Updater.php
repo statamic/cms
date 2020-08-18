@@ -2,62 +2,34 @@
 
 namespace Statamic\Updater;
 
-use Statamic\Statamic;
-use Statamic\Facades\Addon;
-use Statamic\Updater\Changelog;
 use Facades\Statamic\Console\Processes\Composer;
-use Statamic\Updater\Core\Updater as CoreUpdater;
 
 class Updater
 {
     /**
      * @var string
      */
-    protected $slug;
+    protected $package;
 
     /**
-     * Instantiate product updater.
+     * Instantiate package updater.
      *
-     * @param string $slug
+     * @param string $package
      */
-    public function __construct(string $slug)
+    public function __construct(string $package)
     {
-        $this->slug = $slug;
+        $this->package = $package;
     }
 
     /**
-     * Instantiate product updater.
+     * Instantiate package updater.
      *
-     * @param string $slug
+     * @param string $package
      * @return static
      */
-    public static function product(string $slug)
+    public static function package(string $package)
     {
-        if ($slug === Statamic::CORE_SLUG) {
-            return new CoreUpdater($slug);
-        }
-
-        return new static($slug);
-    }
-
-    /**
-     * Update core to latest constrained version.
-     */
-    public function update()
-    {
-        return Composer::update($this->getPackage());
-    }
-
-    /**
-     * Update to latest version.
-     */
-    public function updateToLatest()
-    {
-        // It can take time to figure out the latest version constraint below,
-        // so here we preemptively clear the output cache for the composer ajax polling.
-        Composer::clearCachedOutput($this->getPackage());
-
-        return Composer::require($this->getPackage(), $this->latestVersionConstraint());
+        return new static($package);
     }
 
     /**
@@ -65,42 +37,8 @@ class Updater
      *
      * @param string $version
      */
-    public function installExplicitVersion(string $version)
+    public function install(string $version)
     {
-        return Composer::require($this->getPackage(), $version);
-    }
-
-    /**
-     * Get package.
-     *
-     * @return string
-     */
-    protected function getPackage()
-    {
-        return Addon::all()->first(function ($addon) {
-            return $addon->marketplaceSlug() === $this->slug;
-        })->package();
-    }
-
-    /**
-     * Get latest version.
-     */
-    protected function latestVersion()
-    {
-        return Changelog::product($this->slug)->latest()->version;
-    }
-
-    /**
-     * Get latest version and assemble recommended latest version constraint.
-     *
-     * @return string
-     */
-    protected function latestVersionConstraint()
-    {
-        $versionParts = collect(explode('.', $this->latestVersion()));
-        $versionParts->pop();
-        $versionParts->push('*');
-
-        return $versionParts->implode('.');
+        return Composer::require($this->package, $version);
     }
 }

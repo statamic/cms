@@ -2,11 +2,11 @@
 
 namespace Tests\Auth\Protect;
 
-use Tests\TestCase;
-use Tests\FakesViews;
-use Statamic\Facades\Collection;
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Collection;
+use Tests\FakesViews;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class PageProtectionTestCase extends TestCase
 {
@@ -30,7 +30,7 @@ class PageProtectionTestCase extends TestCase
     protected function createPage($slug, $attributes = [])
     {
         $collection = Collection::make('pages')
-            ->route('{slug}')
+            ->routes('{slug}')
             ->template('default')
             ->save();
 

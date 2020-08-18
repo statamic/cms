@@ -57,12 +57,18 @@
 }
 
 .v-select:not(.vs--unsearchable) .vs__selected-options {
-	@apply appearance-none text-grey-80 w-full shadow-inner;
+	@apply appearance-none text-grey-80 w-full text-sm;
 	@apply flex flex-wrap flex-1 border border-grey-50 border-r-0 rounded-l relative h-full;
+	box-shadow: inset 1px 1px 1px 0px rgba(0,0,0,.05);
 	padding: 5px 8px;
+	line-height: 1.5;
 
     transition: border-color .15s ease-in-out,
-                box-shadow .15s ease-in-out;
+				box-shadow .15s ease-in-out;
+
+	.tags-fieldtype & {
+		@apply border-r rounded-r;
+	}
 }
 
 .vs--single .vs__selected-options {
@@ -74,8 +80,11 @@
 	@apply flex w-full rounded-l relative h-full border-r-0;
 }
 
-
 .vs__actions {
+	@apply flex items-center;
+}
+
+.vs__actions .vs__open-indicator {
 	@include clickable;
 	@apply flex items-center rounded-r px-1 text-sm;
 	height: 2.375rem;
@@ -89,7 +98,7 @@
 	cursor: pointer
 }
 
-.vs__open-indicator {
+.vs__open-indicator svg {
 	@apply flex items-center text-grey-90;
 	height: 16px;
 	width: 16px;
@@ -101,7 +110,7 @@
 	transition-timing-function: cubic-bezier(1, -.115, .975, .855)
 }
 
-.vs--open .vs__open-indicator {
+.vs--open .vs__open-indicator svg {
 	-webkit-transform: rotate(180deg) scale(1);
 	transform: rotate(180deg) scale(1)
 }
@@ -111,10 +120,11 @@
 }
 
 .vs__clear {
-	@apply text-grey-90 mr-1 cursor-pointer p-0;
-	padding: 1px 0 0;
-	border: 0;
-	font-size: 17px;
+	@apply text-grey-90 px-1 cursor-pointer shadow-inner text-base bg-transparent;
+	height: 2.375rem;
+	box-shadow: inset -1px 1px 1px 0px rgba(0,0,0,.05);
+	border-top: 1px solid #c4cdd6;
+	border-bottom: 1px solid #c4cdd6;
 	background-color: transparent;
 	&:hover {
 		@apply text-blue;
@@ -159,11 +169,18 @@
 }
 
 .vs__deselect {
-	@apply flex items-center cursor-pointer text-grey-90 opacity-50 ml-sm p-0;
+	@apply flex items-center cursor-pointer text-grey-60 ml-sm p-0 outline-none;
+
 	&:hover {
-		@apply opacity-75;
+		@apply text-grey-80;
 	}
+
+	&:focus {
+		@apply outline-none;
+	}
+
 	span {
+		flex-shrink: 0;
 		font-size: 17px;
 		font-weight: 700;
 		padding-top: 1px;
@@ -195,7 +212,7 @@
 
 .vs__search,
 .vs__search:focus {
-	@apply appearance-none text-base text-grey-80 px-1 border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
+	@apply appearance-none text-sm text-grey-80 px-1 border-transparent outline-none m-0 p-0 bg-transparent max-w-full;
 	line-height: 1.4;
 	border-left: none;
 	box-shadow: none;
@@ -203,20 +220,8 @@
 	flex-grow: 1
 }
 
-.vs__search::-webkit-input-placeholder {
-	color: inherit
-}
-
-.vs__search:-ms-input-placeholder {
-	color: inherit
-}
-
-.vs__search::-ms-input-placeholder {
-	color: inherit
-}
-
 .vs__search::placeholder {
-	color: inherit
+	@apply text-grey-60;
 }
 
 .vs--unsearchable .vs__search {

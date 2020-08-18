@@ -2,11 +2,9 @@
 
 namespace Tests\Routing;
 
-use Tests\TestCase;
-use Statamic\Facades\Entry;
-use Statamic\Stache\Stache;
-use Tests\PreventSavingStacheItemsToDisk;
 use Statamic\Contracts\Routing\UrlBuilder;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class UrlBuilderTest extends TestCase
 {
@@ -77,19 +75,19 @@ class UrlBuilderTest extends TestCase
     }
 
     /** @test */
-    function it_trims_trailing_slashes()
+    public function it_trims_trailing_slashes()
     {
         $this->assertEquals('/blog/test', $this->builder->build('/blog/test/'));
     }
 
     /** @test */
-    function it_ensures_a_leading_slash()
+    public function it_ensures_a_leading_slash()
     {
         $this->assertEquals('/blog/test', $this->builder->build('blog/test'));
     }
 
     /** @test */
-    function it_merges_in_extra_variables()
+    public function it_merges_in_extra_variables()
     {
         $this->assertEquals(
             '/bar/post',
@@ -103,7 +101,7 @@ class UrlBuilderTest extends TestCase
     }
 
     /** @test */
-    function it_slugifies_non_slugified_values()
+    public function it_slugifies_non_slugified_values()
     {
         $this->assertEquals(
             '/test/bar-baz',
@@ -117,7 +115,7 @@ class UrlBuilderTest extends TestCase
     }
 
     /** @test */
-    function it_removes_consecutive_slashes_left_by_null_values()
+    public function it_removes_consecutive_slashes_left_by_null_values()
     {
         $this->assertEquals(
             '/test/foo/baz',

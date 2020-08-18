@@ -2,10 +2,10 @@
 
 namespace Statamic\Filesystem;
 
-use Statamic\Support\Str;
-use Statamic\Facades\Path;
-use Symfony\Component\Finder\Finder;
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Facades\Path;
+use Statamic\Support\Str;
+use Symfony\Component\Finder\Finder;
 
 class FilesystemAdapter extends AbstractAdapter
 {
@@ -39,7 +39,7 @@ class FilesystemAdapter extends AbstractAdapter
             return Path::tidy($path);
         }
 
-        $path = Path::tidy($this->root . '/' . $path);
+        $path = Path::tidy($this->root.'/'.$path);
 
         return $path;
     }
@@ -79,7 +79,8 @@ class FilesystemAdapter extends AbstractAdapter
 
         return $this->collection($files)->map(function ($file) use ($inRoot) {
             $path = $file->getPathname();
-            return $inRoot && !$this->withAbsolutePaths
+
+            return $inRoot && ! $this->withAbsolutePaths
                 ? $this->relativePath($path)
                 : $this->normalizePath($path);
         });

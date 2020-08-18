@@ -2,80 +2,57 @@
 
 namespace Statamic\Http\Controllers\CP\Updater;
 
-use Statamic\Statamic;
-use Statamic\Facades\Addon;
-use Illuminate\Http\Request;
-use Statamic\Updater\Updater;
-use Statamic\Updater\Changelog;
-use Statamic\Http\Controllers\CP\CpController;
 use Facades\Statamic\Console\Processes\Composer;
+use Facades\Statamic\Marketplace\Marketplace;
+use Illuminate\Http\Request;
+use Statamic\Facades\Addon;
+use Statamic\Http\Controllers\CP\CpController;
+use Statamic\Statamic;
+use Statamic\Updater\Changelog;
+use Statamic\Updater\Updater;
 
 class UpdateProductController extends CpController
 {
     /**
      * Show product updates overview.
      *
-     * @param string $product
+     * @param string $slug
      */
-    public function show($product)
+    public function show($slug)
     {
         $this->authorize('view updates');
 
-        if ($addon = $this->getAddon($product)) {
-            $data['package'] = $addon->package();
-            $data['name'] = $addon->name();
-        } elseif ($product === Statamic::CORE_SLUG) {
-            $data['package'] = Statamic::CORE_REPO;
-            $data['name'] = 'Statamic';
-        } else {
-            abort(404);
+        if (! $product = Marketplace::product($slug)) {
+            return $this->pageNotFound();
         }
 
-        return view('statamic::updater.show', array_merge($data, [
-            'slug' => $product
-        ]));
+        return view('statamic::updater.show', [
+            'slug' => $slug,
+            'package' => $product->package(),
+            'name' => $product->name(),
+        ]);
     }
 
     /**
      * Product changelog.
      *
-     * @param string $product
+     * @param string $slug
      */
-    public function changelog($product)
+    public function changelog($slug)
     {
         $this->authorize('view updates');
 
-        $changelog = Changelog::product($product);
+        if (! $product = Marketplace::product($slug)) {
+            return $this->pageNotFound();
+        }
+
+        $changelog = $product->changelog();
 
         return [
             'changelog' => $changelog->get(),
             'currentVersion' => $changelog->currentVersion(),
-            'lastInstallLog' => Composer::lastCompletedCachedOutput($changelog->composerPackage())['output'],
+            'lastInstallLog' => Composer::lastCompletedCachedOutput($product->package())['output'],
         ];
-    }
-
-    /**
-     * Update using version constraint.
-     *
-     * @param string $product
-     */
-    public function update($product)
-    {
-        $this->authorize('perform updates');
-
-        return Updater::product($product)->update();
-    }
-
-    /**
-     * Update to latest version.
-     *
-     * @param string $product
-     */
-    public function updateToLatest($product)
-    {
-        $this->authorize('perform updates');
-
-        return Updater::product($product)->updateToLatest();
     }
 
     /**
@@ -84,11 +61,13 @@ class UpdateProductController extends CpController
      * @param string $product
      * @param Request $request
      */
-    public function installExplicitVersion($product, Request $request)
+    public function install($product, Request $request)
     {
         $this->authorize('perform updates');
 
-        return Updater::product($product)->installExplicitVersion($request->version);
+        $package = $product === Statamic::CORE_SLUG ? Statamic::PACKAGE : $this->getAddon($product)->package();
+
+        return Updater::package($package)->install($request->version);
     }
 
     /**
@@ -100,7 +79,7 @@ class UpdateProductController extends CpController
     private function getAddon($product)
     {
         return Addon::all()->first(function ($addon) use ($product) {
-            return $addon->marketplaceSlug() === $product;
+            return $addon->slug() === $product;
         });
     }
 }

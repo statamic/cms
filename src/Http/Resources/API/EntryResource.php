@@ -2,9 +2,9 @@
 
 namespace Statamic\Http\Resources\API;
 
-use Illuminate\Http\Resources\Json\Resource;
+use Illuminate\Http\Resources\Json\JsonResource;
 
-class EntryResource extends Resource
+class EntryResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -14,8 +14,9 @@ class EntryResource extends Resource
      */
     public function toArray($request)
     {
-        return array_merge($this->resource->toAugmentedArray(), [
-            'api_url' => $this->resource->apiUrl(),
-        ]);
+        return $this->resource
+            ->toAugmentedCollection()
+            ->withShallowNesting()
+            ->toArray();
     }
 }

@@ -2,10 +2,10 @@
 
 namespace Statamic\Console\Commands;
 
-use Statamic\Facades\YAML;
 use Illuminate\Console\Command;
-use Statamic\Console\RunsInPlease;
 use Illuminate\Filesystem\Filesystem;
+use Statamic\Console\RunsInPlease;
+use Statamic\Facades\YAML;
 
 class SiteClear extends Command
 {
@@ -39,7 +39,7 @@ class SiteClear extends Command
      */
     public function handle()
     {
-        if (! $this->confirm('There is no site theme or sample content in v3 - are you sure you want to remove all new site defaults?', false)) {
+        if ($this->shouldAbort()) {
             return $this->info('Aborted successfully.');
         }
 
@@ -60,6 +60,20 @@ class SiteClear extends Command
             ->clearViews()
             ->resetStatamicConfigs()
             ->clearCache();
+    }
+
+    /**
+     * Check if command should be aborted.
+     *
+     * @return bool
+     */
+    protected function shouldAbort()
+    {
+        if ($this->option('no-interaction')) {
+            return false;
+        }
+
+        return ! $this->confirm('There is no site theme or sample content in v3 - are you sure you want to remove all new site defaults?', false);
     }
 
     /**
