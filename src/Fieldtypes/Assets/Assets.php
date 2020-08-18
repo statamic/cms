@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes\Assets;
 
+use Illuminate\Support\Facades\Route;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
@@ -158,9 +159,15 @@ class Assets extends Fieldtype
 
     public function rules(): array
     {
+        $max = $this->config('max_files');
+
+        if (Route::is('statamic.forms.submit') && $max === 1) {
+            return ['file'];
+        }
+
         $rules = ['array'];
 
-        if ($max = $this->config('max_files')) {
+        if ($max) {
             $rules[] = 'max:'.$max;
         }
 
