@@ -111,7 +111,7 @@ class Terms extends Relationship
             })->all();
 
             if ($this->field->get('max_items') === 1) {
-                return $data[0];
+                return $data[0] ?? null;
             }
         }
 
