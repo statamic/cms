@@ -5,7 +5,7 @@ namespace Statamic\Query\Scopes\Filters\Fields;
 use Statamic\Facades;
 use Statamic\Support\Str;
 
-class Taxonomy extends FieldtypeFilter
+class Terms extends FieldtypeFilter
 {
     public function fieldItems()
     {

@@ -9,7 +9,7 @@ use Statamic\Facades;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
 use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
-use Statamic\Query\Scopes\Filters\Fields\Taxonomy as TaxonomyFilter;
+use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Taxonomies\TermCollection;
@@ -38,7 +38,7 @@ class Terms extends Relationship
 
     public function filter()
     {
-        return new TaxonomyFilter($this);
+        return new TermsFilter($this);
     }
 
     public function augment($value)
