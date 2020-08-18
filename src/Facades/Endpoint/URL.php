@@ -7,7 +7,6 @@ use Statamic\Facades\Config;
 use Statamic\Facades\Path;
 use Statamic\Facades\Pattern;
 use Statamic\Support\Str;
-use Stringy\StaticStringy as Stringy;
 
 /**
  * Manipulate URLs.
@@ -79,7 +78,7 @@ class URL
     }
 
     /**
-     * Checks if one URL is an ancestor of another
+     * Checks if one URL is an ancestor of another.
      */
     public function isAncestorOf($child, $ancestor)
     {
