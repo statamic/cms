@@ -31,4 +31,6 @@ class Radio extends Fieldtype
 
         return new LabeledValue($value, $label);
     }
+
+    protected $view = 'statamic::forms.fields.radios';
 }
