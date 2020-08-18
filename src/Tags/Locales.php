@@ -35,7 +35,9 @@ class Locales extends Tags
             throw new \Exception("Site [$key] does not exist.");
         }
 
-        $data = $this->getLocalizedData($key);
+        if (! $data = $this->getLocalizedData($key)) {
+            return '';
+        }
 
         $data['locale'] = $this->getLocale($site);
 
@@ -102,7 +104,11 @@ class Locales extends Tags
      */
     private function getLocalizedData($locale)
     {
-        return $this->getData()->in($locale)->toAugmentedArray();
+        if (! $data = $this->getData()) {
+            return null;
+        }
+
+        return $data->in($locale)->toAugmentedArray();
     }
 
     /**
