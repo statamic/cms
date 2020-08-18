@@ -192,10 +192,13 @@ class Page implements Entry, Augmentable, Responsable
         }
 
         if ($this->reference && $this->referenceExists()) {
-            return vsprintf('%s/%s', [
+            $url = vsprintf('%s/%s', [
                 rtrim($this->site()->absoluteUrl(), '/'),
                 ltrim($this->uri(), '/'),
             ]);
+
+
+            return $url === '/' ? $url : rtrim($url, '/');
         }
     }
 
