@@ -32,6 +32,8 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $middlewareGroups = [];
     protected $viewNamespace;
     protected $publishAfterInstall = true;
+    protected $config = true;
+    protected $translations = true;
 
     public function boot()
     {
@@ -52,6 +54,8 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootStylesheets()
                 ->bootScripts()
                 ->bootPublishables()
+                ->bootConfig()
+                ->bootTranslations()
                 ->bootRoutes()
                 ->bootMiddleware()
                 ->bootViews()
@@ -157,6 +161,44 @@ abstract class AddonServiceProvider extends ServiceProvider
         foreach ($this->externalScripts as $path) {
             $this->registerExternalScript($path);
         }
+
+        return $this;
+    }
+
+    protected function bootConfig()
+    {
+        $filename = $this->getAddon()->slug();
+        $directory = $this->getAddon()->directory();
+        $origin = "{$directory}config/{$filename}.php";
+
+        if (! $this->config || ! file_exists($origin)) {
+            return $this;
+        }
+
+        $this->mergeConfigFrom($origin, $filename);
+
+        $this->publishes([
+            $origin => config_path("{$filename}.php")
+        ], "{$filename}-config");
+
+        return $this;
+    }
+
+    protected function bootTranslations()
+    {
+        $slug = $this->getAddon()->slug();
+        $directory = $this->getAddon()->directory();
+        $origin = "{$directory}resources/lang";
+
+        if (! $this->translations || ! file_exists($origin)) {
+            return $this;
+        }
+
+        $this->loadTranslationsFrom($origin, $slug);
+
+        $this->publishes([
+            $origin => resource_path("lang/vendor/{$slug}")
+        ], "{$slug}-translations");
 
         return $this;
     }
