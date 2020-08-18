@@ -170,7 +170,9 @@ abstract class AddonServiceProvider extends ServiceProvider
                 return [$origin => public_path("vendor/{$package}/{$destination}")];
             });
 
-        $this->publishes($publishables->all(), $this->getAddon()->slug());
+        if ($publishables->isNotEmpty()) {
+            $this->publishes($publishables->all(), $this->getAddon()->slug());
+        }
 
         return $this;
     }
@@ -350,6 +352,10 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function bootPublishAfterInstall()
     {
         if (! $this->publishAfterInstall) {
+            return $this;
+        }
+
+        if (empty($this->scripts) && empty($this->stylesheets)) {
             return $this;
         }
 
