@@ -264,7 +264,7 @@ class Terms extends Relationship
         return Arr::wrap($taxonomies);
     }
 
-    protected function usingSingleTaxonomy()
+    public function usingSingleTaxonomy()
     {
         return count($this->taxonomies()) === 1;
     }
