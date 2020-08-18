@@ -178,7 +178,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $this->mergeConfigFrom($origin, $filename);
 
         $this->publishes([
-            $origin => config_path("{$filename}.php")
+            $origin => config_path("{$filename}.php"),
         ], "{$filename}-config");
 
         return $this;
@@ -197,7 +197,7 @@ abstract class AddonServiceProvider extends ServiceProvider
         $this->loadTranslationsFrom($origin, $slug);
 
         $this->publishes([
-            $origin => resource_path("lang/vendor/{$slug}")
+            $origin => resource_path("lang/vendor/{$slug}"),
         ], "{$slug}-translations");
 
         return $this;
