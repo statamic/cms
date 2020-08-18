@@ -79,30 +79,19 @@ class URL
     }
 
     /**
-     * Check if a URL is an acestor of the current URL.
-     *
-     * @param string        $uri
-     * @return bool
+     * Checks if one URL is an ancestor of another
      */
-    public function isAncestor($parent_uri, $uri = null)
+    public function isAncestorOf($child, $ancestor)
     {
-        // Homepage would always be ancestor
-        // and not what we're looking for here.
-        if ($parent_uri === '/') {
+        $child = Str::before($child, '?');
+        $child = Str::ensureRight($child, '/');
+        $ancestor = Str::ensureRight($ancestor, '/');
+
+        if ($child === $ancestor) {
             return false;
         }
 
-        // We default to the current URL.
-        if ($uri === null) {
-            $uri = self::getCurrent();
-        }
-
-        // Add trailing slashes to ensure we're comparing the whole URI
-        // and not just pieces of it (e.g. /about and /about-me)
-        $uri = Stringy::ensureRight($uri, '/');
-        $parent_uri = Stringy::ensureRight($parent_uri, '/');
-
-        return Pattern::startsWith($uri, $parent_uri);
+        return Str::startsWith($child, $ancestor);
     }
 
     /**

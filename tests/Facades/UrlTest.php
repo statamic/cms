@@ -84,6 +84,45 @@ class UrlTest extends TestCase
 
     /**
      * @test
+     * @dataProvider ancestorProvider
+     **/
+    public function it_checks_whether_a_url_is_an_ancestor_of_another($child, $parent, $isAncestor)
+    {
+        $this->assertSame($isAncestor, URL::isAncestorOf($child, $parent));
+    }
+
+    public function ancestorProvider()
+    {
+        return [
+            'homepage to homepage' => ['/', '/', false],
+            'directory to homepage' => ['/foo', '/', true],
+            'nested directory to homepage' => ['/foo/bar', '/', true],
+            'nested directory to directory' => ['/foo/bar', '/foo', true],
+            'directory to nested directory' => ['/foo', '/foo/bar', false],
+            'homepage to nested directory' => ['/', '/foo', false],
+
+            'directory to directory with similar name' => ['/about-me', '/about', false],
+            'directory with trailing slash to directory with similar name' => ['/about-me/', '/about', false],
+            'directory to directory with similar name with trailing slash ' => ['/about-me/', '/about/', false],
+
+            'nested directory to directory with trailing slashes' => ['/foo/bar', '/foo/', true],
+            'directory to nested directory with trailing slashes' => ['/foo', '/foo/bar/', false],
+            'homepage to nested directory with trailing slashes' => ['/', '/foo/', false],
+
+            'nested directory with trailing slashes to directory' => ['/foo/bar/', '/foo', true],
+            'directory with trailing slashes to nested directory' => ['/foo/', '/foo/bar', false],
+
+            'homepage with query string to homepage' => ['/?baz=qux', '/', false],
+            'directory with query string  to homepage' => ['/foo?baz=qux', '/', true],
+            'nested directory with query string  to homepage' => ['/foo/bar?baz=qux', '/', true],
+            'nested directory with query string  to directory' => ['/foo/bar?baz=qux', '/foo', true],
+            'directory with query string  to nested directory' => ['/foo?baz=qux', '/foo/bar', false],
+            'homepage with query string  to nested directory' => ['/?baz=qux', '/foo', false],
+        ];
+    }
+
+    /**
+     * @test
      * @dataProvider relativeProvider
      **/
     public function makes_urls_relative($url, $expected)
