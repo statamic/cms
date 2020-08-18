@@ -33,9 +33,10 @@ class Terms extends FieldtypeFilter
     {
         $field = $this->fieldtype->field()->display();
 
-        $taxonomy = $this->fieldtype->field()->handle();
-        $slug = $values['term'];
-        $id = "{$taxonomy}::{$slug}";
+        $id = $this->fieldtype->usingSingleTaxonomy()
+            ? $this->fieldtype->taxonomies()[0].'::'.$values['term']
+            : $values['term'];
+
         $term = Facades\Term::find($id)->title();
 
         return $field.': '.$term;
@@ -43,11 +44,18 @@ class Terms extends FieldtypeFilter
 
     protected function options()
     {
-        return Facades\Taxonomy::find($this->fieldtype->field()->handle())
-            ->queryTerms()
-            ->get()
+        return collect($this->fieldtype->taxonomies())
+            ->map(function ($handle) {
+                return Facades\Taxonomy::find($handle);
+            })
+            ->filter()
+            ->flatMap(function ($taxonomy) {
+                return $taxonomy->queryTerms()->get();
+            })
             ->mapWithKeys(function ($term) {
-                return [$term->slug() => $term->title()];
+                $value = $this->fieldtype->usingSingleTaxonomy() ? $term->slug() : $term->id();
+
+                return [$value => $term->title()];
             });
     }
 }
