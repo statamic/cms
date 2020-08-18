@@ -87,10 +87,12 @@ EOT
         $this->assertStringContainsString('<label>Full Name</label><input type="text" name="name" value="">', $output);
         $this->assertStringContainsString('<label>Email Address</label><input type="email" name="email" value="">', $output);
         $this->assertStringContainsString('<label>Message</label><textarea name="message" rows="5"></textarea>', $output);
+        $this->assertStringContainsString('<input type="file" name="cat_selfie">', $output);
+        $this->assertStringContainsString('<input type="file" name="armadillo_selfies[]" multiple>', $output);
 
         preg_match_all('/<label>(.+)<\/label>/U', $output, $fieldOrder);
 
-        $this->assertEquals(['Full Name', 'Email Address', 'Message'], $fieldOrder[1]);
+        $this->assertEquals(['Full Name', 'Email Address', 'Message', 'Cat Selfie', 'Armadillo Selfies'], $fieldOrder[1]);
     }
 
     /** @test */
@@ -318,6 +320,21 @@ EOT
                         'type' => 'textarea',
                         'display' => 'Message',
                         'validate' => 'required',
+                    ],
+                ],
+                [
+                    'handle' => 'cat_selfie',
+                    'field' => [
+                        'type' => 'assets',
+                        'display' => 'Cat Selfie',
+                        'max_files' => 1,
+                    ],
+                ],
+                [
+                    'handle' => 'armadillo_selfies',
+                    'field' => [
+                        'type' => 'assets',
+                        'display' => 'Armadillo Selfies',
                     ],
                 ],
             ],
