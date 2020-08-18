@@ -43,9 +43,7 @@ class FormController extends Controller
 
             // If any event listeners return false, we'll do a silent failure.
             // If they want to add validation errors, they can throw an exception.
-            if (FormSubmitted::dispatch($submission) === false) {
-                throw new SilentFormFailureException;
-            }
+            throw_if(FormSubmitted::dispatch($submission) === false, new SilentFormFailureException);
         } catch (ValidationException $e) {
             return $this->formFailure($params, $e->errors(), $form->handle());
         } catch (SilentFormFailureException $e) {
