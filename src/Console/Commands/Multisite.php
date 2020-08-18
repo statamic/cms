@@ -47,7 +47,7 @@ class Multisite extends Command
 
         Collection::all()->each(function ($collection) {
             $this->moveCollectionContent($collection);
-            $this->addSitesToCollection($collection);
+            $this->updateCollection($collection);
             $this->checkLine("Collection [<comment>{$collection->handle()}</comment>] updated.");
         });
 
@@ -99,9 +99,17 @@ class Multisite extends Command
         });
     }
 
-    protected function addSitesToCollection($collection)
+    protected function updateCollection($collection)
     {
-        $collection->sites([$this->siteOne, $this->siteTwo])->save();
+        $collection->sites([$this->siteOne, $this->siteTwo]);
+
+        if ($structure = $collection->structureContents()) {
+            $tree = $structure['tree'];
+            $structure['tree'] = [$this->siteOne => $tree];
+            $collection->structureContents($structure);
+        }
+
+        $collection->save();
     }
 
     protected function moveGlobalSet($set)
