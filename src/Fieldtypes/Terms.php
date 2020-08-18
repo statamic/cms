@@ -109,10 +109,10 @@ class Terms extends Relationship
 
                 return explode('::', $id, 2)[1];
             })->all();
-        }
 
-        if ($this->field->get('max_items') === 1) {
-            return $data[0];
+            if ($this->field->get('max_items') === 1) {
+                return $data[0];
+            }
         }
 
         return $data;
