@@ -87,14 +87,10 @@ export default {
 
             return rule.example || false;
         },
-
-        saveableRules() {
-            return this.rules.map(rule => rule.trim()).join('|');
-        }
     },
 
     watch: {
-        saveableRules: {
+        rules: {
             deep: true,
             handler(rules) {
                 this.$emit('updated', rules);
@@ -109,8 +105,14 @@ export default {
     methods: {
         getInitial() {
             this.rules = this.config.validate
-                ? this.config.validate.split('|').map(rule => rule.trim())
+                ? this.explodeRules(this.config.validate)
                 : [];
+        },
+
+        explodeRules(rules) {
+            return typeof rules === 'string'
+                ? rules.split('|').map(rule => rule.trim())
+                : rules;
         },
 
         add(rule) {
