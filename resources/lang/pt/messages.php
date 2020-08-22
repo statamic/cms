@@ -107,7 +107,7 @@ return [
     'licensing_error_unlicensed' => 'Sem licença',
     'licensing_production_alert' => 'Adquira ou insira uma chave de licença válida para que este site cumpra o Contrato de Licença.',
     'licensing_sync_instructions' => 'Os dados do statamic.com são sincronizados uma vez por hora. Force uma sincronização para ver as alterações que você fez.',
-    'licensing_trial_mode_alert' => 'Você está desfrutando de recursos pagos ou complementos que precisam ser licenciados antes da implantação deste site. Diverta-se!',
+    'licensing_trial_mode_alert' => 'Está desfrutando de recursos pagos ou complementos que precisam ser licenciados antes da implementação deste site. Divirta-se!',
     'licensing_utility_description' => 'Ver e resolver detalhes de licenciamento.',
     'max_depth_instructions' => 'O número máximo de níveis em uma página pode estar encadeado. Deixe em branco sem limite.',
     'max_items_instructions' => 'Defina um número máximo de itens seleccionáveis.',
