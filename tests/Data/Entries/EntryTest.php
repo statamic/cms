@@ -29,12 +29,22 @@ class EntryTest extends TestCase
     public function it_sets_and_gets_the_locale()
     {
         $entry = new Entry;
-        $this->assertNull($entry->locale());
+        $this->assertEquals('default', $entry->locale());
 
         $return = $entry->locale('en');
 
         $this->assertEquals($entry, $return);
         $this->assertEquals('en', $entry->locale());
+    }
+
+    /** @test */
+    public function the_locale_is_default_by_default()
+    {
+        $entry = new Entry();
+
+        $return = $entry->locale();
+
+        $this->assertSame('default', $return);
     }
 
     /** @test */
