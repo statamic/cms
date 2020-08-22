@@ -45,7 +45,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
     protected $collection;
     protected $blueprint;
     protected $date;
-    protected $locale;
+    protected $locale = 'default';
     protected $localizations;
     protected $afterSaveCallbacks = [];
 
