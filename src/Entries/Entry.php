@@ -45,7 +45,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
     protected $collection;
     protected $blueprint;
     protected $date;
-    protected $locale = 'default';
+    protected $locale;
     protected $localizations;
     protected $afterSaveCallbacks = [];
 
@@ -228,6 +228,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization
 
         if (EntrySaving::dispatch($this) === false) {
             return false;
+        }
+
+        if (! $this->locale) {
+            $this->locale(Site::default()->handle());
         }
 
         Facades\Entry::save($this);
