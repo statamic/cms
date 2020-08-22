@@ -52,7 +52,7 @@
                 <div class="addon-grid my-4" :class="{ 'opacity-50': loading }">
                     <div class="addon-card bg-white text-grey-80 h-full shadow rounded cursor-pointer relative" v-for="addon in addons" :key="addon.id" @click="showAddon(addon)">
                         <span class="badge absolute top-0 left-0 mt-1 ml-1" v-if="addon.installed">Installed</span>
-                        <div class="h-64 rounded-t bg-cover" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
+                        <div class="h-64 rounded-t bg-cover bg-center" :style="'background-image: url(\''+getCover(addon)+'\')'"></div>
                         <div class="px-3 mb-2 relative text-center">
                             <a :href="addon.seller.website" class="relative">
                                 <img :src="addon.seller.avatar" :alt="addon.seller.name" class="rounded-full h-14 w-14 z-30 bg-white relative -mt-4 border-2 border-white inline">
