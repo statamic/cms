@@ -47,7 +47,7 @@ class FormController extends Controller
         } catch (ValidationException $e) {
             return $this->formFailure($params, $e->errors(), $form->handle());
         } catch (SilentFormFailureException $e) {
-            return $this->formSuccess($params, $submission);
+            return $this->formSuccess($params, $submission, true);
         }
 
         if ($form->store()) {
@@ -67,13 +67,15 @@ class FormController extends Controller
      *
      * @param array $params
      * @param Submission $submission
+     * @param bool $silentFailure
      * @return Response
      */
-    private function formSuccess($params, $submission)
+    private function formSuccess($params, $submission, $silentFailure = false)
     {
         if (request()->ajax()) {
             return response([
                 'success' => true,
+                'submission_created' => ! $silentFailure,
                 'submission' => $submission->data(),
             ]);
         }
@@ -83,6 +85,7 @@ class FormController extends Controller
         $response = $redirect ? redirect($redirect) : back();
 
         session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
+        session()->flash("form.{$submission->form()->handle()}.submission_created", ! $silentFailure);
         session()->flash('submission', $submission);
 
         return $response;

@@ -186,6 +186,9 @@ EOT
         <p class="error">{{ value }}</p>
     {{ /errors }}
     <p class="success">{{ success }}</p>
+    {{ if submission_created }}
+        <div class="analytics"></div>
+    {{ /if }}
 {{ /form:contact }}
 EOT
         );
@@ -195,6 +198,44 @@ EOT
 
         $this->assertEmpty($errors[1]);
         $this->assertEquals(['Submission successful.'], $success[1]);
+        $this->assertStringContainsString('<div class="analytics"></div>', $output);
+    }
+
+    /** @test */
+    public function it_will_submit_form_with_honeypot_filled_and_render_fake_success()
+    {
+        $this->assertEmpty(Form::find('contact')->submissions());
+
+        $this
+            ->post('/!/forms/contact', [
+                'email' => 'san@holo.com',
+                'message' => 'hello',
+                'winnie' => 'the pooh',
+            ])
+            ->assertSessionHasNoErrors()
+            ->assertLocation('/');
+
+        $this->assertCount(0, Form::find('contact')->submissions());
+
+        $output = $this->tag(<<<'EOT'
+{{ form:contact }}
+    {{ errors }}
+        <p class="error">{{ value }}</p>
+    {{ /errors }}
+    <p class="success">{{ success }}</p>
+    {{ if submission_created }}
+        <div class="analytics"></div>
+    {{ /if }}
+{{ /form:contact }}
+EOT
+        );
+
+        preg_match_all('/<p class="error">(.+)<\/p>/U', $output, $errors);
+        preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
+
+        $this->assertEmpty($errors[1]);
+        $this->assertEquals(['Submission successful.'], $success[1]);
+        $this->assertStringNotContainsString('<div class="analytics"></div>', $output);
     }
 
     /** @test */
@@ -344,7 +385,7 @@ EOT
             ->with('forms.contact')
             ->andReturn($blueprint);
 
-        $form = Form::make()->handle('contact');
+        $form = Form::make()->handle('contact')->honeypot('winnie');
 
         Form::shouldReceive('find')
             ->with('contact')
