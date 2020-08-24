@@ -16,6 +16,7 @@
         :initial-origin-values="{}"
         :revisions-enabled="revisions"
         :breadcrumbs="breadcrumbs"
+        :initial-site="site"
         @saved="saved"
     ></entry-publish-form>
 
@@ -33,6 +34,7 @@ export default {
         'localizations',
         'revisions',
         'breadcrumbs',
+        'site',
     ],
 
     methods: {

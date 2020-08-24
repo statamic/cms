@@ -240,6 +240,7 @@ class EntriesController extends CpController
             'collection' => $collection->handle(),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
+            'locale' => $site->handle(),
             'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site) {
                 return [
                     'handle' => $handle,

@@ -13,6 +13,7 @@
         :localizations="{{ json_encode($localizations) }}"
         :revisions="{{ Statamic\Support\Str::bool($revisionsEnabled ) }}"
         :breadcrumbs="{{ $breadcrumbs->toJson() }}"
+        site="{{ $locale }}"
     ></base-entry-create-form>
 
 @endsection
