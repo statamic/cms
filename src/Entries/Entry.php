@@ -304,7 +304,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
         return $this
             ->fluentlyGetOrSet('layout')
             ->getter(function ($layout) {
-                return $layout ?? $this->collection()->layout();
+                return $layout ?? optional($this->origin())->layout() ?? $this->collection()->layout();
             })
             ->args(func_get_args());
     }
