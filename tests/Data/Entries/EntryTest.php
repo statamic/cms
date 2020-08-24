@@ -705,19 +705,24 @@ class EntryTest extends TestCase
     public function it_gets_and_sets_the_template()
     {
         $collection = tap(Collection::make('test'))->save();
-        $entry = (new Entry)->collection($collection);
+        $origin = (new Entry)->collection($collection);
+        $entry = (new Entry)->collection($collection)->origin($origin);
 
         // defaults to default
         $this->assertEquals('default', $entry->template());
 
-        // collection level overrides the configured
+        // collection level overrides the default
         $collection->template('foo');
         $this->assertEquals('foo', $entry->template());
 
-        // entry level overrides the collection
-        $return = $entry->template('bar');
-        $this->assertEquals($entry, $return);
+        // origin overrides collection
+        $origin->template('bar');
         $this->assertEquals('bar', $entry->template());
+
+        // entry level overrides the origin
+        $return = $entry->template('baz');
+        $this->assertEquals($entry, $return);
+        $this->assertEquals('baz', $entry->template());
     }
 
     /** @test */
