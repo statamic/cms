@@ -28,13 +28,18 @@ class EntryTest extends TestCase
     /** @test */
     public function it_sets_and_gets_the_locale()
     {
-        $entry = new Entry;
-        $this->assertEquals('en', $entry->locale());
+        Facades\Site::setConfig(['sites' => [
+            'foo' => [],
+            'bar' => [],
+        ]]);
 
-        $return = $entry->locale('en');
+        $entry = new Entry;
+        $this->assertEquals('foo', $entry->locale()); // defaults to the default site.
+
+        $return = $entry->locale('bar');
 
         $this->assertEquals($entry, $return);
-        $this->assertEquals('en', $entry->locale());
+        $this->assertEquals('bar', $entry->locale());
     }
 
     /** @test */
