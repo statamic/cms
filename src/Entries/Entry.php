@@ -62,7 +62,12 @@ class Entry implements Contract, Augmentable, Responsable, Localization
 
     public function locale($locale = null)
     {
-        return $this->fluentlyGetOrSet('locale')->args(func_get_args());
+        return $this
+            ->fluentlyGetOrSet('locale')
+            ->getter(function ($locale) {
+                return $locale ?? Site::default()->handle();
+            })
+            ->args(func_get_args());
     }
 
     public function site()
@@ -118,7 +123,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
     {
         return [
             'collection' => $this->collectionHandle(),
-            'locale' => $this->locale,
+            'locale' => $this->locale(),
             'origin' => $this->hasOrigin() ? $this->origin()->id() : null,
             'slug' => $this->slug(),
             'date' => optional($this->date())->format('Y-m-d-Hi'),
@@ -278,7 +283,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
             return null;
         }
 
-        return $this->structure()->in($this->locale)
+        return $this->structure()->in($this->locale())
             ->flattenedPages()
             ->map->reference()
             ->flip()->get($this->id) + 1;
@@ -455,7 +460,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
 
     public function in($locale)
     {
-        if ($locale === $this->locale) {
+        if ($locale === $this->locale()) {
             return $this;
         }
 
