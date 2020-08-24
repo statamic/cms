@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class FormSubmitted extends Event
 {
-    public $form;
+    public $submission;
 
-    public function __construct($form)
+    public function __construct($submission)
     {
-        $this->form = $form;
+        $this->submission = $submission;
     }
 
     /**
