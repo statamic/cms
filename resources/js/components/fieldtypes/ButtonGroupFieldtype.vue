@@ -11,7 +11,7 @@
                 :disabled="isReadOnly"
                 :class="{'active': value === option.value}"
                 v-text="option.label || option.value"
-            ></button>
+            />
         </div>
     </div>
 </template>
