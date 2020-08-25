@@ -3,22 +3,22 @@
 ## Unreleased
 
 ### What's new
-- The `form` tags get a `submission_created` boolean. #2285
-- The `template` fieldtype will ignore views in the `partials` directory when `hide_partials` is enabled. #2249
-- The "first child" option is only in `link` fieldtypes if the entry is in a structured collection. #2209
+- The `form` tags get a `submission_created` boolean. [#2285](https://github.com/statamic/cms/issues/2285)
+- The `template` fieldtype will ignore views in the `partials` directory when `hide_partials` is enabled. [#2249](https://github.com/statamic/cms/issues/2249)
+- The "first child" option is only in `link` fieldtypes if the entry is in a structured collection. [#2209](https://github.com/statamic/cms/issues/2209)
 - A Blueprint's `parent` will be the Collection/Taxonomy when creating an Entry/Term.
 - PHP short tags will be sanitized in Antlers templates.
 
 ### What's fixed
-- Vuex store gets the site when creating entries. #2237
-- Entry locale defaults to the default site. #2275
-- Entry inherits its layout from an origin entry, if one exists. #1830
-- Global site selector is scrollable. #1838
-- Rogue closing tag removed. #2253
-- The `FormSubmitted` event gets a `submission` property. #2271
-- Images are inline in Replicator previews. #2267
-- Addon thumbnail alignment. #2272
-- Translations. #2282 #2256
+- Vuex store gets the site when creating entries. [#2237](https://github.com/statamic/cms/issues/2237)
+- Entry locale defaults to the default site. [#2275](https://github.com/statamic/cms/issues/2275)
+- Entry inherits its layout from an origin entry, if one exists. [#1830](https://github.com/statamic/cms/issues/1830)
+- Global site selector is scrollable. [#1838](https://github.com/statamic/cms/issues/1838)
+- Rogue closing tag removed. [#2253](https://github.com/statamic/cms/issues/2253)
+- The `FormSubmitted` event gets a `submission` property. [#2271](https://github.com/statamic/cms/issues/2271)
+- Images are inline in Replicator previews. [#2267](https://github.com/statamic/cms/issues/2267)
+- Addon thumbnail alignment. [#2272](https://github.com/statamic/cms/issues/2272)
+- Translations. [#2282](https://github.com/statamic/cms/issues/2282) [#2256](https://github.com/statamic/cms/issues/2256)
 
 
 
