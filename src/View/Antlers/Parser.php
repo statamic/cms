@@ -156,10 +156,8 @@ class Parser
         // Save the original text coming in so that we can parse it recursively
         // later on without this needing to be within a callback
         $this->original_text = $text;
-        // Prevent the parsing of PHP by b0rking the PHP open tag
-        if (! $this->allowPhp) {
-            $text = str_replace(['<?php'], ['&lt;?php'], $text);
-        }
+
+        $text = $this->sanitizePhp($text);
 
         // We want to extract the noparse blocks before comments,
         // allowing us to show them for documentation purposes
@@ -1537,5 +1535,23 @@ class Parser
         }
 
         throw new RegexError(preg_last_error(), $this->view);
+    }
+
+    protected function sanitizePhp($text)
+    {
+        if ($this->allowPhp) {
+            return $text;
+        }
+
+        $text = str_replace('<?php', '&lt;?php', $text);
+
+        // Also replace short tags if they're enabled.
+        // If they're disabled (which is the common default), you can use <?xml tags right in your template. How nice!
+        // If they're enabled, we want to make sure it doesn't run PHP. You'll need to use {{ xml_header }}.
+        if (ini_get('short_open_tag')) {
+            $text = str_replace('<?', '&lt;?', $text);
+        }
+
+        return $text;
     }
 }
