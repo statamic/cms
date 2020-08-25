@@ -7,6 +7,7 @@
 - The `template` fieldtype will ignore views in the `partials` directory when `hide_partials` is enabled. [#2249](https://github.com/statamic/cms/issues/2249)
 - The "first child" option is only in `link` fieldtypes if the entry is in a structured collection. [#2209](https://github.com/statamic/cms/issues/2209)
 - A Blueprint's `parent` will be the Collection/Taxonomy when creating an Entry/Term.
+- Collection view mode button tooltips. [#2241](https://github.com/statamic/cms/issues/2241)
 - PHP short tags will be sanitized in Antlers templates.
 
 ### What's fixed
