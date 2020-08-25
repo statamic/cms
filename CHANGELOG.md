@@ -18,6 +18,7 @@
 - The `FormSubmitted` event gets a `submission` property. [#2271](https://github.com/statamic/cms/issues/2271)
 - Images are inline in Replicator previews. [#2267](https://github.com/statamic/cms/issues/2267)
 - Addon thumbnail alignment. [#2272](https://github.com/statamic/cms/issues/2272)
+- Simplify how our custom cache store creates paths. Fixes a Windows pathing issue. [#952](https://github.com/statamic/cms/issues/952)
 - Translations. [#2282](https://github.com/statamic/cms/issues/2282) [#2256](https://github.com/statamic/cms/issues/2256)
 
 
