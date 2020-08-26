@@ -321,6 +321,123 @@ class UpdateBlueprintTest extends TestCase
         ], Facades\Blueprint::find('collections.test.test')->contents());
     }
 
+    /** @test */
+    public function localizable_of_false_gets_stripped_out_for_inline_fields_but_left_in_for_reference_fields_with_config_overrides()
+    {
+        $this->setTestRoles(['test' => ['access cp', 'configure fields']]);
+        $user = tap(Facades\User::make()->assignRole('test'))->save();
+        $collection = tap(Collection::make('test'))->save();
+        $blueprint = (new Blueprint)->setNamespace('collections.test')->setHandle('test')->setContents(['title' => 'Test'])->save();
+
+        $fieldset = (new Fieldset)->setContents([
+            'fields' => [
+                [
+                    'handle' => 'somefield',
+                    'field' => [],
+                ],
+            ],
+        ]);
+
+        Facades\Fieldset::shouldReceive('find')
+            ->with('somefieldset')
+            ->andReturn($fieldset);
+
+        $this
+            ->actingAs($user)
+            ->submit($collection, $blueprint, [
+                'title' => 'Updated title',
+                'sections' => [
+                    [
+                        '_id' => 'id-one',
+                        'handle' => 'one',
+                        'display' => 'Section One',
+                        'fields' => [
+                            [
+                                '_id' => 'id-s1-f1',
+                                'handle' => 'one-one',
+                                'type' => 'reference',
+                                'field_reference' => 'somefieldset.somefield',
+                                'config' => [
+                                    'foo' => 'bar',
+                                    'localizable' => false,
+                                ],
+                                'config_overrides' => ['localizable'],
+                            ],
+                            [
+                                '_id' => 'id-s1-f2',
+                                'handle' => 'one-two',
+                                'type' => 'inline',
+                                'config' => [
+                                    'type' => 'text',
+                                    'localizable' => false,
+                                ],
+                            ],
+                            [
+                                '_id' => 'id-s1-f3',
+                                'handle' => 'one-three',
+                                'type' => 'inline',
+                                'config' => [
+                                    'type' => 'text',
+                                    'localizable' => true,
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+            ])
+            ->assertOk();
+
+        $this->assertEquals([
+            'title' => 'Updated title',
+            'sections' => [
+                'one' => [
+                    'display' => 'Section One',
+                    'fields' => [
+                        [
+                            'handle' => 'title',
+                            'field' => [
+                                'type' => 'text',
+                                'required' => true,
+                            ],
+                        ],
+                        [
+                            'handle' => 'one-one',
+                            'field' => 'somefieldset.somefield',
+                            'config' => [
+                                'localizable' => false,
+                            ],
+                        ],
+                        [
+                            'handle' => 'one-two',
+                            'field' => [
+                                'type' => 'text',
+                            ],
+                        ],
+                        [
+                            'handle' => 'one-three',
+                            'field' => [
+                                'type' => 'text',
+                                'localizable' => true,
+                            ],
+                        ],
+                    ],
+                ],
+                'sidebar' => [
+                    'fields' => [
+                        [
+                            'handle' => 'slug',
+                            'field' => [
+                                'type' => 'slug',
+                                'localizable' => true,
+                                'required' => true,
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+        ], Facades\Blueprint::find('collections.test.test')->contents());
+    }
+
     private function submit($collection, $blueprint, $params = [])
     {
         return $this->patch(

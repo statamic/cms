@@ -15,6 +15,7 @@
                 :is-editing="editingField === field._id"
                 :is-section-expanded="isSectionExpanded"
                 :suggestable-condition-fields="suggestableConditionFields"
+                :can-define-localizable="canDefineLocalizable"
                 @edit="$emit('field-editing', field._id)"
                 @updated="$emit('field-updated', i, $event)"
                 @deleted="$emit('field-deleted', i)"
@@ -70,8 +71,11 @@ import ImportField from './ImportField.vue';
 import LinkFields from './LinkFields.vue';
 import FieldtypeSelector from '../fields/FieldtypeSelector.vue';
 import FieldSettings from '../fields/Settings.vue';
+import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
 export default {
+
+    mixins: [CanDefineLocalizable],
 
     components: {
         RegularField,

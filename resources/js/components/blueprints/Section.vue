@@ -32,6 +32,7 @@
                 :editing-field="editingField"
                 :is-section-expanded="isEditing || isSingle"
                 :suggestable-condition-fields="suggestableConditionFields"
+                :can-define-localizable="canDefineLocalizable"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-deleted="deleteField"
@@ -54,8 +55,11 @@
 
 <script>
 import Fields from './Fields.vue';
+import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
 export default {
+
+    mixins: [CanDefineLocalizable],
 
     components: {
         Fields,

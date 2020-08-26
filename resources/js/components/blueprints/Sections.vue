@@ -10,6 +10,7 @@
                 :key="section._id"
                 :section="section"
                 :is-single="singleSection"
+                :can-define-localizable="canDefineLocalizable"
                 :deletable="isSectionDeletable(i)"
                 @updated="updateSection(i, $event)"
                 @deleted="deleteSection(i)"
@@ -36,10 +37,13 @@
 import uniqid from 'uniqid';
 import BlueprintSection from './Section.vue';
 import {Sortable, Plugins} from '@shopify/draggable';
+import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
 let sortableSections, sortableFields;
 
 export default {
+
+    mixins: [CanDefineLocalizable],
 
     components: {
         BlueprintSection

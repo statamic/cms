@@ -5,6 +5,7 @@
         <sections
             :initial-sections="sections"
             :require-section="config.require_section"
+            :can-define-localizable="false"
             :add-section-text="__('Add Set')"
             :new-section-text="__('New Set')"
             @updated="sectionsUpdated"

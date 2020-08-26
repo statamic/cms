@@ -31,6 +31,10 @@ class FieldTransformer
             unset($field['width']);
         }
 
+        if (Arr::get($field, 'localizable', false) === false) {
+            unset($field['localizable']);
+        }
+
         return array_filter([
             'handle' => $submitted['handle'],
             'field' => $field,
@@ -69,6 +73,7 @@ class FieldTransformer
         );
 
         $mergedConfig['width'] = $mergedConfig['width'] ?? 100;
+        $mergedConfig['localizable'] = $mergedConfig['localizable'] ?? false;
 
         return [
             'handle' => $field['handle'],
@@ -85,6 +90,7 @@ class FieldTransformer
     {
         $config = $field['field'];
         $config['width'] = $config['width'] ?? 100;
+        $config['localizable'] = $config['localizable'] ?? false;
 
         return [
             'handle' => $field['handle'],

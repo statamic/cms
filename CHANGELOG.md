@@ -3,6 +3,7 @@
 ## Unreleased
 
 ### What's new
+- Localizable field toggle. [#2045](https://github.com/statamic/cms/issues/2045)
 - The `form` tags get a `submission_created` boolean. [#2285](https://github.com/statamic/cms/issues/2285)
 - The `template` fieldtype will ignore views in the `partials` directory when `hide_partials` is enabled. [#2249](https://github.com/statamic/cms/issues/2249)
 - The "first child" option is only in `link` fieldtypes if the entry is in a structured collection. [#2209](https://github.com/statamic/cms/issues/2209)
