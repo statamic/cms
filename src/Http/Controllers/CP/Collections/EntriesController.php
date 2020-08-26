@@ -324,10 +324,11 @@ class EntriesController extends CpController
     {
         // The values should only be data merged with the origin data.
         // We don't want injected collection values, which $entry->values() would have given us.
-        $values = $entry->data();
-        while ($entry->hasOrigin()) {
-            $entry = $entry->origin();
-            $values = $entry->data()->merge($values);
+        $target = $entry;
+        $values = $target->data();
+        while ($target->hasOrigin()) {
+            $target = $target->origin();
+            $values = $target->data()->merge($values);
         }
         $values = $values->all();
 
