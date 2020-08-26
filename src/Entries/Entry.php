@@ -239,6 +239,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization
 
         if ($this->id()) {
             Blink::store('structure-page-entries')->forget($this->id());
+            Blink::store('structure-uris')->forget($this->id());
         }
 
         $this->taxonomize();

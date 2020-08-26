@@ -9,7 +9,6 @@ use Illuminate\Support\ServiceProvider;
 use Statamic\Facades\Preference;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
-use Statamic\Structures\UriCache;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -127,10 +126,6 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\Statamic\Fields\FieldsetRepository::class, function ($app) {
             return (new \Statamic\Fields\FieldsetRepository($app['files']))
                 ->setDirectory(resource_path('fieldsets'));
-        });
-
-        $this->app->singleton(UriCache::class, function () {
-            return new UriCache;
         });
     }
 

@@ -156,7 +156,7 @@ class Page implements Entry, Augmentable, Responsable
             return optional($this->parent)->uri();
         }
 
-        $uris = app(UriCache::class);
+        $uris = Blink::store('structure-uris');
 
         if ($cached = $uris[$this->reference] ?? null) {
             return $cached;
