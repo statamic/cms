@@ -611,9 +611,6 @@ class EntryTest extends TestCase
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
 
-        $blinkStore = $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock();
-        Facades\Blink::shouldReceive('store')->with('structure-page-entries')->once()->andReturn($blinkStore);
-
         $return = $entry->save();
 
         $this->assertTrue($return);
@@ -623,6 +620,20 @@ class EntryTest extends TestCase
         Event::assertDispatched(EntrySaved::class, function ($event) use ($entry) {
             return $event->entry === $entry;
         });
+    }
+
+    /** @test */
+    public function it_clears_blink_caches_when_saving()
+    {
+        $collection = tap(Collection::make('test')->structure(new CollectionStructure))->save();
+        $entry = (new Entry)->id('a')->collection($collection);
+
+        $mock = Facades\Blink::partialMock();
+        $mock->shouldReceive('store')->with('structure-page-entries')->once()->andReturn(
+            $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock()
+        );
+
+        $entry->save();
     }
 
     /** @test */
