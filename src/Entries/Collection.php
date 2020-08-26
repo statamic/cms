@@ -249,6 +249,7 @@ class Collection implements Contract, AugmentableContract
                 'collections' => [$this->handle()],
                 'max_items' => 1,
                 'listable' => false,
+                'localizable' => true,
             ], 'sidebar');
         }
 
