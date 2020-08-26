@@ -514,6 +514,7 @@ export default {
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
                 this.isRoot = data.isRoot;
+                this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
