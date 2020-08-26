@@ -558,6 +558,10 @@ class Collection implements Contract, AugmentableContract
         return $this
             ->fluentlyGetOrSet('mount')
             ->getter(function ($mount) {
+                if (! $mount) {
+                    return null;
+                }
+
                 return Blink::once("collection-{$this->id()}-mount-{$mount}", function () use ($mount) {
                     return Entry::find($mount);
                 });
