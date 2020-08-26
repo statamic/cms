@@ -11,7 +11,7 @@ use Statamic\Contracts\Taxonomies\TermRepository;
  * @method static whereInTaxonomy(array $handles)
  * @method static find($id)
  * @method static findByUri(string $uri)
- * @method static findBySlug(string $slug, string $collection)
+ * @method static findBySlug(string $slug, string $taxonomy)
  * @method static make(string $slug = null)
  * @method static query()
  * @method static save($entry)
