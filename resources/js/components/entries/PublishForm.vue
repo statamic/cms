@@ -485,6 +485,8 @@ export default {
                 }
             }
 
+            this.$dirty.remove(this.publishContainer);
+
             this.localizing = localization.handle;
 
             if (localization.exists) {
@@ -522,6 +524,11 @@ export default {
         },
 
         createLocalization(localization) {
+            if (this.isCreating) {
+                this.$nextTick(() => window.location = localization.url);
+                return;
+            }
+
             const url = this.activeLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then(response => {
                 this.editLocalization(response.data);
