@@ -32,11 +32,11 @@
                     />
 
                     <site-selector
-                        v-if="structureSites.length > 1"
+                        v-if="sites.length > 1"
                         class="mr-2"
-                        :sites="structureSites"
-                        :value="treeSite"
-                        @input="treeSite = $event.handle"
+                        :sites="sites"
+                        :value="site"
+                        @input="site = $event.handle"
                     />
 
                     <button
@@ -49,7 +49,15 @@
 
                 </template>
 
-                <div v-if="view === 'list' && reorderable">
+                <template v-if="view === 'list' && reorderable">
+                    <site-selector
+                        v-if="sites.length > 1 && reordering && site"
+                        class="mr-2"
+                        :sites="sites"
+                        :value="site"
+                        @input="site = $event.handle"
+                    />
+
                     <button class="btn mr-2"
                         v-if="!reordering"
                         @click="reordering = true"
@@ -64,7 +72,7 @@
                             @click="$refs.list.saveOrder"
                             v-text="__('Save Order')" />
                     </template>
-                </div>
+                </template>
 
                 <create-entry-button
                     v-if="!reordering && canCreate"
@@ -88,6 +96,7 @@
             :reorder-url="reorderUrl"
             :site="site"
             @reordered="reordering = false"
+            @site-changed="site = $event"
         />
 
         <page-tree
@@ -101,7 +110,7 @@
             :submit-parameters="{ deletedEntries }"
             :max-depth="structureMaxDepth"
             :expects-root="structureExpectsRoot"
-            :site="treeSite"
+            :site="site"
             @edit-page="editPage"
             @changed="markTreeDirty"
             @saved="markTreeClean"
@@ -170,12 +179,12 @@ export default {
         runActionUrl: { type: String, required: true },
         bulkActionsUrl: { type: String, required: true },
         reorderUrl: { type: String, required: true },
-        site: { type: String, required: true },
+        initialSite: { type: String, required: true },
+        sites: { type: Array },
         structurePagesUrl: { type: String },
         structureSubmitUrl: { type: String },
         structureMaxDepth: { type: Number, default: Infinity },
         structureExpectsRoot: { type: Boolean },
-        structureSites: { type: Array },
     },
 
     data() {
@@ -186,7 +195,7 @@ export default {
             showEntryDeletionConfirmation: false,
             entryBeingDeleted: null,
             entryDeletionConfirmCallback: null,
-            treeSite: this.site,
+            site: this.initialSite,
             reordering: false
         }
     },

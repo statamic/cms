@@ -81,13 +81,11 @@ class CollectionsController extends CpController
         return view('statamic::collections.show', array_merge($viewData, [
             'structure' => $structure,
             'expectsRoot' => $structure->expectsRoot(),
-            'structureSites' => $collection->sites()->map(function ($site) use ($structure) {
-                $tree = $structure->in($site);
-
+            'sites' => $collection->sites()->map(function ($site) {
+                $site = Site::get($site);
                 return [
-                    'handle' => $tree->locale(),
-                    'name' => $tree->site()->name(),
-                    'url' => $tree->showUrl(),
+                    'handle' => $site->handle(),
+                    'name' => $site->name(),
                 ];
             })->values()->all(),
         ]));
