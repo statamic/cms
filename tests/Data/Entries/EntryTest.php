@@ -628,7 +628,8 @@ class EntryTest extends TestCase
         $collection = tap(Collection::make('test')->structure(new CollectionStructure))->save();
         $entry = (new Entry)->id('a')->collection($collection);
 
-        $mock = Facades\Blink::partialMock();
+        $mock = \Mockery::mock(Facades\Blink::getFacadeRoot())->makePartial();
+        Facades\Blink::swap($mock);
         $mock->shouldReceive('store')->with('structure-page-entries')->once()->andReturn(
             $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock()
         );
