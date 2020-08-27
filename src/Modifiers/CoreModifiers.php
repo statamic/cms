@@ -2182,6 +2182,10 @@ class CoreModifiers extends Modifier
      */
     public function wrap($value, $params)
     {
+        if (! $value) {
+            return $value;
+        }
+
         $attributes = '';
         $tag = Arr::get($params, 0);
 
