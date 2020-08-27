@@ -1,6 +1,25 @@
 # Release Notes
 
-## Unreleased
+## v3.0.2 (2020-08-27)
+
+### What's new
+- Parent field is localizable by default. [#2211](https://github.com/statamic/cms/issues/2211)
+- Site selector when reordering entries.
+
+### What's fixed
+- Prevent overwriting the entry variable. Prevents title, slug, parent, etc from incorrectly falling back to the root value. [#2211](https://github.com/statamic/cms/issues/2211)
+- Fix a "does not exist in structure" error when localizing a page. [#2176](https://github.com/statamic/cms/issues/2176)
+- The "Visit URL" button is updated when you change sites, or update the slug. [#1864](https://github.com/statamic/cms/issues/1864)
+- Fix an error when switching sites when creating an entry. [#2261](https://github.com/statamic/cms/issues/2261)
+- Fix entry reordering when using multiple sites. [#1869](https://github.com/statamic/cms/issues/1869)
+- Fix select fieldtype not rendering when you have numeric options/values. [#2302](https://github.com/statamic/cms/issues/2302)
+- The `wrap` modifier only wraps if there's something to wrap. [#2299](https://github.com/statamic/cms/issues/2299)
+- Fix missing breadcrumb. [#2236](https://github.com/statamic/cms/issues/2236)
+- Section fieldtype shouldn't be localizable. [#2236](https://github.com/statamic/cms/issues/2236)
+- Fix facade IDE typehint [#2297](https://github.com/statamic/cms/issues/2297)
+- Adjust contrast on some UI elements.
+
+## v3.0.1 (2020-08-26)
 
 ### What's new
 - Localizable field toggle. [#2045](https://github.com/statamic/cms/issues/2045)
