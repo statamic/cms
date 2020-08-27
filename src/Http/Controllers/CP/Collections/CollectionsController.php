@@ -66,6 +66,14 @@ class CollectionsController extends CpController
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),
             ]),
+            'sites' => $collection->sites()->map(function ($site) {
+                $site = Site::get($site);
+
+                return [
+                    'handle' => $site->handle(),
+                    'name' => $site->name(),
+                ];
+            })->values()->all(),
         ];
 
         if ($collection->queryEntries()->count() === 0) {
@@ -81,14 +89,6 @@ class CollectionsController extends CpController
         return view('statamic::collections.show', array_merge($viewData, [
             'structure' => $structure,
             'expectsRoot' => $structure->expectsRoot(),
-            'sites' => $collection->sites()->map(function ($site) {
-                $site = Site::get($site);
-
-                return [
-                    'handle' => $site->handle(),
-                    'name' => $site->name(),
-                ];
-            })->values()->all(),
         ]));
     }
 
