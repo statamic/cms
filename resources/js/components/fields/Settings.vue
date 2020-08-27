@@ -15,7 +15,7 @@
                 {{ values.display || config.display || config.handle }}
             </h1>
             <button
-                class="text-grey-50 hover:text-grey-80 mr-3 text-sm"
+                class="text-grey-70 hover:text-grey-80 mr-3 text-sm"
                 @click.prevent="close"
                 v-text="__('Cancel')"
             ></button>
