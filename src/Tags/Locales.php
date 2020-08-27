@@ -27,7 +27,7 @@ class Locales extends Tags
     }
 
     /**
-     * The {{ locale:[key] }} tag.
+     * The {{ locales:[key] }} tag.
      */
     public function wildcard($key)
     {
@@ -57,7 +57,7 @@ class Locales extends Tags
             return $this->sort($locales);
         })->pipe(function ($locales) {
             return $this->addData($locales);
-        })->values();
+        })->filter()->values();
     }
 
     /**
@@ -87,7 +87,10 @@ class Locales extends Tags
     private function addData($locales)
     {
         return $locales->map(function ($locale, $key) {
-            $localized = $this->getLocalizedData($key);
+            if (! $localized = $this->getLocalizedData($key)) {
+                return null;
+            }
+
             $localized['locale'] = $locale;
             $localized['current'] = Site::current()->handle();
             $localized['is_current'] = $key === Site::current()->handle();
@@ -108,7 +111,15 @@ class Locales extends Tags
             return null;
         }
 
-        return $data->in($locale)->toAugmentedArray();
+        if (! $localized = $data->in($locale)) {
+            return null;
+        }
+
+        if (method_exists($localized, 'published') && ! $localized->published()) {
+            return null;
+        }
+
+        return $localized->toAugmentedArray();
     }
 
     /**
