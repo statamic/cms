@@ -53,7 +53,7 @@ export default {
     computed: {
         selectedOptions() {
             let selections = this.value || [];
-            if (typeof selections === 'string') {
+            if (typeof selections === 'string' || typeof selections === 'number') {
                 selections = [selections];
             }
             return selections.map(value => {
