@@ -83,6 +83,7 @@ class CollectionsController extends CpController
             'expectsRoot' => $structure->expectsRoot(),
             'sites' => $collection->sites()->map(function ($site) {
                 $site = Site::get($site);
+
                 return [
                     'handle' => $site->handle(),
                     'name' => $site->name(),
