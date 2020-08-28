@@ -908,6 +908,17 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Returns true if the value is iterable
+     *
+     * @param $value
+     * @return bool
+     */
+    public function isIterable($value)
+    {
+        return is_iterable($value);
+    }
+
+    /**
      * Returns true if the string is JSON, false otherwise.
      *
      * @param $value
