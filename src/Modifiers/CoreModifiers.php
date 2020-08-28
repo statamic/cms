@@ -812,6 +812,17 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Returns true if the value is an array
+     *
+     * @param $value
+     * @return bool
+     */
+    public function isArray($value)
+    {
+        return is_array($value);
+    }
+
+    /**
      * Determines if the date is before another specified date ($params[0]).
      *
      * @param $value
