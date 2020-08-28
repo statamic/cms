@@ -35,7 +35,7 @@ class FormController extends Controller
         $submission = $form->makeSubmission()->data($values);
 
         try {
-            $fields->validate();
+            $fields->validate($this->extraRules($fields));
 
             throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
 
@@ -115,5 +115,21 @@ class FormController extends Controller
         $response = $redirect ? redirect($redirect) : back();
 
         return $response->withInput()->withErrors($errors, 'form.'.$form);
+    }
+
+    protected function extraRules($fields)
+    {
+        $assetFieldRules = $fields->all()
+            ->filter(function ($field) {
+                return $field->fieldtype()->handle() === 'assets';
+            })
+            ->mapWithKeys(function ($field) {
+                return $field->get('max_files') === 1
+                    ? [$field->handle() => 'file']
+                    : [$field->handle().'.*' => 'file'];
+            })
+            ->all();
+
+        return $assetFieldRules;
     }
 }
