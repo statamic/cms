@@ -5,12 +5,13 @@ namespace Tests\Tags\User;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
+use Tests\NormalizesHtml;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class RegisterFormTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use PreventSavingStacheItemsToDisk, NormalizesHtml;
 
     private function tag($tag)
     {
@@ -53,22 +54,22 @@ class RegisterFormTest extends TestCase
     /** @test */
     public function it_renders_form_with_fields_array()
     {
-        $output = $this->tag(<<<'EOT'
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ user:register_form }}
     {{ fields }}
         <label>{{ display }}</label>{{ field }}
     {{ /fields }}
 {{ /user:register_form }}
 EOT
-);
+));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Email Address</label><input type="email" name="email" value="">',
-            '<label>Password</label><input type="password" name="password" value="">',
-            '<label>Password Confirmation</label><input type="password" name="password_confirmation" value="">',
-            '<label>Name</label><input type="text" name="name" value="">',
+            '<label>Email Address</label><input type="email" name="email">',
+            '<label>Password</label><input type="password" name="password">',
+            '<label>Password Confirmation</label><input type="password" name="password_confirmation">',
+            '<label>Name</label><input type="text" name="name">',
         ];
 
         $this->assertEquals($expected, $actual[0]);
@@ -79,24 +80,24 @@ EOT
     {
         $this->useCustomBlueprint();
 
-        $output = $this->tag(<<<'EOT'
+        $output = $this->normalizeHtml($this->tag(<<<'EOT'
 {{ user:register_form }}
     {{ fields }}
         <label>{{ display }}</label>{{ field }}
     {{ /fields }}
 {{ /user:register_form }}
 EOT
-);
+));
 
         preg_match_all('/<label>.+<\/label><input.+>/U', $output, $actual);
 
         $expected = [
-            '<label>Email Address</label><input type="email" name="email" value="">',
-            '<label>Password</label><input type="password" name="password" value="">',
-            '<label>Password Confirmation</label><input type="password" name="password_confirmation" value="">',
-            '<label>Full Name</label><input type="text" name="name" value="">',
-            '<label>Phone Number</label><input type="text" name="phone" value="">',
-            '<label>Over 18 years of age?</label><input type="text" name="age" value="">',
+            '<label>Email Address</label><input type="email" name="email">',
+            '<label>Password</label><input type="password" name="password">',
+            '<label>Password Confirmation</label><input type="password" name="password_confirmation">',
+            '<label>Full Name</label><input type="text" name="name">',
+            '<label>Phone Number</label><input type="text" name="phone">',
+            '<label>Over 18 years of age?</label><input type="text" name="age">',
         ];
 
         $this->assertEquals($expected, $actual[0]);
