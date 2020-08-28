@@ -92,12 +92,22 @@ class Email extends Mailable
     protected function automagic()
     {
         $html = collect($this->submission->toArray())->map(function ($value, $key) {
-            $value = is_array($value) ? json_encode($value) : $value;
-
-            return "<b>{$key}:</b> {$value}";
+            return $this->renderFieldValue($key, $value);
         })->implode("<br>\n");
 
         return $this->html($html);
+    }
+
+    protected function renderFieldValue($key, $value)
+    {
+        $config = optional($this->submission->form()->fields()->get($key))->config() ?? [];
+        $key = $config['display'] ?? ucfirst($key);
+
+        $value = is_array($value)
+            ? collect($value)->implode(', ')
+            : $value;
+
+        return "<b>{$key}:</b> {$value}";
     }
 
     protected function addresses($addresses)
