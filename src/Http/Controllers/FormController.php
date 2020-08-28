@@ -13,6 +13,7 @@ use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Form;
+use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
 use Statamic\Forms\SendEmails;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -27,6 +28,7 @@ class FormController extends Controller
     public function submit(Request $request, $form)
     {
         $fields = $form->blueprint()->fields();
+        $this->validateContentType($request, $fields);
         $values = array_merge($request->all(), $this->normalizeAssetsValues($fields, $request));
 
         $params = collect($request->all())->filter(function ($value, $key) {
@@ -61,6 +63,25 @@ class FormController extends Controller
         SendEmails::dispatch($submission);
 
         return $this->formSuccess($params, $submission);
+    }
+
+    private function validateContentType($request, $fields)
+    {
+        $type = Str::before($request->headers->get('CONTENT_TYPE'), ';');
+
+        if ($type === 'multipart/form-data') {
+            return;
+        }
+
+        $assets = $fields->all()->filter(function ($field) {
+            return $field->fieldtype()->handle() === 'assets';
+        });
+
+        if ($assets->isEmpty()) {
+            return;
+        }
+
+        throw new FileContentTypeRequiredException;
     }
 
     /**
