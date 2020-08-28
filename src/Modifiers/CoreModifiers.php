@@ -812,7 +812,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns true if the value is an array
+     * Returns true if the value is an array.
      *
      * @param $value
      * @return bool
@@ -908,7 +908,7 @@ class CoreModifiers extends Modifier
     }
 
     /**
-     * Returns true if the value is iterable
+     * Returns true if the value is iterable.
      *
      * @param $value
      * @return bool
