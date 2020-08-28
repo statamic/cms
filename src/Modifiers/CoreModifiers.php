@@ -742,7 +742,7 @@ class CoreModifiers extends Modifier
      */
     public function inArray($haystack, $params, $context)
     {
-        if (is_null($haystack)) {
+        if (! is_array($haystack)) {
             return false;
         }
 
