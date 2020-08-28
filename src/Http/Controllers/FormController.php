@@ -26,11 +26,14 @@ class FormController extends Controller
      */
     public function submit(Request $request, $form)
     {
+        $fields = $form->blueprint()->fields();
+        $values = array_merge($request->all(), $this->normalizeAssetsValues($fields, $request));
+
         $params = collect($request->all())->filter(function ($value, $key) {
             return Str::startsWith($key, '_');
         })->all();
 
-        $fields = $form->blueprint()->fields()->addValues($values = $request->all());
+        $fields = $fields->addValues($values);
 
         $submission = $form->makeSubmission()->data($values);
 
@@ -117,6 +120,20 @@ class FormController extends Controller
         return $response->withInput()->withErrors($errors, 'form.'.$form);
     }
 
+    protected function normalizeAssetsValues($fields, $request)
+    {
+        // The assets fieldtype is expecting an array, even for `max_files: 1`, but we don't want to force that on the front end.
+        return $fields->all()
+            ->filter(function ($field) {
+                return $field->fieldtype()->handle() === 'assets'
+                    && $field->get('max_files') === 1;
+            })
+            ->map(function ($field) use ($request) {
+                return Arr::wrap($request->file($field->handle()));
+            })
+            ->all();
+    }
+
     protected function extraRules($fields)
     {
         $assetFieldRules = $fields->all()
@@ -124,9 +141,7 @@ class FormController extends Controller
                 return $field->fieldtype()->handle() === 'assets';
             })
             ->mapWithKeys(function ($field) {
-                return $field->get('max_files') === 1
-                    ? [$field->handle() => 'file']
-                    : [$field->handle().'.*' => 'file'];
+                return [$field->handle().'.*' => 'file'];
             })
             ->all();
 
