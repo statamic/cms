@@ -29,7 +29,6 @@ abstract class Fieldtype implements Arrayable
     protected $defaultValue;
     protected $configFields = [];
     protected $icon;
-    protected $view;
 
     public function setField(Field $field)
     {
@@ -181,10 +180,6 @@ abstract class Fieldtype implements Arrayable
 
     public function view()
     {
-        if ($this->view) {
-            return $this->view;
-        }
-
         $default = 'statamic::forms.fields.'.$this->handle();
 
         return view()->exists($default)
