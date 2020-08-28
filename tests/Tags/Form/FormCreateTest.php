@@ -338,10 +338,10 @@ EOT
     {
         $this->assertFieldRendersHtml([
             '<select name="favourite_animal">',
-                '<option value>Please select...</option>',
-                '<option value="cat">Cat</option>',
-                '<option value="armadillo">Armadillo</option>',
-                '<option value="rat">Rat</option>',
+            '<option value>Please select...</option>',
+            '<option value="cat">Cat</option>',
+            '<option value="armadillo">Armadillo</option>',
+            '<option value="rat">Rat</option>',
             '</select>',
         ], [
             'handle' => 'favourite_animal',
@@ -357,10 +357,10 @@ EOT
 
         $this->assertFieldRendersHtml([
             '<select name="favourite_animal">',
-                '<option value>Please select...</option>',
-                '<option value="cat" selected>Cat</option>',
-                '<option value="armadillo">Armadillo</option>',
-                '<option value="rat">Rat</option>',
+            '<option value>Please select...</option>',
+            '<option value="cat" selected>Cat</option>',
+            '<option value="armadillo">Armadillo</option>',
+            '<option value="rat">Rat</option>',
             '</select>',
         ], [
             'handle' => 'favourite_animal',
@@ -382,9 +382,9 @@ EOT
     {
         $this->assertFieldRendersHtml([
             '<select name="favourite_animals[]" multiple>',
-                '<option value="cat">Cat</option>',
-                '<option value="armadillo">Armadillo</option>',
-                '<option value="rat">Rat</option>',
+            '<option value="cat">Cat</option>',
+            '<option value="armadillo">Armadillo</option>',
+            '<option value="rat">Rat</option>',
             '</select>',
         ], [
             'handle' => 'favourite_animals',
@@ -401,9 +401,9 @@ EOT
 
         $this->assertFieldRendersHtml([
             '<select name="favourite_animals[]" multiple>',
-                '<option value="cat" selected>Cat</option>',
-                '<option value="armadillo">Armadillo</option>',
-                '<option value="rat" selected>Rat</option>',
+            '<option value="cat" selected>Cat</option>',
+            '<option value="armadillo">Armadillo</option>',
+            '<option value="rat" selected>Rat</option>',
             '</select>',
         ], [
             'handle' => 'favourite_animals',
