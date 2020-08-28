@@ -61,7 +61,7 @@ class Email extends Mailable
         $text = array_get($this->config, 'text');
 
         if (! $text && ! $html) {
-            return $this->automagic();
+            return $this->view('statamic::forms.automagic-email');
         }
 
         if ($text) {
@@ -77,8 +77,10 @@ class Email extends Mailable
 
     protected function addData()
     {
-        $data = array_merge($this->submission->toArray(), [
-            'fields'     => $this->getRenderableFieldData()->except(['Id', 'Date'])->all(),
+        $augmented = $this->submission->toAugmentedArray();
+
+        $data = array_merge($augmented, [
+            'fields'     => $this->getRenderableFieldData($augmented),
             'site_url'   => Config::getSiteUrl(),
             'date'       => now(),
             'now'        => now(),
@@ -90,39 +92,16 @@ class Email extends Mailable
         return $this->with($data);
     }
 
-    protected function automagic()
+    protected function getRenderableFieldData($values)
     {
-        $html = $this->getRenderableFieldData()->map(function ($value, $key) {
-            return $this->renderFieldValue($key, $value);
-        })->implode("<br>\n");
+        return collect($values)->map(function ($value, $handle) {
+            $field = $value->field();
+            $display = $field->display();
+            $fieldtype = $field->type();
+            $config = $field->config();
 
-        return $this->html($html);
-    }
-
-    protected function renderFieldValue($key, $value)
-    {
-        return "<b>{$key}:</b> {$value}";
-    }
-
-    protected function getRenderableFieldData()
-    {
-        return collect($this->submission->toArray())->mapWithKeys(function ($value, $key) {
-            return [$this->getRenderableFieldName($key) => $this->getRenderableFieldValue($value)];
+            return compact('display', 'handle', 'fieldtype', 'config', 'value');
         });
-    }
-
-    protected function getRenderableFieldName($key)
-    {
-        $config = optional($this->submission->form()->fields()->get($key))->config() ?? [];
-
-        return $config['display'] ?? ucfirst($key);
-    }
-
-    protected function getRenderableFieldValue($value)
-    {
-        return is_array($value)
-            ? collect($value)->implode(', ')
-            : $value;
     }
 
     protected function addresses($addresses)

@@ -3,8 +3,10 @@
 namespace Statamic\Forms;
 
 use Carbon\Carbon;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
+use Statamic\Data\HasAugmentedData;
 use Statamic\Events\SubmissionDeleted;
 use Statamic\Events\SubmissionSaved;
 use Statamic\Facades\File;
@@ -13,9 +15,9 @@ use Statamic\Forms\Uploaders\AssetsUploader;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Submission implements SubmissionContract
+class Submission implements SubmissionContract, Augmentable
 {
-    use ContainsData, FluentlyGetsAndSets;
+    use ContainsData, FluentlyGetsAndSets, HasAugmentedData;
 
     /**
      * @var string
@@ -214,5 +216,10 @@ class Submission implements SubmissionContract
                 'date' => $this->date(),
             ])
             ->all();
+    }
+
+    public function blueprint()
+    {
+        return $this->form->blueprint();
     }
 }
