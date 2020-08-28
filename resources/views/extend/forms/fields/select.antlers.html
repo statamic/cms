@@ -1,0 +1,8 @@
+<select name="{{ handle }}{{ multiple ?= "[]" }}" {{ multiple ?= "multiple" }}>
+    {{ unless multiple }}
+        <option value>{{ trans key="Please select..." }}</option>
+    {{ /unless }}
+    {{ foreach:options }}
+        <option value="{{ value }}" {{ old | contains:key ?= "selected" }}>{{ value }}</option>
+    {{ /foreach:options }}
+</select>
