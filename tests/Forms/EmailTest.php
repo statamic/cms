@@ -16,6 +16,7 @@ class EmailTest extends TestCase
         /** @var Submission */
         $submission = m::mock(Submission::class);
         $submission->shouldReceive('toArray')->andReturn([]);
+        $submission->shouldReceive('toAugmentedArray')->andReturn([]);
 
         $email = new Email($submission, [
             'to' => Antlers::parse('test@example.com'),
