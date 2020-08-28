@@ -6,12 +6,13 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Form;
 use Statamic\Facades\Parse;
 use Statamic\Support\Arr;
+use Tests\NormalizesHtml;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class FormCreateTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use PreventSavingStacheItemsToDisk, NormalizesHtml;
 
     public function setUp(): void
     {
@@ -782,23 +783,6 @@ EOT
         $expected = collect(Arr::wrap($expectedHtmlParts))->implode('');
 
         $this->assertStringContainsString($expected, $output);
-    }
-
-    private function normalizeHtml($html)
-    {
-        // Remove new lines.
-        $html = str_replace(["\n", "\r"], '', $html);
-
-        // Remove whitespace between elements.
-        $html = preg_replace('/(>)\s*(<)/', '$1$2', $html);
-
-        // Remove whitespace around radio and checkbox labels.
-        $html = preg_replace('/(>)\s*([^\s]+)\s*(<)/', '$1$2$3', $html);
-
-        // Remove spaces at end of element where attributes aren't rendered.
-        $html = str_replace(' >', '>', $html);
-
-        return $html;
     }
 
     public function post($uri, array $data = [], array $headers = [])
