@@ -24,20 +24,7 @@
                         @if(! is_array($submission->get($name)))
                             {!! strip_tags($submission->get($name), '<a>') !!}
                         @else
-                            <table>
-                                @foreach($submission->get($name) as $key => $value)
-                                    <tr>
-                                        <th>{{ $key }}</th>
-                                        <td>
-                                            @if(is_array($value))
-                                                {{ json_encode($value) }}
-                                            @else
-                                                {{ $value }}
-                                            @endif
-                                        </td>
-                                    </tr>
-                                @endforeach
-                            </table>
+                            {!! strip_tags(collect($submission->get($name))->implode(', '), '<a>') !!}
                         @endif
                     </td>
                 </tr>
