@@ -78,6 +78,7 @@ class Email extends Mailable
     protected function addData()
     {
         $data = array_merge($this->submission->toArray(), [
+            'fields'     => $this->getRenderableFieldData()->except(['Id', 'Date'])->all(),
             'site_url'   => Config::getSiteUrl(),
             'date'       => now(),
             'now'        => now(),
@@ -91,7 +92,7 @@ class Email extends Mailable
 
     protected function automagic()
     {
-        $html = collect($this->submission->toArray())->map(function ($value, $key) {
+        $html = $this->getRenderableFieldData()->map(function ($value, $key) {
             return $this->renderFieldValue($key, $value);
         })->implode("<br>\n");
 
@@ -100,14 +101,28 @@ class Email extends Mailable
 
     protected function renderFieldValue($key, $value)
     {
-        $config = optional($this->submission->form()->fields()->get($key))->config() ?? [];
-        $key = $config['display'] ?? ucfirst($key);
+        return "<b>{$key}:</b> {$value}";
+    }
 
-        $value = is_array($value)
+    protected function getRenderableFieldData()
+    {
+        return collect($this->submission->toArray())->mapWithKeys(function ($value, $key) {
+            return [$this->getRenderableFieldName($key) => $this->getRenderableFieldValue($value)];
+        });
+    }
+
+    protected function getRenderableFieldName($key)
+    {
+        $config = optional($this->submission->form()->fields()->get($key))->config() ?? [];
+
+        return $config['display'] ?? ucfirst($key);
+    }
+
+    protected function getRenderableFieldValue($value)
+    {
+        return is_array($value)
             ? collect($value)->implode(', ')
             : $value;
-
-        return "<b>{$key}:</b> {$value}";
     }
 
     protected function addresses($addresses)
