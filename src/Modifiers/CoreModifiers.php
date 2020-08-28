@@ -742,6 +742,10 @@ class CoreModifiers extends Modifier
      */
     public function inArray($haystack, $params, $context)
     {
+        if (is_null($haystack)) {
+            return false;
+        }
+
         $needle = Arr::get($context, $params[0], $params);
 
         if (is_array($needle) && count($needle) === 1) {
