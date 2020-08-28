@@ -1,7 +1,7 @@
-{{ foreach:options }}
+{{ foreach:options as="value|label" }}
     <label>
         <input type="checkbox" name="{{ handle }}[]" value="{{ value }}" {{ if (old | in_array:value) }}checked{{ /if }}>
-        {{ value }}
+        {{ label }}
     </label>
     {{ unless inline }}
         <br>

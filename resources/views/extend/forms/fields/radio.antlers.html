@@ -1,7 +1,7 @@
-{{ foreach:options }}
+{{ foreach:options as="value|label" }}
     <label>
         <input type="radio" name="{{ handle }}" value="{{ value }}" {{ old === value ?= "checked" }}>
-        {{ value }}
+        {{ label }}
     </label>
     {{ unless inline }}
         <br>
