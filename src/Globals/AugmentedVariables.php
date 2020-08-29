@@ -17,4 +17,11 @@ class AugmentedVariables extends AbstractAugmented
             return $this->wrapValue($site, 'site');
         }
     }
+
+    public function title()
+    {
+        if ($title = $this->data->value('title')) {
+            return $this->wrapValue($title, 'title');
+        }
+    }
 }
