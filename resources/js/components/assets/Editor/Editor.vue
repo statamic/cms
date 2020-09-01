@@ -33,15 +33,15 @@
                 </div>
 
                 <div class="asset-editor-meta-actions">
-                    <a @click="open" v-tooltip="__('Open in a new window')">
+                    <button @click="open" v-tooltip="__('Open in a new window')" :aria-label="__('Open in a new window')">
                         <svg-icon name="external-link" class="h-6 w-6"/>
-                    </a>
-                    <a @click="download" v-tooltip="__('Download file')" v-if="asset.allowDownloading">
+                    </button>
+                    <button @click="download" v-tooltip="__('Download file')" :aria-label="__('Download file')" v-if="asset.allowDownloading">
                         <svg-icon name="download" class="h-6 w-6"/>
-                    </a>
-                    <a @click="close" v-tooltip="__('Close editor')">
+                    </button>
+                    <button @click="close" v-tooltip="__('Close editor')" :aria-label="__('Close editor')">
                         <svg-icon name="close" class="h-6 w-6"/>
-                    </a>
+                    </button>
                 </div>
             </div>
 

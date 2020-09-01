@@ -25,6 +25,7 @@ $toggle_radius: 20px;
     border: 1px solid #dfdfdf;
     font-size: 0.1px;
     margin: 6px 0;
+    &:focus { outline: none; }
 }
 
 .toggle-slider {
@@ -39,7 +40,6 @@ $toggle_radius: 20px;
         cursor: not-allowed;
     }
 }
-
 
 .toggle-knob {
     position: absolute;

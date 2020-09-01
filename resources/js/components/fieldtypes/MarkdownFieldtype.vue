@@ -12,23 +12,33 @@
             <div slot-scope="{ dragging }">
                 <div class="markdown-toolbar">
                     <div class="markdown-modes">
-                        <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" />
-                        <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" />
+                        <button @click="mode = 'write'" :class="{ 'active': mode == 'write' }" v-text=" __('Write')" :aria-pressed="mode === 'write' ? 'true' : 'false'" />
+                        <button @click="mode = 'preview'" :class="{ 'active': mode == 'preview' }" v-text=" __('Preview')" :aria-pressed="mode === 'preview' ? 'true' : 'false'" />
                     </div>
 
                     <div class="markdown-buttons" v-if="! isReadOnly">
-                        <button @click="bold" v-tooltip="__('Bold')"><i class="fa fa-bold"></i></button>
-                        <button @click="italic" v-tooltip="__('Italic')"><i class="fa fa-italic"></i></button>
-                        <button @click="insertLink('')" v-tooltip="__('Insert Link')"><i class="fa fa-link"></i></button>
-                        <button @click="addAsset" v-tooltip="__('Insert Asset')" v-if="assetsEnabled"><i class="fa fa-picture-o"></i></button>
-                        <button @click="insertImage('')" v-tooltip="__('Insert Image')" v-else><i class="fa fa-picture-o"></i></button>
-                        <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" v-if="fullScreenMode">
+                        <button @click="bold" v-tooltip="__('Bold')" :aria-label="__('Bold')">
+                            <i class="fa fa-bold"></i>
+                        </button>
+                        <button @click="italic" v-tooltip="__('Italic')" :aria-label="__('Italic')">
+                            <i class="fa fa-italic"></i>
+                        </button>
+                        <button @click="insertLink('')" v-tooltip="__('Insert Link')" :aria-label="__('Insert Link')">
+                            <i class="fa fa-link"></i>
+                        </button>
+                        <button @click="addAsset" v-if="assetsEnabled" v-tooltip="__('Insert Asset')" :aria-label="__('Insert Asset')">
+                            <i class="fa fa-picture-o"></i>
+                        </button>
+                        <button @click="insertImage('')" v-else v-tooltip="__('Insert Image')" :aria-label="__('Insert Image')">
+                            <i class="fa fa-picture-o"></i>
+                        </button>
+                        <button @click="toggleDarkMode" v-tooltip="darkMode ? __('Light Mode') : __('Dark Mode')" :aria-label="__('Toggle Dark Mode')" v-if="fullScreenMode">
                             <svg-icon name="dark-mode" class="w-4 h-4" />
                         </button>
-                        <button @click="openFullScreen" v-tooltip="__('Fullscreen Mode')" v-if="! fullScreenMode">
+                        <button @click="openFullScreen" v-tooltip="__('Fullscreen Mode')" :aria-label="__('Fullscreen Mode')" v-if="! fullScreenMode">
                             <svg-icon name="expand" class="w-4 h-4" />
                         </button>
-                        <button @click="closeFullScreen" v-tooltip="__('Close Fullscreen Mode')" v-if="fullScreenMode">
+                        <button @click="closeFullScreen" v-tooltip="__('Close Fullscreen Mode')" :aria-label="__('Close Fullscreen Mode')" v-if="fullScreenMode">
                             <svg-icon name="shrink-all" class="w-4 h-4" />
                         </button>
                     </div>
@@ -59,7 +69,7 @@
                         <div class="helpers">
                             <div class="flex w-full">
                                 <div class="markdown-cheatsheet-helper">
-                                    <button class="text-link flex items-center" @click="showCheatsheet = true">
+                                    <button class="text-link flex items-center" @click="showCheatsheet = true" :aria-label="__('Show Markdown Cheatsheet')">
                                         <svg-icon name="markdown-icon" class="w-6 items-start mr-px" />
                                         <span>{{ __('Markdown Cheatsheet') }}</span>
                                     </button>
@@ -70,8 +80,6 @@
                                 <div class="whitespace-no-wrap"><span v-text="count.characters" /> {{ __('Characters') }}</div>
                             </div>
                         </div>
-
-
 
                         <div class="drag-notification" v-if="assetsEnabled && draggingFile">
                             <svg-icon name="upload" class="h-12 w-12 mb-2" />
@@ -98,7 +106,7 @@
 
         <stack name="markdownCheatSheet" v-if="showCheatsheet" @closed="showCheatsheet = false">
             <div class="h-full overflow-auto p-3 bg-white relative">
-                <button class="btn-close absolute top-0 right-0 mt-2 mr-4" @click="showCheatsheet = false">&times;</button>
+                <button class="btn-close absolute top-0 right-0 mt-2 mr-4" @click="showCheatsheet = false" :aria-label="__('Close Markdown Cheatsheet')">&times;</button>
                 <div class="max-w-md mx-auto my-4 clean-content">
                     <h2 v-text="__('Markdown Cheatsheet')"></h2>
                     <div v-html="__('markdown.cheatsheet')"></div>

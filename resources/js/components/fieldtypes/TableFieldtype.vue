@@ -8,7 +8,7 @@
                     <th v-for="(column, index) in columnCount" :key="index">
                         <div class="flex items-center justify-between h-6">
                             <span class="column-count">{{ index + 1 }}</span>
-                            <a v-show="canDeleteColumns" class="opacity-25 text-lg antialiased hover:opacity-75" @click="confirmDeleteColumn(index)">
+                            <a v-show="canDeleteColumns" class="opacity-25 text-lg antialiased hover:opacity-75" @click="confirmDeleteColumn(index)" :aria-label="__('Delete Column')">
                                 &times;
                             </a>
                         </div>
@@ -32,7 +32,7 @@
                             <input type="text" v-model="row.value.cells[cellIndex]" class="input-text" :readonly="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')" />
                         </td>
                         <td class="row-controls" v-if="canDeleteColumns">
-                            <a @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75">&times;</a>
+                            <button @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75" :aria-label="__('Delete Row')">&times;</button>
                         </td>
                     </tr>
                 </tbody>

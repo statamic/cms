@@ -15,6 +15,13 @@ class Bard extends Replicator
     protected function configFieldItems(): array
     {
         return [
+            'always_show_set_button' => [
+                'display' => __('Always Show Set Button'),
+                'instructions' => __('statamic::fieldtypes.bard.config.always_show_set_button'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
             'sets' => [
                 'display' => __('Sets'),
                 'instructions' => __('statamic::fieldtypes.bard.config.sets'),
