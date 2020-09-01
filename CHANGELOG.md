@@ -7,6 +7,7 @@
 
 ### What's improved
 - Widespread accessibility improvements through `aria` attributes and matching form labels+IDs
+- The Array fieldtype is now full width by default. It makes it look better more of the time. [#2315](https://github.com/statamic/cms/issues/2315)
 
 ## v3.0.2 (2020-08-27)
 
