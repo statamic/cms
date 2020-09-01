@@ -120,7 +120,7 @@ export default {
                 .filter(rule => rule.minVersion ? SemVer.gte(this.laravelVersion, rule.minVersion) : true)
                 .filter(rule => rule.maxVersion ? SemVer.lte(this.laravelVersion, rule.maxVersion) : true)
                 .map(rule => {
-                    rule.display = rule.label; // Set label to separate `display` property for rendering.
+                    rule.display = clone(rule.label); // Set label to separate `display` property for rendering.
                     rule.label = rule.label + ' ' + rule.value; // Concatenate so that both `label` and `value` are searchable.
                     return rule;
                 })
