@@ -66,7 +66,7 @@ class Tags extends BaseTags
             $this->params->put('files', $form->hasFiles());
         }
 
-        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect']);
+        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect', 'files']);
 
         $html = $this->formOpen(route('statamic.forms.submit', $formHandle), 'POST', $knownParams);
 
