@@ -23,7 +23,7 @@ class Path extends Tags
 
         $url = $this->params->bool('absolute', false)
             ? $site->absoluteUrl().'/'.$src
-            : $site->url().'/'.$site->relativePath($src);
+            : $site->relativePath().'/'.$site->relativePath($src);
 
         return Facades\Path::tidy($url);
     }
