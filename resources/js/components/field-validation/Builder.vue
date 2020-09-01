@@ -1,33 +1,71 @@
 <template>
 
-    <div class="form-group publish-field select-fieldtype field-w-full">
-        <label class="publish-field-label">{{ __('Validation Rules') }}</label>
-        <div class="help-block -mt-1">
-            <p>
-                {{ __('messages.field_validation_instructions') }}
-                <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
-            </p>
+    <div class="w-full">
+
+        <div class="form-group publish-field select-fieldtype field-w-full">
+            <label class="publish-field-label">{{ __('Required') }}</label>
+            <div class="help-block -mt-1">
+                <p>{{ __('Control whether or not this field is required.') }}</p>
+            </div>
+            <toggle-input v-model="isRequired" />
         </div>
 
-        <div class="list-fieldtype">
-            <list-fieldtype
-                handle="rules"
-                :value="rules"
-                ref="list"
-                @input="updated" />
+        <div class="form-group publish-field select-fieldtype field-w-full">
+            <label class="publish-field-label">{{ __('Rules') }}</label>
+            <div class="help-block -mt-1">
+                <p>
+                    {{ __('Add more advanced validation to this field.') }}
+                    <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
+                    <span v-if="helpBlock" class="italic text-grey-50 float-right">
+                        {{ __('Example') }}:
+                        <span class="italic text-blue-lighter">{{ helpBlock }}</span>
+                    </span>
+                </p>
+            </div>
+
+            <v-select
+                v-if="!customRule"
+                ref="rulesInput"
+                name="rules"
+                :options="predefinedRules"
+                :reduce="rule => rule.value"
+                :placeholder="__('Add Rule')"
+                :multiple="false"
+                :searchable="true"
+                :value="selection"
+                class="w-full"
+                @input="add"
+            >
+                <template #option="{ value, display }">
+                    {{ display }} <code class="ml-1">{{ value.replace(':', '') }}</code>
+                </template>
+            </v-select>
+
+            <text-input
+                v-else
+                v-model="customRule"
+                ref="customRuleInput"
+                @keydown.enter.prevent="add(customRule)"
+            />
+
+            <div class="v-select">
+                <sortable-list
+                    item-class="sortable-rule"
+                    handle-class="sortable-rule"
+                    v-model="rules"
+                >
+                    <div class="vs__selected-options-outside flex flex-wrap">
+                        <span v-for="rule in rules" :key="rule" class="vs__selected mt-1 sortable-rule">
+                            {{ rule }}
+                            <button @click="remove(rule)" type="button" :aria-label="__('Delete Rule')" class="vs__deselect">
+                                <span>×</span>
+                            </button>
+                        </span>
+                    </div>
+                </sortable-list>
+            </div>
+
         </div>
-
-        <p v-if="helpBlock" class="text-xs text-grey-60 ml-2 mt-1">
-            {{ __('Example') }}:
-            <span class="italic text-blue">{{ helpBlock }}</span>
-        </p>
-
-        <select-input
-            v-model="predefinedRule"
-            :options="predefinedRules"
-            :placeholder="__('Add Rule')"
-            @input="add"
-            class="inline-block mt-3" />
     </div>
 
 </template>
@@ -36,8 +74,14 @@
 <script>
 import RULES from './Rules.js';
 import SemVer from 'semver'
+import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
 
 export default {
+
+    components: {
+        SortableList,
+        SortableItem,
+    },
 
     props: {
         config: {
@@ -47,8 +91,11 @@ export default {
 
     data() {
         return {
+            isRequired: false,
             rules: [],
+            selection: null,
             predefinedRule: null,
+            customRule: null,
         }
     },
 
@@ -72,6 +119,11 @@ export default {
             return _.chain(RULES)
                 .filter(rule => rule.minVersion ? SemVer.gte(this.laravelVersion, rule.minVersion) : true)
                 .filter(rule => rule.maxVersion ? SemVer.lte(this.laravelVersion, rule.maxVersion) : true)
+                .map(rule => {
+                    rule.display = rule.label; // Set label to separate `display` property for rendering.
+                    rule.label = rule.label + ' ' + rule.value; // Concatenate so that both `label` and `value` are searchable.
+                    return rule;
+                })
                 .value();
         },
 
@@ -90,12 +142,19 @@ export default {
     },
 
     watch: {
-        rules: {
-            deep: true,
-            handler(rules) {
-                this.$emit('updated', rules);
+        isRequired(value) {
+            if (value === true) {
+                this.ensureRequired();
+            } else {
+                this.remove('required');
             }
-        }
+        },
+
+        rules(value) {
+            this.resetState();
+
+            this.$emit('updated', value);
+        },
     },
 
     created() {
@@ -109,21 +168,56 @@ export default {
                 : [];
         },
 
+        resetState() {
+            this.selection = null;
+            this.predefinedRule = null;
+            this.customRule = null;
+            this.isRequired = this.rules.includes('required');
+        },
+
         explodeRules(rules) {
             return typeof rules === 'string'
                 ? rules.split('|').map(rule => rule.trim())
                 : rules;
         },
 
+        ensureRequired() {
+            if (! this.rules.includes('required')) {
+                this.rules.unshift('required');
+            }
+        },
+
+        ensure(rule) {
+            this.resetState();
+
+            if (! this.rules.includes(rule)) {
+                this.rules.push(rule);
+            }
+        },
+
         add(rule) {
-            this.$refs.list.newItem = rule;
-            this.$refs.list.$refs.newItem.focus();
+            if (this.hasParameters(rule) === ':') {
+                this.resetState();
+                this.predefinedRule = rule;
+                this.customRule = rule;
+                this.$nextTick(() => this.$refs.customRuleInput.$refs.input.focus());
+            } else {
+                this.ensure(rule);
+            }
+        },
+
+        remove(rule) {
+            this.rules = this.rules.filter(value => value !== rule);
+        },
+
+        hasParameters(rule) {
+            return rule.substr(rule.length - 1);
         },
 
         updated(rules) {
-            this.predefinedRule = null;
             this.rules = rules;
-        }
+        },
+
     }
 }
 </script>
