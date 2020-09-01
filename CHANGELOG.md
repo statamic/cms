@@ -1,5 +1,13 @@
 # Release Notes
 
+## Unreleased
+
+### What's new
+- Bard now has an option to always show the "Add Set" button.
+
+### What's improved
+- Widespread accessibility improvements through `aria` attributes and matching form labels+IDs
+
 ## v3.0.2 (2020-08-27)
 
 ### What's new
