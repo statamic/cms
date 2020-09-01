@@ -8,6 +8,7 @@
 ### What's improved
 - Widespread accessibility improvements through `aria` attributes and matching form labels+IDs
 - The Array fieldtype is now full width by default. It makes it look better more of the time. [#2315](https://github.com/statamic/cms/issues/2315)
+- Filter badges are no longer forced to lowercase for selfish aesthetic purposes. There are many legitimate cases for case sensitivity. [#2219](https://github.com/statamic/cms/issues/2219)
 
 ### What's fixed
 - The link tag now properly prefixes URLs with the current site base url. [#2317](https://github.com/statamic/cms/issues/2317)
