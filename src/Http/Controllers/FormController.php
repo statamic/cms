@@ -28,7 +28,7 @@ class FormController extends Controller
     public function submit(Request $request, $form)
     {
         $fields = $form->blueprint()->fields();
-        $this->validateContentType($request, $fields);
+        $this->validateContentType($request, $form);
         $values = array_merge($request->all(), $this->normalizeAssetsValues($fields, $request));
 
         $params = collect($request->all())->filter(function ($value, $key) {
@@ -65,23 +65,13 @@ class FormController extends Controller
         return $this->formSuccess($params, $submission);
     }
 
-    private function validateContentType($request, $fields)
+    private function validateContentType($request, $form)
     {
         $type = Str::before($request->headers->get('CONTENT_TYPE'), ';');
 
-        if ($type === 'multipart/form-data') {
-            return;
+        if ($type !== 'multipart/form-data' && $form->hasFiles()) {
+            throw new FileContentTypeRequiredException;
         }
-
-        $assets = $fields->all()->filter(function ($field) {
-            return $field->fieldtype()->handle() === 'assets';
-        });
-
-        if ($assets->isEmpty()) {
-            return;
-        }
-
-        throw new FileContentTypeRequiredException;
     }
 
     /**

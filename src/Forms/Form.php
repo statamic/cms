@@ -327,4 +327,11 @@ class Form implements FormContract
             'email' => $this->email,
         ];
     }
+
+    public function hasFiles()
+    {
+        return $this->fields()->filter(function ($field) {
+            return $field->fieldtype()->handle() === 'assets';
+        })->isNotEmpty();
+    }
 }
