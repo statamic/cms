@@ -5,7 +5,7 @@
         <div class="form-group publish-field select-fieldtype field-w-full">
             <label class="publish-field-label">{{ __('Required') }}</label>
             <div class="help-block -mt-1">
-                <p>{{ __('Control whether or not this field is required.') }}</p>
+                <p>{{ __('messages.field_validation_required_instructions') }}</p>
             </div>
             <toggle-input v-model="isRequired" />
         </div>
@@ -14,7 +14,7 @@
             <label class="publish-field-label">{{ __('Rules') }}</label>
             <div class="help-block -mt-1">
                 <p>
-                    {{ __('Add more advanced validation to this field.') }}
+                    {{ __('messages.field_validation_advanced_instructions') }}
                     <a :href="laravelDocsLink" target="_blank">{{ __('Learn more') }}</a>
                     <span v-if="helpBlock" class="italic text-grey-50 float-right">
                         {{ __('Example') }}:
