@@ -7,7 +7,7 @@
 }
 
 .array-table {
-    @apply border rounded border-separate text-sm text-left;
+    @apply border rounded border-separate text-sm text-left w-full;
 
     tr:not(:last-child) {
         th, td {
