@@ -4,10 +4,8 @@ namespace Statamic\Http\Controllers\CP\Forms;
 
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 use Statamic\Facades\Config;
-use Statamic\Forms\Presenters\UploadedFilePresenter;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Resources\CP\Submissions\Submissions;
-use Statamic\Support\Html;
 use Statamic\Support\Str;
 
 class FormSubmissionsController extends CpController
@@ -20,10 +18,7 @@ class FormSubmissionsController extends CpController
             return ['data' => [], 'meta' => ['columns' => []]];
         }
 
-        // Get sanitized submissions.
-        $submissions = $form->submissions()->each(function ($submission) {
-            $this->sanitizeSubmission($submission);
-        })->values();
+        $submissions = $form->submissions()->values();
 
         // Search submissions.
         if ($search = $this->request->search) {
@@ -46,38 +41,6 @@ class FormSubmissionsController extends CpController
         return (new Submissions($paginator))
             ->blueprint($form->blueprint())
             ->columnPreferenceKey("forms.{$form->handle()}.columns");
-    }
-
-    private function sanitizeSubmission($submission)
-    {
-        collect($submission->data())->each(function ($value, $field) use ($submission) {
-            $sanitized = ($submission->form()->isUploadableField($field))
-                ? UploadedFilePresenter::render($submission, $field)
-                : $this->sanitizeField($value, $submission);
-
-            $submission->set($field, $sanitized);
-        });
-    }
-
-    private function sanitizeField($value, $submission)
-    {
-        if (is_null($value)) {
-            return null;
-        }
-
-        $is_arr = is_array($value);
-
-        $values = (array) $value;
-
-        foreach ($values as &$value) {
-            if (is_array($value)) {
-                $value = json_encode($value);
-            } else {
-                $value = Html::sanitize($value);
-            }
-        }
-
-        return ($is_arr) ? $values : $values[0];
     }
 
     private function searchSubmissions($submissions)
@@ -122,8 +85,16 @@ class FormSubmissionsController extends CpController
 
         $this->authorize('view', $submission);
 
-        $this->sanitizeSubmission($submission);
+        $blueprint = $submission->blueprint();
+        $fields = $blueprint->fields()->addValues($submission->data())->preProcess();
 
-        return view('statamic::forms.submission', compact('form', 'submission'));
+        return view('statamic::forms.submission', [
+            'form' => $form,
+            'submission' => $submission,
+            'blueprint' => $blueprint->toPublishArray(),
+            'values' => $fields->values(),
+            'meta' => $fields->meta(),
+            'title' => $submission->date()->format('M j, Y @ H:i'),
+        ]);
     }
 }
