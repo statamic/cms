@@ -9,6 +9,9 @@
 - Widespread accessibility improvements through `aria` attributes and matching form labels+IDs
 - The Array fieldtype is now full width by default. It makes it look better more of the time. [#2315](https://github.com/statamic/cms/issues/2315)
 
+### What's fixed
+- The link tag now properly prefixes URLs with the current site base url. [#2317](https://github.com/statamic/cms/issues/2317)
+
 ## v3.0.2 (2020-08-27)
 
 ### What's new
