@@ -4,6 +4,7 @@ namespace Statamic\Tags;
 
 use Statamic\Facades;
 use Statamic\Facades\Site;
+use Statamic\Facades\URL;
 
 class Path extends Tags
 {
@@ -23,7 +24,7 @@ class Path extends Tags
 
         $url = $this->params->bool('absolute', false)
             ? $site->absoluteUrl().'/'.$src
-            : $site->relativePath().'/'.$site->relativePath($src);
+            : URL::makeRelative($site->url()).'/'.$src;
 
         return Facades\Path::tidy($url);
     }
