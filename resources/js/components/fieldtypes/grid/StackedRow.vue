@@ -6,10 +6,10 @@
     >
         <div
             class="grid-item-header"
-            :class="{ [sortableHandleClass]: grid.isReorderable, 'hidden': ! grid.isReorderable }"
+            :class="{ [sortableHandleClass]: grid.isReorderable }"
         >
             {{ index }}
-            <span v-if="canDelete" class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" />
+            <button v-if="canDelete" class="icon icon-cross cursor-pointer" @click="$emit('removed', index)" :aria-label="__('Delete Row')" />
         </div>
         <publish-fields-container>
             <publish-field
