@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## v3.0.3 (2020-09-02)
 
 ### What's new
 - Bard now has an option to always show the "Add Set" button.
