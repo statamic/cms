@@ -23,7 +23,11 @@ export default {
 
         this.$store.commit('statamic/fieldtypes', 'loading');
 
-        this.$axios.get(cp_url('fields/fieldtypes?selectable=true')).then(response => this.$store.commit('statamic/fieldtypes', response.data));
+        let url = cp_url('fields/fieldtypes?selectable=true');
+
+        if (this.$config.get('isFormBlueprint')) url += '&forms=true';
+
+        this.$axios.get(url).then(response => this.$store.commit('statamic/fieldtypes', response.data));
     }
 
 }

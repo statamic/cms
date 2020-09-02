@@ -51,7 +51,8 @@ export default {
         action: String,
         initialBlueprint: Object,
         showTitle: Boolean,
-        useSections: { type: Boolean, default: true }
+        useSections: { type: Boolean, default: true },
+        isFormBlueprint: { type: Boolean, default: false },
     },
 
     data() {
@@ -67,6 +68,10 @@ export default {
             e.preventDefault();
             this.save();
         });
+
+        if (this.isFormBlueprint) {
+            Statamic.$config.set('isFormBlueprint', true);
+        }
     },
 
     watch: {
