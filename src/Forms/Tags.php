@@ -54,6 +54,7 @@ class Tags extends BaseTags
     public function create()
     {
         $formHandle = $this->getForm();
+        $form = Form::find($formHandle);
         $sessionHandle = "form.{$formHandle}";
 
         $data = $this->getFormSession($sessionHandle);
@@ -61,7 +62,11 @@ class Tags extends BaseTags
 
         $this->addToDebugBar($data, $formHandle);
 
-        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect']);
+        if (! $this->params->has('files')) {
+            $this->params->put('files', $form->hasFiles());
+        }
+
+        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect', 'files']);
 
         $html = $this->formOpen(route('statamic.forms.submit', $formHandle), 'POST', $knownParams);
 

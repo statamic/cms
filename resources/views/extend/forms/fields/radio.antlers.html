@@ -1,6 +1,6 @@
 {{ foreach:options as="value|label" }}
     <label>
-        <input type="checkbox" name="{{ handle }}[]" value="{{ value }}" {{ if (old | in_array:value) }}checked{{ /if }}>
+        <input type="radio" name="{{ handle }}" value="{{ value }}" {{ old === value ?= "checked" }}>
         {{ label }}
     </label>
     {{ unless inline }}

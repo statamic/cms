@@ -18,8 +18,6 @@ class Textarea extends Fieldtype
         ];
     }
 
-    protected $view = 'statamic::forms.fields.textarea';
-
     public function filter()
     {
         return new TextareaFilter($this);

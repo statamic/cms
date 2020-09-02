@@ -742,6 +742,10 @@ class CoreModifiers extends Modifier
      */
     public function inArray($haystack, $params, $context)
     {
+        if (! is_array($haystack)) {
+            return false;
+        }
+
         $needle = Arr::get($context, $params[0], $params);
 
         if (is_array($needle) && count($needle) === 1) {
@@ -805,6 +809,17 @@ class CoreModifiers extends Modifier
     public function isAlphanumeric($value)
     {
         return Stringy::isAlphanumeric($value);
+    }
+
+    /**
+     * Returns true if the value is an array.
+     *
+     * @param $value
+     * @return bool
+     */
+    public function isArray($value)
+    {
+        return is_array($value);
     }
 
     /**
@@ -890,6 +905,17 @@ class CoreModifiers extends Modifier
     public function isFuture($value)
     {
         return $this->carbon($value)->isFuture();
+    }
+
+    /**
+     * Returns true if the value is iterable.
+     *
+     * @param $value
+     * @return bool
+     */
+    public function isIterable($value)
+    {
+        return is_iterable($value);
     }
 
     /**

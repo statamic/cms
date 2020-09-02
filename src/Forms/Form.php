@@ -300,22 +300,6 @@ class Form implements FormContract
     }
 
     /**
-     * Is a field an uploadable type?
-     *
-     * @param string $field
-     * @return mixed
-     */
-    public function isUploadableField($field)
-    {
-        // TODO: Reimplement isUploadableField()
-        return false;
-
-        // $field = collect($this->fields())->get($field);
-
-        // return in_array(array_get($field, 'type'), ['file', 'files', 'asset', 'assets']);
-    }
-
-    /**
      * Get the date format.
      *
      * @return string
@@ -342,5 +326,12 @@ class Form implements FormContract
             'store' => $this->store(),
             'email' => $this->email,
         ];
+    }
+
+    public function hasFiles()
+    {
+        return $this->fields()->filter(function ($field) {
+            return $field->fieldtype()->handle() === 'assets';
+        })->isNotEmpty();
     }
 }
