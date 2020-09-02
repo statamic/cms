@@ -94,15 +94,12 @@ class Blueprint implements Augmentable
 
     public function setContents(array $contents)
     {
-        if ($fields = array_pull($contents, 'fields')) {
-            $contents['sections'] = [
-                'main' => ['fields' => $fields],
-            ];
-        }
-
         $this->contents = $contents;
 
-        return $this->resetFieldsCache();
+        return $this
+            ->normalizeSections()
+            ->normalizeFields()
+            ->resetFieldsCache();
     }
 
     public function contents(): array
@@ -433,5 +430,56 @@ class Blueprint implements Augmentable
     public function shallowAugmentedArrayKeys()
     {
         return ['handle', 'title'];
+    }
+
+    protected function normalizeSections()
+    {
+        if ($fields = Arr::pull($this->contents, 'fields')) {
+            $this->contents['sections'] = [
+                'main' => ['fields' => $fields],
+            ];
+        }
+
+        return $this;
+    }
+
+    protected function normalizeFields()
+    {
+        foreach (Arr::get($this->contents, 'sections', []) as $sectionHandle => $section) {
+            foreach (Arr::get($section, 'fields', []) as $fieldKey => $field) {
+                $this->contents['sections'][$sectionHandle]['fields'][$fieldKey] = $this->normalizeField($field);
+            }
+        }
+
+        return $this;
+    }
+
+    protected function normalizeField($field)
+    {
+        if (Arr::get($field, 'field.required') === true) {
+            $field = $this->normalizeFieldRequiredValidation($field);
+        }
+
+        return $field;
+    }
+
+    protected function normalizeFieldRequiredValidation($field)
+    {
+        $validate = Arr::get($field, 'field.validate', []);
+
+        if (is_string($validate)) {
+            $validate = explode('|', $validate);
+        }
+
+        $validate = collect($validate);
+
+        if (! $validate->contains('required')) {
+            $validate->prepend('required');
+        }
+
+        Arr::forget($field, 'field.required');
+        Arr::set($field, 'field.validate', $validate->all());
+
+        return $field;
     }
 }
