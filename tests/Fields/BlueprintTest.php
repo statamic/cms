@@ -130,66 +130,6 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
-    public function it_normalizes_required_validation_on_fields()
-    {
-        $blueprint = new Blueprint;
-
-        $blueprint->setContents([
-            'fields' => [
-                [
-                    'handle' => 'one',
-                    'field' => ['type' => 'text', 'required' => true],
-                ],
-                [
-                    'handle' => 'two',
-                    'field' => ['type' => 'text', 'required' => true, 'validate' => 'email'],
-                ],
-                [
-                    'handle' => 'three',
-                    'field' => ['type' => 'text', 'required' => true, 'validate' => ['email']],
-                ],
-                [
-                    'handle' => 'four',
-                    'field' => ['type' => 'text', 'required' => true, 'validate' => 'min:3|required'],
-                ],
-                [
-                    'handle' => 'five',
-                    'field' => ['type' => 'text', 'required' => true, 'validate' => ['min:3', 'required']],
-                ],
-            ],
-        ]);
-
-        $this->assertEquals([
-            'sections' => [
-                'main' => [
-                    'fields' => [
-                        [
-                            'handle' => 'one',
-                            'field' => ['type' => 'text', 'validate' => ['required']],
-                        ],
-                        [
-                            'handle' => 'two',
-                            'field' => ['type' => 'text', 'validate' => ['required', 'email']],
-                        ],
-                        [
-                            'handle' => 'three',
-                            'field' => ['type' => 'text', 'validate' => ['required', 'email']],
-                        ],
-                        [
-                            'handle' => 'four',
-                            'field' => ['type' => 'text', 'validate' => ['min:3', 'required']],
-                        ],
-                        [
-                            'handle' => 'five',
-                            'field' => ['type' => 'text', 'validate' => ['min:3', 'required']],
-                        ],
-                    ],
-                ],
-            ],
-        ], $blueprint->contents());
-    }
-
-    /** @test */
     public function it_can_check_if_has_field()
     {
         FieldsetRepository::shouldReceive('find')

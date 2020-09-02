@@ -98,7 +98,6 @@ class Blueprint implements Augmentable
 
         return $this
             ->normalizeSections()
-            ->normalizeFields()
             ->resetFieldsCache();
     }
 
@@ -441,45 +440,5 @@ class Blueprint implements Augmentable
         }
 
         return $this;
-    }
-
-    protected function normalizeFields()
-    {
-        foreach (Arr::get($this->contents, 'sections', []) as $sectionHandle => $section) {
-            foreach (Arr::get($section, 'fields', []) as $fieldKey => $field) {
-                $this->contents['sections'][$sectionHandle]['fields'][$fieldKey] = $this->normalizeField($field);
-            }
-        }
-
-        return $this;
-    }
-
-    protected function normalizeField($field)
-    {
-        if (Arr::get($field, 'field.required') === true) {
-            $field = $this->normalizeFieldRequiredValidation($field);
-        }
-
-        return $field;
-    }
-
-    protected function normalizeFieldRequiredValidation($field)
-    {
-        $validate = Arr::get($field, 'field.validate', []);
-
-        if (is_string($validate)) {
-            $validate = explode('|', $validate);
-        }
-
-        $validate = collect($validate);
-
-        if (! $validate->contains('required')) {
-            $validate->prepend('required');
-        }
-
-        Arr::forget($field, 'field.required');
-        Arr::set($field, 'field.validate', $validate->all());
-
-        return $field;
     }
 }
