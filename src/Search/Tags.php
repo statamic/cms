@@ -3,6 +3,7 @@
 namespace Statamic\Search;
 
 use Statamic\Facades\Search;
+use Statamic\Facades\Site;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
@@ -26,6 +27,7 @@ class Tags extends BaseTags
             ->limit($this->params->get('limit'))
             ->offset($this->params->get('offset'));
 
+        $this->querySite($builder);
         $this->queryStatus($builder);
         $this->queryConditions($builder);
 
@@ -60,5 +62,16 @@ class Tags extends BaseTags
         }
 
         return $query->where('status', 'published');
+    }
+
+    protected function querySite($query)
+    {
+        $site = $this->params->get(['site', 'locale'], Site::current()->handle());
+
+        if ($site === '*' || ! Site::hasMultiple()) {
+            return;
+        }
+
+        return $query->where('site', $site);
     }
 }
