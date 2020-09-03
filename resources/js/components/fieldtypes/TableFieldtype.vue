@@ -74,6 +74,7 @@
 
 <script>
 import { SortableList, SortableItem, SortableHelpers } from '../sortable/Sortable';
+import SortableKeyValue from '../sortable/SortableKeyValue';
 
 export default {
 
@@ -197,6 +198,13 @@ export default {
         deleteCancelled() {
             this.deletingRow = false;
             this.deletingColumn = false;
+        },
+
+        arrayToSortable(arr) {
+            return _.map(arr, value => {
+                return this.data.find(v => JSON.stringify(v.value) == JSON.stringify(value))
+                    || new SortableKeyValue(null, value);
+            });
         }
     }
 
