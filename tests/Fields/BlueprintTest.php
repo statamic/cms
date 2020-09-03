@@ -107,13 +107,23 @@ class BlueprintTest extends TestCase
         $this->assertEquals(['sections' => ['main' => ['fields' => []]]], $blueprint->contents());
 
         $blueprint->setContents([
-            'fields' => ['one' => ['type' => 'text']],
+            'fields' => [
+                [
+                    'handle' => 'one',
+                    'field' => ['type' => 'text'],
+                ],
+            ],
         ]);
 
         $this->assertEquals([
             'sections' => [
                 'main' => [
-                    'fields' => ['one' => ['type' => 'text']],
+                    'fields' => [
+                        [
+                            'handle' => 'one',
+                            'field' => ['type' => 'text'],
+                        ],
+                    ],
                 ],
             ],
         ], $blueprint->contents());

@@ -202,7 +202,7 @@ export default [
         example: 'not_in:foo,bar,...'
     },
     {
-        label: 'Not Regex',
+        label: 'Not Regular Expression',
         value: 'not_regex:',
         example: 'not_regex:pattern'
     },
