@@ -131,9 +131,7 @@ export default {
                 .filter(rule => rule.minVersion ? SemVer.gte(this.laravelVersion, rule.minVersion) : true)
                 .filter(rule => rule.maxVersion ? SemVer.lte(this.laravelVersion, rule.maxVersion) : true)
                 .map(rule => {
-                    rule.display = clone(rule.label); // Set label to separate `display` property for rendering.
-                    rule.label = rule.label + ' ' + rule.value; // Concatenate so that both `label` and `value` are searchable.
-                    return rule;
+                    return this.prepareRenderableRule(rule);
                 })
                 .value();
         },
@@ -191,6 +189,16 @@ export default {
                 : rules;
         },
 
+        prepareRenderableRule(rule) {
+            rule.display = clone(rule.label); // Set label to separate `display` property for rendering.
+
+            this.$nextTick(() => {
+                rule.label = `${rule.label} ${rule.value}`; // Concatenate so that both `label` and `value` are searchable.
+            });
+
+            return rule;
+        },
+
         ensureRequired() {
             if (! this.rules.includes('required')) {
                 this.rules.unshift('required');
@@ -206,7 +214,7 @@ export default {
         },
 
         add(rule) {
-            if (this.hasParameters(rule)) {
+            if (this.hasUnfinishedParameters(rule)) {
                 this.resetState();
                 this.selectedLaravelRule = rule;
                 this.customRule = rule;
@@ -218,12 +226,11 @@ export default {
 
         ifSearchNotFoundAddCustom() {
             let rulesSelect = this.$refs.rulesSelect;
+            let rule = rulesSelect.search;
 
-            if (rulesSelect.search.length === 0 || rulesSelect.filteredOptions.length > 0) {
-                return;
-            }
+            if (this.searchNotFound(rulesSelect) || this.hasUnfinishedParameters(rule)) return;
 
-            this.add(this.$refs.rulesSelect.search);
+            this.add(rule);
 
             this.$nextTick(() => this.$refs.searchInput.blur());
         },
@@ -232,8 +239,12 @@ export default {
             this.rules = this.rules.filter(value => value !== rule);
         },
 
-        hasParameters(rule) {
+        hasUnfinishedParameters(rule) {
             return rule.substr(rule.length - 1) === ':';
+        },
+
+        searchNotFound(rulesSelect) {
+            return rulesSelect.search.length === 0 || rulesSelect.filteredOptions.length > 0;
         },
 
         updated(rules) {
