@@ -26,6 +26,7 @@ class Tags extends BaseTags
             ->limit($this->params->get('limit'))
             ->offset($this->params->get('offset'));
 
+        $this->queryStatus($builder);
         $this->queryConditions($builder);
 
         $results = $this->addResultTypes($builder->get());
@@ -50,5 +51,14 @@ class Tags extends BaseTags
 
             return $result;
         });
+    }
+
+    protected function queryStatus($query)
+    {
+        if ($this->isQueryingCondition('status') || $this->isQueryingCondition('published')) {
+            return;
+        }
+
+        return $query->where('status', 'published');
     }
 }
