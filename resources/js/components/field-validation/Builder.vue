@@ -25,7 +25,7 @@
 
             <v-select
                 v-if="!customRule"
-                ref="rulesInput"
+                ref="rulesSelect"
                 name="rules"
                 :options="predefinedRules"
                 :reduce="rule => rule.value"
@@ -36,8 +36,20 @@
                 class="w-full"
                 @input="add"
             >
+                <template #search="{ attributes, events }">
+                    <input
+                        ref="searchInput"
+                        v-bind="attributes"
+                        v-on="events"
+                        class="vs__search"
+                        @keydown.enter="ifSearchNotFoundAddCustom"
+                    />
+                </template>
                 <template #option="{ value, display }">
                     {{ display }} <code class="ml-1">{{ value.replace(':', '') }}</code>
+                </template>
+                <template #no-options="{ search }">
+                    <div class="vs__dropdown-option text-left">{{ __('Add') }} <code class="ml-1">{{ search }}</code></div>
                 </template>
             </v-select>
 
@@ -128,7 +140,7 @@ export default {
         },
 
         helpBlock() {
-            if (! this.predefinedRule) {
+            if (! this.customRule || ! this.predefinedRule) {
                 return false;
             }
 
@@ -204,6 +216,18 @@ export default {
             } else {
                 this.ensure(rule);
             }
+        },
+
+        ifSearchNotFoundAddCustom() {
+            let rulesSelect = this.$refs.rulesSelect;
+
+            if (rulesSelect.search.length === 0 || rulesSelect.filteredOptions.length > 0) {
+                return;
+            }
+
+            this.add(this.$refs.rulesSelect.search);
+
+            this.$nextTick(() => this.$refs.searchInput.blur());
         },
 
         remove(rule) {
