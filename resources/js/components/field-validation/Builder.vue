@@ -27,12 +27,12 @@
                 v-if="!customRule"
                 ref="rulesSelect"
                 name="rules"
-                :options="predefinedRules"
+                :options="laravelRules"
                 :reduce="rule => rule.value"
                 :placeholder="__('Add Rule')"
                 :multiple="false"
                 :searchable="true"
-                :value="selection"
+                :value="selectedLaravelRule"
                 class="w-full"
                 @input="add"
             >
@@ -105,8 +105,7 @@ export default {
         return {
             isRequired: false,
             rules: [],
-            selection: null,
-            predefinedRule: null,
+            selectedLaravelRule: null,
             customRule: null,
         }
     },
@@ -127,7 +126,7 @@ export default {
             return `https://laravel.com/docs/${version}/validation#available-validation-rules`;
         },
 
-        predefinedRules() {
+        laravelRules() {
             return _.chain(RULES)
                 .filter(rule => rule.minVersion ? SemVer.gte(this.laravelVersion, rule.minVersion) : true)
                 .filter(rule => rule.maxVersion ? SemVer.lte(this.laravelVersion, rule.maxVersion) : true)
@@ -140,12 +139,12 @@ export default {
         },
 
         helpBlock() {
-            if (! this.customRule || ! this.predefinedRule) {
+            if (! this.selectedLaravelRule) {
                 return false;
             }
 
             let rule = _.chain(RULES)
-                .filter(rule => rule.value === this.predefinedRule)
+                .filter(rule => rule.value === this.selectedLaravelRule)
                 .first()
                 .value();
 
@@ -181,8 +180,7 @@ export default {
         },
 
         resetState() {
-            this.selection = null;
-            this.predefinedRule = null;
+            this.selectedLaravelRule = null;
             this.customRule = null;
             this.isRequired = this.rules.includes('required');
         },
@@ -208,9 +206,9 @@ export default {
         },
 
         add(rule) {
-            if (this.hasParameters(rule) === ':') {
+            if (this.hasParameters(rule)) {
                 this.resetState();
-                this.predefinedRule = rule;
+                this.selectedLaravelRule = rule;
                 this.customRule = rule;
                 this.$nextTick(() => this.$refs.customRuleInput.$refs.input.focus());
             } else {
@@ -235,7 +233,7 @@ export default {
         },
 
         hasParameters(rule) {
-            return rule.substr(rule.length - 1);
+            return rule.substr(rule.length - 1) === ':';
         },
 
         updated(rules) {
