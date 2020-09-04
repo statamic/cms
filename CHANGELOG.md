@@ -1,5 +1,12 @@
 # Release Notes
 
+## v3.0.5 (2020-09-04)
+
+### What's fixed
+- Fix an issue introduced in 3.0.4 where using a Collection would cause an error.
+
+
+
 ## v3.0.4 (2020-09-04)
 
 ### What's new
