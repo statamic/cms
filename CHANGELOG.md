@@ -1,5 +1,21 @@
 # Release Notes
 
+## v3.0.4 (2020-09-04)
+
+### What's new
+- Revamped the validation builder you see when editing a field in a Blueprint or Fieldset.
+- The `trans` tag accepts a `locale` parameter if you want to be explicit, just like the `trans()` helper.
+
+### What's fixed
+- The table fieldtype is usable inside Replicator. [#1447](https://github.com/statamic/cms/issues/1447)
+- The search results tag will now filter results by the current site by default. [#2343](https://github.com/statamic/cms/issues/2343)
+- It'll also filter by published results by default. [#2268](https://github.com/statamic/cms/issues/2268)
+- Tag pairs using the `scope` modifier have access to cascading variables. [#1550](https://github.com/statamic/cms/issues/1550)
+- Using the `where` modifier no longer removes access to cascading variables. [#2224](https://github.com/statamic/cms/issues/2224)
+- Fix error when using the `scope` modifier on a Grid fieldtype. [#2250](https://github.com/statamic/cms/issues/2250)
+
+
+
 ## v3.0.3 (2020-09-02)
 
 ### What's new
