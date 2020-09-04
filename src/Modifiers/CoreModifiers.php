@@ -2185,7 +2185,7 @@ class CoreModifiers extends Modifier
 
         $collection = collect($value)->where($key, $val);
 
-        return $collection->all();
+        return $collection->values()->all();
     }
 
     /**
