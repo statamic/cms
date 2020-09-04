@@ -595,6 +595,10 @@ class Parser
                     }
 
                     if (! empty($values)) {
+                        if ($values instanceof Collection) {
+                            $values = $values->all();
+                        }
+
                         if (Arr::isAssoc($values)) {
                             $replacement = $this->parse($content, array_merge($data, $values));
                         } else {

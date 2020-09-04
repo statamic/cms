@@ -521,6 +521,15 @@ EOT;
         $this->assertEquals('one', $this->parse($template, $this->variables));
     }
 
+    public function testArrayModifiersOnCollectionsGetParsed()
+    {
+        $template = '{{ simple limit="1" }}{{ value }}{{ /simple }}';
+
+        $this->assertEquals('one', $this->parse($template, [
+            'simple' => collect(['one', 'two', 'three']),
+        ]));
+    }
+
     public function testRecursiveChildren()
     {
         // the variables are inside RecursiveChildren@index
