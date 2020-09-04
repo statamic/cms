@@ -595,9 +595,15 @@ class Parser
                     }
 
                     if (! empty($values)) {
-                        // parse the tag found with the value(s) related to it
-                        $tmpname = md5($name);
-                        $replacement = $this->parseVariables("{{ $tmpname }}$content{{ /$tmpname }}", [$tmpname => $values]);
+                        if (Arr::isAssoc($values)) {
+                            $replacement = $this->parse($content, array_merge($data, $values));
+                        } else {
+                            $values = $this->addLoopIterationVariables($values);
+                            $replacement = collect($values)
+                                ->map(function ($value) use ($content, $data) {
+                                    return (string) $this->parse($content, array_merge($data, $value));
+                                })->join('');
+                        }
                     }
                 } else {
                     // nope, this must be a callback
