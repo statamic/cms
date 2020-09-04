@@ -15,6 +15,6 @@ class RoleSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Role saved');
+        return __('Role saved', [], config('statamic.git.locale'));
     }
 }

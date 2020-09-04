@@ -15,6 +15,6 @@ class EntrySaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Entry saved');
+        return __('Entry saved', [], config('statamic.git.locale'));
     }
 }

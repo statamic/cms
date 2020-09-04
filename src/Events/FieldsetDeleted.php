@@ -15,6 +15,6 @@ class FieldsetDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Fieldset deleted');
+        return __('Fieldset deleted', [], config('statamic.git.locale'));
     }
 }

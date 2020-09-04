@@ -15,6 +15,6 @@ class RoleDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Role deleted');
+        return __('Role deleted', [], config('statamic.git.locale'));
     }
 }

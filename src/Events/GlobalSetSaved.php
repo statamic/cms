@@ -15,6 +15,6 @@ class GlobalSetSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Global Set saved');
+        return __('Global Set saved', [], config('statamic.git.locale'));
     }
 }

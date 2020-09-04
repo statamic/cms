@@ -15,6 +15,6 @@ class EntryDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Entry deleted');
+        return __('Entry deleted', [], config('statamic.git.locale'));
     }
 }

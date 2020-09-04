@@ -15,6 +15,6 @@ class AssetUploaded extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Asset uploaded');
+        return __('Asset uploaded', [], config('statamic.git.locale'));
     }
 }

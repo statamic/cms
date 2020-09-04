@@ -15,6 +15,6 @@ class SubmissionDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Submission deleted');
+        return __('Submission deleted', [], config('statamic.git.locale'));
     }
 }

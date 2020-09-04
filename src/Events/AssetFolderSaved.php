@@ -15,6 +15,6 @@ class AssetFolderSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Asset folder saved');
+        return __('Asset folder saved', [], config('statamic.git.locale'));
     }
 }

@@ -15,6 +15,6 @@ class CollectionDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Collection deleted');
+        return __('Collection deleted', [], config('statamic.git.locale'));
     }
 }

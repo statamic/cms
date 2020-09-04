@@ -15,6 +15,6 @@ class UserGroupDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('User group deleted');
+        return __('User group deleted', [], config('statamic.git.locale'));
     }
 }

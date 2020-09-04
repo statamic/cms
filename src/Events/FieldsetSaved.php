@@ -15,6 +15,6 @@ class FieldsetSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Fieldset saved');
+        return __('Fieldset saved', [], config('statamic.git.locale'));
     }
 }

@@ -15,6 +15,6 @@ class GlobalSetDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Global Set deleted');
+        return __('Global Set deleted', [], config('statamic.git.locale'));
     }
 }

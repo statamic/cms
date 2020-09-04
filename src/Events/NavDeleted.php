@@ -15,6 +15,6 @@ class NavDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Navigation deleted');
+        return __('Navigation deleted', [], config('statamic.git.locale'));
     }
 }

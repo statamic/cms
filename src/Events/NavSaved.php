@@ -15,6 +15,6 @@ class NavSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Navigation saved');
+        return __('Navigation saved', [], config('statamic.git.locale'));
     }
 }

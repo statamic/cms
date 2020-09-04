@@ -15,6 +15,6 @@ class BlueprintDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Blueprint deleted');
+        return __('Blueprint deleted', [], config('statamic.git.locale'));
     }
 }

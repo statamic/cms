@@ -15,6 +15,6 @@ class TaxonomySaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Taxonomy saved');
+        return __('Taxonomy saved', [], config('statamic.git.locale'));
     }
 }

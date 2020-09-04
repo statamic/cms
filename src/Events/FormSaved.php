@@ -15,6 +15,6 @@ class FormSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Form saved');
+        return __('Form saved', [], config('statamic.git.locale'));
     }
 }

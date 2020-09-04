@@ -15,6 +15,6 @@ class AssetContainerDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Asset container deleted');
+        return __('Asset container deleted', [], config('statamic.git.locale'));
     }
 }

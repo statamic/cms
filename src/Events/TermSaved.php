@@ -15,6 +15,6 @@ class TermSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Term saved');
+        return __('Term saved', [], config('statamic.git.locale'));
     }
 }

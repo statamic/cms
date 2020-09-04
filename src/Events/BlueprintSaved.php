@@ -15,6 +15,6 @@ class BlueprintSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Blueprint saved');
+        return __('Blueprint saved', [], config('statamic.git.locale'));
     }
 }

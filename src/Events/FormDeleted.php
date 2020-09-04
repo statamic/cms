@@ -15,6 +15,6 @@ class FormDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Form deleted');
+        return __('Form deleted', [], config('statamic.git.locale'));
     }
 }

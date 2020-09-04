@@ -15,6 +15,6 @@ class SubmissionSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Submission saved');
+        return __('Submission saved', [], config('statamic.git.locale'));
     }
 }

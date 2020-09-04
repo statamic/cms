@@ -15,6 +15,6 @@ class TermDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Term deleted');
+        return __('Term deleted', [], config('statamic.git.locale'));
     }
 }

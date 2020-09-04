@@ -15,6 +15,6 @@ class CollectionSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Collection saved');
+        return __('Collection saved', [], config('statamic.git.locale'));
     }
 }

@@ -15,6 +15,6 @@ class AssetFolderDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Asset folder deleted');
+        return __('Asset folder deleted', [], config('statamic.git.locale'));
     }
 }

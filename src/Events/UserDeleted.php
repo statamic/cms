@@ -15,6 +15,6 @@ class UserDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('User deleted');
+        return __('User deleted', [], config('statamic.git.locale'));
     }
 }

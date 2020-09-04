@@ -15,6 +15,6 @@ class UserSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('User saved');
+        return __('User saved', [], config('statamic.git.locale'));
     }
 }

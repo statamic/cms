@@ -15,6 +15,6 @@ class UserGroupSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('User group saved');
+        return __('User group saved', [], config('statamic.git.locale'));
     }
 }

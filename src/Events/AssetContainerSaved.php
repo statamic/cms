@@ -15,6 +15,6 @@ class AssetContainerSaved extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Asset container saved');
+        return __('Asset container saved', [], config('statamic.git.locale'));
     }
 }

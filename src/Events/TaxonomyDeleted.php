@@ -15,6 +15,6 @@ class TaxonomyDeleted extends Event implements ProvidesCommitMessage
 
     public function commitMessage()
     {
-        return __('Taxonomy deleted');
+        return __('Taxonomy deleted', [], config('statamic.git.locale'));
     }
 }
