@@ -1421,14 +1421,14 @@ EOT;
         $template = <<<'EOT'
 {{ food }} {{ drink }}
 {{ array scope="s" }}
--{{ s:food }}- {{ s:drink }}
+-{{ s:food }}- {{ s:drink }} {{ food }} {{ drink }}
 {{ /array }}
 EOT;
 
         $expected = <<<'EOT'
 burger whisky
--- juice
--- smoothie
+-- juice burger juice
+-- smoothie burger smoothie
 
 EOT;
         $this->assertEquals($expected, $this->parse($template, $context));
