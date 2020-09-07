@@ -7,6 +7,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
+use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Imaging\ImageGenerator;
 use Statamic\Support\Str;
@@ -156,7 +157,7 @@ class Glide extends Tags
     private function generateGlideUrl($item)
     {
         try {
-            $url = $this->getManipulator($item)->build();
+            $url = $this->isResizable($item) ? $this->getManipulator($item)->build() : $this->normalizeItem($item);
         } catch (\Exception $e) {
             \Log::error($e->getMessage());
 
@@ -264,5 +265,37 @@ class Glide extends Tags
     private function getServer()
     {
         return app(Server::class);
+    }
+
+    /**
+     * Checks if a file at a given path is resizable.
+     *
+     * @param string $item
+     * @return bool
+     */
+    private function isResizable($item)
+    {
+        return in_array(strtolower(Path::extension($item)), $this->allowedFileFormats());
+    }
+
+    /**
+     * The list of allowed file formats based on the configured driver.
+     *
+     * @see http://image.intervention.io/getting_started/formats
+     *
+     * @throws \Exception
+     * @return array
+     */
+    private function allowedFileFormats()
+    {
+        $driver = config('statamic.assets.image_manipulation.driver');
+
+        if ($driver == 'gd') {
+            return ['jpeg', 'jpg', 'png', 'gif', 'webp'];
+        } elseif ($driver == 'imagick') {
+            return ['jpeg', 'jpg', 'png', 'gif', 'tif', 'bmp', 'psd', 'webp'];
+        }
+
+        throw new \Exception("Unsupported image manipulation driver [$driver]");
     }
 }
