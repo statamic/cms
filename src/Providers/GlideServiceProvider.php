@@ -8,7 +8,6 @@ use League\Glide\Server;
 use Statamic\Contracts\Imaging\ImageManipulator;
 use Statamic\Contracts\Imaging\UrlBuilder;
 use Statamic\Facades\Config;
-use Statamic\Facades\URL;
 use Statamic\Imaging\GlideImageManipulator;
 use Statamic\Imaging\GlideUrlBuilder;
 use Statamic\Imaging\ImageGenerator;
