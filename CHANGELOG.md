@@ -1,5 +1,18 @@
 # Release Notes
 
+## v3.0.6 (2020-09-07)
+
+### What's new
+- Improved multisite Glide support. [#2379](https://github.com/statamic/cms/issues/2379)
+- Added a GlideImageGenerated event. [#2160](https://github.com/statamic/cms/issues/2160)
+- The Glide tag will return the item's original URL if it's not resizable (like an svg). [#2122](https://github.com/statamic/cms/issues/2122)
+
+### What's fixed
+- Fixed more of that issue from 3.0.4. [#2369](https://github.com/statamic/cms/issues/2369)
+- Adjust the margin in the section fieldtype. [#2154](https://github.com/statamic/cms/issues/2154)
+- Fix an issue where using a modifier on an array of augmentables (e.g. entries or assets), nothing would be output.
+
+
 ## v3.0.5 (2020-09-04)
 
 ### What's fixed
