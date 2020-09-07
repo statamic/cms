@@ -36,15 +36,27 @@
             @endif
             <tr>
                 <th class="pl-2 py-1 w-1/4">{{ __('Default From Address') }}</th>
-                <td><code>{{ config('mail.from.address') }}</code></td>
+                <td>
+                    @if (config('mail.from.address'))
+                        <code>{{ config('mail.from.address') }}</code>
+                    @endif
+                </td>
             </tr>
             <tr>
                 <th class="pl-2 py-1 w-1/4">{{ __('Default From Name') }}</th>
-                <td><code>{{ config('mail.from.name') }}</code></td>
+                <td>
+                    @if (config('mail.from.name'))
+                        <code>{{ config('mail.from.name') }}</code>
+                    @endif
+                </td>
             </tr>
             <tr>
                 <th class="pl-2 py-1 w-1/4">{{ __('Markdown theme') }}</th>
-                <td><code>{{ config('mail.markdown.theme') }}</code></td>
+                <td>
+                    @if (config('mail.markdown.theme'))
+                        <code>{{ config('mail.markdown.theme') }}</code>
+                    @endif
+                </td>
             </tr>
             <tr>
                 <th class="pl-2 py-1 w-1/4">{{ __('Markdown paths') }}</th>
