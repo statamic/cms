@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Contracts\Data\Localization;
 use Statamic\CP\Column;
 use Statamic\Exceptions\TermsFieldtypeBothOptionsUsedException;
 use Statamic\Exceptions\TermsFieldtypeTaxonomyOptionUsed;
@@ -88,7 +89,7 @@ class Terms extends Relationship
                     $term->collection($entry->collection());
                 }
 
-                $locale = $entry
+                $locale = $entry && $entry instanceof Localization
                     ? $entry->locale()
                     : Site::current()->handle();
 
