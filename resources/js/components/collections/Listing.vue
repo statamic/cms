@@ -8,7 +8,7 @@
                 <template slot="actions" slot-scope="{ row: collection, index }">
                     <dropdown-list>
                         <dropdown-item :text="__('Edit Collection')" :redirect="collection.edit_url" />
-                        <dropdown-item :text="__('Edit Blueprints')" :redirect="collection.blueprints_url" />
+                        <dropdown-item :text="__('Edit Blueprint')" :redirect="collection.blueprints_url" />
                         <dropdown-item :text="__('Scaffold Resources')" :redirect="collection.scaffold_url" />
                         <dropdown-item
                             v-if="collection.deleteable"
