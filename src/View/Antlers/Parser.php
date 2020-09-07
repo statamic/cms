@@ -304,6 +304,10 @@ class Parser
         $total = count($loop);
 
         foreach ($loop as $key => &$value) {
+            if ($value instanceof Augmentable) {
+                $value = $value->toAugmentedArray();
+            }
+
             // If the value of the current iteration is *not* already an array (ie. we're
             // dealing with a super basic list like [one, two, three] then convert it
             // to one, where the value is stored in a key named "value".

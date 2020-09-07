@@ -1842,6 +1842,20 @@ EOT;
             }),
         ]));
     }
+
+    /** @test */
+    public function it_automatically_augments_augmentable_objects_when_looping_with_modifier()
+    {
+        $loop = [
+            new AugmentableObject(['one' => 'foo', 'two' => 'bar']),
+            new AugmentableObject(['one' => 'baz', 'two' => 'qux']),
+        ];
+
+        $this->assertEquals(
+            '<FOO!><bar>',
+            (string) Antlers::parse('{{ augmentables limit="1" }}<{{ one }}><{{ two }}>{{ /augmentables }}', ['augmentables' => $loop])
+        );
+    }
 }
 
 class NonArrayableObject
