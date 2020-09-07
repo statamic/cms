@@ -11,7 +11,7 @@ Route::name('statamic.')->group(function () {
      * Glide
      * On-the-fly URL-based image transforms.
      */
-    if (!config('statamic.assets.image_manipulation.cache')) {
+    if (! config('statamic.assets.image_manipulation.cache')) {
         Site::all()->map(function ($site) {
             return URL::makeRelative($site->url());
         })->unique()->each(function ($sitePrefix) {
