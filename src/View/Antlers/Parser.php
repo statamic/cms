@@ -595,6 +595,10 @@ class Parser
                     }
 
                     if (! empty($values)) {
+                        if ($values instanceof Value) {
+                            $values = $values->value();
+                        }
+
                         if ($values instanceof Collection) {
                             $values = $values->all();
                         }

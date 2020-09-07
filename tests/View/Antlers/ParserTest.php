@@ -1813,6 +1813,35 @@ EOT;
         $this->assertEquals('test', $this->parse('{{ elseifs }}', ['elseifs' => 'test']));
         $this->assertEquals('test', $this->parse('{{ elseunlessses }}', ['elseunlessses' => 'test']));
     }
+
+    /**
+     * @test
+     *
+     * Somehow when an empty replicator field is used it makes it into the callback array part
+     * of the parser with an empty Value object.
+     * See https://github.com/statamic/cms/issues/2369
+     **/
+    public function when_a_loop_is_a_value_object_with_an_empty_array_it_get_parsed_as_one()
+    {
+        $template = <<<'EOT'
+before
+{{ simple }}
+    {{ foo }}
+{{ /simple }}
+after
+EOT;
+
+        $expected = <<<'EOT'
+before
+
+after
+EOT;
+
+        $this->assertEquals($expected, $this->parse($template, [
+            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator {
+            }),
+        ]));
+    }
 }
 
 class NonArrayableObject
