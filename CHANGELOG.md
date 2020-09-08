@@ -1,5 +1,14 @@
 # Release Notes
 
+## 3.0.7 (2020-09-08)
+
+### What's fixed
+- Fix more instances of [#2369](https://github.com/statamic/cms/issues/2369)
+- The scope modifier supports collections, not just arrays.
+- Pagination in tags now re-keys the values. Fixes an issue where you might get no results when you aren't on the first page.
+
+
+
 ## v3.0.6 (2020-09-07)
 
 ### What's new
