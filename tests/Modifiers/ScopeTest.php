@@ -4,7 +4,6 @@ namespace Tests\Modifiers;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Collection;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Fields\Blueprint;
@@ -44,7 +43,7 @@ class ScopeTest extends TestCase
             'test' => [
                 'one' => 'foo',
                 'two' => 'bar',
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $this->modify($arr, 'test'));
@@ -64,7 +63,7 @@ class ScopeTest extends TestCase
             'test' => [
                 'one' => 'foo',
                 'two' => 'bar',
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $this->modify($arr, 'test'));
@@ -84,7 +83,7 @@ class ScopeTest extends TestCase
             'test' => [
                 'one' => ['foo' => 'bar'],
                 'two' => ['foo' => 'baz'],
-            ]
+            ],
         ];
 
         $this->assertEquals($expected, $this->modify($arr, 'test'));
@@ -95,7 +94,6 @@ class ScopeTest extends TestCase
         return Modify::value($arr)->scope($scope)->fetch();
     }
 }
-
 
 class NonArrayableObject
 {
