@@ -10,7 +10,11 @@
                 :options="options"
                 :clearable="false"
                 :reduce="(option) => option.value"
-            />
+            >
+                <template #option="{ label }">
+                  {{ __(label) }}
+                </template>
+            </v-select>
         </div>
         <div class="flex-1">
             <text-input
@@ -42,11 +46,7 @@ export default {
         return {
             enabled: this.value != null,
             option: 'url',
-            options: [
-                {label: 'URL', value: 'url'},
-                {label: 'First Child', value: 'first-child'},
-                {label: 'Entry', value: 'entry'}
-            ],
+            options: [],
             entriesValue: [],
         }
     },
@@ -78,6 +78,8 @@ export default {
     },
 
     created() {
+        this.options = this.initialOptions();
+
         if (this.value === '@child') {
             this.option = 'first-child';
         }
@@ -93,6 +95,18 @@ export default {
     },
 
     methods: {
+
+        initialOptions() {
+            let options = [
+                {label: __('URL'), value: 'url'},
+                {label: __('First Child'), value: 'first-child'},
+                {label: __('Entry'), value: 'entry'}
+            ];
+
+            return this.meta.showFirstChildOption
+                ? options
+                : _.reject(options, option => option.value === 'first-child');
+        },
 
         entriesSelected(entries) {
             this.entriesValue = entries;

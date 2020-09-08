@@ -12,7 +12,7 @@ use Stringy\StaticStringy;
 class Statamic
 {
     const CORE_SLUG = 'statamic';
-    const CORE_REPO = 'statamic/cms';
+    const PACKAGE = 'statamic/cms';
 
     protected static $scripts = [];
     protected static $externalScripts = [];
@@ -22,10 +22,16 @@ class Statamic
     protected static $actionRoutes = [];
     protected static $jsonVariables = [];
     protected static $bootedCallbacks = [];
+    protected static $afterInstalledCallbacks = [];
 
     public static function version()
     {
         return \Facades\Statamic\Version::get();
+    }
+
+    public static function pro()
+    {
+        return config('statamic.editions.pro');
     }
 
     public static function availableScripts(Request $request)
@@ -133,7 +139,7 @@ class Statamic
 
     public static function isApiRoute()
     {
-        if (! config('statamic.api.enabled')) {
+        if (! config('statamic.api.enabled') || ! static::pro()) {
             return false;
         }
 
@@ -142,7 +148,7 @@ class Statamic
 
     public static function apiRoute($route, $params = [])
     {
-        if (! config('statamic.api.enabled')) {
+        if (! config('statamic.api.enabled') || ! static::pro()) {
             return null;
         }
 
@@ -238,6 +244,18 @@ class Statamic
     {
         foreach (static::$bootedCallbacks as $callback) {
             $callback();
+        }
+    }
+
+    public static function afterInstalled(Closure $callback)
+    {
+        static::$afterInstalledCallbacks[] = $callback;
+    }
+
+    public static function runAfterInstalledCallbacks($command)
+    {
+        foreach (static::$afterInstalledCallbacks as $callback) {
+            $callback($command);
         }
     }
 }

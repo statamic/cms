@@ -6,6 +6,6 @@ class Relate extends Tags
 {
     public function wildcard($tag)
     {
-        return $this->context->get($tag);
+        return $this->context->value($tag);
     }
 }

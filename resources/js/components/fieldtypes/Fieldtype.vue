@@ -50,6 +50,10 @@ export default {
 
         replicatorPreview() {
             return this.value;
+        },
+
+        fieldId() {
+            return 'field_'+this.config.handle;
         }
     },
 

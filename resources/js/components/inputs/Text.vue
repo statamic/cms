@@ -6,6 +6,7 @@
                 ref="input"
                 class="input-text"
                 :class="classes"
+                :id="id"
                 :name="name"
                 :value="value"
                 :type="type"
@@ -36,6 +37,7 @@ export default {
         name: {},
         disabled: { default: false },
         classes: { default: null },
+        id: { default: null },
         isReadOnly: { type: Boolean, default: false },
         placeholder: { required: false },
         type: { default: "text" },

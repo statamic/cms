@@ -159,6 +159,7 @@ class FieldtypeTest extends TestCase
 
         $fieldtype = new class($fields) extends Fieldtype {
             protected $mock;
+            protected static $handle = 'test';
 
             public function __construct($mock)
             {

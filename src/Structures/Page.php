@@ -156,11 +156,7 @@ class Page implements Entry, Augmentable, Responsable
             return optional($this->parent)->uri();
         }
 
-        $uris = app(UriCache::class);
-
-        if ($cached = $uris[$this->reference] ?? null) {
-            return $cached;
-        }
+        $uris = Blink::store('structure-uris');
 
         if ($cached = $uris[$this->reference] ?? null) {
             return $cached;
@@ -192,10 +188,12 @@ class Page implements Entry, Augmentable, Responsable
         }
 
         if ($this->reference && $this->referenceExists()) {
-            return vsprintf('%s/%s', [
+            $url = vsprintf('%s/%s', [
                 rtrim($this->site()->absoluteUrl(), '/'),
                 ltrim($this->uri(), '/'),
             ]);
+
+            return $url === '/' ? $url : rtrim($url, '/');
         }
     }
 
@@ -300,6 +298,16 @@ class Page implements Entry, Augmentable, Responsable
     public function routeData()
     {
         return $this->entry()->routeData();
+    }
+
+    public function published()
+    {
+        return $this->entry()->published();
+    }
+
+    public function private()
+    {
+        return $this->entry()->private();
     }
 
     public function blueprint()

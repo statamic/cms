@@ -16,6 +16,6 @@ class ComposerOutputController extends Controller
      */
     public function check(Request $request)
     {
-        return Composer::cachedOutput($request->package);
+        return Composer::colorized()->cachedOutput($request->package);
     }
 }

@@ -4,8 +4,10 @@ namespace Statamic\Forms;
 
 use DebugBar\DataCollector\ConfigCollector;
 use DebugBar\DebugBarException;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Form;
 use Statamic\Facades\URL;
+use Statamic\Support\Arr;
 use Statamic\Tags\Concerns;
 use Statamic\Tags\Tags as BaseTags;
 
@@ -25,7 +27,7 @@ class Tags extends BaseTags
      */
     public function __call($method, $args)
     {
-        $this->parameters['form'] = $this->method;
+        $this->params['form'] = $this->method;
 
         return $this->create();
     }
@@ -39,7 +41,7 @@ class Tags extends BaseTags
      */
     public function set()
     {
-        $this->context['form'] = $this->getParam(static::HANDLE_PARAM);
+        $this->context['form'] = $this->params->get(static::HANDLE_PARAM);
 
         return [];
     }
@@ -52,14 +54,19 @@ class Tags extends BaseTags
     public function create()
     {
         $formHandle = $this->getForm();
+        $form = Form::find($formHandle);
         $sessionHandle = "form.{$formHandle}";
 
         $data = $this->getFormSession($sessionHandle);
         $data['fields'] = $this->getFields($sessionHandle);
 
-        $this->addToDebugBar($formHandle, $data);
+        $this->addToDebugBar($data, $formHandle);
 
-        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect']);
+        if (! $this->params->has('files')) {
+            $this->params->put('files', $form->hasFiles());
+        }
+
+        $knownParams = array_merge(static::HANDLE_PARAM, ['redirect', 'error_redirect', 'allow_request_redirect', 'files']);
 
         $html = $this->formOpen(route('statamic.forms.submit', $formHandle), 'POST', $knownParams);
 
@@ -162,7 +169,7 @@ class Tags extends BaseTags
      */
     protected function getSortOrder()
     {
-        return $this->get('sort', 'date');
+        return $this->params->get('sort', 'date');
     }
 
     /**
@@ -172,7 +179,7 @@ class Tags extends BaseTags
      */
     protected function getForm()
     {
-        if (! $form = $this->get(static::HANDLE_PARAM, array_get($this->context, 'form'))) {
+        if (! $form = $this->params->get(static::HANDLE_PARAM, Arr::get($this->context, 'form'))) {
             throw new \Exception('A form handle is required on Form tags. Please refer to the docs for more information.');
         }
 
@@ -210,24 +217,21 @@ class Tags extends BaseTags
      */
     protected function addToDebugBar($data, $formHandle)
     {
-        if (! function_exists('debug_bar')) {
+        if (! function_exists('debugbar') || ! class_exists(ConfigCollector::class)) {
             return;
         }
 
-        $debug = [];
-        $debug[$formHandle] = $data;
+        $blink = Blink::store();
 
-        if ($this->blink->exists('debug_bar_data')) {
-            $debug = array_merge($debug, $this->blink->get('debug_bar_data'));
-        }
+        $debug = array_merge([$formHandle => $data], $blink->get('debug_bar_data', []));
 
-        $this->blink->put('debug_bar_data', $debug);
+        $blink->put('debug_bar_data', $debug);
 
         try {
             debugbar()->getCollector('Forms')->setData($debug);
         } catch (DebugBarException $e) {
             // Collector doesn't exist yet. We'll create it.
-            $collector = debugbar()->addCollector(new ConfigCollector($debug, 'Forms'));
+            debugbar()->addCollector(new ConfigCollector($debug, 'Forms'));
         }
     }
 

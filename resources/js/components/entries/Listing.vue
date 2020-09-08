@@ -120,6 +120,8 @@ export default {
             listingKey: 'entries',
             preferencesPrefix: `collections.${this.collection}`,
             requestUrl: cp_url(`collections/${this.collection}/entries`),
+            currentSite: this.site,
+            initialSite: this.site,
         }
     },
 
@@ -128,6 +130,22 @@ export default {
         reordering(reordering, wasReordering) {
             if (reordering === wasReordering) return;
             reordering ? this.reorder() : this.cancelReordering();
+        },
+
+        activeFilters: {
+            deep: true,
+            handler(filters) {
+                this.currentSite = filters.site ? filters.site.site : null;
+            }
+        },
+
+        site(site) {
+            this.currentSite = site;
+        },
+
+        currentSite(site) {
+            this.setSiteFilter(site);
+            this.$emit('site-changed', site);
         }
 
     },
@@ -147,6 +165,12 @@ export default {
 
         reorder() {
             this.filtersReset();
+
+            // When reordering, we *need* a site, since mixing them up would be awkward.
+            // If we're dealing with multiple sites, it's possible the user "cleared"
+            // the site filter so we'll want to fall back to the initial site.
+            this.setSiteFilter(this.currentSite || this.initialSite);
+
             this.page = 1;
             this.sortColumn = 'order';
         },
@@ -159,12 +183,16 @@ export default {
             this.items = items;
         },
 
+        setSiteFilter(site) {
+            this.filterChanged({ handle: 'site', values: { site }});
+        },
+
         saveOrder() {
             const payload = {
                 ids: this.items.map(item => item.id),
                 page: this.page,
                 perPage: this.perPage,
-                site: this.site
+                site: this.currentSite
             };
 
             this.$axios.post(this.reorderUrl, payload)

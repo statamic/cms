@@ -64,6 +64,11 @@ class AssetsController extends CpController
         $request->validate([
             'container' => 'required',
             'folder' => 'required',
+            'file' => ['file', function ($attribute, $value, $fail) {
+                if (in_array(trim(strtolower($value->getClientOriginalExtension())), ['php', 'php3', 'php4', 'php5', 'phtml'])) {
+                    $fail(__('validation.uploaded'));
+                }
+            }],
         ]);
 
         $container = AssetContainer::find($request->container);

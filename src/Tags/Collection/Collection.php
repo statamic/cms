@@ -17,7 +17,7 @@ class Collection extends Tags
      */
     public function __call($method, $args)
     {
-        $this->parameters['from'] = $this->method;
+        $this->params['from'] = $this->method;
 
         return $this->output(
             $this->entries()->get()
@@ -30,7 +30,7 @@ class Collection extends Tags
     public function index()
     {
         if (! $this->params->hasAny(['from', 'in', 'folder', 'use', 'collection'])) {
-            return $this->context->get('collection');
+            return $this->context->value('collection');
         }
 
         return $this->output(
@@ -51,7 +51,7 @@ class Collection extends Tags
      */
     public function next()
     {
-        $this->parameters['from'] = $this->currentEntry()->collection()->handle();
+        $this->params['from'] = $this->currentEntry()->collection()->handle();
 
         return $this->output(
             $this->entries()->next($this->currentEntry())
@@ -63,7 +63,7 @@ class Collection extends Tags
      */
     public function previous()
     {
-        $this->parameters['from'] = $this->currentEntry()->collection()->handle();
+        $this->params['from'] = $this->currentEntry()->collection()->handle();
 
         return $this->output(
             $this->entries()->previous($this->currentEntry())
@@ -75,7 +75,7 @@ class Collection extends Tags
      */
     public function older()
     {
-        $this->parameters['from'] = $this->currentEntry()->collection()->handle();
+        $this->params['from'] = $this->currentEntry()->collection()->handle();
 
         return $this->output(
             $this->entries()->older($this->currentEntry())
@@ -87,7 +87,7 @@ class Collection extends Tags
      */
     public function newer()
     {
-        $this->parameters['from'] = $this->currentEntry()->collection()->handle();
+        $this->params['from'] = $this->currentEntry()->collection()->handle();
 
         return $this->output(
             $this->entries()->newer($this->currentEntry())
@@ -96,11 +96,11 @@ class Collection extends Tags
 
     protected function entries()
     {
-        return new Entries($this->parameters);
+        return new Entries($this->params);
     }
 
     protected function currentEntry()
     {
-        return Entry::find($this->get('current', $this->context->get('id')));
+        return Entry::find($this->params->get('current', $this->context->get('id')));
     }
 }

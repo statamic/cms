@@ -2,6 +2,7 @@
 
 namespace Statamic\Fields;
 
+use Facades\Statamic\Fields\FieldtypeRepository;
 use Statamic\Facades\Fieldset;
 use Statamic\Support\Arr;
 
@@ -30,6 +31,10 @@ class FieldTransformer
             unset($field['width']);
         }
 
+        if (Arr::get($field, 'localizable', false) === false) {
+            unset($field['localizable']);
+        }
+
         return array_filter([
             'handle' => $submitted['handle'],
             'field' => $field,
@@ -53,7 +58,7 @@ class FieldTransformer
             return static::importFieldToVue($field);
         }
 
-        return (is_string($field['field']))
+        return is_string($field['field'])
             ? static::referenceFieldToVue($field)
             : static::inlineFieldToVue($field);
     }
@@ -68,6 +73,7 @@ class FieldTransformer
         );
 
         $mergedConfig['width'] = $mergedConfig['width'] ?? 100;
+        $mergedConfig['localizable'] = $mergedConfig['localizable'] ?? false;
 
         return [
             'handle' => $field['handle'],
@@ -75,7 +81,8 @@ class FieldTransformer
             'field_reference' => $field['field'],
             'config' => $mergedConfig,
             'config_overrides' => array_keys($config),
-            'fieldtype' => $fieldsetField['type'],
+            'fieldtype' => $type = $fieldsetField['type'],
+            'icon' => FieldtypeRepository::find($type)->icon(),
         ];
     }
 
@@ -83,12 +90,15 @@ class FieldTransformer
     {
         $config = $field['field'];
         $config['width'] = $config['width'] ?? 100;
+        $config['localizable'] = $config['localizable'] ?? false;
+        $config = static::normalizeRequiredValidation($config);
 
         return [
             'handle' => $field['handle'],
             'type' => 'inline',
             'config' => $config,
-            'fieldtype' => $config['type'] ?? 'text',
+            'fieldtype' => $type = $config['type'] ?? 'text',
+            'icon' => FieldtypeRepository::find($type)->icon(),
         ];
     }
 
@@ -121,5 +131,29 @@ class FieldTransformer
         app()->instance($binding, $fields);
 
         return $fields;
+    }
+
+    protected static function normalizeRequiredValidation($config)
+    {
+        if (Arr::get($config, 'required') !== true) {
+            return $config;
+        }
+
+        $validate = Arr::get($config, 'validate', []);
+
+        if (is_string($validate)) {
+            $validate = explode('|', $validate);
+        }
+
+        $validate = collect($validate);
+
+        if (! $validate->contains('required')) {
+            $validate->prepend('required');
+        }
+
+        Arr::forget($config, 'required');
+        Arr::set($config, 'validate', $validate->all());
+
+        return $config;
     }
 }

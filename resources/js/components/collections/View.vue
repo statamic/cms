@@ -14,10 +14,10 @@
                 </dropdown-list>
 
                 <div class="btn-group mr-2" v-if="canUseStructureTree && !treeIsDirty">
-                    <button class="btn px-2" @click="view = 'tree'" :class="{'active': view === 'tree'}">
+                    <button class="btn px-2" @click="view = 'tree'" :class="{'active': view === 'tree'}" v-tooltip="__('Tree')">
                         <svg-icon name="structures" class="h-4 w-4"/>
                     </button>
-                    <button class="btn px-2" @click="view = 'list'" :class="{'active': view === 'list'}">
+                    <button class="btn px-2" @click="view = 'list'" :class="{'active': view === 'list'}" v-tooltip="__('List')">
                         <svg-icon name="assets-mode-table" class="h-4 w-4" />
                     </button>
                 </div>
@@ -32,11 +32,11 @@
                     />
 
                     <site-selector
-                        v-if="structureSites.length > 1"
+                        v-if="sites.length > 1"
                         class="mr-2"
-                        :sites="structureSites"
-                        :value="treeSite"
-                        @input="treeSite = $event.handle"
+                        :sites="sites"
+                        :value="site"
+                        @input="site = $event.handle"
                     />
 
                     <button
@@ -49,7 +49,15 @@
 
                 </template>
 
-                <div v-if="view === 'list' && reorderable">
+                <template v-if="view === 'list' && reorderable">
+                    <site-selector
+                        v-if="sites.length > 1 && reordering && site"
+                        class="mr-2"
+                        :sites="sites"
+                        :value="site"
+                        @input="site = $event.handle"
+                    />
+
                     <button class="btn mr-2"
                         v-if="!reordering"
                         @click="reordering = true"
@@ -64,10 +72,10 @@
                             @click="$refs.list.saveOrder"
                             v-text="__('Save Order')" />
                     </template>
-                </div>
+                </template>
 
                 <create-entry-button
-                    v-if="!reordering"
+                    v-if="!reordering && canCreate"
                     button-class="btn-primary"
                     :url="createUrl"
                     :blueprints="blueprints" />
@@ -88,6 +96,7 @@
             :reorder-url="reorderUrl"
             :site="site"
             @reordered="reordering = false"
+            @site-changed="site = $event"
         />
 
         <page-tree
@@ -101,7 +110,7 @@
             :submit-parameters="{ deletedEntries }"
             :max-depth="structureMaxDepth"
             :expects-root="structureExpectsRoot"
-            :site="treeSite"
+            :site="site"
             @edit-page="editPage"
             @changed="markTreeDirty"
             @saved="markTreeClean"
@@ -114,18 +123,17 @@
                     v-tooltip="__('Redirect')" />
             </template>
 
-            <template #branch-options="{ branch, removeBranch, orphanChildren, depth, isRoot }">
+            <template #branch-options="{ branch, removeBranch, orphanChildren, depth }">
                 <template v-if="depth < structureMaxDepth">
                     <h6 class="px-1" v-text="__('Create Child Entry')" v-if="blueprints.length > 1" />
                     <li class="divider" v-if="blueprints.length > 1" />
                     <dropdown-item
                         v-for="blueprint in blueprints"
                         :key="blueprint.handle"
-                        v-if="!isRoot"
                         @click="createEntry(blueprint.handle, branch.id)"
                         v-text="blueprints.length > 1 ? blueprint.title : __('Create Child Entry')" />
                 </template>
-                <li class="divider" v-if="!isRoot"></li>
+                <li class="divider"></li>
                 <dropdown-item
                     :text="__('Delete')"
                     class="warning"
@@ -171,12 +179,12 @@ export default {
         runActionUrl: { type: String, required: true },
         bulkActionsUrl: { type: String, required: true },
         reorderUrl: { type: String, required: true },
-        site: { type: String, required: true },
+        initialSite: { type: String, required: true },
+        sites: { type: Array },
         structurePagesUrl: { type: String },
         structureSubmitUrl: { type: String },
         structureMaxDepth: { type: Number, default: Infinity },
         structureExpectsRoot: { type: Boolean },
-        structureSites: { type: Array },
     },
 
     data() {
@@ -187,7 +195,7 @@ export default {
             showEntryDeletionConfirmation: false,
             entryBeingDeleted: null,
             entryDeletionConfirmCallback: null,
-            treeSite: this.site,
+            site: this.initialSite,
             reordering: false
         }
     },

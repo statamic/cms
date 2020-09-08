@@ -1,5 +1,6 @@
 <template>
-    <div>
+    <element-container @resized="containerWidth = $event.width">
+    <div :class="{ 'narrow': containerWidth < 500, 'really-narrow': containerWidth < 280 }">
 
         <uploader
             ref="uploader"
@@ -148,6 +149,7 @@
             </selector>
         </stack>
     </div>
+    </element-container>
 </template>
 
 
@@ -208,7 +210,8 @@ export default {
             draggingFile: false,
             uploads: [],
             innerDragging: false,
-            displayMode: 'grid'
+            displayMode: 'grid',
+            containerWidth: null,
         };
     },
 

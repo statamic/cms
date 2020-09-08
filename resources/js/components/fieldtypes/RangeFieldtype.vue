@@ -4,14 +4,15 @@
             <div v-if="config.prepend" v-text="config.prepend" class="mr-1" />
             <input
                 type="range"
-                :name="name"
                 v-model="val"
+                :name="name"
                 :min="config.min"
                 :max="config.max"
                 :step="config.step"
                 :width="config.width"
                 :readonly="isReadOnly"
                 :disabled="isReadOnly"
+                :id="fieldId"
                 class="flex-1"
             />
             <div class="rounded border px-1 py-sm mx-1 bg-grey-10">{{ val }}</div>

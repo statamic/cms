@@ -62,8 +62,8 @@ class DummyClass extends Filter
     public function badge($values)
     {
         // return $values['featured'] === 'featured'
-        //     ? __('is featured')
-        //     : __('not featured');
+        //     ? __('Featured')
+        //     : __('Not Featured');
     }
 
     /**

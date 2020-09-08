@@ -3,22 +3,21 @@
 namespace Statamic\Forms;
 
 use Carbon\Carbon;
+use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Forms\Submission as SubmissionContract;
 use Statamic\Data\ContainsData;
-use Statamic\Exceptions\PublishException;
-use Statamic\Exceptions\SilentFormFailureException;
+use Statamic\Data\HasAugmentedData;
+use Statamic\Events\SubmissionDeleted;
+use Statamic\Events\SubmissionSaved;
 use Statamic\Facades\File;
 use Statamic\Facades\YAML;
+use Statamic\Forms\Uploaders\AssetsUploader;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Submission implements SubmissionContract
+class Submission implements SubmissionContract, Augmentable
 {
-    use ContainsData, FluentlyGetsAndSets;
-
-    /**
-     * @var bool
-     */
-    private $guard = true;
+    use ContainsData, FluentlyGetsAndSets, HasAugmentedData;
 
     /**
      * @var string
@@ -99,47 +98,18 @@ class Submission implements SubmissionContract
     }
 
     /**
-     * Disable validation.
-     */
-    public function unguard()
-    {
-        $this->guard = false;
-
-        return $this;
-    }
-
-    /**
-     * Enable validation.
-     */
-    public function guard()
-    {
-        $this->guard = true;
-
-        return $this;
-    }
-
-    /**
      * Get or set the data.
      *
      * @param array|null $data
      * @return array
-     * @throws PublishException|HoneypotException
      */
     public function data($data = null)
     {
-        if (is_null($data)) {
+        if (func_num_args() === 0) {
             return $this->data;
         }
 
-        // If a honeypot exists, throw an exception.
-        if (array_get($data, $this->form()->honeypot())) {
-            throw new SilentFormFailureException('Honeypot field has been populated.');
-        }
-
-        // Validate and remove any fields that aren't present in the form blueprint.
-        if ($this->guard) {
-            $data = collect($this->validate($data))->intersectByKeys($this->fields())->all();
-        }
+        $data = collect($data)->intersectByKeys($this->fields())->all();
 
         $this->data = $data;
 
@@ -151,68 +121,15 @@ class Submission implements SubmissionContract
      */
     public function uploadFiles()
     {
-        $request = request();
+        collect($this->fields())
+            ->filter(function ($config, $handle) {
+                return Arr::get($config, 'type') === 'assets' && request()->hasFile($handle);
+            })
+            ->each(function ($config, $handle) {
+                Arr::set($this->data, $handle, AssetsUploader::field($config)->upload(request()->file($handle)));
+            });
 
-        collect($this->fields())->filter(function ($field) {
-            // Only deal with uploadable fields
-            return in_array(array_get($field, 'type'), ['file', 'files', 'asset', 'assets']);
-        })->map(function ($config, $field) {
-            // Map into a nicer data schema to work with
-            return compact('field', 'config');
-        })->reject(function ($arr) use ($request) {
-            // Remove if no file was uploaded
-            return ! $request->hasFile($arr['field']);
-        })->map(function ($arr, $field) use ($request) {
-            // Add the uploaded files to our data array
-            $files = collect(array_filter((array) $request->file($field)));
-            $arr['files'] = $files;
-
-            return $arr;
-        })->each(function ($arr) {
-            // A plural type uses the singular version. assets => asset, etc.
-            $type = rtrim(array_get($arr, 'config.type'), 's');
-
-            // Upload the files
-            $class = 'Statamic\Forms\Uploaders\\'.ucfirst($type).'Uploader';
-            $uploader = new $class(array_get($arr, 'config'), array_get($arr, 'files'));
-            $data = $uploader->upload();
-
-            // Add the resulting paths to our submission
-            array_set($this->data, $arr['field'], $data);
-        });
-    }
-
-    /**
-     * Validate an array of data against rules in the form blueprint.
-     *
-     * @param  array $data       Data to validate
-     * @throws PublishException  An exception will be thrown if it doesn't validate
-     * @return array
-     */
-    private function validate($data)
-    {
-        $rules = [];
-        $attributes = [];
-
-        // Merge in field rules
-        foreach ($this->fields() as $field_name => $field_config) {
-            if ($field_rules = array_get($field_config, 'validate')) {
-                $rules[$field_name] = $field_rules;
-            }
-
-            // Define the attribute (friendly name) so it doesn't appear as field.fieldname
-            $attributes[$field_name] = array_get($field_config, 'display', $field_name);
-        }
-
-        $validator = app('validator')->make($data, $rules, [], $attributes);
-
-        if ($validator->fails()) {
-            $e = new PublishException;
-            $e->setErrors($validator->errors()->toArray());
-            throw $e;
-        }
-
-        return $data;
+        return $this;
     }
 
     /**
@@ -254,6 +171,8 @@ class Submission implements SubmissionContract
     public function save()
     {
         File::put($this->getPath(), YAML::dump($this->data()));
+
+        SubmissionSaved::dispatch($this);
     }
 
     /**
@@ -262,6 +181,8 @@ class Submission implements SubmissionContract
     public function delete()
     {
         File::delete($this->getPath());
+
+        SubmissionDeleted::dispatch($this);
     }
 
     /**
@@ -295,5 +216,10 @@ class Submission implements SubmissionContract
                 'date' => $this->date(),
             ])
             ->all();
+    }
+
+    public function blueprint()
+    {
+        return $this->form->blueprint();
     }
 }

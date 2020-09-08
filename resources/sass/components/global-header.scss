@@ -104,13 +104,22 @@
 }
 
 .site-selector {
-    @apply flex items-center border-l border-r mr-2 h-full text-sm;
-
     .site-selector-icon {
-        @apply block mr-1;
         height: 20px;
         width: 1.25rem;
     }
+
+    .v-select { @apply h-full }
+    .vs__actions { @apply hidden }
+    .vs__selected-options { @apply border-none shadow-none p-0 }
+    .vs__dropdown-toggle { @apply h-full rounded-none }
+
+    .vs--single.vs--unsearchable .vs__selected-options {
+        @apply border-none flex items-center;
+        background: none
+    }
+
+    .vs__dropdown-toggle:focus, .vs__dropdown-toggle:focus-within { @apply shadow-none; }
 }
 
 

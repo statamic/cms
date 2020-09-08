@@ -122,6 +122,11 @@ class SitesTest extends TestCase
         // https://github.com/statamic/cms/issues/1874
         $this->assertEquals('en', $this->sites->findByUrl('http://test.com/delightful')->handle());
         $this->assertEquals('de', $this->sites->findByUrl('http://test.com/de')->handle());
+
+        // Make sure that urls that have a query string don't get misinterpreted.
+        // https://github.com/statamic/cms/issues/2207
+        $this->assertEquals('en', $this->sites->findByUrl('http://test.com?foo=bar')->handle());
+        $this->assertEquals('de', $this->sites->findByUrl('http://test.com/de?foo=bar')->handle());
     }
 
     /** @test */

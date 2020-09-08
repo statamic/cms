@@ -369,7 +369,7 @@ export default {
             this.clearErrors();
 
             const payload = { ...this.values, ...{
-                blueprint: this.fieldset.handle,
+                _blueprint: this.fieldset.handle,
                 published: this.published,
                 _localized: this.localizedFields,
             }};

@@ -12,7 +12,6 @@
                 :class="{'active': value === option.value}"
                 v-text="option.label || option.value"
             />
-            </label>
         </div>
     </div>
 </template>

@@ -208,24 +208,50 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_and_sets_entry_blueprints()
+    public function it_gets_entry_blueprints()
     {
-        BlueprintRepository::shouldReceive('find')->with('default')->andReturn($default = new Blueprint);
-        BlueprintRepository::shouldReceive('find')->with('one')->andReturn($blueprintOne = new Blueprint);
-        BlueprintRepository::shouldReceive('find')->with('two')->andReturn($blueprintTwo = new Blueprint);
+        $collection = (new Collection)->handle('blog');
 
-        $collection = new Collection;
-        $this->assertCount(0, $collection->entryBlueprints());
-        $this->assertEquals($default, $collection->entryBlueprint());
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'one' => $blueprintOne = (new Blueprint)->setHandle('one'),
+            'two' => $blueprintTwo = (new Blueprint)->setHandle('two'),
+        ]));
 
-        $return = $collection->entryBlueprints(['one', 'two']);
-
-        $this->assertEquals($collection, $return);
         $blueprints = $collection->entryBlueprints();
         $this->assertCount(2, $blueprints);
         $this->assertEveryItemIsInstanceOf(Blueprint::class, $blueprints);
-        $this->assertEquals([$blueprintOne, $blueprintTwo], $blueprints->values()->all());
+        $this->assertEquals([$blueprintOne, $blueprintTwo], $blueprints->all());
+
         $this->assertEquals($blueprintOne, $collection->entryBlueprint());
+        $this->assertEquals($blueprintOne, $collection->entryBlueprint('one'));
+        $this->assertEquals($blueprintTwo, $collection->entryBlueprint('two'));
+        $this->assertNull($collection->entryBlueprint('three'));
+    }
+
+    /** @test */
+    public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_collection()
+    {
+        $collection = (new Collection)->handle('blog');
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect());
+        BlueprintRepository::shouldReceive('find')->with('default')->andReturn(
+            $blueprint = (new Blueprint)
+                ->setHandle('thisll_change')
+                ->setContents(['title' => 'This will change'])
+        );
+
+        $blueprints = $collection->entryBlueprints();
+        $this->assertCount(1, $blueprints);
+        $this->assertEquals([$blueprint], $blueprints->all());
+
+        tap($collection->entryBlueprint(), function ($default) use ($blueprint) {
+            $this->assertEquals($blueprint, $default);
+            $this->assertEquals('blog', $default->handle());
+            $this->assertEquals('Blog', $default->title());
+        });
+
+        $this->assertEquals($blueprint, $collection->entryBlueprint('blog'));
+        $this->assertNull($collection->entryBlueprint('two'));
     }
 
     /** @test */

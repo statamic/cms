@@ -1,0 +1,31 @@
+{{ fields }}
+    <b>{{ display }}:</b>
+
+    {{ if value }}
+
+        {{ if fieldtype == "assets" }}
+            {{ if value|is_iterable }}
+                {{ value }}{{ permalink }}{{ if !last }}, {{ /if }}{{ /value }}
+            {{ else }}
+                {{ value:permalink }}
+            {{ /if }}
+
+        {{ elseif fieldtype == "select" && !config:multiple }}
+            {{ value:label }}
+
+        {{ elseif fieldtype == "radio" }}
+            {{ value:label }}
+
+        {{ elseif fieldtype == "select" || fieldtype == "checkboxes" }}
+            {{ value }}{{ label }}{{ if !last }}, {{ /if }}{{ /value }}
+
+        {{ elseif value|is_iterable }}
+            {{ value | json }}
+
+        {{ else }}
+            {{ value }}
+        {{ /if }}
+
+    {{ /if }}
+    <br>
+{{ /fields }}

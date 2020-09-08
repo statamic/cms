@@ -36,6 +36,7 @@ abstract class Relationship extends Fieldtype
             ],
             'mode' => [
                 'display' => __('Mode'),
+                'instructions' => __('statamic::fieldtypes.relationship.config.mode'),
                 'type' => 'radio',
                 'default' => 'default',
                 'options' => [
@@ -70,7 +71,7 @@ abstract class Relationship extends Fieldtype
             $items = collect([$items]);
         }
 
-        return $items->map(function ($item) use ($data) {
+        return $items->map(function ($item) {
             return [
                 'id' => method_exists($item, 'id') ? $item->id() : $item->handle(),
                 'title' => method_exists($item, 'title') ? $item->title() : $item->get('title'),
@@ -237,7 +238,7 @@ abstract class Relationship extends Fieldtype
             return $this->augmentValue($value);
         });
 
-        $values = $values->map(function ($value) {
+        $values = $values->filter()->map(function ($value) {
             return $this->shallowAugmentValue($value);
         });
 

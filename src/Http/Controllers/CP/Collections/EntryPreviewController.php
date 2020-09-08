@@ -7,7 +7,6 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Contracts\Entries\Entry as EntryContract;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
 use Statamic\Http\Controllers\CP\CpController;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
@@ -41,7 +40,7 @@ class EntryPreviewController extends CpController
     {
         $this->authorize('create', [EntryContract::class, $collection]);
 
-        $fields = Blueprint::find($request->blueprint)
+        $fields = $collection->entryBlueprint($request->blueprint)
             ->fields()
             ->addValues($preview = $request->preview)
             ->process();

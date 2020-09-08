@@ -3,13 +3,14 @@
         <div class="state-container w-4 h-4 text-grey-50" @click="focus">
             <svg-icon name="magnifying-glass"></svg-icon>
         </div>
-
+        <label class="sr-only" v-text="__('Global Search')" for="global-search" />
         <input type="text"
             autocomplete="off"
             class="search-input"
             ref="input"
             name="search"
             v-model="query"
+            id="global-search"
             @keydown.up.prevent="moveUp"
             @keydown.down.prevent="moveDown"
             @keydown.enter.prevent="hit"

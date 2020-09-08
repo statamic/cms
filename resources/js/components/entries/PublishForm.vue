@@ -420,7 +420,7 @@ export default {
             // Once the hook has completed, we need to make the actual request.
             // We build the payload here because the before hook may have modified values.
             const payload = { ...this.values, ...{
-                blueprint: this.fieldset.handle,
+                _blueprint: this.fieldset.handle,
                 _localized: this.localizedFields,
             }};
 
@@ -485,6 +485,8 @@ export default {
                 }
             }
 
+            this.$dirty.remove(this.publishContainer);
+
             this.localizing = localization.handle;
 
             if (localization.exists) {
@@ -514,6 +516,7 @@ export default {
                 this.actions = data.actions;
                 this.fieldset = data.blueprint;
                 this.isRoot = data.isRoot;
+                this.permalink = data.permalink;
                 this.site = localization.handle;
                 this.localizing = false;
                 this.$nextTick(() => this.$refs.container.clearDirtyState());
@@ -521,6 +524,11 @@ export default {
         },
 
         createLocalization(localization) {
+            if (this.isCreating) {
+                this.$nextTick(() => window.location = localization.url);
+                return;
+            }
+
             const url = this.activeLocalization.url + '/localize';
             this.$axios.post(url, { site: localization.handle }).then(response => {
                 this.editLocalization(response.data);
@@ -552,11 +560,11 @@ export default {
 
         publishActionCompleted({ published, isWorkingCopy, response }) {
             this.saving = false;
-            this.$refs.container.saved();
             if (published !== undefined) {
                 this.$refs.container.setFieldValue('published', published);
                 this.initialPublished = published;
             }
+            this.$refs.container.saved();
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
             this.title = response.data.data.title;

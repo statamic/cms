@@ -11,10 +11,10 @@
         &:first-child {
             @apply .rounded-t .border-t-0;
         }
-    }
 
-    label {
-        @apply .uppercase .text-sm .font-bold mb-2;
+        .field-inner > label {
+            @apply .uppercase .text-sm .font-bold .mt-1;
+        }
     }
 
     .help-block {

@@ -14,11 +14,14 @@ class Parameters extends ArrayAccessor
         }
 
         $items = collect($items)->mapWithKeys(function ($value, $key) use ($context) {
-            // Values in parameters prefixed with a colon should be treated as the corresponding
-            // field's value in the context. If it doesn't exist, the value remains the literal.
+            // Values in parameters prefixed with a colon should be treated as the corresponding field's value in the context.
             if (Str::startsWith($key, ':')) {
                 $key = substr($key, 1);
-                $value = $context->get($value, $value);
+                $value = $context->get($value);
+            }
+
+            if ($value instanceof Value) {
+                $value = $value->value();
             }
 
             if ($value === 'true') {
@@ -33,12 +36,5 @@ class Parameters extends ArrayAccessor
         })->all();
 
         return parent::make($items);
-    }
-
-    public function get($keys, $default = null)
-    {
-        $value = parent::get($keys, $default);
-
-        return $value instanceof Value ? $value->value() : $value;
     }
 }

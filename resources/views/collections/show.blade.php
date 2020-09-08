@@ -17,7 +17,8 @@
         run-action-url="{{ cp_route('collections.entries.actions.run', $collection->handle()) }}"
         bulk-actions-url="{{ cp_route('collections.entries.actions.bulk', $collection->handle()) }}"
         reorder-url="{{ cp_route('collections.entries.reorder', $collection->handle()) }}"
-        site="{{ $site }}"
+        initial-site="{{ $site }}"
+        :sites="{{ json_encode($sites) }}"
 
         @if ($collection->hasStructure())
         :structured="{{ Statamic\Support\Str::bool($user->can('reorder', $collection)) }}"
@@ -25,12 +26,14 @@
         structure-submit-url="{{ cp_route('collections.structure.update', $collection->handle()) }}"
         :structure-max-depth="{{ $structure->maxDepth() ?? 'Infinity' }}"
         :structure-expects-root="{{ Statamic\Support\Str::bool($structure->expectsRoot()) }}"
-        :structure-sites="{{ json_encode($structureSites) }}"
         @endif
     >
         <template #twirldown>
             @can('edit', $collection)
                 <dropdown-item :text="__('Edit Collection')" redirect="{{ $collection->editUrl() }}"></dropdown-item>
+            @endcan
+            @can('configure fields')
+                <dropdown-item :text="__('Edit Blueprints')" redirect="{{ cp_route('collections.blueprints.index', $collection) }}"></dropdown-item>
             @endcan
             @can('edit', $collection)
                 <dropdown-item :text="__('Scaffold Resources')" redirect="{{ cp_route('collections.scaffold', $collection->handle()) }}"></dropdown-item>

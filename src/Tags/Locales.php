@@ -27,7 +27,7 @@ class Locales extends Tags
     }
 
     /**
-     * The {{ locale:[key] }} tag.
+     * The {{ locales:[key] }} tag.
      */
     public function wildcard($key)
     {
@@ -35,7 +35,9 @@ class Locales extends Tags
             throw new \Exception("Site [$key] does not exist.");
         }
 
-        $data = $this->getLocalizedData($key);
+        if (! $data = $this->getLocalizedData($key)) {
+            return '';
+        }
 
         $data['locale'] = $this->getLocale($site);
 
@@ -55,7 +57,7 @@ class Locales extends Tags
             return $this->sort($locales);
         })->pipe(function ($locales) {
             return $this->addData($locales);
-        })->values();
+        })->filter()->values();
     }
 
     /**
@@ -85,7 +87,10 @@ class Locales extends Tags
     private function addData($locales)
     {
         return $locales->map(function ($locale, $key) {
-            $localized = $this->getLocalizedData($key);
+            if (! $localized = $this->getLocalizedData($key)) {
+                return null;
+            }
+
             $localized['locale'] = $locale;
             $localized['current'] = Site::current()->handle();
             $localized['is_current'] = $key === Site::current()->handle();
@@ -102,7 +107,19 @@ class Locales extends Tags
      */
     private function getLocalizedData($locale)
     {
-        return $this->getData()->in($locale)->toAugmentedArray();
+        if (! $data = $this->getData()) {
+            return null;
+        }
+
+        if (! $localized = $data->in($locale)) {
+            return null;
+        }
+
+        if (method_exists($localized, 'published') && ! $localized->published()) {
+            return null;
+        }
+
+        return $localized->toAugmentedArray();
     }
 
     /**
@@ -116,7 +133,7 @@ class Locales extends Tags
             return $this->data;
         }
 
-        $id = $this->get('id', $this->context->get('id'));
+        $id = $this->params->get('id', $this->context->get('id'));
 
         return $this->data = Entry::find($id);
     }
@@ -129,12 +146,12 @@ class Locales extends Tags
      */
     private function sort($locales)
     {
-        if ($sort = $this->get('sort')) {
+        if ($sort = $this->params->get('sort')) {
             [$sort, $dir] = $this->getSort($sort);
             $locales = ($dir === 'asc') ? $locales->sortBy($sort) : $locales->sortByDesc($sort);
         }
 
-        if ($this->getBool('current_first', true)) {
+        if ($this->params->bool('current_first', true)) {
             $locales = $this->moveCurrentLocaleToFront($locales);
         }
 

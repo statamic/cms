@@ -4,9 +4,9 @@
         <table v-if="isKeyed" class="array-table">
             <tbody>
                 <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
-                    <th>{{ config.keys[element.key] }}</th>
+                    <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ config.keys[element.key] }}</label></th>
                     <td>
-                        <input type="text" class="input-text-minimal" v-model="data[index].value" :readonly="isReadOnly" />
+                        <input type="text" class="input-text-minimal" :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly" />
                     </td>
                 </tr>
             </tbody>

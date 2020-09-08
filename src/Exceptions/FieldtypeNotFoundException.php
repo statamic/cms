@@ -44,6 +44,10 @@ class FieldtypeNotFoundException extends Exception implements ProvidesSolution
             return 'entries';
         }
 
+        if (in_array($this->fieldtype, ['taxonomy'])) {
+            return 'terms';
+        }
+
         return StringComparator::findClosestMatch(
             FieldtypeRepository::handles()->all(),
             $this->fieldtype

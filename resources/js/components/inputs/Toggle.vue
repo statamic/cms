@@ -1,9 +1,16 @@
 <template>
-    <div class="toggle-container" :class="{ 'on': value, 'cursor-not-allowed': readOnly }" @click="toggle" role="checkbox">
+    <button
+        type="button"
+        class="toggle-container"
+        :class="{ 'on': value, 'cursor-not-allowed': readOnly }"
+        @click="toggle"
+        :aria-pressed="stateLiteral"
+        :aria-label="__('Toggle Button')"
+    >
         <div class="toggle-slider">
             <div class="toggle-knob" tabindex="0" @keyup.prevent.space.enter="toggle" ref="knob" />
         </div>
-    </div>
+    </button>
 </template>
 
 <script>
@@ -17,6 +24,16 @@ export default {
             type: Boolean,
             default: () => false
         },
+    },
+
+    computed: {
+        stateLiteral() {
+            if (this.value) {
+                return 'true';
+            }
+
+            return 'false';
+        }
     },
 
     methods: {

@@ -23,6 +23,10 @@
         background: transparent url('../img/drag-dots.svg') center center no-repeat;
         &:hover { @apply .bg-grey-20; }
     }
+    
+    img {
+        @apply inline-block;
+    }
 
     .replicator-set-controls {
         @apply flex items-center;

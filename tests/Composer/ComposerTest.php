@@ -4,7 +4,6 @@ namespace Tests\Composer;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Support\Facades\Cache;
-use Statamic\Support\Str;
 use Symfony\Component\Process\Process;
 use Tests\Fakes\Composer\Package\PackToTheFuture;
 use Tests\TestCase;
@@ -24,7 +23,7 @@ class ComposerTest extends TestCase
         copy($this->basePath('composer.lock'), $this->basePath('composer.lock.bak'));
         Cache::forget('composer.test/package');
 
-        Composer::swap(new \Statamic\Console\Processes\Composer($this->basePath(), 'vendor/bin/composer'));
+        Composer::swap(new \Statamic\Console\Processes\Composer($this->basePath()));
     }
 
     public function tearDown(): void
@@ -102,7 +101,7 @@ class ComposerTest extends TestCase
         $this->assertTrue($installed->keys()->contains('test/package'));
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
-        $this->assertTrue(Str::contains(Cache::get('composer.test/package')['output'], 'Installing test/package'));
+        $this->assertStringContainsString("Installing \e[32mtest/package", Cache::get('composer.test/package')['output']);
 
         // Test that we can update the package...
 
@@ -113,7 +112,7 @@ class ComposerTest extends TestCase
         $this->assertTrue($installed->keys()->contains('test/package'));
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.1', $installed->get('test/package')->version);
-        $this->assertTrue(Str::contains(Cache::get('composer.test/package')['output'], 'Updating test/package'));
+        $this->assertStringContainsString("Updating \e[32mtest/package", Cache::get('composer.test/package')['output']);
 
         // Test that we can downgrade to a specific version...
 
@@ -124,7 +123,7 @@ class ComposerTest extends TestCase
         $this->assertTrue($installed->keys()->contains('test/package'));
         $this->assertFileExists($this->basePath('vendor/test/package'));
         $this->assertEquals('1.0.0', $installed->get('test/package')->version);
-        $this->assertTrue(Str::contains(Cache::get('composer.test/package')['output'], 'Downgrading test/package'));
+        $this->assertStringContainsString("Downgrading \e[32mtest/package", Cache::get('composer.test/package')['output']);
 
         // Test that we can remove the package...
 
@@ -132,7 +131,7 @@ class ComposerTest extends TestCase
 
         $this->assertStringNotContainsString('test/package', Composer::installed()->keys());
         $this->assertFileNotExists($this->basePath('vendor/test/package'));
-        $this->assertTrue(Str::contains(Cache::get('composer.test/package')['output'], 'Removing test/package'));
+        $this->assertStringContainsString("Removing \e[32mtest/package", Cache::get('composer.test/package')['output']);
     }
 
     private function basePath($path = null)

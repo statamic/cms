@@ -10,14 +10,14 @@ class Redirect extends Tags
     public function wildcard($tag)
     {
         return $this->redirect(
-            $this->context->get($tag)
+            $this->context->value($tag)
         );
     }
 
     public function index()
     {
         return $this->redirect(
-            $this->get(['to', 'url'])
+            $this->params->get(['to', 'url'])
         );
     }
 
@@ -35,6 +35,6 @@ class Redirect extends Tags
             return;
         }
 
-        abort(redirect($location, $this->get('response', 302)));
+        abort(redirect($location, $this->params->get('response', 302)));
     }
 }

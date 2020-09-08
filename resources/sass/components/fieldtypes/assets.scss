@@ -123,23 +123,12 @@
 /* Responsive Wangjangling
   ========================================================================== */
 
-@element .assets-fieldtype and (max-width: 500px) {
-    :self .assets-fieldtype-picker {
-        @apply flex;
-        p {
-            // @apply ml-0 text-center;
-        }
-        .drag-drop-text { display: none; }
-    }
-}
+// hide the 'or drag to upload' text when too narrow
+.assets-fieldtype .narrow .assets-fieldtype-picker .drag-drop-text { display: none; }
 
-@element .assets-fieldtype and (max-width: 280px) {
-    :self .assets-fieldtype-picker {
-        @apply flex-col;
-        .upload-asset-control {
-          @apply ml-0 text-center;
-        }
-        p { @apply ml-0 mt-1 text-center }
-        .drag-drop-text { display: none; }
-    }
+// center align the text when it gets really narrow
+.assets-fieldtype .really-narrow .assets-fieldtype-picker {
+    @apply flex-col;
+    .upload-asset-control { @apply ml-0 text-center; }
+    p { @apply ml-0 mt-1 text-center }
 }

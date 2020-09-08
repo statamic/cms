@@ -22,7 +22,8 @@
                 @updated="setFieldValue"
                 @meta-updated="setFieldMeta"
                 :can-toggle-labels="canToggleLabels"
-                :enable-sidebar="hasSidebar" />
+                :enable-sidebar="hasSidebar"
+                :read-only="readOnly" />
         </div>
     </publish-container>
 
@@ -40,7 +41,8 @@ export default {
         breadcrumbs: Array,
         action: String,
         method: { type: String, default: 'post' },
-        canToggleLabels: { type: Boolean, default: true }
+        canToggleLabels: { type: Boolean, default: true },
+        readOnly: { type: Boolean, default: false }
     },
 
     data() {

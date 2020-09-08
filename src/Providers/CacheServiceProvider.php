@@ -48,6 +48,10 @@ class CacheServiceProvider extends ServiceProvider
     private function macroRememberWithExpiration()
     {
         Cache::macro('rememberWithExpiration', function ($cacheKey, $callback) {
+            if (Cache::has($cacheKey)) {
+                return Cache::get($cacheKey);
+            }
+
             $keyValuePair = $callback();
             $value = reset($keyValuePair);
             $expiration = Carbon::now()->addMinutes(key($keyValuePair));

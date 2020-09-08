@@ -1,19 +1,25 @@
 <template>
 
-    <div class="site-selector">
-        <dropdown-list>
-            <template v-slot:trigger>
-                <button class="flex outline-none px-2 items-center dropdown-toggle anti text-grey hover:text-grey-80">
-                    <i class="site-selector-icon"><slot name="icon" /></i><span class="hidden md:block">{{ activeName }}</span>
-                </button>
+    <div class="site-selector flex items-center mr-2 h-full border-l border-r">
+        <v-select
+            :options="sites"
+            label="name"
+            :get-option-key="(option) => option.handle"
+            :value="activeName"
+            :clearable="false"
+            :searchable="false"
+            @input="selected"
+        >
+            <template #selected-option="option">
+                <div class="flex items-center px-1 text-sm text-grey hover:text-grey-80 anti">
+                    <svg-icon name="sites" class="site-selector-icon mr-1" />
+                    <div class="whitespace-no-wrap">{{ option.name }}</div>
+                </div>
             </template>
-
-            <dropdown-item
-                v-for="site in sites" :key="site.handle"
-                :text="siteNameWithStatus(site)"
-                :class="{'text-grey hover:text-white': site.handle !== active}"
-                :redirect="cp_url(`select-site/${site.handle}`)" />
-        </dropdown-list>
+            <template #option="{ name, handle }">
+                <div :class="{ 'text-grey-50': handle === active }">{{ name }}</div>
+            </template>
+        </v-select>
     </div>
 
 </template>
@@ -36,8 +42,10 @@ export default {
     },
 
     methods: {
-        siteNameWithStatus(site) {
-            return [site.name, site.handle === this.active ? '(active)' : ''].join(' ').trim();
+        selected(site) {
+            if (site.handle !== this.active) {
+                window.location = cp_url(`select-site/${site.handle}`);
+            }
         }
     }
 

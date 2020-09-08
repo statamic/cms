@@ -6,6 +6,7 @@
         :focus="focus"
         :value="value"
         :is-read-only="isReadOnly"
+        :id="fieldId"
         @input="update"
         @focus="$emit('focus')"
         @blur="$emit('blur')"

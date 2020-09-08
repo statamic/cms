@@ -29,7 +29,6 @@ class EntryRevisionsTest extends TestCase
         $this->dir = __DIR__.'/tmp';
         config(['statamic.revisions.enabled' => true]);
         config(['statamic.revisions.path' => $this->dir]);
-        $this->setTestUserBlueprint();
         $this->collection = Collection::make('blog')->revisionsEnabled(true)->save();
     }
 
@@ -336,11 +335,5 @@ class EntryRevisionsTest extends TestCase
         $blueprint->shouldReceive('ensureFieldPrepended')->andReturnSelf();
 
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint);
-    }
-
-    private function setTestUserBlueprint()
-    {
-        $blueprint = \Statamic\Facades\Blueprint::find('user');
-        BlueprintRepository::shouldReceive('find')->with('user')->andReturn($blueprint);
     }
 }

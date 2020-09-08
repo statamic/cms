@@ -17,13 +17,13 @@
                 </div>
                 <div class="flex items-center no-select">
                 <div class="h-10 -my-sm border-l pr-1 w-px" v-if="toolbarIsFixed && hasExtraButtons"></div>
-                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')">
+                    <button class="bard-toolbar-button" @click="showSource = !showSource" v-if="allowSource" v-tooltip="__('Show HTML Source')" :aria-label="__('Show HTML Source')">
                         <svg-icon name="file-code" class="w-4 h-4 "/>
                     </button>
-                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
+                    <button class="bard-toolbar-button" @click="toggleCollapseSets" v-tooltip="__('Expand/Collapse Sets')" :aria-label="__('Expand/Collapse Sets')" v-if="config.sets.length > 0">
                         <svg-icon name="expand-collapse-vertical" class="w-4 h-4" />
                     </button>
-                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
+                    <button class="bard-toolbar-button" @click="toggleFullscreen" v-tooltip="__('Toggle Fullscreen Mode')" aria-label="__('Toggle Fullscreen Mode')" v-if="config.fullscreen">
                         <svg-icon name="shrink-all" class="w-4 h-4" v-if="fullScreenMode" />
                         <svg-icon name="expand" class="w-4 h-4" v-else />
                     </button>
@@ -56,14 +56,14 @@
                     slot-scope="{ commands, isActive, menu }"
                     class="bard-set-selector"
                     :class="{
-                        'invisible': !menu.isActive,
+                        'invisible': !config.always_show_set_button && !menu.isActive,
                         'visible': menu.isActive
                     }"
                     :style="`top: ${menu.top}px`"
                 >
                     <dropdown-list ref="setSelectorDropdown">
                         <template v-slot:trigger>
-                            <button type="button" class="btn-round">
+                            <button type="button" class="btn-round" :aria-label="__('Add Set')" v-tooltip="__('Add Set')">
                                 <span class="icon icon-plus text-grey-80 antialiased"></span>
                             </button>
                         </template>
@@ -75,8 +75,7 @@
                 </div>
             </editor-floating-menu>
 
-            <editor-content :editor="editor" v-show="!showSource" />
-
+            <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
             <bard-source :html="html" v-if="showSource" />
         </div>
         <div class="bard-footer-toolbar" v-if="config.reading_time">
@@ -114,6 +113,8 @@ import Doc from './Doc';
 import BardSource from './Source.vue';
 import Link from './Link';
 import Image from './Image';
+import Subscript from './Subscript';
+import Superscript from './Superscript';
 import RemoveFormat from './RemoveFormat';
 import LinkToolbarButton from './LinkToolbarButton.vue';
 import ManagesSetMeta from '../replicator/ManagesSetMeta';
@@ -435,6 +436,8 @@ export default {
             if (btns.includes('italic')) exts.push(new Italic());
             if (btns.includes('strikethrough')) exts.push(new Strike());
             if (btns.includes('underline')) exts.push(new Underline());
+            if (btns.includes('subscript')) exts.push(new Subscript());
+            if (btns.includes('superscript')) exts.push(new Superscript());
             if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
             if (btns.includes('removeformat')) exts.push(new RemoveFormat());
             if (btns.includes('image')) exts.push(new Image({ bard: this }));

@@ -84,11 +84,9 @@ interface AssetContainer
     public function delete();
 
     /**
-     * Get or set the blueprint to be used by assets in this container.
-     *
-     * @param string $blueprint
+     * Get the blueprint to be used by assets in this container.
      */
-    public function blueprint($blueprint = null);
+    public function blueprint();
 
     /**
      * Whether the container's assets are web-accessible.
