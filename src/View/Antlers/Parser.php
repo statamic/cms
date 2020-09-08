@@ -598,7 +598,7 @@ class Parser
                         }
                     }
 
-                    if (! empty($values)) {
+                    if ($this->isLoopable($values) && ! empty($values)) {
                         if ($values instanceof Value) {
                             $values = $values->value();
                         }
