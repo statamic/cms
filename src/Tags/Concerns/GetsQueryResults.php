@@ -36,7 +36,9 @@ trait GetsQueryResults
             $this->queryPaginationFriendlyOffset($query, $offset);
         }
 
-        return $query->paginate($perPage);
+        return tap($query->paginate($perPage), function ($paginator) {
+            $paginator->setCollection($paginator->getCollection()->values());
+        });
     }
 
     protected function queryPaginationFriendlyOffset($query, $offset)
