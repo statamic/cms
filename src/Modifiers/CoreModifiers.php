@@ -1625,6 +1625,10 @@ class CoreModifiers extends Modifier
             throw new \Exception('Scope modifier requires a name.');
         }
 
+        if ($value instanceof Collection) {
+            $value = $value->toAugmentedArray();
+        }
+
         return Arr::addScope($value, $scope);
     }
 
