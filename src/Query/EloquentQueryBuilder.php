@@ -82,11 +82,6 @@ abstract class EloquentQueryBuilder implements Builder
         return $this;
     }
 
-    public function inRandomOrder()
-    {
-        return $this->builder->inRandomOrder();
-    }
-
     protected function column($column)
     {
         return $column;
