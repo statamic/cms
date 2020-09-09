@@ -28,6 +28,6 @@ class UniqueEntryValue
             return true;
         }
 
-        return $except === $existing->id();
+        return $except == $existing->id();
     }
 }
