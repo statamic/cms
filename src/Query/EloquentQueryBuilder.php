@@ -67,6 +67,13 @@ abstract class EloquentQueryBuilder extends Builder
         return $this;
     }
 
+    public function whereIn($column, $values)
+    {
+        $this->builder->whereIn($this->column($column), $values);
+
+        return $this;
+    }
+
     public function orderBy($column, $direction = 'asc')
     {
         $this->builder->orderBy($this->column($column), $direction);
