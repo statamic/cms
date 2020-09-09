@@ -2,8 +2,8 @@
 
 namespace Statamic\Query;
 
-use Statamic\Contracts\Query\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
 abstract class EloquentQueryBuilder implements Builder

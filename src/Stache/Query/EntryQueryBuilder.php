@@ -4,7 +4,6 @@ namespace Statamic\Stache\Query;
 
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
-use Statamic\Facades\Stache;
 
 class EntryQueryBuilder extends Builder
 {
