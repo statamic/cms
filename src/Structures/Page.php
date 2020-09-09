@@ -89,7 +89,7 @@ class Page implements Entry, Augmentable, Responsable
             return $this;
         }
 
-        if (! is_string($reference)) {
+        if (is_object($reference)) {
             throw_unless($id = $reference->id(), new \Exception('Cannot set an entry without an ID'));
             Blink::store('structure-page-entries')->put($id, $reference);
             $reference = $id;
