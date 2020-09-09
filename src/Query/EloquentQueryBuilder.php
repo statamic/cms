@@ -2,13 +2,14 @@
 
 namespace Statamic\Query;
 
-use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
+use Statamic\Contracts\Query\Builder;
 
-abstract class EloquentQueryBuilder
+abstract class EloquentQueryBuilder implements Builder
 {
     protected $builder;
 
-    public function __construct(Builder $builder)
+    public function __construct(EloquentBuilder $builder)
     {
         $this->builder = $builder;
     }
@@ -32,7 +33,7 @@ abstract class EloquentQueryBuilder
         return $this->get()->first();
     }
 
-    public function paginate($perPage, $columns = ['*'])
+    public function paginate($perPage = null, $columns = [])
     {
         $paginator = $this->builder->paginate($perPage, $this->selectableColumns($columns));
 
@@ -41,14 +42,26 @@ abstract class EloquentQueryBuilder
         );
     }
 
+    public function getCountForPagination()
+    {
+        return $this->builder->getCountForPagination();
+    }
+
     public function count()
     {
         return $this->builder->count();
     }
 
-    public function where($column, $operator, $value = null)
+    public function where($column, $operator = null, $value = null)
     {
         $this->builder->where($this->column($column), $operator, $value);
+
+        return $this;
+    }
+
+    public function whereIn($column, $values)
+    {
+        $this->builder->whereIn($this->column($column), $values);
 
         return $this;
     }
