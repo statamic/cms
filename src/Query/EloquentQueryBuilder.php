@@ -2,10 +2,11 @@
 
 namespace Statamic\Query;
 
+use Statamic\Contracts\Query\Builder;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
-abstract class EloquentQueryBuilder extends Builder
+abstract class EloquentQueryBuilder implements Builder
 {
     protected $builder;
 
