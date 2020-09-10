@@ -2,10 +2,11 @@
 
 namespace Statamic\Stache\Query;
 
+use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Entries\EntryCollection;
 use Statamic\Facades;
 
-class EntryQueryBuilder extends Builder
+class EntryQueryBuilder extends Builder implements QueryBuilder
 {
     use QueriesTaxonomizedEntries;
 
