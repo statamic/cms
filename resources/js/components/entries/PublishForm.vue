@@ -20,15 +20,19 @@
             </div>
 
             <div class="hidden md:flex items-center">
-                <button
+
+                <save-and-continue-options
                     v-if="!readOnly"
-                    :class="{
-                        'btn': revisionsEnabled,
-                        'btn-primary': isCreating || !revisionsEnabled,
-                    }"
-                    :disabled="!canSave"
-                    @click.prevent="save"
-                    v-text="saveText" />
+                    :show-options="!revisionsEnabled"
+                    :button-class="saveButtonClass"
+                >
+                    <button
+                        :class="saveButtonClass"
+                        :disabled="!canSave"
+                        @click.prevent="save"
+                        v-text="saveText"
+                    />
+                </save-and-continue-options>
 
                 <button
                     v-if="revisionsEnabled && !isCreating"
@@ -248,13 +252,15 @@
 
 
 <script>
-import PublishActions from './PublishActions.vue';
-import RevisionHistory from '../revision-history/History.vue';
+import PublishActions from './PublishActions';
+import SaveAndContinueOptions from '../publish/SaveAndContinueOptions';
+import RevisionHistory from '../revision-history/History';
 
 export default {
 
     components: {
         PublishActions,
+        SaveAndContinueOptions,
         RevisionHistory,
     },
 
@@ -374,7 +380,14 @@ export default {
             if (!this.published && this.initialPublished) return __('Save & Unpublish');
 
             return __('Save');
-        }
+        },
+
+        saveButtonClass() {
+            return {
+                'btn': this.revisionsEnabled,
+                'btn-primary': this.isCreating || ! this.revisionsEnabled,
+            };
+        },
 
     },
 
