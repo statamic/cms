@@ -54,7 +54,7 @@ class Install extends Command
             base_path('content/collections'),
             base_path('content/globals'),
             base_path('content/taxonomies'),
-            base_path('content/structures'),
+            base_path('content/navigation'),
             base_path('users'),
         ];
 
