@@ -39,11 +39,15 @@ export default {
         buttonClass: {
             default: 'btn-primary',
         },
+        preferencesPrefix: {
+            type: String,
+            required: true,
+        },
     },
 
     data() {
         return {
-            currentOption: 'listing',
+            currentOption: null,
         };
     },
 
@@ -52,11 +56,36 @@ export default {
             return {
                 options: {
                     listing: __('Go To Listing'),
-                    continue: __('Continue Editing'),
-                    another: __('Create Another'),
+                    continue_editing: __('Continue Editing'),
+                    add_another: __('Create Another'),
                 },
-                default: 'listing',
             };
+        },
+
+        preferencesKey() {
+            return `${this.preferencesPrefix}.after_save`;
+        },
+    },
+
+    watch: {
+        currentOption: 'setPreference',
+    },
+
+    mounted() {
+        this.setInitialValue();
+    },
+
+    methods: {
+        setInitialValue() {
+            this.currentOption = this.$preferences.get(this.preferencesKey) || 'listing';
+        },
+
+        setPreference(value) {
+            if (value === this.$preferences.get(this.preferencesKey)) return;
+
+            value === 'listing'
+                ? this.$preferences.remove(this.preferencesKey)
+                : this.$preferences.set(this.preferencesKey, value);
         },
     },
 

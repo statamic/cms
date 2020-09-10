@@ -21,10 +21,11 @@
 
             <div class="hidden md:flex items-center">
 
-                <save-and-continue-options
+                <save-button-options
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled"
                     :button-class="saveButtonClass"
+                    :preferences-prefix="`collections.${collectionHandle}`"
                 >
                     <button
                         :class="saveButtonClass"
@@ -32,7 +33,7 @@
                         @click.prevent="save"
                         v-text="saveText"
                     />
-                </save-and-continue-options>
+                </save-button-options>
 
                 <button
                     v-if="revisionsEnabled && !isCreating"
@@ -253,14 +254,14 @@
 
 <script>
 import PublishActions from './PublishActions';
-import SaveAndContinueOptions from '../publish/SaveAndContinueOptions';
+import SaveButtonOptions from '../publish/SaveButtonOptions';
 import RevisionHistory from '../revision-history/History';
 
 export default {
 
     components: {
         PublishActions,
-        SaveAndContinueOptions,
+        SaveButtonOptions,
         RevisionHistory,
     },
 
