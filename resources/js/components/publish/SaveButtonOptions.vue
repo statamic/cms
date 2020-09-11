@@ -57,7 +57,7 @@ export default {
                 options: {
                     listing: __('Go To Listing'),
                     continue_editing: __('Continue Editing'),
-                    add_another: __('Create Another'),
+                    create_another: __('Create Another'),
                 },
             };
         },
