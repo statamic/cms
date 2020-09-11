@@ -476,9 +476,22 @@ export default {
                 .then(() => {
                     if (! this.revisionsEnabled) this.initialPublished = response.data.published;
 
-                    // Finally, we'll emit an event. We need to wait until after the hooks are resolved because
-                    // if this form is being shown in a stack, we only want to close it once everything's done.
-                    this.$nextTick(() => this.$emit('saved', response));
+                    // If the user has opted to create another entry, redirect them to create page.
+                    if (this.afterSaveOption === 'create_another') {
+                        window.location = this.createAnotherUrl;
+                    }
+
+                    // If the user has opted to go to listing (default/null option), redirect them there.
+                    else if (this.afterSaveOption === null) {
+                        window.location = this.listingUrl;
+                    }
+
+                    // Otherwise, leave them on the edit form and emit an event. We need to wait until after
+                    // the hooks are resolved because if this form is being shown in a stack, we only
+                    // want to close it once everything's done.
+                    else {
+                        this.$nextTick(() => this.$emit('saved', response));
+                    }
                 }).catch(e => {});
         },
 
