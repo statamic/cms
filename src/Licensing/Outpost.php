@@ -130,13 +130,14 @@ class Outpost
 
     private function handleRequestException(RequestException $e)
     {
-        switch ($e->getCode()) {
-            case 422:
-                return $this->cacheAndReturnValidationResponse($e);
-            case 429:
-                return $this->cacheAndReturnRateLimitResponse($e);
-            case 500:
-                return $this->cacheAndReturnErrorResponse();
+        $code = $e->getCode();
+
+        if ($code == 422) {
+            return $this->cacheAndReturnValidationResponse($e);
+        } elseif ($code == 429) {
+            return $this->cacheAndReturnRateLimitResponse($e);
+        } elseif ($code >= 500 && $code < 600) {
+            return $this->cacheAndReturnErrorResponse();
         }
 
         throw $e;
