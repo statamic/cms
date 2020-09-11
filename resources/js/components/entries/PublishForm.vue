@@ -40,8 +40,7 @@
                     class="ml-2 btn-primary flex items-center"
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
-                    <span v-text="__('Publish')" />
-                    <svg-icon name="chevron-down-xs" class="ml-1 w-2" />
+                    <span>{{ __('Publish') }}…</span>
                 </button>
             </div>
 
@@ -384,11 +383,31 @@ export default {
         saveText() {
             if (this.revisionsEnabled) return __('Save Changes');
 
-            if (this.published) return __('Save & Publish');
+            if (this.isCreating && this.published && this.afterSaveOption === 'create_another') {
+                return __('Publish & Create Another')
+            }
+            if (this.isCreating && this.published && this.afterSaveOption === 'continue_editing') {
+                return __('Publish & Continue')
+            }
 
-            if (!this.published && this.initialPublished) return __('Save & Unpublish');
+            if (this.isCreating && this.published && ! this.afterSaveOption) {
+                return __('Publish')
+            }
+
+            if (this.published && this.afterSaveOption === 'create_another') {
+                return __('Save & Create Another')
+            }
+            if (this.published && this.afterSaveOption === 'continue_editing') {
+                return __('Save & Continue')
+            }
+
+            if (this.isUnpublishing) return __('Save & Unpublish');
 
             return __('Save');
+        },
+
+        isUnpublishing() {
+            return !this.published && this.initialPublished;
         },
 
         saveButtonClass() {
