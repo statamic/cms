@@ -30,6 +30,8 @@
         :preloaded-assets="{{ json_encode($preloadedAssets) }}"
         :breadcrumbs="{{ $breadcrumbs->toJson() }}"
         :can-edit-blueprint="{{ $str::bool($user->can('configure fields')) }}"
+        create-another-url="{{ cp_route('collections.entries.create', [$collection, $locale]) }}"
+        listing-url="{{ cp_route('collections.show', $collection) }}"
     ></entry-publish-form>
 
 @endsection

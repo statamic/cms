@@ -295,7 +295,9 @@ export default {
         initialPermalink: String,
         revisionsEnabled: Boolean,
         preloadedAssets: Array,
-        canEditBlueprint: Boolean
+        canEditBlueprint: Boolean,
+        createAnotherUrl: String,
+        listingUrl: String,
     },
 
     data() {
