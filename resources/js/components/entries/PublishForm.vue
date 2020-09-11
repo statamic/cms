@@ -387,7 +387,7 @@ export default {
                 return __('Publish & Create Another')
             }
             if (this.isCreating && this.published && this.afterSaveOption === 'continue_editing') {
-                return __('Publish & Continue')
+                return __('Publish & Continue Editing')
             }
 
             if (this.isCreating && this.published && ! this.afterSaveOption) {
@@ -398,7 +398,7 @@ export default {
                 return __('Save & Create Another')
             }
             if (this.published && this.afterSaveOption === 'continue_editing') {
-                return __('Save & Continue')
+                return __('Save & Continue Editing')
             }
 
             if (this.isUnpublishing) return __('Save & Unpublish');
