@@ -7,6 +7,7 @@ use GuzzleHttp\Exception\ConnectException;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
+use InvalidArgumentException;
 use Statamic\Facades;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
@@ -19,6 +20,7 @@ class Outpost
 
     private $response;
     private $client;
+    private $store;
 
     public function __construct(Client $client)
     {
@@ -97,7 +99,7 @@ class Outpost
             'payload' => $this->payload(),
         ]);
 
-        Cache::put(self::CACHE_KEY, $contents, $expiration);
+        $this->cache()->put(self::CACHE_KEY, $contents, $expiration);
 
         return $contents;
     }
@@ -120,12 +122,12 @@ class Outpost
 
     private function getCachedResponse()
     {
-        return Cache::get(self::CACHE_KEY);
+        return $this->cache()->get(self::CACHE_KEY);
     }
 
     public function clearCachedResponse()
     {
-        return Cache::forget(self::CACHE_KEY);
+        return $this->cache()->forget(self::CACHE_KEY);
     }
 
     private function handleRequestException(RequestException $e)
@@ -163,5 +165,20 @@ class Outpost
     private function cacheAndReturnErrorResponse()
     {
         return $this->cacheResponse(now()->addMinutes(5), ['error' => 500]);
+    }
+
+    private function cache()
+    {
+        if ($this->store) {
+            return $this->store;
+        }
+
+        try {
+            $store = Cache::store('outpost');
+        } catch (InvalidArgumentException $e) {
+            $store = Cache::store();
+        }
+
+        return $this->store = $store;
     }
 }

@@ -2,8 +2,6 @@
 
 namespace Tests;
 
-use Statamic\Http\Middleware\CP\ContactOutpost;
-
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $shouldFakeVersion = true;
@@ -14,8 +12,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         require_once __DIR__.'/ConsoleKernel.php';
 
         parent::setUp();
-
-        $this->withoutMiddleware(ContactOutpost::class);
 
         $uses = array_flip(class_uses_recursive(static::class));
 
@@ -97,6 +93,11 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('statamic.api.enabled', true);
 
         $app['config']->set('statamic.editions.pro', true);
+
+        $app['config']->set('cache.stores.outpost', [
+            'driver' => 'file',
+            'path' => storage_path('framework/cache/outpost-data'),
+        ]);
     }
 
     protected function assertEveryItem($items, $callback)
