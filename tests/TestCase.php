@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use Statamic\Http\Middleware\CP\ContactOutpost;
+
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $shouldFakeVersion = true;
@@ -12,6 +14,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         require_once __DIR__.'/ConsoleKernel.php';
 
         parent::setUp();
+
+        $this->withoutMiddleware(ContactOutpost::class);
 
         $uses = array_flip(class_uses_recursive(static::class));
 
