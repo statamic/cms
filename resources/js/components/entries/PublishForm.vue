@@ -181,15 +181,16 @@
                 </div>
                 <template v-slot:buttons>
                    <button
-                    v-if="!readOnly"
-                    class="ml-2"
-                    :class="{
-                        'btn': revisionsEnabled,
-                        'btn-primary': isCreating || !revisionsEnabled,
-                    }"
-                    :disabled="!canSave"
-                    @click.prevent="save"
-                    v-text="saveText" />
+                        v-if="!readOnly"
+                        class="ml-2"
+                        :class="{
+                            'btn': revisionsEnabled,
+                            'btn-primary': isCreating || !revisionsEnabled,
+                        }"
+                        :disabled="!canSave"
+                        @click.prevent="save"
+                        v-text="saveText">
+                    </button>
 
                     <button
                         v-if="revisionsEnabled && !isCreating"
@@ -381,55 +382,30 @@ export default {
         },
 
         saveText() {
-            if (this.revisionsEnabled) return __('Save Changes');
-
-            if (this.isCreating && this.published && this.afterSaveOption === 'create_another') {
-                return __('Publish & Create Another')
+            switch(true) {
+                case this.revisionsEnabled:
+                    return __('Save Changes')
+                case this.isUnpublishing:
+                    return __('Unpublish')
+                case this.isPublishingDraft:
+                    return __('Publish')
+                case this.isCreating && this.published:
+                    return __('Publish')
+                case this.published:
+                    return __('Save');
+                case this.isCreating && ! this.published:
+                    return ('Save')
+                default:
+                    return __('Save')
             }
-            if (this.isCreating && this.published && this.afterSaveOption === 'continue_editing') {
-                return __('Publish & Continue Editing')
-            }
-
-            if (this.isCreating && ! this.published && this.afterSaveOption === 'create_another') {
-                return ('Save & Create Another');
-            }
-
-            if (this.isCreating && ! this.published && this.afterSaveOption === 'continue_editing') {
-                return ('Save & Continue Editing');
-            }
-
-            if (this.isCreating && ! this.published && ! this.afterSaveOption) {
-                return ('Save');
-            }
-
-            if (this.isCreating && this.published && ! this.afterSaveOption) {
-                return __('Publish')
-            }
-
-            if (this.published && this.afterSaveOption === 'create_another') {
-                return __('Save & Create Another')
-            }
-            if (this.published && this.afterSaveOption === 'continue_editing') {
-                return __('Save & Continue Editing')
-            }
-
-            if (this.isUnpublishing && this.afterSaveOption === 'create_another') {
-                return __('Unpublish & Create Another')
-            }
-
-            if (this.isUnpublishing && this.afterSaveOption === 'continue_editing') {
-                return __('Unpublish & Continue Editing')
-            }
-
-            if (this.isUnpublishing && ! this.afterSaveOption) {
-                return __('Unpublish')
-            }
-
-            return __('Save');
         },
 
         isUnpublishing() {
             return !this.published && this.initialPublished;
+        },
+
+        isPublishingDraft() {
+            return this.published && ! this.initialPublished;
         },
 
         saveButtonClass() {

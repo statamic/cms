@@ -9,7 +9,7 @@
         <dropdown-list v-if="showOptions" class="text-left">
             <template v-slot:trigger>
                 <button :class="buttonClass" class="rounded-l-none">
-                    <svg-icon name="chevron-down-xs" class="w-2" />
+                    <svg-icon v-if="buttonIcon" :name="buttonIcon.name" :class="buttonIcon.class" />
                 </button>
             </template>
             <h6 v-text="__('After Saving')" class="p-1" />
@@ -60,6 +60,17 @@ export default {
                     create_another: __('Create Another'),
                 },
             };
+        },
+
+        buttonIcon() {
+            switch(true) {
+                case this.currentOption === 'listing':
+                    return {name: 'micro-arrow-go-back', class: 'w-3'};
+                case this.currentOption === 'continue_editing':
+                    return {name: 'chevron-down-xs', class: 'w-2'};
+                case this.currentOption === 'create_another':
+                    return {name: 'micro-add-circle', class: 'w-3'};
+            }
         },
 
         preferencesKey() {
