@@ -474,7 +474,11 @@ export default {
                     response
                 })
                 .then(() => {
-                    if (! this.revisionsEnabled) this.initialPublished = response.data.published;
+                    // If revisions are enabled, just emit event.
+                    if (this.revisionsEnabled) {
+                        this.$nextTick(() => this.$emit('saved', response));
+                        return;
+                    }
 
                     // If the user has opted to create another entry, redirect them to create page.
                     if (this.afterSaveOption === 'create_another') {
@@ -490,6 +494,7 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
+                        this.initialPublished = response.data.published;
                         this.$nextTick(() => this.$emit('saved', response));
                     }
                 }).catch(e => {});
