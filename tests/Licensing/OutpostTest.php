@@ -171,7 +171,7 @@ class OutpostTest extends TestCase
         ];
 
         $this->assertEquals($expectedResponse, $outpost->response());
-        Carbon::setTestNow(now()->addSeconds($retryAfter-1));
+        Carbon::setTestNow(now()->addSeconds($retryAfter - 1));
         $this->assertCachedResponseEquals($expectedResponse);
         Carbon::setTestNow(now()->addSeconds(1));
         $this->assertResponseNotCached();
