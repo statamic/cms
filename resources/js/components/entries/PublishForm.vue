@@ -390,6 +390,18 @@ export default {
                 return __('Publish & Continue Editing')
             }
 
+            if (this.isCreating && ! this.published && this.afterSaveOption === 'create_another') {
+                return ('Save & Create Another');
+            }
+
+            if (this.isCreating && ! this.published && this.afterSaveOption === 'continue_editing') {
+                return ('Save & Continue Editing');
+            }
+
+            if (this.isCreating && ! this.published && ! this.afterSaveOption) {
+                return ('Save');
+            }
+
             if (this.isCreating && this.published && ! this.afterSaveOption) {
                 return __('Publish')
             }
@@ -401,7 +413,17 @@ export default {
                 return __('Save & Continue Editing')
             }
 
-            if (this.isUnpublishing) return __('Save & Unpublish');
+            if (this.isUnpublishing && this.afterSaveOption === 'create_another') {
+                return __('Unpublish & Create Another')
+            }
+
+            if (this.isUnpublishing && this.afterSaveOption === 'continue_editing') {
+                return __('Unpublish & Continue Editing')
+            }
+
+            if (this.isUnpublishing && ! this.afterSaveOption) {
+                return __('Unpublish')
+            }
 
             return __('Save');
         },
