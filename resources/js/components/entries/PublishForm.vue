@@ -25,7 +25,7 @@
                     v-if="!readOnly"
                     :show-options="!revisionsEnabled"
                     :button-class="saveButtonClass"
-                    :preferences-prefix="`collections.${collectionHandle}`"
+                    :preferences-prefix="preferencesPrefix"
                 >
                     <button
                         :class="saveButtonClass"
@@ -256,8 +256,13 @@
 import PublishActions from './PublishActions';
 import SaveButtonOptions from '../publish/SaveButtonOptions';
 import RevisionHistory from '../revision-history/History';
+import HasPreferences from '../data-list/HasPreferences';
 
 export default {
+
+    mixins: [
+        HasPreferences,
+    ],
 
     components: {
         PublishActions,
@@ -316,6 +321,7 @@ export default {
             state: 'new',
             revisionMessage: null,
             showRevisionHistory: false,
+            preferencesPrefix: `collections.${this.collectionHandle}`,
 
             // Whether it was published the last time it was saved.
             // Successful publish actions (if using revisions) or just saving (if not) will update this.
@@ -388,6 +394,10 @@ export default {
                 'btn': this.revisionsEnabled,
                 'btn-primary': this.isCreating || ! this.revisionsEnabled,
             };
+        },
+
+        afterSaveOption() {
+            return this.getPreference('after_save');
         },
 
     },
