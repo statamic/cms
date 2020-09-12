@@ -107,7 +107,7 @@ return [
     'licensing_error_unlicensed' => 'Nicht lizenziert',
     'licensing_production_alert' => 'Bitte kauf oder gib einen gültigen Lizenzschlüssel für diese Webseite ein, damit die Lizenzvereinbarung eingehalten wird.',
     'licensing_sync_instructions' => 'Die Angaben von statamic.com werden einmal pro Stunde synchronisiert. Erzwinge eine Synchronisierung, um alle vorgenommenen Änderungen anzuzeigen.',
-    'licensing_trial_mode_alert' => 'Sie kommst in den Genuss von kostenpflichtigen Funktionen oder Addons, die vor der Veröffentlichung dieser Webseite lizenziert werden müssen. Viel Vergnügen!',
+    'licensing_trial_mode_alert' => 'Du kommst in den Genuss von kostenpflichtigen Funktionen oder Addons, die vor der Veröffentlichung dieser Webseite lizenziert werden müssen. Viel Vergnügen!',
     'licensing_utility_description' => 'Lizenzdetails anzeigen und auflösen.',
     'max_depth_instructions' => 'Maximale Anzahl von Ebenen festlegen, in denen Seiten verschachtelt werden dürfen. Für eine unbegrenzte Tiefe leer lassen.',
     'max_items_instructions' => 'Maximale Anzahl auswählbarer Einträge festlegen.',
