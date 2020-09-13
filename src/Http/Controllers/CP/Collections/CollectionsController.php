@@ -33,6 +33,8 @@ class CollectionsController extends CpController
                 'blueprints_url' => cp_route('collections.blueprints.index', $collection->handle()),
                 'scaffold_url' => cp_route('collections.scaffold', $collection->handle()),
                 'deleteable' => User::current()->can('delete', $collection),
+                'editable' => User::current()->can('edit', $collection),
+                'blueprint_editable' => User::current()->can('configure fields'),
             ];
         })->values();
 
