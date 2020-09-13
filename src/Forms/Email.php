@@ -6,6 +6,7 @@ use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Queue\SerializesModels;
 use Statamic\Facades\Config;
+use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Site;
 use Statamic\Support\Str;
@@ -79,7 +80,7 @@ class Email extends Mailable
     {
         $augmented = $this->submission->toAugmentedArray();
 
-        $data = array_merge($augmented, [
+        $data = array_merge($augmented, $this->getGlobalsData(), [
             'fields'     => $this->getRenderableFieldData($augmented),
             'site_url'   => Config::getSiteUrl(),
             'date'       => now(),
@@ -102,6 +103,23 @@ class Email extends Mailable
 
             return compact('display', 'handle', 'fieldtype', 'config', 'value');
         });
+    }
+
+    private function getGlobalsData()
+    {
+        $data = [];
+
+        foreach (GlobalSet::all() as $global) {
+            if (! $global->existsIn(Site::current()->handle())) {
+                continue;
+            }
+
+            $global = $global->in(Site::current()->handle());
+
+            $data[$global->handle()] = $global->toAugmentedArray();
+        }
+
+        return $data;
     }
 
     protected function addresses($addresses)
