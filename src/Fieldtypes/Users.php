@@ -97,6 +97,10 @@ class Users extends Relationship
         }
 
         return $users->map(function ($user) {
+            if (! $user) {
+                return null;
+            }
+
             return [
                 'id' => $user->id(),
                 'title' => $user->get('name', $user->email()),
