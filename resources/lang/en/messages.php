@@ -89,6 +89,7 @@ return [
     'getting_started_widget_header' => 'Getting Started with Statamic 3',
     'getting_started_widget_intro' => 'To begin building your new Statamic 3 site, we recommend starting with these steps.',
     'getting_started_widget_navigation' => 'Create multi-level lists of links that can be used to render navbars, footers, and so on.',
+    'getting_started_widget_pro' => 'Statamic Pro adds unlimited user accounts, roles, permissions, git-integration, revisions, multi-site, and more!',
     'git_disabled' => 'Statamic Git integration is currently disabled.',
     'git_nothing_to_commit' => 'Nothing to commit, content paths clean!',
     'git_utility_description' => 'Manage Git tracked content.',

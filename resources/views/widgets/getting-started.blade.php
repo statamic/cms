@@ -13,6 +13,15 @@
                 <p>{{ __('statamic::messages.getting_started_widget_docs') }}</p>
             </div>
         </a>
+        <a href="https://statamic.dev/licensing" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+            <div class="h-8 w-8 mr-2 text-grey-80">
+                @svg('pro-ribbon')
+            </div>
+            <div class="flex-1">
+                <h3 class="mb-1 text-blue">{{ __('Enable Pro Mode') }}</h3>
+                <p>{{ __('statamic::messages.getting_started_widget_navigation') }}</p>
+            </div>
+        </a>
         <a href="{{ cp_route('collections.create') }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
                 @svg('content-writing')
@@ -39,7 +48,6 @@
                 <h3 class="mb-1 text-blue">{{ __('Create a Navigation') }}</h3>
                 <p>{{ __('statamic::messages.getting_started_widget_navigation') }}</p>
             </div>
-
         </a>
     </div>
 </div>
