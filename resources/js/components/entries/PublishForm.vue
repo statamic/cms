@@ -511,7 +511,7 @@ export default {
                     // the hooks are resolved because if this form is being shown in a stack, we only
                     // want to close it once everything's done.
                     else {
-                        this.initialPublished = response.data.published;
+                        this.initialPublished = response.data.data.published;
                         this.$nextTick(() => this.$emit('saved', response));
                     }
                 }).catch(e => {});
