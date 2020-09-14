@@ -42,7 +42,7 @@
         </a>
         <a href="{{ cp_route('navigation.create') }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
-                @svg('structures')
+                @svg('hierarchy-files')
             </div>
             <div class="flex-1">
                 <h3 class="mb-1 text-blue">{{ __('Create a Navigation') }}</h3>
