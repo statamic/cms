@@ -4,7 +4,7 @@ namespace Statamic\Auth\Passwords;
 
 class PasswordReset
 {
-    const BROKER_RESETS = 'resets';
+    const BROKER_RESETS = 'users';
     const BROKER_ACTIVATIONS = 'activations';
 
     protected static $url;
