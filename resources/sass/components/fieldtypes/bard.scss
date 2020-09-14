@@ -1,5 +1,7 @@
 .bard-fieldtype-wrapper {
-    @apply .border .rounded relative;
+    @apply .border .rounded relative outline-none;
+
+    * { outline: none; }
 
     &:focus-within {
         @apply focus-outline;
