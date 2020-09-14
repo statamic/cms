@@ -10,6 +10,7 @@ return [
     'assets.config.mode' => 'Choisissez votre disposition préférée.',
     'assets.config.restrict' => 'Empêchez les utilisateurs de naviguer vers d’autres dossiers.',
     'bard.config.allow_source' => 'Activez l’option pour afficher le code source HTML pendant l’écriture.',
+    'bard.config.always_show_set_button' => 'Activez l’option pour toujours afficher le bouton "Ajouter un jeu".',
     'bard.config.buttons' => 'Choisissez les boutons à afficher dans la barre d’outils.',
     'bard.config.container' => 'Choisissez quel conteneur de ressources à utiliser pour ce champ.',
     'bard.config.fullscreen' => 'Activez l’option pour basculer en mode plein écran.',
