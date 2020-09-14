@@ -220,6 +220,7 @@ class TermsController extends CpController
             'taxonomy' => $taxonomy->handle(),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $taxonomy->defaultPublishState(),
+            'locale' => $site->handle(),
             'localizations' => $taxonomy->sites()->map(function ($handle) use ($taxonomy, $site) {
                 return [
                     'handle' => $handle,

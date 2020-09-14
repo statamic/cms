@@ -12,6 +12,8 @@
         :meta="{{ json_encode($meta) }}"
         :published="{{ json_encode($published) }}"
         :localizations="{{ json_encode($localizations) }}"
+        create-another-url="{{ cp_route('taxonomies.terms.create', [$taxonomy, $locale]) }}"
+        listing-url="{{ cp_route('taxonomies.show', $taxonomy) }}"
     ></base-term-create-form>
 
 @endsection

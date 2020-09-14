@@ -31,6 +31,8 @@
         :initial-read-only="{{ $str::bool($readOnly) }}"
         :preloaded-assets="{{ json_encode($preloadedAssets) }}"
         :breadcrumbs="{{ $breadcrumbs->toJson() }}"
+        create-another-url="{{ cp_route('taxonomies.terms.create', [$taxonomy, $locale]) }}"
+        listing-url="{{ cp_route('taxonomies.show', $taxonomy) }}"
     ></term-publish-form>
 
 @endsection
