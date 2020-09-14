@@ -384,28 +384,22 @@ export default {
         saveText() {
             switch(true) {
                 case this.revisionsEnabled:
-                    return __('Save Changes')
+                    return __('Save Changes');
                 case this.isUnpublishing:
-                    return __('Unpublish')
-                case this.isPublishingDraft:
-                    return __('Publish')
-                case this.isCreating && this.published:
-                    return __('Publish')
-                case this.published:
-                    return __('Save');
-                case this.isCreating && ! this.published:
-                    return ('Save')
+                    return __('Save & Unpublish');
+                case this.isDraft:
+                    return __('Save Draft');
                 default:
-                    return __('Save')
+                    return __('Save & Publish');
             }
         },
 
         isUnpublishing() {
-            return !this.published && this.initialPublished;
+            return this.initialPublished && ! this.published && ! this.isCreating;
         },
 
-        isPublishingDraft() {
-            return this.published && ! this.initialPublished;
+        isDraft() {
+            return ! this.published;
         },
 
         saveButtonClass() {
