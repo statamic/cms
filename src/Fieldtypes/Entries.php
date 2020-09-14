@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Scope;
@@ -149,8 +150,13 @@ class Entries extends Relationship
 
         $collections = $this->getConfiguredCollections();
 
-        return collect($collections)->flatMap(function ($collection) use ($collections) {
-            $collection = Collection::findByHandle($collection);
+        return collect($collections)->flatMap(function ($collectionHandle) use ($collections) {
+            $collection = Collection::findByHandle($collectionHandle);
+
+            if (! $collection) {
+                throw new CollectionNotFoundException($collectionHandle);
+            }
+
             $blueprints = $collection->entryBlueprints();
 
             return $blueprints->map(function ($blueprint) use ($collection, $collections, $blueprints) {
