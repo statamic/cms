@@ -88,7 +88,6 @@ return [
     'getting_started_widget_header' => 'Erste Schritte mit Statamic 3',
     'getting_started_widget_intro' => 'Wir empfehlen dir beim Aufbau deiner neuen Statamic 3 Webseite mit diesen Schritten zu beginnen.',
     'getting_started_widget_navigation' => 'Erstelle mehrstufige Listen mit Links, die für die Gestaltung von Navbars, Fuszeilen etc. verwendet werden können.',
-    'getting_started_widget_reminder' => 'Bitte denke daran: <b>Statamic ist eine kommerzielle Software</b> und du musst möglicherweise eine entsprechende Lizenz erwerben, um Statamic nach Ablauf der Beta-Phase weiter nutzen zu können.',
     'git_disabled' => 'Die Statamic Git Integration ist zurzeit deaktiviert.',
     'git_nothing_to_commit' => 'Nichts zu committen, Inhaltspfade sauber!',
     'git_utility_description' => 'Von Git getrackte Inhalte verwalten.',

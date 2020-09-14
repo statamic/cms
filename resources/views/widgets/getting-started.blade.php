@@ -1,9 +1,7 @@
 <div class="card p-0 content">
     <div class="py-3 px-4 border-b">
         <h1>{{ __('statamic::messages.getting_started_widget_header') }}</h1>
-        <p>{{ __('statamic::messages.getting_started_widget_intro') }}
-            {!! __('statamic::messages.getting_started_widget_reminder') !!}
-        </p>
+        <p>{{ __('statamic::messages.getting_started_widget_intro') }}</p>
     </div>
     <div class="flex flex-wrap p-2">
         <a href="https://statamic.dev" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">

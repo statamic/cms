@@ -88,7 +88,6 @@ return [
     'getting_started_widget_header' => 'Introduzione a Statamic',
     'getting_started_widget_intro' => 'Per iniziare a costruire il tuo nuovo sito Statamic, ti consigliamo di iniziare con questi passaggi.',
     'getting_started_widget_navigation' => 'Crea elenchi multilivello di link che possono essere utilizzati per barre di navigazione, footer e così via.',
-    'getting_started_widget_reminder' => 'Ricorda: <b>Statamic è un software commerciale</b> e potrebbe essere necessario acquistare una licenza appropriata per continuare a utilizzare Statamic dopo la fine del periodo beta.',
     'git_disabled' => 'L\'integrazione di Statamic Git è attualmente disabilitata.',
     'git_nothing_to_commit' => 'Niente da impegnare, percorsi di contenuto puliti!',
     'git_utility_description' => 'Gestisci i contenuti monitorati da Git.',

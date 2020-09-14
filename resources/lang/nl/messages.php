@@ -88,7 +88,6 @@ return [
     'getting_started_widget_header' => 'Starten met Statamic 3',
     'getting_started_widget_intro' => 'Om te beginnen met het bouwen van je nieuwe Statamic 3 site, raden we je aan om met deze stappen te beginnen.',
     'getting_started_widget_navigation' => 'Creëer multi-level lijsten van links die gebruik kunnen worden om navigaties, footers etc. te genereren.',
-    'getting_started_widget_reminder' => 'Belangrijk: <b>Statamic is commerciële software</b> en mogelijk moet u een geldige licentie aanschaffen om Statamic te blijven gebruiken nadat de bètaperiode is verstreken.',
     'git_disabled' => 'Statamic Git-integratie is momenteel uitgeschakeld.',
     'git_nothing_to_commit' => 'Niets te doen, inhoudspaden schoon!',
     'git_utility_description' => 'Beheer door Git bijgehouden inhoud.',
