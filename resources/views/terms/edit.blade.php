@@ -9,8 +9,8 @@
         publish-container="base"
         :initial-actions="{{ json_encode($actions) }}"
         method="patch"
-        taxonomy-title="{{ $taxonomy['title'] }}"
-        taxonomy-url="{{ $taxonomy['url'] }}"
+        taxonomy-handle="{{ $taxonomy }}"
+        :breadcrumbs="{{ $breadcrumbs->toJson() }}"
         initial-title="{{ $title }}"
         initial-reference="{{ $reference }}"
         :initial-fieldset="{{ json_encode($blueprint) }}"
@@ -30,6 +30,7 @@
         {{-- :amp="{{ $str::bool($term->ampable()) }}" --}}
         :initial-read-only="{{ $str::bool($readOnly) }}"
         :preloaded-assets="{{ json_encode($preloadedAssets) }}"
+        :breadcrumbs="{{ $breadcrumbs->toJson() }}"
     ></term-publish-form>
 
 @endsection

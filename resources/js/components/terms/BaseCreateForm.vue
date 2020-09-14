@@ -6,8 +6,8 @@
         :initial-actions="actions"
         method="post"
         :initial-title="__('Create')"
-        :taxonomy-title="taxonomyTitle"
-        :taxonomy-url="taxonomyUrl"
+        :taxonomy-handle="taxonomyHandle"
+        :breadcrumbs="breadcrumbs"
         :initial-fieldset="fieldset"
         :initial-values="values"
         :initial-meta="meta"
@@ -26,8 +26,8 @@ export default {
 
     props: [
         'actions',
-        'taxonomyTitle',
-        'taxonomyUrl',
+        'taxonomyHandle',
+        'breadcrumbs',
         'fieldset',
         'values',
         'meta',

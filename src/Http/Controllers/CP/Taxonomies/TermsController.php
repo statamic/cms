@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Taxonomies;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Taxonomies\Term as TermContract;
+use Statamic\CP\Breadcrumbs;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
@@ -97,7 +98,7 @@ class TermsController extends CpController
             ],
             'values' => array_merge($values, ['id' => $term->id()]),
             'meta' => $meta,
-            'taxonomy' => $this->taxonomyToArray($taxonomy),
+            'taxonomy' => $taxonomy->handle(),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => User::current()->cant('edit', $term),
             'published' => $term->published(),
@@ -126,6 +127,7 @@ class TermsController extends CpController
             'hasWorkingCopy' => $term->hasWorkingCopy(),
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $term->revisionsEnabled(),
+            'breadcrumbs' => $this->breadcrumbs($taxonomy),
         ];
 
         if ($request->wantsJson()) {
@@ -215,7 +217,7 @@ class TermsController extends CpController
             ],
             'values' => $values,
             'meta' => $fields->meta(),
-            'taxonomy' => $this->taxonomyToArray($taxonomy),
+            'taxonomy' => $taxonomy->handle(),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $taxonomy->defaultPublishState(),
             'localizations' => $taxonomy->sites()->map(function ($handle) use ($taxonomy, $site) {
@@ -229,6 +231,7 @@ class TermsController extends CpController
                     'livePreviewUrl' => cp_route('taxonomies.terms.preview.create', [$taxonomy->handle(), $handle]),
                 ];
             })->all(),
+            'breadcrumbs' => $this->breadcrumbs($taxonomy),
         ];
 
         if ($request->wantsJson()) {
@@ -275,15 +278,6 @@ class TermsController extends CpController
         return ['data' => ['redirect' => $term->editUrl()]];
     }
 
-    // TODO: Change to $taxonomy->toArray()
-    protected function taxonomyToArray($taxonomy)
-    {
-        return [
-            'title' => $taxonomy->title(),
-            'url' => cp_route('taxonomies.show', $taxonomy->handle()),
-        ];
-    }
-
     protected function extractFromFields($term, $blueprint)
     {
         // The values should only be data merged with the origin data.
@@ -323,5 +317,19 @@ class TermsController extends CpController
             })
             ->filter()
             ->values();
+    }
+
+    protected function breadcrumbs($taxonomy)
+    {
+        return new Breadcrumbs([
+            [
+                'text' => __('Taxonomies'),
+                'url' => cp_route('taxonomies.index'),
+            ],
+            [
+                'text' => $taxonomy->title(),
+                'url' => $taxonomy->showUrl(),
+            ],
+        ]);
     }
 }
