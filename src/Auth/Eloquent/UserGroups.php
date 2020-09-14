@@ -70,6 +70,6 @@ class UserGroups
      */
     private function table()
     {
-        return DB::table('group_user');
+        return DB::connection(config('statamic.database.connection'))->table('group_user');
     }
 }

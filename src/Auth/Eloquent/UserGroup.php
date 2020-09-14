@@ -14,7 +14,8 @@ class UserGroup extends FileUserGroup
 
     protected function getUserIds()
     {
-        return \DB::table('group_user')
+        return \DB::connection(config('statamic.database.connection'))
+            ->table('group_user')
             ->where('group_id', $this->id())
             ->pluck('user_id');
     }
