@@ -107,6 +107,10 @@ class Field implements Arrayable
             return true;
         }
 
+        if ($this->config()['type'] === 'section') {
+            return false;
+        }
+
         return (bool) $this->get('listable');
     }
 
