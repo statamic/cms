@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'any.config.default' => 'Stel de standaardwaarde in',
     'array.config.keys' => 'Stel de array keys (variabelen) en optionele labels in.',
     'array.config.mode' => 'Dynamische modus geeft de gebruiker controle over de data terwijl keyed modus dat niet doet.',
     'assets.config.allow_uploads' => 'Nieuwe file-uploads toestaan',
@@ -10,6 +11,7 @@ return [
     'assets.config.mode' => 'Kies je voorkeur voor layoutstijl.',
     'assets.config.restrict' => 'Voorkom dat gebruikers naar andere mapen kunnen bladeren.',
     'bard.config.allow_source' => 'Schakel de optie in dat gebruikers de HTML-broncode kunnen bekijken tijdens het schrijven.',
+    'bard.config.always_show_set_button' => 'Schakel in om altijd de voeg-set-knop-toe te tonen.',
     'bard.config.buttons' => 'Kies welke knoppen er in de toolbar zitten.',
     'bard.config.container' => 'Kies welke asset-container er voor dit veld gebruikt moet worden.',
     'bard.config.fullscreen' => 'Schakel de optie in dat mensen volledige schermweergave kunnen gebruiken.',
