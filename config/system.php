@@ -92,7 +92,7 @@ return [
     |
     */
 
-    'enable_cache_tags' => true,
+    'enable_cache_tags' => env('ENABLE_CACHE_TAGS', true),
 
     /*
     |--------------------------------------------------------------------------
