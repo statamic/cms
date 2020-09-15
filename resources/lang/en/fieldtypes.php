@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'any.config.default' => 'Set the default value.',
     'array.config.keys' => 'Set the array keys (variables) and optional labels.',
     'array.config.mode' => 'Dynamic mode gives the user control of the data while keyed mode does not.',
     'assets.config.allow_uploads' => 'Allow new file uploads.',
