@@ -176,7 +176,7 @@ export default {
         },
 
         showFixedToolbar() {
-            return this.toolbarIsFixed && (this.allowSource || this.hasExtraButtons)
+            return this.toolbarIsFixed && (this.visibleButtons.length > 0 || this.allowSource || this.hasExtraButtons)
         },
 
         hasExtraButtons() {
