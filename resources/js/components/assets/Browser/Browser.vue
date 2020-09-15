@@ -1,6 +1,6 @@
 <template>
 
-    <div>
+    <div class="min-h-screen">
         <div v-if="initializing" class="loading">
             <loading-graphic  />
         </div>
@@ -15,10 +15,10 @@
             @upload-complete="uploadCompleted"
             @error="uploadError"
         >
-            <div slot-scope="{ dragging }" class="relative">
+            <div slot-scope="{ dragging }" class="min-h-screen">
                 <div class="drag-notification" v-show="dragging">
-                    <svg-icon name="upload" class="h-12 w-12 mb-2" />
-                    {{ __('Drop File to Upload') }}
+                    <svg-icon name="upload" class="h-12 w-12 m-2" />
+                    <span>{{ __('Drop File to Upload') }}</span>
                 </div>
 
                 <div class="publish-tabs tabs rounded-none rounded-t -mx-1px shadow-none" v-if="showContainerTabs">
