@@ -4,14 +4,14 @@ namespace Statamic\Forms;
 
 use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Events\Data\FormDeleted;
-use Statamic\Events\Data\FormSaved;
-use Statamic\Facades;
+use Statamic\Events\FormBlueprintFound;
+use Statamic\Events\FormDeleted;
+use Statamic\Events\FormSaved;
+use Statamic\Facades\Blueprint;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
 use Statamic\Facades\YAML;
-use Statamic\Fields\Blueprint;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -52,21 +52,18 @@ class Form implements FormContract
     }
 
     /**
-     * Get or set the blueprint.
+     * Get the blueprint.
      *
-     * @param mixed $blueprint
      * @return mixed
      */
-    public function blueprint($blueprint = null)
+    public function blueprint()
     {
-        return $this->fluentlyGetOrSet('blueprint')
-            ->getter(function ($blueprint) {
-                return Facades\Blueprint::find($blueprint);
-            })
-            ->setter(function ($blueprint) {
-                return $blueprint instanceof Blueprint ? $blueprint->handle() : $blueprint;
-            })
-            ->args(func_get_args());
+        $blueprint = Blueprint::find('forms.'.$this->handle())
+            ?? Blueprint::makeFromFields([])->setHandle($this->handle())->setNamespace('forms');
+
+        FormBlueprintFound::dispatch($blueprint, $this);
+
+        return $blueprint;
     }
 
     /**
@@ -147,7 +144,6 @@ class Form implements FormContract
     {
         $data = collect([
             'title' => $this->title,
-            'blueprint' => $this->blueprint,
             'honeypot' => $this->honeypot,
             'email' => collect($this->email)->map(function ($email) {
                 return Arr::removeNullValues($email);
@@ -187,7 +183,6 @@ class Form implements FormContract
             ->filter(function ($value, $property) {
                 return in_array($property, [
                     'title',
-                    'blueprint',
                     'honeypot',
                     'store',
                     'email',
@@ -305,22 +300,6 @@ class Form implements FormContract
     }
 
     /**
-     * Is a field an uploadable type?
-     *
-     * @param string $field
-     * @return mixed
-     */
-    public function isUploadableField($field)
-    {
-        // TODO: Reimplement isUploadableField()
-        return false;
-
-        // $field = collect($this->fields())->get($field);
-
-        // return in_array(array_get($field, 'type'), ['file', 'files', 'asset', 'assets']);
-    }
-
-    /**
      * Get the date format.
      *
      * @return string
@@ -328,7 +307,7 @@ class Form implements FormContract
     public function dateFormat()
     {
         // TODO: Should this be a form.yaml config, a config/forms.php config, or a global config?
-        return 'M j, Y @ h:i';
+        return 'M j, Y @ H:i';
 
         // return $this->formset()->get('date_format', 'M j, Y @ h:i');
     }
@@ -343,10 +322,16 @@ class Form implements FormContract
         return [
             'handle' => $this->handle,
             'title' => $this->title,
-            'blueprint' => $this->blueprint,
             'honeypot' => $this->honeypot(),
             'store' => $this->store(),
             'email' => $this->email,
         ];
+    }
+
+    public function hasFiles()
+    {
+        return $this->fields()->filter(function ($field) {
+            return $field->fieldtype()->handle() === 'assets';
+        })->isNotEmpty();
     }
 }

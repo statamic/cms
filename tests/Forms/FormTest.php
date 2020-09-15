@@ -22,7 +22,6 @@ class FormTest extends TestCase
 
         Form::make('contact_us')
             ->title('Contact Us')
-            ->blueprint($blueprint)
             ->honeypot('winnie')
             ->save();
 
@@ -30,7 +29,6 @@ class FormTest extends TestCase
 
         $this->assertEquals('contact_us', $form->handle());
         $this->assertEquals('Contact Us', $form->title());
-        $this->assertEquals('post', $form->blueprint()->handle());
         $this->assertEquals('winnie', $form->honeypot());
     }
 

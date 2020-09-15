@@ -5,10 +5,12 @@ namespace Statamic\Taxonomies;
 use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
+use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
-use Statamic\Events\Data\TaxonomyDeleted;
-use Statamic\Events\Data\TaxonomySaved;
+use Statamic\Events\TaxonomyDeleted;
+use Statamic\Events\TaxonomySaved;
+use Statamic\Events\TermBlueprintFound;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
@@ -20,7 +22,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Taxonomy implements Contract, Responsable, AugmentableContract
 {
-    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData;
+    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
 
     protected $handle;
     protected $title;
@@ -30,6 +32,11 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     protected $defaultPublishState = true;
     protected $revisions = false;
     protected $searchIndex;
+
+    public function __construct()
+    {
+        $this->cascade = collect();
+    }
 
     public function id()
     {
@@ -74,30 +81,32 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         ]);
     }
 
-    public function termBlueprints($blueprints = null)
+    public function termBlueprints()
     {
-        return $this
-            ->fluentlyGetOrSet('blueprints')
-            ->getter(function ($blueprints) {
-                if (is_null($blueprints)) {
-                    return collect([$this->fallbackTermBlueprint()]);
-                }
+        $blueprints = Blueprint::in('taxonomies/'.$this->handle());
 
-                return collect($blueprints)->map(function ($blueprint) {
-                    return Blueprint::find($blueprint);
-                });
-            })
-            ->setter(function ($blueprints) {
-                return empty($blueprints) ? null : $blueprints;
-            })
-            ->args(func_get_args());
+        if ($blueprints->isEmpty()) {
+            $blueprints = collect([$this->fallbackTermBlueprint()]);
+        }
+
+        return $blueprints->values()->map(function ($blueprint) {
+            return $this->ensureTermBlueprintFields($blueprint);
+        });
     }
 
-    public function termBlueprint()
+    public function termBlueprint($blueprint = null, $term = null)
     {
-        return $this->ensureTermBlueprintFields(
-            $this->termBlueprints()->first() ?? $this->fallbackTermBlueprint()
-        );
+        $blueprint = is_null($blueprint)
+            ? $this->termBlueprints()->first()
+            : $this->termBlueprints()->keyBy->handle()->get($blueprint);
+
+        $blueprint ? $this->ensureTermBlueprintFields($blueprint) : null;
+
+        if ($blueprint) {
+            TermBlueprintFound::dispatch($blueprint->setParent($term ?? $this), $term);
+        }
+
+        return $blueprint;
     }
 
     public function ensureTermBlueprintFields($blueprint)
@@ -111,7 +120,15 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function fallbackTermBlueprint()
     {
-        return Blueprint::find('default');
+        $blueprint = Blueprint::find('default')
+            ->setHandle($this->handle())
+            ->setNamespace('taxonomies.'.$this->handle());
+
+        $contents = $blueprint->contents();
+        $contents['title'] = $this->title();
+        $blueprint->setContents($contents);
+
+        return $blueprint;
     }
 
     public function sortField()
@@ -165,6 +182,8 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         if (Site::hasMultiple()) {
             $data['sites'] = $this->sites;
         }
+
+        $data['inject'] = $this->cascade->all();
 
         return $data;
     }
@@ -287,6 +306,11 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     public static function __callStatic($method, $parameters)
     {
         return Facades\Taxonomy::{$method}(...$parameters);
+    }
+
+    public function __toString()
+    {
+        return $this->handle();
     }
 
     public function augmentedArrayData()

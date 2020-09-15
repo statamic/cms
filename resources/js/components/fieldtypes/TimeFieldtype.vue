@@ -16,6 +16,7 @@
                     @focus="$emit('focus')"
                     @blur="$emit('blur')"
                     :readonly="isReadOnly"
+                    :id="fieldId"
                     tabindex="0"
                 />
                 <span class="colon">:</span>

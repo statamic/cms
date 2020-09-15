@@ -40,18 +40,18 @@
 	}
 }
 
-@element .date-time-container and (max-width: 260px) {
-	:self {
-		@apply block;
+// Make date and time and fields sit one above the other
+// when it's too narrow for them to sit side by side.
+.date-time-container.narrow {
+    @apply block;
 
-		.date-container {
-			@apply mb-1;
-		}
+    .date-container {
+        @apply mb-1;
+    }
 
-		.time-container {
-			@apply ml-0;
-		}
-	}
+    .time-container {
+        @apply ml-0;
+    }
 }
 
 // Dear sweet baby Jesus please forgive me for this brittle selector

@@ -14,6 +14,7 @@ class EntryFactory
     protected $published = true;
     protected $order;
     protected $locale = 'en';
+    protected $origin;
 
     public function id($id)
     {
@@ -57,6 +58,13 @@ class EntryFactory
         return $this;
     }
 
+    public function origin($origin)
+    {
+        $this->origin = $origin;
+
+        return $this;
+    }
+
     public function make()
     {
         $entry = Entry::make()
@@ -64,6 +72,7 @@ class EntryFactory
             ->collection($this->createCollection())
             ->slug($this->slug)
             ->data($this->data)
+            ->origin($this->origin)
             ->published($this->published);
 
         if ($this->id) {

@@ -9,10 +9,10 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
+use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
-use Statamic\Facades\User;
 use Statamic\Http\Responses\DataResponse;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
@@ -20,7 +20,7 @@ use Statamic\Statamic;
 
 class LocalizedTerm implements Term, Responsable, Augmentable
 {
-    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns;
+    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified;
 
     protected $locale;
     protected $term;
@@ -70,14 +70,18 @@ class LocalizedTerm implements Term, Responsable, Augmentable
 
     public function values()
     {
-        return $this->term
+        $values = $this->term
             ->dataForLocale($this->defaultLocale())
             ->merge($this->data());
+
+        return $this->taxonomy()->cascade()->merge($values);
     }
 
     public function value($key)
     {
-        return $this->get($key) ?? $this->inDefaultLocale()->get($key);
+        return $this->get($key)
+            ?? $this->inDefaultLocale()->get($key)
+            ?? $this->taxonomy()->cascade($key);
     }
 
     public function site()
@@ -157,9 +161,15 @@ class LocalizedTerm implements Term, Responsable, Augmentable
         return $this;
     }
 
-    public function blueprint()
+    public function blueprint($blueprint = null)
     {
-        return $this->term->blueprint();
+        if (func_num_args() === 0) {
+            return $this->term->blueprint();
+        }
+
+        $this->term->blueprint($blueprint);
+
+        return $this;
     }
 
     public function reference()
@@ -407,12 +417,5 @@ class LocalizedTerm implements Term, Responsable, Augmentable
         return $this->has('updated_at')
             ? Carbon::createFromTimestamp($this->get('updated_at'))
             : $this->term->fileLastModified();
-    }
-
-    public function lastModifiedBy()
-    {
-        return $this->has('updated_by')
-            ? User::find($this->get('updated_by'))
-            : null;
     }
 }

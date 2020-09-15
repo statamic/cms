@@ -60,11 +60,13 @@ class TaxonomyRepositoryTest extends TestCase
     public function it_saves_a_taxonomy_to_the_stache_and_to_a_file()
     {
         $taxonomy = TaxonomyAPI::make('new');
+        $taxonomy->cascade(['foo' => 'bar']);
         $this->assertNull($this->repo->findByHandle('new'));
 
         $this->repo->save($taxonomy);
 
-        $this->assertNotNull($this->repo->findByHandle('new'));
+        $this->assertNotNull($item = $this->repo->findByHandle('new'));
+        $this->assertEquals(['foo' => 'bar'], $item->cascade()->all());
         $this->assertTrue(file_exists($this->directory.'/new.yaml'));
         @unlink($this->directory.'/new.yaml');
     }

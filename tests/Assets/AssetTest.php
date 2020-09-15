@@ -8,8 +8,8 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
-use Statamic\Events\Data\AssetSaved;
-use Statamic\Events\Data\AssetUploaded;
+use Statamic\Events\AssetSaved;
+use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
@@ -31,7 +31,6 @@ class AssetTest extends TestCase
 
         $this->container = (new AssetContainer)
             ->handle('test_container')
-            ->blueprint('test_blueprint')
             ->disk('test');
 
         Storage::fake('test');
@@ -498,8 +497,8 @@ class AssetTest extends TestCase
     public function it_compiles_augmented_array_data()
     {
         Facades\Blueprint::shouldReceive('find')
-            ->with('test_blueprint')
-            ->andReturn($blueprint = (new Blueprint)->setHandle('test_blueprint'));
+            ->with('assets/test_container')
+            ->andReturn($blueprint = (new Blueprint)->setHandle('test_container')->setNamespace('assets'));
 
         $asset = (new Asset)
             ->container($this->container)
@@ -537,8 +536,8 @@ class AssetTest extends TestCase
     public function data_keys_get_added_to_array()
     {
         Facades\Blueprint::shouldReceive('find')
-            ->with('test_blueprint')
-            ->andReturn((new Blueprint)->setHandle('test_blueprint'));
+            ->with('assets/test_container')
+            ->andReturn($blueprint = (new Blueprint)->setHandle('test_container')->setNamespace('assets'));
 
         $array = (new Asset)
             ->container($this->container)
@@ -556,8 +555,8 @@ class AssetTest extends TestCase
     public function extra_keys_get_added_to_array_when_file_exists()
     {
         Facades\Blueprint::shouldReceive('find')
-            ->with('test_blueprint')
-            ->andReturn((new Blueprint)->setHandle('test_blueprint'));
+            ->with('assets/test_container')
+            ->andReturn($blueprint = (new Blueprint)->setHandle('test_container')->setNamespace('assets'));
 
         $container = $this->container;
         Storage::disk('test')->put('test.txt', '');

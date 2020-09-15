@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
+use Statamic\Statamic;
 
 class Install extends Command
 {
@@ -34,6 +35,7 @@ class Install extends Command
         $this->addons()
              ->createFiles()
              ->publish()
+             ->runCallbacks()
              ->clearViews()
              ->clearCache();
     }
@@ -52,7 +54,7 @@ class Install extends Command
             base_path('content/collections'),
             base_path('content/globals'),
             base_path('content/taxonomies'),
-            base_path('content/structures'),
+            base_path('content/navigation'),
             base_path('users'),
         ];
 
@@ -95,6 +97,13 @@ class Install extends Command
     protected function clearCache()
     {
         $this->call('cache:clear');
+
+        return $this;
+    }
+
+    protected function runCallbacks()
+    {
+        Statamic::runAfterInstalledCallbacks($this);
 
         return $this;
     }

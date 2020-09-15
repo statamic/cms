@@ -24,12 +24,11 @@ interface Form extends Arrayable
     public function title($title = null);
 
     /**
-     * Get or set the blueprint.
+     * Get the blueprint.
      *
-     * @param mixed $blueprint
      * @return mixed
      */
-    public function blueprint($blueprint = null);
+    public function blueprint();
 
     /**
      * Get the submissions.

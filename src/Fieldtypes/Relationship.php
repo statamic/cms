@@ -71,7 +71,7 @@ abstract class Relationship extends Fieldtype
             $items = collect([$items]);
         }
 
-        return $items->map(function ($item) use ($data) {
+        return $items->map(function ($item) {
             return [
                 'id' => method_exists($item, 'id') ? $item->id() : $item->handle(),
                 'title' => method_exists($item, 'title') ? $item->title() : $item->get('title'),

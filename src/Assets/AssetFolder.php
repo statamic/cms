@@ -4,8 +4,8 @@ namespace Statamic\Assets;
 
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Contracts\Assets\AssetFolder as Contract;
-use Statamic\Events\Data\AssetFolderDeleted;
-use Statamic\Events\Data\AssetFolderSaved;
+use Statamic\Events\AssetFolderDeleted;
+use Statamic\Events\AssetFolderSaved;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;

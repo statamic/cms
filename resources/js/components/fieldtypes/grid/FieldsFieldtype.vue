@@ -3,6 +3,7 @@
     <fields
         :fields="fields"
         :editing-field="editingField"
+        :can-define-localizable="false"
         @field-created="fieldCreated"
         @field-updated="fieldUpdated"
         @field-linked="fieldLinked"

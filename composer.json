@@ -18,19 +18,19 @@
         "league/csv": "^9.0",
         "league/glide": "^1.1",
         "pixelfear/composer-dist-plugin": "^0.1.0",
-        "scrumpy/html-to-prosemirror": "^0.7.0",
-        "scrumpy/prosemirror-to-html": "^0.10.0",
         "spatie/blink": "^1.1.2",
         "statamic/stringy": "^3.1",
         "symfony/var-exporter": "^4.3",
-        "symfony/yaml": "^4.1@dev",
+        "symfony/yaml": "^4.1 || ^5.1",
         "twistor/flysystem-guzzle": "^6.0",
+        "ueberdosis/html-to-prosemirror": "^0.7.0",
+        "ueberdosis/prosemirror-to-html": "^0.10.0",
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
         "google/cloud-translate": "^1.6",
-        "mockery/mockery": "~1.0",
+        "mockery/mockery": "^1.2.3",
         "orchestra/testbench": "^4.0 || ^5.0"
     },
     "config": {

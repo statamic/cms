@@ -156,10 +156,8 @@ class Parser
         // Save the original text coming in so that we can parse it recursively
         // later on without this needing to be within a callback
         $this->original_text = $text;
-        // Prevent the parsing of PHP by b0rking the PHP open tag
-        if (! $this->allowPhp) {
-            $text = str_replace(['<?php'], ['&lt;?php'], $text);
-        }
+
+        $text = $this->sanitizePhp($text);
 
         // We want to extract the noparse blocks before comments,
         // allowing us to show them for documentation purposes
@@ -306,6 +304,10 @@ class Parser
         $total = count($loop);
 
         foreach ($loop as $key => &$value) {
+            if ($value instanceof Augmentable) {
+                $value = $value->toAugmentedArray();
+            }
+
             // If the value of the current iteration is *not* already an array (ie. we're
             // dealing with a super basic list like [one, two, three] then convert it
             // to one, where the value is stored in a key named "value".
@@ -596,10 +598,24 @@ class Parser
                         }
                     }
 
-                    if (! empty($values)) {
-                        // parse the tag found with the value(s) related to it
-                        $tmpname = md5($name);
-                        $replacement = $this->parseVariables("{{ $tmpname }}$content{{ /$tmpname }}", [$tmpname => $values]);
+                    if ($this->isLoopable($values) && ! empty($values)) {
+                        if ($values instanceof Value) {
+                            $values = $values->value();
+                        }
+
+                        if ($values instanceof Collection) {
+                            $values = $values->all();
+                        }
+
+                        if (Arr::isAssoc($values)) {
+                            $replacement = $this->parse($content, array_merge($data, $values));
+                        } else {
+                            $values = $this->addLoopIterationVariables($values);
+                            $replacement = collect($values)
+                                ->map(function ($value) use ($content, $data) {
+                                    return (string) $this->parse($content, array_merge($data, $value));
+                                })->join('');
+                        }
                     }
                 } else {
                     // nope, this must be a callback
@@ -1402,7 +1418,7 @@ class Parser
 
     protected function isLoopable($value)
     {
-        if (is_array($value)) {
+        if (is_array($value) || $value instanceof Collection) {
             return true;
         }
 
@@ -1537,5 +1553,23 @@ class Parser
         }
 
         throw new RegexError(preg_last_error(), $this->view);
+    }
+
+    protected function sanitizePhp($text)
+    {
+        if ($this->allowPhp) {
+            return $text;
+        }
+
+        $text = str_replace('<?php', '&lt;?php', $text);
+
+        // Also replace short tags if they're enabled.
+        // If they're disabled (which is the common default), you can use <?xml tags right in your template. How nice!
+        // If they're enabled, we want to make sure it doesn't run PHP. You'll need to use {{ xml_header }}.
+        if (ini_get('short_open_tag')) {
+            $text = str_replace('<?', '&lt;?', $text);
+        }
+
+        return $text;
     }
 }

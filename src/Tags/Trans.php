@@ -11,8 +11,10 @@ class Trans extends Tags
      */
     public function wildcard($tag)
     {
-        $key = $this->get('key', $tag);
+        $key = $this->params->get('key', $tag);
+        $locale = $this->params->pull('locale') ?? $this->params->pull('site');
+        $params = $this->params->all();
 
-        return trans($key, $this->parameters->all());
+        return __($key, $this->params->all(), $locale);
     }
 }

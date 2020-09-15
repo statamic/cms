@@ -14,8 +14,8 @@ use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
-use Statamic\Events\Data\UserDeleted;
-use Statamic\Events\Data\UserSaved;
+use Statamic\Events\UserDeleted;
+use Statamic\Events\UserSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\URL;
@@ -146,13 +146,9 @@ abstract class User implements
      * @param string|null|bool
      * @return \Statamic\Fields\Blueprint
      */
-    public function blueprint($blueprint = null)
+    public function blueprint()
     {
-        if (is_null($blueprint)) {
-            return Blueprint::find('user');
-        }
-
-        $this->set('blueprint', $blueprint);
+        return Facades\User::blueprint();
     }
 
     public function save()

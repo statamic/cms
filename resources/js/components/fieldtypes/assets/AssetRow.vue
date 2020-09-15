@@ -10,11 +10,11 @@
                 <img class="asset-thumbnail max-h-full max-w-full rounded w-8 h-8 fit-cover lazyloaded" :src="thumbnail" v-if="isImage" />
                 <div class="img" v-else><file-icon type="div" :extension="asset.extension"></file-icon></div>
             </div>
-            <a @click="edit" class="flex-1 text-sm truncate">{{ asset.basename }}</a>
+            <button @click="edit" class="flex-1 text-sm truncate" :aria-label="__('Edit Asset')">{{ asset.basename }}</button>
         </td>
         <td class="p-0 pr-1 w-10 text-right align-middle">
 
-            <button class="flex items-center p-1 w-full h-full text-grey-60 hover:text-grey-90" @click="remove">
+            <button class="flex items-center p-1 w-full h-full text-grey-60 hover:text-grey-90" @click="remove" :aria-label="__('Remove Asset')">
                 <svg-icon name="trash" />
             </button>
 

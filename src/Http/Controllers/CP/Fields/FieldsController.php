@@ -96,6 +96,9 @@ class FieldsController extends CpController
                 ],
                 'default' => 'hidden',
                 'width' => 50,
+                'unless' => [
+                    'type' => 'section',
+                ],
             ],
         ]);
 

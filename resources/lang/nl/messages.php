@@ -3,8 +3,8 @@
 return [
     'activate_account_notification_body' => 'Je ontvangt deze e-mail, omdat we een verzoek ontvangen hebben om je wachtwoord te resetten.',
     'activate_account_notification_subject' => 'Activeer je account',
-    'addon_has_more_releases_beyond_license_body' => 'U kunt bijwerken, maar u moet een nieuwe licentie upgraden of aanschaffen.',
-    'addon_has_more_releases_beyond_license_heading' => 'Deze add-on heeft meer releases dan uw gelicentieerde limiet.',
+    'addon_has_more_releases_beyond_license_body' => 'Je kunt bijwerken, maar moet een nieuwe licentie aanschaffen of een bestaande upgraden.',
+    'addon_has_more_releases_beyond_license_heading' => 'Deze add-on heeft meer releases dan je licentie toe staat.',
     'addon_list_loading_error' => 'Er is iets misgegaan bij het laden van add-ons. Probeer het later opnieuw.',
     'asset_container_blueprint_instructions' => 'Blueprints definiëren aanvullende aangepaste velden die te gebruiken zijn als je assets bewerkt.',
     'asset_container_create_folder_instructions' => 'Indien ingeschakeld kunnen gebruikers mappen aanmaken in deze container.',
@@ -88,7 +88,6 @@ return [
     'getting_started_widget_header' => 'Starten met Statamic 3',
     'getting_started_widget_intro' => 'Om te beginnen met het bouwen van je nieuwe Statamic 3 site, raden we je aan om met deze stappen te beginnen.',
     'getting_started_widget_navigation' => 'Creëer multi-level lijsten van links die gebruik kunnen worden om navigaties, footers etc. te genereren.',
-    'getting_started_widget_reminder' => 'Belangrijk: <b>Statamic is commerciële software</b> en mogelijk moet u een geldige licentie aanschaffen om Statamic te blijven gebruiken nadat de bètaperiode is verstreken.',
     'git_disabled' => 'Statamic Git-integratie is momenteel uitgeschakeld.',
     'git_nothing_to_commit' => 'Niets te doen, inhoudspaden schoon!',
     'git_utility_description' => 'Beheer door Git bijgehouden inhoud.',

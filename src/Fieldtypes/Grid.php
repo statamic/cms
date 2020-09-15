@@ -161,6 +161,6 @@ class Grid extends Fieldtype
 
         return collect($value)->map(function ($row) use ($method) {
             return $this->fields()->addValues($row)->{$method}()->values()->all();
-        });
+        })->all();
     }
 }

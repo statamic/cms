@@ -61,19 +61,26 @@ class Email extends Mailable
         $text = array_get($this->config, 'text');
 
         if (! $text && ! $html) {
-            return $this->automagic();
+            return $this->view('statamic::forms.automagic-email');
         }
 
         if ($text) {
             $this->text($text);
         }
 
-        return $this->view($html);
+        if ($html) {
+            $this->view($html);
+        }
+
+        return $this;
     }
 
     protected function addData()
     {
-        $data = array_merge($this->submission->toArray(), [
+        $augmented = $this->submission->toAugmentedArray();
+
+        $data = array_merge($augmented, [
+            'fields'     => $this->getRenderableFieldData($augmented),
             'site_url'   => Config::getSiteUrl(),
             'date'       => now(),
             'now'        => now(),
@@ -85,15 +92,16 @@ class Email extends Mailable
         return $this->with($data);
     }
 
-    protected function automagic()
+    protected function getRenderableFieldData($values)
     {
-        $html = collect($this->submission->toArray())->map(function ($value, $key) {
-            $value = is_array($value) ? json_encode($value) : $value;
+        return collect($values)->map(function ($value, $handle) {
+            $field = $value->field();
+            $display = $field->display();
+            $fieldtype = $field->type();
+            $config = $field->config();
 
-            return "<b>{$key}:</b> {$value}";
-        })->implode("<br>\n");
-
-        return $this->html($html);
+            return compact('display', 'handle', 'fieldtype', 'config', 'value');
+        });
     }
 
     protected function addresses($addresses)
@@ -124,7 +132,7 @@ class Email extends Mailable
         $data = $this->submission->toArray();
 
         return collect($config)->map(function ($value) use ($data) {
-            return Parse::template(Parse::env($value), $data);
+            return (string) Parse::template(Parse::env($value), $data);
         });
     }
 }

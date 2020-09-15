@@ -29,7 +29,7 @@ class Submissions extends ResourceCollection
     {
         $columns = $this->blueprint
             ->columns()
-            ->ensurePrepended(Column::make('datestamp')->label('Date')->value('datestring'));
+            ->ensurePrepended(Column::make('datestamp')->label('Date'));
 
         if ($key = $this->columnPreferenceKey) {
             $columns->setPreferred($key);
@@ -43,7 +43,12 @@ class Submissions extends ResourceCollection
         $this->setColumns();
 
         return [
-            'data' => $this->collection,
+            'data' => $this->collection->each(function ($collection) {
+                $collection
+                    ->blueprint($this->blueprint)
+                    ->columns($this->columns);
+            }),
+
             'meta' => [
                 'columns' => $this->columns,
             ],

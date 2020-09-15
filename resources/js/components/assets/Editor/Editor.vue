@@ -33,15 +33,15 @@
                 </div>
 
                 <div class="asset-editor-meta-actions">
-                    <a @click="open" v-tooltip="__('Open in a new window')">
+                    <button @click="open" v-tooltip="__('Open in a new window')" :aria-label="__('Open in a new window')">
                         <svg-icon name="external-link" class="h-6 w-6"/>
-                    </a>
-                    <a @click="download" v-tooltip="__('Download file')" v-if="asset.allowDownloading">
+                    </button>
+                    <button @click="download" v-tooltip="__('Download file')" :aria-label="__('Download file')" v-if="asset.allowDownloading">
                         <svg-icon name="download" class="h-6 w-6"/>
-                    </a>
-                    <a @click="close" v-tooltip="__('Close editor')">
+                    </button>
+                    <button @click="close" v-tooltip="__('Close editor')" :aria-label="__('Close editor')">
                         <svg-icon name="close" class="h-6 w-6"/>
-                    </a>
+                    </button>
                 </div>
             </div>
 
@@ -259,20 +259,8 @@ export default {
                 this.meta = data.meta;
                 this.runActionUrl = data.runActionUrl;
                 this.actions = data.actions;
-                this.getFieldset();
-            });
-        },
 
-        /**
-         * Load the fieldset
-         */
-        getFieldset() {
-            const url = cp_url(`fields/publish-blueprints/${this.asset.blueprint}`);
-
-            this.$axios.get(url).then(response => {
-                this.fieldset = response.data;
-
-                // Flatten fields from all sections into one array.
+                this.fieldset = data.blueprint;
                 this.fields = _.chain(this.fieldset.sections)
                     .map(section => section.fields)
                     .flatten(true)

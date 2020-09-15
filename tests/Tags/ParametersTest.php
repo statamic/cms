@@ -37,6 +37,7 @@ class ParametersTest extends TestCase
             'unevaluated' => 'foo',
             ':evaluatednested' => 'nested:foo',
             'unevaluatednested' => 'nested:foo',
+            ':notInContext' => 'not_in_context',
             'true' => true,
             'false' => false,
             'truthy' => 'true',
@@ -68,6 +69,7 @@ class ParametersTest extends TestCase
             'unevaluated' => 'foo',
             'evaluatednested' => 'bar',
             'unevaluatednested' => 'nested:foo',
+            'notInContext' => null,
             'true' => true,
             'false' => false,
             'truthy' => true,
@@ -88,6 +90,7 @@ class ParametersTest extends TestCase
         $this->assertEquals(123.456, $this->params->get('float'));
         $this->assertEquals('bar', $this->params->get('evaluated'));
         $this->assertEquals('foo', $this->params->get('unevaluated'));
+        $this->assertEquals(null, $this->params->get('notInContext'));
         $this->assertEquals(true, $this->params->get('true'));
         $this->assertEquals(false, $this->params->get('false'));
         $this->assertEquals(true, $this->params->get('truthy'));
@@ -203,6 +206,7 @@ class ParametersTest extends TestCase
             'unevaluated' => 'foo',
             'evaluatednested' => 'bar',
             'unevaluatednested' => 'nested:foo',
+            'notInContext' => null,
             'true' => true,
             'false' => false,
             'truthy' => true,

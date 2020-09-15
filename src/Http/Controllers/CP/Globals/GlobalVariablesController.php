@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Globals;
 
 use Illuminate\Http\Request;
-use Statamic\Events\PublishBlueprintFound;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -27,8 +26,6 @@ class GlobalVariablesController extends CpController
 
         $blueprint = $variables->blueprint();
 
-        event(new PublishBlueprintFound($blueprint, 'globals', $variables));
-
         [$values, $meta] = $this->extractFromFields($variables, $blueprint);
 
         if ($hasOrigin = $variables->hasOrigin()) {
@@ -42,7 +39,7 @@ class GlobalVariablesController extends CpController
             'editing' => true,
             'actions' => [
                 'save' => $variables->updateUrl(),
-                'editBlueprint' => $blueprint->editUrl(),
+                'editBlueprint' => cp_route('globals.blueprint.edit', $set->handle()),
             ],
             'values' => $values,
             'meta' => $meta,

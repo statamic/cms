@@ -5,9 +5,7 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\CP\Breadcrumbs;
-use Statamic\Events\PublishBlueprintFound;
 use Statamic\Facades\Asset;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -77,8 +75,6 @@ class EntriesController extends CpController
 
         $blueprint = $entry->blueprint();
 
-        event(new PublishBlueprintFound($blueprint, 'entry', $entry));
-
         [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
         if ($hasOrigin = $entry->hasOrigin()) {
@@ -96,13 +92,13 @@ class EntriesController extends CpController
                 'revisions' => $entry->revisionsUrl(),
                 'restore' => $entry->restoreRevisionUrl(),
                 'createRevision' => $entry->createRevisionUrl(),
-                'editBlueprint' => $blueprint->editUrl(),
+                'editBlueprint' => cp_route('collections.blueprints.edit', [$collection, $blueprint]),
             ],
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
             'collection' => $collection->handle(),
             'blueprint' => $blueprint->toPublishArray(),
-            'readOnly' => User::fromUser($request->user())->cant('edit', $entry),
+            'readOnly' => User::current()->cant('edit', $entry),
             'locale' => $entry->locale(),
             'localizedFields' => $entry->data()->keys()->all(),
             'isRoot' => $entry->isRoot(),
@@ -160,6 +156,10 @@ class EntriesController extends CpController
 
         $parent = $values->pull('parent');
 
+        if ($explicitBlueprint = $values->pull('blueprint')) {
+            $entry->blueprint($explicitBlueprint);
+        }
+
         $values = $values->except(['slug', 'date']);
 
         if ($entry->hasOrigin()) {
@@ -186,17 +186,14 @@ class EntriesController extends CpController
         if ($entry->revisionsEnabled() && $entry->published()) {
             $entry
                 ->makeWorkingCopy()
-                ->user(User::fromUser($request->user()))
+                ->user(User::current())
                 ->save();
         } else {
             if (! $entry->revisionsEnabled()) {
                 $entry->published($request->published);
             }
 
-            $entry
-                ->set('updated_by', User::fromUser($request->user())->id())
-                ->set('updated_at', now()->timestamp)
-                ->save();
+            $entry->updateLastModified(User::current())->save();
         }
 
         return new EntryResource($entry->fresh());
@@ -206,9 +203,7 @@ class EntriesController extends CpController
     {
         $this->authorize('create', [EntryContract::class, $collection]);
 
-        $blueprint = $request->blueprint
-            ? $collection->ensureEntryBlueprintFields(Blueprint::find($request->blueprint))
-            : $collection->entryBlueprint();
+        $blueprint = $collection->entryBlueprint($request->blueprint);
 
         if (! $blueprint) {
             throw new \Exception(__('A valid blueprint is required.'));
@@ -245,6 +240,7 @@ class EntriesController extends CpController
             'collection' => $collection->handle(),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
+            'locale' => $site->handle(),
             'localizations' => $collection->sites()->map(function ($handle) use ($collection, $site) {
                 return [
                     'handle' => $handle,
@@ -271,9 +267,7 @@ class EntriesController extends CpController
     {
         $this->authorize('store', [EntryContract::class, $collection]);
 
-        $blueprint = $collection->ensureEntryBlueprintFields(
-            Blueprint::find($request->blueprint)
-        );
+        $blueprint = $collection->entryBlueprint($request->_blueprint);
 
         $fields = $blueprint->fields()->addValues($request->all());
 
@@ -283,7 +277,7 @@ class EntriesController extends CpController
 
         $entry = Entry::make()
             ->collection($collection)
-            ->blueprint($request->blueprint)
+            ->blueprint($request->_blueprint)
             ->locale($site->handle())
             ->published($request->get('published'))
             ->slug($request->slug)
@@ -304,13 +298,10 @@ class EntriesController extends CpController
         if ($entry->revisionsEnabled()) {
             $entry->store([
                 'message' => $request->message,
-                'user' => User::fromUser($request->user()),
+                'user' => User::current(),
             ]);
         } else {
-            $entry
-                ->set('updated_by', User::fromUser($request->user())->id())
-                ->set('updated_at', now()->timestamp)
-                ->save();
+            $entry->updateLastModified(User::current())->save();
         }
 
         return new EntryResource($entry);
@@ -331,7 +322,15 @@ class EntriesController extends CpController
 
     protected function extractFromFields($entry, $blueprint)
     {
-        $values = $entry->values()->all();
+        // The values should only be data merged with the origin data.
+        // We don't want injected collection values, which $entry->values() would have given us.
+        $target = $entry;
+        $values = $target->data();
+        while ($target->hasOrigin()) {
+            $target = $target->origin();
+            $values = $target->data()->merge($values);
+        }
+        $values = $values->all();
 
         if ($entry->hasStructure()) {
             $values['parent'] = array_filter([optional($entry->parent())->id()]);

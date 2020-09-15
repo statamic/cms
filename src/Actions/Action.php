@@ -86,6 +86,11 @@ abstract class Action implements Arrayable
         return 'Are you sure you want to run this action?|Are you sure you want to run this action on :count items?';
     }
 
+    public function warningText()
+    {
+        return null;
+    }
+
     public function toArray()
     {
         return [
@@ -94,6 +99,7 @@ abstract class Action implements Arrayable
             'confirm' => $this->confirm,
             'buttonText' => $this->buttonText(),
             'confirmationText' => $this->confirmationText(),
+            'warningText' => $this->warningText(),
             'dangerous' => $this->dangerous,
             'fields' => $this->fields()->toPublishArray(),
             'values' => $this->fields()->values(),

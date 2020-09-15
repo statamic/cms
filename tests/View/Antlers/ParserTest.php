@@ -48,18 +48,23 @@ class ParserTest extends TestCase
         ];
     }
 
+    private function parse($template, $data = [])
+    {
+        return (string) Antlers::parse($template, $data);
+    }
+
     public function testStringVariable()
     {
         $template = '{{ string }}';
 
-        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Hello wilderness', $this->parse($template, $this->variables));
     }
 
     public function testStringVariableWithTightBraces()
     {
         $template = '{{string}}';
 
-        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Hello wilderness', $this->parse($template, $this->variables));
     }
 
     public function testArrayVariable()
@@ -90,7 +95,7 @@ before
 after
 EOT;
 
-        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+        $this->assertEquals($expected, $this->parse($template, $this->variables));
     }
 
     public function testComplexArrayVariable()
@@ -118,7 +123,7 @@ before
 after
 EOT;
 
-        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+        $this->assertEquals($expected, $this->parse($template, $this->variables));
     }
 
     public function testAssociativeArrayVariable()
@@ -154,27 +159,27 @@ before
 after
 EOT;
 
-        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+        $this->assertEquals($expected, $this->parse($template, $this->variables));
     }
 
     public function testScopeGlue()
     {
         $template = '{{ associative:one }} {{ associative.two }}';
 
-        $this->assertEquals('hello wilderness', Antlers::parse($template, $this->variables));
+        $this->assertEquals('hello wilderness', $this->parse($template, $this->variables));
     }
 
     public function testNonExistantVariablesShouldBeNull()
     {
         $template = '{{ missing }}';
 
-        $this->assertEquals('', Antlers::parse($template, $this->variables));
+        $this->assertEquals('', $this->parse($template, $this->variables));
     }
 
     /** @test */
     public function accessing_strings_as_arrays_returns_null()
     {
-        $this->assertEquals('bar, ><', Antlers::parse('{{ foo }}, >{{ foo:test }}<', ['foo' => 'bar']));
+        $this->assertEquals('bar, ><', $this->parse('{{ foo }}, >{{ foo:test }}<', ['foo' => 'bar']));
     }
 
     /** @test */
@@ -189,7 +194,7 @@ EOT;
             }
         })::register();
 
-        $this->assertEquals('bar, callback', Antlers::parse('{{ foo }}, {{ foo:test }}', ['foo' => 'bar']));
+        $this->assertEquals('bar, callback', $this->parse('{{ foo }}, {{ foo:test }}', ['foo' => 'bar']));
     }
 
     /** @test */
@@ -200,49 +205,49 @@ EOT;
 
         $template = '{{ string }} {{ /string }}';
 
-        $this->assertEquals('', Antlers::parse($template, $this->variables));
+        $this->assertEquals('', $this->parse($template, $this->variables));
     }
 
     public function testStaticStringsWithDoubleQuotesShouldBeLeftAlone()
     {
         $template = '{{ "Thundercats are Go!" }}';
 
-        $this->assertEquals('Thundercats are Go!', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Thundercats are Go!', $this->parse($template, $this->variables));
     }
 
     public function testStaticStringsWithSingleQuotesShouldBeLeftAlone()
     {
         $template = "{{ 'Thundercats are Go!' }}";
 
-        $this->assertEquals('Thundercats are Go!', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Thundercats are Go!', $this->parse($template, $this->variables));
     }
 
     public function testStaticStringsWithDoubleQuotesCanBeModified()
     {
         $template = '{{ "Thundercats are Go!" | upper }}';
 
-        $this->assertEquals('THUNDERCATS ARE GO!', Antlers::parse($template, $this->variables));
+        $this->assertEquals('THUNDERCATS ARE GO!', $this->parse($template, $this->variables));
     }
 
     public function testStaticStringsWithSingleQuotesCanBeModified()
     {
         $template = "{{ 'Thundercats are Go!' | upper }}";
 
-        $this->assertEquals('THUNDERCATS ARE GO!', Antlers::parse($template, $this->variables));
+        $this->assertEquals('THUNDERCATS ARE GO!', $this->parse($template, $this->variables));
     }
 
     public function testSingleBracesShouldNotBeParsed()
     {
         $template = '{string}';
 
-        $this->assertEquals('{string}', Antlers::parse($template, $this->variables));
+        $this->assertEquals('{string}', $this->parse($template, $this->variables));
     }
 
     public function testModifiedNonExistantVariablesShouldBeNull()
     {
         $template = '{{ missing|upper }}';
 
-        $this->assertEquals('', Antlers::parse($template, $this->variables));
+        $this->assertEquals('', $this->parse($template, $this->variables));
     }
 
     public function testUnclosedArrayVariablePairsShouldBeNull()
@@ -252,21 +257,21 @@ EOT;
 
         $template = '{{ simple }}';
 
-        $this->assertEquals('', Antlers::parse($template, $this->variables));
+        $this->assertEquals('', $this->parse($template, $this->variables));
     }
 
     public function testSingleCondition()
     {
         $template = '{{ if string == "Hello wilderness" }}yes{{ endif }}';
 
-        $this->assertEquals('yes', Antlers::parse($template, $this->variables));
+        $this->assertEquals('yes', $this->parse($template, $this->variables));
     }
 
     public function testMultipleAndConditions()
     {
         $template = '{{ if string == "Hello wilderness" && content }}yes{{ endif }}';
 
-        $this->assertEquals('yes', Antlers::parse($template, $this->variables));
+        $this->assertEquals('yes', $this->parse($template, $this->variables));
     }
 
     public function testMultipleOrConditions()
@@ -274,8 +279,8 @@ EOT;
         $should_pass = '{{ if string == "failure" || string == "Hello wilderness" }}yes{{ endif }}';
         $should_fail = '{{ if string == "failure" or string == "womp" }}yes{{ endif }}';
 
-        $this->assertEquals('yes', Antlers::parse($should_pass, $this->variables));
-        $this->assertEquals('', Antlers::parse($should_fail, $this->variables));
+        $this->assertEquals('yes', $this->parse($should_pass, $this->variables));
+        $this->assertEquals('', $this->parse($should_fail, $this->variables));
     }
 
     public function testOrExistanceConditions()
@@ -285,52 +290,52 @@ EOT;
         $should_fail = '{{ if strudel || wurst }}yes{{ endif }}';
         $should_also_fail = '{{ if strudel or wurst }}yes{{ endif }}';
 
-        $this->assertEquals('yes', Antlers::parse($should_pass, $this->variables));
-        $this->assertEquals('yes', Antlers::parse($should_also_pass, $this->variables));
-        $this->assertEquals('', Antlers::parse($should_fail, $this->variables));
-        $this->assertEquals('', Antlers::parse($should_also_fail, $this->variables));
+        $this->assertEquals('yes', $this->parse($should_pass, $this->variables));
+        $this->assertEquals('yes', $this->parse($should_also_pass, $this->variables));
+        $this->assertEquals('', $this->parse($should_fail, $this->variables));
+        $this->assertEquals('', $this->parse($should_also_fail, $this->variables));
     }
 
     public function testConditionsOnOverlappingVariableNames()
     {
         $template = '{{ if complex }}{{ complex limit="1" }}{{ string }}{{ /complex }}{{ /if }}';
 
-        $this->assertEquals('the first string', Antlers::parse($template, $this->variables));
+        $this->assertEquals('the first string', $this->parse($template, $this->variables));
     }
 
     public function testLoopWithParamInsideConditionMatchingVariableName()
     {
         $template = '{{ if complex_string }}{{ complex_string }}{{ /if }}{{ complex }}{{ /complex }}';
 
-        $this->assertEquals('Hello wildernesses', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Hello wildernesses', $this->parse($template, $this->variables));
     }
 
     public function testTernaryCondition()
     {
         $template = '{{ string ? "Pass" : "Fail" }}';
 
-        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Pass', $this->parse($template, $this->variables));
     }
 
     public function testTernaryConditionIsntTooGreedy()
     {
         $template = '{{ content }} {{ string ? "Pass" : "Fail" }} {{ content }}';
 
-        $this->assertEquals('Paragraph Pass Paragraph', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Paragraph Pass Paragraph', $this->parse($template, $this->variables));
     }
 
     public function testTernaryConditionWithAVariable()
     {
         $template = '{{ string ? string : "Fail" }}';
 
-        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Hello wilderness', $this->parse($template, $this->variables));
     }
 
     public function testTernaryConditionWithModifiers()
     {
         $template = '{{ string ? string | upper : "Fail" }}';
 
-        $this->assertEquals('HELLO WILDERNESS', Antlers::parse($template, $this->variables));
+        $this->assertEquals('HELLO WILDERNESS', $this->parse($template, $this->variables));
     }
 
     public function testTernaryConditionWithMultipleLines()
@@ -341,7 +346,7 @@ EOT;
     : "Fail" }}
 EOT;
 
-        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Pass', $this->parse($template, $this->variables));
     }
 
     public function testTernaryEscapesQuotesProperly()
@@ -349,7 +354,7 @@ EOT;
         $data = ['condition' => true, 'var' => '"Wow" said the man'];
         $template = '{{ condition ? var : "nah" }}';
 
-        $this->assertEquals('"Wow" said the man', Antlers::parse($template, $data));
+        $this->assertEquals('"Wow" said the man', $this->parse($template, $data));
     }
 
     public function testTernaryConditionInsideParameter()
@@ -358,7 +363,7 @@ EOT;
 
         $template = "{{ test variable='{{ true ? 'Hello wilderness' : 'fail' }}' }}";
 
-        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Hello wilderness', $this->parse($template, $this->variables));
     }
 
     public function testNullCoalescence()
@@ -366,130 +371,130 @@ EOT;
         // or, ?:, and ?? are all aliases.
         // while ?: and ?? have slightly different behaviors in php, they work the same in antlers.
 
-        $this->assertEquals('Hello wilderness', Antlers::parse('{{ string or "Pass" }}', $this->variables));
-        $this->assertEquals('Hello wilderness', Antlers::parse('{{ string ?: "Pass" }}', $this->variables));
-        $this->assertEquals('Hello wilderness', Antlers::parse('{{ string ?? "Pass" }}', $this->variables));
-        $this->assertEquals('Pass', Antlers::parse('{{ missing or "Pass" }}', $this->variables));
-        $this->assertEquals('Pass', Antlers::parse('{{ missing ?: "Pass" }}', $this->variables));
-        $this->assertEquals('Pass', Antlers::parse('{{ missing ?? "Pass" }}', $this->variables));
+        $this->assertEquals('Hello wilderness', $this->parse('{{ string or "Pass" }}', $this->variables));
+        $this->assertEquals('Hello wilderness', $this->parse('{{ string ?: "Pass" }}', $this->variables));
+        $this->assertEquals('Hello wilderness', $this->parse('{{ string ?? "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', $this->parse('{{ missing or "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', $this->parse('{{ missing ?: "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', $this->parse('{{ missing ?? "Pass" }}', $this->variables));
     }
 
     public function testTruthCoalescing()
     {
-        $this->assertEquals('Pass', Antlers::parse('{{ string ?= "Pass" }}', $this->variables));
-        $this->assertEquals('Pass', Antlers::parse('{{ associative:one ?= "Pass" }}', $this->variables));
-        $this->assertEquals('', Antlers::parse('{{ missing ?= "Pass" }}', $this->variables));
-        $this->assertEquals('', Antlers::parse('{{ missing:thing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', $this->parse('{{ string ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', $this->parse('{{ associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', $this->parse('{{ missing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', $this->parse('{{ missing:thing ?= "Pass" }}', $this->variables));
 
         // Negating with !
-        $this->assertEquals('', Antlers::parse('{{ !string ?= "Pass" }}', $this->variables));
-        $this->assertEquals('', Antlers::parse('{{ !associative:one ?= "Pass" }}', $this->variables));
-        $this->assertEquals('Pass', Antlers::parse('{{ !missing ?= "Pass" }}', $this->variables));
-        $this->assertEquals('Pass', Antlers::parse('{{ !missing:thing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', $this->parse('{{ !string ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', $this->parse('{{ !associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', $this->parse('{{ !missing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', $this->parse('{{ !missing:thing ?= "Pass" }}', $this->variables));
 
         // and with spaces
-        $this->assertEquals('', Antlers::parse('{{ ! string ?= "Pass" }}', $this->variables));
-        $this->assertEquals('', Antlers::parse('{{ ! associative:one ?= "Pass" }}', $this->variables));
-        $this->assertEquals('Pass', Antlers::parse('{{ ! missing ?= "Pass" }}', $this->variables));
-        $this->assertEquals('Pass', Antlers::parse('{{ ! missing:thing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', $this->parse('{{ ! string ?= "Pass" }}', $this->variables));
+        $this->assertEquals('', $this->parse('{{ ! associative:one ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', $this->parse('{{ ! missing ?= "Pass" }}', $this->variables));
+        $this->assertEquals('Pass', $this->parse('{{ ! missing:thing ?= "Pass" }}', $this->variables));
     }
 
     public function testTruthCoalescingInsideLoop()
     {
         $template = '{{ complex }}{{ first ?= "Pass" }}{{ /complex }}';
 
-        $this->assertEquals('Pass', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Pass', $this->parse($template, $this->variables));
     }
 
     public function testSingleStandardStringModifierTight()
     {
         $template = '{{ string|upper }}';
 
-        $this->assertEquals('HELLO WILDERNESS', Antlers::parse($template, $this->variables));
+        $this->assertEquals('HELLO WILDERNESS', $this->parse($template, $this->variables));
     }
 
     public function testChainedStandardStringModifiersTight()
     {
         $template = '{{ string|upper|lower }}';
 
-        $this->assertEquals('hello wilderness', Antlers::parse($template, $this->variables));
+        $this->assertEquals('hello wilderness', $this->parse($template, $this->variables));
     }
 
     public function testSingleStandardStringModifierRelaxed()
     {
         $template = '{{ string | upper }}';
 
-        $this->assertEquals('HELLO WILDERNESS', Antlers::parse($template, $this->variables));
+        $this->assertEquals('HELLO WILDERNESS', $this->parse($template, $this->variables));
     }
 
     public function testChainedStandardStringModifiersRelaxed()
     {
         $template = '{{ string | upper | lower }}';
 
-        $this->assertEquals('hello wilderness', Antlers::parse($template, $this->variables));
+        $this->assertEquals('hello wilderness', $this->parse($template, $this->variables));
     }
 
     public function testSingleParameterStringModifier()
     {
         $template = "{{ string upper='true' }}";
 
-        $this->assertEquals('HELLO WILDERNESS', Antlers::parse($template, $this->variables));
+        $this->assertEquals('HELLO WILDERNESS', $this->parse($template, $this->variables));
     }
 
     public function testChainedParameterStringModifiers()
     {
         $template = "{{ string upper='true' lower='true' }}";
 
-        $this->assertEquals('hello wilderness', Antlers::parse($template, $this->variables));
+        $this->assertEquals('hello wilderness', $this->parse($template, $this->variables));
     }
 
     public function testSingleStandardArrayModifierTight()
     {
         $template = '{{ simple|length }}';
 
-        $this->assertEquals('3', Antlers::parse($template, $this->variables));
+        $this->assertEquals('3', $this->parse($template, $this->variables));
     }
 
     public function testSingleStandardArrayModifierRelaxed()
     {
         $template = '{{ simple | length }}';
 
-        $this->assertEquals('3', Antlers::parse($template, $this->variables));
+        $this->assertEquals('3', $this->parse($template, $this->variables));
     }
 
     public function testChainedStandardArrayModifiersTightOnContent()
     {
         $template = '{{ content|markdown|lower }}';
 
-        $this->assertEquals("<p>paragraph</p>\n", Antlers::parse($template, $this->variables));
+        $this->assertEquals("<p>paragraph</p>\n", $this->parse($template, $this->variables));
     }
 
     public function testChainedStandardModifiersRelaxedOnContent()
     {
         $template = '{{ content | markdown | lower }}';
 
-        $this->assertEquals("<p>paragraph</p>\n", Antlers::parse($template, $this->variables));
+        $this->assertEquals("<p>paragraph</p>\n", $this->parse($template, $this->variables));
     }
 
     public function testChainedParameterModifiersOnContent()
     {
         $template = "{{ content markdown='true' lower='true' }}";
 
-        $this->assertEquals("<p>paragraph</p>\n", Antlers::parse($template, $this->variables));
+        $this->assertEquals("<p>paragraph</p>\n", $this->parse($template, $this->variables));
     }
 
     public function testConditionsWithModifiers()
     {
         $template = "{{ if string|upper == 'HELLO WILDERNESS' }}yes{{ endif }}";
 
-        $this->assertEquals('yes', Antlers::parse($template, $this->variables));
+        $this->assertEquals('yes', $this->parse($template, $this->variables));
     }
 
     public function testConditionsWithRelaxedModifiers()
     {
         $template = "{{ if string | upper == 'HELLO WILDERNESS' }}yes{{ endif }}";
 
-        $this->assertEquals('yes', Antlers::parse($template, $this->variables));
+        $this->assertEquals('yes', $this->parse($template, $this->variables));
     }
 
     public function testTagsWithCurliesInParamsGetsParsed()
@@ -499,21 +504,30 @@ EOT;
 
         $template = "{{ test variable='{string}' }}";
 
-        $this->assertEquals('Hello wilderness', Antlers::parse($template, $this->variables));
+        $this->assertEquals('Hello wilderness', $this->parse($template, $this->variables));
     }
 
     public function testDateConditionWithChainedRelaxedModifiersWithSpacesInArguments()
     {
         $template = '{{ if (date | modify_date:+3 years | format:Y) == "2015" }}yes{{ endif }}';
 
-        $this->assertEquals('yes', Antlers::parse($template, $this->variables));
+        $this->assertEquals('yes', $this->parse($template, $this->variables));
     }
 
     public function testArrayModifiersGetParsed()
     {
         $template = '{{ simple limit="1" }}{{ value }}{{ /simple }}';
 
-        $this->assertEquals('one', Antlers::parse($template, $this->variables));
+        $this->assertEquals('one', $this->parse($template, $this->variables));
+    }
+
+    public function testArrayModifiersOnCollectionsGetParsed()
+    {
+        $template = '{{ simple limit="1" }}{{ value }}{{ /simple }}';
+
+        $this->assertEquals('one', $this->parse($template, [
+            'simple' => collect(['one', 'two', 'three']),
+        ]));
     }
 
     public function testRecursiveChildren()
@@ -525,7 +539,7 @@ EOT;
 
         $expected = '<ul><li>One<ul><li>Two</li><li>Three<ul><li>Four</li></ul></li></ul></li></ul>';
 
-        $this->assertEquals($expected, Antlers::parse($template, []));
+        $this->assertEquals($expected, $this->parse($template, []));
     }
 
     public function testRecursiveChildrenWithScope()
@@ -537,7 +551,7 @@ EOT;
 
         $expected = '<ul><li>One<ul><li>Two</li><li>Three<ul><li>Four</li></ul></li></ul></li></ul>';
 
-        $this->assertEquals($expected, Antlers::parse($template, []));
+        $this->assertEquals($expected, $this->parse($template, []));
     }
 
     public function testEmptyValuesAreNotOverriddenByPreviousIteration()
@@ -556,7 +570,7 @@ EOT;
 
         $this->assertEquals(
             '[1.1][1.2][2.1]',
-            Antlers::parse('{{ loop }}{{ one }}{{ two }}{{ /loop }}', $variables)
+            $this->parse('{{ loop }}{{ one }}{{ two }}{{ /loop }}', $variables)
         );
     }
 
@@ -579,7 +593,7 @@ EOT;
 
         $this->assertEquals(
             '[1.1][1.2][2.1]',
-            Antlers::parse('{{ loop }}{{ one }}{{ test:some_parsing var="two" }}{{ two }}{{ /test:some_parsing }}{{ /loop }}', $variables)
+            $this->parse('{{ loop }}{{ one }}{{ test:some_parsing var="two" }}{{ two }}{{ /test:some_parsing }}{{ /loop }}', $variables)
         );
     }
 
@@ -597,12 +611,12 @@ EOT;
 
         $this->assertEquals(
             '[one][two]',
-            Antlers::parse('{{ hello:world }}[{{ baz }}]{{ /hello:world }}', $variables)
+            $this->parse('{{ hello:world }}[{{ baz }}]{{ /hello:world }}', $variables)
         );
 
         $this->assertEquals(
             '[one][two]',
-            Antlers::parse('{{ hello:world scope="s" }}[{{ s:baz }}]{{ /hello:world }}', $variables)
+            $this->parse('{{ hello:world scope="s" }}[{{ s:baz }}]{{ /hello:world }}', $variables)
         );
     }
 
@@ -615,14 +629,14 @@ EOT;
 
         $this->assertEquals(
             'Hello wilderness&lt;?php echo "!"; ?>',
-            Antlers::parse('{{ string }}<?php echo "!"; ?>', $this->variables, [])
+            $this->parse('{{ string }}<?php echo "!"; ?>', $this->variables, [])
         );
     }
 
     /** @test */
     public function it_doesnt_parse_noparse_tags()
     {
-        $parsed = Antlers::parse('{{ noparse }}{{ string }}{{ /noparse }} {{ string }}', $this->variables);
+        $parsed = $this->parse('{{ noparse }}{{ string }}{{ /noparse }} {{ string }}', $this->variables);
 
         $this->assertEquals('{{ string }} Hello wilderness', $parsed);
     }
@@ -635,7 +649,7 @@ EOT;
             'content' => 'before {{ string }} after',
         ];
 
-        $parsed = Antlers::parse('{{ content | noparse }} {{ string }}', $variables);
+        $parsed = $this->parse('{{ content | noparse }} {{ string }}', $variables);
 
         $this->assertEquals('before {{ string }} after hello', $parsed);
     }
@@ -747,7 +761,7 @@ EOT;
     {
         $this->assertEquals(
             'Hello World',
-            Antlers::parse('{{ string }}', new ArrayableObject(['string' => 'Hello World']))
+            $this->parse('{{ string }}', new ArrayableObject(['string' => 'Hello World']))
         );
     }
 
@@ -755,7 +769,7 @@ EOT;
     public function it_throws_exception_for_non_arrayable_data_object()
     {
         try {
-            Antlers::parse('{{ string }}', new NonArrayableObject(['string' => 'Hello World']));
+            $this->parse('{{ string }}', new NonArrayableObject(['string' => 'Hello World']));
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals('Expecting array or object implementing Arrayable. Encountered [Tests\View\Antlers\NonArrayableObject]', $e->getMessage());
 
@@ -769,7 +783,7 @@ EOT;
     public function it_throws_exception_for_unsupported_data_value()
     {
         try {
-            Antlers::parse('{{ string }}', 'string');
+            $this->parse('{{ string }}', 'string');
         } catch (\InvalidArgumentException $e) {
             $this->assertEquals('Expecting array or object implementing Arrayable. Encountered [string]', $e->getMessage());
 
@@ -791,7 +805,7 @@ EOT;
 
         $value = new Value('expected', 'test', $fieldtype);
 
-        $parsed = Antlers::parse('{{ test }}', ['test' => $value]);
+        $parsed = $this->parse('{{ test }}', ['test' => $value]);
 
         $this->assertEquals('augmented expected', $parsed);
     }
@@ -813,7 +827,7 @@ EOT;
             'two' => 'world',
         ], 'test', $fieldtype);
 
-        $parsed = Antlers::parse('{{ test }}{{ one }} {{ two }}{{ /test }}', ['test' => $value]);
+        $parsed = $this->parse('{{ test }}{{ one }} {{ two }}{{ /test }}', ['test' => $value]);
 
         $this->assertEquals('HELLO WORLD', $parsed);
     }
@@ -823,7 +837,7 @@ EOT;
     {
         $value = new AugmentableObject(['foo' => 'bar']);
 
-        $parsed = Antlers::parse('{{ test:foo }}', ['test' => $value]);
+        $parsed = $this->parse('{{ test:foo }}', ['test' => $value]);
 
         $this->assertEquals('bar', $parsed);
     }
@@ -847,7 +861,7 @@ EOT;
             ['one' => 'une', 'two' => 'deux'],
         ], 'test', $fieldtype);
 
-        $parsed = Antlers::parse('{{ test }}{{ one }} {{ two }} {{ /test }}', ['test' => $value]);
+        $parsed = $this->parse('{{ test }}{{ one }} {{ two }} {{ /test }}', ['test' => $value]);
 
         $this->assertEquals('UNO DOS UNE DEUX ', $parsed);
     }
@@ -857,7 +871,7 @@ EOT;
     {
         $value = new Value(['foo' => 'bar'], 'test');
 
-        $parsed = Antlers::parse('{{ test:foo }}', ['test' => $value]);
+        $parsed = $this->parse('{{ test:foo }}', ['test' => $value]);
 
         $this->assertEquals('bar', $parsed);
     }
@@ -867,7 +881,7 @@ EOT;
     {
         $value = new Value(['foo' => 'bar'], 'test');
 
-        $parsed = Antlers::parse('{{ nested:test:foo }}', [
+        $parsed = $this->parse('{{ nested:test:foo }}', [
             'nested' => [
                 'test' => $value,
             ],
@@ -883,7 +897,7 @@ EOT;
             'foo' => ['nested' => 'bar'],
         ], 'test');
 
-        $parsed = Antlers::parse('{{ nested:test:foo:nested }}', [
+        $parsed = $this->parse('{{ nested:test:foo:nested }}', [
             'nested' => [
                 'test' => $value,
             ],
@@ -941,26 +955,26 @@ EOT;
             'string' => 'hello',
         ];
 
-        $this->assertEquals($expected, (string) Antlers::parse($template, $variables));
+        $this->assertEquals($expected, (string) $this->parse($template, $variables));
 
         $this->assertEquals(
             'shmaugmented before hello after',
-            (string) Antlers::parse('{{ parseable | replace:aug:shmaug }}', $variables)
+            (string) $this->parse('{{ parseable | replace:aug:shmaug }}', $variables)
         );
 
         $this->assertEquals(
             'shmaugmented before {{ string }} after',
-            (string) Antlers::parse('{{ non_parseable | replace:aug:shmaug }}', $variables)
+            (string) $this->parse('{{ non_parseable | replace:aug:shmaug }}', $variables)
         );
 
         $this->assertEquals(
             'shmaugmented before hello after',
-            (string) Antlers::parse('{{ parseable replace="aug|shmaug" }}', $variables)
+            (string) $this->parse('{{ parseable replace="aug|shmaug" }}', $variables)
         );
 
         $this->assertEquals(
             'shmaugmented before {{ string }} after',
-            (string) Antlers::parse('{{ non_parseable replace="aug|shmaug" }}', $variables)
+            (string) $this->parse('{{ non_parseable replace="aug|shmaug" }}', $variables)
         );
     }
 
@@ -976,7 +990,7 @@ EOT;
 
         $this->assertEquals(
             'string',
-            Antlers::parse('{{ object }}', compact('object'))
+            $this->parse('{{ object }}', compact('object'))
         );
     }
 
@@ -989,7 +1003,7 @@ EOT;
         $object = new class {
         };
 
-        $this->assertEquals('', Antlers::parse('{{ object }}', compact('object')));
+        $this->assertEquals('', $this->parse('{{ object }}', compact('object')));
     }
 
     /** @test */
@@ -1002,7 +1016,7 @@ EOT;
 
         $this->assertEquals(
             'foo bar',
-            Antlers::parse('{{ object }}{{ one }} {{ two }}{{ /object }}', [
+            $this->parse('{{ object }}{{ one }} {{ two }}{{ /object }}', [
                 'object' => $arrayableObject,
             ])
         );
@@ -1021,7 +1035,7 @@ EOT;
 
         $this->assertEquals(
             '',
-            Antlers::parse('{{ object }}{{ one }} {{ two }}{{ /object }}', [
+            $this->parse('{{ object }}{{ one }} {{ two }}{{ /object }}', [
                 'object' => $nonArrayableObject,
             ])
         );
@@ -1050,7 +1064,7 @@ EOT;
 
 EOT;
 
-        $this->assertEquals($expected, Antlers::parse($template));
+        $this->assertEquals($expected, $this->parse($template));
     }
 
     /** @test */
@@ -1076,7 +1090,7 @@ EOT;
 
 EOT;
 
-        $this->assertEquals($expected, Antlers::parse($template));
+        $this->assertEquals($expected, $this->parse($template));
     }
 
     /** @test */
@@ -1108,7 +1122,7 @@ Hello wilderness
 
 EOT;
 
-        $this->assertEquals($expected, Antlers::parse($template, ['string' => 'Hello wilderness']));
+        $this->assertEquals($expected, $this->parse($template, ['string' => 'Hello wilderness']));
     }
 
     /** @test */
@@ -1133,7 +1147,7 @@ EOT;
     no results
 EOT;
 
-        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+        $this->assertEquals($expected, $this->parse($template, $this->variables));
     }
 
     /** @test */
@@ -1165,7 +1179,7 @@ Hello wilderness
 
 EOT;
 
-        $this->assertEquals($expected, Antlers::parse($template, $this->variables));
+        $this->assertEquals($expected, $this->parse($template, $this->variables));
     }
 
     /** @test */
@@ -1187,7 +1201,7 @@ EOT;
             }
         })::register();
 
-        $this->assertEquals('augmented the value', Antlers::parse('{{ tag }}'));
+        $this->assertEquals('augmented the value', $this->parse('{{ tag }}'));
     }
 
     /** @test */
@@ -1213,7 +1227,7 @@ EOT;
 
         $this->assertEquals(
             'augmented the value with howdy in it',
-            (string) Antlers::parse('{{ tag }}', ['var' => 'howdy'])
+            (string) $this->parse('{{ tag }}', ['var' => 'howdy'])
         );
     }
 
@@ -1240,7 +1254,7 @@ EOT;
 
         $this->assertEquals(
             'augmented the value with {{ var }} in it',
-            (string) Antlers::parse('{{ tag }}', ['var' => 'howdy'])
+            (string) $this->parse('{{ tag }}', ['var' => 'howdy'])
         );
     }
 
@@ -1260,7 +1274,7 @@ EOT;
 
         $this->assertEquals(
             'augmented the value with howdy in it',
-            (string) Antlers::parse('{{ test }}', [
+            (string) $this->parse('{{ test }}', [
                 'test' => $value,
                 'var' => 'howdy',
             ])
@@ -1283,7 +1297,7 @@ EOT;
 
         $this->assertEquals(
             'augmented the value with {{ var }} in it',
-            (string) Antlers::parse('{{ test }}', [
+            (string) $this->parse('{{ test }}', [
                 'test' => $value,
                 'var' => 'howdy',
             ])
@@ -1300,7 +1314,7 @@ EOT;
 
         $this->assertEquals(
             'FOO! bar',
-            Antlers::parse('{{ object }}{{ one }} {{ two }}{{ /object }}', [
+            $this->parse('{{ object }}{{ one }} {{ two }}{{ /object }}', [
                 'object' => $augmentable,
             ])
         );
@@ -1323,7 +1337,7 @@ EOT;
 
         $this->assertEquals(
             'FOO! bar',
-            Antlers::parse('{{ tag }}{{ one }} {{ two }}{{ /tag }}')
+            $this->parse('{{ tag }}{{ one }} {{ two }}{{ /tag }}')
         );
     }
 
@@ -1337,7 +1351,7 @@ EOT;
 
         $this->assertEquals(
             'FOO! bar BAZ! qux ',
-            Antlers::parse('{{ object }}{{ one }} {{ two }} {{ /object }}', [
+            $this->parse('{{ object }}{{ one }} {{ two }} {{ /object }}', [
                 'object' => $augmentable,
             ])
         );
@@ -1373,7 +1387,7 @@ EOT;
 whisky burger singing
 juice burger --
 EOT;
-        $this->assertEquals($expected, Antlers::parse($template, $context));
+        $this->assertEquals($expected, $this->parse($template, $context));
     }
 
     /** @test */
@@ -1398,7 +1412,7 @@ EOT;
 whisky burger singing
 juice burger --
 EOT;
-        $this->assertEquals($expected, Antlers::parse($template, $context));
+        $this->assertEquals($expected, $this->parse($template, $context));
     }
 
     /** @test */
@@ -1416,17 +1430,17 @@ EOT;
         $template = <<<'EOT'
 {{ food }} {{ drink }}
 {{ array scope="s" }}
--{{ s:food }}- {{ s:drink }}
+-{{ s:food }}- {{ s:drink }} {{ food }} {{ drink }}
 {{ /array }}
 EOT;
 
         $expected = <<<'EOT'
 burger whisky
--- juice
--- smoothie
+-- juice burger juice
+-- smoothie burger smoothie
 
 EOT;
-        $this->assertEquals($expected, Antlers::parse($template, $context));
+        $this->assertEquals($expected, $this->parse($template, $context));
     }
 
     /** @test */
@@ -1521,7 +1535,7 @@ activity: singing
     array:test:activity: singing
 EOT;
 
-        $this->assertEquals($expected, trim(Antlers::parse($template, $context)));
+        $this->assertEquals($expected, trim($this->parse($template, $context)));
     }
 
     /** @test */
@@ -1529,7 +1543,7 @@ EOT;
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expecting an associative array');
-        Antlers::parse('', ['foo', 'bar']);
+        $this->parse('', ['foo', 'bar']);
     }
 
     /** @test */
@@ -1537,7 +1551,7 @@ EOT;
     {
         $this->expectException(\InvalidArgumentException::class);
         $this->expectExceptionMessage('Expecting an associative array');
-        Antlers::parse('', [
+        $this->parse('', [
             ['foo' => 'bar'],
             ['foo' => 'baz'],
         ]);
@@ -1566,7 +1580,7 @@ after
 
 EOT;
 
-        $this->assertEquals($expected, Antlers::parse($template, [
+        $this->assertEquals($expected, $this->parse($template, [
             'array' => [
                 ['foo' => 'bar'],
                 ['foo' => 'baz'],
@@ -1611,7 +1625,7 @@ after
 
 EOT;
 
-        $this->assertEquals($expected, Antlers::parse($template));
+        $this->assertEquals($expected, $this->parse($template));
     }
 
     /** @test */
@@ -1621,9 +1635,9 @@ EOT;
 
         $template = '{{ if entries }}yup{{ else }}nope{{ /if }}';
 
-        $this->assertEquals('yup', Antlers::parse($template, ['entries' => Entry::query()]));
-        $this->assertEquals('yup', Antlers::parse($template, ['entries' => Entry::query()->where('collection', 'blog')]));
-        $this->assertEquals('nope', Antlers::parse($template, ['entries' => Entry::query()->where('collection', 'dunno')]));
+        $this->assertEquals('yup', $this->parse($template, ['entries' => Entry::query()]));
+        $this->assertEquals('yup', $this->parse($template, ['entries' => Entry::query()->where('collection', 'blog')]));
+        $this->assertEquals('nope', $this->parse($template, ['entries' => Entry::query()->where('collection', 'dunno')]));
     }
 
     /** @test */
@@ -1646,7 +1660,7 @@ EOT;
 
         // unaugmented, the second item would be filtered out.
         // augmenting changes the second item to a yup, so it should be included.
-        $this->assertEquals('123', Antlers::parse('{{ test where="type:yup" }}{{ text }}{{ /test }}', [
+        $this->assertEquals('123', $this->parse('{{ test where="type:yup" }}{{ text }}{{ /test }}', [
             'test' => $value,
             'hello' => 'there',
         ]));
@@ -1664,7 +1678,7 @@ EOT;
 
         $value = new Value('world', 'hello', $fieldtype);
 
-        $this->assertEquals('world', Antlers::parse('{{ hello }}', [
+        $this->assertEquals('world', $this->parse('{{ hello }}', [
             'hello' => $value,
         ]));
     }
@@ -1683,7 +1697,7 @@ EOT;
 
         $this->assertEquals(
             'world, world, World',
-            Antlers::parse('{{ hello }}{{ key }}, {{ value }}, {{ label }}{{ /hello }}', [
+            $this->parse('{{ hello }}{{ key }}, {{ value }}, {{ label }}{{ /hello }}', [
                 'hello' => $value,
             ])
         );
@@ -1703,9 +1717,9 @@ EOT;
 
         $vars = ['hello' => $value];
 
-        $this->assertEquals('world', Antlers::parse('{{ hello:value }}', $vars));
-        $this->assertEquals('world', Antlers::parse('{{ hello:key }}', $vars));
-        $this->assertEquals('World', Antlers::parse('{{ hello:label }}', $vars));
+        $this->assertEquals('world', $this->parse('{{ hello:value }}', $vars));
+        $this->assertEquals('world', $this->parse('{{ hello:key }}', $vars));
+        $this->assertEquals('World', $this->parse('{{ hello:label }}', $vars));
     }
 
     /** @test */
@@ -1725,42 +1739,42 @@ EOT;
             'nully' => new Value(null, 'nully', $fieldtype),
         ];
 
-        $this->assertEquals('true', Antlers::parse('{{ if string }}true{{ else }}false{{ /if }}', $vars));
-        $this->assertEquals('false', Antlers::parse('{{ if nully }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('true', $this->parse('{{ if string }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', $this->parse('{{ if nully }}true{{ else }}false{{ /if }}', $vars));
 
-        $this->assertEquals('true', Antlers::parse('{{ if string == "foo" }}true{{ else }}false{{ /if }}', $vars));
-        $this->assertEquals('false', Antlers::parse('{{ if nully == "foo" }}true{{ else }}false{{ /if }}', $vars));
-        $this->assertEquals('false', Antlers::parse('{{ if string == "bar" }}true{{ else }}false{{ /if }}', $vars));
-        $this->assertEquals('false', Antlers::parse('{{ if nully == "bar" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('true', $this->parse('{{ if string == "foo" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', $this->parse('{{ if nully == "foo" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', $this->parse('{{ if string == "bar" }}true{{ else }}false{{ /if }}', $vars));
+        $this->assertEquals('false', $this->parse('{{ if nully == "bar" }}true{{ else }}false{{ /if }}', $vars));
 
-        $this->assertEquals('true', Antlers::parse('{{ string ? "true" : "false" }}', $vars));
-        $this->assertEquals('false', Antlers::parse('{{ nully ? "true" : "false" }}', $vars));
+        $this->assertEquals('true', $this->parse('{{ string ? "true" : "false" }}', $vars));
+        $this->assertEquals('false', $this->parse('{{ nully ? "true" : "false" }}', $vars));
 
-        $this->assertEquals('true', Antlers::parse('{{ string == "foo" ? "true" : "false" }}', $vars));
-        $this->assertEquals('false', Antlers::parse('{{ string == "bar" ? "true" : "false" }}', $vars));
+        $this->assertEquals('true', $this->parse('{{ string == "foo" ? "true" : "false" }}', $vars));
+        $this->assertEquals('false', $this->parse('{{ string == "bar" ? "true" : "false" }}', $vars));
 
-        $this->assertEquals('foo', Antlers::parse('{{ string or "fallback" }}', $vars));
-        $this->assertEquals('FOO', Antlers::parse('{{ string:label or "fallback" }}', $vars));
-        $this->assertEquals('fallback', Antlers::parse('{{ nully or "fallback" }}', $vars));
-        $this->assertEquals('fallback', Antlers::parse('{{ nully:label or "fallback" }}', $vars));
+        $this->assertEquals('foo', $this->parse('{{ string or "fallback" }}', $vars));
+        $this->assertEquals('FOO', $this->parse('{{ string:label or "fallback" }}', $vars));
+        $this->assertEquals('fallback', $this->parse('{{ nully or "fallback" }}', $vars));
+        $this->assertEquals('fallback', $this->parse('{{ nully:label or "fallback" }}', $vars));
 
-        $this->assertEquals('foo', Antlers::parse('{{ string ?? "fallback" }}', $vars));
-        $this->assertEquals('FOO', Antlers::parse('{{ string:label ?? "fallback" }}', $vars));
-        $this->assertEquals('fallback', Antlers::parse('{{ nully ?? "fallback" }}', $vars));
-        $this->assertEquals('fallback', Antlers::parse('{{ nully:label ?? "fallback" }}', $vars));
+        $this->assertEquals('foo', $this->parse('{{ string ?? "fallback" }}', $vars));
+        $this->assertEquals('FOO', $this->parse('{{ string:label ?? "fallback" }}', $vars));
+        $this->assertEquals('fallback', $this->parse('{{ nully ?? "fallback" }}', $vars));
+        $this->assertEquals('fallback', $this->parse('{{ nully:label ?? "fallback" }}', $vars));
 
-        $this->assertEquals('fallback', Antlers::parse('{{ string ?= "fallback" }}', $vars));
-        $this->assertEquals('fallback', Antlers::parse('{{ string:label ?= "fallback" }}', $vars));
-        $this->assertEquals('', Antlers::parse('{{ nully ?= "fallback" }}', $vars));
-        $this->assertEquals('', Antlers::parse('{{ nully:label ?= "fallback" }}', $vars));
+        $this->assertEquals('fallback', $this->parse('{{ string ?= "fallback" }}', $vars));
+        $this->assertEquals('fallback', $this->parse('{{ string:label ?= "fallback" }}', $vars));
+        $this->assertEquals('', $this->parse('{{ nully ?= "fallback" }}', $vars));
+        $this->assertEquals('', $this->parse('{{ nully:label ?= "fallback" }}', $vars));
     }
 
     /** @test */
     public function empty_collections_are_considered_empty_in_conditions()
     {
         $template = '{{ if stuff }}yes{{ else }}no{{ /if }}';
-        $this->assertEquals('no', Antlers::parse($template, ['stuff' => collect()]));
-        $this->assertEquals('yes', Antlers::parse($template, ['stuff' => collect(['one'])]));
+        $this->assertEquals('no', $this->parse($template, ['stuff' => collect()]));
+        $this->assertEquals('yes', $this->parse($template, ['stuff' => collect(['one'])]));
     }
 
     /** @test */
@@ -1770,21 +1784,21 @@ EOT;
         $viewErrorBag = new ViewErrorBag;
         $messageBag = new MessageBag;
 
-        $this->assertEquals('no', Antlers::parse($template, ['errors' => $viewErrorBag]));
-        $this->assertEquals('yes', Antlers::parse($template, ['errors' => $viewErrorBag->put('default', new MessageBag)]));
-        $this->assertEquals('yes', Antlers::parse($template, ['errors' => $viewErrorBag->put('form.contact', new MessageBag)]));
+        $this->assertEquals('no', $this->parse($template, ['errors' => $viewErrorBag]));
+        $this->assertEquals('yes', $this->parse($template, ['errors' => $viewErrorBag->put('default', new MessageBag)]));
+        $this->assertEquals('yes', $this->parse($template, ['errors' => $viewErrorBag->put('form.contact', new MessageBag)]));
     }
 
     /** @test */
     public function objects_are_considered_truthy()
     {
-        $this->assertEquals('yes', Antlers::parse('{{ if object }}yes{{ else }}no{{ /if }}', ['object' => new \stdClass]));
+        $this->assertEquals('yes', $this->parse('{{ if object }}yes{{ else }}no{{ /if }}', ['object' => new \stdClass]));
     }
 
     /** @test */
     public function parameter_style_modifier_with_colon_prefix_will_get_the_values_from_context()
     {
-        $this->assertEquals('Tes Te', Antlers::parse('{{ word :backspace="one" }} {{ word :backspace="two" }}', [
+        $this->assertEquals('Tes Te', $this->parse('{{ word :backspace="one" }} {{ word :backspace="two" }}', [
             'word' => 'Test',
             'one' => 1,
             'two' => 2,
@@ -1794,10 +1808,53 @@ EOT;
     /** @test */
     public function variables_starting_with_if_arent_treated_as_if_statements()
     {
-        $this->assertEquals('test', Antlers::parse('{{ iframe }}', ['iframe' => 'test']));
-        $this->assertEquals('test', Antlers::parse('{{ unlesses }}', ['unlesses' => 'test']));
-        $this->assertEquals('test', Antlers::parse('{{ elseifs }}', ['elseifs' => 'test']));
-        $this->assertEquals('test', Antlers::parse('{{ elseunlessses }}', ['elseunlessses' => 'test']));
+        $this->assertEquals('test', $this->parse('{{ iframe }}', ['iframe' => 'test']));
+        $this->assertEquals('test', $this->parse('{{ unlesses }}', ['unlesses' => 'test']));
+        $this->assertEquals('test', $this->parse('{{ elseifs }}', ['elseifs' => 'test']));
+        $this->assertEquals('test', $this->parse('{{ elseunlessses }}', ['elseunlessses' => 'test']));
+    }
+
+    /**
+     * @test
+     *
+     * Somehow when an empty replicator field is used it makes it into the callback array part
+     * of the parser with an empty Value object.
+     * See https://github.com/statamic/cms/issues/2369
+     **/
+    public function when_a_loop_is_a_value_object_with_an_empty_array_it_get_parsed_as_one()
+    {
+        $template = <<<'EOT'
+before
+{{ simple }}
+    {{ foo }}
+{{ /simple }}
+after
+EOT;
+
+        $expected = <<<'EOT'
+before
+
+after
+EOT;
+
+        $this->assertEquals($expected, $this->parse($template, [
+            'simple' => new Value([], null, new class extends \Statamic\Fieldtypes\Replicator {
+            }),
+        ]));
+    }
+
+    /** @test */
+    public function it_automatically_augments_augmentable_objects_when_looping_with_modifier()
+    {
+        $loop = [
+            new AugmentableObject(['one' => 'foo', 'two' => 'bar']),
+            new AugmentableObject(['one' => 'baz', 'two' => 'qux']),
+        ];
+
+        $this->assertEquals(
+            '<FOO!><bar>',
+            (string) Antlers::parse('{{ augmentables limit="1" }}<{{ one }}><{{ two }}>{{ /augmentables }}', ['augmentables' => $loop])
+        );
     }
 }
 

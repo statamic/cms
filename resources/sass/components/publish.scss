@@ -91,7 +91,7 @@ code.parent-url {
     @apply flex-shrink-0;
     margin-left: 20px;
 
-    max-width: 300px;
+    width: 300px;
 
     .publish-section-actions {
         @apply border-b;
@@ -120,9 +120,7 @@ code.parent-url {
 .field-w-full { @apply w-full; }
 
 // When the wrapper gets narrow enough, the fields should all become full width.
-@element .publish-fields and (max-width: 600px) {
-    :self .publish-field { width: 100%; }
-}
+.publish-fields-narrow .publish-field { width: 100%; }
 
 .publish-section:not(:empty) {
     @apply shadow bg-white rounded-md w-full;

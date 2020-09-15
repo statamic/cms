@@ -65,7 +65,7 @@ class EntriesTest extends TestCase
 
     protected function getEntryIds($params = [])
     {
-        return collect($this->getEntries($params)->items())->map->id()->values()->all();
+        return collect($this->getEntries($params)->items())->map->id()->all();
     }
 
     /** @test */

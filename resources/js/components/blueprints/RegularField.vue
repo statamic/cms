@@ -5,12 +5,20 @@
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 pr-2 py-1 pl-1">
-                    <svg-icon class="text-grey-70 mr-1" :name="field.fieldtype" v-tooltip="tooltipText" />
+                    <svg-icon class="text-grey-70 mr-1" :name="field.icon" v-tooltip="tooltipText" />
                     <a v-text="labelText" @click="$emit('edit')" />
                     <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
                 <div class="pr-1 flex">
                     <width-selector v-model="width" class="mr-1" />
+                    <button v-if="canDefineLocalizable"
+                        class="hover:text-grey-100 mr-1"
+                        :class="{ 'text-grey-100': localizable, 'text-grey-60': !localizable }"
+                        v-tooltip="__('Localizable')"
+                        @click="localizable = !localizable"
+                    >
+                        <svg-icon name="earth" />
+                    </button>
                     <button @click.prevent="$emit('deleted')" class="text-grey-60 hover:text-grey-100"><svg-icon name="trash" /></button>
                     <stack name="field-settings" v-if="isEditing" @closed="editorClosed">
                         <field-settings
@@ -35,10 +43,11 @@
 import Field from './Field.vue';
 import FieldSettings from '../fields/Settings.vue';
 import WidthSelector from '../fields/WidthSelector.vue';
+import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
 export default {
 
-    mixins: [Field],
+    mixins: [Field, CanDefineLocalizable],
 
     components: {
         FieldSettings,
@@ -51,7 +60,7 @@ export default {
 
      data() {
         return {
-            showHandle: false
+            showHandle: false,
         }
     },
 
@@ -96,7 +105,19 @@ export default {
             if (! this.isSectionExpanded) return 'blueprint-section-field-w-full';
 
             return `blueprint-section-field-${tailwind_width_class(this.width)}`;
-        }
+        },
+
+        localizable: {
+            get() {
+                return this.field.config.localizable || false;
+            },
+            set(localizable) {
+                let field = this.field;
+                field.config.localizable = localizable;
+                if (field.type === 'reference') field.config_overrides.push('localizable');
+                this.$emit('updated', field);
+            }
+        },
     },
 
     methods: {

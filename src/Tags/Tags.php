@@ -4,7 +4,6 @@ namespace Statamic\Tags;
 
 use Statamic\Extend\HasAliases;
 use Statamic\Extend\HasHandle;
-use Statamic\Extend\HasParameters;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Parse;
@@ -12,7 +11,7 @@ use Statamic\Support\Arr;
 
 abstract class Tags
 {
-    use HasHandle, HasAliases, HasParameters, RegistersItself;
+    use HasHandle, HasAliases, RegistersItself;
 
     protected static $binding = 'tags';
 
@@ -83,7 +82,7 @@ abstract class Tags
         $this->setParser($properties['parser']);
         $this->setContent($properties['content']);
         $this->setContext($properties['context']);
-        $this->setParameters($properties['parameters']);
+        $this->setParameters($properties['params']);
         $this->tag = array_get($properties, 'tag');
         $this->method = array_get($properties, 'tag_method');
     }
@@ -114,10 +113,6 @@ abstract class Tags
     {
         $this->params = Parameters::make($parameters, $this->context);
 
-        // Temporary BC alias.
-        // TODO: Remove with HasParameters trait
-        $this->parameters = $this->params;
-
         return $this;
     }
 
@@ -145,7 +140,7 @@ abstract class Tags
      */
     public function parse($data = [])
     {
-        if ($scope = $this->get('scope')) {
+        if ($scope = $this->params->get('scope')) {
             $data = Arr::addScope($data, $scope);
         }
 
@@ -169,7 +164,7 @@ abstract class Tags
             return $this->parse([$as => $data]);
         }
 
-        if ($scope = $this->get('scope')) {
+        if ($scope = $this->params->get('scope')) {
             $data = Arr::addScope($data, $scope);
         }
 

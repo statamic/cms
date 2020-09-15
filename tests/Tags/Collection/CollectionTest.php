@@ -482,8 +482,7 @@ class CollectionTest extends TestCase
     public function it_adds_defaults_for_missing_items_based_on_blueprint()
     {
         $blueprint = Blueprint::make('test')->setContents(['fields' => [['handle' => 'title', 'field' => ['type' => 'text']]]]);
-        Blueprint::shouldReceive('find')->with('test')->andReturn($blueprint);
-        $this->foods->entryBlueprints(['test']);
+        Blueprint::shouldReceive('in')->with('collections/foods')->andReturn(collect([$blueprint]));
 
         $this->makeEntry($this->foods, 'a')->set('title', 'Apple')->save();
         $this->makeEntry($this->foods, 'b')->save();

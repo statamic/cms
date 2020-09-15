@@ -7,25 +7,42 @@ trait GetsFormSession
     /**
      * Get form session error/success output.
      *
-     * @param string $handle
+     * @param string $formName
+     * @return array
      */
-    protected function getFormSession($key = 'default')
+    protected function getFormSession($formName = 'default')
     {
         $data = [];
 
-        $errorBagKey = $key;
-
-        $successKey = $key !== 'default'
-            ? "{$key}.success"
-            : 'success';
-
-        $errors = optional(session()->get('errors'))->getBag($errorBagKey);
+        $errors = optional(session()->get('errors'))->getBag($formName);
 
         $data['errors'] = $errors ? $errors->all() : [];
         $data['error'] = $errors ? $this->getFirstErrorForEachField($errors) : [];
-        $data['success'] = session()->get($successKey);
+        $data['success'] = $this->getFromFormSession($formName, 'success');
+
+        // Only include this boolean if it's actually passed in session;
+        // It will be for form submissions, but not for user login/register submissions.
+        if ($this->getFromFormSession($formName, 'submission_created')) {
+            $data['submission_created'] = true;
+        }
 
         return $data;
+    }
+
+    /**
+     * Get value from form session.
+     *
+     * @param string $formName
+     * @param string $key
+     * @return mixed
+     */
+    protected function getFromFormSession($formName, $key)
+    {
+        return session()->get(
+            $formName !== 'default'
+                ? "{$formName}.{$key}"
+                : $key
+        );
     }
 
     /**

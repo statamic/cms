@@ -27,7 +27,7 @@ class Entries
     }
 
     protected $ignoredParams = ['as'];
-    protected $parameters;
+    protected $params;
     protected $collections;
     protected $site;
     protected $showPublished;
@@ -35,9 +35,9 @@ class Entries
     protected $since;
     protected $until;
 
-    public function __construct($parameters)
+    public function __construct($params)
     {
-        $this->parseParameters($parameters);
+        $this->parseParameters($params);
     }
 
     public function get()
@@ -62,8 +62,8 @@ class Entries
 
     public function next($currentEntry)
     {
-        throw_if($this->parameters->has('paginate'), new \Exception('collection:next is not compatible with [paginate] parameter'));
-        throw_if($this->parameters->has('offset'), new \Exception('collection:next is not compatible with [offset] parameter'));
+        throw_if($this->params->has('paginate'), new \Exception('collection:next is not compatible with [paginate] parameter'));
+        throw_if($this->params->has('offset'), new \Exception('collection:next is not compatible with [offset] parameter'));
         throw_if($this->collections->count() > 1, new \Exception('collection:next is not compatible with multiple collections'));
 
         $collection = $this->collections->first();
@@ -86,8 +86,8 @@ class Entries
 
     public function previous($currentEntry)
     {
-        throw_if($this->parameters->has('paginate'), new \Exception('collection:previous is not compatible with [paginate] parameter'));
-        throw_if($this->parameters->has('offset'), new \Exception('collection:previous is not compatible with [offset] parameter'));
+        throw_if($this->params->has('paginate'), new \Exception('collection:previous is not compatible with [paginate] parameter'));
+        throw_if($this->params->has('offset'), new \Exception('collection:previous is not compatible with [offset] parameter'));
         throw_if($this->collections->count() > 1, new \Exception('collection:previous is not compatible with multiple collections'));
 
         $collection = $this->collections->first();
@@ -105,11 +105,11 @@ class Entries
             throw new \Exception('collection:previous requires ordered or dated collection');
         }
 
-        $limit = $this->parameters['limit'] ?? false;
+        $limit = $this->params['limit'] ?? false;
         $count = $query->count();
 
         if ($limit && $limit < $count) {
-            $this->parameters['offset'] = $count - $limit;
+            $this->params['offset'] = $count - $limit;
         }
 
         return $this->results($query);
@@ -159,19 +159,19 @@ class Entries
 
     protected function parseParameters($params)
     {
-        $this->parameters = $params->except($this->ignoredParams);
+        $this->params = $params->except($this->ignoredParams);
 
         $this->collections = $this->parseCollections();
         $this->orderBys = $this->parseOrderBys();
-        $this->site = $this->parameters->get(['site', 'locale']);
-        $this->since = $this->parameters->get('since');
-        $this->until = $this->parameters->get('until');
+        $this->site = $this->params->get(['site', 'locale']);
+        $this->since = $this->params->get('since');
+        $this->until = $this->params->get('until');
     }
 
     protected function parseCollections()
     {
-        $from = $this->parameters->get(['from', 'in', 'folder', 'use', 'collection']);
-        $not = $this->parameters->get(['not_from', 'not_in', 'not_folder', 'dont_use', 'not_collection']);
+        $from = $this->params->get(['from', 'in', 'folder', 'use', 'collection']);
+        $not = $this->params->get(['not_from', 'not_in', 'not_folder', 'dont_use', 'not_collection']);
 
         if ($from === '*') {
             $from = Collection::handles()->all();
@@ -221,7 +221,7 @@ class Entries
 
     protected function querySite($query)
     {
-        $site = $this->parameters->get(['site', 'locale'], Site::current()->handle());
+        $site = $this->params->get(['site', 'locale'], Site::current()->handle());
 
         if ($site === '*' || ! Site::hasMultiple()) {
             return;
@@ -254,8 +254,8 @@ class Entries
         $showPast = $collection->pastDateBehavior() === 'public';
 
         // Override by tag parameters.
-        $showFuture = $this->parameters['show_future'] ?? $showFuture;
-        $showPast = $this->parameters['show_past'] ?? $showPast;
+        $showFuture = $this->params['show_future'] ?? $showFuture;
+        $showPast = $this->params['show_past'] ?? $showPast;
 
         if ($showFuture && $showPast) {
             return;
@@ -299,7 +299,7 @@ class Entries
 
     protected function queryTaxonomies($query)
     {
-        collect($this->parameters)->filter(function ($value, $key) {
+        collect($this->params)->filter(function ($value, $key) {
             return $key === 'taxonomy' || Str::startsWith($key, 'taxonomy:');
         })->each(function ($values, $param) use ($query) {
             $taxonomy = substr($param, 9);
@@ -349,7 +349,7 @@ class Entries
 
     protected function queryRedirects($query)
     {
-        $isQueryingRedirect = $this->parameters->first(function ($v, $k) {
+        $isQueryingRedirect = $this->params->first(function ($v, $k) {
             return Str::startsWith($k, 'redirect:');
         });
 
@@ -357,7 +357,7 @@ class Entries
             return;
         }
 
-        if (! $this->parameters->bool(['redirects', 'links'], false)) {
+        if (! $this->params->bool(['redirects', 'links'], false)) {
             $query->where('redirect', '=', null);
         }
     }

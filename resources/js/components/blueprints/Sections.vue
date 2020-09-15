@@ -9,11 +9,14 @@
                 v-for="(section, i) in sections"
                 :key="section._id"
                 :section="section"
+                :is-single="singleSection"
+                :can-define-localizable="canDefineLocalizable"
+                :deletable="isSectionDeletable(i)"
                 @updated="updateSection(i, $event)"
                 @deleted="deleteSection(i)"
             />
 
-            <div class="blueprint-add-section-container w-full md:w-1/2 2xl:w-1/3">
+            <div class="blueprint-add-section-container w-full md:w-1/2 2xl:w-1/3" v-if="!singleSection">
                 <button class="blueprint-add-section-button outline-none" @click="addSection">
                     <div class="text-center flex items-center leading-none">
                         <div class="text-2xl mr-1">+</div>
@@ -34,10 +37,13 @@
 import uniqid from 'uniqid';
 import BlueprintSection from './Section.vue';
 import {Sortable, Plugins} from '@shopify/draggable';
+import CanDefineLocalizable from '../fields/CanDefineLocalizable';
 
 let sortableSections, sortableFields;
 
 export default {
+
+    mixins: [CanDefineLocalizable],
 
     components: {
         BlueprintSection
@@ -55,6 +61,14 @@ export default {
         newSectionText: {
             type: String,
             default: () => __('New Section')
+        },
+        singleSection: {
+            type: Boolean,
+            default: false
+        },
+        requireSection: {
+            type: Boolean,
+            default: true
         }
     },
 
@@ -65,6 +79,7 @@ export default {
     },
 
     mounted() {
+        this.ensureSection();
         this.makeSortable();
     },
 
@@ -80,7 +95,8 @@ export default {
     methods: {
 
         makeSortable() {
-            this.makeSectionsSortable();
+            if (! this.singleSection) this.makeSectionsSortable();
+
             this.makeFieldsSortable();
         },
 
@@ -158,10 +174,26 @@ export default {
 
         deleteSection(i) {
             this.sections.splice(i, 1);
+
+            this.ensureSection();
         },
 
         updateSection(i, section) {
             this.sections.splice(i, 1, section);
+        },
+
+        ensureSection() {
+            if (this.requireSection && this.sections.length === 0) {
+                this.addSection();
+            }
+        },
+
+        isSectionDeletable(i) {
+            if (this.sections.length > 1) return true;
+
+            if (i > 0) return true;
+
+            return !this.requireSection;
         }
 
     }

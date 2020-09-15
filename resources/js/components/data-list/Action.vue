@@ -11,7 +11,9 @@
             @confirm="confirm"
             @cancel="cancel"
         >
-            <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-2': action.fields.length }" />
+            <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-2': warningText || action.fields.length }" />
+
+            <div v-if="warningText" v-text="warningText" class="text-red" :class="{ 'mb-2': action.fields.length }" />
 
             <publish-container
                 v-if="action.fields.length"
@@ -70,6 +72,12 @@ export default {
             if (! this.action.confirmationText) return;
 
             return __n(this.action.confirmationText, this.selections);
+        },
+
+        warningText() {
+            if (! this.action.warningText) return;
+
+            return __n(this.action.warningText, this.selections);
         },
 
         runButtonText() {

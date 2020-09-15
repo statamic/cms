@@ -21,7 +21,9 @@ class Field implements Arrayable
 
     public function newInstance()
     {
-        return (new static($this->handle, $this->config))->setValue($this->value);
+        return (new static($this->handle, $this->config))
+            ->setParent($this->parent)
+            ->setValue($this->value);
     }
 
     public function setHandle(string $handle)
@@ -103,6 +105,10 @@ class Field implements Arrayable
     {
         if (is_null($this->get('listable'))) {
             return true;
+        }
+
+        if ($this->config()['type'] === 'section') {
+            return false;
         }
 
         return (bool) $this->get('listable');

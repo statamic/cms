@@ -9,10 +9,11 @@ use Illuminate\Support\Facades\Event;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
-use Statamic\Events\Data\FormSubmitted;
-use Statamic\Events\Data\SubmissionCreated;
+use Statamic\Events\FormSubmitted;
+use Statamic\Events\SubmissionCreated;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Form;
+use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
 use Statamic\Forms\SendEmails;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -26,28 +27,32 @@ class FormController extends Controller
      */
     public function submit(Request $request, $form)
     {
+        $fields = $form->blueprint()->fields();
+        $this->validateContentType($request, $form);
+        $values = array_merge($request->all(), $this->normalizeAssetsValues($fields, $request));
+
         $params = collect($request->all())->filter(function ($value, $key) {
             return Str::startsWith($key, '_');
         })->all();
 
-        $fields = $form->blueprint()->fields()->addValues($values = $request->all());
+        $fields = $fields->addValues($values);
+
+        $submission = $form->makeSubmission()->data($values);
 
         try {
-            throw_if(Arr::has($values, $form->honeypot()), new SilentFormFailureException);
+            $fields->validate($this->extraRules($fields));
 
-            $fields->validate();
+            throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
 
-            $submission = $form->makeSubmission()->data($values)->uploadFiles();
+            $submission->uploadFiles();
 
             // If any event listeners return false, we'll do a silent failure.
             // If they want to add validation errors, they can throw an exception.
-            if (FormSubmitted::dispatch($submission) === false) {
-                throw new SilentFormFailureException;
-            }
+            throw_if(FormSubmitted::dispatch($submission) === false, new SilentFormFailureException);
         } catch (ValidationException $e) {
             return $this->formFailure($params, $e->errors(), $form->handle());
         } catch (SilentFormFailureException $e) {
-            return $this->formSuccess($params, $submission);
+            return $this->formSuccess($params, $submission, true);
         }
 
         if ($form->store()) {
@@ -60,6 +65,15 @@ class FormController extends Controller
         return $this->formSuccess($params, $submission);
     }
 
+    private function validateContentType($request, $form)
+    {
+        $type = Str::before($request->headers->get('CONTENT_TYPE'), ';');
+
+        if ($type !== 'multipart/form-data' && $form->hasFiles()) {
+            throw new FileContentTypeRequiredException;
+        }
+    }
+
     /**
      * The steps for a successful form submission.
      *
@@ -67,13 +81,15 @@ class FormController extends Controller
      *
      * @param array $params
      * @param Submission $submission
+     * @param bool $silentFailure
      * @return Response
      */
-    private function formSuccess($params, $submission)
+    private function formSuccess($params, $submission, $silentFailure = false)
     {
         if (request()->ajax()) {
             return response([
                 'success' => true,
+                'submission_created' => ! $silentFailure,
                 'submission' => $submission->data(),
             ]);
         }
@@ -83,6 +99,7 @@ class FormController extends Controller
         $response = $redirect ? redirect($redirect) : back();
 
         session()->flash("form.{$submission->form()->handle()}.success", __('Submission successful.'));
+        session()->flash("form.{$submission->form()->handle()}.submission_created", ! $silentFailure);
         session()->flash('submission', $submission);
 
         return $response;
@@ -112,5 +129,33 @@ class FormController extends Controller
         $response = $redirect ? redirect($redirect) : back();
 
         return $response->withInput()->withErrors($errors, 'form.'.$form);
+    }
+
+    protected function normalizeAssetsValues($fields, $request)
+    {
+        // The assets fieldtype is expecting an array, even for `max_files: 1`, but we don't want to force that on the front end.
+        return $fields->all()
+            ->filter(function ($field) {
+                return $field->fieldtype()->handle() === 'assets'
+                    && $field->get('max_files') === 1;
+            })
+            ->map(function ($field) use ($request) {
+                return Arr::wrap($request->file($field->handle()));
+            })
+            ->all();
+    }
+
+    protected function extraRules($fields)
+    {
+        $assetFieldRules = $fields->all()
+            ->filter(function ($field) {
+                return $field->fieldtype()->handle() === 'assets';
+            })
+            ->mapWithKeys(function ($field) {
+                return [$field->handle().'.*' => 'file'];
+            })
+            ->all();
+
+        return $assetFieldRules;
     }
 }

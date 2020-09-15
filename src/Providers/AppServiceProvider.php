@@ -6,11 +6,9 @@ use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
-use Statamic\Exceptions\StatamicProRequiredException;
 use Statamic\Facades\Preference;
 use Statamic\Sites\Sites;
 use Statamic\Statamic;
-use Statamic\Structures\UriCache;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -31,7 +29,8 @@ class AppServiceProvider extends ServiceProvider
         $this->registerMiddlewareGroup();
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
-             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class);
+            ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
+            ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
@@ -76,8 +75,6 @@ class AppServiceProvider extends ServiceProvider
                 Preference::get('date_format', config('statamic.cp.date_format'))
             );
         });
-
-        $this->checkMultisiteFeature();
     }
 
     public function register()
@@ -109,6 +106,7 @@ class AppServiceProvider extends ServiceProvider
             return (new \Statamic\Data\DataRepository)
                 ->setRepository('entry', \Statamic\Contracts\Entries\EntryRepository::class)
                 ->setRepository('term', \Statamic\Contracts\Taxonomies\TermRepository::class)
+                ->setRepository('collection', \Statamic\Contracts\Entries\CollectionRepository::class)
                 ->setRepository('taxonomy', \Statamic\Contracts\Taxonomies\TaxonomyRepository::class)
                 ->setRepository('global', \Statamic\Contracts\Globals\GlobalRepository::class)
                 ->setRepository('asset', \Statamic\Contracts\Assets\AssetRepository::class)
@@ -118,16 +116,16 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(\Statamic\Fields\BlueprintRepository::class, function ($app) {
             return (new \Statamic\Fields\BlueprintRepository($app['files']))
                 ->setDirectory(resource_path('blueprints'))
-                ->setFallbackDirectory(__DIR__.'/../../resources/blueprints');
+                ->setFallback('default', function () {
+                    return \Statamic\Facades\Blueprint::makeFromFields([
+                        'content' => ['type' => 'markdown', 'localizable' => true],
+                    ]);
+                });
         });
 
         $this->app->bind(\Statamic\Fields\FieldsetRepository::class, function ($app) {
             return (new \Statamic\Fields\FieldsetRepository($app['files']))
                 ->setDirectory(resource_path('fieldsets'));
-        });
-
-        $this->app->singleton(UriCache::class, function () {
-            return new UriCache;
         });
     }
 
@@ -137,16 +135,5 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Http\Middleware\Localize::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ]);
-    }
-
-    protected function checkMultisiteFeature()
-    {
-        if (Statamic::pro()) {
-            return;
-        }
-
-        $sites = config('statamic.sites.sites');
-
-        throw_if(count($sites) > 1, new StatamicProRequiredException('Statamic Pro is required to use multiple sites.'));
     }
 }

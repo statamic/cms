@@ -9,6 +9,7 @@ use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Exceptions\NotBootedException;
+use Statamic\Extend\Manifest;
 use Statamic\Facades\Addon;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -30,6 +31,9 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $routes = [];
     protected $middlewareGroups = [];
     protected $viewNamespace;
+    protected $publishAfterInstall = true;
+    protected $config = true;
+    protected $translations = true;
 
     public function boot()
     {
@@ -50,9 +54,12 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootStylesheets()
                 ->bootScripts()
                 ->bootPublishables()
+                ->bootConfig()
+                ->bootTranslations()
                 ->bootRoutes()
                 ->bootMiddleware()
-                ->bootViews();
+                ->bootViews()
+                ->bootPublishAfterInstall();
         });
     }
 
@@ -158,6 +165,44 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
+    protected function bootConfig()
+    {
+        $filename = $this->getAddon()->slug();
+        $directory = $this->getAddon()->directory();
+        $origin = "{$directory}config/{$filename}.php";
+
+        if (! $this->config || ! file_exists($origin)) {
+            return $this;
+        }
+
+        $this->mergeConfigFrom($origin, $filename);
+
+        $this->publishes([
+            $origin => config_path("{$filename}.php"),
+        ], "{$filename}-config");
+
+        return $this;
+    }
+
+    protected function bootTranslations()
+    {
+        $slug = $this->getAddon()->slug();
+        $directory = $this->getAddon()->directory();
+        $origin = "{$directory}resources/lang";
+
+        if (! $this->translations || ! file_exists($origin)) {
+            return $this;
+        }
+
+        $this->loadTranslationsFrom($origin, $slug);
+
+        $this->publishes([
+            $origin => resource_path("lang/vendor/{$slug}"),
+        ], "{$slug}-translations");
+
+        return $this;
+    }
+
     protected function bootPublishables()
     {
         $package = $this->getAddon()->packageName();
@@ -167,7 +212,9 @@ abstract class AddonServiceProvider extends ServiceProvider
                 return [$origin => public_path("vendor/{$package}/{$destination}")];
             });
 
-        $this->publishes($publishables->all());
+        if ($publishables->isNotEmpty()) {
+            $this->publishes($publishables->all(), $this->getAddon()->slug());
+        }
 
         return $this;
     }
@@ -291,7 +338,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
         $this->publishes([
             $path => public_path("vendor/{$name}/js/{$filename}.js"),
-        ]);
+        ], $this->getAddon()->slug());
 
         Statamic::script($name, $filename);
     }
@@ -308,7 +355,7 @@ abstract class AddonServiceProvider extends ServiceProvider
 
         $this->publishes([
             $path => public_path("vendor/{$name}/css/{$filename}.css"),
-        ]);
+        ], $this->getAddon()->slug());
 
         Statamic::style($name, $filename);
     }
@@ -327,10 +374,40 @@ abstract class AddonServiceProvider extends ServiceProvider
     {
         throw_unless($this->app->isBooted(), new NotBootedException);
 
-        $class = get_class($this);
+        if (! $addon = $this->getAddonByServiceProvider()) {
+            // No addon? Then we're trying to boot one that hasn't been discovered yet.
+            // Probably just installed and we're inside the statamic:install command.
+            $this->app[Manifest::class]->build();
+            $addon = $this->getAddonByServiceProvider();
+        }
 
-        return Addon::all()->first(function ($addon) use ($class) {
-            return Str::startsWith($class, $addon->namespace());
+        return $addon;
+    }
+
+    private function getAddonByServiceProvider()
+    {
+        return Addon::all()->first(function ($addon) {
+            return Str::startsWith(get_class($this), $addon->namespace());
         });
+    }
+
+    protected function bootPublishAfterInstall()
+    {
+        if (! $this->publishAfterInstall) {
+            return $this;
+        }
+
+        if (empty($this->scripts) && empty($this->stylesheets)) {
+            return $this;
+        }
+
+        Statamic::afterInstalled(function ($command) {
+            $command->call('vendor:publish', [
+                '--tag' => $this->getAddon()->slug(),
+                '--force' => true,
+            ]);
+        });
+
+        return $this;
     }
 }

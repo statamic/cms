@@ -59,7 +59,7 @@ class GlobalsController extends CpController
             })->values(),
         ];
 
-        $fields = ($blueprint = $this->editFormBlueprint())
+        $fields = ($blueprint = $this->editFormBlueprint($set))
             ->fields()
             ->addValues($values)
             ->preProcess();
@@ -80,7 +80,7 @@ class GlobalsController extends CpController
 
         $this->authorize('update', $set);
 
-        $fields = $this->editFormBlueprint()->fields()->addValues($request->all());
+        $fields = $this->editFormBlueprint($set)->fields()->addValues($request->all());
 
         $fields->validate();
 
@@ -153,7 +153,7 @@ class GlobalsController extends CpController
         return response('', 204);
     }
 
-    protected function editFormBlueprint()
+    protected function editFormBlueprint($set)
     {
         $fields = [
             'name' => [
@@ -170,11 +170,12 @@ class GlobalsController extends CpController
                 'display' => __('Content Model'),
                 'fields' => [
                     'blueprint' => [
-                        'type' => 'blueprints',
+                        'type' => 'html',
                         'instructions' => __('statamic::messages.globals_blueprint_instructions'),
-                        'validate' => 'array',
-                        'mode' => 'select',
-                        'max_items' => 1,
+                        'html' => ''.
+                            '<div class="text-xs">'.
+                            '   <a href="'.cp_route('globals.blueprint.edit', $set->handle()).'" class="text-blue">'.__('Edit').'</a>'.
+                            '</div>',
                     ],
                 ],
             ],

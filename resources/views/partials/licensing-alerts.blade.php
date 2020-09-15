@@ -29,7 +29,7 @@
                             {{ __('statamic::messages.licensing_trial_mode_alert') }}
                         </span>
                         @can('access licensing utility')
-                        <a href="{{ cp_route('utilities.licensing') }}" class="text-white hover:text-yellow flex items-center">
+                        <a href="{{ cp_route('utilities.licensing') }}" class="text-white hover:text-yellow flex items-center" aria-label="{{ __('Go to Your License Settings') }}">
                             @svg('arrow-right')
                         </a>
                         @endcan
@@ -38,7 +38,7 @@
                     <div class="flex items-center justify-between">
                         {{ __('statamic::messages.licensing_production_alert') }}
                         @can('access licensing utility')
-                            <a href="{{ cp_route('utilities.licensing') }}" class="text-white hover:text-yellow flex items-center">
+                            <a href="{{ cp_route('utilities.licensing') }}" class="text-white hover:text-yellow flex items-center" aria-label="{{ __('Go to Your License Settings') }}">
                                 @svg('arrow-right')
                             </a>
                         @endcan

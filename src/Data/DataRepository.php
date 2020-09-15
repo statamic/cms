@@ -57,6 +57,10 @@ class DataRepository
             [$repo, $id] = explode('::', $id, 2);
         }
 
+        if ($repo && ! isset($this->repositories[$repo])) {
+            return [null, $reference];
+        }
+
         return [$repo, $id];
     }
 }

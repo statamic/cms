@@ -8,6 +8,8 @@ return [
     'access_cp_desc' => 'Permite o acesso ao painel de controlo, mas não garante que tudo possa ser feito uma vez autenticado.',
     'configure_fields' => 'Configurar Campos',
     'configure_fields_desc' => 'Capacidade de editar plantas, conjuntos de campos e respectivos campos.',
+    'configure_addons' => 'Configurar complementos',
+    'configure_addons_desc' => 'Capacidade de acessar a área de complementos para instalar e desinstalar complementos.',
     'group_collections' => 'Colecções',
     'configure_collections' => 'Configurar Colecções',
     'configure_collections_desc' => 'Permitir acesso a todas as permissões relaccionadas à coleção',
