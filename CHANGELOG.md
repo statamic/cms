@@ -1,7 +1,8 @@
 # Release Notes
 
-## Unreleased
-###
+## 3.0.8 (2020-09-15)
+
+### What's new
 - The Save/Publish button now supports "After Saving" options! You can choose to go to back to the listing, stay and edit, or create another and it will remember your last chosen option next time. [#675](https://github.com/statamic/cms/issues/675)
 
 ### What's improved
