@@ -153,7 +153,7 @@ class Entries extends Relationship
         return collect($collections)->flatMap(function ($collectionHandle) use ($collections) {
             $collection = Collection::findByHandle($collectionHandle);
 
-            throw_if(!$collection, CollectionNotFoundException($collectionHandle));
+            throw_if(!$collection, new CollectionNotFoundException($collectionHandle));
 
             $blueprints = $collection->entryBlueprints();
 
