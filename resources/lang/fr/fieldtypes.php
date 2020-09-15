@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'any.config.default' => 'Définissez la valeur par défaut.',
     'array.config.keys' => 'Définissez les clés du tableau (les variables) et leurs étiquettes facultatives.',
     'array.config.mode' => 'Le mode dynamique donne à l’utilisateur le contrôle des données, contrairement au mode à clé.',
     'assets.config.allow_uploads' => 'Autorisez le téléversement de nouveaux fichiers.',
