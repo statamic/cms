@@ -1,5 +1,26 @@
 # Release Notes
 
+## Unreleased
+###
+- The Save/Publish button now supports "After Saving" options! You can choose to go to back to the listing, stay and edit, or create another and it will remember your last chosen option next time. [#675](https://github.com/statamic/cms/issues/675)
+
+### What's improved
+- The Getting Started widget now explains Pro Mode, and no longer references the beta. [#2402](https://github.com/statamic/cms/issues/2402)
+- The French and German translations have been updated.
+- The Select field now supports **max items**. [#1771](https://github.com/statamic/cms/issues/1771)
+- The Range field has a smarter, configurable default that accounts for the `step` option. [#2328](https://github.com/statamic/cms/issues/2328)
+- The Replicator field now looks better when underneath a Section field. [#2375](https://github.com/statamic/cms/issues/2375)
+
+### What's fixed
+- Bard's floating toolbar no longer keeps the table icons in the dark. Dark mode is one thing, but dark on dark is Tom Haverford-level silly. [#2189](https://github.com/statamic/cms/issues/2189)
+- Bard's overaggressive focus outlines on Safari have been surgically removed. [#2188](https://github.com/statamic/cms/issues/2188)
+- The publish sidebar will no longer collapse like a bully shoving a skinny kid into their locker.
+- Section fieldtypes are no longer included in listings. [#2425](https://github.com/statamic/cms/issues/2425)
+- Global search shows the collection/taxonomy name again. Sorry about that regression — at least it was cosmetic! [#2332](https://github.com/statamic/cms/issues/2332)
+
+
+
+
 ## 3.0.7 (2020-09-08)
 
 ### What's fixed
