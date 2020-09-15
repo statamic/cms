@@ -24,7 +24,7 @@ class Cache extends Tags
 
     private function isEnabled()
     {
-        if (! config('statamic.system.enable_cache_tags')) {
+        if (! config('statamic.system.enable_cache_tags', true)) {
             return false;
         }
 
