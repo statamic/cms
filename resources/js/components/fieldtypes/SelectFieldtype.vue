@@ -84,7 +84,9 @@ export default {
         },
 
         limitReached() {
-            return this.config.max_items && (this.currentLength >= this.config.max_items);
+            if (! this.config.max_items) return false;
+
+            return this.currentLength >= this.config.max_items;
         },
 
         currentLength() {
