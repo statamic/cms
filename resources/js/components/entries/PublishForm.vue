@@ -20,23 +20,27 @@
             </div>
 
             <div class="hidden md:flex items-center">
-                <button
+
+                <save-button-options
                     v-if="!readOnly"
-                    :class="{
-                        'btn': revisionsEnabled,
-                        'btn-primary': isCreating || !revisionsEnabled,
-                    }"
-                    :disabled="!canSave"
-                    @click.prevent="save"
-                    v-text="saveText" />
+                    :show-options="!revisionsEnabled"
+                    :button-class="saveButtonClass"
+                    :preferences-prefix="preferencesPrefix"
+                >
+                    <button
+                        :class="saveButtonClass"
+                        :disabled="!canSave"
+                        @click.prevent="save"
+                        v-text="saveText"
+                    />
+                </save-button-options>
 
                 <button
                     v-if="revisionsEnabled && !isCreating"
                     class="ml-2 btn-primary flex items-center"
                     :disabled="!canPublish"
                     @click="confirmingPublish = true">
-                    <span v-text="__('Publish')" />
-                    <svg-icon name="chevron-down-xs" class="ml-1 w-2" />
+                    <span>{{ __('Publish') }}…</span>
                 </button>
             </div>
 
@@ -177,15 +181,16 @@
                 </div>
                 <template v-slot:buttons>
                    <button
-                    v-if="!readOnly"
-                    class="ml-2"
-                    :class="{
-                        'btn': revisionsEnabled,
-                        'btn-primary': isCreating || !revisionsEnabled,
-                    }"
-                    :disabled="!canSave"
-                    @click.prevent="save"
-                    v-text="saveText" />
+                        v-if="!readOnly"
+                        class="ml-2"
+                        :class="{
+                            'btn': revisionsEnabled,
+                            'btn-primary': isCreating || !revisionsEnabled,
+                        }"
+                        :disabled="!canSave"
+                        @click.prevent="save"
+                        v-text="saveText">
+                    </button>
 
                     <button
                         v-if="revisionsEnabled && !isCreating"
@@ -248,13 +253,20 @@
 
 
 <script>
-import PublishActions from './PublishActions.vue';
-import RevisionHistory from '../revision-history/History.vue';
+import PublishActions from './PublishActions';
+import SaveButtonOptions from '../publish/SaveButtonOptions';
+import RevisionHistory from '../revision-history/History';
+import HasPreferences from '../data-list/HasPreferences';
 
 export default {
 
+    mixins: [
+        HasPreferences,
+    ],
+
     components: {
         PublishActions,
+        SaveButtonOptions,
         RevisionHistory,
     },
 
@@ -283,7 +295,9 @@ export default {
         initialPermalink: String,
         revisionsEnabled: Boolean,
         preloadedAssets: Array,
-        canEditBlueprint: Boolean
+        canEditBlueprint: Boolean,
+        createAnotherUrl: String,
+        listingUrl: String,
     },
 
     data() {
@@ -309,6 +323,7 @@ export default {
             state: 'new',
             revisionMessage: null,
             showRevisionHistory: false,
+            preferencesPrefix: `collections.${this.collectionHandle}`,
 
             // Whether it was published the last time it was saved.
             // Successful publish actions (if using revisions) or just saving (if not) will update this.
@@ -367,14 +382,36 @@ export default {
         },
 
         saveText() {
-            if (this.revisionsEnabled) return __('Save Changes');
+            switch(true) {
+                case this.revisionsEnabled:
+                    return __('Save Changes');
+                case this.isUnpublishing:
+                    return __('Save & Unpublish');
+                case this.isDraft:
+                    return __('Save Draft');
+                default:
+                    return __('Save & Publish');
+            }
+        },
 
-            if (this.published) return __('Save & Publish');
+        isUnpublishing() {
+            return this.initialPublished && ! this.published && ! this.isCreating;
+        },
 
-            if (!this.published && this.initialPublished) return __('Save & Unpublish');
+        isDraft() {
+            return ! this.published;
+        },
 
-            return __('Save');
-        }
+        saveButtonClass() {
+            return {
+                'btn': this.revisionsEnabled,
+                'btn-primary': this.isCreating || ! this.revisionsEnabled,
+            };
+        },
+
+        afterSaveOption() {
+            return this.getPreference('after_save');
+        },
 
     },
 
@@ -448,11 +485,29 @@ export default {
                     response
                 })
                 .then(() => {
-                    if (! this.revisionsEnabled) this.initialPublished = response.data.published;
+                    // If revisions are enabled, just emit event.
+                    if (this.revisionsEnabled) {
+                        this.$nextTick(() => this.$emit('saved', response));
+                        return;
+                    }
 
-                    // Finally, we'll emit an event. We need to wait until after the hooks are resolved because
-                    // if this form is being shown in a stack, we only want to close it once everything's done.
-                    this.$nextTick(() => this.$emit('saved', response));
+                    // If the user has opted to create another entry, redirect them to create page.
+                    if (this.afterSaveOption === 'create_another') {
+                        window.location = this.createAnotherUrl;
+                    }
+
+                    // If the user has opted to go to listing (default/null option), redirect them there.
+                    else if (this.afterSaveOption === null) {
+                        window.location = this.listingUrl;
+                    }
+
+                    // Otherwise, leave them on the edit form and emit an event. We need to wait until after
+                    // the hooks are resolved because if this form is being shown in a stack, we only
+                    // want to close it once everything's done.
+                    else {
+                        this.initialPublished = response.data.data.published;
+                        this.$nextTick(() => this.$emit('saved', response));
+                    }
                 }).catch(e => {});
         },
 
