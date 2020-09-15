@@ -119,7 +119,7 @@ class Email extends Mailable
             $data[$global->handle()] = $global->toAugmentedArray();
         }
 
-        return $data;
+        return array_merge($data, $data['global'] ?? []);
     }
 
     protected function addresses($addresses)
