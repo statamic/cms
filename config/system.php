@@ -83,6 +83,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Enable Cache Tags
+    |--------------------------------------------------------------------------
+    |
+    | Sometimes you'll want to be able to disable the {{ cache }} tags in
+    | Antlers, so here is where you can do that. Otherwise, it will be
+    | enabled all the time.
+    |
+    */
+
+    'cache_tags_enabled' => env('STATAMIC_CACHE_TAGS_ENABLED', true),
+
+    /*
+    |--------------------------------------------------------------------------
     | Intensive Operations
     |--------------------------------------------------------------------------
     |

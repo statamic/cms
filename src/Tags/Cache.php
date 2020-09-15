@@ -24,7 +24,9 @@ class Cache extends Tags
 
     private function isEnabled()
     {
-        // TODO: make a global config
+        if (! config('statamic.system.cache_tags_enabled', true)) {
+            return false;
+        }
 
         // Only get requests. This disables the cache during live preview.
         return request()->method() === 'GET';
