@@ -78,4 +78,15 @@ return [
         'activations' => config('auth.defaults.passwords'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | DB Connection
+    |--------------------------------------------------------------------------
+    |
+    | Default database connection.
+    |
+    */
+
+    'database' => config('database.default'),
+
 ];
