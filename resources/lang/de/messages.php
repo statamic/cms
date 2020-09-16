@@ -85,7 +85,7 @@ return [
     'form_configure_title_instructions' => 'Gewöhnlich ein Call to Action, wie z.B. Kontakt.',
     'getting_started_widget_blueprints' => 'Blueprints legen die benutzerdefinierten Felder fest, die zum Erstellen und Speichern der Inhalte verwendet werden.',
     'getting_started_widget_collections' => 'Sammlungen enthalten die verschiedenen Inhaltsarten der Webseite.',
-    'getting_started_widget_docs' => 'Lerne Statamic kennen, indem du seine Möglichkeiten richtig verstehst.',
+    'getting_started_widget_docs' => 'Die Möglichkeiten von Statamic richtig kennen und verstehen lernen.',
     'getting_started_widget_header' => 'Erste Schritte mit Statamic 3',
     'getting_started_widget_intro' => 'Wir empfehlen dir beim Aufbau deiner neuen Statamic 3 Webseite mit diesen Schritten zu beginnen.',
     'getting_started_widget_navigation' => 'Erstelle mehrstufige Listen mit Links, die für die Gestaltung von Navbars, Fuszeilen etc. verwendet werden können.',
