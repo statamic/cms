@@ -1,5 +1,33 @@
 # Release Notes
 
+# Unreleased
+
+### What's new
+- Antlers now supports array access with square brackets. [#1983](https://github.com/statamic/cms/issues/1983)
+- The cache tag can be disabled. [#2328](https://github.com/statamic/cms/issues/2328)
+- You can choose a different database connection for users. [#2416](https://github.com/statamic/cms/issues/2416)
+- Form emails get access to global variables. [#2411](https://github.com/statamic/cms/issues/2411)
+- Form fields in templates get placeholder attributes. [#2354](https://github.com/statamic/cms/issues/2354)
+
+### What's improved
+- The Spanish, Dutch, and French translations have been updated. [#2440](https://github.com/statamic/cms/issues/2440), [#2435](https://github.com/statamic/cms/issues/2435), [#2434](https://github.com/statamic/cms/issues/2434)
+- When creating a field, the fieldtype title is used instead of uppercasing the handle. [#1662](https://github.com/statamic/cms/issues/1662)
+- Improved the asset uploader drop zone. [#2358](https://github.com/statamic/cms/issues/2358)
+- You get a more helpful exception when using a non-existent collection in the entries fieldtype. [#2422](https://github.com/statamic/cms/issues/2422)
+- Prevent showing options in the collection listing dropdown if you don't have permission. [#2412](https://github.com/statamic/cms/issues/2412)
+- Prevent an empty code element when you're missing a mail config. [#2380](https://github.com/statamic/cms/issues/2380)
+
+### What's fixed
+- Fixed a password reset related error. [#1973](https://github.com/statamic/cms/issues/1973)
+- Angle brackets can be used in modifiers. [#2022](https://github.com/statamic/cms/issues/2022)
+- Adjusted the contrast in the markdown fieldtype. [#2185](https://github.com/statamic/cms/issues/2185)
+- Bard's fixed toolbar is shown even when fullscreen and source are disabled. [#2280](https://github.com/statamic/cms/issues/2280)
+- Fixed the asset rename warning translation. [#2329](https://github.com/statamic/cms/issues/2329)
+- Fixed the "Pro mode" text in the Getting Started widget. [#2433](https://github.com/statamic/cms/issues/2433)
+- Prevent an error on the entry list when you reference a non-existent user. [#2410](https://github.com/statamic/cms/issues/2410)
+- Passing a zero into a tag parameter that expects a number will now use the zero instead of falling back to a one.
+
+
 ## 3.0.8 (2020-09-15)
 
 ### What's new
