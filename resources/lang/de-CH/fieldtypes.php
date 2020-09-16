@@ -20,7 +20,7 @@ return [
     'bard.config.reading_time' => 'Geschätzte Lesezeit am unteren Rand des Feldes anzeigen.',
     'bard.config.save_html' => 'HTML anstelle von strukturierten Daten speichern. Dies vereinfacht zwar die Kontrolle über dein Template Markup, schränkt dieses aber ein.',
     'bard.config.sets' => 'Sets sind anpassbare Blöcke mit Feldern, die an beliebiger Stelle in deinen Bard-Inhalt eingefügt werden können.',
-    'bard.config.target_blank' => 'Sämtliche Links mit `target="_blank` ausstatten.',
+    'bard.config.target_blank' => 'Sämtliche Links mit `target="_blank"` ausstatten.',
     'bard.config.toolbar_mode' => 'Bevorzugten Stil der Symbolleiste auswählen.',
     'checkboxes.config.inline' => 'Checkboxen in einer Reihe anzeigen.',
     'checkboxes.config.options' => 'Arrayschlüssel und deren optionale Beschriftungen festlegen.',
