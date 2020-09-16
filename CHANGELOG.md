@@ -3,7 +3,7 @@
 # Unreleased
 
 ### What's new
-- Antlers now supports dynamic array access with a brand new (to Antlers) square bracket syntax. [#1983](https://github.com/statamic/cms/issues/1983) (thanks [@morhi](https://github.com/morhi)!)
+- Antlers now supports [dynamic array access](https://statamic.dev/antlers#dynamic-access) with a brand new (to Antlers) square bracket syntax. [#1983](https://github.com/statamic/cms/issues/1983) (thanks [@morhi](https://github.com/morhi)!)
 - The cache tag can be now disabled. [#2328](https://github.com/statamic/cms/issues/2328)
 - You can now set a separate database connection for users. [#2416](https://github.com/statamic/cms/issues/2416)
 - Form emails now have full access to all global variables. [#2411](https://github.com/statamic/cms/issues/2411)
