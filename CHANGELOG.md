@@ -1,6 +1,6 @@
 # Release Notes
 
-# Unreleased
+## 3.0.9 (2020-09-16)
 
 ### What's new
 - Antlers now supports [dynamic array access](https://statamic.dev/antlers#dynamic-access) with a brand new (to Antlers) square bracket syntax. [#1983](https://github.com/statamic/cms/issues/1983) (thanks [@morhi](https://github.com/morhi)!)
