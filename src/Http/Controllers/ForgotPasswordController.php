@@ -36,6 +36,8 @@ class ForgotPasswordController extends Controller
 
     public function broker()
     {
-        return Password::broker(PasswordReset::BROKER_RESETS);
+        $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_RESETS);
+
+        return Password::broker($broker);
     }
 }
