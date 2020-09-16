@@ -30,9 +30,9 @@ this: is some yaml
 
 <h3>Mengutip</h3>
 
-<p>Buat blok kutipan dengan memulai teks Anda dengan <code>> </code>.</p>
+<p>Buat blockquote dengan memulai teks Anda dengan <code>> </code>.</p>
 
-<pre class="language-markdown"><code>> Ini akan menjadi kutipan blok.</code></pre>
+<pre class="language-markdown"><code>> Ini akan menjadi blockquote.</code></pre>
 
 <h3>Gambar-Gambar</h3>
 <pre class="language-markdown"><code>![alt text](http://example.com/image.jpg)</code></pre>

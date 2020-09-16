@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'any.config.default' => '',
     'array.config.keys' => 'Setel kunci array (variabel) dan label opsional.',
     'array.config.mode' => 'Mode dinamis memberi pengguna kontrol atas data sementara mode kunci tidak.',
     'assets.config.allow_uploads' => 'Izinkan unggahan file baru.',
