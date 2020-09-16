@@ -2,7 +2,7 @@
 
 return [
     'super' => 'Superusuario',
-    'super_desc' => 'Esto otorga al usuario acceso sin restricciones a todo. Usa con precaución.',
+    'super_desc' => 'Esto otorga al usuario acceso sin restricciones a todo. Usar con precaución.',
     'group_cp' => 'Panel de control',
     'access_cp' => 'Entra al Panel de control',
     'access_cp_desc' => 'Permite el acceso al ^Panel de control, pero no garantiza que se pueda hacer nada una vez dentro.',
