@@ -86,6 +86,7 @@ class Bard extends Replicator
                 'width' => 50,
             ],
             'target_blank' => [
+                'display' => __('Target Blank'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
