@@ -31,6 +31,7 @@ class ParametersTest extends TestCase
         $this->params = Parameters::make([
             'string' => 'hello',
             'array' => ['one', 'two'],
+            'zero' => 0,
             'integer' => 7,
             'float' => 123.456,
             ':evaluated' => 'foo',
@@ -63,6 +64,7 @@ class ParametersTest extends TestCase
         $this->assertSame([
             'string' => 'hello',
             'array' => ['one', 'two'],
+            'zero' => 0,
             'integer' => 7,
             'float' => 123.456,
             'evaluated' => 'bar',
@@ -181,6 +183,8 @@ class ParametersTest extends TestCase
         $this->assertEquals(0, $this->params->int('string'));
         $this->assertEquals(0, $this->params->int('unknown'));
         $this->assertEquals(3, $this->params->int('unknown', 3));
+        $this->assertEquals(0, $this->params->int('zero'));
+        $this->assertEquals(0, $this->params->int('zero', 1));
         $this->assertEquals('fallback', $this->params->int('unknown', 'fallback'));
     }
 
@@ -200,6 +204,7 @@ class ParametersTest extends TestCase
         $expected = [
             'string' => 'hello',
             'array' => ['one', 'two'],
+            'zero' => 0,
             'integer' => 7,
             'float' => 123.456,
             'evaluated' => 'bar',

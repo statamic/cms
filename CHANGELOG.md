@@ -1,5 +1,55 @@
 # Release Notes
 
+## 3.0.9 (2020-09-16)
+
+### What's new
+- Antlers now supports [dynamic array access](https://statamic.dev/antlers#dynamic-access) with a brand new (to Antlers) square bracket syntax. [#1983](https://github.com/statamic/cms/issues/1983) (thanks [@morhi](https://github.com/morhi)!)
+- The cache tag can be now disabled. [#2328](https://github.com/statamic/cms/issues/2328)
+- You can now set a separate database connection for users. [#2416](https://github.com/statamic/cms/issues/2416)
+- Form emails now have full access to all global variables. [#2411](https://github.com/statamic/cms/issues/2411)
+- Form fields in templates get placeholder attributes. [#2354](https://github.com/statamic/cms/issues/2354)
+
+### What's improved
+- The Spanish, Dutch, and French translations have been updated. [#2440](https://github.com/statamic/cms/issues/2440), [#2435](https://github.com/statamic/cms/issues/2435), [#2434](https://github.com/statamic/cms/issues/2434)
+- When creating a field, the fieldtype title is used instead of uppercasing the handle. [#1662](https://github.com/statamic/cms/issues/1662)
+- Improved the asset uploader drop zone. [#2358](https://github.com/statamic/cms/issues/2358)
+- You now get a more helpful exception when using a non-existent collection in the entries fieldtype. [#2422](https://github.com/statamic/cms/issues/2422)
+- We now prevent options from showing in the collection listing dropdown if you don't have permission to do the things. [#2412](https://github.com/statamic/cms/issues/2412)
+- The Mail config utility area now looks better. [#2380](https://github.com/statamic/cms/issues/2380)
+
+### What's fixed
+- Fixed a password reset related error. [#1973](https://github.com/statamic/cms/issues/1973)
+- Angle brackets can now be used in modifiers. [#2022](https://github.com/statamic/cms/issues/2022)
+- The Markdown fieldtype's dark mode preview text is no longer dark on dark. {insert another Tom Haverford reference} [#2185](https://github.com/statamic/cms/issues/2185)
+- Bard's fixed toolbar is now shown when fullscreen and source are disabled, as you'd expect. [#2280](https://github.com/statamic/cms/issues/2280)
+- Fixed the asset rename warning translation. [#2329](https://github.com/statamic/cms/issues/2329)
+- Fixed the "Pro Mode" text in the Getting Started widget. [#2433](https://github.com/statamic/cms/issues/2433)
+- Prevent an error on the entry list when you reference a non-existent user. [#2410](https://github.com/statamic/cms/issues/2410)
+- Passing a zero into a tag parameter that expects a number will now use the zero instead of falling back to a one. Weird one. Or weird zero I guess.
+
+
+## 3.0.8 (2020-09-15)
+
+### What's new
+- The Save/Publish button now supports "After Saving" options! You can choose to go to back to the listing, stay and edit, or create another and it will remember your last chosen option next time. [#675](https://github.com/statamic/cms/issues/675)
+
+### What's improved
+- The Getting Started widget now explains Pro Mode, and no longer references the beta. [#2402](https://github.com/statamic/cms/issues/2402)
+- The French and German translations have been updated.
+- The Select field now supports **max items**. [#1771](https://github.com/statamic/cms/issues/1771)
+- The Range field has a smarter, configurable default that accounts for the `step` option. [#2328](https://github.com/statamic/cms/issues/2328)
+- The Replicator field now looks better when underneath a Section field. [#2375](https://github.com/statamic/cms/issues/2375)
+
+### What's fixed
+- Bard's floating toolbar no longer keeps the table icons in the dark. Dark mode is one thing, but dark on dark is Tom Haverford-level silly. [#2189](https://github.com/statamic/cms/issues/2189)
+- Bard's overaggressive focus outlines on Safari have been surgically removed. [#2188](https://github.com/statamic/cms/issues/2188)
+- The publish sidebar will no longer collapse like a bully shoving a skinny kid into their locker.
+- Section fieldtypes are no longer included in listings. [#2425](https://github.com/statamic/cms/issues/2425)
+- Global search shows the collection/taxonomy name again. Sorry about that regression — at least it was cosmetic! [#2332](https://github.com/statamic/cms/issues/2332)
+
+
+
+
 ## 3.0.7 (2020-09-08)
 
 ### What's fixed

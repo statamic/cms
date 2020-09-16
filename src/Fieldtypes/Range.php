@@ -25,14 +25,21 @@ class Range extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.range.config.min'),
                 'type' => 'integer',
                 'default' => 0,
-                'width' => 50,
+                'width' => 33,
             ],
             'max' => [
                 'display' => __('Max'),
                 'instructions' => __('statamic::fieldtypes.range.config.max'),
                 'type' => 'integer',
                 'default' => 100,
-                'width' => 50,
+                'width' => 33,
+            ],
+            'default' => [
+                'display' => __('Default'),
+                'instructions' => __('statamic::fieldtypes.any.config.default'),
+                'type' => 'integer',
+                'default' => null,
+                'width' => 33,
             ],
             'prepend' => [
                 'display' => __('Prepend'),

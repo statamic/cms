@@ -36,7 +36,7 @@ class RenameAsset extends Action
     public function warningText()
     {
         /** @translation */
-        return 'rename_asset_warning';
+        return 'messages.rename_asset_warning';
     }
 
     public function run($assets, $values)

@@ -43,7 +43,7 @@ class ArrayAccessor extends Collection
 
     public function int($key, $default = 0)
     {
-        if (! $value = $this->get($key)) {
+        if (is_null($value = $this->get($key))) {
             return $default;
         }
 

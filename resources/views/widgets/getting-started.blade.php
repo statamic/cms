@@ -19,7 +19,7 @@
             </div>
             <div class="flex-1">
                 <h3 class="mb-1 text-blue">{{ __('Enable Pro Mode') }}</h3>
-                <p>{{ __('statamic::messages.getting_started_widget_navigation') }}</p>
+                <p>{{ __('statamic::messages.getting_started_widget_pro') }}</p>
             </div>
         </a>
         <a href="{{ cp_route('collections.create') }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
