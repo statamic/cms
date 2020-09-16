@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'any.config.default' => 'Standardwert festlegen.',
     'array.config.keys' => 'Arrayschlüssel (Variablen) und optionale Beschriftungen festlegen.',
     'array.config.mode' => 'Der dynamische Modus gibt der Benutzer*in die Kontrolle über die Daten, während der geschlossene Modus dies nicht tut.',
     'assets.config.allow_uploads' => 'Das Hochladen neuer Dateien zulassen.',
@@ -9,12 +10,13 @@ return [
     'assets.config.max_files' => 'Die maximale Anzahl der auswählbaren Dateien.',
     'assets.config.mode' => 'Bevorzugten Layoutstil auswählen.',
     'assets.config.restrict' => 'Verhindern, dass Benutzer*innen zu anderen Ordnern navigieren können.',
-    'bard.config.allow_source' => 'Option zum Anzeigen des HTML-Quellcodes während des Schreibens aktivieren.',
+    'bard.config.allow_source' => 'Ermöglicht beim Schreiben das Anzeigen des HTML-Quellcodes.',
+    'bard.config.always_show_set_button' => 'Ermöglicht das ständige Anzeigen des «Set hinzufügen»-Buttons.',
     'bard.config.buttons' => 'Auswählen, welche Buttons in der Symbolleiste angezeigt werden sollen.',
     'bard.config.container' => 'Datei-Container für dieses Feld auswählen.',
-    'bard.config.fullscreen' => 'Option zum Umschalten in den Vollbildmodus aktivieren.',
+    'bard.config.fullscreen' => 'Ermöglicht das Umschalten in den Vollbildmodus.',
     'bard.config.link_noopener' => 'Sämtliche Links mit `rel="noopener"` ausstatten.',
-    'bard.config.link_noreferrer' => 'Sämtliche Links mit `rel="noreferrer` ausstatten.',
+    'bard.config.link_noreferrer' => 'Sämtliche Links mit `rel="noreferrer"` ausstatten.',
     'bard.config.reading_time' => 'Geschätzte Lesezeit am unteren Rand des Feldes anzeigen.',
     'bard.config.save_html' => 'HTML anstelle von strukturierten Daten speichern. Dies vereinfacht zwar die Kontrolle über dein Template Markup, schränkt dieses aber ein.',
     'bard.config.sets' => 'Sets sind anpassbare Blöcke mit Feldern, die an beliebiger Stelle in deinen Bard-Inhalt eingefügt werden können.',
@@ -71,7 +73,7 @@ return [
     'select.config.placeholder' => 'Nicht anwählbaren Platzhaltertext festlegen.',
     'select.config.push_tags' => 'Neu erstellte Tags zur Optionsliste hinzufügen.',
     'select.config.searchable' => 'Die Suche durch verfügbare Optionen aktivieren.',
-    'select.config.taggable' => 'Das Hinzufügen neuer Optionen zusätzlich zu den Vordefinierten zulassen.',
+    'select.config.taggable' => 'Das Hinzufügen neuer Optionen zusätzlich zu den vordefinierten zulassen.',
     'template.config.hide_partials' => 'Partials sind selten als Templates vorgesehen.',
     'text.config.append' => 'Zusätzlichen Text rechts vom eigentlichen Text anhängen.',
     'text.config.character_limit' => 'Maximale Anzahl der möglichen Zeichen festlegen.',
