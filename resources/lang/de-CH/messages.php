@@ -88,7 +88,7 @@ return [
     'getting_started_widget_docs' => 'Die Möglichkeiten von Statamic richtig kennen und verstehen lernen.',
     'getting_started_widget_header' => 'Erste Schritte mit Statamic 3',
     'getting_started_widget_intro' => 'Wir empfehlen dir beim Aufbau deiner neuen Statamic 3 Webseite mit diesen Schritten zu beginnen.',
-    'getting_started_widget_navigation' => 'Erstelle mehrstufige Listen mit Links, die für die Gestaltung von Navbars, Fuszeilen etc. verwendet werden können.',
+    'getting_started_widget_navigation' => 'Mehrstufige Listen mit Links erstellen, die für die Gestaltung von Navbars, Fuszeilen etc. verwendet werden können.',
     'getting_started_widget_pro' => 'Statamic Pro fügt unlimitierte Benutzerkonten, Rollen, Berechtigungen, Git-Integration, Überarbeitungen, Multisite und mehr hinzu!',
     'git_disabled' => 'Die Statamic Git Integration ist zurzeit deaktiviert.',
     'git_nothing_to_commit' => 'Nichts zu committen, Inhaltspfade sauber!',
