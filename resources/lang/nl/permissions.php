@@ -9,7 +9,7 @@ return [
     'configure_fields' => 'Configureer velden',
     'configure_fields_desc' => 'De mogelijkheid om blueprints, fieldsets en andere velden te wijzigen.',
     'configure_addons' => 'Configureer add-ons',
-    'configure_addons_desc' => 'Mogelijkheid om het add-ongebied te openen om add-ons te installeren en te verwijderen.',
+    'configure_addons_desc' => 'Toegang tot addons, met de mogelijkheid om addons te installeren en te verwijderen.',
     'group_collections' => 'Collecties',
     'configure_collections' => 'Configureer collecties',
     'configure_collections_desc' => 'Geeft toegang tot alle collectiegerelateerde rechten',

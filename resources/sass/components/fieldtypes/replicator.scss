@@ -23,7 +23,7 @@
         background: transparent url('../img/drag-dots.svg') center center no-repeat;
         &:hover { @apply .bg-grey-20; }
     }
-    
+
     img {
         @apply inline-block;
     }
@@ -58,4 +58,9 @@
     .replicator-fieldtype-container {
         @apply px-3;
     }
+}
+
+// Avoid double borders
+.section-fieldtype ~ .replicator-fieldtype {
+    border-top: 0;
 }

@@ -17,6 +17,8 @@
         :revisions-enabled="revisions"
         :breadcrumbs="breadcrumbs"
         :initial-site="site"
+        :create-another-url="createAnotherUrl"
+        :listing-url="listingUrl"
         @saved="saved"
     ></entry-publish-form>
 
@@ -35,6 +37,8 @@ export default {
         'revisions',
         'breadcrumbs',
         'site',
+        'createAnotherUrl',
+        'listingUrl',
     ],
 
     methods: {

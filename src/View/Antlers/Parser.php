@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Exceptions\ArrayKeyNotFoundException;
 use Statamic\Facades\Config;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
@@ -815,7 +816,7 @@ class Parser
         // also pass in the current callback (for later processing callback tags); also setting
         // $ref so that we can use it within the anonymous function
         $ref = $this;
-        $condition = $this->preg_replace_callback('/\b('.$this->variableRegex.')\b/', function ($match) use ($ref) {
+        $condition = $this->preg_replace_callback('/(\b'.$this->variableRegex.'[\b\]])/', function ($match) use ($ref) {
             return $ref->processConditionVar($match);
         }, $condition);
 
@@ -979,7 +980,7 @@ class Parser
      */
     public function processConditionVar($match)
     {
-        $var = is_array($match) ? $match[0] : $match;
+        $var = trim(is_array($match) ? $match[0] : $match);
 
         if (in_array(strtolower($var), ['true', 'false', 'null', 'or', 'and']) or
             strpos($var, '__cond_str') === 0 or
@@ -1192,6 +1193,12 @@ class Parser
      */
     protected function getVariableExistenceAndValue($key, $context)
     {
+        try {
+            $key = $this->replaceDynamicArrayKeys($key, $context);
+        } catch (ArrayKeyNotFoundException $exception) {
+            return [false, null];
+        }
+
         // If the key exists in the context, great, we're done.
         if (Arr::has($context, $key)) {
             return [true, Arr::get($context, $key)];
@@ -1255,6 +1262,49 @@ class Parser
         }
 
         return [false, null];
+    }
+
+    /**
+     * Replaces a dynamic array key access with the actual value.
+     *
+     * Example:
+     *
+     * The context contains a variable 'key' with the value 'foo' and there is an
+     * array 'old' containing a key 'foo'. The value of the array with the key 'foo'
+     * can be accessed using the variable 'key' like this inside the template:
+     *
+     *      {{ old[key] }} or {{ if old[key] }} ...
+     *
+     * @param string $key
+     * @param array $context
+     * @throws ArrayKeyNotFoundException
+     *
+     * @return string
+     */
+    protected function replaceDynamicArrayKeys($key, $context)
+    {
+        if (! Str::containsAll($key, ['[', ']'])) {
+            return $key;
+        }
+
+        // If the key contains dynamic array keys, let's replace them with their actual value.
+        return trim($this->preg_replace_callback('/\[([\'"\w\d-]*)\]/', function ($matches) use ($context) {
+            $key = $matches[1];
+
+            if ($this->isLiteralString($key)) {
+                return '.'.trim($key, '"\'');
+            }
+
+            $value = Arr::get($context, $key);
+
+            if (! (is_string($value) || is_numeric($value))) {
+                // If the variable does not exist in the context or the value is not a valid key
+                // the replacement should not return a value to prevent unexpected behaviour.
+                throw new ArrayKeyNotFoundException();
+            }
+
+            return '.'.$value;
+        }, $key));
     }
 
     /**

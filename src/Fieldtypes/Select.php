@@ -26,16 +26,22 @@ class Select extends Fieldtype
                 'value_header' => __('Label'),
                 'add_button' => __('Add Option'),
             ],
-            'clearable' => [
-                'display' => __('Clearable'),
-                'instructions' => __('statamic::fieldtypes.select.config.clearable'),
+            'multiple' => [
+                'display' => __('Multiple'),
+                'instructions' => __('statamic::fieldtypes.select.config.multiple'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
             ],
-            'multiple' => [
-                'display' => __('Multiple'),
-                'instructions' => __('statamic::fieldtypes.select.config.multiple'),
+            'max_items' => [
+                'display' => __('Max Items'),
+                'instructions' => __('statamic::messages.max_items_instructions'),
+                'type' => 'integer',
+                'width' => 50,
+            ],
+            'clearable' => [
+                'display' => __('Clearable'),
+                'instructions' => __('statamic::fieldtypes.select.config.clearable'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,
