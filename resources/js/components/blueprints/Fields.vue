@@ -119,8 +119,7 @@ export default {
                 config: {
                     ...field,
                     isNew: true,
-                    handle,
-                    display: handle.substring(0, 1).toUpperCase() + handle.substr(1),
+                    handle
                 }
             };
 

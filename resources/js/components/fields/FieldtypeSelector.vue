@@ -199,6 +199,7 @@ export default {
             // and id keys. This will be 'field_n' etc, where n would be the total root
             // level, grid, or set fields depending on the event listener location.
             let field = {
+                display: fieldtype.title,
                 type: fieldtype.handle,
                 instructions: null,
                 localizable: false,

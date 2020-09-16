@@ -23,7 +23,7 @@ return [
     dies: ist etwas YAML
     ```</code></pre>
 
-    <p>Du kannst auch Code inline hinzufügen, indem du den Inhalt mit je einem einfachen Backtick (<code>`</code>) umschliesst.</p>
+    <p>Du kannst auch Code inline hinzufügen, indem du den Inhalt mit je einem einfachen Backtick (<code>`</code>) umschließt.</p>
 
     <h3>Zitate</h3>
     <p>Erstelle ein Zitat indem du den Text mit <code>>&nbsp;</code> beginnst.</p>

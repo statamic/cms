@@ -1,7 +1,7 @@
 <template>
 
     <div>
-        <breadcrumb :url="taxonomyUrl" :title="taxonomyTitle" />
+        <breadcrumb v-if="breadcrumbs" :url="breadcrumbs[1].url" :title="breadcrumbs[1].text" />
 
         <div class="flex items-center mb-3">
             <h1 class="flex-1">
@@ -18,15 +18,20 @@
             </div>
 
             <div class="hidden md:flex items-center">
-                <button
+
+                <save-button-options
                     v-if="!readOnly"
-                    :class="{
-                        'btn': revisionsEnabled,
-                        'btn-primary': ! revisionsEnabled,
-                    }"
-                    :disabled="!canSave"
-                    @click.prevent="save"
-                    v-text="saveText" />
+                    :show-options="!revisionsEnabled"
+                    :button-class="saveButtonClass"
+                    :preferences-prefix="preferencesPrefix"
+                >
+                    <button
+                        :class="saveButtonClass"
+                        :disabled="!canSave"
+                        @click.prevent="save"
+                        v-text="saveText"
+                    />
+                </save-button-options>
 
                 <button
                     v-if="revisionsEnabled"
@@ -227,12 +232,19 @@
 
 <script>
 import PublishActions from './PublishActions.vue';
+import SaveButtonOptions from '../publish/SaveButtonOptions';
 import RevisionHistory from '../revision-history/History.vue';
+import HasPreferences from '../data-list/HasPreferences';
 
 export default {
 
+    mixins: [
+        HasPreferences,
+    ],
+
     components: {
         PublishActions,
+        SaveButtonOptions,
         RevisionHistory,
     },
 
@@ -250,8 +262,8 @@ export default {
         initialOriginMeta: Object,
         initialSite: String,
         initialIsWorkingCopy: Boolean,
-        taxonomyTitle: String,
-        taxonomyUrl: String,
+        taxonomyHandle: String,
+        breadcrumbs: Array,
         initialActions: Object,
         method: String,
         amp: Boolean,
@@ -262,6 +274,8 @@ export default {
         initialPermalink: String,
         revisionsEnabled: Boolean,
         preloadedAssets: Array,
+        createAnotherUrl: String,
+        listingUrl: String,
     },
 
     data() {
@@ -291,7 +305,8 @@ export default {
             confirmingPublish: false,
             readOnly: this.initialReadOnly,
             isRoot: this.initialIsRoot,
-            permalink: this.initialPermalink
+            permalink: this.initialPermalink,
+            preferencesPrefix: `taxonomies.${this.taxonomyHandle}`,
         }
     },
 
@@ -339,7 +354,18 @@ export default {
             if (!this.published && this.initialPublished) return __('Save & Unpublish');
 
             return __('Save');
-        }
+        },
+
+        saveButtonClass() {
+            return {
+                'btn': this.revisionsEnabled,
+                'btn-primary': ! this.revisionsEnabled,
+            };
+        },
+
+        afterSaveOption() {
+            return this.getPreference('after_save');
+        },
 
     },
 
@@ -381,13 +407,30 @@ export default {
                 this.isWorkingCopy = true;
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
-                this.$nextTick(() => this.$emit('saved', response));
+                this.handleSuccess(response);
             }).catch(e => this.handleAxiosError(e));
         },
 
         confirmPublish() {
             if (this.canPublish) {
                 this.confirmingPublish = true;
+            }
+        },
+
+        handleSuccess(response) {
+            // If the user has opted to create another entry, redirect them to create page.
+            if (! this.revisionsEnabled && this.afterSaveOption === 'create_another') {
+                window.location = this.createAnotherUrl;
+            }
+
+            // If the user has opted to go to listing (default/null option), redirect them there.
+            else if (! this.revisionsEnabled && this.afterSaveOption === null) {
+                window.location = this.listingUrl;
+            }
+
+            // Otherwise, leave them on the edit form and emit an event.
+            else {
+                this.$nextTick(() => this.$emit('saved', response));
             }
         },
 
