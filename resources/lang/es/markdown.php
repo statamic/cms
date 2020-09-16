@@ -12,14 +12,14 @@ return [
 </code></pre>
 
 <h3>Negritas &amp; Itálicas</h3>
-<pre class="language-markdown"><code>Puedes hacer el texto *itálico*, **negrito**, o _**ambos**_.</code></pre>
+<pre class="language-markdown"><code>Puedes hacer el texto *itálico*, **en negrita**, o _**ambos**_.</code></pre>
 
 <h3>Enlaces</h3>
 <pre class="language-markdown"><code>Este es un [enlace de muestra](http://ejemplo.com).</code></pre>
 
 <h3>Código</h3>
 <p>
-Envuelte tu código con tres tildes inversas (<code>```</code>) en la líneas de antes y después.
+Envuelve tu código con tres tildes inversas (<code>```</code>) en la líneas de antes y después.
 </p>
 
 <pre class="language-markdown"><code>```
