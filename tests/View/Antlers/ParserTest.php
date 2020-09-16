@@ -413,6 +413,16 @@ EOT;
         $this->assertEquals('Pass', $this->parse('{{ missing[thing] ?? "Pass" }}', $this->variables));
     }
 
+    public function testNullCoalescenceWithStringModifiers()
+    {
+        $this->assertEquals('HELLO WILDERNESS', $this->parse('{{ missing ?? string | upper }}', $this->variables));
+        $this->assertEquals('HELLO WILDERNESS', $this->parse('{{ missing | upper ?? string | upper }}', $this->variables));
+        $this->assertEquals('HELLO WILDERNESS', $this->parse('{{ string | upper ?? missing | upper }}', $this->variables));
+
+        // With parameters
+        $this->assertEquals('Hello wilderness >', $this->parse('{{ missing ?? string | ensure_right: > }}', $this->variables));
+    }
+
     public function testTruthCoalescing()
     {
         $this->assertEquals('Pass', $this->parse('{{ string ?= "Pass" }}', $this->variables));
