@@ -174,6 +174,7 @@ class AssetContainersController extends CpController
                         'type' => 'slug',
                         'display' => __('Handle'),
                         'validate' => 'required|alpha_dash',
+                        'separator' => '_',
                         'instructions' => __('statamic::messages.asset_container_handle_instructions'),
                     ],
                 ],
