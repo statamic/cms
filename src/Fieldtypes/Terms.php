@@ -88,7 +88,7 @@ class Terms extends Relationship
                     $term->collection($entry->collection());
                 }
 
-                $locale = $entry
+                $locale = $entry && method_exists($entry, 'locale')
                     ? $entry->locale()
                     : Site::current()->handle();
 
