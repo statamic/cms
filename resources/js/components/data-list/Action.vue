@@ -89,7 +89,12 @@ export default {
     methods: {
 
         select() {
-            this.confirming = true;
+            if (this.action.confirm) {
+                this.confirming = true;
+                return;
+            }
+
+            this.$emit('selected', this.action, this.values);
         },
 
         confirm() {
