@@ -102,7 +102,8 @@ return [
     'url' => 'Das Format ist ungültig.',
     'unique_entry_value' => 'Dieser Wert wurde bereits vergeben.',
     'unique_user_value' => 'Dieser Wert wurde bereits vergeben.',
-    'one_site_without_origin' => 'Mindestens eine Webseite darf keine Quelle enthalten.',
+    'duplicate_field_handle' => 'Feld mit dem Handle :handle kann nicht mehr als einmal verwendet werden.',
+    'one_site_without_origin' => 'Mindestens eine Website darf keine Quelle enthalten.',
     'origin_cannot_be_disabled' => 'Kann keine deaktivierte Quelle auswählen.',
     'custom' => [
         'attribute-name' => [
