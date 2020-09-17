@@ -47,7 +47,7 @@ trait HasAvatar
     }
 
     /**
-     * The Gravatar URL
+     * The Gravatar URL.
      */
     public function gravatarUrl($size = 64)
     {
