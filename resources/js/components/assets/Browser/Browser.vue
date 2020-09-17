@@ -200,7 +200,9 @@
                                 </div>
                             </div>
 
-                            <div class="p-2 text-grey-70" v-if="containerIsEmpty">{{ __('This container is empty') }}</div>
+                            <div class="p-2 text-grey-70"
+                                v-if="containerIsEmpty"
+                                v-text="searchQuery ? __('No results') : __('This container is empty')" />
 
                         </div>
 
@@ -360,7 +362,7 @@ export default {
         containerIsEmpty() {
             return this.assets.length === 0
                 && this.folders.length === 0
-                && ! this.folder.parent_path;
+                && (!this.folder || !this.folder.parent_path);
         },
 
         editedAssetBasename() {
