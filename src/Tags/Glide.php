@@ -99,7 +99,7 @@ class Glide extends Tags
         return $items->map(function ($item) {
             $url = $this->generateGlideUrl($item);
 
-            $path = $this->generateImage($item);
+            $path = $this->generateImage((string) $item);
 
             [$width, $height] = getimagesize($this->getServer()->getCache()->getAdapter()->getPathPrefix().$path);
 
@@ -123,8 +123,8 @@ class Glide extends Tags
     {
         $params = $this->getGlideParams($item);
 
-        return (Str::isUrl($item))
-            ? $this->getGenerator()->generateByPath($item, $params)
+        return Str::isUrl($item)
+            ? $this->getGenerator()->generateByUrl($item, $params)
             : $this->getGenerator()->generateByAsset(Asset::find($item), $params);
     }
 
