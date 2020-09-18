@@ -1688,7 +1688,7 @@ class CoreModifiers extends Modifier
             return $value;
         }
 
-        $glue = Arr::get($params, 0, 'and');
+        $glue = Arr::get($params, 0, __('and'));
         $oxford_comma = Arr::get($params, 1, true);
 
         return Str::makeSentenceList($value, $glue, $oxford_comma);
