@@ -2,13 +2,13 @@
 
 ## 3.0.10 (2020-09-18)
 
-## What's improved
+### What's improved
 - German, French, and Portuguese translations have been updated. [#2445](https://github.com/statamic/cms/issues/2445) [#2444](https://github.com/statamic/cms/issues/2444) [#2458](https://github.com/statamic/cms/issues/2458)
 - When an asset search returns no results it says "No results" instead of "This container is empty".
 - Asset container handle are generated using snake_case as you type the title.
 - The "and" the sentence_list modifier is translated. [#2463](https://github.com/statamic/cms/issues/2463)
 
-## What's fixed
+### What's fixed
 - Actions that don't want to be confirmed... won't be. [#1497](https://github.com/statamic/cms/issues/1497) [#2446](https://github.com/statamic/cms/issues/2446)
 - Assets can be searched in grid mode. [#2318](https://github.com/statamic/cms/issues/2318) [#2442](https://github.com/statamic/cms/issues/2442)
 - User avatars can be output in templates. [#2017](https://github.com/statamic/cms/issues/2017)
@@ -17,7 +17,7 @@
 - Fix an issue where the sort modifier would output nothing. [#2450](https://github.com/statamic/cms/issues/2450)
 - Prevent the tree from disappearing when switching from list view. [#2408](https://github.com/statamic/cms/issues/2408)
 
-## What's removed
+### What's removed
 - "Angle brackets can now be used in modifiers" from 3.0.9 has been reverted for now. [#2022](https://github.com/statamic/cms/issues/2022)
 
 
