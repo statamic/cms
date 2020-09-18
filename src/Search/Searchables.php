@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Closure;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Statamic\Facades\Asset;
@@ -65,11 +66,18 @@ class Searchables
     public function fields($searchable): array
     {
         $fields = $this->index->config()['fields'];
+        $transformers = $this->index->config()['transformers'] ?? [];
 
         return collect($fields)->mapWithKeys(function ($field) use ($searchable) {
             $value = method_exists($searchable, $field) ? $searchable->{$field}() : $searchable->get($field);
 
             return [$field => $value];
+        })->flatMap(function ($value, $field) use ($transformers) {
+            if (! isset($transformers[$field]) || ! $transformers[$field] instanceof Closure) {
+                return [$field => $value];
+            }
+
+            return $transformers[$field]($value);
         })->all();
     }
 }
