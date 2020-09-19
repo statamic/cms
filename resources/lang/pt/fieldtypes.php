@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'any.config.default' => 'Definir o valor por defeito',
     'array.config.keys' => 'O modo dinâmico dá ao utilizador o controlo dos dados enquanto que o modo com chave não o faz.',
     'array.config.mode' => 'Defina as chaves da matriz (variáveis) e as etiquetas opcionais.',
     'assets.config.allow_uploads' => 'Permitir o carregamento de novos ficheiros.',
@@ -10,6 +11,7 @@ return [
     'assets.config.mode' => 'Escolha o seu estilo de layout preferido.',
     'assets.config.restrict' => 'Impedir que os utilizadores naveguem para outras pastas.',
     'bard.config.allow_source' => 'Habilitar a opção de visualizar o código fonte HTML enquanto escreve',
+    'bard.config.always_show_set_button' => 'Permitir mostrar sempre o botão "Adicionar Set".',
     'bard.config.buttons' => 'Escolha quais os botões a mostrar na barra de ferramentas.',
     'bard.config.container' => 'Escolha qual o contentor de activos a utilizar para este campo.',
     'bard.config.fullscreen' => 'Permitir a opção de alternar para o modo de ecrã inteiro',
