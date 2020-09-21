@@ -227,7 +227,7 @@ abstract class Relationship extends Fieldtype
     {
         $values = collect($values)->map(function ($value) {
             return $this->augmentValue($value);
-        });
+        })->filter()->values();
 
         return $this->config('max_items') === 1 ? $values->first() : $values;
     }
