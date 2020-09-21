@@ -1,7 +1,7 @@
 <template>
 
     <div class="replicator-set-picker">
-        <dropdown-list ref="setSelectorDropdown" class="align-left inline-block">
+        <dropdown-list class="align-left inline-block">
             <template v-slot:trigger>
                 <button v-if="last" class="btn-round" v-tooltip.right="__('Add Set')" :aria-label="__('Add Set')">
                     <span class="icon icon-plus text-grey-80 antialiased"></span>
