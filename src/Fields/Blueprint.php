@@ -260,6 +260,11 @@ class Blueprint implements Augmentable
         return $this->fields()->has($field);
     }
 
+    public function hasSection($section)
+    {
+        return $this->sections()->has($section);
+    }
+
     public function hasFieldInSection($field, $section)
     {
         if ($section = $this->sections()->get($section)) {
@@ -369,6 +374,17 @@ class Blueprint implements Augmentable
                 return $this->removeFieldFromSection($handle, $sectionKey);
             }
         }
+    }
+
+    public function removeSection($handle)
+    {
+        if (! $this->hasSection($handle)) {
+            return $this;
+        }
+
+        Arr::pull($this->contents['sections'], $handle);
+
+        return $this->resetFieldsCache();
     }
 
     public function removeFieldFromSection($handle, $section)

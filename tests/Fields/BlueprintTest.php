@@ -708,6 +708,46 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function it_removes_a_specific_section()
+    {
+        $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
+            'title' => 'Test',
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                    ],
+                ],
+                'section_two' => [
+                    'fields' => [
+                        ['handle' => 'three', 'field' => ['type' => 'text']],
+                        ['handle' => 'four', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertTrue($blueprint->hasSection('section_one'));
+        $this->assertTrue($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two'));
+        $this->assertTrue($blueprint->hasSection('section_two'));
+        $this->assertTrue($blueprint->hasField('three'));
+        $this->assertTrue($blueprint->hasField('four'));
+
+        $return = $blueprint->removeSection('section_two');
+
+        $this->assertEquals($blueprint, $return);
+
+        $this->assertTrue($blueprint->hasSection('section_one'));
+        $this->assertTrue($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two'));
+        $this->assertFalse($blueprint->hasSection('section_two'));
+        $this->assertFalse($blueprint->hasField('three'));
+        $this->assertFalse($blueprint->hasField('four'));
+    }
+
+    /** @test */
     public function it_validates_unique_handles()
     {
         $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
