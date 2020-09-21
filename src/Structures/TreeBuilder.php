@@ -25,7 +25,7 @@ class TreeBuilder
             return null;
         }
 
-        if ($from) {
+        if ($from && $from !== '/') {
             $entry = Entry::findByUri($from);
             $page = $tree->page($entry->id());
             $pages = $page->pages()->all();
