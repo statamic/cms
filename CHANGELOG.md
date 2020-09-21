@@ -1,5 +1,22 @@
 # Release Notes
 
+## 3.0.11 (2020-09-21)
+
+### What's new
+- Ability to remove a blueprint section programmatically. [#2491](https://github.com/statamic/cms/issues/2491)
+- You can pass a variable into the `nav` tag's `from` parameter and it will make sure it has a slash, allowing you to do `:from="segment_1"`.
+
+### What's fixed
+- Fixed a protection related error on taxonomy URLs. [#2472](https://github.com/statamic/cms/issues/2472) [#2481](https://github.com/statamic/cms/issues/2481)
+- Relationship tags filter out invalid IDs when augmenting. [#1752](https://github.com/statamic/cms/issues/1752)
+- The `nav:breadcrumbs` tag supports multi-site. [#1807](https://github.com/statamic/cms/issues/1807) [#2487](https://github.com/statamic/cms/issues/2487)
+- Prevent `nav from="/"` returning nothing. [#1683](https://github.com/statamic/cms/issues/1683) [#1542](https://github.com/statamic/cms/issues/1542)
+- Fixed pluralisation issue. [#1695](https://github.com/statamic/cms/issues/1695)
+- Fixed an error when adding a Bard set. [#1718](https://github.com/statamic/cms/issues/1718)
+- Entries' `order` variables are available in templates.
+
+
+
 ## 3.0.10 (2020-09-18)
 
 ### What's improved
