@@ -23,6 +23,7 @@ class Asset extends JsonResource
             'lastModified' => $this->lastModified()->inPreferredFormat(),
             'lastModifiedRelative' => $this->lastModified()->diffForHumans(),
             'isImage' => $this->isImage(),
+            'isSvg' => $this->isSvg(),
             'isAudio' => $this->isAudio(),
             'isVideo' => $this->isVideo(),
             'isPreviewable' => $this->isPreviewable(),

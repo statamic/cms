@@ -55,6 +55,12 @@
                         </div>
                     </div>
 
+                    <div class="editor-preview-image" v-if="asset.isSvg">
+                        <div class="bg-checkerboard p-4">
+                            <img :src="asset.url" class="asset-thumb" />
+                        </div>
+                    </div>
+
                     <div class="audio-wrapper" v-if="asset.isAudio">
                         <audio :src="asset.url" controls preload="auto"></audio>
                     </div>
