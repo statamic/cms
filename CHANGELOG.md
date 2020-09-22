@@ -1,5 +1,27 @@
 # Release Notes
 
+## 3.0.12 (2020-09-22)
+
+### What's improved
+- Added labels to scaffolding checkboxes. [#2488](https://github.com/statamic/cms/issues/2488)
+- French and Portuguese translations have been updated. [#2493](https://github.com/statamic/cms/issues/2493) [#2474](https://github.com/statamic/cms/issues/2474)
+- Yo dawg, I heard you like HTML, so the HTML fieldtype gets an HTML field so you can write HTML to display as HTML.
+
+### What's fixed
+- Removed the handle field in the navigation edit form. [#1959](https://github.com/statamic/cms/issues/1959)
+- Fixed the missing icons when you add new fields. [#1959](https://github.com/statamic/cms/issues/1959)
+- Long links in Bard get wrapped. [#1814](https://github.com/statamic/cms/issues/1814)
+- Asset upload instructions actually explain asset uploads. [#1686](https://github.com/statamic/cms/issues/1686)
+- Invalid dates no longer cause an error. [#2038](https://github.com/statamic/cms/issues/2038)
+- SVGs get rendered in the asset editor modal. [#2484](https://github.com/statamic/cms/issues/2484)
+- Fixed some breadcrumb links. [#2475](https://github.com/statamic/cms/issues/2475)
+- The YAML fieldtype is now actually read only when it needs to be, instead of just saying it is. [#2082](https://github.com/statamic/cms/issues/2082)
+- Upgraded the Pickr library, which stops the color fieldtype dropping off the page. [#2110](https://github.com/statamic/cms/issues/2110)
+- The Revealer fieldtype's label is hidden inside Replicator. [#2468](https://github.com/statamic/cms/issues/2468)
+- The `has` method on data classes like entries will return `true` if it has a value of `false` or `null`.
+- The submission class sets its data and supplements properties to collections.
+
+
 ## 3.0.11 (2020-09-21)
 
 ### What's new
