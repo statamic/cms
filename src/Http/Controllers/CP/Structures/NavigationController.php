@@ -163,11 +163,6 @@ class NavigationController extends CpController
                         'type' => 'text',
                         'validate' => 'required',
                     ],
-                    'handle' => [
-                        'display' => __('Handle'),
-                        'instructions' => __('statamic::messages.navigation_configure_handle_instructions'),
-                        'type' => 'slug',
-                    ],
                 ],
             ],
             'options' => [
