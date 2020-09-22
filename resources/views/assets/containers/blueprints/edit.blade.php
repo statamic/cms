@@ -4,7 +4,7 @@
 @section('content')
 
     @include('statamic::partials.breadcrumb', [
-        'url' => cp_route('assets.browse.index', $container->handle()),
+        'url' => cp_route('assets.browse.show', $container->handle()),
         'title' => $container->title(),
     ])
 
