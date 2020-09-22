@@ -15,7 +15,7 @@ trait ContainsData
 
     public function has($key)
     {
-        return $this->get($key) != null;
+        return $this->data->has($key);
     }
 
     public function set($key, $value)
