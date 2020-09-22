@@ -6,6 +6,7 @@ return [
     'addon_has_more_releases_beyond_license_body' => 'You may update, but will need to upgrade or purchase a new license.',
     'addon_has_more_releases_beyond_license_heading' => 'This addon has more releases beyond your licensed limit.',
     'addon_list_loading_error' => 'Something went wrong while loading addons. Try again later.',
+    'asset_container_allow_uploads_instructions' => 'When enabled will give users the ability upload files into this container.',
     'asset_container_blueprint_instructions' => 'Blueprints define additional custom fields available when editing assets.',
     'asset_container_create_folder_instructions' => 'When enabled will give users the ability to create folders in this container.',
     'asset_container_disk_instructions' => 'Filesystem disks specify where files are stored — either locally or in a remote location like Amazon S3. They can be configured in `config/filesystems.php`',
