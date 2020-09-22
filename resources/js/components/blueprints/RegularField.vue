@@ -5,7 +5,7 @@
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 pr-2 py-1 pl-1">
-                    <svg-icon class="text-grey-70 mr-1" :name="fieldIcon" v-tooltip="tooltipText" />
+                    <svg-icon class="text-grey-70 mr-1" :name="field.icon" v-tooltip="tooltipText" />
                     <a v-text="labelText" @click="$emit('edit')" />
                     <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
@@ -87,10 +87,6 @@ export default {
         labelText() {
             return this.field.config.display
                 || Vue.options.filters.titleize(Vue.options.filters.deslugify(this.field.handle));
-        },
-
-        fieldIcon() {
-            return this.field.icon || this.field.fieldtype
         },
 
         width: {
