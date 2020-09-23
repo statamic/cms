@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Scrumpy\ProseMirrorToHtml\Renderer;
+use ProseMirrorToHtml\Renderer;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
@@ -74,7 +74,7 @@ class Augmentor
         return collect($value)->reject(function ($value) {
             return $value['type'] === 'set'
                 && Arr::get($value, 'attrs.enabled', true) === false;
-        });
+        })->values();
     }
 
     protected function addSetIndexes($value)

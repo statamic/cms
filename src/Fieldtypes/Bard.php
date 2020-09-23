@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use Scrumpy\ProseMirrorToHtml\Renderer;
+use ProseMirrorToHtml\Renderer;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
