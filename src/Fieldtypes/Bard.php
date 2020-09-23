@@ -190,7 +190,7 @@ class Bard extends Replicator
         }
 
         if (is_string($value)) {
-            $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($value);
+            $doc = (new \HtmlToProseMirror\Renderer)->render($value);
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
@@ -285,7 +285,7 @@ class Bard extends Replicator
                 if (empty($set['text'])) {
                     return;
                 }
-                $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($set['text']);
+                $doc = (new \HtmlToProseMirror\Renderer)->render($set['text']);
 
                 return $doc['content'];
             }
