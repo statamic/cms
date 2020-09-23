@@ -95,6 +95,10 @@ class Markdown extends Fieldtype
             $markdown = $markdown->withSmartPunctuation();
         }
 
+        if (is_null($value)) {
+            return;
+        }
+
         $html = $markdown->parse((string) $value);
 
         return $html;
