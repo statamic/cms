@@ -2,10 +2,12 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Scrumpy\ProseMirrorToHtml\Renderer;
+use ProseMirrorToHtml\Nodes\Image as DefaultImageNode;
+use ProseMirrorToHtml\Renderer;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Bard\ImageNode as CustomImageNode;
 use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
 
@@ -74,7 +76,7 @@ class Augmentor
         return collect($value)->reject(function ($value) {
             return $value['type'] === 'set'
                 && Arr::get($value, 'attrs.enabled', true) === false;
-        });
+        })->values();
     }
 
     protected function addSetIndexes($value)
@@ -91,19 +93,12 @@ class Augmentor
 
     public function convertToHtml($value)
     {
-        $renderer = new Renderer;
-        $renderer->addNodes([
-            ImageNode::class,
-            SetNode::class,
-        ]);
-
-        $renderer->addNodes(static::$customNodes);
-        $renderer->addMarks(static::$customMarks);
-
-        return $renderer->render([
-            'type' => 'doc',
-            'content' => $value,
-        ]);
+        return (new Renderer)
+            ->replaceNode(DefaultImageNode::class, CustomImageNode::class)
+            ->addNode(SetNode::class)
+            ->addNodes(static::$customNodes)
+            ->addMarks(static::$customMarks)
+            ->render(['type' => 'doc', 'content' => $value]);
     }
 
     public static function addNode($node)
