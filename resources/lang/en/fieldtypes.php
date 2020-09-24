@@ -70,7 +70,7 @@ return [
     'select.config.clearable' => 'Enable to allow deselecting your option.',
     'select.config.multiple' => 'Allow multiple selections.',
     'select.config.options' => 'Set the keys and their optional labels.',
-    'select.config.placeholder' => 'Set default, non-selectable placeholder text.',
+    'select.config.placeholder' => 'Set placeholder text.',
     'select.config.push_tags' => 'Add newly created tags to the options list.',
     'select.config.searchable' => 'Enable searching through possible options.',
     'select.config.taggable' => 'Allow adding new options in addition to pre-defined options',
@@ -78,6 +78,6 @@ return [
     'text.config.append' => 'Add text after (to the right of) the text input.',
     'text.config.character_limit' => 'Set the maximum number of enterable characters.',
     'text.config.input_type' => 'Set the HTML5 input type.',
-    'text.config.placeholder' => 'Set default placeholder text.',
+    'text.config.placeholder' => 'Set placeholder text.',
     'text.config.prepend' => 'Add text before (to the left of) the text input.',
 ];
