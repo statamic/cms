@@ -93,21 +93,12 @@ class Augmentor
 
     public function convertToHtml($value)
     {
-        $renderer = new Renderer;
-
-        $renderer->replaceNode(DefaultImageNode::class, CustomImageNode::class);
-
-        $renderer->addNodes([
-            SetNode::class,
-        ]);
-
-        $renderer->addNodes(static::$customNodes);
-        $renderer->addMarks(static::$customMarks);
-
-        return $renderer->render([
-            'type' => 'doc',
-            'content' => $value,
-        ]);
+        return (new Renderer)
+            ->replaceNode(DefaultImageNode::class, CustomImageNode::class)
+            ->addNode(SetNode::class)
+            ->addNodes(static::$customNodes)
+            ->addMarks(static::$customMarks)
+            ->render(['type' => 'doc', 'content' => $value]);
     }
 
     public static function addNode($node)
