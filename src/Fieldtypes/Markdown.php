@@ -75,6 +75,10 @@ class Markdown extends Fieldtype
 
     public function augment($value)
     {
+        if (is_null($value)) {
+            return;
+        }
+
         $markdown = \Statamic\Facades\Markdown::parser(
             $this->config('parser', 'default')
         );
@@ -93,10 +97,6 @@ class Markdown extends Fieldtype
 
         if ($this->config('smartypants')) {
             $markdown = $markdown->withSmartPunctuation();
-        }
-
-        if (is_null($value)) {
-            return;
         }
 
         $html = $markdown->parse((string) $value);
