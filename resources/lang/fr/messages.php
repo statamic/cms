@@ -6,6 +6,7 @@ return [
     'addon_has_more_releases_beyond_license_body' => 'Vous pouvez mettre à jour, mais devrez mettre à niveau ou acheter une nouvelle licence.',
     'addon_has_more_releases_beyond_license_heading' => 'Cet addon a plus de versions au-delà de votre limite de licence.',
     'addon_list_loading_error' => 'Une erreur s’est produite lors du chargement des addons. Réessayez plus tard.',
+    'asset_container_allow_uploads_instructions' => 'Si activé, donne la possibilité aux utilisateurs de téléverser des fichiers dans ce conteneur.',
     'asset_container_blueprint_instructions' => 'Les Blueprints définissent les champs personnalisés additionnels disponibles lors de la modification des ressources.',
     'asset_container_create_folder_instructions' => 'Si activé, donne la possibilité aux utilisateurs de créer des dossiers dans ce conteneur.',
     'asset_container_disk_instructions' => 'Les disques du système de fichiers vous permettent de préciser où seront stockés les fichiers, soit localement, soit sur un emplacement externe comme Amazon S3. Ils peuvent être configurés dans `config/filesystems.php`',
