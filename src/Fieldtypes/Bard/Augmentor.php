@@ -2,10 +2,12 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
+use ProseMirrorToHtml\Nodes\Image as DefaultImageNode;
 use ProseMirrorToHtml\Renderer;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
+use Statamic\Fieldtypes\Bard\ImageNode as CustomImageNode;
 use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
 
@@ -92,8 +94,10 @@ class Augmentor
     public function convertToHtml($value)
     {
         $renderer = new Renderer;
+
+        $renderer->replaceNode(DefaultImageNode::class, CustomImageNode::class);
+
         $renderer->addNodes([
-            ImageNode::class,
             SetNode::class,
         ]);
 
