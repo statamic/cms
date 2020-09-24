@@ -209,7 +209,7 @@ class Terms extends Relationship
 
         return [
             'id' => $id,
-            'title' => $term->value('title'),
+            'title' => $term->title(),
             'published' => $term->published(),
             'private' => $term->private(),
             'edit_url' => $term->editUrl(),
