@@ -54,6 +54,9 @@ export default {
         selections: {
             type: Number,
             required: true,
+        },
+        errors: {
+            type: Object
         }
     },
 
@@ -62,7 +65,6 @@ export default {
             confirming: false,
             fieldset: {sections:[{fields:this.action.fields}]},
             values: this.action.values,
-            errors: {},
         }
     },
 

@@ -12,6 +12,7 @@
                 :key="action.handle"
                 :action="action"
                 :selections="selections.length"
+                :errors="errors"
                 @selected="run"
             >
                 <button

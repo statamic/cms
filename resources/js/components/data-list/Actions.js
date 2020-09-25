@@ -10,6 +10,12 @@ export default {
         url: String
     },
 
+    data() {
+        return {
+            errors: {}
+        }
+    },
+
     computed: {
 
         sortedActions() {
@@ -27,6 +33,8 @@ export default {
 
         run(action, values) {
             this.$emit('started');
+
+            this.errors = {};
 
             const payload = {
                 action: action.handle,
@@ -50,7 +58,13 @@ export default {
 
                 this.$emit('completed');
             }).catch(error => {
-                error.response.data.text().then(data => this.$toast.error(JSON.parse(data).message));
+                error.response.data.text().then(data => {
+                    data = JSON.parse(data);
+
+                    this.$toast.error(data.message);
+
+                    if (error.response.status == 422) this.errors = data.errors;
+                });
 
                 this.$emit('completed', false)
             });
