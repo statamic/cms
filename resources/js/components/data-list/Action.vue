@@ -9,7 +9,7 @@
             :danger="action.dangerous"
             :buttonText="runButtonText"
             @confirm="confirm"
-            @cancel="cancel"
+            @cancel="reset"
         >
             <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-2': warningText || action.fields.length }" />
 
@@ -86,6 +86,10 @@ export default {
 
     },
 
+    created() {
+        this.$events.$on('reset-action-modals', this.reset);
+    },
+
     methods: {
 
         select() {
@@ -99,12 +103,14 @@ export default {
 
         confirm() {
             this.$emit('selected', this.action, this.values);
-            this.confirming = false;
         },
 
-        cancel() {
+        reset() {
             this.confirming = false;
-        }
+
+            this.values = clone(this.action.values);
+        },
+
     }
 
 }

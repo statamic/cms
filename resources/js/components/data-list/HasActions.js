@@ -17,6 +17,7 @@ export default {
             if (successful === false) return;
 
             this.$events.$emit('clear-selections');
+            this.$events.$emit('reset-action-modals');
 
             this.$toast.success(__('Action completed'));
 
