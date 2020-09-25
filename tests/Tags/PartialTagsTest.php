@@ -14,12 +14,11 @@ class PartialTagsTest extends TestCase
     {
         parent::setUp();
         $this->withFakeViews();
-        $this->markTestIncomplete();
     }
 
     private function tag($tag)
     {
-        return Parse::template($tag, []);
+        return (string) Parse::template($tag, []);
     }
 
     protected function partialTag($src, $params = '')
@@ -54,7 +53,7 @@ class PartialTagsTest extends TestCase
     /** @test */
     public function partials_can_contain_front_matter()
     {
-        $this->viewShouldReturnRaw('mypartial', "---\nfoo: bar\n---\nthe partial content with {{ foo }}");
+        $this->viewShouldReturnRaw('mypartial', "---\nfoo: bar\n---\nthe partial content with {{ view:foo }}");
 
         $this->assertEquals(
             'the partial content with bar',
