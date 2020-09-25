@@ -240,7 +240,8 @@ export default {
         },
 
         fieldSelectBlur(index) {
-            this.conditions[index].field = this.$refs.fieldSelect[index].$refs.search.value;
+            const value = this.$refs.fieldSelect[index].$refs.search.value;
+            if (value) this.conditions[index].field = value;
         },
     }
 }
