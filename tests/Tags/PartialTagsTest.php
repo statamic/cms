@@ -16,9 +16,9 @@ class PartialTagsTest extends TestCase
         $this->withFakeViews();
     }
 
-    private function tag($tag)
+    private function tag($tag, $context = [])
     {
-        return (string) Parse::template($tag, []);
+        return (string) Parse::template($tag, $context);
     }
 
     protected function partialTag($src, $params = '')
@@ -75,11 +75,11 @@ class PartialTagsTest extends TestCase
     /** @test */
     public function partials_have_slots_when_used_as_pair()
     {
-        $this->viewShouldReturnRaw('mypartial', '{{ slot }}');
+        $this->viewShouldReturnRaw('mypartial', 'before {{ slot }} after');
 
         $this->assertEquals(
-            'outside',
-            $this->tag('{{ partial:mypartial }}outside{{ /partial:mypartial }}')
+            'before bar outside after',
+            $this->tag('{{ partial:mypartial }}{{ foo }} outside{{ /partial:mypartial }}', ['foo' => 'bar'])
         );
     }
 
