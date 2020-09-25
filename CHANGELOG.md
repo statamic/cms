@@ -1,5 +1,28 @@
 # Release Notes
 
+## 3.0.13 (2020-09-25)
+
+### What's new
+- The partial tag now supports [slots](https://statamic.dev/tags/partial#slots).
+
+### What's improved
+- The preview area of the asset editor has been improved for SVGs.
+- The get_content tag has been given a little performance boost.
+- French translations have been updated. [#2504](https://github.com/statamic/cms/issues/2504)
+- Improve the UX of defining field conditions.
+
+### What's fixed
+- Status icons update when saving entries without needing to refresh. [#1822](https://github.com/statamic/cms/issues/1822)
+- Fixed entries in a structured collection (i.e. pages) ignoring content protection. [#2526](https://github.com/statamic/cms/issues/2526)
+- A markdown field with no value will be treated that way, rather than as an empty string. [#2503](https://github.com/statamic/cms/issues/2503)
+- Actions with redirects now actually redirect. [#1946](https://github.com/statamic/cms/issues/1946)
+- Action confirmation modals remain open on failures. [#1576](https://github.com/statamic/cms/issues/1576)
+- Bard will now render strikethrough elements. [#2517](https://github.com/statamic/cms/issues/2517)
+- Bumped html-to-prosemirror and prosemirror-to-html packages. 
+- Bumped lodash version [#2089](https://github.com/statamic/cms/issues/2089)
+
+
+
 ## 3.0.12 (2020-09-22)
 
 ### What's improved
@@ -20,6 +43,7 @@
 - The Revealer fieldtype's label is hidden inside Replicator. [#2468](https://github.com/statamic/cms/issues/2468)
 - The `has` method on data classes like entries will return `true` if it has a value of `false` or `null`.
 - The submission class sets its data and supplements properties to collections.
+
 
 
 ## 3.0.11 (2020-09-21)
