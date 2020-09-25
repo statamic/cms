@@ -72,15 +72,14 @@ class PartialTagsTest extends TestCase
         );
     }
 
+    /** @test */
     public function partials_have_slots_when_used_as_pair()
     {
         $this->viewShouldReturnRaw('mypartial', '{{ slot }}');
 
-        $this->tag('{{ partial:mypartial }}outside{{ /partial:mypartial }}');
-
         $this->assertEquals(
             'outside',
-            $this->partialTag('mypartial')
+            $this->tag('{{ partial:mypartial }}outside{{ /partial:mypartial }}')
         );
     }
 
