@@ -11,7 +11,11 @@ export default {
             this.loading = true;
         },
 
-        actionCompleted() {
+        actionCompleted(successful=null) {
+            this.loading = false;
+
+            if (successful === false) return;
+
             this.$events.$emit('clear-selections');
 
             this.$toast.success(__('Action completed'));

@@ -36,21 +36,24 @@ export default {
             };
 
             this.$axios.post(this.url, payload, { responseType: 'blob' }).then(response => {
-                this.$emit('completed');
-
-                if (response.data.redirect) {
-                    this.redirect(response);
-                } else if (response.headers['content-disposition']) {
+                if (response.headers['content-disposition']) {
                     this.downloadFile(response);
                 }
-            }).catch(error => {
-                this.$toast.error(error.response.data.message);
-                this.$emit('completed');
-            });
-        },
 
-        redirect(response) {
-            window.location = response.data.redirect;
+                // We need a blob for file downloads, but we need to convert it back to JSON to handle a redirect
+                else {
+                    response.data.text().then(data => {
+                        data = JSON.parse(data);
+                        if (data.redirect) window.location = data.redirect;
+                    });
+                }
+
+                this.$emit('completed');
+            }).catch(error => {
+                error.response.data.text().then(data => this.$toast.error(JSON.parse(data).message));
+
+                this.$emit('completed', false)
+            });
         },
 
         downloadFile(response) {
