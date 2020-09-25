@@ -39,7 +39,10 @@
                 :push-tags="true"
                 :reduce="field => field.value"
                 :create-option="field => ({value: field, label: field })"
-                @search:blur="fieldSelectBlur(index)" />
+                @search:blur="fieldSelectBlur(index)"
+            >
+                <template #no-options><div class="hidden" /></template>
+            </v-select>
 
             <select-input
                 v-model="conditions[index].operator"
