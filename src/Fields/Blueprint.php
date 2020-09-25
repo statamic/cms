@@ -205,12 +205,10 @@ class Blueprint implements Augmentable
 
         // Set the field config in it's proper place.
         if (! $imported) {
-            if ($prepend && $exists) {
-                $fields->forget($handle)->prepend($field);
-            } elseif ($prepend && ! $exists) {
-                $fields->prepend($field);
-            } elseif ($exists) {
+            if ($exists) {
                 $fields->put($handle, $field);
+            } elseif (! $exists && $prepend) {
+                $fields->prepend($field);
             } else {
                 $fields->push($field);
             }
