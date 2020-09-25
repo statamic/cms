@@ -70,7 +70,7 @@ return [
     'select.config.clearable' => 'Activez pour permettre de désélectionner votre option.',
     'select.config.multiple' => 'Autorisez des sélections multiples.',
     'select.config.options' => 'Définissez les clés et leurs étiquettes facultatives.',
-    'select.config.placeholder' => 'Définissez un texte d’espace réservé par défaut, non sélectionnable.',
+    'select.config.placeholder' => 'Définissez un texte d’espace réservé.',
     'select.config.push_tags' => 'Ajoutez les étiquettes nouvellement créées à la liste d’options.',
     'select.config.searchable' => 'Activez la recherche parmi les options possibles.',
     'select.config.taggable' => 'Autorisez l’ajout de nouvelles options en plus des options prédéfinies.',
@@ -78,6 +78,6 @@ return [
     'text.config.append' => 'Ajoutez du texte après (à droite de) la saisie de texte.',
     'text.config.character_limit' => 'Définissez le nombre maximum de caractères saisissables.',
     'text.config.input_type' => 'Définissez le type d’entrée HTML5.',
-    'text.config.placeholder' => 'Définissez un texte d’espace réservé par défaut, non sélectionnable.',
+    'text.config.placeholder' => 'Définissez un texte d’espace réservé.',
     'text.config.prepend' => 'Ajoutez du texte avant (à gauche de) la saisie de texte.',
 ];
