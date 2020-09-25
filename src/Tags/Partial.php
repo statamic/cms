@@ -12,7 +12,7 @@ class Partial extends Tags
 
         $variables = array_merge($this->context->all(), $this->params->all(), [
             '__frontmatter' => $this->params->all(),
-            'slot' => trim($this->parse()),
+            'slot' => $this->isPair ? trim($this->parse()) : null,
         ]);
 
         return view($this->viewName($partial), $variables)
