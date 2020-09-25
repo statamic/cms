@@ -34,7 +34,7 @@
                 v-model="conditions[index].field"
                 class="min-w-md"
                 :options="fieldOptions"
-                :placeholder="__('Select field')"
+                :placeholder="__('Field')"
                 :taggable="true"
                 :push-tags="true"
                 :reduce="field => field.value"
