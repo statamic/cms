@@ -9,7 +9,6 @@ use League\Glide\Server;
 use Statamic\Events\GlideImageGenerated;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
-use Twistor\Flysystem\GuzzleAdapter;
 
 class ImageGenerator
 {
