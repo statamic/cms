@@ -47,7 +47,7 @@ return [
     'collections_past_date_behavior_instructions' => 'Como as entradas datadas do passado devem se comportar.',
     'collections_route_instructions' => 'A rota controla o padrão de URL das entradas.',
     'collections_sort_direction_instructions' => 'A direcção de classificação padrão.',
-    'collections_taxonomies_instructions' => 'Ligue entradas nesta colecção a taxonomias. Os campos serão adicionados automaticamente para publicar formulários.',
+    'collections_taxonomies_instructions' => 'Ligue entradas nesta colecção a taxonomias. Os campos serão adicionados automaticamente aos formulários.',
     'email_utility_configuration_description' => 'As configurações de correio são definidas em <code>:path</code>',
     'email_utility_description' => 'Verifique a configuração do email e envie um teste.',
     'expect_root_instructions' => 'Considerada a primeira página da árvore uma página &quot;raiz&quot; ou &quot;home&quot;.',
