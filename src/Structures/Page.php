@@ -4,6 +4,7 @@ namespace Statamic\Structures;
 
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Traits\ForwardsCalls;
+use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Routing\UrlBuilder;
@@ -14,7 +15,7 @@ use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 
-class Page implements Entry, Augmentable, Responsable
+class Page implements Entry, Augmentable, Responsable, Protectable
 {
     use HasAugmentedInstance, ForwardsCalls;
 
@@ -318,6 +319,11 @@ class Page implements Entry, Augmentable, Responsable
     public function collection()
     {
         return Collection::findByMount($this);
+    }
+
+    public function getProtectionScheme()
+    {
+        return optional($this->entry())->getProtectionScheme();
     }
 
     public function __call($method, $args)

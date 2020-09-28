@@ -13,6 +13,7 @@ class Entry extends JsonResource
             'title' => $this->resource->value('title'),
             'permalink' => $this->resource->absoluteUrl(),
             'published' => $this->resource->published(),
+            'status' => $this->resource->status(),
             'private' => $this->resource->private(),
             'edit_url' => $this->resource->editUrl(),
             'collection' => [

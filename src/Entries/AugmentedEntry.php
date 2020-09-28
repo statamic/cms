@@ -29,6 +29,7 @@ class AugmentedEntry extends AbstractAugmented
             'published',
             'private',
             'date',
+            'order',
             'is_entry',
             'collection',
             'last_modified',

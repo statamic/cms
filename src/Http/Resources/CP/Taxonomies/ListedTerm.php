@@ -55,6 +55,7 @@ class ListedTerm extends JsonResource
             $value = $this->blueprint
                 ->field($key)
                 ->setValue($extra[$key] ?? $this->resource->value($key))
+                ->setParent($this->resource)
                 ->preProcessIndex()
                 ->value();
 

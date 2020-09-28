@@ -55,6 +55,25 @@
                         </div>
                     </div>
 
+                    <div class="editor-preview-image" v-if="asset.isSvg">
+                        <div class="bg-checkerboard h-full w-full">
+                            <div class="hidden md:grid md:grid-cols-3 border-b-2 border-grey-90">
+                                <div class="border-r p-2 border-grey-90 flex items-center justify-center">
+                                    <img :src="asset.url" class="asset-thumb w-4 h-4" />
+                                </div>
+                                <div class="border-l border-r p-2 border-grey-90 flex items-center justify-center">
+                                    <img :src="asset.url" class="asset-thumb w-12 h-12" />
+                                </div>
+                                <div class="border-l p-2 border-grey-90 flex items-center justify-center">
+                                    <img :src="asset.url" class="asset-thumb w-24 h-24" />
+                                </div>
+                            </div>
+                            <div class="h-full flex items-center justify-center">
+                                <img :src="asset.url" class="asset-thumb w-2/3 max-h-screen-1/2 relative md:-top-6" />
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="audio-wrapper" v-if="asset.isAudio">
                         <audio :src="asset.url" controls preload="auto"></audio>
                     </div>

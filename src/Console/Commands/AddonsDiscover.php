@@ -34,7 +34,7 @@ class AddonsDiscover extends Command
         $manifest->build();
 
         foreach (array_keys($manifest->manifest) as $package) {
-            $this->line("<info>Discovered Addon:</info> {$package}");
+            $this->line("Discovered Addon: <info>{$package}</info>");
         }
 
         $this->info('Addon manifest generated successfully.');

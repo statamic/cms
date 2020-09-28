@@ -506,6 +506,8 @@ export default {
                     // want to close it once everything's done.
                     else {
                         this.initialPublished = response.data.data.published;
+                        this.activeLocalization.published = response.data.data.published;
+                        this.activeLocalization.status = response.data.data.status;
                         this.$nextTick(() => this.$emit('saved', response));
                     }
                 }).catch(e => {});

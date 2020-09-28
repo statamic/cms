@@ -5,7 +5,7 @@
 
     <header class="mb-3">
         @include('statamic::partials.breadcrumb', [
-            'url' => cp_route('asset-containers.edit', $container->handle()),
+            'url' => cp_route('assets.browse.show', $container->handle()),
             'title' => $container->title()
         ])
         <h1>@yield('title')</h1>

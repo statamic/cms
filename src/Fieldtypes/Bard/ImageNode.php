@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
-use Scrumpy\ProseMirrorToHtml\Nodes\Node;
+use ProseMirrorToHtml\Nodes\Node;
 use Statamic\Facades\Asset;
 use Statamic\Support\Str;
 

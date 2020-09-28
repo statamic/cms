@@ -1688,7 +1688,7 @@ class CoreModifiers extends Modifier
             return $value;
         }
 
-        $glue = Arr::get($params, 0, 'and');
+        $glue = Arr::get($params, 0, __('and'));
         $oxford_comma = Arr::get($params, 1, true);
 
         return Str::makeSentenceList($value, $glue, $oxford_comma);
@@ -1757,23 +1757,22 @@ class CoreModifiers extends Modifier
      */
     public function sort($value, $params)
     {
-        $key = Arr::get($params, 0);
-        $is_descending = strtolower(Arr::get($params, 1)) == 'desc';
+        $key = Arr::get($params, 0, 'true');
+        $desc = strtolower(Arr::get($params, 1)) == 'desc';
 
-        // Enforce collection
-        $value = ($value instanceof Collection) ? $value : collect($value);
+        $value = $value instanceof Collection ? $value : collect($value);
 
-        // Random sort
         if ($key === 'random') {
             return $value->shuffle();
         }
 
-        // Primitive array sort
-        if ($key === 'true' || $key == 'value') {
-            return $is_descending ? $value->sort()->reverse() : $value->sort();
+        if ($key === 'true') {
+            $value = $desc ? $value->sort()->reverse() : $value->sort();
+        } else {
+            $value = $desc ? $value->sortByDesc($key) : $value->sortBy($key);
         }
 
-        return $is_descending ? $value->sortByDesc($key) : $value->sortBy($key);
+        return $value->values();
     }
 
     /**

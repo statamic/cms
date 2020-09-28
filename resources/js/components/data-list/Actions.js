@@ -10,6 +10,12 @@ export default {
         url: String
     },
 
+    data() {
+        return {
+            errors: {}
+        }
+    },
+
     computed: {
 
         sortedActions() {
@@ -28,6 +34,8 @@ export default {
         run(action, values) {
             this.$emit('started');
 
+            this.errors = {};
+
             const payload = {
                 action: action.handle,
                 context: action.context,
@@ -36,21 +44,30 @@ export default {
             };
 
             this.$axios.post(this.url, payload, { responseType: 'blob' }).then(response => {
-                this.$emit('completed');
-
-                if (response.data.redirect) {
-                    this.redirect(response);
-                } else if (response.headers['content-disposition']) {
+                if (response.headers['content-disposition']) {
                     this.downloadFile(response);
                 }
-            }).catch(error => {
-                this.$toast.error(error.response.data.message);
-                this.$emit('completed');
-            });
-        },
 
-        redirect(response) {
-            window.location = response.data.redirect;
+                // We need a blob for file downloads, but we need to convert it back to JSON to handle a redirect
+                else {
+                    response.data.text().then(data => {
+                        data = JSON.parse(data);
+                        if (data.redirect) window.location = data.redirect;
+                    });
+                }
+
+                this.$emit('completed');
+            }).catch(error => {
+                error.response.data.text().then(data => {
+                    data = JSON.parse(data);
+
+                    this.$toast.error(data.message);
+
+                    if (error.response.status == 422) this.errors = data.errors;
+                });
+
+                this.$emit('completed', false)
+            });
         },
 
         downloadFile(response) {

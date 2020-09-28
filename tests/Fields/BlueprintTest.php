@@ -456,6 +456,33 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_prepended_a_field_exists_and_it_already_exists()
+    {
+        $blueprint = (new Blueprint)->setContents(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'first', 'field' => ['type' => 'text']],
+                    ['handle' => 'existing', 'field' => ['type' => 'text']],
+                ],
+            ],
+        ]]);
+
+        $return = $blueprint->ensureFieldPrepended('existing', ['type' => 'textarea', 'foo' => 'bar']);
+
+        $this->assertEquals($blueprint, $return);
+        $this->assertTrue($blueprint->hasField('existing'));
+        $this->assertEquals(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'first', 'field' => ['type' => 'text']],
+                    ['handle' => 'existing', 'field' => ['type' => 'text', 'foo' => 'bar']],
+                ],
+            ],
+        ]], $blueprint->contents());
+        $this->assertEquals(['type' => 'text', 'foo' => 'bar'], $blueprint->fields()->get('existing')->config());
+    }
+
+    /** @test */
     public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_a_field_exists_and_it_already_exists_in_a_specific_section()
     {
         $blueprint = (new Blueprint)->setContents(['sections' => [
@@ -705,6 +732,46 @@ class BlueprintTest extends TestCase
         $this->assertTrue($blueprint->hasField('two'));
         $this->assertFalse($blueprint->hasField('three'));
         $this->assertTrue($blueprint->hasField('four'));
+    }
+
+    /** @test */
+    public function it_removes_a_specific_section()
+    {
+        $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
+            'title' => 'Test',
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        ['handle' => 'one', 'field' => ['type' => 'text']],
+                        ['handle' => 'two', 'field' => ['type' => 'text']],
+                    ],
+                ],
+                'section_two' => [
+                    'fields' => [
+                        ['handle' => 'three', 'field' => ['type' => 'text']],
+                        ['handle' => 'four', 'field' => ['type' => 'text']],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertTrue($blueprint->hasSection('section_one'));
+        $this->assertTrue($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two'));
+        $this->assertTrue($blueprint->hasSection('section_two'));
+        $this->assertTrue($blueprint->hasField('three'));
+        $this->assertTrue($blueprint->hasField('four'));
+
+        $return = $blueprint->removeSection('section_two');
+
+        $this->assertEquals($blueprint, $return);
+
+        $this->assertTrue($blueprint->hasSection('section_one'));
+        $this->assertTrue($blueprint->hasField('one'));
+        $this->assertTrue($blueprint->hasField('two'));
+        $this->assertFalse($blueprint->hasSection('section_two'));
+        $this->assertFalse($blueprint->hasField('three'));
+        $this->assertFalse($blueprint->hasField('four'));
     }
 
     /** @test */

@@ -27,9 +27,11 @@ trait TracksLastModified
             return $this;
         }
 
-        return $this
-            ->set('updated_by', optional($user)->id())
-            ->set('updated_at', Carbon::now()->timestamp);
+        $user
+            ? $this->set('updated_by', $user->id())
+            : $this->remove('updated_by');
+
+        return $this->set('updated_at', Carbon::now()->timestamp);
     }
 
     public function touch($user = null)

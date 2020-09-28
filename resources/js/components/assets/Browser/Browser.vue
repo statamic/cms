@@ -171,7 +171,7 @@
                             <div class="data-grid" v-if="mode === 'grid' && ! containerIsEmpty">
                                 <div class="asset-browser-grid flex flex-wrap -mx-1 px-2 pt-2">
                                     <!-- Parent Folder -->
-                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-if="folder.parent_path && !restrictFolderNavigation">
+                                    <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-if="(folder && folder.parent_path) && !restrictFolderNavigation">
                                         <div class="w-full relative text-center cursor-pointer ratio-4:3" @click="selectFolder(folder.parent_path)">
                                             <div class="absolute inset-0 flex items-center justify-center">
                                                 <file-icon extension="folder" class="w-full h-full text-blue-lighter hover:text-blue"></file-icon>
@@ -200,7 +200,9 @@
                                 </div>
                             </div>
 
-                            <div class="p-2 text-grey-70" v-if="containerIsEmpty">{{ __('This container is empty') }}</div>
+                            <div class="p-2 text-grey-70"
+                                v-if="containerIsEmpty"
+                                v-text="searchQuery ? __('No results') : __('This container is empty')" />
 
                         </div>
 
@@ -360,7 +362,7 @@ export default {
         containerIsEmpty() {
             return this.assets.length === 0
                 && this.folders.length === 0
-                && ! this.folder.parent_path;
+                && (!this.folder || !this.folder.parent_path);
         },
 
         editedAssetBasename() {

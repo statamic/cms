@@ -245,7 +245,7 @@
         em, i { font-style: italic }
 
         a {
-            @apply text-blue underline;
+            @apply text-blue underline break-words;
         }
 
         a:active,

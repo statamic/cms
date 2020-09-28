@@ -9,7 +9,7 @@
             :danger="action.dangerous"
             :buttonText="runButtonText"
             @confirm="confirm"
-            @cancel="cancel"
+            @cancel="reset"
         >
             <div v-if="confirmationText" v-text="confirmationText" :class="{ 'mb-2': warningText || action.fields.length }" />
 
@@ -54,6 +54,9 @@ export default {
         selections: {
             type: Number,
             required: true,
+        },
+        errors: {
+            type: Object
         }
     },
 
@@ -62,7 +65,6 @@ export default {
             confirming: false,
             fieldset: {sections:[{fields:this.action.fields}]},
             values: this.action.values,
-            errors: {},
         }
     },
 
@@ -86,20 +88,31 @@ export default {
 
     },
 
+    created() {
+        this.$events.$on('reset-action-modals', this.reset);
+    },
+
     methods: {
 
         select() {
-            this.confirming = true;
+            if (this.action.confirm) {
+                this.confirming = true;
+                return;
+            }
+
+            this.$emit('selected', this.action, this.values);
         },
 
         confirm() {
             this.$emit('selected', this.action, this.values);
-            this.confirming = false;
         },
 
-        cancel() {
+        reset() {
             this.confirming = false;
-        }
+
+            this.values = clone(this.action.values);
+        },
+
     }
 
 }

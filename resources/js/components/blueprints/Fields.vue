@@ -115,6 +115,7 @@ export default {
                 _id: uniqid(),
                 type: 'inline',
                 fieldtype: field.type,
+                icon: field.icon,
                 handle,
                 config: {
                     ...field,

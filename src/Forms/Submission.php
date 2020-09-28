@@ -29,6 +29,12 @@ class Submission implements SubmissionContract, Augmentable
      */
     public $form;
 
+    public function __construct()
+    {
+        $this->data = collect();
+        $this->supplements = collect();
+    }
+
     /**
      * Get or set the ID.
      *

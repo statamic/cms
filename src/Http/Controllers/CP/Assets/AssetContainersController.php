@@ -174,6 +174,7 @@ class AssetContainersController extends CpController
                         'type' => 'slug',
                         'display' => __('Handle'),
                         'validate' => 'required|alpha_dash',
+                        'separator' => '_',
                         'instructions' => __('statamic::messages.asset_container_handle_instructions'),
                     ],
                 ],
@@ -216,7 +217,7 @@ class AssetContainersController extends CpController
                     'allow_uploads' => [
                         'type' => 'toggle',
                         'display' => __('Allow Uploads'),
-                        'instructions' => __('statamic::messages.asset_container_blueprint_instructions'),
+                        'instructions' => __('statamic::messages.asset_container_allow_uploads_instructions'),
                         'default' => true,
                     ],
                     'create_folders' => [

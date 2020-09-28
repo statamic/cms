@@ -33,4 +33,21 @@ class StatamicAuthTables extends Migration
             $table->string('group_id');
         });
     }
+
+    /**
+     * Reverse the migrations.
+     */
+     public function down()
+     {
+         Schema::table('users', function (Blueprint $blueprint) {
+             $table->dropColumn('super');
+             $table->dropColumn('avatar');
+             $table->dropColumn('preferences');
+             $table->dropColumn('last_login');
+             $table->string('password')->nullable(false)->change();
+         });
+
+         Schema::dropIfExists('role_user');
+         Schema::dropIfExists('group_user');
+     }
 }

@@ -5,6 +5,7 @@ namespace Statamic\Entries;
 use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
+use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as Contract;
@@ -29,7 +30,7 @@ use Statamic\Routing\Routable;
 use Statamic\Statamic;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization
+class Entry implements Contract, Augmentable, Responsable, Localization, Protectable
 {
     use Routable {
         uri as routableUri;
@@ -624,5 +625,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization
     protected function shallowAugmentedArrayKeys()
     {
         return ['id', 'title', 'url', 'permalink', 'api_url'];
+    }
+
+    public function getProtectionScheme()
+    {
+        return $this->value('protect');
     }
 }

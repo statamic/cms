@@ -2,29 +2,24 @@
 
 namespace Statamic\Tags;
 
-use Statamic\Entries\EntryCollection;
+use Statamic\Contracts\Entries\Entry as EntryContract;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
-use Statamic\Tags\Collection\Collection;
+use Statamic\Tags\Concerns\OutputsItems;
 
-class GetContent extends Collection
+class GetContent extends Tags
 {
+    use OutputsItems;
+
     /**
      * {{ get_content:* }} ... {{ /get_content:* }}.
      */
-    public function __call($method, $args)
+    public function wildcard($tag)
     {
-        $from = Arr::get($this->context, $method)->raw();
-
-        if (is_array($from)) {
-            $from = implode('|', $from);
-        }
-
-        $this->params['from'] = $from;
-
-        return $this->index();
+        return $this->entries(
+           $this->context->value($tag)
+        );
     }
 
     /**
@@ -32,26 +27,37 @@ class GetContent extends Collection
      */
     public function index()
     {
-        $from = $this->params->explode(['from', 'id']);
+        return $this->entries($this->params->get(['from', 'id']));
+    }
 
-        if (Str::startsWith($from[0], '/')) {
-            $site = $this->params->get(['site', 'locale'], Site::current()->handle());
-
-            $entries = EntryCollection::make($from)->map(function ($item) use ($site) {
-                return Entry::findByUri($item, $site);
-            });
-
-            return $this->output($entries);
+    private function entries($items)
+    {
+        // $items may be a string containing a single ID or URI,
+        // or it could be a string with multiple pipe-delimited IDs or URIs.
+        if (! is_iterable($items)) {
+            if (Str::contains($items, '|')) {
+                $items = explode('|', $items);
+            } else {
+                $items = [$items];
+            }
         }
 
-        // TODO: Support multiple IDs.
-        if (count($from) > 1) {
-            throw new \Exception('The get_content tag currently only supports getting a single item by ID.');
+        // We'll determine what's been provided by looking at the first item,
+        // and assume that all the items provided are the same type.
+        $first = $items[0];
+
+        // If it's already an entry, we're done.
+        // The user doesn't need to use this tag, but we'll let it work anyway.
+        if ($first instanceof EntryContract) {
+            return $this->output($items);
         }
 
-        $this->params['id:matches'] = $from[0];
-        $this->params['from'] = '*';
+        $usingUris = Str::startsWith($first, '/');
 
-        return parent::index();
+        $query = Entry::query()
+            ->where('site', $this->params->get(['site', 'locale'], Site::current()->handle()))
+            ->whereIn($usingUris ? 'uri' : 'id', $items);
+
+        return $this->output($query->get());
     }
 }

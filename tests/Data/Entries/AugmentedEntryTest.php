@@ -90,6 +90,7 @@ class AugmentedEntryTest extends AugmentedTestCase
             'published'     => ['type' => 'bool', 'value' => true],
             'private'       => ['type' => 'bool', 'value' => false],
             'date'          => ['type' => Carbon::class, 'value' => '2018-01-03 17:05'],
+            'order'         => ['type' => 'null', 'value' => null], // todo: test for when this is an int
             'is_entry'      => ['type' => 'bool', 'value' => true],
             'collection'    => ['type' => CollectionContract::class, 'value' => $collection],
             'last_modified' => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],

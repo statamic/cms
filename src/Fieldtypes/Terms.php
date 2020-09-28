@@ -82,14 +82,16 @@ class Terms extends Relationship
 
                 $term = Term::find($id) ?? Term::make($slug)->taxonomy($taxonomy);
 
-                $entry = $this->field->parent();
+                // The parent is the item this terms fieldtype exists on. Most commonly an
+                // entry, but could also be something else, like another taxonomy term.
+                $parent = $this->field->parent();
 
-                if ($entry && $this->field->handle() === $taxonomy->handle()) {
-                    $term->collection($entry->collection());
+                if ($parent && $this->field->handle() === $taxonomy->handle()) {
+                    $term->collection($parent->collection());
                 }
 
-                $locale = $entry
-                    ? $entry->locale()
+                $locale = $parent
+                    ? $parent->locale()
                     : Site::current()->handle();
 
                 return $term->in($locale);

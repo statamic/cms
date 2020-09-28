@@ -231,6 +231,8 @@ export default {
     watch: {
 
         view(view) {
+            this.site = this.site || this.initialSite;
+
             this.$config.set('wrapperClass', view === 'tree' ? undefined : 'max-w-full');
 
             localStorage.setItem('statamic.collection-view.'+this.handle, view);

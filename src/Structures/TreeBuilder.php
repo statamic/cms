@@ -6,6 +6,7 @@ use Statamic\Contracts\Structures\Nav;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Structure;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class TreeBuilder
 {
@@ -25,7 +26,8 @@ class TreeBuilder
             return null;
         }
 
-        if ($from) {
+        if ($from && $from !== '/') {
+            $from = Str::start($from, '/');
             $entry = Entry::findByUri($from);
             $page = $tree->page($entry->id());
             $pages = $page->pages()->all();

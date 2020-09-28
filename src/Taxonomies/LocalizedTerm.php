@@ -5,6 +5,7 @@ namespace Statamic\Taxonomies;
 use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
+use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Data\HasAugmentedInstance;
@@ -18,7 +19,7 @@ use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
 
-class LocalizedTerm implements Term, Responsable, Augmentable
+class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
 {
     use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified;
 
@@ -417,5 +418,10 @@ class LocalizedTerm implements Term, Responsable, Augmentable
         return $this->has('updated_at')
             ? Carbon::createFromTimestamp($this->get('updated_at'))
             : $this->term->fileLastModified();
+    }
+
+    public function getProtectionScheme()
+    {
+        return $this->value('protect');
     }
 }
