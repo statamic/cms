@@ -4,6 +4,7 @@ namespace Statamic\Query;
 
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Statamic\Contracts\Query\Builder;
+use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
 abstract class EloquentQueryBuilder implements Builder
 {
@@ -36,6 +37,14 @@ abstract class EloquentQueryBuilder implements Builder
     public function paginate($perPage = null, $columns = [])
     {
         $paginator = $this->builder->paginate($perPage, $this->selectableColumns($columns));
+
+        $paginator = app()->makeWith(LengthAwarePaginator::class, [
+            'items' => $paginator->items(),
+            'total' => $paginator->total(),
+            'perPage' => $paginator->perPage(),
+            'currentPage' => $paginator->currentPage(),
+            'options' => $paginator->getOptions(),
+        ]);
 
         return $paginator->setCollection(
             $this->transform($paginator->getCollection(), $columns)
