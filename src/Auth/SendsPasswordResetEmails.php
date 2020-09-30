@@ -57,7 +57,14 @@ trait SendsPasswordResetEmails
      */
     protected function validateEmail(Request $request)
     {
-        $request->validateWithBag('user.forgot_password', ['email' => 'required|email']);
+        // Workaround for `$request->validateWithBag()` not being available in older Laravel versions.
+        try {
+            $request->validate(['email' => 'required|email']);
+        } catch (ValidationException $e) {
+            $e->errorBag = 'user.forgot_password';
+
+            throw $e;
+        }
     }
 
     /**
