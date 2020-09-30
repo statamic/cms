@@ -8,7 +8,6 @@ use Statamic\Fields\Fieldset;
 use Statamic\Fields\FieldTransformer;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 
 class FieldsetController extends CpController
 {
@@ -83,22 +82,22 @@ class FieldsetController extends CpController
     {
         $request->validate([
             'title' => 'required',
+            'handle' => 'required',
         ]);
 
-        $handle = Str::snake($request->title);
-
-        if (Facades\Fieldset::find($handle)) {
+        if (Facades\Fieldset::find($request->handle)) {
             return back()->withInput()->with('error', __('A fieldset with that name already exists.'));
         }
-
         $fieldset = (new Fieldset)
-            ->setHandle($handle)
+            ->setHandle($request->handle)
             ->setContents([
                 'title' => $request->title,
                 'fields' => [],
             ])->save();
 
-        return redirect($fieldset->editUrl())->with('success', __('Fieldset created'));
+        session()->flash('success', __('Fieldset created'));
+
+        return ['redirect' => $fieldset->editUrl()];
     }
 
     public function destroy($fieldset)

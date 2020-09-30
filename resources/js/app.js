@@ -109,6 +109,7 @@ Statamic.app({
         CreateTermButton: require('./components/terms/CreateTermButton.vue').default,
         Importer: require('./components/importer/importer'),
         FieldsetListing: require('./components/fieldsets/Listing.vue').default,
+        FieldsetCreateForm: require('./components/fieldsets/CreateForm.vue').default,
         FieldsetEditForm: require('./components/fieldsets/EditForm.vue').default,
         BlueprintListing: require('./components/blueprints/Listing.vue').default,
         BlueprintBuilder: require('./components/blueprints/Builder.vue').default,
