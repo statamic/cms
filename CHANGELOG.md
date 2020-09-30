@@ -1,18 +1,23 @@
 # Release Notes
 
-## Unreleased
+## 3.0.14 (2020-09-30)
 
 ### What's improved
 - Prevent the asset browser's bulk action toolbar pushing everything down in grid mode.
 - You can define a fieldset's handle when creating it. [#1717](https://github.com/statamic/cms/issues/1717)
 - Added a `down` method to the auth migration. [#2546](https://github.com/statamic/cms/issues/2546)
 - Increase performance of blueprint lookups. [#2552](https://github.com/statamic/cms/issues/2552)
+- Entry and Term static cache URLs will be invalidated when they're deleted. [#2393](https://github.com/statamic/cms/issues/2393)
 - Fix the listings' "check all" checkbox position.
-- French and Portuguese translations.
+- The `user:forgot_password_form` tag plays nicer with other forms on the page.
+- A bunch of translations have been updated.
 
 ### What's fixed
 - Stop forcing the title field to the start. [#2536](https://github.com/statamic/cms/issues/2536)
 - Fix position of Bard toolbar inside a Stack. [#1911](https://github.com/statamic/cms/issues/1911)
+- The translator tool will no longer null out nested arrays. [#2544](https://github.com/statamic/cms/issues/2544)
+- Fixed the `success` variable on the `user:forgot_password_form` tag. [#1777](https://github.com/statamic/cms/issues/1777)
+- Fixed the `mount` variable in routes sometimes doubling up or being for the wrong site. [#2569](https://github.com/statamic/cms/issues/2569)
 - Match the "discovered addon" color to Laravel's "discovered package" color in the `statamic:install` output.
 
 
