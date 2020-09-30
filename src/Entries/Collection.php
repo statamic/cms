@@ -171,6 +171,17 @@ class Collection implements Contract, AugmentableContract
         return optional($mount->in($site))->url();
     }
 
+    public function uri($site = null)
+    {
+        if (! $mount = $this->mount()) {
+            return null;
+        }
+
+        $site = $site ?? $this->sites()->first();
+
+        return optional($mount->in($site))->uri();
+    }
+
     public function showUrl()
     {
         return cp_route('collections.show', $this->handle());
