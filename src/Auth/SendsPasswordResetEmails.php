@@ -57,7 +57,7 @@ trait SendsPasswordResetEmails
      */
     protected function validateEmail(Request $request)
     {
-        $request->validate(['email' => 'required|email']);
+        $request->validateWithBag('user.forgot_password', ['email' => 'required|email']);
     }
 
     /**
