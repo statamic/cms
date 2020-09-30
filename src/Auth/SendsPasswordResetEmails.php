@@ -80,7 +80,7 @@ trait SendsPasswordResetEmails
      */
     protected function sendResetLinkResponse(Request $request, $response)
     {
-        session()->flash('user.forgot_password.success', __('Password reset email has been sent.'));
+        session()->flash('user.forgot_password.success', __(Password::RESET_LINK_SENT));
 
         $redirect = $request->has('_redirect')
             ? redirect($request->input('_redirect'))
