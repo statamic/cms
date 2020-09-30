@@ -82,12 +82,13 @@ class FieldsetController extends CpController
     {
         $request->validate([
             'title' => 'required',
-            'handle' => 'required',
+            'handle' => 'required|alpha_dash',
         ]);
 
         if (Facades\Fieldset::find($request->handle)) {
             return back()->withInput()->with('error', __('A fieldset with that name already exists.'));
         }
+
         $fieldset = (new Fieldset)
             ->setHandle($request->handle)
             ->setContents([

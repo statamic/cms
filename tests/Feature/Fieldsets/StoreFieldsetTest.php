@@ -49,15 +49,18 @@ class StoreFieldsetTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->post(cp_route('fieldsets.store'), ['title' => 'Test', 'handle' => 'test'])
+            ->submit()
+            ->assertOk()
             ->assertJson(['redirect' => cp_route('fieldsets.edit', 'test')])
             ->assertSessionHas('success');
 
         $this->assertCount(1, Facades\Fieldset::all());
+        $fieldset = Facades\Fieldset::find('test');
         $this->assertEquals([
             'title' => 'Test',
             'fields' => [],
-        ], Facades\Fieldset::find('test')->contents());
+        ], $fieldset->contents());
+        $this->assertEquals('test', $fieldset->handle());
     }
 
     /** @test */
@@ -69,8 +72,49 @@ class StoreFieldsetTest extends TestCase
         $this
             ->from('/original')
             ->actingAs($user)
-            ->post(cp_route('fieldsets.store'), ['title' => ''])
+            ->submit(['title' => ''])
             ->assertRedirect('/original')
             ->assertSessionHasErrors('title');
+    }
+
+    /** @test */
+    public function handle_is_required()
+    {
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $this->assertCount(0, Facades\Fieldset::all());
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->submit(['handle' => ''])
+            ->assertRedirect('/original')
+            ->assertSessionHasErrors('handle');
+    }
+
+    /** @test */
+    public function handle_must_be_alpha_dash()
+    {
+        $user = tap(Facades\User::make()->makeSuper())->save();
+        $this->assertCount(0, Facades\Fieldset::all());
+
+        $this
+            ->from('/original')
+            ->actingAs($user)
+            ->submit(['handle' => 'two words'])
+            ->assertRedirect('/original')
+            ->assertSessionHasErrors('handle');
+    }
+
+    private function submit($params = [])
+    {
+        return $this->post(cp_route('fieldsets.store'), $this->validParams($params));
+    }
+
+    private function validParams($overrides = [])
+    {
+        return array_merge([
+            'title' => 'Test',
+            'handle' => 'test',
+        ], $overrides);
     }
 }
