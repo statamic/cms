@@ -45,8 +45,8 @@ trait SendsPasswordResetEmails
         );
 
         return $response == Password::RESET_LINK_SENT
-                    ? $this->sendResetLinkResponse($request, $response)
-                    : $this->sendResetLinkFailedResponse($request, $response);
+            ? $this->sendResetLinkResponse($request, $response)
+            : $this->sendResetLinkFailedResponse($request, $response);
     }
 
     /**
@@ -80,9 +80,15 @@ trait SendsPasswordResetEmails
      */
     protected function sendResetLinkResponse(Request $request, $response)
     {
+        session()->flash('user.forgot_password.success', __('Password reset email has been sent.'));
+
+        $redirect = $request->has('_redirect')
+            ? redirect($request->input('_redirect'))
+            : back();
+
         return $request->wantsJson()
-                    ? new JsonResponse(['message' => trans($response)], 200)
-                    : back()->with('status', trans($response));
+            ? new JsonResponse(['message' => trans($response)], 200)
+            : $redirect->with('status', trans($response));
     }
 
     /**
@@ -94,15 +100,19 @@ trait SendsPasswordResetEmails
      */
     protected function sendResetLinkFailedResponse(Request $request, $response)
     {
+        $redirect = $request->has('_error_redirect')
+            ? redirect($request->input('_error_redirect'))
+            : back();
+
         if ($request->wantsJson()) {
             throw ValidationException::withMessages([
                 'email' => [trans($response)],
             ]);
         }
 
-        return back()
-                ->withInput($request->only('email'))
-                ->withErrors(['email' => trans($response)]);
+        return $redirect
+            ->withInput($request->only('email'))
+            ->withErrors(['email' => trans($response)], 'user.forgot_password');
     }
 
     /**
