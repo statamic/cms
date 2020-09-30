@@ -1,5 +1,22 @@
 # Release Notes
 
+## Unreleased
+
+### What's improved
+- Prevent the asset browser's bulk action toolbar pushing everything down in grid mode.
+- You can define a fieldset's handle when creating it. [#1717](https://github.com/statamic/cms/issues/1717)
+- Added a `down` method to the auth migration. [#2546](https://github.com/statamic/cms/issues/2546)
+- Increase performance of blueprint lookups. [#2552](https://github.com/statamic/cms/issues/2552)
+- Fix the listings' "check all" checkbox position.
+- French and Portuguese translations.
+
+### What's fixed
+- Stop forcing the title field to the start. [#2536](https://github.com/statamic/cms/issues/2536)
+- Fix position of Bard toolbar inside a Stack. [#1911](https://github.com/statamic/cms/issues/1911)
+- Match the "discovered addon" color to Laravel's "discovered package" color in the `statamic:install` output.
+
+
+
 ## 3.0.13 (2020-09-25)
 
 ### What's new
