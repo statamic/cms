@@ -71,7 +71,7 @@ EOT
         preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
         preg_match_all('/<p class="email_sent">(.+)<\/p>/U', $output, $emailSent);
 
-        $this->assertEquals(['We can\'t find a user with that email address.'], $errors[1]);
+        $this->assertEquals([__(Password::INVALID_USER)], $errors[1]);
         $this->assertEmpty($success[1]);
         $this->assertEmpty($emailSent[1]);
     }
@@ -109,8 +109,8 @@ EOT
         preg_match_all('/<p class="email_sent">(.+)<\/p>/U', $output, $emailSent);
 
         $this->assertEmpty($errors[1]);
-        $this->assertEquals(['Password reset email has been sent.'], $success[1]);
-        $this->assertEquals(['Password reset email has been sent.'], $emailSent[1]);
+        $this->assertEquals([__(Password::RESET_LINK_SENT)], $success[1]);
+        $this->assertEquals([__(Password::RESET_LINK_SENT)], $emailSent[1]);
     }
 
     /** @test */
@@ -147,8 +147,8 @@ EOT
         preg_match_all('/<p class="email_sent">(.+)<\/p>/U', $output, $emailSent);
 
         $this->assertEmpty($errors[1]);
-        $this->assertEquals(['Password reset email has been sent.'], $success[1]);
-        $this->assertEquals(['Password reset email has been sent.'], $emailSent[1]);
+        $this->assertEquals([__(Password::RESET_LINK_SENT)], $success[1]);
+        $this->assertEquals([__(Password::RESET_LINK_SENT)], $emailSent[1]);
     }
 
     /** @test */
@@ -176,7 +176,7 @@ EOT
         preg_match_all('/<p class="success">(.+)<\/p>/U', $output, $success);
         preg_match_all('/<p class="email_sent">(.+)<\/p>/U', $output, $emailSent);
 
-        $this->assertEquals(['We can\'t find a user with that email address.'], $errors[1]);
+        $this->assertEquals([__(Password::INVALID_USER)], $errors[1]);
         $this->assertEmpty($success[1]);
         $this->assertEmpty($emailSent[1]);
     }
