@@ -6,6 +6,7 @@ use ProseMirrorToHtml\Renderer;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
+use Statamic\Support\Arr;
 
 class Bard extends Replicator
 {
@@ -215,8 +216,8 @@ class Bard extends Replicator
             'type' => 'set',
             'attrs' => [
                 'id' => "set-$index",
-                'enabled' => array_pull($values, 'enabled', true),
-                'values' => $values,
+                'enabled' => $row['attrs']['enabled'] ?? true,
+                'values' => Arr::except($values, 'enabled'),
             ],
         ];
     }
