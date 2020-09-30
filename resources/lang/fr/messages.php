@@ -67,6 +67,7 @@ return [
     'fieldset_import_prefix_instructions' => 'Le préfixe à appliquer à chaque champ lors de leur importation. Ex. hero_',
     'fieldset_intro' => 'Les jeux de champs sont des compagnons optionnels des Blueprints qui vous permettent de créer des partiels utilisables dans ces Blueprints.',
     'fieldset_link_fields_prefix_instructions' => 'Tous les champs du jeu de champs lié seront préfixés avec ceci. Utile quand vous voulez importer les mêmes champs plusieurs fois.',
+    'fieldsets_handle_instructions' => 'Utilisé pour référencer cet ensemble de champs ailleurs. Il n\'est pas anodin de changer plus tard.',
     'fieldsets_title_instructions' => 'Décrit généralement quels champs seront inclus, comme "Bloc Image"',
     'focal_point_instructions' => 'La définition d’un point focal permet un recadrage dynamique des photos avec un sujet qui reste dans le cadre.',
     'focal_point_previews_are_examples' => 'Les aperçus de recadrage n’ont qu’une valeur d’exemple',

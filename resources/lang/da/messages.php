@@ -67,6 +67,7 @@ return [
     'fieldset_import_prefix_instructions' => 'Præfikset, der skal anvendes på hvert felt, når de importeres. for eksempel. helt_',
     'fieldset_intro' => 'Feltsæt er en valgfri ledsager til blueprints, der fungerer som genanvendelige deldele, der kan bruges inden for blueprints.',
     'fieldset_link_fields_prefix_instructions' => 'Hvert felt i det sammenkædede feltsæt vil blive forud for dette. Nyttigt, hvis du vil importere de samme felter flere gange.',
+    'fieldsets_handle_instructions' => 'Bruges til at henvise til dette felt andetsteds. Det er ikke-trivielt at ændre senere.',
     'fieldsets_title_instructions' => 'Beskriver normalt, hvilke felter der vil være indeni, som f.eks. Image Block',
     'focal_point_instructions' => 'Indstilling af et brændpunkt tillader dynamisk beskæring af fotos med et motiv, der forbliver i rammen.',
     'focal_point_previews_are_examples' => 'Forhåndsvisning af beskæringer er kun eksempler',
