@@ -5,6 +5,7 @@ namespace Tests\Data\Entries;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\Collection;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
@@ -478,6 +479,39 @@ class CollectionTest extends TestCase
         } catch (CollectionNotFoundException $e) {
             $this->assertEquals('Collection [somewhere] not found', $e->getMessage());
         }
+    }
+
+    /** @test */
+    public function it_gets_the_uri_and_url_from_the_mounted_entry()
+    {
+        $mount = $this->mock(Entry::class);
+        $frenchMount = $this->mock(Entry::class);
+        $mount->shouldReceive('in')->with('en')->andReturnSelf();
+        $mount->shouldReceive('in')->with('fr')->andReturn($frenchMount);
+        $mount->shouldReceive('uri')->andReturn('/blog');
+        $mount->shouldReceive('url')->andReturn('/en/blog');
+        $frenchMount->shouldReceive('uri')->andReturn('/le-blog');
+        $frenchMount->shouldReceive('url')->andReturn('/fr/le-blog');
+
+        Facades\Entry::shouldReceive('find')->with('mounted')->andReturn($mount);
+
+        $collection = (new Collection)->handle('test');
+
+        $this->assertNull($collection->uri());
+        $this->assertNull($collection->url());
+        $this->assertNull($collection->uri('en'));
+        $this->assertNull($collection->url('en'));
+        $this->assertNull($collection->uri('fr'));
+        $this->assertNull($collection->url('fr'));
+
+        $collection->mount('mounted');
+
+        $this->assertEquals('/blog', $collection->uri());
+        $this->assertEquals('/en/blog', $collection->url());
+        $this->assertEquals('/blog', $collection->uri('en'));
+        $this->assertEquals('/en/blog', $collection->url('en'));
+        $this->assertEquals('/le-blog', $collection->uri('fr'));
+        $this->assertEquals('/fr/le-blog', $collection->url('fr'));
     }
 
     private function makeStructure()
