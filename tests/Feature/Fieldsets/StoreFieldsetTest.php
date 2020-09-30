@@ -49,13 +49,14 @@ class StoreFieldsetTest extends TestCase
 
         $this
             ->actingAs($user)
-            ->post(cp_route('fieldsets.store'), ['title' => 'Test'])
+            ->post(cp_route('fieldsets.store'), ['title' => 'Test', 'handle' => 'test'])
             ->assertRedirect(cp_route('fieldsets.edit', 'test'))
             ->assertSessionHas('success');
 
         $this->assertCount(1, Facades\Fieldset::all());
         $this->assertEquals([
             'title' => 'Test',
+            'handle' => 'test',
             'fields' => [],
         ], Facades\Fieldset::find('test')->contents());
     }
