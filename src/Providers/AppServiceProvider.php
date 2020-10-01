@@ -95,10 +95,8 @@ class AppServiceProvider extends ServiceProvider
             \Statamic\Contracts\Assets\AssetRepository::class => \Statamic\Assets\AssetRepository::class,
             \Statamic\Contracts\Forms\FormRepository::class => \Statamic\Forms\FormRepository::class,
         ])->each(function ($concrete, $abstract) {
-            $this->app->singleton($abstract, $concrete);
-
-            foreach ($concrete::bindings() as $abstract => $concrete) {
-                $this->app->bind($abstract, $concrete);
+            if (! $this->app->bound($abstract)) {
+                Statamic::repository($abstract, $concrete);
             }
         });
 

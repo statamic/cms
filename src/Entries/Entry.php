@@ -564,7 +564,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
-            'mount' => $this->collection()->url(),
+            'mount' => $this->collection()->uri($this->locale()),
         ]);
 
         if ($this->hasDate()) {

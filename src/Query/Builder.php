@@ -4,9 +4,10 @@ namespace Statamic\Query;
 
 use Illuminate\Pagination\Paginator;
 use InvalidArgumentException;
+use Statamic\Contracts\Query\Builder as Contract;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
 
-abstract class Builder
+abstract class Builder implements Contract
 {
     protected $limit;
     protected $offset = 0;

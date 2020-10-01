@@ -182,7 +182,8 @@ class Generate extends Command
         foreach ($this->manualFiles as $file) {
             $source = 'resources/lang/en/'.$file.'.php';
             $fullSourcePath = __DIR__.'/../../../'.$source;
-            $strings = collect(require $fullSourcePath);
+            $strings = require $fullSourcePath;
+            $strings = collect(Arr::dot($strings));
 
             foreach ($this->languages() as $lang) {
                 if ($lang === 'en') {
