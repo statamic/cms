@@ -234,7 +234,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function uri()
     {
-        return '/'.$this->handle;
+        return str_replace('_', '-', '/'.$this->handle);
     }
 
     public function collection($collection = null)
