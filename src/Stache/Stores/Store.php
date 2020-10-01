@@ -20,6 +20,7 @@ abstract class Store
     protected $paths;
     protected $fileItems;
     protected $shouldCacheFileItems = false;
+    protected $modified;
 
     public function directory($directory = null)
     {
@@ -156,6 +157,8 @@ abstract class Store
 
     public function handleFileChanges()
     {
+        $this->modified = collect();
+
         // We only want to act on any file changes one time per store.
         if ($this->fileChangesHandled) {
             return;
@@ -268,6 +271,8 @@ abstract class Store
                 $index->updateItem($item);
             });
         });
+
+        $this->modified = $modified;
     }
 
     protected function handleModifiedItem($item)
