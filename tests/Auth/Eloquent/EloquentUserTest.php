@@ -2,6 +2,7 @@
 
 namespace Tests\Auth\Eloquent;
 
+use Illuminate\Foundation\Testing\WithFaker;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Statamic\Auth\Eloquent\User as EloquentUser;
@@ -12,7 +13,6 @@ use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
 use Tests\Preferences\HasPreferencesTests;
 use Tests\TestCase;
-use Illuminate\Foundation\Testing\WithFaker;
 
 class EloquentUserTest extends TestCase
 {
