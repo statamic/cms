@@ -1,5 +1,20 @@
 # Release Notes
 
+## Unreleased
+
+### What's improved
+- You can override repositories using `Statamic::repository()` which stops service provider load order being a factor.
+- The entry repository uses a container binding for the query builder to make extending simpler.
+- Added a query builder contract which the parser will check for instead of a concrete class.
+- The Eloquent query builder is more consistent with other query builder classes.
+- Taxonomy related entry query builder methods have been extracted into a trait to ease reusability.
+
+### What's fixed
+- The unique slug validation rule works when your entry IDs are integers.
+- Pages can define entries by passing integer IDs, instead of just strings (UUIDs).
+
+
+
 ## 3.0.14 (2020-09-30)
 
 ### What's improved
