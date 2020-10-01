@@ -12,10 +12,11 @@ use Tests\Auth\PermissibleContractTests;
 use Tests\Auth\UserContractTests;
 use Tests\Preferences\HasPreferencesTests;
 use Tests\TestCase;
+use Illuminate\Foundation\Testing\WithFaker;
 
 class EloquentUserTest extends TestCase
 {
-    use UserContractTests, PermissibleContractTests, HasPreferencesTests;
+    use UserContractTests, PermissibleContractTests, HasPreferencesTests, WithFaker;
 
     private $num = 0;
 
