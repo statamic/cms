@@ -90,12 +90,12 @@ class CollectionsStore extends BasicStore
 
         parent::handleFileChanges();
 
-        // TODO: only update urls for structured collection that were modified.
-        Collection::all()->each->updateEntryUris();
+        foreach ($this->modified as $collection) {
+            $collection->updateEntryUris();
 
-        // TODO: only update order indexes for collections that were modified.
-        Collection::all()->filter->orderable()->each(function ($collection) {
-            Stache::store('entries')->store($collection->handle())->index('order')->update();
-        });
+            if ($collection->orderable()) {
+                Stache::store('entries')->store($collection->handle())->index('order')->update();
+            }
+        }
     }
 }
