@@ -282,7 +282,7 @@ class GuzzleAdapter implements AdapterInterface
     protected function getMimetypeFromResponse($path, ResponseInterface $response)
     {
         if ($mimetype = $response->getHeader('Content-Type')) {
-            list($mimetype) = explode(';', reset($mimetype), 2);
+            [$mimetype] = explode(';', reset($mimetype), 2);
 
             return trim($mimetype);
         }
