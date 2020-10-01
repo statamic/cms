@@ -285,4 +285,17 @@ class Tree implements Localization
 
         return [$match, array_values($branches)];
     }
+
+    public function entry($entry)
+    {
+        $blink = 'structure-entries-'.$this->structure->handle().'-'.$this->locale();
+
+        $entries = Blink::once($blink, function () {
+            $refs = $this->flattenedPages()->map->reference()->filter()->all();
+
+            return \Statamic\Facades\Entry::query()->whereIn('id', $refs)->get()->keyBy->id();
+        });
+
+        return $entries->get($entry);
+    }
 }
