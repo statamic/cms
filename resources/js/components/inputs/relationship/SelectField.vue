@@ -13,7 +13,7 @@
             :create-option="(value) => ({ title: value, id: value })"
             :placeholder="config.placeholder || __('Choose...')"
             :searchable="true"
-            :taggable="taggable"
+            :taggable="isTaggable"
             :value="items"
             @input="input"
             @search="search"
@@ -65,6 +65,14 @@ export default {
         return {
             options: [],
         }
+    },
+
+    computed: {
+        isTaggable() {
+            if (data_get(this.config, 'create') === false) return false;
+
+            return this.taggable;
+        },
     },
 
     created() {
