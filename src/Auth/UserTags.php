@@ -207,29 +207,30 @@ class UserTags extends Tags
      */
     public function forgotPasswordForm()
     {
-        $data = [
-            'errors' => [],
-        ];
+        $data = $this->getFormSession('user.forgot_password');
 
-        if (session('email_sent')) {
-            return $this->parse(['email_sent' => true, 'success' => true]);
-        }
+        // Alias for backwards compatibility.
+        $data['email_sent'] = $data['success'];
 
-        if (session('errors')) {
-            $data['errors'] = session('errors')->all();
-        }
-
-        $knownParams = ['redirect', 'allow_request_redirect', 'reset_url'];
+        $knownParams = ['redirect', 'error_redirect', 'allow_request_redirect', 'reset_url'];
 
         $html = $this->formOpen(route('statamic.password.email'), 'POST', $knownParams);
 
+        $params = [];
+
         if ($redirect = $this->getRedirectUrl()) {
-            $html .= '<input type="hidden" name="redirect" value="'.$redirect.'" />';
+            $params['redirect'] = $this->parseRedirect($redirect);
         }
 
-        if ($reset_url = $this->params->get('reset_url')) {
-            $html .= '<input type="hidden" name="reset_url" value="'.$reset_url.'" />';
+        if ($errorRedirect = $this->getErrorRedirectUrl()) {
+            $params['error_redirect'] = $this->parseRedirect($errorRedirect);
         }
+
+        if ($resetUrl = $this->params->get('reset_url')) {
+            $params['reset_url'] = $resetUrl;
+        }
+
+        $html .= $this->formMetaFields($params);
 
         $html .= $this->parse($data);
 

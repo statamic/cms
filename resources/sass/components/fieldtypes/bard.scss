@@ -475,6 +475,13 @@
 /* Bard inside the live preview
   ========================================================================== */
 
-  .live-preview-fields .bard-fixed-toolbar {
+.live-preview-fields .bard-fixed-toolbar {
     top: 0;
+}
+
+/* Bard inside a stack
+  ========================================================================== */
+
+.stack-content .bard-fixed-toolbar {
+      top: -24px;
 }

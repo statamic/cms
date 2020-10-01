@@ -49,6 +49,22 @@ class PageTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_entry_dynamically_when_its_set_using_an_int()
+    {
+        EntryAPI::shouldReceive('find')
+            ->with(3)
+            ->andReturn($entry = new Entry);
+
+        $page = new Page;
+        $this->assertNull($page->entry());
+
+        $return = $page->setEntry(3);
+
+        $this->assertEquals($entry, $page->entry());
+        $this->assertEquals($page, $return);
+    }
+
+    /** @test */
     public function it_gets_and_sets_the_parent()
     {
         $page = new Page;

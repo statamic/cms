@@ -3,7 +3,9 @@
 namespace Statamic\StaticCaching;
 
 use Illuminate\Contracts\Queue\ShouldQueue;
+use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
+use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 
 class Invalidate implements ShouldQueue
@@ -12,7 +14,9 @@ class Invalidate implements ShouldQueue
 
     protected $events = [
         EntrySaved::class => 'invalidateEntry',
+        EntryDeleted::class => 'invalidateEntry',
         TermSaved::class => 'invalidateTerm',
+        TermDeleted::class => 'invalidateTerm',
     ];
 
     public function __construct(Invalidator $invalidator)
@@ -27,12 +31,12 @@ class Invalidate implements ShouldQueue
         }
     }
 
-    public function invalidateEntry(EntrySaved $event)
+    public function invalidateEntry($event)
     {
         $this->invalidator->invalidate($event->entry);
     }
 
-    public function invalidateTerm(TermSaved $event)
+    public function invalidateTerm($event)
     {
         $this->invalidator->invalidate($event->term);
     }

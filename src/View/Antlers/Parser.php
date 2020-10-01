@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Exceptions\ArrayKeyNotFoundException;
 use Statamic\Facades\Config;
 use Statamic\Fields\LabeledValue;
@@ -20,7 +21,6 @@ use Statamic\Fields\Value;
 use Statamic\Ignition\Value as IgnitionViewValue;
 use Statamic\Modifiers\ModifierException;
 use Statamic\Modifiers\Modify;
-use Statamic\Query\Builder;
 use Statamic\Support\Arr;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 

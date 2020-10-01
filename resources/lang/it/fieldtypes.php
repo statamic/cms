@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'any.config.default' => 'Imposta il valore predefinito.',
     'array.config.keys' => 'Imposta le chiavi dell\'array (variabili) e le etichette opzionali.',
     'array.config.mode' => 'La modalità dinamica consente all\'utente di controllare i dati a differenza della modalità fissa.',
     'assets.config.allow_uploads' => 'Consenti nuovi caricamenti di file.',
@@ -10,6 +11,7 @@ return [
     'assets.config.mode' => 'Scegli il tuo layout preferito.',
     'assets.config.restrict' => 'Impedisci agli utenti di accedere ad altre cartelle.',
     'bard.config.allow_source' => 'Abilita l\'opzione per visualizzare il sorgente HTML durante la scrittura.',
+    'bard.config.always_show_set_button' => 'Abilita per mostrare sempre il pulsante &quot;Aggiungi set&quot;.',
     'bard.config.buttons' => 'Scegli i pulsanti da mostrare nella barra degli strumenti.',
     'bard.config.container' => 'Scegli quale contenitore dei media utilizzare per questo campo.',
     'bard.config.fullscreen' => 'Abilita l\'opzione per attivare la modalità a schermo intero.',
