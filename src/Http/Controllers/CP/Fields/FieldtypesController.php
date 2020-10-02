@@ -40,6 +40,7 @@ class FieldtypesController extends CpController
             'checkboxes',
             'integer',
             'radio',
+            'section',
             'select',
             'text',
             'textarea',
