@@ -11,7 +11,7 @@ class FormExportController extends CpController
 {
     public function export($form, $type)
     {
-        $this->authorize("view {$form->handle()} form submissions");
+        $this->authorize('view', $form);
 
         $exporter = 'Statamic\Forms\Exporters\\'.Str::studly($type).'Exporter';
 
