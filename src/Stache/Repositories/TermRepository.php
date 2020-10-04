@@ -62,7 +62,7 @@ class TermRepository implements RepositoryContract
             return null;
         }
 
-        if (! Taxonomy::handleExists($taxonomy)) {
+        if (! $taxonomy = $this->findTaxonomyHandleByUri($taxonomy)) {
             return null;
         }
 
@@ -125,5 +125,10 @@ class TermRepository implements RepositoryContract
         return [
             Term::class => \Statamic\Taxonomies\Term::class,
         ];
+    }
+
+    private function findTaxonomyHandleByUri($uri)
+    {
+        return $this->stache->store('taxonomies')->index('uri')->items()->flip()->get(Str::ensureLeft($uri, '/'));
     }
 }

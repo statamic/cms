@@ -18,7 +18,6 @@ use Statamic\Events\UserDeleted;
 use Statamic\Events\UserSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\URL;
 use Statamic\Fields\Value;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
@@ -32,7 +31,7 @@ abstract class User implements
     Augmentable,
     AuthorizableContract
 {
-    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns;
+    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, HasAvatar;
 
     abstract public function get($key, $fallback = null);
 
@@ -66,29 +65,6 @@ abstract class User implements
         }
 
         return strtoupper(mb_substr($name, 0, 1).mb_substr($surname, 0, 1));
-    }
-
-    public function avatar($size = 64)
-    {
-        if ($this->hasAvatarField()) {
-            return $this->avatarFieldUrl();
-        }
-
-        return config('statamic.users.avatars') === 'gravatar'
-            ? URL::gravatar($this->email(), $size)
-            : null;
-    }
-
-    protected function hasAvatarField()
-    {
-        return $this->has('avatar') && $this->blueprint()->hasField('avatar');
-    }
-
-    protected function avatarFieldUrl()
-    {
-        $value = (new Value($this->get('avatar'), 'avatar', $this->blueprint()->field('avatar')->fieldtype(), $this));
-
-        return $value->value()->url();
     }
 
     public function isSuper()

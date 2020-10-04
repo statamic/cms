@@ -8,10 +8,12 @@
                 <tbody>
                     <tr>
                         <td class="checkbox-column border-r" @click="selected.blueprint = ! selected.blueprint">
-                            <input type="checkbox" v-model="selected.blueprint" class="mr-2" />
+                            <div class="flex items-center h-full">
+                                <input type="checkbox" v-model="selected.blueprint" class="mr-2" id="field_blueprint" />
+                            </div>
                         </td>
                         <td class="border-r">
-                            {{ __('Blueprint') }}
+                            <label for="field_blueprint" v-text="__('Blueprint')" />
                         </td>
                         <td :class="{'opacity-25': ! selected.blueprint }">
                             <input type="text" v-model="blueprint" class="input-text">
@@ -19,10 +21,12 @@
                     </tr>
                     <tr>
                         <td class="checkbox-column border-r" @click="selected.index = ! selected.index">
-                            <input type="checkbox" v-model="selected.index" class="mr-2" />
+                            <div class="flex items-center h-full">
+                                <input type="checkbox" v-model="selected.index" class="mr-2" id="field_index" />
+                            </div>
                         </td>
                         <td class="border-r">
-                            {{ __('Index Template') }}
+                            <label for="field_index" v-text="__('Index Template')" />
                         </td>
                         <td :class="{'opacity-25': ! selected.index }">
                             <input type="text" v-model="index" class="input-text font-mono">
@@ -30,10 +34,12 @@
                     </tr>
                     <tr>
                         <td class="checkbox-column border-r" @click="selected.show = ! selected.show">
-                            <input type="checkbox" v-model="selected.show" class="mr-2" />
+                            <div class="flex items-center h-full">
+                                <input type="checkbox" v-model="selected.show" class="mr-2" id="field_template" />
+                            </div>
                         </td>
                         <td class="border-r">
-                            {{ __('Show Template') }}
+                            <label for="field_template" v-text="__('Show Template')" />
                         </td>
                         <td :class="{'opacity-25': ! selected.show }">
                             <input type="text" v-model="show" class="input-text font-mono">

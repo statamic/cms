@@ -61,7 +61,7 @@
                     }"
                     :style="`top: ${menu.top}px`"
                 >
-                    <dropdown-list ref="setSelectorDropdown">
+                    <dropdown-list>
                         <template v-slot:trigger>
                             <button type="button" class="btn-round" :aria-label="__('Add Set')" v-tooltip="__('Add Set')">
                                 <span class="icon icon-plus text-grey-80 antialiased"></span>
@@ -290,7 +290,6 @@ export default {
             // Perform this in nextTick because the meta data won't be ready until then.
             this.$nextTick(() => {
                 this.editor.commands.set({ id, values });
-                this.$refs.setSelectorDropdown.close();
             });
         },
 

@@ -201,6 +201,7 @@ export default {
             let field = {
                 display: fieldtype.title,
                 type: fieldtype.handle,
+                icon: fieldtype.icon,
                 instructions: null,
                 localizable: false,
                 width: 100,

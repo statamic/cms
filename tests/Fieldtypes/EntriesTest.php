@@ -28,7 +28,7 @@ class EntriesTest extends TestCase
     /** @test */
     public function it_augments_to_a_collection_of_entries()
     {
-        $augmented = $this->fieldtype()->augment(['123', '456']);
+        $augmented = $this->fieldtype()->augment(['123', 'invalid', '456']);
 
         $this->assertInstanceOf(Collection::class, $augmented);
         $this->assertEveryItemIsInstanceOf(Entry::class, $augmented);

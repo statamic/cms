@@ -13,6 +13,7 @@ use Illuminate\Support\Str;
 use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Query\Builder;
 use Statamic\Exceptions\ArrayKeyNotFoundException;
 use Statamic\Facades\Config;
 use Statamic\Fields\LabeledValue;
@@ -20,7 +21,6 @@ use Statamic\Fields\Value;
 use Statamic\Ignition\Value as IgnitionViewValue;
 use Statamic\Modifiers\ModifierException;
 use Statamic\Modifiers\Modify;
-use Statamic\Query\Builder;
 use Statamic\Support\Arr;
 use Symfony\Component\HttpKernel\Exception\HttpException;
 
@@ -66,10 +66,10 @@ class Parser
     public function __construct()
     {
         // Matches a variable inside curly braces. Spaces not allowed.
-        $this->variableRegex = "(?!if\s|unless\s)[a-zA-Z0-9_'\"][^{}=\s]*";
+        $this->variableRegex = "(?!if\s|unless\s)[a-zA-Z0-9_'\"][^<>{}=\s]*";
 
         // Matches a full variable expression inside curly braces.
-        $this->looseVariableRegex = "(?!if\s|unless\s)[a-zA-Z0-9_'\"][^{}=]*";
+        $this->looseVariableRegex = "(?!if\s|unless\s)[a-zA-Z0-9_'\"][^<>{}=]*";
 
         // Matches the first part of a {{ tag: followed a variable name and full expression.
         $this->callbackNameRegex = '(?!if\s|unless\s)[a-zA-Z0-9_][^<>{}=!?]*'.':'.$this->variableRegex;

@@ -2,10 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
-use Scrumpy\ProseMirrorToHtml\Renderer;
+use ProseMirrorToHtml\Renderer;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
+use Statamic\Support\Arr;
 
 class Bard extends Replicator
 {
@@ -190,7 +191,7 @@ class Bard extends Replicator
         }
 
         if (is_string($value)) {
-            $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($value);
+            $doc = (new \HtmlToProseMirror\Renderer)->render($value);
             $value = $doc['content'];
         } elseif ($this->isLegacyData($value)) {
             $value = $this->convertLegacyData($value);
@@ -215,8 +216,8 @@ class Bard extends Replicator
             'type' => 'set',
             'attrs' => [
                 'id' => "set-$index",
-                'enabled' => array_pull($values, 'enabled', true),
-                'values' => $values,
+                'enabled' => $row['attrs']['enabled'] ?? true,
+                'values' => Arr::except($values, 'enabled'),
             ],
         ];
     }
@@ -285,7 +286,7 @@ class Bard extends Replicator
                 if (empty($set['text'])) {
                     return;
                 }
-                $doc = (new \Scrumpy\HtmlToProseMirror\Renderer)->render($set['text']);
+                $doc = (new \HtmlToProseMirror\Renderer)->render($set['text']);
 
                 return $doc['content'];
             }

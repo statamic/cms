@@ -322,6 +322,16 @@ class Asset implements AssetContract, Augmentable
     }
 
     /**
+     * Is this asset an svg?
+     *
+     * @return bool
+     */
+    public function isSvg()
+    {
+        return $this->extensionIsOneOf(['svg']);
+    }
+
+    /**
      * Is this asset a video file?
      *
      * @return bool

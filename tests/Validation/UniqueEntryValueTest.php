@@ -46,7 +46,7 @@ class UniqueEntryValueTest extends TestCase
     /** @test */
     public function it_passes_duplicate_slug_validation_when_updating_in_a_single_collection()
     {
-        EntryFactory::id('123')->slug('foo')->collection('collection-one')->create();
+        EntryFactory::id(123)->slug('foo')->collection('collection-one')->create();
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],
@@ -67,7 +67,7 @@ class UniqueEntryValueTest extends TestCase
             'site-two' => ['url' => '/'],
         ]]);
 
-        EntryFactory::id('123')->slug('foo')->collection('collection-one')->locale('site-one')->create();
+        EntryFactory::id(123)->slug('foo')->collection('collection-one')->locale('site-one')->create();
 
         $this->assertTrue(Validator::make(
             ['slug' => 'foo'],

@@ -258,4 +258,13 @@ class Statamic
             $callback($command);
         }
     }
+
+    public static function repository($abstract, $concrete)
+    {
+        app()->singleton($abstract, $concrete);
+
+        foreach ($concrete::bindings() as $abstract => $concrete) {
+            app()->bind($abstract, $concrete);
+        }
+    }
 }

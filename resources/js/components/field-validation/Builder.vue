@@ -127,7 +127,7 @@ export default {
         },
 
         laravelRules() {
-            return _.chain(RULES)
+            return _.chain(clone(RULES))
                 .filter(rule => rule.minVersion ? SemVer.gte(this.laravelVersion, rule.minVersion) : true)
                 .filter(rule => rule.maxVersion ? SemVer.lte(this.laravelVersion, rule.maxVersion) : true)
                 .map(rule => {

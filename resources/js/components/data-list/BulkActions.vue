@@ -1,6 +1,6 @@
 <template>
 
-    <div v-if="hasSelections" class="data-list-bulk-actions">
+    <div v-if="showAlways || hasSelections" class="data-list-bulk-actions">
         <div class="input-group input-group-sm relative z-10">
             <div class="input-group-prepend">
                 <div class="text-grey-60"
@@ -8,10 +8,12 @@
             </div>
 
             <data-list-action
+                v-if="hasSelections"
                 v-for="(action, index) in sortedActions"
                 :key="action.handle"
                 :action="action"
                 :selections="selections.length"
+                :errors="errors"
                 @selected="run"
             >
                 <button
@@ -40,6 +42,10 @@ export default {
         context: {
             type: Object,
             default: () => {}
+        },
+        showAlways: {
+            type: Boolean,
+            default: false
         }
     },
 

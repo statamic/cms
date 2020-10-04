@@ -1,5 +1,127 @@
 # Release Notes
 
+## Unreleased
+
+### What's improved
+- You can override repositories using `Statamic::repository()` which stops service provider load order being a factor.
+- The entry repository uses a container binding for the query builder to make extending simpler.
+- Added a query builder contract which the parser will check for instead of a concrete class.
+- The Eloquent query builder is more consistent with other query builder classes.
+- Taxonomy related entry query builder methods have been extracted into a trait to ease reusability.
+
+### What's fixed
+- The unique slug validation rule works when your entry IDs are integers.
+- Pages can define entries by passing integer IDs, instead of just strings (UUIDs).
+
+
+
+## 3.0.14 (2020-09-30)
+
+### What's improved
+- Prevent the asset browser's bulk action toolbar pushing everything down in grid mode.
+- You can define a fieldset's handle when creating it. [#1717](https://github.com/statamic/cms/issues/1717)
+- Added a `down` method to the auth migration. [#2546](https://github.com/statamic/cms/issues/2546)
+- Increase performance of blueprint lookups. [#2552](https://github.com/statamic/cms/issues/2552)
+- Entry and Term static cache URLs will be invalidated when they're deleted. [#2393](https://github.com/statamic/cms/issues/2393)
+- Fix the listings' "check all" checkbox position.
+- The `user:forgot_password_form` tag plays nicer with other forms on the page.
+- A bunch of translations have been updated.
+
+### What's fixed
+- Stop forcing the title field to the start. [#2536](https://github.com/statamic/cms/issues/2536)
+- Fix position of Bard toolbar inside a Stack. [#1911](https://github.com/statamic/cms/issues/1911)
+- The translator tool will no longer null out nested arrays. [#2544](https://github.com/statamic/cms/issues/2544)
+- Fixed the `success` variable on the `user:forgot_password_form` tag. [#1777](https://github.com/statamic/cms/issues/1777)
+- Fixed the `mount` variable in routes sometimes doubling up or being for the wrong site. [#2569](https://github.com/statamic/cms/issues/2569)
+- Match the "discovered addon" color to Laravel's "discovered package" color in the `statamic:install` output.
+
+
+
+## 3.0.13 (2020-09-25)
+
+### What's new
+- The partial tag now supports [slots](https://statamic.dev/tags/partial#slots).
+
+### What's improved
+- The preview area of the asset editor has been improved for SVGs.
+- The get_content tag has been given a little performance boost.
+- French translations have been updated. [#2504](https://github.com/statamic/cms/issues/2504)
+- Improve the UX of defining field conditions.
+
+### What's fixed
+- Status icons update when saving entries without needing to refresh. [#1822](https://github.com/statamic/cms/issues/1822)
+- Fixed entries in a structured collection (i.e. pages) ignoring content protection. [#2526](https://github.com/statamic/cms/issues/2526)
+- A markdown field with no value will be treated that way, rather than as an empty string. [#2503](https://github.com/statamic/cms/issues/2503)
+- Actions with redirects now actually redirect. [#1946](https://github.com/statamic/cms/issues/1946)
+- Action confirmation modals remain open on failures. [#1576](https://github.com/statamic/cms/issues/1576)
+- Bard will now render strikethrough elements. [#2517](https://github.com/statamic/cms/issues/2517)
+- Bumped html-to-prosemirror and prosemirror-to-html packages. 
+- Bumped lodash version [#2089](https://github.com/statamic/cms/issues/2089)
+
+
+
+## 3.0.12 (2020-09-22)
+
+### What's improved
+- Added labels to scaffolding checkboxes. [#2488](https://github.com/statamic/cms/issues/2488)
+- French and Portuguese translations have been updated. [#2493](https://github.com/statamic/cms/issues/2493) [#2474](https://github.com/statamic/cms/issues/2474)
+- Yo dawg, I heard you like HTML, so the HTML fieldtype gets an HTML field so you can write HTML to display as HTML.
+
+### What's fixed
+- Removed the handle field in the navigation edit form. [#1959](https://github.com/statamic/cms/issues/1959)
+- Fixed the missing icons when you add new fields. [#1959](https://github.com/statamic/cms/issues/1959)
+- Long links in Bard get wrapped. [#1814](https://github.com/statamic/cms/issues/1814)
+- Asset upload instructions actually explain asset uploads. [#1686](https://github.com/statamic/cms/issues/1686)
+- Invalid dates no longer cause an error. [#2038](https://github.com/statamic/cms/issues/2038)
+- SVGs get rendered in the asset editor modal. [#2484](https://github.com/statamic/cms/issues/2484)
+- Fixed some breadcrumb links. [#2475](https://github.com/statamic/cms/issues/2475)
+- The YAML fieldtype is now actually read only when it needs to be, instead of just saying it is. [#2082](https://github.com/statamic/cms/issues/2082)
+- Upgraded the Pickr library, which stops the color fieldtype dropping off the page. [#2110](https://github.com/statamic/cms/issues/2110)
+- The Revealer fieldtype's label is hidden inside Replicator. [#2468](https://github.com/statamic/cms/issues/2468)
+- The `has` method on data classes like entries will return `true` if it has a value of `false` or `null`.
+- The submission class sets its data and supplements properties to collections.
+
+
+
+## 3.0.11 (2020-09-21)
+
+### What's new
+- Ability to remove a blueprint section programmatically. [#2491](https://github.com/statamic/cms/issues/2491)
+- You can pass a variable into the `nav` tag's `from` parameter and it will make sure it has a slash, allowing you to do `:from="segment_1"`.
+
+### What's fixed
+- Fixed a protection related error on taxonomy URLs. [#2472](https://github.com/statamic/cms/issues/2472) [#2481](https://github.com/statamic/cms/issues/2481)
+- Relationship tags filter out invalid IDs when augmenting. [#1752](https://github.com/statamic/cms/issues/1752)
+- The `nav:breadcrumbs` tag supports multi-site. [#1807](https://github.com/statamic/cms/issues/1807) [#2487](https://github.com/statamic/cms/issues/2487)
+- Prevent `nav from="/"` returning nothing. [#1683](https://github.com/statamic/cms/issues/1683) [#1542](https://github.com/statamic/cms/issues/1542)
+- Fixed pluralisation issue. [#1695](https://github.com/statamic/cms/issues/1695)
+- Fixed an error when adding a Bard set. [#1718](https://github.com/statamic/cms/issues/1718)
+- Entries' `order` variables are available in templates.
+
+
+
+## 3.0.10 (2020-09-18)
+
+### What's improved
+- German, French, and Portuguese translations have been updated. [#2445](https://github.com/statamic/cms/issues/2445) [#2444](https://github.com/statamic/cms/issues/2444) [#2458](https://github.com/statamic/cms/issues/2458)
+- When an asset search returns no results it says "No results" instead of "This container is empty".
+- Asset container handle are generated using snake_case as you type the title.
+- The "and" the sentence_list modifier is translated. [#2463](https://github.com/statamic/cms/issues/2463)
+
+### What's fixed
+- Actions that don't want to be confirmed... won't be. [#1497](https://github.com/statamic/cms/issues/1497) [#2446](https://github.com/statamic/cms/issues/2446)
+- Assets can be searched in grid mode. [#2318](https://github.com/statamic/cms/issues/2318) [#2442](https://github.com/statamic/cms/issues/2442)
+- User avatars can be output in templates. [#2017](https://github.com/statamic/cms/issues/2017)
+- The glide:generate tag uses the appropriate generation methods.
+- Resolved an error in a taxonomy term listing when using a terms field on another term. [#2307](https://github.com/statamic/cms/issues/2307)
+- Fix an issue where the sort modifier would output nothing. [#2450](https://github.com/statamic/cms/issues/2450)
+- Prevent the tree from disappearing when switching from list view. [#2408](https://github.com/statamic/cms/issues/2408)
+
+### What's removed
+- "Angle brackets can now be used in modifiers" from 3.0.9 has been reverted for now. [#2022](https://github.com/statamic/cms/issues/2022)
+
+
+
 ## 3.0.9 (2020-09-16)
 
 ### What's new

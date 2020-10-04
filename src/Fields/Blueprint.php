@@ -205,12 +205,10 @@ class Blueprint implements Augmentable
 
         // Set the field config in it's proper place.
         if (! $imported) {
-            if ($prepend && $exists) {
-                $fields->forget($handle)->prepend($field);
-            } elseif ($prepend && ! $exists) {
-                $fields->prepend($field);
-            } elseif ($exists) {
+            if ($exists) {
                 $fields->put($handle, $field);
+            } elseif (! $exists && $prepend) {
+                $fields->prepend($field);
             } else {
                 $fields->push($field);
             }
@@ -258,6 +256,11 @@ class Blueprint implements Augmentable
     public function hasField($field)
     {
         return $this->fields()->has($field);
+    }
+
+    public function hasSection($section)
+    {
+        return $this->sections()->has($section);
     }
 
     public function hasFieldInSection($field, $section)
@@ -369,6 +372,17 @@ class Blueprint implements Augmentable
                 return $this->removeFieldFromSection($handle, $sectionKey);
             }
         }
+    }
+
+    public function removeSection($handle)
+    {
+        if (! $this->hasSection($handle)) {
+            return $this;
+        }
+
+        Arr::pull($this->contents['sections'], $handle);
+
+        return $this->resetFieldsCache();
     }
 
     public function removeFieldFromSection($handle, $section)

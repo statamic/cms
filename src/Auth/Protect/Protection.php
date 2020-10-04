@@ -3,6 +3,7 @@
 namespace Statamic\Auth\Protect;
 
 use InvalidArgumentException;
+use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Facades\URL;
 
 class Protection
@@ -29,7 +30,15 @@ class Protection
 
     public function scheme()
     {
-        return config('statamic.protect.default') ?? optional($this->data)->value('protect');
+        if ($default = config('statamic.protect.default')) {
+            return $default;
+        }
+
+        if ($this->data && $this->data instanceof Protectable) {
+            return $this->data->getProtectionScheme();
+        }
+
+        return null;
     }
 
     public function driver()
