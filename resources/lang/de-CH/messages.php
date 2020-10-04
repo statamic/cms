@@ -6,7 +6,7 @@ return [
     'addon_has_more_releases_beyond_license_body' => 'Du kannst aktualisieren, musst aber ein Upgrade durchführen oder eine neue Lizenz erwerben.',
     'addon_has_more_releases_beyond_license_heading' => 'Dieses Addon hat weitere Versionen, die dein Lizenzlimit überschreiten.',
     'addon_list_loading_error' => 'Beim Laden der Addons ist ein Fehler aufgetreten. Versuch es später noch einmal.',
-    'asset_container_allow_uploads_instructions' => 'Wenn diese Option aktiviert ist, können Benutzer Dateien in diesen Container hochladen.',
+    'asset_container_allow_uploads_instructions' => 'Ist diese Option aktiviert, können Benutzer*innen Dateien in diesen Container hochladen.',
     'asset_container_blueprint_instructions' => 'Blueprints enthalten zusätzliche benutzerdefinierte Felder, die beim Bearbeiten der Dateien verfügbar sind.',
     'asset_container_create_folder_instructions' => 'Ist diese Option aktiviert, können Benutzer*innen Ordner in diesem Container erstellen.',
     'asset_container_disk_instructions' => 'Dateisystem-Laufwerke legen fest, wo Dateien gespeichert werden sollen – entweder lokal oder an einem entfernten Ort wie Amazon S3. Sie können in `config/filesystems.php` konfiguriert werden.',
