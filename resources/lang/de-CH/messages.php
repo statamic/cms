@@ -68,7 +68,7 @@ return [
     'fieldset_intro' => 'Fieldsets sind optionale Ergänzungen zu Blueprints und dienen als wiederverwendbare Partials, die in Blueprints verwendet werden können.',
     'fieldset_link_fields_prefix_instructions' => 'Jedem Feld im verknüpften Fieldset wird dieses Präfix vorangestellt. Nützlich, wenn du die gleichen Felder mehrfach importieren möchtest.',
     'fieldsets_handle_instructions' => 'Wird verwendet, um dieses Feldset an anderer Stelle zu referenzieren. Es ist nicht trivial, sich später zu ändern.',
-    'fieldsets_title_instructions' => 'Beschreibt in der Regel, welche Felder darin enthalten sein werden, wie z.B. Bilder-Block.',
+    'fieldsets_title_instructions' => 'Beschreibt in der Regel, welche Felder darin enthalten sein werden, wie z.B. Bilderblock oder Metadaten.',
     'focal_point_instructions' => 'Das Setzen des Fokuspunkts ermöglicht das dynamische Zuschneiden des Fotos auf den Motivschwerpunkt.',
     'focal_point_previews_are_examples' => 'Vorschau Bildausschnitte sind nur Beispiele',
     'forgot_password_enter_email' => 'Bitte gib deine E-Mail-Adresse ein, damit wir dir einen Link zum Zurücksetzen des Passworts zusenden können.',
