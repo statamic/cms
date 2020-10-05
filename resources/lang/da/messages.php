@@ -136,7 +136,7 @@ return [
     'reset_password_notification_no_action' => 'Hvis du ikke anmodede om nulstilling af adgangskode, er der ikke behov for yderligere handling.',
     'reset_password_notification_subject' => 'Nulstil adgangskode besked',
     'role_change_handle_warning' => 'Ændring af håndtaget opdaterer ikke referencer til det i brugere og grupper.',
-    'role_handle_instructions' => 'Håndtag bruges til at henvise til denne rolle på frontend. Kan ikke let ændres.',
+    'role_handle_instructions' => 'Variablen bruges til at henvise til denne rolle på frontend. Kan ikke let ændres.',
     'role_intro' => 'Roller er grupper med adgangs- og handlingstilladelser, der kan tildeles brugere og brugergrupper.',
     'role_title_instructions' => 'Normalt et ental navneord, som Editor eller Admin.',
     'search_utility_description' => 'Administrer og se vigtige oplysninger om Statamics søgeindekser.',
