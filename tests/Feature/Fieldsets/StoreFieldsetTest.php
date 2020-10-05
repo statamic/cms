@@ -4,8 +4,8 @@ namespace Tests\Feature\Fieldsets;
 
 use Facades\Statamic\Fields\FieldsetRepository;
 use Statamic\Facades;
-use Tests\Fakes\FakeFieldsetRepository;
 use Statamic\Testing\FakesRoles;
+use Tests\Fakes\FakeFieldsetRepository;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 

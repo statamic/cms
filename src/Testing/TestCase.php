@@ -9,12 +9,6 @@ use Statamic\Statamic;
 
 abstract class TestCase extends OrchestraTestCase
 {
-//    protected $addon = [
-//        'provider' => '',
-//        'name' => 'vendor/addon',
-//        'namespace' => 'Vendor\\Addon\\',
-//    ];
-
     protected function getPackageProviders($app)
     {
         return [
@@ -34,12 +28,12 @@ abstract class TestCase extends OrchestraTestCase
     {
         parent::getEnvironmentSetUp($app);
 
-         $app->make(Manifest::class)->manifest = [
-             $this->addon['name'] => [
-                 'id'        => $this->addon['name'],
-                 'namespace' => $this->addon['namespace'],
-             ],
-         ];
+        $app->make(Manifest::class)->manifest = [
+            $this->addon['name'] => [
+                'id'        => $this->addon['name'],
+                'namespace' => $this->addon['namespace'],
+            ],
+        ];
     }
 
     protected function resolveApplicationConfiguration($app)

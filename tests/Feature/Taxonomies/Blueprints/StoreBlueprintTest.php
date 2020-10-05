@@ -5,8 +5,8 @@ namespace Tests\Feature\Taxonomies\Blueprints;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades;
 use Statamic\Facades\Taxonomy;
-use Tests\Fakes\FakeBlueprintRepository;
 use Statamic\Testing\FakesRoles;
+use Tests\Fakes\FakeBlueprintRepository;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 

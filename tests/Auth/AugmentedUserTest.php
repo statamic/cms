@@ -7,9 +7,9 @@ use Statamic\Auth\AugmentedUser;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Statamic\Fields\Value;
-use Tests\Data\AugmentedTestCase;
 use Statamic\Testing\FakesRoles;
 use Statamic\Testing\FakesUserGroups;
+use Tests\Data\AugmentedTestCase;
 
 class AugmentedUserTest extends AugmentedTestCase
 {

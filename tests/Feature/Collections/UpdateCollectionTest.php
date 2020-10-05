@@ -6,8 +6,8 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
-use Tests\Fakes\FakeBlueprintRepository;
 use Statamic\Testing\FakesRoles;
+use Tests\Fakes\FakeBlueprintRepository;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 

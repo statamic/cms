@@ -5,7 +5,6 @@ namespace Tests\Tags\User;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
-use Statamic\Testing\ModifiesAddonManifest;
 use Statamic\Testing\NormalizesHtml;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;

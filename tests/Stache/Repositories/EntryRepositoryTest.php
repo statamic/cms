@@ -11,8 +11,8 @@ use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\NavigationStore;
-use Tests\TestCase;
 use Statamic\Testing\UnlinksPaths;
+use Tests\TestCase;
 
 class EntryRepositoryTest extends TestCase
 {

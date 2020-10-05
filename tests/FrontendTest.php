@@ -13,7 +13,6 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Testing\FakesRoles;
 use Statamic\Testing\FakesViews;
-use Tests\PreventSavingStacheItemsToDisk;
 
 class FrontendTest extends TestCase
 {

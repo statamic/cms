@@ -2,8 +2,6 @@
 
 namespace Tests;
 
-use Tests\PreventSavingStacheItemsToDisk;
-
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $shouldFakeVersion = true;
