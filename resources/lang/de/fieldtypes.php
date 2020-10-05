@@ -70,7 +70,7 @@ return [
     'select.config.clearable' => 'Option zum Abwählen der Auswahl aktivieren.',
     'select.config.multiple' => 'Mehrfachauswahl zulassen.',
     'select.config.options' => 'Arrayschlüssel und deren optionale Beschriftungen festlegen.',
-    'select.config.placeholder' => 'Nicht anwählbaren Platzhaltertext festlegen.',
+    'select.config.placeholder' => 'Platzhaltertext festlegen.',
     'select.config.push_tags' => 'Neu erstellte Tags zur Optionsliste hinzufügen.',
     'select.config.searchable' => 'Die Suche durch verfügbare Optionen aktivieren.',
     'select.config.taggable' => 'Das Hinzufügen neuer Optionen zusätzlich zu den vordefinierten zulassen.',
@@ -78,6 +78,6 @@ return [
     'text.config.append' => 'Zusätzlichen Text rechts vom eigentlichen Text anhängen.',
     'text.config.character_limit' => 'Maximale Anzahl der möglichen Zeichen festlegen.',
     'text.config.input_type' => 'HTML5 Inputtyp festlegen.',
-    'text.config.placeholder' => 'Standard-Platzhaltertext festlegen.',
+    'text.config.placeholder' => 'Platzhaltertext festlegen.',
     'text.config.prepend' => 'Zusätzlichen Text links vom eigentlichen Text voranstellen.',
 ];
