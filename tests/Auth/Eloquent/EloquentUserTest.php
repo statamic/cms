@@ -18,8 +18,6 @@ class EloquentUserTest extends TestCase
 {
     use UserContractTests, PermissibleContractTests, HasPreferencesTests, WithFaker;
 
-    private $num = 0;
-
     public function setUp(): void
     {
         parent::setUp();
