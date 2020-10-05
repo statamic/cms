@@ -3,17 +3,23 @@
 namespace Statamic\Testing;
 
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
+use Statamic\Extend\Manifest;
 use Statamic\Providers\StatamicServiceProvider;
 use Statamic\Statamic;
 
 abstract class TestCase extends OrchestraTestCase
 {
+//    protected $addon = [
+//        'provider' => '',
+//        'name' => 'vendor/addon',
+//        'namespace' => 'Vendor\\Addon\\',
+//    ];
+
     protected function getPackageProviders($app)
     {
-        // TODO: figure out how to also put the addon's provider in here too
-
         return [
             StatamicServiceProvider::class,
+            $this->addon->provider,
         ];
     }
 
@@ -28,14 +34,12 @@ abstract class TestCase extends OrchestraTestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        // TODO: figure out how to get the addon's details
-
-        // $app->make(Manifest::class)->manifest = [
-        //     'vendor/package' => [
-        //         'id'        => 'vendor/package',
-        //         'namespace' => 'Vendor\\Package\\',
-        //     ],
-        // ];
+         $app->make(Manifest::class)->manifest = [
+             $this->addon->name => [
+                 'id'        => $this->addon->name,
+                 'namespace' => $this->addon->namespace,
+             ],
+         ];
     }
 
     protected function resolveApplicationConfiguration($app)
