@@ -11,7 +11,7 @@ use Statamic\Facades;
 use Statamic\Facades\Config;
 use Statamic\Facades\Git;
 use Statamic\Facades\User;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class GitEventTest extends TestCase

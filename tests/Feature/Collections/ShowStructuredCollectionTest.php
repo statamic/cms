@@ -6,7 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
 use Statamic\Structures\CollectionStructure;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 
 class ShowStructuredCollectionTest extends ShowCollectionTest
 {

@@ -6,7 +6,7 @@ use Illuminate\Support\Collection as LaravelCollection;
 use Statamic\Contracts\Entries\Collection as StatamicCollection;
 use Statamic\Facades;
 use Statamic\Structures\Nav;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 
 class NavTest extends StructureTestCase
 {

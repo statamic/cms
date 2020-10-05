@@ -4,8 +4,8 @@ namespace Tests\Feature\Navigation;
 
 use Statamic\Facades;
 use Statamic\Facades\Nav;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EditNavigationTest extends TestCase

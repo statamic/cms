@@ -7,7 +7,7 @@ use Mockery;
 use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
 use Statamic\Taxonomies\Term;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class TermTest extends TestCase

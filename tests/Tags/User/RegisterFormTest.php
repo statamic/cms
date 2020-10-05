@@ -5,8 +5,9 @@ namespace Tests\Tags\User;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
-use Tests\NormalizesHtml;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\ModifiesAddonManifest;
+use Statamic\Testing\NormalizesHtml;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class RegisterFormTest extends TestCase

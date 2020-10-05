@@ -8,7 +8,7 @@ use Statamic\Facades\Search;
 use Statamic\Facades\User;
 use Statamic\Search\Index;
 use Statamic\Search\QueryBuilder;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class GlobalSearchTest extends TestCase

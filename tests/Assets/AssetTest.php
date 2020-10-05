@@ -13,7 +13,7 @@ use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AssetTest extends TestCase

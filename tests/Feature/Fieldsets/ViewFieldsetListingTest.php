@@ -4,8 +4,8 @@ namespace Tests\Feature\Fieldsets;
 
 use Statamic\Facades;
 use Statamic\Fields\Fieldset;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ViewFieldsetListingTest extends TestCase

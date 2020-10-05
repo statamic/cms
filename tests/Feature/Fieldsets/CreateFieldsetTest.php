@@ -3,8 +3,8 @@
 namespace Tests\Feature\Fieldsets;
 
 use Statamic\Facades;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CreateFieldsetTest extends TestCase

@@ -11,6 +11,9 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\FakesViews;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 
 class FrontendTest extends TestCase
 {

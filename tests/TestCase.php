@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
+
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $shouldFakeVersion = true;

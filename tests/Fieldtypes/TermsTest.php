@@ -10,7 +10,7 @@ use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Terms;
 use Statamic\Taxonomies\LocalizedTerm;
 use Statamic\Taxonomies\TermCollection;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class TermsTest extends TestCase

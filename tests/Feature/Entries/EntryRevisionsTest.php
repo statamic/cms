@@ -14,8 +14,8 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fields;
 use Statamic\Revisions\Revision;
 use Statamic\Revisions\WorkingCopy;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EntryRevisionsTest extends TestCase

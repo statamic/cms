@@ -4,8 +4,8 @@ namespace Tests\Auth\Protect;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
-use Tests\FakesViews;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesViews;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class PageProtectionTestCase extends TestCase

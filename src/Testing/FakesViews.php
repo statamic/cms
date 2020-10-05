@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Statamic\Testing;
 
 use Illuminate\View\Factory;
 use Illuminate\View\View;

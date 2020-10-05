@@ -5,7 +5,7 @@ namespace Tests\Feature\Collections;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\User;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 
 class ShowRegularCollectionTest extends ShowCollectionTest
 {

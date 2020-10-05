@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Validator;
 use Statamic\Facades\User;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UniqueUserValueTest extends TestCase

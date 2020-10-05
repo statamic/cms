@@ -6,8 +6,8 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Auth\User;
 use Statamic\Entries\Collection;
 use Statamic\Facades;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ViewCollectionListingTest extends TestCase

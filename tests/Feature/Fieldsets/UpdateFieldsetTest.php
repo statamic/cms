@@ -6,8 +6,8 @@ use Facades\Statamic\Fields\FieldsetRepository;
 use Statamic\Facades;
 use Statamic\Fields\Fieldset;
 use Tests\Fakes\FakeFieldsetRepository;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UpdateFieldsetTest extends TestCase

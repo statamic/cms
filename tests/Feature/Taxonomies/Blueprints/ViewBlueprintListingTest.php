@@ -5,8 +5,8 @@ namespace Tests\Feature\Taxonomies\Blueprints;
 use Statamic\Facades;
 use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ViewBlueprintListingTest extends TestCase

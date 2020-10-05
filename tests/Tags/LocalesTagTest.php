@@ -5,7 +5,7 @@ namespace Tests\Tags;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Site;
 use Tests\Factories\EntryFactory;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class LocalesTagTest extends TestCase

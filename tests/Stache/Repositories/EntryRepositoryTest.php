@@ -12,7 +12,7 @@ use Statamic\Stache\Stores\CollectionsStore;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\NavigationStore;
 use Tests\TestCase;
-use Tests\UnlinksPaths;
+use Statamic\Testing\UnlinksPaths;
 
 class EntryRepositoryTest extends TestCase
 {

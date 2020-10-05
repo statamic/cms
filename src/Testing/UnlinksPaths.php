@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Statamic\Testing;
 
 trait UnlinksPaths
 {

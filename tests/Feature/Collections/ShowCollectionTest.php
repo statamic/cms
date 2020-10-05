@@ -3,8 +3,8 @@
 namespace Tests\Feature\Collections;
 
 use Statamic\Facades\User;
-use Tests\FakesRoles;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 abstract class ShowCollectionTest extends TestCase

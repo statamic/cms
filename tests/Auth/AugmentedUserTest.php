@@ -8,8 +8,8 @@ use Statamic\Facades\Blueprint;
 use Statamic\Facades\User;
 use Statamic\Fields\Value;
 use Tests\Data\AugmentedTestCase;
-use Tests\FakesRoles;
-use Tests\FakesUserGroups;
+use Statamic\Testing\FakesRoles;
+use Statamic\Testing\FakesUserGroups;
 
 class AugmentedUserTest extends AugmentedTestCase
 {

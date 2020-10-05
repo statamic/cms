@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests;
+namespace Statamic\Testing;
 
 use Illuminate\Support\Collection;
 use Statamic\Auth\File\Role as FileRole;

@@ -9,7 +9,7 @@ use Statamic\Auth\Protect\Protectors\Authenticated;
 use Statamic\Auth\Protect\Protectors\Fallback;
 use Statamic\Auth\Protect\Protectors\NullProtector;
 use Statamic\Auth\Protect\Protectors\Protector;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ProtectionTest extends TestCase

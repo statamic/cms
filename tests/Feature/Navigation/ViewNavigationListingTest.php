@@ -3,7 +3,7 @@
 namespace Tests\Feature\Navigation;
 
 use Statamic\Facades;
-use Tests\PreventSavingStacheItemsToDisk;
+use Statamic\Testing\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ViewNavigationListingTest extends TestCase
