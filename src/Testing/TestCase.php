@@ -35,7 +35,7 @@ abstract class TestCase extends OrchestraTestCase
         parent::getEnvironmentSetUp($app);
 
          $app->make(Manifest::class)->manifest = [
-             $this->addon->name => [
+             $this->addon['name'] => [
                  'id'        => $this->addon['name'],
                  'namespace' => $this->addon['namespace'],
              ],
@@ -53,7 +53,7 @@ abstract class TestCase extends OrchestraTestCase
         ];
 
         foreach ($configs as $config) {
-            $app['config']->set("statamic.$config", require(__DIR__.'/../../config/{$config}.php'));
+            $app['config']->set("statamic.$config", require(__DIR__."/../../config/{$config}.php"));
         }
     }
 }
