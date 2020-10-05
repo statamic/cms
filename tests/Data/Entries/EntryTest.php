@@ -18,7 +18,7 @@ use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\Page;
 use Statamic\Structures\Tree;
 use Statamic\Support\Arr;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EntryTest extends TestCase

@@ -2,7 +2,7 @@
 
 namespace Tests;
 
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {

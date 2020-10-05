@@ -10,7 +10,7 @@ use Statamic\Facades;
 use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 use Statamic\Stache\Stores\EntriesStore;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EntriesStoreTest extends TestCase

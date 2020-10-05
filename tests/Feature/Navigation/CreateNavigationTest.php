@@ -4,7 +4,7 @@ namespace Tests\Feature\Navigation;
 
 use Statamic\Facades\User;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CreateNavigationTest extends TestCase

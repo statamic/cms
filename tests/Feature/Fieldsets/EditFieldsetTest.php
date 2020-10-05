@@ -7,7 +7,7 @@ use Statamic\Facades;
 use Statamic\Fields\Fieldset;
 use Tests\Fakes\FakeFieldsetRepository;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EditFieldsetTest extends TestCase

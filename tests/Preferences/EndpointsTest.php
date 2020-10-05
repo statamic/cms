@@ -4,7 +4,7 @@ namespace Tests\Preferences;
 
 use Statamic\Facades\Preference;
 use Statamic\Facades\User;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EndpointsTest extends TestCase

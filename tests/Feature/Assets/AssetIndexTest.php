@@ -5,7 +5,7 @@ namespace Tests\Feature\Assets;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\User;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AssetIndexTest extends TestCase

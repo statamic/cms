@@ -13,7 +13,7 @@ use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
 use Statamic\Fields\Blueprint;
 use Statamic\Structures\CollectionStructure;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CollectionTest extends TestCase

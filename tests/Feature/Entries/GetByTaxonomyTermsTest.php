@@ -6,7 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Taxonomy;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class GetByTaxonomyTermsTest extends TestCase

@@ -6,7 +6,7 @@ use Facades\Statamic\Fields\FieldsetRepository;
 use Statamic\Facades;
 use Tests\Fakes\FakeFieldsetRepository;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class StoreFieldsetTest extends TestCase

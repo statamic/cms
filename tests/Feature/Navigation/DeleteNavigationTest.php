@@ -5,7 +5,7 @@ namespace Tests\Feature\Navigation;
 use Statamic\Facades\Nav;
 use Statamic\Facades\User;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class DeleteNavigationTest extends TestCase

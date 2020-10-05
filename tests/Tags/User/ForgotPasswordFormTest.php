@@ -5,7 +5,7 @@ namespace Tests\Tags\User;
 use Illuminate\Support\Facades\Password;
 use Statamic\Facades\Parse;
 use Statamic\Facades\User;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ForgotPasswordFormTest extends TestCase

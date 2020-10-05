@@ -12,7 +12,7 @@ use Statamic\Structures\Page;
 use Statamic\Structures\Pages;
 use Statamic\Structures\Structure;
 use Statamic\Structures\Tree;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class PageTest extends TestCase

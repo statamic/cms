@@ -7,7 +7,7 @@ use Statamic\Facades\Parse;
 use Statamic\Facades\User;
 use Statamic\Testing\FakesRoles;
 use Statamic\Testing\FakesUserGroups;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UserTagsTest extends TestCase

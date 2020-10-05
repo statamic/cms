@@ -7,7 +7,7 @@ use Statamic\Facades;
 use Statamic\Facades\Taxonomy;
 use Tests\Fakes\FakeBlueprintRepository;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class StoreBlueprintTest extends TestCase

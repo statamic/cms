@@ -18,7 +18,7 @@ use Statamic\Fields\Fieldtype;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Tags\Tags;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ParserTest extends TestCase

@@ -7,7 +7,7 @@ use Statamic\Facades;
 use Statamic\Facades\Collection;
 use Statamic\Fields\Blueprint;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class ViewBlueprintListingTest extends TestCase

@@ -6,7 +6,7 @@ use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UpdateNavigationTest extends TestCase

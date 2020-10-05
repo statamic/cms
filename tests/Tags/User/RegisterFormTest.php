@@ -7,7 +7,7 @@ use Statamic\Facades\Parse;
 use Statamic\Facades\User;
 use Statamic\Testing\ModifiesAddonManifest;
 use Statamic\Testing\NormalizesHtml;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class RegisterFormTest extends TestCase

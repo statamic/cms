@@ -5,7 +5,7 @@ namespace Tests\Data\Taxonomies;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Fields\Blueprint;
 use Statamic\Taxonomies\Taxonomy;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class TaxonomyTest extends TestCase

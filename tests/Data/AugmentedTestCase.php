@@ -5,7 +5,7 @@ namespace Tests\Data;
 use Carbon\Carbon;
 use Statamic\Contracts\Auth\User;
 use Statamic\Fields\Value;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AugmentedTestCase extends TestCase

@@ -6,7 +6,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Route;
 use Statamic\Facades\Collection;
 use Statamic\Testing\FakesViews;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class RoutesTest extends TestCase

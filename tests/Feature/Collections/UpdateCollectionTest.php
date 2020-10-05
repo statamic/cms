@@ -8,7 +8,7 @@ use Statamic\Facades\Collection;
 use Statamic\Facades\User;
 use Tests\Fakes\FakeBlueprintRepository;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UpdateCollectionTest extends TestCase

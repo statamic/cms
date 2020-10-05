@@ -9,7 +9,7 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\Fieldset;
 use Tests\Fakes\FakeBlueprintRepository;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UpdateBlueprintTest extends TestCase

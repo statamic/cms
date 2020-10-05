@@ -3,7 +3,7 @@
 namespace Tests\Routing;
 
 use Statamic\Contracts\Routing\UrlBuilder;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UrlBuilderTest extends TestCase

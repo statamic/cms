@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\AssetContainer;
 use Statamic\Facades;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class StoreAssetTest extends TestCase

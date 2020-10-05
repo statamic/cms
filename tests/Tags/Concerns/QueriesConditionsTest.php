@@ -10,7 +10,7 @@ use Statamic\Tags\Collection\Entries;
 use Statamic\Tags\Concerns\QueriesConditions;
 use Statamic\Tags\Context;
 use Statamic\Tags\Parameters;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class QueriesConditionsTest extends TestCase

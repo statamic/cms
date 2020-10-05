@@ -7,7 +7,7 @@ use Illuminate\Support\Facades\Route;
 use Statamic\Facades\CP\Nav;
 use Statamic\Facades\User;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class NavTest extends TestCase

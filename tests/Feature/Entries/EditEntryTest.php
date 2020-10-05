@@ -8,7 +8,7 @@ use Statamic\Facades\Folder;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class EditEntryTest extends TestCase

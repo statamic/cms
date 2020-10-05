@@ -8,7 +8,7 @@ use Statamic\Facades\Parse;
 use Statamic\Support\Arr;
 use Statamic\Testing\ModifiesAddonManifest;
 use Statamic\Testing\NormalizesHtml;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class FormCreateTest extends TestCase

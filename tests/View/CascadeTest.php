@@ -9,7 +9,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\User;
 use Statamic\Sites\Site as SiteInstance;
 use Statamic\View\Cascade;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CascadeTest extends TestCase

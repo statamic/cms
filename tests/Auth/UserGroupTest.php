@@ -8,7 +8,7 @@ use Statamic\Auth\File\UserGroup;
 use Statamic\Facades;
 use Statamic\Facades\Role as RoleAPI;
 use Statamic\Facades\User as UserAPI;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class UserGroupTest extends TestCase

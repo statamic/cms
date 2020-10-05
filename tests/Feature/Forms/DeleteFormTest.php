@@ -5,7 +5,7 @@ namespace Tests\Feature\Forms;
 use Statamic\Facades\form;
 use Statamic\Facades\User;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class DeleteFormTest extends TestCase

@@ -12,7 +12,7 @@ use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Facades;
 use Statamic\Fields\Blueprint;
 use Statamic\Filesystem\FlysystemAdapter;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AssetContainerTest extends TestCase

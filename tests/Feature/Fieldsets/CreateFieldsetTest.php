@@ -4,7 +4,7 @@ namespace Tests\Feature\Fieldsets;
 
 use Statamic\Facades;
 use Statamic\Testing\FakesRoles;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CreateFieldsetTest extends TestCase

@@ -9,7 +9,7 @@ use Statamic\Data\AugmentedCollection;
 use Statamic\Facades\AssetContainer;
 use Statamic\Fields\Field;
 use Statamic\Fieldtypes\Assets\Assets;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AssetsTest extends TestCase

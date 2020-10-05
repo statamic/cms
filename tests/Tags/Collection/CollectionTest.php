@@ -14,7 +14,7 @@ use Statamic\Structures\CollectionStructure;
 use Statamic\Tags\Collection\Collection;
 use Statamic\Tags\Collection\Entries;
 use Statamic\Tags\Context;
-use Statamic\Testing\PreventSavingStacheItemsToDisk;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class CollectionTest extends TestCase
