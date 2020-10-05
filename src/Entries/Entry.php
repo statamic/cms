@@ -65,6 +65,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         return $this
             ->fluentlyGetOrSet('locale')
+            ->setter(function ($locale) {
+                return $locale instanceof \Statamic\Sites\Site ? $locale->handle() : $locale;
+            })
             ->getter(function ($locale) {
                 return $locale ?? Site::default()->handle();
             })
