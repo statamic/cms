@@ -78,7 +78,7 @@ class TaxonomyRepository implements RepositoryContract
         // the slash trimmed off at this point. We'll make sure it's there.
         $uri = Str::ensureLeft($uri, '/');
 
-        if (! $key = $this->store->index('uri')->items()->flip()->get($uri)) {
+        if (! $key = $this->findTaxonomyHandleByUri($uri)) {
             return null;
         }
 
@@ -90,5 +90,10 @@ class TaxonomyRepository implements RepositoryContract
         return [
             Taxonomy::class => \Statamic\Taxonomies\Taxonomy::class,
         ];
+    }
+
+    private function findTaxonomyHandleByUri($uri)
+    {
+        return $this->store->index('uri')->items()->flip()->get($uri);
     }
 }

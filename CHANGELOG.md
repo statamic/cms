@@ -1,6 +1,9 @@
 # Release Notes
 
-## Unreleased
+## 3.0.15 (2020-10-05)
+
+### What's new
+- Laravel 8 is now supported. [#2547](https://github.com/statamic/cms/issues/2547)
 
 ### What's improved
 - You can override repositories using `Statamic::repository()` which stops service provider load order being a factor.
@@ -8,8 +11,14 @@
 - Added a query builder contract which the parser will check for instead of a concrete class.
 - The Eloquent query builder is more consistent with other query builder classes.
 - Taxonomy related entry query builder methods have been extracted into a trait to ease reusability.
+- Improve performance related to noticing collection YAML file changes. [#2572](https://github.com/statamic/cms/issues/2572)
+- Portuguese, Danish, and German translations have been updated. [#2583](https://github.com/statamic/cms/issues/2583) [#2587](https://github.com/statamic/cms/issues/2587) [#2588](https://github.com/statamic/cms/issues/2588)
 
 ### What's fixed
+- Fix handling of taxonomy routes when they have multiple words. [#2273](https://github.com/statamic/cms/issues/2273)
+- Setting `create: false` on a `terms` field will actually prevent you from being able to enter new terms. [#2453](https://github.com/statamic/cms/issues/2453)
+- Prevent seeing validation rules multiple times times. [#2582](https://github.com/statamic/cms/issues/2582)
+- If you have permission to view form submissions, you have permission to export them. [#2577](https://github.com/statamic/cms/issues/2577)
 - The unique slug validation rule works when your entry IDs are integers.
 - Pages can define entries by passing integer IDs, instead of just strings (UUIDs).
 
