@@ -19,7 +19,7 @@ abstract class TestCase extends OrchestraTestCase
     {
         return [
             StatamicServiceProvider::class,
-            $this->addon->provider,
+            $this->addon['provider'],
         ];
     }
 
@@ -36,8 +36,8 @@ abstract class TestCase extends OrchestraTestCase
 
          $app->make(Manifest::class)->manifest = [
              $this->addon->name => [
-                 'id'        => $this->addon->name,
-                 'namespace' => $this->addon->namespace,
+                 'id'        => $this->addon['name'],
+                 'namespace' => $this->addon['namespace'],
              ],
          ];
     }
