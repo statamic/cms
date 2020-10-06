@@ -28,11 +28,6 @@ abstract class TestCase extends OrchestraTestCase
         }
     }
 
-    public function enablePro()
-    {
-        config()->set('statamic.editions.pro', true);
-    }
-
     protected function getPackageProviders($app)
     {
         return [
@@ -79,5 +74,10 @@ abstract class TestCase extends OrchestraTestCase
         ));
 
         $app['config']->set('statamic.users.repository', 'file');
+    }
+
+    public function enablePro()
+    {
+        app()['config']->set('statamic.editions.pro', true);
     }
 }
