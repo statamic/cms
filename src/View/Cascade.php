@@ -33,6 +33,13 @@ class Cascade
         return $this->data;
     }
 
+    public function withRequest($request)
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
     public function withSite($site)
     {
         $this->site = $site;
