@@ -31,7 +31,6 @@ In order to ensure that the Statamic community is welcoming to all and generally
 - [Statamic 3 Documentation][docs]
 - [Statamic 3 Application Repo][app-repo]
 - [Statamic 3 Migrator](https://github.com/statamic/migrator)
-- [Statamic 3 Development Blog](https://v3.statamic.com)
 - [Statamic Discord][discord]
 
 [docs]: https://statamic.dev/
