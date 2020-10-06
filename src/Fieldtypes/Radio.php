@@ -24,7 +24,7 @@ class Radio extends Fieldtype
             ],
             'cast_booleans' => [
                 'display' => __('Cast Booleans'),
-                'instructions' => __('statamic::fieldtypes.select.config.cast_booleans'),
+                'instructions' => __('statamic::fieldtypes.radio.config.cast_booleans'),
                 'type' => 'toggle',
                 'default' => false,
                 'width' => 50,

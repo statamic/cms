@@ -58,6 +58,7 @@ return [
     'markdown.config.parser' => 'The name of a customized Markdown parser. Leave blank for default.',
     'markdown.config.restrict' => 'Prevent users from navigating to other folders.',
     'markdown.config.smartypants' => 'Automatically convert straight quotes into curly quotes, dashes into en/em-dashes, and other similar text transformations.',
+    'radio.config.cast_booleans' => 'Options with values of true and false will be saved as booleans.',
     'radio.config.inline' => 'Show the radio buttons in a row.',
     'radio.config.options' => 'Set the array keys and their optional labels.',
     'range.config.append' => 'Add text to the end (right-side) of the slider.',
