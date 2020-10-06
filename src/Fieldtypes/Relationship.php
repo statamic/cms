@@ -87,8 +87,6 @@ abstract class Relationship extends Fieldtype
             return null;
         }
 
-        $data = Arr::wrap($data);
-
         if ($this->field->get('max_items') === 1) {
             return $data[0];
         }
