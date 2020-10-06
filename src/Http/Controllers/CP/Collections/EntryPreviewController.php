@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Collections;
 
 use Exception;
+use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;
@@ -70,6 +71,7 @@ class EntryPreviewController extends CpController
 
         app()->instance('request', $subrequest);
         Facade::clearResolvedInstance('request');
+        Cascade::withRequest($subrequest);
 
         try {
             $response = $entry->toLivePreviewResponse($subrequest, $request->extras);
@@ -83,6 +85,7 @@ class EntryPreviewController extends CpController
 
         app()->instance('request', $request);
         Facade::clearResolvedInstance('request');
+        Cascade::withRequest($request);
 
         return $response;
     }

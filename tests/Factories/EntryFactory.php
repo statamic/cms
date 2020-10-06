@@ -10,11 +10,17 @@ class EntryFactory
 {
     protected $id;
     protected $slug;
-    protected $data = [];
-    protected $published = true;
+    protected $data;
+    protected $published;
     protected $order;
-    protected $locale = 'en';
+    protected $locale;
     protected $origin;
+    protected $collection;
+
+    public function __construct()
+    {
+        $this->reset();
+    }
 
     public function id($id)
     {
@@ -79,6 +85,8 @@ class EntryFactory
             $entry->id($this->id);
         }
 
+        $this->reset();
+
         return $entry;
     }
 
@@ -97,5 +105,17 @@ class EntryFactory
             ?? Collection::make($this->collection)
                 ->sites(['en'])
                 ->save();
+    }
+
+    private function reset()
+    {
+        $this->id = null;
+        $this->slug = null;
+        $this->data = [];
+        $this->published = true;
+        $this->order = null;
+        $this->locale = 'en';
+        $this->origin = null;
+        $this->collection = null;
     }
 }
