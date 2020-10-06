@@ -11,6 +11,11 @@ use Statamic\Statamic;
 
 abstract class TestCase extends OrchestraTestCase
 {
+    public function enablePro()
+    {
+        config()->set('statamic.editions.pro', true);
+    }
+    
     protected function getPackageProviders($app)
     {
         return [
