@@ -6,7 +6,6 @@ use Illuminate\Encryption\Encrypter;
 use Orchestra\Testbench\TestCase as OrchestraTestCase;
 use Statamic\Extend\Manifest;
 use Statamic\Providers\StatamicServiceProvider;
-use Statamic\Stache\Stores\UsersStore;
 use Statamic\Statamic;
 
 abstract class TestCase extends OrchestraTestCase
@@ -15,7 +14,7 @@ abstract class TestCase extends OrchestraTestCase
     {
         config()->set('statamic.editions.pro', true);
     }
-    
+
     protected function getPackageProviders($app)
     {
         return [
