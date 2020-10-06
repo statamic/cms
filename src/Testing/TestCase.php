@@ -10,6 +10,8 @@ use Statamic\Statamic;
 
 abstract class TestCase extends OrchestraTestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     protected $shouldFakeVersion = true;
     protected $shouldPreventNavBeingBuilt = true;
 
@@ -26,6 +28,13 @@ abstract class TestCase extends OrchestraTestCase
             \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn([]);
             $this->addToAssertionCount(-1); // Dont want to assert this
         }
+
+        $this->preventSavingStacheItemsToDisk();
+    }
+
+    public function tearDown(): void
+    {
+        $this->deleteFakeStacheDirectory();
     }
 
     protected function getPackageProviders($app)
