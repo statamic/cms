@@ -10,6 +10,24 @@ use Statamic\Statamic;
 
 abstract class TestCase extends OrchestraTestCase
 {
+    protected $shouldFakeVersion = true;
+    protected $shouldPreventNavBeingBuilt = true;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        if ($this->shouldFakeVersion) {
+            \Facades\Statamic\Version::shouldReceive('get')->andReturn('3.0.0-testing');
+            $this->addToAssertionCount(-1); // Dont want to assert this
+        }
+
+        if ($this->shouldPreventNavBeingBuilt) {
+            \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn([]);
+            $this->addToAssertionCount(-1); // Dont want to assert this
+        }
+    }
+
     public function enablePro()
     {
         config()->set('statamic.editions.pro', true);
