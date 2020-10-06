@@ -1,5 +1,23 @@
 # Release Notes
 
+## 3.0.16 (2020-10-06)
+
+### What's new
+- Added a `key` parameter to the [`cache` tag](https://statamic.dev/tags/cache). [#2589](https://github.com/statamic/cms/issues/2589)
+- Search indexes can define [transformers](https://statamic.dev/search#transforming-fields). [#2462](https://github.com/statamic/cms/issues/2462)
+
+### What's improved
+- The `locale` method on the `Entry` class can accept a `Site` object.
+- The `toggle` fieldtype can understand `0` and `1` in your YAML files, rather than just `true` and `false`.
+- French translation has been updated. [#2591](https://github.com/statamic/cms/issues/2591)
+
+### What's fixed
+- Entries are placed appropriately into a collection's structure when localizing them. [#2471](https://github.com/statamic/cms/issues/2471)
+- The `date` method on the `Entry` class checks for `Carbon\Carbon`, rather than `Illuminate\Support\Carbon`.
+- The subrequest is passed along to the cascade in Live Preview, which fixes things like `segment_x` variables using the CP URL.
+
+
+
 ## 3.0.15 (2020-10-05)
 
 ### What's new
