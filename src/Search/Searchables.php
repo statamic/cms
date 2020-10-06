@@ -70,6 +70,7 @@ class Searchables
 
         return collect($fields)->mapWithKeys(function ($field) use ($searchable) {
             $value = method_exists($searchable, $field) ? $searchable->{$field}() : $searchable->get($field);
+
             return [$field => $value];
         })->flatMap(function ($value, $field) use ($transformers) {
             if (! isset($transformers[$field]) || ! $transformers[$field] instanceof Closure) {

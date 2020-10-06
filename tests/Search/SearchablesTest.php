@@ -2,10 +2,7 @@
 
 namespace Tests\Search;
 
-use Mockery;
 use Statamic\Facades\Entry;
-use Statamic\Search\Algolia\Index;
-use Statamic\Search\ItemResolver;
 use Statamic\Search\Searchables;
 use Tests\TestCase;
 
@@ -21,8 +18,8 @@ class SearchablesTest extends TestCase
             'transformers' => [
                 'title' => function ($value) {
                     return strtoupper($value);
-                }
-            ]
+                },
+            ],
         ]);
 
         $index = app(\Statamic\Search\Comb\Index::class, [
@@ -51,8 +48,8 @@ class SearchablesTest extends TestCase
                         'title' => $value,
                         'title_upper' => strtoupper($value),
                     ];
-                }
-            ]
+                },
+            ],
         ]);
 
         $index = app(\Statamic\Search\Comb\Index::class, [
