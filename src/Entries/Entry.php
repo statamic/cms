@@ -338,7 +338,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     return null;
                 }
 
-                if ($date instanceof Carbon) {
+                if ($date instanceof \Carbon\Carbon) {
                     return $date;
                 }
 
