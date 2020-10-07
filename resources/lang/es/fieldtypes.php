@@ -2,6 +2,7 @@
 
 return [
     'any.config.default' => 'Establezca el valor predeterminado.',
+    'any.config.cast_booleans' => 'Las opciones con valores de verdadero y falso se guardarán como valores booleanos.',
     'array.config.keys' => 'Establezca las claves de matriz (variables) y las etiquetas opcionales.',
     'array.config.mode' => 'El modo dinámico le da al usuario el control de los datos mientras que el modo con clave no lo hace.',
     'assets.config.allow_uploads' => 'Permitir nuevas cargas de archivos.',
@@ -66,7 +67,6 @@ return [
     'range.config.prepend' => 'Agregue texto al principio (lado izquierdo) del control deslizante.',
     'range.config.step' => 'El tamaño mínimo entre valores.',
     'relationship.config.mode' => 'Elija su estilo de interfaz de usuario preferido.',
-    'select.config.cast_booleans' => 'Las opciones con valores de verdadero y falso se guardarán como valores booleanos.',
     'select.config.clearable' => 'Habilite para permitir anular la selección de su opción.',
     'select.config.multiple' => 'Permitir múltiples selecciones.',
     'select.config.options' => 'Establecer las teclas y sus etiquetas opcionales.',
