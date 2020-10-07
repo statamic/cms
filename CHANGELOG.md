@@ -1,5 +1,17 @@
 # Release Notes
 
+## Unreleased
+
+### What's improved
+- Added `cast_booleans` configuration option to Radio fieldtype [#2601](https://github.com/statamic/cms/issues/2601)
+- Listing Vue component is available globally [#2602](https://github.com/statamic/cms/issues/2602)
+
+### What's fixed
+- Context is provided to the nav tag recursively. [#2610](https://github.com/statamic/cms/issues/2610)
+- Template front-matter works across operating systems. [#2607](https://github.com/statamic/cms/issues/2607)
+
+
+
 ## 3.0.16 (2020-10-06)
 
 ### What's new
