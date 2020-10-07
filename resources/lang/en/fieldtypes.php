@@ -2,6 +2,7 @@
 
 return [
     'any.config.default' => 'Set the default value.',
+    'any.config.cast_booleans' => 'Options with values of true and false will be saved as booleans.',
     'array.config.keys' => 'Set the array keys (variables) and optional labels.',
     'array.config.mode' => 'Dynamic mode gives the user control of the data while keyed mode does not.',
     'assets.config.allow_uploads' => 'Allow new file uploads.',
@@ -58,7 +59,6 @@ return [
     'markdown.config.parser' => 'The name of a customized Markdown parser. Leave blank for default.',
     'markdown.config.restrict' => 'Prevent users from navigating to other folders.',
     'markdown.config.smartypants' => 'Automatically convert straight quotes into curly quotes, dashes into en/em-dashes, and other similar text transformations.',
-    'radio.config.cast_booleans' => 'Options with values of true and false will be saved as booleans.',
     'radio.config.inline' => 'Show the radio buttons in a row.',
     'radio.config.options' => 'Set the array keys and their optional labels.',
     'range.config.append' => 'Add text to the end (right-side) of the slider.',
@@ -67,7 +67,6 @@ return [
     'range.config.prepend' => 'Add text to the beginning (left-side) of the slider.',
     'range.config.step' => 'The minimum size between values.',
     'relationship.config.mode' => 'Choose your preferred UI style.',
-    'select.config.cast_booleans' => 'Options with values of true and false will be saved as booleans.',
     'select.config.clearable' => 'Enable to allow deselecting your option.',
     'select.config.multiple' => 'Allow multiple selections.',
     'select.config.options' => 'Set the keys and their optional labels.',

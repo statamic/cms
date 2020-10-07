@@ -2,6 +2,7 @@
 
 return [
     'any.config.default' => 'Indstil standardværdien.',
+    'any.config.cast_booleans' => 'Valgmuligheder med værdierne sandt og falsk gemmes som booleanske.',
     'array.config.keys' => 'Indstil matrixnøgler (variabler) og valgfri etiketter.',
     'array.config.mode' => 'Dynamisk tilstand giver brugeren kontrol over dataene, mens tastetilstand ikke gør det.',
     'assets.config.allow_uploads' => 'Tillad nye filoverførsler.',
@@ -66,7 +67,6 @@ return [
     'range.config.prepend' => 'Føj tekst til begyndelsen (venstre side) af skyderen.',
     'range.config.step' => 'Minimumsstørrelsen mellem værdierne.',
     'relationship.config.mode' => 'Vælg din foretrukne UI-stil.',
-    'select.config.cast_booleans' => 'Valgmuligheder med værdierne sandt og falsk gemmes som booleanske.',
     'select.config.clearable' => 'Aktiver for at tillade fravælgelse af din indstilling.',
     'select.config.multiple' => 'Tillad flere valg.',
     'select.config.options' => 'Indstil tasterne og deres valgfri etiketter.',
