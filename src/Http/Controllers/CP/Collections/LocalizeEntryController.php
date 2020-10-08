@@ -37,7 +37,7 @@ class LocalizeEntryController extends CpController
         }
 
         $tree = $structure->in($localized->locale());
-        $parent = $entry->parent()->in($localized->locale());
+        $parent = optional($entry->parent())->in($localized->locale());
 
         $localized->afterSave(function ($localized) use ($parent, $tree) {
             if (! $parent || $parent->isRoot()) {
