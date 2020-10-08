@@ -58,14 +58,14 @@ class Structure extends Tags
             $data = $page->toAugmentedArray();
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
 
-            return array_merge($data, [
+            return array_merge($this->context->all(), $data, [
                 'children'    => $children,
                 'parent'      => $parent,
                 'depth'       => $depth,
                 'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->url(), '/'),
                 'is_parent'   => Site::current()->url() === $page->url() ? false : URL::isAncestorOf(URL::getCurrent(), $page->url()),
                 'is_external' => URL::isExternal($page->absoluteUrl()),
-            ], $this->context->all());
+            ]);
         })->filter()->values()->all();
     }
 }
