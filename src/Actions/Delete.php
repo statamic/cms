@@ -3,6 +3,7 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Contracts\Entries\Entry;
 
 class Delete extends Action
 {
@@ -15,6 +16,10 @@ class Delete extends Action
 
     public function visibleTo($item)
     {
+        if ($item instanceof Entry && $item->collection()->sites()->count() > 1) {
+            return false;
+        }
+
         return true;
     }
 
