@@ -25,8 +25,16 @@ class Value extends Index
             return $item->queryEntries()->count();
         }
 
-        return method_exists($item, $method)
-            ? $item->{$method}()
-            : $item->value($this->name);
+        if (method_exists($item, $method)) {
+            return $item->{$method}();
+        }
+
+        $field = $item->blueprint()->field($this->name);
+
+        if ($field && $field->fieldtype()->handle() === 'date') {
+            return $item->augmentedValue($this->name)->value();
+        }
+
+        return $item->value($this->name);
     }
 }
