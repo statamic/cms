@@ -83,7 +83,7 @@ return [
     'timezone' => 'deve ser uma zona válida.',
     'unique' => 'Este valor já foi usado.',
     'uploaded' => 'Falha no carregamento.',
-    'url' => 'formato é inválido.',
+    'url' => 'O formato é inválido.',
     'unique_entry_value' => 'Este valor já foi usado.',
     'unique_user_value' => 'Este valor já foi usado.',
     'duplicate_field_handle' => 'Campo com o valor de :handle não pode ser usado mais do que uma vez.',
