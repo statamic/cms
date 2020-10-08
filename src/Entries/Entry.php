@@ -139,6 +139,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function delete()
     {
+        if ($this->descendants()->map->fresh()->filter()->isNotEmpty()) {
+            throw new \Exception('Cannot delete an entry with localizations.');
+        }
+
         if ($this->hasStructure()) {
             tap($this->structure(), function ($structure) {
                 $structure->trees()->each(function ($tree) {
