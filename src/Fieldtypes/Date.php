@@ -82,6 +82,11 @@ class Date extends Fieldtype
         ];
     }
 
+    public function augment($value)
+    {
+        return Carbon::createFromFormat($this->dateFormat($value), $value);
+    }
+
     public function filter()
     {
         return new DateFilter($this);
