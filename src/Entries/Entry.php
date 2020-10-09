@@ -145,7 +145,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         if ($this->hasStructure()) {
             tap($this->structure(), function ($structure) {
-                $structure->trees()->each(function ($tree) {
+                tap($structure->in($this->locale()), function ($tree) {
                     // Ugly, but it's moving all the child pages to the parent. TODO: Tidy.
                     $parent = $this->parent();
                     if (optional($parent)->isRoot()) {
