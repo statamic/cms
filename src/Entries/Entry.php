@@ -166,6 +166,25 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return true;
     }
 
+    public function deleteDescendants()
+    {
+        $this->descendants()->each->delete();
+    }
+
+    public function detachLocalizations()
+    {
+        Facades\Entry::query()
+            ->where('collection', $this->collectionHandle())
+            ->where('origin', $this->id())
+            ->get()
+            ->each(function ($loc) {
+                $loc
+                    ->origin(null)
+                    ->data($this->data()->merge($loc->data()))
+                    ->save();
+            });
+    }
+
     public function editUrl()
     {
         return $this->cpUrl('collections.entries.edit');
