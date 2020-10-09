@@ -3,6 +3,7 @@
 namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Mockery;
@@ -816,11 +817,22 @@ class EntryTest extends TestCase
     {
         Event::fake();
         $entry = (new Entry)->collection(tap(Collection::make('test'))->save());
-        Facades\Entry::shouldReceive('delete')->with($entry);
+        Facades\Entry::partialMock()->shouldReceive('delete')->with($entry);
 
         $return = $entry->delete();
 
         $this->assertTrue($return);
+    }
+
+    /** @test */
+    public function it_prevents_deleting_if_there_are_descendants()
+    {
+        $this->expectExceptionMessage('Cannot delete an entry with localizations.');
+
+        $entry = EntryFactory::collection('test')->create();
+        EntryFactory::collection('test')->origin($entry->id())->create();
+
+        $entry->delete();
     }
 
     /** @test */
