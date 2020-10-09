@@ -817,7 +817,10 @@ class EntryTest extends TestCase
     {
         Event::fake();
         $entry = (new Entry)->collection(tap(Collection::make('test'))->save());
-        Facades\Entry::partialMock()->shouldReceive('delete')->with($entry);
+
+        $mock = \Mockery::mock(Facades\Entry::getFacadeRoot())->makePartial();
+        Facades\Entry::swap($mock);
+        $mock->shouldReceive('delete')->with($entry);
 
         $return = $entry->delete();
 
