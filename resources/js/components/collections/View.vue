@@ -253,8 +253,9 @@ export default {
         },
 
         saveTree() {
-            this.$refs.tree.save();
-            this.deletedEntries = [];
+            this.$refs.tree.save()
+                .then(() => this.deletedEntries = [])
+                .catch(() => {});
         },
 
         markTreeDirty() {
