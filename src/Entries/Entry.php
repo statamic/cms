@@ -361,6 +361,15 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this->hasDate() && $this->date()->format('H:i:s') !== '00:00:00';
     }
 
+    public function hasPublicUrl()
+    {
+        return $this->collection()->routes()
+                   ->filter(function ($route) {
+                       return $route !== null;
+                   })
+                   ->count() > 0;
+    }
+
     public function sites()
     {
         return $this->collection()->sites();

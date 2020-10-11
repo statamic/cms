@@ -100,7 +100,7 @@
 
                                 <div :class="{ 'hi': !shouldShowSidebar }">
 
-                                    <div class="p-2 flex items-center -mx-1">
+                                    <div v-if="permalink || (isBase && livePreviewUrl)" class="p-2 flex items-center -mx-1">
                                         <button
                                             class="flex items-center justify-center btn-flat w-full mx-1 px-1"
                                             v-if="isBase && livePreviewUrl"

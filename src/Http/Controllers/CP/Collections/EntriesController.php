@@ -105,7 +105,7 @@ class EntriesController extends CpController
             'hasOrigin' => $hasOrigin,
             'originValues' => $originValues ?? null,
             'originMeta' => $originMeta ?? null,
-            'permalink' => $entry->absoluteUrl(),
+            'permalink' => ($entry->hasPublicUrl() ? $entry->absoluteUrl() : null),
             'localizations' => $collection->sites()->map(function ($handle) use ($entry) {
                 $localized = $entry->in($handle);
                 $exists = $localized !== null;
