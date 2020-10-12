@@ -58,7 +58,6 @@ class ApiController extends Controller
                     $value = false;
                 }
 
-
                 if (Str::contains($filter, ':')) {
                     [$field, $condition] = explode(':', $filter);
                 } else {
