@@ -61,6 +61,8 @@ class SearchablesTest extends TestCase
         foreach ($everything as $searchable) {
             $this->assertTrue($searchables->contains($searchable));
         }
+
+        $this->assertFalse($searchables->contains(new NotSearchable));
     }
 
     /** @test */
@@ -91,6 +93,7 @@ class SearchablesTest extends TestCase
         $this->assertFalse($searchables->contains($asset));
         $this->assertFalse($searchables->contains($user));
         $this->assertFalse($searchables->contains($entry));
+        $this->assertFalse($searchables->contains(new NotSearchable));
     }
 
     /** @test */
@@ -116,6 +119,7 @@ class SearchablesTest extends TestCase
         $this->assertFalse($searchables->contains($term));
         $this->assertFalse($searchables->contains($asset));
         $this->assertFalse($searchables->contains($user));
+        $this->assertFalse($searchables->contains(new NotSearchable));
     }
 
     /** @test */
@@ -146,6 +150,7 @@ class SearchablesTest extends TestCase
         $this->assertFalse($searchables->contains($asset));
         $this->assertFalse($searchables->contains($user));
         $this->assertFalse($searchables->contains($term));
+        $this->assertFalse($searchables->contains(new NotSearchable));
     }
 
     /** @test */
@@ -171,6 +176,7 @@ class SearchablesTest extends TestCase
         $this->assertFalse($searchables->contains($entry));
         $this->assertFalse($searchables->contains($asset));
         $this->assertFalse($searchables->contains($user));
+        $this->assertFalse($searchables->contains(new NotSearchable));
     }
 
     /** @test */
@@ -207,6 +213,7 @@ class SearchablesTest extends TestCase
         $this->assertFalse($searchables->contains($asset));
         $this->assertFalse($searchables->contains($user));
         $this->assertFalse($searchables->contains($term));
+        $this->assertFalse($searchables->contains(new NotSearchable));
     }
 
     /** @test */
@@ -232,6 +239,7 @@ class SearchablesTest extends TestCase
         $this->assertFalse($searchables->contains($entry));
         $this->assertFalse($searchables->contains($term));
         $this->assertFalse($searchables->contains($user));
+        $this->assertFalse($searchables->contains(new NotSearchable));
     }
 
     /** @test */
@@ -259,6 +267,7 @@ class SearchablesTest extends TestCase
         $this->assertFalse($searchables->contains($entry));
         $this->assertFalse($searchables->contains($term));
         $this->assertFalse($searchables->contains($asset));
+        $this->assertFalse($searchables->contains(new NotSearchable));
     }
 
     /** @test */
@@ -327,4 +336,9 @@ class SearchablesTest extends TestCase
 
         return new Searchables($index);
     }
+}
+
+class NotSearchable
+{
+    //
 }

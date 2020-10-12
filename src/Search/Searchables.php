@@ -4,6 +4,10 @@ namespace Statamic\Search;
 
 use Closure;
 use Illuminate\Support\Collection;
+use Statamic\Contracts\Assets\Asset as AssetContract;
+use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Term;
@@ -63,32 +67,36 @@ class Searchables
     {
         $searchables = $this->getConfiguredSearchables();
 
+        if (! $this->isSearchable($searchable)) {
+            return false;
+        }
+
         if ($searchables->contains('all')) {
             return true;
         }
 
-        if ($searchable instanceof \Statamic\Contracts\Entries\Entry) {
+        if ($searchable instanceof EntryContract) {
             $collections = $this->searchableCollections();
 
             return $collections->isNotEmpty()
                 && ($collections->contains('*') || $collections->contains($searchable->collectionHandle()));
         }
 
-        if ($searchable instanceof \Statamic\Contracts\Taxonomies\Term) {
+        if ($searchable instanceof TermContract) {
             $taxonomies = $this->searchableTaxonomies();
 
             return $taxonomies->isNotEmpty()
                 && ($taxonomies->contains('*') || $taxonomies->contains($searchable->taxonomyHandle()));
         }
 
-        if ($searchable instanceof \Statamic\Contracts\Assets\Asset) {
+        if ($searchable instanceof AssetContract) {
             $containers = $this->searchableAssetContainers();
 
             return $containers->isNotEmpty()
                 && ($containers->contains('*') || $containers->contains($searchable->containerHandle()));
         }
 
-        if ($searchable instanceof \Statamic\Contracts\Auth\User) {
+        if ($searchable instanceof UserContract) {
             return $searchables->contains('users');
         }
 
@@ -125,6 +133,24 @@ class Searchables
         })->map(function ($item) {
             return Str::after($item, 'assets:');
         });
+    }
+
+    private function isSearchable($searchable)
+    {
+        $contracts = [
+            EntryContract::class,
+            TermContract::class,
+            AssetContract::class,
+            UserContract::class,
+        ];
+
+        foreach ($contracts as $contract) {
+            if ($searchable instanceof $contract) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function fields($searchable): array
