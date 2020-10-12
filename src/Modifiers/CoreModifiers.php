@@ -58,7 +58,7 @@ class CoreModifiers extends Modifier
             $character = (strpos($value, '?') !== false) ? '&' : '?';
 
             // Build the query param. If the second param is not set, just set the value as empty.
-            $queryParam = "{$params[0]}=" . ($params[1] ?? '');
+            $queryParam = "{$params[0]}=".($params[1] ?? '');
 
             $value = "{$url}{$character}{$queryParam}{$anchor}";
         }
@@ -1576,7 +1576,7 @@ class CoreModifiers extends Modifier
             // Remove the query param matching the specified key.
             unset($queryAssociativeArray[$params[0]]);
 
-            $value = $url . (empty($queryAssociativeArray) ? '' : '?' . http_build_query($queryAssociativeArray)) . $anchor;
+            $value = $url.(empty($queryAssociativeArray) ? '' : '?'.http_build_query($queryAssociativeArray)).$anchor;
         }
 
         return $value;
@@ -1782,7 +1782,7 @@ class CoreModifiers extends Modifier
             // Update the existing param that matches the specified key, or add it if it doesn't exist.
             $queryAssociativeArray[$params[0]] = $params[1] ?? '';
 
-            $value = "{$url}?" . http_build_query($queryAssociativeArray) . $anchor;
+            $value = "{$url}?".http_build_query($queryAssociativeArray).$anchor;
         }
 
         return $value;
