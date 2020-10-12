@@ -38,6 +38,28 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Adds a query param matching the specified key/value pair.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function addQueryParam($value, $params)
+    {
+        if (isset($params[0])) {
+            // If a "?" is present in the URL, it means we should prepend "&" to the query param. Else, prepend "?".
+            $character = (strpos($value, '?') !== false) ? '&' : '?';
+
+            // Build the query param. If the second param is not set, just set the value as empty.
+            $queryParam = "{$params[0]}=" . ($params[1] ?? '');
+
+            return "{$value}{$character}{$queryParam}";
+        }
+
+        return $value;
+    }
+
+    /**
      * Creates a sentence list from the given array and the ability to set the glue.
      *
      * @param $value
@@ -1522,6 +1544,31 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Removes a query param matching the specified key if it exists.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function removeQueryParam($value, $params)
+    {
+        if (isset($params[0])) {
+            // Remove query params from the URL.
+            $url = strtok($value, '?');
+
+            // Build an associative array based on the query string.
+            parse_str(parse_url($value, PHP_URL_QUERY), $queryAssociativeArray);
+
+            // Remove the query param matching the specified key.
+            unset($queryAssociativeArray[$params[0]]);
+
+            return $url . (empty($queryAssociativeArray) ? '' : '?' . http_build_query($queryAssociativeArray));
+        }
+
+        return $value;
+    }
+
+    /**
      * Returns a new string with the suffix $params[0] removed, if present.
      *
      * @param $value
@@ -1692,6 +1739,32 @@ class CoreModifiers extends Modifier
         $oxford_comma = Arr::get($params, 1, true);
 
         return Str::makeSentenceList($value, $glue, $oxford_comma);
+    }
+
+    /**
+     * Sets a query param matching the specified key/value pair.
+     * If the key exists, its value gets updated. Else, the key/value pair gets added.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function setQueryParam($value, $params)
+    {
+        if (isset($params[0])) {
+            // Remove query params from the URL.
+            $url = strtok($value, '?');
+
+            // Build an associative array based on the query string.
+            parse_str(parse_url($value, PHP_URL_QUERY), $queryAssociativeArray);
+
+            // Update the existing param that matches the specified key, or add it if it doesn't exist.
+            $queryAssociativeArray[$params[0]] = $params[1] ?? '';
+
+            return "{$url}?" . http_build_query($queryAssociativeArray);
+        }
+
+        return $value;
     }
 
     /**
