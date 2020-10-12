@@ -47,13 +47,20 @@ class CoreModifiers extends Modifier
     public function addQueryParam($value, $params)
     {
         if (isset($params[0])) {
+            // Remove anchor from the URL.
+            $url = strtok($value, '#');
+
+            // Get the anchor value an preprend it with a "#" if a value is retrieved.
+            $fragment = parse_url($value, PHP_URL_FRAGMENT);
+            $anchor = is_null($fragment) ? '' : "#{$fragment}";
+
             // If a "?" is present in the URL, it means we should prepend "&" to the query param. Else, prepend "?".
             $character = (strpos($value, '?') !== false) ? '&' : '?';
 
             // Build the query param. If the second param is not set, just set the value as empty.
             $queryParam = "{$params[0]}=" . ($params[1] ?? '');
 
-            return "{$value}{$character}{$queryParam}";
+            $value = "{$url}{$character}{$queryParam}{$anchor}";
         }
 
         return $value;
@@ -1553,16 +1560,23 @@ class CoreModifiers extends Modifier
     public function removeQueryParam($value, $params)
     {
         if (isset($params[0])) {
-            // Remove query params from the URL.
+            // Remove query params (and any following anchor) from the URL.
             $url = strtok($value, '?');
+            $url = strtok($url, '#');
+
+            // Parse the URL to retrieve the possible query string and anchor.
+            $parsedUrl = parse_url($value);
+
+            // Get the anchor value an preprend it with a "#" if a value is retrieved.
+            $anchor = isset($parsedUrl['fragment']) ? "#{$parsedUrl['fragment']}" : '';
 
             // Build an associative array based on the query string.
-            parse_str(parse_url($value, PHP_URL_QUERY), $queryAssociativeArray);
+            parse_str($parsedUrl['query'] ?? '', $queryAssociativeArray);
 
             // Remove the query param matching the specified key.
             unset($queryAssociativeArray[$params[0]]);
 
-            return $url . (empty($queryAssociativeArray) ? '' : '?' . http_build_query($queryAssociativeArray));
+            $value = $url . (empty($queryAssociativeArray) ? '' : '?' . http_build_query($queryAssociativeArray)) . $anchor;
         }
 
         return $value;
@@ -1752,16 +1766,23 @@ class CoreModifiers extends Modifier
     public function setQueryParam($value, $params)
     {
         if (isset($params[0])) {
-            // Remove query params from the URL.
+            // Remove query params (and any following anchor) from the URL.
             $url = strtok($value, '?');
+            $url = strtok($url, '#');
+
+            // Parse the URL to retrieve the possible query string and anchor.
+            $parsedUrl = parse_url($value);
+
+            // Get the anchor value an preprend it with a "#" if a value is retrieved.
+            $anchor = isset($parsedUrl['fragment']) ? "#{$parsedUrl['fragment']}" : '';
 
             // Build an associative array based on the query string.
-            parse_str(parse_url($value, PHP_URL_QUERY), $queryAssociativeArray);
+            parse_str($parsedUrl['query'] ?? '', $queryAssociativeArray);
 
             // Update the existing param that matches the specified key, or add it if it doesn't exist.
             $queryAssociativeArray[$params[0]] = $params[1] ?? '';
 
-            return "{$url}?" . http_build_query($queryAssociativeArray);
+            $value = "{$url}?" . http_build_query($queryAssociativeArray) . $anchor;
         }
 
         return $value;
