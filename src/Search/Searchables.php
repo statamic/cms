@@ -71,24 +71,21 @@ class Searchables
             $collections = $this->searchableCollections();
 
             return $collections->isNotEmpty()
-                && ($collections->contains('*')
-                || $collections->contains($searchable->collectionHandle()));
+                && ($collections->contains('*') || $collections->contains($searchable->collectionHandle()));
         }
 
         if ($searchable instanceof \Statamic\Contracts\Taxonomies\Term) {
             $taxonomies = $this->searchableTaxonomies();
 
             return $taxonomies->isNotEmpty()
-                && ($taxonomies->contains('*')
-                || $taxonomies->contains($searchable->taxonomyHandle()));
+                && ($taxonomies->contains('*') || $taxonomies->contains($searchable->taxonomyHandle()));
         }
 
         if ($searchable instanceof \Statamic\Contracts\Assets\Asset) {
             $containers = $this->searchableAssetContainers();
 
             return $containers->isNotEmpty()
-                && ($containers->contains('*')
-                || $containers->contains($searchable->containerHandle()));
+                && ($containers->contains('*') || $containers->contains($searchable->containerHandle()));
         }
 
         if ($searchable instanceof \Statamic\Contracts\Auth\User) {
