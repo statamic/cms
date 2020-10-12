@@ -122,10 +122,11 @@ class CascadeTest extends TestCase
     /** @test */
     public function it_hydrates_request_variables()
     {
-        $this->get('/test');
+        $this->get('/test?test=test');
 
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
             $this->assertEquals('http://test.com/test', $cascade['current_url']);
+            $this->assertEquals('http://test.com/test?test=test', $cascade['current_full_url']);
             $this->assertEquals('/test', $cascade['current_uri']);
         });
     }
