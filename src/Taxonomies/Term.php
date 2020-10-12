@@ -60,7 +60,7 @@ class Term implements TermContract
 
     public function taxonomyHandle()
     {
-        return $this->taxonomy()->handle();
+        return $this->taxonomy;
     }
 
     public function path()
