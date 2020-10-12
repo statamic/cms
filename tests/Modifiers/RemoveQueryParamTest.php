@@ -14,7 +14,7 @@ class RemoveQueryParamTest extends TestCase
     public function it_removes_an_existing_query_param()
     {
         $this->assertSame($this->baseUrl, $this->modify("{$this->baseUrl}?q=statamic", $this->queryParamKey));
-        $this->assertSame($this->baseUrl, $this->modify("{$this->baseUrl}?q=statamic", $this->queryParamKey));
+        $this->assertSame("{$this->baseUrl}#test", $this->modify("{$this->baseUrl}?q=statamic#test", $this->queryParamKey));
         $this->assertSame("{$this->baseUrl}?sourceid=chrome", $this->modify("{$this->baseUrl}?q=statamic&sourceid=chrome", $this->queryParamKey));
         $this->assertSame("{$this->baseUrl}?sourceid=chrome", $this->modify("{$this->baseUrl}?sourceid=chrome&q=statamic", $this->queryParamKey));
     }
@@ -23,13 +23,8 @@ class RemoveQueryParamTest extends TestCase
     public function it_does_nothing_if_the_query_param_key_does_not_exist()
     {
         $this->assertSame($this->baseUrl, $this->modify($this->baseUrl, $this->queryParamKey));
+        $this->assertSame("{$this->baseUrl}#test", $this->modify("{$this->baseUrl}#test", $this->queryParamKey));
         $this->assertSame("{$this->baseUrl}?sourceid=chrome", $this->modify("{$this->baseUrl}?sourceid=chrome", $this->queryParamKey));
-    }
-
-    /** @test */
-    public function it_does_nothing_if_no_parameters_are_passed()
-    {
-        $this->assertSame($this->baseUrl, $this->modify($this->baseUrl));
     }
 
     private function modify(string $url, ?string $queryParamKey = null)

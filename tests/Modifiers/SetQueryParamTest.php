@@ -15,6 +15,7 @@ class SetQueryParamTest extends TestCase
     {
         $this->assertSame("{$this->baseUrl}?q=", $this->modify("{$this->baseUrl}?q=statamic", ['q']));
         $this->assertSame("{$this->baseUrl}?q=test", $this->modify("{$this->baseUrl}?q=statamic", $this->queryParam));
+        $this->assertSame("{$this->baseUrl}?q=test#test", $this->modify("{$this->baseUrl}?q=statamic#test", $this->queryParam));
         $this->assertSame("{$this->baseUrl}?q=test&sourceid=chrome", $this->modify("{$this->baseUrl}?q=statamic&sourceid=chrome", $this->queryParam));
         $this->assertSame("{$this->baseUrl}?sourceid=chrome&q=test", $this->modify("{$this->baseUrl}?sourceid=chrome&q=statamic", $this->queryParam));
     }
@@ -24,6 +25,7 @@ class SetQueryParamTest extends TestCase
     {
         $this->assertSame("{$this->baseUrl}?q=", $this->modify($this->baseUrl, ['q']));
         $this->assertSame("{$this->baseUrl}?q=test", $this->modify($this->baseUrl, $this->queryParam));
+        $this->assertSame("{$this->baseUrl}?q=test#test", $this->modify("{$this->baseUrl}#test", $this->queryParam));
         $this->assertSame("{$this->baseUrl}?sourceid=chrome&q=test", $this->modify("{$this->baseUrl}?sourceid=chrome", $this->queryParam));
     }
 

@@ -16,12 +16,14 @@ class AddQueryParamTest extends TestCase
         $this->assertSame("{$this->baseUrl}?q=", $this->modify($this->baseUrl, ['q']));
         $this->assertSame("{$this->baseUrl}?q=test", $this->modify($this->baseUrl, $this->queryParam));
         $this->assertSame("{$this->baseUrl}?sourceid=chrome&q=test", $this->modify("{$this->baseUrl}?sourceid=chrome", $this->queryParam));
+        $this->assertSame("{$this->baseUrl}?q=test#test", $this->modify("{$this->baseUrl}#test", $this->queryParam));
     }
 
     /** @test */
     public function it_does_nothing_if_no_parameters_are_passed()
     {
         $this->assertSame($this->baseUrl, $this->modify($this->baseUrl));
+        $this->assertSame("{$this->baseUrl}#test", $this->modify("{$this->baseUrl}#test"));
     }
 
     private function modify(string $url, ?array $queryParam = null)
