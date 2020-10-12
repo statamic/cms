@@ -52,6 +52,13 @@ class ApiController extends Controller
     {
         collect($this->request->filter ?? [])
             ->each(function ($value, $filter) use ($query) {
+                if ($value === 'true') {
+                    $value = true;
+                } elseif ($value === 'false') {
+                    $value = false;
+                }
+
+
                 if (Str::contains($filter, ':')) {
                     [$field, $condition] = explode(':', $filter);
                 } else {
