@@ -3,6 +3,8 @@
 namespace Statamic\StaticCaching;
 
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Support\Arr;
 
@@ -23,15 +25,24 @@ class DefaultInvalidator implements Invalidator
             return $this->cacher->flush();
         }
 
-        // Invalidate the item's own URL.
-        if ($url = $item->url()) {
-            $this->cacher->invalidateUrl($url);
-        }
-
         if ($item instanceof Entry) {
+            // Invalidate the item's own URL.
+            if ($url = $item->url()) {
+                $this->cacher->invalidateUrl($url);
+            }
+
             $this->invalidateEntryUrls($item);
         } elseif ($item instanceof Term) {
+            // Invalidate the item's own URL.
+            if ($url = $item->url()) {
+                $this->cacher->invalidateUrl($url);
+            }
+
             $this->invalidateTermUrls($item);
+        } elseif ($item instanceof GlobalSet) {
+            $this->cacher->invalidateUrls($this->cacher->getUrls());
+        } elseif ($item instanceof Nav) {
+            $this->cacher->invalidateUrls($this->cacher->getUrls());
         }
     }
 
