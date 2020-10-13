@@ -50,6 +50,15 @@ class Index extends BaseIndex
     {
         $this->getIndex()->delete();
     }
+    
+    public function update()
+    {
+        $this->getIndex()->clearObjects();
+
+        $this->insertMultiple($this->searchables()->all());
+        
+        return $this;
+    }
 
     public function getIndex()
     {
