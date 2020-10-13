@@ -168,7 +168,12 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function deleteDescendants()
     {
-        $this->descendants()->each->delete();
+        $this->descendants()->each(function ($entry) {
+            $entry->deleteDescendants();
+            $entry->delete();
+        });
+
+        $this->localizations = null;
 
         return true;
     }
