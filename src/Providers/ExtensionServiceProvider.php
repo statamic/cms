@@ -22,6 +22,7 @@ class ExtensionServiceProvider extends ServiceProvider
 {
     protected $actions = [
         Actions\Delete::class,
+        Actions\DeleteMultisiteEntry::class,
         Actions\Publish::class,
         Actions\Unpublish::class,
         Actions\SendPasswordReset::class,

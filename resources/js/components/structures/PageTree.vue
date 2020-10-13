@@ -167,12 +167,15 @@ export default {
             this.saving = true;
             const payload = { pages: this.pages, site: this.site, expectsRoot: this.expectsRoot, ...this.submitParameters };
 
-            this.$axios.post(this.submitUrl, payload).then(response => {
+            return this.$axios.post(this.submitUrl, payload).then(response => {
                 this.$emit('saved');
-                this.saving = false;
                 this.$toast.success(__('Saved'));
                 this.initialPages = this.pages;
-            });
+                return response;
+            }).catch(e => {
+                this.$toast.error(e.response ? e.response.data.message : __('Something went wrong'));
+                return Promise.reject(e);
+            }).finally(() => this.saving = false);
         },
 
         addPages(pages, targetParent) {
