@@ -169,6 +169,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function deleteDescendants()
     {
         $this->descendants()->each->delete();
+
+        return true;
     }
 
     public function detachLocalizations()
@@ -183,6 +185,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     ->data($this->data()->merge($loc->data()))
                     ->save();
             });
+
+        return true;
     }
 
     public function editUrl()
