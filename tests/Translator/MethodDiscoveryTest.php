@@ -77,6 +77,7 @@ class MethodDiscoveryTest extends TestCase
             'php annotated return single quote :param',
             'php annotated return double quote string',
             'php annotated return double quote :param',
+            'php annotated return with single asterisk',
 
             'vue template trans single quote',
             'vue template trans single quote :param',
