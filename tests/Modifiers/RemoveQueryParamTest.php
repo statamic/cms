@@ -27,6 +27,12 @@ class RemoveQueryParamTest extends TestCase
         $this->assertSame("{$this->baseUrl}?sourceid=chrome", $this->modify("{$this->baseUrl}?sourceid=chrome", $this->queryParamKey));
     }
 
+    /** @test */
+    public function it_does_nothing_if_no_parameters_are_passed()
+    {
+        $this->assertSame($this->baseUrl, $this->modify($this->baseUrl));
+    }
+
     private function modify(string $url, ?string $queryParamKey = null)
     {
         if (is_null($queryParamKey)) {
