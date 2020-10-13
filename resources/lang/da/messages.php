@@ -24,6 +24,7 @@ return [
     'cache_utility_image_cache_description' => 'Billedcachen gemmer kopier af alle transformerede og ændrede størrelser på billeder.',
     'cache_utility_stache_description' => 'Stache er Statamics indholdsbutik, der fungerer meget som en database. Det genereres automatisk fra indholdsfilerne.',
     'cache_utility_static_cache_description' => 'Statiske sider omgår Statamic fuldstændigt og gengives direkte fra serveren for maksimal ydelse.',
+    'choose_entry_localization_deletion_behavior' => 'Vælg den handling, du vil udføre på de lokaliserede poster.',
     'collection_configure_date_behavior_private' => 'Privat - Skjult fra lister, URL\'er 404',
     'collection_configure_date_behavior_public' => 'Offentlig - Altid synlig',
     'collection_configure_date_behavior_unlisted' => 'Unoteret - Skjult fra lister, webadresser synlige',
