@@ -7,7 +7,7 @@
             </div>
             <div class="flex-1 px-2 py-3 text-grey">
                 <div class="publish-fields">
-                    <div class="form-group">
+                    <div class="form-group" :class="{ 'has-error': this.error }">
                         <div class="field-inner">
                             <label class="publish-field-label" for="field_behavior">
                                 <span v-text="__('Localizations')" />
@@ -22,6 +22,8 @@
                                 <button @click="behavior = 'copy'" class="btn px-2" :class="{ active: behavior === 'copy' }"><span v-text="__('Detach')" /></button>
                             </div>
                         </div>
+
+                        <small v-if="error" class="help-block text-red mt-1 mb-0" v-text="__('statamic::validation.required')" />
                     </div>
                 </div>
             </div>
@@ -30,7 +32,7 @@
                     @click="$emit('cancel')"
                     v-text="__('Cancel')" />
                 <button class="btn ml-2 btn-danger"
-                    @click="$emit('confirm', behavior)"
+                    @click="confirm"
                     v-text="__('Confirm')" />
             </div>
         </div>
@@ -48,6 +50,7 @@ export default {
     data() {
         return {
             behavior: null,
+            error: false,
         }
     },
 
@@ -57,6 +60,19 @@ export default {
 
             return `${__('messages.choose_entry_localization_deletion_behavior')} <a href="${url}" target="_blank">${__('Learn more')}</a>`;
         }
+    },
+
+    methods: {
+
+        confirm() {
+            if (! this.behavior) {
+                this.error = true;
+                return;
+            }
+
+            this.$emit('confirm', this.behavior);
+        }
+
     }
 
 }
