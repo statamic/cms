@@ -150,6 +150,7 @@
 
         <delete-localization-confirmation
             v-if="showLocalizationDeleteBehaviorConfirmation"
+            :entries="deletedEntries.length"
             @confirm="localizationDeleteBehaviorConfirmCallback"
             @cancel="showLocalizationDeleteBehaviorConfirmation = false"
         />

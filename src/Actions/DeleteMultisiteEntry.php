@@ -3,6 +3,7 @@
 namespace Statamic\Actions;
 
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Statamic;
 
 class DeleteMultisiteEntry extends Delete
 {
@@ -16,16 +17,22 @@ class DeleteMultisiteEntry extends Delete
     {
         return [
             'behavior' => [
-                'display' => 'Localization handling',
-                'instructions' => 'How would you like to handle localized versions of the entries being deleted? <a href="" target="_blank">More info.</a>',
-                'type' => 'radio',
+                'display' => __('Localizations'),
+                'instructions' => __('statamic::messages.choose_entry_localization_deletion_behavior').' <a href="'.Statamic::docsUrl('/knowledge-base/localizing-entries#deleting').'" target="_blank">'.__('Learn more').'</a>',
+                'type' => 'button_group',
                 'options' => [
-                    'delete' => 'Delete localized versions',
-                    'copy' => 'Copy data to localizations',
+                    'delete' => __('Delete'),
+                    'copy' => __('Detach'),
                 ],
                 'validate' => 'required',
             ],
         ];
+    }
+
+    public function buttonText()
+    {
+        /* @translation */
+        return 'Confirm';
     }
 
     public function run($items, $values)
