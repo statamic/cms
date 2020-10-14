@@ -13,12 +13,21 @@ class CollectionStructureController extends CpController
     {
         $this->authorize('reorder', $collection);
 
-        $tree = $this->toTree($request->pages);
+        $deletedEntries = collect(
+            $request->deletedEntries ?? []
+        )->map(function ($id) {
+            return Entry::find($id);
+        });
 
-        collect($request->deletedEntries ?? [])
-            ->map(function ($id) {
-                Entry::find($id)->delete();
-            });
+        if ($request->deleteLocalizationBehavior === 'copy') {
+            $deletedEntries->each->detachLocalizations();
+        } else {
+            $deletedEntries->each->deleteDescendants();
+        }
+
+        $deletedEntries->each->delete();
+
+        $tree = $this->toTree($request->pages);
 
         $collection
             ->structure()

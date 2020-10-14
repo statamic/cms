@@ -6,13 +6,16 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\MessageBag;
+use Illuminate\Support\Traits\Localizable;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Form;
+use Statamic\Facades\Site;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
 use Statamic\Forms\SendEmails;
 use Statamic\Support\Arr;
@@ -20,6 +23,8 @@ use Statamic\Support\Str;
 
 class FormController extends Controller
 {
+    use Localizable;
+
     /**
      * Handle a form submission request.
      *
@@ -27,6 +32,7 @@ class FormController extends Controller
      */
     public function submit(Request $request, $form)
     {
+        $site = Site::findByUrl(URL::previous());
         $fields = $form->blueprint()->fields();
         $this->validateContentType($request, $form);
         $values = array_merge($request->all(), $this->normalizeAssetsValues($fields, $request));
@@ -40,7 +46,9 @@ class FormController extends Controller
         $submission = $form->makeSubmission()->data($values);
 
         try {
-            $fields->validate($this->extraRules($fields));
+            $this->withLocale($site->shortLocale(), function () use ($fields) {
+                $fields->validate($this->extraRules($fields));
+            });
 
             throw_if(Arr::get($values, $form->honeypot()), new SilentFormFailureException);
 
@@ -60,7 +68,7 @@ class FormController extends Controller
         }
 
         SubmissionCreated::dispatch($submission);
-        SendEmails::dispatch($submission);
+        SendEmails::dispatch($submission, $site);
 
         return $this->formSuccess($params, $submission);
     }

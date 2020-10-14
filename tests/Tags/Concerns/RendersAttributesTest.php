@@ -24,9 +24,13 @@ class RendersAttributesTest extends TestCase
         $output = $this->tag->renderAttributes([
             'class' => 'm-0 mb-1',
             ':name' => 'first_name',
+            'disabled' => 'true',
+            'autocomplete' => true,
+            'dont_render_falses' => false,
+            'dont_render_nulls' => null,
         ]);
 
-        $this->assertEquals('class="m-0 mb-1" :name="first_name"', $output);
+        $this->assertEquals('class="m-0 mb-1" :name="first_name" disabled="true" autocomplete="true"', $output);
     }
 
     /** @test */
@@ -40,11 +44,14 @@ class RendersAttributesTest extends TestCase
                 'class' => 'm-0 mb-1',
                 ':name' => 'first_name',
                 'attr:src' => 'avatar.jpg',
+                'dont_render_falses' => false,
+                'dont_render_nulls' => null,
                 'disabled' => 'true',
+                'autocomplete' => true,
             ])
             ->renderAttributesFromParams();
 
-        $this->assertEquals('class="m-0 mb-1" name="Han" src="avatar.jpg" disabled', $output);
+        $this->assertEquals('class="m-0 mb-1" name="Han" src="avatar.jpg" disabled="true" autocomplete="true"', $output);
     }
 
     /** @test */

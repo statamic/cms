@@ -1,14 +1,31 @@
 # Release Notes
 
-## Unreleased
+## 3.0.17 (2020-10-13)
+
+### What's new
+- Added a `find` method to the query builder. [#2630](https://github.com/statamic/cms/issues/2630)
+- Added a `current_full_url` variable that includes the query string. [#2638](https://github.com/statamic/cms/issues/2638)
+- Added a bunch of query parameter related modifiers. [#2638](https://github.com/statamic/cms/issues/2638)
 
 ### What's improved
+- Deleting entries when using multiple sites will give you options on how to handle localizations. [#2623](https://github.com/statamic/cms/issues/2623)
+- When you have a huge bunch of assets, it would cause search indexing while saving entries to be slow. Now it's fast. [#2643](https://github.com/statamic/cms/issues/2643)
 - Added `cast_booleans` configuration option to Radio fieldtype [#2601](https://github.com/statamic/cms/issues/2601)
 - Listing Vue component is available globally [#2602](https://github.com/statamic/cms/issues/2602)
+- Portuguese and Danish translations have been updated.
+- Popper.js has been updated. [#2622](https://github.com/statamic/cms/issues/2622)
+- The translator generate command recognizes annotations with single asterisks. [8f778d0](https://github.com/statamic/cms/commits/8f778d0)
+- Static caching strategy is settable in the `.env` file. [#2648](https://github.com/statamic/cms/issues/2648)
 
 ### What's fixed
 - Context is provided to the nav tag recursively. [#2610](https://github.com/statamic/cms/issues/2610)
 - Template front-matter works across operating systems. [#2607](https://github.com/statamic/cms/issues/2607)
+- Partial is used on the licensing page. [#2620](https://github.com/statamic/cms/issues/2620)
+- Fixed an error when localizating the root entry in a structured collection. [c9f0255fd](https://github.com/statamic/cms/commit/c9f0255fd)
+- Updating an Algolia index will flush it rather than deleting it. [#2645](https://github.com/statamic/cms/issues/2645)
+- Password reset errors are now shown (and in the right positions). [#2618](https://github.com/statamic/cms/issues/2618)
+- Passing `true` and `false` into API filters will now be treated as booleans. [#2640](https://github.com/statamic/cms/issues/2640)
+- Falsey HTML attributes are stripped out. True attributes actually say true. Useful for aria attributes on svg tags. [#2605](https://github.com/statamic/cms/issues/2605)
 
 
 

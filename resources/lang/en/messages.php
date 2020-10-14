@@ -24,6 +24,7 @@ return [
     'cache_utility_image_cache_description' => 'The image cache stores copies of all transformed and resized images.',
     'cache_utility_stache_description' => 'The Stache is Statamic\'s content store that functions much like a database. It is generated automatically from the content files.',
     'cache_utility_static_cache_description' => 'Static pages bypass Statamic completely and are rendered directly from the server for maximum performance.',
+    'choose_entry_localization_deletion_behavior' => 'Choose the action you wish to perform on the localized entries.',
     'collection_configure_date_behavior_private' => 'Private - Hidden from listings, URLs 404',
     'collection_configure_date_behavior_public' => 'Public - Always visible',
     'collection_configure_date_behavior_unlisted' => 'Unlisted - Hidden from listings, URLs visible',

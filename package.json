@@ -13,7 +13,7 @@
     "test-watch": "npm run test -- --watch --notify"
   },
   "dependencies": {
-    "@popperjs/core": "^2.1.0",
+    "@popperjs/core": "^2.5.3",
     "@shopify/draggable": "^1.0.0-beta.8",
     "@simonwep/pickr": "^1.7.4",
     "ansi-to-html": "^0.6.14",

@@ -24,6 +24,7 @@ return [
     'cache_utility_image_cache_description' => 'Der Bildercache speichert die Kopien aller transformierten und skalierten Bilder ab.',
     'cache_utility_stache_description' => 'Der Stache ist der Inhaltsspeicher von Statamic, welcher ähnlich wie eine Datenbank funktioniert. Er wird automatisch aus den Inhalten generiert.',
     'cache_utility_static_cache_description' => 'Statische Seiten werden komplett von Statamic umgangen und für die maximale Geschwindigkeit direkt vom Server bereitgestellt.',
+    'choose_entry_localization_deletion_behavior' => 'Wählen Sie die Aktion aus, die Sie für die lokalisierten Einträge ausführen möchten.',
     'collection_configure_date_behavior_private' => 'Privat – Einträge versteckt, URLs 404',
     'collection_configure_date_behavior_public' => 'Öffentlich – Immer sichtbar',
     'collection_configure_date_behavior_unlisted' => 'Nicht aufgelistet – Einträge versteckt, URLs sichtbar',

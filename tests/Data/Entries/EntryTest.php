@@ -3,6 +3,7 @@
 namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Mockery;
@@ -816,11 +817,136 @@ class EntryTest extends TestCase
     {
         Event::fake();
         $entry = (new Entry)->collection(tap(Collection::make('test'))->save());
-        Facades\Entry::shouldReceive('delete')->with($entry);
+
+        $mock = \Mockery::mock(Facades\Entry::getFacadeRoot())->makePartial();
+        Facades\Entry::swap($mock);
+        $mock->shouldReceive('delete')->with($entry);
 
         $return = $entry->delete();
 
         $this->assertTrue($return);
+    }
+
+    /** @test */
+    public function it_prevents_deleting_if_there_are_descendants()
+    {
+        $this->expectExceptionMessage('Cannot delete an entry with localizations.');
+
+        $entry = EntryFactory::collection('test')->create();
+        EntryFactory::collection('test')->origin($entry->id())->create();
+
+        $entry->delete();
+    }
+
+    /** @test */
+    public function it_deletes_descendants()
+    {
+        Event::fake();
+        config(['statamic.sites.sites' => [
+            'en' => [],
+            'fr' => [],
+            'de' => [],
+        ]]);
+
+        $entry = EntryFactory::collection('test')->locale('en')->id('1')->create();
+        $localization = EntryFactory::collection('test')->locale('fr')->id('2')->origin('1')->create();
+        $deeperLocalization = EntryFactory::collection('test')->locale('de')->id('3')->origin('2')->create();
+
+        $this->assertCount(3, Facades\Entry::all());
+        $this->assertCount(2, $entry->descendants());
+        $this->assertCount(1, $localization->descendants());
+
+        $return = $entry->deleteDescendants();
+
+        $this->assertTrue($return);
+        $this->assertCount(1, Facades\Entry::all());
+        $this->assertCount(0, $entry->descendants());
+        $this->assertCount(0, $localization->descendants());
+    }
+
+    /** @test */
+    public function it_detaches_localizations()
+    {
+        Event::fake();
+        config(['statamic.sites.sites' => [
+            'en' => [],
+            'fr' => [],
+            'fr_ca' => [],
+        ]]);
+
+        $english = EntryFactory::collection('test')->locale('en')->id('en')->data([
+            'title' => 'English',
+            'food' => 'Burger',
+            'drink' => 'Water',
+        ])->create();
+
+        $french = EntryFactory::collection('test')->locale('fr')->id('fr')->origin('en')->data([
+            'title' => 'French',
+            'food' => 'Croissant',
+        ])->create();
+
+        $frenchCanadian = EntryFactory::collection('test')->locale('fr_ca')->id('fr_ca')->origin('fr')->data([
+            'title' => 'French Canadian',
+            'food' => 'Poutine',
+        ])->create();
+
+        $this->assertEquals('English', $english->value('title'));
+        $this->assertEquals('Burger', $english->value('food'));
+        $this->assertEquals('Water', $english->value('drink'));
+        $this->assertEquals([
+            'title' => 'English',
+            'food' => 'Burger',
+            'drink' => 'Water',
+        ], $english->data()->all());
+
+        $this->assertEquals($english, $french->origin());
+        $this->assertEquals('French', $french->value('title'));
+        $this->assertEquals('Croissant', $french->value('food'));
+        $this->assertEquals('Water', $french->value('drink'));
+        $this->assertEquals([
+            'title' => 'French',
+            'food' => 'Croissant',
+        ], $french->data()->all());
+
+        $this->assertEquals($french, $frenchCanadian->origin());
+        $this->assertEquals('French Canadian', $frenchCanadian->value('title'));
+        $this->assertEquals('Poutine', $frenchCanadian->value('food'));
+        $this->assertEquals('Water', $frenchCanadian->value('drink'));
+        $this->assertEquals([
+            'title' => 'French Canadian',
+            'food' => 'Poutine',
+        ], $frenchCanadian->data()->all());
+
+        $return = $english->detachLocalizations();
+
+        $this->assertTrue($return);
+        $this->assertEquals('English', $english->value('title'));
+        $this->assertEquals('Burger', $english->value('food'));
+        $this->assertEquals('Water', $english->value('drink'));
+        $this->assertEquals([
+            'title' => 'English',
+            'food' => 'Burger',
+            'drink' => 'Water',
+        ], $english->data()->all());
+
+        $this->assertNull($french->origin());
+        $this->assertEquals('French', $french->value('title'));
+        $this->assertEquals('Croissant', $french->value('food'));
+        $this->assertEquals('Water', $french->value('drink'));
+        $this->assertEquals([
+            'title' => 'French',
+            'food' => 'Croissant',
+            'drink' => 'Water',
+        ], $french->data()->all());
+
+        $this->assertEquals($french, $frenchCanadian->origin());
+        $this->assertEquals('French Canadian', $frenchCanadian->value('title'));
+        $this->assertEquals('Poutine', $frenchCanadian->value('food'));
+        $this->assertEquals('Water', $frenchCanadian->value('drink'));
+        $this->assertEquals([
+            'title' => 'French Canadian',
+            'food' => 'Poutine',
+        ], $frenchCanadian->data()->all());
     }
 
     /** @test */

@@ -1232,6 +1232,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Generate an md5 hash of a value.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function md5($value)
+    {
+        return md5($value);
+    }
+
+    /**
      * Get the date difference in minutes.
      *
      * @param Carbon  $value

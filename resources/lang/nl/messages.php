@@ -24,6 +24,7 @@ return [
     'cache_utility_image_cache_description' => 'De afbeeldingencache slaat kopieën van alle aangepaste en herschaalde afbeeldingen.',
     'cache_utility_stache_description' => 'De Stache is de content-cache van Statamic. Het functioneert als een soort database. Het wordt automatisch gegenereerd op basis van de inhoudsbestanden van de website.',
     'cache_utility_static_cache_description' => 'Statische pagina\'s passeren Statamic volledige en  en worden rechtstreeks vanaf de server getoond. Dit zorgt voor maximale performance.',
+    'choose_entry_localization_deletion_behavior' => 'Kies de actie die u op de gelokaliseerde vermeldingen wilt uitvoeren.',
     'collection_configure_date_behavior_private' => 'Privé - Verborgen in lijsten, URL\'s geven een 404-error.',
     'collection_configure_date_behavior_public' => 'Openbaar - Altijd zichtbaar',
     'collection_configure_date_behavior_unlisted' => 'Verborgen - Verborgen in lijsten, URL\'s functioneren',
