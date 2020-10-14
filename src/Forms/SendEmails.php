@@ -17,9 +17,12 @@ class SendEmails implements ShouldQueue
 
     protected $submission;
 
-    public function __construct(Submission $submission)
+    protected $locale;
+
+    public function __construct(Submission $submission, $locale)
     {
         $this->submission = $submission;
+        $this->locale = $locale;
     }
 
     /**
@@ -30,7 +33,7 @@ class SendEmails implements ShouldQueue
     public function handle()
     {
         $this->parseEmailConfigs($this->submission)->each(function ($config) {
-            Mail::send(new Email($this->submission, $config));
+            Mail::send((new Email($this->submission, $config))->locale($this->locale));
         });
     }
 
