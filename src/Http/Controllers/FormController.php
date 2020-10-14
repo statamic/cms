@@ -62,7 +62,7 @@ class FormController extends Controller
         }
 
         SubmissionCreated::dispatch($submission);
-        SendEmails::dispatch($submission, Site::findByUrl(URL::previous())->shortLocale());
+        SendEmails::dispatch($submission, Site::findByUrl(URL::previous()));
 
         return $this->formSuccess($params, $submission);
     }

@@ -10,19 +10,19 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Mail;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Facades\Antlers;
+use Statamic\Sites\Site;
 
 class SendEmails implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     protected $submission;
+    protected $site;
 
-    protected $locale;
-
-    public function __construct(Submission $submission, $locale)
+    public function __construct(Submission $submission, Site $site)
     {
         $this->submission = $submission;
-        $this->locale = $locale;
+        $this->site = $site;
     }
 
     /**
@@ -33,7 +33,7 @@ class SendEmails implements ShouldQueue
     public function handle()
     {
         $this->parseEmailConfigs($this->submission)->each(function ($config) {
-            Mail::send((new Email($this->submission, $config))->locale($this->locale));
+            Mail::send(new Email($this->submission, $config, $this->site));
         });
     }
 
