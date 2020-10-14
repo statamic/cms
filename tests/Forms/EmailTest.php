@@ -4,6 +4,7 @@ namespace Tests\Forms;
 
 use Mockery as m;
 use Statamic\Facades\Antlers;
+use Statamic\Facades\Site;
 use Statamic\Forms\Email;
 use Statamic\Forms\Submission;
 use Tests\TestCase;
@@ -21,7 +22,7 @@ class EmailTest extends TestCase
         $email = new Email($submission, [
             'to' => Antlers::parse('test@example.com'),
             'html' => Antlers::parse('emails/test'),
-        ]);
+        ], Site::default());
 
         $email->build();
 
