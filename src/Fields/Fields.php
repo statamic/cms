@@ -197,7 +197,7 @@ class Fields
             $field->setConfig(array_merge($field->config(), $overrides));
         }
 
-        return $field->setHandle($config['handle']);
+        return $field->setParent($this->parent)->setHandle($config['handle']);
     }
 
     private function getImportedFields(array $config): array
@@ -206,7 +206,7 @@ class Fields
             throw new \Exception("Fieldset {$config['import']} not found.");
         }
 
-        $fields = $fieldset->fields()->all();
+        $fields = $fieldset->fields()->all()->each->setParent($this->parent);
 
         if ($overrides = $config['config'] ?? null) {
             $fields = $fields->map(function ($field, $handle) use ($overrides) {
