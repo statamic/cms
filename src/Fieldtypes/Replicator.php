@@ -51,9 +51,9 @@ class Replicator extends Fieldtype
         ]);
     }
 
-    protected function fields($set)
+    public function fields($set)
     {
-        return new Fields($this->config("sets.$set.fields"));
+        return new Fields($this->config("sets.$set.fields"), $this->field()->parent());
     }
 
     public function extraRules(): array
@@ -99,13 +99,13 @@ class Replicator extends Fieldtype
         return collect($values)->reject(function ($set, $key) {
             return array_get($set, 'enabled', true) === false;
         })->map(function ($set) use ($shallow) {
-            if (! $config = $this->config("sets.{$set['type']}.fields")) {
+            if (! $this->config("sets.{$set['type']}.fields")) {
                 return $set;
             }
 
             $augmentMethod = $shallow ? 'shallowAugment' : 'augment';
 
-            $values = (new Fields($config))->addValues($set)->{$augmentMethod}()->values();
+            $values = $this->fields($set['type'])->addValues($set)->{$augmentMethod}()->values();
 
             return $values->merge(['type' => $set['type']])->all();
         })->values()->all();
