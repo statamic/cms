@@ -1,5 +1,18 @@
 # Release Notes
 
+## 3.0.18 (2020-10-14)
+
+### What's new
+- Added an [`md5` modifier](https://statamic.dev/modifiers/md5). [#2652](https://github.com/statamic/cms/issues/2652)
+
+### What's fixed
+- Form validation errors are translated appropriately. [#2387](https://github.com/statamic/cms/issues/2387)
+- Form emails are localized based on the site where they were submitted. [#2658](https://github.com/statamic/cms/issues/2658)
+- The `entries` fieldtype will localize its selections in views based on the locale. [#2657](https://github.com/statamic/cms/issues/2657)
+- The entry gets passed along in more places, fixing some issues with Replicator, Grid, and Bard. [#2656](https://github.com/statamic/cms/issues/2656)
+
+
+
 ## 3.0.17 (2020-10-13)
 
 ### What's new
