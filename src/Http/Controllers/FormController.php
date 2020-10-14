@@ -6,6 +6,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\MessageBag;
 use Illuminate\Validation\ValidationException;
 use Statamic\Contracts\Forms\Submission;
@@ -13,6 +14,7 @@ use Statamic\Events\FormSubmitted;
 use Statamic\Events\SubmissionCreated;
 use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\Form;
+use Statamic\Facades\Site;
 use Statamic\Forms\Exceptions\FileContentTypeRequiredException;
 use Statamic\Forms\SendEmails;
 use Statamic\Support\Arr;
@@ -60,7 +62,7 @@ class FormController extends Controller
         }
 
         SubmissionCreated::dispatch($submission);
-        SendEmails::dispatch($submission);
+        SendEmails::dispatch($submission, Site::findByUrl(URL::previous()));
 
         return $this->formSuccess($params, $submission);
     }
