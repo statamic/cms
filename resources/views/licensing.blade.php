@@ -33,35 +33,39 @@
 
         <h6 class="mt-4">Site</h6>
         <div class="card p-0 mt-1">
-            <table class="data-table">
-                <tr>
-                    <td class="w-64 font-bold">
-                        <span class="little-dot {{ $site->valid() ? 'bg-green' : 'bg-red' }} mr-1"></span>
-                        {{ $site->key() ?? __('No license key') }}
-                    </td>
-                    <td class="relative">
-                        {{ $site->domain()['url'] ?? '' }}
-                        @if ($site->hasMultipleDomains())
-                            <span class="text-2xs">({{ trans_choice('and :count more', $site->additionalDomainCount()) }})</span>
-                        @endif
-                    </td>
-                    <td class="text-right text-red">{{ $site->invalidReason() }}</td>
-                </tr>
-            </table>
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <tr>
+                        <td class="w-64 font-bold">
+                            <span class="little-dot {{ $site->valid() ? 'bg-green' : 'bg-red' }} mr-1"></span>
+                            {{ $site->key() ?? __('No license key') }}
+                        </td>
+                        <td class="relative">
+                            {{ $site->domain()['url'] ?? '' }}
+                            @if ($site->hasMultipleDomains())
+                                <span class="text-2xs">({{ trans_choice('and :count more', $site->additionalDomainCount()) }})</span>
+                            @endif
+                        </td>
+                        <td class="text-right text-red">{{ $site->invalidReason() }}</td>
+                    </tr>
+                </table>
+            </div>
         </div>
 
         <h6 class="mt-4">Core</h6>
         <div class="card p-0 mt-1">
-            <table class="data-table">
-                <tr>
-                    <td class="w-64 font-bold">
-                        <span class="little-dot {{ $statamic->valid() ? 'bg-green' : 'bg-red' }} mr-1"></span>
-                        Statamic @if ($statamic->pro())<span class="text-pink">Pro</span>@else Free @endif
-                    </td>
-                    <td>{{ $statamic->version() }}</td>
-                    <td class="text-right text-red">{{ $statamic->invalidReason() }}</td>
-                </tr>
-            </table>
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    <tr>
+                        <td class="w-64 font-bold">
+                            <span class="little-dot {{ $statamic->valid() ? 'bg-green' : 'bg-red' }} mr-1"></span>
+                            Statamic @if ($statamic->pro())<span class="text-pink">Pro</span>@else Free @endif
+                        </td>
+                        <td>{{ $statamic->version() }}</td>
+                        <td class="text-right text-red">{{ $statamic->invalidReason() }}</td>
+                    </tr>
+                </table>
+            </div>
         </div>
 
         <h6 class="mt-4">{{ __('Addons') }}</h6>
@@ -69,36 +73,40 @@
         <p class="text-sm text-grey mt-1">{{ __('No addons installed') }}</p>
         @else
         <div class="card p-0 mt-1">
-            <table class="data-table">
-                @foreach ($addons as $addon)
-                    <tr>
-                        <td class="w-64 mr-1">
-                            <span class="little-dot {{ $addon->valid() ? 'bg-green' : 'bg-red' }} mr-1"></span>
-                            <span class="font-bold">{{ $addon->name() }}</span>
-                            @if ($addon->edition())<span class="badge uppercase font-bold text-grey-60">{{ $addon->edition() ?? '' }}</span>@endif
-                        </td>
-                        <td>{{ $addon->version() }}</td>
-                        <td class="text-right text-red">{{ $addon->invalidReason() }}</td>
-                    </tr>
-                @endforeach
-            </table>
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    @foreach ($addons as $addon)
+                        <tr>
+                            <td class="w-64 mr-1">
+                                <span class="little-dot {{ $addon->valid() ? 'bg-green' : 'bg-red' }} mr-1"></span>
+                                <span class="font-bold">{{ $addon->name() }}</span>
+                                @if ($addon->edition())<span class="badge uppercase font-bold text-grey-60">{{ $addon->edition() ?? '' }}</span>@endif
+                            </td>
+                            <td>{{ $addon->version() }}</td>
+                            <td class="text-right text-red">{{ $addon->invalidReason() }}</td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
         </div>
         @endif
 
         @if (!$unlistedAddons->isEmpty())
         <h6 class="mt-4">{{ __('Unlisted Addons') }}</h6>
         <div class="card p-0 mt-1">
-            <table class="data-table">
-                @foreach ($unlistedAddons as $addon)
-                    <tr>
-                        <td class="w-64 font-bold mr-1">
-                            <span class="little-dot bg-green mr-1"></span>
-                            {{ $addon->name() }}
-                        </td>
-                        <td>{{ $addon->version() }}</td>
-                    </tr>
-                @endforeach
-            </table>
+            <div class="data-table-wrapper">
+                <table class="data-table">
+                    @foreach ($unlistedAddons as $addon)
+                        <tr>
+                            <td class="w-64 font-bold mr-1">
+                                <span class="little-dot bg-green mr-1"></span>
+                                {{ $addon->name() }}
+                            </td>
+                            <td>{{ $addon->version() }}</td>
+                        </tr>
+                    @endforeach
+                </table>
+            </div>
         </div>
         @endif
 

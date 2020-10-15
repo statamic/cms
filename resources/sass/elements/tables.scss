@@ -28,8 +28,12 @@
     @apply py-1.5 pr-2 flex items-center border-t;
 }
 
+.data-table-wrapper {
+    @apply max-w-full min-w-full overflow-x-auto;
+}
+
 .data-table {
-	@apply text-left text-grey outline-none w-full max-w-full overflow-x-auto;
+	@apply text-left text-grey outline-none min-w-full;
 
     thead {
 		// @apply bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide outline-none;
@@ -120,6 +124,12 @@
 
 	.sortable-row.draggable-mirror {
 		display: none;
+	}
+}
+
+@screen md {
+	.data-table {
+		@apply w-full;
 	}
 }
 

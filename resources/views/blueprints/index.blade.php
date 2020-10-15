@@ -31,21 +31,23 @@
         @if ($loop->first)
         <h3 class="little-heading pl-0 mb-1">{{ __('Collections') }}</h3>
         <div class="card p-0 mb-2">
-            <table class="data-table">
-        @endif
-                @foreach ($collection->entryBlueprints() as $blueprint)
-                    <tr>
-                        <td>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 mr-2">@svg('content-writing')</div>
-                                <a href="{{ cp_route('collections.blueprints.edit', [$collection, $blueprint]) }}">{{ $blueprint->title() }}</a>
-                            </div>
-                        </td>
-                        <td class="text-right text-2xs">{{ $collection->title() }}</td>
-                    </tr>
-                @endforeach
-        @if ($loop->last)
-            </table>
+            <div class="data-table-wrapper">
+                <table class="data-table">
+            @endif
+                    @foreach ($collection->entryBlueprints() as $blueprint)
+                        <tr>
+                            <td>
+                                <div class="flex items-center">
+                                    <div class="w-4 h-4 mr-2">@svg('content-writing')</div>
+                                    <a href="{{ cp_route('collections.blueprints.edit', [$collection, $blueprint]) }}">{{ $blueprint->title() }}</a>
+                                </div>
+                            </td>
+                            <td class="text-right text-2xs">{{ $collection->title() }}</td>
+                        </tr>
+                    @endforeach
+            @if ($loop->last)
+                </table>
+            </div>
         </div>
         @endif
     @endforeach
@@ -54,21 +56,23 @@
         @if ($loop->first)
         <h3 class="little-heading pl-0 mb-1">{{ __('Taxonomies') }}</h3>
         <div class="card p-0 mb-2">
-            <table class="data-table">
-        @endif
-                @foreach ($taxonomy->termBlueprints() as $blueprint)
-                    <tr>
-                        <td>
-                            <div class="flex items-center">
-                                <div class="w-4 h-4 mr-2">@svg('tags')</div>
-                                <a href="{{ cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]) }}">{{ $blueprint->title() }}</a>
-                            </div>
-                        </td>
-                        <td class="text-right text-2xs">{{ $taxonomy->title() }}</td>
-                    </tr>
-                @endforeach
-        @if ($loop->last)
-            </table>
+            <div class="data-table-wrapper">
+                <table class="data-table">
+            @endif
+                    @foreach ($taxonomy->termBlueprints() as $blueprint)
+                        <tr>
+                            <td>
+                                <div class="flex items-center">
+                                    <div class="w-4 h-4 mr-2">@svg('tags')</div>
+                                    <a href="{{ cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]) }}">{{ $blueprint->title() }}</a>
+                                </div>
+                            </td>
+                            <td class="text-right text-2xs">{{ $taxonomy->title() }}</td>
+                        </tr>
+                    @endforeach
+            @if ($loop->last)
+                </table>
+            </div>
         </div>
         @endif
     @endforeach
@@ -77,18 +81,20 @@
         @if ($loop->first)
         <h3 class="little-heading pl-0 mb-1">{{ __('Globals') }}</h3>
         <div class="card p-0 mb-2">
-            <table class="data-table">
-        @endif
-                <tr>
-                    <td>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 mr-2">@svg('earth')</div>
-                            <a href="{{ cp_route('globals.blueprint.edit', $set->handle()) }}">{{ $set->title() }}</a>
-                        </div>
-                    </td>
-                </tr>
-        @if ($loop->last)
-            </table>
+            <div class="data-table-wrapper">
+                <table class="data-table">
+            @endif
+                    <tr>
+                        <td>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 mr-2">@svg('earth')</div>
+                                <a href="{{ cp_route('globals.blueprint.edit', $set->handle()) }}">{{ $set->title() }}</a>
+                            </div>
+                        </td>
+                    </tr>
+            @if ($loop->last)
+                </table>
+            </div>
         </div>
         @endif
     @endforeach
@@ -97,18 +103,20 @@
         @if ($loop->first)
         <h3 class="little-heading pl-0 mb-1">{{ __('Asset Containers') }}</h3>
         <div class="card p-0 mb-2">
-            <table class="data-table">
-        @endif
-                <tr>
-                    <td>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 mr-2">@svg('assets')</div>
-                            <a href="{{ cp_route('asset-containers.blueprint.edit', $container->handle()) }}">{{ $container->title() }}</a>
-                        </div>
-                    </td>
-                </tr>
-        @if ($loop->last)
-            </table>
+            <div class="data-table-wrapper">
+                <table class="data-table">
+            @endif
+                    <tr>
+                        <td>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 mr-2">@svg('assets')</div>
+                                <a href="{{ cp_route('asset-containers.blueprint.edit', $container->handle()) }}">{{ $container->title() }}</a>
+                            </div>
+                        </td>
+                    </tr>
+            @if ($loop->last)
+                </table>
+            </div>
         </div>
         @endif
     @endforeach
@@ -117,34 +125,38 @@
         @if ($loop->first)
         <h3 class="little-heading pl-0 mb-1">{{ __('Forms') }}</h3>
         <div class="card p-0 mb-2">
-            <table class="data-table">
+            <div class="data-table-wrapper">
+                <table class="data-table">
+            @endif
+                    <tr>
+                        <td>
+                            <div class="flex items-center">
+                                <div class="w-4 h-4 mr-2">@svg('drawer-file')</div>
+                                <a href="{{ cp_route('forms.blueprint.edit', $form->handle()) }}">{{ $form->title() }}</a>
+                            </div>
+                        </td>
+                    </tr>
+            @if ($loop->last)
+                </table>
+            </div>
+        </div>
         @endif
-                <tr>
-                    <td>
-                        <div class="flex items-center">
-                            <div class="w-4 h-4 mr-2">@svg('drawer-file')</div>
-                            <a href="{{ cp_route('forms.blueprint.edit', $form->handle()) }}">{{ $form->title() }}</a>
-                        </div>
-                    </td>
-        @if ($loop->last)
-                </tr>
-        </table>
-        @endif
-    </div>
     @endforeach
 
     <h3 class="little-heading pl-0 mb-1">{{ __('Other') }}</h3>
     <div class="card p-0 mb-2">
-        <table class="data-table">
-            <tr>
-                <td>
-                    <div class="flex items-center">
-                        <div class="w-4 h-4 mr-2">@svg('users')</div>
-                        <a href="{{ cp_route('users.blueprint.edit') }}">{{ __('User') }}</a>
-                    </div>
-                </td>
-            </tr>
-        </table>
+        <div class="data-table-wrapper">
+            <table class="data-table">
+                <tr>
+                    <td>
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 mr-2">@svg('users')</div>
+                            <a href="{{ cp_route('users.blueprint.edit') }}">{{ __('User') }}</a>
+                        </div>
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div>
 
     @include('statamic::partials.docs-callout', [
