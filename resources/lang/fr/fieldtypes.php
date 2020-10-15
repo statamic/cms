@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'any.config.cast_booleans' => 'Les options avec des valeurs true (vrai) et false (faux) seront enregistrées en tant que booléens.',
     'any.config.default' => 'Définissez la valeur par défaut.',
     'any.config.cast_booleans' => 'Les options avec des valeurs true (vrai) et false (faux) seront enregistrées en tant que booléens.',
     'array.config.keys' => 'Définissez les clés du tableau (les variables) et leurs étiquettes facultatives.',
