@@ -33,6 +33,13 @@ class Cascade
         return $this->data;
     }
 
+    public function withRequest($request)
+    {
+        $this->request = $request;
+
+        return $this;
+    }
+
     public function withSite($site)
     {
         $this->site = $site;
@@ -165,6 +172,7 @@ class Cascade
 
             // Request
             'current_url' => $this->request->url(),
+            'current_full_url' => $this->request->fullUrl(),
             'current_uri' => URL::format($this->request->path()),
             'get_post' => Arr::sanitize($this->request->all()),
             'get' => Arr::sanitize($this->request->query->all()),

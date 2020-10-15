@@ -65,6 +65,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         return $this
             ->fluentlyGetOrSet('locale')
+            ->setter(function ($locale) {
+                return $locale instanceof \Statamic\Sites\Site ? $locale->handle() : $locale;
+            })
             ->getter(function ($locale) {
                 return $locale ?? Site::default()->handle();
             })
@@ -136,9 +139,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function delete()
     {
+        if ($this->descendants()->map->fresh()->filter()->isNotEmpty()) {
+            throw new \Exception('Cannot delete an entry with localizations.');
+        }
+
         if ($this->hasStructure()) {
             tap($this->structure(), function ($structure) {
-                $structure->trees()->each(function ($tree) {
+                tap($structure->in($this->locale()), function ($tree) {
                     // Ugly, but it's moving all the child pages to the parent. TODO: Tidy.
                     $parent = $this->parent();
                     if (optional($parent)->isRoot()) {
@@ -155,6 +162,34 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         Facades\Entry::delete($this);
 
         EntryDeleted::dispatch($this);
+
+        return true;
+    }
+
+    public function deleteDescendants()
+    {
+        $this->descendants()->each(function ($entry) {
+            $entry->deleteDescendants();
+            $entry->delete();
+        });
+
+        $this->localizations = null;
+
+        return true;
+    }
+
+    public function detachLocalizations()
+    {
+        Facades\Entry::query()
+            ->where('collection', $this->collectionHandle())
+            ->where('origin', $this->id())
+            ->get()
+            ->each(function ($loc) {
+                $loc
+                    ->origin(null)
+                    ->data($this->data()->merge($loc->data()))
+                    ->save();
+            });
 
         return true;
     }
@@ -335,7 +370,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                     return null;
                 }
 
-                if ($date instanceof Carbon) {
+                if ($date instanceof \Carbon\Carbon) {
                     return $date;
                 }
 

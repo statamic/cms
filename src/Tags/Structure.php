@@ -58,7 +58,7 @@ class Structure extends Tags
             $data = $page->toAugmentedArray();
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
 
-            return array_merge($data, [
+            return array_merge($this->context->all(), $data, [
                 'children'    => $children,
                 'parent'      => $parent,
                 'depth'       => $depth,

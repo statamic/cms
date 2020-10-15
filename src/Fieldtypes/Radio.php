@@ -22,6 +22,13 @@ class Radio extends Fieldtype
                 'type' => 'toggle',
                 'width' => 50,
             ],
+            'cast_booleans' => [
+                'display' => __('Cast Booleans'),
+                'instructions' => __('statamic::fieldtypes.any.config.cast_booleans'),
+                'type' => 'toggle',
+                'default' => false,
+                'width' => 50,
+            ],
         ];
     }
 
@@ -30,5 +37,31 @@ class Radio extends Fieldtype
         $label = is_null($value) ? null : array_get($this->config('options'), $value, $value);
 
         return new LabeledValue($value, $label);
+    }
+
+    public function preProcess($value)
+    {
+        if ($this->config('cast_booleans')) {
+            if ($value === true) {
+                return 'true';
+            } elseif ($value === false) {
+                return 'false';
+            }
+        }
+
+        return $value;
+    }
+
+    public function process($value)
+    {
+        if ($this->config('cast_booleans')) {
+            if ($value === 'true') {
+                return true;
+            } elseif ($value === 'false') {
+                return false;
+            }
+        }
+
+        return $value;
     }
 }

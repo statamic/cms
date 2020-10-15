@@ -24,6 +24,7 @@ return [
     'cache_utility_image_cache_description' => 'La cache delle immagini memorizza copie di tutte le immagini trasformate e ridimensionate.',
     'cache_utility_stache_description' => 'La Stache è il content store di Statamic che funziona in modo molto simile a un database. Viene generato automaticamente dai tuoi file di contenuti.',
     'cache_utility_static_cache_description' => 'Le pagine statiche bypassano  Statamic e vengono renderizzate direttamente dal server per il massimo delle prestazioni.',
+    'choose_entry_localization_deletion_behavior' => 'Scegli l\'azione che desideri eseguire sulle voci localizzate.',
     'collection_configure_date_behavior_private' => 'Privato - Nascoste dagli elenchi, non accessibili tramite URL',
     'collection_configure_date_behavior_public' => 'Pubblico - Sempre visibili',
     'collection_configure_date_behavior_unlisted' => 'Non in elenco: Nascoste dagli elenchi, accessibili tramite URL',

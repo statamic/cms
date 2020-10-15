@@ -45,4 +45,10 @@ class Test
         /** @translation */
         return 'php annotated return double quote :param';
     }
+
+    public function returnMethodFive()
+    {
+        /* @translation */
+        return 'php annotated return with single asterisk';
+    }
 }

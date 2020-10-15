@@ -2,6 +2,7 @@
 
 return [
     'any.config.default' => 'Standardwert festlegen.',
+    'any.config.cast_booleans' => 'Optionen mit den Werten *true* und *false* als Booleans speichern.',
     'array.config.keys' => 'Arrayschlüssel (Variablen) und optionale Beschriftungen festlegen.',
     'array.config.mode' => 'Der dynamische Modus gibt der Benutzer*in die Kontrolle über die Daten, während der geschlossene Modus dies nicht tut.',
     'assets.config.allow_uploads' => 'Das Hochladen neuer Dateien zulassen.',
@@ -66,7 +67,6 @@ return [
     'range.config.prepend' => 'Text auf der linke Seite des Schiebereglers hinzufügen.',
     'range.config.step' => 'Mindestgrösse zwischen den Werten.',
     'relationship.config.mode' => 'Bevorzugten UI Stil auswählen.',
-    'select.config.cast_booleans' => 'Optionen mit den Werten *true* und *false* als Booleans speichern.',
     'select.config.clearable' => 'Option zum Abwählen der Auswahl aktivieren.',
     'select.config.multiple' => 'Mehrfachauswahl zulassen.',
     'select.config.options' => 'Arrayschlüssel und deren optionale Beschriftungen festlegen.',

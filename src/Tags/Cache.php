@@ -34,6 +34,10 @@ class Cache extends Tags
 
     private function getCacheKey()
     {
+        if ($this->params->has('key')) {
+            return $this->params->get('key');
+        }
+
         $hash = [
             'content' => $this->content,
             'params' => $this->params->all(),

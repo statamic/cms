@@ -46,7 +46,7 @@ class MethodDiscovery
 
     protected function annotatedReturnRegex()
     {
-        return '\/\** @translation \*\/\s+'
+        return '\/\**? @translation \*\/\s+'
             .'return ([\'"])([\w\d\s\t\n\r,.\'\":\\\?!@£$%^&*<>_\-=\|\+]+)\1;';
     }
 }

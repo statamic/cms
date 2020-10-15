@@ -24,6 +24,7 @@ return [
     'cache_utility_image_cache_description' => 'O cache de imagem armazena cópias de todas as imagens transformadas e redimensionadas.',
     'cache_utility_stache_description' => 'O Stache é o armazenamento de conteúdo do Statamic que funciona como um banco de dados. É gerado automaticamente a partir dos seus arquivos de conteúdo.',
     'cache_utility_static_cache_description' => 'As páginas estáticas ignoram completamente o Statamic e são criadas directamente do seu servidor para obter o máximo desempenho.',
+    'choose_entry_localization_deletion_behavior' => 'Escolha a ação que você deseja realizar nas entradas localizadas.',
     'collection_configure_date_behavior_private' => 'Privado - oculto nas listagens, URLs 404',
     'collection_configure_date_behavior_public' => 'Público - sempre visível',
     'collection_configure_date_behavior_unlisted' => 'Não listado - oculto nas listagens, URLs visíveis',

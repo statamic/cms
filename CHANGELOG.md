@@ -1,5 +1,65 @@
 # Release Notes
 
+## 3.0.18 (2020-10-14)
+
+### What's new
+- Added an [`md5` modifier](https://statamic.dev/modifiers/md5). [#2652](https://github.com/statamic/cms/issues/2652)
+
+### What's fixed
+- Form validation errors are translated appropriately. [#2387](https://github.com/statamic/cms/issues/2387)
+- Form emails are localized based on the site where they were submitted. [#2658](https://github.com/statamic/cms/issues/2658)
+- The `entries` fieldtype will localize its selections in views based on the locale. [#2657](https://github.com/statamic/cms/issues/2657)
+- The entry gets passed along in more places, fixing some issues with Replicator, Grid, and Bard. [#2656](https://github.com/statamic/cms/issues/2656)
+
+
+
+## 3.0.17 (2020-10-13)
+
+### What's new
+- Added a `find` method to the query builder. [#2630](https://github.com/statamic/cms/issues/2630)
+- Added a `current_full_url` variable that includes the query string. [#2638](https://github.com/statamic/cms/issues/2638)
+- Added a bunch of query parameter related modifiers. [#2638](https://github.com/statamic/cms/issues/2638)
+
+### What's improved
+- Deleting entries when using multiple sites will give you options on how to handle localizations. [#2623](https://github.com/statamic/cms/issues/2623)
+- When you have a huge bunch of assets, it would cause search indexing while saving entries to be slow. Now it's fast. [#2643](https://github.com/statamic/cms/issues/2643)
+- Added `cast_booleans` configuration option to Radio fieldtype [#2601](https://github.com/statamic/cms/issues/2601)
+- Listing Vue component is available globally [#2602](https://github.com/statamic/cms/issues/2602)
+- Portuguese and Danish translations have been updated.
+- Popper.js has been updated. [#2622](https://github.com/statamic/cms/issues/2622)
+- The translator generate command recognizes annotations with single asterisks. [8f778d0](https://github.com/statamic/cms/commits/8f778d0)
+- Static caching strategy is settable in the `.env` file. [#2648](https://github.com/statamic/cms/issues/2648)
+
+### What's fixed
+- Context is provided to the nav tag recursively. [#2610](https://github.com/statamic/cms/issues/2610)
+- Template front-matter works across operating systems. [#2607](https://github.com/statamic/cms/issues/2607)
+- Partial is used on the licensing page. [#2620](https://github.com/statamic/cms/issues/2620)
+- Fixed an error when localizating the root entry in a structured collection. [c9f0255fd](https://github.com/statamic/cms/commit/c9f0255fd)
+- Updating an Algolia index will flush it rather than deleting it. [#2645](https://github.com/statamic/cms/issues/2645)
+- Password reset errors are now shown (and in the right positions). [#2618](https://github.com/statamic/cms/issues/2618)
+- Passing `true` and `false` into API filters will now be treated as booleans. [#2640](https://github.com/statamic/cms/issues/2640)
+- Falsey HTML attributes are stripped out. True attributes actually say true. Useful for aria attributes on svg tags. [#2605](https://github.com/statamic/cms/issues/2605)
+
+
+
+## 3.0.16 (2020-10-06)
+
+### What's new
+- Added a `key` parameter to the [`cache` tag](https://statamic.dev/tags/cache). [#2589](https://github.com/statamic/cms/issues/2589)
+- Search indexes can define [transformers](https://statamic.dev/search#transforming-fields). [#2462](https://github.com/statamic/cms/issues/2462)
+
+### What's improved
+- The `locale` method on the `Entry` class can accept a `Site` object.
+- The `toggle` fieldtype can understand `0` and `1` in your YAML files, rather than just `true` and `false`.
+- French translation has been updated. [#2591](https://github.com/statamic/cms/issues/2591)
+
+### What's fixed
+- Entries are placed appropriately into a collection's structure when localizing them. [#2471](https://github.com/statamic/cms/issues/2471)
+- The `date` method on the `Entry` class checks for `Carbon\Carbon`, rather than `Illuminate\Support\Carbon`.
+- The subrequest is passed along to the cascade in Live Preview, which fixes things like `segment_x` variables using the CP URL.
+
+
+
 ## 3.0.15 (2020-10-05)
 
 ### What's new

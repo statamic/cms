@@ -3,6 +3,7 @@
 return [
     'any.config.cast_booleans' => 'Les options avec des valeurs true (vrai) et false (faux) seront enregistrées en tant que booléens.',
     'any.config.default' => 'Définissez la valeur par défaut.',
+    'any.config.cast_booleans' => 'Les options avec des valeurs true (vrai) et false (faux) seront enregistrées en tant que booléens.',
     'array.config.keys' => 'Définissez les clés du tableau (les variables) et leurs étiquettes facultatives.',
     'array.config.mode' => 'Le mode dynamique donne à l’utilisateur le contrôle des données, contrairement au mode à clé.',
     'assets.config.allow_uploads' => 'Autorisez le téléversement de nouveaux fichiers.',

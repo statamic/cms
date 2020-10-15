@@ -129,6 +129,11 @@ abstract class Builder implements Contract
         return $this;
     }
 
+    public function find($id, $columns = ['*'])
+    {
+        return $this->where('id', $id)->get($columns)->first();
+    }
+
     public function first()
     {
         return $this->get()->first();

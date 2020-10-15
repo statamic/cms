@@ -142,14 +142,17 @@ EOT;
     /** @test */
     public function it_parses_with_content_and_front_matter()
     {
-        $yaml = <<<'EOT'
----
-foo: bar
----
-some content
-EOT;
+        $yaml = "---\nfoo: bar\n---\nsome content";
 
-        $this->assertEqualsIgnoringLineEndings(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
+        $this->assertEquals(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
+    }
+
+    /** @test */
+    public function it_parses_with_content_and_front_matter_with_crlf()
+    {
+        $yaml = "---\r\nfoo: bar\r\n---\r\nsome content";
+
+        $this->assertEquals(['foo' => 'bar', 'content' => 'some content'], YAML::parse($yaml));
     }
 
     /** @test */

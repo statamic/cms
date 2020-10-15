@@ -107,7 +107,7 @@
             :create-url="createUrl"
             :pages-url="structurePagesUrl"
             :submit-url="structureSubmitUrl"
-            :submit-parameters="{ deletedEntries }"
+            :submit-parameters="{ deletedEntries, deleteLocalizationBehavior }"
             :max-depth="structureMaxDepth"
             :expects-root="structureExpectsRoot"
             :site="site"
@@ -148,6 +148,12 @@
             @cancel="showEntryDeletionConfirmation = false; entryBeingDeleted = null;"
         />
 
+        <delete-localization-confirmation
+            v-if="showLocalizationDeleteBehaviorConfirmation"
+            :entries="deletedEntries.length"
+            @confirm="localizationDeleteBehaviorConfirmCallback"
+            @cancel="showLocalizationDeleteBehaviorConfirmation = false"
+        />
     </div>
 
 </template>
@@ -155,6 +161,7 @@
 <script>
 import PageTree from '../structures/PageTree.vue';
 import DeleteEntryConfirmation from './DeleteEntryConfirmation.vue';
+import DeleteLocalizationConfirmation from './DeleteLocalizationConfirmation.vue';
 import SiteSelector from '../SiteSelector.vue';
 
 export default {
@@ -162,6 +169,7 @@ export default {
     components: {
         PageTree,
         DeleteEntryConfirmation,
+        DeleteLocalizationConfirmation,
         SiteSelector
     },
 
@@ -195,6 +203,9 @@ export default {
             showEntryDeletionConfirmation: false,
             entryBeingDeleted: null,
             entryDeletionConfirmCallback: null,
+            deleteLocalizationBehavior: null,
+            showLocalizationDeleteBehaviorConfirmation: false,
+            localizationDeleteBehaviorConfirmCallback: null,
             site: this.initialSite,
             reordering: false
         }
@@ -253,8 +264,24 @@ export default {
         },
 
         saveTree() {
-            this.$refs.tree.save();
-            this.deletedEntries = [];
+            if (this.sites.length === 1 || this.deletedEntries.length === 0) {
+                this.performTreeSaving();
+                return;
+            }
+
+            this.showLocalizationDeleteBehaviorConfirmation = true;
+            this.localizationDeleteBehaviorConfirmCallback = (behavior) => {
+                this.deleteLocalizationBehavior = behavior;
+                this.showLocalizationDeleteBehaviorConfirmation = false;
+                this.$nextTick(() => this.performTreeSaving());
+            }
+        },
+
+        performTreeSaving() {
+            this.$refs.tree
+                .save()
+                .then(() => (this.deletedEntries = []))
+                .catch(() => {});
         },
 
         markTreeDirty() {

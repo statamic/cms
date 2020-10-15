@@ -8,7 +8,7 @@ use Illuminate\Queue\SerializesModels;
 use Statamic\Facades\Config;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Parse;
-use Statamic\Facades\Site;
+use Statamic\Sites\Site;
 use Statamic\Support\Str;
 
 class Email extends Mailable
@@ -17,11 +17,14 @@ class Email extends Mailable
 
     protected $submission;
     protected $config;
+    protected $site;
 
-    public function __construct(Submission $submission, array $config)
+    public function __construct(Submission $submission, array $config, Site $site)
     {
         $this->submission = $submission;
         $this->config = $this->parseConfig($config);
+        $this->site = $site;
+        $this->locale($site->shortLocale());
     }
 
     public function build()
@@ -86,8 +89,8 @@ class Email extends Mailable
             'date'       => now(),
             'now'        => now(),
             'today'      => now(),
-            'site'       => $site = Site::current()->handle(),
-            'locale'     => $site,
+            'site'       => $this->site->handle(),
+            'locale'     => $this->site->handle(),
         ]);
 
         return $this->with($data);
@@ -110,11 +113,11 @@ class Email extends Mailable
         $data = [];
 
         foreach (GlobalSet::all() as $global) {
-            if (! $global->existsIn(Site::current()->handle())) {
+            if (! $global->existsIn($this->site->handle())) {
                 continue;
             }
 
-            $global = $global->in(Site::current()->handle());
+            $global = $global->in($this->site->handle());
 
             $data[$global->handle()] = $global->toAugmentedArray();
         }

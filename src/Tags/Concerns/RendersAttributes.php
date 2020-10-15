@@ -14,10 +14,15 @@ trait RendersAttributes
     {
         return collect($attributes)
             ->map(function ($value, $attribute) {
-                return $value === true
-                    ? $attribute
-                    : sprintf('%s="%s"', $attribute, $value);
+                if ($value === null || $value === false) {
+                    return;
+                }
+
+                $value = $value === true ? 'true' : $value;
+
+                return sprintf('%s="%s"', $attribute, $value);
             })
+            ->filter()
             ->implode(' ');
     }
 

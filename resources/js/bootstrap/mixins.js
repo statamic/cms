@@ -2,12 +2,13 @@
 import Vue from 'vue'
 import Fieldtype from '../components/fieldtypes/Fieldtype.vue'
 import IndexFieldtype from '../components/fieldtypes/IndexFieldtype.vue'
-import BardToolbarButton from '../components/fieldtypes/bard/ToolbarButton.vue';
+import BardToolbarButton from '../components/fieldtypes/bard/ToolbarButton.vue'
+import Listing from '../components/Listing.vue'
 
 window.Fieldtype = Fieldtype;
 window.IndexFieldtype = IndexFieldtype;
 window.BardToolbarButton = BardToolbarButton;
-
+window.Listing = Listing;
 
 Vue.mixin({
     methods: {
