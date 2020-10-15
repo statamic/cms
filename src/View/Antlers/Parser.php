@@ -815,7 +815,7 @@ class Parser
         // also pass in the current callback (for later processing callback tags); also setting
         // $ref so that we can use it within the anonymous function
         $ref = $this;
-        $condition = $this->preg_replace_callback('/\b('.$this->variableRegex.')\b/', function ($match) use ($ref) {
+        $condition = $this->preg_replace_callback('/\b('.$this->variableRegex.'\b]?)/', function ($match) use ($ref) {
             return $ref->processConditionVar($match);
         }, $condition);
 
