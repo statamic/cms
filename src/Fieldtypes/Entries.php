@@ -192,7 +192,7 @@ class Entries extends Relationship
     {
         if (is_string($value)) {
             $value = Entry::find($value);
-            if ($entry = $this->field()->parent()) {
+            if ($value != null && $entry = $this->field()->parent()) {
                 $value = $value->in($entry->locale());
             }
         }
