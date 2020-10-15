@@ -1896,6 +1896,87 @@ EOT;
             (string) Antlers::parse('{{ augmentables limit="1" }}<{{ one }}><{{ two }}>{{ /augmentables }}', ['augmentables' => $loop])
         );
     }
+
+    /** @test */
+    public function it_uses_tags_with_single_part_in_conditions()
+    {
+        (new class extends Tags {
+            public static $handle = 'truthy';
+
+            public function index()
+            {
+                return true;
+            }
+        })::register();
+
+        (new class extends Tags {
+            public static $handle = 'falsey';
+
+            public function index()
+            {
+                return false;
+            }
+        })::register();
+
+        $this->assertEquals('yes', $this->parse('{{ if {truthy} }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('yes', $this->parse('{{ if {truthy} == true }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('no', $this->parse('{{ if {truthy} == false }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('no', $this->parse('{{ if {falsey} }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('no', $this->parse('{{ if {falsey} == true }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('yes', $this->parse('{{ if {falsey} == false }}yes{{ else }}no{{ /if }}'));
+    }
+
+    /** @test */
+    public function it_uses_tags_with_multiple_parts_in_conditions()
+    {
+        (new class extends Tags {
+            public static $handle = 'truthy';
+
+            public function test()
+            {
+                return true;
+            }
+        })::register();
+
+        (new class extends Tags {
+            public static $handle = 'falsey';
+
+            public function test()
+            {
+                return false;
+            }
+        })::register();
+
+        $this->assertEquals('yes', $this->parse('{{ if {truthy:test} }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('yes', $this->parse('{{ if {truthy:test} == true }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('no', $this->parse('{{ if {truthy:test} == false }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('no', $this->parse('{{ if {falsey:test} }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('no', $this->parse('{{ if {falsey:test} == true }}yes{{ else }}no{{ /if }}'));
+        $this->assertEquals('yes', $this->parse('{{ if {falsey:test} == false }}yes{{ else }}no{{ /if }}'));
+    }
+
+    /** @test */
+    public function it_does_stuff_in_issue_2537()
+    {
+        $template = '{{ if noindex || segment_1 == "mobile" || get:page > 0 }}yes{{ else }}no{{ /if }}';
+
+        $this->assertEquals('yes', $this->parse($template, ['noindex' => true]));
+    }
+
+    /** @test */
+    public function it_does_stuff_in_issue_2456()
+    {
+        $template = '{{ if publication_venue:publication_venue_types:slug !== "journal" and publication_venue:first_year }}yes{{ else }}no{{ /if }}';
+
+        $this->assertEquals('yes', $this->parse($template, [
+            'publication_venue' => [
+                'first_year' => true,
+                'publication_venue_types' => [
+                    'slug' => 'notjournal',
+                ],
+            ],
+        ]));
+    }
 }
 
 class NonArrayableObject
