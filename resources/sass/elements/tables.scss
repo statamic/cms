@@ -29,9 +29,7 @@
 }
 
 .data-table {
-	@apply text-left text-grey outline-none max-w-full block;
-	overflow-x: auto;
-	width: fit-content;
+	@apply text-left text-grey outline-none w-full max-w-full overflow-x-auto;
 
     thead {
 		// @apply bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide outline-none;
@@ -122,12 +120,6 @@
 
 	.sortable-row.draggable-mirror {
 		display: none;
-	}
-}
-
-@screen md {
-	.data-table {
-		@apply w-full table;
 	}
 }
 
