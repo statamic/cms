@@ -30,7 +30,7 @@ return [
 
         'half' => [
             'driver' => 'application',
-            'expiry' => null,
+            'expiry' => 'null',
         ],
 
         'full' => [
@@ -65,7 +65,7 @@ return [
     | flushed from the static cache. See the documentation for more details.
     | If a custom class is not defined, the default invalidator is used.
     |
-    | https://docs.statamic.com/static-caching
+    | https://statamic.dev/static-caching
     |
     */
 
