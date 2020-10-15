@@ -1,5 +1,16 @@
 # Release Notes
 
+## 3.0.19 (2020-10-15)
+
+### What's improved
+- The French translation has been updated. [#2664](https://github.com/statamic/cms/issues/2664)
+
+### What's fixed
+- Prevent exception when an invalid or outdated entry is selected in an entries fieldtype. [#2660](https://github.com/statamic/cms/issues/2660)
+- Fix a handful of Antlers conditional issues. [#2663](https://github.com/statamic/cms/issues/2663) [#1193](https://github.com/statamic/cms/issues/1193) [#2614](https://github.com/statamic/cms/issues/2614) [#2537](https://github.com/statamic/cms/issues/2537) [#2456](https://github.com/statamic/cms/issues/2456)
+
+
+
 ## 3.0.18 (2020-10-14)
 
 ### What's new
