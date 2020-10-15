@@ -2,7 +2,6 @@
 
 namespace Statamic\Entries;
 
-use Facades\Statamic\View\Cascade;
 use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
@@ -349,13 +348,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function toResponse($request)
     {
         return (new \Statamic\Http\Responses\DataResponse($this))->toResponse($request);
-    }
-
-    public function toLivePreviewResponse($request, $extras)
-    {
-        Cascade::set('live_preview', $extras);
-
-        return $this->toResponse($request);
     }
 
     public function date($date = null)

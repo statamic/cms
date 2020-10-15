@@ -14,7 +14,8 @@ export default {
     data() {
         return {
             payload: null,
-            channel: null
+            channel: null,
+            iframeLoaded: false
         }
     },
 
@@ -57,15 +58,22 @@ export default {
 
         updateIframeContents(contents) {
             const iframe = this.$refs.iframe;
-            const scrollX = $(iframe.contentWindow.document).scrollLeft();
-            const scrollY = $(iframe.contentWindow.document).scrollTop();
+            
+            if (this.iframeLoaded && this.$config.get('livePreview.external_url')) {
+                const child = iframe.contentWindow.document.getElementsByTagName('iframe')[0];
+                child.contentWindow.postMessage('liveUpdate', '*');
+            } else {
+                const scrollX = $(iframe.contentWindow.document).scrollLeft();
+                const scrollY = $(iframe.contentWindow.document).scrollTop();
 
-            contents += '<script type="text/javascript">window.scrollTo('+scrollX+', '+scrollY+');\x3c/script>';
+                contents += '<script type="text/javascript">window.scrollTo('+scrollX+', '+scrollY+');\x3c/script>';
 
-            iframe.contentWindow.document.open();
-            iframe.contentWindow.document.write(contents);
-            iframe.contentWindow.document.close();
-            this.channel.postMessage({ event: 'popout.loaded' })
+                iframe.contentWindow.document.open();
+                iframe.contentWindow.document.write(contents);
+                iframe.contentWindow.document.close();
+                this.channel.postMessage({ event: 'popout.loaded' })
+                this.iframeLoaded = true;
+            }
         },
 
     }

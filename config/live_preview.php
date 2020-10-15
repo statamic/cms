@@ -33,4 +33,6 @@ return [
         //
     ],
 
+    'external_url' => env('LIVE_PREVIEW_EXTERNAL_URL', false),
+
 ];

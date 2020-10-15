@@ -125,6 +125,8 @@ class AppServiceProvider extends ServiceProvider
             return (new \Statamic\Fields\FieldsetRepository($app['files']))
                 ->setDirectory(resource_path('fieldsets'));
         });
+
+        $this->app->bind(\Statamic\Contracts\Entries\LivePreview::class, \Statamic\Entries\LivePreview::class);
     }
 
     protected function registerMiddlewareGroup()

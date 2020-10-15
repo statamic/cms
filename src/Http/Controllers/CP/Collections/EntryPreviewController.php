@@ -8,6 +8,7 @@ use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Contracts\Entries\LivePreview;
 use Statamic\Facades\Entry;
 use Statamic\Http\Controllers\CP\CpController;
 use Symfony\Component\Debug\Exception\FatalThrowableError;
@@ -16,6 +17,13 @@ use Throwable;
 
 class EntryPreviewController extends CpController
 {
+    protected $livePreview;
+
+    public function __construct(LivePreview $livePreview)
+    {
+        $this->livePreview = $livePreview;
+    }
+
     public function show()
     {
         return view('statamic::entries.preview');
@@ -74,7 +82,7 @@ class EntryPreviewController extends CpController
         Cascade::withRequest($subrequest);
 
         try {
-            $response = $entry->toLivePreviewResponse($subrequest, $request->extras);
+            $response = $this->livePreview->toLivePreviewResponse($entry, $subrequest, $request->extras);
         } catch (Exception $e) {
             app(ExceptionHandler::class)->report($e);
             $response = app(ExceptionHandler::class)->render($subrequest, $e);
