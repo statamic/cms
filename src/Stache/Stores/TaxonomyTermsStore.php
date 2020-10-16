@@ -103,6 +103,7 @@ class TaxonomyTermsStore extends ChildStore
         });
 
         $associations = $this->index('associations');
+        $ids = $this->index('id');
         $titles = $this->index('title');
         $uris = $this->index('uri');
 
@@ -118,7 +119,10 @@ class TaxonomyTermsStore extends ChildStore
 
             $titles->put($key, $value);
 
-            $uris->put($key, $this->makeTerm($taxonomy, $slug)->uri());
+            $term = $this->makeTerm($taxonomy, $slug);
+
+            $uris->put($key, $term->uri());
+            $ids->put($key, $term->id());
         }
 
         $associations->cache();
