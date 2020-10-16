@@ -230,7 +230,7 @@ class Statamic
         return implode(' ‹ ', collect(array_map('__', $values))->map(function($value, $index) use ($values){
             if (is_array($value)){
                 $key = strtolower($values[$index]);
-                return data_get($value, $key) != null ? data_get($value, $key) : $values[$index];
+                return data_get($value, $key) != null && is_array(data_get($value, $key)) == false ? data_get($value, $key) : $values[$index];
             }
             return $value;
         })->toArray());
