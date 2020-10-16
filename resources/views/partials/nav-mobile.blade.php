@@ -16,11 +16,11 @@
                                     @foreach ($item->children() as $child)
                                         <li class="{{ $child->isActive() ? 'current' : '' }}">
                                             <a href="{{ $child->url() }}">
-                                                @if (is_array(__($child->name())) == true && data_get(__($child->name()),'nav') === null)
+                                                @if (is_array(__($child->name())) == true && data_get(__($child->name()), strtolower($child->name())) === null)
                                                     {{$child->name()}}
                                                 @else
-                                                    {{ is_array(__($child->name())) ? __($child->name().'.nav') : __($child->name()) }}
-                                                @endif  
+                                                    {{ is_array(__($child->name())) ? __($child->name().'.'.strtolower($child->name())) : __($child->name()) }}
+                                                @endif 
                                             </a>
                                         </li>
                                     @endforeach
