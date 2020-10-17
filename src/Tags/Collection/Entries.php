@@ -302,6 +302,10 @@ class Entries
         collect($this->params)->filter(function ($value, $key) {
             return $key === 'taxonomy' || Str::startsWith($key, 'taxonomy:');
         })->each(function ($values, $param) use ($query) {
+            if (empty($values)) {
+                return;
+            }
+
             $taxonomy = substr($param, 9);
             [$taxonomy, $modifier] = array_pad(explode(':', $taxonomy), 2, 'any');
 
