@@ -206,7 +206,7 @@ class Field implements Arrayable
 
     public function preProcess()
     {
-        $value = $this->value ?? $this->defaultValue();
+        $value = $this->value ?: $this->defaultValue();
 
         $value = $this->fieldtype()->preProcess($value);
 
