@@ -105,6 +105,8 @@ class TaxonomyTermsStore extends ChildStore
         $indexes = $this->resolveIndexes()->except('associations');
         $associations = $this->index('associations');
 
+        $associations->forgetEntry($entry->id());
+
         foreach ($terms as $slug => $value) {
             $associations->push([
                 'value' => $value,
