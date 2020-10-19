@@ -2,7 +2,7 @@
 
 namespace Statamic\Contracts\Entries;
 
-interface LivePreview
+interface LivePreviewHandler
 {
     public function toLivePreviewResponse($entry, $request, $extras);
 }

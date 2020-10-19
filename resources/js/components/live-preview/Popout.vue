@@ -1,7 +1,7 @@
 <template>
 
     <div class="live-preview-contents min-h-screen">
-        <iframe ref="iframe" frameborder="0" class="min-h-screen" />
+        <iframe ref="iframe" :src="iframeSource" frameborder="0" class="min-h-screen" />
     </div>
 
 </template>
@@ -15,7 +15,7 @@ export default {
         return {
             payload: null,
             channel: null,
-            iframeLoaded: false
+            iframeSource: false
         }
     },
 
@@ -58,10 +58,13 @@ export default {
 
         updateIframeContents(contents) {
             const iframe = this.$refs.iframe;
-            
-            if (this.iframeLoaded && this.$config.get('livePreview.external_url')) {
-                const child = iframe.contentWindow.document.getElementsByTagName('iframe')[0];
-                child.contentWindow.postMessage('liveUpdate', '*');
+
+            if (this.$config.get('livePreview.external_url')) {
+                if (this.iframeSource) {
+                    iframe.contentWindow.postMessage('liveUpdate', '*');
+                } else {
+                    this.iframeSource = contents.data;
+                }
             } else {
                 const scrollX = $(iframe.contentWindow.document).scrollLeft();
                 const scrollY = $(iframe.contentWindow.document).scrollTop();
@@ -71,8 +74,7 @@ export default {
                 iframe.contentWindow.document.open();
                 iframe.contentWindow.document.write(contents);
                 iframe.contentWindow.document.close();
-                this.channel.postMessage({ event: 'popout.loaded' })
-                this.iframeLoaded = true;
+                this.channel.postMessage({ event: 'popout.loaded' });
             }
         },
 

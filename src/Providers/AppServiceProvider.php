@@ -126,7 +126,7 @@ class AppServiceProvider extends ServiceProvider
                 ->setDirectory(resource_path('fieldsets'));
         });
 
-        $this->app->bind(\Statamic\Contracts\Entries\LivePreview::class, \Statamic\Entries\LivePreview::class);
+        $this->app->bind(\Statamic\Contracts\Entries\LivePreviewHandler::class, \Statamic\Entries\LivePreviewHandler::class);
     }
 
     protected function registerMiddlewareGroup()

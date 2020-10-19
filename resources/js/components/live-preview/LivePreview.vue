@@ -63,7 +63,7 @@
 
                     <transition name="live-preview-contents-slide">
                         <div v-show="panesVisible" ref="contents" class="live-preview-contents items-center justify-center overflow-auto" :class="{ 'pointer-events-none': editorResizing }">
-                            <iframe ref="iframe" frameborder="0" :class="previewDevice ? 'device' : 'responsive'" :style="{ width: previewDeviceWidth, height: previewDeviceHeight }" />
+                            <iframe ref="iframe" :src="iframeSource" frameborder="0" :class="previewDevice ? 'device' : 'responsive'" :style="{ width: previewDeviceWidth, height: previewDeviceHeight }" />
                         </div>
                     </transition>
 
@@ -118,7 +118,7 @@ export default {
             loading: true,
             extras: {},
             keybinding: null,
-            iframeLoaded: false,
+            iframeSource: null
         }
     },
 
@@ -225,9 +225,12 @@ export default {
         updateIframeContents(contents) {
             const iframe = this.$refs.iframe;
 
-            if (this.iframeLoaded && this.$config.get('livePreview.external_url')) {
-                const child = iframe.contentWindow.document.getElementsByTagName('iframe')[0];
-                child.contentWindow.postMessage('liveUpdate', '*');
+            if (this.$config.get('livePreview.external_url')) {
+                if (this.iframeSource) {
+                    iframe.contentWindow.postMessage('liveUpdate', '*');
+                } else {
+                    this.iframeSource = contents.data;
+                }
             } else {
                 const scrollX = $(iframe.contentWindow.document).scrollLeft();
                 const scrollY = $(iframe.contentWindow.document).scrollTop();
@@ -237,13 +240,12 @@ export default {
                 iframe.contentWindow.document.open();
                 iframe.contentWindow.document.write(contents);
                 iframe.contentWindow.document.close();
-                this.iframeLoaded = true;
             }
             this.loading = false;
         },
 
         close() {
-            this.iframeLoaded = false;
+            this.iframeSource = null;
             if (this.poppedOut) this.closePopout();
 
             this.animateOut().then(() => this.$emit('closed'));

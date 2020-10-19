@@ -2,7 +2,7 @@
 
 namespace Statamic\Data;
 
-use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Cache;
 
 trait ContainsSupplementalData
 {
@@ -28,7 +28,7 @@ trait ContainsSupplementalData
     public function forLivePreview()
     {
         if (request()->get('preview')) {
-            $livePreviewCache = json_decode(Storage::disk('local')->get('live-preview-cache.json'), true);
+            $livePreviewCache = Cache::get('live-preview-data', []);
 
             if (isset($livePreviewCache[request()->get('preview')][$this->id()])) {
                 $this->data($livePreviewCache[request()->get('preview')][$this->id()]);
