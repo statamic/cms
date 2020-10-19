@@ -466,6 +466,7 @@ class EntriesTest extends TestCase
         $this->makeEntry('3')->data(['tags' => ['meh']])->save();
 
         $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy:tags' => ''])->map->slug()->all());
+        $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy:tags' => '|'])->map->slug()->all());
     }
 }
 
