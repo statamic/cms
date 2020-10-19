@@ -102,10 +102,8 @@ class TaxonomyTermsStore extends ChildStore
             return [Str::slug($value) => $value];
         });
 
+        $indexes = $this->resolveIndexes()->except('associations');
         $associations = $this->index('associations');
-        $ids = $this->index('id');
-        $titles = $this->index('title');
-        $uris = $this->index('uri');
 
         foreach ($terms as $slug => $value) {
             $associations->push([
@@ -114,20 +112,13 @@ class TaxonomyTermsStore extends ChildStore
                 'entry' => $entry->id(),
                 'site' => $entry->locale(),
             ]);
-
-            $key = $entry->locale().'::'.$slug;
-
-            $titles->put($key, $value);
-
-            $term = $this->makeTerm($taxonomy, $slug);
-
-            $uris->put($key, $term->uri());
-            $ids->put($key, $term->id());
         }
-
         $associations->cache();
-        $titles->cache();
-        $uris->cache();
+
+        foreach ($terms as $slug => $value) {
+            $term = $this->makeTerm($taxonomy, $slug);
+            $indexes->each->updateItem($term);
+        }
     }
 
     protected function makeTerm($taxonomy, $slug)
