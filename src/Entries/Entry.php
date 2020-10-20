@@ -402,7 +402,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         $array = $this->data()->merge([
             'id' => $this->id(),
-            'origin' => optional($this->origin)->id(),
+            'origin' => optional($this->origin())->id(),
             'published' => $this->published === false ? false : null,
         ]);
 
