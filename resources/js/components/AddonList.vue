@@ -73,14 +73,14 @@
             <h6 class="mt-4">{{ __('Unlisted Addons') }}</h6>
             <div class="card p-0 mt-1">
                 <div class="data-table-wrapper">
-                    <table class="data-table">
-                        <tbody>
-                            <tr v-for="addon in unlisted" :key="addon.package">
-                                <td v-text="addon.name" />
-                                <td v-text="addon.package" />
-                            </tr>
-                        </tbody>
-                    </table>
+                <table class="data-table">
+                    <tbody>
+                        <tr v-for="addon in unlisted" :key="addon.package">
+                            <td v-text="addon.name" />
+                            <td v-text="addon.package" />
+                        </tr>
+                    </tbody>
+                </table>
                 </div>
             </div>
         </template>

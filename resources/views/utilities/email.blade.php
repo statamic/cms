@@ -29,45 +29,45 @@
     <p class="text-sm text-grey mb-2">{!! __('statamic::messages.email_utility_configuration_description', ['path' => config_path('mail.php')]) !!}</p>
     <div class="card p-0">
         <div class="data-table-wrapper">
-            <table class="data-table">
-                @if (config('mail.mailers'))
-                    @include('statamic::utilities.partials.email-l7')
-                @else
-                    @include('statamic::utilities.partials.email-l6')
-                @endif
-                <tr>
-                    <th class="pl-2 py-1 w-1/4">{{ __('Default From Address') }}</th>
-                    <td>
-                        @if (config('mail.from.address'))
-                            <code>{{ config('mail.from.address') }}</code>
-                        @endif
-                    </td>
-                </tr>
-                <tr>
-                    <th class="pl-2 py-1 w-1/4">{{ __('Default From Name') }}</th>
-                    <td>
-                        @if (config('mail.from.name'))
-                            <code>{{ config('mail.from.name') }}</code>
-                        @endif
-                    </td>
-                </tr>
-                <tr>
-                    <th class="pl-2 py-1 w-1/4">{{ __('Markdown theme') }}</th>
-                    <td>
-                        @if (config('mail.markdown.theme'))
-                            <code>{{ config('mail.markdown.theme') }}</code>
-                        @endif
-                    </td>
-                </tr>
-                <tr>
-                    <th class="pl-2 py-1 w-1/4">{{ __('Markdown paths') }}</th>
-                    <td>
-                        @foreach (config('mail.markdown.paths') as $path)
-                            <code>{{ $path }}</code><br>
-                        @endforeach
-                    </td>
-                </tr>
-            </table>
+        <table class="data-table">
+            @if (config('mail.mailers'))
+                @include('statamic::utilities.partials.email-l7')
+            @else
+                @include('statamic::utilities.partials.email-l6')
+            @endif
+            <tr>
+                <th class="pl-2 py-1 w-1/4">{{ __('Default From Address') }}</th>
+                <td>
+                    @if (config('mail.from.address'))
+                        <code>{{ config('mail.from.address') }}</code>
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <th class="pl-2 py-1 w-1/4">{{ __('Default From Name') }}</th>
+                <td>
+                    @if (config('mail.from.name'))
+                        <code>{{ config('mail.from.name') }}</code>
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <th class="pl-2 py-1 w-1/4">{{ __('Markdown theme') }}</th>
+                <td>
+                    @if (config('mail.markdown.theme'))
+                        <code>{{ config('mail.markdown.theme') }}</code>
+                    @endif
+                </td>
+            </tr>
+            <tr>
+                <th class="pl-2 py-1 w-1/4">{{ __('Markdown paths') }}</th>
+                <td>
+                    @foreach (config('mail.markdown.paths') as $path)
+                        <code>{{ $path }}</code><br>
+                    @endforeach
+                </td>
+            </tr>
+        </table>
         </div>
     </div>
 
