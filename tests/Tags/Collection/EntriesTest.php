@@ -457,6 +457,17 @@ class EntriesTest extends TestCase
 
         $this->getEntries(['taxonomy:tags:xyz' => 'test']);
     }
+
+    /** @test */
+    public function it_returns_all_entries_where_taxonomy_parameter_value_is_empty()
+    {
+        $this->makeEntry('1')->save();
+        $this->makeEntry('2')->data(['tags' => ['rad']])->save();
+        $this->makeEntry('3')->data(['tags' => ['meh']])->save();
+
+        $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy:tags' => ''])->map->slug()->all());
+        $this->assertEquals([1, 2, 3], $this->getEntries(['taxonomy:tags' => '|'])->map->slug()->all());
+    }
 }
 
 class PostType extends Scope

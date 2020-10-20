@@ -306,7 +306,11 @@ class Entries
             [$taxonomy, $modifier] = array_pad(explode(':', $taxonomy), 2, 'any');
 
             if (is_string($values)) {
-                $values = explode('|', $values);
+                $values = array_filter(explode('|', $values));
+            }
+
+            if (count($values) === 0) {
+                return;
             }
 
             $values = collect($values)->map(function ($term) use ($taxonomy) {
