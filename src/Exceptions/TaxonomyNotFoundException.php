@@ -8,6 +8,7 @@ use Facade\IgnitionContracts\BaseSolution;
 use Facade\IgnitionContracts\ProvidesSolution;
 use Facade\IgnitionContracts\Solution;
 use Statamic\Facades\Taxonomy;
+use Statamic\Statamic;
 
 class TaxonomyNotFoundException extends Exception implements ProvidesSolution
 {
@@ -29,7 +30,7 @@ class TaxonomyNotFoundException extends Exception implements ProvidesSolution
         return BaseSolution::create("The {$this->taxonomy} taxonomy was not found.")
             ->setSolutionDescription($description)
             ->setDocumentationLinks([
-                'Read the taxonomies guide' => 'https://docs.statamic.com/taxonomies',
+                'Read the taxonomies guide' => Statamic::docsUrl('/taxonomies'),
             ]);
     }
 

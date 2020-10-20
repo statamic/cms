@@ -3,6 +3,7 @@
 namespace Statamic\Ignition\Solutions;
 
 use Facade\IgnitionContracts\Solution;
+use Statamic\Statamic;
 
 class EnableOAuth implements Solution
 {
@@ -19,7 +20,7 @@ class EnableOAuth implements Solution
     public function getDocumentationLinks(): array
     {
         return [
-            'OAuth Guide' => 'https://docs.statamic.com/oauth',
+            'OAuth Guide' => Statamic::docsUrl('/oauth'),
         ];
     }
 }

@@ -8,6 +8,7 @@ use Facade\IgnitionContracts\BaseSolution;
 use Facade\IgnitionContracts\ProvidesSolution;
 use Facade\IgnitionContracts\Solution;
 use Statamic\Facades\Collection;
+use Statamic\Statamic;
 
 class CollectionNotFoundException extends Exception implements ProvidesSolution
 {
@@ -29,7 +30,7 @@ class CollectionNotFoundException extends Exception implements ProvidesSolution
         return BaseSolution::create("The {$this->collection} collection was not found.")
             ->setSolutionDescription($description)
             ->setDocumentationLinks([
-                'Read the collections guide' => 'https://docs.statamic.com/collections',
+                'Read the collections guide' => Statamic::docsUrl('/collections'),
             ]);
     }
 
