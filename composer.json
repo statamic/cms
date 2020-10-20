@@ -17,6 +17,7 @@
         "league/commonmark": "^1.5",
         "league/csv": "^9.0",
         "league/glide": "^1.1",
+        "michelf/php-smartypants": "^1.8",
         "pixelfear/composer-dist-plugin": "^0.1.0",
         "spatie/blink": "^1.1.2",
         "statamic/stringy": "^3.1",
