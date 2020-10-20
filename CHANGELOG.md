@@ -1,5 +1,31 @@
 # Release Notes
 
+## 3.0.20 (2020-10-20)
+
+### What's new
+- Added a `smartypants` modifier and `Html::smartypants()` method. [#2689](https://github.com/statamic/cms/issues/2689)
+
+### What's improved
+- Danish and Dutch translations have been updated. [#2693](https://github.com/statamic/cms/issues/2693) [#2691](https://github.com/statamic/cms/issues/2691)
+
+### What's fixed
+- A bunch of taxonomy cache fixes. Listed below for good measure. [#2686](https://github.com/statamic/cms/issues/2686)
+- Prevent taxonomy terms hanging around after you delete them. [#1349](https://github.com/statamic/cms/issues/1349)
+- Prevent taxonomy terms showing the slug instead of the title. [#1982](https://github.com/statamic/cms/issues/1982)
+- Prevent an undefined offset error when creating terms. [#2020](https://github.com/statamic/cms/issues/2020)
+- Entry-term assocation is actually removed when expected. [#1870](https://github.com/statamic/cms/issues/1870)
+- Prevent terms being displayed as the ID when you create new ones on an entry.
+- An empty taxonomy parameter no longer tries to filter. [#2672](https://github.com/statamic/cms/issues/2672)
+- Entries and Terms fieldtypes will show all results in select mode (instead of just the first paginated page). [#1727](https://github.com/statamic/cms/issues/1727)
+- Entries fieldtype will show localized entries in select and typehead modes. [#1835](https://github.com/statamic/cms/issues/1835)
+- Prevent changing publish status from wiping out the origin. [#2451](https://github.com/statamic/cms/issues/2451)
+- YAML content should be null if it's just whitespace [#2677](https://github.com/statamic/cms/issues/2677)
+- Delete Eloquent user through the repository. [da9335936](https://github.com/statamic/cms/commit/da9335936) [#2697](https://github.com/statamic/cms/issues/2697)
+- Fixed variable name in down migration [#2676](https://github.com/statamic/cms/issues/2676)
+- Updated docs urls [898889ce5](https://github.com/statamic/cms/commit/898889ce5)
+
+
+
 ## 3.0.19 (2020-10-15)
 
 ### What's improved
