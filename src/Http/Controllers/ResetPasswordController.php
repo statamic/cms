@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\ResetsPasswords;
@@ -10,9 +11,7 @@ use Statamic\Http\Middleware\RedirectIfAuthenticated;
 
 class ResetPasswordController extends Controller
 {
-    use ResetsPasswords {
-        resetPassword as protected traitResetPassword;
-    }
+    use ResetsPasswords;
 
     public function __construct()
     {
@@ -44,14 +43,9 @@ class ResetPasswordController extends Controller
         return request('redirect') ?? route('statamic.site');
     }
 
-    protected function resetPassword($user, $password)
+    protected function setUserPassword($user, $password)
     {
-        // We override because the parent (trait) method hashes the password first,
-        // but the Statamic User class's password method also hashes, which would
-        // result in a double-hashed password. Also, it uses the mutator style.
         $user->password($password);
-
-        $this->traitResetPassword($user, $password);
     }
 
     public function broker()
