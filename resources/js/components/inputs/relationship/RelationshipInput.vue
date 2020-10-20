@@ -11,6 +11,7 @@
             :taggable="taggable"
             :read-only="readOnly"
             :url="selectionsUrl"
+            :site="site"
             @input="selectFieldSelected"
             @focus="$emit('focus')"
             @blur="$emit('blur')"
