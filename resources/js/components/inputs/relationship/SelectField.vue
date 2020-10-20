@@ -77,7 +77,8 @@ export default {
 
         parameters() {
             return {
-                site: this.site
+                site: this.site,
+                paginate: false
             }
         }
     },

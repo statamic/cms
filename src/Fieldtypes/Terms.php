@@ -146,7 +146,9 @@ class Terms extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        return $query->paginate();
+        $shouldPaginate = $request->has('paginate') ? Str::toBool($request->paginate) : true;
+
+        return $shouldPaginate ? $query->paginate() : $query->get();
     }
 
     public function getResourceCollection($request, $items)
