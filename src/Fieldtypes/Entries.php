@@ -10,7 +10,6 @@ use Statamic\Facades\Site;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
 use Statamic\Http\Resources\CP\Entries\Entry as EntryResource;
 use Statamic\Query\Scopes\Filters\Concerns\QueriesFilters;
-use Statamic\Support\Str;
 
 class Entries extends Relationship
 {
@@ -71,9 +70,7 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        $shouldPaginate = $request->has('paginate') ? Str::toBool($request->paginate) : true;
-
-        $items = $shouldPaginate ? $query->paginate() : $query->get();
+        $items = $request->boolean('paginate', true) ? $query->paginate() : $query->get();
 
         return $items->preProcessForIndex();
     }
