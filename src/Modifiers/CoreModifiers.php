@@ -1855,6 +1855,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Parse with SmartyPants. Aren't you fancy?
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function smartypants($value, $params)
+    {
+        return Html::smartypants($value);
+    }
+
+    /**
      * Sort an array by key $params[0] and direction $params[1].
      *
      * @param $value
