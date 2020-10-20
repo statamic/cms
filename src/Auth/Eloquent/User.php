@@ -257,13 +257,6 @@ class User extends BaseUser
         $this->saveGroups();
     }
 
-    public function delete()
-    {
-        $this->model()->delete();
-
-        event(new UserDeleted($this->id(), []));
-    }
-
     public function lastModified()
     {
         return $this->model()->updated_at;
