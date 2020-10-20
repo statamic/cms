@@ -11,6 +11,7 @@ use Statamic\Facades\Role;
 use Statamic\Facades\UserGroup;
 use Statamic\Preferences\HasPreferences;
 use Statamic\Support\Arr;
+use Statamic\Events\UserDeleted;
 
 class User extends BaseUser
 {
