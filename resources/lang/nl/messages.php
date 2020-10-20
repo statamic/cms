@@ -54,7 +54,7 @@ return [
     'email_utility_description' => 'Bekijk e-mailconfiguratiesettings and verstuur testmails.',
     'expect_root_instructions' => 'Beschouwd de eerste pagina in een boomstructuur als "root" of "home" -pagina.',
     'field_conditions_instructions' => 'Wanneer dit veld getoond of verborgen moet worden.',
-    'field_desynced_from_origin' => 'Gedesynchroniseerd van de oorsprong. CKlik om te synchroniseren en de oorspronkelijke waarde te herstellen.',
+    'field_desynced_from_origin' => 'Gedesynchroniseerd van de oorsprong. Klik om te synchroniseren en de oorspronkelijke waarde te herstellen.',
     'field_synced_with_origin' => 'Gesynchroniseerd met de oorsprong. Klik of wijzig het veld om te desynchroniseren.',
     'field_validation_advanced_instructions' => 'Voeg meer geavanceerde validatie toe aan dit veld.',
     'field_validation_required_instructions' => 'Bepaal wanneer dit veld verplicht is.',
