@@ -55,6 +55,15 @@ class Text extends Fieldtype
         ];
     }
 
+    public function process($data)
+    {
+        if ($this->config('input_type') === 'number') {
+            return (int) $data;
+        }
+
+        return $data;
+    }
+
     public function preProcessIndex($value)
     {
         if ($value) {
