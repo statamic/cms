@@ -3,6 +3,7 @@
 use Barryvdh\Debugbar\LaravelDebugbar;
 use Statamic\Facades\Path;
 use Statamic\Statamic;
+use Statamic\Modifiers\Modify;
 
 function cp_route($route, $params = [])
 {
@@ -19,4 +20,9 @@ if (! function_exists('debugbar')) {
     {
         return app()->bound(LaravelDebugbar::class) ? app(LaravelDebugbar::class) : optional();
     }
+}
+
+function modify($value): Modify
+{
+    return Modify::value($value);
 }
