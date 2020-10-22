@@ -1822,7 +1822,7 @@ class CoreModifiers extends Modifier
         if (is_array($value)) {
             return collect($value)->shuffle()->all();
         }
-        
+
         if ($value instanceof Collection) {
             return $value->shuffle();
         }
