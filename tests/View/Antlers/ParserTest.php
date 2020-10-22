@@ -575,11 +575,11 @@ EOT;
         // the variables are inside RecursiveChildren@index
         $this->app['statamic.tags']['recursive_children'] = \Tests\Fixtures\Addon\Tags\RecursiveChildren::class;
 
-        $template = '<ul>{{ recursive_children }}<li>{{ title }}{{ if children }}<ul>{{ *recursive children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
+        $template = '<ul>{{ recursive_children }}<li>{{ title }}.{{ foo }}{{ if children }}<ul>{{ *recursive children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
 
-        $expected = '<ul><li>One<ul><li>Two</li><li>Three<ul><li>Four</li></ul></li></ul></li></ul>';
+        $expected = '<ul><li>One.Bar<ul><li>Two.Bar</li><li>Three.Bar<ul><li>Four.Baz</li></ul></li></ul></li></ul>';
 
-        $this->assertEquals($expected, $this->parse($template, []));
+        $this->assertEquals($expected, $this->parse($template, ['foo' => 'Bar']));
     }
 
     public function testRecursiveChildrenWithScope()
@@ -587,11 +587,11 @@ EOT;
         // the variables are inside RecursiveChildren@index
         $this->app['statamic.tags']['recursive_children'] = \Tests\Fixtures\Addon\Tags\RecursiveChildren::class;
 
-        $template = '<ul>{{ recursive_children scope="item" }}<li>{{ item:title }}{{ if item:children }}<ul>{{ *recursive item:children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
+        $template = '<ul>{{ recursive_children scope="item" }}<li>{{ item:title }}.{{ item:foo }}.{{ foo }}{{ if item:children }}<ul>{{ *recursive item:children* }}</ul>{{ /if }}</li>{{ /recursive_children }}</ul>';
 
-        $expected = '<ul><li>One<ul><li>Two</li><li>Three<ul><li>Four</li></ul></li></ul></li></ul>';
+        $expected = '<ul><li>One..Bar<ul><li>Two..Bar</li><li>Three..Bar<ul><li>Four.Baz.Baz</li></ul></li></ul></li></ul>';
 
-        $this->assertEquals($expected, $this->parse($template, []));
+        $this->assertEquals($expected, $this->parse($template, ['foo' => 'Bar']));
     }
 
     public function testEmptyValuesAreNotOverriddenByPreviousIteration()

@@ -932,7 +932,7 @@ class Parser
                     $has_children = false;
                 }
 
-                $replacement = $this->parse($orig_text, $child);
+                $replacement = $this->parse($orig_text, array_merge($data, $child));
 
                 // If this is the first loop we'll use $tag as reference, if not
                 // we'll use the previous tag ($next_tag)
