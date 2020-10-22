@@ -2,8 +2,8 @@
 
 use Barryvdh\Debugbar\LaravelDebugbar;
 use Statamic\Facades\Path;
-use Statamic\Statamic;
 use Statamic\Modifiers\Modify;
+use Statamic\Statamic;
 
 function cp_route($route, $params = [])
 {
