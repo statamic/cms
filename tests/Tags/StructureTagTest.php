@@ -3,6 +3,7 @@
 namespace Tests\Tags;
 
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Contracts\Entries\QueryBuilder;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Nav;
@@ -133,19 +134,17 @@ EOT;
 
     private function createNav()
     {
-        $one = EntryFactory::collection('pages')->data(['title' => 'One', 'nav_title' => 'Navtitle One'])->create();
-        $oneOne = EntryFactory::collection('pages')->data(['title' => 'One One', 'nav_title' => 'Navtitle One One'])->create();
-        $two = EntryFactory::collection('pages')->data(['title' => 'Two', 'foo' => 'notbar'])->create();
-        $three = EntryFactory::collection('pages')->data(['title' => 'Three'])->create();
-        $threeOne = EntryFactory::collection('pages')->data(['title' => 'Three One', 'nav_title' => 'Navtitle Three One'])->create();
-        $threeTwo = EntryFactory::collection('pages')->data(['title' => 'Three Two', 'foo' => 'notbar'])->create();
+        $one = EntryFactory::collection('pages')->id('1')->data(['title' => 'One', 'nav_title' => 'Navtitle One'])->create();
+        $oneOne = EntryFactory::collection('pages')->id('1-1')->data(['title' => 'One One', 'nav_title' => 'Navtitle One One'])->create();
+        $two = EntryFactory::collection('pages')->id('2')->data(['title' => 'Two', 'foo' => 'notbar'])->create();
+        $three = EntryFactory::collection('pages')->id('3')->data(['title' => 'Three'])->create();
+        $threeOne = EntryFactory::collection('pages')->id('3-1')->data(['title' => 'Three One', 'nav_title' => 'Navtitle Three One'])->create();
+        $threeTwo = EntryFactory::collection('pages')->id('3-2')->data(['title' => 'Three Two', 'foo' => 'notbar'])->create();
 
-        Entry::shouldReceive('find')->with('1')->andReturn($one);
-        Entry::shouldReceive('find')->with('1-1')->andReturn($oneOne);
-        Entry::shouldReceive('find')->with('2')->andReturn($two);
-        Entry::shouldReceive('find')->with('3')->andReturn($three);
-        Entry::shouldReceive('find')->with('3-1')->andReturn($threeOne);
-        Entry::shouldReceive('find')->with('3-2')->andReturn($threeTwo);
+        $builder = $this->mock(QueryBuilder::class);
+        $builder->shouldReceive('whereIn')->with('id', ['1', '1-1', '2', '3', '3-1', '3-2'])->andReturnSelf();
+        $builder->shouldReceive('get')->andReturn(collect([$one, $oneOne, $two, $three, $threeOne, $threeTwo]));
+        Entry::shouldReceive('query')->andReturn($builder);
 
         $this->makeNav([
             ['entry' => '1', 'children' => [
