@@ -2,9 +2,9 @@
 
 use Barryvdh\Debugbar\LaravelDebugbar;
 use Statamic\Facades\Path;
-use Statamic\Tags\Loader as TagLoader;
 use Statamic\Statamic;
 use Statamic\Support\Str;
+use Statamic\Tags\Loader as TagLoader;
 use Statamic\View\Antlers\Parser;
 
 function cp_route($route, $params = [])
