@@ -24,7 +24,6 @@ if (! function_exists('debugbar')) {
     }
 }
 
-
 function tag(string $name, array $params = [])
 {
     if ($pos = strpos($name, ':')) {
