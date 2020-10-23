@@ -2,7 +2,10 @@
 
 use Barryvdh\Debugbar\LaravelDebugbar;
 use Statamic\Facades\Path;
+use Statamic\Tags\Loader as TagLoader;
 use Statamic\Statamic;
+use Statamic\Support\Str;
+use Statamic\View\Antlers\Parser;
 
 function cp_route($route, $params = [])
 {
@@ -19,4 +22,27 @@ if (! function_exists('debugbar')) {
     {
         return app()->bound(LaravelDebugbar::class) ? app(LaravelDebugbar::class) : optional();
     }
+}
+
+
+function tag(string $name, array $params = [])
+{
+    if ($pos = strpos($name, ':')) {
+        $original_method = substr($name, $pos + 1);
+        $method = Str::camel($original_method);
+        $name = substr($name, 0, $pos);
+    } else {
+        $method = $original_method = 'index';
+    }
+
+    $tag = app(TagLoader::class)->load($name, [
+        'parser'     => app(Parser::class),
+        'params'     => $params,
+        'content'    => '',
+        'context'    => [],
+        'tag'        => $name.':'.$original_method,
+        'tag_method' => $original_method,
+    ]);
+
+    return call_user_func([$tag, $method]);
 }
