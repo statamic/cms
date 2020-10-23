@@ -637,7 +637,9 @@ class EntryTest extends TestCase
         $mock->shouldReceive('store')->with('structure-uris')->once()->andReturn(
             $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('forget')->with('a')->once()->getMock()
         );
-        $mock->shouldReceive('forget')->with('structure-entries-collection::test-en')->once();
+        $mock->shouldReceive('store')->with('structure-entries')->once()->andReturn(
+            $this->mock(\Spatie\Blink\Blink::class)->shouldReceive('flush')->getMock()
+        );
 
         $entry->save();
     }
