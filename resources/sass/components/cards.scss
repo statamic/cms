@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .card {
-    @apply .shadow .bg-white .rounded-md .p-1;
+    @apply .shadow .bg-white .rounded-md .p-1 .overflow-hidden;
 }
 
 @screen md {
