@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
 
@@ -38,7 +37,7 @@ abstract class ActionController extends CpController
         if ($redirect = $action->redirect($items, $values)) {
             return ['redirect' => $redirect];
         } elseif ($download = $action->download($items, $values)) {
-            return $download instanceof Response ? $download : response()->download($download);
+            return is_string($download) ? response()->download($download) : $download;
         }
 
         return [];
