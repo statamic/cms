@@ -62,7 +62,7 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "Tests\\": "tests",
+            "Tests\\": "tests/",
             "Foo\\Bar\\": "tests/fixtures/Addon"
         }
     }
