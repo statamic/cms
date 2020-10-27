@@ -17,9 +17,14 @@ class LivePreviewHandler implements LivePreviewContract
 
             $livePreviewCache[auth()->user()->id()][$entry->id()] = $entry->supplements();
 
-            Cache::put('live-preview-data', $livePreviewCache, now()->addMinutes(1));
+            Cache::put('live-preview-data', $livePreviewCache, now()->addMinutes(5));
 
-            $livePreviewUrl = config('statamic.live_preview.external_url').'/'.$request->path().'?preview='.auth()->user()->id();
+            $path = $request->path();
+            if (! starts_with($path, '/')) {
+                $path = str_start($path, '/');
+            }
+
+            $livePreviewUrl = config('statamic.live_preview.external_url').$path.'?preview='.auth()->user()->id();
 
             return response([
                 'data' => $livePreviewUrl,
