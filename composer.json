@@ -9,7 +9,7 @@
     ],
     "license": "proprietary",
     "require": {
-        "composer/composer": "^1.10",
+        "composer/composer": "^2.0.0",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "laravel/framework": "^6.0 || ^7.0 || ^8.0",
