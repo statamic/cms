@@ -5,6 +5,7 @@ namespace Statamic\Stache\Repositories;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Taxonomies\TermRepository as RepositoryContract;
 use Statamic\Facades\Collection;
+use Statamic\Facades\Site;
 use Statamic\Facades\Taxonomy;
 use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Stache\Stache;
@@ -45,13 +46,16 @@ class TermRepository implements RepositoryContract
     public function findByUri(string $uri, string $site = null): ?Term
     {
         $collection = Collection::all()
-            ->filter->url()
             ->first(function ($collection) use ($uri) {
-                return Str::startsWith($uri, $collection->url());
-            });
+                if (Str::startsWith($uri, $collection->url())) {
+                    return true;
+                }
 
+                return Site::hasMultiple() ? false : Str::startsWith($uri, '/' . $collection->handle());
+            });
+        
         if ($collection) {
-            $uri = Str::after($uri, $collection->url());
+            $uri = Str::after($uri, $collection->url() ?? $collection->handle());
         }
 
         $uri = Str::removeLeft($uri, '/');
