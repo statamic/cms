@@ -1,5 +1,29 @@
 # Release Notes
 
+## 3.0.21 (2020-10-28)
+
+### What's improved
+- Addons can get their directory without needing it in the manifest. [#2761](https://github.com/statamic/cms/issues/2761)
+- Structure tree entries get eager loaded. [#2573](https://github.com/statamic/cms/issues/2573)
+- Composer 2 is used within the control panel. [facca2693](https://github.com/statamic/cms/commit/facca2693)
+- `Str::isUrl()` checks more URLs. [#2759](https://github.com/statamic/cms/issues/2759)
+- Dutch translation has been updated. [#2754](https://github.com/statamic/cms/issues/2754)
+- The Entry facade docblock has been updated. [#2720](https://github.com/statamic/cms/issues/2720)
+- The `@svg` Blade directive is only registered on CP routes. Prevents conflicts with things like Blade UI Kit. [99e812e6c](https://github.com/statamic/cms/commit/99e812e6c)
+- The `shuffle` modifier works for Collections. [#2709](https://github.com/statamic/cms/issues/2709)
+- The `.idea` directory is git ignored, and we now require `ext-json`, which improves the experience for PhpStorm users. [#2735](https://github.com/statamic/cms/issues/2735)
+
+### What's fixed
+- Fix how data gets passed into `*recursive var*` in the parser and structure tag. [#2719](https://github.com/statamic/cms/issues/2719)
+- Addon views are registered only if the views directory exists. [#2707](https://github.com/statamic/cms/issues/2707)
+- Actions can return any type of `Request` for downloads, like a `StreamedResponse`. [#2738](https://github.com/statamic/cms/issues/2738)
+- Update some JS dependencies to patch security issues. [49e4ce819](https://github.com/statamic/cms/commit/49e4ce819) [c290a86ec](https://github.com/statamic/cms/commit/c290a86ec)
+- Prevent an error when using the `entries` fieldtype in a non entry (e.g. a user) [8ede3718b](https://github.com/statamic/cms/commit/8ede3718b)
+- Prevent making addon instances multiple times [d4ce47099](https://github.com/statamic/cms/commit/d4ce47099)
+- Fixed a PSR-4 incompatible test. [#2734](https://github.com/statamic/cms/issues/2734)
+
+
+
 ## 3.0.20 (2020-10-20)
 
 ### What's new
