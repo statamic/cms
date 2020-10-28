@@ -74,6 +74,8 @@ class StrTest extends TestCase
     {
         $this->assertTrue(Str::isUrl('http://example.com'));
         $this->assertTrue(Str::isUrl('https://example.com'));
+        $this->assertTrue(Str::isUrl('ftp://example.com'));
+        $this->assertTrue(Str::isUrl('mailto:bob@down.com'));
         $this->assertTrue(Str::isUrl('/relative'));
         $this->assertFalse(Str::isUrl('test'));
     }
