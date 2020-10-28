@@ -1032,7 +1032,7 @@ class CoreModifiers extends Modifier
      */
     public function isUrl($value)
     {
-        return filter_var($value, FILTER_VALIDATE_URL) !== false;
+        return Str::isUrl($value);
     }
 
     /**
