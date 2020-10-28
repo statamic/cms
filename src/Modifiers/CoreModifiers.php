@@ -1823,6 +1823,10 @@ class CoreModifiers extends Modifier
             return collect($value)->shuffle()->all();
         }
 
+        if ($value instanceof Collection) {
+            return $value->shuffle();
+        }
+
         return Stringy::shuffle($value);
     }
 
