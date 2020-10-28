@@ -3,6 +3,7 @@
 namespace Statamic\Testing\Extend;
 
 use Facades\Statamic\Licensing\LicenseManager;
+use Foo\Bar\TestAddonServiceProvider;
 use Illuminate\Support\Collection;
 use Statamic\Extend\Addon;
 use Statamic\Facades\File;
@@ -10,6 +11,14 @@ use Tests\TestCase;
 
 class AddonTest extends TestCase
 {
+    protected $addonFixtureDir;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        $this->addonFixtureDir = realpath(__DIR__.'/../Fixtures/Addon');
+    }
+
     /** @test */
     public function it_creates_an_instance_with_a_name()
     {
@@ -100,7 +109,8 @@ class AddonTest extends TestCase
         $this->assertEquals('Test Addon', $addon->name());
         $this->assertEquals('Test description', $addon->description());
         $this->assertEquals('Vendor\\TestAddon', $addon->namespace());
-        $this->assertEquals('/path/to/addon', $addon->directory());
+        $this->assertEquals($this->addonFixtureDir, $addon->directory());
+        $this->assertEquals('', $addon->autoload());
         $this->assertEquals('http://test-url.com', $addon->url());
         $this->assertEquals('Test Developer LLC', $addon->developer());
         $this->assertEquals('http://test-developer.com', $addon->developerUrl());
@@ -111,10 +121,10 @@ class AddonTest extends TestCase
     /** @test */
     public function it_checks_if_a_file_exists()
     {
-        $addon = Addon::make('Test Addon')->directory('/path/to/addon');
+        $addon = $this->makeFromPackage();
 
-        File::shouldReceive('exists')->with('/path/to/addon/test.txt')->andReturnTrue();
-        File::shouldReceive('exists')->with('/path/to/addon/notfound.txt')->andReturnFalse();
+        File::shouldReceive('exists')->with($this->addonFixtureDir.'/test.txt')->andReturnTrue();
+        File::shouldReceive('exists')->with($this->addonFixtureDir.'/notfound.txt')->andReturnFalse();
 
         $this->assertTrue($addon->hasFile('test.txt'));
         $this->assertFalse($addon->hasFile('notfound.txt'));
@@ -123,9 +133,9 @@ class AddonTest extends TestCase
     /** @test */
     public function it_gets_file_contents()
     {
-        $addon = Addon::make('Test Addon')->directory('/path/to/addon');
+        $addon = $this->makeFromPackage();
 
-        File::shouldReceive('get')->with('/path/to/addon/test.txt')->andReturn('the file contents');
+        File::shouldReceive('get')->with($this->addonFixtureDir.'/test.txt')->andReturn('the file contents');
 
         $this->assertEquals('the file contents', $addon->getFile('test.txt'));
     }
@@ -133,23 +143,23 @@ class AddonTest extends TestCase
     /** @test */
     public function it_writes_file_contents()
     {
-        $addon = Addon::make('Test Addon')->directory('/path/to/addon');
+        $addon = $this->makeFromPackage();
 
-        File::shouldReceive('put')->with('/path/to/addon/test.txt', 'the file contents');
+        File::shouldReceive('put')->with($this->addonFixtureDir.'/test.txt', 'the file contents');
 
         $addon->putFile('test.txt', 'the file contents');
     }
 
     /** @test */
-    public function it_doesnt_allow_getting_files_if_no_directory_is_set()
+    public function it_doesnt_allow_getting_files_if_no_provider_is_set()
     {
         File::spy();
-        $addon = $this->makeFromPackage(['directory' => null]);
+        $addon = $this->makeFromPackage(['provider' => null]);
 
         try {
             $addon->getFile('foo.txt', 'foo');
         } catch (\Exception $e) {
-            $this->assertEquals('Cannot get files without a directory specified.', $e->getMessage());
+            $this->assertEquals('Cannot get files without a provider specified.', $e->getMessage());
             File::shouldNotHaveReceived('get');
 
             return;
@@ -159,15 +169,15 @@ class AddonTest extends TestCase
     }
 
     /** @test */
-    public function it_doesnt_allow_checking_for_files_if_no_directory_is_set()
+    public function it_doesnt_allow_checking_for_files_if_no_provider_is_set()
     {
         File::spy();
-        $addon = $this->makeFromPackage(['directory' => null]);
+        $addon = $this->makeFromPackage(['provider' => null]);
 
         try {
             $addon->hasFile('foo.txt', 'foo');
         } catch (\Exception $e) {
-            $this->assertEquals('Cannot check files without a directory specified.', $e->getMessage());
+            $this->assertEquals('Cannot check files without a provider specified.', $e->getMessage());
             File::shouldNotHaveReceived('get');
 
             return;
@@ -177,15 +187,15 @@ class AddonTest extends TestCase
     }
 
     /** @test */
-    public function it_doesnt_allow_writing_files_if_no_directory_is_set()
+    public function it_doesnt_allow_writing_files_if_no_provider_is_set()
     {
         File::spy();
-        $addon = $this->makeFromPackage(['directory' => null]);
+        $addon = $this->makeFromPackage(['provider' => null]);
 
         try {
             $addon->putFile('foo.txt', 'foo');
         } catch (\Exception $e) {
-            $this->assertEquals('Cannot write files without a directory specified.', $e->getMessage());
+            $this->assertEquals('Cannot write files without a provider specified.', $e->getMessage());
             File::shouldNotHaveReceived('put');
 
             return;
@@ -230,15 +240,15 @@ class AddonTest extends TestCase
         $this->assertEquals('the license', Addon::make('foo/bar')->license());
     }
 
-    private function makeFromPackage($attributes)
+    private function makeFromPackage($attributes = [])
     {
         return Addon::makeFromPackage(array_merge([
             'id' => 'vendor/test-addon',
             'name' => 'Test Addon',
             'description' => 'Test description',
             'namespace' => 'Vendor\\TestAddon',
-            'directory' => '/path/to/addon',
-            'autoload' => 'src',
+            'provider' => TestAddonServiceProvider::class,
+            'autoload' => '',
             'url' => 'http://test-url.com',
             'developer' => 'Test Developer LLC',
             'developerUrl' => 'http://test-developer.com',
