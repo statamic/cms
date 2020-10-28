@@ -4,7 +4,6 @@ namespace Statamic\Providers;
 
 use Illuminate\Routing\Router;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Facades\Preference;
 use Statamic\Sites\Sites;
@@ -59,10 +58,6 @@ class AppServiceProvider extends ServiceProvider
         $this->publishes([
             "{$this->root}/resources/views/extend/forms" => resource_path('views/vendor/statamic/forms'),
         ], 'statamic-forms');
-
-        Blade::directive('svg', function ($expression) {
-            return "<?php echo Statamic::svg({$expression}) ?>";
-        });
 
         $this->app['redirect']->macro('cpRoute', function ($route, $parameters = []) {
             return $this->to(cp_route($route, $parameters));
