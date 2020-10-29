@@ -363,6 +363,92 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function converts_to_array_suitable_for_rendering_prefixed_conditional_fields_in_publish_component()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('deeper_partial')
+            ->andReturn((new Fieldset)->setHandle('deeper_partial')->setContents([
+                'title' => 'Deeper Partial',
+                'fields' => [
+                    [
+                        'handle' => 'two',
+                        'field' => ['type' => 'text'],
+                    ],
+                ],
+            ]));
+
+        FieldsetRepository::shouldReceive('find')
+            ->with('partial')
+            ->andReturn((new Fieldset)->setHandle('partial')->setContents([
+                'title' => 'Partial',
+                'fields' => [
+                    [
+                        'handle' => 'one',
+                        'field' => ['type' => 'text'],
+                    ],
+                    [
+                        'import' => 'deeper_partial',
+                        'prefix' => 'deeper_',
+                    ],
+                ],
+            ]));
+
+        $blueprint = (new Blueprint)->setHandle('test')->setContents($contents = [
+            'title' => 'Test',
+            'sections' => [
+                'section_one' => [
+                    'fields' => [
+                        ['import' => 'partial', 'prefix' => 'nested_'],
+                    ],
+                ],
+            ],
+        ]);
+
+        $this->assertEquals([
+            'title' => 'Test',
+            'handle' => 'test',
+            'sections' => [
+                [
+                    'display' => 'Section one',
+                    'handle' => 'section_one',
+                    'instructions' => null,
+                    'fields' => [
+                        [
+                            'handle' => 'nested_one',
+                            'prefix' => 'nested_',
+                            'type' => 'text',
+                            'display' => 'Nested One',
+                            'placeholder' => null,
+                            'input_type' => 'text',
+                            'character_limit' => 0,
+                            'prepend' => null,
+                            'append' => null,
+                            'component' => 'text',
+                            'instructions' => null,
+                            'required' => false,
+                        ],
+                        [
+                            'handle' => 'nested_deeper_two',
+                            'prefix' => 'nested_deeper_',
+                            'type' => 'text',
+                            'display' => 'Nested Deeper Two',
+                            'placeholder' => null,
+                            'input_type' => 'text',
+                            'character_limit' => 0,
+                            'prepend' => null,
+                            'append' => null,
+                            'component' => 'text',
+                            'instructions' => null,
+                            'required' => false,
+                        ],
+                    ],
+                ],
+            ],
+            'empty' => false,
+        ], $blueprint->toPublishArray());
+    }
+
+    /** @test */
     public function it_saves_through_the_repository()
     {
         BlueprintRepository::shouldReceive('save')->with($blueprint = new Blueprint)->once();
