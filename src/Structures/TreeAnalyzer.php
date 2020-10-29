@@ -3,6 +3,7 @@
 namespace Statamic\Structures;
 
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class TreeAnalyzer
 {
@@ -16,8 +17,12 @@ class TreeAnalyzer
             return $this;
         }
 
-        $old = Arr::dot($old);
-        $new = Arr::dot($new);
+        $old = collect(Arr::dot($old))->filter(function ($value, $key) {
+            return Str::endsWith($key, '.entry');
+        })->all();
+        $new = collect(Arr::dot($new))->filter(function ($value, $key) {
+            return Str::endsWith($key, '.entry');
+        })->all();
 
         $this->removed = array_values(array_diff($old, $new));
         $this->added = array_values(array_diff($new, $old));

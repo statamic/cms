@@ -27,7 +27,7 @@ class TreeAnalyzerTest extends TestCase
     {
         $old = [];
         $new = [
-            ['entry' => '1'],
+            ['entry' => '1', 'a' => 'b'],
         ];
 
         $analyzer = (new TreeAnalyzer)->analyze($old, $new);
@@ -43,7 +43,7 @@ class TreeAnalyzerTest extends TestCase
     public function it_sees_removals()
     {
         $old = [
-            ['entry' => '1'],
+            ['entry' => '1', 'a' => 'b'],
         ];
         $new = [];
 
@@ -60,12 +60,12 @@ class TreeAnalyzerTest extends TestCase
     public function it_sees_moves()
     {
         $old = [
-            ['entry' => '1'],
-            ['entry' => '2'],
+            ['entry' => '1', 'a' => 'b'],
+            ['entry' => '2', 'c' => 'd'],
         ];
         $new = [
-            ['entry' => '2'],
-            ['entry' => '1'],
+            ['entry' => '2', 'c' => 'd'],
+            ['entry' => '1', 'a' => 'b'],
         ];
 
         $analyzer = (new TreeAnalyzer)->analyze($old, $new);
@@ -81,10 +81,10 @@ class TreeAnalyzerTest extends TestCase
     public function it_sees_additions_and_removals()
     {
         $old = [
-            ['entry' => '1'],
+            ['entry' => '1', 'a' => 'b'],
         ];
         $new = [
-            ['entry' => '2'],
+            ['entry' => '2', 'c' => 'd'],
         ];
 
         $analyzer = (new TreeAnalyzer)->analyze($old, $new);
@@ -99,25 +99,25 @@ class TreeAnalyzerTest extends TestCase
     public function it_sees_multilevel_changes()
     {
         $old = [
-            ['entry' => '1', 'children' => [
-                ['entry' => '7'],
-                ['entry' => '8'],
-                ['entry' => '10'],
+            ['entry' => '1', 'a' => 'b', 'children' => [
+                ['entry' => '7', 'c' => 'd'],
+                ['entry' => '8', 'e' => 'f'],
+                ['entry' => '10', 'g' => 'h'],
             ]],
-            ['entry' => '2', 'children' => [
-                ['entry' => '3'],
-                ['entry' => '13'],
+            ['entry' => '2', 'i' => 'j', 'children' => [
+                ['entry' => '3', 'k' => 'l'],
+                ['entry' => '13', 'm' => 'n'],
             ]],
         ];
 
         $new = [
-            ['entry' => '1'],
-            ['entry' => '2', 'children' => [
-                ['entry' => '3'],
-                ['entry' => '13'],
-                ['entry' => '10'],
+            ['entry' => '1', 'a' => 'b'],
+            ['entry' => '2', 'i' => 'j', 'children' => [
+                ['entry' => '3', 'k' => 'l'],
+                ['entry' => '13', 'm' => 'n'],
+                ['entry' => '10', 'g' => 'h'],
             ]],
-            ['entry' => '9'],
+            ['entry' => '9', 'o' => 'p'],
         ];
 
         $analyzer = (new TreeAnalyzer)->analyze($old, $new);
