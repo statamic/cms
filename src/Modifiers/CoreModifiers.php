@@ -1032,7 +1032,7 @@ class CoreModifiers extends Modifier
      */
     public function isUrl($value)
     {
-        return filter_var($value, FILTER_VALIDATE_URL) !== false;
+        return Str::isUrl($value);
     }
 
     /**
@@ -1821,6 +1821,10 @@ class CoreModifiers extends Modifier
     {
         if (is_array($value)) {
             return collect($value)->shuffle()->all();
+        }
+
+        if ($value instanceof Collection) {
+            return $value->shuffle();
         }
 
         return Stringy::shuffle($value);

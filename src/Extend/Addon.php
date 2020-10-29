@@ -3,6 +3,7 @@
 namespace Statamic\Extend;
 
 use Facades\Statamic\Licensing\LicenseManager;
+use ReflectionClass;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
@@ -62,6 +63,13 @@ final class Addon
      * @var string
      */
     protected $autoload;
+
+    /**
+     * The service provider class.
+     *
+     * @var string
+     */
+    protected $provider;
 
     /**
      * The name of the addon. eg. "Bloodhound Search".
@@ -162,8 +170,8 @@ final class Addon
         $instance = self::make($package['id']);
 
         $keys = [
-            'id', 'slug', 'editions', 'marketplaceId', 'marketplaceSlug', 'marketplaceSellerSlug', 'name', 'namespace', 'directory',
-            'autoload', 'description', 'package', 'version', 'latestVersion', 'url', 'developer', 'developerUrl', 'isCommercial',
+            'id', 'slug', 'editions', 'marketplaceId', 'marketplaceSlug', 'marketplaceSellerSlug', 'name', 'namespace',
+            'autoload', 'provider', 'description', 'package', 'version', 'latestVersion', 'url', 'developer', 'developerUrl', 'isCommercial',
         ];
 
         foreach (Arr::only($package, $keys) as $key => $value) {
@@ -297,7 +305,7 @@ final class Addon
     public function hasFile($path)
     {
         if (! $this->directory()) {
-            throw new \Exception('Cannot check files without a directory specified.');
+            throw new \Exception('Cannot check files without a provider specified.');
         }
 
         return File::exists(Path::assemble($this->directory(), $path));
@@ -312,7 +320,7 @@ final class Addon
     public function getFile($path)
     {
         if (! $this->directory()) {
-            throw new \Exception('Cannot get files without a directory specified.');
+            throw new \Exception('Cannot get files without a provider specified.');
         }
 
         return File::get(Path::assemble($this->directory(), $path));
@@ -327,7 +335,7 @@ final class Addon
     public function putFile($path, $contents)
     {
         if (! $this->directory()) {
-            throw new \Exception('Cannot write files without a directory specified.');
+            throw new \Exception('Cannot write files without a provider specified.');
         }
 
         File::put(
@@ -391,6 +399,28 @@ final class Addon
         $this->$method = $args[0];
 
         return $this;
+    }
+
+    /**
+     * The directory the package is located within. eg. "/path/to/vendor/statamic/bloodhound/".
+     *
+     * @return string
+     */
+    public function directory()
+    {
+        if (! $this->provider) {
+            return null;
+        }
+
+        if ($this->directory) {
+            return $this->directory;
+        }
+
+        $reflector = new ReflectionClass($this->provider);
+
+        $dir = Str::removeRight(dirname($reflector->getFileName()), rtrim($this->autoload, '/'));
+
+        return $this->directory = Str::ensureRight($dir, '/');
     }
 
     public function existsOnMarketplace()

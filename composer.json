@@ -9,6 +9,7 @@
     ],
     "license": "proprietary",
     "require": {
+        "ext-json": "*",
         "composer/composer": "^1.10 || ^2.0.0",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
@@ -63,7 +64,7 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests",
-            "Foo\\Bar\\": "tests/fixtures/Addon"
+            "Foo\\Bar\\": "tests/Fixtures/Addon"
         }
     }
 }
