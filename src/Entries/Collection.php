@@ -332,9 +332,9 @@ class Collection implements Contract, AugmentableContract
         return $this;
     }
 
-    public function updateEntryUris()
+    public function updateEntryUris($ids = null)
     {
-        Facades\Collection::updateEntryUris($this);
+        Facades\Collection::updateEntryUris($this, $ids);
 
         return $this;
     }

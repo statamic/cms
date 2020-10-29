@@ -74,7 +74,7 @@ class CollectionsStore extends BasicStore
         return $value === 'published';
     }
 
-    public function updateEntryUris($collection)
+    public function updateEntryUris($collection, $ids = null)
     {
         Stache::store('entries')
             ->store($collection->handle())
