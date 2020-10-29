@@ -1,5 +1,12 @@
 # Release Notes
 
+## Unreleased
+
+### What's fixed
+- Addon directories should include a trailing slash. [seo-pro#140](https://github.com/statamic/seo-pro/issues/140)
+
+
+
 ## 3.0.21 (2020-10-28)
 
 ### What's improved
