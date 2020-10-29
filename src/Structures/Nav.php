@@ -87,4 +87,9 @@ class Nav extends Structure implements Contract
     {
         return cp_route('navigation.destroy', $this->handle());
     }
+
+    public function newTreeInstance()
+    {
+        return new NavTree;
+    }
 }

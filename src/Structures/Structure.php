@@ -14,7 +14,7 @@ abstract class Structure implements StructureContract
 
     protected $title;
     protected $handle;
-    protected $trees;
+    protected $trees = [];
     protected $collection;
     protected $maxDepth;
     protected $expectsRoot = false;
@@ -54,12 +54,16 @@ abstract class Structure implements StructureContract
         return collect($this->trees);
     }
 
-    public function makeTree($site)
+    public function makeTree($site, $tree = [])
     {
-        return (new Tree)
+        return $this->newTreeInstance()
             ->locale($site)
-            ->structure($this);
+            ->structure($this)
+            ->tree($tree)
+            ->syncOriginal();
     }
+
+    abstract public function newTreeInstance();
 
     public function addTree($tree)
     {
