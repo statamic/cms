@@ -355,6 +355,7 @@ class FieldsTest extends TestCase
         $this->assertEquals([
             [
                 'handle' => 'one',
+                'prefix' => null,
                 'type' => 'text',
                 'display' => 'One',
                 'instructions' => 'One instructions',
@@ -369,6 +370,7 @@ class FieldsTest extends TestCase
             ],
             [
                 'handle' => 'two',
+                'prefix' => null,
                 'type' => 'textarea',
                 'display' => 'Two',
                 'instructions' => 'Two instructions',

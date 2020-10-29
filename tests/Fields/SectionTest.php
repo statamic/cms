@@ -134,6 +134,7 @@ class SectionTest extends TestCase
             'fields' => [
                 [
                     'handle' => 'one',
+                    'prefix' => null,
                     'type' => 'text',
                     'display' => 'One',
                     'instructions' => 'One instructions',
@@ -148,6 +149,7 @@ class SectionTest extends TestCase
                 ],
                 [
                     'handle' => 'two',
+                    'prefix' => null,
                     'type' => 'textarea',
                     'display' => 'Two',
                     'instructions' => 'Two instructions',
