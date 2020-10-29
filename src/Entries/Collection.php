@@ -352,9 +352,6 @@ class Collection implements Contract, AugmentableContract
         Blink::forget('collection-handles');
         Blink::flushStartingWith("collection-{$this->id()}");
 
-        if ($this->hasStructure()) { // todo: only if the structure changed.
-            $this->updateEntryUris();
-        }
 
         CollectionSaved::dispatch($this);
 
