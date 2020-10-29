@@ -14,6 +14,9 @@ class EventServiceProvider extends ServiceProvider
         \Illuminate\Auth\Events\Login::class => [
             \Statamic\Auth\SetLastLoginTimestamp::class,
         ],
+        \Statamic\Events\CollectionStructureTreeSaved::class => [
+            \Statamic\Entries\UpdateStructuredEntryUris::class,
+        ],
     ];
 
     protected $subscribe = [
