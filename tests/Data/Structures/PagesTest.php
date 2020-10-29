@@ -57,7 +57,7 @@ class PagesTest extends TestCase
         $parent->shouldReceive('uri')->andReturn('/root');
 
         $pages = (new Pages)
-            ->setTree(new Tree)
+            ->setTree($this->newTree())
             ->setParent($parent)
             ->setRoute('{parent_uri}/{slug}')
             ->setPages([
@@ -78,5 +78,15 @@ class PagesTest extends TestCase
             'one-two-one',
             'two',
         ], $pages->flattenedPages()->map->reference()->all());
+    }
+
+    protected function newTree()
+    {
+        return new class extends Tree {
+            public function path()
+            {
+                //
+            }
+        };
     }
 }

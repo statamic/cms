@@ -2,6 +2,7 @@
 
 namespace Tests\Data\Entries;
 
+use Facades\Statamic\Contracts\Structures\TreeRepository;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Contracts\Data\Augmentable;
@@ -13,6 +14,7 @@ use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
 use Statamic\Fields\Blueprint;
 use Statamic\Structures\CollectionStructure;
+use Statamic\Structures\CollectionStructureTree;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -393,18 +395,21 @@ class CollectionTest extends TestCase
         EntryFactory::id('456')->collection('test')->create();
         EntryFactory::id('789')->collection('test')->create();
 
-        $return = $collection->structureContents($contents = [
+        $return = $collection->structureContents([
             'max_depth' => 2,
-            'tree' => [
+        ]);
+
+        TreeRepository::shouldReceive('find')->with('collections/test')->once()->andReturn(
+            (new CollectionStructureTree)->locale('en')->tree([
                 ['entry' => '123', 'children' => [
                     ['entry' => '789'],
                 ]],
                 ['entry' => '456'],
-            ],
-        ]);
+            ])->syncOriginal()
+        );
 
         $this->assertEquals($collection, $return);
-        $this->assertEquals($contents, $collection->structureContents());
+        $this->assertEquals(['root' => false, 'max_depth' => 2], $collection->structureContents());
         $this->assertTrue($collection->hasStructure());
         $structure = $collection->structure();
         $this->assertInstanceOf(CollectionStructure::class, $structure);
@@ -416,15 +421,90 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
-    public function setting_a_structure_removes_the_existing_inline_structure()
+    public function it_works_with_putting_the_whole_tree_in_there()
+    {
+        $this->markTestIncomplete();
+    }
+
+    /** @test */
+    public function it_sets_the_structure_inline_when_collection_has_multiple_sites()
+    {
+        Site::setConfig(['sites' => [
+            'en' => ['url' => 'http://domain.com/'],
+            'fr' => ['url' => 'http://domain.com/fr/'],
+            'de' => ['url' => 'http://domain.com/de/'],
+            'es' => ['url' => 'http://domain.com/es/'],
+        ]]);
+
+        // This applies to a file-based approach.
+
+        $collection = (new Collection)->handle('test')->sites(['en', 'fr', 'de']);
+        $this->assertFalse($collection->hasStructure());
+        $this->assertNull($collection->structure());
+
+        EntryFactory::id('1')->collection('test')->locale('en')->create();
+        EntryFactory::id('2')->collection('test')->locale('en')->create();
+        EntryFactory::id('3')->collection('test')->locale('en')->create();
+
+        EntryFactory::id('4')->collection('test')->locale('fr')->create();
+        EntryFactory::id('5')->collection('test')->locale('fr')->create();
+        EntryFactory::id('6')->collection('test')->locale('fr')->create();
+        EntryFactory::id('7')->collection('test')->locale('fr')->create();
+
+        $return = $collection->structureContents([
+            'max_depth' => 2,
+        ]);
+
+        TreeRepository::shouldReceive('find')->with('collections/test/en')->once()->andReturn(
+            (new CollectionStructureTree)->locale('en')->tree([
+                ['entry' => '1', 'children' => [
+                    ['entry' => '3'],
+                ]],
+                ['entry' => '2'],
+            ])->syncOriginal()
+        );
+
+        TreeRepository::shouldReceive('find')->with('collections/test/fr')->once()->andReturn(
+            (new CollectionStructureTree)->locale('fr')->tree([
+                ['entry' => '4', 'children' => [
+                    ['entry' => '6'],
+                ]],
+                ['entry' => '5'],
+                ['entry' => '7'],
+            ])->syncOriginal()
+        );
+
+        TreeRepository::shouldReceive('find')->with('collections/test/de')->once()->andReturnNull();
+        TreeRepository::shouldReceive('find')->with('collections/test/es')->once()->andReturnNull();
+
+        $this->assertEquals($collection, $return);
+        $this->assertEquals(['root' => false, 'max_depth' => 2], $collection->structureContents());
+        $this->assertTrue($collection->hasStructure());
+        $structure = $collection->structure();
+        $this->assertInstanceOf(CollectionStructure::class, $structure);
+        $this->assertEquals('collection::test', $structure->handle());
+        $this->assertSame($collection, $structure->collection());
+        $this->assertEquals(2, $structure->in('en')->pages()->all()->count());
+        $this->assertEquals(3, $structure->in('en')->flattenedPages()->count());
+        $this->assertEquals(3, $structure->in('fr')->pages()->all()->count());
+        $this->assertEquals(4, $structure->in('fr')->flattenedPages()->count());
+        $this->assertEquals(0, $structure->in('de')->pages()->all()->count());
+        $this->assertEquals(0, $structure->in('de')->flattenedPages()->count());
+        $this->assertNull($structure->in('es'));
+        $this->assertEquals(2, $structure->maxDepth());
+    }
+
+    /** @test */
+    public function setting_a_structure_overrides_the_existing_inline_structure()
     {
         $collection = (new Collection)->handle('test');
-        $collection->structureContents($contents = ['tree' => []]);
+        $collection->structureContents($contents = ['root' => true, 'max_depth' => 3]);
         $this->assertSame($contents, $collection->structureContents());
 
-        $collection->structure(new CollectionStructure);
+        $collection->structure($structure = (new CollectionStructure)->expectsRoot(false)->maxDepth(13));
 
-        $this->assertNull($collection->structureContents());
+        $this->assertEquals(['root' => false, 'max_depth' => 13], $collection->structureContents());
+        $this->assertSame($structure, $collection->structure());
     }
 
     /** @test */
@@ -434,7 +514,7 @@ class CollectionTest extends TestCase
         $collection->structure($structure = (new CollectionStructure)->maxDepth(2));
         $this->assertSame($structure, $collection->structure());
         $this->assertEquals(2, $collection->structure()->maxDepth());
-        $this->assertNull($collection->structureContents());
+        $this->assertEquals(['root' => false, 'max_depth' => 2], $collection->structureContents());
 
         $collection->structureContents(['max_depth' => 13, 'tree' => []]);
 

@@ -116,7 +116,7 @@ class PageTest extends TestCase
         $parent->shouldReceive('uri')->andReturn('/the/parent/uri');
         $parent->shouldReceive('isRoot')->andReturnFalse();
 
-        $tree = (new Tree)->structure(
+        $tree = $this->newTree()->structure(
             $this->mock(CollectionStructure::class)->shouldReceive('collection')->andReturn($collection)->getMock()
         );
 
@@ -138,7 +138,7 @@ class PageTest extends TestCase
         $entry->shouldReceive('uri')->andReturn('/the/actual/entry/uri');
         $entry->shouldReceive('value')->with('redirect')->andReturnNull();
 
-        $tree = (new Tree)->structure(
+        $tree = $this->newTree()->structure(
             $this->mock(Nav::class)
         );
 
@@ -161,7 +161,7 @@ class PageTest extends TestCase
         $entry->shouldReceive('uri')->andReturn('/the/actual/entry/uri');
         $entry->shouldReceive('value')->with('redirect')->andReturn('http://example.com/page');
 
-        $tree = (new Tree)->structure(
+        $tree = $this->newTree()->structure(
             $this->mock(Nav::class)
         );
 
@@ -178,7 +178,7 @@ class PageTest extends TestCase
     /** @test */
     public function it_gets_child_pages()
     {
-        $tree = (new Tree)->structure($this->mock(Structure::class));
+        $tree = $this->newTree()->structure($this->mock(Structure::class));
 
         $page = (new Page)
             ->setTree($tree)
@@ -257,7 +257,7 @@ class PageTest extends TestCase
         $entry->shouldReceive('id')->andReturn('root');
         $entry->shouldReceive('slug')->andReturn('');
 
-        $tree = (new Tree)->structure(
+        $tree = $this->newTree()->structure(
             $this->mock(Structure::class)->shouldReceive('collection')->andReturnFalse()->getMock()
         );
 
@@ -291,5 +291,15 @@ class PageTest extends TestCase
         $page->setEntry($entry);
 
         $this->assertEquals('hello', $page->testing('123'));
+    }
+
+    protected function newTree()
+    {
+        return new class extends Tree {
+            public function path()
+            {
+                //
+            }
+        };
     }
 }

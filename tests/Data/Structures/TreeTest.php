@@ -34,7 +34,7 @@ class TreeTest extends TestCase
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('route')->with('the-locale')->once()->andReturn('/the-route/{slug}');
 
-        $tree = (new Tree)
+        $tree = $this->newTree()
             ->locale('the-locale')
             ->structure($structure);
 
@@ -47,7 +47,7 @@ class TreeTest extends TestCase
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('editUrl')->withNoArgs()->once()->andReturn('/edit-url');
 
-        $tree = (new Tree)->structure($structure);
+        $tree = $this->newTree()->structure($structure);
 
         $this->assertEquals('/edit-url', $tree->editUrl());
     }
@@ -58,7 +58,7 @@ class TreeTest extends TestCase
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('deleteUrl')->withNoArgs()->once()->andReturn('/delete-url');
 
-        $tree = (new Tree)->structure($structure);
+        $tree = $this->newTree()->structure($structure);
 
         $this->assertEquals('/delete-url', $tree->deleteUrl());
     }
@@ -70,7 +70,7 @@ class TreeTest extends TestCase
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('showUrl')->with([])->once()->andReturn('/show-url');
 
-        $tree = (new Tree)
+        $tree = $this->newTree()
             ->locale('the-locale')
             ->structure($structure);
 
@@ -84,7 +84,7 @@ class TreeTest extends TestCase
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('showUrl')->with(['site' => 'the-locale'])->once()->andReturn('/show-url');
 
-        $tree = (new Tree)
+        $tree = $this->newTree()
             ->locale('the-locale')
             ->structure($structure);
 
@@ -153,6 +153,7 @@ class TreeTest extends TestCase
     public function it_appends_an_entry()
     {
         $tree = $this->tree();
+        $this->assertEquals([], $tree->diff()->affected());
 
         $tree->append(Entry::make()->id('appended-page'));
 
@@ -180,12 +181,14 @@ class TreeTest extends TestCase
                 'entry' => 'appended-page',
             ],
         ], $tree->tree());
+        $this->assertEquals(['appended-page'], $tree->diff()->affected());
     }
 
     /** @test */
     public function it_appends_an_entry_to_another_page()
     {
         $tree = $this->tree();
+        $this->assertEquals([], $tree->diff()->affected());
 
         $tree->appendTo('pages-board', Entry::make()->id('appended-page'));
 
@@ -213,17 +216,19 @@ class TreeTest extends TestCase
                 'entry' => 'pages-blog',
             ],
         ], $tree->tree());
+        $this->assertEquals(['appended-page'], $tree->diff()->affected());
     }
 
     /** @test */
     public function it_moves_an_entry_to_another_page()
     {
         $tree = $this->tree();
+        $this->assertEquals([], $tree->diff()->affected());
 
         // Add [foo=>bar] to the directors page, just so we can test the whole array gets moved.
         $treeContent = $tree->tree();
         $treeContent[1]['children'][0]['children'][0]['foo'] = 'bar';
-        $tree->tree($treeContent);
+        $tree->tree($treeContent)->syncOriginal();
 
         $tree->move('pages-directors', 'pages-about');
 
@@ -247,12 +252,13 @@ class TreeTest extends TestCase
                 'entry' => 'pages-blog',
             ],
         ], $tree->tree());
+        $this->assertEquals(['pages-directors'], $tree->diff()->affected());
     }
 
     /** @test */
     public function it_doesnt_get_moved_if_its_already_in_the_target()
     {
-        $tree = $this->tree()->tree($arr = [
+        $tree = $this->tree($arr = [
             [
                 'entry' => 'pages-home',
             ],
@@ -271,10 +277,12 @@ class TreeTest extends TestCase
                 'entry' => 'pages-blog',
             ],
         ]);
+        $this->assertEquals([], $tree->diff()->affected());
 
         $tree->move('pages-board', 'pages-about');
 
         $this->assertEquals($arr, $tree->tree());
+        $this->assertEquals([], $tree->diff()->affected());
     }
 
     /**
@@ -283,7 +291,7 @@ class TreeTest extends TestCase
      **/
     public function it_can_move_the_root()
     {
-        $tree = $this->tree()->tree([
+        $tree = $this->tree([
             [
                 'entry' => 'pages-home',
             ],
@@ -304,6 +312,7 @@ class TreeTest extends TestCase
                 ],
             ],
         ]);
+        $this->assertEquals([], $tree->diff()->affected());
 
         $tree->move('pages-home', 'pages-board');
 
@@ -328,12 +337,14 @@ class TreeTest extends TestCase
                 ],
             ],
         ], $tree->tree());
+
+        $this->assertEquals(['pages-home'], $tree->diff()->affected());
     }
 
     /** @test */
     public function it_fixes_indexes_when_moving()
     {
-        $tree = $this->tree()->tree([
+        $tree = $this->tree([
             [
                 'entry' => 'pages-home',
             ],
@@ -383,7 +394,7 @@ class TreeTest extends TestCase
         $structure->shouldReceive('validateTree')->with($firstContents, 'the-locale')->once()->andReturn($firstContents);
         $structure->shouldReceive('validateTree')->with($secondContents, 'the-locale')->once()->andReturn($secondContents);
 
-        $tree = (new Tree)->structure($structure)->locale('the-locale');
+        $tree = $this->newTree()->structure($structure)->locale('the-locale');
 
         // Calling tree multiple times doesn't re-validate
         $tree->tree($firstContents);
@@ -402,12 +413,12 @@ class TreeTest extends TestCase
         $tree->tree();
     }
 
-    protected function tree()
+    protected function tree($tree = null)
     {
-        return (new Tree)
+        return $this->newTree()
             ->locale('en')
             ->structure((new Nav)->expectsRoot(true))
-            ->tree([
+            ->tree($tree ?? [
                 [
                     'entry' => 'pages-home',
                 ],
@@ -427,6 +438,17 @@ class TreeTest extends TestCase
                 [
                     'entry' => 'pages-blog',
                 ],
-            ]);
+            ])
+            ->syncOriginal();
+    }
+
+    protected function newTree()
+    {
+        return new class extends Tree {
+            public function path()
+            {
+                //
+            }
+        };
     }
 }

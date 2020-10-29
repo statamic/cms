@@ -101,7 +101,8 @@ class NavigationStore extends BasicStore
 
         return $tree
             ->initialPath($path)
-            ->tree($data['tree'] ?? []);
+            ->tree($data['tree'] ?? [])
+            ->syncOriginal();
     }
 
     public function getItemKey($item)

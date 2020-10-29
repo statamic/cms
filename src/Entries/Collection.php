@@ -401,17 +401,7 @@ class Collection implements Contract, AugmentableContract
         $array['inject'] = Arr::pull($array, 'cascade');
 
         if ($this->hasStructure()) {
-            $array['structure'] = Arr::removeNullValues([
-                'root' => $this->structure()->expectsRoot(),
-                'max_depth' => $this->structure()->maxDepth(),
-                'tree' => $this->structure()->trees()->map(function ($tree) {
-                    return $tree->fileData()['tree'];
-                })->all(),
-            ]);
-
-            if (! Site::hasMultiple()) {
-                $array['structure']['tree'] = $array['structure']['tree'][Site::default()->handle()];
-            }
+            $array['structure'] = $this->structureContents();
         }
 
         return $array;
@@ -521,6 +511,16 @@ class Collection implements Contract, AugmentableContract
 
                 return $contents;
             })
+            ->getter(function ($contents) {
+                if (! $structure = $this->structure()) {
+                    return null;
+                }
+
+                return Arr::removeNullValues([
+                    'root' => $structure->expectsRoot(),
+                    'max_depth' => $structure->maxDepth(),
+                ]);
+            })
             ->args(func_get_args());
     }
 
@@ -531,15 +531,17 @@ class Collection implements Contract, AugmentableContract
             ->expectsRoot($this->structureContents['root'] ?? false)
             ->maxDepth($this->structureContents['max_depth'] ?? null);
 
-        $trees = $this->structureContents['tree'];
+        // For backwards compatibility, we'll allow the tree to be included in the collection's
+        // yaml file. However when saving the structure, it'll be moved to the dedicated files.
+        if ($trees = $this->structureContents['tree'] ?? null) {
+            if (! Site::hasMultiple()) {
+                $trees = [Site::default()->handle() => $trees];
+            }
 
-        if (! Site::hasMultiple()) {
-            $trees = [Site::default()->handle() => $trees];
-        }
-
-        foreach ($trees as $site => $contents) {
-            $tree = $structure->makeTree($site)->tree($contents);
-            $structure->addTree($tree);
+            foreach ($trees as $site => $contents) {
+                $tree = $structure->makeTree($site, $contents);
+                $structure->addTree($tree);
+            }
         }
 
         return $structure;

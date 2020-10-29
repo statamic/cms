@@ -151,7 +151,7 @@ class CollectionEntriesStore extends ChildStore
 
         foreach ($trees as $site => $treeContents) {
             $structure->addTree(
-                $tempStructure->makeTree($site)->tree($treeContents)->remove($id)
+                $tempStructure->makeTree($site, $treeContents)->remove($id)
             );
         }
 

@@ -129,8 +129,8 @@ class Multisite extends Command
         $tree = $yaml['tree'] ?? [];
 
         $nav
-            ->addTree($nav->makeTree($this->siteOne)->tree($tree))
-            ->addTree($nav->makeTree($this->siteTwo)->tree($tree))
+            ->addTree($nav->makeTree($this->siteOne, $tree))
+            ->addTree($nav->makeTree($this->siteTwo, $tree))
             ->save();
     }
 

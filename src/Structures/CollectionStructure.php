@@ -2,6 +2,8 @@
 
 namespace Statamic\Structures;
 
+use Facades\Statamic\Contracts\Structures\TreeRepository;
+
 class CollectionStructure extends Structure
 {
     public function handle($handle = null)
@@ -53,6 +55,11 @@ class CollectionStructure extends Structure
     public function route(string $site): ?string
     {
         return $this->collection->route($site);
+    }
+
+    public function newTreeInstance()
+    {
+        return new CollectionStructureTree;
     }
 
     public function validateTree(array $tree, string $locale): array
@@ -128,13 +135,27 @@ class CollectionStructure extends Structure
 
     public function in($site)
     {
-        if ($tree = parent::in($site)) {
-            return $tree;
+        if (isset($this->trees[$site])) {
+            return $this->trees[$site];
         }
 
-        if ($this->existsIn($site)) {
-            return $this->makeTree($site)->tree([]);
+        $name = 'collections/'.$this->collection()->handle();
+
+        if ($this->collection()->sites()->count() > 1) {
+            $name .= '/'.$site;
         }
+
+        if ($tree = TreeRepository::find($name)) {
+            $tree->locale($site)->structure($this);
+        }
+
+        if (! $tree && $this->existsIn($site)) {
+            $tree = $this->makeTree($site);
+        }
+
+        $this->trees[$site] = $tree;
+
+        return $tree;
     }
 
     public function existsIn($site)

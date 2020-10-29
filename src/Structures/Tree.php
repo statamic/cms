@@ -2,14 +2,16 @@
 
 namespace Statamic\Structures;
 
+use Facades\Statamic\Structures\TreeAnalyzer;
 use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Structures\Tree as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Tree implements Localization
+abstract class Tree implements Contract, Localization
 {
     use ExistsAsFile, FluentlyGetsAndSets;
 
@@ -17,6 +19,7 @@ class Tree implements Localization
     protected $tree = [];
     protected $structure;
     protected $cachedFlattenedPages;
+    protected $original;
 
     public function locale($locale = null)
     {
@@ -67,15 +70,6 @@ class Tree implements Localization
     public function route()
     {
         return $this->structure->route($this->locale());
-    }
-
-    public function path()
-    {
-        return vsprintf('%s/%s/%s.yaml', [
-            rtrim(Stache::store('navigation')->directory(), '/'),
-            $this->locale(),
-            $this->handle(),
-        ]);
     }
 
     public function parent()
@@ -139,10 +133,16 @@ class Tree implements Localization
     {
         $this->cachedFlattenedPages = null;
 
-        $this
-            ->structure()
-            ->addTree($this)
-            ->save();
+        Facades\Tree::save($this);
+
+        $this->dispatchSavedEvent();
+
+        $this->syncOriginal();
+    }
+
+    protected function dispatchSavedEvent()
+    {
+        //
     }
 
     public function fileData()
@@ -297,5 +297,19 @@ class Tree implements Localization
         });
 
         return $entries->get($entry);
+    }
+
+    public function syncOriginal()
+    {
+        $this->original = [
+            'tree' => $this->tree,
+        ];
+
+        return $this;
+    }
+
+    public function diff()
+    {
+        return TreeAnalyzer::analyze($this->original['tree'], $this->tree);
     }
 }
