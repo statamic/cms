@@ -352,7 +352,6 @@ class Collection implements Contract, AugmentableContract
         Blink::forget('collection-handles');
         Blink::flushStartingWith("collection-{$this->id()}");
 
-
         CollectionSaved::dispatch($this);
 
         return $this;
