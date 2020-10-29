@@ -78,9 +78,9 @@ class CollectionRepository implements RepositoryContract
         $this->store->delete($collection);
     }
 
-    public function updateEntryUris(Collection $collection)
+    public function updateEntryUris(Collection $collection, $ids = null)
     {
-        $this->store->updateEntryUris($collection);
+        $this->store->updateEntryUris($collection, $ids);
     }
 
     public function whereStructured(): IlluminateCollection

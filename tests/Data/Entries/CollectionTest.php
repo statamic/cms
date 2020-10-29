@@ -514,6 +514,18 @@ class CollectionTest extends TestCase
         $this->assertEquals('/fr/le-blog', $collection->url('fr'));
     }
 
+    /** @test */
+    public function it_updates_entry_uris_through_the_repository()
+    {
+        $collection = (new Collection)->handle('test');
+
+        Facades\Collection::shouldReceive('updateEntryUris')->with($collection, null)->once()->ordered();
+        Facades\Collection::shouldReceive('updateEntryUris')->with($collection, ['one', 'two'])->once()->ordered();
+
+        $collection->updateEntryUris();
+        $collection->updateEntryUris(['one', 'two']);
+    }
+
     private function makeStructure()
     {
         return (new CollectionStructure)->tap(function ($s) {
