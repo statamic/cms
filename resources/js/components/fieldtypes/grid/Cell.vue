@@ -1,6 +1,6 @@
 <template>
 
-    <td class="grid-cell" :class="fieldtypeComponent">
+    <td class="grid-cell align-middle" :class="fieldtypeComponent">
         <div v-show="showInner">
             <component
                 :is="fieldtypeComponent"
