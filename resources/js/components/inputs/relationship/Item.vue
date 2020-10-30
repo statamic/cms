@@ -6,7 +6,7 @@
     >
         <div class="item-move" v-if="sortable">&nbsp;</div>
         <div class="item-inner">
-            <div v-if="statusIcon" class="little-dot mr-1" :class="getStatusClass(item)" />
+            <div v-if="statusIcon" class="little-dot mr-1" :class="item.status" />
 
             <div
                 v-if="item.invalid"
@@ -22,7 +22,7 @@
                 :item="item"
                 :component="formComponent"
                 :component-props="formComponentProps"
-                @updated="item.title = $event.title"
+                @updated="itemUpdated"
                 @closed="isEditing = false"
             />
 
@@ -74,15 +74,12 @@ export default {
             this.isEditing = true;
         },
 
-        getStatusClass(entry) {
-            if (entry.published && entry.private) {
-                return 'bg-transparent border border-grey-60';
-            } else if (entry.published) {
-                return 'bg-green';
-            } else {
-                return 'bg-grey-40';
-            }
-        }
+        itemUpdated(responseData) {
+            this.item.title = responseData.title;
+            this.item.published = responseData.published;
+            this.item.private = responseData.private;
+            this.item.status = responseData.status;
+        },
 
     }
 
