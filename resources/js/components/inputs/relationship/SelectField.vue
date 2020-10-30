@@ -34,14 +34,21 @@
                 <div class="text-sm text-grey-70 text-left py-1 px-2" v-text="__('No options to choose from.')" />
             </template>
             <template #footer="{ deselect }" v-if="multiple">
-                <div class="vs__selected-options-outside flex flex-wrap">
-                    <span v-for="item in items" class="vs__selected mt-1">
-                        {{ item.title }}
-                        <button @click="deselect(item)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
-                            <span>×</span>
-                        </button>
-                    </span>
-                </div>
+                <sortable-list
+                    item-class="sortable-item"
+                    handle-class="sortable-item"
+                    :value="items"
+                    @input="input"
+                >
+                    <div class="vs__selected-options-outside flex flex-wrap">
+                        <span v-for="item in items" :key="item.id" class="vs__selected mt-1 sortable-item">
+                            {{ item.title }}
+                            <button @click="deselect(item)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
+                                <span>×</span>
+                            </button>
+                        </span>
+                    </div>
+                </sortable-list>
             </template>
         </v-select>
     </div>
@@ -49,7 +56,14 @@
 </template>
 
 <script>
+import { SortableList, SortableItem } from '../../sortable/Sortable';
+
 export default {
+
+    components: {
+        SortableList,
+        SortableItem,
+    },
 
     props: {
         items: Array,
