@@ -175,12 +175,16 @@ export default {
         });
     },
 
+    beforeDestroy() {
+        this.setLoadingProgress(false);
+    },
+
     watch: {
 
         loading: {
             immediate: true,
             handler(loading) {
-                this.$progress.loading(`relationship-fieldtype-${this._uid}`, loading);
+                this.setLoadingProgress(loading);
             }
         },
 
@@ -262,6 +266,10 @@ export default {
         selectFieldSelected(selectedItemData) {
             this.$emit('item-data-updated', selectedItemData.map(item => ({ id: item.id, title: item.title })));
             this.update(selectedItemData.map(item => item.id));
+        },
+
+        setLoadingProgress(state) {
+            this.$progress.loading(`relationship-fieldtype-${this._uid}`, state);
         }
 
     }
