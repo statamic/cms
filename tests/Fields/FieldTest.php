@@ -306,6 +306,7 @@ class FieldTest extends TestCase
 
         $this->assertEquals([
             'handle' => 'test',
+            'prefix' => null,
             'type' => 'example',
             'display' => 'Test Field',
             'instructions' => 'Test instructions',

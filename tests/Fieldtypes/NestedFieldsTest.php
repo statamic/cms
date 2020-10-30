@@ -77,6 +77,7 @@ class NestedFieldsTest extends TestCase
                 'validate' => 'required',
                 'component' => 'assets',
                 'handle' => 'image',
+                'prefix' => null,
                 'required' => true,
             ],
         ], $actual);

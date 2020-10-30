@@ -355,6 +355,7 @@ class FieldsTest extends TestCase
         $this->assertEquals([
             [
                 'handle' => 'one',
+                'prefix' => null,
                 'type' => 'text',
                 'display' => 'One',
                 'instructions' => 'One instructions',
@@ -369,6 +370,7 @@ class FieldsTest extends TestCase
             ],
             [
                 'handle' => 'two',
+                'prefix' => null,
                 'type' => 'textarea',
                 'display' => 'Two',
                 'instructions' => 'Two instructions',
@@ -376,6 +378,73 @@ class FieldsTest extends TestCase
                 'validate' => 'min:2',
                 'character_limit' => null,
                 'component' => 'textarea',
+            ],
+        ], $fields->toPublishArray());
+    }
+
+    /** @test */
+    public function converts_to_array_suitable_for_rendering_prefixed_conditional_fields_in_publish_component()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('deeper_partial')
+            ->andReturn((new Fieldset)->setHandle('deeper_partial')->setContents([
+                'title' => 'Deeper Partial',
+                'fields' => [
+                    [
+                        'handle' => 'two',
+                        'field' => ['type' => 'text'],
+                    ],
+                ],
+            ]));
+
+        FieldsetRepository::shouldReceive('find')
+            ->with('partial')
+            ->andReturn((new Fieldset)->setHandle('partial')->setContents([
+                'title' => 'Partial',
+                'fields' => [
+                    [
+                        'handle' => 'one',
+                        'field' => ['type' => 'text'],
+                    ],
+                    [
+                        'import' => 'deeper_partial',
+                        'prefix' => 'deeper_',
+                    ],
+                ],
+            ]));
+
+        $fields = new Fields([
+            ['import' => 'partial', 'prefix' => 'nested_'],
+        ]);
+
+        $this->assertEquals([
+            [
+                'handle' => 'nested_one',
+                'prefix' => 'nested_',
+                'type' => 'text',
+                'display' => 'Nested One',
+                'placeholder' => null,
+                'input_type' => 'text',
+                'character_limit' => 0,
+                'prepend' => null,
+                'append' => null,
+                'component' => 'text',
+                'instructions' => null,
+                'required' => false,
+            ],
+            [
+                'handle' => 'nested_deeper_two',
+                'prefix' => 'nested_deeper_',
+                'type' => 'text',
+                'display' => 'Nested Deeper Two',
+                'placeholder' => null,
+                'input_type' => 'text',
+                'character_limit' => 0,
+                'prepend' => null,
+                'append' => null,
+                'component' => 'text',
+                'instructions' => null,
+                'required' => false,
             ],
         ], $fields->toPublishArray());
     }
