@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <div class="replicator-set-body" v-show="!collapsed">
+        <div class="replicator-set-body" v-if="!collapsed">
             <set-field
                 v-for="field in fields"
                 v-show="showField(field)"
