@@ -372,6 +372,11 @@ final class Addon
 
         return version_compare($this->version, $this->latestVersion, '=');
     }
+    
+    public function version()
+    {
+        return $this->version();
+    }
 
     public function license()
     {
