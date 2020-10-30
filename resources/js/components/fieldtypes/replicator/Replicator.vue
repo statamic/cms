@@ -150,6 +150,12 @@ export default {
             this.collapsed = _.pluck(this.values, '_id');
         },
 
+        collapseAllByDefault() {
+            if (this.config.collapsed) {
+                this.collapseAll();
+            }
+        },
+
         expandAll() {
             this.collapsed = [];
         },
@@ -162,6 +168,10 @@ export default {
             }, 1);
         },
 
+    },
+
+    mounted() {
+        this.collapseAllByDefault();
     },
 
     watch: {
