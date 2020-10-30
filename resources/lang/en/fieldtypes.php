@@ -67,6 +67,7 @@ return [
     'range.config.prepend' => 'Add text to the beginning (left-side) of the slider.',
     'range.config.step' => 'The minimum size between values.',
     'relationship.config.mode' => 'Choose your preferred UI style.',
+    'replicator.config.collapsed' => 'Collapse all sets by default.',
     'select.config.clearable' => 'Enable to allow deselecting your option.',
     'select.config.multiple' => 'Allow multiple selections.',
     'select.config.options' => 'Set the keys and their optional labels.',
