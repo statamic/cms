@@ -9,9 +9,21 @@ use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
 class Replicator extends Fieldtype
 {
     protected $defaultValue = [];
-    protected $configFields = [
-        'sets' => ['type' => 'sets'],
-    ];
+
+    protected function configFieldItems(): array
+    {
+        return [
+            'collapsed' => [
+                'display' => __('Collapsed'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.collapsed'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
+            'sets' => [
+                'type' => 'sets',
+            ],
+        ];
+    }
 
     public function filter()
     {
