@@ -375,7 +375,7 @@ final class Addon
 
     public function version()
     {
-        return $this->version();
+        return $this->version;
     }
 
     public function license()
