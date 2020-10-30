@@ -13,11 +13,18 @@ class Replicator extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
-            'collapsed' => [
-                'display' => __('Collapsed'),
-                'instructions' => __('statamic::fieldtypes.replicator.config.collapsed'),
-                'type' => 'toggle',
+            'collapse' => [
+                'display' => __('Collapse'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
+                'type' => 'select',
+                'cast_booleans' => true,
                 'width' => 50,
+                'options' => [
+                    'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
+                    'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
+                    'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
+                ],
+                'default' => false,
             ],
             'sets' => [
                 'type' => 'sets',

@@ -2,7 +2,7 @@
 
     <div class="replicator-fieldtype-container">
 
-        <div class="absolute top-0 right-0 p-3 text-2xs" v-if="values.length > 0">
+        <div class="absolute top-0 right-0 p-3 text-2xs" v-if="config.collapse !== 'accordion' && values.length > 0">
             <button @click="collapseAll" class="text-blue hover:text-black mr-1" v-text="__('Collapse All')" />
             <button @click="expandAll" class="text-blue hover:text-black" v-text="__('Expand All')" />
         </div>
@@ -131,6 +131,8 @@ export default {
             this.updateSetMeta(set._id, this.meta.new[handle]);
 
             this.values.splice(index, 0, set);
+
+            this.expandSet(set._id);
         },
 
         collapseSet(id) {
@@ -140,6 +142,11 @@ export default {
         },
 
         expandSet(id) {
+            if (this.config.collapse === 'accordion') {
+                this.collapsed = this.value.map(v => v._id).filter(v => v !== id);
+                return;
+            }
+
             if (this.collapsed.includes(id)) {
                 var index = this.collapsed.indexOf(id);
                 this.collapsed.splice(index, 1);
@@ -165,7 +172,7 @@ export default {
     },
 
     mounted() {
-        if (this.config.collapsed) this.collapseAll();
+        if (this.config.collapse) this.collapseAll();
     },
 
     watch: {
