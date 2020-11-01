@@ -33,10 +33,12 @@ export default {
 
             var templates = response.data;
 
-            // Filter out partials
+            // Filter out partials and components
             if (this.config.hide_partials) {
                 templates = _.reject(templates, function(template) {
-                    return template.startsWith('partials/') || template.match(/(^_.*|\/_.*|\._.*)/g);
+                    return template.startsWith('partials/')
+                        || template.startsWith('components/')
+                        || template.match(/(^_.*|\/_.*|\._.*)/g);
                 });
             }
 
