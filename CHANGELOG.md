@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 3.0.23 (2020-11-01)
 
 ### What's new
 - Replicator can configure it's set collapsing behavior. Everything by default [#2771](https://github.com/statamic/cms/issues/2771), or accordion style [979daebec](https://github.com/statamic/cms/commit/979daebec).
@@ -9,6 +9,7 @@
 ### What's improved
 - Radio fieldtype labels are shown in listings instead of just the values. [#2731](https://github.com/statamic/cms/issues/2731)
 - Add Slovene translation. [#2777](https://github.com/statamic/cms/issues/2777)
+- Improve Replicator and Bard performance when collapsing sets. [#2787](https://github.com/statamic/cms/issues/2787)
 
 ### What's fixed
 - Fixed field conditions in Grids and imported fieldsets with prefixes. [#2767](https://github.com/statamic/cms/issues/2767)
