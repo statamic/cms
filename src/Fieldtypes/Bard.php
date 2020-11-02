@@ -324,11 +324,18 @@ class Bard extends Replicator
             return (new Fields($set['fields']))->addValues($defaults[$handle])->meta();
         })->toArray();
 
+        $previews = collect($existing)->map(function ($fields) {
+            return collect($fields)->map(function () {
+                return null;
+            })->all();
+        })->all();
+
         return [
             'existing' => $existing,
             'new' => $new,
             'defaults' => $defaults,
             'collapsed' => [],
+            'previews' => $previews,
             '__collaboration' => ['existing'],
         ];
     }
