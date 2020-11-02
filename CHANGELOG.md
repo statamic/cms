@@ -1,5 +1,25 @@
 # Release Notes
 
+## Unreleased
+
+### What's new
+- Replicator can configure it's set collapsing behavior. Everything by default [#2771](https://github.com/statamic/cms/issues/2771), or accordion style [979daebec](https://github.com/statamic/cms/commit/979daebec).
+- Static caching supports invalidaton by Navigation and Global. [#2778](https://github.com/statamic/cms/issues/2778)
+
+### What's improved
+- Radio fieldtype labels are shown in listings instead of just the values. [#2731](https://github.com/statamic/cms/issues/2731)
+- Add Slovene translation. [#2777](https://github.com/statamic/cms/issues/2777)
+
+### What's fixed
+- Fixed field conditions in Grids and imported fieldsets with prefixes. [#2767](https://github.com/statamic/cms/issues/2767)
+- Only look up addon editions if they're installed. [#2782](https://github.com/statamic/cms/issues/2782)
+- Taggable and Relationship fieldtype in select mode is reorderable by drag and drop. [#2059](https://github.com/statamic/cms/issues/2059)
+- Fix a few instances of title, status, etc not being updated in the UI appropriately. [#1822](https://github.com/statamic/cms/issues/1822)
+- Prevent select fields from converting booleans when used as config field. [b2a425079](https://github.com/statamic/cms/commit/b2a425079)
+- Prevent an overzealous blink cache clear. [818c4fdc4](https://github.com/statamic/cms/commit/818c4fdc4)
+
+
+
 ## 3.0.22 (2020-10-29)
 
 ### What's fixed
