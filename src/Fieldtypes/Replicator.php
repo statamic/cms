@@ -133,7 +133,7 @@ class Replicator extends Fieldtype
     public function preload()
     {
         return [
-            'existing' => collect($this->field->value())->mapWithKeys(function ($set) {
+            'existing' => $existing = collect($this->field->value())->mapWithKeys(function ($set) {
                 $config = $this->config("sets.{$set['type']}.fields", []);
 
                 return [$set['_id'] => (new Fields($config))->addValues($set)->meta()];
@@ -145,6 +145,11 @@ class Replicator extends Fieldtype
                 return (new Fields($set['fields']))->all()->map->defaultValue();
             })->all(),
             'collapsed' => [],
+            'previews' => collect($existing)->map(function ($fields) {
+                return collect($fields)->map(function () {
+                    return null;
+                })->all();
+            })->all(),
         ];
     }
 }

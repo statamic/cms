@@ -48,7 +48,7 @@
                 @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="focused"
                 @blur="blurred"
-                @replicator-preview-updated="previews[field.handle] = $event"
+                @replicator-preview-updated="previewUpdated(field.handle, $event)"
             />
         </div>
     </div>
@@ -92,6 +92,10 @@ export default {
             return this.options.bard.meta.existing[this.node.attrs.id];
         },
 
+        previews() {
+            return this.options.bard.meta.previews[this.node.attrs.id];
+        },
+
         collapsed() {
             return this.options.bard.meta.collapsed.includes(this.node.attrs.id);
         },
@@ -123,10 +127,6 @@ export default {
 
     },
 
-    created() {
-        this.initPreviews();
-    },
-
     methods: {
 
         updated(handle, value) {
@@ -140,6 +140,12 @@ export default {
             let meta = clone(this.meta);
             meta[handle] = value;
             this.options.bard.updateSetMeta(this.node.attrs.id, meta);
+        },
+
+        previewUpdated(handle, value) {
+            let previews = clone(this.previews);
+            previews[handle] = value;
+            this.options.bard.updateSetPreviews(this.node.attrs.id, previews);
         },
 
         destroy() {

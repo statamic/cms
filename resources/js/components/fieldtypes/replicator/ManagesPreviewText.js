@@ -1,11 +1,5 @@
 export default {
 
-    data() {
-        return {
-            previews: {},
-        }
-    },
-
     computed: {
         previewText() {
             const previews = _(this.previews).filter((value, handle) => {
@@ -28,14 +22,6 @@ export default {
                     return JSON.stringify(value);
                 })
                 .join(' / ');
-        }
-    },
-
-    methods: {
-        initPreviews() {
-            let previews = {};
-            this.fields.forEach(field => previews[field.handle] = null);
-            this.previews = previews;
         }
     }
 

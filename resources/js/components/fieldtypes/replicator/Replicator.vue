@@ -29,6 +29,7 @@
                     :is-read-only="isReadOnly"
                     :collapsed="collapsed.includes(set._id)"
                     :error-key-prefix="errorKeyPrefix || handle"
+                    :previews="previews[set._id]"
                     @collapsed="collapseSet(set._id)"
                     @expanded="expandSet(set._id)"
                     @updated="updated"
@@ -36,6 +37,7 @@
                     @removed="removed(set, index)"
                     @focus="focused = true"
                     @blur="blurred"
+                    @previews-updated="previews[set._id] = $event"
                 >
                     <template v-slot:picker v-if="!isReadOnly && index !== values.length-1">
                         <set-picker
@@ -80,6 +82,7 @@ export default {
             values: this.value,
             focused: false,
             collapsed: this.meta.collapsed,
+            previews: this.meta.previews,
         }
     },
 
@@ -203,6 +206,12 @@ export default {
         collapsed(value) {
             const meta = this.meta;
             meta.collapsed = value;
+            this.updateMeta(meta);
+        },
+
+        previews(previews) {
+            let meta = this.meta;
+            meta.previews = previews;
             this.updateMeta(meta);
         }
 

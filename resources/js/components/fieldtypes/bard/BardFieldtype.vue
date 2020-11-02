@@ -157,6 +157,7 @@ export default {
             fullScreenMode: false,
             buttons: [],
             collapsed: this.meta.collapsed,
+            previews: this.meta.previews,
             mounted: false,
         }
     },
@@ -276,6 +277,15 @@ export default {
             const meta = this.meta;
             meta.collapsed = value;
             this.updateMeta(meta);
+        },
+
+        previews: {
+            deep: true,
+            handler(value) {
+                const meta = clone(this.meta);
+                meta.previews = value;
+                this.updateMeta(meta);
+            }
         }
 
     },
@@ -487,6 +497,10 @@ export default {
             });
 
             return exts;
+        },
+
+        updateSetPreviews(set, previews) {
+            this.previews[set] = previews;
         }
     }
 }
