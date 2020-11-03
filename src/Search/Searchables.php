@@ -159,11 +159,7 @@ class Searchables
         $transformers = $this->index->config()['transformers'] ?? [];
 
         return collect($fields)->mapWithKeys(function ($field) use ($searchable) {
-            $value = method_exists($searchable, $field) ? $searchable->{$field}() : $searchable->get($field);
-
-            if (is_null($value) && $searchable->hasOrigin()) {
-                $value = $searchable->originValue($field);
-            }
+            $value = method_exists($searchable, $field) ? $searchable->{$field}() : $searchable->value($field);
 
             return [$field => $value];
         })->flatMap(function ($value, $field) use ($transformers) {
