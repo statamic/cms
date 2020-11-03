@@ -9,6 +9,10 @@ class StacheLock
 {
     public function handle($request, Closure $next)
     {
+        if (! config('statamic.stache.lock.enabled', true)) {
+            return $next($request);
+        }
+
         $start = time();
         $lock = Stache::lock('stache-warming');
 
