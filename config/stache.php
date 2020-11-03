@@ -85,4 +85,9 @@ return [
         //
     ],
 
+    'lock' => [
+        'enabled' => true,
+        'timeout' => 30,
+    ],
+
 ];

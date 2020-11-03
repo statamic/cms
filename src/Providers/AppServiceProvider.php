@@ -125,6 +125,7 @@ class AppServiceProvider extends ServiceProvider
     protected function registerMiddlewareGroup()
     {
         $this->app->make(Router::class)->middlewareGroup('statamic.web', [
+            \Statamic\Http\Middleware\StacheLock::class,
             \Statamic\Http\Middleware\Localize::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ]);
