@@ -4,6 +4,7 @@ namespace Tests\Data\Taxonomies;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Mockery;
+use Statamic\Facades;
 use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
 use Statamic\Taxonomies\Term;
@@ -72,5 +73,18 @@ class TermTest extends TestCase
 
         $this->assertEquals('the new blueprint', $term->blueprint());
         $this->assertEquals('the new blueprint', $term->blueprint());
+    }
+
+    /** @test */
+    public function it_gets_the_entry_count_through_the_repository()
+    {
+        $term = (new Term)->taxonomy('tags')->slug('foo');
+
+        $mock = \Mockery::mock(Facades\Term::getFacadeRoot())->makePartial();
+        Facades\Term::swap($mock);
+        $mock->shouldReceive('entriesCount')->with($term)->andReturn(7)->once();
+
+        $this->assertEquals(7, $term->entriesCount());
+        $this->assertEquals(7, $term->entriesCount());
     }
 }
