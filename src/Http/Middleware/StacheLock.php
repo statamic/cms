@@ -13,7 +13,7 @@ class StacheLock
         $lock = Stache::lock('stache-warming');
 
         while (! $lock->acquire()) {
-            if (time() - $start >= config('statamic.stache.lock.timeout')) {
+            if (time() - $start >= config('statamic.stache.lock.timeout', 30)) {
                 return $this->outputRefreshResponse($request);
             }
 
