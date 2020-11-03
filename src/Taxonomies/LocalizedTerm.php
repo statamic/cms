@@ -193,6 +193,11 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
         return $this->term->entries();
     }
 
+    public function entriesCount()
+    {
+        return $this->term->entriesCount();
+    }
+
     protected function revisionKey()
     {
         return vsprintf('taxonomies/%s/%s/%s', [

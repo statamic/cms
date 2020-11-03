@@ -144,6 +144,18 @@ class Term implements TermContract
         return $this->queryEntries()->get();
     }
 
+    public function entriesCount()
+    {
+        return Blink::once('term-entries-count-'.$this->id(), function () {
+            return Stache::store('terms')
+                ->store($this->taxonomy)
+                ->index('associations')
+                ->items()
+                ->where('value', $this->slug())
+                ->count();
+        });
+    }
+
     public function queryEntries()
     {
         $entries = $this->collection
