@@ -1,5 +1,19 @@
 # Release Notes
 
+## 3.0.24 (2020-11-04)
+
+### What's new
+- Added Stache Locking. Reduces resource spikes on busy sites while building the cache. [#2794](https://github.com/statamic/cms/issues/2794)
+- Added an `entriesCount` method to taxonomy terms which lets us perform a more efficient count query. This speeds up Stache build time on taxonomy-heavy sites. [#2792](https://github.com/statamic/cms/issues/2792)
+
+### What's improved
+- Added some missing translations. [36d973eb](https://github.com/statamic/cms/commit/36d973eb)
+
+### What's fixed
+- Fixed a typo in a Dutch translation. [#2796](https://github.com/statamic/cms/issues/2796)
+
+
+
 ## 3.0.23 (2020-11-01)
 
 ### What's new
