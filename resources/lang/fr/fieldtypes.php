@@ -3,7 +3,6 @@
 return [
     'any.config.cast_booleans' => 'Les options avec des valeurs true (vrai) et false (faux) seront enregistrées en tant que booléens.',
     'any.config.default' => 'Définissez la valeur par défaut.',
-    'any.config.cast_booleans' => 'Les options avec des valeurs true (vrai) et false (faux) seront enregistrées en tant que booléens.',
     'array.config.keys' => 'Définissez les clés du tableau (les variables) et leurs étiquettes facultatives.',
     'array.config.mode' => 'Le mode dynamique donne à l’utilisateur le contrôle des données, contrairement au mode à clé.',
     'assets.config.allow_uploads' => 'Autorisez le téléversement de nouveaux fichiers.',
@@ -68,6 +67,10 @@ return [
     'range.config.prepend' => 'Ajoutez du texte au début (côté gauche) du curseur.',
     'range.config.step' => 'La taille minimale entre les valeurs.',
     'relationship.config.mode' => 'Choisissez votre style d’interface utilisateur préféré.',
+    'replicator.config.collapse' => 'Le comportement de réduction défini.',
+    'replicator.config.collapse.accordion' => 'N\'autoriser qu\'un seul ensemble à être étendu à la fois',
+    'replicator.config.collapse.disabled' => 'Tous les ensembles ont été développés par défaut',
+    'replicator.config.collapse.enabled' => 'Tous les ensembles ont été réduits par défaut',
     'select.config.clearable' => 'Activez pour permettre de désélectionner votre option.',
     'select.config.multiple' => 'Autorisez des sélections multiples.',
     'select.config.options' => 'Définissez les clés et leurs étiquettes facultatives.',
