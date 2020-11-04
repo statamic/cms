@@ -85,4 +85,22 @@ return [
         //
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Locking
+    |--------------------------------------------------------------------------
+    |
+    | In order to prevent concurrent requests from updating the Stache at
+    | the same and wasting resources, it will be "locked" so subsequent
+    | requests will have to wait until the first has been completed.
+    |
+    | https://statamic.dev/stache#locks
+    |
+    */
+
+    'lock' => [
+        'enabled' => true,
+        'timeout' => 30,
+    ],
+
 ];
