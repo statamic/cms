@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'any.config.default' => 'Imposta il valore predefinito.',
     'any.config.cast_booleans' => 'Le opzioni con valori "true" e "false" verranno salvate come booleani.',
+    'any.config.default' => 'Imposta il valore predefinito.',
     'array.config.keys' => 'Imposta le chiavi dell\'array (variabili) e le etichette opzionali.',
     'array.config.mode' => 'La modalità dinamica consente all\'utente di controllare i dati a differenza della modalità fissa.',
     'assets.config.allow_uploads' => 'Consenti nuovi caricamenti di file.',
@@ -67,6 +67,10 @@ return [
     'range.config.prepend' => 'Aggiungi testo all\'inizio (lato sinistro) dello slider.',
     'range.config.step' => 'Lo step tra i valori.',
     'relationship.config.mode' => 'Scegli il tuo stile di layout preferito.',
+    'replicator.config.collapse' => 'Il comportamento di collasso dell\'insieme.',
+    'replicator.config.collapse.accordion' => 'Consentire l\'espansione di un solo set alla volta',
+    'replicator.config.collapse.disabled' => 'Tutti i set sono espansi per impostazione predefinita',
+    'replicator.config.collapse.enabled' => 'Tutti i set sono compressi per impostazione predefinita',
     'select.config.clearable' => 'Abilita per consentire la deselezione dell\'opzione.',
     'select.config.multiple' => 'Consenti la selezione multipla delle opzioni.',
     'select.config.options' => 'Imposta le chiavi e le loro etichette opzionali.',

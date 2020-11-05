@@ -123,6 +123,11 @@ class Select extends Fieldtype
         return $value;
     }
 
+    public function preProcessConfig($value)
+    {
+        return $value;
+    }
+
     public function process($value)
     {
         if ($this->config('cast_booleans')) {

@@ -9,9 +9,28 @@ use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
 class Replicator extends Fieldtype
 {
     protected $defaultValue = [];
-    protected $configFields = [
-        'sets' => ['type' => 'sets'],
-    ];
+
+    protected function configFieldItems(): array
+    {
+        return [
+            'collapse' => [
+                'display' => __('Collapse'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
+                'type' => 'select',
+                'cast_booleans' => true,
+                'width' => 50,
+                'options' => [
+                    'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
+                    'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
+                    'accordion' => __('statamic::fieldtypes.replicator.config.collapse.accordion'),
+                ],
+                'default' => false,
+            ],
+            'sets' => [
+                'type' => 'sets',
+            ],
+        ];
+    }
 
     public function filter()
     {
@@ -114,7 +133,7 @@ class Replicator extends Fieldtype
     public function preload()
     {
         return [
-            'existing' => collect($this->field->value())->mapWithKeys(function ($set) {
+            'existing' => $existing = collect($this->field->value())->mapWithKeys(function ($set) {
                 $config = $this->config("sets.{$set['type']}.fields", []);
 
                 return [$set['_id'] => (new Fields($config))->addValues($set)->meta()];
@@ -126,6 +145,11 @@ class Replicator extends Fieldtype
                 return (new Fields($set['fields']))->all()->map->defaultValue();
             })->all(),
             'collapsed' => [],
+            'previews' => collect($existing)->map(function ($fields) {
+                return collect($fields)->map(function () {
+                    return null;
+                })->all();
+            })->all(),
         ];
     }
 }

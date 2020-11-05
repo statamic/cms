@@ -625,6 +625,9 @@ export default {
             this.isWorkingCopy = isWorkingCopy;
             this.confirmingPublish = false;
             this.title = response.data.data.title;
+            this.activeLocalization.title = response.data.data.title;
+            this.activeLocalization.published = response.data.data.published;
+            this.activeLocalization.status = response.data.data.status;
             this.permalink = response.data.data.permalink
             this.$nextTick(() => this.$emit('saved', response));
         },

@@ -16,7 +16,7 @@ class AddonTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
-        $this->addonFixtureDir = realpath(__DIR__.'/../Fixtures/Addon');
+        $this->addonFixtureDir = realpath(__DIR__.'/../Fixtures/Addon').'/';
     }
 
     /** @test */
@@ -123,8 +123,8 @@ class AddonTest extends TestCase
     {
         $addon = $this->makeFromPackage();
 
-        File::shouldReceive('exists')->with($this->addonFixtureDir.'/test.txt')->andReturnTrue();
-        File::shouldReceive('exists')->with($this->addonFixtureDir.'/notfound.txt')->andReturnFalse();
+        File::shouldReceive('exists')->with($this->addonFixtureDir.'test.txt')->andReturnTrue();
+        File::shouldReceive('exists')->with($this->addonFixtureDir.'notfound.txt')->andReturnFalse();
 
         $this->assertTrue($addon->hasFile('test.txt'));
         $this->assertFalse($addon->hasFile('notfound.txt'));
@@ -135,7 +135,7 @@ class AddonTest extends TestCase
     {
         $addon = $this->makeFromPackage();
 
-        File::shouldReceive('get')->with($this->addonFixtureDir.'/test.txt')->andReturn('the file contents');
+        File::shouldReceive('get')->with($this->addonFixtureDir.'test.txt')->andReturn('the file contents');
 
         $this->assertEquals('the file contents', $addon->getFile('test.txt'));
     }
@@ -145,7 +145,7 @@ class AddonTest extends TestCase
     {
         $addon = $this->makeFromPackage();
 
-        File::shouldReceive('put')->with($this->addonFixtureDir.'/test.txt', 'the file contents');
+        File::shouldReceive('put')->with($this->addonFixtureDir.'test.txt', 'the file contents');
 
         $addon->putFile('test.txt', 'the file contents');
     }

@@ -113,6 +113,15 @@ class TermRepository implements RepositoryContract
         return app(Term::class)->slug($slug);
     }
 
+    public function entriesCount(Term $term): int
+    {
+        return $this->store->store($term->taxonomyHandle())
+            ->index('associations')
+            ->items()
+            ->where('value', $term->slug())
+            ->count();
+    }
+
     protected function ensureAssociations()
     {
         Taxonomy::all()->each(function ($taxonomy) {

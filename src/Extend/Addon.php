@@ -402,7 +402,7 @@ final class Addon
     }
 
     /**
-     * The directory the package is located within. eg. "/path/to/vendor/statamic/bloodhound".
+     * The directory the package is located within. eg. "/path/to/vendor/statamic/bloodhound/".
      *
      * @return string
      */
@@ -420,7 +420,7 @@ final class Addon
 
         $dir = Str::removeRight(dirname($reflector->getFileName()), rtrim($this->autoload, '/'));
 
-        return $this->directory = Str::removeRight($dir, '/');
+        return $this->directory = Str::ensureRight($dir, '/');
     }
 
     public function existsOnMarketplace()

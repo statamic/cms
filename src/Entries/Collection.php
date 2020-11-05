@@ -320,7 +320,7 @@ class Collection implements Contract, AugmentableContract
     {
         Facades\Collection::save($this);
 
-        Blink::flush('collection-handles');
+        Blink::forget('collection-handles');
         Blink::flushStartingWith("collection-{$this->id()}");
 
         if ($this->hasStructure()) { // todo: only if the structure changed.

@@ -56,8 +56,8 @@ class AddonsQuery
 
         $response['data'] = collect($response['data'])->map(function ($addon) use ($installed) {
             return $addon + [
-                'installed' => $installed->contains($addon['id']),
-                'edition' => Addon::get($addon['package'])->edition(),
+                'installed' => $isInstalled = $installed->contains($addon['id']),
+                'edition' => $isInstalled ? Addon::get($addon['package'])->edition() : null,
             ];
         })->all();
 
