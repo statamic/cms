@@ -41,7 +41,7 @@ abstract class Manager
         }
 
         if (isset($this->customCreators[$config['driver']])) {
-            return $this->callCustomCreator($config);
+            return $this->callCustomCreator($config, $name);
         } else {
             $driverMethod = 'create'.camel_case($config['driver']).'Driver';
 
@@ -60,9 +60,9 @@ abstract class Manager
         return $this;
     }
 
-    protected function callCustomCreator(array $config)
+    protected function callCustomCreator(array $config, string $name)
     {
-        return $this->customCreators[$config['driver']]($this->app, $config);
+        return $this->customCreators[$config['driver']]($this->app, $config, $name);
     }
 
     protected function invalidImplementationMessage($name)
