@@ -5,6 +5,7 @@ namespace Statamic\Tags;
 use Statamic\Assets\AssetCollection;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Entry;
 use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 
@@ -56,7 +57,19 @@ class Assets extends Tags
     {
         $id = $this->params->get(['container', 'handle', 'id']);
         $path = $this->params->get('path');
+        $collection = $this->params->get('collection');
 
+        if ($id || $path) {
+            return $this->assetsFromContainer($id, $path);
+        }
+
+        if ($collection) {
+            return $this->assetsFromCollection($collection);
+        }
+    }
+
+    protected function assetsFromContainer($id, $path)
+    {
         if (! $id && ! $path) {
             \Log::debug('No asset container ID or path was specified.');
 
@@ -73,9 +86,75 @@ class Assets extends Tags
             return $this->parseNoResults();
         }
 
-        $this->assets = $container->assets($this->params->get('folder'), $this->params->get('recursive', false));
+        $assets = $container->assets($this->params->get('folder'), $this->params->get('recursive', false));
+
+        $this->assets = $this->filterByType($assets);
 
         return $this->output();
+    }
+
+    protected function assetsFromCollection($collection)
+    {
+        $assets = Entry::whereCollection($collection)
+            ->flatMap(function ($entry) {
+                return $this->filterByFields($entry)->flatMap(function ($field) {
+                    if ($this->isAssetsFieldValue($field)) {
+                        return $this->filterByType($field->value());
+                    }
+                });
+            })->unique();
+
+        if ($assets->isEmpty()) {
+            return $this->parseNoResults();
+        }
+
+        $this->assets = $assets;
+
+        return $this->output();
+    }
+
+    protected function filterByFields($entry)
+    {
+        $fields = array_filter(explode('|', $this->params->get('fields')));
+
+        $fields = $fields
+            ? $entry->toAugmentedArray($fields)
+            : $entry->toAugmentedArray();
+
+        return collect($fields);
+    }
+
+    protected function filterByType($value)
+    {
+        if (is_null($value)) {
+            return null;
+        }
+
+        $value instanceof \Statamic\Assets\Asset
+            ? $value = collect([$value])
+            : $value;
+
+        $type = $this->params->get('type');
+
+        if (! $type) {
+            return $value;
+        }
+
+        return $value->filter(function ($value) use ($type) {
+            if ($type === 'image') {
+                return $value->isImage();
+            }
+
+            if ($type === 'svg') {
+                return $value->isSvg();
+            }
+
+            if ($type === 'video') {
+                return $value->isVideo();
+            }
+
+            return false;
+        });
     }
 
     /**
