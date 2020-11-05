@@ -5,11 +5,11 @@
             <div class="blueprint-drag-handle w-4 border-r"></div>
             <div class="flex flex-1 items-center justify-between">
                 <div class="flex items-center flex-1 pr-2 py-1 pl-1">
-                    <svg-icon class="text-grey-70 mr-1" :name="field.icon" v-tooltip="tooltipText" />
-                    <a v-text="labelText" @click="$emit('edit')" />
+                    <svg-icon class="text-grey-70 mr-1 flex-none" :name="field.icon" v-tooltip="tooltipText" />
+                    <a class="break-all" v-text="labelText" @click="$emit('edit')" />
                     <svg-icon name="hyperlink" v-if="isReferenceField" class="text-grey-60 text-3xs ml-1" v-tooltip="__('Imported from fieldset') + ': ' + field.field_reference" />
                 </div>
-                <div class="pr-1 flex">
+                <div class="flex-none pr-1 flex">
                     <width-selector v-model="width" class="mr-1" />
                     <button v-if="canDefineLocalizable"
                         class="hover:text-grey-100 mr-1"

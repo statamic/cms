@@ -15,6 +15,7 @@
 }
 
 .blueprint-drag-handle {
+    @apply flex-none;
     cursor: move;
     background: rgba(black, 0.01) url('../img/drag-dots.svg') 50% 50% no-repeat;
 }
