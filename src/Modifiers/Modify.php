@@ -157,7 +157,7 @@ class Modify implements \IteratorAggregate
         } catch (Exception $e) {
             // If a modifier's code raised an exception, we'll just
             // catch it here and rethrow it as a ModifierException.
-            $e = new ModifierException($e->getMessage());
+            $e = new ModifierException($e->getMessage(), 0, $e);
             $e->setModifier($modifier);
             throw $e;
         }
