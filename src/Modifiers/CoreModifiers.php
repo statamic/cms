@@ -1982,7 +1982,17 @@ class CoreModifiers extends Modifier
      */
     public function sum($value, $params)
     {
-        return collect($value)->sum(Arr::get($params, 0, null));
+        $key = Arr::get($params, 0, null);
+
+        return collect($value)->reduce(function ($carry, $value) use ($key) {
+            if ($key) {
+                $value = data_get($value, $key);
+            }
+
+            $value = $value instanceof Value ? $value->value() : $value;
+
+            return $carry + (int) $value;
+        }, 0);
     }
 
     /**

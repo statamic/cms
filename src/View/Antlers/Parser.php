@@ -1458,7 +1458,7 @@ class Parser
         try {
             return Modify::value($value)->context($context)->$modifier($parameters)->fetch();
         } catch (ModifierException $e) {
-            throw_if(config('app.debug'), $e);
+            throw_if(config('app.debug'), ($prev = $e->getPrevious()) ? $prev : $e);
             Log::notice(sprintf('Error in [%s] modifier: %s', $e->getModifier(), $e->getMessage()));
 
             return $value;

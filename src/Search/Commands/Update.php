@@ -40,7 +40,8 @@ class Update extends Command
 
         $selection = $this->choice(
             'Select an index to update',
-            collect(['all'])->merge($this->indexes())->all()
+            collect(['all'])->merge($this->indexes())->all(),
+            0
         );
 
         return ($selection == 'all') ? $this->indexes() : [$selection];
