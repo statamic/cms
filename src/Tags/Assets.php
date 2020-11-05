@@ -59,13 +59,15 @@ class Assets extends Tags
         $path = $this->params->get('path');
         $collection = $this->params->get('collection');
 
-        if ($id || $path) {
-            return $this->assetsFromContainer($id, $path);
+        $this->assets = $collection
+            ? $this->assetsFromCollection($collection)
+            : $this->assetsFromContainer($id, $path);
+
+        if ($this->assets->isEmpty()) {
+            return $this->parseNoResults();
         }
 
-        if ($collection) {
-            return $this->assetsFromCollection($collection);
-        }
+        return $this->output();
     }
 
     protected function assetsFromContainer($id, $path)
@@ -73,7 +75,7 @@ class Assets extends Tags
         if (! $id && ! $path) {
             \Log::debug('No asset container ID or path was specified.');
 
-            return;
+            return collect();
         }
 
         if (! $id) {
@@ -83,19 +85,17 @@ class Assets extends Tags
         $container = AssetContainer::find($id);
 
         if (! $container) {
-            return $this->parseNoResults();
+            return collect();
         }
 
         $assets = $container->assets($this->params->get('folder'), $this->params->get('recursive', false));
 
-        $this->assets = $this->filterByType($assets);
-
-        return $this->output();
+        return $this->filterByType($assets);
     }
 
     protected function assetsFromCollection($collection)
     {
-        $assets = Entry::whereCollection($collection)
+        return Entry::whereCollection($collection)
             ->flatMap(function ($entry) {
                 return $this->filterByFields($entry)->flatMap(function ($field) {
                     if ($this->isAssetsFieldValue($field)) {
@@ -103,14 +103,6 @@ class Assets extends Tags
                     }
                 });
             })->unique();
-
-        if ($assets->isEmpty()) {
-            return $this->parseNoResults();
-        }
-
-        $this->assets = $assets;
-
-        return $this->output();
     }
 
     protected function filterByFields($entry)
