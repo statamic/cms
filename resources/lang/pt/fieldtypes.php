@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'any.config.default' => 'Definir o valor padrão',
     'any.config.cast_booleans' => 'Opções com valores de verdadeiro e falso serão salvas como booleans.',
+    'any.config.default' => 'Definir o valor padrão',
     'array.config.keys' => 'O modo dinâmico dá ao utilizador o controlo dos dados enquanto que o modo com chave não o faz.',
     'array.config.mode' => 'Defina as chaves da matriz (variáveis) e as etiquetas opcionais.',
     'assets.config.allow_uploads' => 'Permitir o carregamento de novos ficheiros.',

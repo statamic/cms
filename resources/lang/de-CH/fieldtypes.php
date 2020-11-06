@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'any.config.default' => 'Standardwert festlegen.',
     'any.config.cast_booleans' => 'Optionen mit den Werten *true* und *false* als Booleans speichern.',
+    'any.config.default' => 'Standardwert festlegen.',
     'array.config.keys' => 'Arrayschlüssel (Variablen) und optionale Beschriftungen festlegen.',
     'array.config.mode' => 'Der dynamische Modus gibt der Benutzer*in die Kontrolle über die Daten, während der geschlossene Modus dies nicht tut.',
     'assets.config.allow_uploads' => 'Das Hochladen neuer Dateien zulassen.',

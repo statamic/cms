@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'any.config.default' => 'Indstil standardværdien.',
     'any.config.cast_booleans' => 'Valgmuligheder med værdierne sandt og falsk gemmes som booleanske.',
+    'any.config.default' => 'Indstil standardværdien.',
     'array.config.keys' => 'Indstil matrixnøgler (variabler) og valgfri etiketter.',
     'array.config.mode' => 'Dynamisk tilstand giver brugeren kontrol over dataene, mens tastetilstand ikke gør det.',
     'assets.config.allow_uploads' => 'Tillad nye filoverførsler.',
