@@ -131,6 +131,10 @@ export default {
                 enabled: true,
             });
 
+            let previews = {};
+            Object.keys(this.meta.defaults[handle]).forEach(key => previews[key] = null);
+            this.previews = Object.assign({}, this.previews, { [set._id]: previews });
+
             this.updateSetMeta(set._id, this.meta.new[handle]);
 
             this.values.splice(index, 0, set);
