@@ -21,7 +21,7 @@
 - Prevent an error when there's a Replicator set without any fields. [402feb229](https://github.com/statamic/cms/commit/402feb229)
 - Fix issue where only the last field's value of a Replicator is shown in the preview. [a5fd579f4](https://github.com/statamic/cms/commit/a5fd579f4)
 - Fix a weird table shrinky overflowy UI thing.  [#2595](https://github.com/statamic/cms/issues/2595)
-- Localized entries get appropriate fallback values placed in the search index. [#2789](https://github.com/statamic/cms/issues/2789) [https://github.com/statamic/cms/commit/88b245b262d7597811a4dd9058977bb058c746ed](https://github.com/statamic/cms/commit/https://github.com/statamic/cms/commit/88b245b262d7597811a4dd9058977bb058c746ed)
+- Localized entries get appropriate fallback values placed in the search index. [#2789](https://github.com/statamic/cms/issues/2789) [88b245b](https://github.com/statamic/cms/commit/88b245b)
 - Fix the `sum` modifier not being able to handle `Value` objects. [#2703](https://github.com/statamic/cms/issues/2703)
 - Prevent `select` fields with lots of text from overflowing. [#2702](https://github.com/statamic/cms/issues/2702)
 - Prevent blueprint fields with long labels from overflowing. [#2673](https://github.com/statamic/cms/issues/2673)
