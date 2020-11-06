@@ -1,7 +1,8 @@
 <?php
 
 return [
-    'any.config.default' => '',
+    'any.config.cast_booleans' => 'Opsi dengan nilai benar dan salah akan disimpan sebagai boolean.',
+    'any.config.default' => 'Tetapkan nilai default.',
     'array.config.keys' => 'Setel kunci array (variabel) dan label opsional.',
     'array.config.mode' => 'Mode dinamis memberi pengguna kontrol atas data sementara mode kunci tidak.',
     'assets.config.allow_uploads' => 'Izinkan unggahan file baru.',
@@ -66,7 +67,10 @@ return [
     'range.config.prepend' => 'Tambahkan teks ke awal (sisi kiri) penggeser.',
     'range.config.step' => 'Ukuran minimum antar nilai.',
     'relationship.config.mode' => 'Pilih gaya UI pilihan Anda.',
-    'select.config.cast_booleans' => 'Opsi dengan nilai benar dan salah akan disimpan sebagai boolean.',
+    'replicator.config.collapse' => 'Set perilaku runtuh.',
+    'replicator.config.collapse.accordion' => 'Hanya izinkan satu set untuk diperluas dalam satu waktu',
+    'replicator.config.collapse.disabled' => 'Semua set diperluas secara default',
+    'replicator.config.collapse.enabled' => 'Semua set diciutkan secara default',
     'select.config.clearable' => 'Aktifkan untuk mengizinkan penghapusan pilihan Anda.',
     'select.config.multiple' => 'Izinkan banyak pilihan.',
     'select.config.options' => 'Atur kunci dan label opsionalnya.',
