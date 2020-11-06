@@ -157,7 +157,7 @@ export default {
         },
 
         previewUpdated(handle, value) {
-            let previews = clone(this.previews);
+            let previews = this.previews;
             previews[handle] = value;
             this.$emit('previews-updated', previews);
         },
