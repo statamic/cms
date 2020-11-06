@@ -313,7 +313,7 @@ class Bard extends Replicator
             $values = $set['attrs']['values'];
             $config = $this->config("sets.{$values['type']}.fields", []);
 
-            return [$set['attrs']['id'] => (new Fields($config))->addValues($values)->meta()];
+            return [$set['attrs']['id'] => (new Fields($config))->addValues($values)->meta()->put('_', '_')];
         })->toArray();
 
         $defaults = collect($this->config('sets'))->map(function ($set) {
@@ -321,7 +321,7 @@ class Bard extends Replicator
         })->all();
 
         $new = collect($this->config('sets'))->map(function ($set, $handle) use ($defaults) {
-            return (new Fields($set['fields']))->addValues($defaults[$handle])->meta();
+            return (new Fields($set['fields']))->addValues($defaults[$handle])->meta()->put('_', '_');
         })->toArray();
 
         $previews = collect($existing)->map(function ($fields) {
