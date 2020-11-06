@@ -228,6 +228,10 @@ class Bard extends Replicator
             return $value;
         }
 
+        if ($this->isLegacyData($value)) {
+            $value = $this->convertLegacyData($value);
+        }
+
         $data = collect($value)->reject(function ($value) {
             return $value['type'] === 'set';
         })->values();
