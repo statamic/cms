@@ -283,7 +283,7 @@ final class Addon
      * The name of addon.
      *
      * @param string $name
-     * @return stirng|self
+     * @return string|self
      */
     public function name($name = null)
     {
