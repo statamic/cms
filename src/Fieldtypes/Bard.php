@@ -230,7 +230,7 @@ class Bard extends Replicator
 
         $data = collect($value)->reject(function ($value) {
             return $value['type'] === 'set';
-        });
+        })->values();
 
         $renderer = new Renderer;
 
