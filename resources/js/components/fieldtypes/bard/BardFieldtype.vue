@@ -282,7 +282,7 @@ export default {
         previews: {
             deep: true,
             handler(value) {
-                const meta = clone(this.meta);
+                const meta = this.meta;
                 meta.previews = value;
                 this.updateMeta(meta);
             }
