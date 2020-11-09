@@ -44,6 +44,7 @@ class FormController extends Controller
         $fields = $fields->addValues($values);
 
         $submission = $form->makeSubmission()->data($values);
+        $submission->id(microtime(true));
 
         try {
             $this->withLocale($site->shortLocale(), function () use ($fields) {
