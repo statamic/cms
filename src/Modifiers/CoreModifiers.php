@@ -2388,7 +2388,15 @@ class CoreModifiers extends Modifier
     public function embedUrl($url)
     {
         if (Str::contains($url, 'vimeo')) {
-            return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
+            $url = str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
+
+            if (Str::contains($url, '?')) {
+                $url = str_replace('?', '?dnt=1&', $url);
+            } else {
+                $url .= '?dnt=1';
+            }
+
+            return $url;
         }
 
         if (Str::contains($url, 'youtu.be')) {
