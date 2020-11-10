@@ -3,7 +3,6 @@
 namespace Statamic\Assets;
 
 use Exception;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Assets\QueryBuilder as Contract;
 use Statamic\Facades;
@@ -21,9 +20,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
 
         $cacheKey = 'asset-folder-files-'.$this->getContainer()->handle().'-'.$this->folder;
 
-        $assets = Cache::remember($cacheKey, now()->addMinute(), function () use ($recursive) {
-            return $this->getContainer()->files($this->folder, $recursive);
-        });
+        $assets = $this->getContainer()->files($this->folder, $recursive);
 
         if (empty($this->wheres) && $this->limit) {
             $assets = $assets->skip($this->offset)->take($this->limit)->values();

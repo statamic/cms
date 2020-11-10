@@ -383,6 +383,8 @@ class Asset implements AssetContract, Augmentable
         Facades\Asset::save($this);
 
         Cache::forget($this->metaCacheKey());
+        Cache::forget($this->container()->filesCacheKey());
+        Cache::forget($this->container()->filesCacheKey($this->folder()));
 
         AssetSaved::dispatch($this);
 
@@ -462,6 +464,8 @@ class Asset implements AssetContract, Augmentable
      */
     public function move($folder, $filename = null)
     {
+        Cache::forget($this->container()->filesCacheKey($this->folder()));
+
         $filename = $filename ?: $this->filename();
         $oldPath = $this->path();
         $oldMetaPath = $this->metaPath();
