@@ -13,12 +13,13 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
     protected $container;
     protected $folder;
     protected $recursive = false;
+    protected $files;
 
     protected function getBaseItems()
     {
         $recursive = $this->folder ? $this->recursive : true;
 
-        $assets = $this->getContainer()->files($this->folder, $recursive);
+        $assets = $this->files ?? $this->files = $this->getContainer()->files($this->folder, $recursive);
 
         if (empty($this->wheres) && $this->limit) {
             $assets = $assets->skip($this->offset)->take($this->limit)->values();
