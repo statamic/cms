@@ -23,7 +23,7 @@
 
                 <save-button-options
                     v-if="!readOnly"
-                    :show-options="!revisionsEnabled"
+                    :show-options="!revisionsEnabled && !isInline"
                     :button-class="saveButtonClass"
                     :preferences-prefix="preferencesPrefix"
                 >
@@ -290,6 +290,7 @@ export default {
         method: String,
         amp: Boolean,
         isCreating: Boolean,
+        isInline: Boolean,
         initialReadOnly: Boolean,
         initialIsRoot: Boolean,
         initialPermalink: String,
@@ -492,12 +493,12 @@ export default {
                     }
 
                     // If the user has opted to create another entry, redirect them to create page.
-                    if (this.afterSaveOption === 'create_another') {
+                    if (!this.isInline && this.afterSaveOption === 'create_another') {
                         window.location = this.createAnotherUrl;
                     }
 
                     // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (this.afterSaveOption === null) {
+                    else if (!this.isInline && this.afterSaveOption === null) {
                         window.location = this.listingUrl;
                     }
 
