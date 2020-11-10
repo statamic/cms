@@ -4,6 +4,7 @@ namespace Statamic\Assets;
 
 use Facades\Statamic\Assets\Dimensions;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use League\Flysystem\Filesystem;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -124,17 +125,23 @@ class Asset implements AssetContract, Augmentable
             return $this->generateMeta();
         }
 
+        if ($cached = Cache::get($this->metaCacheKey())) {
+            $this->meta = $cached;
+        }
+
         if ($this->meta) {
             return array_merge($this->meta, ['data' => $this->data->all()]);
         }
 
-        if ($this->disk()->exists($path = $this->metaPath())) {
-            return YAML::parse($this->disk()->get($path));
-        }
+        return $this->meta = Cache::rememberForever($this->metaCacheKey(), function () {
+            if ($this->disk()->exists($path = $this->metaPath())) {
+                return YAML::parse($this->disk()->get($path));
+            }
 
-        $this->writeMeta($this->meta = $this->generateMeta());
+            $this->writeMeta($meta = $this->generateMeta());
 
-        return $this->meta;
+            return $meta;
+        });
     }
 
     public function generateMeta()
@@ -169,6 +176,11 @@ class Asset implements AssetContract, Augmentable
         $contents = YAML::dump($meta);
 
         $this->disk()->put($this->metaPath(), $contents);
+    }
+
+    protected function metaCacheKey()
+    {
+        return 'asset-meta-'.$this->id();
     }
 
     /**
@@ -370,6 +382,10 @@ class Asset implements AssetContract, Augmentable
     {
         Facades\Asset::save($this);
 
+        Cache::forget($this->metaCacheKey());
+        Cache::forget($this->container()->filesCacheKey());
+        Cache::forget($this->container()->filesCacheKey($this->folder()));
+
         AssetSaved::dispatch($this);
 
         return true;
@@ -448,6 +464,8 @@ class Asset implements AssetContract, Augmentable
      */
     public function move($folder, $filename = null)
     {
+        Cache::forget($this->container()->filesCacheKey($this->folder()));
+
         $filename = $filename ?: $this->filename();
         $oldPath = $this->path();
         $oldMetaPath = $this->metaPath();
