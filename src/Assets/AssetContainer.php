@@ -228,7 +228,9 @@ class AssetContainer implements AssetContainerContract, Augmentable
             $recursive = true;
         }
 
-        return Cache::remember($this->filesCacheKey($folder), now()->addMinute(), function () use ($folder, $recursive) {
+        $cacheFor = config('statamic.assets.file_listing_cache_length', 60);
+
+        return Cache::remember($this->filesCacheKey($folder), $cacheFor, function () use ($folder, $recursive) {
             $files = collect($this->disk()->getFiles($folder, $recursive));
 
             // Get rid of files we never want to show up.
