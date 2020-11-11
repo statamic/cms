@@ -127,5 +127,6 @@ return [
     */
 
     'cache_meta' => true,
+    'file_listing_cache_length' => 60,
 
 ];
