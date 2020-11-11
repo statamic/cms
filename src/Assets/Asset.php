@@ -127,7 +127,7 @@ class Asset implements AssetContract, Augmentable
 
         if (!$this->meta && $cached = Cache::get($this->metaCacheKey())) {  
             $this->meta = $cached;
-            $this->hydrate();
+            $this->data = collect($cached['data']);
         }
 
         if ($this->meta) {
