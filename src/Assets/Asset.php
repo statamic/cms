@@ -89,10 +89,6 @@ class Asset implements AssetContract, Augmentable
 
     public function hydrate()
     {
-        if ($this->meta) {
-            return $this;
-        }
-
         $this->meta = $this->meta();
 
         $this->data = collect($this->meta['data']);
@@ -123,10 +119,6 @@ class Asset implements AssetContract, Augmentable
     {
         if (! config('statamic.assets.cache_meta')) {
             return $this->generateMeta();
-        }
-
-        if ($cached = Cache::get($this->metaCacheKey())) {
-            $this->meta = $cached;
         }
 
         if ($this->meta) {
@@ -381,6 +373,8 @@ class Asset implements AssetContract, Augmentable
     public function save()
     {
         Facades\Asset::save($this);
+
+        $this->meta = null;
 
         Cache::forget($this->metaCacheKey());
         Cache::forget($this->container()->filesCacheKey());

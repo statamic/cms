@@ -4,6 +4,7 @@ namespace Tests\Assets;
 
 use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
@@ -277,19 +278,25 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_meta_data()
+    public function it_gets_existing_meta_data()
     {
         Storage::fake('test');
         Storage::disk('test')->put('foo/test.txt', '');
-        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump($meta = [
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump($expected = [
             'data' => ['foo' => 'bar'],
             'size' => 123,
         ]));
 
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo/test.txt');
+        $cacheKey = 'asset-meta-'.$asset->id();
 
-        $this->assertEquals($meta, $asset->meta());
+        // If we haven't yet asked for meta, it should not exist in cache...
+        $this->assertNull(Cache::get($cacheKey));
+
+        // After we ask for meta, we should see it in cache as well...
+        $this->assertEquals($expected, $asset->meta());
+        $this->assertEquals($expected, Cache::get($cacheKey));
     }
 
     /** @test */
@@ -305,15 +312,40 @@ class AssetTest extends TestCase
 
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo/image.jpg')->set('foo', 'bar');
+        $cacheKey = 'asset-meta-'.$asset->id();
 
-        $this->assertEquals([
+        $metaWithoutData = [
+            'data' => [],
+            'size' => 723,
+            'last_modified' => Carbon::parse('2012-01-02 4:57pm')->timestamp,
+            'width' => 30,
+            'height' => 60,
+        ];
+
+        $metaWithData = [
             'data' => ['foo' => 'bar'],
             'size' => 723,
             'last_modified' => Carbon::parse('2012-01-02 4:57pm')->timestamp,
             'width' => 30,
             'height' => 60,
-        ], $asset->meta());
-        Storage::disk('test')->assertExists('foo/.meta/image.jpg.yaml');
+        ];
+
+        // The meta that's saved to file will also be cached, but will not include in-memory data...
+        $this->assertEquals($metaWithoutData, YAML::parse(Storage::disk('test')->get('foo/.meta/image.jpg.yaml')));
+        $this->assertEquals($metaWithoutData, Cache::get($cacheKey));
+
+        // Even though the meta data is not cached, we're still able able to get it off the intance...
+        $this->assertEquals($metaWithData, $asset->meta());
+        $this->assertEquals($metaWithoutData, Cache::get($cacheKey));
+
+        // Saving should clear the cache and persist the new meta data to the filesystem...
+        $asset->save();
+        $this->assertNull(Cache::get($cacheKey));
+        $this->assertEquals($metaWithData, YAML::parse(Storage::disk('test')->get('foo/.meta/image.jpg.yaml')));
+
+        // Then if we ask for new meta, it should cache with the newly saved data...
+        $this->assertEquals($metaWithData, $asset->meta());
+        $this->assertEquals($metaWithData, Cache::get($cacheKey));
     }
 
     /** @test */
