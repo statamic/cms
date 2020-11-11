@@ -125,8 +125,9 @@ class Asset implements AssetContract, Augmentable
             return $this->generateMeta();
         }
 
-        if ($cached = Cache::get($this->metaCacheKey())) {
-            return $cached;
+        if (!$this->meta && $cached = Cache::get($this->metaCacheKey())) {  
+            $this->meta = $cached;
+            $this->hydrate();
         }
 
         if ($this->meta) {
