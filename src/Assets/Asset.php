@@ -89,10 +89,6 @@ class Asset implements AssetContract, Augmentable
 
     public function hydrate()
     {
-        if ($this->meta) {
-            return $this;
-        }
-
         $this->meta = $this->meta();
 
         $this->data = collect($this->meta['data']);
@@ -123,10 +119,6 @@ class Asset implements AssetContract, Augmentable
     {
         if (! config('statamic.assets.cache_meta')) {
             return $this->generateMeta();
-        }
-
-        if ($cached = Cache::get($this->metaCacheKey())) {
-            $this->meta = $cached;
         }
 
         if ($this->meta) {
@@ -178,7 +170,7 @@ class Asset implements AssetContract, Augmentable
         $this->disk()->put($this->metaPath(), $contents);
     }
 
-    protected function metaCacheKey()
+    public function metaCacheKey()
     {
         return 'asset-meta-'.$this->id();
     }
@@ -382,9 +374,7 @@ class Asset implements AssetContract, Augmentable
     {
         Facades\Asset::save($this);
 
-        Cache::forget($this->metaCacheKey());
-        Cache::forget($this->container()->filesCacheKey());
-        Cache::forget($this->container()->filesCacheKey($this->folder()));
+        $this->clearCaches();
 
         AssetSaved::dispatch($this);
 
@@ -401,9 +391,23 @@ class Asset implements AssetContract, Augmentable
         $this->disk()->delete($this->path());
         $this->disk()->delete($this->metaPath());
 
+        $this->clearCaches();
+
         AssetDeleted::dispatch($this);
 
         return $this;
+    }
+
+    /**
+     * Clear meta and filesystem listing caches.
+     */
+    private function clearCaches()
+    {
+        $this->meta = null;
+
+        Cache::forget($this->metaCacheKey());
+        Cache::forget($this->container()->filesCacheKey());
+        Cache::forget($this->container()->filesCacheKey($this->folder()));
     }
 
     /**
