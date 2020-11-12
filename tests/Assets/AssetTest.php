@@ -278,6 +278,36 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_generates_and_clears_meta_and_filesystem_listing_caches()
+    {
+        Storage::fake('test');
+        Storage::disk('test')->put('foo/test.txt', '');
+        Storage::disk('test')->put('foo/.meta/test.txt.yaml', YAML::dump($expected = [
+            'data' => ['foo' => 'bar'],
+            'size' => 123,
+        ]));
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo/test.txt');
+
+        // Caches shouldn't be generated until asked for...
+        $this->assertFalse(Cache::has($asset->metaCacheKey()));
+        $this->assertFalse(Cache::has($container->filesCacheKey('foo')));
+
+        // Ask for meta and files to generate caches...
+        $asset->meta();
+        $container->files('foo');
+        $this->assertTrue(Cache::has($asset->metaCacheKey()));
+        $this->assertTrue(Cache::has($container->filesCacheKey('foo')));
+
+        // Deleting asset and container should clear caches...
+        $asset->delete();
+        $container->delete();
+        $this->assertFalse(Cache::has($asset->metaCacheKey()));
+        $this->assertFalse(Cache::has($container->filesCacheKey('foo')));
+    }
+
+    /** @test */
     public function it_gets_existing_meta_data()
     {
         Storage::fake('test');
@@ -289,14 +319,13 @@ class AssetTest extends TestCase
 
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo/test.txt');
-        $cacheKey = 'asset-meta-'.$asset->id();
 
         // If we haven't yet asked for meta, it should not exist in cache...
-        $this->assertNull(Cache::get($cacheKey));
+        $this->assertNull(Cache::get($asset->metaCacheKey()));
 
         // After we ask for meta, we should see it in cache as well...
         $this->assertEquals($expected, $asset->meta());
-        $this->assertEquals($expected, Cache::get($cacheKey));
+        $this->assertEquals($expected, Cache::get($asset->metaCacheKey()));
     }
 
     /** @test */
@@ -312,7 +341,6 @@ class AssetTest extends TestCase
 
         $container = Facades\AssetContainer::make('test')->disk('test');
         $asset = (new Asset)->container($container)->path('foo/image.jpg')->set('foo', 'bar');
-        $cacheKey = 'asset-meta-'.$asset->id();
 
         $metaWithoutData = [
             'data' => [],
@@ -332,20 +360,20 @@ class AssetTest extends TestCase
 
         // The meta that's saved to file will also be cached, but will not include in-memory data...
         $this->assertEquals($metaWithoutData, YAML::parse(Storage::disk('test')->get('foo/.meta/image.jpg.yaml')));
-        $this->assertEquals($metaWithoutData, Cache::get($cacheKey));
+        $this->assertEquals($metaWithoutData, Cache::get($asset->metaCacheKey()));
 
         // Even though the meta data is not cached, we're still able able to get it off the intance...
         $this->assertEquals($metaWithData, $asset->meta());
-        $this->assertEquals($metaWithoutData, Cache::get($cacheKey));
+        $this->assertEquals($metaWithoutData, Cache::get($asset->metaCacheKey()));
 
         // Saving should clear the cache and persist the new meta data to the filesystem...
         $asset->save();
-        $this->assertNull(Cache::get($cacheKey));
+        $this->assertNull(Cache::get($asset->metaCacheKey()));
         $this->assertEquals($metaWithData, YAML::parse(Storage::disk('test')->get('foo/.meta/image.jpg.yaml')));
 
         // Then if we ask for new meta, it should cache with the newly saved data...
         $this->assertEquals($metaWithData, $asset->meta());
-        $this->assertEquals($metaWithData, Cache::get($cacheKey));
+        $this->assertEquals($metaWithData, Cache::get($asset->metaCacheKey()));
     }
 
     /** @test */

@@ -170,7 +170,7 @@ class Asset implements AssetContract, Augmentable
         $this->disk()->put($this->metaPath(), $contents);
     }
 
-    protected function metaCacheKey()
+    public function metaCacheKey()
     {
         return 'asset-meta-'.$this->id();
     }
@@ -374,11 +374,7 @@ class Asset implements AssetContract, Augmentable
     {
         Facades\Asset::save($this);
 
-        $this->meta = null;
-
-        Cache::forget($this->metaCacheKey());
-        Cache::forget($this->container()->filesCacheKey());
-        Cache::forget($this->container()->filesCacheKey($this->folder()));
+        $this->clearCaches();
 
         AssetSaved::dispatch($this);
 
@@ -395,9 +391,23 @@ class Asset implements AssetContract, Augmentable
         $this->disk()->delete($this->path());
         $this->disk()->delete($this->metaPath());
 
+        $this->clearCaches();
+
         AssetDeleted::dispatch($this);
 
         return $this;
+    }
+
+    /**
+     * Clear meta and filesystem listing caches.
+     */
+    private function clearCaches()
+    {
+        $this->meta = null;
+
+        Cache::forget($this->metaCacheKey());
+        Cache::forget($this->container()->filesCacheKey());
+        Cache::forget($this->container()->filesCacheKey($this->folder()));
     }
 
     /**
