@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.0.27 (2020-11-12)
+
+### What's fixed
+- Fixed some issues around asset caching. [#2831](https://github.com/statamic/cms/issues/2831) [#2840](https://github.com/statamic/cms/issues/2840)
+
+
+
 ## 3.0.26 (2020-11-10)
 
 ### What's improved
@@ -269,7 +276,7 @@
 - Actions with redirects now actually redirect. [#1946](https://github.com/statamic/cms/issues/1946)
 - Action confirmation modals remain open on failures. [#1576](https://github.com/statamic/cms/issues/1576)
 - Bard will now render strikethrough elements. [#2517](https://github.com/statamic/cms/issues/2517)
-- Bumped html-to-prosemirror and prosemirror-to-html packages. 
+- Bumped html-to-prosemirror and prosemirror-to-html packages.
 - Bumped lodash version [#2089](https://github.com/statamic/cms/issues/2089)
 
 
