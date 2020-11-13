@@ -39,4 +39,16 @@ return [
 
     'pagination_size' => 50,
 
+    /*
+    |--------------------------------------------------------------------------
+    | URLs
+    |--------------------------------------------------------------------------
+    |
+    | Whether or not keys like edit_url or api_url are exposed via your
+    | API endpoints.
+    |
+    */
+
+    'disable_urls' => true,
+
 ];
