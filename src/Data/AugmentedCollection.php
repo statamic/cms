@@ -29,6 +29,13 @@ class AugmentedCollection extends Collection
         return $this->shallowNesting;
     }
 
+    public function withoutUrls()
+    {
+        $this->forget(['api_url', 'edit_url']);
+
+        return $this;
+    }
+
     public function toArray()
     {
         return $this->map(function ($value) {
