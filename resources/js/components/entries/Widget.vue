@@ -5,7 +5,7 @@
         </div>
 
         <data-list
-            v-if="!initializing"
+            v-if="!initializing && items.length"
             :rows="items"
             :columns="cols"
             :sort="false"
@@ -29,6 +29,10 @@
                 />
             </div>
         </data-list>
+
+        <p v-else-if="!initializing && !items.length" class="p-2 pt-1 text-sm text-grey-50">
+            {{ __('There are no entries in this site') }}
+        </p>
 
     </div>
 </template>
