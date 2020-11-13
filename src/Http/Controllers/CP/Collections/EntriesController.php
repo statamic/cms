@@ -57,9 +57,7 @@ class EntriesController extends CpController
         $query = $collection->queryEntries();
 
         if ($site = request('site')) {
-            if (Site::hasMultiple() && $collection->sites()->contains($site)) {
-                $query->where('site', $site);
-            }
+            $query->where('site', $site);
         }
 
         if ($search = request('search')) {
