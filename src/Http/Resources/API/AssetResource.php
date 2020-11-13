@@ -14,9 +14,14 @@ class AssetResource extends JsonResource
      */
     public function toArray($request)
     {
-        return $this->resource
+        $collection = $this->resource
             ->toAugmentedCollection()
-            ->withShallowNesting()
-            ->toArray();
+            ->withShallowNesting();
+
+        if (config('statamic.api.disable_urls', false)) {
+            $collection->withoutUrls();
+        }
+
+        return $collection->toArray();
     }
 }
