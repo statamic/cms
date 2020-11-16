@@ -1601,20 +1601,20 @@ class CoreModifiers extends Modifier
                     $value = "{$url}?".implode('&', $matches).$anchor;
                     $query = parse_url($value, PHP_URL_QUERY);
                     parse_str($query ?? '', $queryAssociativeArray);
-    
+
                     $rii = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($queryAssociativeArray), \RecursiveIteratorIterator::SELF_FIRST);
                     $currentOriginalParent = $originalQueryAssociativeArray;
-    
+
                     foreach ($rii as $key => $value) {
                         if ($rii->hasChildren()) {
                             $currentOriginalParent = $currentOriginalParent[$key];
-    
+
                             // If the currently iterated array keys of the new query params array doesn't match the original array keys at the same position,
                             // it means we have to reorder the currently iterated array (because an item was removed).
                             if (array_keys($value) !== array_keys($currentOriginalParent)) {
                                 $lastIndex = 0;
                                 $reindexedArray = [];
-    
+
                                 // Reorder integer array keys only.
                                 foreach ($value as $key => $value) {
                                     if (is_int($key)) {
@@ -1623,7 +1623,7 @@ class CoreModifiers extends Modifier
                                         $reindexedArray[$key] = $value;
                                     }
                                 }
-    
+
                                 $currentDepth = $rii->getDepth();
 
                                 // Save modifications recursively (going up the array).
@@ -1639,13 +1639,13 @@ class CoreModifiers extends Modifier
                                             : $rii->getSubIterator($subDepth + 1)->getArrayCopy()
                                     );
                                 }
-    
+
                                 // Only one key per call can be removed,
                                 // so break the iterator loop because all the following sub-arrays will match.
                                 break;
                             }
-                        // We reached the bottom level, so reset the parent.
                         } else {
+                            // We reached the bottom level, so reset the parent.
                             $currentOriginalParent = $originalQueryAssociativeArray;
                         }
                     }
@@ -1854,7 +1854,7 @@ class CoreModifiers extends Modifier
 
             // Parse the URL to retrieve the possible query string and anchor.
             $query = parse_url($value, PHP_URL_QUERY);
-            
+
             // Build an associative array based on the query string.
             parse_str($query ?? '', $queryAssociativeArray);
 
