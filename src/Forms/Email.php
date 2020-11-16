@@ -84,6 +84,7 @@ class Email extends Mailable
         $augmented = $this->submission->toAugmentedArray();
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
+            'config'     => config()->all(),
             'fields'     => $this->getRenderableFieldData($augmented),
             'site_url'   => Config::getSiteUrl(),
             'date'       => now(),
