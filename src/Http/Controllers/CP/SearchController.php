@@ -17,7 +17,7 @@ class SearchController extends CpController
             ->filter(function ($item) {
                 return User::current()->can('view', $item);
             })
-            ->limit(10)
+            ->take(10)
             ->map(function ($item) {
                 return $item->toAugmentedCollection([
                     'title', 'edit_url',
