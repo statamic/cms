@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Exceptions;
+namespace Statamic\View\Antlers;
 
 class ArrayKeyNotFoundException extends \Exception
 {

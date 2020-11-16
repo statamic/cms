@@ -276,6 +276,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         if ($this->id()) {
             Blink::store('structure-page-entries')->forget($this->id());
             Blink::store('structure-uris')->forget($this->id());
+            Blink::store('structure-entries')->flush();
         }
 
         $this->taxonomize();
@@ -402,7 +403,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         $array = $this->data()->merge([
             'id' => $this->id(),
-            'origin' => optional($this->origin)->id(),
+            'origin' => optional($this->origin())->id(),
             'published' => $this->published === false ? false : null,
         ]);
 

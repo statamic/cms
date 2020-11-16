@@ -1,5 +1,170 @@
 # Release Notes
 
+## 3.0.27 (2020-11-12)
+
+### What's fixed
+- Fixed some issues around asset caching. [#2831](https://github.com/statamic/cms/issues/2831) [#2840](https://github.com/statamic/cms/issues/2840)
+
+
+
+## 3.0.26 (2020-11-10)
+
+### What's improved
+- Asset browsing has been given some performance improvements when dealing with large amounts of assets. [#2828](https://github.com/statamic/cms/issues/2828)
+- The `embed_url` modifier load embeds without cookies from Vimeo or YouTube. [#2820](https://github.com/statamic/cms/issues/2820)
+- Increase scannability of the fieldtype picker. [statamic/ideas#384](https://github.com/statamic/ideas/issues/384)
+
+### What's fixed
+- Fixed some issues with nav and breadcrumb tags on multisite. [#2269](https://github.com/statamic/cms/issues/2269)
+- Fix legacy bard data not displaying in listings. [13b70fa79](https://github.com/statamic/cms/commit/13b70fa79)
+- Fix an issue where Bard text doesn't show up in listings sometimes. [ab4194c88](https://github.com/statamic/cms/commit/ab4194c88)
+
+
+
+## 3.0.25 (2020-11-06)
+
+### What's new
+- Field names in form validation can be translated. [#2764](https://github.com/statamic/cms/issues/2764)
+- Added an Indonesian translation [#2426](https://github.com/statamic/cms/issues/2426)
+- The `assets` tag can search by collection, and fields, and filter by type. [#2716](https://github.com/statamic/cms/issues/2716)
+
+### What's improved
+- French, German, and Danish translations have been updated. [#2808](https://github.com/statamic/cms/issues/2808) [#2804](https://github.com/statamic/cms/issues/2804) [#2809](https://github.com/statamic/cms/issues/2809)
+- The name is passed along when creating custom search index drivers. [#2781](https://github.com/statamic/cms/issues/2781)
+- The `search:update` command defaults to `all` so you can just hit enter. [a0c7ad908](https://github.com/statamic/cms/commit/a0c7ad908)
+- Exceptions thrown within modifiers will now show the real exception in the stack trace. [0c443f751](https://github.com/statamic/cms/commit/0c443f751)
+- The `text` fieldtype will save integers instead of strings when `input_type` is `number`. [#2708](https://github.com/statamic/cms/issues/2708)
+
+### What's fixed
+- Fix shallow augmentation for nested relations. [#2801](https://github.com/statamic/cms/issues/2801)
+- Fix a recursion issue in Bard that made the page hang. [#2805](https://github.com/statamic/cms/issues/2805)
+- Prevent an error when adding a new set in Bard or Replicator. [f9c448d1c](https://github.com/statamic/cms/commit/f9c448d1c)
+- Prevent an error when there's a Replicator set without any fields. [402feb229](https://github.com/statamic/cms/commit/402feb229)
+- Fix issue where only the last field's value of a Replicator is shown in the preview. [a5fd579f4](https://github.com/statamic/cms/commit/a5fd579f4)
+- Fix a weird table shrinky overflowy UI thing.  [#2595](https://github.com/statamic/cms/issues/2595)
+- Localized entries get appropriate fallback values placed in the search index. [#2789](https://github.com/statamic/cms/issues/2789) [88b245b](https://github.com/statamic/cms/commit/88b245b)
+- Fix the `sum` modifier not being able to handle `Value` objects. [#2703](https://github.com/statamic/cms/issues/2703)
+- Prevent `select` fields with lots of text from overflowing. [#2702](https://github.com/statamic/cms/issues/2702)
+- Prevent blueprint fields with long labels from overflowing. [#2673](https://github.com/statamic/cms/issues/2673)
+
+
+
+## 3.0.24 (2020-11-04)
+
+### What's new
+- Added Stache Locking. Reduces resource spikes on busy sites while building the cache. [#2794](https://github.com/statamic/cms/issues/2794)
+- Added an `entriesCount` method to taxonomy terms which lets us perform a more efficient count query. This speeds up Stache build time on taxonomy-heavy sites. [#2792](https://github.com/statamic/cms/issues/2792)
+
+### What's improved
+- Added some missing translations. [36d973eb](https://github.com/statamic/cms/commit/36d973eb)
+
+### What's fixed
+- Fixed a typo in a Dutch translation. [#2796](https://github.com/statamic/cms/issues/2796)
+
+
+
+## 3.0.23 (2020-11-01)
+
+### What's new
+- Replicator can configure it's set collapsing behavior. Everything by default [#2771](https://github.com/statamic/cms/issues/2771), or accordion style [979daebec](https://github.com/statamic/cms/commit/979daebec).
+- Static caching supports invalidaton by Navigation and Global. [#2778](https://github.com/statamic/cms/issues/2778)
+
+### What's improved
+- Radio fieldtype labels are shown in listings instead of just the values. [#2731](https://github.com/statamic/cms/issues/2731)
+- Add Slovene translation. [#2777](https://github.com/statamic/cms/issues/2777)
+- Improve Replicator and Bard performance when collapsing sets. [#2787](https://github.com/statamic/cms/issues/2787)
+
+### What's fixed
+- Fixed field conditions in Grids and imported fieldsets with prefixes. [#2767](https://github.com/statamic/cms/issues/2767)
+- Only look up addon editions if they're installed. [#2782](https://github.com/statamic/cms/issues/2782)
+- Taggable and Relationship fieldtype in select mode is reorderable by drag and drop. [#2059](https://github.com/statamic/cms/issues/2059)
+- Fix a few instances of title, status, etc not being updated in the UI appropriately. [#1822](https://github.com/statamic/cms/issues/1822)
+- Prevent select fields from converting booleans when used as config field. [b2a425079](https://github.com/statamic/cms/commit/b2a425079)
+- Prevent an overzealous blink cache clear. [818c4fdc4](https://github.com/statamic/cms/commit/818c4fdc4)
+
+
+
+## 3.0.22 (2020-10-29)
+
+### What's fixed
+- Addon directories should include a trailing slash. [seo-pro#140](https://github.com/statamic/seo-pro/issues/140)
+
+
+
+## 3.0.21 (2020-10-28)
+
+### What's improved
+- Addons can get their directory without needing it in the manifest. [#2761](https://github.com/statamic/cms/issues/2761)
+- Structure tree entries get eager loaded. [#2573](https://github.com/statamic/cms/issues/2573)
+- Composer 2 is used within the control panel. [facca2693](https://github.com/statamic/cms/commit/facca2693)
+- `Str::isUrl()` checks more URLs. [#2759](https://github.com/statamic/cms/issues/2759)
+- Dutch translation has been updated. [#2754](https://github.com/statamic/cms/issues/2754)
+- The Entry facade docblock has been updated. [#2720](https://github.com/statamic/cms/issues/2720)
+- The `@svg` Blade directive is only registered on CP routes. Prevents conflicts with things like Blade UI Kit. [99e812e6c](https://github.com/statamic/cms/commit/99e812e6c)
+- The `shuffle` modifier works for Collections. [#2709](https://github.com/statamic/cms/issues/2709)
+- The `.idea` directory is git ignored, and we now require `ext-json`, which improves the experience for PhpStorm users. [#2735](https://github.com/statamic/cms/issues/2735)
+
+### What's fixed
+- Fix how data gets passed into `*recursive var*` in the parser and structure tag. [#2719](https://github.com/statamic/cms/issues/2719)
+- Addon views are registered only if the views directory exists. [#2707](https://github.com/statamic/cms/issues/2707)
+- Actions can return any type of `Request` for downloads, like a `StreamedResponse`. [#2738](https://github.com/statamic/cms/issues/2738)
+- Update some JS dependencies to patch security issues. [49e4ce819](https://github.com/statamic/cms/commit/49e4ce819) [c290a86ec](https://github.com/statamic/cms/commit/c290a86ec)
+- Prevent an error when using the `entries` fieldtype in a non entry (e.g. a user) [8ede3718b](https://github.com/statamic/cms/commit/8ede3718b)
+- Prevent making addon instances multiple times [d4ce47099](https://github.com/statamic/cms/commit/d4ce47099)
+- Fixed a PSR-4 incompatible test. [#2734](https://github.com/statamic/cms/issues/2734)
+
+
+
+## 3.0.20 (2020-10-20)
+
+### What's new
+- Added a `smartypants` modifier and `Html::smartypants()` method. [#2689](https://github.com/statamic/cms/issues/2689)
+
+### What's improved
+- Danish and Dutch translations have been updated. [#2693](https://github.com/statamic/cms/issues/2693) [#2691](https://github.com/statamic/cms/issues/2691)
+
+### What's fixed
+- A bunch of taxonomy cache fixes. Listed below for good measure. [#2686](https://github.com/statamic/cms/issues/2686)
+- Prevent taxonomy terms hanging around after you delete them. [#1349](https://github.com/statamic/cms/issues/1349)
+- Prevent taxonomy terms showing the slug instead of the title. [#1982](https://github.com/statamic/cms/issues/1982)
+- Prevent an undefined offset error when creating terms. [#2020](https://github.com/statamic/cms/issues/2020)
+- Entry-term assocation is actually removed when expected. [#1870](https://github.com/statamic/cms/issues/1870)
+- Prevent terms being displayed as the ID when you create new ones on an entry.
+- An empty taxonomy parameter no longer tries to filter. [#2672](https://github.com/statamic/cms/issues/2672)
+- Entries and Terms fieldtypes will show all results in select mode (instead of just the first paginated page). [#1727](https://github.com/statamic/cms/issues/1727)
+- Entries fieldtype will show localized entries in select and typehead modes. [#1835](https://github.com/statamic/cms/issues/1835)
+- Prevent changing publish status from wiping out the origin. [#2451](https://github.com/statamic/cms/issues/2451)
+- YAML content should be null if it's just whitespace [#2677](https://github.com/statamic/cms/issues/2677)
+- Delete Eloquent user through the repository. [da9335936](https://github.com/statamic/cms/commit/da9335936) [#2697](https://github.com/statamic/cms/issues/2697)
+- Fixed variable name in down migration [#2676](https://github.com/statamic/cms/issues/2676)
+- Updated docs urls [898889ce5](https://github.com/statamic/cms/commit/898889ce5)
+
+
+
+## 3.0.19 (2020-10-15)
+
+### What's improved
+- The French translation has been updated. [#2664](https://github.com/statamic/cms/issues/2664)
+
+### What's fixed
+- Prevent exception when an invalid or outdated entry is selected in an entries fieldtype. [#2660](https://github.com/statamic/cms/issues/2660)
+- Fix a handful of Antlers conditional issues. [#2663](https://github.com/statamic/cms/issues/2663) [#1193](https://github.com/statamic/cms/issues/1193) [#2614](https://github.com/statamic/cms/issues/2614) [#2537](https://github.com/statamic/cms/issues/2537) [#2456](https://github.com/statamic/cms/issues/2456)
+
+
+
+## 3.0.18 (2020-10-14)
+
+### What's new
+- Added an [`md5` modifier](https://statamic.dev/modifiers/md5). [#2652](https://github.com/statamic/cms/issues/2652)
+
+### What's fixed
+- Form validation errors are translated appropriately. [#2387](https://github.com/statamic/cms/issues/2387)
+- Form emails are localized based on the site where they were submitted. [#2658](https://github.com/statamic/cms/issues/2658)
+- The `entries` fieldtype will localize its selections in views based on the locale. [#2657](https://github.com/statamic/cms/issues/2657)
+- The entry gets passed along in more places, fixing some issues with Replicator, Grid, and Bard. [#2656](https://github.com/statamic/cms/issues/2656)
+
+
+
 ## 3.0.17 (2020-10-13)
 
 ### What's new
@@ -111,7 +276,7 @@
 - Actions with redirects now actually redirect. [#1946](https://github.com/statamic/cms/issues/1946)
 - Action confirmation modals remain open on failures. [#1576](https://github.com/statamic/cms/issues/1576)
 - Bard will now render strikethrough elements. [#2517](https://github.com/statamic/cms/issues/2517)
-- Bumped html-to-prosemirror and prosemirror-to-html packages. 
+- Bumped html-to-prosemirror and prosemirror-to-html packages.
 - Bumped lodash version [#2089](https://github.com/statamic/cms/issues/2089)
 
 

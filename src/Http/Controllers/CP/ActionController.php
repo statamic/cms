@@ -3,9 +3,9 @@
 namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Statamic\Facades\Action;
 use Statamic\Facades\User;
+use Symfony\Component\HttpFoundation\Response;
 
 abstract class ActionController extends CpController
 {

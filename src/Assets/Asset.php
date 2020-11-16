@@ -4,6 +4,7 @@ namespace Statamic\Assets;
 
 use Facades\Statamic\Assets\Dimensions;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use League\Flysystem\Filesystem;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
@@ -88,10 +89,6 @@ class Asset implements AssetContract, Augmentable
 
     public function hydrate()
     {
-        if ($this->meta) {
-            return $this;
-        }
-
         $this->meta = $this->meta();
 
         $this->data = collect($this->meta['data']);
@@ -128,13 +125,15 @@ class Asset implements AssetContract, Augmentable
             return array_merge($this->meta, ['data' => $this->data->all()]);
         }
 
-        if ($this->disk()->exists($path = $this->metaPath())) {
-            return YAML::parse($this->disk()->get($path));
-        }
+        return $this->meta = Cache::rememberForever($this->metaCacheKey(), function () {
+            if ($this->disk()->exists($path = $this->metaPath())) {
+                return YAML::parse($this->disk()->get($path));
+            }
 
-        $this->writeMeta($this->meta = $this->generateMeta());
+            $this->writeMeta($meta = $this->generateMeta());
 
-        return $this->meta;
+            return $meta;
+        });
     }
 
     public function generateMeta()
@@ -169,6 +168,11 @@ class Asset implements AssetContract, Augmentable
         $contents = YAML::dump($meta);
 
         $this->disk()->put($this->metaPath(), $contents);
+    }
+
+    public function metaCacheKey()
+    {
+        return 'asset-meta-'.$this->id();
     }
 
     /**
@@ -370,6 +374,8 @@ class Asset implements AssetContract, Augmentable
     {
         Facades\Asset::save($this);
 
+        $this->clearCaches();
+
         AssetSaved::dispatch($this);
 
         return true;
@@ -385,9 +391,23 @@ class Asset implements AssetContract, Augmentable
         $this->disk()->delete($this->path());
         $this->disk()->delete($this->metaPath());
 
+        $this->clearCaches();
+
         AssetDeleted::dispatch($this);
 
         return $this;
+    }
+
+    /**
+     * Clear meta and filesystem listing caches.
+     */
+    private function clearCaches()
+    {
+        $this->meta = null;
+
+        Cache::forget($this->metaCacheKey());
+        Cache::forget($this->container()->filesCacheKey());
+        Cache::forget($this->container()->filesCacheKey($this->folder()));
     }
 
     /**
@@ -448,6 +468,8 @@ class Asset implements AssetContract, Augmentable
      */
     public function move($folder, $filename = null)
     {
+        Cache::forget($this->container()->filesCacheKey($this->folder()));
+
         $filename = $filename ?: $this->filename();
         $oldPath = $this->path();
         $oldMetaPath = $this->metaPath();

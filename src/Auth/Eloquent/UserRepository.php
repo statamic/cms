@@ -85,7 +85,7 @@ class UserRepository extends BaseRepository
 
     public function delete(UserContract $user)
     {
-        // todo
+        $user->model()->delete();
     }
 
     public function fromUser($user): ?UserContract

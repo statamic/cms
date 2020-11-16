@@ -3,6 +3,7 @@
 namespace Statamic\Support;
 
 use Illuminate\Support\HtmlString;
+use Michelf\SmartyPants;
 use Statamic\Facades\Config;
 use Statamic\Facades\Markdown;
 
@@ -313,6 +314,11 @@ class Html
     public static function markdown($string)
     {
         return Markdown::parse($string);
+    }
+
+    public static function smartypants($string)
+    {
+        return SmartyPants::defaultTransform($string, SmartyPants::ATTR_DEFAULT);
     }
 
     /**

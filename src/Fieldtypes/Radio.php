@@ -64,4 +64,9 @@ class Radio extends Fieldtype
 
         return $value;
     }
+
+    public function preProcessIndex($value)
+    {
+        return collect($this->config('options'))->get($value, $value);
+    }
 }

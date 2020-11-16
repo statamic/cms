@@ -14,7 +14,6 @@ use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
-use Statamic\Exceptions\ArrayKeyNotFoundException;
 use Statamic\Facades\Config;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
@@ -816,7 +815,7 @@ class Parser
         // also pass in the current callback (for later processing callback tags); also setting
         // $ref so that we can use it within the anonymous function
         $ref = $this;
-        $condition = $this->preg_replace_callback('/(\b'.$this->variableRegex.'[\b\]])/', function ($match) use ($ref) {
+        $condition = $this->preg_replace_callback('/\b('.$this->variableRegex.'\b]?)/', function ($match) use ($ref) {
             return $ref->processConditionVar($match);
         }, $condition);
 
@@ -933,7 +932,7 @@ class Parser
                     $has_children = false;
                 }
 
-                $replacement = $this->parse($orig_text, $child);
+                $replacement = $this->parse($orig_text, array_merge($data, $child));
 
                 // If this is the first loop we'll use $tag as reference, if not
                 // we'll use the previous tag ($next_tag)
@@ -980,7 +979,7 @@ class Parser
      */
     public function processConditionVar($match)
     {
-        $var = trim(is_array($match) ? $match[0] : $match);
+        $var = is_array($match) ? $match[0] : $match;
 
         if (in_array(strtolower($var), ['true', 'false', 'null', 'or', 'and']) or
             strpos($var, '__cond_str') === 0 or
@@ -1459,7 +1458,7 @@ class Parser
         try {
             return Modify::value($value)->context($context)->$modifier($parameters)->fetch();
         } catch (ModifierException $e) {
-            throw_if(config('app.debug'), $e);
+            throw_if(config('app.debug'), ($prev = $e->getPrevious()) ? $prev : $e);
             Log::notice(sprintf('Error in [%s] modifier: %s', $e->getModifier(), $e->getMessage()));
 
             return $value;

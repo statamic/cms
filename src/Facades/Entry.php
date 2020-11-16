@@ -12,15 +12,17 @@ use Statamic\Contracts\Entries\EntryRepository;
  * @method static null|\Statamic\Contracts\Entries\Entry find($id)
  * @method static null|\Statamic\Contracts\Entries\Entry findByUri(string $uri)
  * @method static null|\Statamic\Contracts\Entries\Entry findBySlug(string $slug, string $collection)
- * @method static \Statamic\Entries\Entry make()
- * @method static \Statamic\Stache\Query\EntryQueryBuilder query()
+ * @method static \Statamic\Contracts\Entries\Entry make()
+ * @method static \Statamic\Contracts\Entries\QueryBuilder query()
  * @method static void save($entry)
  * @method static void delete($entry)
  * @method static array createRules($collection, $site)
  * @method static array updateRules($collection, $entry)
  *
- * @see \Statamic\Entries\EntryCollection
  * @see \Statamic\Stache\Repositories\EntryRepository
+ * @see \Statamic\Stache\Query\EntryQueryBuilder
+ * @see \Statamic\Entries\EntryCollection
+ * @see \Statamic\Entries\Entry
  */
 class Entry extends Facade
 {

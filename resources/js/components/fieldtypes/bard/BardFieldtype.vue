@@ -157,6 +157,7 @@ export default {
             fullScreenMode: false,
             buttons: [],
             collapsed: this.meta.collapsed,
+            previews: this.meta.previews,
             mounted: false,
         }
     },
@@ -276,6 +277,15 @@ export default {
             const meta = this.meta;
             meta.collapsed = value;
             this.updateMeta(meta);
+        },
+
+        previews: {
+            deep: true,
+            handler(value) {
+                const meta = this.meta;
+                meta.previews = value;
+                this.updateMeta(meta);
+            }
         }
 
     },
@@ -285,6 +295,11 @@ export default {
         addSet(handle) {
             const id = `set-${uniqid()}`;
             const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
+
+            let previews = {};
+            Object.keys(this.meta.defaults[handle]).forEach(key => previews[key] = null);
+            this.previews = Object.assign({}, this.previews, { [id]: previews });
+
             this.updateSetMeta(id, this.meta.new[handle]);
 
             // Perform this in nextTick because the meta data won't be ready until then.
@@ -487,6 +502,10 @@ export default {
             });
 
             return exts;
+        },
+
+        updateSetPreviews(set, previews) {
+            this.previews[set] = previews;
         }
     }
 }

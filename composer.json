@@ -9,7 +9,8 @@
     ],
     "license": "proprietary",
     "require": {
-        "composer/composer": "^1.10",
+        "ext-json": "*",
+        "composer/composer": "^1.10 || ^2.0.0",
         "facade/ignition-contracts": "^1.0",
         "guzzlehttp/guzzle": "^6.3 || ^7.0",
         "laravel/framework": "^6.0 || ^7.0 || ^8.0",
@@ -17,9 +18,11 @@
         "league/commonmark": "^1.5",
         "league/csv": "^9.0",
         "league/glide": "^1.1",
-        "pixelfear/composer-dist-plugin": "^0.1.0",
+        "michelf/php-smartypants": "^1.8",
+        "pixelfear/composer-dist-plugin": "^0.1.4",
         "spatie/blink": "^1.1.2",
         "statamic/stringy": "^3.1",
+        "symfony/lock": "^5.1",
         "symfony/var-exporter": "^4.3",
         "symfony/yaml": "^4.1 || ^5.1",
         "ueberdosis/html-to-prosemirror": "^1.0",
@@ -62,7 +65,7 @@
     "autoload-dev": {
         "psr-4": {
             "Tests\\": "tests",
-            "Foo\\Bar\\": "tests/fixtures/Addon"
+            "Foo\\Bar\\": "tests/Fixtures/Addon"
         }
     }
 }

@@ -2,8 +2,8 @@ import { OPERATORS, ALIASES } from './Constants.js';
 
 export default class {
 
-    fromBlueprint(conditions) {
-        return _.map(conditions, (condition, field) => this.splitRhs(field, condition));
+    fromBlueprint(conditions, prefix=null) {
+        return _.map(conditions, (condition, field) => this.splitRhs(field, condition, prefix));
     }
 
     toBlueprint(conditions) {
@@ -16,12 +16,20 @@ export default class {
         return converted;
     }
 
-    splitRhs(field, condition) {
+    splitRhs(field, condition, prefix=null) {
         return {
-            'field': field,
+            'field': this.getScopedFieldHandle(field, prefix),
             'operator': this.getOperatorFromRhs(condition),
             'value': this.getValueFromRhs(condition)
         };
+    }
+
+    getScopedFieldHandle(field, prefix) {
+        if (field.startsWith('root.') || ! prefix) {
+            return field;
+        }
+
+        return prefix + field;
     }
 
     getOperatorFromRhs(condition) {

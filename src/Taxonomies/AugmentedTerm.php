@@ -49,11 +49,6 @@ class AugmentedTerm extends AbstractAugmented
         return $this->data->queryEntries()->where('site', $this->data->locale());
     }
 
-    protected function entriesCount()
-    {
-        return $this->entries()->count();
-    }
-
     protected function isTerm()
     {
         return true;

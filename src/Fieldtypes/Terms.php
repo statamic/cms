@@ -146,7 +146,7 @@ class Terms extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        return $query->paginate();
+        return $request->boolean('paginate', true) ? $query->paginate() : $query->get();
     }
 
     public function getResourceCollection($request, $items)

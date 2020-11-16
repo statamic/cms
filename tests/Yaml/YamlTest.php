@@ -204,6 +204,20 @@ EOT;
     }
 
     /** @test */
+    public function when_parsing_and_content_is_just_whitespace_it_treats_it_as_null()
+    {
+        $yaml = <<<'EOT'
+---
+foo: bar
+---
+
+
+EOT;
+
+        $this->assertEquals(['foo' => 'bar'], YAML::parse($yaml));
+    }
+
+    /** @test */
     public function it_throws_exception_when_parsing_without_an_argument_or_file()
     {
         $this->expectException(Exception::class);

@@ -70,7 +70,7 @@ Statamic's documentation lives in the [https://github.com/statamic/docs](https:/
 
 ### Core Enhancements
 
-If you would like to work on a new core feature or improvement, first create a [Github issue](https://github.com/statamic/cms/issues) for it if there’s not one already. While we appreciate community contributions, we do remain selective about what features make it into Statamic itself, so don’t take it the wrong way if we recommend that you to pursue the idea as an addon instead.
+If you would like to work on a new core feature or improvement, first create a [Github issue](https://github.com/statamic/cms/issues) for it if there’s not one already. While we appreciate community contributions, we do remain selective about what features make it into Statamic itself, so don’t take it the wrong way if we recommend that you pursue the idea as an addon instead.
 
 ### Compiled Assets
 

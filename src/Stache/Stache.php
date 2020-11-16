@@ -8,6 +8,8 @@ use Statamic\Extensions\FileStore;
 use Statamic\Facades\File;
 use Statamic\Stache\Stores\Store;
 use Statamic\Support\Str;
+use Symfony\Component\Lock\LockFactory;
+use Symfony\Component\Lock\LockInterface;
 use Wilderborn\Partyline\Facade as Partyline;
 
 class Stache
@@ -16,6 +18,8 @@ class Stache
     protected $stores;
     protected $startTime;
     protected $updateIndexes = true;
+    protected $lockFactory;
+    protected $locks = [];
 
     public function __construct()
     {
@@ -95,11 +99,15 @@ class Stache
     {
         Partyline::comment('Warming Stache...');
 
+        $lock = tap($this->lock('stache-warming'))->acquire(true);
+
         $this->startTimer();
 
         $this->stores()->each->warm();
 
         $this->stopTimer();
+
+        $lock->release();
     }
 
     public function instance()
@@ -172,5 +180,21 @@ class Stache
     public function shouldUpdateIndexes()
     {
         return $this->updateIndexes;
+    }
+
+    public function setLockFactory(LockFactory $lockFactory)
+    {
+        $this->lockFactory = $lockFactory;
+
+        return $this;
+    }
+
+    public function lock($name): LockInterface
+    {
+        if (isset($this->locks[$name])) {
+            return $this->locks[$name];
+        }
+
+        return $this->locks[$name] = $this->lockFactory->createLock($name);
     }
 }

@@ -1,8 +1,8 @@
 <?php
 
 return [
-    'any.config.default' => 'Establezca el valor predeterminado.',
     'any.config.cast_booleans' => 'Las opciones con valores de verdadero y falso se guardarán como valores booleanos.',
+    'any.config.default' => 'Establezca el valor predeterminado.',
     'array.config.keys' => 'Establezca las claves de matriz (variables) y las etiquetas opcionales.',
     'array.config.mode' => 'El modo dinámico le da al usuario el control de los datos mientras que el modo con clave no lo hace.',
     'assets.config.allow_uploads' => 'Permitir nuevas cargas de archivos.',
@@ -67,6 +67,10 @@ return [
     'range.config.prepend' => 'Agregue texto al principio (lado izquierdo) del control deslizante.',
     'range.config.step' => 'El tamaño mínimo entre valores.',
     'relationship.config.mode' => 'Elija su estilo de interfaz de usuario preferido.',
+    'replicator.config.collapse' => 'El comportamiento de colapso del conjunto.',
+    'replicator.config.collapse.accordion' => 'Solo permite expandir un conjunto a la vez',
+    'replicator.config.collapse.disabled' => 'Todos los conjuntos expandidos por defecto',
+    'replicator.config.collapse.enabled' => 'Todos los conjuntos colapsaron por defecto',
     'select.config.clearable' => 'Habilite para permitir anular la selección de su opción.',
     'select.config.multiple' => 'Permitir múltiples selecciones.',
     'select.config.options' => 'Establecer las teclas y sus etiquetas opcionales.',

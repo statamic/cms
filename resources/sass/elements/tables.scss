@@ -29,9 +29,8 @@
 }
 
 .data-table {
-	@apply text-left text-grey outline-none max-w-full block;
+	@apply text-left text-grey outline-none max-w-full w-full;
 	overflow-x: auto;
-	width: fit-content;
 
     thead {
 		// @apply bg-grey-20 text-grey-90 uppercase text-2xs tracking-wide outline-none;

@@ -5,7 +5,7 @@
         </div>
 
         <data-list
-            v-if="!initializing"
+            v-if="!initializing && items.length"
             :rows="items"
             :columns="cols"
             :sort="false"
@@ -30,6 +30,10 @@
             </div>
         </data-list>
 
+        <p v-else-if="!initializing && !items.length" class="p-2 pt-1 text-sm text-grey-50">
+            {{ __('There are no entries in this site') }}
+        </p>
+
     </div>
 </template>
 
@@ -42,13 +46,14 @@ export default {
 
     props: {
         collection: String,
+        site: String,
     },
 
     data() {
         return {
             cols: [{ label: "Title", field: "title", visible: true }],
             listingKey: 'entries',
-            requestUrl: cp_url(`collections/${this.collection}/entries`),
+            requestUrl: cp_url(`collections/${this.collection}/entries?site=${this.site}`),
         }
     }
 

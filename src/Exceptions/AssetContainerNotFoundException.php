@@ -8,6 +8,7 @@ use Facade\IgnitionContracts\BaseSolution;
 use Facade\IgnitionContracts\ProvidesSolution;
 use Facade\IgnitionContracts\Solution;
 use Statamic\Facades\AssetContainer;
+use Statamic\Statamic;
 
 class AssetContainerNotFoundException extends Exception implements ProvidesSolution
 {
@@ -29,7 +30,7 @@ class AssetContainerNotFoundException extends Exception implements ProvidesSolut
         return BaseSolution::create("The {$this->container} asset container was not found.")
             ->setSolutionDescription($description)
             ->setDocumentationLinks([
-                'Read the assets guide' => 'https://docs.statamic.com/assets',
+                'Read the assets guide' => Statamic::docsUrl('/assets'),
             ]);
     }
 

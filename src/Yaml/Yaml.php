@@ -45,7 +45,9 @@ class Yaml
         if (Pattern::startsWith($str, '---')) {
             $split = preg_split("/\n---/", $str, 2, PREG_SPLIT_NO_EMPTY);
             $str = $split[0];
-            $content = ltrim(array_get($split, 1, ''));
+            if (empty($content = ltrim(array_get($split, 1, '')))) {
+                $content = null;
+            }
         }
 
         try {

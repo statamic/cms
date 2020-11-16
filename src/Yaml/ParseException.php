@@ -6,6 +6,7 @@ use ErrorException;
 use Facade\IgnitionContracts\BaseSolution;
 use Facade\IgnitionContracts\ProvidesSolution;
 use Facade\IgnitionContracts\Solution;
+use Statamic\Statamic;
 
 class ParseException extends ErrorException implements ProvidesSolution
 {
@@ -16,7 +17,7 @@ class ParseException extends ErrorException implements ProvidesSolution
         return BaseSolution::create($title)
             ->setSolutionDescription($desc)
             ->setDocumentationLinks([
-                'YAML Primer' => 'https://docs.statamic.com/yaml',
+                'YAML Primer' => Statamic::docsUrl('/yaml'),
             ]);
     }
 

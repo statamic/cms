@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Contracts\Data\Localization;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -70,7 +71,9 @@ class Entries extends Relationship
             $query->orderBy($sort, $this->getSortDirection($request));
         }
 
-        return $query->paginate()->preProcessForIndex();
+        $items = $request->boolean('paginate', true) ? $query->paginate() : $query->get();
+
+        return $items->preProcessForIndex();
     }
 
     public function getResourceCollection($request, $items)
@@ -192,8 +195,9 @@ class Entries extends Relationship
     {
         if (is_string($value)) {
             $value = Entry::find($value);
-            if ($entry = $this->field()->parent()) {
-                $value = $value->in($entry->locale());
+            if ($value != null && $parent = $this->field()->parent()) {
+                $site = $parent instanceof Localization ? $parent->locale() : Site::current()->handle();
+                $value = $value->in($site);
             }
         }
 

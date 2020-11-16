@@ -3,6 +3,7 @@
 namespace Statamic\Widgets;
 
 use Statamic\Facades\Collection as CollectionAPI;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
 class Collection extends Widget
@@ -30,6 +31,7 @@ class Collection extends Widget
 
         return view('statamic::widgets.collection', [
             'collection' => $collection,
+            'site' => Site::selected(),
             'title' => $this->config('title', $collection->title()),
             'button' => __('New :thing', ['thing' => $collection->entryBlueprint()->title()]),
             'limit' => $this->config('limit', 5),
