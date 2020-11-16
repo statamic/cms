@@ -18,6 +18,7 @@ use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Value;
+use Statamic\Http\Url\UrlHelper;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
 use Statamic\Support\Str;
@@ -50,7 +51,7 @@ class CoreModifiers extends Modifier
             // Remove anchor from the URL.
             $url = strtok($value, '#');
 
-            // Get the anchor value an preprend it with a "#" if a value is retrieved.
+            // Get the anchor value and preprend it with a "#" if a value is retrieved.
             $fragment = parse_url($value, PHP_URL_FRAGMENT);
             $anchor = is_null($fragment) ? '' : "#{$fragment}";
 
@@ -1571,27 +1572,93 @@ class CoreModifiers extends Modifier
      */
     public function removeQueryParam($value, $params)
     {
-        if (isset($params[0])) {
-            // Remove query params (and any following anchor) from the URL.
-            $url = strtok($value, '?');
-            $url = strtok($url, '#');
+        return UrlHelper::parseUrlAndRebuildQueryParams($value, $params, function ($value, $params, $url, $anchor) {
+            // Match all query params key/value (ex.: q=statamic).
+            preg_match_all('/(?<=\?|&).+?(?=&|#|$)/', $value, $matches);
+            $matches = $matches[0] ?? [];
 
-            // Parse the URL to retrieve the possible query string and anchor.
-            $parsedUrl = parse_url($value);
+            foreach ($matches as $key => $match) {
+                // If a param's key matches the key to remove, unset it.
+                if (Str::startsWith($match, "{$params[0]}=")) {
+                    unset($matches[$key]);
+                }
+            }
 
-            // Get the anchor value an preprend it with a "#" if a value is retrieved.
-            $anchor = isset($parsedUrl['fragment']) ? "#{$parsedUrl['fragment']}" : '';
+            // If no matches were found (or the only one was deleted), it means we have no query params.
+            // So just assign the URL with its anchor (if any).
+            if (empty($matches)) {
+                $value = "{$url}{$anchor}";
+            // Else, append query params (and reindex numeric keys if a second param is specified and query params contain at least one array)
+            // and the anchor (if any).
+            } else {
+                // If we should reorganize indexes...
+                if (isset($params[1]) && (Str::containsAll($value, ['[', ']']) || Str::containsAll($value, ['%5B', '%5D']))) {
+                    // Parse the original URL to compare the original query params array to the new one (in order to detect changes).
+                    $query = parse_url($value, PHP_URL_QUERY);
+                    parse_str($query ?? '', $originalQueryAssociativeArray);
 
-            // Build an associative array based on the query string.
-            parse_str($parsedUrl['query'] ?? '', $queryAssociativeArray);
+                    // Parse the new URL to compare it with the original.
+                    $value = "{$url}?".implode('&', $matches).$anchor;
+                    $query = parse_url($value, PHP_URL_QUERY);
+                    parse_str($query ?? '', $queryAssociativeArray);
+    
+                    $rii = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($queryAssociativeArray), \RecursiveIteratorIterator::SELF_FIRST);
+                    $currentOriginalParent = $originalQueryAssociativeArray;
+    
+                    foreach ($rii as $key => $value){
+                        if ($rii->hasChildren()) {
+                            $currentOriginalParent = $currentOriginalParent[$key];
+    
+                            // If the currently iterated array keys of the new query params array doesn't match the original array keys at the same position,
+                            // it means we have to reorder the currently iterated array (because an item was removed).
+                            if (array_keys($value) !== array_keys($currentOriginalParent)) {
+                                $lastIndex = 0;
+                                $reindexedArray = [];
+    
+                                // Reorder integer array keys only.
+                                foreach ($value as $key => $value) {
+                                    if (is_int($key)) {
+                                        $reindexedArray[$lastIndex++] = $value;
+                                    } else {
+                                        $reindexedArray[$key] = $value;
+                                    }
+                                }
+    
+                                $currentDepth = $rii->getDepth();
 
-            // Remove the query param matching the specified key.
-            unset($queryAssociativeArray[$params[0]]);
+                                // Save modifications recursively (going up the array).
+                                for ($subDepth = $currentDepth; $subDepth >= 0; --$subDepth) {
+                                    $subIterator = $rii->getSubIterator($subDepth); 
 
-            $value = $url.(empty($queryAssociativeArray) ? '' : '?'.http_build_query($queryAssociativeArray)).$anchor;
-        }
+                                    // If we are on the level we want to update, assign the reindexed array. 
+                                    // Else, set the key to the parent iterator's value.
+                                    $subIterator->offsetSet(
+                                        $subIterator->key(),
+                                        $subDepth === $currentDepth
+                                            ? $reindexedArray
+                                            : $rii->getSubIterator($subDepth+1)->getArrayCopy()
+                                    );
+                                }
+    
+                                // Only one key per call can be removed,
+                                // so break the iterator loop because all the following sub-arrays will match.
+                                break;
+                            }
+                        // We reached the bottom level, so reset the parent.
+                        } else {
+                            $currentOriginalParent = $originalQueryAssociativeArray;
+                        }
+                    }
 
-        return $value;
+                    // Rebuild the new URL using the reordered array.
+                    $value = "{$url}?".UrlHelper::buildQueryString($rii->getArrayCopy()).$anchor;
+                } else {
+                    $value = "{$url}?".implode('&', $matches).$anchor;
+                }
+            }
+
+            return $value;
+        });
     }
 
     /**
@@ -1777,27 +1844,33 @@ class CoreModifiers extends Modifier
      */
     public function setQueryParam($value, $params)
     {
-        if (isset($params[0])) {
-            // Remove query params (and any following anchor) from the URL.
-            $url = strtok($value, '?');
-            $url = strtok($url, '#');
+        return UrlHelper::parseUrlAndRebuildQueryParams($value, $params, function ($value, $params, $url, $anchor) {
+            $character = (strpos($value, '?') !== false) ? '&' : '?';
+            $newParam = ($params[0] ?? '').'='.($params[1] ?? '');
+
+            // Build the new URL "lazily" (without assigning indexes if none are specified and without the anchor).
+            // It will then be parsed by "parse_url" which will clean everything up (assign indexes and remove duplicate keys).
+            $value = strtok($value, '#')."{$character}{$newParam}";
 
             // Parse the URL to retrieve the possible query string and anchor.
-            $parsedUrl = parse_url($value);
-
-            // Get the anchor value an preprend it with a "#" if a value is retrieved.
-            $anchor = isset($parsedUrl['fragment']) ? "#{$parsedUrl['fragment']}" : '';
-
+            $query = parse_url($value, PHP_URL_QUERY);
+    
             // Build an associative array based on the query string.
-            parse_str($parsedUrl['query'] ?? '', $queryAssociativeArray);
+            parse_str($query ?? '', $queryAssociativeArray);
 
-            // Update the existing param that matches the specified key, or add it if it doesn't exist.
-            $queryAssociativeArray[$params[0]] = $params[1] ?? '';
+            // Sort param keys alphabetically.
+            ksort($queryAssociativeArray);
 
-            $value = "{$url}?".http_build_query($queryAssociativeArray).$anchor;
-        }
+            // If there're no query params, just assign the URL with its anchor (if any).
+            if (empty($queryAssociativeArray)) {
+                $value = "{$url}{$anchor}";
+            // Else, append query params and the anchor (if any) to the URL.
+            } else {
+                $value = "{$url}?".UrlHelper::buildQueryString($queryAssociativeArray).$anchor;
+            }
 
-        return $value;
+            return $value;
+        });
     }
 
     /**
@@ -2459,5 +2532,32 @@ class CoreModifiers extends Modifier
         }
 
         return $value;
+    }
+
+    private function insertRecursive(array &$array, array &$keys, $newValue)
+    {
+        if (!empty($keys) && !is_null(key($keys))) {
+            $key = current($keys);
+
+            if (next($keys) !== false ?: key($keys) !== null) {
+                if (!array_key_exists($key, $array) || !is_array($array[$key])) {
+                    if ($key === '') {
+                        $array[] = [];
+                        $arrayKeys = array_keys($array);
+                        $key = end($arrayKeys);
+                    } else {
+                        $array[$key] = [];
+                    }
+                }
+
+                $this->insertRecursive($array[$key], $keys, $newValue);
+            } else {
+                if ($key === '') {
+                    $array[] = $newValue;
+                } else {
+                    $array[$key] = $newValue;
+                }
+            }
+        }
     }
 }
