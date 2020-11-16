@@ -86,11 +86,15 @@ class Terms extends Relationship
                 // entry, but could also be something else, like another taxonomy term.
                 $parent = $this->field->parent();
 
-                if ($parent && $this->field->handle() === $taxonomy->handle()) {
+                if (
+                    $parent &&
+                    ($parent instanceof \Statamic\Entries\Entry || $parent instanceof \Statamic\Taxonomies\Term) &&
+                    $this->field->handle() === $taxonomy->handle()
+                ) {
                     $term->collection($parent->collection());
                 }
 
-                $locale = $parent
+                $locale = $parent && $parent instanceof \Statamic\Contracts\Data\Localization
                     ? $parent->locale()
                     : Site::current()->handle();
 
