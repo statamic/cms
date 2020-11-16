@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP;
 
 use Illuminate\Http\Request;
 use Statamic\Facades\Search;
+use Statamic\Facades\User;
 
 class SearchController extends CpController
 {
@@ -12,8 +13,11 @@ class SearchController extends CpController
         return Search::index()
             ->ensureExists()
             ->search($request->query('q'))
-            ->limit(10)
             ->get()
+            ->filter(function ($item) {
+                return User::current()->can('view', $item);
+            })
+            ->limit(10)
             ->map(function ($item) {
                 return $item->toAugmentedCollection([
                     'title', 'edit_url',
