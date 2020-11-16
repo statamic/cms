@@ -1605,7 +1605,7 @@ class CoreModifiers extends Modifier
                     $rii = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($queryAssociativeArray), \RecursiveIteratorIterator::SELF_FIRST);
                     $currentOriginalParent = $originalQueryAssociativeArray;
     
-                    foreach ($rii as $key => $value){
+                    foreach ($rii as $key => $value) {
                         if ($rii->hasChildren()) {
                             $currentOriginalParent = $currentOriginalParent[$key];
     
@@ -1627,16 +1627,16 @@ class CoreModifiers extends Modifier
                                 $currentDepth = $rii->getDepth();
 
                                 // Save modifications recursively (going up the array).
-                                for ($subDepth = $currentDepth; $subDepth >= 0; --$subDepth) {
-                                    $subIterator = $rii->getSubIterator($subDepth); 
+                                for ($subDepth = $currentDepth; $subDepth >= 0; $subDepth--) {
+                                    $subIterator = $rii->getSubIterator($subDepth);
 
-                                    // If we are on the level we want to update, assign the reindexed array. 
+                                    // If we are on the level we want to update, assign the reindexed array.
                                     // Else, set the key to the parent iterator's value.
                                     $subIterator->offsetSet(
                                         $subIterator->key(),
                                         $subDepth === $currentDepth
                                             ? $reindexedArray
-                                            : $rii->getSubIterator($subDepth+1)->getArrayCopy()
+                                            : $rii->getSubIterator($subDepth + 1)->getArrayCopy()
                                     );
                                 }
     
@@ -1854,7 +1854,7 @@ class CoreModifiers extends Modifier
 
             // Parse the URL to retrieve the possible query string and anchor.
             $query = parse_url($value, PHP_URL_QUERY);
-    
+            
             // Build an associative array based on the query string.
             parse_str($query ?? '', $queryAssociativeArray);
 
@@ -2568,32 +2568,5 @@ class CoreModifiers extends Modifier
         }
 
         return $value;
-    }
-
-    private function insertRecursive(array &$array, array &$keys, $newValue)
-    {
-        if (!empty($keys) && !is_null(key($keys))) {
-            $key = current($keys);
-
-            if (next($keys) !== false ?: key($keys) !== null) {
-                if (!array_key_exists($key, $array) || !is_array($array[$key])) {
-                    if ($key === '') {
-                        $array[] = [];
-                        $arrayKeys = array_keys($array);
-                        $key = end($arrayKeys);
-                    } else {
-                        $array[$key] = [];
-                    }
-                }
-
-                $this->insertRecursive($array[$key], $keys, $newValue);
-            } else {
-                if ($key === '') {
-                    $array[] = $newValue;
-                } else {
-                    $array[$key] = $newValue;
-                }
-            }
-        }
     }
 }
