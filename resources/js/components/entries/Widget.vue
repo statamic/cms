@@ -46,16 +46,15 @@ export default {
 
     props: {
         collection: String,
-        site: String,
     },
 
     data() {
         return {
             cols: [{ label: "Title", field: "title", visible: true }],
             listingKey: 'entries',
-            requestUrl: cp_url(`collections/${this.collection}/entries?site=${this.site}`),
+            requestUrl: cp_url(`collections/${this.collection}/entries`),
         }
-    }
+    },
 
 }
 </script>
