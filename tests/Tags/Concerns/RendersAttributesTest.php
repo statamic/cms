@@ -26,11 +26,11 @@ class RendersAttributesTest extends TestCase
             ':name' => 'first_name',
             'disabled' => 'true',
             'autocomplete' => true,
-            'dont_render_falses' => false,
+            'focusable' => false,
             'dont_render_nulls' => null,
         ]);
 
-        $this->assertEquals('class="m-0 mb-1" :name="first_name" disabled="true" autocomplete="true"', $output);
+        $this->assertEquals('class="m-0 mb-1" :name="first_name" disabled="true" autocomplete="true" focusable="false"', $output);
     }
 
     /** @test */
@@ -44,14 +44,14 @@ class RendersAttributesTest extends TestCase
                 'class' => 'm-0 mb-1',
                 ':name' => 'first_name',
                 'attr:src' => 'avatar.jpg',
-                'dont_render_falses' => false,
+                'focusable' => false,
                 'dont_render_nulls' => null,
                 'disabled' => 'true',
                 'autocomplete' => true,
             ])
             ->renderAttributesFromParams();
 
-        $this->assertEquals('class="m-0 mb-1" name="Han" src="avatar.jpg" disabled="true" autocomplete="true"', $output);
+        $this->assertEquals('class="m-0 mb-1" name="Han" src="avatar.jpg" focusable="false" disabled="true" autocomplete="true"', $output);
     }
 
     /** @test */
@@ -76,6 +76,28 @@ class RendersAttributesTest extends TestCase
             ->renderAttributesFromParams(['src', 'name']);
 
         $this->assertEquals('class="m-0 mb-1" src="avatar.jpg"', $output);
+    }
+
+    /** @test */
+    public function it_will_render_falsy_attributes()
+    {
+        $this->assertEquals('', $this->tag->renderAttributesFromParams());
+
+        $output = $this->tag
+            ->setContext(['first_name' => 'Han'])
+            ->setParameters([
+                'class' => 'm-0 mb-1',
+                ':name' => 'first_name',
+                'attr:src' => 'avatar.jpg',
+                'focusable' => false,
+                'dont_render_nulls' => null,
+                'disabled' => 'true',
+                'autocomplete' => true,
+                'aria-hidden' => true,
+            ])
+            ->renderAttributesFromParams();
+
+        $this->assertEquals('class="m-0 mb-1" name="Han" src="avatar.jpg" focusable="false" disabled="true" autocomplete="true" aria-hidden="true"', $output);
     }
 }
 
