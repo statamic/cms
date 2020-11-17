@@ -211,6 +211,15 @@ class Collection implements Contract, AugmentableContract
 
     public function entryBlueprints()
     {
+        $blink = 'collection-entry-blueprints-'.$this->handle();
+
+        return Blink::once($blink, function () {
+            return $this->getEntryBlueprints();
+        });
+    }
+
+    private function getEntryBlueprints()
+    {
         $blueprints = Blueprint::in('collections/'.$this->handle());
 
         if ($blueprints->isEmpty()) {
