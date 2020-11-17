@@ -30,7 +30,7 @@
         "wilderborn/partyline": "^1.0"
     },
     "require-dev": {
-        "fzaninotto/faker": "~1.4",
+        "fakerphp/faker": "~1.10",
         "google/cloud-translate": "^1.6",
         "mockery/mockery": "^1.2.3",
         "orchestra/testbench": "^4.0 || ^5.0 || ^6.0"
