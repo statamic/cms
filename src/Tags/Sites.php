@@ -8,7 +8,7 @@ class Sites extends Tags
 {
     public function index()
     {
-        return collect(Site::all())->map(function($site) {
+        return collect(Site::all())->map(function ($site) {
             return [
                 'handle' => $site->handle(),
                 'name' => $site->name(),
