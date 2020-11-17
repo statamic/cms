@@ -19,9 +19,7 @@ trait RendersAttributes
                 }
 
                 $value = is_bool($value)
-                    ? $value
-                        ? 'true'
-                        : 'false'
+                    ? ($value ? 'true' : 'false')
                     : $value;
 
                 return sprintf('%s="%s"', $attribute, $value);
