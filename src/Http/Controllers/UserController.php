@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
 use Illuminate\Support\MessageBag;
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Events\UserRegistered;
 use Statamic\Facades\User;
 
 class UserController extends Controller
@@ -73,7 +74,7 @@ class UserController extends Controller
 
         $user->save();
 
-        // TODO: Registered event
+        UserRegistered::dispatch($user);
 
         Auth::login($user);
 
