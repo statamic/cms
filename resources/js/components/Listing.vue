@@ -16,7 +16,10 @@ export default {
     props: {
         initialSortColumn: String,
         initialSortDirection: String,
-        initialColumns: Array,
+        initialColumns: {
+            type: Array,
+            default: () => [],
+        },
         filters: Array,
     },
 
