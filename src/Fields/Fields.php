@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\FieldRepository;
 use Facades\Statamic\Fields\FieldsetRepository;
 use Facades\Statamic\Fields\Validator;
 use Illuminate\Support\Collection;
+use Statamic\Facades\Blink;
 
 class Fields
 {
@@ -202,6 +203,12 @@ class Fields
 
     private function getImportedFields(array $config): array
     {
+        $blink = 'blueprint-imported-fields-'.md5(json_encode($config));
+
+        if (Blink::has($blink)) {
+            return Blink::get($blink);
+        }
+
         if (! $fieldset = FieldsetRepository::find($config['import'])) {
             throw new \Exception("Fieldset {$config['import']} not found.");
         }
@@ -223,7 +230,11 @@ class Fields
             });
         }
 
-        return $fields->all();
+        $result = $fields->all();
+
+        Blink::put($blink, $result);
+
+        return $result;
     }
 
     public function meta()
