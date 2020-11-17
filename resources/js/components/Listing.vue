@@ -16,6 +16,10 @@ export default {
     props: {
         initialSortColumn: String,
         initialSortDirection: String,
+        initialColumns: {
+            type: Array,
+            default: () => [],
+        },
         filters: Array,
     },
 
@@ -25,7 +29,8 @@ export default {
             initializing: true,
             loading: true,
             items: [],
-            columns: [],
+            columns: this.initialColumns,
+            visibleColumns: this.initialColumns.filter(column => column.visible),
             sortColumn: this.initialSortColumn,
             sortDirection: this.initialSortDirection,
             meta: null,
@@ -42,6 +47,7 @@ export default {
                 perPage: this.perPage,
                 search: this.searchQuery,
                 filters: this.activeFilterParameters,
+                columns: this.visibleColumns.map(column => column.field).join(','),
             }, this.additionalParameters);
         },
 

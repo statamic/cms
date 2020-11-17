@@ -3,9 +3,12 @@
 namespace Statamic\Http\Resources\CP\Taxonomies;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
 class Terms extends ResourceCollection
 {
+    use HasRequestedColumns;
+
     public $collects = ListedTerm::class;
     protected $blueprint;
     protected $columnPreferenceKey;
@@ -43,11 +46,11 @@ class Terms extends ResourceCollection
             'data' => $this->collection->each(function ($term) {
                 $term
                     ->blueprint($this->blueprint)
-                    ->columns($this->columns);
+                    ->columns($this->requestedColumns());
             }),
 
             'meta' => [
-                'columns' => $this->columns,
+                'columns' => $this->visibleColumns(),
             ],
         ];
     }
