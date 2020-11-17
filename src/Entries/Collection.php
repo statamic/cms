@@ -228,8 +228,6 @@ class Collection implements Contract, AugmentableContract
             ? $this->entryBlueprints()->first()
             : $this->entryBlueprints()->keyBy->handle()->get($blueprint);
 
-        $blueprint = $blueprint ? $this->ensureEntryBlueprintFields($blueprint) : null;
-
         if ($blueprint) {
             EntryBlueprintFound::dispatch($blueprint->setParent($entry ?? $this), $entry);
         }
