@@ -17,5 +17,4 @@ class Sites extends Tags
             ];
         })->values()->all();
     }
-
 }
