@@ -3,9 +3,12 @@
 namespace Statamic\Http\Resources\CP\Entries;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
 class Entries extends ResourceCollection
 {
+    use HasRequestedColumns;
+
     public $collects = ListedEntry::class;
     protected $blueprint;
     protected $columnPreferenceKey;
@@ -33,42 +36,6 @@ class Entries extends ResourceCollection
         }
 
         $this->columns = $columns->rejectUnlisted()->values();
-    }
-
-    private function requestedColumns()
-    {
-        if (! $requested = $this->requestedColumnKeys()) {
-            return $this->columns;
-        }
-
-        return $this->columns->keyBy('field')->only($requested)->values();
-    }
-
-    private function visibleColumns()
-    {
-        if (! $requested = $this->requestedColumnKeys()) {
-            return $this->columns;
-        }
-
-        $columns = $this->columns->keyBy('field')->map->visible(false);
-
-        return collect($requested)
-            ->map(function ($field) use ($columns) {
-                return $columns->get($field)->visible(true);
-            })
-            ->merge($columns->except($requested))
-            ->values();
-    }
-
-    private function requestedColumnKeys()
-    {
-        $columns = request('columns');
-
-        if (! $columns) {
-            return [];
-        }
-
-        return explode(',', $columns);
     }
 
     public function toArray($request)
