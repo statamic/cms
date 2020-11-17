@@ -152,6 +152,11 @@ export default {
         },
 
         treeChanged(node, tree) {
+            if (!this.validate()) {
+                this.updateTreeData();
+                return;
+            }
+            
             this.treeUpdated(tree);
         },
 
@@ -161,6 +166,19 @@ export default {
             this.pages = tree.getPureData();
             this.$refs.soundDrop.play();
             this.$emit('changed');
+        },
+
+        validate() {
+            let isValid = true;
+            th.depthFirstSearch(this.treeData, (childNode) => {
+                const index = childNode.parent.children.indexOf(childNode);
+                const level = childNode._vm.level;
+                const isRoot = this.expectsRoot && level === 1 && index === 0;
+                if (isRoot && childNode.children.length > 0) {
+                    isValid = false;
+                } 
+            });
+            return isValid;
         },
 
         save() {
