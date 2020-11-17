@@ -1,5 +1,26 @@
 # Release Notes
 
+## 3.0.28 (2020-11-17)
+
+### What's new
+- Added a `UserRegistered` event. [#2838](https://github.com/statamic/cms/issues/2838)
+- Add config values to the form email data. [#2847](https://github.com/statamic/cms/issues/2847)
+
+### What's improved
+- Improved speed of CP entry, term, and form submission listings by only requesting values for visible columns. [#2857](https://github.com/statamic/cms/issues/2857)
+- Made some Blueprint related performance improvements. [#2856](https://github.com/statamic/cms/issues/2856)
+- Added unique classes based on the handle to each field wrapper div. [statamic/ideas#388](https://github.com/statamic/ideas/issues/388)
+- Replaced fzaninotto/faker with fakerphp/faker. [#2819](https://github.com/statamic/cms/issues/2819)
+
+### What's fixed
+- Collection widget shows entries for the current site. [adbeaeba5](https://github.com/statamic/cms/commit/adbeaeba5)
+- Prevent situations where a structure could end up with a root page with children. [#2852](https://github.com/statamic/cms/issues/2852)
+- Render attributes whose value is false. [#2845](https://github.com/statamic/cms/issues/2845)
+- Prevent removing/ordering of options on read-only relationship selects. [#2415](https://github.com/statamic/cms/issues/2415)
+- Adjusted trial mode banner visibility. [4b83422b9](https://github.com/statamic/cms/commit/4b83422b9)
+
+
+
 ## 3.0.27 (2020-11-12)
 
 ### What's fixed
