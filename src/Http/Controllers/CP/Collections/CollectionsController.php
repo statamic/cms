@@ -60,10 +60,18 @@ class CollectionsController extends CpController
 
         $site = $request->site ? Site::get($request->site) : Site::selected();
 
+        $columns = $collection
+            ->entryBlueprint()
+            ->columns()
+            ->setPreferred("collections.{$collection->handle()}.columns")
+            ->rejectUnlisted()
+            ->values();
+
         $viewData = [
             'collection' => $collection,
             'blueprints' => $blueprints,
             'site' => $site->handle(),
+            'columns' => $columns,
             'filters' => Scope::filters('entries', [
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),

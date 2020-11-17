@@ -95,7 +95,11 @@ export default {
 
         sortColumn(column) {
             this.sharedState.sortColumn = column;
-        }
+        },
+
+        visibleColumns(columns) {
+            this.$emit('visible-columns-updated', columns);
+        },
 
     },
 
