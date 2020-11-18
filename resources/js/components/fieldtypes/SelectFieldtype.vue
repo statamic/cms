@@ -89,12 +89,28 @@ export default {
             return this.currentLength >= this.config.max_items;
         },
 
+        limitExceeded() {
+            if (! this.config.max_items) return false;
+
+            return this.currentLength > this.config.max_items;
+        },
+
         currentLength() {
-            return (this.value) ? this.value.length : 0
+            if (this.value) {
+                return (typeof this.value == 'string') ? 1 : this.value.length;
+            }
+
+            return 0;
         },
 
         limitIndicatorColor() {
-            return this.limitReached ? 'text-red' : 'text-grey'
+            if (this.limitExceeded) {
+                return 'text-red';
+            } else if (this.limitReached) {
+                return 'text-green';
+            }
+
+            return 'text-grey';
         }
     },
 
