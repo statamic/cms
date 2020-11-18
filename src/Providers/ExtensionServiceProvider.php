@@ -161,6 +161,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Tags\Trans::class,
         Tags\TransChoice::class,
         Tags\Users::class,
+        Tags\Variable::class,
         Tags\Widont::class,
         Tags\Yields::class,
         \Statamic\Forms\Tags::class,
