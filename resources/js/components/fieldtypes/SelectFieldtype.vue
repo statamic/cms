@@ -8,7 +8,7 @@
             :disabled="config.disabled || isReadOnly || limitReached"
             :options="options"
             :placeholder="config.placeholder"
-            :searchable="config.searchable"
+            :searchable="config.searchable || config.taggable"
             :taggable="config.taggable"
             :push-tags="config.push_tags"
             :multiple="config.multiple"
