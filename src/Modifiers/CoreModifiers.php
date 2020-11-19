@@ -3,6 +3,7 @@
 namespace Statamic\Modifiers;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
@@ -1103,6 +1104,10 @@ class CoreModifiers extends Modifier
      */
     public function length($value)
     {
+        if ($value instanceof Arrayable) {
+            $value = $value->toArray();
+        }
+        
         return (is_array($value)) ? count($value) : Stringy::length($value);
     }
 
