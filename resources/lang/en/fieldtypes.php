@@ -71,6 +71,7 @@ return [
     'replicator.config.collapse.accordion' => 'Only allow one set to be expanded at a time',
     'replicator.config.collapse.disabled' => 'All sets expanded by default',
     'replicator.config.collapse.enabled' => 'All sets collapsed by default',
+    'replicator.config.max_sets' => 'The maximum number of sets.',
     'select.config.clearable' => 'Enable to allow deselecting your option.',
     'select.config.multiple' => 'Allow multiple selections.',
     'select.config.options' => 'Set the keys and their optional labels.',

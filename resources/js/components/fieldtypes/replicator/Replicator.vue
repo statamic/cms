@@ -50,7 +50,7 @@
             </div>
         </sortable-list>
 
-        <set-picker v-if="!isReadOnly"
+        <set-picker v-if="!isReadOnly && values.length < config.max_sets"
             :last="true"
             :sets="setConfigs"
             :index="values.length"
