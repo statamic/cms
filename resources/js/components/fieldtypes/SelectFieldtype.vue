@@ -5,7 +5,7 @@
             class="flex-1"
             :name="name"
             :clearable="config.clearable"
-            :disabled="config.disabled || isReadOnly || limitReached"
+            :disabled="config.disabled || isReadOnly || (config.multiple && limitReached)"
             :options="options"
             :placeholder="config.placeholder"
             :searchable="config.searchable || config.taggable"
