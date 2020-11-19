@@ -1,5 +1,20 @@
 # Release Notes
 
+## 3.0.29 (2020-11-19)
+
+### What's fixed
+- Fix issue where nested imports with prefixes causes compounding prefixes. [#2869](https://github.com/statamic/cms/issues/2869)
+- Prevent select fields with max_items set to 1 being unclearable. [d04519d2b](https://github.com/statamic/cms/commit/d04519d2b)
+- Select fields are searchable if you allow additions, even if you don't explicitly enable the searchable option. [5cba0bc](https://github.com/statamic/cms/commit/5cba0bc)
+- Adjust Bard Set Picker placement. [80ff247b2](https://github.com/statamic/cms/commit/80ff247b2)
+- Fix styling of pagination's `...` separator. [f0f1cdef6](https://github.com/statamic/cms/commit/f0f1cdef6)
+- Support cmd+s to save on Fieldset and Navagition form pages. [b77a8d227](https://github.com/statamic/cms/commit/b77a8d227)
+- Fixed that annoying little gap in the main nav when the trial banner isn't there. [d9396a838](https://github.com/statamic/cms/commit/d9396a838)
+- Only turn fieldtype length limiter to red when you exceed the limit. Meeting is fine. [0c939faa3](https://github.com/statamic/cms/commit/0c939faa3) [7ce0200f1](https://github.com/statamic/cms/commit/7ce0200f1)
+- Fix the `rtfm` command's URL and text. [3185d65e5](https://github.com/statamic/cms/commit/3185d65e5)
+
+
+
 ## 3.0.28 (2020-11-17)
 
 ### What's new
