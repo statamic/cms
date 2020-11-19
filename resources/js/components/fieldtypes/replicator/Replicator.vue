@@ -50,7 +50,7 @@
             </div>
         </sortable-list>
 
-        <set-picker v-if="!isReadOnly && values.length < config.max_sets"
+        <set-picker v-if="!isReadOnly && canAddSet()"
             :last="true"
             :sets="setConfigs"
             :index="values.length"
@@ -176,6 +176,9 @@ export default {
             }, 1);
         },
 
+        canAddSet() {
+            return !this.config.max_sets || this.values.length < this.config.max_sets;
+        }
     },
 
     mounted() {
