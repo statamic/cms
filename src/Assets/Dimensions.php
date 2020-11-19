@@ -74,13 +74,18 @@ class Dimensions
 
         $cachePath = "{$this->asset->containerId()}/{$this->asset->path()}";
 
-        $manager->copy("source://{$this->asset->path()}", "cache://{$cachePath}");
+        $source = "source://{$this->asset->path()}";
+        $destination = "cache://{$cachePath}";
+        if ($manager->has($destination)) {
+            $manager->delete($destination);
+        }
+        $manager->copy($source, $destination);
 
         $size = getimagesize($cache->getAdapter()->getPathPrefix().$cachePath);
 
         $cache->delete($cachePath);
 
-        return array_splice($size, 0, 2);
+        return $size ? array_splice($size, 0, 2) : [null, null];
     }
 
     private function getCacheFlysystem()
