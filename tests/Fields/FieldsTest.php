@@ -218,7 +218,7 @@ class FieldsTest extends TestCase
             'fields' => [
                 [
                     'import' => 'inner',
-                    'prefix' => 'prefix_'
+                    'prefix' => 'prefix_',
                 ],
             ],
         ]);
@@ -247,7 +247,7 @@ class FieldsTest extends TestCase
             [
                 'import' => 'outer',
                 'prefix' => 'second_',
-            ]
+            ],
         ]);
 
         $fields = $fields->all();
