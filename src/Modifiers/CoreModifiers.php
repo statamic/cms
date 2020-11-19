@@ -1107,7 +1107,7 @@ class CoreModifiers extends Modifier
         if ($value instanceof Arrayable) {
             $value = $value->toArray();
         }
-        
+
         return (is_array($value)) ? count($value) : Stringy::length($value);
     }
 
