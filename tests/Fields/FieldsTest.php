@@ -208,6 +208,58 @@ class FieldsTest extends TestCase
         $this->assertEquals('test_two', $fields['test_two']->handle());
     }
 
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/2869
+     **/
+    public function it_prefixes_the_handles_of_nested_imported_fieldsets()
+    {
+        $outer = (new Fieldset)->setHandle('outer')->setContents([
+            'fields' => [
+                [
+                    'import' => 'inner',
+                    'prefix' => 'prefix_'
+                ],
+            ],
+        ]);
+
+        $inner = (new Fieldset)->setHandle('inner')->setContents([
+            'fields' => [
+                [
+                    'handle' => 'foo',
+                    'field' => ['type' => 'text'],
+                ],
+                [
+                    'handle' => 'bar',
+                    'field' => ['type' => 'text'],
+                ],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('outer')->times(2)->andReturn($outer);
+        FieldsetRepository::shouldReceive('find')->with('inner')->times(1)->andReturn($inner);
+
+        $fields = new Fields([
+            [
+                'import' => 'outer',
+                'prefix' => 'first_',
+            ],
+            [
+                'import' => 'outer',
+                'prefix' => 'second_',
+            ]
+        ]);
+
+        $fields = $fields->all();
+
+        $this->assertInstanceOf(Collection::class, $fields);
+        $this->assertCount(4, $fields);
+        $this->assertEquals('first_prefix_foo', $fields['first_prefix_foo']->handle());
+        $this->assertEquals('first_prefix_bar', $fields['first_prefix_bar']->handle());
+        $this->assertEquals('second_prefix_foo', $fields['second_prefix_foo']->handle());
+        $this->assertEquals('second_prefix_bar', $fields['second_prefix_bar']->handle());
+    }
+
     /** @test */
     public function it_throws_exception_when_trying_to_import_a_non_existent_fieldset()
     {

@@ -223,6 +223,7 @@ class Fields
 
         if ($prefix = array_get($config, 'prefix')) {
             $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
+                $field = clone $field;
                 $handle = $prefix.$field->handle();
                 $prefix = $prefix.$field->prefix();
 
