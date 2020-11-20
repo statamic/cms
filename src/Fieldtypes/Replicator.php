@@ -153,6 +153,7 @@ class Replicator extends Fieldtype
             'collapsed' => [],
             'previews' => collect($existing)->map(function ($fields) {
                 return collect($fields)->map(function () {
+                    return null;
                 })->all();
             })->all(),
         ];
