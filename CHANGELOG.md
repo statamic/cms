@@ -1,5 +1,22 @@
 # Release Notes
 
+## 3.0.30 (2020-11-20)
+
+### What's new
+- Added a [sites](https://statamic.dev/variables/sites) variable. [#2513](https://github.com/statamic/cms/issues/2513)
+- Added the ability to limit number of sets in a Replicator field. [#2866](https://github.com/statamic/cms/issues/2866)
+- The search:results tag supports pagination. [d059bc4eb](https://github.com/statamic/cms/commit/d059bc4eb)
+
+### What's fixed
+- Prevent comma in submission filenames when used in some locales. [927890a95](https://github.com/statamic/cms/commit/927890a95)
+- Prevent form submissions generating new IDs. [#2822](https://github.com/statamic/cms/issues/2822)
+- Don't use the "after save" features when inside a Stack. [#2827](https://github.com/statamic/cms/issues/2827) [#2469](https://github.com/statamic/cms/issues/2469)
+- Global CP search results are filtered by permission. [#2848](https://github.com/statamic/cms/issues/2848)
+- Prevent error when getting image dimensions from a corrupt file. [#2877](https://github.com/statamic/cms/issues/2877)
+- Query string is maintained in pagination links in tags. [d059bc4eb](https://github.com/statamic/cms/commit/d059bc4eb)
+
+
+
 ## 3.0.29 (2020-11-19)
 
 ### What's fixed
