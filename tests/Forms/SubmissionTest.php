@@ -20,4 +20,16 @@ class SubmissionTest extends TestCase
 
         $this->assertEquals('123', $submission->id());
     }
+
+    /** @test */
+    public function generated_ids_dont_have_commas()
+    {
+        // this test becomes unnecessary if we ever move away from using microtime for ids.
+
+        setlocale(LC_ALL, 'de_DE');
+
+        $submission = Form::make('test')->makeSubmission();
+
+        $this->assertStringNotContainsString(',', $submission->id());
+    }
 }
