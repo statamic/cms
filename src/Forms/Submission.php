@@ -45,7 +45,7 @@ class Submission implements SubmissionContract, Augmentable
     {
         return $this->fluentlyGetOrSet('id')
             ->getter(function ($id) {
-                return $id ?: microtime(true);
+                return $this->id = $id ?: microtime(true);
             })
             ->args(func_get_args());
     }
