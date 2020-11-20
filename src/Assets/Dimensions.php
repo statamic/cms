@@ -74,12 +74,11 @@ class Dimensions
 
         $cachePath = "{$this->asset->containerId()}/{$this->asset->path()}";
 
-        $source = "source://{$this->asset->path()}";
-        $destination = "cache://{$cachePath}";
-        if ($manager->has($destination)) {
+        if ($manager->has($destination = "cache://{$cachePath}")) {
             $manager->delete($destination);
         }
-        $manager->copy($source, $destination);
+
+        $manager->copy("source://{$this->asset->path()}", $destination);
 
         $size = getimagesize($cache->getAdapter()->getPathPrefix().$cachePath);
 
