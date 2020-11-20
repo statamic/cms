@@ -2,7 +2,6 @@
 
 namespace Statamic\Search;
 
-use Illuminate\Contracts\Pagination\Paginator;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Tags\Concerns;
@@ -12,7 +11,6 @@ class Tags extends BaseTags
 {
     use Concerns\OutputsItems,
         Concerns\QueriesConditions;
-
     use Concerns\GetsQueryResults {
         results as getQueryResults;
     }
