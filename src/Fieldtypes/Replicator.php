@@ -18,7 +18,7 @@ class Replicator extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.replicator.config.collapse'),
                 'type' => 'select',
                 'cast_booleans' => true,
-                'width' => 25,
+                'width' => 50,
                 'options' => [
                     'false' => __('statamic::fieldtypes.replicator.config.collapse.disabled'),
                     'true' => __('statamic::fieldtypes.replicator.config.collapse.enabled'),
@@ -30,7 +30,7 @@ class Replicator extends Fieldtype
                 'display' => __('Max Sets'),
                 'instructions' => __('statamic::fieldtypes.replicator.config.max_sets'),
                 'type' => 'integer',
-                'width' => 25,
+                'width' => 50,
             ],
             'sets' => [
                 'type' => 'sets',
