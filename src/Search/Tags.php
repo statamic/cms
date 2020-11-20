@@ -2,6 +2,7 @@
 
 namespace Statamic\Search;
 
+use Illuminate\Contracts\Pagination\Paginator;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Tags\Concerns;
@@ -11,6 +12,10 @@ class Tags extends BaseTags
 {
     use Concerns\OutputsItems,
         Concerns\QueriesConditions;
+
+    use Concerns\GetsQueryResults {
+        results as getQueryResults;
+    }
 
     protected static $handle = 'search';
 
@@ -31,14 +36,15 @@ class Tags extends BaseTags
         $this->queryStatus($builder);
         $this->queryConditions($builder);
 
-        $results = $this->addResultTypes($builder->get());
+        $results = $this->getQueryResults($builder);
+        $results = $this->addResultTypes($results);
 
         return $this->output($results);
     }
 
     protected function addResultTypes($results)
     {
-        return $results->map(function ($result) {
+        return $results->supplement('result_type', function ($result) {
             $type = null;
 
             if ($result instanceof \Statamic\Contracts\Entries\Entry) {
@@ -49,9 +55,7 @@ class Tags extends BaseTags
                 $type = 'asset';
             }
 
-            $result->set('result_type', $type);
-
-            return $result;
+            return $type;
         });
     }
 
