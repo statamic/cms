@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Statamic\Auth\UserCollection;
 use Statamic\Auth\UserRepository as BaseRepository;
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\OAuth\Provider;
 
 class UserRepository extends BaseRepository
 {
@@ -52,7 +53,9 @@ class UserRepository extends BaseRepository
 
     public function findByOAuthId(string $provider, string $id): ?UserContract
     {
-        // todo
+        return $this->find(
+            (new Provider($provider))->getUserId($id)
+        );
     }
 
     public function model($method, ...$args)

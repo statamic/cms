@@ -16,6 +16,8 @@ class User extends BaseUser
 {
     use ContainsSupplementalData, HasPreferences;
 
+    public $timestamps = false;
+
     protected $model;
     protected $roles;
     protected $groups;
