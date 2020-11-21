@@ -106,6 +106,23 @@ class NavTest extends TestCase
     }
 
     /** @test */
+    public function is_can_create_a_nav_item_with_a_custom_svg_icon()
+    {
+        $this->actingAs(tap(User::make()->makeSuper())->save());
+
+        Nav::utilities('Geocities Importer')
+            ->url('#')
+            ->icon('<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>');
+
+        $item = Nav::build()->get('Utilities')->last();
+
+        $this->assertEquals('Utilities', $item->section());
+        $this->assertEquals('Geocities Importer', $item->name());
+        $this->assertEquals(config('app.url').'/cp/#', $item->url());
+        $this->assertEquals('<svg><circle cx="50" cy="50" r="40" stroke="black" stroke-width="3" fill="red" /></svg>', $item->icon());
+    }
+
+    /** @test */
     public function it_can_get_and_modify_an_existing_item()
     {
         $this->actingAs(tap(User::make()->makeSuper())->save());
