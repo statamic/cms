@@ -55,7 +55,7 @@ class Install extends Command
             config('statamic.stache.stores.globals.directory'),
             config('statamic.stache.stores.taxonomies.directory'),
             config('statamic.stache.stores.navigation.directory'),
-            base_path('users'),
+            config('statamic.users.repositories.file.paths.users'),
         ];
 
         $gitignores = [
