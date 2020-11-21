@@ -15,6 +15,12 @@ class Textarea extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.text.config.character_limit'),
                 'type' => 'text',
             ],
+            'antlers' => [
+                'display' => __('Antlers'),
+                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
         ];
     }
 
