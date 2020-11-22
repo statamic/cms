@@ -7,11 +7,11 @@ use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Extensions\Translation\Translator;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Data;
 use Statamic\Facades\File;
-use Statamic\Facades\Localization;
 use Statamic\Facades\Markdown;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Path;
@@ -1164,7 +1164,7 @@ class CoreModifiers extends Modifier
      */
     public function localize($value)
     {
-        return Localization::fetch($value);
+        return Translator::get($value);
     }
 
     /**
