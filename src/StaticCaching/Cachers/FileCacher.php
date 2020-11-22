@@ -5,7 +5,6 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Statamic\Facades\File;
-use Statamic\Facades\Path;
 
 class FileCacher extends AbstractCacher
 {

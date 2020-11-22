@@ -3,7 +3,6 @@
 namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Http\Request;
-use Statamic\Facades\URL;
 
 class ApplicationCacher extends AbstractCacher
 {

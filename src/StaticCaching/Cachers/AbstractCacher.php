@@ -5,7 +5,6 @@ namespace Statamic\StaticCaching\Cachers;
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Statamic\Facades\Config;
 use Statamic\StaticCaching\Cacher;
 use Statamic\Support\Str;
 
