@@ -53,7 +53,7 @@ class Text extends Fieldtype
                 'width' => 50,
             ],
             'antlers' => [
-                'display' => __('Antlers'),
+                'display' => 'Antlers',
                 'instructions' => __('statamic::fieldtypes.any.config.antlers'),
                 'type' => 'toggle',
                 'width' => 50,

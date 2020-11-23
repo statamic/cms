@@ -16,7 +16,7 @@ class Textarea extends Fieldtype
                 'type' => 'text',
             ],
             'antlers' => [
-                'display' => __('Antlers'),
+                'display' => 'Antlers',
                 'instructions' => __('statamic::fieldtypes.any.config.antlers'),
                 'type' => 'toggle',
                 'width' => 50,
