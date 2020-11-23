@@ -1,9 +1,9 @@
 <?php
 
 return [
+    'any.config.antlers' => 'Whether you\'d like this field to be parsed by Antlers.',
     'any.config.cast_booleans' => 'Options with values of true and false will be saved as booleans.',
     'any.config.default' => 'Set the default value.',
-    'any.config.antlers' => 'Toggle if you\'d like this field to be parsed by Antlers.',
     'array.config.keys' => 'Set the array keys (variables) and optional labels.',
     'array.config.mode' => 'Dynamic mode gives the user control of the data while keyed mode does not.',
     'assets.config.allow_uploads' => 'Allow new file uploads.',
