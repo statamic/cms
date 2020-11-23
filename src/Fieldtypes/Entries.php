@@ -193,12 +193,12 @@ class Entries extends Relationship
 
     protected function augmentValue($value)
     {
-        if (is_string($value)) {
+        if (! is_object($value)) {
             $value = Entry::find($value);
-            if ($value != null && $parent = $this->field()->parent()) {
-                $site = $parent instanceof Localization ? $parent->locale() : Site::current()->handle();
-                $value = $value->in($site);
-            }
+        }
+        if ($value != null && $parent = $this->field()->parent()) {
+            $site = $parent instanceof Localization ? $parent->locale() : Site::current()->handle();
+            $value = $value->in($site);
         }
 
         return $value;
