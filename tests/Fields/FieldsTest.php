@@ -419,6 +419,7 @@ class FieldsTest extends TestCase
                 'input_type' => 'text',
                 'prepend' => null,
                 'append' => null,
+                'antlers' => false,
             ],
             [
                 'handle' => 'two',
@@ -430,6 +431,7 @@ class FieldsTest extends TestCase
                 'validate' => 'min:2',
                 'character_limit' => null,
                 'component' => 'textarea',
+                'antlers' => false,
             ],
         ], $fields->toPublishArray());
     }
@@ -483,6 +485,7 @@ class FieldsTest extends TestCase
                 'component' => 'text',
                 'instructions' => null,
                 'required' => false,
+                'antlers' => false,
             ],
             [
                 'handle' => 'nested_deeper_two',
@@ -497,6 +500,7 @@ class FieldsTest extends TestCase
                 'component' => 'text',
                 'instructions' => null,
                 'required' => false,
+                'antlers' => false,
             ],
         ], $fields->toPublishArray());
     }
