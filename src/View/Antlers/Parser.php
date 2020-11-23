@@ -14,7 +14,6 @@ use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
-use Statamic\Facades\Config;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Ignition\Value as IgnitionViewValue;

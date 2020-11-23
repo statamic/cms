@@ -3,7 +3,6 @@
 namespace Statamic\Stache\Query;
 
 use Statamic\Facades;
-use Statamic\Facades\Taxonomy;
 use Statamic\Taxonomies\TermCollection;
 
 class TermQueryBuilder extends Builder

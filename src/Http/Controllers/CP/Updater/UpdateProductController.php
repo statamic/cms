@@ -8,7 +8,6 @@ use Illuminate\Http\Request;
 use Statamic\Facades\Addon;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Statamic;
-use Statamic\Updater\Changelog;
 use Statamic\Updater\Updater;
 
 class UpdateProductController extends CpController

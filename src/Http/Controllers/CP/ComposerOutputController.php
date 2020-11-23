@@ -4,7 +4,6 @@ namespace Statamic\Http\Controllers\CP;
 
 use Facades\Statamic\Console\Processes\Composer;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Http\Controllers\Controller;
 
 class ComposerOutputController extends Controller
