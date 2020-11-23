@@ -336,7 +336,13 @@ class User extends BaseUser
 
         $model->last_login = $model->fromDateTime($time);
 
+        $timestamps = $model->timestamps;
+
+        $model->timestamps = false;
+
         $model->save();
+
+        $model->timestamps = $timestamps;
     }
 
     protected function getPreferences()
