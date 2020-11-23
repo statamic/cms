@@ -90,7 +90,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return array
+     * @return array|void
      */
     public function alias($value, $params)
     {
@@ -146,8 +146,8 @@ class CoreModifiers extends Modifier
      * Removes a given number ($param[0]) of characters from the end of a variable.
      *
      * @param $value
-     * @param array $params
-     * @return string
+     * @param $params
+     * @return array|false|string
      */
     public function backspace($value, $params)
     {
@@ -473,8 +473,8 @@ class CoreModifiers extends Modifier
      * Uses <!--more--> by default.
      *
      * @param $value
-     * @param array $params
-     * @return string
+     * @param $params
+     * @return array|false|string
      */
     public function excerpt($value, $params)
     {
@@ -1115,7 +1115,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return array
+     * @return array|Collection
      */
     public function limit($value, $params)
     {
@@ -1265,6 +1265,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
+     * @param $context
      * @return int
      */
     public function mod($value, $params, $context)
@@ -1306,7 +1307,8 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return mixed
+     * @param $context
+     * @return float|int
      */
     public function multiply($value, $params, $context)
     {
@@ -1434,9 +1436,11 @@ class CoreModifiers extends Modifier
 
     /**
      * Renders an array variable with a partial, context aware.
-     * @param  $value
-     * @param  $params
-     * @return [string
+     *
+     * @param $value
+     * @param $params
+     * @param $context
+     * @return string
      */
     public function partial($value, $params, $context)
     {
@@ -1615,6 +1619,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
+     * @param $context
      * @return string
      */
     public function repeat($value, $params, $context)
@@ -1744,7 +1749,6 @@ class CoreModifiers extends Modifier
      *
      * @param Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function secondsAgo($value, $params)
@@ -1838,8 +1842,6 @@ class CoreModifiers extends Modifier
      * Get the singular form of an English word.
      *
      * @param $value
-     * @param $params
-     * @param $context
      * @return string
      */
     public function singular($value)
@@ -1934,6 +1936,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
+     * @param $context
      * @return string
      */
     public function stripTags($value, $params, $context)
@@ -1957,7 +1960,8 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return mixed
+     * @param $context
+     * @return int|float
      */
     public function subtract($value, $params, $context)
     {
@@ -2080,6 +2084,7 @@ class CoreModifiers extends Modifier
      * Converts the data to json.
      *
      * @param $value
+     * @param $params
      * @return string
      */
     public function toJson($value, $params)
@@ -2314,8 +2319,7 @@ class CoreModifiers extends Modifier
      *
      * @param array $value
      * @param $params
-     *
-     * @return Collection
+     * @return array
      */
     public function where($value, $params)
     {
@@ -2396,7 +2400,6 @@ class CoreModifiers extends Modifier
      * direct to the page.
      *
      * @param string  $url
-     *
      * @return string
      */
     public function embedUrl($url)
@@ -2462,6 +2465,7 @@ class CoreModifiers extends Modifier
      * Takes a modifier array, split on ":", and formats it for HTML attribute key:value pairs.
      *
      * @param $params
+     * @param string $delimiter
      * @return array
      */
     private function buildAttributesFromParameters($params, $delimiter = ':')
