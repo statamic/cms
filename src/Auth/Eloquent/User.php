@@ -357,4 +357,22 @@ class User extends BaseUser
     {
         $this->model()->preferences = array_merge($this->getPreferences(), Arr::wrap($preferences));
     }
+
+    public function __set($key, $value)
+    {
+        if ($key === 'timestamps') {
+            return $this->model()->timestamps = $value;
+        }
+
+        return $this->$key = $value;
+    }
+
+    public function __get($key)
+    {
+        if ($key === 'timestamps') {
+            return $this->model()->timestamps;
+        }
+
+        return $this->$key;
+    }
 }
