@@ -48,7 +48,6 @@ class Manager
     public function getCpImageManipulationPresets()
     {
         return [
-            'cp_thumbnail_small' => ['w' => '300', 'fit' => 'crop'],
             'cp_thumbnail_small_landscape' => ['w' => '400', 'h' => '300', 'fit' => 'crop'],
             'cp_thumbnail_small_portrait' => ['h' => '300', 'fit' => 'crop'],
             'cp_thumbnail_small_square' => ['w' => '300', 'h' => '300'],
