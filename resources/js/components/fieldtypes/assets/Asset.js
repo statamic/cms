@@ -32,10 +32,6 @@ export default {
             return this.asset.thumbnail;
         },
 
-        toenail() {
-            return this.asset.toenail;
-        },
-
         label() {
             return this.asset.basename;
         }

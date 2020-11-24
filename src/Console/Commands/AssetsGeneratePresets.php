@@ -5,8 +5,8 @@ namespace Statamic\Console\Commands;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Config;
 use Statamic\Facades\Image;
-use Statamic\Imaging\ImageGenerator;
 use Statamic\Imaging\PresetGenerator;
 
 class AssetsGeneratePresets extends Command
@@ -28,24 +28,26 @@ class AssetsGeneratePresets extends Command
     protected $description = 'Generate asset preset manipulations.';
 
     /**
-     * @var ImageGenerator
+     * @var PresetGenerator
      */
-    protected $imageGenerator;
+    protected $generator;
 
     /**
      * @var \Statamic\Assets\AssetCollection
      */
     protected $imageAssets;
 
+    public function __construct(PresetGenerator $generator)
+    {
+        $this->generator = $generator;
+        parent::__construct();
+    }
+
     /**
      * Execute the console command.
-     *
-     * @param ImageGenerator $imageGenerator
      */
-    public function handle(ImageGenerator $imageGenerator)
+    public function handle()
     {
-        $this->imageGenerator = $imageGenerator;
-
         $this->imageAssets = Asset::all()->filter(function ($asset) {
             return $asset->isImage();
         });
@@ -62,7 +64,7 @@ class AssetsGeneratePresets extends Command
      */
     protected function generateUserPresets()
     {
-        $presets = config('statamic.assets.image_manipulation.presets', []);
+        $presets = Image::userManipulationPresets();
 
         if (empty($presets)) {
             return $this->line('<fg=red>[✗]</> No user defined presets.');
@@ -93,15 +95,13 @@ class AssetsGeneratePresets extends Command
      */
     private function generatePresets($presets)
     {
-        $generator = new PresetGenerator($this->imageGenerator, $presets);
-
         foreach ($presets as $preset => $params) {
             $bar = $this->output->createProgressBar($this->imageAssets->count());
             $bar->setFormat("[%current%/%max%] Generating <comment>$preset</comment>... %filename%");
 
             foreach ($this->imageAssets as $asset) {
                 $bar->setMessage($asset->basename(), 'filename');
-                $generator->generate($asset, $preset);
+                $this->generator->generate($asset, $preset);
                 $bar->advance();
             }
 
