@@ -31,5 +31,7 @@ class SubmissionTest extends TestCase
         $submission = Form::make('test')->makeSubmission();
 
         $this->assertStringNotContainsString(',', $submission->id());
+
+        setlocale(LC_ALL, 'en_US');
     }
 }
