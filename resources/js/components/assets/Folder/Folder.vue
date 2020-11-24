@@ -75,13 +75,8 @@ export default {
     },
 
     created() {
-        // Allow key commands with a focused input
-        this.$keys.stop(e => {
-            return ! ['enter', 'escape'].includes(e.code.toLowerCase())
-        })
-
-        this.$keys.bind('enter', this.submit)
-        this.$keys.bind('esc', this.cancel)
+        this.$keys.bindGlobal('enter', this.submit)
+        this.$keys.bindGlobal('esc', this.cancel)
     },
 
 }
