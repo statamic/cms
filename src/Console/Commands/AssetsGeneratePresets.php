@@ -56,7 +56,7 @@ class AssetsGeneratePresets extends Command
     }
 
     /**
-     * Generate user provided presets
+     * Generate user provided presets.
      *
      * @return void
      */
@@ -72,7 +72,7 @@ class AssetsGeneratePresets extends Command
     }
 
     /**
-     * Generate thumbnails required by the control panel
+     * Generate thumbnails required by the control panel.
      *
      * @return void
      */
@@ -86,7 +86,7 @@ class AssetsGeneratePresets extends Command
     }
 
     /**
-     * Generate supplied presets
+     * Generate supplied presets.
      *
      * @param array $presets
      * @return void
