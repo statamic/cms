@@ -309,7 +309,7 @@ class Entries
                 $values = array_filter(explode('|', $values));
             }
 
-            if (count($values) === 0) {
+            if ((is_countable($values) && count($values) === 0) || is_null($values)) {
                 return;
             }
 
