@@ -41,16 +41,50 @@ class Manager
     }
 
     /**
+     * Get the image manipulation presets.
+     *
+     * @return array
+     */
+    public function manipulationPresets()
+    {
+        $presets = $this->userManipulationPresets();
+
+        if (config('statamic.cp.enabled')) {
+            $presets = array_merge($presets, $this->cpManipulationPresets());
+        }
+
+        return $presets;
+    }
+
+    /**
+     * Get the user defined image manipulation presets.
+     *
+     * @return array
+     */
+    public function userManipulationPresets()
+    {
+        return config('statamic.assets.image_manipulation.presets', []);
+    }
+
+    /**
      * Get the image manipulation presets required by the control panel.
      *
      * @return array
      */
-    public function getCpImageManipulationPresets()
+    public function cpManipulationPresets()
     {
         return [
             'cp_thumbnail_small_landscape' => ['w' => '400', 'h' => '300', 'fit' => 'crop'],
             'cp_thumbnail_small_portrait' => ['h' => '300', 'fit' => 'crop'],
             'cp_thumbnail_small_square' => ['w' => '300', 'h' => '300'],
         ];
+    }
+
+    /**
+     * @deprecated
+     */
+    public function getCpImageManipulationPresets()
+    {
+        return $this->cpManipulationPresets();
     }
 }

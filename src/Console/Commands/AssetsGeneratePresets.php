@@ -63,7 +63,7 @@ class AssetsGeneratePresets extends Command
      */
     protected function generateUserPresets()
     {
-        $presets = Config::getImageManipulationPresets();
+        $presets = Image::userManipulationPresets();
 
         if (empty($presets)) {
             return $this->line('<fg=red>[✗]</> No user defined presets.');
