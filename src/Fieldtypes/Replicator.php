@@ -26,6 +26,12 @@ class Replicator extends Fieldtype
                 ],
                 'default' => false,
             ],
+            'max_sets' => [
+                'display' => __('Max Sets'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.max_sets'),
+                'type' => 'integer',
+                'width' => 50,
+            ],
             'sets' => [
                 'type' => 'sets',
             ],

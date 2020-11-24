@@ -268,7 +268,7 @@ class BrowserTest extends TestCase
             'data' => [
                 'assets' => [
                     ['id', 'size_formatted', 'last_modified_relative', 'actions'],
-                    ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail', 'toenail'],
+                    ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail'],
                 ],
                 'folder' => [
                     'title', 'path', 'parent_path', 'actions', 'folders',

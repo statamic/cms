@@ -14,6 +14,7 @@ use Statamic\Events\BlueprintDeleted;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -102,6 +103,18 @@ class Blueprint implements Augmentable
     }
 
     public function contents(): array
+    {
+        return Blink::once($this->contentsBlinkKey(), function () {
+            return $this->getContents();
+        });
+    }
+
+    private function contentsBlinkKey()
+    {
+        return "blueprint-contents-{$this->namespace()}-{$this->handle()}";
+    }
+
+    private function getContents()
     {
         $contents = $this->contents;
 
@@ -418,6 +431,8 @@ class Blueprint implements Augmentable
     protected function resetFieldsCache()
     {
         $this->fieldsCache = null;
+
+        Blink::forget($this->contentsBlinkKey());
 
         return $this;
     }

@@ -1,5 +1,59 @@
 # Release Notes
 
+## 3.0.30 (2020-11-20)
+
+### What's new
+- Added a [sites](https://statamic.dev/variables/sites) variable. [#2513](https://github.com/statamic/cms/issues/2513)
+- Added the ability to limit number of sets in a Replicator field. [#2866](https://github.com/statamic/cms/issues/2866)
+- The search:results tag supports pagination. [d059bc4eb](https://github.com/statamic/cms/commit/d059bc4eb)
+
+### What's fixed
+- Prevent comma in submission filenames when used in some locales. [927890a95](https://github.com/statamic/cms/commit/927890a95)
+- Prevent form submissions generating new IDs. [#2822](https://github.com/statamic/cms/issues/2822)
+- Don't use the "after save" features when inside a Stack. [#2827](https://github.com/statamic/cms/issues/2827) [#2469](https://github.com/statamic/cms/issues/2469)
+- Global CP search results are filtered by permission. [#2848](https://github.com/statamic/cms/issues/2848)
+- Prevent error when getting image dimensions from a corrupt file. [#2877](https://github.com/statamic/cms/issues/2877)
+- Query string is maintained in pagination links in tags. [d059bc4eb](https://github.com/statamic/cms/commit/d059bc4eb)
+
+
+
+## 3.0.29 (2020-11-19)
+
+### What's fixed
+- Fix issue where nested imports with prefixes causes compounding prefixes. [#2869](https://github.com/statamic/cms/issues/2869)
+- Prevent select fields with max_items set to 1 being unclearable. [d04519d2b](https://github.com/statamic/cms/commit/d04519d2b)
+- Select fields are searchable if you allow additions, even if you don't explicitly enable the searchable option. [5cba0bc](https://github.com/statamic/cms/commit/5cba0bc)
+- Adjust Bard Set Picker placement. [80ff247b2](https://github.com/statamic/cms/commit/80ff247b2)
+- Fix styling of pagination's `...` separator. [f0f1cdef6](https://github.com/statamic/cms/commit/f0f1cdef6)
+- Support cmd+s to save on Fieldset and Navagition form pages. [b77a8d227](https://github.com/statamic/cms/commit/b77a8d227)
+- Fixed that annoying little gap in the main nav when the trial banner isn't there. [d9396a838](https://github.com/statamic/cms/commit/d9396a838)
+- Only turn fieldtype length limiter to red when you exceed the limit. Meeting is fine. [0c939faa3](https://github.com/statamic/cms/commit/0c939faa3) [7ce0200f1](https://github.com/statamic/cms/commit/7ce0200f1)
+- Fix the `rtfm` command's URL and text. [3185d65e5](https://github.com/statamic/cms/commit/3185d65e5)
+- The `length` modifier works with collections. [#2876](https://github.com/statamic/cms/issues/2876)
+
+
+
+## 3.0.28 (2020-11-17)
+
+### What's new
+- Added a `UserRegistered` event. [#2838](https://github.com/statamic/cms/issues/2838)
+- Add config values to the form email data. [#2847](https://github.com/statamic/cms/issues/2847)
+
+### What's improved
+- Improved speed of CP entry, term, and form submission listings by only requesting values for visible columns. [#2857](https://github.com/statamic/cms/issues/2857)
+- Made some Blueprint related performance improvements. [#2856](https://github.com/statamic/cms/issues/2856)
+- Added unique classes based on the handle to each field wrapper div. [statamic/ideas#388](https://github.com/statamic/ideas/issues/388)
+- Replaced fzaninotto/faker with fakerphp/faker. [#2819](https://github.com/statamic/cms/issues/2819)
+
+### What's fixed
+- Collection widget shows entries for the current site. [adbeaeba5](https://github.com/statamic/cms/commit/adbeaeba5)
+- Prevent situations where a structure could end up with a root page with children. [#2852](https://github.com/statamic/cms/issues/2852)
+- Render attributes whose value is false. [#2845](https://github.com/statamic/cms/issues/2845)
+- Prevent removing/ordering of options on read-only relationship selects. [#2415](https://github.com/statamic/cms/issues/2415)
+- Adjusted trial mode banner visibility. [4b83422b9](https://github.com/statamic/cms/commit/4b83422b9)
+
+
+
 ## 3.0.27 (2020-11-12)
 
 ### What's fixed

@@ -5,6 +5,7 @@ namespace Statamic\Auth;
 use Statamic\Contracts\Auth\User;
 use Statamic\Contracts\Auth\UserRepository as RepositoryContract;
 use Statamic\Facades\Blueprint;
+use Statamic\OAuth\Provider;
 
 abstract class UserRepository implements RepositoryContract
 {
@@ -52,5 +53,12 @@ abstract class UserRepository implements RepositoryContract
             'roles' => ['type' => 'user_roles', 'width' => 50],
             'groups' => ['type' => 'user_groups', 'width' => 50],
         ])->setHandle('user');
+    }
+
+    public function findByOAuthId(string $provider, string $id): ?User
+    {
+        return $this->find(
+            (new Provider($provider))->getUserId($id)
+        );
     }
 }

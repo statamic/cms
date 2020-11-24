@@ -3,7 +3,6 @@
 namespace Statamic\Http\Controllers\CP\Globals;
 
 use Illuminate\Http\Request;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\GlobalSet;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Http\Controllers\CP\Fields\ManagesBlueprints;

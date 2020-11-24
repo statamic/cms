@@ -50,11 +50,6 @@ class UserRepository extends BaseRepository
         return $this->makeUser($model);
     }
 
-    public function findByOAuthId(string $provider, string $id): ?UserContract
-    {
-        // todo
-    }
-
     public function model($method, ...$args)
     {
         $model = $this->config['model'];

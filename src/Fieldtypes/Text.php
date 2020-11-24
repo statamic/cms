@@ -52,6 +52,12 @@ class Text extends Fieldtype
                 'type' => 'text',
                 'width' => 50,
             ],
+            'antlers' => [
+                'display' => 'Antlers',
+                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                'type' => 'toggle',
+                'width' => 50,
+            ],
         ];
     }
 

@@ -39,7 +39,7 @@
                     @blur="blurred"
                     @previews-updated="previews[set._id] = $event"
                 >
-                    <template v-slot:picker v-if="!isReadOnly && index !== values.length-1">
+                    <template v-slot:picker v-if="index !== values.length-1 && canAddSet">
                         <set-picker
                             class="replicator-set-picker-between"
                             :sets="setConfigs"
@@ -50,7 +50,7 @@
             </div>
         </sortable-list>
 
-        <set-picker v-if="!isReadOnly"
+        <set-picker v-if="canAddSet"
             :last="true"
             :sets="setConfigs"
             :index="values.length"
@@ -87,6 +87,11 @@ export default {
     },
 
     computed: {
+        canAddSet() {
+            if (this.isReadOnly) return false;
+
+            return !this.config.max_sets || this.values.length < this.config.max_sets;
+        },
 
         setConfigs() {
             return this.config.sets;
@@ -175,7 +180,6 @@ export default {
                 }
             }, 1);
         },
-
     },
 
     mounted() {

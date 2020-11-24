@@ -146,6 +146,7 @@ class SectionTest extends TestCase
                     'character_limit' => 0,
                     'prepend' => null,
                     'append' => null,
+                    'antlers' => false,
                 ],
                 [
                     'handle' => 'two',
@@ -157,6 +158,7 @@ class SectionTest extends TestCase
                     'validate' => 'min:2',
                     'character_limit' => null,
                     'component' => 'textarea',
+                    'antlers' => false,
                 ],
             ],
         ], $section->toPublishArray());

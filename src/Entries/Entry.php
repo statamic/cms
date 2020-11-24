@@ -21,7 +21,6 @@ use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;

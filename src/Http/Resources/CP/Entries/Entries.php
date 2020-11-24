@@ -3,9 +3,12 @@
 namespace Statamic\Http\Resources\CP\Entries;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
+use Statamic\Http\Resources\CP\Concerns\HasRequestedColumns;
 
 class Entries extends ResourceCollection
 {
+    use HasRequestedColumns;
+
     public $collects = ListedEntry::class;
     protected $blueprint;
     protected $columnPreferenceKey;
@@ -43,11 +46,11 @@ class Entries extends ResourceCollection
             'data' => $this->collection->each(function ($entry) {
                 $entry
                     ->blueprint($this->blueprint)
-                    ->columns($this->columns);
+                    ->columns($this->requestedColumns());
             }),
 
             'meta' => [
-                'columns' => $this->columns,
+                'columns' => $this->visibleColumns(),
             ],
         ];
     }

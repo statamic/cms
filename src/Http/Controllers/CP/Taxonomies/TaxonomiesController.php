@@ -54,11 +54,19 @@ class TaxonomiesController extends CpController
             ];
         });
 
+        $columns = $taxonomy
+            ->termBlueprint()
+            ->columns()
+            ->setPreferred("taxonomies.{$taxonomy->handle()}.columns")
+            ->rejectUnlisted()
+            ->values();
+
         $viewData = [
             'taxonomy' => $taxonomy,
             'hasTerms' => true, // todo $taxonomy->queryTerms()->count(),
             'blueprints' => $blueprints,
             'site' => Site::selected()->handle(),
+            'columns' => $columns,
             'filters' => Scope::filters('terms', [
                 'taxonomy' => $taxonomy->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),

@@ -2,6 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\CP\Column;
 use Statamic\Exceptions\TermsFieldtypeBothOptionsUsedException;
 use Statamic\Exceptions\TermsFieldtypeTaxonomyOptionUsed;
@@ -86,11 +88,11 @@ class Terms extends Relationship
                 // entry, but could also be something else, like another taxonomy term.
                 $parent = $this->field->parent();
 
-                if ($parent && $this->field->handle() === $taxonomy->handle()) {
+                if ($parent && $parent instanceof Entry && $this->field->handle() === $taxonomy->handle()) {
                     $term->collection($parent->collection());
                 }
 
-                $locale = $parent
+                $locale = $parent && $parent instanceof Localization
                     ? $parent->locale()
                     : Site::current()->handle();
 
