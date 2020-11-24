@@ -5,6 +5,7 @@ namespace Statamic\Console\Commands;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Asset;
+use Statamic\Facades\Config;
 use Statamic\Facades\Image;
 use Statamic\Imaging\PresetGenerator;
 
@@ -62,7 +63,7 @@ class AssetsGeneratePresets extends Command
      */
     protected function generateUserPresets()
     {
-        $presets = config('statamic.assets.image_manipulation.presets', []);
+        $presets = Config::getImageManipulationPresets();
 
         if (empty($presets)) {
             return $this->line('<fg=red>[✗]</> No user defined presets.');
