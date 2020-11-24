@@ -1579,7 +1579,7 @@ class CoreModifiers extends Modifier
 
             foreach ($matches as $key => $match) {
                 // If a param's key matches the key to remove, unset it.
-                if (Str::startsWith($match, "{$params[0]}=")) {
+                if ($match === $params[0] || Str::startsWith($match, "{$params[0]}=")) {
                     unset($matches[$key]);
                 }
             }
@@ -1588,73 +1588,71 @@ class CoreModifiers extends Modifier
             // So just assign the URL with its anchor (if any).
             if (empty($matches)) {
                 $value = "{$url}{$anchor}";
-            // Else, append query params (and reindex numeric keys if a second param is specified and query params contain at least one array)
-            // and the anchor (if any).
-            } else {
-                // If we should reorganize indexes...
-                if (isset($params[1]) && (Str::containsAll($value, ['[', ']']) || Str::containsAll($value, ['%5B', '%5D']))) {
-                    // Parse the original URL to compare the original query params array to the new one (in order to detect changes).
-                    $query = parse_url($value, PHP_URL_QUERY);
-                    parse_str($query ?? '', $originalQueryAssociativeArray);
+            // Reindex numeric keys if a second param is specified and query params contain at least one array,
+            // then append query params and the anchor (if any).
+            } elseif (isset($params[1]) && (Str::containsAll($value, ['[', ']']) || Str::containsAll($value, ['%5B', '%5D']))) {
+                // Parse the original URL to compare the original query params array to the new one (in order to detect changes).
+                $query = parse_url($value, PHP_URL_QUERY);
+                parse_str($query ?? '', $originalQueryAssociativeArray);
 
-                    // Parse the new URL to compare it with the original.
-                    $value = "{$url}?".implode('&', $matches).$anchor;
-                    $query = parse_url($value, PHP_URL_QUERY);
-                    parse_str($query ?? '', $queryAssociativeArray);
+                // Parse the new URL to compare it with the original.
+                $value = "{$url}?".implode('&', $matches).$anchor;
+                $query = parse_url($value, PHP_URL_QUERY);
+                parse_str($query ?? '', $queryAssociativeArray);
 
-                    $rii = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($queryAssociativeArray), \RecursiveIteratorIterator::SELF_FIRST);
-                    $currentOriginalParent = $originalQueryAssociativeArray;
+                $rii = new \RecursiveIteratorIterator(new \RecursiveArrayIterator($queryAssociativeArray), \RecursiveIteratorIterator::SELF_FIRST);
+                $currentOriginalParent = $originalQueryAssociativeArray;
 
-                    foreach ($rii as $key => $value) {
-                        if ($rii->hasChildren()) {
-                            $currentOriginalParent = $currentOriginalParent[$key];
+                foreach ($rii as $key => $value) {
+                    if ($rii->hasChildren()) {
+                        $currentOriginalParent = $currentOriginalParent[$key];
 
-                            // If the currently iterated array keys of the new query params array doesn't match the original array keys at the same position,
-                            // it means we have to reorder the currently iterated array (because an item was removed).
-                            if (array_keys($value) !== array_keys($currentOriginalParent)) {
-                                $lastIndex = 0;
-                                $reindexedArray = [];
+                        // If the currently iterated array keys of the new query params array doesn't match the original array keys at the same position,
+                        // it means we have to reorder the currently iterated array (because an item was removed).
+                        if (array_keys($value) !== array_keys($currentOriginalParent)) {
+                            $lastIndex = 0;
+                            $reindexedArray = [];
 
-                                // Reorder integer array keys only.
-                                foreach ($value as $key => $value) {
-                                    if (is_int($key)) {
-                                        $reindexedArray[$lastIndex++] = $value;
-                                    } else {
-                                        $reindexedArray[$key] = $value;
-                                    }
+                            // Reorder integer array keys only.
+                            foreach ($value as $key => $value) {
+                                if (is_int($key)) {
+                                    $reindexedArray[$lastIndex++] = $value;
+                                } else {
+                                    $reindexedArray[$key] = $value;
                                 }
-
-                                $currentDepth = $rii->getDepth();
-
-                                // Save modifications recursively (going up the array).
-                                for ($subDepth = $currentDepth; $subDepth >= 0; $subDepth--) {
-                                    $subIterator = $rii->getSubIterator($subDepth);
-
-                                    // If we are on the level we want to update, assign the reindexed array.
-                                    // Else, set the key to the parent iterator's value.
-                                    $subIterator->offsetSet(
-                                        $subIterator->key(),
-                                        $subDepth === $currentDepth
-                                            ? $reindexedArray
-                                            : $rii->getSubIterator($subDepth + 1)->getArrayCopy()
-                                    );
-                                }
-
-                                // Only one key per call can be removed,
-                                // so break the iterator loop because all the following sub-arrays will match.
-                                break;
                             }
-                        } else {
-                            // We reached the bottom level, so reset the parent.
-                            $currentOriginalParent = $originalQueryAssociativeArray;
-                        }
-                    }
 
-                    // Rebuild the new URL using the reordered array.
-                    $value = "{$url}?".UrlHelper::buildQueryString($rii->getArrayCopy()).$anchor;
-                } else {
-                    $value = "{$url}?".implode('&', $matches).$anchor;
+                            $currentDepth = $rii->getDepth();
+
+                            // Save modifications recursively (going up the array).
+                            for ($subDepth = $currentDepth; $subDepth >= 0; $subDepth--) {
+                                $subIterator = $rii->getSubIterator($subDepth);
+
+                                // If we are on the level we want to update, assign the reindexed array.
+                                // Else, set the key to the parent iterator's value.
+                                $subIterator->offsetSet(
+                                    $subIterator->key(),
+                                    $subDepth === $currentDepth
+                                        ? $reindexedArray
+                                        : $rii->getSubIterator($subDepth + 1)->getArrayCopy()
+                                );
+                            }
+
+                            // Only one key per call can be removed,
+                            // so break the iterator loop because all the following sub-arrays will match.
+                            break;
+                        }
+                    // We reached the bottom level, so reset the parent.
+                    } else {
+                        $currentOriginalParent = $originalQueryAssociativeArray;
+                    }
                 }
+
+                // Rebuild the new URL using the reordered array.
+                $value = "{$url}?".UrlHelper::buildQueryString($rii->getArrayCopy()).$anchor;
+            // Else, simply append query params and the anchor (if any).
+            } else {
+                $value = "{$url}?".implode('&', $matches).$anchor;
             }
 
             return $value;
