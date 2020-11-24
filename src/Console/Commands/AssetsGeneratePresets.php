@@ -40,6 +40,7 @@ class AssetsGeneratePresets extends Command
     public function __construct(PresetGenerator $generator)
     {
         $this->generator = $generator;
+        parent::__construct();
     }
 
     /**
