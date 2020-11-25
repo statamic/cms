@@ -191,6 +191,9 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('utilities', 'Utilities\UtilitiesController@index')->name('utilities.index');
     Utility::routes();
 
+    Route::get('graphql', 'GraphQLController@index')->name('graphql.index');
+    Route::get('graphiql', 'GraphQLController@graphiql')->name('graphql.graphiql');
+
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
         Route::get('relationship', 'RelationshipFieldtypeController@index')->name('relationship.index');
         Route::get('relationship/data', 'RelationshipFieldtypeController@data')->name('relationship.data');
