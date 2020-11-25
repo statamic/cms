@@ -16,4 +16,11 @@ class ApiServiceProvider extends ServiceProvider
     {
         Resource::mapDefaults();
     }
+
+    public function boot()
+    {
+        $this->publishes([
+            __DIR__.'/../../resources/graphiql' => public_path('vendor/statamic/graphiql'),
+        ], 'statamic-graphiql');
+    }
 }
