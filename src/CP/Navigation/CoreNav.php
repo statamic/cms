@@ -184,6 +184,11 @@ class CoreNav
 
         $this->makeUtilitiesSection();
 
+
+        Nav::tools('GraphQL')
+            ->route('graphql.index')
+            ->icon('array');
+
         return $this;
     }
 
