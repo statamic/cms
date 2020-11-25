@@ -6,7 +6,6 @@ use Statamic\Extend\HasAliases;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\RegistersItself;
 use Statamic\Facades\Antlers;
-use Statamic\Facades\Parse;
 use Statamic\Support\Arr;
 
 abstract class Tags

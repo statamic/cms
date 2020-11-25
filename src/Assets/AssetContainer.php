@@ -2,7 +2,7 @@
 
 namespace Statamic\Assets;
 
-use Statamic\Contracts\Assets\Asset as AssetContract;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\ExistsAsFile;
@@ -14,7 +14,6 @@ use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
-use Statamic\Facades\Folder;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
@@ -227,16 +226,25 @@ class AssetContainer implements AssetContainerContract, Augmentable
             $recursive = true;
         }
 
-        $files = collect($this->disk()->getFiles($folder, $recursive));
+        $cacheFor = config('statamic.assets.file_listing_cache_length', 60);
 
-        // Get rid of files we never want to show up.
-        $files = $files->reject(function ($path) {
-            return Str::startsWith($path, '.meta/')
-                || Str::contains($path, '/.meta/')
-                || Str::endsWith($path, ['.DS_Store', '.gitkeep', '.gitignore']);
+        return Cache::remember($this->filesCacheKey($folder), $cacheFor, function () use ($folder, $recursive) {
+            $files = collect($this->disk()->getFiles($folder, $recursive));
+
+            // Get rid of files we never want to show up.
+            $files = $files->reject(function ($path) {
+                return Str::startsWith($path, '.meta/')
+                    || Str::contains($path, '/.meta/')
+                    || Str::endsWith($path, ['.DS_Store', '.gitkeep', '.gitignore']);
+            });
+
+            return $files->values();
         });
+    }
 
-        return $files->values();
+    public function filesCacheKey($folder = '/')
+    {
+        return 'asset-files-'.$this->handle().'-'.$folder;
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Statamic\Modifiers;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
@@ -10,7 +11,6 @@ use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Data;
 use Statamic\Facades\File;
-use Statamic\Facades\Localization;
 use Statamic\Facades\Markdown;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Path;
@@ -90,7 +90,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return array
+     * @return array|void
      */
     public function alias($value, $params)
     {
@@ -146,8 +146,8 @@ class CoreModifiers extends Modifier
      * Removes a given number ($param[0]) of characters from the end of a variable.
      *
      * @param $value
-     * @param array $params
-     * @return string
+     * @param $params
+     * @return array|false|string
      */
     public function backspace($value, $params)
     {
@@ -473,8 +473,8 @@ class CoreModifiers extends Modifier
      * Uses <!--more--> by default.
      *
      * @param $value
-     * @param array $params
-     * @return string
+     * @param $params
+     * @return array|false|string
      */
     public function excerpt($value, $params)
     {
@@ -1103,6 +1103,10 @@ class CoreModifiers extends Modifier
      */
     public function length($value)
     {
+        if ($value instanceof Arrayable) {
+            $value = $value->toArray();
+        }
+
         return (is_array($value)) ? count($value) : Stringy::length($value);
     }
 
@@ -1111,7 +1115,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return array
+     * @return array|Collection
      */
     public function limit($value, $params)
     {
@@ -1159,7 +1163,7 @@ class CoreModifiers extends Modifier
      */
     public function localize($value)
     {
-        return Localization::fetch($value);
+        return $this->trans($value);
     }
 
     /**
@@ -1261,6 +1265,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
+     * @param $context
      * @return int
      */
     public function mod($value, $params, $context)
@@ -1302,7 +1307,8 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return mixed
+     * @param $context
+     * @return float|int
      */
     public function multiply($value, $params, $context)
     {
@@ -1430,9 +1436,11 @@ class CoreModifiers extends Modifier
 
     /**
      * Renders an array variable with a partial, context aware.
-     * @param  $value
-     * @param  $params
-     * @return [string
+     *
+     * @param $value
+     * @param $params
+     * @param $context
+     * @return string
      */
     public function partial($value, $params, $context)
     {
@@ -1611,6 +1619,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
+     * @param $context
      * @return string
      */
     public function repeat($value, $params, $context)
@@ -1740,7 +1749,6 @@ class CoreModifiers extends Modifier
      *
      * @param Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function secondsAgo($value, $params)
@@ -1834,8 +1842,6 @@ class CoreModifiers extends Modifier
      * Get the singular form of an English word.
      *
      * @param $value
-     * @param $params
-     * @param $context
      * @return string
      */
     public function singular($value)
@@ -1930,6 +1936,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
+     * @param $context
      * @return string
      */
     public function stripTags($value, $params, $context)
@@ -1953,7 +1960,8 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return mixed
+     * @param $context
+     * @return int|float
      */
     public function subtract($value, $params, $context)
     {
@@ -2076,6 +2084,7 @@ class CoreModifiers extends Modifier
      * Converts the data to json.
      *
      * @param $value
+     * @param $params
      * @return string
      */
     public function toJson($value, $params)
@@ -2310,8 +2319,7 @@ class CoreModifiers extends Modifier
      *
      * @param array $value
      * @param $params
-     *
-     * @return Collection
+     * @return array
      */
     public function where($value, $params)
     {
@@ -2392,13 +2400,20 @@ class CoreModifiers extends Modifier
      * direct to the page.
      *
      * @param string  $url
-     *
      * @return string
      */
     public function embedUrl($url)
     {
-        if (Str::contains($url, 'youtube')) {
-            return str_replace('watch?v=', 'embed/', $url);
+        if (Str::contains($url, 'vimeo')) {
+            $url = str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
+
+            if (Str::contains($url, '?')) {
+                $url = str_replace('?', '?dnt=1&', $url);
+            } else {
+                $url .= '?dnt=1';
+            }
+
+            return $url;
         }
 
         if (Str::contains($url, 'youtu.be')) {
@@ -2408,12 +2423,14 @@ class CoreModifiers extends Modifier
             if (Str::contains($url, '?t=')) {
                 $url = str_replace('?t=', '?start=', $url);
             }
-
-            return $url;
         }
 
-        if (Str::contains($url, 'vimeo')) {
-            return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
+        if (Str::contains($url, 'youtube.com/watch?v=')) {
+            $url = str_replace('watch?v=', 'embed/', $url);
+        }
+
+        if (Str::contains($url, 'youtube.com')) {
+            $url = str_replace('youtube.com', 'youtube-nocookie.com', $url);
         }
 
         return $url;
@@ -2448,6 +2465,7 @@ class CoreModifiers extends Modifier
      * Takes a modifier array, split on ":", and formats it for HTML attribute key:value pairs.
      *
      * @param $params
+     * @param string $delimiter
      * @return array
      */
     private function buildAttributesFromParameters($params, $delimiter = ':')

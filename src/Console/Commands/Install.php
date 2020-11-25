@@ -50,12 +50,12 @@ class Install extends Command
     protected function createFiles()
     {
         $gitkeeps = [
-            base_path('content/assets'),
-            base_path('content/collections'),
-            base_path('content/globals'),
-            base_path('content/taxonomies'),
-            base_path('content/navigation'),
-            base_path('users'),
+            config('statamic.stache.stores.asset-containers.directory'),
+            config('statamic.stache.stores.collections.directory'),
+            config('statamic.stache.stores.globals.directory'),
+            config('statamic.stache.stores.taxonomies.directory'),
+            config('statamic.stache.stores.navigation.directory'),
+            config('statamic.users.repositories.file.paths.users'),
         ];
 
         $gitignores = [

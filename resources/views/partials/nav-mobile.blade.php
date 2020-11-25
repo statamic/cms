@@ -9,7 +9,7 @@
                     @unless ($item->view())
                         <li class="{{ $item->isActive() ? 'current' : '' }}">
                             <a href="{{ $item->url() }}">
-                                <i>@svg($item->icon())</i><span>{{ __($item->name()) }}</span>
+                                <i>{!! $item->icon() !!}</i><span>{{ __($item->name()) }}</span>
                             </a>
                             @if ($item->children() && $item->isActive())
                                 <ul>

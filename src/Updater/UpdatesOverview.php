@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Facades\Statamic\Marketplace\Marketplace;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Addon;
-use Statamic\Statamic;
 
 class UpdatesOverview
 {

@@ -26,6 +26,12 @@ class Replicator extends Fieldtype
                 ],
                 'default' => false,
             ],
+            'max_sets' => [
+                'display' => __('Max Sets'),
+                'instructions' => __('statamic::fieldtypes.replicator.config.max_sets'),
+                'type' => 'integer',
+                'width' => 50,
+            ],
             'sets' => [
                 'type' => 'sets',
             ],
@@ -136,10 +142,10 @@ class Replicator extends Fieldtype
             'existing' => $existing = collect($this->field->value())->mapWithKeys(function ($set) {
                 $config = $this->config("sets.{$set['type']}.fields", []);
 
-                return [$set['_id'] => (new Fields($config))->addValues($set)->meta()];
+                return [$set['_id'] => (new Fields($config))->addValues($set)->meta()->put('_', '_')];
             })->toArray(),
             'new' => collect($this->config('sets'))->map(function ($set, $handle) {
-                return (new Fields($set['fields']))->meta();
+                return (new Fields($set['fields']))->meta()->put('_', '_');
             })->toArray(),
             'defaults' => collect($this->config('sets'))->map(function ($set) {
                 return (new Fields($set['fields']))->all()->map->defaultValue();

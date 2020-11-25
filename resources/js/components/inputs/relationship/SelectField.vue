@@ -41,10 +41,13 @@
                     @input="input"
                 >
                     <div class="vs__selected-options-outside flex flex-wrap">
-                        <span v-for="item in items" :key="item.id" class="vs__selected mt-1 sortable-item">
+                        <span v-for="item in items" :key="item.id" class="vs__selected mt-1" :class="{ 'sortable-item': !readOnly }">
                             {{ item.title }}
-                            <button @click="deselect(item)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
+                            <button v-if="!readOnly" @click="deselect(item)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
                                 <span>×</span>
+                            </button>
+                            <button v-else type="button" class="vs__deselect">
+                                <span class="opacity-50">×</span>
                             </button>
                         </span>
                     </div>

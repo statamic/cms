@@ -1,8 +1,9 @@
 <?php
 
 return [
-    'any.config.default' => 'Standardwert festlegen.',
+    'any.config.antlers' => 'Ob dieses Feld von Antlers analysiert werden soll.',
     'any.config.cast_booleans' => 'Optionen mit den Werten *true* und *false* als Booleans speichern.',
+    'any.config.default' => 'Standardwert festlegen.',
     'array.config.keys' => 'Arrayschlüssel (Variablen) und optionale Beschriftungen festlegen.',
     'array.config.mode' => 'Der dynamische Modus gibt der Benutzer*in die Kontrolle über die Daten, während der geschlossene Modus dies nicht tut.',
     'assets.config.allow_uploads' => 'Das Hochladen neuer Dateien zulassen.',
@@ -71,6 +72,7 @@ return [
     'replicator.config.collapse.accordion' => 'Nur ein Set kann jeweils auf einmal ausgeklappt werden',
     'replicator.config.collapse.disabled' => 'Alle Sets sind standardmäßig eingeklappt',
     'replicator.config.collapse.enabled' => 'Alle Sets sind standardmäßig ausgeklappt',
+    'replicator.config.max_sets' => 'Die maximale Anzahl von Sätzen.',
     'select.config.clearable' => 'Option zum Abwählen der Auswahl aktivieren.',
     'select.config.multiple' => 'Mehrfachauswahl zulassen.',
     'select.config.options' => 'Arrayschlüssel und deren optionale Beschriftungen festlegen.',

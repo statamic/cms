@@ -24,6 +24,11 @@ class AugmentedCollection extends Collection
         return $this;
     }
 
+    public function hasShallowNesting()
+    {
+        return $this->shallowNesting;
+    }
+
     public function toArray()
     {
         return $this->map(function ($value) {

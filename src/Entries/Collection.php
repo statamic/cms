@@ -18,7 +18,6 @@ use Statamic\Facades\File;
 use Statamic\Facades\Search;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
-use Statamic\Facades\Structure;
 use Statamic\Facades\Taxonomy;
 use Statamic\Statamic;
 use Statamic\Structures\CollectionStructure;
@@ -211,6 +210,15 @@ class Collection implements Contract, AugmentableContract
 
     public function entryBlueprints()
     {
+        $blink = 'collection-entry-blueprints-'.$this->handle();
+
+        return Blink::once($blink, function () {
+            return $this->getEntryBlueprints();
+        });
+    }
+
+    private function getEntryBlueprints()
+    {
         $blueprints = Blueprint::in('collections/'.$this->handle());
 
         if ($blueprints->isEmpty()) {
@@ -224,17 +232,37 @@ class Collection implements Contract, AugmentableContract
 
     public function entryBlueprint($blueprint = null, $entry = null)
     {
-        $blueprint = is_null($blueprint)
-            ? $this->entryBlueprints()->first()
-            : $this->entryBlueprints()->keyBy->handle()->get($blueprint);
-
-        $blueprint = $blueprint ? $this->ensureEntryBlueprintFields($blueprint) : null;
-
-        if ($blueprint) {
-            EntryBlueprintFound::dispatch($blueprint->setParent($entry ?? $this), $entry);
+        if (! $blueprint = $this->getBaseEntryBlueprint($blueprint)) {
+            return null;
         }
 
+        $blueprint->setParent($entry ?? $this);
+
+        $this->dispatchEntryBlueprintFoundEvent($blueprint, $entry);
+
         return $blueprint;
+    }
+
+    private function getBaseEntryBlueprint($blueprint)
+    {
+        $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint;
+
+        return Blink::once($blink, function () use ($blueprint) {
+            return is_null($blueprint)
+                ? $this->entryBlueprints()->first()
+                : $this->entryBlueprints()->keyBy->handle()->get($blueprint);
+        });
+    }
+
+    private function dispatchEntryBlueprintFoundEvent($blueprint, $entry)
+    {
+        $id = optional($entry)->id() ?? 'null';
+
+        $blink = 'collection-entry-blueprint-'.$this->handle().'-'.$blueprint->handle().'-'.$id;
+
+        Blink::once($blink, function () use ($blueprint, $entry) {
+            EntryBlueprintFound::dispatch($blueprint, $entry);
+        });
     }
 
     public function fallbackEntryBlueprint()

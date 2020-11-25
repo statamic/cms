@@ -16,15 +16,79 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
 
     protected function getBaseItems()
     {
-        $container = $this->container instanceof AssetContainer
-            ? $this->container
-            : Facades\AssetContainer::find($this->container);
-
         $recursive = $this->folder ? $this->recursive : true;
 
-        return $this->collect($container->files($this->folder, $recursive)->map(function ($path) use ($container) {
-            return $container->asset($path);
-        }));
+        $cacheKey = 'asset-folder-files-'.$this->getContainer()->handle().'-'.$this->folder;
+
+        $assets = $this->getContainer()->files($this->folder, $recursive);
+
+        if (empty($this->wheres) && $this->limit) {
+            $assets = $assets->skip($this->offset)->take($this->limit)->values();
+        }
+
+        if ($this->requiresAssetInstances()) {
+            $assets = $this->convertPathsToAssets($assets);
+        }
+
+        return $this->collect($assets);
+    }
+
+    protected function limitItems($items)
+    {
+        if (! empty($this->wheres) || ! $this->limit) {
+            return parent::limitItems($items);
+        }
+
+        return $items;
+    }
+
+    protected function getFilteredItems()
+    {
+        $items = $this->getBaseItems();
+
+        if ($this->requiresAssetInstances()) {
+            $items = $this->filterWheres($items);
+        }
+
+        return $items;
+    }
+
+    public function get($columns = ['*'])
+    {
+        $items = parent::get($columns);
+
+        if (! $this->requiresAssetInstances()) {
+            $items = $this->convertPathsToAssets($items);
+        }
+
+        return $items;
+    }
+
+    private function requiresAssetInstances()
+    {
+        if (! empty($this->wheres)) {
+            return true;
+        }
+
+        if (! empty($this->orderBys)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function convertPathsToAssets($paths)
+    {
+        return $paths->map(function ($path) {
+            return $this->getContainer()->asset($path);
+        });
+    }
+
+    private function getContainer()
+    {
+        return $this->container instanceof AssetContainer
+            ? $this->container
+            : Facades\AssetContainer::find($this->container);
     }
 
     public function where($column, $operator = null, $value = null)

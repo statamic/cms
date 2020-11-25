@@ -1,8 +1,9 @@
 <?php
 
 return [
-    'any.config.default' => 'Indstil standardværdien.',
+    'any.config.antlers' => 'Uanset om du vil have, at dette felt skal tages af Antlers.',
     'any.config.cast_booleans' => 'Valgmuligheder med værdierne sandt og falsk gemmes som booleanske.',
+    'any.config.default' => 'Indstil standardværdien.',
     'array.config.keys' => 'Indstil matrixnøgler (variabler) og valgfri etiketter.',
     'array.config.mode' => 'Dynamisk tilstand giver brugeren kontrol over dataene, mens tastetilstand ikke gør det.',
     'assets.config.allow_uploads' => 'Tillad nye filoverførsler.',
@@ -71,6 +72,7 @@ return [
     'replicator.config.collapse.accordion' => 'Tillad kun, at ét sæt udvides ad gangen',
     'replicator.config.collapse.disabled' => 'Alle sæt udvides som standard',
     'replicator.config.collapse.enabled' => 'Alle sæt er som standard skjult',
+    'replicator.config.max_sets' => 'Det maksimale antal sæt.',
     'select.config.clearable' => 'Aktiver for at tillade fravælgelse af din indstilling.',
     'select.config.multiple' => 'Tillad flere valg.',
     'select.config.options' => 'Indstil tasterne og deres valgfri etiketter.',

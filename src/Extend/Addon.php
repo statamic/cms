@@ -6,8 +6,6 @@ use Facades\Statamic\Licensing\LicenseManager;
 use ReflectionClass;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
-use Statamic\Facades\URL;
-use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 use Statamic\Updater\AddonChangelog;
@@ -283,7 +281,7 @@ final class Addon
      * The name of addon.
      *
      * @param string $name
-     * @return stirng|self
+     * @return string|self
      */
     public function name($name = null)
     {

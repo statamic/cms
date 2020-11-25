@@ -1,8 +1,9 @@
 <?php
 
 return [
-    'any.config.default' => 'Set the default value.',
+    'any.config.antlers' => 'Whether you\'d like this field to be parsed by Antlers.',
     'any.config.cast_booleans' => 'Options with values of true and false will be saved as booleans.',
+    'any.config.default' => 'Set the default value.',
     'array.config.keys' => 'Set the array keys (variables) and optional labels.',
     'array.config.mode' => 'Dynamic mode gives the user control of the data while keyed mode does not.',
     'assets.config.allow_uploads' => 'Allow new file uploads.',
@@ -68,9 +69,10 @@ return [
     'range.config.step' => 'The minimum size between values.',
     'relationship.config.mode' => 'Choose your preferred UI style.',
     'replicator.config.collapse' => 'The set collapsing behavior.',
+    'replicator.config.collapse.accordion' => 'Only allow one set to be expanded at a time',
     'replicator.config.collapse.disabled' => 'All sets expanded by default',
     'replicator.config.collapse.enabled' => 'All sets collapsed by default',
-    'replicator.config.collapse.accordion' => 'Only allow one set to be expanded at a time',
+    'replicator.config.max_sets' => 'The maximum number of sets.',
     'select.config.clearable' => 'Enable to allow deselecting your option.',
     'select.config.multiple' => 'Allow multiple selections.',
     'select.config.options' => 'Set the keys and their optional labels.',

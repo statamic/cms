@@ -282,7 +282,7 @@ export default {
         previews: {
             deep: true,
             handler(value) {
-                const meta = clone(this.meta);
+                const meta = this.meta;
                 meta.previews = value;
                 this.updateMeta(meta);
             }
@@ -295,6 +295,11 @@ export default {
         addSet(handle) {
             const id = `set-${uniqid()}`;
             const values = Object.assign({}, { type: handle }, this.meta.defaults[handle]);
+
+            let previews = {};
+            Object.keys(this.meta.defaults[handle]).forEach(key => previews[key] = null);
+            this.previews = Object.assign({}, this.previews, { [id]: previews });
+
             this.updateSetMeta(id, this.meta.new[handle]);
 
             // Perform this in nextTick because the meta data won't be ready until then.

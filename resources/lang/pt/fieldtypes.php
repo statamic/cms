@@ -1,8 +1,9 @@
 <?php
 
 return [
-    'any.config.default' => 'Definir o valor padrão',
+    'any.config.antlers' => 'Se você deseja que este campo seja analisado pelo Antlers.',
     'any.config.cast_booleans' => 'Opções com valores de verdadeiro e falso serão salvas como booleans.',
+    'any.config.default' => 'Definir o valor padrão',
     'array.config.keys' => 'O modo dinâmico dá ao utilizador o controlo dos dados enquanto que o modo com chave não o faz.',
     'array.config.mode' => 'Defina as chaves da matriz (variáveis) e as etiquetas opcionais.',
     'assets.config.allow_uploads' => 'Permitir o carregamento de novos ficheiros.',
@@ -71,6 +72,7 @@ return [
     'replicator.config.collapse.accordion' => 'Permitir que apenas um conjunto seja expandido de cada vez',
     'replicator.config.collapse.disabled' => 'Todos os conjuntos são expandidos por padrão',
     'replicator.config.collapse.enabled' => 'Todos os conjuntos recolhidos por padrão',
+    'replicator.config.max_sets' => 'O número máximo de conjuntos.',
     'select.config.clearable' => 'Permitir a desmarcação da sua opção.',
     'select.config.multiple' => 'Permitir selecções múltiplas.',
     'select.config.options' => 'Defina as chaves e as suas etiquetas opcionais.',

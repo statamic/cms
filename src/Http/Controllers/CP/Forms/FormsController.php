@@ -41,7 +41,14 @@ class FormsController extends CpController
     {
         $this->authorize('view', $form);
 
-        return view('statamic::forms.show', compact('form'));
+        $columns = $form
+            ->blueprint()
+            ->columns()
+            ->setPreferred("forms.{$form->handle()}.columns")
+            ->rejectUnlisted()
+            ->values();
+
+        return view('statamic::forms.show', compact('form', 'columns'));
     }
 
     /**

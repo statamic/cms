@@ -1,8 +1,9 @@
 <?php
 
 return [
-    'any.config.default' => 'Stel de standaardwaarde in',
+    'any.config.antlers' => 'Of u wilt dat dit veld wordt geparseerd door Antlers.',
     'any.config.cast_booleans' => 'Opties met de waarde true en false worden ogeslagen als booleans.',
+    'any.config.default' => 'Stel de standaardwaarde in',
     'array.config.keys' => 'Stel de array keys (variabelen) en optionele labels in.',
     'array.config.mode' => 'Dynamische modus geeft de gebruiker controle over de data terwijl keyed modus dat niet doet.',
     'assets.config.allow_uploads' => 'Nieuwe file-uploads toestaan',
@@ -71,6 +72,7 @@ return [
     'replicator.config.collapse.accordion' => 'Sta slechts één set tegelijk toe om te worden uitgebreid',
     'replicator.config.collapse.disabled' => 'Alle sets zijn standaard uitgevouwen',
     'replicator.config.collapse.enabled' => 'Alle sets zijn standaard samengevouwen',
+    'replicator.config.max_sets' => 'Het maximale aantal sets.',
     'select.config.clearable' => 'Schakel in om het deselecteren van een optie toe te staan.',
     'select.config.multiple' => 'Sta meerdere selecties toe',
     'select.config.options' => 'Stel de keys hun optionele labels in.',
