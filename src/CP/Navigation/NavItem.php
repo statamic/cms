@@ -3,6 +3,8 @@
 namespace Statamic\CP\Navigation;
 
 use Statamic\Facades\CP\Nav;
+use Statamic\Facades\File;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -92,7 +94,16 @@ class NavItem
      */
     public function icon($icon = null)
     {
-        return $this->fluentlyGetOrSet('icon')->value($icon);
+        return $this
+            ->fluentlyGetOrSet('icon')
+            ->setter(function ($value) {
+                if (File::exists(public_path("vendor/statamic/cp/svg/{$value}.svg"))) {
+                    return Statamic::svg($value);
+                }
+
+                return $value;
+            })
+            ->value($icon);
     }
 
     /**
