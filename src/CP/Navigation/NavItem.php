@@ -96,7 +96,7 @@ class NavItem
         return $this
             ->fluentlyGetOrSet('icon')
             ->setter(function ($value) {
-                return Str::startsWith($value, '<svg ') ? $value : Statamic::svg($value);
+                return Str::startsWith($value, '<svg') ? $value : Statamic::svg($value);
             })
             ->value($icon);
     }
