@@ -71,6 +71,10 @@ export default {
             return this.normalizeInputOptions(this.config.options);
         },
 
+        replicatorPreview() {
+            return this.selectedOptions.map(option => option.label).join(', ');
+        },
+
         resetOnOptionsChange() {
             // Reset logic should only happen when the config value is true.
             // Nothing should be reset when it's false or undefined.
