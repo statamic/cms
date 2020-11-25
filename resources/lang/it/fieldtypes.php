@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'any.config.antlers' => 'Se desideri che questo campo venga analizzato da Antlers.',
     'any.config.cast_booleans' => 'Le opzioni con valori "true" e "false" verranno salvate come booleani.',
     'any.config.default' => 'Imposta il valore predefinito.',
     'array.config.keys' => 'Imposta le chiavi dell\'array (variabili) e le etichette opzionali.',
@@ -71,6 +72,7 @@ return [
     'replicator.config.collapse.accordion' => 'Consentire l\'espansione di un solo set alla volta',
     'replicator.config.collapse.disabled' => 'Tutti i set sono espansi per impostazione predefinita',
     'replicator.config.collapse.enabled' => 'Tutti i set sono compressi per impostazione predefinita',
+    'replicator.config.max_sets' => 'Il numero massimo di set.',
     'select.config.clearable' => 'Abilita per consentire la deselezione dell\'opzione.',
     'select.config.multiple' => 'Consenti la selezione multipla delle opzioni.',
     'select.config.options' => 'Imposta le chiavi e le loro etichette opzionali.',

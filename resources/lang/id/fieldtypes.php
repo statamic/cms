@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'any.config.antlers' => 'Apakah Anda ingin bidang ini diurai oleh Antlers.',
     'any.config.cast_booleans' => 'Opsi dengan nilai benar dan salah akan disimpan sebagai boolean.',
     'any.config.default' => 'Tetapkan nilai default.',
     'array.config.keys' => 'Setel kunci array (variabel) dan label opsional.',
@@ -71,6 +72,7 @@ return [
     'replicator.config.collapse.accordion' => 'Hanya izinkan satu set untuk diperluas dalam satu waktu',
     'replicator.config.collapse.disabled' => 'Semua set diperluas secara default',
     'replicator.config.collapse.enabled' => 'Semua set diciutkan secara default',
+    'replicator.config.max_sets' => 'Jumlah set maksimum.',
     'select.config.clearable' => 'Aktifkan untuk mengizinkan penghapusan pilihan Anda.',
     'select.config.multiple' => 'Izinkan banyak pilihan.',
     'select.config.options' => 'Atur kunci dan label opsionalnya.',

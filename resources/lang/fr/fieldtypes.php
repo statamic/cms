@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'any.config.antlers' => 'Si vous souhaitez que ce champ soit analysé par Antlers.',
     'any.config.cast_booleans' => 'Les options avec des valeurs true (vrai) et false (faux) seront enregistrées en tant que booléens.',
     'any.config.default' => 'Définissez la valeur par défaut.',
     'array.config.keys' => 'Définissez les clés du tableau (les variables) et leurs étiquettes facultatives.',
@@ -71,6 +72,7 @@ return [
     'replicator.config.collapse.accordion' => 'N’autoriser qu’un seul jeu à être développé à la fois.',
     'replicator.config.collapse.disabled' => 'Tous les jeux développés par défaut.',
     'replicator.config.collapse.enabled' => 'Tous les jeux réduits par défaut.',
+    'replicator.config.max_sets' => 'Le nombre maximum d\'ensembles.',
     'select.config.clearable' => 'Activez pour permettre de désélectionner votre option.',
     'select.config.multiple' => 'Autorisez des sélections multiples.',
     'select.config.options' => 'Définissez les clés et leurs étiquettes facultatives.',
