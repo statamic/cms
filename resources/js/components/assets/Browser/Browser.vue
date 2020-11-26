@@ -50,7 +50,7 @@
                                 <div class="data-list-header">
                                     <data-list-search v-model="searchQuery" />
 
-                                    <template v-if="! hasSelections">
+                                    <template v-if="!hasSelections">
                                         <button v-if="canCreateFolders" class="btn-flat btn-icon-only ml-2" @click="creatingFolder = true">
                                             <svg-icon name="folder-add" class="h-4 w-4 mr-1" />
                                             <span>{{ __('Create Folder') }}</span>
@@ -89,7 +89,7 @@
                             />
 
                             <data-list-table
-                                v-if="mode === 'table' && ! containerIsEmpty"
+                                v-if="mode === 'table' && !containerIsEmpty"
                                 :allow-bulk-actions="true"
                                 :loading="loadingAssets"
                                 :rows="rows"
@@ -139,7 +139,7 @@
                                                 :container="container"
                                                 :path="path"
                                                 @closed="editedFolderPath = null"
-                                                @updated="folderUpdated(i, $event)"
+                                                @updated="folderUpdated($event)"
                                             />
                                         </td>
                                     </tr>
@@ -171,7 +171,7 @@
                             </data-list-table>
 
                             <!-- Grid Mode -->
-                            <div class="data-grid" v-if="mode === 'grid' && ! containerIsEmpty">
+                            <div class="data-grid" v-if="mode === 'grid' && !containerIsEmpty">
                                 <div class="asset-browser-grid flex flex-wrap -mx-1 px-2 pt-2">
                                     <!-- Parent Folder -->
                                     <div class="w-1/3 md:w-1/4 lg:w-1/5 xl:w-1/6 mb-2 px-1 group" v-if="(folder && folder.parent_path) && !restrictFolderNavigation">
@@ -281,9 +281,8 @@ export default {
             container: {},
             initializing: true,
             loadingAssets: true,
-            assets: [],
+            items: [],
             path: this.selectedPath,
-            folders: [],
             folder: {},
             searchQuery: '',
             editedAssetId: this.initialEditingAssetId,
@@ -291,7 +290,6 @@ export default {
             creatingFolder: false,
             uploads: [],
             page: 1,
-            perPage: 30, // TODO: Should come from the controller, or a config.
             meta: {},
             sortColumn: 'basename',
             sortDirection: 'asc',
@@ -303,6 +301,13 @@ export default {
     },
 
     computed: {
+        folders() {
+            return this.items.filter(item => item.itemType === 'folder')
+        },
+
+        assets() {
+            return this.items.filter(item => item.itemType === 'asset')
+        },
 
         selectedContainer() {
             return (typeof this.initialContainer === 'object')
@@ -337,16 +342,16 @@ export default {
         },
 
         canCreateFolders() {
-            return this.folder && this.container.create_folders && ! this.restrictFolderNavigation;
+            return this.folder && this.container.create_folders && !this.restrictFolderNavigation;
         },
 
         parameters() {
             return {
                 page: this.page,
-                perPage: this.perPage,
                 sort: this.sortColumn,
                 order: this.sortDirection,
                 search: this.searchQuery,
+                withFolders: !this.restrictFolderNavigation,
             }
         },
 
@@ -363,9 +368,8 @@ export default {
         },
 
         containerIsEmpty() {
-            return this.assets.length === 0
-                && this.folders.length === 0
-                && (!this.folder || !this.folder.parent_path);
+            return this.items.length === 0
+                && (!this.folder || !this.folder.parent_path || this.restrictFolderNavigation);
         },
 
         editedAssetBasename() {
@@ -453,15 +457,13 @@ export default {
 
             this.$axios.get(url, { params: this.parameters }).then(response => {
                 const data = response.data;
-                this.assets = data.data.assets;
+                this.items = data.data.items;
                 this.meta = data.meta;
 
                 if (this.searchQuery) {
                     this.folder = null;
-                    this.folders = [];
                 } else {
                     this.folder = data.data.folder;
-                    this.folders = data.data.folder.folders;
                     this.runActionUrl = data.links.run_asset_action;
                     this.bulkActionsUrl = data.links.bulk_asset_actions;
                     this.runFolderActionUrl = data.links.run_folder_action;
@@ -471,8 +473,7 @@ export default {
                 this.initializing = false;
             }).catch(e => {
                 this.$toast.error(e.response.data.message, { action: null, duration: null });
-                this.assets = [];
-                this.folders = [];
+                this.items = [];
                 this.loadingAssets = false;
                 this.initializing = false;
             });
@@ -536,13 +537,15 @@ export default {
         },
 
         folderCreated(folder) {
-            this.folders.push(folder);
-            this.folders = _.sortBy(this.folders, 'title');
             this.creatingFolder = false;
+            this.loadAssets();
         },
 
-        folderUpdated(index, newFolder) {
-            this.folders[index] = newFolder;
+        folderUpdated(newFolder) {
+            const index = this.items.findIndex(item =>
+                item.itemType === 'folder' && item.path === this.editedFolderPath
+            )
+            this.items[index] = newFolder;
             this.editedFolderPath = null;
         },
 
@@ -560,7 +563,7 @@ export default {
 
             if (i != -1) {
                 this.selectedAssets.splice(i, 1);
-            } else if (! this.reachedSelectionLimit) {
+            } else if (!this.reachedSelectionLimit) {
                 this.selectedAssets.push(id);
             }
             this.$emit('selections-updated', this.selectedAssets);

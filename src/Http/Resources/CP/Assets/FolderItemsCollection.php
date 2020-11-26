@@ -4,9 +4,9 @@ namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Http\Resources\Json\ResourceCollection;
 
-class FolderAssetsCollection extends ResourceCollection
+class FolderItemsCollection extends ResourceCollection
 {
-    public $collects = FolderAsset::class;
+    public $collects = FolderItem::class;
     protected $folder;
 
     public function folder($folder)
@@ -19,8 +19,8 @@ class FolderAssetsCollection extends ResourceCollection
     public function toArray($request)
     {
         return [
-            'assets' => $this->collection->values(),
-            'folder' => (new Folder($this->folder))->withChildFolders(),
+            'items' => $this->collection->values(),
+            'folder' => new Folder($this->folder),
         ];
     }
 
