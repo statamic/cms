@@ -77,9 +77,9 @@ class BrowserController extends CpController
         $assets = $folder->queryAssets()->get();
 
         $items = $folders->concat($assets);
-        
+
         $items = $this->paginate($items, 30);
-        
+
         return (new FolderItemsCollection($items))->folder($folder);
     }
 
@@ -99,7 +99,7 @@ class BrowserController extends CpController
     private function paginate($items, $perPage)
     {
         $currentPage = Paginator::resolveCurrentPage();
-        
+
         $results = $items->slice(($currentPage - 1) * $perPage, $perPage);
 
         return $this->paginator($results, $items->count(), $perPage, $currentPage, [

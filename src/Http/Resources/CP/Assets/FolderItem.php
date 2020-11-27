@@ -15,14 +15,13 @@ class FolderItem extends JsonResource
                 ['itemType' => 'asset'],
                 (new FolderAsset($this->resource))->toArray($request)
             );
-        } 
+        }
 
         if ($this->resource instanceof FolderResource) {
             return array_merge(
                 ['itemType' => 'folder'],
                 (new Folder($this->resource))->toArray($request)
             );
-        } 
+        }
     }
-
 }
