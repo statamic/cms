@@ -3,8 +3,8 @@
 namespace Statamic\Http\Resources\CP\Assets;
 
 use Illuminate\Http\Resources\Json\JsonResource;
-use \Statamic\Assets\Asset as AssetResource;
-use \Statamic\Assets\AssetFolder as FolderResource;
+use Statamic\Assets\Asset as AssetResource;
+use Statamic\Assets\AssetFolder as FolderResource;
 
 class FolderItem extends JsonResource
 {
