@@ -420,12 +420,12 @@ export default {
         handleSuccess(response) {
             // If the user has opted to create another entry, redirect them to create page.
             if (! this.revisionsEnabled && this.afterSaveOption === 'create_another') {
-                window.location = this.createAnotherUrl;
+                this.$nextTick(() => window.location = this.createAnotherUrl);
             }
 
             // If the user has opted to go to listing (default/null option), redirect them there.
             else if (! this.revisionsEnabled && this.afterSaveOption === null) {
-                window.location = this.listingUrl;
+                this.$nextTick(() => window.location = this.listingUrl);
             }
 
             // Otherwise, leave them on the edit form and emit an event.
