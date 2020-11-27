@@ -4,7 +4,9 @@ namespace Statamic\StaticCaching\Cachers;
 
 use Illuminate\Contracts\Cache\Repository;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Statamic\Facades\File;
+use Statamic\Support\Str;
 
 class FileCacher extends AbstractCacher
 {
@@ -33,6 +35,13 @@ class FileCacher extends AbstractCacher
      */
     public function cachePage(Request $request, $content)
     {
+        if (
+            $content instanceof Response
+            && Str::before($content->headers->get('Content-Type'), ';') !== 'text/html'
+        ) {
+            return;
+        }
+
         $url = $this->getUrl($request);
 
         if ($this->isExcluded($url)) {
