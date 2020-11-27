@@ -146,6 +146,28 @@ class BrowserTest extends TestCase
     }
 
     /** @test */
+    public function it_lists_assets_and_folders_in_the_root_folder()
+    {
+        $this->withoutExceptionHandling();
+        $container = AssetContainer::make('test')->disk('test')->save();
+        $assetOne = $container
+            ->makeAsset('one.txt')
+            ->upload(UploadedFile::fake()->create('one.txt'));
+        $assetTwo = $container
+            ->makeAsset('two.jpg')
+            ->upload(UploadedFile::fake()->image('two.jpg'));
+        $assetInOtherFolder = $container
+            ->makeAsset('subdirectory/other.txt')
+            ->upload(UploadedFile::fake()->create('other.txt'));
+
+        $this
+            ->actingAs($this->userWithPermission())
+            ->getJson('/cp/assets/browse/folders/test/?withFolders=true')
+            ->assertSuccessful()
+            ->assertJsonStructure($this->jsonStructureWithFolders());
+    }
+
+    /** @test */
     public function it_lists_assets_in_a_subfolder()
     {
         $container = AssetContainer::make('test')->disk('test')->save();
@@ -266,14 +288,26 @@ class BrowserTest extends TestCase
             'meta',
             'links' => ['run_folder_action', 'run_asset_action'],
             'data' => [
-                'assets' => [
-                    ['id', 'size_formatted', 'last_modified_relative', 'actions'],
-                    ['id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail'],
+                'items' => [
+                    ['itemType', 'id', 'size_formatted', 'last_modified_relative', 'actions'],
+                    ['itemType', 'id', 'size_formatted', 'last_modified_relative', 'actions', 'thumbnail'],
                 ],
                 'folder' => [
-                    'title', 'path', 'parent_path', 'actions', 'folders',
+                    'title', 'path', 'parent_path', 'actions',
                 ],
             ],
         ];
+    }
+
+    private function jsonStructureWithFolders()
+    {
+        $structure = $this->jsonStructure();
+
+        array_unshift(
+            $structure['data']['items'],
+            ['itemType', 'title', 'path', 'parent_path', 'basename', 'actions']
+        );
+
+        return $structure;
     }
 }
