@@ -62,14 +62,14 @@ class Install extends Command
             storage_path('statamic'),
         ];
 
-        foreach ($gitkeeps as $dir) {
+        foreach (array_filter($gitkeeps) as $dir) {
             if (! File::exists($gitkeep = $dir.'/.gitkeep')) {
                 File::put($gitkeep, '');
                 $this->info("Created the <comment>[$dir]</comment> directory.");
             }
         }
 
-        foreach ($gitignores as $dir) {
+        foreach (array_filter($gitignores) as $dir) {
             if (! File::exists($gitignore = $dir.'/.gitignore')) {
                 File::put($gitignore, "*\n!.gitignore");
                 $this->info("Created the <comment>[$dir]</comment> directory.");
