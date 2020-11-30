@@ -3,6 +3,7 @@
 namespace Statamic\Globals;
 
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Globals\Variables as Contract;
 use Statamic\Data\ContainsData;
@@ -149,7 +150,7 @@ class Variables implements Contract, Localization, Augmentable
         return $this->globalSet()->in($origin);
     }
 
-    public function newAugmentedInstance()
+    public function newAugmentedInstance(): Augmented
     {
         return new AugmentedVariables($this);
     }

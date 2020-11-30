@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ContainsData;
 use Statamic\Data\Data;
 use Statamic\Data\HasAugmentedInstance;
@@ -690,7 +691,7 @@ class Asset implements AssetContract, Augmentable
         return Facades\Asset::{$method}(...$parameters);
     }
 
-    public function newAugmentedInstance()
+    public function newAugmentedInstance(): Augmented
     {
         return new AugmentedAsset($this);
     }

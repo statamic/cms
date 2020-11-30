@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Data\HasAugmentedInstance;
@@ -244,7 +245,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable
         return $this->pages()->flattenedPages();
     }
 
-    public function newAugmentedInstance()
+    public function newAugmentedInstance(): Augmented
     {
         return new AugmentedPage($this);
     }
