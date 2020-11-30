@@ -1642,8 +1642,8 @@ class CoreModifiers extends Modifier
                             // so break the iterator loop because all the following sub-arrays will match.
                             break;
                         }
-                    // We reached the bottom level, so reset the parent.
                     } else {
+                        // We reached the bottom level, so reset the parent.
                         $currentOriginalParent = $originalQueryAssociativeArray;
                     }
                 }
