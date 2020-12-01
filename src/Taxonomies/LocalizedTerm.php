@@ -329,6 +329,13 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
         ])->all();
     }
 
+    public function status()
+    {
+        // Though Terms don't really need a status concept
+        // this will allow them to be included in Search Results
+        return 'published';
+    }
+
     public function toResponse($request)
     {
         if (! view()->exists($this->template())) {
