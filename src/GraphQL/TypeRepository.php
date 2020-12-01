@@ -10,13 +10,23 @@ class TypeRepository
 
     public function get($class)
     {
-        if (isset($this->types[$class])) {
-            return $this->types[$class];
+        $name = $class;
+        $isClass = false;
+
+        if (class_exists($class)) {
+            $isClass = true;
+            $name = $class::name();
         }
 
-        $instance = new $class([]);
+        if (isset($this->types[$name])) {
+            return $this->types[$name];
+        }
 
-        return $this->types[$class] = $instance;
+        if ($isClass) {
+            $type = new $class([]);
+        }
+
+        return $this->types[$name] = $type ?? null;
     }
 
     public function query()

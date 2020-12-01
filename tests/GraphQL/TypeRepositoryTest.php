@@ -3,6 +3,7 @@
 namespace Tests\GraphQL;
 
 use Statamic\GraphQL\TypeRepository;
+use Statamic\GraphQL\Types\ObjectType;
 use Statamic\GraphQL\Types\Query;
 use Tests\TestCase;
 
@@ -16,12 +17,13 @@ class TypeRepositoryTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_a_type_by_class()
+    public function it_gets_a_type_by_class_and_stores_it_using_the_name()
     {
-        $query = $this->types->get(Query::class);
+        $type = $this->types->get(TestObjectType::class);
 
-        $this->assertInstanceOf(Query::class, $query);
-        $this->assertSame($query, $this->types->get(Query::class));
+        $this->assertInstanceOf(TestObjectType::class, $type);
+        $this->assertSame($type, $this->types->get(TestObjectType::class));
+        $this->assertSame($type, $this->types->get('TheTestObject'));
     }
 
     /** @test */
@@ -31,5 +33,18 @@ class TypeRepositoryTest extends TestCase
 
         $this->assertInstanceOf(Query::class, $query);
         $this->assertSame($query, $this->types->query());
+    }
+}
+
+class TestObjectType extends ObjectType
+{
+    public static function name(): string
+    {
+        return 'TheTestObject';
+    }
+
+    public function config(array $args): array
+    {
+        return [];
     }
 }

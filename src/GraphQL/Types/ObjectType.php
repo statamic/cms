@@ -11,5 +11,7 @@ abstract class ObjectType extends BaseObjectType
         parent::__construct($this->config($args));
     }
 
+    abstract public static function name(): string;
+
     abstract public function config(array $args): array;
 }
