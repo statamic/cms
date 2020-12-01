@@ -50,7 +50,7 @@ Route::name('statamic.')->group(function () {
         Route::get(config('statamic.oauth.routes.callback'), 'OAuthController@handleProviderCallback')->name('oauth.callback');
     }
 
-    Route::match(['GET', 'POST'], 'graphql', 'GraphQLController@index')->name('graphql');
+    Route::post('graphql', 'GraphQLController@index')->name('graphql');
 });
 
 Statamic::additionalWebRoutes();
