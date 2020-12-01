@@ -169,7 +169,7 @@ class User extends BaseUser
         return $this->groups = $this->groups
             ?? (new UserGroups($this))->all()->map(function ($row) {
                 return UserGroup::find($row->group_id);
-            });
+            })->keyBy->handle();
     }
 
     protected function setGroups($groups)
