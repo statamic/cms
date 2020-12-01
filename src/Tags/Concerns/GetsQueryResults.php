@@ -45,7 +45,7 @@ trait GetsQueryResults
     {
         $offsetIds = (clone $query)
             ->limit($offset)
-            ->get('id')
+            ->get(['id'])
             ->map->id()
             ->all();
 
