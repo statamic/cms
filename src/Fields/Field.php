@@ -295,4 +295,15 @@ class Field implements Arrayable
     {
         return $this->fieldtype()->preload();
     }
+
+    public function toGraphQL(): \GraphQL\Type\Definition\Type
+    {
+        $type = $this->fieldtype()->graphQLType();
+
+        if ($this->isRequired()) {
+            $type = \GraphQL\Type\Definition\Type::nonNull($type);
+        }
+
+        return $type;
+    }
 }
