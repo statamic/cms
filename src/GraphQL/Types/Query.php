@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
+use Statamic\GraphQL\Queries\Entries;
 
 class Query extends ObjectType
 {
@@ -14,7 +15,6 @@ class Query extends ObjectType
     public function config(array $args): array
     {
         return [
-            'name' => 'Query',
             'fields' => [
                 'ping' => [
                     'type' => Type::string(),
@@ -22,6 +22,7 @@ class Query extends ObjectType
                         return 'pong';
                     },
                 ],
+                'entries' => Entries::definition(),
             ],
         ];
     }
