@@ -20,6 +20,9 @@ class GraphQLController
     {
         return new Schema([
             'query' => TypeRepository::query(),
+            'typeLoader' => function ($name) {
+                return TypeRepository::get($name);
+            },
         ]);
     }
 }
