@@ -145,13 +145,13 @@
     padding: 8px;
 
     .asset-thumb {
-        text-align: center;
+        min-height: 150px;
+        min-width: 150px;
+        @apply shadow flex justify-center items-center;
+        border: 5px solid #fff;
 
         img {
-            @apply shadow block w-auto h-auto;
-            border: 5px solid #fff;
-            max-height: 150px;
-            max-width: 150px;
+            @apply w-auto h-auto;
             margin: 0 auto;
         }
     }
@@ -189,7 +189,7 @@
     }
 
     &.is-svg {
-        .asset-thumb-container {
+        .asset-thumb {
             background: url('../img/trans-bg.gif');
         }
     }
