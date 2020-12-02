@@ -6,9 +6,10 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 /** @group graphql */
-class EntriesTest extends GraphQLTestCase
+class EntriesTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
@@ -79,13 +80,13 @@ GQL;
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
             ->assertOk()
-            ->assertGqlData(['entries' => [
+            ->assertExactJson(['data' => ['entries' => [
                 ['id' => '1', 'title' => 'Standard Blog Post'],
                 ['id' => '2', 'title' => 'Art Directed Blog Post'],
                 ['id' => '3', 'title' => 'Event One'],
                 ['id' => '4', 'title' => 'Event Two'],
                 ['id' => '5', 'title' => 'Hamburger'],
-            ]]);
+            ]]]);
     }
 
     /** @test */
@@ -104,10 +105,10 @@ GQL;
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
             ->assertOk()
-            ->assertGqlData(['entries' => [
+            ->assertExactJson(['data' => ['entries' => [
                 ['id' => '3', 'title' => 'Event One'],
                 ['id' => '4', 'title' => 'Event Two'],
-            ]]);
+            ]]]);
     }
 
     /** @test */
@@ -126,11 +127,11 @@ GQL;
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
             ->assertOk()
-            ->assertGqlData(['entries' => [
+            ->assertExactJson(['data' => ['entries' => [
                 ['id' => '1', 'title' => 'Standard Blog Post'],
                 ['id' => '2', 'title' => 'Art Directed Blog Post'],
                 ['id' => '5', 'title' => 'Hamburger'],
-            ]]);
+            ]]]);
     }
 
     /** @test */
@@ -160,7 +161,7 @@ GQL;
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
             ->assertOk()
-            ->assertGqlData(['entries' => [
+            ->assertExactJson(['data' => ['entries' => [
                 [
                     'id' => '1',
                     'title' => 'Standard Blog Post',
@@ -178,6 +179,6 @@ GQL;
                     'title' => 'Hamburger',
                     'calories' => 350,
                 ],
-            ]]);
+            ]]]);
     }
 }

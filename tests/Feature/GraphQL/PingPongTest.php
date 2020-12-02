@@ -2,8 +2,10 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Tests\TestCase;
+
 /** @group graphql */
-class PingPongTest extends GraphQLTestCase
+class PingPongTest extends TestCase
 {
     /** @test */
     public function it_pongs_when_pinged()
@@ -12,6 +14,6 @@ class PingPongTest extends GraphQLTestCase
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => '{ping}'])
             ->assertOk()
-            ->assertGqlData(['ping' => 'pong']);
+            ->assertExactJson(['data' => ['ping' => 'pong']]);
     }
 }
