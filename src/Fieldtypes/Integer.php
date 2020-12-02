@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use GraphQL\Type\Definition\Type;
 use Statamic\Fields\Fieldtype;
 
 class Integer extends Fieldtype
@@ -29,5 +30,10 @@ class Integer extends Fieldtype
         }
 
         return (int) $data;
+    }
+
+    public function graphQLType(): Type
+    {
+        return Type::int();
     }
 }

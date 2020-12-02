@@ -7,7 +7,7 @@ use Statamic\GraphQL\Queries\Entries;
 
 class Query extends ObjectType
 {
-    public static function name(): string
+    public static function name(array $args): string
     {
         return 'Query';
     }
