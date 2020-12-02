@@ -51,7 +51,7 @@ class TypeRepositoryTest extends TestCase
 
 class TestObjectType extends ObjectType
 {
-    public static function name(): string
+    public static function name(array $args): string
     {
         return 'TheTestObject';
     }

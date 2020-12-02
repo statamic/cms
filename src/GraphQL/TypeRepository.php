@@ -9,14 +9,14 @@ class TypeRepository
 {
     protected $types = [];
 
-    public function get($class)
+    public function get($class, array $args = [])
     {
         $name = $class;
         $isClass = false;
 
         if (class_exists($class)) {
             $isClass = true;
-            $name = $class::name();
+            $name = $class::name($args);
         }
 
         if (isset($this->types[$name])) {
@@ -24,7 +24,7 @@ class TypeRepository
         }
 
         if ($isClass) {
-            $type = new $class([]);
+            $type = new $class($args);
         }
 
         return $this->types[$name] = $type ?? null;
