@@ -24,6 +24,7 @@ class Text extends Fieldtype
                 'options' => [
                     'color',
                     'email',
+                    'hidden',
                     'month',
                     'number',
                     'password',
