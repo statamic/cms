@@ -25,7 +25,7 @@ class Entries
                     $query->whereIn('collection', $collection);
                 }
 
-                return $query->get()->all();
+                return $query->get();
             },
         ];
     }
