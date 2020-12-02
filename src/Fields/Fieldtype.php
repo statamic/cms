@@ -212,4 +212,9 @@ abstract class Fieldtype implements Arrayable
     {
         return Statamic::docsUrl('fieldtypes/'.static::handle());
     }
+
+    public function graphQLType(): \GraphQL\Type\Definition\Type
+    {
+        return \GraphQL\Type\Definition\Type::string();
+    }
 }

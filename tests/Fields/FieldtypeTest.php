@@ -314,6 +314,17 @@ class FieldtypeTest extends TestCase
         $this->assertNull($fieldtype->config('unknown'));
         $this->assertEquals('fallback', $fieldtype->config('unknown', 'fallback'));
     }
+
+    /**
+     * @test
+     * @group graphql
+     **/
+    public function it_gets_the_graphql_type_of_string_by_default()
+    {
+        $type = (new TestFieldtype)->graphQLType();
+
+        $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $type);
+    }
 }
 
 class TestFieldtype extends Fieldtype

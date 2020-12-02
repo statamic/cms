@@ -3,6 +3,7 @@
 namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use GraphQL\Type\Definition\Type;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
@@ -510,5 +511,55 @@ class FieldTest extends TestCase
             $this->assertEquals('foo', $value->raw());
             $this->assertEquals('foo shallow augmented', $value->value());
         });
+    }
+
+    /**
+     * @test
+     * @graphql
+     **/
+    public function it_gets_the_graphql_type()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function graphQLType(): Type
+            {
+                return new \GraphQL\Type\Definition\FloatType;
+            }
+        };
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn($fieldtype);
+
+        $field = new Field('test', ['type' => 'fieldtype']);
+
+        $type = $field->toGraphQL();
+
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $type);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type);
+    }
+
+    /**
+     * @test
+     * @graphql
+     **/
+    public function it_makes_the_graphql_type_non_nullable_if_its_required()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function graphQLType(): Type
+            {
+                return new \GraphQL\Type\Definition\FloatType;
+            }
+        };
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn($fieldtype);
+
+        $field = new Field('test', ['type' => 'fieldtype', 'validate' => 'required']);
+
+        $type = $field->toGraphQL();
+
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $type);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type->getWrappedType());
     }
 }

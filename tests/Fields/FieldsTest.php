@@ -749,4 +749,27 @@ class FieldsTest extends TestCase
 
         $fields->validate(['foo' => 'bar']);
     }
+
+    /**
+     * @test
+     * @group graphql
+     **/
+    public function it_gets_the_fields_as_graphql_types()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+            ['handle' => 'two', 'field' => ['type' => 'text', 'validate' => 'required']],
+        ]);
+
+        $types = $fields->toGraphQL();
+
+        $this->assertInstanceOf(Collection::class, $types);
+        $this->assertCount(2, $types);
+
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $types['one']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['one']);
+
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $types['two']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['two']->getWrappedType());
+    }
 }
