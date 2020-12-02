@@ -34,6 +34,19 @@ class TypeRepositoryTest extends TestCase
         $this->assertInstanceOf(Query::class, $query);
         $this->assertSame($query, $this->types->query());
     }
+
+    /** @test */
+    public function it_registers_a_type_by_name()
+    {
+        $this->assertNull($this->types->get('test'));
+
+        $type = new TestObjectType([]);
+
+        $this->types->register('test', $type);
+
+        $this->assertSame($type, $this->types->get('test'));
+        $this->assertEquals(['test' => $type], $this->types->registered());
+    }
 }
 
 class TestObjectType extends ObjectType
