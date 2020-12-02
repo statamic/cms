@@ -1,5 +1,24 @@
 # Release Notes
 
+## 3.0.32 (2020-12-02)
+
+### What's new
+- Added `term.saved` and `term.saving` hooks. [016306639](https://github.com/statamic/cms/commit/016306639) [8c3320d20](https://github.com/statamic/cms/commit/8c3320d20)
+
+### What's improved
+- Added `hidden` to the `text` fieldtype's `input_type` dropdown. [#2952](https://github.com/statamic/cms/issues/2952)
+- Improved visual spacing when adding Replicator blocks. [#2955](https://github.com/statamic/cms/issues/2955)
+- Updated French translations. [#2870](https://github.com/statamic/cms/issues/2870)
+
+### What's fixed
+- Reverted the `highlight.js` and `tiptap-extensions` upgrades from 3.0.31. Fixes a Prosemirror error. [#2919](https://github.com/statamic/cms/issues/2919)
+- Fix users not being able to change their own passwords. [6fec3bace](https://github.com/statamic/cms/commit/6fec3bace)
+- Fix users not being able to reset their passwords when using Eloquent. [#2795](https://github.com/statamic/cms/issues/2795)
+- Fix an unnecessary alert after saving a term. [#2930](https://github.com/statamic/cms/issues/2930)
+- Prevent the `statamic:install` command trying to creating `.gitkeep` files at the wrong place. [#2939](https://github.com/statamic/cms/issues/2939)
+
+
+
 ## 3.0.31 (2020-11-25)
 
 ### What's new
