@@ -8,10 +8,12 @@ abstract class ObjectType extends BaseObjectType
 {
     public function __construct(array $args)
     {
-        parent::__construct($this->config($args));
+        parent::__construct(array_merge([
+            'name' => static::name($args),
+        ], $this->config($args)));
     }
 
-    abstract public static function name(): string;
+    abstract public static function name(array $args): string;
 
     abstract public function config(array $args): array;
 }
