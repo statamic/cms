@@ -44,7 +44,7 @@ GQL;
         EntryFactory::collection('blog')->id('2')->data(['title' => 'Second'])->create();
         EntryFactory::collection('events')->id('3')->data(['title' => 'Third'])->create();
         EntryFactory::collection('events')->id('4')->data(['title' => 'Fourth'])->create();
-        EntryFactory::collection('articles')->id('5')->data(['title' => 'Fifth'])->create();
+        EntryFactory::collection('food')->id('5')->data(['title' => 'Fifth'])->create();
         $this->assertCount(5, Entry::all());
 
         $query = <<<'GQL'
@@ -73,12 +73,12 @@ GQL;
         EntryFactory::collection('blog')->id('2')->data(['title' => 'Second'])->create();
         EntryFactory::collection('events')->id('3')->data(['title' => 'Third'])->create();
         EntryFactory::collection('events')->id('4')->data(['title' => 'Fourth'])->create();
-        EntryFactory::collection('articles')->id('5')->data(['title' => 'Fifth'])->create();
+        EntryFactory::collection('food')->id('5')->data(['title' => 'Fifth'])->create();
         $this->assertCount(5, Entry::all());
 
         $query = <<<'GQL'
 {
-    entries(collection: ["blog", "articles"]) {
+    entries(collection: ["blog", "food"]) {
         id
         title
     }
