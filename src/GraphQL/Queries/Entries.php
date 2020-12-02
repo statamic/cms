@@ -15,8 +15,17 @@ class Entries
 
         return [
             'type' => Type::listOf(TypeRepository::get(EntryInterface::class)),
+            'args' => [
+                'collection' => Type::listOf(Type::string()),
+            ],
             'resolve' => function ($value, $args) {
-                return Entry::all();
+                $query = Entry::query();
+
+                if ($collection = $args['collection'] ?? null) {
+                    $query->whereIn('collection', $collection);
+                }
+
+                return $query->get()->all();
             },
         ];
     }
