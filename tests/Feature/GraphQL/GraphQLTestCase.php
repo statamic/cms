@@ -13,7 +13,7 @@ class GraphQLTestCase extends TestCase
         parent::setUp();
 
         TestResponse::macro('assertGqlData', function ($data) {
-            $this->assertJson(['data' => $data]);
+            $this->assertExactJson(['data' => $data]);
         });
     }
 }
