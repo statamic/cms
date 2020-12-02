@@ -394,6 +394,24 @@ export default {
             this.saving = true;
             this.clearErrors();
 
+            this.runBeforeSaveHook();
+        },
+
+        runBeforeSaveHook() {
+            Statamic.$hooks.run('term.saving', {
+                taxonomy: this.taxonomyHandle,
+                values: this.values,
+                container: this.$refs.container,
+                storeName: this.publishContainer,
+            })
+            .then(this.performSaveRequest)
+            .catch(error => {
+                this.saving = false;
+                this.$toast.error(error || 'Something went wrong');
+            });
+        },
+
+        performSaveRequest() {
             const payload = { ...this.values, ...{
                 _blueprint: this.fieldset.handle,
                 published: this.published,
