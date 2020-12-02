@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL;
 
+use GraphQL\Type\Definition\Type;
 use Statamic\GraphQL\Types\Query;
 
 class TypeRepository
@@ -27,6 +28,16 @@ class TypeRepository
         }
 
         return $this->types[$name] = $type ?? null;
+    }
+
+    public function register(string $name, Type $type)
+    {
+        $this->types[$name] = $type;
+    }
+
+    public function registered()
+    {
+        return $this->types;
     }
 
     public function query()
