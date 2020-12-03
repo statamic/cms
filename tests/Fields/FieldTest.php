@@ -515,7 +515,7 @@ class FieldTest extends TestCase
 
     /**
      * @test
-     * @graphql
+     * @group graphql
      **/
     public function it_gets_the_graphql_type()
     {
@@ -534,8 +534,9 @@ class FieldTest extends TestCase
 
         $type = $field->toGraphQL();
 
-        $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $type);
-        $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type);
+        $this->assertIsArray($type);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $type['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type['type']);
     }
 
     /**
