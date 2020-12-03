@@ -30,7 +30,7 @@ class Entry extends \Rebing\GraphQL\Support\Type
     public function interfaces(): array
     {
         return [
-            GraphQL::type(EntryInterface::NAME)
+            GraphQL::type(EntryInterface::NAME),
         ];
     }
 
@@ -38,10 +38,11 @@ class Entry extends \Rebing\GraphQL\Support\Type
     {
         return $this->blueprint->fields()->toGraphQL()->merge([
             'id' => [
-                'type' => Type::nonNull(Type::ID())
+                'type' => Type::nonNull(Type::ID()),
             ],
         ])->map(function (array $arr) {
             $arr['resolve'] = $this->resolver();
+
             return $arr;
         })->all();
     }
