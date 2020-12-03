@@ -20,11 +20,11 @@ class EntryInterface extends InterfaceType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(Type::ID())
+                'type' => Type::nonNull(Type::ID()),
             ],
             'title' => [
-                'type' => Type::nonNull(Type::string())
-            ]
+                'type' => Type::nonNull(Type::string()),
+            ],
         ];
     }
 
