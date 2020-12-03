@@ -135,6 +135,34 @@ GQL;
     }
 
     /** @test */
+    public function it_queries_entries_from_multiple_collections_using_variables()
+    {
+        $query = <<<'GQL'
+query($collection:[String]) {
+    entries(collection: $collection) {
+        id
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', [
+                'query' => $query,
+                'variables' => [
+                    'collection' => ['blog', 'food'],
+                ],
+            ])
+            ->assertOk()
+            ->assertExactJson(['data' => ['entries' => [
+                ['id' => '1', 'title' => 'Standard Blog Post'],
+                ['id' => '2', 'title' => 'Art Directed Blog Post'],
+                ['id' => '5', 'title' => 'Hamburger'],
+            ]]]);
+    }
+
+    /** @test */
     public function it_queries_blueprint_specific_fields()
     {
         $query = <<<'GQL'
