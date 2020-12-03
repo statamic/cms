@@ -10,7 +10,7 @@ use Statamic\Fields\Blueprint;
 use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
-class Entry extends \Rebing\GraphQL\Support\Type
+class EntryType extends \Rebing\GraphQL\Support\Type
 {
     private $collection;
     private $blueprint;
