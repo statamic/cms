@@ -305,7 +305,7 @@ class Field implements Arrayable
         }
 
         return [
-            'type' => $type
+            'type' => $type,
         ];
     }
 }
