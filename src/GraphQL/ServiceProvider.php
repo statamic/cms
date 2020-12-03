@@ -4,9 +4,9 @@ namespace Statamic\GraphQL;
 
 use Illuminate\Support\ServiceProvider as LaravelProvider;
 use Rebing\GraphQL\Support\Facades\GraphQL;
-use Statamic\GraphQL\Queries\Entries;
-use Statamic\GraphQL\Queries\Entry;
-use Statamic\GraphQL\Queries\Ping;
+use Statamic\GraphQL\Queries\EntriesQuery;
+use Statamic\GraphQL\Queries\EntryQuery;
+use Statamic\GraphQL\Queries\PingQuery;
 use Statamic\GraphQL\Types\EntryInterface;
 
 class ServiceProvider extends LaravelProvider
@@ -24,9 +24,9 @@ class ServiceProvider extends LaravelProvider
     {
         $schema = [
             'query' => [
-                'ping' => Ping::class,
-                'entries' => Entries::class,
-                'entry' => Entry::class,
+                'ping' => PingQuery::class,
+                'entries' => EntriesQuery::class,
+                'entry' => EntryQuery::class,
             ],
             'mutation' => [],
             'middleware' => [],

@@ -8,7 +8,7 @@ use Rebing\GraphQL\Support\Query;
 use Statamic\Facades\Entry;
 use Statamic\GraphQL\Types\EntryInterface;
 
-class Entries extends Query
+class EntriesQuery extends Query
 {
     public function __construct()
     {
