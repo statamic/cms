@@ -4,6 +4,7 @@ namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
 use Statamic\GraphQL\Queries\Entries;
+use Statamic\GraphQL\Queries\Entry;
 
 class Query extends ObjectType
 {
@@ -23,6 +24,7 @@ class Query extends ObjectType
                     },
                 ],
                 'entries' => Entries::definition(),
+                'entry' => Entry::definition(),
             ],
         ];
     }
