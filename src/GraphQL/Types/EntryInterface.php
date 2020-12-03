@@ -31,7 +31,7 @@ class EntryInterface extends InterfaceType
     public function resolveType(Entry $entry)
     {
         $type = GraphQL::type(
-            \Statamic\GraphQL\Types\Entry::buildName($entry->collection(), $entry->blueprint())
+            EntryType::buildName($entry->collection(), $entry->blueprint())
         );
 
         return $type;
@@ -47,7 +47,7 @@ class EntryInterface extends InterfaceType
                         return compact('collection', 'blueprint');
                     });
             })->map(function ($item) {
-                return new \Statamic\GraphQL\Types\Entry($item['collection'], $item['blueprint']);
+                return new EntryType($item['collection'], $item['blueprint']);
             })->all();
 
         GraphQL::addTypes($types);
