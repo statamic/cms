@@ -43,7 +43,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function getPackageProviders($app)
     {
-        return ['Statamic\Providers\StatamicServiceProvider'];
+        return [
+            \Statamic\Providers\StatamicServiceProvider::class,
+            \Rebing\GraphQL\GraphQLServiceProvider::class,
+        ];
     }
 
     protected function getPackageAliases($app)
