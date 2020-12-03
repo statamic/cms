@@ -2,31 +2,39 @@
 
 namespace Statamic\GraphQL\Queries;
 
-use Facades\Statamic\GraphQL\TypeRepository;
 use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Facades\GraphQL;
+use Rebing\GraphQL\Support\Query;
 use Statamic\Facades\Entry;
 use Statamic\GraphQL\Types\EntryInterface;
 
-class Entries
+class Entries extends Query
 {
-    public static function definition(): array
+    public function __construct()
     {
-        EntryInterface::registerTypes();
+        EntryInterface::addTypes();
+    }
 
+    public function type(): Type
+    {
+        return Type::listOf(GraphQL::type(EntryInterface::NAME));
+    }
+
+    public function args(): array
+    {
         return [
-            'type' => Type::listOf(TypeRepository::get(EntryInterface::class)),
-            'args' => [
-                'collection' => Type::listOf(Type::string()),
-            ],
-            'resolve' => function ($value, $args) {
-                $query = Entry::query();
-
-                if ($collection = $args['collection'] ?? null) {
-                    $query->whereIn('collection', $collection);
-                }
-
-                return $query->get();
-            },
+            'collection' => Type::listOf(Type::string()),
         ];
+    }
+
+    public function resolve($root, $args)
+    {
+        $query = Entry::query();
+
+        if ($collection = $args['collection'] ?? null) {
+            $query->whereIn('collection', $collection);
+        }
+
+        return $query->get();
     }
 }

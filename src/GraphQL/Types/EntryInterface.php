@@ -2,45 +2,54 @@
 
 namespace Statamic\GraphQL\Types;
 
-use Facades\Statamic\GraphQL\TypeRepository;
 use GraphQL\Type\Definition\Type;
-use Statamic\Contracts\Entries\Entry as EntryContract;
+use Rebing\GraphQL\Support\Facades\GraphQL;
+use Rebing\GraphQL\Support\InterfaceType;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Collection;
-use Statamic\GraphQL\Types\Entry as EntryType;
 
 class EntryInterface extends InterfaceType
 {
-    public static function name(): string
-    {
-        return 'EntryInterface';
-    }
+    const NAME = 'EntryInterface';
 
-    public function __construct(array $config)
+    protected $attributes = [
+        'name' => self::NAME,
+    ];
+
+    public function fields(): array
     {
-        parent::__construct([
-            'fields' => [
-                'id' => Type::nonNull(Type::ID()),
-                'title' => Type::nonNull(Type::string()),
+        return [
+            'id' => [
+                'type' => Type::nonNull(Type::ID())
             ],
-            'resolveType' => function (EntryContract $entry) {
-                return TypeRepository::get(EntryType::class, [$entry->collection(), $entry->blueprint()]);
-            },
-        ]);
+            'title' => [
+                'type' => Type::nonNull(Type::string())
+            ]
+        ];
     }
 
-    public static function types(): array
+    public function resolveType(Entry $entry)
     {
-        return Collection::all()
-            ->flatMap(function ($collection) {
-                return $collection->entryBlueprints()->map(function ($blueprint) use ($collection) {
-                    return compact('collection', 'blueprint');
-                });
-            })
-            ->mapWithKeys(function ($item) {
-                $type = TypeRepository::get(EntryType::class, [$item['collection'], $item['blueprint']]);
+        $type = GraphQL::type(
+            \Statamic\GraphQL\Types\Entry::buildName($entry->collection(), $entry->blueprint())
+        );
 
-                return [$type->name => $type];
-            })
-            ->all();
+        return $type;
+    }
+
+    public static function addTypes()
+    {
+        $types = Collection::all()
+            ->flatMap(function ($collection) {
+                return $collection
+                    ->entryBlueprints()
+                    ->map(function ($blueprint) use ($collection) {
+                        return compact('collection', 'blueprint');
+                    });
+            })->map(function ($item) {
+                return new \Statamic\GraphQL\Types\Entry($item['collection'], $item['blueprint']);
+            })->all();
+
+        GraphQL::addTypes($types);
     }
 }
