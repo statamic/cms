@@ -766,10 +766,12 @@ class FieldsTest extends TestCase
         $this->assertInstanceOf(Collection::class, $types);
         $this->assertCount(2, $types);
 
-        $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $types['one']);
-        $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['one']);
+        $this->assertIsArray($types['one']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $types['one']['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['one']['type']);
 
-        $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $types['two']);
-        $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['two']->getWrappedType());
+        $this->assertIsArray($types['two']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $types['two']['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['two']['type']->getWrappedType());
     }
 }

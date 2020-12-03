@@ -2,43 +2,60 @@
 
 namespace Statamic\GraphQL\Types;
 
-use Facades\Statamic\GraphQL\TypeRepository;
 use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Fields\Blueprint;
 use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
-class Entry extends ObjectType
+class Entry extends \Rebing\GraphQL\Support\Type
 {
-    public static function name(array $args): string
-    {
-        [$collection, $blueprint] = $args;
+    private $collection;
+    private $blueprint;
 
+    public function __construct($collection, $blueprint)
+    {
+        $this->collection = $collection;
+        $this->blueprint = $blueprint;
+        $this->attributes['name'] = static::buildName($collection, $blueprint);
+    }
+
+    public static function buildName(Collection $collection, Blueprint $blueprint): string
+    {
         return 'Entry_'.Str::studly($collection->handle()).'_'.Str::studly($blueprint->handle());
     }
 
-    public function config(array $args): array
+    public function interfaces(): array
     {
-        [$collection, $blueprint] = $args;
-
         return [
-            'interfaces' => [
-                TypeRepository::get(EntryInterface::class, $args),
-            ],
-            'fields' => function () use ($blueprint) {
-                return $blueprint->fields()->toGraphQL()->merge([
-                    'id' => Type::nonNull(Type::ID()),
-                ])->all();
-            },
-            'resolveField' => function (EntryContract $entry, $args, $context, $info) {
-                $value = $entry->augmentedValue($info->fieldName);
-
-                if ($value instanceof Value) {
-                    $value = $value->value();
-                }
-
-                return $value;
-            },
+            GraphQL::type(EntryInterface::NAME)
         ];
+    }
+
+    public function fields(): array
+    {
+        return $this->blueprint->fields()->toGraphQL()->merge([
+            'id' => [
+                'type' => Type::nonNull(Type::ID())
+            ],
+        ])->map(function (array $arr) {
+            $arr['resolve'] = $this->resolver();
+            return $arr;
+        })->all();
+    }
+
+    private function resolver()
+    {
+        return function (EntryContract $entry, $args, $context, $info) {
+            $value = $entry->augmentedValue($info->fieldName);
+
+            if ($value instanceof Value) {
+                $value = $value->value();
+            }
+
+            return $value;
+        };
     }
 }

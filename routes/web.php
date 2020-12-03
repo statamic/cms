@@ -49,8 +49,6 @@ Route::name('statamic.')->group(function () {
         Route::get(config('statamic.oauth.routes.login'), 'OAuthController@redirectToProvider')->name('oauth.login');
         Route::get(config('statamic.oauth.routes.callback'), 'OAuthController@handleProviderCallback')->name('oauth.callback');
     }
-
-    Route::post('graphql', 'GraphQLController@index')->name('graphql');
 });
 
 Statamic::additionalWebRoutes();
