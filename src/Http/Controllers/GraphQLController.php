@@ -11,7 +11,13 @@ class GraphQLController
 {
     public function index(Request $request)
     {
-        $result = GraphQL::executeQuery($this->schema(), $request->input('query'));
+        $result = GraphQL::executeQuery(
+            $this->schema(),
+            $request->input('query'),
+            null,
+            null,
+            $request->input('variables')
+        );
 
         return $result->toArray();
     }
