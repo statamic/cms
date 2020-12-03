@@ -32,7 +32,7 @@ jobs:
           - laravel: 8.*
             php: 7.2
 
-    name: P${{ matrix.php }} - C${{ matrix.composer }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
+    name: P${{ matrix.php }} - C${{ matrix.composer }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ubuntu-latest
 
     steps:
       - name: Checkout code
