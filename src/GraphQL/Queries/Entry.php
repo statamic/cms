@@ -2,31 +2,34 @@
 
 namespace Statamic\GraphQL\Queries;
 
-use Facades\Statamic\GraphQL\TypeRepository;
 use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Facades\GraphQL;
+use Rebing\GraphQL\Support\Query;
 use Statamic\Facades;
 use Statamic\GraphQL\Types\EntryInterface;
 
-class Entry
+class Entry extends Query
 {
-    public static function definition(): array
+    public function type(): Type
     {
-        EntryInterface::registerTypes();
+        return GraphQL::type(EntryInterface::NAME);
+    }
 
+    public function args(): array
+    {
         return [
-            'type' => TypeRepository::get(EntryInterface::class),
-            'args' => [
-                'id' => Type::string(),
-            ],
-            'resolve' => function ($value, $args) {
-                $query = Facades\Entry::query();
-
-                if ($id = $args['id']) {
-                    $query->where('id', $id);
-                }
-
-                return $query->limit(1)->get()->first();
-            },
+            'id' => Type::string(),
         ];
+    }
+
+    public function resolve($root, $args)
+    {
+        $query = Facades\Entry::query();
+
+        if ($id = $args['id']) {
+            $query->where('id', $id);
+        }
+
+        return $query->limit(1)->get()->first();
     }
 }

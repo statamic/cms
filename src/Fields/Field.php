@@ -296,7 +296,7 @@ class Field implements Arrayable
         return $this->fieldtype()->preload();
     }
 
-    public function toGraphQL(): \GraphQL\Type\Definition\Type
+    public function toGraphQL(): array
     {
         $type = $this->fieldtype()->graphQLType();
 
@@ -304,6 +304,8 @@ class Field implements Arrayable
             $type = \GraphQL\Type\Definition\Type::nonNull($type);
         }
 
-        return $type;
+        return [
+            'type' => $type
+        ];
     }
 }
