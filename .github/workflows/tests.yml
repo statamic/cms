@@ -17,7 +17,7 @@ jobs:
         composer: [1, 2]
         laravel: [8.*, 7.*, 6.*]
         dependency-version: [prefer-lowest, prefer-stable]
-        os: [ubuntu-latest]
+        os: [ubuntu-20.04]
         include:
           - laravel: 8.*
             testbench: 6.*
