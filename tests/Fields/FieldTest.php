@@ -540,7 +540,7 @@ class FieldTest extends TestCase
 
     /**
      * @test
-     * @graphql
+     * @group graphql
      **/
     public function it_makes_the_graphql_type_non_nullable_if_its_required()
     {
@@ -559,7 +559,8 @@ class FieldTest extends TestCase
 
         $type = $field->toGraphQL();
 
-        $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $type);
-        $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type->getWrappedType());
+        $this->assertIsArray($type);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $type['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type['type']->getWrappedType());
     }
 }
