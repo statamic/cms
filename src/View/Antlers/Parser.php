@@ -875,6 +875,7 @@ class Parser
         // Re-inject any strings we extracted
         $condition = $this->injectExtractions($condition, '__cond_str');
         $condition = $this->injectExtractions($condition, '__cond_exists');
+        $condition = $this->injectExtractions($condition, '__cond_callbacks');
 
         return $condition;
     }

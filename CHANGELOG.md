@@ -12,6 +12,7 @@
 - Fix the "View" dropdown link on the taxonomy term listing page. [e26a1ad5f](https://github.com/statamic/cms/commit/e26a1ad5f)
 - Fix terms not having the collection scoped URLs on the collection specific listing page. [175783dc6](https://github.com/statamic/cms/commit/175783dc6)
 - Fix a paginator related error when using Laravel 6. [6ade2a61c](https://github.com/statamic/cms/commit/6ade2a61c)
+- Fixed an issue where colon delimited strings in Antlers conditions weren't parsed correctly. [#2396](https://github.com/statamic/cms/issues/2396)
 
 
 
