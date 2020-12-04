@@ -26,7 +26,7 @@ class Index extends BaseIndex
 
         try {
             $results = $comb->lookUp($query)['data'];
-        } catch (NoResultsFound | NotEnoughCharacters $e) {
+        } catch (NoResultsFound | NotEnoughCharacters | NoQuery $e) {
             return collect();
         }
 
