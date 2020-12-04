@@ -17,7 +17,7 @@ jobs:
         composer: [1, 2]
         laravel: [8.*, 7.*, 6.*]
         dependency-version: [prefer-lowest, prefer-stable]
-        os: [ubuntu-latest]
+        os: [ubuntu-20.04]
         include:
           - laravel: 8.*
             testbench: 6.*
@@ -32,18 +32,18 @@ jobs:
           - laravel: 8.*
             php: 7.2
 
-    name: P${{ matrix.php }} - C${{ matrix.composer }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ${{ matrix.os }}
+    name: P${{ matrix.php }} - C${{ matrix.composer }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ubuntu-latest
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v1
 
       - name: Setup PHP
-        uses: shivammathur/setup-php@v1
+        uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
           tools: composer:v${{ matrix.composer }}
-          extension-csv: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
+          extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
 
       - name: Install dependencies
@@ -55,7 +55,7 @@ jobs:
         run: vendor/bin/phpunit
 
   js-tests:
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     if: "!contains(github.event.head_commit.message, '[ci skip]')"
 
     name: JavaScript tests
@@ -72,7 +72,7 @@ jobs:
 
   slack:
     name: Slack Notification
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-20.04
     needs: [php-tests, js-tests]
     if: always()
     steps:
