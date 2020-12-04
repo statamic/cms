@@ -1,5 +1,20 @@
 # Release Notes
 
+## Unreleased
+
+### What's improved
+- Allow collection specific taxonomy views to work without mounting (when you have a single word collection). [352772eaa](https://github.com/statamic/cms/commit/352772eaa)
+- Updated German translation. [#2968](https://github.com/statamic/cms/issues/2968)
+
+### What's fixed
+- Fixed an issue where you couldn't re-select an asset after removing one. [844e3710d](https://github.com/statamic/cms/commit/844e3710d)
+- Prevent terms being excluded from search results by giving them a published status. [#2950](https://github.com/statamic/cms/issues/2950)
+- Fix the "View" dropdown link on the taxonomy term listing page. [e26a1ad5f](https://github.com/statamic/cms/commit/e26a1ad5f)
+- Fix terms not having the collection scoped URLs on the collection specific listing page. [175783dc6](https://github.com/statamic/cms/commit/175783dc6)
+- Fix a paginator related error when using Laravel 6. [6ade2a61c](https://github.com/statamic/cms/commit/6ade2a61c)
+
+
+
 ## 3.0.32 (2020-12-02)
 
 ### What's new
