@@ -455,7 +455,9 @@ export default {
             // our fieldtype is only concerned with their respective IDs.
             this.update(_.pluck(assets, 'id'));
 
-            this.updateMeta({ data: assets });
+            let meta = this.meta;
+            meta.data = assets;
+            this.updateMeta(meta);
         },
 
         loading(loading) {
