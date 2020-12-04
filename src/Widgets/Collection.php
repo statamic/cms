@@ -4,6 +4,7 @@ namespace Statamic\Widgets;
 
 use Statamic\Facades\Collection as CollectionAPI;
 use Statamic\Facades\Scope;
+use Statamic\Facades\Site;
 use Statamic\Facades\User;
 
 class Collection extends Widget
@@ -33,6 +34,7 @@ class Collection extends Widget
             'collection' => $collection,
             'filters' => Scope::filters('entries', [
                 'collection' => $collection->handle(),
+                'site' => Site::current()->handle(),
             ]),
             'title' => $this->config('title', $collection->title()),
             'button' => __('New :thing', ['thing' => $collection->entryBlueprint()->title()]),
