@@ -6,10 +6,15 @@ use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use Rebing\GraphQL\Support\Query;
 use Statamic\Facades\Entry;
+use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Types\EntryInterface;
 
 class EntriesQuery extends Query
 {
+    protected $middleware = [
+        ResolvePage::class,
+    ];
+
     public function __construct()
     {
         EntryInterface::addTypes();
@@ -17,13 +22,15 @@ class EntriesQuery extends Query
 
     public function type(): Type
     {
-        return Type::listOf(GraphQL::type(EntryInterface::NAME));
+        return GraphQL::paginate(GraphQL::type(EntryInterface::NAME));
     }
 
     public function args(): array
     {
         return [
             'collection' => Type::listOf(Type::string()),
+            'limit' => Type::int(),
+            'page' => Type::int(),
         ];
     }
 
@@ -35,6 +42,6 @@ class EntriesQuery extends Query
             $query->whereIn('collection', $collection);
         }
 
-        return $query->get();
+        return $query->paginate($args['limit'] ?? 1000);
     }
 }
