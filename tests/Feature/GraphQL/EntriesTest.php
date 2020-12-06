@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Tests\Factories\EntryFactory;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -24,8 +25,48 @@ class EntriesTest extends TestCase
         $query = <<<'GQL'
 {
     entries {
-        id
-        title
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '1', 'title' => 'Standard Blog Post'],
+                ['id' => '2', 'title' => 'Art Directed Blog Post'],
+                ['id' => '3', 'title' => 'Event One'],
+                ['id' => '4', 'title' => 'Event Two'],
+                ['id' => '5', 'title' => 'Hamburger'],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_paginates_entries()
+    {
+        // Add some more entries to be able to make pagination assertions a little more obvious
+        EntryFactory::collection('food')->id('6')->data(['title' => 'Cheeseburger'])->create();
+        EntryFactory::collection('food')->id('7')->data(['title' => 'Fries'])->create();
+
+        $query = <<<'GQL'
+{
+    entries(limit: 2, page: 3) {
+        total
+        per_page
+        current_page
+        from
+        to
+        last_page
+        has_more_pages
+        data {
+            id
+            title
+        }
     }
 }
 GQL;
@@ -35,11 +76,17 @@ GQL;
             ->post('/graphql', ['query' => $query])
             ->assertOk()
             ->assertExactJson(['data' => ['entries' => [
-                ['id' => '1', 'title' => 'Standard Blog Post'],
-                ['id' => '2', 'title' => 'Art Directed Blog Post'],
-                ['id' => '3', 'title' => 'Event One'],
-                ['id' => '4', 'title' => 'Event Two'],
-                ['id' => '5', 'title' => 'Hamburger'],
+                'total' => 7,
+                'per_page' => 2,
+                'current_page' => 3,
+                'from' => 5,
+                'to' => 6,
+                'last_page' => 4,
+                'has_more_pages' => true,
+                'data' => [
+                    ['id' => '5', 'title' => 'Hamburger'],
+                    ['id' => '6', 'title' => 'Cheeseburger'],
+                ],
             ]]]);
     }
 
@@ -49,8 +96,10 @@ GQL;
         $query = <<<'GQL'
 {
     entries(collection: "events") {
-        id
-        title
+        data {
+            id
+            title
+        }
     }
 }
 GQL;
@@ -59,10 +108,10 @@ GQL;
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
             ->assertOk()
-            ->assertExactJson(['data' => ['entries' => [
+            ->assertExactJson(['data' => ['entries' => ['data' => [
                 ['id' => '3', 'title' => 'Event One'],
                 ['id' => '4', 'title' => 'Event Two'],
-            ]]]);
+            ]]]]);
     }
 
     /** @test */
@@ -71,8 +120,10 @@ GQL;
         $query = <<<'GQL'
 {
     entries(collection: ["blog", "food"]) {
-        id
-        title
+        data {
+            id
+            title
+        }
     }
 }
 GQL;
@@ -81,11 +132,11 @@ GQL;
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
             ->assertOk()
-            ->assertExactJson(['data' => ['entries' => [
+            ->assertExactJson(['data' => ['entries' => ['data' => [
                 ['id' => '1', 'title' => 'Standard Blog Post'],
                 ['id' => '2', 'title' => 'Art Directed Blog Post'],
                 ['id' => '5', 'title' => 'Hamburger'],
-            ]]]);
+            ]]]]);
     }
 
     /** @test */
@@ -94,8 +145,10 @@ GQL;
         $query = <<<'GQL'
 query($collection:[String]) {
     entries(collection: $collection) {
-        id
-        title
+        data {
+            id
+            title
+        }
     }
 }
 GQL;
@@ -109,11 +162,11 @@ GQL;
                 ],
             ])
             ->assertOk()
-            ->assertExactJson(['data' => ['entries' => [
+            ->assertExactJson(['data' => ['entries' => ['data' => [
                 ['id' => '1', 'title' => 'Standard Blog Post'],
                 ['id' => '2', 'title' => 'Art Directed Blog Post'],
                 ['id' => '5', 'title' => 'Hamburger'],
-            ]]]);
+            ]]]]);
     }
 
     /** @test */
@@ -122,18 +175,20 @@ GQL;
         $query = <<<'GQL'
 {
     entries(collection: ["blog", "food"]) {
-        id
-        title
-        ... on Entry_Blog_Article {
-            intro
-            content
-        }
-        ... on Entry_Blog_ArtDirected {
-            hero_image
-            content
-        }
-        ... on Entry_Food_Food {
-            calories
+        data {
+            id
+            title
+            ... on Entry_Blog_Article {
+                intro
+                content
+            }
+            ... on Entry_Blog_ArtDirected {
+                hero_image
+                content
+            }
+            ... on Entry_Food_Food {
+                calories
+            }
         }
     }
 }
@@ -143,7 +198,7 @@ GQL;
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
             ->assertOk()
-            ->assertExactJson(['data' => ['entries' => [
+            ->assertExactJson(['data' => ['entries' => ['data' => [
                 [
                     'id' => '1',
                     'title' => 'Standard Blog Post',
@@ -161,6 +216,6 @@ GQL;
                     'title' => 'Hamburger',
                     'calories' => 350,
                 ],
-            ]]]);
+            ]]]]);
     }
 }
