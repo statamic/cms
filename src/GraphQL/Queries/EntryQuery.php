@@ -4,7 +4,6 @@ namespace Statamic\GraphQL\Queries;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Facades\GraphQL;
-use Rebing\GraphQL\Support\Query;
 use Statamic\Facades;
 use Statamic\GraphQL\Types\EntryInterface;
 
