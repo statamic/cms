@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use PHPUnit\Framework\Assert;
+
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $shouldFakeVersion = true;
@@ -28,6 +30,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn([]);
             $this->addToAssertionCount(-1); // Dont want to assert this
         }
+
+        $this->addGqlMacros();
     }
 
     public function tearDown(): void
@@ -189,5 +193,27 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         method_exists(static::class, 'assertDirectoryDoesNotExist')
             ? static::assertDirectoryDoesNotExist($filename, $message)
             : parent::assertDirectoryNotExists($filename, $message);
+    }
+
+    private function addGqlMacros()
+    {
+        $testResponseClass = version_compare($this->app->version(), 7, '<')
+            ? \Illuminate\Foundation\Testing\TestResponse::class
+            : \Illuminate\Testing\TestResponse::class;
+
+        $testResponseClass::macro('assertGqlOk', function () {
+            $this->assertOk();
+
+            $json = $this->json();
+
+            if (isset($json['errors'])) {
+                throw new \PHPUnit\Framework\ExpectationFailedException(
+                    'GraphQL response contained errors',
+                    new \SebastianBergmann\Comparator\ComparisonFailure('', '', '', json_encode($json, JSON_PRETTY_PRINT))
+                );
+            }
+
+            return $this;
+        });
     }
 }
