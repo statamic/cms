@@ -39,18 +39,23 @@ class EntryInterface extends InterfaceType
 
     public static function addTypes()
     {
-        $types = Collection::all()
+        GraphQL::addType(self::class);
+
+        $combinations = Collection::all()
             ->flatMap(function ($collection) {
                 return $collection
                     ->entryBlueprints()
                     ->map(function ($blueprint) use ($collection) {
+                        $blueprint->fields()->all()->map->fieldtype()->each(function ($fieldtype) {
+                            $fieldtype->addGqlTypes();
+                        });
+
                         return compact('collection', 'blueprint');
                     });
-            })->map(function ($item) {
-                return new EntryType($item['collection'], $item['blueprint']);
-            })->all();
+            });
 
-        GraphQL::addType(self::class);
-        GraphQL::addTypes($types);
+        GraphQL::addTypes($combinations->map(function ($item) {
+            return new EntryType($item['collection'], $item['blueprint']);
+        })->all());
     }
 }

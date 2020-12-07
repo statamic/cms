@@ -217,4 +217,9 @@ abstract class Fieldtype implements Arrayable
     {
         return \GraphQL\Type\Definition\Type::string();
     }
+
+    public function addGqlTypes()
+    {
+        //
+    }
 }

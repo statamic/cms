@@ -2,8 +2,11 @@
 
 namespace Statamic\Fieldtypes;
 
+use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Statamic\GraphQL\Types\GridItemType;
 use Statamic\Query\Scopes\Filters\Fields\Grid as GridFilter;
 
 class Grid extends Fieldtype
@@ -100,7 +103,7 @@ class Grid extends Fieldtype
         ]);
     }
 
-    private function fields()
+    public function fields()
     {
         return new Fields($this->config('fields'), $this->field()->parent());
     }
@@ -162,5 +165,17 @@ class Grid extends Fieldtype
         return collect($value)->map(function ($row) use ($method) {
             return $this->fields()->addValues($row)->{$method}()->values()->all();
         })->all();
+    }
+
+    public function graphQlType(): Type
+    {
+        return Type::listOf(GraphQL::type('GridItem_'.$this->field->handle()));
+    }
+
+    public function addGqlTypes()
+    {
+        $type = new GridItemType($this);
+
+        GraphQL::addType($type);
     }
 }
