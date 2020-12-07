@@ -32,6 +32,7 @@ class Nav extends Structure
 
             return $uri;
         })->mapWithKeys(function ($uri) {
+            $uri = Str::ensureLeft($uri, '/');
             return [$uri => Data::findByUri($uri, Site::current()->handle())];
         })->filter();
 
