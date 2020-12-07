@@ -3,6 +3,7 @@
 namespace Statamic\Search\Comb;
 
 use Statamic\Facades\File;
+use Statamic\Search\Comb\Exceptions\NoQuery;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
 use Statamic\Search\Comb\Exceptions\NotEnoughCharacters;
 use Statamic\Search\Documents;
@@ -26,7 +27,7 @@ class Index extends BaseIndex
 
         try {
             $results = $comb->lookUp($query)['data'];
-        } catch (NoResultsFound | NotEnoughCharacters $e) {
+        } catch (NoResultsFound | NotEnoughCharacters | NoQuery $e) {
             return collect();
         }
 
