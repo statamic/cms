@@ -2,6 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
+use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection;
@@ -224,5 +226,16 @@ class Entries extends Relationship
         return empty($collections = $this->config('collections'))
             ? Collection::handles()->all()
             : $collections;
+    }
+
+    public function graphQlType(): Type
+    {
+        $type = GraphQL::type('EntryInterface');
+
+        if ($this->config('max_items') !== 1) {
+            $type = Type::listOf($type);
+        }
+
+        return $type;
     }
 }
