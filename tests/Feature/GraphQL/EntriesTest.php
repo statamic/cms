@@ -36,7 +36,7 @@ GQL;
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
-            ->assertOk()
+            ->assertGqlOk()
             ->assertExactJson(['data' => ['entries' => ['data' => [
                 ['id' => '1', 'title' => 'Standard Blog Post'],
                 ['id' => '2', 'title' => 'Art Directed Blog Post'],
@@ -74,7 +74,7 @@ GQL;
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
-            ->assertOk()
+            ->assertGqlOk()
             ->assertExactJson(['data' => ['entries' => [
                 'total' => 7,
                 'per_page' => 2,
@@ -107,7 +107,7 @@ GQL;
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
-            ->assertOk()
+            ->assertGqlOk()
             ->assertExactJson(['data' => ['entries' => ['data' => [
                 ['id' => '3', 'title' => 'Event One'],
                 ['id' => '4', 'title' => 'Event Two'],
@@ -131,7 +131,7 @@ GQL;
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
-            ->assertOk()
+            ->assertGqlOk()
             ->assertExactJson(['data' => ['entries' => ['data' => [
                 ['id' => '1', 'title' => 'Standard Blog Post'],
                 ['id' => '2', 'title' => 'Art Directed Blog Post'],
@@ -161,7 +161,7 @@ GQL;
                     'collection' => ['blog', 'food'],
                 ],
             ])
-            ->assertOk()
+            ->assertGqlOk()
             ->assertExactJson(['data' => ['entries' => ['data' => [
                 ['id' => '1', 'title' => 'Standard Blog Post'],
                 ['id' => '2', 'title' => 'Art Directed Blog Post'],
@@ -197,7 +197,7 @@ GQL;
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
-            ->assertOk()
+            ->assertGqlOk()
             ->assertExactJson(['data' => ['entries' => ['data' => [
                 [
                     'id' => '1',
