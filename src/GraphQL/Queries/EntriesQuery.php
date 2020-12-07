@@ -4,7 +4,6 @@ namespace Statamic\GraphQL\Queries;
 
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Facades\GraphQL;
-use Rebing\GraphQL\Support\Query;
 use Statamic\Facades\Entry;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Types\EntryInterface;
@@ -14,11 +13,6 @@ class EntriesQuery extends Query
     protected $middleware = [
         ResolvePage::class,
     ];
-
-    public function __construct()
-    {
-        EntryInterface::addTypes();
-    }
 
     public function type(): Type
     {

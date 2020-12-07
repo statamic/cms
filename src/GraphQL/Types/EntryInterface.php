@@ -50,6 +50,7 @@ class EntryInterface extends InterfaceType
                 return new EntryType($item['collection'], $item['blueprint']);
             })->all();
 
+        GraphQL::addType(self::class);
         GraphQL::addTypes($types);
     }
 }
