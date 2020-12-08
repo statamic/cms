@@ -2,9 +2,14 @@
 
 namespace Statamic\Fieldtypes;
 
+use GraphQL\Type\Definition\Type;
 use ProseMirrorToHtml\Renderer;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
+use Statamic\GraphQL\Types\BardSetsType;
+use Statamic\GraphQL\Types\BardTextType;
+use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
 use Statamic\Support\Arr;
 
@@ -369,5 +374,31 @@ class Bard extends Replicator
 
             return $item;
         })->all();
+    }
+
+    public function graphQlType(): Type
+    {
+        return $this->config('sets') ? parent::graphQlType() : Type::string();
+    }
+
+    public function addGqlTypes()
+    {
+        $types = collect($this->config('sets'))->mapWithKeys(function ($config, $handle) {
+            $type = new ReplicatorSetType($this, $handle);
+
+            return [$type->name => $type];
+        });
+
+        $text = new BardTextType($this);
+
+        $types->put($text->name, $text);
+
+        GraphQL::addTypes($types->all());
+
+        $union = new BardSetsType($this, $types->map(function ($type, $name) {
+            return GraphQL::type($name);
+        })->all());
+
+        GraphQL::addType($union);
     }
 }
