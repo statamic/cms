@@ -174,6 +174,7 @@ class Replicator extends Fieldtype
     {
         $types = collect($this->config('sets'))->mapWithKeys(function ($config, $handle) {
             $type = new ReplicatorSetType($this, $handle);
+
             return [$type->name => $type];
         });
 

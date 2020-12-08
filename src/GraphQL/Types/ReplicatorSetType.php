@@ -29,7 +29,7 @@ class ReplicatorSetType extends \Rebing\GraphQL\Support\Type
             ->merge([
                 'type' => [
                     'type' => Type::nonNull(Type::string()),
-                ]
+                ],
             ])
             ->all();
     }
