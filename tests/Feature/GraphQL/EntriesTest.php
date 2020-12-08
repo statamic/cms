@@ -337,4 +337,31 @@ GQL;
                 ],
             ]]]]);
     }
+
+    /** @test */
+    public function it_sorts_entries()
+    {
+        $query = <<<'GQL'
+{
+    entries(sort: "title") {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '2', 'title' => 'Art Directed Blog Post'],
+                ['id' => '3', 'title' => 'Event One'],
+                ['id' => '4', 'title' => 'Event Two'],
+                ['id' => '5', 'title' => 'Hamburger'],
+                ['id' => '1', 'title' => 'Standard Blog Post'],
+            ]]]]);
+    }
 }
