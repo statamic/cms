@@ -12,16 +12,11 @@ class EntriesTest extends TestCase
     use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
 
-    public function setUp(): void
-    {
-        parent::setUp();
-
-        $this->createEntries();
-    }
-
     /** @test */
     public function it_queries_entries()
     {
+        $this->createEntries();
+
         $query = <<<'GQL'
 {
     entries {
@@ -49,6 +44,7 @@ GQL;
     /** @test */
     public function it_paginates_entries()
     {
+        $this->createEntries();
         // Add some more entries to be able to make pagination assertions a little more obvious
         EntryFactory::collection('food')->id('6')->data(['title' => 'Cheeseburger'])->create();
         EntryFactory::collection('food')->id('7')->data(['title' => 'Fries'])->create();
@@ -93,6 +89,8 @@ GQL;
     /** @test */
     public function it_queries_entries_from_a_single_collection()
     {
+        $this->createEntries();
+
         $query = <<<'GQL'
 {
     entries(collection: "events") {
@@ -117,6 +115,8 @@ GQL;
     /** @test */
     public function it_queries_entries_from_multiple_collections()
     {
+        $this->createEntries();
+
         $query = <<<'GQL'
 {
     entries(collection: ["blog", "food"]) {
@@ -142,6 +142,8 @@ GQL;
     /** @test */
     public function it_queries_entries_from_multiple_collections_using_variables()
     {
+        $this->createEntries();
+
         $query = <<<'GQL'
 query($collection:[String]) {
     entries(collection: $collection) {
@@ -172,6 +174,8 @@ GQL;
     /** @test */
     public function it_queries_blueprint_specific_fields()
     {
+        $this->createEntries();
+
         $query = <<<'GQL'
 {
     entries(collection: ["blog", "food"]) {
@@ -222,6 +226,8 @@ GQL;
     /** @test */
     public function it_filters_entries()
     {
+        $this->createEntries();
+
         config(['app.debug' => true]);
         EntryFactory::collection('blog')->id('6')->data([
             'title' => 'That was so rad!',
@@ -270,6 +276,8 @@ GQL;
     /** @test */
     public function it_filters_entries_with_equalto_shorthand()
     {
+        $this->createEntries();
+
         $query = <<<'GQL'
 {
     entries(filter: {
@@ -298,6 +306,8 @@ GQL;
     /** @test */
     public function it_filters_entries_with_multiple_conditions_of_the_same_type()
     {
+        $this->createEntries();
+
         EntryFactory::collection('blog')->id('6')->data([
             'title' => 'This is rad',
         ])->create();
@@ -341,6 +351,8 @@ GQL;
     /** @test */
     public function it_sorts_entries()
     {
+        $this->createEntries();
+
         $query = <<<'GQL'
 {
     entries(sort: "title") {
