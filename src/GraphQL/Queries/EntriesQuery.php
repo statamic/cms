@@ -8,6 +8,7 @@ use Statamic\Facades\Entry;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\GraphQL\Types\JsonArgument;
+use Statamic\Support\Arr;
 use Statamic\Tags\Concerns\QueriesConditions;
 
 class EntriesQuery extends Query
@@ -50,12 +51,20 @@ class EntriesQuery extends Query
 
     private function filterQuery($query, $filters)
     {
-        foreach ($filters as $field => $conditions) {
-            if (! is_array($conditions)) {
-                $conditions = ['equals' => $conditions];
+        foreach ($filters as $field => $definitions) {
+            if (! is_array($definitions)) {
+                $definitions = [['equals' => $definitions]];
             }
 
-            foreach ($conditions as $condition => $value) {
+            if (Arr::assoc($definitions)) {
+                $definitions = collect($definitions)->map(function ($value, $key) {
+                    return [$key => $value];
+                })->values()->all();
+            }
+
+            foreach ($definitions as $definition) {
+                $condition = array_keys($definition)[0];
+                $value = array_values($definition)[0];
                 $this->queryCondition($query, $field, $condition, $value);
             }
         }
