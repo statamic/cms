@@ -266,4 +266,32 @@ GQL;
                 ],
             ]]]]);
     }
+
+    /** @test */
+    public function it_filters_entries_with_equalto_shorthand()
+    {
+        $query = <<<'GQL'
+{
+    entries(filter: {
+        title: "Hamburger"
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                [
+                    'id' => '5',
+                    'title' => 'Hamburger',
+                ]
+            ]]]]);
+    }
 }

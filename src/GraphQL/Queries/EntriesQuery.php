@@ -51,6 +51,10 @@ class EntriesQuery extends Query
     private function filterQuery($query, $filters)
     {
         foreach ($filters as $field => $conditions) {
+            if (! is_array($conditions)) {
+                $conditions = ['equals' => $conditions];
+            }
+
             foreach ($conditions as $condition => $value) {
                 $this->queryCondition($query, $field, $condition, $value);
             }
