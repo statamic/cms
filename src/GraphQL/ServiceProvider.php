@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL;
 
 use Illuminate\Support\ServiceProvider as LaravelProvider;
+use Statamic\GraphQL\Queries\CollectionsQuery;
 use Statamic\GraphQL\Queries\EntriesQuery;
 use Statamic\GraphQL\Queries\EntryQuery;
 use Statamic\GraphQL\Queries\PingQuery;
@@ -23,6 +24,7 @@ class ServiceProvider extends LaravelProvider
                 'ping' => PingQuery::class,
                 'entries' => EntriesQuery::class,
                 'entry' => EntryQuery::class,
+                'collections' => CollectionsQuery::class,
             ],
             'mutation' => [],
             'middleware' => [],
