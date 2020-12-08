@@ -8,6 +8,7 @@ use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\GridItemType;
 use Statamic\Query\Scopes\Filters\Fields\Grid as GridFilter;
+use Statamic\Support\Str;
 
 class Grid extends Fieldtype
 {
@@ -169,7 +170,7 @@ class Grid extends Fieldtype
 
     public function graphQlType(): Type
     {
-        return Type::listOf(GraphQL::type('GridItem_'.$this->field->handle()));
+        return Type::listOf(GraphQL::type('GridItem_'.Str::studly($this->field->handle())));
     }
 
     public function addGqlTypes()
