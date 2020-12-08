@@ -2,7 +2,9 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use Statamic\Facades\Blueprint;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -374,6 +376,75 @@ GQL;
                 ['id' => '4', 'title' => 'Event Two'],
                 ['id' => '5', 'title' => 'Hamburger'],
                 ['id' => '1', 'title' => 'Standard Blog Post'],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_sorts_entries_descending()
+    {
+        $this->createEntries();
+
+        $query = <<<'GQL'
+{
+    entries(sort: "title desc") {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '1', 'title' => 'Standard Blog Post'],
+                ['id' => '5', 'title' => 'Hamburger'],
+                ['id' => '4', 'title' => 'Event Two'],
+                ['id' => '3', 'title' => 'Event One'],
+                ['id' => '2', 'title' => 'Art Directed Blog Post'],
+            ]]]]);
+    }
+
+    /** @test */
+    public function it_sorts_entries_on_multiple_fields()
+    {
+        EntryFactory::collection('test')->id('1')->slug('1')->data(['title' => 'Beta', 'number' => 2])->create();
+        EntryFactory::collection('test')->id('2')->slug('2')->data(['title' => 'Alpha', 'number' => 2])->create();
+        EntryFactory::collection('test')->id('3')->slug('3')->data(['title' => 'Alpha', 'number' => 1])->create();
+        EntryFactory::collection('test')->id('4')->slug('4')->data(['title' => 'Beta', 'number' => 1])->create();
+
+        $blueprint = Blueprint::makeFromFields([
+            'number' => ['type' => 'integer'],
+        ])->setHandle('test');
+
+        BlueprintRepository::shouldReceive('in')->with('collections/test')->andReturn(collect(['test' => $blueprint]));
+
+        $query = <<<'GQL'
+{
+    entries(collection: "test", sort: ["title", "number desc"]) {
+        data {
+            id
+            title
+            ... on Entry_Test_Test {
+                number
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '2', 'title' => 'Alpha', 'number' => 2],
+                ['id' => '3', 'title' => 'Alpha', 'number' => 1],
+                ['id' => '1', 'title' => 'Beta', 'number' => 2],
+                ['id' => '4', 'title' => 'Beta', 'number' => 1],
             ]]]]);
     }
 }
