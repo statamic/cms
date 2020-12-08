@@ -7,9 +7,13 @@ use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Facades\Entry;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Types\EntryInterface;
+use Statamic\GraphQL\Types\JsonArgument;
+use Statamic\Tags\Concerns\QueriesConditions;
 
 class EntriesQuery extends Query
 {
+    use QueriesConditions;
+
     protected $middleware = [
         ResolvePage::class,
     ];
@@ -25,6 +29,7 @@ class EntriesQuery extends Query
             'collection' => Type::listOf(Type::string()),
             'limit' => Type::int(),
             'page' => Type::int(),
+            'filter' => GraphQL::type(JsonArgument::NAME),
         ];
     }
 
@@ -36,6 +41,19 @@ class EntriesQuery extends Query
             $query->whereIn('collection', $collection);
         }
 
+        if ($filters = $args['filter'] ?? null) {
+            $this->filterQuery($query, $filters);
+        }
+
         return $query->paginate($args['limit'] ?? 1000);
+    }
+
+    private function filterQuery($query, $filters)
+    {
+        foreach ($filters as $field => $conditions) {
+            foreach ($conditions as $condition => $value) {
+                $this->queryCondition($query, $field, $condition, $value);
+            }
+        }
     }
 }
