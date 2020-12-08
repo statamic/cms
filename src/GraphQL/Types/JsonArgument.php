@@ -3,8 +3,8 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\CustomScalarType;
-use Rebing\GraphQL\Support\Type;
 use GraphQL\Type\Definition\Type as GraphqlType;
+use Rebing\GraphQL\Support\Type;
 
 class JsonArgument extends Type
 {

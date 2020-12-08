@@ -291,7 +291,7 @@ GQL;
                 [
                     'id' => '5',
                     'title' => 'Hamburger',
-                ]
+                ],
             ]]]]);
     }
 
@@ -334,7 +334,7 @@ GQL;
                 [
                     'id' => '8',
                     'title' => 'This is both rad and awesome',
-                ]
+                ],
             ]]]]);
     }
 }
