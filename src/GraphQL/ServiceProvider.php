@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL;
 
 use Illuminate\Support\ServiceProvider as LaravelProvider;
+use Statamic\GraphQL\Queries\CollectionQuery;
 use Statamic\GraphQL\Queries\CollectionsQuery;
 use Statamic\GraphQL\Queries\EntriesQuery;
 use Statamic\GraphQL\Queries\EntryQuery;
@@ -25,6 +26,7 @@ class ServiceProvider extends LaravelProvider
                 'entries' => EntriesQuery::class,
                 'entry' => EntryQuery::class,
                 'collections' => CollectionsQuery::class,
+                'collection' => CollectionQuery::class,
             ],
             'mutation' => [],
             'middleware' => [],
