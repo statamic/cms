@@ -2,8 +2,12 @@
 
 namespace Statamic\Fieldtypes;
 
+use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
+use Statamic\GraphQL\Types\ReplicatorSetsType;
+use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
 
 class Replicator extends Fieldtype
@@ -157,5 +161,29 @@ class Replicator extends Fieldtype
                 })->all();
             })->all(),
         ];
+    }
+
+    public function graphQlType(): Type
+    {
+        $type = GraphQL::type(ReplicatorSetsType::buildName($this));
+
+        return Type::listOf($type);
+    }
+
+    public function addGqlTypes()
+    {
+        $types = collect($this->config('sets'))->mapWithKeys(function ($config, $handle) {
+            $type = new ReplicatorSetType($this, $handle);
+
+            return [$type->name => $type];
+        });
+
+        GraphQL::addTypes($types->all());
+
+        $union = new ReplicatorSetsType($this, $types->map(function ($type, $name) {
+            return GraphQL::type($name);
+        })->all());
+
+        GraphQL::addType($union);
     }
 }
