@@ -9,6 +9,7 @@ use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 use Statamic\Tags\Concerns\QueriesConditions;
 
 class EntriesQuery extends Query
@@ -31,7 +32,7 @@ class EntriesQuery extends Query
             'limit' => Type::int(),
             'page' => Type::int(),
             'filter' => GraphQL::type(JsonArgument::NAME),
-            'sort' => Type::string(),
+            'sort' => Type::listOf(Type::string()),
         ];
     }
 
@@ -75,8 +76,16 @@ class EntriesQuery extends Query
         }
     }
 
-    private function sortQuery($query, $sort)
+    private function sortQuery($query, $sorts)
     {
-        $query->orderBy($sort);
+        foreach ($sorts as $sort) {
+            $order = 'asc';
+
+            if (Str::contains($sort, ' ')) {
+                [$sort, $order] = explode(' ', $sort);
+            }
+
+            $query->orderBy($sort, $order);
+        }
     }
 }
