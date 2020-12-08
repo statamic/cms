@@ -15,11 +15,13 @@ jobs:
       matrix:
         php: [7.4, 7.3, 7.2, 8.0]
         composer: [1, 2]
-        laravel: [^8.18.1, 7.*, 6.*]
+        laravel: [8.*, 7.*, 6.*]
         dependency-version: [prefer-lowest, prefer-stable]
         os: [ubuntu-20.04]
         include:
-          - laravel: ^8.18.1
+          - laravel: 8.*
+            laravel-constraint: ^8.18.1
+          - laravel: 8.*
             testbench: 6.*
           - laravel: 7.*
             testbench: 5.*
@@ -32,7 +34,7 @@ jobs:
             dependency-version: prefer-lowest
             additional-deps: '"mockery/mockery:>=1.3.3"'
         exclude:
-          - laravel: ^8.18.1
+          - laravel: 8.*
             php: 7.2
 
     name: P${{ matrix.php }} - C${{ matrix.composer }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ubuntu-latest
@@ -51,7 +53,7 @@ jobs:
 
       - name: Install dependencies
         run: |
-          composer require "laravel/framework:${{ matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" ${{ matrix.additional-deps }} --no-interaction --no-update
+          composer require "laravel/framework:${{ matrix.laravel-constraint || matrix.laravel }}" "orchestra/testbench:${{ matrix.testbench }}" ${{ matrix.additional-deps }} --no-interaction --no-update
           composer update --${{ matrix.dependency-version }} --prefer-dist --no-interaction --no-suggest
 
       - name: Execute tests
