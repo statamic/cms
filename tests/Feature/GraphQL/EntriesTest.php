@@ -218,4 +218,52 @@ GQL;
                 ],
             ]]]]);
     }
+
+    /** @test */
+    public function it_filters_entries()
+    {
+        config(['app.debug' => true]);
+        EntryFactory::collection('blog')->id('6')->data([
+            'title' => 'That was so rad!',
+        ])->create();
+
+        EntryFactory::collection('blog')->id('7')->data([
+            'title' => 'I wish I was as cool as Daniel Radcliffe!',
+        ])->create();
+
+        EntryFactory::collection('blog')->id('8')->data([
+            'title' => 'I hate radishes.',
+        ])->create();
+
+        $query = <<<'GQL'
+{
+    entries(filter: {
+        title: {
+            contains: "rad",
+            ends_with: "!"
+        }
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                [
+                    'id' => '6',
+                    'title' => 'That was so rad!',
+                ],
+                [
+                    'id' => '7',
+                    'title' => 'I wish I was as cool as Daniel Radcliffe!',
+                ],
+            ]]]]);
+    }
 }
