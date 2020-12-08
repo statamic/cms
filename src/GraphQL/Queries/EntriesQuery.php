@@ -31,6 +31,7 @@ class EntriesQuery extends Query
             'limit' => Type::int(),
             'page' => Type::int(),
             'filter' => GraphQL::type(JsonArgument::NAME),
+            'sort' => Type::string(),
         ];
     }
 
@@ -44,6 +45,10 @@ class EntriesQuery extends Query
 
         if ($filters = $args['filter'] ?? null) {
             $this->filterQuery($query, $filters);
+        }
+
+        if ($sort = $args['sort'] ?? null) {
+            $this->sortQuery($query, $sort);
         }
 
         return $query->paginate($args['limit'] ?? 1000);
@@ -68,5 +73,10 @@ class EntriesQuery extends Query
                 $this->queryCondition($query, $field, $condition, $value);
             }
         }
+    }
+
+    private function sortQuery($query, $sort)
+    {
+        $query->orderBy($sort);
     }
 }
