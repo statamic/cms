@@ -294,4 +294,47 @@ GQL;
                 ]
             ]]]]);
     }
+
+    /** @test */
+    public function it_filters_entries_with_multiple_conditions_of_the_same_type()
+    {
+        EntryFactory::collection('blog')->id('6')->data([
+            'title' => 'This is rad',
+        ])->create();
+
+        EntryFactory::collection('blog')->id('7')->data([
+            'title' => 'This is awesome',
+        ])->create();
+
+        EntryFactory::collection('blog')->id('8')->data([
+            'title' => 'This is both rad and awesome',
+        ])->create();
+
+        $query = <<<'GQL'
+{
+    entries(filter: {
+        title: [
+            { contains: "rad" },
+            { contains: "awesome" },
+        ]
+    }) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                [
+                    'id' => '8',
+                    'title' => 'This is both rad and awesome',
+                ]
+            ]]]]);
+    }
 }
