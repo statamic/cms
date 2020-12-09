@@ -1,5 +1,16 @@
 # Release Notes
 
+## 3.0.34 (2020-12-09)
+
+### What's new 
+- PHP 8 support. [#2944](https://github.com/statamic/cms/issues/2944)
+
+### What's fixed
+- Use the correct password reset url in emails when using the `user:forgot_password_form`. [#2988](https://github.com/statamic/cms/issues/2988)
+- Passing an invalid `from` value to a `nav` tag will output from the root, rather than throw an error. [#2963](https://github.com/statamic/cms/issues/2963)
+
+
+
 ## 3.0.33 (2020-12-08)
 
 ### What's improved
