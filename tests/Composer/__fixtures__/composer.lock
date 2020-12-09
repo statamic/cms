@@ -641,7 +641,11 @@
                 "url": "example-dependency",
                 "reference": "549107a0c12aec6f5557b0af742c11951585a083"
             },
-            "type": "library"
+            "type": "library",
+            "transport-options": {
+                "symlink": false,
+                "relative": true
+            }
         },
         {
             "name": "symfony/console",

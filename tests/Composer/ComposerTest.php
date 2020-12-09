@@ -67,7 +67,7 @@ class ComposerTest extends TestCase
     public function it_can_get_installed_path_of_a_package()
     {
         $this->assertEquals(
-            __DIR__.'/__fixtures__/example-dependency',
+            __DIR__.'/__fixtures__/vendor/statamic/composer-test-example-dependency',
             Composer::installedPath('statamic/composer-test-example-dependency')
         );
 
