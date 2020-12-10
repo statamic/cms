@@ -12,6 +12,7 @@ use Statamic\GraphQL\Queries\CollectionsQuery;
 use Statamic\GraphQL\Queries\EntriesQuery;
 use Statamic\GraphQL\Queries\EntryQuery;
 use Statamic\GraphQL\Queries\PingQuery;
+use Statamic\GraphQL\Queries\TaxonomiesQuery;
 
 class ServiceProvider extends LaravelProvider
 {
@@ -35,6 +36,7 @@ class ServiceProvider extends LaravelProvider
                 'asset' => AssetQuery::class,
                 'assetContainers' => AssetContainersQuery::class,
                 'assetContainer' => AssetContainerQuery::class,
+                'taxonomies' => TaxonomiesQuery::class,
             ],
             'mutation' => [],
             'middleware' => [],
