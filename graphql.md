@@ -214,9 +214,48 @@ Used for querying a single entry.
 }
 ```
 
+### Assets {#assets-query}
+
+Used for querying multiple assets of an asset container.
+
+Returns a [paginated](#pagination) list of [AssetInterface](#asset-interface) types.
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `container` | `String!` | Specifies which asset container to query.
+| `limit` | `Int` | The number of results to be shown per paginated page.
+| `page` | `Int` | The paginated page to be shown. Defaults to `1`.
+| `sort` | `[String]` | [Sorts](#sorting) the results based on one or more fields and directions.
+
+Example query and response:
+
+```graphql
+{
+    assets(container: "images") {
+        current_page
+        data {
+            url
+        }
+    }
+}
+```
+
+```json
+{
+    "entries": {
+        "current_page": 1,
+        "data": [
+            { "url": "/assets/images/001.jpg" },
+            { "url": "/assets/images/002.jpg" },
+        ]
+    }
+}
+```
+
 ## Types
 
 - [EntryInterface](#entry-interface)
+- [AssetInterface](#asset-interface)
 
 ### EntryInterface {#entry-interface}
 
@@ -241,6 +280,29 @@ You will need to query the implementations using fragments in order to get bluep
         ... on Entry_Blog_ArtDirected_Post {
             hero_image
             content
+        }
+    }
+}
+```
+
+The fieldtypes will define their types. For instance, a text field will be a `String`, a [grid](#grid-fieldtype) field will expose a list of `GridItem` types.
+
+### AssetInterface {#asset-interface}
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `path` | `String!` | The path to the asset.
+
+Each `AssetInterface` will also have an implementation for each asset container's blueprint.
+
+You will need to query the implementations using fragments in order to get blueprint-specific fields.
+
+```graphql
+{
+    entries {
+        path
+        ... on Asset_Images {
+            alt
         }
     }
 }
