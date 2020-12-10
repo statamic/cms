@@ -214,6 +214,28 @@ Used for querying a single entry.
 }
 ```
 
+### Asset Containers {#asset-containers-query}
+
+Used for querying asset containers.
+
+```graphql
+{
+    assetContainers {
+        handle
+        title
+    }
+}
+```
+
+```json
+{
+    "assetContainers": [
+        { "handle": "images", "title": "Images" },
+        { "handle": "documents", "title": "Documents" },
+    ]
+}
+```
+
 ### Assets {#assets-query}
 
 Used for querying multiple assets of an asset container.
