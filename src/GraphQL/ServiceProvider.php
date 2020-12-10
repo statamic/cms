@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL;
 
 use Illuminate\Support\ServiceProvider as LaravelProvider;
+use Statamic\GraphQL\Queries\AssetContainerQuery;
 use Statamic\GraphQL\Queries\AssetContainersQuery;
 use Statamic\GraphQL\Queries\AssetQuery;
 use Statamic\GraphQL\Queries\AssetsQuery;
@@ -33,6 +34,7 @@ class ServiceProvider extends LaravelProvider
                 'assets' => AssetsQuery::class,
                 'asset' => AssetQuery::class,
                 'assetContainers' => AssetContainersQuery::class,
+                'assetContainer' => AssetContainerQuery::class,
             ],
             'mutation' => [],
             'middleware' => [],

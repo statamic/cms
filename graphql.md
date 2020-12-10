@@ -236,6 +236,34 @@ Used for querying asset containers.
 }
 ```
 
+### Asset Container {#asset-container-query}
+
+Used for querying a single asset container.
+
+Returns an [AssetContainer](#asset-container-type) type.
+
+```graphql
+{
+    assetContainer(handle: "images") {
+        handle
+        title
+    }
+}
+```
+
+```json
+{
+    "assetContainer": {
+        "handle": "images", 
+        "title": "Images"
+    }
+}
+```
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `handle` | `String!` | Specifies which asset container to retrieve.
+
 ### Assets {#assets-query}
 
 Used for querying multiple assets of an asset container.
