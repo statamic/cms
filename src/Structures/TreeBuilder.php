@@ -17,6 +17,7 @@ class TreeBuilder
         }
 
         $from = $params['from'] ?? null;
+        $fields = $params['fields'] ?? null;
 
         if ($from && $structure instanceof Nav) {
             throw new \Exception('Cannot get a nested starting position on a navigation structure.');
@@ -37,20 +38,20 @@ class TreeBuilder
                 ->all();
         }
 
-        return $this->toTree($pages, 1);
+        return $this->toTree($pages, 1, $fields);
     }
 
-    protected function toTree($pages, $depth)
+    protected function toTree($pages, $depth, $fields)
     {
-        return $pages->map(function ($page) use ($depth) {
+        return $pages->map(function ($page) use ($depth, $fields) {
             if ($page->reference() && ! $page->referenceExists()) {
                 return null;
             }
 
             return [
-                'page' => $page,
+                'page' => $page->selectedQueryColumns($fields),
                 'depth' => $depth,
-                'children' => $this->toTree($page->pages()->all(), $depth + 1),
+                'children' => $this->toTree($page->pages()->all(), $depth + 1, $fields),
             ];
         })->filter()->values()->all();
     }
