@@ -252,6 +252,36 @@ Example query and response:
 }
 ```
 
+### Asset {#asset-query}
+
+Used for querying a single asset.
+
+```graphql
+{
+    asset(id: 1) {
+        id
+        title
+    }
+}
+```
+
+```json
+{
+    "asset": {
+        "id": 1, 
+        "title": "First Entry"
+    }
+}
+```
+
+You can either query by `id`, or by `container` and `path` together.
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `id` | `String` | The ID of the asset. If you use this, you don't need `container` or `path`.
+| `container` | `String` | The container to look for the asset. You must also provide the `path`.
+| `path` | `String` | The path to the asset, relative to the container. You must also provide the `container`.
+
 ## Types
 
 - [EntryInterface](#entry-interface)
