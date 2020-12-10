@@ -354,6 +354,28 @@ Used for querying taxonomies.
 }
 ```
 
+### Taxonomy {#taxonomy-query}
+
+Used for querying a single taxonomy.
+
+```graphql
+{
+    taxonomy(handle: "tags") {
+        handle
+        title
+    }
+}
+```
+
+```json
+{
+    "taxonomy": {
+        "handle": "tags", 
+        "title": "Tags"
+    }
+}
+```
+
 ## Types
 
 - [EntryInterface](#entry-interface)
