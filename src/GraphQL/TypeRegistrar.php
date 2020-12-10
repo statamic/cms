@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL;
 
 use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\GraphQL\Types\AssetContainerType;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\GraphQL\Types\CollectionType;
 use Statamic\GraphQL\Types\EntryInterface;
@@ -20,6 +21,7 @@ class TypeRegistrar
 
         GraphQL::addType(JsonArgument::class);
         GraphQL::addType(CollectionType::class);
+        GraphQL::addType(AssetContainerType::class);
         EntryInterface::addTypes();
         AssetInterface::addTypes();
 
