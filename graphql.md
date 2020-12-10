@@ -332,6 +332,28 @@ You can either query by `id`, or by `container` and `path` together.
 | `container` | `String` | The container to look for the asset. You must also provide the `path`.
 | `path` | `String` | The path to the asset, relative to the container. You must also provide the `container`.
 
+### Taxonomies {#taxonomies-query}
+
+Used for querying taxonomies.
+
+```graphql
+{
+    taxonomies {
+        handle
+        title
+    }
+}
+```
+
+```json
+{
+    "taxonomies": [
+        { "handle": "tags", "title": "Tags" },
+        { "handle": "categories", "title": "Categories" },
+    ]
+}
+```
+
 ## Types
 
 - [EntryInterface](#entry-interface)
