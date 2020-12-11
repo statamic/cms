@@ -376,6 +376,68 @@ Used for querying a single taxonomy.
 }
 ```
 
+### Terms {#terms-query}
+
+Used for querying multiple taxonomy terms.
+
+Returns a [paginated](#pagination) list of [TermInterface](#term-interface) types.
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `taxonomy` | `[String]` | Narrows down the results by terms in one or more taxonomies.
+| `limit` | `Int` | The number of results to be shown per paginated page.
+| `page` | `Int` | The paginated page to be shown. Defaults to `1`.
+| `filter` | `JsonArgument` | Narrows down the results based on [filters](#filters).
+| `sort` | `[String]` | [Sorts](#sorting) the results based on one or more fields and directions.
+
+Example query and response:
+
+```graphql
+{
+    terms {
+        current_page
+        data {
+            id
+            title
+        }
+    }
+}
+```
+
+```json
+{
+    "terms": {
+        "current_page": 1,
+        "data": [
+            { "id": "tags::one", "title": "Tag One" },
+            { "id": "tags::two", "title": "Tag Two" }
+        ]
+    }
+}
+```
+
+### Term {#term-query}
+
+Used for querying a single taxonomy term.
+
+```graphql
+{
+    term(id: "tags::one") {
+        id
+        title
+    }
+}
+```
+
+```json
+{
+    "term": {
+        "id": "tags::one", 
+        "title": "Tag One""
+    }
+}
+```
+
 ## Types
 
 - [EntryInterface](#entry-interface)
@@ -403,6 +465,36 @@ You will need to query the implementations using fragments in order to get bluep
         }
         ... on Entry_Blog_ArtDirected_Post {
             hero_image
+            content
+        }
+    }
+}
+```
+
+The fieldtypes will define their types. For instance, a text field will be a `String`, a [grid](#grid-fieldtype) field will expose a list of `GridItem` types.
+
+### TermInterface {#term-interface}
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `id` | `ID!` | 
+| `title` | `String!` |
+| `slug` | `String!` |
+
+Each `TermInterface` will also have implementations for each taxonomy/blueprint combination.
+
+You will need to query the implementations using fragments in order to get blueprint-specific fields.
+
+```graphql
+{
+    terms {
+        id
+        title
+        ... on Term_Tags_RegularTag {
+            content
+        }
+        ... on Term_Tags_SpecialTag {
+            how_special
             content
         }
     }
