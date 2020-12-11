@@ -19,6 +19,7 @@ return [
     'asset_folders_directory_instructions' => 'We recommend avoiding spaces and special characters to keep URLs clean.',
     'blueprints_intro' => 'Blueprints define and organize fields to create the content models for collections, forms, and other data types.',
     'blueprints_title_instructions' => 'Usually a singular noun, like Article or Product',
+    'blueprints_hide_instructions' => 'Hides the blueprint from the create buttons in the CP',
     'cache_utility_application_cache_description' => 'Laravel\'s unified cache used by Statamic, third party addons, and composer packages.',
     'cache_utility_description' => 'Manage and view important information about Statamic\'s various caching layers.',
     'cache_utility_image_cache_description' => 'The image cache stores copies of all transformed and resized images.',

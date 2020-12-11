@@ -165,6 +165,7 @@ class BlueprintRepository
             $contents = YAML::file($path)->parse();
 
             return (new Blueprint)
+                ->setHide(Arr::pull($contents, 'hide'))
                 ->setOrder(Arr::pull($contents, 'order'))
                 ->setInitialPath($path)
                 ->setHandle($handle)
