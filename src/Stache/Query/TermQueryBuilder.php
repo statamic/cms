@@ -61,7 +61,7 @@ class TermQueryBuilder extends Builder
             : $this->getKeysFromTaxonomiesWithWheres($taxonomies, $this->wheres);
 
         return $keys->unique(function ($key) {
-            return explode('::', $key)[2];
+            return collect(explode('::', $key))->forget(1)->join('::');
         });
     }
 
