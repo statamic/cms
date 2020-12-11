@@ -753,6 +753,10 @@ class CoreModifiers extends Modifier
      */
     public function joinplode($value, $params)
     {
+        if (is_null($value)) {
+            return '';
+        }
+
         // Workaround to support pipe characters. If there are multiple params
         // that means a pipe was used. We'll just join them for now.
         if (count($params) > 1) {
