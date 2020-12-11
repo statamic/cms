@@ -282,6 +282,9 @@ export default {
         previews: {
             deep: true,
             handler(value) {
+                if (JSON.stringify(this.meta.previews) === JSON.stringify(value)) {
+                    return
+                }
                 const meta = this.meta;
                 meta.previews = value;
                 this.updateMeta(meta);
