@@ -8,6 +8,9 @@ use Statamic\Structures\TreeBuilder;
 
 class TreeResource extends JsonResource
 {
+    protected $fields;
+    protected $depth;
+
     /**
      * Set selected fields.
      *
@@ -17,6 +20,19 @@ class TreeResource extends JsonResource
     public function fields($fields = null)
     {
         $this->fields = $fields;
+
+        return $this;
+    }
+
+    /**
+     * Set max depth.
+     *
+     * @param int|null $depth
+     * @return $this
+     */
+    public function maxDepth($depth = null)
+    {
+        $this->maxDepth = $depth;
 
         return $this;
     }
@@ -34,6 +50,7 @@ class TreeResource extends JsonResource
             'include_home' => true,
             'site' => Site::default()->handle(),
             'fields' => $this->fields,
+            'max_depth' => $this->maxDepth,
         ]);
     }
 }

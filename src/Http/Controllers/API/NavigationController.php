@@ -16,12 +16,16 @@ class NavigationController extends ApiController
         throw_unless($nav, new NotFoundHttpException("Navigation [{$navHandle}] not found"));
 
         $site = request('site', Site::default()->handle());
-        $fields = explode(',', request('fields', '*'));
 
         $tree = $nav->in($site);
 
         throw_unless($tree, new NotFoundHttpException("Navigation [{$navHandle}] not found in [{$site}] site"));
 
-        return app(TreeResource::class)::make($tree)->fields($fields);
+        $fields = explode(',', request('fields', '*'));
+        $maxDepth = request('max_depth');
+
+        return app(TreeResource::class)::make($tree)
+            ->fields($fields)
+            ->maxDepth($maxDepth);
     }
 }

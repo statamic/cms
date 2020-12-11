@@ -17,6 +17,7 @@ class TreeBuilder
         }
 
         $from = $params['from'] ?? null;
+        $maxDepth = $params['max_depth'] ?? null;
         $fields = $params['fields'] ?? null;
 
         if ($from && $structure instanceof Nav) {
@@ -38,12 +39,16 @@ class TreeBuilder
                 ->all();
         }
 
-        return $this->toTree($pages, 1, $fields);
+        return $this->toTree($pages, 1, $maxDepth, $fields);
     }
 
-    protected function toTree($pages, $depth, $fields)
+    protected function toTree($pages, $depth, $maxDepth, $fields)
     {
-        return $pages->map(function ($page) use ($depth, $fields) {
+        if ($maxDepth && $depth > $maxDepth) {
+            return [];
+        }
+
+        return $pages->map(function ($page) use ($depth, $maxDepth, $fields) {
             if ($page->reference() && ! $page->referenceExists()) {
                 return null;
             }
@@ -51,7 +56,7 @@ class TreeBuilder
             return [
                 'page' => $page->selectedQueryColumns($fields),
                 'depth' => $depth,
-                'children' => $this->toTree($page->pages()->all(), $depth + 1, $fields),
+                'children' => $this->toTree($page->pages()->all(), $depth + 1, $maxDepth, $fields),
             ];
         })->filter()->values()->all();
     }
