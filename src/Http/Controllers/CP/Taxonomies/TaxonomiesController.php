@@ -48,7 +48,7 @@ class TaxonomiesController extends CpController
         $this->authorize('view', $taxonomy);
 
         $blueprints = $taxonomy->termBlueprints()
-            ->reject(function($blueprint) {
+            ->reject(function ($blueprint) {
                 return $blueprint->hide();
             })
             ->map(function ($blueprint) {

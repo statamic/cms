@@ -52,7 +52,7 @@ class CollectionsController extends CpController
         $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
         $blueprints = $collection->entryBlueprints()
-            ->reject(function($blueprint) {
+            ->reject(function ($blueprint) {
                 return $blueprint->hide();
             })
             ->map(function ($blueprint) {
