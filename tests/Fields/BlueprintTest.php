@@ -64,6 +64,22 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_hide_property_which_is_false_by_default()
+    {
+        $blueprint = new Blueprint;
+        $this->assertSame(false, $blueprint->hide());
+
+        $blueprint->setHide(true);
+        $this->assertSame(true, $blueprint->hide());
+
+        $blueprint->setHide(false);
+        $this->assertSame(false, $blueprint->hide());
+
+        $blueprint->setHide(null);
+        $this->assertSame(false, $blueprint->hide());
+    }
+
+    /** @test */
     public function the_title_falls_back_to_a_humanized_handle()
     {
         $blueprint = (new Blueprint)->setHandle('the_blueprint_handle');
