@@ -9,6 +9,7 @@ use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
@@ -22,7 +23,7 @@ use Statamic\Statamic;
 
 class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
 {
-    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified;
+    use ContainsSupplementalData, Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified;
 
     protected $locale;
     protected $term;
