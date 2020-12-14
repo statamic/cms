@@ -438,6 +438,46 @@ Used for querying a single taxonomy term.
 }
 ```
 
+### Global Sets {#global-sets-query}
+
+Used for querying multiple global sets.
+
+Returns a list of [GlobalSetInterface](#global-set-interface) types.
+
+| Argument | Type | Description |
+|----------|------|-------------|
+| `taxonomy` | `[String]` | Narrows down the results by terms in one or more taxonomies.
+| `limit` | `Int` | The number of results to be shown per paginated page.
+| `page` | `Int` | The paginated page to be shown. Defaults to `1`.
+| `filter` | `JsonArgument` | Narrows down the results based on [filters](#filters).
+| `sort` | `[String]` | [Sorts](#sorting) the results based on one or more fields and directions.
+
+Example query and response:
+
+```graphql
+{
+    globalSets {
+        title
+        handle
+        ... on GlobalSet_Social {
+            twitter
+        }
+        ... on GlobalSet_Company {
+            company_name
+        }
+    }
+}
+```
+
+```json
+{
+    "globalSets": [
+        { "handle": "social", "twitter": "@statamic" },
+        { "handle": "company", "company_name": "Statamic" },
+    ]
+}
+```
+
 ## Types
 
 - [EntryInterface](#entry-interface)
