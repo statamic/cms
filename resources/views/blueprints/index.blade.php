@@ -23,6 +23,9 @@
                 @if ($loop->first)<h6 class="p-1 mt-2">{{ __('Taxonomies') }}</h6>@endif
                 <dropdown-item redirect="{{ cp_route('taxonomies.blueprints.create', $taxonomy) }}">{{ $taxonomy->title() }}</dropdown-item>
             @endforeach
+
+            <h6 class="p-1 mt-2">Other</h6>
+            <dropdown-item redirect="{{ cp_route('blueprints.create') }}">Miscellaneous</dropdown-item>
         </dropdown-list>
         </div>
     </div>

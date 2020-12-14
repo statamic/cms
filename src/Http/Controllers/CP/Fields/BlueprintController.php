@@ -28,6 +28,24 @@ class BlueprintController extends CpController
         ]);
     }
 
+    public function create()
+    {
+        return view('statamic::blueprints.create', [
+            'action' => cp_route('blueprints.store'),
+        ]);
+    }
+
+    public function store(Request $request)
+    {
+        $request->validate(['title' => 'required']);
+
+        $blueprint = $this->storeBlueprint($request, '');
+
+        return redirect()
+            ->cpRoute('blueprints.edit', [$blueprint])
+            ->with('success', __('Blueprint created'));
+    }
+
     public function edit($blueprint)
     {
         if ($blueprint === 'user') {
@@ -55,6 +73,8 @@ class BlueprintController extends CpController
 
         $blueprint->delete();
 
-        return redirect()->back();
+        return redirect()
+            ->cpRoute('blueprints.index')
+            ->with('success', __('Blueprint deleted'));
     }
 }
