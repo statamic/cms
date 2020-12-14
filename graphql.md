@@ -478,6 +478,32 @@ Example query and response:
 }
 ```
 
+### Global Set {#global-set-query}
+
+Used for querying a single global set.
+
+```graphql
+{
+    globalSet(handle: "social") {
+        title
+        handle
+        ... on GlobalSet_Social {
+            twitter
+        }
+    }
+}
+```
+
+```json
+{
+    "globalSet": {
+        "title": "Social",
+        "handle": "social",
+        "twitter": "@statamic",
+    }
+}
+```
+
 ## Types
 
 - [EntryInterface](#entry-interface)
@@ -559,6 +585,32 @@ You will need to query the implementations using fragments in order to get bluep
         path
         ... on Asset_Images {
             alt
+        }
+    }
+}
+```
+
+The fieldtypes will define their types. For instance, a text field will be a `String`, a [grid](#grid-fieldtype) field will expose a list of `GridItem` types.
+
+### GlobalSetInterface {#global-set-interface}
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `handle` | `String!` | The handle of the set.
+| `title` | `String!` | The title of the set.
+
+Each `GlobalSetInterface` will also have an implementation for each set's blueprint.
+
+> Note that while Statamic doesn't enfore a blueprint for a globals (see [Blueprint is Optional](/blueprints#blueprint-is-optional)), it is required within the context of GraphQL. Fields that haven't been explicitly added to a blueprint will not be available.
+
+You will need to query the implementations using fragments in order to get blueprint-specific fields.
+
+```graphql
+{
+    globalSets {
+        handle
+        ... on GlobalSet_Social {
+            twitter
         }
     }
 }
