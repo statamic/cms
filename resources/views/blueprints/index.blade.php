@@ -144,6 +144,25 @@
                     </div>
                 </td>
             </tr>
+            @foreach ($miscBlueprints as $blueprint)
+                <tr>
+                    <td class="flex flex-row justify-between">
+                        <div class="flex items-center">
+                            <div class="w-4 h-4 mr-2">@svg('generic')</div>
+                            <a href="{{ cp_route('blueprints.edit', ['blueprint' => $blueprint->handle()]) }}">{{ $blueprint->title() }}</a>
+                        </div>
+
+                        <dropdown-list>
+                            <form action="{{ cp_route('blueprints.destroy', ['blueprint' => $blueprint->handle()]) }}" method="POST">
+                                @csrf
+                                @method('DELETE')
+
+                                <dropdown-item class="warning" text="Delete"></dropdown-item>
+                            </form>
+                        </dropdown-list>
+                    </td>
+                </tr>
+            @endforeach
         </table>
     </div>
 
