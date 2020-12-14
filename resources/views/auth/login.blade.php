@@ -1,11 +1,15 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::outside')
-@section('body_class', 'rad-mode')
+@section('body_class', config('statamic.cp.login_theme').'-mode')
 @section('title', __('Log in'))
 
 @section('content')
 <div class="logo pt-7">
-    @svg('statamic-wordmark')
+    @if (Statamic::pro() && config('statamic.cp.logo_path'))
+        <img src="{{ config('statamic.cp.logo_path') }}" alt="{{ config('statamic.cp.cms_name') }}" class="white-label-logo">
+    @else
+        @svg('statamic-wordmark')
+    @endif
 </div>
 
 <div class="card auth-card mx-auto">

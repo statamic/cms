@@ -73,6 +73,44 @@ return [
     |
     */
 
-    'link_to_docs' => true,
+    'link_to_docs' => false,
+
+    /*
+    |--------------------------------------------------------------------------
+    | Support Link
+    |--------------------------------------------------------------------------
+    |
+    | Set the location of the support link in the "Useful Links" header
+    | dropdown. Use 'false' to remove it entirely.
+    |
+    */
+
+    'support_link' => env('SUPPORT_LINK', 'https://statamic.com/support'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Login Theme
+    |--------------------------------------------------------------------------
+    |
+    | Optionally spice up the login screen and choose
+    | between "rad" or "business" modes.
+    |
+    */
+
+    'login_theme' => env('login_mode', 'rad'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | White Labeling
+    |--------------------------------------------------------------------------
+    |
+    | When in Pro Mode you may replace the Statamic name and logo with those
+    | your choosing, as long as they're not intended to mislead.
+    |
+    */
+
+    'cms_name' => env('CMS_NAME', 'Statamic'),
+
+    'logo_path' =>  env('LOGO_PATH', null),
 
 ];
