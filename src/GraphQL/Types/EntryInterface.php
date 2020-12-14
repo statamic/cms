@@ -45,11 +45,8 @@ class EntryInterface extends InterfaceType
             ->flatMap(function ($collection) {
                 return $collection
                     ->entryBlueprints()
+                    ->each->addGqlTypes()
                     ->map(function ($blueprint) use ($collection) {
-                        $blueprint->fields()->all()->map->fieldtype()->each(function ($fieldtype) {
-                            $fieldtype->addGqlTypes();
-                        });
-
                         return compact('collection', 'blueprint');
                     });
             });

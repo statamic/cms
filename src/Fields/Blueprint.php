@@ -470,4 +470,9 @@ class Blueprint implements Augmentable
 
         return $this;
     }
+
+    public function addGqlTypes()
+    {
+        $this->fields()->all()->map->fieldtype()->each->addGqlTypes();
+    }
 }
