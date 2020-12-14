@@ -48,11 +48,8 @@ class TermInterface extends InterfaceType
             ->flatMap(function ($taxonomy) {
                 return $taxonomy
                     ->termBlueprints()
+                    ->each->addGqlTypes()
                     ->map(function ($blueprint) use ($taxonomy) {
-                        $blueprint->fields()->all()->map->fieldtype()->each(function ($fieldtype) {
-                            $fieldtype->addGqlTypes();
-                        });
-
                         return compact('taxonomy', 'blueprint');
                     });
             });
