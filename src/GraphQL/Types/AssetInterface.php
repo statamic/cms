@@ -37,6 +37,9 @@ class AssetInterface extends InterfaceType
     public static function addTypes()
     {
         GraphQL::addType(self::class);
-        GraphQL::addTypes(AssetContainer::all()->mapInto(AssetType::class)->all());
+
+        GraphQL::addTypes(AssetContainer::all()->each(function ($container) {
+            $container->blueprint()->addGqlTypes();
+        })->mapInto(AssetType::class)->all());
     }
 }
