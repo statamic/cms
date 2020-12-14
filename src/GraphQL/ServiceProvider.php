@@ -11,6 +11,7 @@ use Statamic\GraphQL\Queries\CollectionQuery;
 use Statamic\GraphQL\Queries\CollectionsQuery;
 use Statamic\GraphQL\Queries\EntriesQuery;
 use Statamic\GraphQL\Queries\EntryQuery;
+use Statamic\GraphQL\Queries\GlobalSetsQuery;
 use Statamic\GraphQL\Queries\PingQuery;
 use Statamic\GraphQL\Queries\TaxonomiesQuery;
 use Statamic\GraphQL\Queries\TaxonomyQuery;
@@ -43,6 +44,7 @@ class ServiceProvider extends LaravelProvider
                 'taxonomy' => TaxonomyQuery::class,
                 'terms' => TermsQuery::class,
                 'term' => TermQuery::class,
+                'globalSets' => GlobalSetsQuery::class,
             ],
             'mutation' => [],
             'middleware' => [],

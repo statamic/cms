@@ -7,6 +7,7 @@ use Statamic\GraphQL\Types\AssetContainerType;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\GraphQL\Types\CollectionType;
 use Statamic\GraphQL\Types\EntryInterface;
+use Statamic\GraphQL\Types\GlobalSetInterface;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\GraphQL\Types\TaxonomyType;
 use Statamic\GraphQL\Types\TermInterface;
@@ -28,6 +29,7 @@ class TypeRegistrar
         EntryInterface::addTypes();
         TermInterface::addTypes();
         AssetInterface::addTypes();
+        GlobalSetInterface::addTypes();
 
         $this->registered = true;
     }
