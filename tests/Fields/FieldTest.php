@@ -3,7 +3,6 @@
 namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
-use GraphQL\Type\Definition\Type;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\Value;
@@ -520,7 +519,7 @@ class FieldTest extends TestCase
     public function it_gets_the_graphql_type()
     {
         $fieldtype = new class extends Fieldtype {
-            public function toGqlType(): Type
+            public function toGqlType()
             {
                 return new \GraphQL\Type\Definition\FloatType;
             }
@@ -546,7 +545,7 @@ class FieldTest extends TestCase
     public function it_makes_the_graphql_type_non_nullable_if_its_required()
     {
         $fieldtype = new class extends Fieldtype {
-            public function toGqlType(): Type
+            public function toGqlType()
             {
                 return new \GraphQL\Type\Definition\FloatType;
             }

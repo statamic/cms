@@ -214,7 +214,7 @@ abstract class Fieldtype implements Arrayable
         return Statamic::docsUrl('fieldtypes/'.static::handle());
     }
 
-    public function toGqlType(): Type
+    public function toGqlType()
     {
         return Type::string();
     }

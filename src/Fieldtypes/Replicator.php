@@ -166,7 +166,7 @@ class Replicator extends Fieldtype
         ];
     }
 
-    public function toGqlType(): Type
+    public function toGqlType()
     {
         $type = GraphQL::type(ReplicatorSetsType::buildName($this));
 

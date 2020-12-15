@@ -168,7 +168,7 @@ class Grid extends Fieldtype
         })->all();
     }
 
-    public function toGqlType(): Type
+    public function toGqlType()
     {
         return Type::listOf(GraphQL::type('GridItem_'.Str::studly($this->field->handle())));
     }
