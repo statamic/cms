@@ -819,7 +819,7 @@ Grid fields can be queried with no extra requirements. You can just use the nest
 A fieldtype can define what GraphQL type will be used. By default, all fieldtypes will return strings.
 
 ```php
-public function graphQLType(): \GraphQL\Type\Definition\Type
+public function toGqlType(): \GraphQL\Type\Definition\Type
 {
     return \GraphQL\Type\Definition\Type::string();
 }

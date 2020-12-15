@@ -298,7 +298,7 @@ class Field implements Arrayable
 
     public function toGraphQL(): array
     {
-        $type = $this->fieldtype()->graphQLType();
+        $type = $this->fieldtype()->toGqlType();
 
         if ($this->isRequired()) {
             $type = \GraphQL\Type\Definition\Type::nonNull($type);

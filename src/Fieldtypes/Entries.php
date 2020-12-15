@@ -228,7 +228,7 @@ class Entries extends Relationship
             : $collections;
     }
 
-    public function graphQlType(): Type
+    public function toGqlType(): Type
     {
         $type = GraphQL::type('EntryInterface');
 

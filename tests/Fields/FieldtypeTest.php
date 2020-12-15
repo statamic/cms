@@ -321,7 +321,7 @@ class FieldtypeTest extends TestCase
      **/
     public function it_gets_the_graphql_type_of_string_by_default()
     {
-        $type = (new TestFieldtype)->graphQLType();
+        $type = (new TestFieldtype)->toGqlType();
 
         $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $type);
     }

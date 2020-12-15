@@ -520,7 +520,7 @@ class FieldTest extends TestCase
     public function it_gets_the_graphql_type()
     {
         $fieldtype = new class extends Fieldtype {
-            public function graphQLType(): Type
+            public function toGqlType(): Type
             {
                 return new \GraphQL\Type\Definition\FloatType;
             }
@@ -546,7 +546,7 @@ class FieldTest extends TestCase
     public function it_makes_the_graphql_type_non_nullable_if_its_required()
     {
         $fieldtype = new class extends Fieldtype {
-            public function graphQLType(): Type
+            public function toGqlType(): Type
             {
                 return new \GraphQL\Type\Definition\FloatType;
             }
