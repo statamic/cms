@@ -32,7 +32,7 @@ class Integer extends Fieldtype
         return (int) $data;
     }
 
-    public function graphQLType(): Type
+    public function toGqlType(): Type
     {
         return Type::int();
     }

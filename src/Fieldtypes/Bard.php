@@ -378,9 +378,9 @@ class Bard extends Replicator
         })->all();
     }
 
-    public function graphQlType(): Type
+    public function toGqlType(): Type
     {
-        return $this->config('sets') ? parent::graphQlType() : Type::string();
+        return $this->config('sets') ? parent::toGqlType() : Type::string();
     }
 
     public function addGqlTypes()
