@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use GraphQL\Type\Definition\Type;
 use Statamic\Fields\Fieldtype;
 
 class Toggle extends Fieldtype
@@ -21,5 +22,10 @@ class Toggle extends Fieldtype
     public function augment($data)
     {
         return (bool) $data;
+    }
+
+    public function graphQlType(): Type
+    {
+        return Type::boolean();
     }
 }
