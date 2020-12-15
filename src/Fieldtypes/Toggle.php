@@ -24,7 +24,7 @@ class Toggle extends Fieldtype
         return (bool) $data;
     }
 
-    public function toGqlType(): Type
+    public function toGqlType()
     {
         return Type::boolean();
     }

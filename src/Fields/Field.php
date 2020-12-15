@@ -3,6 +3,7 @@
 namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Support\Str;
 
@@ -300,12 +301,14 @@ class Field implements Arrayable
     {
         $type = $this->fieldtype()->toGqlType();
 
-        if ($this->isRequired()) {
-            $type = \GraphQL\Type\Definition\Type::nonNull($type);
+        if ($type instanceof Type) {
+            $type = ['type' => $type];
         }
 
-        return [
-            'type' => $type,
-        ];
+        if ($this->isRequired()) {
+            $type['type'] = Type::nonNull($type['type']);
+        }
+
+        return $type;
     }
 }

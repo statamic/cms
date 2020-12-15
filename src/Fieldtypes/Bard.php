@@ -376,7 +376,7 @@ class Bard extends Replicator
         })->all();
     }
 
-    public function toGqlType(): Type
+    public function toGqlType()
     {
         return $this->config('sets') ? parent::toGqlType() : Type::string();
     }
