@@ -9,17 +9,17 @@ use Statamic\Stache\Query\TermQueryBuilder;
 use Statamic\Taxonomies\TermCollection;
 
 /**
- * @method static all(): TermCollection.
- * @method static whereTaxonomy(string $handle): TermCollection
- * @method static whereInTaxonomy(array $handles): TermCollection
- * @method static find($id): ?TermContract
- * @method static findByUri(string $uri, string $site = null): ?TermContract
- * @method static findBySlug(string $slug, string $taxonomy): ?TermContract
+ * @method static TermCollection all()
+ * @method static TermCollection whereTaxonomy(string $handle)
+ * @method static TermCollection whereInTaxonomy(array $handles)
+ * @method static TermContract find($id)
+ * @method static TermContract findByUri(string $uri, string $site = null)
+ * @method static TermContract findBySlug(string $slug, string $taxonomy)
  * @method static save($term)
  * @method static delete($term)
- * @method static query(): TermQueryBuilder
- * @method static make(string $slug = null): Term
- * @method static entriesCount(Term $term): int
+ * @method static TermQueryBuilder query()
+ * @method static Term make(string $slug = null)
+ * @method static int entriesCount(Term $term)
  *
  * @see \Statamic\Contracts\Taxonomies\TermRepository
  */
