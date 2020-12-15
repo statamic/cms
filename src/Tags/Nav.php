@@ -59,4 +59,9 @@ class Nav extends Structure
 
         return $output;
     }
+
+    public function count()
+    {
+        return count($this->index());
+    }
 }
