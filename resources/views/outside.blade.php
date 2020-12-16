@@ -3,7 +3,7 @@
     <head>
         @include('statamic::partials.head')
     </head>
-    <body class="outside @yield('body_class')">
+    <body class="outside {{ config('statamic.cp.login_theme') }}-mode @yield('body_class')">
         <div id="statamic">
             @yield('content')
         </div>

@@ -73,7 +73,7 @@ return [
     |
     */
 
-    'link_to_docs' => false,
+    'link_to_docs' => env('STATAMIC_LINK_TO_DOCS', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -85,7 +85,7 @@ return [
     |
     */
 
-    'support_link' => env('SUPPORT_LINK', 'https://statamic.com/support'),
+    'support_url' => env('STATAMIC_SUPPORT_URL', 'https://statamic.com/support'),
 
     /*
     |--------------------------------------------------------------------------
@@ -97,7 +97,7 @@ return [
     |
     */
 
-    'login_theme' => env('login_mode', 'rad'),
+    'login_theme' => env('STATAMIC_LOGIN_THEME', 'rad'),
 
     /*
     |--------------------------------------------------------------------------
@@ -109,8 +109,8 @@ return [
     |
     */
 
-    'cms_name' => env('CMS_NAME', 'Statamic'),
+    'cms_name' => env('STATAMIC_CMS_NAME', 'Statamic'),
 
-    'logo_path' =>  env('LOGO_PATH', null),
+    'logo_url' =>  env('STATAMIC_LOGO_URL', null),
 
 ];

@@ -1,5 +1,4 @@
 @extends('statamic::outside')
-@section('body_class', 'rad-mode')
 @section('title', __('Unauthorized'))
 
 @section('content')

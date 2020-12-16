@@ -5,13 +5,12 @@
         <button class="nav-toggle md:hidden ml-sm flex-shrink-0" @click="toggleMobileNav" v-else v-cloak aria-label="{{ __('Toggle Mobile Nav') }}">@svg('close')</button>
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
             <div v-tooltip="version" class="hidden md:block flex-shrink-0">
-                @if (Statamic::pro() && config('statamic.cp.logo_path'))
-                    <img src="{{ config('statamic.cp.logo_path') }}" alt="{{ config('statamic.cp.cms_name') }}" class="white-label-logo">
+                @if (Statamic::pro() && config('statamic.cp.logo_url'))
+                    <img src="{{ config('statamic.cp.logo_url') }}" alt="{{ config('statamic.cp.cms_name') }}" class="white-label-logo">
                 @else
                     @svg('statamic-wordmark')
                     @if (Statamic::pro())<span class="font-bold text-4xs align-top">PRO</span>@endif
                 @endif
-
             </div>
         </a>
     </div>
