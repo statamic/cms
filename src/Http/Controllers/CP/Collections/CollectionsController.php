@@ -53,9 +53,7 @@ class CollectionsController extends CpController
 
         $blueprints = $collection
             ->entryBlueprints()
-            ->reject(function ($blueprint) {
-                return $blueprint->hidden();
-            })
+            ->reject->hidden()
             ->map(function ($blueprint) {
                 return [
                     'handle' => $blueprint->handle(),
