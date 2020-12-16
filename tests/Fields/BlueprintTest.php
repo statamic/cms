@@ -64,19 +64,19 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_the_hide_property_which_is_false_by_default()
+    public function it_gets_the_hidden_property_which_is_false_by_default()
     {
         $blueprint = new Blueprint;
-        $this->assertSame(false, $blueprint->hide());
+        $this->assertSame(false, $blueprint->hidden());
 
-        $blueprint->setHide(true);
-        $this->assertSame(true, $blueprint->hide());
+        $blueprint->setHidden(true);
+        $this->assertSame(true, $blueprint->hidden());
 
-        $blueprint->setHide(false);
-        $this->assertSame(false, $blueprint->hide());
+        $blueprint->setHidden(false);
+        $this->assertSame(false, $blueprint->hidden());
 
-        $blueprint->setHide(null);
-        $this->assertSame(false, $blueprint->hide());
+        $blueprint->setHidden(null);
+        $this->assertSame(false, $blueprint->hidden());
     }
 
     /** @test */

@@ -21,11 +21,11 @@
 
             <div class="form-group">
                 <label class="block">{{ __('Hidden') }}</label>
-                <small class="help-block">{{ __('messages.blueprints_hide_instructions') }}</small>
-                <div v-if="errors.hide">
-                    <small class="help-block text-red" v-for="(error, i) in errors.hide" :key="i" v-text="error" />
+                <small class="help-block">{{ __('messages.blueprints_hidden_instructions') }}</small>
+                <div v-if="errors.hidden">
+                    <small class="help-block text-red" v-for="(error, i) in errors.hidden" :key="i" v-text="error" />
                 </div>
-                <toggle-input name="hide" v-model="blueprint.hide" />
+                <toggle-input name="hidden" v-model="blueprint.hidden" />
             </div>
         </div>
 
