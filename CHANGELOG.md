@@ -1,5 +1,27 @@
 # Release Notes
 
+## Unreleased
+
+### What's new
+- Blueprints can be hidden from the Create Entry and Create Term buttons. [#3007](https://github.com/statamic/cms/issues/3007)
+- Added a `UserBlueprintFound` event. [#2983](https://github.com/statamic/cms/issues/2983)
+
+### What's fixed
+
+- Fixed a circular reference which made Bard freeze the page. [#2959](https://github.com/statamic/cms/issues/2959) [#3005](https://github.com/statamic/cms/issues/3005)
+- Register our custom cache driver earlier, which fixes compatibility with Laravel Telescope. [#3023](https://github.com/statamic/cms/issues/3023) [#1721](https://github.com/statamic/cms/issues/1721)
+- The Toggle fieldtype gives you a boolean when undefined, rather than null. [1f11c9c89](https://github.com/statamic/cms/commit/1f11c9c89)
+[05601e49b](https://github.com/statamic/cms/commit/05601e49b)
+- Terms can contain supplemental data, which fixes error within search. [#3008](https://github.com/statamic/cms/issues/3008)
+- Fix `isInGroup` for Eloquent user driver. [#2951](https://github.com/statamic/cms/issues/2951)
+- Fix issue where only one term would be returned when you have two terms with the same slug in different taxonomies. [c9624a49e](https://github.com/statamic/cms/commit/c9624a49e)
+- Hide the "Duplicate Row" button when max grid rows have been reached. [#3006](https://github.com/statamic/cms/issues/3006)
+- Removed the zero indexed grid item count. [b657efa28](https://github.com/statamic/cms/commit/b657efa28)
+- Fix `join` modifier when value is null. [#3001](https://github.com/statamic/cms/issues/3001)
+- Fix Term facade hints. [#3012](https://github.com/statamic/cms/issues/3012)
+- Bump `ini` from 1.3.5 to 1.3.8 [#3009](https://github.com/statamic/cms/issues/3009)
+
+
 ## 3.0.34 (2020-12-09)
 
 ### What's new 
