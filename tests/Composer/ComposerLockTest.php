@@ -1,0 +1,84 @@
+<?php
+
+namespace Tests\Composer;
+
+use Illuminate\Filesystem\Filesystem;
+use Statamic\Console\Composer\Lock;
+use Statamic\Exceptions\ComposerLockFileNotFoundException;
+use Statamic\Exceptions\ComposerLockPackageNotFoundException;
+use Tests\Fakes\Composer\Package\PackToTheFuture;
+use Tests\TestCase;
+
+class ComposerLockTest extends TestCase
+{
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        $this->files = app(Filesystem::class);
+
+        $this->lockPath = base_path('composer.lock');
+        $this->previousLockPath = storage_path('statamic/updater/composer.lock.bak');
+
+        $this->removeLockFiles();
+    }
+
+    /** @test */
+    public function it_errors_when_composer_lock_file_is_not_found()
+    {
+        $this->expectException(ComposerLockFileNotFoundException::class);
+        $this->expectExceptionMessage("Could not find a composer lock file at [{$this->lockPath}].");
+
+        Lock::file()->getInstalledVersion('package/two');
+    }
+
+    /** @test */
+    public function it_errors_when_package_is_not_found()
+    {
+        PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath);
+
+        $this->expectException(ComposerLockPackageNotFoundException::class);
+        $this->expectExceptionMessage('Could not find the [package/two] in your composer.lock file.');
+
+        Lock::file()->getInstalledVersion('package/two');
+    }
+
+    /** @test */
+    public function it_can_get_installed_version_of_a_package_from_composer_lock()
+    {
+        PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath);
+
+        $this->assertEquals('1.0.0', Lock::file()->getInstalledVersion('package/one'));
+
+        PackToTheFuture::generateComposerLock('package/one', '1.1.0', $this->lockPath);
+
+        $this->assertEquals('1.1.0', Lock::file()->getInstalledVersion('package/one'));
+    }
+
+    /** @test */
+    public function it_can_gets_normalized_version_of_a_package_from_composer_lock()
+    {
+        PackToTheFuture::generateComposerLock('package/one', 'v1.0.0', $this->lockPath);
+
+        $this->assertEquals('1.0.0', Lock::file()->getInstalledVersion('package/one'));
+    }
+
+    /** @test */
+    public function it_can_get_installed_version_of_a_package_from_multiple_composer_lock_files()
+    {
+        PackToTheFuture::generateComposerLock('package/one', '2.0.0', $this->lockPath);
+        PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->previousLockPath);
+
+        $this->assertEquals('2.0.0', Lock::file()->getInstalledVersion('package/one'));
+        $this->assertEquals('1.0.0', Lock::file($this->previousLockPath)->getInstalledVersion('package/one'));
+    }
+
+    private function removeLockFiles()
+    {
+        foreach ([$this->lockPath, $this->previousLockPath] as $lockFile) {
+            if ($this->files->exists($lockFile)) {
+                $this->files->delete($lockFile);
+            }
+        }
+    }
+}
