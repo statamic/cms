@@ -57,7 +57,7 @@ class TaxonomiesController extends CpController
                     'handle' => $blueprint->handle(),
                     'title' => $blueprint->title(),
                 ];
-            });
+            })->values();
 
         $columns = $taxonomy
             ->termBlueprint()
