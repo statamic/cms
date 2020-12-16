@@ -2,9 +2,7 @@
 @section('title', __('Unauthorized'))
 
 @section('content')
-<div class="logo pt-7">
-    @svg('statamic-wordmark')
-</div>
+@include('statamic::partials.outside-logo')
 
 <div class="card auth-card mx-auto text-center text-grey-70">
     <div class="mb-3">{{ __('Unauthorized') }}</div>

@@ -1,9 +1,7 @@
 @extends('statamic::outside')
 
 @section('content')
-    <div class="logo pt-7">
-        @svg('statamic-wordmark')
-    </div>
+    @include('statamic::partials.outside-logo')
 
     <div class="card auth-card mx-auto">
         <div class="text-center pb-2 mb-2">

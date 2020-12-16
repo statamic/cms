@@ -3,13 +3,8 @@
 @section('title', __('Log in'))
 
 @section('content')
-<div class="logo pt-7">
-    @if (Statamic::pro() && config('statamic.cp.logo_url'))
-        <img src="{{ config('statamic.cp.logo_url') }}" alt="{{ config('statamic.cp.cms_name') }}" class="white-label-logo">
-    @else
-        @svg('statamic-wordmark')
-    @endif
-</div>
+
+@include('statamic::partials.outside-logo')
 
 <div class="card auth-card mx-auto">
     <login inline-template :show-email-login="!{{ $str::bool($oauth) }}" :has-error="{{ $str::bool(count($errors) > 0) }}">

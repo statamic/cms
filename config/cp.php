@@ -92,12 +92,12 @@ return [
     | Login Theme
     |--------------------------------------------------------------------------
     |
-    | Optionally spice up the login screen and choose
-    | between "rad" or "business" modes.
+    | Optionally spice up the login and other outside-the-control-panel
+    | screens. You may choose between "rad" or "business" themes.
     |
     */
 
-    'login_theme' => env('STATAMIC_LOGIN_THEME', 'rad'),
+    'theme' => env('STATAMIC_THEME', 'rad'),
 
     /*
     |--------------------------------------------------------------------------
