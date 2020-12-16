@@ -26,6 +26,7 @@ class Blueprint implements Augmentable
     protected $handle;
     protected $namespace;
     protected $order;
+    protected $hidden = false;
     protected $initialPath;
     protected $contents;
     protected $fieldsCache;
@@ -70,6 +71,22 @@ class Blueprint implements Augmentable
     public function order()
     {
         return $this->order;
+    }
+
+    public function setHidden(?bool $hidden)
+    {
+        if (is_null($hidden)) {
+            $hidden = false;
+        }
+
+        $this->hidden = $hidden;
+
+        return $this;
+    }
+
+    public function hidden()
+    {
+        return $this->hidden;
     }
 
     public function setInitialPath(string $path)
@@ -127,7 +144,10 @@ class Blueprint implements Augmentable
         }
 
         return array_filter(
-            array_merge(['order' => $this->order], $contents)
+            array_merge([
+                'hide' => $this->hidden,
+                'order' => $this->order,
+            ], $contents)
         );
     }
 

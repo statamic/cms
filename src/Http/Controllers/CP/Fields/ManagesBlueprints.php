@@ -38,6 +38,7 @@ trait ManagesBlueprints
         })->all();
 
         $blueprint->setContents(array_filter([
+            'hide' => $request->hidden,
             'title' => $request->title,
             'sections' => $sections,
         ]));
@@ -77,6 +78,7 @@ trait ManagesBlueprints
         return [
             'title' => $blueprint->title(),
             'handle' => $blueprint->handle(),
+            'hidden' => $blueprint->hidden(),
             'sections' => $blueprint->sections()->map(function ($section, $i) {
                 return array_merge($this->sectionToVue($section), ['_id' => $i]);
             })->values()->all(),

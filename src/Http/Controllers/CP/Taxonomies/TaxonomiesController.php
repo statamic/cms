@@ -47,12 +47,15 @@ class TaxonomiesController extends CpController
     {
         $this->authorize('view', $taxonomy);
 
-        $blueprints = $taxonomy->termBlueprints()->map(function ($blueprint) {
-            return [
-                'handle' => $blueprint->handle(),
-                'title' => $blueprint->title(),
-            ];
-        });
+        $blueprints = $taxonomy
+            ->termBlueprints()
+            ->reject->hidden()
+            ->map(function ($blueprint) {
+                return [
+                    'handle' => $blueprint->handle(),
+                    'title' => $blueprint->title(),
+                ];
+            })->values();
 
         $columns = $taxonomy
             ->termBlueprint()
