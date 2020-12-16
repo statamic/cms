@@ -18,7 +18,7 @@ use Statamic\Taxonomies\TermCollection;
  * @method static save($term)
  * @method static delete($term)
  * @method static TermQueryBuilder query()
- * @method static Term make(string $slug = null)
+ * @method static TermContract make(string $slug = null)
  * @method static int entriesCount(Term $term)
  *
  * @see \Statamic\Contracts\Taxonomies\TermRepository
