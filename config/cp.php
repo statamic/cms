@@ -111,6 +111,6 @@ return [
 
     'cms_name' => env('STATAMIC_CMS_NAME', 'Statamic'),
 
-    'logo_url' =>  env('STATAMIC_LOGO_URL', null),
+    'logo_url' => env('STATAMIC_LOGO_URL', null),
 
 ];
