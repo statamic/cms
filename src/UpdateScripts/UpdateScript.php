@@ -24,6 +24,10 @@ abstract class UpdateScript
      */
     public static function register()
     {
+        if (! app()->has('statamic.update-scripts')) {
+            return;
+        }
+
         app('statamic.update-scripts')[] = static::class;
     }
 

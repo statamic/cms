@@ -76,6 +76,17 @@ class UpdateScriptTest extends TestCase
     }
 
     /** @test */
+    public function it_silently_fails_to_register_on_older_statamic_versions()
+    {
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.1.8', $this->lockPath);
+
+        app()->forgetInstance('statamic.update-scripts');
+
+        UpdatePermissions::register();
+    }
+
+    /** @test */
     public function it_can_check_if_package_is_updating_to_specific_version()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
