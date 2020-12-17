@@ -15,20 +15,8 @@ abstract class UpdateScript
     {
         $this->files = app(Filesystem::class);
 
-        $this->ensurePreviousComposerLockFileExists('composer.lock');
-        $this->ensurePreviousComposerLockFileExists('storage/statamic/updater/composer.lock.bak');
-    }
-
-    /**
-     * Register update script with Statamic.
-     */
-    public static function register()
-    {
-        if (! app()->has('statamic.update-scripts')) {
-            return;
-        }
-
-        app('statamic.update-scripts')[] = static::class;
+        $this->ensureComposerLockFileExists('composer.lock');
+        $this->ensureComposerLockFileExists('storage/statamic/updater/composer.lock.bak');
     }
 
     /**
@@ -66,15 +54,27 @@ abstract class UpdateScript
     }
 
     /**
-     * Ensure previous composer lock backup exists for version checks.
+     * Ensure lock files exist for version checks.
      *
      * @param string $relativePath
      * @return bool
      */
-    protected function ensurePreviousComposerLockFileExists($relativePath)
+    protected function ensureComposerLockFileExists($relativePath)
     {
         if (! Lock::file($relativePath)->exists()) {
             throw new ComposerLockFileNotFoundException(base_path($relativePath));
         }
+    }
+
+    /**
+     * Register update script with Statamic.
+     */
+    public static function register()
+    {
+        if (! app()->has('statamic.update-scripts')) {
+            return;
+        }
+
+        app('statamic.update-scripts')[] = static::class;
     }
 }
