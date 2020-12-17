@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 3.0.35 (2020-12-17)
 
 ### What's new
 - Blueprints can be hidden from the Create Entry and Create Term buttons. [#3007](https://github.com/statamic/cms/issues/3007)
@@ -20,6 +20,7 @@
 - Fix `join` modifier when value is null. [#3001](https://github.com/statamic/cms/issues/3001)
 - Fix Term facade hints. [#3012](https://github.com/statamic/cms/issues/3012)
 - Bump `ini` from 1.3.5 to 1.3.8 [#3009](https://github.com/statamic/cms/issues/3009)
+
 
 
 ## 3.0.34 (2020-12-09)
