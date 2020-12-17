@@ -23,6 +23,13 @@ class ComposerLockTest extends TestCase
         $this->removeLockFiles();
     }
 
+    public function tearDown(): void
+    {
+        $this->removeLockFiles();
+
+        parent::tearDown();
+    }
+
     /** @test */
     public function it_errors_when_composer_lock_file_is_not_found()
     {
