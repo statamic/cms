@@ -83,7 +83,7 @@ class UpdateScriptTest extends TestCase
 
         app()->forgetInstance('statamic.update-scripts');
 
-        UpdatePermissions::register();
+        $this->assertNull(UpdatePermissions::register());
     }
 
     /** @test */
