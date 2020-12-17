@@ -37,9 +37,9 @@ class Install extends Command
              ->createFiles()
              ->publish()
              ->runCallbacks()
-             ->runUpdateScripts()
              ->clearViews()
-             ->clearCache();
+             ->clearCache()
+             ->runUpdateScripts();
     }
 
     protected function addons()
