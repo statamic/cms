@@ -6,6 +6,7 @@ use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 use Statamic\Statamic;
+use Statamic\UpdateScripts\UpdateScript;
 
 class Install extends Command
 {
@@ -36,6 +37,7 @@ class Install extends Command
              ->createFiles()
              ->publish()
              ->runCallbacks()
+             ->runUpdateScripts()
              ->clearViews()
              ->clearCache();
     }
@@ -104,6 +106,13 @@ class Install extends Command
     protected function runCallbacks()
     {
         Statamic::runAfterInstalledCallbacks($this);
+
+        return $this;
+    }
+
+    protected function runUpdateScripts()
+    {
+        UpdateScript::runAll();
 
         return $this;
     }
