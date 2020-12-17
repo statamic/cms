@@ -3,8 +3,9 @@
 namespace Tests\Updater;
 
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Collection;
 use Statamic\Exceptions\ComposerLockFileNotFoundException;
-use Statamic\Updater\UpdateScript;
+use Statamic\UpdateScripts\UpdateScript;
 use Tests\Fakes\Composer\Package\PackToTheFuture;
 use Tests\TestCase;
 
@@ -52,6 +53,29 @@ class UpdateScriptTest extends TestCase
     }
 
     /** @test */
+    public function it_can_register_itself_with_statamic()
+    {
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.1.8', $this->lockPath);
+
+        $registered = app('statamic.update-scripts');
+
+        $this->assertInstanceOf(Collection::class, $registered);
+        $this->assertNotContains(UpdatePermissions::class, $registered);
+        $this->assertNotContains(UpdateSeoProDefaultContent::class, $registered);
+
+        $initialCount = $registered->count();
+
+        UpdatePermissions::register();
+        UpdateSeoProDefaultContent::register();
+
+        $this->assertInstanceOf(Collection::class, $registered);
+        $this->assertContains(UpdatePermissions::class, $registered);
+        $this->assertContains(UpdateSeoProDefaultContent::class, $registered);
+        $this->assertCount($initialCount + 2, $registered);
+    }
+
+    /** @test */
     public function it_can_check_if_package_is_updating_to_specific_version()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
@@ -94,6 +118,24 @@ class UpdatePermissions extends UpdateScript
     public function package()
     {
         return 'statamic/cms';
+    }
+
+    public function shouldUpdate($newVersion, $oldVersion)
+    {
+        //
+    }
+
+    public function update()
+    {
+        //
+    }
+}
+
+class UpdateSeoProDefaultContent extends UpdateScript
+{
+    public function package()
+    {
+        return 'statamic/seo-pro';
     }
 
     public function shouldUpdate($newVersion, $oldVersion)

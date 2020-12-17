@@ -20,6 +20,14 @@ abstract class UpdateScript
     }
 
     /**
+     * Register update script with Statamic.
+     */
+    public static function register()
+    {
+        app('statamic.update-scripts')[] = static::class;
+    }
+
+    /**
      * Define the package being updated.
      *
      * @return string

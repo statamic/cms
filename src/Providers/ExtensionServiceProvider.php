@@ -183,6 +183,7 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $this->registerExtensions();
         $this->registerAddonManifest();
+        $this->registerUpdateScripts();
     }
 
     protected function registerAddonManifest()
@@ -284,5 +285,15 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app['statamic.extensions'][Modifier::class] = collect()
             ->merge($this->app['statamic.extensions'][Modifier::class] ?? [])
             ->merge($modifiers);
+    }
+
+    protected function registerUpdateScripts()
+    {
+        $this->app->instance('statamic.update-scripts', collect());
+
+        foreach ($this->app['files']->files(__DIR__.'/../UpdateScripts/Core') as $file) {
+            $fqcn = 'Statamic\\UpdateScripts\\Core\\'.$file->getFilenameWithoutExtension();
+            $fqcn::register();
+        }
     }
 }
