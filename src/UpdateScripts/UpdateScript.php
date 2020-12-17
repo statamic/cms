@@ -1,6 +1,6 @@
 <?php
 
-namespace Statamic\Updater;
+namespace Statamic\UpdateScripts;
 
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Composer\Lock;
