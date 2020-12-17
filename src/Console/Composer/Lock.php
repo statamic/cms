@@ -36,6 +36,26 @@ class Lock
     }
 
     /**
+     * Backup lock file, using vanilla PHP so that this can be run in a Composer hook.
+     *
+     * @param string $file
+     */
+    public static function backup(string $file = 'composer.lock')
+    {
+        if (! is_file($file)) {
+            return;
+        }
+
+        $backup = dirname($file).'/storage/statamic/updater/composer.lock.bak';
+
+        if (! is_dir($backupDir = dirname($backup))) {
+            mkdir($backupDir, 0777, true);
+        }
+
+        copy($file, $backup);
+    }
+
+    /**
      * Determine if lock file exists.
      *
      * @return bool
