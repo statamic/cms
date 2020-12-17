@@ -334,6 +334,6 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
 
     public function jsonSerialize()
     {
-        return $this->toAugmentedCollection($this->selectedQueryColumns);
+        return $this->toAugmentedCollection($this->selectedQueryColumns)->toAugmentedArray();
     }
 }
