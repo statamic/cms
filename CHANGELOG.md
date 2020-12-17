@@ -7,7 +7,6 @@
 - Added a `UserBlueprintFound` event. [#2983](https://github.com/statamic/cms/issues/2983)
 
 ### What's fixed
-
 - Fixed a circular reference which made Bard freeze the page. [#2959](https://github.com/statamic/cms/issues/2959) [#3005](https://github.com/statamic/cms/issues/3005)
 - Register our custom cache driver earlier, which fixes compatibility with Laravel Telescope. [#3023](https://github.com/statamic/cms/issues/3023) [#1721](https://github.com/statamic/cms/issues/1721)
 - The Toggle fieldtype gives you a boolean when undefined, rather than null. [1f11c9c89](https://github.com/statamic/cms/commit/1f11c9c89)
