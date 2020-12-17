@@ -84,4 +84,14 @@ class ComposerLockBackupTest extends \PHPUnit\Framework\TestCase
             }
         }
     }
+
+    /**
+     * @deprecated
+     */
+    public static function assertFileNotExists(string $filename, string $message = '') : void
+    {
+        method_exists(static::class, 'assertFileDoesNotExist')
+            ? static::assertFileDoesNotExist($filename, $message)
+            : parent::assertFileNotExists($filename, $message);
+    }
 }
