@@ -7,7 +7,7 @@ use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Http\Resources\API\TreeResource;
 
-class NavigationController extends ApiController
+class NavigationTreeController extends ApiController
 {
     public function show($navHandle)
     {
