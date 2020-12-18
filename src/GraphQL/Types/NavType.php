@@ -21,6 +21,9 @@ class NavType extends \Rebing\GraphQL\Support\Type
             'title' => [
                 'type' => Type::nonNull(Type::string()),
             ],
+            'max_depth' => [
+                'type' => Type::int(),
+            ],
         ])->map(function (array $arr) {
             $arr['resolve'] = $this->resolver();
 
@@ -32,13 +35,10 @@ class NavType extends \Rebing\GraphQL\Support\Type
     private function resolver()
     {
         return function ($nav, $args, $context, $info) {
-            switch ($info->fieldName) {
-                case 'title':
-                    return $nav->title();
-                case 'handle':
-                    return $nav->handle();
-                default:
-                    return null;
+            if (in_array($field = $info->fieldName, ['title', 'handle', 'max_depth'])) {
+                $method = Str::camel($field);
+
+                return $nav->$method();
             }
         };
     }

@@ -14,12 +14,11 @@ class NavTest extends TestCase
     /** @test */
     public function it_queries_a_nav_by_handle()
     {
-        config(['app.debug' => true]);
         Nav::make('links')->title('Links')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {
             $nav->addTree($nav->makeTree('en'));
             $nav->save();
         });
-        Nav::make('footer')->title('Footer')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {
+        Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
             $nav->addTree($nav->makeTree('en'));
             $nav->save();
         });
@@ -29,6 +28,7 @@ class NavTest extends TestCase
     nav(handle: "footer") {
         handle
         title
+        max_depth
     }
 }
 GQL;
@@ -41,6 +41,7 @@ GQL;
                 'nav' => [
                     'handle' => 'footer',
                     'title' => 'Footer',
+                    'max_depth' => 3,
                 ],
             ]]);
     }
