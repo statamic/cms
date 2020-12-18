@@ -27,6 +27,7 @@ class NavTest extends TestCase
         handle
         title
         max_depth
+        expects_root
     }
 }
 GQL;
@@ -40,6 +41,7 @@ GQL;
                     'handle' => 'footer',
                     'title' => 'Footer',
                     'max_depth' => 3,
+                    'expects_root' => false,
                 ],
             ]]);
     }
@@ -225,7 +227,7 @@ GQL;
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
             ->assertGqlOk()
-            ->assertJson(['data' => [
+            ->assertExactJson(['data' => [
                 'nav' => [
                     'tree' => [
                         [
