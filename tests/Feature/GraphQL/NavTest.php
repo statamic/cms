@@ -45,4 +45,63 @@ GQL;
                 ],
             ]]);
     }
+
+    /** @test */
+    public function it_queries_the_tree_inside_a_nav()
+    {
+        Nav::make('footer')->title('Footer')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {
+            $nav->addTree($nav->makeTree('en')->tree([
+                ['url' => '/one', 'title' => 'One', 'children' => [
+                    ['url' => '/one/nested', 'title' => 'Nested'],
+                ]],
+                ['url' => '/two', 'title' => 'Two'],
+            ]));
+            $nav->save();
+        });
+
+        $query = <<<'GQL'
+{
+    nav(handle: "footer") {
+        tree {
+            depth
+            page {
+                url
+            }
+            children {
+                depth
+                page {
+                    url
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'nav' => [
+                    'tree' => [
+                        [
+                            'depth' => 1,
+                            'page' => ['url' => '/one'],
+                            'children' => [
+                                [
+                                    'depth' => 2,
+                                    'page' => ['url' => '/one/nested'],
+                                ],
+                            ],
+                        ],
+                        [
+                            'depth' => 1,
+                            'page' => ['url' => '/two'],
+                            'children' => [],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
 }
