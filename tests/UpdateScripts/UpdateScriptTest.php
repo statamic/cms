@@ -1,6 +1,6 @@
 <?php
 
-namespace Tests\Updater;
+namespace Tests\UpdateScripts;
 
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
