@@ -12,6 +12,6 @@ Route::name('assets.index')->get('assets/{asset_container}', 'AssetsController@i
 Route::name('assets.show')->get('assets/{asset_container}/{asset}', 'AssetsController@show')->where('asset', '.*');
 
 Route::get('collections/{collection}/tree', 'CollectionTreeController@show');
-Route::get('navigation/{navigation}', 'NavigationController@show');
+Route::get('navigation/{navigation}/tree', 'NavigationController@show');
 
 Route::get('{path?}', 'NotFoundController')->where('path', '.*');
