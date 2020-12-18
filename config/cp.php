@@ -106,7 +106,7 @@ return [
     |
     | When in Pro Mode you may replace the Statamic name, logo, favicon,
     | and add your own CSS to the control panel to match your
-    | company client brand.
+    | company or client's brand.
     |
     */
 
