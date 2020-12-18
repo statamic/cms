@@ -526,6 +526,28 @@ Used for querying Navs.
 }
 ```
 
+### Nav {#nav-query}
+
+Used for querying a single Nav.
+
+```graphql
+{
+    nav(handle: "footer") {
+        handle
+        title
+    }
+}
+```
+
+```json
+{
+    "nav": {
+        "handle": "footer", 
+        "title": "Footer Links"
+    }
+}
+```
+
 ## Types
 
 - [EntryInterface](#entry-interface)
