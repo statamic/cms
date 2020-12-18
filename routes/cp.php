@@ -28,6 +28,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::group(['namespace' => 'Structures'], function () {
         Route::resource('navs', 'NavigationsController');
+        Route::redirect('navigation/{any?}', redirect(str_replace_first('navigation', 'navs', Request::fullUrl()), 301));
         Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
     });
 
