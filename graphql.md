@@ -89,6 +89,18 @@ Note that you can even perform the same query multiple times. If you want to do 
 - [Collection](#collection-query)
 - [Entries](#entries-query)
 - [Entry](#entry-query)
+- [Asset Containers](#asset-containers-query)
+- [Asset Container](#asset-container-query)
+- [Assets](#assets-query)
+- [Asset](#asset-query)
+- [Taxonomies](#taxonomies-query)
+- [Taxonomy](#taxonomy-query)
+- [Terms](#terms-query)
+- [Term](#term-query)
+- [Global Sets](#global-sets-query)
+- [Global Set](#global-set-query)
+- [Navs](#navs-query)
+- [Nav](#nav-query)
 
 ### Ping {#ping-query}
 
@@ -112,6 +124,8 @@ Used for testing that your connection works. If you send a query of `{ping}`, yo
 
 Used for querying collections.
 
+Returns a list of [Collection](#collection-type) types.
+
 ```graphql
 {
     collections {
@@ -133,6 +147,8 @@ Used for querying collections.
 ### Collection {#collection-query}
 
 Used for querying a single collection.
+
+Returns a [Collection](#collection-type) type.
 
 ```graphql
 {
@@ -551,7 +567,13 @@ Used for querying a single Nav.
 ## Types
 
 - [EntryInterface](#entry-interface)
+- [Collection](#collection-type)
+- [CollectionStructure](#collection-structure-type)
+- [TreeBranch](#tree-branch-type)
+- [PageInterface](#page-interface)
+- [TermInterface](#term-interface)
 - [AssetInterface](#asset-interface)
+- [GlobalSetInterface](#global-set-interface)
 
 ### EntryInterface {#entry-interface}
 
@@ -582,6 +604,43 @@ You will need to query the implementations using fragments in order to get bluep
 ```
 
 The fieldtypes will define their types. For instance, a text field will be a `String`, a [grid](#grid-fieldtype) field will expose a list of `GridItem` types.
+
+### Collection {#collection-type}
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `handle` | `String!` | 
+| `title` | `String!` |
+| `structure` | [`CollectionStructure`](#collection-structure-type) | If the collection is structured (e.g. a "pages" collection), you can use this to query its tree.
+
+### CollectionStructure {#collection-structure-type}
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `handle` | `String!` | 
+| `title` | `String!` |
+| `tree` | [[`TreeBranch`](#tree-branch-type)] | A list of tree branches.
+
+### TreeBranch {#tree-branch-type}
+
+Represents a branch within a (collection or nav) structure's tree.
+
+| Field | Type | Description |
+|-------|------|-------------|
+| `depth` | `Int!` | The nesting level of the current branch.
+| `page` | [`PageInterface`](#page-interface) | Contains page's fields.
+| `children` | [[`TreeBranch`](#tree-branch-type)] | A list of tree branches.
+
+> Note: it's not possible to do recursive queries in GraphQL, so if you want to get multiple levels of child branches,
+> take a look at a workaround in [recursive tree branches](#recursive-tree-branches) below.
+
+### PageInterface {#page-interface}
+
+A "page" within a structure tree could be a basic text/url node, or it could be a reference to an entry.
+
+When it's a basic node, you'll have access to all the [EntryInterface](#entry-interface)'s basic fields like `title` and `url`.
+
+When it's a reference to an entry, you'll _also_ be able to query any of the entry's implementations. However, instead of the `Entry_` prefix, you'll need to use an `EntryPage_` prefix.
 
 ### TermInterface {#term-interface}
 
@@ -857,6 +916,89 @@ Grid fields can be queried with no extra requirements. You can just use the nest
     }
 }
 ```
+
+## Recursive Tree Branches
+
+Often, when dealing with navs, you need to recursively output all the child branches. For example, when using the `nav` tag in Antlers, you might do something like this:
+
+```
+<ul>
+{{ nav }}
+    <li>
+        <a href="{{ url }}">{{ title }}</a>
+        {{ if children }}
+            <ul>{{ *recursive children* }}</ul>
+        {{ /if }}
+    </li>
+{{ /nav }}
+</ul>
+```
+
+In GraphQL, it's not possible to perform recursive queries like that. You'll need to explicitly query each level:
+
+```graphql
+{
+    nav(handle: "links") {
+        tree {
+            page {
+                title
+                url
+            }
+            children {
+                page {
+                    title
+                    url
+                }
+                children {
+                    page {
+                        title
+                        url
+                    }
+                }
+            }
+        }
+    }
+}
+```
+
+In this example, if you wanted anything more than `title` and `url`, you'd need to add them to each level.
+
+This can quickly become tedious and is very repetitive, so here's a workaround using fragments. If you wanted to add more fields, you only need to do it one spot. If you want to query more levels, you can just increase the nesting level of the recursive fragment.
+
+```graphql
+{
+    nav(handle: "links") {
+        tree {
+            ...Fields
+            ...RecursiveChildren
+        }
+    }
+}
+
+fragment Fields on TreeBranch {
+    depth
+    page {
+        title
+        url
+        # any other fields you want for each branch
+    }
+}
+
+fragment RecursiveChildren on TreeBranch {
+    children {
+        ...Fields
+        children {
+            ...Fields
+            children {
+                ...Fields
+                ## just keep repeating this as deep as necessary
+            }
+        }
+    }
+}
+```
+
+Hat tip to Hash Interactive for their [blog post](https://hashinteractive.com/blog/graphql-recursive-query-with-fragments/) on this technique.
 
 ## Custom Fieldtypes
 
