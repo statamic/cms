@@ -104,13 +104,15 @@ return [
     | White Labeling
     |--------------------------------------------------------------------------
     |
-    | When in Pro Mode you may replace the Statamic name and logo with those
-    | your choosing, as long as they're not intended to mislead.
+    | When in Pro Mode you may replace the Statamic name, logo, and add your
+    | own CSS to the control panel to match your company or client brand.
     |
     */
 
-    'cms_name' => env('STATAMIC_CMS_NAME', 'Statamic'),
+    'custom_cms_name' => env('STATAMIC_CUSTOM_CMS_NAME', 'Statamic'),
 
-    'logo_url' => env('STATAMIC_LOGO_URL', null),
+    'custom_logo_url' => env('STATAMIC_CUSTOM_LOGO_URL', null),
+
+    'custom_css_url' => env('STATAMIC_CUSTOM_CSS_URL', null),
 
 ];
