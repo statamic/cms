@@ -504,6 +504,28 @@ Used for querying a single global set.
 }
 ```
 
+### Navs {#navs-query}
+
+Used for querying Navs.
+
+```graphql
+{
+    navs {
+        handle
+        title
+    }
+}
+```
+
+```json
+{
+    "navs": [
+        { "handle": "header_links", "title": "Header Links" },
+        { "handle": "footer_links", "title": "Footer Links" },
+    ]
+}
+```
+
 ## Types
 
 - [EntryInterface](#entry-interface)
