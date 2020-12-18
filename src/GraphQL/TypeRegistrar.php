@@ -10,8 +10,10 @@ use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\GraphQL\Types\GlobalSetInterface;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\GraphQL\Types\NavType;
+use Statamic\GraphQL\Types\PageInterface;
 use Statamic\GraphQL\Types\TaxonomyType;
 use Statamic\GraphQL\Types\TermInterface;
+use Statamic\GraphQL\Types\TreeBranchType;
 
 class TypeRegistrar
 {
@@ -28,10 +30,12 @@ class TypeRegistrar
         GraphQL::addType(TaxonomyType::class);
         GraphQL::addType(AssetContainerType::class);
         GraphQL::addType(NavType::class);
+        GraphQL::addType(TreeBranchType::class);
         EntryInterface::addTypes();
         TermInterface::addTypes();
         AssetInterface::addTypes();
         GlobalSetInterface::addTypes();
+        PageInterface::addTypes();
 
         $this->registered = true;
     }

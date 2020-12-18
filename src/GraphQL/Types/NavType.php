@@ -3,6 +3,10 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\Site;
+use Statamic\Structures\TreeBuilder;
+use Statamic\Support\Str;
 
 class NavType extends \Rebing\GraphQL\Support\Type
 {
@@ -24,6 +28,9 @@ class NavType extends \Rebing\GraphQL\Support\Type
             'max_depth' => [
                 'type' => Type::int(),
             ],
+            'tree' => [
+                'type' => Type::listOf(GraphQL::type(TreeBranchType::NAME)),
+            ],
         ])->map(function (array $arr) {
             $arr['resolve'] = $this->resolver();
 
@@ -39,6 +46,13 @@ class NavType extends \Rebing\GraphQL\Support\Type
                 $method = Str::camel($field);
 
                 return $nav->$method();
+            }
+
+            if ($field === 'tree') {
+                return (new TreeBuilder)->build([
+                    'structure' => $nav->handle(),
+                    'site' => Site::default()->handle(),
+                ]);
             }
         };
     }
