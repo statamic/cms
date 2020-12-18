@@ -47,6 +47,16 @@ abstract class UpdateScript
     abstract public function update();
 
     /**
+     * Get console command object for outputting messages to console.
+     *
+     * @return \Illuminate\Console\Command|NullConsole
+     */
+    public function console()
+    {
+        return $this->console;
+    }
+
+    /**
      * Determine if user is updating to specific version.
      *
      * @param mixed $version
@@ -114,6 +124,7 @@ abstract class UpdateScript
                 }
             })
             ->each(function ($script) {
+                $script->console()->info('Running update script <comment>['.get_class($script).']</comment>');
                 $script->update();
             });
     }

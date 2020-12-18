@@ -226,6 +226,7 @@ class UpdateScriptTest extends TestCase
         UpdatePermissions::register();
 
         $console = $this->mock(Command::class, function ($mock) {
+            $mock->shouldReceive('info')->once()->with('Running update script <comment>['.UpdatePermissions::class.']</comment>');
             $mock->shouldReceive('success')->times(2);
         });
 
@@ -257,7 +258,7 @@ class UpdatePermissions extends UpdateScript
     public function update()
     {
         Facades\User::all()->map->email()->each(function ($user) {
-            $this->console->success("User [{$user}] permission updated successfully!");
+            $this->console()->success("User [{$user}] permission updated successfully!");
         });
 
         cache()->put('permissions-update-successful', true);
