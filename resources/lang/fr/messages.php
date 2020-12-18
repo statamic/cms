@@ -17,6 +17,7 @@ return [
     'asset_container_rename_instructions' => 'Si activé, donne la possibilité aux utilisateurs de renommer les fichiers dans ce conteneur.',
     'asset_container_title_instructions' => 'Habituellement un nom au pluriel, comme "Images" ou "Documents".',
     'asset_folders_directory_instructions' => 'Nous vous recommandons d’éviter les espaces et les caractères spéciaux pour garder vos URL propres.',
+    'blueprints_hidden_instructions' => 'Masque ce Blueprint quand on clique sur le bouton Créer dans le Panneau de configuration',
     'blueprints_intro' => 'Les Blueprints définissent et organisent les champs afin de créer les modèles de contenu pour les collections, les formulaires et d’autres types de données.',
     'blueprints_title_instructions' => 'Habituellement un nom singulier, comme "Article" ou "Produit"',
     'cache_utility_application_cache_description' => 'Le cache unifié de Laravel utilisé par Statamic, les extensions tierces et les packages Composer.',
