@@ -18,10 +18,7 @@ class NavTest extends TestCase
             $nav->addTree($nav->makeTree('en'));
             $nav->save();
         });
-        Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
-            $nav->addTree($nav->makeTree('en'));
-            $nav->save();
-        });
+        $this->createFooterNav();
 
         $query = <<<'GQL'
 {
@@ -49,15 +46,7 @@ GQL;
     /** @test */
     public function it_queries_the_tree_inside_a_nav()
     {
-        Nav::make('footer')->title('Footer')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {
-            $nav->addTree($nav->makeTree('en')->tree([
-                ['url' => '/one', 'title' => 'One', 'children' => [
-                    ['url' => '/one/nested', 'title' => 'Nested'],
-                ]],
-                ['url' => '/two', 'title' => 'Two'],
-            ]));
-            $nav->save();
-        });
+        $this->createFooterNav();
 
         $query = <<<'GQL'
 {
@@ -103,5 +92,115 @@ GQL;
                     ],
                 ],
             ]]);
+    }
+
+    /** @test */
+    public function it_queries_the_tree_inside_a_nav_using_fragments_for_pseudo_recursion()
+    {
+        // Courtesy of https://hashinteractive.com/blog/graphql-recursive-query-with-fragments/
+
+        $this->createFooterNav();
+
+        $query = <<<'GQL'
+{
+    nav(handle: "footer") {
+        tree {
+            ...Children
+            ...RecursiveChildren
+        }
+    }
+}
+
+fragment Children on TreeBranch {
+    depth
+    page {
+        url
+    }
+}
+
+fragment RecursiveChildren on TreeBranch {
+    children {
+        ...Children
+        children {
+            ...Children
+            children {
+                ...Children
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'nav' => [
+                    'tree' => [
+                        [
+                            'depth' => 1,
+                            'page' => ['url' => '/one'],
+                            'children' => [
+                                [
+                                    'depth' => 2,
+                                    'page' => ['url' => '/one/nested'],
+                                    'children' => [
+                                        [
+                                            'depth' => 3,
+                                            'page' => ['url' => '/one/nested/double-nested'],
+                                            'children' => [
+                                                [
+                                                    'depth' => 4,
+                                                    'page' => ['url' => '/one/nested/double-nested/triple-nested'],
+                                                ],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                        [
+                            'depth' => 1,
+                            'page' => ['url' => '/two'],
+                            'children' => [],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
+
+    private function createFooterNav()
+    {
+        Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
+            $nav->addTree($nav->makeTree('en')->tree([
+                [
+                    'url' => '/one',
+                    'title' => 'One',
+                    'children' => [
+                        [
+                            'url' => '/one/nested',
+                            'title' => 'Nested',
+                            'children' => [
+                                [
+                                    'url' => '/one/nested/double-nested',
+                                    'title' => 'Double Nested',
+                                    'children' => [
+                                        [
+                                            'url' => '/one/nested/double-nested/triple-nested',
+                                            'title' => 'Triple Nested',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                ], ],
+                [
+                    'url' => '/two',
+                    'title' => 'Two',
+                ],
+            ]));
+            $nav->save();
+        });
     }
 }
