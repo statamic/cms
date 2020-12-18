@@ -26,6 +26,8 @@ class EntryTest extends TestCase
     entry(id: "3") {
         id
         title
+        slug
+        url
     }
 }
 GQL;
@@ -38,6 +40,8 @@ GQL;
                 'entry' => [
                     'id' => '3',
                     'title' => 'Event One',
+                    'slug' => 'event-one',
+                    'url' => '/events/event-one',
                 ],
             ]]);
     }
