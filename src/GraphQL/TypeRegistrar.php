@@ -31,11 +31,11 @@ class TypeRegistrar
         GraphQL::addType(AssetContainerType::class);
         GraphQL::addType(NavType::class);
         GraphQL::addType(TreeBranchType::class);
+        PageInterface::addTypes();
         EntryInterface::addTypes();
         TermInterface::addTypes();
         AssetInterface::addTypes();
         GlobalSetInterface::addTypes();
-        PageInterface::addTypes();
 
         $this->registered = true;
     }

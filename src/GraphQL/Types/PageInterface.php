@@ -2,12 +2,9 @@
 
 namespace Statamic\GraphQL\Types;
 
-use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Facades\GraphQL;
-use Rebing\GraphQL\Support\InterfaceType;
-use Statamic\Structures\Page;
 
-class PageInterface extends InterfaceType
+class PageInterface extends EntryInterface
 {
     const NAME = 'PageInterface';
 
@@ -15,22 +12,15 @@ class PageInterface extends InterfaceType
         'name' => self::NAME,
     ];
 
-    public function fields(): array
+    public function resolveType($page)
     {
-        return [
-            'url' => [
-                'type' => Type::string(),
-            ],
-        ];
-    }
-
-    public function resolveType(Page $page)
-    {
-        if (! $page->reference()) {
+        if (! $entry = $page->entry()) {
             return GraphQL::type(PageType::NAME);
         }
 
-        throw new \Exception('todo: resolve entry based page');
+        return GraphQL::type(
+            EntryPageType::buildName($entry->collection(), $entry->blueprint())
+        );
     }
 
     public static function addTypes()

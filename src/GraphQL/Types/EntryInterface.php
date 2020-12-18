@@ -5,7 +5,6 @@ namespace Statamic\GraphQL\Types;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 use Rebing\GraphQL\Support\InterfaceType;
-use Statamic\Contracts\Entries\Entry;
 use Statamic\Facades\Collection;
 
 class EntryInterface extends InterfaceType
@@ -34,7 +33,7 @@ class EntryInterface extends InterfaceType
         ];
     }
 
-    public function resolveType(Entry $entry)
+    public function resolveType($entry)
     {
         $type = GraphQL::type(
             EntryType::buildName($entry->collection(), $entry->blueprint())
@@ -57,8 +56,11 @@ class EntryInterface extends InterfaceType
                     });
             });
 
-        GraphQL::addTypes($combinations->map(function ($item) {
-            return new EntryType($item['collection'], $item['blueprint']);
+        GraphQL::addTypes($combinations->flatMap(function ($item) {
+            return [
+                new EntryType($item['collection'], $item['blueprint']),
+                new EntryPageType($item['collection'], $item['blueprint']),
+            ];
         })->all());
     }
 }

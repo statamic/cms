@@ -10,6 +10,7 @@ use Tests\TestCase;
 class NavTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use CreatesQueryableTestEntries;
 
     /** @test */
     public function it_queries_a_nav_by_handle()
@@ -164,6 +165,88 @@ GQL;
                             'depth' => 1,
                             'page' => ['url' => '/two'],
                             'children' => [],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_queries_the_tree_inside_a_nav_with_entries()
+    {
+        config(['app.debug' => true]);
+        $this->createEntries();
+
+        Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
+            $nav->addTree($nav->makeTree('en')->tree([
+                [
+                    'entry' => '1',
+                    'children' => [
+                        [
+                            'entry' => '2',
+                        ],
+                    ],
+                ],
+            ]));
+            $nav->save();
+        });
+
+        $query = <<<'GQL'
+{
+    nav(handle: "footer") {
+        tree {
+            depth
+            ...Page
+
+            children {
+                depth
+                ...Page
+            }
+        }
+    }
+}
+
+fragment Page on TreeBranch {
+    page {
+        id
+        title
+        slug
+        ... on EntryPage_Blog_Article {
+            intro
+        }
+        ... on EntryPage_Blog_ArtDirected {
+            hero_image
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertJson(['data' => [
+                'nav' => [
+                    'tree' => [
+                        [
+                            'depth' => 1,
+                            'page' => [
+                                'id' => '1',
+                                'title' => 'Standard Blog Post',
+                                'slug' => 'standard-blog-post',
+                                'intro' => 'The intro',
+                            ],
+                            'children' => [
+                                [
+                                    'depth' => 2,
+                                    'page' => [
+                                        'id' => '2',
+                                        'title' => 'Art Directed Blog Post',
+                                        'slug' => 'art-directed-blog-post',
+                                        'hero_image' => 'hero.jpg',
+                                    ],
+                                ],
+                            ],
                         ],
                     ],
                 ],
