@@ -2,9 +2,9 @@
 
 namespace Statamic\GraphQL\Types;
 
-class NavType extends StructureType
+class CollectionStructureType extends StructureType
 {
-    const NAME = 'Navigation';
+    const NAME = 'CollectionStructure';
 
     protected $attributes = [
         'name' => self::NAME,

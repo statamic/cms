@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
+use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Fields\Value;
 
 class CollectionType extends \Rebing\GraphQL\Support\Type
@@ -21,6 +22,9 @@ class CollectionType extends \Rebing\GraphQL\Support\Type
             ],
             'title' => [
                 'type' => Type::nonNull(Type::string()),
+            ],
+            'structure' => [
+                'type' => GraphQL::type(CollectionStructureType::NAME),
             ],
         ])->map(function (array $arr) {
             $arr['resolve'] = $this->resolver();
