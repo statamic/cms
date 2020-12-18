@@ -11,8 +11,11 @@ class CollectionTreeController extends ApiController
     public function show($collection)
     {
         $site = request('site', Site::default()->handle());
+        $structure = $collection->structure();
 
-        $tree = $collection->structure()->in($site);
+        throw_unless($structure, new NotFoundHttpException("Collection [{$collection->handle()}] is not a structured collection"));
+
+        $tree = $structure->in($site);
 
         throw_unless($tree, new NotFoundHttpException("Collection [{$collection->handle()}] not found in [{$site}] site"));
 
