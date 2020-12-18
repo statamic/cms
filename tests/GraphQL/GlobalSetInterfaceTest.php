@@ -23,6 +23,7 @@ class GlobalSetInterfaceTest extends TestCase
 
         GlobalFactory::handle('social_media')->create();
         GlobalFactory::handle('company_details')->create();
+        GlobalFactory::handle('without_blueprint')->create();
         $social = tap($this->partialMock(Blueprint::class), function ($m) {
             $m->shouldReceive('handle')->andReturn('article');
             $m->shouldReceive('addGqlTypes')->once();
@@ -33,6 +34,7 @@ class GlobalSetInterfaceTest extends TestCase
         });
         BlueprintRepository::shouldReceive('find')->with('globals.social_media')->andReturn($social);
         BlueprintRepository::shouldReceive('find')->with('globals.company_details')->andReturn($company);
+        BlueprintRepository::shouldReceive('find')->with('globals.without_blueprint')->andReturnNull();
 
         GlobalSetInterface::addTypes();
 
@@ -42,6 +44,7 @@ class GlobalSetInterfaceTest extends TestCase
             $this->assertEquals($expected = [
                 'GlobalSet_SocialMedia',
                 'GlobalSet_CompanyDetails',
+                'GlobalSet_WithoutBlueprint',
             ], $actual = collect($args)->map->name->all());
 
             return $actual === $expected;
