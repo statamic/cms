@@ -112,7 +112,7 @@ class Install extends Command
 
     protected function runUpdateScripts()
     {
-        UpdateScript::runAll();
+        UpdateScript::runAll($this);
 
         return $this;
     }

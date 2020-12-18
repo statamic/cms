@@ -2,9 +2,12 @@
 
 namespace Tests\Updater;
 
+use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
+use Statamic\Auth\UserCollection;
 use Statamic\Exceptions\ComposerLockFileNotFoundException;
+use Statamic\Facades;
 use Statamic\UpdateScripts\UpdateScript;
 use Tests\Fakes\Composer\Package\PackToTheFuture;
 use Tests\TestCase;
@@ -207,6 +210,28 @@ class UpdateScriptTest extends TestCase
         $this->assertFalse(cache()->has('seo-pro-update-successful'));
     }
 
+    /** @test */
+    public function it_can_write_to_console_from_update_method()
+    {
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.1.8', $this->lockPath);
+
+        $users = new UserCollection([
+            Facades\User::make()->email('jack@jill.com'),
+            Facades\User::make()->email('jill@jack.com'),
+        ]);
+
+        Facades\User::shouldReceive('all')->andReturn($users);
+
+        UpdatePermissions::register();
+
+        $console = $this->mock(Command::class, function ($mock) {
+            $mock->shouldReceive('success')->times(2);
+        });
+
+        UpdateScript::runAll($console);
+    }
+
     private function removeLockFiles()
     {
         foreach ([$this->lockPath, $this->previousLockPath] as $lockFile) {
@@ -231,6 +256,10 @@ class UpdatePermissions extends UpdateScript
 
     public function update()
     {
+        Facades\User::all()->map->email()->each(function ($user) {
+            $this->console->success("User [{$user}] permission updated successfully!");
+        });
+
         cache()->put('permissions-update-successful', true);
     }
 }

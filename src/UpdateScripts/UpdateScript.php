@@ -4,16 +4,21 @@ namespace Statamic\UpdateScripts;
 
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Composer\Lock;
+use Statamic\Console\NullConsole;
 use Statamic\Exceptions\ComposerLockFileNotFoundException;
 use Statamic\Exceptions\ComposerLockPackageNotFoundException;
 
 abstract class UpdateScript
 {
+    protected $console;
+    protected $files;
+
     /**
      * Instantiate update script.
      */
-    public function __construct()
+    public function __construct($console = null)
     {
+        $this->console = $console ?? new NullConsole;
         $this->files = app(Filesystem::class);
 
         $this->ensureComposerLockFileExists('composer.lock');
@@ -81,16 +86,18 @@ abstract class UpdateScript
 
     /**
      * Run all registered update scripts.
+     *
+     * @param mixed $console
      */
-    public static function runAll()
+    public static function runAll($console = null)
     {
         $newLockFile = Lock::file();
         $oldLockFile = Lock::file(storage_path('statamic/updater/composer.lock.bak'));
 
         app('statamic.update-scripts')
-            ->map(function ($fqcn) {
+            ->map(function ($fqcn) use ($console) {
                 try {
-                    return new $fqcn;
+                    return new $fqcn($console);
                 } catch (ComposerLockFileNotFoundException $exception) {
                     return null;
                 }
