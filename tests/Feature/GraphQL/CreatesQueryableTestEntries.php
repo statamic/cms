@@ -15,18 +15,24 @@ trait CreatesQueryableTestEntries
         Collection::make('events')->routes(['en' => '/events/{slug}'])->save();
         Collection::make('food')->routes(['en' => '/food/{slug}'])->save();
 
-        EntryFactory::collection('blog')->id('1')->data([
-            'title' => 'Standard Blog Post',
-            'intro' => 'The intro',
-            'content' => 'The standard blog post content',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('1')
+            ->slug('standard-blog-post')
+            ->data([
+                'title' => 'Standard Blog Post',
+                'intro' => 'The intro',
+                'content' => 'The standard blog post content',
+            ])->create();
 
-        EntryFactory::collection('blog')->id('2')->data([
-            'blueprint' => 'art_directed',
-            'title' => 'Art Directed Blog Post',
-            'hero_image' => 'hero.jpg',
-            'content' => 'The art directed blog post content',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('2')
+            ->slug('art-directed-blog-post')
+            ->data([
+                'blueprint' => 'art_directed',
+                'title' => 'Art Directed Blog Post',
+                'hero_image' => 'hero.jpg',
+                'content' => 'The art directed blog post content',
+            ])->create();
 
         EntryFactory::collection('events')->id('3')->slug('event-one')->data(['title' => 'Event One'])->create();
 

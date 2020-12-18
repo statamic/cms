@@ -49,9 +49,13 @@ class EntryInterfaceTest extends TestCase
             $this->assertEveryItemIsInstanceOf(EntryType::class, $args);
             $this->assertEquals($expected = [
                 'Entry_BlogPosts_Article',
+                'EntryPage_BlogPosts_Article',
                 'Entry_BlogPosts_ArtDirected',
+                'EntryPage_BlogPosts_ArtDirected',
                 'Entry_MenuItems_Appetizer',
+                'EntryPage_MenuItems_Appetizer',
                 'Entry_MenuItems_Entree',
+                'EntryPage_MenuItems_Entree',
             ], $actual = collect($args)->map->name->all());
 
             return $actual === $expected;
