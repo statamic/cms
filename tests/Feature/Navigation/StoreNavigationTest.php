@@ -33,7 +33,7 @@ class StoreNavigationTest extends TestCase
             ->actingAs($this->userWithPermission())
             ->submit($this->validParams())
             ->assertOk()
-            ->assertJson(['redirect' => cp_route('navigation.show', 'test')]);
+            ->assertJson(['redirect' => cp_route('navs.show', 'test')]);
 
         $this->assertCount(1, Nav::all());
         $nav = Nav::all()->first();
@@ -98,6 +98,6 @@ class StoreNavigationTest extends TestCase
 
     private function submit($params = [])
     {
-        return $this->post(cp_route('navigation.store'), $params);
+        return $this->post(cp_route('navs.store'), $params);
     }
 }

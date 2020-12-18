@@ -80,7 +80,7 @@ class CoreNav
             });
 
         Nav::content('Navigation')
-            ->route('navigation.index')
+            ->route('navs.index')
             ->icon('hierarchy-files')
             ->can('index', NavContract::class)
             ->children(function () {

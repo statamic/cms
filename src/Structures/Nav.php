@@ -73,18 +73,18 @@ class Nav extends Structure implements Contract
 
     public function showUrl($params = [])
     {
-        return cp_route('navigation.show', array_merge($params, [
-            'navigation' => $this->handle(),
+        return cp_route('navs.show', array_merge($params, [
+            'nav' => $this->handle(),
         ]));
     }
 
     public function editUrl()
     {
-        return cp_route('navigation.edit', $this->handle());
+        return cp_route('navs.edit', $this->handle());
     }
 
     public function deleteUrl()
     {
-        return cp_route('navigation.destroy', $this->handle());
+        return cp_route('navs.destroy', $this->handle());
     }
 }

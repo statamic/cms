@@ -40,7 +40,7 @@
                 <p>{{ __('statamic::messages.getting_started_widget_blueprints') }}</p>
             </div>
         </a>
-        <a href="{{ cp_route('navigation.create') }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
+        <a href="{{ cp_route('navs.create') }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
                 @svg('hierarchy-files')
             </div>

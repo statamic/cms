@@ -11,7 +11,7 @@ use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 
-class NavigationController extends CpController
+class NavigationsController extends CpController
 {
     public function index()
     {
@@ -30,7 +30,7 @@ class NavigationController extends CpController
             ];
         })->values();
 
-        return view('statamic::navigation.index', compact('navs'));
+        return view('statamic::navs.index', compact('navs'));
     }
 
     public function edit($nav)
@@ -53,7 +53,7 @@ class NavigationController extends CpController
             ->addValues($values)
             ->preProcess();
 
-        return view('statamic::navigation.edit', [
+        return view('statamic::navs.edit', [
             'blueprint' => $blueprint->toPublishArray(),
             'values' => $fields->values(),
             'meta' => $fields->meta(),
@@ -71,7 +71,7 @@ class NavigationController extends CpController
             return redirect($nav->trees()->first()->showUrl());
         }
 
-        return view('statamic::navigation.show', [
+        return view('statamic::navs.show', [
             'site' => $site,
             'nav' => $nav,
             'expectsRoot' => $nav->expectsRoot(),
@@ -128,7 +128,7 @@ class NavigationController extends CpController
     {
         $this->authorize('create', NavContract::class, __('You are not authorized to configure navs.'));
 
-        return view('statamic::navigation.create');
+        return view('statamic::navs.create');
     }
 
     public function store(Request $request)

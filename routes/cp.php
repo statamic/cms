@@ -27,7 +27,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('select-site/{handle}', 'SelectSiteController@select');
 
     Route::group(['namespace' => 'Structures'], function () {
-        Route::resource('navigation', 'NavigationController');
+        Route::resource('navs', 'NavigationsController');
         Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
     });
 

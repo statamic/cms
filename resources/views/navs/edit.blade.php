@@ -5,7 +5,7 @@
 
     <header class="mb-3">
         @include('statamic::partials.breadcrumb', [
-            'url' => cp_route('navigation.show', $nav->handle()),
+            'url' => cp_route('navs.show', $nav->handle()),
             'title' => $nav->title()
         ])
         <h1>@yield('title')</h1>

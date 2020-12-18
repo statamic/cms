@@ -89,10 +89,10 @@ class NavTest extends StructureTestCase
     {
         $nav = $this->structure('test');
 
-        $this->assertEquals('http://localhost/cp/navigation/test', $nav->showUrl());
-        $this->assertEquals('http://localhost/cp/navigation/test?foo=bar', $nav->showUrl(['foo' => 'bar']));
-        $this->assertEquals('http://localhost/cp/navigation/test/edit', $nav->editUrl());
-        $this->assertEquals('http://localhost/cp/navigation/test', $nav->deleteUrl());
+        $this->assertEquals('http://localhost/cp/navs/test', $nav->showUrl());
+        $this->assertEquals('http://localhost/cp/navs/test?foo=bar', $nav->showUrl(['foo' => 'bar']));
+        $this->assertEquals('http://localhost/cp/navs/test/edit', $nav->editUrl());
+        $this->assertEquals('http://localhost/cp/navs/test', $nav->deleteUrl());
     }
 
     /** @test */

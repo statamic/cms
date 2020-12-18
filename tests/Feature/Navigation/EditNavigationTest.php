@@ -51,6 +51,6 @@ class EditNavigationTest extends TestCase
 
     public function visitEditPage($nav)
     {
-        return $this->get(route('statamic.cp.navigation.edit', $nav->handle()));
+        return $this->get(route('statamic.cp.navs.edit', $nav->handle()));
     }
 }

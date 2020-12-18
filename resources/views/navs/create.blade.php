@@ -3,6 +3,6 @@
 
 @section('content')
     <navigation-create-form
-        route="{{ cp_route('navigation.store') }}">
+        route="{{ cp_route('navs.store') }}">
     </navigation-create-form>
 @stop
