@@ -37,13 +37,12 @@ trait ManagesBlueprints
             ]];
         })->all();
 
-        $blueprint->setContents(array_merge(
-            ['hide' => $request->hidden],
-            array_filter([
+        $blueprint
+            ->setHidden($request->hidden)
+            ->setContents(array_filter([
                 'title' => $request->title,
                 'sections' => $sections,
-            ])
-        ));
+            ]));
 
         return $blueprint;
     }
