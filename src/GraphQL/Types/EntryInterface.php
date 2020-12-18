@@ -25,6 +25,12 @@ class EntryInterface extends InterfaceType
             'title' => [
                 'type' => Type::nonNull(Type::string()),
             ],
+            'slug' => [
+                'type' => Type::nonNull(Type::string()),
+            ],
+            'url' => [
+                'type' => Type::string(),
+            ],
         ];
     }
 
