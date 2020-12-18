@@ -23,7 +23,7 @@ class CreateNavigationTest extends TestCase
             ->actingAs($user)
             ->visitCreatePage()
             ->assertOk()
-            ->assertViewIs('statamic::navs.create')
+            ->assertViewIs('statamic::navigation.create')
             ->assertSee('Create Navigation');
     }
 
@@ -43,6 +43,6 @@ class CreateNavigationTest extends TestCase
 
     public function visitCreatePage()
     {
-        return $this->get(cp_route('navs.create'));
+        return $this->get(cp_route('navigation.create'));
     }
 }

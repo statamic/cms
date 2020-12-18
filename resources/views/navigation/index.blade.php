@@ -9,7 +9,7 @@
             <h1>{{ __('Navigation') }}</h1>
 
             @can('create', 'Statamic\Contracts\Structures\Structure')
-                <a href="{{ cp_route('navs.create') }}" class="btn-primary">{{ __('Create Navigation') }}</a>
+                <a href="{{ cp_route('navigation.create') }}" class="btn-primary">{{ __('Create Navigation') }}</a>
             @endcan
         </header>
 
@@ -24,7 +24,7 @@
             'description' => __('statamic::messages.navigation_configure_intro'),
             'svg' => 'empty/navigation',
             'button_text' => __('Create Navigation'),
-            'button_url' => cp_route('navs.create'),
+            'button_url' => cp_route('navigation.create'),
             'can' => $user->can('create', 'Statamic\Contracts\Structures\Nav')
         ])
 

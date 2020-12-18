@@ -188,6 +188,6 @@ class ViewNavigationListingTest extends TestCase
 
     private function visitIndex()
     {
-        return $this->get(route('statamic.cp.navs.index'));
+        return $this->get(route('statamic.cp.navigation.index'));
     }
 }
