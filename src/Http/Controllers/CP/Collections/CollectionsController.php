@@ -5,6 +5,7 @@ namespace Statamic\Http\Controllers\CP\Collections;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Entries\Collection as CollectionContract;
 use Statamic\CP\Column;
+use Statamic\Events\CollectionCreated;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Scope;
@@ -181,6 +182,8 @@ class CollectionsController extends CpController
         if (Site::hasMultiple()) {
             $collection->sites([Site::default()->handle()]);
         }
+
+        CollectionCreated::dispatch($collection);
 
         $collection->save();
 
