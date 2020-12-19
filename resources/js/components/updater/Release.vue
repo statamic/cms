@@ -8,8 +8,8 @@
             </div>
             <div v-if="showActions">
                 <button v-if="release.type === 'current'" class="btn opacity-50" disabled v-text="__('Current Version')" />
-                <button v-else-if="release.latest" @click="$emit('install')" class="btn" v-text="__('Update to Latest')" />
-                <button v-else @click="$emit('install')" class="btn">
+                <button v-else-if="release.latest" @click="confirmationOpen = true" class="btn" v-text="__('Update to Latest')" />
+                <button v-else @click="confirmationOpen = true" class="btn">
                     <template v-if="release.type === 'upgrade'">{{ __('Update to :version', { version: release.version }) }}</template>
                     <template v-if="release.type === 'downgrade'">{{ __('Downgrade to :version', { version: release.version }) }}</template>
                 </button>
@@ -18,6 +18,17 @@
         <div class="card-body">
             <div v-html="release.body"></div>
         </div>
+
+        <confirmation-modal
+            v-if="confirmationOpen"
+            :title="__('Update Statamic')"
+            :bodyText="__('Are you sure you want to update Statamic?')"
+            :buttonText="__('Confirm')"
+            :danger="true"
+            @confirm="$emit('install')"
+            @cancel="confirmationOpen = false"
+        >
+        </confirmation-modal>
     </div>
 
 </template>
@@ -28,7 +39,13 @@ export default {
     props: {
         release: { type: Object, required: true },
         showActions: { type: Boolean }
-    }
+    },
+
+    data() {
+        return {
+            confirmationOpen: false,
+        }
+    },
 
 }
 </script>
