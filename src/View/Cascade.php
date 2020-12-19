@@ -5,6 +5,7 @@ namespace Statamic\View;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades;
+use Statamic\Facades\Collection;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\URL;
 use Statamic\Sites\Site;
@@ -141,6 +142,8 @@ class Cascade
         $variables = $this->content instanceof Augmentable
             ? $this->content->toAugmentedArray()
             : $this->content->toArray();
+
+        $variables['mount'] = Collection::findByMount($this->content()->entry());
 
         foreach ($variables as $key => $value) {
             $this->set($key, $value);
