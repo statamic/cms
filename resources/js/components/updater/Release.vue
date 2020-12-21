@@ -21,8 +21,8 @@
 
         <confirmation-modal
             v-if="confirmationPrompt"
-            :title="packageName"
-            :bodyText="__('Are you sure you want to :type to :version?', { type: confirmationPrompt.type, version: confirmationPrompt.version })"
+            :title="confirmationTitle"
+            :bodyText="confirmationText"
             :buttonText="__('Confirm')"
             :danger="true"
             @confirm="$emit('install')"
@@ -45,6 +45,24 @@ export default {
     data() {
         return {
             confirmationPrompt: null,
+        }
+    },
+
+    computed: {
+        confirmationTitle() {
+            let attrs = { name: this.packageName }
+
+            return this.confirmationPrompt.type === 'downgrade'
+                ? __('Downgrade :name', attrs)
+                : __('Update :name', attrs)
+        },
+
+        confirmationText() {
+            let attrs = { version: this.confirmationPrompt.version }
+
+            return this.confirmationPrompt.type === 'downgrade'
+                ? __('Are you sure you want to downgrade to :version?', attrs)
+                : __('Are you sure you want to update to :version?', attrs)
         }
     },
 
