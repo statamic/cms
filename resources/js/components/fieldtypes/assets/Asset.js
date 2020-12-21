@@ -28,6 +28,10 @@ export default {
             return this.asset.extension === 'svg' && ! this.asset.url.includes('::');
         },
 
+        canBeTransparent() {
+            return ['png', 'svg'].includes(this.asset.extension)
+        },
+
         thumbnail() {
             return this.asset.thumbnail;
         },
