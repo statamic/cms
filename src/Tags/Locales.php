@@ -31,9 +31,9 @@ class Locales extends Tags
      */
     public function count()
     {
-      return $this->getLocales()->count(); 
+        return $this->getLocales()->count(); 
     }
-    
+
     /**
      * The {{ locales:[key] }} tag.
      */
