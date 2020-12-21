@@ -3,6 +3,7 @@
 namespace Statamic\Entries;
 
 use Statamic\Data\AbstractAugmented;
+use Statamic\Facades\Collection;
 
 class AugmentedEntry extends AbstractAugmented
 {
@@ -32,6 +33,7 @@ class AugmentedEntry extends AbstractAugmented
             'order',
             'is_entry',
             'collection',
+            'mount',
             'last_modified',
             'updated_at',
             'updated_by',
@@ -61,5 +63,10 @@ class AugmentedEntry extends AbstractAugmented
     protected function parent()
     {
         return $this->data->parent();
+    }
+
+    protected function mount()
+    {
+        return Collection::findByMount($this->data);
     }
 }
