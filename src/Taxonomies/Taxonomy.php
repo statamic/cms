@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Responsable;
 use Statamic\Contracts\Data\Augmentable as AugmentableContract;
 use Statamic\Contracts\Taxonomies\Taxonomy as Contract;
 use Statamic\Data\ContainsCascadingData;
+use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Events\TaxonomyDeleted;
@@ -22,7 +23,7 @@ use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Taxonomy implements Contract, Responsable, AugmentableContract
 {
-    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData;
+    use FluentlyGetsAndSets, ExistsAsFile, HasAugmentedData, ContainsCascadingData, ContainsSupplementalData;
 
     protected $handle;
     protected $title;
@@ -235,6 +236,11 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
     public function uri()
     {
         return str_replace('_', '-', '/'.$this->handle);
+    }
+
+    public function url()
+    {
+        return $this->uri();
     }
 
     public function collection($collection = null)
