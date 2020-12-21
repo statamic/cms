@@ -1,22 +1,26 @@
 <div class="global-header">
-    <div class="lg:w-56 pl-1 md:pl-3 h-full flex items-center">
+    <div class="lg:flex-1 pl-1 md:pl-3 h-full flex items-center">
         <button class="nav-toggle hidden md:block ml-sm flex-shrink-0" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">@svg('burger')</button>
         <button class="nav-toggle md:hidden ml-sm flex-shrink-0" @click="toggleMobileNav" v-if="! mobileNavOpen" aria-label="{{ __('Toggle Mobile Nav') }}">@svg('burger')</button>
         <button class="nav-toggle md:hidden ml-sm flex-shrink-0" @click="toggleMobileNav" v-else v-cloak aria-label="{{ __('Toggle Mobile Nav') }}">@svg('close')</button>
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
             <div v-tooltip="version" class="hidden md:block flex-shrink-0">
-                @svg('statamic-wordmark')
-                @if (Statamic::pro())<span class="font-bold text-4xs align-top">PRO</span>@endif
+                @if (Statamic::pro() && config('statamic.cp.custom_logo_url'))
+                    <img src="{{ config('statamic.cp.custom_logo_url') }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="white-label-logo">
+                @else
+                    @svg('statamic-wordmark')
+                    @if (Statamic::pro())<span class="font-bold text-4xs align-top">PRO</span>@endif
+                @endif
             </div>
         </a>
     </div>
 
-    <div class="sm:px-4 w-full flex-1 mx-auto" :class="wrapperClass">
+    <div class="sm:px-4 w-full flex-1 lg:flex items-center justify-center mx-auto" :class="wrapperClass">
         <global-search endpoint="{{ cp_route('search') }}" placeholder="{{ __('Search...') }}">
         </global-search>
     </div>
 
-    <div class="lg:absolute top-0 right-0 head-link h-full md:pr-3 flex items-center">
+    <div class="head-link h-full md:pr-3 flex items-center justify-end lg:flex-1">
 
         @if (Statamic\Facades\Site::hasMultiple())
             <global-site-selector>
@@ -38,15 +42,19 @@
                 </button>
             </template>
 
+            @if (config('statamic.cp.link_to_docs'))
             <dropdown-item external-link="https://statamic.dev" class="flex items-center">
                 <span>{{__('Documentation')}}</span>
                 <i class="w-3 block ml-1">@svg('external-link')</i>
             </dropdown-item>
+            @endif
 
-            <dropdown-item external-link="https://statamic.com/forum" class="flex items-center">
+            @if (config('statamic.cp.support_url'))
+            <dropdown-item external-link="{{ config('statamic.cp.support_url') }}" class="flex items-center">
                 <span>{{__('Support')}}</span>
                 <i class="w-3 block ml-1">@svg('external-link')</i>
             </dropdown-item>
+            @endif
 
             <dropdown-item @click="$events.$emit('keyboard-shortcuts.open')" class="flex items-center">
                 <span>{{__('Keyboard Shortcuts')}}</span>
