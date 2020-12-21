@@ -97,4 +97,22 @@ class TaxonomyTest extends TestCase
         $this->assertEquals($blueprint, $taxonomy->termBlueprint('tags'));
         $this->assertNull($taxonomy->termBlueprint('two'));
     }
+
+    /** @test */
+    public function it_returns_a_url_for_breadcrumbs()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+        $this->assertEquals("/tags", $taxonomy->url());
+    }
+
+    /** @test */
+    public function it_gets_and_sets_supplemental_data()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        $return = $taxonomy->setSupplement('foo', 'bar');
+
+        $this->assertEquals($taxonomy, $return);
+        $this->assertEquals('bar', $taxonomy->getSupplement('foo'));
+    }
 }
