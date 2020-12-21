@@ -31,7 +31,7 @@ class Locales extends Tags
      */
     public function count()
     {
-        return $this->getLocales()->count(); 
+        return $this->getLocales()->count();
     }
 
     /**
