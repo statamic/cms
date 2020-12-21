@@ -15,7 +15,7 @@
 
         <div class="asset-thumb-container">
 
-            <div class="asset-thumb">
+            <div class="asset-thumb" :class="{ 'bg-checkerboard': canBeTransparent }">
 
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
