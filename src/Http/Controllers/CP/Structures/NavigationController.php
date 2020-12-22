@@ -209,4 +209,9 @@ class NavigationController extends CpController
 
         $nav->delete();
     }
+
+    public function redirect(Request $request)
+    {
+        return redirect(str_replace_first('navigation', 'navs', $request->fullUrl()));
+    }
 }
