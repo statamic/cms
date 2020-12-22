@@ -27,7 +27,6 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     Route::get('select-site/{handle}', 'SelectSiteController@select');
 
     Route::group(['namespace' => 'Structures'], function () {
-        Route::redirect('navigation/{any?}', redirect(str_replace_first('navigation', 'navs', Request::fullUrl())));
         Route::resource('navs', 'NavigationController', [
             'names' => [
                 'index' => 'navigation.index',
@@ -42,6 +41,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
                 'navs' => 'navigation',
             ],
         ]);
+        Route::redirect('navigation/{any?}', str_replace_first('navigation', 'navs', Request::fullUrl()));
         Route::resource('structures.pages', 'StructurePagesController', ['only' => ['index', 'store']]);
     });
 
