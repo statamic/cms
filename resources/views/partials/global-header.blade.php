@@ -15,7 +15,7 @@
         </a>
     </div>
 
-    <div class="sm:px-4 w-full flex-1 lg:flex items-center justify-center mx-auto" :class="wrapperClass">
+    <div class="sm:px-4 w-full flex-1 lg:flex items-center justify-center mx-auto max-w-full">
         <global-search endpoint="{{ cp_route('search') }}" placeholder="{{ __('Search...') }}">
         </global-search>
     </div>
