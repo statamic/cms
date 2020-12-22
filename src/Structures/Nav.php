@@ -74,7 +74,7 @@ class Nav extends Structure implements Contract
     public function showUrl($params = [])
     {
         return cp_route('navigation.show', array_merge($params, [
-            'nav' => $this->handle(),
+            'navigation' => $this->handle(),
         ]));
     }
 
