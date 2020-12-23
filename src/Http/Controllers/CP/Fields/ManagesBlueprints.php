@@ -37,10 +37,12 @@ trait ManagesBlueprints
             ]];
         })->all();
 
-        $blueprint->setContents(array_filter([
-            'title' => $request->title,
-            'sections' => $sections,
-        ]));
+        $blueprint
+            ->setHidden($request->hidden)
+            ->setContents(array_filter([
+                'title' => $request->title,
+                'sections' => $sections,
+            ]));
 
         return $blueprint;
     }
@@ -77,6 +79,7 @@ trait ManagesBlueprints
         return [
             'title' => $blueprint->title(),
             'handle' => $blueprint->handle(),
+            'hidden' => $blueprint->hidden(),
             'sections' => $blueprint->sections()->map(function ($section, $i) {
                 return array_merge($this->sectionToVue($section), ['_id' => $i]);
             })->values()->all(),

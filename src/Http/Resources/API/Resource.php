@@ -18,6 +18,7 @@ class Resource
         GlobalSetResource::class,
         TermResource::class,
         UserResource::class,
+        TreeResource::class,
     ];
 
     /**

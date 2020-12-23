@@ -1,12 +1,10 @@
 @inject('str', 'Statamic\Support\Str')
 @extends('statamic::outside')
-@section('body_class', 'rad-mode')
 @section('title', __('Log in'))
 
 @section('content')
-<div class="logo pt-7">
-    @svg('statamic-wordmark')
-</div>
+
+@include('statamic::partials.outside-logo')
 
 <div class="card auth-card mx-auto">
     <login inline-template :show-email-login="!{{ $str::bool($oauth) }}" :has-error="{{ $str::bool(count($errors) > 0) }}">

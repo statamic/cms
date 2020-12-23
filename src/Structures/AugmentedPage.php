@@ -3,6 +3,7 @@
 namespace Statamic\Structures;
 
 use Statamic\Entries\AugmentedEntry;
+use Statamic\Statamic;
 
 class AugmentedPage extends AugmentedEntry
 {
@@ -20,11 +21,22 @@ class AugmentedPage extends AugmentedEntry
 
     public function keys()
     {
-        if ($this->hasEntry) {
-            return parent::keys();
-        }
+        $keys = $this->hasEntry
+            ? parent::keys()
+            : ['title', 'url', 'uri', 'permalink'];
 
-        return ['title', 'url', 'uri', 'permalink'];
+        return Statamic::isApiRoute()
+            ? $this->apiKeys($keys)
+            : $keys;
+    }
+
+    private function apiKeys($keys)
+    {
+        return collect($keys)
+            ->reject(function ($key) {
+                return in_array($key, ['parent']);
+            })
+            ->all();
     }
 
     protected function getFromData($key)
