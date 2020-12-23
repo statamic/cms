@@ -116,5 +116,7 @@ abstract class UpdateScript
                 $script->console()->info('Running update script <comment>['.get_class($script).']</comment>');
                 $script->update();
             });
+
+        $oldLockFile->delete();
     }
 }

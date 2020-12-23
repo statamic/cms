@@ -67,6 +67,14 @@ class Lock
     }
 
     /**
+     * Delete lock file.
+     */
+    public function delete()
+    {
+        $this->files->delete($this->path);
+    }
+
+    /**
      * Ensure this lock file exists.
      *
      * @throws ComposerLockFileNotFoundException

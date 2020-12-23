@@ -70,6 +70,20 @@ class ComposerLockTest extends TestCase
     }
 
     /** @test */
+    public function it_can_delete_lock_file()
+    {
+        $this->assertFalse(Lock::file($this->previousLockPath)->exists());
+
+        PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->previousLockPath);
+
+        $this->assertTrue(Lock::file($this->previousLockPath)->exists());
+
+        Lock::file($this->previousLockPath)->delete();
+
+        $this->assertFalse(Lock::file($this->previousLockPath)->exists());
+    }
+
+    /** @test */
     public function it_errors_when_composer_lock_file_is_not_found()
     {
         $this->expectException(ComposerLockFileNotFoundException::class);

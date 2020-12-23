@@ -142,6 +142,19 @@ class UpdateScriptTest extends TestCase
     }
 
     /** @test */
+    public function it_deletes_previous_lock_file_after_running_update_scripts()
+    {
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.1.8', $this->lockPath);
+
+        $this->assertFileExists($this->previousLockPath);
+
+        UpdateScript::runAll();
+
+        $this->assertFileNotExists($this->previousLockPath);
+    }
+
+    /** @test */
     public function it_doesnt_error_when_attempting_to_run_update_scripts_with_no_lock_file()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0', $this->lockPath);
