@@ -8,6 +8,7 @@ use Illuminate\Support\Collection;
 use Statamic\Auth\UserCollection;
 use Statamic\Exceptions\ComposerLockFileNotFoundException;
 use Statamic\Facades;
+use Statamic\Facades\Path;
 use Statamic\UpdateScripts\UpdateScript;
 use Tests\Fakes\Composer\Package\PackToTheFuture;
 use Tests\TestCase;
@@ -34,23 +35,23 @@ class UpdateScriptTest extends TestCase
     }
 
     /** @test */
-    public function it_errors_when_no_lock_file_is_detected()
+    public function it_errors_when_instantiating_with_no_lock_file()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0', $this->previousLockPath);
 
         $this->expectException(ComposerLockFileNotFoundException::class);
-        $this->expectExceptionMessage("Could not find a composer lock file at [{$this->lockPath}].");
+        $this->expectExceptionMessage('Could not find a composer lock file at ['.Path::makeRelative($this->lockPath).'].');
 
         new UpdatePermissions;
     }
 
     /** @test */
-    public function it_errors_when_no_previous_lock_file_is_present()
+    public function it_errors_when_instantiating_with_no_previous_lock_file()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0', $this->lockPath);
 
         $this->expectException(ComposerLockFileNotFoundException::class);
-        $this->expectExceptionMessage("Could not find a composer lock file at [{$this->previousLockPath}].");
+        $this->expectExceptionMessage('Could not find a composer lock file at ['.Path::makeRelative($this->previousLockPath).'].');
 
         new UpdatePermissions;
     }
@@ -141,13 +142,14 @@ class UpdateScriptTest extends TestCase
     }
 
     /** @test */
-    public function it_doesnt_error_when_attempting_to_run_update_scripts_if_composer_lock_backup_doesnt_exist()
+    public function it_doesnt_error_when_attempting_to_run_update_scripts_with_no_lock_file()
     {
-        PackToTheFuture::generateComposerLock('statamic/cms', '3.1.8', $this->lockPath);
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0', $this->lockPath);
 
         UpdatePermissions::register();
         UpdateTrees::register();
         UpdateTaxonomies::register();
+        SeoProUpdate::register();
 
         $registered = app('statamic.update-scripts');
 
@@ -156,20 +158,23 @@ class UpdateScriptTest extends TestCase
         $this->assertContains(UpdatePermissions::class, $registered);
         $this->assertContains(UpdateTrees::class, $registered);
         $this->assertContains(UpdateTaxonomies::class, $registered);
+        $this->assertContains(SeoProUpdate::class, $registered);
 
         $this->assertFalse(cache()->has('permissions-update-successful'));
         $this->assertFalse(cache()->has('trees-update-successful'));
         $this->assertFalse(cache()->has('taxonomies-update-successful'));
+        $this->assertFalse(cache()->has('seo-pro-update-successful'));
     }
 
     /** @test */
-    public function it_doesnt_error_when_attempting_to_run_update_scripts_if_composer_lock_doesnt_exist()
+    public function it_doesnt_error_when_attempting_to_run_update_scripts_with_no_previous_lock_file()
     {
-        PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0', $this->previousLockPath);
 
         UpdatePermissions::register();
         UpdateTrees::register();
         UpdateTaxonomies::register();
+        SeoProUpdate::register();
 
         $registered = app('statamic.update-scripts');
 
@@ -178,10 +183,12 @@ class UpdateScriptTest extends TestCase
         $this->assertContains(UpdatePermissions::class, $registered);
         $this->assertContains(UpdateTrees::class, $registered);
         $this->assertContains(UpdateTaxonomies::class, $registered);
+        $this->assertContains(SeoProUpdate::class, $registered);
 
         $this->assertFalse(cache()->has('permissions-update-successful'));
         $this->assertFalse(cache()->has('trees-update-successful'));
         $this->assertFalse(cache()->has('taxonomies-update-successful'));
+        $this->assertFalse(cache()->has('seo-pro-update-successful'));
     }
 
     /** @test */

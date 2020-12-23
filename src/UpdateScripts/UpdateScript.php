@@ -10,8 +10,12 @@ use Statamic\Exceptions\ComposerLockPackageNotFoundException;
 
 abstract class UpdateScript
 {
+    const BACKUP_PATH = 'storage/statamic/updater/composer.lock.bak';
+
     protected $console;
     protected $files;
+    protected $newLockFile;
+    protected $oldLockFile;
 
     /**
      * Instantiate update script.
@@ -20,9 +24,8 @@ abstract class UpdateScript
     {
         $this->console = $console ?? new NullConsole;
         $this->files = app(Filesystem::class);
-
-        $this->ensureComposerLockFileExists('composer.lock');
-        $this->ensureComposerLockFileExists('storage/statamic/updater/composer.lock.bak');
+        $this->newLockFile = Lock::file()->ensureExists();
+        $this->oldLockFile = Lock::file(self::BACKUP_PATH)->ensureExists();
     }
 
     /**
@@ -63,23 +66,9 @@ abstract class UpdateScript
      */
     public function isUpdatingTo($version)
     {
-        $oldVersion = Lock::file(storage_path('statamic/updater/composer.lock.bak'))
-            ->getInstalledVersion($this->package());
+        $oldVersion = $this->oldLockFile->getInstalledVersion($this->package());
 
         return version_compare($version, $oldVersion, '>');
-    }
-
-    /**
-     * Ensure lock files exist for version checks.
-     *
-     * @param string $relativePath
-     * @return bool
-     */
-    protected function ensureComposerLockFileExists($relativePath)
-    {
-        if (! Lock::file($relativePath)->exists()) {
-            throw new ComposerLockFileNotFoundException(base_path($relativePath));
-        }
     }
 
     /**
@@ -102,7 +91,7 @@ abstract class UpdateScript
     public static function runAll($console = null)
     {
         $newLockFile = Lock::file();
-        $oldLockFile = Lock::file(storage_path('statamic/updater/composer.lock.bak'));
+        $oldLockFile = Lock::file(self::BACKUP_PATH);
 
         app('statamic.update-scripts')
             ->map(function ($fqcn) use ($console) {

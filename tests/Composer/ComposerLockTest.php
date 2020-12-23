@@ -6,6 +6,7 @@ use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Composer\Lock;
 use Statamic\Exceptions\ComposerLockFileNotFoundException;
 use Statamic\Exceptions\ComposerLockPackageNotFoundException;
+use Statamic\Facades\Path;
 use Tests\Fakes\Composer\Package\PackToTheFuture;
 use Tests\TestCase;
 
@@ -31,21 +32,48 @@ class ComposerLockTest extends TestCase
     }
 
     /** @test */
-    public function it_errors_when_composer_lock_file_is_not_found()
+    public function it_can_check_if_lock_file_exists()
     {
-        $this->expectException(ComposerLockFileNotFoundException::class);
-        $this->expectExceptionMessage("Could not find a composer lock file at [{$this->lockPath}].");
+        $this->assertFalse(Lock::file()->exists());
 
-        Lock::file()->getInstalledVersion('package/two');
+        PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath);
+
+        $this->assertTrue(Lock::file()->exists());
     }
 
     /** @test */
-    public function it_errors_when_package_is_not_found()
+    public function it_can_check_if_custom_lock_file_exists()
     {
-        PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath);
+        $this->assertFalse(Lock::file($this->previousLockPath)->exists());
 
-        $this->expectException(ComposerLockPackageNotFoundException::class);
-        $this->expectExceptionMessage('Could not find the [package/two] in your composer.lock file.');
+        PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->previousLockPath);
+
+        $this->assertTrue(Lock::file($this->previousLockPath)->exists());
+    }
+
+    /** @test */
+    public function it_can_ensure_lock_file_exists()
+    {
+        $this->expectException(ComposerLockFileNotFoundException::class);
+        $this->expectExceptionMessage('Could not find a composer lock file at ['.Path::makeRelative($this->lockPath).'].');
+
+        Lock::file()->ensureExists();
+    }
+
+    /** @test */
+    public function it_can_ensure_custom_lock_file_exists()
+    {
+        $this->expectException(ComposerLockFileNotFoundException::class);
+        $this->expectExceptionMessage('Could not find a composer lock file at ['.Path::makeRelative($this->previousLockPath).'].');
+
+        Lock::file($this->previousLockPath)->ensureExists();
+    }
+
+    /** @test */
+    public function it_errors_when_composer_lock_file_is_not_found()
+    {
+        $this->expectException(ComposerLockFileNotFoundException::class);
+        $this->expectExceptionMessage('Could not find a composer lock file at ['.Path::makeRelative($this->lockPath).'].');
 
         Lock::file()->getInstalledVersion('package/two');
     }
@@ -60,6 +88,17 @@ class ComposerLockTest extends TestCase
         PackToTheFuture::generateComposerLock('package/one', '1.1.0', $this->lockPath);
 
         $this->assertEquals('1.1.0', Lock::file()->getInstalledVersion('package/one'));
+    }
+
+    /** @test */
+    public function it_errors_when_package_is_not_found()
+    {
+        PackToTheFuture::generateComposerLock('package/one', '1.0.0', $this->lockPath);
+
+        $this->expectException(ComposerLockPackageNotFoundException::class);
+        $this->expectExceptionMessage('Could not find the [package/two] in your composer.lock file.');
+
+        Lock::file()->getInstalledVersion('package/two');
     }
 
     /** @test */

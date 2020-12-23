@@ -6,11 +6,12 @@ use Illuminate\Filesystem\Filesystem;
 use Statamic\Exceptions\ComposerLockFileNotFoundException;
 use Statamic\Exceptions\ComposerLockPackageNotFoundException;
 use Statamic\Facades\Path;
+use Statamic\UpdateScripts\UpdateScript;
 
 class Lock
 {
-    public $files;
-    public $path;
+    protected $files;
+    protected $path;
 
     /**
      * Instantiate lock file helper.
@@ -46,13 +47,13 @@ class Lock
             return;
         }
 
-        $backup = dirname($file).'/storage/statamic/updater/composer.lock.bak';
+        $backupPath = dirname($file).'/'.UpdateScript::BACKUP_PATH;
 
-        if (! is_dir($backupDir = dirname($backup))) {
+        if (! is_dir($backupDir = dirname($backupPath))) {
             mkdir($backupDir, 0777, true);
         }
 
-        copy($file, $backup);
+        copy($file, $backupPath);
     }
 
     /**
@@ -66,6 +67,19 @@ class Lock
     }
 
     /**
+     * Ensure this lock file exists.
+     *
+     * @throws ComposerLockFileNotFoundException
+     * @return $this
+     */
+    public function ensureExists()
+    {
+        throw_unless($this->exists(), new ComposerLockFileNotFoundException(Path::makeRelative($this->path)));
+
+        return $this;
+    }
+
+    /**
      * Get installed version of a specific package.
      *
      * @param string $package
@@ -73,9 +87,7 @@ class Lock
      */
     public function getInstalledVersion(string $package)
     {
-        if (! $this->exists()) {
-            throw new ComposerLockFileNotFoundException($this->path);
-        }
+        $this->ensureExists();
 
         $installed = collect(json_decode($this->files->get($this->path))->packages)
             ->keyBy('name')
@@ -94,7 +106,7 @@ class Lock
      * @param string $version
      * @return string
      */
-    private function normalizeVersion(string $version)
+    protected function normalizeVersion(string $version)
     {
         return ltrim($version, 'v');
     }
