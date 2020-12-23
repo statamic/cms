@@ -112,4 +112,25 @@ class AugmentedEntryTest extends AugmentedTestCase
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
     }
+
+    /** @test */
+    public function it_gets_the_mount_from_the_value_first_if_it_exists()
+    {
+        $mount = tap(Collection::make('a'))->save();
+
+        $entry = EntryFactory::id('entry-id')
+            ->collection('test')
+            ->slug('entry-slug')
+            ->create();
+
+        $augmented = new AugmentedEntry($entry);
+
+        $this->assertNull($augmented->get('mount'));
+
+        $mount->mount($entry->id())->save();
+        $this->assertEquals($mount, $augmented->get('mount'));
+
+        $entry->set('mount', 'b');
+        $this->assertEquals('b', $augmented->get('mount'));
+    }
 }
