@@ -111,11 +111,18 @@ class UpdateScriptTest extends TestCase
 
         $script = new UpdatePermissions;
 
-        $this->assertTrue($script->isUpdatingTo('3.1.9'));
-        $this->assertTrue($script->isUpdatingTo('3.2'));
-        $this->assertTrue($script->isUpdatingTo('4.0'));
+        $this->assertFalse($script->isUpdatingTo('4.0.0'));
+        $this->assertFalse($script->isUpdatingTo('4.0'));
+        $this->assertFalse($script->isUpdatingTo('3.2.0'));
+        $this->assertFalse($script->isUpdatingTo('3.2'));
+        $this->assertFalse($script->isUpdatingTo('3.1.9'));
+        $this->assertTrue($script->isUpdatingTo('3.1.8'));
+        $this->assertTrue($script->isUpdatingTo('3.1.7'));
+        $this->assertTrue($script->isUpdatingTo('3.1.0'));
+        $this->assertTrue($script->isUpdatingTo('3.1'));
+        $this->assertTrue($script->isUpdatingTo('3.0.26'));
         $this->assertFalse($script->isUpdatingTo('3.0.25'));
-        $this->assertFalse($script->isUpdatingTo('2.0'));
+        $this->assertFalse($script->isUpdatingTo('3.0.24'));
     }
 
     /** @test */

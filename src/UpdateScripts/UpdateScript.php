@@ -67,8 +67,9 @@ abstract class UpdateScript
     public function isUpdatingTo($version)
     {
         $oldVersion = $this->oldLockFile->getInstalledVersion($this->package());
+        $newVersion = $this->newLockFile->getInstalledVersion($this->package());
 
-        return version_compare($version, $oldVersion, '>');
+        return version_compare($version, $newVersion, '<=') && version_compare($version, $oldVersion, '>');
     }
 
     /**
