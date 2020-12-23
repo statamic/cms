@@ -3,6 +3,7 @@
 namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
+use Statamic\Console\Composer\Json;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 use Statamic\Statamic;
@@ -112,7 +113,30 @@ class Install extends Command
 
     protected function runUpdateScripts()
     {
+        if (Json::isMissingPreUpdateCmd()) {
+            return $this->outputMissingPreUpdateCmd();
+        }
+
         UpdateScript::runAll($this);
+
+        return $this;
+    }
+
+    protected function outputMissingPreUpdateCmd()
+    {
+        $this->error('We notice you are missing a composer hook!');
+        $this->error('Please ensure the following is registered in the `scripts` section of your composer.json file,');
+        $this->error('And re-run [php artisan statamic:install] when complete.');
+
+        $this->line(<<<'EOT'
+"scripts": {
+    "pre-update-cmd": [
+        "Statamic\\Console\\Composer\\Scripts::preUpdateCmd"
+    ],
+    ...
+}
+EOT
+        );
 
         return $this;
     }
