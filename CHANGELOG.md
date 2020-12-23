@@ -2,16 +2,16 @@
 
 ## 3.0.36 (2020-12-23)
 
-## What's new
+### What's new
 - Added a `mount` variable to entries in templates. [#3046](https://github.com/statamic/cms/issues/3046)
 - Added a `locales:count` tag. [#3042](https://github.com/statamic/cms/issues/3042)
 
-## What's improved
+### What's improved
 - Hide the "Enable Pro" part of the Getting Started widget if it's enabled. [#3051](https://github.com/statamic/cms/issues/3051)
 - Updated French and German translations. [#3029](https://github.com/statamic/cms/issues/3029) [#3052](https://github.com/statamic/cms/issues/3052)
 - Improved the Asset SVG asset previews. [#2945](https://github.com/statamic/cms/issues/2945)
 
-## What's fixed
+### What's fixed
 - Fix issue where you couldn't drag Bard sets when used inside a Replicator. [#2063](https://github.com/statamic/cms/issues/2063)
 - The 'Add Date' button is unavailable in the date fieldtype when it's read only. [#3025](https://github.com/statamic/cms/issues/3025)
 - Fix issue where a non existent avatar sometimes caused an error. [#3027](https://github.com/statamic/cms/issues/3027)
