@@ -250,6 +250,8 @@ class UpdateScriptTest extends TestCase
 
         Facades\User::shouldReceive('all')->andReturn($users);
 
+        app()->instance('statamic.update-scripts', collect()); // Ignore core update scripts.
+
         UpdatePermissions::register();
 
         $console = $this->mock(Command::class, function ($mock) {
