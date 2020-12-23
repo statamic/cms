@@ -1,7 +1,7 @@
 <?php
 
 return [
-    'any.config.antlers' => 'Soll dieses Feld von Antlers geparst werden?'
+    'any.config.antlers' => 'Soll dieses Feld von Antlers geparst werden?',
     'any.config.cast_booleans' => 'Optionen mit den Werten *true* und *false* als Booleans speichern.',
     'any.config.default' => 'Standardwert festlegen.',
     'array.config.keys' => 'Arrayschlüssel (Variablen) und optionale Beschriftungen festlegen.',
