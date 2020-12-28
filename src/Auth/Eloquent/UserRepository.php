@@ -42,7 +42,7 @@ class UserRepository extends BaseRepository
         return null;
     }
 
-    public function findOrFail($id, $columns = []): User
+    public function findOrFail($id, $columns = []): UserContract
     {
         $result = $this->find($id);
 
