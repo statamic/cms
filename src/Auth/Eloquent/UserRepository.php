@@ -3,6 +3,7 @@
 namespace Statamic\Auth\Eloquent;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Statamic\Auth\UserCollection;
 use Statamic\Auth\UserRepository as BaseRepository;
 use Statamic\Contracts\Auth\User as UserContract;
@@ -39,6 +40,17 @@ class UserRepository extends BaseRepository
         }
 
         return null;
+    }
+
+    public function findOrFail($id, $columns = []): ?User
+    {
+        $result = $this->find($id);
+
+        if (! is_null($result)) {
+            return $result;
+        }
+
+        throw (new ModelNotFoundException)->setModel(Model::class, $id);
     }
 
     public function findByEmail(string $email): ?UserContract

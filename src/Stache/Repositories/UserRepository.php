@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Statamic\Auth\File\RoleRepository;
 use Statamic\Auth\File\User as FileUser;
 use Statamic\Auth\File\UserGroupRepository;
@@ -39,6 +40,17 @@ class UserRepository extends BaseRepository
     public function find($id): ?User
     {
         return $this->store->getItem($id);
+    }
+
+    public function findOrFail($id, $columns = []): ?User
+    {
+        $result = $this->find($id);
+
+        if (! is_null($result)) {
+            return $result;
+        }
+
+        throw (new ModelNotFoundException)->setModel(FileUser::class, $id);
     }
 
     public function findByEmail(string $email): ?User
