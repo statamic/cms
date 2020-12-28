@@ -12,7 +12,7 @@ interface UserRepository
 
     public function find($id): ?User;
 
-    public function findOrFail($id, $columns = []): ?User;
+    public function findOrFail($id, $columns = []): User;
 
     public function findByEmail(string $email): ?User;
 

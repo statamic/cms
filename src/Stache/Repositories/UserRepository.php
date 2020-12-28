@@ -42,7 +42,7 @@ class UserRepository extends BaseRepository
         return $this->store->getItem($id);
     }
 
-    public function findOrFail($id, $columns = []): ?User
+    public function findOrFail($id, $columns = []): User
     {
         $result = $this->find($id);
 
