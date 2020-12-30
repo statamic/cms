@@ -6,6 +6,7 @@ use Statamic\Contracts\Structures\Structure as StructureContract;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Structures\TreeBuilder;
+use Statamic\Support\Str;
 
 class Structure extends Tags
 {
