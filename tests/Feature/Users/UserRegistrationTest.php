@@ -40,7 +40,8 @@ class UserRegistrationTest extends TestCase
     /** @test */
     public function user_not_saved_when_user_registration_returns_false()
     {
-        Event::listen(function (UserRegistering $event) {
+        // need to register the "legacy" way so it works on L6 & L7
+        Event::listen(UserRegistering::class, function () {
             return false;
         });
 
