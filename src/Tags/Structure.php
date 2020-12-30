@@ -57,13 +57,14 @@ class Structure extends Tags
 
             $data = $page->toAugmentedArray();
             $children = empty($item['children']) ? [] : $this->toArray($item['children'], $data, $depth + 1);
+            $redirect_child = isset($data['redirect']) ? $data['redirect']->raw() == '@child' : false;
 
             return array_merge($data, [
                 'children'    => $children,
                 'parent'      => $parent,
                 'depth'       => $depth,
                 'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->url(), '/'),
-                'is_parent'   => Site::current()->url() === $page->url() ? false : URL::isAncestorOf(URL::getCurrent(), $page->url()),
+                'is_parent'   => Site::current()->url() === $page->url() ? false : URL::isAncestorOf(URL::getCurrent(), $redirect_child ? Str::beforeLast($page->url(), '/') : $page->url()), // remove last URL segment if redirect is @child
                 'is_external' => URL::isExternal($page->absoluteUrl()),
             ]);
         })->filter()->values()->all();

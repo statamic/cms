@@ -86,7 +86,7 @@ class URL
         $child = Str::ensureRight($child, '/');
         $ancestor = Str::ensureRight($ancestor, '/');
 
-        if ($child === $ancestor) {
+        if ($child === $ancestor || $ancestor === '/') {
             return false;
         }
 
