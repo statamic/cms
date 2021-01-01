@@ -360,6 +360,7 @@ class Collection implements Contract, AugmentableContract
 
         CollectionSaved::dispatch($this);
 
+        // can't use `dispatchIf` as not support in Laravel 6
         if ($isNew) {
             CollectionCreated::dispatch($isNew, $this);
         }
