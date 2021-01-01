@@ -360,7 +360,9 @@ class Collection implements Contract, AugmentableContract
 
         CollectionSaved::dispatch($this);
 
-        CollectionCreated::dispatchIf($isNew, $this);
+        if ($isNew) {
+            CollectionCreated::dispatch($isNew, $this);
+        }
 
         return $this;
     }
