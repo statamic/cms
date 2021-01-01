@@ -7,6 +7,7 @@ use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionDeleted;
 use Statamic\Events\CollectionSaved;
 use Statamic\Events\EntryBlueprintFound;
@@ -162,7 +163,7 @@ class Collection implements Contract, AugmentableContract
     public function url($site = null)
     {
         if (! $mount = $this->mount()) {
-            return null;
+            return;
         }
 
         $site = $site ?? $this->sites()->first();
@@ -173,7 +174,7 @@ class Collection implements Contract, AugmentableContract
     public function uri($site = null)
     {
         if (! $mount = $this->mount()) {
-            return null;
+            return;
         }
 
         $site = $site ?? $this->sites()->first();
@@ -233,7 +234,7 @@ class Collection implements Contract, AugmentableContract
     public function entryBlueprint($blueprint = null, $entry = null)
     {
         if (! $blueprint = $this->getBaseEntryBlueprint($blueprint)) {
-            return null;
+            return;
         }
 
         $blueprint->setParent($entry ?? $this);
@@ -346,6 +347,8 @@ class Collection implements Contract, AugmentableContract
 
     public function save()
     {
+        $isNew = ! Facades\Collection::handleExists($this->handle);
+
         Facades\Collection::save($this);
 
         Blink::forget('collection-handles');
@@ -356,6 +359,8 @@ class Collection implements Contract, AugmentableContract
         }
 
         CollectionSaved::dispatch($this);
+
+        CollectionCreated::dispatchIf($isNew, $this);
 
         return $this;
     }
@@ -576,7 +581,7 @@ class Collection implements Contract, AugmentableContract
     public function structureHandle()
     {
         if (! $this->hasStructure()) {
-            return null;
+            return;
         }
 
         return $this->structure()->handle();
@@ -604,7 +609,7 @@ class Collection implements Contract, AugmentableContract
             ->fluentlyGetOrSet('mount')
             ->getter(function ($mount) {
                 if (! $mount) {
-                    return null;
+                    return;
                 }
 
                 return Blink::once("collection-{$this->id()}-mount-{$mount}", function () use ($mount) {

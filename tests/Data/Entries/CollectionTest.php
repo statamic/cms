@@ -4,9 +4,12 @@ namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\Collection;
+use Statamic\Events\CollectionCreated;
+use Statamic\Events\CollectionSaved;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
@@ -298,6 +301,30 @@ class CollectionTest extends TestCase
         $return = $collection->save();
 
         $this->assertEquals($collection, $return);
+    }
+
+    /** @test */
+    public function it_dispatches_collection_saved()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('test');
+        $collection->save();
+
+        Event::assertDispatched(CollectionSaved::class);
+    }
+
+    /** @test */
+    public function it_dispatches_collection_created_only_once()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('test');
+        $collection->save();
+        $collection->save();
+
+        Event::assertDispatched(CollectionSaved::class, 2);
+        Event::assertDispatched(CollectionCreated::class, 1);
     }
 
     /** @test */
