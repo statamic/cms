@@ -36,6 +36,7 @@
                 v-for="release in unlicensedReleases"
                 :key="release.version"
                 :release="release"
+                :package-name="name"
                 :show-actions="showActions"
                 @install="installExplicitVersion(release.version)"
             />
@@ -45,6 +46,7 @@
             v-for="release in licensedReleases"
             :key="release.version"
             :release="release"
+            :package-name="name"
             :show-actions="showActions"
             @install="installExplicitVersion(release.version)"
         />
