@@ -26,6 +26,12 @@ trait GetsFormSession
             $data['submission_created'] = true;
         }
 
+        // Only include this boolean if it's actually passed in session;
+        // It will be for user registration submissions, but not form submissions.
+        if ($this->getFromFormSession($formName, 'user_created')) {
+            $data['user_created'] = true;
+        }
+
         return $data;
     }
 
