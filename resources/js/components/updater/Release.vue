@@ -25,7 +25,7 @@
             :bodyText="confirmationText"
             :buttonText="__('Confirm')"
             :danger="true"
-            @confirm="$emit('install')"
+            @confirm="confirm"
             @cancel="confirmationPrompt = null"
         >
         </confirmation-modal>
@@ -65,6 +65,15 @@ export default {
                 : __('Are you sure you want to update to :version?', attrs)
         }
     },
+
+    methods: {
+
+        confirm() {
+            this.confirmationPrompt = null;
+            this.$nextTick(() => this.$emit('install'));
+        }
+
+    }
 
 }
 </script>
