@@ -9,6 +9,7 @@ class Floatval extends Fieldtype
     protected $icon = 'integer';
     protected $rules = ['numeric'];
     protected static $title = 'Float';
+    protected static $handle = 'float';
 
     /**
      * Pre-process the data before it gets sent to the publish page.
