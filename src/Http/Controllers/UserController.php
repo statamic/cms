@@ -5,8 +5,10 @@ namespace Statamic\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
+use Illuminate\Validation\ValidationException;
 use Statamic\Events\UserRegistered;
 use Statamic\Events\UserRegistering;
+use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\User;
 
 class UserController extends Controller
@@ -56,18 +58,22 @@ class UserController extends Controller
             return $this->userRegistrationFailure($validator->errors());
         }
 
-        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        try {
+            $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
-        $user = User::make()
+            $user = User::make()
             ->email($request->email)
             ->password($request->password)
             ->data($values);
 
-        if ($roles = config('statamic.users.new_user_roles')) {
-            $user->roles($roles);
-        }
+            if ($roles = config('statamic.users.new_user_roles')) {
+                $user->roles($roles);
+            }
 
-        if (UserRegistering::dispatch($user) === false) {
+            throw_if(UserRegistering::dispatch($user) === false, new SilentFormFailureException);
+        } catch (ValidationException $e) {
+            return $this->userRegistrationFailure($e->errors());
+        } catch (SilentFormFailureException $e) {
             return $this->userRegistrationSuccess(true);
         }
 
@@ -92,7 +98,7 @@ class UserController extends Controller
         $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
 
         session()->flash('user.register.success', __('Registration successful.'));
-        session()->flash('user.registered', ! $silentFailure);
+        session()->flash('user.register.user_created', ! $silentFailure);
 
         return $response;
     }
