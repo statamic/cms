@@ -7,6 +7,7 @@ use Statamic\Contracts\Entries\Collection as Contract;
 use Statamic\Data\ContainsCascadingData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Events\CollectionCreated;
 use Statamic\Events\CollectionDeleted;
 use Statamic\Events\CollectionSaved;
 use Statamic\Events\EntryBlueprintFound;
@@ -346,6 +347,8 @@ class Collection implements Contract, AugmentableContract
 
     public function save()
     {
+        $isNew = ! Facades\Collection::handleExists($this->handle);
+
         Facades\Collection::save($this);
 
         Blink::forget('collection-handles');
@@ -353,6 +356,10 @@ class Collection implements Contract, AugmentableContract
 
         if ($this->hasStructure()) { // todo: only if the structure changed.
             $this->updateEntryUris();
+        }
+
+        if ($isNew) {
+            CollectionCreated::dispatch($this);
         }
 
         CollectionSaved::dispatch($this);
