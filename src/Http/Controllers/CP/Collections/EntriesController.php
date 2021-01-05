@@ -127,6 +127,7 @@ class EntriesController extends CpController
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
+            'canManagePublishState' => User::current()->can('publish', $entry),
         ];
 
         if ($request->wantsJson()) {
@@ -189,7 +190,7 @@ class EntriesController extends CpController
                 ->user(User::current())
                 ->save();
         } else {
-            if (! $entry->revisionsEnabled()) {
+            if (! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
                 $entry->published($request->published);
             }
 
@@ -254,6 +255,7 @@ class EntriesController extends CpController
             })->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
+            'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
         ];
 
         if ($request->wantsJson()) {
