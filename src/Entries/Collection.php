@@ -358,11 +358,11 @@ class Collection implements Contract, AugmentableContract
             $this->updateEntryUris();
         }
 
-        CollectionSaved::dispatch($this);
-
         if ($isNew) {
             CollectionCreated::dispatch($this);
         }
+
+        CollectionSaved::dispatch($this);
 
         return $this;
     }
