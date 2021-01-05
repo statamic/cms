@@ -3,6 +3,7 @@
 namespace Statamic\Ignition\Solutions;
 
 use Facade\IgnitionContracts\RunnableSolution;
+use Statamic\Console\Composer\Json as ComposerJson;
 
 class AddComposerPreUpdateCmd implements RunnableSolution
 {
@@ -33,7 +34,7 @@ class AddComposerPreUpdateCmd implements RunnableSolution
 
     public function run(array $parameters = [])
     {
-        // dd('running solutions');
+        ComposerJson::addPreUpdateCmd();
     }
 
     public function getRunParameters(): array
