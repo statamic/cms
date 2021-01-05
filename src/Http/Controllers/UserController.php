@@ -58,18 +58,18 @@ class UserController extends Controller
             return $this->userRegistrationFailure($validator->errors());
         }
 
-        try {
-            $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
+        $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
 
-            $user = User::make()
+        $user = User::make()
             ->email($request->email)
             ->password($request->password)
             ->data($values);
 
-            if ($roles = config('statamic.users.new_user_roles')) {
-                $user->roles($roles);
-            }
+        if ($roles = config('statamic.users.new_user_roles')) {
+            $user->roles($roles);
+        }
 
+        try {
             throw_if(UserRegistering::dispatch($user) === false, new SilentFormFailureException);
         } catch (ValidationException $e) {
             return $this->userRegistrationFailure($e->errors());
