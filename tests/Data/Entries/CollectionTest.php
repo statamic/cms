@@ -312,7 +312,9 @@ class CollectionTest extends TestCase
         $collection = (new Collection)->handle('test');
         $collection->save();
 
-        Event::assertDispatched(CollectionSaved::class);
+        Event::assertDispatched(CollectionSaved::class, function ($event) use ($collection) {
+            return $event->collection === $collection;
+        });
     }
 
     /** @test */
@@ -324,6 +326,9 @@ class CollectionTest extends TestCase
         $collection->save();
         $collection->save();
 
+        Event::assertDispatched(CollectionCreated::class, function ($event) use ($collection) {
+            return $event->collection === $collection;
+        });
         Event::assertDispatched(CollectionSaved::class, 2);
         Event::assertDispatched(CollectionCreated::class, 1);
     }
