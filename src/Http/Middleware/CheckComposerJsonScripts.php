@@ -10,7 +10,7 @@ class CheckComposerJsonScripts
 {
     public function handle($request, Closure $next)
     {
-        if (config('app.debug') === false || $request->is('_ignition*')) {
+        if (config('app.debug') === false || $request->is('_ignition*') || $request->wantsJson()) {
             return $next($request);
         }
 
