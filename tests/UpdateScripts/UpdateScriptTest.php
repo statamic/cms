@@ -123,6 +123,27 @@ class UpdateScriptTest extends TestCase
         $this->assertTrue($script->isUpdatingTo('3.0.26'));
         $this->assertFalse($script->isUpdatingTo('3.0.25'));
         $this->assertFalse($script->isUpdatingTo('3.0.24'));
+        $this->assertFalse($script->isUpdatingTo('3.0.0-beta.1'));
+        $this->assertTrue($script->isUpdatingTo('3.1.0-beta.1'));
+        $this->assertFalse($script->isUpdatingTo('3.2.0-beta.1'));
+    }
+
+    /** @test */
+    public function it_can_check_if_package_is_updating_past_a_specific_beta_version()
+    {
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
+        PackToTheFuture::generateComposerLock('statamic/cms', 'v3.1.0-beta.2', $this->lockPath);
+
+        $script = new UpdatePermissions;
+
+        $this->assertFalse($script->isUpdatingTo('4.0.0'));
+        $this->assertFalse($script->isUpdatingTo('4.0'));
+        $this->assertFalse($script->isUpdatingTo('3.0.25'));
+        $this->assertTrue($script->isUpdatingTo('3.0.26'));
+        $this->assertTrue($script->isUpdatingTo('3.1.0-beta.1'));
+        $this->assertTrue($script->isUpdatingTo('3.1.0-beta.2'));
+        $this->assertFalse($script->isUpdatingTo('3.1.0-beta.3'));
+        $this->assertFalse($script->isUpdatingTo('3.1.0'));
     }
 
     /** @test */
