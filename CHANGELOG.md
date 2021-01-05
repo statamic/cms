@@ -1,5 +1,21 @@
 # Release Notes
 
+## Unreleased
+
+### What's new
+- Added a `CollectionCreated` event. [#3062](https://github.com/statamic/cms/issues/3062)
+- Added a `UserRegistering` event. [#3057](https://github.com/statamic/cms/issues/3057)
+- Added a `float` fieldtype. [#3060](https://github.com/statamic/cms/issues/3060)
+
+### What's improved
+- You now get a confirmation before updating or downgrading Statamic and addons. [#3038](https://github.com/statamic/cms/issues/3038)
+
+### What's fixed
+- Fixed entry publish state management permissions. [#3039](https://github.com/statamic/cms/issues/3039)
+- Bump `axios` from 0.19.2 to 0.21.1 [#3068](https://github.com/statamic/cms/issues/3068)
+
+
+
 ## 3.0.36 (2020-12-23)
 
 ### What's new
