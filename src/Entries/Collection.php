@@ -163,7 +163,7 @@ class Collection implements Contract, AugmentableContract
     public function url($site = null)
     {
         if (! $mount = $this->mount()) {
-            return;
+            return null;
         }
 
         $site = $site ?? $this->sites()->first();
@@ -174,7 +174,7 @@ class Collection implements Contract, AugmentableContract
     public function uri($site = null)
     {
         if (! $mount = $this->mount()) {
-            return;
+            return null;
         }
 
         $site = $site ?? $this->sites()->first();
@@ -234,7 +234,7 @@ class Collection implements Contract, AugmentableContract
     public function entryBlueprint($blueprint = null, $entry = null)
     {
         if (! $blueprint = $this->getBaseEntryBlueprint($blueprint)) {
-            return;
+            return null;
         }
 
         $blueprint->setParent($entry ?? $this);
@@ -583,7 +583,7 @@ class Collection implements Contract, AugmentableContract
     public function structureHandle()
     {
         if (! $this->hasStructure()) {
-            return;
+            return null;
         }
 
         return $this->structure()->handle();
@@ -611,7 +611,7 @@ class Collection implements Contract, AugmentableContract
             ->fluentlyGetOrSet('mount')
             ->getter(function ($mount) {
                 if (! $mount) {
-                    return;
+                    return null;
                 }
 
                 return Blink::once("collection-{$this->id()}-mount-{$mount}", function () use ($mount) {
