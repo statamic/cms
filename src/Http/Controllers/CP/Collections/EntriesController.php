@@ -189,7 +189,7 @@ class EntriesController extends CpController
                 ->user(User::current())
                 ->save();
         } else {
-            if (! $entry->revisionsEnabled()) {
+            if (! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
                 $entry->published($request->published);
             }
 
