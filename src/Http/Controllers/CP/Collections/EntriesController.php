@@ -97,6 +97,7 @@ class EntriesController extends CpController
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
             'collection' => $collection->handle(),
+            'collectionHasRoutes' => is_null($collection->route($entry->locale())) ? 'false' : 'true',
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => User::current()->cant('edit', $entry),
             'locale' => $entry->locale(),
