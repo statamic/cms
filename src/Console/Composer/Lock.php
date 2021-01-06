@@ -8,7 +8,6 @@ use Statamic\Exceptions\ComposerLockPackageNotFoundException;
 use Statamic\Facades\Path;
 use Statamic\Statamic;
 use Statamic\UpdateScripts\UpdateScript;
-use Tests\Fakes\Composer\Package\PackToTheFuture;
 
 class Lock
 {
@@ -65,7 +64,19 @@ class Lock
      */
     public static function createDummyBackup($version)
     {
-        PackToTheFuture::generateComposerLock(Statamic::PACKAGE, $version, base_path(UpdateScript::BACKUP_PATH));
+        $content = [
+            'packages' => [
+                [
+                    'name' => Statamic::PACKAGE,
+                    'version' => $version,
+                ],
+            ],
+        ];
+
+        app(Filesystem::class)->put(
+            base_path(UpdateScript::BACKUP_PATH),
+            json_encode($content, JSON_UNESCAPED_SLASHES)
+        );
     }
 
     /**
