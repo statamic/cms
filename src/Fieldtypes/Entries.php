@@ -43,6 +43,7 @@ class Entries extends Relationship
         'breadcrumbs' => 'breadcrumbs',
         'collectionHandle' => 'collection',
         'canManagePublishState' => 'canManagePublishState',
+        'collectionHasRoutes' => 'collectionHasRoutes',
     ];
 
     protected function configFieldItems(): array
