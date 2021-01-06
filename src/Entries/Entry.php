@@ -17,6 +17,7 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Events\EntryCreated;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
@@ -264,6 +265,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function save()
     {
+        $isNew = ! is_null(Facades\Entry::find($this->id()));
+
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
@@ -285,6 +288,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         foreach ($afterSaveCallbacks as $callback) {
             $callback($this);
+        }
+
+        if ($isNew) {
+            EntryCreated::dispatch($this);
         }
 
         EntrySaved::dispatch($this);
