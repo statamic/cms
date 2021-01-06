@@ -28,6 +28,15 @@ class EntryTest extends TestCase
         title
         slug
         url
+        uri
+        edit_url
+        permalink
+        published
+        private
+        collection {
+            title
+            handle
+        }
     }
 }
 GQL;
@@ -35,13 +44,22 @@ GQL;
         $this
             ->withoutExceptionHandling()
             ->post('/graphql', ['query' => $query])
-            ->assertOk()
+            ->assertGqlOk()
             ->assertExactJson(['data' => [
                 'entry' => [
                     'id' => '3',
                     'title' => 'Event One',
                     'slug' => 'event-one',
                     'url' => '/events/event-one',
+                    'uri' => '/events/event-one',
+                    'edit_url' => 'http://localhost/cp/collections/events/entries/3/event-one',
+                    'permalink' => 'http://localhost/events/event-one',
+                    'published' => true,
+                    'private' => false,
+                    'collection' => [
+                        'title' => 'Events',
+                        'handle' => 'events',
+                    ],
                 ],
             ]]);
     }
