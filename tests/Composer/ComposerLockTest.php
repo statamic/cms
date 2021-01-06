@@ -134,11 +134,21 @@ class ComposerLockTest extends TestCase
     }
 
     /** @test */
-    public function it_can_create_dummy_backup_for_specific_statamic_version()
+    public function it_can_override_package_version()
     {
-        Lock::createDummyBackup('3.0.0');
+        PackToTheFuture::generateComposerLockForMultiple([
+            'package/one' => '1.0.0',
+            'package/two' => '1.0.0',
+            'statamic/cms' => '3.1.0',
+        ], $this->previousLockPath);
 
-        $this->assertEquals('3.0.0', Lock::file($this->previousLockPath)->getInstalledVersion('statamic/cms'));
+        $lock = Lock::file($this->previousLockPath)
+            ->overridePackageVersion('package/one', '1.0.1')
+            ->overridePackageVersion('statamic/cms', '3.0.0');
+
+        $this->assertEquals('1.0.1', $lock->getInstalledVersion('package/one'));
+        $this->assertEquals('1.0.0', $lock->getInstalledVersion('package/two'));
+        $this->assertEquals('3.0.0', $lock->getInstalledVersion('statamic/cms'));
     }
 
     private function removeLockFiles()

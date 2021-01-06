@@ -6,7 +6,6 @@ use Illuminate\Filesystem\Filesystem;
 use Statamic\Exceptions\ComposerLockFileNotFoundException;
 use Statamic\Exceptions\ComposerLockPackageNotFoundException;
 use Statamic\Facades\Path;
-use Statamic\Statamic;
 use Statamic\UpdateScripts\UpdateScript;
 
 class Lock
@@ -55,28 +54,6 @@ class Lock
         }
 
         copy($file, $backupPath);
-    }
-
-    /**
-     * Create dummy lock backup for specific Statamic version.
-     *
-     * @param mixed $version
-     */
-    public static function createDummyBackup($version)
-    {
-        $content = [
-            'packages' => [
-                [
-                    'name' => Statamic::PACKAGE,
-                    'version' => $version,
-                ],
-            ],
-        ];
-
-        app(Filesystem::class)->put(
-            base_path(UpdateScript::BACKUP_PATH),
-            json_encode($content, JSON_UNESCAPED_SLASHES)
-        );
     }
 
     /**
@@ -129,6 +106,34 @@ class Lock
         }
 
         return $this->normalizeVersion($installed->version);
+    }
+
+    /**
+     * Override package version.
+     *
+     * @param string $package
+     * @param string $version
+     * @return $this
+     */
+    public function overridePackageVersion($package, $version)
+    {
+        $content = json_decode($this->files->get($this->path), true);
+
+        $packages = collect($content['packages'])
+            ->map(function ($packageDetails) use ($package, $version) {
+                if ($packageDetails['name'] === $package) {
+                    $packageDetails['version'] = $version;
+                }
+
+                return $packageDetails;
+            })
+            ->all();
+
+        $content['packages'] = $packages;
+
+        $this->files->put($this->path, json_encode($content, JSON_UNESCAPED_SLASHES));
+
+        return $this;
     }
 
     /**
