@@ -93,6 +93,7 @@ import {
     CodeBlock,
     HardBreak,
     Heading,
+    HorizontalRule,
     OrderedList,
     BulletList,
     ListItem,
@@ -458,6 +459,7 @@ export default {
             if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
             if (btns.includes('removeformat')) exts.push(new RemoveFormat());
             if (btns.includes('image')) exts.push(new Image({ bard: this }));
+            if (btns.includes('horizontalrule')) exts.push(new HorizontalRule());
 
             if (btns.includes('orderedlist') || btns.includes('unorderedlist')) {
                 if (btns.includes('orderedlist')) exts.push(new OrderedList());
