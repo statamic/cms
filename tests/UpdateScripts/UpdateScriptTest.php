@@ -283,6 +283,48 @@ class UpdateScriptTest extends TestCase
         UpdateScript::runAll($console);
     }
 
+    /** @test */
+    public function it_runs_update_scripts_from_specific_package_versions()
+    {
+        PackToTheFuture::generateComposerLockForMultiple([
+            'statamic/cms' => '3.1.8',
+            'statamic/seo-pro' => '2.1.0',
+        ], $this->lockPath);
+
+        $this->assertFileNotExists($this->previousLockPath);
+
+        UpdatePermissions::register();
+        SeoProUpdate::register();
+
+        $this->assertFalse(cache()->has('permissions-update-successful'));
+        $this->assertFalse(cache()->has('seo-pro-update-successful'));
+
+        $registered = app('statamic.update-scripts');
+
+        $this->assertContains(UpdatePermissions::class, $registered);
+        $this->assertContains(SeoProUpdate::class, $registered);
+
+        UpdateScript::runAllFromSpecificPackageVersion('statamic/cms', '3.1.8');
+
+        $this->assertFalse(cache()->has('permissions-update-successful'));
+        $this->assertFalse(cache()->has('seo-pro-update-successful'));
+        $this->assertFileNotExists($this->previousLockPath);
+
+        UpdateScript::runAllFromSpecificPackageVersion('statamic/cms', '3.0.0');
+
+        $this->assertTrue(cache()->has('permissions-update-successful'));
+        $this->assertFalse(cache()->has('seo-pro-update-successful'));
+        $this->assertFileNotExists($this->previousLockPath);
+
+        cache()->forget('permissions-update-successful');
+
+        UpdateScript::runAllFromSpecificPackageVersion('statamic/seo-pro', '1.0.0');
+
+        $this->assertFalse(cache()->has('permissions-update-successful'));
+        $this->assertTrue(cache()->has('seo-pro-update-successful'));
+        $this->assertFileNotExists($this->previousLockPath);
+    }
+
     private function removeLockFiles()
     {
         foreach ([$this->lockPath, $this->previousLockPath] as $lockFile) {
@@ -302,7 +344,7 @@ class UpdatePermissions extends UpdateScript
 
     public function shouldUpdate($newVersion, $oldVersion)
     {
-        return true;
+        return $this->isUpdatingTo('3.1.0');
     }
 
     public function update()
@@ -360,7 +402,7 @@ class SeoProUpdate extends UpdateScript
 
     public function shouldUpdate($newVersion, $oldVersion)
     {
-        return true;
+        return $this->isUpdatingTo('2.1.0');
     }
 
     public function update()

@@ -88,13 +88,14 @@ abstract class UpdateScript
      * Run all registered update scripts.
      *
      * @param mixed $console
+     * @return bool
      */
     public static function runAll($console = null)
     {
         $newLockFile = Lock::file();
         $oldLockFile = Lock::file(self::BACKUP_PATH);
 
-        app('statamic.update-scripts')
+        $scripts = app('statamic.update-scripts')
             ->map(function ($fqcn) use ($console) {
                 try {
                     return new $fqcn($console);
@@ -119,5 +120,23 @@ abstract class UpdateScript
             });
 
         $oldLockFile->delete();
+
+        return $scripts->isNotEmpty();
+    }
+
+    /**
+     * Run all registered update scripts from specific package version.
+     *
+     * @param string $package
+     * @param string $version
+     * @param mixed $console
+     */
+    public static function runAllFromSpecificPackageVersion($package, $oldVersion, $console = null)
+    {
+        Lock::backup(base_path('composer.lock'));
+
+        Lock::file(self::BACKUP_PATH)->overridePackageVersion($package, $oldVersion);
+
+        return static::runAll($console);
     }
 }
