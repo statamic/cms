@@ -24,7 +24,7 @@ class EnableComposerUpdateScripts implements RunnableSolution
     public function getDocumentationLinks(): array
     {
         return [
-            'Configuring Statamic update scripts on older installations' => '', // TODO: Link knowledge base article.
+            'Configuring update scripts on older installations' => Statamic::docsUrl('/knowledge-base/configuring-update-scripts'),
         ];
     }
 
