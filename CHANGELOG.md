@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 3.0.37 (2021-01-06)
 
 ### What's new
 - Added a `CollectionCreated` event. [#3062](https://github.com/statamic/cms/issues/3062)
