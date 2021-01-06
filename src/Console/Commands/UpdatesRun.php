@@ -51,7 +51,7 @@ class UpdatesRun extends Command
     protected function getArguments()
     {
         return [
-            ['version', InputArgument::REQUIRED, 'Specify the version of Statamic you are updating from'],
+            ['version', InputArgument::REQUIRED, 'Specify the version you are updating from'],
         ];
     }
 
