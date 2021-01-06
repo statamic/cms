@@ -74,7 +74,7 @@ class PackToTheFuture
      *
      * @param string $package
      * @param string $version
-     * @param string|null $version
+     * @param string|null $path
      */
     public static function generateComposerLock(string $package, string $version, $path = null)
     {
@@ -85,6 +85,34 @@ class PackToTheFuture
                     'version' => $version,
                 ],
             ],
+        ];
+
+        file_put_contents(
+            static::preparePath($path ?? static::DEFAULT_TEST_PACKAGE_LOCATION.'/composer.lock'),
+            json_encode($content, JSON_UNESCAPED_SLASHES)
+        );
+    }
+
+    /**
+     * Generate composer.lock file for multiple test packages.
+     *
+     * @param string $packages
+     * @param string|null $path
+     */
+    public static function generateComposerLockForMultiple($packages, $path = null)
+    {
+        $packages = collect($packages)
+            ->map(function ($version, $package) {
+                return [
+                    'name' => $package,
+                    'version' => $version,
+                ];
+            })
+            ->values()
+            ->all();
+
+        $content = [
+            'packages' => $packages,
         ];
 
         file_put_contents(
