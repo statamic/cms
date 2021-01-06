@@ -30,6 +30,24 @@ class EntryInterface extends InterfaceType
             'url' => [
                 'type' => Type::string(),
             ],
+            'uri' => [
+                'type' => Type::string(),
+            ],
+            'edit_url' => [
+                'type' => Type::nonNull(Type::string()),
+            ],
+            'permalink' => [
+                'type' => Type::string(),
+            ],
+            'published' => [
+                'type' => Type::nonNull(Type::boolean()),
+            ],
+            'private' => [
+                'type' => Type::nonNull(Type::boolean()),
+            ],
+            'collection' => [
+                'type' => Type::nonNull(GraphQL::type(CollectionType::NAME)),
+            ],
         ];
     }
 
