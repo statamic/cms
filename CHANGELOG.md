@@ -6,6 +6,7 @@
 - Added a `CollectionCreated` event. [#3062](https://github.com/statamic/cms/issues/3062)
 - Added a `UserRegistering` event. [#3057](https://github.com/statamic/cms/issues/3057)
 - Added a `float` fieldtype. [#3060](https://github.com/statamic/cms/issues/3060)
+- Query strings can be ignored when using static caching. [#3075](https://github.com/statamic/cms/issues/3075)
 
 ### What's improved
 - You now get a confirmation before updating or downgrading Statamic and addons. [#3038](https://github.com/statamic/cms/issues/3038)
