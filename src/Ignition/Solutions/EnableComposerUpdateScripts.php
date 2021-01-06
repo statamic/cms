@@ -6,6 +6,7 @@ use Exception;
 use Facade\IgnitionContracts\RunnableSolution;
 use Statamic\Console\Composer\Json as ComposerJson;
 use Statamic\Console\NullConsole;
+use Statamic\Statamic;
 use Statamic\UpdateScripts\UpdateScript;
 
 class EnableComposerUpdateScripts implements RunnableSolution
@@ -43,7 +44,7 @@ class EnableComposerUpdateScripts implements RunnableSolution
         $console = new NullConsole;
 
         // Attempt updates first.
-        UpdateScript::runAllFromSpecificPackageVersion('statamic/seo-pro', '1.0', $console);
+        UpdateScript::runAllFromSpecificPackageVersion(Statamic::PACKAGE, '3.0.0', $console);
 
         // If there was error output in console,
         // throw exception so that user can re-run ignition solution or click through docs link.
