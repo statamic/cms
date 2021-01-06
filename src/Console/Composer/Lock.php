@@ -6,7 +6,9 @@ use Illuminate\Filesystem\Filesystem;
 use Statamic\Exceptions\ComposerLockFileNotFoundException;
 use Statamic\Exceptions\ComposerLockPackageNotFoundException;
 use Statamic\Facades\Path;
+use Statamic\Statamic;
 use Statamic\UpdateScripts\UpdateScript;
+use Tests\Fakes\Composer\Package\PackToTheFuture;
 
 class Lock
 {
@@ -54,6 +56,16 @@ class Lock
         }
 
         copy($file, $backupPath);
+    }
+
+    /**
+     * Create dummy lock backup for specific Statamic version.
+     *
+     * @param mixed $version
+     */
+    public static function createDummyBackup($version)
+    {
+        PackToTheFuture::generateComposerLock(Statamic::PACKAGE, $version, base_path(UpdateScript::BACKUP_PATH));
     }
 
     /**

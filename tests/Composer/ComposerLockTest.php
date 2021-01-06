@@ -133,6 +133,14 @@ class ComposerLockTest extends TestCase
         $this->assertEquals('1.0.0', Lock::file($this->previousLockPath)->getInstalledVersion('package/one'));
     }
 
+    /** @test */
+    public function it_can_create_dummy_backup_for_specific_statamic_version()
+    {
+        Lock::createDummyBackup('3.0.0');
+
+        $this->assertEquals('3.0.0', Lock::file($this->previousLockPath)->getInstalledVersion('statamic/cms'));
+    }
+
     private function removeLockFiles()
     {
         foreach ([$this->lockPath, $this->previousLockPath] as $lockFile) {
