@@ -2,8 +2,9 @@
 
 namespace Statamic\Console\Commands;
 
+use Exception;
 use Illuminate\Console\Command;
-use Statamic\Console\Composer\Json;
+use Statamic\Console\Composer\Json as ComposerJson;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 use Statamic\Statamic;
@@ -113,11 +114,24 @@ class Install extends Command
 
     protected function runUpdateScripts()
     {
-        if (Json::isMissingPreUpdateCmd()) {
-            return $this->outputMissingPreUpdateCmd();
+        if (ComposerJson::isMissingPreUpdateCmd()) {
+            return $this->addPreUpdateCmdAndRunFirstTime();
         }
 
         UpdateScript::runAll($this);
+
+        return $this;
+    }
+
+    protected function addPreUpdateCmdAndRunFirstTime()
+    {
+        try {
+            ComposerJson::addPreUpdateCmd();
+        } catch (Exception $exception) {
+            return $this->outputMissingPreUpdateCmd();
+        }
+
+        UpdateScript::runAllFromSpecificPackageVersion(Statamic::PACKAGE, '3.0.0', $this);
 
         return $this;
     }
@@ -126,7 +140,7 @@ class Install extends Command
     {
         $this->error('We notice you are missing a composer hook!');
         $this->error('Please ensure the following is registered in the `scripts` section of your composer.json file,');
-        $this->error('And re-run [php artisan statamic:install] when complete.');
+        $this->error('And re-run [php please updates:run 3.0] when complete.');
 
         $this->line(<<<'EOT'
 "scripts": {
