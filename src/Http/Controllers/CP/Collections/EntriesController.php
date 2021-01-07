@@ -156,6 +156,14 @@ class EntriesController extends CpController
 
         $parent = $values->pull('parent');
 
+        if (! is_null($parent)) {
+            $parentEntry = Entry::find($parent);
+
+            if (optional($parentEntry)->isRoot()) {
+                $parent = null;
+            }
+        }
+
         if ($explicitBlueprint = $values->pull('blueprint')) {
             $entry->blueprint($explicitBlueprint);
         }
