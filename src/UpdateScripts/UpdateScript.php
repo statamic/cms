@@ -24,8 +24,6 @@ abstract class UpdateScript
     {
         $this->console = $console ?? new NullConsole;
         $this->files = app(Filesystem::class);
-        $this->newLockFile = Lock::file()->ensureExists();
-        $this->oldLockFile = Lock::file(self::BACKUP_PATH)->ensureExists();
     }
 
     /**
@@ -66,8 +64,8 @@ abstract class UpdateScript
      */
     public function isUpdatingTo($version)
     {
-        $oldVersion = $this->oldLockFile->getInstalledVersion($this->package());
-        $newVersion = $this->newLockFile->getInstalledVersion($this->package());
+        $newVersion = Lock::file()->getInstalledVersion($this->package());
+        $oldVersion = Lock::file(self::BACKUP_PATH)->getInstalledVersion($this->package());
 
         return version_compare($version, $newVersion, '<=') && version_compare($version, $oldVersion, '>');
     }
@@ -97,20 +95,15 @@ abstract class UpdateScript
 
         $scripts = app('statamic.update-scripts')
             ->map(function ($fqcn) use ($console) {
-                try {
-                    return new $fqcn($console);
-                } catch (ComposerLockFileNotFoundException $exception) {
-                    return null;
-                }
+                return new $fqcn($console);
             })
-            ->filter()
             ->filter(function ($script) use ($newLockFile, $oldLockFile) {
                 try {
                     return $script->shouldUpdate(
                         $newLockFile->getInstalledVersion($script->package()),
                         $oldLockFile->getInstalledVersion($script->package())
                     );
-                } catch (ComposerLockPackageNotFoundException $exception) {
+                } catch (ComposerLockFileNotFoundException | ComposerLockPackageNotFoundException $exception) {
                     return false;
                 }
             })

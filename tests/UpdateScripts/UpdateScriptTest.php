@@ -6,9 +6,7 @@ use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Statamic\Auth\UserCollection;
-use Statamic\Exceptions\ComposerLockFileNotFoundException;
 use Statamic\Facades;
-use Statamic\Facades\Path;
 use Statamic\UpdateScripts\UpdateScript;
 use Tests\Fakes\Composer\Package\PackToTheFuture;
 use Tests\TestCase;
@@ -32,28 +30,6 @@ class UpdateScriptTest extends TestCase
         $this->removeLockFiles();
 
         parent::tearDown();
-    }
-
-    /** @test */
-    public function it_errors_when_instantiating_with_no_lock_file()
-    {
-        PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0', $this->previousLockPath);
-
-        $this->expectException(ComposerLockFileNotFoundException::class);
-        $this->expectExceptionMessage('Could not find a composer lock file at ['.Path::makeRelative($this->lockPath).'].');
-
-        new UpdatePermissions;
-    }
-
-    /** @test */
-    public function it_errors_when_instantiating_with_no_previous_lock_file()
-    {
-        PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0', $this->lockPath);
-
-        $this->expectException(ComposerLockFileNotFoundException::class);
-        $this->expectExceptionMessage('Could not find a composer lock file at ['.Path::makeRelative($this->previousLockPath).'].');
-
-        new UpdatePermissions;
     }
 
     /** @test */
