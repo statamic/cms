@@ -118,9 +118,25 @@ class ComposerLockTest extends TestCase
     /** @test */
     public function it_can_gets_normalized_version_of_a_package_from_composer_lock()
     {
-        PackToTheFuture::generateComposerLock('package/one', 'v1.0.0', $this->lockPath);
+        PackToTheFuture::generateComposerLockForMultiple([
+            'package/one' => '1.0.0', // Doesn't need normalizing.
+            'package/two' => '2.0',
+            'package/three' => '3',
+            'package/four' => 'v4.0.0',
+            'package/five' => 'v5.0',
+            'package/six' => 'v6',
+            'package/seven' => '7.1.0-beta.1', // Doesn't need normalizing.
+            'package/eight' => 'v8.1.0-beta.1',
+        ], $this->lockPath);
 
         $this->assertEquals('1.0.0', Lock::file()->getInstalledVersion('package/one'));
+        $this->assertEquals('2.0.0', Lock::file()->getInstalledVersion('package/two'));
+        $this->assertEquals('3.0.0', Lock::file()->getInstalledVersion('package/three'));
+        $this->assertEquals('4.0.0', Lock::file()->getInstalledVersion('package/four'));
+        $this->assertEquals('5.0.0', Lock::file()->getInstalledVersion('package/five'));
+        $this->assertEquals('6.0.0', Lock::file()->getInstalledVersion('package/six'));
+        $this->assertEquals('7.1.0-beta.1', Lock::file()->getInstalledVersion('package/seven'));
+        $this->assertEquals('8.1.0-beta.1', Lock::file()->getInstalledVersion('package/eight'));
     }
 
     /** @test */

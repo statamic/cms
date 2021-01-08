@@ -147,6 +147,19 @@ class UpdateScriptTest extends TestCase
     }
 
     /** @test */
+    public function it_can_check_if_version_is_normalized_when_user_overrides_lock_version()
+    {
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.0', $this->previousLockPath);
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.0.0', $this->lockPath);
+
+        $script = new UpdatePermissions;
+
+        // When user runs `php please updates:run 3.0`, `isUpdatingTo()` was returning the wrong result
+        // in this situation because `3.0` and `3.0.0` are not equal when using `version_compare()`.
+        $this->assertFalse($script->isUpdatingTo('3.0.0'));
+    }
+
+    /** @test */
     public function it_runs_update_scripts()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);

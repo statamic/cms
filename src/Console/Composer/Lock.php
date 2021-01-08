@@ -122,7 +122,7 @@ class Lock
         $packages = collect($content['packages'])
             ->map(function ($packageDetails) use ($package, $version) {
                 if ($packageDetails['name'] === $package) {
-                    $packageDetails['version'] = $version;
+                    $packageDetails['version'] = $this->normalizeVersion($version);
                 }
 
                 return $packageDetails;
@@ -144,6 +144,16 @@ class Lock
      */
     protected function normalizeVersion(string $version)
     {
-        return ltrim($version, 'v');
+        $version = ltrim($version, 'v');
+
+        if (preg_match('/^\d+\.\d+$/', $version)) {
+            $version .= '.0';
+        }
+
+        if (preg_match('/^\d+$/', $version)) {
+            $version .= '.0.0';
+        }
+
+        return $version;
     }
 }
