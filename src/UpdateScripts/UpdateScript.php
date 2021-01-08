@@ -94,12 +94,11 @@ abstract class UpdateScript
         $newLockFile = Lock::file();
         $oldLockFile = Lock::file(self::BACKUP_PATH);
 
-        $scripts = static::getRegisteredUpdateScripts($console);
-
-        $scripts = static::filterRunnable($scripts, $oldLockFile, $newLockFile)->each(function ($script) {
-            $script->console()->info('Running update script <comment>['.get_class($script).']</comment>');
-            $script->update();
-        });
+        $scripts = static::runUpdatableScripts(
+            static::getRegisteredScripts($console),
+            $oldLockFile,
+            $newLockFile
+        );
 
         $oldLockFile->delete();
 
@@ -121,14 +120,11 @@ abstract class UpdateScript
         $newLockFile = Lock::file();
         $oldLockFile = Lock::file(self::BACKUP_PATH)->overridePackageVersion($package, $oldVersion);
 
-        $scripts = static::getRegisteredUpdateScripts($console)->filter(function ($script) use ($package) {
+        $scripts = static::getRegisteredScripts($console)->filter(function ($script) use ($package) {
             return $script->package() === $package;
         });
 
-        $scripts = static::filterRunnable($scripts, $oldLockFile, $newLockFile)->each(function ($script) {
-            $script->console()->info('Running update script <comment>['.get_class($script).']</comment>');
-            $script->update();
-        });
+        $scripts = static::runUpdatableScripts($scripts, $oldLockFile, $newLockFile);
 
         $oldLockFile->delete();
 
@@ -141,7 +137,7 @@ abstract class UpdateScript
      * @param mixed $console
      * @return \Illuminate\Support\Collection
      */
-    protected static function getRegisteredUpdateScripts($console)
+    protected static function getRegisteredScripts($console)
     {
         return app('statamic.update-scripts')->map(function ($fqcn) use ($console) {
             return new $fqcn($console);
@@ -149,24 +145,29 @@ abstract class UpdateScript
     }
 
     /**
-     * Filter runnable update scripts.
+     * Run updatable scripts.
      *
      * @param \Illuminate\Support\Collection $scripts
      * @param Lock $oldLockFile
      * @param Lock $newLockFile
      * @return \Illuminate\Support\Collection
      */
-    protected static function filterRunnable($scripts, $oldLockFile, $newLockFile)
+    protected static function runUpdatableScripts($scripts, $oldLockFile, $newLockFile)
     {
-        return $scripts->filter(function ($script) use ($newLockFile, $oldLockFile) {
-            try {
-                return $script->shouldUpdate(
-                    $newLockFile->getInstalledVersion($script->package()),
-                    $oldLockFile->getInstalledVersion($script->package())
-                );
-            } catch (ComposerLockFileNotFoundException | ComposerLockPackageNotFoundException $exception) {
-                return false;
-            }
-        });
+        return $scripts
+            ->filter(function ($script) use ($newLockFile, $oldLockFile) {
+                try {
+                    return $script->shouldUpdate(
+                        $newLockFile->getInstalledVersion($script->package()),
+                        $oldLockFile->getInstalledVersion($script->package())
+                    );
+                } catch (ComposerLockFileNotFoundException | ComposerLockPackageNotFoundException $exception) {
+                    return false;
+                }
+            })
+            ->each(function ($script) {
+                $script->console()->info('Running update script <comment>['.get_class($script).']</comment>');
+                $script->update();
+            });
     }
 }
