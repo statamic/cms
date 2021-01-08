@@ -147,7 +147,7 @@ class GlideController extends Controller
         try {
             SignatureFactory::create(Config::getAppKey())->validateRequest($path, $_GET);
         } catch (SignatureException $e) {
-            abort(400, $e->getMessage());
+            abort(404);
         }
     }
 }
