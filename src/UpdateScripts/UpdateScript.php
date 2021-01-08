@@ -93,19 +93,33 @@ abstract class UpdateScript
         $newLockFile = Lock::file();
         $oldLockFile = Lock::file(self::BACKUP_PATH);
 
-        $scripts = app('statamic.update-scripts')
-            ->map(function ($fqcn) use ($console) {
-                return new $fqcn($console);
-            })
-            ->filter(function ($script) use ($newLockFile, $oldLockFile) {
-                try {
-                    return $script->shouldUpdate(
-                        $newLockFile->getInstalledVersion($script->package()),
-                        $oldLockFile->getInstalledVersion($script->package())
-                    );
-                } catch (ComposerLockFileNotFoundException | ComposerLockPackageNotFoundException $exception) {
-                    return false;
-                }
+        $scripts = static::getRunnableUpdateScripts($oldLockFile, $newLockFile, $console)->each(function ($script) {
+            $script->console()->info('Running update script <comment>['.get_class($script).']</comment>');
+            $script->update();
+        });
+
+        $oldLockFile->delete();
+
+        return $scripts->isNotEmpty();
+    }
+
+    /**
+     * Run all registered update scripts for a specific package version.
+     *
+     * @param string $package
+     * @param string $version
+     * @param mixed $console
+     */
+    public static function runUpdatesForSpecificPackageVersion($package, $oldVersion, $console = null)
+    {
+        Lock::backup(base_path('composer.lock'));
+
+        $newLockFile = Lock::file();
+        $oldLockFile = Lock::file(self::BACKUP_PATH)->overridePackageVersion($package, $oldVersion);
+
+        $scripts = static::getRunnableUpdateScripts($oldLockFile, $newLockFile, $console)
+            ->filter(function ($script) use ($package) {
+                return $script->package() === $package;
             })
             ->each(function ($script) {
                 $script->console()->info('Running update script <comment>['.get_class($script).']</comment>');
@@ -118,18 +132,28 @@ abstract class UpdateScript
     }
 
     /**
-     * Run all registered update scripts from specific package version.
+     * Get runnable update scripts.
      *
      * @param string $package
      * @param string $version
      * @param mixed $console
+     * @return \Illuminate\Support\Collection
      */
-    public static function runAllFromSpecificPackageVersion($package, $oldVersion, $console = null)
+    protected static function getRunnableUpdateScripts($oldLockFile, $newLockFile, $console)
     {
-        Lock::backup(base_path('composer.lock'));
-
-        Lock::file(self::BACKUP_PATH)->overridePackageVersion($package, $oldVersion);
-
-        return static::runAll($console);
+        return app('statamic.update-scripts')
+            ->map(function ($fqcn) use ($console) {
+                return new $fqcn($console);
+            })
+            ->filter(function ($script) use ($newLockFile, $oldLockFile) {
+                try {
+                    return $script->shouldUpdate(
+                        $newLockFile->getInstalledVersion($script->package()),
+                        $oldLockFile->getInstalledVersion($script->package())
+                    );
+                } catch (ComposerLockFileNotFoundException | ComposerLockPackageNotFoundException $exception) {
+                    return false;
+                }
+            });
     }
 }

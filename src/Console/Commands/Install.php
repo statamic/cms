@@ -131,7 +131,7 @@ class Install extends Command
             return $this->outputMissingPreUpdateCmd();
         }
 
-        UpdateScript::runAllFromSpecificPackageVersion(Statamic::PACKAGE, '3.0.0', $this);
+        UpdateScript::runUpdatesForSpecificPackageVersion(Statamic::PACKAGE, '3.0.0', $this);
 
         return $this;
     }

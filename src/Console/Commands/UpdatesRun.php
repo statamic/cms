@@ -36,7 +36,7 @@ class UpdatesRun extends Command
     {
         $package = $this->option('package') ?? Statamic::PACKAGE;
 
-        $success = UpdateScript::runAllFromSpecificPackageVersion($package, $this->argument('version'), $this);
+        $success = UpdateScript::runUpdatesForSpecificPackageVersion($package, $this->argument('version'), $this);
 
         $success
             ? $this->info('Update scripts were run successfully!')

@@ -282,34 +282,28 @@ class UpdateScriptTest extends TestCase
 
         $this->assertFileNotExists($this->previousLockPath);
 
-        UpdatePermissions::register();
+        UpdateTaxonomies::register();
         SeoProUpdate::register();
 
-        $this->assertFalse(cache()->has('permissions-update-successful'));
+        $this->assertFalse(cache()->has('taxonomies-update-successful'));
         $this->assertFalse(cache()->has('seo-pro-update-successful'));
 
         $registered = app('statamic.update-scripts');
 
-        $this->assertContains(UpdatePermissions::class, $registered);
+        $this->assertContains(UpdateTaxonomies::class, $registered);
         $this->assertContains(SeoProUpdate::class, $registered);
 
-        UpdateScript::runAllFromSpecificPackageVersion('statamic/cms', '3.1.8');
+        UpdateScript::runUpdatesForSpecificPackageVersion('statamic/cms', '3.0.0');
 
-        $this->assertFalse(cache()->has('permissions-update-successful'));
+        $this->assertTrue(cache()->has('taxonomies-update-successful'));
         $this->assertFalse(cache()->has('seo-pro-update-successful'));
         $this->assertFileNotExists($this->previousLockPath);
 
-        UpdateScript::runAllFromSpecificPackageVersion('statamic/cms', '3.0.0');
+        cache()->forget('taxonomies-update-successful');
 
-        $this->assertTrue(cache()->has('permissions-update-successful'));
-        $this->assertFalse(cache()->has('seo-pro-update-successful'));
-        $this->assertFileNotExists($this->previousLockPath);
+        UpdateScript::runUpdatesForSpecificPackageVersion('statamic/seo-pro', '1.0.0');
 
-        cache()->forget('permissions-update-successful');
-
-        UpdateScript::runAllFromSpecificPackageVersion('statamic/seo-pro', '1.0.0');
-
-        $this->assertFalse(cache()->has('permissions-update-successful'));
+        $this->assertFalse(cache()->has('taxonomies-update-successful'));
         $this->assertTrue(cache()->has('seo-pro-update-successful'));
         $this->assertFileNotExists($this->previousLockPath);
     }
