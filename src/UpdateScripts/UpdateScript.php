@@ -121,16 +121,14 @@ abstract class UpdateScript
         $newLockFile = Lock::file();
         $oldLockFile = Lock::file(self::BACKUP_PATH)->overridePackageVersion($package, $oldVersion);
 
-        $scripts = static::getRegisteredUpdateScripts($console);
+        $scripts = static::getRegisteredUpdateScripts($console)->filter(function ($script) use ($package) {
+            return $script->package() === $package;
+        });
 
-        $scripts = static::filterRunnable($scripts, $oldLockFile, $newLockFile)
-            ->filter(function ($script) use ($package) {
-                return $script->package() === $package;
-            })
-            ->each(function ($script) {
-                $script->console()->info('Running update script <comment>['.get_class($script).']</comment>');
-                $script->update();
-            });
+        $scripts = static::filterRunnable($scripts, $oldLockFile, $newLockFile)->each(function ($script) {
+            $script->console()->info('Running update script <comment>['.get_class($script).']</comment>');
+            $script->update();
+        });
 
         $oldLockFile->delete();
 
