@@ -61,6 +61,7 @@ abstract class UpdateScript
      * Determine if user is updating to specific version.
      *
      * @param mixed $version
+     * @return bool
      */
     public function isUpdatingTo($version)
     {
@@ -109,6 +110,7 @@ abstract class UpdateScript
      * @param string $package
      * @param string $version
      * @param mixed $console
+     * @return bool
      */
     public static function runUpdatesForSpecificPackageVersion($package, $oldVersion, $console = null)
     {
