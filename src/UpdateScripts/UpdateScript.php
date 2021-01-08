@@ -108,7 +108,7 @@ abstract class UpdateScript
      * Run all registered update scripts for a specific package version.
      *
      * @param string $package
-     * @param string $version
+     * @param string $oldVersion
      * @param mixed $console
      * @return bool
      */
@@ -136,8 +136,8 @@ abstract class UpdateScript
     /**
      * Get runnable update scripts.
      *
-     * @param string $package
-     * @param string $version
+     * @param Lock $oldLockFile
+     * @param Lock $newLockFile
      * @param mixed $console
      * @return \Illuminate\Support\Collection
      */
