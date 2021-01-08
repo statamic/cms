@@ -171,7 +171,7 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
     });
 
     Route::group(['namespace' => 'Users'], function () {
-        Route::post('users/actions', 'UserActionController@run')->name('users.actions.run');
+    Route::post('users/actions', 'UserActionController@run')->name('users.actions.run');
         Route::get('users/actions', 'UserActionController@bulkActions')->name('users.actions.bulk');
         Route::get('users/blueprint', 'UserBlueprintController@edit')->name('users.blueprint.edit');
         Route::patch('users/blueprint', 'UserBlueprintController@update')->name('users.blueprint.update');

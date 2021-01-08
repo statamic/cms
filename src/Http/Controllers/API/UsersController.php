@@ -17,6 +17,8 @@ class UsersController extends ApiController
 
     public function show($user)
     {
+        $user = User::find($user);
+
         return app(UserResource::class)::make($user);
     }
 }

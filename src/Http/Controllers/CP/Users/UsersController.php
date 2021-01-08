@@ -145,6 +145,8 @@ class UsersController extends CpController
 
     public function edit(Request $request, $user)
     {
+        $user = User::find($user);
+
         $this->authorize('edit', $user);
 
         $blueprint = $user->blueprint();
@@ -187,6 +189,8 @@ class UsersController extends CpController
 
     public function update(Request $request, $user)
     {
+        $user = User::find($user);
+
         $this->authorize('edit', $user);
 
         $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->all());
@@ -215,6 +219,8 @@ class UsersController extends CpController
 
     public function destroy($user)
     {
+        $user = User::find($user);
+
         if (! $user = User::find($user)) {
             return $this->pageNotFound();
         }
