@@ -7,11 +7,6 @@ use Statamic\UpdateScripts\UpdateScript;
 
 class AddPerEntryPermissions extends UpdateScript
 {
-    public function package()
-    {
-        return 'statamic/cms';
-    }
-
     public function shouldUpdate($newVersion, $oldVersion)
     {
         return $this->isUpdatingTo('3.1');
