@@ -32,6 +32,10 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
+        if ($this->isAnotherAuthor($user, $entry)) {
+            return $user->hasPermission("edit other authors {$entry->collectionHandle()} entries");
+        }
+
         return $user->hasPermission("edit {$entry->collectionHandle()} entries");
     }
 
@@ -58,6 +62,10 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
+        if ($this->isAnotherAuthor($user, $entry)) {
+            return $user->hasPermission("delete other authors {$entry->collectionHandle()} entries");
+        }
+
         return $user->hasPermission("delete {$entry->collectionHandle()} entries");
     }
 
@@ -65,6 +73,19 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
+        if ($this->isAnotherAuthor($user, $entry)) {
+            return $user->hasPermission("publish other authors {$entry->collectionHandle()} entries");
+        }
+
         return $user->hasPermission("publish {$entry->collectionHandle()} entries");
+    }
+
+    public function isAnotherAuthor($user, $entry)
+    {
+        if ($entry->authors() === false) {
+            return false;
+        }
+
+        return ! $entry->authors()->contains($user->id());
     }
 }
