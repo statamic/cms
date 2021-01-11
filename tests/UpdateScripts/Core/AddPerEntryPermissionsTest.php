@@ -6,10 +6,11 @@ use Statamic\Facades\Role;
 use Statamic\UpdateScripts\Core\AddPerEntryPermissions;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
+use Tests\UpdateScripts\Concerns\RunsUpdateScripts;
 
 class AddPerEntryPermissionsTest extends TestCase
 {
-    use PreventSavingStacheItemsToDisk;
+    use PreventSavingStacheItemsToDisk, RunsUpdateScripts;
 
     /** @test */
     public function it_can_add_new_per_entry_permissions()
@@ -45,7 +46,7 @@ class AddPerEntryPermissionsTest extends TestCase
             ])
             ->save();
 
-        (new AddPerEntryPermissions)->update();
+        $this->runUpdateScript(AddPerEntryPermissions::class);
 
         $expectedAuthor = [
             'access cp',
