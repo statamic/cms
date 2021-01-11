@@ -13,6 +13,7 @@ use Statamic\Modifiers\CoreModifiers;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes;
 use Statamic\Query\Scopes\Scope;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Tags;
 use Statamic\Widgets;
@@ -293,7 +294,7 @@ class ExtensionServiceProvider extends ServiceProvider
 
         foreach ($this->app['files']->files(__DIR__.'/../UpdateScripts/Core') as $file) {
             $fqcn = 'Statamic\\UpdateScripts\\Core\\'.$file->getFilenameWithoutExtension();
-            $fqcn::register();
+            $fqcn::register(Statamic::PACKAGE);
         }
     }
 }

@@ -8,6 +8,7 @@ use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
 use Statamic\Auth\UserCollection;
 use Statamic\Facades;
+use Statamic\Support\Str;
 use Statamic\UpdateScripts\UpdateScript;
 use Tests\Fakes\Composer\Package\PackToTheFuture;
 use Tests\TestCase;
@@ -39,21 +40,18 @@ class UpdateScriptTest extends TestCase
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
         PackToTheFuture::generateComposerLock('statamic/cms', '3.1.8', $this->lockPath);
 
-        $registered = app('statamic.update-scripts');
-
+        $this->assertCount(0, $registered = $this->getRegistered());
         $this->assertInstanceOf(Collection::class, $registered);
         $this->assertNotContains(UpdatePermissions::class, $registered);
         $this->assertNotContains(UpdateTrees::class, $registered);
 
-        $initialCount = $registered->count();
+        $this->register(UpdatePermissions::class);
+        $this->register(UpdateTrees::class);
 
-        UpdatePermissions::register();
-        UpdateTrees::register();
-
+        $this->assertCount(2, $registered = $this->getRegistered());
         $this->assertInstanceOf(Collection::class, $registered);
         $this->assertContains(UpdatePermissions::class, $registered);
         $this->assertContains(UpdateTrees::class, $registered);
-        $this->assertCount($initialCount + 2, $registered);
     }
 
     /** @test */
@@ -64,7 +62,7 @@ class UpdateScriptTest extends TestCase
 
         app()->forgetInstance('statamic.update-scripts');
 
-        $this->assertNull(UpdatePermissions::register());
+        $this->assertNull($this->register(UpdatePermissions::class));
     }
 
     /** @test */
@@ -73,7 +71,7 @@ class UpdateScriptTest extends TestCase
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
         PackToTheFuture::generateComposerLock('statamic/cms', '3.1.8', $this->lockPath);
 
-        $script = new UpdatePermissions;
+        $script = $this->register(UpdatePermissions::class);
 
         $this->assertTrue($script->isUpdatingTo('3.1.8'));
         $this->assertFalse($script->isUpdatingTo('3.0.25'));
@@ -86,7 +84,7 @@ class UpdateScriptTest extends TestCase
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
         PackToTheFuture::generateComposerLock('statamic/cms', '3.1.8', $this->lockPath);
 
-        $script = new UpdatePermissions;
+        $script = $this->register(UpdatePermissions::class);
 
         $this->assertFalse($script->isUpdatingTo('4.0.0'));
         $this->assertFalse($script->isUpdatingTo('4.0'));
@@ -111,7 +109,7 @@ class UpdateScriptTest extends TestCase
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
         PackToTheFuture::generateComposerLock('statamic/cms', 'v3.1.0-beta.2', $this->lockPath);
 
-        $script = new UpdatePermissions;
+        $script = $this->register(UpdatePermissions::class);
 
         $this->assertFalse($script->isUpdatingTo('4.0.0'));
         $this->assertFalse($script->isUpdatingTo('4.0'));
@@ -129,7 +127,7 @@ class UpdateScriptTest extends TestCase
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0', $this->previousLockPath);
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.0', $this->lockPath);
 
-        $script = new UpdatePermissions;
+        $script = $this->register(UpdatePermissions::class);
 
         // When user runs `php please updates:run 3.0`, `isUpdatingTo()` was returning the wrong result
         // in this situation because `3.0` and `3.0.0` are not equal when using `version_compare()`.
@@ -142,17 +140,16 @@ class UpdateScriptTest extends TestCase
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
         PackToTheFuture::generateComposerLock('statamic/cms', '3.1.8', $this->lockPath);
 
-        UpdatePermissions::register();
-        UpdateTrees::register();
-        UpdateTaxonomies::register();
+        $this->register(UpdatePermissions::class);
+        $this->register(UpdateTrees::class);
+        $this->register(UpdateTaxonomies::class);
 
-        $registered = app('statamic.update-scripts');
-
-        Manager::runAll();
-
+        $this->assertCount(3, $registered = $this->getRegistered());
         $this->assertContains(UpdatePermissions::class, $registered);
         $this->assertContains(UpdateTrees::class, $registered);
         $this->assertContains(UpdateTaxonomies::class, $registered);
+
+        Manager::runAll();
 
         $this->assertTrue(cache()->has('permissions-update-successful'));
         $this->assertFalse(cache()->has('trees-update-successful'));
@@ -177,19 +174,18 @@ class UpdateScriptTest extends TestCase
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0', $this->lockPath);
 
-        UpdatePermissions::register();
-        UpdateTrees::register();
-        UpdateTaxonomies::register();
-        SeoProUpdate::register();
+        $this->register(UpdatePermissions::class);
+        $this->register(UpdateTrees::class);
+        $this->register(UpdateTaxonomies::class);
+        $this->register(SeoProUpdate::class, 'statamic/seo-pro');
 
-        $registered = app('statamic.update-scripts');
-
-        Manager::runAll();
-
+        $this->assertCount(4, $registered = $this->getRegistered());
         $this->assertContains(UpdatePermissions::class, $registered);
         $this->assertContains(UpdateTrees::class, $registered);
         $this->assertContains(UpdateTaxonomies::class, $registered);
         $this->assertContains(SeoProUpdate::class, $registered);
+
+        Manager::runAll();
 
         $this->assertFalse(cache()->has('permissions-update-successful'));
         $this->assertFalse(cache()->has('trees-update-successful'));
@@ -202,19 +198,18 @@ class UpdateScriptTest extends TestCase
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0', $this->previousLockPath);
 
-        UpdatePermissions::register();
-        UpdateTrees::register();
-        UpdateTaxonomies::register();
-        SeoProUpdate::register();
+        $this->register(UpdatePermissions::class);
+        $this->register(UpdateTrees::class);
+        $this->register(UpdateTaxonomies::class);
+        $this->register(SeoProUpdate::class, 'statamic/seo-pro');
 
-        $registered = app('statamic.update-scripts');
-
-        Manager::runAll();
-
+        $this->assertCount(4, $registered = $this->getRegistered());
         $this->assertContains(UpdatePermissions::class, $registered);
         $this->assertContains(UpdateTrees::class, $registered);
         $this->assertContains(UpdateTaxonomies::class, $registered);
         $this->assertContains(SeoProUpdate::class, $registered);
+
+        Manager::runAll();
 
         $this->assertFalse(cache()->has('permissions-update-successful'));
         $this->assertFalse(cache()->has('trees-update-successful'));
@@ -228,19 +223,18 @@ class UpdateScriptTest extends TestCase
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
         PackToTheFuture::generateComposerLock('statamic/cms', '3.1.8', $this->lockPath);
 
-        UpdatePermissions::register();
-        UpdateTrees::register();
-        UpdateTaxonomies::register();
-        SeoProUpdate::register();
+        $this->register(UpdatePermissions::class);
+        $this->register(UpdateTrees::class);
+        $this->register(UpdateTaxonomies::class);
+        $this->register(SeoProUpdate::class, 'statamic/seo-pro');
 
-        $registered = app('statamic.update-scripts');
-
-        Manager::runAll();
-
+        $this->assertCount(4, $registered = $this->getRegistered());
         $this->assertContains(UpdatePermissions::class, $registered);
         $this->assertContains(UpdateTrees::class, $registered);
         $this->assertContains(UpdateTaxonomies::class, $registered);
         $this->assertContains(SeoProUpdate::class, $registered);
+
+        Manager::runAll();
 
         $this->assertTrue(cache()->has('permissions-update-successful'));
         $this->assertFalse(cache()->has('trees-update-successful'));
@@ -261,9 +255,7 @@ class UpdateScriptTest extends TestCase
 
         Facades\User::shouldReceive('all')->andReturn($users);
 
-        app()->instance('statamic.update-scripts', collect()); // Ignore core update scripts.
-
-        UpdatePermissions::register();
+        $this->register(UpdatePermissions::class);
 
         $console = $this->mock(Command::class, function ($mock) {
             $mock->shouldReceive('info')->once()->with('Running update script <comment>['.UpdatePermissions::class.']</comment>');
@@ -274,7 +266,7 @@ class UpdateScriptTest extends TestCase
     }
 
     /** @test */
-    public function it_runs_update_scripts_from_specific_package_versions()
+    public function it_runs_scripts_forspecific_package_versions()
     {
         PackToTheFuture::generateComposerLockForMultiple([
             'statamic/cms' => '3.1.8',
@@ -283,16 +275,14 @@ class UpdateScriptTest extends TestCase
 
         $this->assertFileNotExists($this->previousLockPath);
 
-        UpdateTaxonomies::register();
-        SeoProUpdate::register();
+        $this->register(UpdateTaxonomies::class);
+        $this->register(SeoProUpdate::class, 'statamic/seo-pro');
 
-        $this->assertFalse(cache()->has('taxonomies-update-successful'));
-        $this->assertFalse(cache()->has('seo-pro-update-successful'));
-
-        $registered = app('statamic.update-scripts');
-
+        $this->assertCount(2, $registered = $this->getRegistered());
         $this->assertContains(UpdateTaxonomies::class, $registered);
         $this->assertContains(SeoProUpdate::class, $registered);
+        $this->assertFalse(cache()->has('taxonomies-update-successful'));
+        $this->assertFalse(cache()->has('seo-pro-update-successful'));
 
         Manager::runUpdatesForSpecificPackageVersion('statamic/cms', '3.0.0');
 
@@ -309,6 +299,27 @@ class UpdateScriptTest extends TestCase
         $this->assertFileNotExists($this->previousLockPath);
     }
 
+    private function register($class, $package = 'statamic/cms')
+    {
+        $class::register($package);
+
+        if (! app()->has('statamic.update-scripts')) {
+            return null;
+        }
+
+        return new $class($package);
+    }
+
+    private function getRegistered()
+    {
+        return app('statamic.update-scripts')
+            ->pluck('class')
+            ->reject(function ($class) {
+                return Str::startsWith($class, 'Statamic\UpdateScripts\Core');
+            })
+            ->values();
+    }
+
     private function removeLockFiles()
     {
         foreach ([$this->lockPath, $this->previousLockPath] as $lockFile) {
@@ -321,11 +332,6 @@ class UpdateScriptTest extends TestCase
 
 class UpdatePermissions extends UpdateScript
 {
-    public function package()
-    {
-        return 'statamic/cms';
-    }
-
     public function shouldUpdate($newVersion, $oldVersion)
     {
         return $this->isUpdatingTo('3.1.0');
@@ -343,11 +349,6 @@ class UpdatePermissions extends UpdateScript
 
 class UpdateTrees extends UpdateScript
 {
-    public function package()
-    {
-        return 'statamic/cms';
-    }
-
     public function shouldUpdate($newVersion, $oldVersion)
     {
         return false;
@@ -361,11 +362,6 @@ class UpdateTrees extends UpdateScript
 
 class UpdateTaxonomies extends UpdateScript
 {
-    public function package()
-    {
-        return 'statamic/cms';
-    }
-
     public function shouldUpdate($newVersion, $oldVersion)
     {
         return true;
@@ -379,11 +375,6 @@ class UpdateTaxonomies extends UpdateScript
 
 class SeoProUpdate extends UpdateScript
 {
-    public function package()
-    {
-        return 'statamic/seo-pro';
-    }
-
     public function shouldUpdate($newVersion, $oldVersion)
     {
         return $this->isUpdatingTo('2.1.0');

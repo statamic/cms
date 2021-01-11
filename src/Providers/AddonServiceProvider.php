@@ -326,7 +326,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function bootUpdateScripts()
     {
         foreach ($this->updateScripts as $class) {
-            $class::register();
+            $class::register($this->getAddon()->package());
         }
 
         return $this;

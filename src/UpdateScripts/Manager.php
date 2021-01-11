@@ -64,8 +64,8 @@ class Manager
      */
     protected function getRegisteredScripts($console)
     {
-        return app('statamic.update-scripts')->map(function ($fqcn) use ($console) {
-            return new $fqcn($console);
+        return app('statamic.update-scripts')->map(function ($script) use ($console) {
+            return new $script['class']($script['package'], $console);
         });
     }
 

@@ -10,24 +10,19 @@ abstract class UpdateScript
 {
     const BACKUP_PATH = 'storage/statamic/updater/composer.lock.bak';
 
+    protected $package;
     protected $console;
     protected $files;
 
     /**
      * Instantiate update script.
      */
-    public function __construct($console = null)
+    public function __construct($package, $console = null)
     {
+        $this->package = $package;
         $this->console = $console ?? new NullConsole;
         $this->files = app(Filesystem::class);
     }
-
-    /**
-     * Define the package being updated.
-     *
-     * @return string
-     */
-    abstract public function package();
 
     /**
      * Whether the update should be run.
@@ -42,6 +37,16 @@ abstract class UpdateScript
      * Perform the update.
      */
     abstract public function update();
+
+    /**
+     * Get the package being updated.
+     *
+     * @return string
+     */
+    public function package()
+    {
+        return $this->package;
+    }
 
     /**
      * Get console command object for outputting messages to console.
@@ -70,12 +75,15 @@ abstract class UpdateScript
     /**
      * Register update script with Statamic.
      */
-    public static function register()
+    public static function register($package)
     {
         if (! app()->has('statamic.update-scripts')) {
             return;
         }
 
-        app('statamic.update-scripts')[] = static::class;
+        app('statamic.update-scripts')[] = [
+            'class' => static::class,
+            'package' => $package,
+        ];
     }
 }
