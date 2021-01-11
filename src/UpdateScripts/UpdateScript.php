@@ -14,8 +14,6 @@ abstract class UpdateScript
 
     protected $console;
     protected $files;
-    protected $newLockFile;
-    protected $oldLockFile;
 
     /**
      * Instantiate update script.
