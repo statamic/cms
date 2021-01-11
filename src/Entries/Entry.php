@@ -28,6 +28,7 @@ use Statamic\Facades\Stache;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Entry implements Contract, Augmentable, Responsable, Localization, Protectable
@@ -434,6 +435,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
+            'date' => $this->collection()->dated() ? $this->date()->timestamp : null,
             'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
         ];
     }
@@ -448,10 +450,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $attrs = $revision->attributes();
 
-        return $entry
+        $entry
             ->published($attrs['published'])
             ->data($attrs['data'])
             ->slug($attrs['slug']);
+
+        if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
+            $entry->date(Carbon::createFromTimestamp($date));
+        }
+
+        return $entry;
     }
 
     public function status()
