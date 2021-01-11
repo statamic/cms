@@ -19,7 +19,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $listen = [];
     protected $subscribe = [];
     protected $tags = [];
-    protected $filters = [];
+    protected $scopes = [];
     protected $fieldtypes = [];
     protected $modifiers = [];
     protected $widgets = [];
@@ -46,7 +46,7 @@ abstract class AddonServiceProvider extends ServiceProvider
             $this
                 ->bootEvents()
                 ->bootTags()
-                ->bootFilters()
+                ->bootScopes()
                 ->bootFieldtypes()
                 ->bootModifiers()
                 ->bootWidgets()
@@ -89,9 +89,9 @@ abstract class AddonServiceProvider extends ServiceProvider
         return $this;
     }
 
-    protected function bootFilters()
+    protected function bootScopes()
     {
-        foreach ($this->filters as $class) {
+        foreach ($this->scopes as $class) {
             $class::register();
         }
 
