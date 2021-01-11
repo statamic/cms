@@ -2,10 +2,10 @@
 
 namespace Statamic\Console\Commands;
 
+use Facades\Statamic\UpdateScripts\Manager as UpdateScriptManager;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Statamic;
-use Statamic\UpdateScripts\UpdateScript;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -36,7 +36,7 @@ class UpdatesRun extends Command
     {
         $package = $this->option('package') ?? Statamic::PACKAGE;
 
-        $success = UpdateScript::runUpdatesForSpecificPackageVersion($package, $this->argument('version'), $this);
+        $success = UpdateScriptManager::runUpdatesForSpecificPackageVersion($package, $this->argument('version'), $this);
 
         $success
             ? $this->info('Update scripts were run successfully!')

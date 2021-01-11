@@ -3,12 +3,12 @@
 namespace Statamic\Console\Commands;
 
 use Exception;
+use Facades\Statamic\UpdateScripts\Manager as UpdateScriptManager;
 use Illuminate\Console\Command;
 use Statamic\Console\Composer\Json as ComposerJson;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 use Statamic\Statamic;
-use Statamic\UpdateScripts\UpdateScript;
 
 class Install extends Command
 {
@@ -118,7 +118,7 @@ class Install extends Command
             return $this->addPreUpdateCmdAndRunFirstTime();
         }
 
-        UpdateScript::runAll($this);
+        UpdateScriptManager::runAll($this);
 
         return $this;
     }
@@ -131,7 +131,7 @@ class Install extends Command
             return $this->outputMissingPreUpdateCmd();
         }
 
-        UpdateScript::runUpdatesForSpecificPackageVersion(Statamic::PACKAGE, '3.0.0', $this);
+        UpdateScriptManager::runUpdatesForSpecificPackageVersion(Statamic::PACKAGE, '3.0.0', $this);
 
         return $this;
     }
