@@ -14,11 +14,11 @@ class UpdatesRun extends Command
     use RunsInPlease;
 
     /**
-     * The name and signature of the console command.
+     * The name of the console command.
      *
      * @var string
      */
-    protected $signature = 'statamic:updates:run';
+    protected $name = 'statamic:updates:run';
 
     /**
      * The console command description.
