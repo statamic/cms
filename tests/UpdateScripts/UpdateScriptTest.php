@@ -2,6 +2,7 @@
 
 namespace Tests\UpdateScripts;
 
+use Facades\Statamic\UpdateScripts\Manager;
 use Illuminate\Console\Command;
 use Illuminate\Filesystem\Filesystem;
 use Illuminate\Support\Collection;
@@ -147,7 +148,7 @@ class UpdateScriptTest extends TestCase
 
         $registered = app('statamic.update-scripts');
 
-        UpdateScript::runAll();
+        Manager::runAll();
 
         $this->assertContains(UpdatePermissions::class, $registered);
         $this->assertContains(UpdateTrees::class, $registered);
@@ -166,7 +167,7 @@ class UpdateScriptTest extends TestCase
 
         $this->assertFileExists($this->previousLockPath);
 
-        UpdateScript::runAll();
+        Manager::runAll();
 
         $this->assertFileNotExists($this->previousLockPath);
     }
@@ -183,7 +184,7 @@ class UpdateScriptTest extends TestCase
 
         $registered = app('statamic.update-scripts');
 
-        UpdateScript::runAll();
+        Manager::runAll();
 
         $this->assertContains(UpdatePermissions::class, $registered);
         $this->assertContains(UpdateTrees::class, $registered);
@@ -208,7 +209,7 @@ class UpdateScriptTest extends TestCase
 
         $registered = app('statamic.update-scripts');
 
-        UpdateScript::runAll();
+        Manager::runAll();
 
         $this->assertContains(UpdatePermissions::class, $registered);
         $this->assertContains(UpdateTrees::class, $registered);
@@ -234,7 +235,7 @@ class UpdateScriptTest extends TestCase
 
         $registered = app('statamic.update-scripts');
 
-        UpdateScript::runAll();
+        Manager::runAll();
 
         $this->assertContains(UpdatePermissions::class, $registered);
         $this->assertContains(UpdateTrees::class, $registered);
@@ -269,7 +270,7 @@ class UpdateScriptTest extends TestCase
             $mock->shouldReceive('success')->times(2);
         });
 
-        UpdateScript::runAll($console);
+        Manager::runAll($console);
     }
 
     /** @test */
@@ -293,7 +294,7 @@ class UpdateScriptTest extends TestCase
         $this->assertContains(UpdateTaxonomies::class, $registered);
         $this->assertContains(SeoProUpdate::class, $registered);
 
-        UpdateScript::runUpdatesForSpecificPackageVersion('statamic/cms', '3.0.0');
+        Manager::runUpdatesForSpecificPackageVersion('statamic/cms', '3.0.0');
 
         $this->assertTrue(cache()->has('taxonomies-update-successful'));
         $this->assertFalse(cache()->has('seo-pro-update-successful'));
@@ -301,7 +302,7 @@ class UpdateScriptTest extends TestCase
 
         cache()->forget('taxonomies-update-successful');
 
-        UpdateScript::runUpdatesForSpecificPackageVersion('statamic/seo-pro', '1.0.0');
+        Manager::runUpdatesForSpecificPackageVersion('statamic/seo-pro', '1.0.0');
 
         $this->assertFalse(cache()->has('taxonomies-update-successful'));
         $this->assertTrue(cache()->has('seo-pro-update-successful'));

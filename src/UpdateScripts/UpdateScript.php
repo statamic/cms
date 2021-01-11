@@ -5,8 +5,6 @@ namespace Statamic\UpdateScripts;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Composer\Lock;
 use Statamic\Console\NullConsole;
-use Statamic\Exceptions\ComposerLockFileNotFoundException;
-use Statamic\Exceptions\ComposerLockPackageNotFoundException;
 
 abstract class UpdateScript
 {
@@ -79,93 +77,5 @@ abstract class UpdateScript
         }
 
         app('statamic.update-scripts')[] = static::class;
-    }
-
-    /**
-     * Run all registered update scripts.
-     *
-     * @param mixed $console
-     * @return bool
-     */
-    public static function runAll($console = null)
-    {
-        $newLockFile = Lock::file();
-        $oldLockFile = Lock::file(self::BACKUP_PATH);
-
-        $scripts = static::runUpdatableScripts(
-            static::getRegisteredScripts($console),
-            $oldLockFile,
-            $newLockFile
-        );
-
-        $oldLockFile->delete();
-
-        return $scripts->isNotEmpty();
-    }
-
-    /**
-     * Run all registered update scripts for a specific package version.
-     *
-     * @param string $package
-     * @param string $oldVersion
-     * @param mixed $console
-     * @return bool
-     */
-    public static function runUpdatesForSpecificPackageVersion($package, $oldVersion, $console = null)
-    {
-        Lock::backup(base_path('composer.lock'));
-
-        $newLockFile = Lock::file();
-        $oldLockFile = Lock::file(self::BACKUP_PATH)->overridePackageVersion($package, $oldVersion);
-
-        $scripts = static::getRegisteredScripts($console)->filter(function ($script) use ($package) {
-            return $script->package() === $package;
-        });
-
-        $scripts = static::runUpdatableScripts($scripts, $oldLockFile, $newLockFile);
-
-        $oldLockFile->delete();
-
-        return $scripts->isNotEmpty();
-    }
-
-    /**
-     * Get registered update scripts.
-     *
-     * @param mixed $console
-     * @return \Illuminate\Support\Collection
-     */
-    protected static function getRegisteredScripts($console)
-    {
-        return app('statamic.update-scripts')->map(function ($fqcn) use ($console) {
-            return new $fqcn($console);
-        });
-    }
-
-    /**
-     * Run updatable scripts.
-     *
-     * @param \Illuminate\Support\Collection $scripts
-     * @param Lock $oldLockFile
-     * @param Lock $newLockFile
-     * @return \Illuminate\Support\Collection
-     */
-    protected static function runUpdatableScripts($scripts, $oldLockFile, $newLockFile)
-    {
-        return $scripts
-            ->filter(function ($script) use ($newLockFile, $oldLockFile) {
-                try {
-                    return $script->shouldUpdate(
-                        $newLockFile->getInstalledVersion($script->package()),
-                        $oldLockFile->getInstalledVersion($script->package())
-                    );
-                } catch (ComposerLockFileNotFoundException | ComposerLockPackageNotFoundException $exception) {
-                    return false;
-                }
-            })
-            ->each(function ($script) {
-                $script->console()->info('Running update script <comment>['.get_class($script).']</comment>');
-                $script->update();
-            });
     }
 }
