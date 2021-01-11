@@ -1,5 +1,26 @@
 # Release Notes
 
+## 3.0.38 (2021-01-11)
+
+### What's new
+- Added a horizontal rule button to Bard. [#3076](https://github.com/statamic/cms/issues/3076)
+- Ability to choose from multiple blueprints on the empty collection screen. [#1985](https://github.com/statamic/cms/issues/1985)
+- You can now edit a blueprint section's or Bard set's handle separately from the display text. [#1667](https://github.com/statamic/cms/issues/1667)
+- Addons can more easily register actions, scopes, and filters. [#3093](https://github.com/statamic/cms/issues/3093)
+
+### What's improved
+- Updated French and Dutch translations. [#3077](https://github.com/statamic/cms/issues/3077) [#3086](https://github.com/statamic/cms/issues/3086)
+
+### What's fixed
+- Fix Bard issue where using bold inside a link would split the link up. [#2109](https://github.com/statamic/cms/issues/2109)
+- Fix Bard issue where an empty paragraph is added before a newly added set. [#1491](https://github.com/statamic/cms/issues/1491)
+- Prevent editing and removing assets from the assets fieldtype when it's read only. [#1826](https://github.com/statamic/cms/issues/1826)
+- Half measure static caching uses the correct expiry key as per the docs. [#2744](https://github.com/statamic/cms/issues/2744)
+- Fixed an issue where a statically cached page would get unintentionally re-cached. [#3085](https://github.com/statamic/cms/issues/3085)
+- Fix date handling when using revisions. [#3094](https://github.com/statamic/cms/issues/3094)
+
+
+
 ## 3.0.37 (2021-01-06)
 
 ### What's new
