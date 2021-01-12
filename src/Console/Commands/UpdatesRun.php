@@ -6,19 +6,19 @@ use Facades\Statamic\UpdateScripts\Manager as UpdateScriptManager;
 use Illuminate\Console\Command;
 use Statamic\Console\RunsInPlease;
 use Statamic\Statamic;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
 
 class UpdatesRun extends Command
 {
     use RunsInPlease;
 
     /**
-     * The name of the console command.
+     * The name and signature of the console command.
      *
      * @var string
      */
-    protected $name = 'statamic:updates:run';
+    protected $signature = 'statamic:updates:run
+        { version : Specify the version you are updating from }
+        { --package : Specify a specific package you are updating from (ie. john/my-addon) }';
 
     /**
      * The console command description.
@@ -41,29 +41,5 @@ class UpdatesRun extends Command
         $success
             ? $this->info('Update scripts were run successfully!')
             : $this->comment('There were no update scripts for this version.');
-    }
-
-    /**
-     * Get the console command arguments.
-     *
-     * @return array
-     */
-    protected function getArguments()
-    {
-        return [
-            ['version', InputArgument::REQUIRED, 'Specify the version you are updating from'],
-        ];
-    }
-
-    /**
-     * Get the console command options.
-     *
-     * @return array
-     */
-    protected function getOptions()
-    {
-        return [
-            ['package', '', InputOption::VALUE_REQUIRED, 'Specify a specific package you are updating from (ie. john/my-addon)'],
-        ];
     }
 }
