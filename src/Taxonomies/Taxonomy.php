@@ -240,7 +240,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function url()
     {
-        return $this->uri();
+        return Site::current();
     }
 
     public function collection($collection = null)
@@ -324,6 +324,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         return [
             'title' => $this->title(),
             'handle' => $this->handle(),
+            'url' => $this->url(),
         ];
     }
 }
