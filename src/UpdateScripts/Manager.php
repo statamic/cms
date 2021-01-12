@@ -45,11 +45,11 @@ class Manager
         $newLockFile = Lock::file();
         $oldLockFile = Lock::file(UpdateScript::BACKUP_PATH)->overridePackageVersion($package, $oldVersion);
 
-        $scripts = static::getRegisteredScripts($console)->filter(function ($script) use ($package) {
+        $scripts = $this->getRegisteredScripts($console)->filter(function ($script) use ($package) {
             return $script->package() === $package;
         });
 
-        $scripts = static::runUpdatableScripts($scripts, $oldLockFile, $newLockFile);
+        $scripts = $this->runUpdatableScripts($scripts, $oldLockFile, $newLockFile);
 
         $oldLockFile->delete();
 
