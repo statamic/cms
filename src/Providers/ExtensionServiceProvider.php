@@ -180,6 +180,8 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Forms\Widget::class,
     ];
 
+    protected $updateScripts = [];
+
     public function register()
     {
         $this->registerExtensions();
@@ -292,9 +294,8 @@ class ExtensionServiceProvider extends ServiceProvider
     {
         $this->app->instance('statamic.update-scripts', collect());
 
-        foreach ($this->app['files']->files(__DIR__.'/../UpdateScripts/Core') as $file) {
-            $fqcn = 'Statamic\\UpdateScripts\\Core\\'.$file->getFilenameWithoutExtension();
-            $fqcn::register(Statamic::PACKAGE);
+        foreach ($this->updateScripts as $class) {
+            $class::register(Statamic::PACKAGE);
         }
     }
 }
