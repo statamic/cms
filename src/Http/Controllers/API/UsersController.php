@@ -20,7 +20,7 @@ class UsersController extends ApiController
     {
         throw_unless(
             $user = User::find($user),
-            new NotFoundHttpException("User [$user] not found.")
+            new NotFoundHttpException()
         );
 
         return app(UserResource::class)::make($user);

@@ -13,7 +13,7 @@ class PasswordController extends CpController
     {
         throw_unless(
             $user = User::find($user),
-            new NotFoundHttpException("User [$user] not found.")
+            new NotFoundHttpException()
         );
 
         $this->authorize('editPassword', $user);

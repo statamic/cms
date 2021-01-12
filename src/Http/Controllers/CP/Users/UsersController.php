@@ -148,7 +148,7 @@ class UsersController extends CpController
     {
         throw_unless(
             $user = User::find($user),
-            new NotFoundHttpException("User [$user] not found.")
+            new NotFoundHttpException()
         );
 
         $this->authorize('edit', $user);
@@ -195,7 +195,7 @@ class UsersController extends CpController
     {
         throw_unless(
             $user = User::find($user),
-            new NotFoundHttpException("User [$user] not found.")
+            new NotFoundHttpException()
         );
 
         $this->authorize('edit', $user);
@@ -228,7 +228,7 @@ class UsersController extends CpController
     {
         throw_unless(
             $user = User::find($user),
-            new NotFoundHttpException("User [$user] not found.")
+            new NotFoundHttpException()
         );
 
         if (! $user = User::find($user)) {
