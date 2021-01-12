@@ -107,6 +107,7 @@ export default {
 
         value(value, oldValue) {
             if (JSON.stringify(value) == JSON.stringify(oldValue)) return;
+            if (JSON.stringify(value) == JSON.stringify(this.sortableToArray(this.data))) return;
             this.data = this.arrayToSortable(value);
         }
     },
@@ -202,13 +203,6 @@ export default {
         deleteCancelled() {
             this.deletingRow = false;
             this.deletingColumn = false;
-        },
-
-        arrayToSortable(arr) {
-            return _.map(arr, value => {
-                return this.data.find(v => JSON.stringify(v.value) == JSON.stringify(value))
-                    || new SortableKeyValue(null, value);
-            });
         }
     }
 
