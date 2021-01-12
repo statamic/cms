@@ -146,10 +146,7 @@ class UsersController extends CpController
 
     public function edit(Request $request, $user)
     {
-        throw_unless(
-            $user = User::find($user),
-            new NotFoundHttpException()
-        );
+        throw_unless($user = User::find($user), new NotFoundHttpException);
 
         $this->authorize('edit', $user);
 
@@ -193,10 +190,7 @@ class UsersController extends CpController
 
     public function update(Request $request, $user)
     {
-        throw_unless(
-            $user = User::find($user),
-            new NotFoundHttpException()
-        );
+        throw_unless($user = User::find($user), new NotFoundHttpException);
 
         $this->authorize('edit', $user);
 
@@ -226,10 +220,7 @@ class UsersController extends CpController
 
     public function destroy($user)
     {
-        throw_unless(
-            $user = User::find($user),
-            new NotFoundHttpException()
-        );
+        throw_unless($user = User::find($user), new NotFoundHttpException);
 
         if (! $user = User::find($user)) {
             return $this->pageNotFound();
