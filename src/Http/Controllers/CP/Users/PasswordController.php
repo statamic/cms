@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\CP\Users;
 
 use Illuminate\Http\Request;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 
@@ -10,7 +11,10 @@ class PasswordController extends CpController
 {
     public function update(Request $request, $user)
     {
-        $user = User::find($user);
+        throw_unless(
+            $user = User::find($user),
+            new NotFoundHttpException("User [$user] not found.")
+        );
 
         $this->authorize('editPassword', $user);
 

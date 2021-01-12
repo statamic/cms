@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
@@ -145,7 +146,10 @@ class UsersController extends CpController
 
     public function edit(Request $request, $user)
     {
-        $user = User::find($user);
+        throw_unless(
+            $user = User::find($user),
+            new NotFoundHttpException("User [$user] not found.")
+        );
 
         $this->authorize('edit', $user);
 
@@ -189,7 +193,10 @@ class UsersController extends CpController
 
     public function update(Request $request, $user)
     {
-        $user = User::find($user);
+        throw_unless(
+            $user = User::find($user),
+            new NotFoundHttpException("User [$user] not found.")
+        );
 
         $this->authorize('edit', $user);
 
@@ -219,7 +226,10 @@ class UsersController extends CpController
 
     public function destroy($user)
     {
-        $user = User::find($user);
+        throw_unless(
+            $user = User::find($user),
+            new NotFoundHttpException("User [$user] not found.")
+        );
 
         if (! $user = User::find($user)) {
             return $this->pageNotFound();
