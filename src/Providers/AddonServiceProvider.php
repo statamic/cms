@@ -30,6 +30,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $publishables = [];
     protected $routes = [];
     protected $middlewareGroups = [];
+    protected $updateScripts = [];
     protected $viewNamespace;
     protected $publishAfterInstall = true;
     protected $config = true;
@@ -58,6 +59,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootTranslations()
                 ->bootRoutes()
                 ->bootMiddleware()
+                ->bootUpdateScripts()
                 ->bootViews()
                 ->bootPublishAfterInstall();
         });
@@ -316,6 +318,15 @@ abstract class AddonServiceProvider extends ServiceProvider
             foreach ($middleware as $class) {
                 $this->app['router']->pushMiddlewareToGroup($group, $class);
             }
+        }
+
+        return $this;
+    }
+
+    protected function bootUpdateScripts()
+    {
+        foreach ($this->updateScripts as $class) {
+            $class::register($this->getAddon()->package());
         }
 
         return $this;
