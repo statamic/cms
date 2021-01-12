@@ -5,13 +5,11 @@ namespace Tests\Feature\Entries;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
-use Mockery;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Folder;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
-use Statamic\Fields\Fields;
 use Statamic\Revisions\Revision;
 use Statamic\Revisions\WorkingCopy;
 use Tests\FakesRoles;
@@ -339,16 +337,9 @@ class EntryRevisionsTest extends TestCase
 
     private function setTestBlueprint($handle, $fields)
     {
-        $fields = collect($fields)->map(function ($field, $handle) {
-            return compact('handle', 'field');
-        })->all();
-
-        $blueprint = Mockery::mock(Blueprint::class);
-        $blueprint->shouldReceive('fields')->andReturn(new Fields($fields));
-
-        $blueprint->shouldReceive('ensureField')->andReturnSelf();
-        $blueprint->shouldReceive('ensureFieldPrepended')->andReturnSelf();
+        $blueprint = Blueprint::makeFromFields($fields)->setHandle($handle);
 
         BlueprintRepository::shouldReceive('find')->with('test')->andReturn($blueprint);
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect(['test' => $blueprint]));
     }
 }
