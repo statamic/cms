@@ -14,13 +14,6 @@ mix.sass(`${src}/sass/cp.scss`, `${dest}/css`).options({
     ],
 });
 
-mix.sass(`${src}/sass/graphiql.scss`, `${dest}/css`).options({
-    processCssUrls: false,
-    postCss: [
-        require('autoprefixer')
-    ],
-});
-
 mix.js(`${src}/js/app.js`, `${dest}/js`);
 mix.extract([
     '@popperjs/core',
