@@ -138,7 +138,7 @@ abstract class Builder extends BaseBuilder
                     }
                 }
             }
-            
+
             return ! in_array($value, $where['values']);
         });
     }
