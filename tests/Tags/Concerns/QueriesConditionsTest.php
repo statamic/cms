@@ -106,17 +106,19 @@ class QueriesConditionsTest extends TestCase
         $this->makeEntry('cat')->set('type', 'feline')->save();
         $this->makeEntry('lion')->set('type', 'feline')->save();
         $this->makeEntry('horse')->set('type', 'equine')->save();
+        $this->makeEntry('horse')->set('type', 'equine')->save();
+        $this->makeEntry('sphinx')->set('type', ['feline', 'aves'])->save();
         $this->makeEntry('bigfoot')->save();
 
-        $this->assertCount(7, $this->getEntries());
+        $this->assertCount(8, $this->getEntries());
         $this->assertEquals(['dog', 'wolf'], $this->getEntries(['type:in' => ['canine']])->map->slug()->all());
-        $this->assertEquals(['tiger', 'cat', 'lion'], $this->getEntries(['type:in' => ['feline']])->map->slug()->all());
-        $this->assertEquals(['dog', 'wolf', 'tiger', 'cat', 'lion'], $this->getEntries(['type:in' => ['canine', 'feline']])->map->slug()->all());
+        $this->assertEquals(['tiger', 'cat', 'lion', 'sphinx'], $this->getEntries(['type:in' => ['feline']])->map->slug()->all());
+        $this->assertEquals(['dog', 'wolf', 'tiger', 'cat', 'lion', 'sphinx'], $this->getEntries(['type:in' => ['canine', 'feline']])->map->slug()->all());
         $this->assertEquals(['horse'], $this->getEntries(['type:in' => ['equine']])->map->slug()->all());
 
         // Handles pipe array syntax
         $this->assertEquals(
-            ['dog', 'wolf', 'tiger', 'cat', 'lion'],
+            ['dog', 'wolf', 'tiger', 'cat', 'lion', 'sphinx'],
             $this->getEntries(['type:in' => 'canine|feline'])->map->slug()->all()
         );
     }
@@ -130,11 +132,12 @@ class QueriesConditionsTest extends TestCase
         $this->makeEntry('cat')->set('type', 'feline')->save();
         $this->makeEntry('lion')->set('type', 'feline')->save();
         $this->makeEntry('horse')->set('type', 'equine')->save();
+        $this->makeEntry('sphinx')->set('type', ['feline', 'aves'])->save();
         $this->makeEntry('bigfoot')->save();
 
-        $this->assertCount(7, $this->getEntries());
+        $this->assertCount(8, $this->getEntries());
         $this->assertEquals(
-            ['tiger', 'cat', 'lion', 'horse', 'bigfoot'],
+            ['tiger', 'cat', 'lion', 'horse', 'sphinx', 'bigfoot'],
             $this->getEntries(['type:not_in' => ['canine']])->map->slug()->all()
         );
         $this->assertEquals(
@@ -146,7 +149,7 @@ class QueriesConditionsTest extends TestCase
             $this->getEntries(['type:not_in' => ['canine', 'feline']])->map->slug()->all()
         );
         $this->assertEquals(
-            ['dog', 'wolf', 'tiger', 'cat', 'lion', 'bigfoot'],
+            ['dog', 'wolf', 'tiger', 'cat', 'lion', 'sphinx', 'bigfoot'],
             $this->getEntries(['type:not_in' => ['equine']])->map->slug()->all()
         );
 

@@ -116,6 +116,13 @@ abstract class Builder extends BaseBuilder
     protected function filterWhereIn($values, $where)
     {
         return $values->filter(function ($value) use ($where) {
+            if (is_array($value)) {
+                foreach ($value as $term) {
+                    if (in_array($term, $where['values'])) {
+                        return true;
+                    }
+                }
+            }
             return in_array($value, $where['values']);
         });
     }
@@ -123,6 +130,13 @@ abstract class Builder extends BaseBuilder
     protected function filterWhereNotIn($values, $where)
     {
         return $values->filter(function ($value) use ($where) {
+            if (is_array($value)) {
+                foreach ($value as $term) {
+                    if (in_array($term, $where['values'])) {
+                        return false;
+                    }
+                }
+            }
             return ! in_array($value, $where['values']);
         });
     }
