@@ -17,7 +17,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
-use Statamic\Facades\User;
 use Statamic\GraphQL\ResolvesValues;
 
 class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializable, ResolvesValuesContract
@@ -263,15 +262,6 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
     public function id()
     {
         return optional($this->entry())->id();
-    }
-
-    public function canDelete()
-    {
-        if (! $entry = $this->entry()) {
-            return true;
-        }
-
-        return User::current()->can('delete', $entry);
     }
 
     public function in($site)
