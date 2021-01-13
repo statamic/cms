@@ -79,6 +79,7 @@ class TreeBuilder
                 'title'       => $page->title(),
                 'url'         => $page->url(),
                 'edit_url'    => $page->editUrl(),
+                'can_delete'  => $page->canDelete(),
                 'slug'        => $page->slug(),
                 'redirect'    => $page->reference() ? $page->entry()->get('redirect') : null,
                 'collection'  => ! $collection ? null : [
