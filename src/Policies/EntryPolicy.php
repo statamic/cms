@@ -80,7 +80,7 @@ class EntryPolicy
         return $user->hasPermission("publish {$entry->collectionHandle()} entries");
     }
 
-    public function isAnotherAuthor($user, $entry)
+    protected function isAnotherAuthor($user, $entry)
     {
         if ($entry->authors() === false) {
             return false;
