@@ -6,7 +6,7 @@ class GraphQLController
 {
     public function index()
     {
-        return view('statamic::graphql.index');
+        return redirect()->action([self::class, 'graphiql']);
     }
 
     public function graphiql()
