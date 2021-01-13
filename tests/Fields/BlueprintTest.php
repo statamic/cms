@@ -539,6 +539,37 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function it_ensures_a_field_has_config()
+    {
+        $blueprint = (new Blueprint)->setContents(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'title', 'field' => ['type' => 'text']],
+                    ['handle' => 'author', 'field' => ['type' => 'text', 'do_not_touch_other_config' => true]],
+                ],
+            ],
+            'section_two' => [
+                'fields' => [
+                    ['handle' => 'content', 'field' => ['type' => 'text']],
+                ],
+            ],
+        ]]);
+
+        $fields = $blueprint->ensureFieldHasConfig('author', ['read_only' => true])->fields();
+
+        $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
+        $this->assertEquals(['type' => 'text'], $fields->get('content')->config());
+
+        $expectedConfig = [
+            'type' => 'text',
+            'do_not_touch_other_config' => true,
+            'read_only' => true,
+        ];
+
+        $this->assertEquals($expectedConfig, $fields->get('author')->config());
+    }
+
+    /** @test */
     public function it_merges_previously_undefined_keys_into_the_config_when_ensuring_a_field_exists_and_it_already_exists()
     {
         $blueprint = (new Blueprint)->setContents(['sections' => [
