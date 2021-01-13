@@ -106,7 +106,6 @@ class QueriesConditionsTest extends TestCase
         $this->makeEntry('cat')->set('type', 'feline')->save();
         $this->makeEntry('lion')->set('type', 'feline')->save();
         $this->makeEntry('horse')->set('type', 'equine')->save();
-        $this->makeEntry('horse')->set('type', 'equine')->save();
         $this->makeEntry('sphinx')->set('type', ['feline', 'aves'])->save();
         $this->makeEntry('bigfoot')->save();
 
