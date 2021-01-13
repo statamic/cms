@@ -11,6 +11,8 @@ class GraphQLController
 
     public function graphiql()
     {
-        return view('statamic::graphql.graphiql');
+        return view('statamic::graphql.graphiql', [
+            'url' => '/'.config('graphql.prefix'),
+        ]);
     }
 }
