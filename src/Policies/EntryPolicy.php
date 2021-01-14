@@ -32,7 +32,7 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
-        if ($this->isAnotherAuthor($user, $entry)) {
+        if ($this->hasAnotherAuthor($user, $entry)) {
             return $user->hasPermission("edit other authors {$entry->collectionHandle()} entries");
         }
 
@@ -62,7 +62,7 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
-        if ($this->isAnotherAuthor($user, $entry)) {
+        if ($this->hasAnotherAuthor($user, $entry)) {
             return $user->hasPermission("delete other authors {$entry->collectionHandle()} entries");
         }
 
@@ -73,16 +73,16 @@ class EntryPolicy
     {
         $user = User::fromUser($user);
 
-        if ($this->isAnotherAuthor($user, $entry)) {
+        if ($this->hasAnotherAuthor($user, $entry)) {
             return $user->hasPermission("publish other authors {$entry->collectionHandle()} entries");
         }
 
         return $user->hasPermission("publish {$entry->collectionHandle()} entries");
     }
 
-    protected function isAnotherAuthor($user, $entry)
+    protected function hasAnotherAuthor($user, $entry)
     {
-        if ($entry->authors() === false) {
+        if ($entry->blueprint()->hasField('author') === false) {
             return false;
         }
 
