@@ -98,6 +98,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('statamic.stache.stores.asset-containers.directory', __DIR__.'/__fixtures__/content/assets');
 
         $app['config']->set('statamic.api.enabled', true);
+        $app['config']->set('statamic.graphql.enabled', true);
 
         $app['config']->set('statamic.editions.pro', true);
 
