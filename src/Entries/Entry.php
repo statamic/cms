@@ -84,9 +84,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function authors()
     {
-        return $this->blueprint()->fields()->has('author')
-            ? collect($this->value('author'))
-            : false;
+        return collect($this->value('author'));
     }
 
     public function collection($collection = null)
