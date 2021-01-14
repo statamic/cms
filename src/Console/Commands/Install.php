@@ -87,7 +87,6 @@ class Install extends Command
     {
         $this->call('vendor:publish', ['--tag' => 'statamic']);
         $this->call('vendor:publish', ['--tag' => 'statamic-cp', '--force' => true]);
-        $this->call('vendor:publish', ['--tag' => 'statamic-graphiql', '--force' => true]);
 
         return $this;
     }
