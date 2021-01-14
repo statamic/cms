@@ -39,6 +39,17 @@ class EntryPolicy
         return $user->hasPermission("edit {$entry->collectionHandle()} entries");
     }
 
+    public function editOtherAuthorsEntries($user, $collection, $blueprint = null)
+    {
+        $blueprint = $blueprint ?? $collection->entryBlueprint();
+
+        if ($blueprint->hasField('author') === false) {
+            return true;
+        }
+
+        return $user->hasPermission("edit other authors {$collection->handle()} entries");
+    }
+
     public function update($user, $entry)
     {
         $user = User::fromUser($user);

@@ -149,7 +149,15 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
-        $fields = $entry->blueprint()->fields()->addValues($request->except('id'));
+        $blueprint = $entry->blueprint();
+
+        $data = $request->except('id');
+
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $data['author'] = $entry->value('author');
+        }
+
+        $fields = $entry->blueprint()->fields()->addValues($data);
 
         $fields->validate(Entry::updateRules($collection, $entry));
 
@@ -276,7 +284,13 @@ class EntriesController extends CpController
 
         $blueprint = $collection->entryBlueprint($request->_blueprint);
 
-        $fields = $blueprint->fields()->addValues($request->all());
+        $data = $request->all();
+
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $data['author'] = [User::current()->id()];
+        }
+
+        $fields = $blueprint->fields()->addValues($data);
 
         $fields->validate(Entry::createRules($collection, $site));
 
