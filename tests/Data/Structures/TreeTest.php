@@ -402,6 +402,85 @@ class TreeTest extends TestCase
         $tree->tree();
     }
 
+    /** @test */
+    public function it_cannot_move_into_root_if_structure_expects_root()
+    {
+        $this->expectExceptionMessage('Root page cannot have children');
+
+        $tree = $this->tree()->tree([
+            [
+                'entry' => 'pages-home',
+            ],
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                    ],
+                    [
+                        'entry' => 'pages-directors',
+                    ],
+                ],
+            ],
+            [
+                'entry' => 'pages-blog',
+            ],
+        ]);
+
+        $tree->move('pages-board', 'pages-home');
+    }
+
+    /** @test */
+    public function it_can_move_into_root_if_structure_does_not_expect_root()
+    {
+        $tree = $this->tree();
+        $tree->structure()->expectsRoot(false);
+
+        $tree->tree([
+            [
+                'entry' => 'pages-home',
+            ],
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                    ],
+                    [
+                        'entry' => 'pages-directors',
+                    ],
+                ],
+            ],
+            [
+                'entry' => 'pages-blog',
+            ],
+        ]);
+
+        $tree->move('pages-board', 'pages-home');
+
+        $this->assertEquals([
+            [
+                'entry' => 'pages-home',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                    ],
+                ],
+            ],
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-directors',
+                    ],
+                ],
+            ],
+            [
+                'entry' => 'pages-blog',
+            ],
+        ], $tree->tree());
+    }
+
     protected function tree()
     {
         return (new Tree)
