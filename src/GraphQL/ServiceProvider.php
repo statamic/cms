@@ -6,11 +6,17 @@ use Illuminate\Support\ServiceProvider as LaravelProvider;
 
 class ServiceProvider extends LaravelProvider
 {
-    public function boot()
+    public function register()
     {
-        $this->app->booted(function () {
+        $this->app->booting(function () {
+            $this->disableGraphiql();
             $this->setDefaultSchema();
         });
+    }
+
+    private function disableGraphiql()
+    {
+        config(['graphql.graphiql.display' => false]);
     }
 
     private function setDefaultSchema()
