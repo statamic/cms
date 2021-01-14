@@ -1040,3 +1040,29 @@ public function addGqlTypes()
     GraphQL::addType($type);
 }
 ```
+
+## Laravel Package
+
+Under the hood, Statamic uses the [rebing/graphql-laravel](https://github.com/rebing/graphql-laravel) package.
+
+By default, the integration should feel seamless and you won't even know another package is being used. Statamic will 
+perform the following automatic configuration of this package:
+
+- Setting up the `default` schema to Statamic's.
+- Disabling the `/graphiql` route (since we have our own inside the Control Panel)
+
+However, you're free to use this package on its own, as if you've installed it into a standalone Laravel application.
+
+If Statamic detects that you've published the package's config file (located at `config/graphql.php`), it will assume you're trying to use it manually and will
+avoid doing the automatic setup steps mentioned above.
+
+If you'd like to use Statamic's GraphQL schema in within the config file (maybe you want a different default, and want Statamic's one at `/graphql/statamic`)
+you can use the `DefaultSchema` class.
+
+```php
+[
+    'schemas' => [
+        'statamic' => \Statamic\GraphQL\DefaultSchema::config()
+    ]
+]
+```
