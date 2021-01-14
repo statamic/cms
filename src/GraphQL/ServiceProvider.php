@@ -9,9 +9,18 @@ class ServiceProvider extends LaravelProvider
     public function register()
     {
         $this->app->booting(function () {
+            if ($this->hasPublishedConfig()) {
+                return;
+            }
+
             $this->disableGraphiql();
             $this->setDefaultSchema();
         });
+    }
+
+    private function hasPublishedConfig()
+    {
+        return $this->app['files']->exists(config_path('graphql.php'));
     }
 
     private function disableGraphiql()
