@@ -6,6 +6,22 @@ pro: true
 id: fc564ddf-80c1-4d87-8675-4a41f13c7774
 ---
 
+## Enable GraphQL
+
+Enable the GraphQL API in your config or with an environment variable.
+
+```php
+// config/statamic/graphql.php
+'enabled' => true,
+```
+
+```env
+STATAMIC_GRAPHQL_ENABLED=true
+```
+
+> If you publish the underlying [package's](#laravel-package) config, the query routes will
+> be enabled regardless of whether you've disabled it in the Statamic config.
+
 ## Interfaces
 
 Statamic will provide "interface" types, which describe more generic items. For instance, an `EntryInterface` exists for all

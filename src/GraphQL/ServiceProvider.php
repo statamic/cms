@@ -15,6 +15,10 @@ class ServiceProvider extends LaravelProvider
                 return;
             }
 
+            if (! config('statamic.graphql.enabled')) {
+                config(['graphql.routes' => false]);
+            }
+
             $this->addMiddleware();
             $this->disableGraphiql();
             $this->setDefaultSchema();
