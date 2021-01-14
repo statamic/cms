@@ -177,8 +177,13 @@ class EntriesController extends CpController
 
         if ($collection->structure() && ! $collection->orderable()) {
             $entry->afterSave(function ($entry) use ($parent) {
-                $entry->structure()
-                    ->in($entry->locale())
+                $tree = $entry->structure()->in($entry->locale());
+
+                if (optional($tree->page($parent))->isRoot()) {
+                    $parent = null;
+                }
+
+                $tree
                     ->move($entry->id(), $parent)
                     ->save();
             });
