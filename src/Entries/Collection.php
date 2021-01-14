@@ -289,7 +289,7 @@ class Collection implements Contract, AugmentableContract
             $blueprint->ensureField('date', ['type' => 'date', 'required' => true], 'sidebar');
         }
 
-        if ($this->hasStructure()) {
+        if ($this->hasStructure() && ! $this->orderable()) {
             $blueprint->ensureField('parent', [
                 'type' => 'entries',
                 'collections' => [$this->handle()],
