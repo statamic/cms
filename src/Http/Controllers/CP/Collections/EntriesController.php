@@ -75,6 +75,10 @@ class EntriesController extends CpController
 
         $blueprint = $entry->blueprint();
 
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
+        }
+
         [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
         if ($hasOrigin = $entry->hasOrigin()) {
@@ -221,6 +225,10 @@ class EntriesController extends CpController
 
         if (! $blueprint) {
             throw new \Exception(__('A valid blueprint is required.'));
+        }
+
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
         }
 
         $values = [];
