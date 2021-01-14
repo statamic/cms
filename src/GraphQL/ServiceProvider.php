@@ -3,6 +3,8 @@
 namespace Statamic\GraphQL;
 
 use Illuminate\Support\ServiceProvider as LaravelProvider;
+use Statamic\Http\Middleware\API\SwapExceptionHandler;
+use Statamic\Http\Middleware\RequireStatamicPro;
 
 class ServiceProvider extends LaravelProvider
 {
@@ -13,6 +15,7 @@ class ServiceProvider extends LaravelProvider
                 return;
             }
 
+            $this->addMiddleware();
             $this->disableGraphiql();
             $this->setDefaultSchema();
         });
@@ -21,6 +24,14 @@ class ServiceProvider extends LaravelProvider
     private function hasPublishedConfig()
     {
         return $this->app['files']->exists(config_path('graphql.php'));
+    }
+
+    private function addMiddleware()
+    {
+        config(['graphql.middleware' => [
+            SwapExceptionHandler::class,
+            RequireStatamicPro::class,
+        ]]);
     }
 
     private function disableGraphiql()
