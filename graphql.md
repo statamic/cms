@@ -1082,3 +1082,15 @@ you can use the `DefaultSchema` class.
     ]
 ]
 ```
+
+## Authorization
+
+By default, all queries are allowed by anyone. We plan to add native features in the future.
+
+You can define custom authorization logic for any query by providing a closure to the static `auth` method.
+
+```php
+EntriesQuery::auth(function () {
+    return true; // true authorizes, false denies.
+});
+```
