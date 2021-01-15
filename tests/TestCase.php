@@ -216,5 +216,25 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
             return $this;
         });
+
+        $testResponseClass::macro('assertGqlUnauthorized', function () {
+            $this->assertOk();
+
+            $json = $this->json();
+
+            if (! isset($json['errors'])) {
+                throw new \PHPUnit\Framework\ExpectationFailedException(
+                    'GraphQL response contained no errors',
+                    new \SebastianBergmann\Comparator\ComparisonFailure('', '', json_encode(['errors' => [['message' => 'Unauthorized']]], JSON_PRETTY_PRINT), json_encode($json, JSON_PRETTY_PRINT))
+                );
+            }
+
+            Assert::assertTrue(
+                collect($json['errors'])->map->message->contains('Unauthorized'),
+                'No unauthorized error message in response'
+            );
+
+            return $this;
+        });
     }
 }
