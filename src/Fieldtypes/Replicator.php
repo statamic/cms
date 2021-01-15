@@ -98,6 +98,7 @@ class Replicator extends Fieldtype
             $rules = collect($rules)->map(function ($rule) use ($index) {
                 return str_replace('{this}', "{$this->field->handle()}.$index", $rule);
             })->all();
+
             return [$this->setRuleFieldKey($handle, $index) => $rules];
         })->all();
     }
