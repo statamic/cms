@@ -261,9 +261,26 @@ class Bard extends Replicator
         }, collect())->all();
     }
 
-    protected function setRuleFieldKey($handle, $index)
+    protected function setRuleFieldPrefix($index)
     {
-        return "{$this->field->handle()}.{$index}.attrs.values.{$handle}";
+        return "{$this->field->handle()}.{$index}.attrs.values";
+    }
+
+    public function extraValidationAttributes(): array
+    {
+        if (! $this->config('sets')) {
+            return [];
+        }
+
+        return collect($this->field->value())->filter(function ($set) {
+            return $set['type'] === 'set';
+        })->map(function ($set, $index) {
+            $set = $set['attrs']['values'];
+
+            return $this->setValidationAttributes($set['type'], $set, $index);
+        })->reduce(function ($carry, $rules) {
+            return $carry->merge($rules);
+        }, collect())->all();
     }
 
     public function isLegacyData($value)
