@@ -9,6 +9,7 @@ class Validator
     protected $fields;
     protected $data = [];
     protected $extraRules = [];
+    protected $context = [];
 
     public function make()
     {
@@ -29,6 +30,13 @@ class Validator
         return $this;
     }
 
+    public function withContext($context)
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
     public function rules()
     {
         return $this
@@ -43,7 +51,7 @@ class Validator
         }
 
         return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
-            return $carry->merge($field->rules());
+            return $carry->merge($field->setValidationContext($this->context)->rules());
         }, collect());
     }
 

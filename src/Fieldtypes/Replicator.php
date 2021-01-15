@@ -95,11 +95,16 @@ class Replicator extends Fieldtype
 
     protected function setRules($handle, $data, $index)
     {
-        $rules = $this->fields($handle)->addValues($data)->validator()->rules();
+        $rules = $this
+            ->fields($handle)
+            ->addValues($data)
+            ->validator()
+            ->withContext(['prefix' => $this->setRuleFieldPrefix($index).'.'])
+            ->rules();
 
         return collect($rules)->mapWithKeys(function ($rules, $handle) use ($index) {
             $rules = collect($rules)->map(function ($rule) use ($index) {
-                return str_replace('{this}', $this->setRuleFieldPrefix($index), $rule);
+                return str_replace('{this}', $this->field->validationContext('prefix').$this->setRuleFieldPrefix($index), $rule);
             })->all();
 
             return [$this->setRuleFieldPrefix($index).'.'.$handle => $rules];
@@ -122,11 +127,9 @@ class Replicator extends Fieldtype
 
     protected function setValidationAttributes($handle, $data, $index)
     {
-        $attributes = $this->fields($handle)->validator()->attributes();
+        $attributes = $this->fields($handle)->addValues($data)->validator()->attributes();
 
         return collect($attributes)->mapWithKeys(function ($attribute, $handle) use ($index) {
-            $attribute = str_replace('{this}', "{$this->field->handle()}.$index", $attribute);
-
             return [$this->setRuleFieldPrefix($index).'.'.$handle => $attribute];
         })->all();
     }
