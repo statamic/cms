@@ -4,6 +4,7 @@ namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Lang;
 use Statamic\Support\Str;
 
 class Field implements Arrayable
@@ -107,6 +108,18 @@ class Field implements Arrayable
     public function isRequired()
     {
         return collect($this->rules()[$this->handle])->contains('required');
+    }
+
+    public function validationAttributes()
+    {
+        $display = Lang::has($key = 'validation.attributes.'.$this->handle())
+            ? Lang::get($key)
+            : $this->display();
+
+        return array_merge(
+            [$this->handle() => $display],
+            $this->fieldtype()->extraValidationAttributes()
+        );
     }
 
     public function isLocalizable()

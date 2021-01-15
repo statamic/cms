@@ -2,7 +2,6 @@
 
 namespace Statamic\Fields;
 
-use Illuminate\Support\Facades\Lang;
 use Illuminate\Support\Facades\Validator as LaravelValidator;
 
 class Validator
@@ -71,17 +70,15 @@ class Validator
             $this->fields->preProcessValidatables()->values()->all(),
             $this->rules(),
             [],
-            $this->fieldAttributes()
+            $this->attributes()
         );
     }
 
-    private function fieldAttributes()
+    public function attributes()
     {
-        return $this->fields->all()->map(function ($field) {
-            $handle = 'validation.attributes.'.$field->handle();
-
-            return Lang::has($handle) ? Lang::get($handle) : $field->display();
-        })->all();
+        return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
+            return $carry->merge($field->validationAttributes());
+        }, collect())->all();
     }
 
     public static function explodeRules($rules)

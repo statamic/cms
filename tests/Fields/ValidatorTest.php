@@ -116,4 +116,34 @@ class ValidatorTest extends TestCase
             'additional' => ['required'],
         ], $validation->rules());
     }
+
+    /** @test */
+    public function it_compiles_field_attributes()
+    {
+        $fieldWithNoExtraAttributes = Mockery::mock(Field::class);
+        $fieldWithNoExtraAttributes->shouldReceive('validationAttributes')->andReturn(['one' => 'One']);
+
+        $fieldWithExtraAttributes = Mockery::mock(Field::class);
+        $fieldWithExtraAttributes->shouldReceive('validationAttributes')->andReturn([
+            'two' => 'Two',
+            'extra_one' => 'Extra One',
+            'extra_two' => 'Extra Two',
+        ]);
+
+        $fields = Mockery::mock(Fields::class);
+        $fields->shouldReceive('all')->andReturn(collect([
+            $fieldWithNoExtraAttributes,
+            $fieldWithExtraAttributes,
+        ]));
+        $fields->shouldReceive('preProcessValidatables')->andReturnSelf();
+
+        $validation = (new Validator)->fields($fields);
+
+        $this->assertEquals([
+            'one' => 'One',
+            'two' => 'Two',
+            'extra_one' => 'Extra One',
+            'extra_two' => 'Extra Two',
+        ], $validation->attributes());
+    }
 }

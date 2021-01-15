@@ -150,6 +150,35 @@ class FieldTest extends TestCase
     }
 
     /** @test */
+    public function it_merges_extra_validation_attributes_from_field_with_fieldtype()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function extraValidationAttributes(): array
+            {
+                return [
+                    'foo' => 'Foo',
+                    'bar' => 'Bar',
+                ];
+            }
+        };
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype_with_attributes')
+            ->andReturn($fieldtype);
+
+        $field = new Field('test', [
+            'type' => 'fieldtype_with_attributes',
+            'display' => 'My Test Field',
+        ]);
+
+        $this->assertEquals([
+            'test' => 'My Test Field',
+            'foo' => 'Foo',
+            'bar' => 'Bar',
+        ], $field->validationAttributes());
+    }
+
+    /** @test */
     public function it_checks_if_a_field_is_required_when_defined_in_field()
     {
         $fieldtype = new class extends Fieldtype {
