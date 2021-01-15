@@ -124,9 +124,30 @@ class Grid extends Fieldtype
     {
         $rules = $this->fields()->validator()->rules();
 
-        return collect($rules)->mapWithKeys(function ($rules, $handle) {
-            return ["{$this->field->handle()}.*.{$handle}" => $rules];
+        return collect($this->field->value())->mapWithKeys(function ($row, $index) use ($rules) {
+            return collect($row)->except('_id')->mapWithKeys(function ($value, $handle) use ($rules, $index) {
+                $prefix = "{$this->field->handle()}.{$index}";
+
+                $fieldRules = collect($rules[$handle])->map(function ($rule) use ($prefix) {
+                    return str_replace('{this}', $prefix, $rule);
+                })->all();
+
+                return ["{$prefix}.{$handle}" => $fieldRules];
+            });
         })->all();
+    }
+
+    public function extraValidationAttributes(): array
+    {
+        $attributes = $this->fields()->validator()->attributes();
+
+        return collect($this->field->value())->map(function ($row, $index) use ($attributes) {
+            return collect($row)->except('_id')->mapWithKeys(function ($value, $handle) use ($attributes, $index) {
+                return ["{$this->field->handle()}.{$index}.{$handle}" => $attributes[$handle]];
+            });
+        })->reduce(function ($carry, $rules) {
+            return $carry->merge($rules);
+        }, collect())->all();
     }
 
     public function preload()
