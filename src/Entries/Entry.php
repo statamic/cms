@@ -248,6 +248,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function apiUrl()
     {
+        if (! $this->id) {
+            return null;
+        }
+
         return Statamic::apiRoute('collections.entries.show', [$this->collectionHandle(), $this->id()]);
     }
 
