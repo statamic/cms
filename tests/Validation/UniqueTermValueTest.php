@@ -1,6 +1,5 @@
 <?php
 
-use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Validator;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
