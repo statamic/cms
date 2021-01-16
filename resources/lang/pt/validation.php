@@ -85,6 +85,7 @@ return [
     'uploaded' => 'Falha no carregamento.',
     'url' => 'O formato é inválido.',
     'unique_entry_value' => 'Este valor já foi usado.',
+    'unique_term_value' => 'Este valor já foi usado.',
     'unique_user_value' => 'Este valor já foi usado.',
     'duplicate_field_handle' => 'Campo com o valor de :handle não pode ser usado mais do que uma vez.',
     'one_site_without_origin' => 'Pelo menos um site não deve ter uma origem.',
