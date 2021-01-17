@@ -739,7 +739,7 @@ class Parser
                     $conditional = '<?php if ('.$condition.'): ?>'.addslashes($this->getVariable($if_true, $data)).'<?php endif ?>';
 
                     // Do the evaluation
-                    $output = $this->parsePhp($conditional);
+                    $output = stripslashes($this->parsePhp($conditional));
 
                     // Slide it on back into the template
                     $text = str_replace($match[0], $output, $text);
@@ -760,7 +760,7 @@ class Parser
                     $conditional = '<?php echo('.$condition.') ? "'.addslashes($this->getVariable(trim($if_true), $data)).'" : "'.addslashes($this->getVariable(trim($if_false), $data)).'"; ?>';
 
                     // Do the evaluation
-                    $output = $this->parsePhp($conditional);
+                    $output = stripslashes($this->parsePhp($conditional));
 
                     // Slide it on back into the template
                     $text = str_replace($match[0], $output, $text);
@@ -1051,7 +1051,7 @@ class Parser
         } elseif (is_object($value)) {
             return 'true';
         } else {
-            return stripslashes(var_export($value, true));
+            return var_export($value, true);
         }
     }
 
