@@ -2,6 +2,7 @@
 
 namespace Statamic\Search\Comb;
 
+use Statamic\Entries\Entry;
 use Statamic\Facades\File;
 use Statamic\Search\Comb\Exceptions\NoQuery;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
@@ -92,7 +93,7 @@ class Index extends BaseIndex
             return;
         }
 
-        $data->forget($document->id());
+        $data->forget($document->reference());
 
         $this->save($data);
     }
