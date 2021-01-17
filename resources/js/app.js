@@ -61,7 +61,7 @@ Vue.prototype.$echo = Statamic.$echo;
 Vue.prototype.$bard = Statamic.$bard;
 Vue.prototype.$keys = Statamic.$keys;
 
-window.moment = Vue.moment = Vue.prototype.$moment = require('moment');
+window.moment = Vue.moment = Vue.prototype.$moment = require('moment-timezone');
 
 Vue.use(Popover, { tooltip: true })
 Vue.use(PortalVue)

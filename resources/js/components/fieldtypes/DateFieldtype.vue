@@ -129,9 +129,19 @@ export default {
 
     methods: {
         handleUpdate(value) {
-            let date = this.config.mode === "single"
-                ? Vue.moment(this.dateTime).format(this.format)
-                : this.date;
+            let date = null;
+            if (this.config.mode === "single") {
+                date = Vue.moment(this.dateTime).format(this.format);
+            } else {
+                let tempDate = Object.assign({}, this.date);
+                date = {
+                    start: Vue.moment(tempDate.start).tz('UTC', true).toDate(),
+                    end: Vue.moment(tempDate.end).tz('UTC', true).toDate()
+                };
+            }
+            // let date = this.config.mode === "single"
+            //     ? Vue.moment(this.dateTime).format(this.format)
+            //     : this.date;
 
             if (date == 'Invalid date') {
                 date = null;
