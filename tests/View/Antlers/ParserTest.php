@@ -1821,7 +1821,7 @@ EOT;
         ];
 
         $this->assertEquals("Let's work together", $this->parse('{{ seo_title ? seo_title : title }}', $vars));
-        $this->assertEquals("Contact", $this->parse('{{ title ? title : seo_title }}', $vars));
+        $this->assertEquals('Contact', $this->parse('{{ title ? title : seo_title }}', $vars));
 
         $this->assertEquals('https://statamic.com', $this->parse('{{ local_office_link ? local_office_link : head_office_link }}', $vars));
         $this->assertEquals('https://statamic.com', $this->parse('{{ head_office_link ? head_office_link : local_office_link }}', $vars));
