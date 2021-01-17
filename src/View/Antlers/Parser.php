@@ -1051,7 +1051,7 @@ class Parser
         } elseif (is_object($value)) {
             return 'true';
         } else {
-            return var_export($value, true);
+            return stripslashes(var_export($value, true));
         }
     }
 
