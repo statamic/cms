@@ -102,7 +102,7 @@ class TaxonomyTest extends TestCase
     public function it_returns_a_url_for_breadcrumbs()
     {
         $taxonomy = (new Taxonomy)->handle('tags');
-        $this->assertEquals('http://localhost', $taxonomy->url()->url());
+        $this->assertEquals("/tags", $taxonomy->url());
     }
 
     /** @test */
