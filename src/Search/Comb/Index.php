@@ -2,7 +2,6 @@
 
 namespace Statamic\Search\Comb;
 
-use Statamic\Entries\Entry;
 use Statamic\Facades\File;
 use Statamic\Search\Comb\Exceptions\NoQuery;
 use Statamic\Search\Comb\Exceptions\NoResultsFound;
