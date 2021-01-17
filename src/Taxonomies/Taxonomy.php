@@ -240,7 +240,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function url()
     {
-        return ($this->collection ? $this->collection->url() : '') . $this->uri();
+        return ($this->collection ? $this->collection->url() : '').$this->uri();
     }
 
     public function collection($collection = null)
