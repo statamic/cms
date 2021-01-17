@@ -159,6 +159,10 @@ class Tags extends BaseTags
     {
         $submissions = Form::find($this->getForm())->submissions();
 
+        if ($sort = $this->params->get('sort')) {
+            $submissions->sortBy($sort);
+        }
+
         return $this->output($submissions);
     }
 
