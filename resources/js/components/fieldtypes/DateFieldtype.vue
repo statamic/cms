@@ -129,25 +129,22 @@ export default {
 
     methods: {
         handleUpdate(value) {
-            let date = null;
-            if (this.config.mode === "single") {
-                date = Vue.moment(this.dateTime).format(this.format);
-            } else {
-                let tempDate = Object.assign({}, this.date);
-                date = {
-                    start: Vue.moment(tempDate.start).tz('UTC', true).toDate(),
-                    end: Vue.moment(tempDate.end).tz('UTC', true).toDate()
-                };
-            }
-            // let date = this.config.mode === "single"
-            //     ? Vue.moment(this.dateTime).format(this.format)
-            //     : this.date;
+            let date = this.config.mode === "single"
+                ? Vue.moment(this.dateTime).format(this.format)
+                : this.convertToUTC(this.date);
 
             if (date == 'Invalid date') {
                 date = null;
             }
 
             this.update(date);
+        },
+
+        convertToUTC(date) {
+            return {
+                start: Vue.moment(date.start).tz('UTC', true).format(this.format),
+                end: Vue.moment(date.end).tz('UTC', true).format(this.format)
+            };
         },
 
         addDate() {
