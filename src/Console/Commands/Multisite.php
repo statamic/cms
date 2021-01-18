@@ -43,6 +43,8 @@ class Multisite extends Command
 
         $this->siteTwo = $this->ask('Handle of the second site', 'two');
 
+        $this->clearStache();
+
         $config = $this->updateSiteConfig();
 
         Collection::all()->each(function ($collection) {
@@ -67,6 +69,13 @@ class Multisite extends Command
 
         $this->comment('[!] Update <comment>config/statamic/sites.php</comment>\'s sites array to the following:');
         $this->line(VarExporter::export($config));
+    }
+
+    protected function clearStache()
+    {
+        Stache::clear();
+        $this->checkLine('Stache cleared.');
+        $this->line('');
     }
 
     protected function updateSiteConfig()
