@@ -53,6 +53,8 @@ class Multisite extends Command
 
         $config = $this->updateSiteConfig();
 
+        $this->comment('Converting...');
+
         Collection::all()->each(function ($collection) {
             $this->moveCollectionContent($collection);
             $this->updateCollection($collection);
@@ -70,6 +72,7 @@ class Multisite extends Command
         });
 
         Cache::clear();
+        $this->checkLine('Cache cleared.');
 
         $this->attemptToWriteSiteConfig($config);
 
