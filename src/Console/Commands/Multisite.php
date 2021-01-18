@@ -13,6 +13,7 @@ use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Facades\YAML;
+use Statamic\Statamic;
 use Symfony\Component\VarExporter\VarExporter;
 
 class Multisite extends Command
@@ -27,6 +28,10 @@ class Multisite extends Command
 
     public function handle()
     {
+        if (! $this->checkForAndEnablePro()) {
+            return $this->crossLine('Multisite has not been enabled.');
+        }
+
         Stache::disableUpdatingIndexes();
 
         $this->siteOne = Site::default()->handle();
@@ -178,5 +183,28 @@ class Multisite extends Command
     protected function navsHaveBeenMoved()
     {
         return File::isDirectory("content/navigation/{$this->siteOne}");
+    }
+
+    protected function checkForAndEnablePro()
+    {
+        if (Statamic::pro()) {
+            return true;
+        }
+
+        if (! $this->confirm('Statamic Pro is required for multiple sites. Would you like to enable it?', true)) {
+            return false;
+        }
+
+        try {
+            Statamic::enablePro();
+            $this->checkLine('Statamic Pro has been enabled.');
+        } catch (\Exception $e) {
+            $this->error('Could not automatically enable Pro.');
+            $this->line('You can enable it manually in <comment>config/statamic/editions.php</comment>');
+
+            return false;
+        }
+
+        return true;
     }
 }
