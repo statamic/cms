@@ -162,7 +162,10 @@
 
                 this.$store.commit('statamic/composer', {
                     processing: true,
-                    status: 'Installing ' + this.package + ' version ' + version,
+                    status: __('Installing :package version :version', {
+                        package: this.package,
+                        version: version
+                    }),
                     package: this.package,
                 });
 
@@ -174,7 +177,7 @@
 
                 this.$store.commit('statamic/composer', {
                     processing: false,
-                    status: 'Installation complete!',
+                    status: __('Installation complete!'),
                     package: this.package,
                 });
 
