@@ -8,6 +8,13 @@ use Tests\TestCase;
 /** @group graphql */
 class QueryAuthorizationTest extends TestCase
 {
+    public function tearDown(): void
+    {
+        parent::tearDown();
+
+        PingQuery::auth(null);
+    }
+
     /** @test */
     public function it_authorizes_by_default()
     {

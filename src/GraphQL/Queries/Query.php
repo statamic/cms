@@ -16,7 +16,7 @@ abstract class Query extends BaseQuery
         TypeRegistrar::register();
     }
 
-    public static function auth(Closure $closure)
+    public static function auth($closure)
     {
         static::$auth = $closure;
     }
