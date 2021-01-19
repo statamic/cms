@@ -12,3 +12,5 @@
 {{ trans_choice('blade trans_choice single quote :param', 2, ['param']) }}
 {{ trans_choice("blade trans_choice double quote string", 2) }}
 {{ trans_choice("blade trans_choice double quote :param", 2, ['param']) }}
+
+{{ __('blade with/slash') }}
