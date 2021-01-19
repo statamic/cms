@@ -16,7 +16,6 @@ class GlobalTest extends TestCase
     /** @test */
     public function it_queries_a_global_set_by_handle()
     {
-        config(['app.debug' => true]);
         GlobalFactory::handle('social')->data(['twitter' => '@statamic'])->create();
         GlobalFactory::handle('company')->data(['company_name' => 'Statamic'])->create();
         $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');

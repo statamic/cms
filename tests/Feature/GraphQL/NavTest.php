@@ -176,7 +176,6 @@ GQL;
     /** @test */
     public function it_queries_the_tree_inside_a_nav_with_entries()
     {
-        config(['app.debug' => true]);
         $this->createEntries();
 
         Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {

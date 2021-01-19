@@ -14,7 +14,6 @@ class NavigationsTest extends TestCase
     /** @test */
     public function it_queries_navigations()
     {
-        config(['app.debug' => true]);
         Nav::make('links')->title('Links')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {
             $nav->addTree($nav->makeTree('en'));
             $nav->save();
