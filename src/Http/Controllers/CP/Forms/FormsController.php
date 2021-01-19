@@ -216,7 +216,7 @@ class FormsController extends CpController
                                 'handle' => 'to',
                                 'field' => [
                                     'type' => 'text',
-                                    'display' => __('Recipient (To)'),
+                                    'display' => __('Recipient'),
                                     'validate' => [
                                         'required',
                                     ],
@@ -227,7 +227,7 @@ class FormsController extends CpController
                                 'handle' => 'from',
                                 'field' => [
                                     'type' => 'text',
-                                    'display' => __('Sender (From)'),
+                                    'display' => __('Sender'),
                                     'instructions' => __('statamic::messages.form_configure_email_from_instructions').' ('.config('mail.from.address').').',
                                 ],
                             ],
@@ -243,6 +243,7 @@ class FormsController extends CpController
                                 'handle' => 'subject',
                                 'field' => [
                                     'type' => 'text',
+                                    'display' => __('Subject'),
                                     'instructions' => __('statamic::messages.form_configure_email_subject_instructions'),
                                 ],
                             ],
