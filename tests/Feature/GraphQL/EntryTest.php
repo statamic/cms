@@ -3,7 +3,7 @@
 namespace Tests\Feature\GraphQL;
 
 use GraphQL\Type\Definition\Type;
-use Statamic\GraphQL\Types\EntryInterface;
+use Statamic\Facades\GraphQL;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -67,9 +67,9 @@ GQL;
     }
 
     /** @test */
-    public function it_can_add_custom_fields_to_entry()
+    public function it_can_add_custom_fields_to_interface()
     {
-        EntryInterface::addField('one', function () {
+        GraphQL::addField('EntryInterface', 'one', function () {
             return [
                 'type' => Type::string(),
                 'resolve' => function ($a) {
@@ -78,7 +78,7 @@ GQL;
             ];
         });
 
-        EntryInterface::addField('two', function () {
+        GraphQL::addField('EntryInterface', 'two', function () {
             return [
                 'type' => Type::string(),
                 'resolve' => function ($a) {
@@ -87,7 +87,7 @@ GQL;
             ];
         });
 
-        EntryInterface::addField('title', function () {
+        GraphQL::addField('EntryInterface', 'title', function () {
             return [
                 'type' => Type::string(),
                 'resolve' => function ($a) {
@@ -119,5 +119,80 @@ GQL;
                     'title' => 'the overridden title',
                 ],
             ]]);
+    }
+
+    /** @test */
+    public function it_can_add_custom_fields_to_an_implementation()
+    {
+        GraphQL::addField('Entry_Blog_ArtDirected', 'one', function () {
+            return [
+                'type' => Type::string(),
+                'resolve' => function ($a) {
+                    return 'first';
+                },
+            ];
+        });
+
+        GraphQL::addField('Entry_Blog_ArtDirected', 'title', function () {
+            return [
+                'type' => Type::string(),
+                'resolve' => function ($a) {
+                    return 'the overridden title';
+                },
+            ];
+        });
+
+        $query = <<<'GQL'
+{
+    entry(id: "2") {
+        id
+        ... on Entry_Blog_ArtDirected {
+            one
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'id' => '2',
+                    'one' => 'first',
+                    'title' => 'the overridden title',
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function adding_custom_field_to_an_implementation_does_not_add_it_to_the_interface()
+    {
+        GraphQL::addField('Entry_Blog_ArtDirected', 'one', function () {
+            return [
+                'type' => Type::string(),
+                'resolve' => function ($a) {
+                    return 'first';
+                },
+            ];
+        });
+
+        $query = <<<'GQL'
+{
+    entry(id: "2") {
+        id
+        one
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson(['errors' => [[
+                'message' => 'Cannot query field "one" on type "EntryInterface". Did you mean to use an inline fragment on "Entry_Blog_ArtDirected"?',
+            ]]]);
     }
 }
