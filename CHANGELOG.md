@@ -1,5 +1,87 @@
 # Release Notes
 
+## 3.0.39 (2021-01-19)
+
+### What's improved
+- Fixed a handful of translation issues. [#2511](https://github.com/statamic/cms/issues/2511) [#2520](https://github.com/statamic/cms/issues/2520) [#2515](https://github.com/statamic/cms/issues/2515) [#2510](https://github.com/statamic/cms/issues/2510) [#2509](https://github.com/statamic/cms/issues/2509) [#2641](https://github.com/statamic/cms/issues/2641) [#2514](https://github.com/statamic/cms/issues/2514) [#3119](https://github.com/statamic/cms/issues/3119)
+- The `multisite` command will enable pro and update your config file for you. [#3125](https://github.com/statamic/cms/issues/3125)
+
+### What's fixed
+- Fix error in the `multisite` command. [#3125](https://github.com/statamic/cms/issues/3125)
+- Fix table fieldtype duplicating data. [#2470](https://github.com/statamic/cms/issues/2470)
+- Fix table fieldtype not showing delete row button. [#2790](https://github.com/statamic/cms/issues/2790)
+- Fix entries etc not being removed from search index when deleted. [#3121](https://github.com/statamic/cms/issues/3121)
+- Fix API URL related error when using Live Preview while creating an entry. [#3112](https://github.com/statamic/cms/issues/3112)
+- Fix time being added to the date fieldtype unnecessarily. [#3118](https://github.com/statamic/cms/issues/3118)
+- Prevent null values from being saved in Bard and Replicator fields. [#3126](https://github.com/statamic/cms/issues/3126)
+- Prevent a situation where you could move a page into a child of the root, which isn't allowed. [#3104](https://github.com/statamic/cms/issues/3104)
+- Prevent orderable collections from having a parent field. [#2012](https://github.com/statamic/cms/issues/2012)
+- Removed route model binding for users. [#3088](https://github.com/statamic/cms/issues/3088)
+- Fix 404s within the CP rendering as front-end 404s. [#3098](https://github.com/statamic/cms/issues/3098)
+
+
+
+## 3.0.38 (2021-01-11)
+
+### What's new
+- Added a horizontal rule button to Bard. [#3076](https://github.com/statamic/cms/issues/3076)
+- Ability to choose from multiple blueprints on the empty collection screen. [#1985](https://github.com/statamic/cms/issues/1985)
+- You can now edit a blueprint section's or Bard set's handle separately from the display text. [#1667](https://github.com/statamic/cms/issues/1667)
+- Addons can more easily register actions, scopes, and filters. [#3093](https://github.com/statamic/cms/issues/3093)
+
+### What's improved
+- Updated French and Dutch translations. [#3077](https://github.com/statamic/cms/issues/3077) [#3086](https://github.com/statamic/cms/issues/3086)
+
+### What's fixed
+- Fix Bard issue where using bold inside a link would split the link up. [#2109](https://github.com/statamic/cms/issues/2109)
+- Fix Bard issue where an empty paragraph is added before a newly added set. [#1491](https://github.com/statamic/cms/issues/1491)
+- Prevent editing and removing assets from the assets fieldtype when it's read only. [#1826](https://github.com/statamic/cms/issues/1826)
+- Half measure static caching uses the correct expiry key as per the docs. [#2744](https://github.com/statamic/cms/issues/2744)
+- Fixed an issue where a statically cached page would get unintentionally re-cached. [#3085](https://github.com/statamic/cms/issues/3085)
+- Fix date handling when using revisions. [#3094](https://github.com/statamic/cms/issues/3094)
+
+
+
+## 3.0.37 (2021-01-06)
+
+### What's new
+- Added a `CollectionCreated` event. [#3062](https://github.com/statamic/cms/issues/3062)
+- Added a `UserRegistering` event. [#3057](https://github.com/statamic/cms/issues/3057)
+- Added a `float` fieldtype. [#3060](https://github.com/statamic/cms/issues/3060)
+
+### What's improved
+- You now get a confirmation before updating or downgrading Statamic and addons. [#3038](https://github.com/statamic/cms/issues/3038)
+
+### What's fixed
+- Fixed entry publish state management permissions. [#3039](https://github.com/statamic/cms/issues/3039)
+- Query strings can be ignored when using static caching. [#3075](https://github.com/statamic/cms/issues/3075)
+- Bump `axios` from 0.19.2 to 0.21.1 [#3068](https://github.com/statamic/cms/issues/3068)
+
+
+
+## 3.0.36 (2020-12-23)
+
+### What's new
+- Added a `mount` variable to entries in templates. [#3046](https://github.com/statamic/cms/issues/3046)
+- Added a `locales:count` tag. [#3042](https://github.com/statamic/cms/issues/3042)
+
+### What's improved
+- Hide the "Enable Pro" part of the Getting Started widget if it's enabled. [#3051](https://github.com/statamic/cms/issues/3051)
+- Updated French and German translations. [#3029](https://github.com/statamic/cms/issues/3029) [#3052](https://github.com/statamic/cms/issues/3052)
+- Improved the Asset SVG asset previews. [#2945](https://github.com/statamic/cms/issues/2945)
+
+### What's fixed
+- Fix issue where you couldn't drag Bard sets when used inside a Replicator. [#2063](https://github.com/statamic/cms/issues/2063)
+- The 'Add Date' button is unavailable in the date fieldtype when it's read only. [#3025](https://github.com/statamic/cms/issues/3025)
+- Fix issue where a non existent avatar sometimes caused an error. [#3027](https://github.com/statamic/cms/issues/3027)
+- Show a dropdown indicator when there's more than one taxonomy blueprint. [#3010](https://github.com/statamic/cms/issues/3010)
+- Fix btn class selector clash. [#3022](https://github.com/statamic/cms/issues/3022)
+- Updating through the CP will also update dependencies, fixing an issue where people were stuck on 3.0.12. [#3045](https://github.com/statamic/cms/issues/3045)
+- Prevent Replicator sets shrinking when dragging them. [9dedf49b3](https://github.com/statamic/cms/commit/9dedf49b3)
+- Fix issue where you couldn't un-hide a blueprint. [#3033](https://github.com/statamic/cms/issues/3033)
+
+
+
 ## 3.0.35 (2020-12-17)
 
 ### What's new

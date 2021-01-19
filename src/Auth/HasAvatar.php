@@ -22,7 +22,7 @@ trait HasAvatar
      */
     public function hasAvatarField()
     {
-        return $this->has('avatar') && $this->blueprint()->hasField('avatar');
+        return $this->get('avatar') && $this->blueprint()->hasField('avatar');
     }
 
     /**

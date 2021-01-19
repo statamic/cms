@@ -1,6 +1,6 @@
 <template>
 
-    <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }">
+    <div class="bard-fieldtype-wrapper" :class="{'bard-fullscreen': fullScreenMode }" @dragstart.stop>
 
         <editor-menu-bar :editor="editor" v-if="!readOnly">
             <div slot-scope="{ commands, isActive, menu }" class="bard-fixed-toolbar" v-if="showFixedToolbar">
@@ -93,6 +93,7 @@ import {
     CodeBlock,
     HardBreak,
     Heading,
+    HorizontalRule,
     OrderedList,
     BulletList,
     ListItem,
@@ -448,6 +449,7 @@ export default {
 
             let btns = this.buttons.map(button => button.name);
 
+            if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
             if (btns.includes('quote')) exts.push(new Blockquote());
             if (btns.includes('bold')) exts.push(new Bold());
             if (btns.includes('italic')) exts.push(new Italic());
@@ -455,9 +457,9 @@ export default {
             if (btns.includes('underline')) exts.push(new Underline());
             if (btns.includes('subscript')) exts.push(new Subscript());
             if (btns.includes('superscript')) exts.push(new Superscript());
-            if (btns.includes('anchor')) exts.push(new Link({ vm: this }));
             if (btns.includes('removeformat')) exts.push(new RemoveFormat());
             if (btns.includes('image')) exts.push(new Image({ bard: this }));
+            if (btns.includes('horizontalrule')) exts.push(new HorizontalRule());
 
             if (btns.includes('orderedlist') || btns.includes('unorderedlist')) {
                 if (btns.includes('orderedlist')) exts.push(new OrderedList());

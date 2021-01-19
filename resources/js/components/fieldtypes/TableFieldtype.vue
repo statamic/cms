@@ -13,7 +13,7 @@
                             </a>
                         </div>
                     </th>
-                    <th class="row-controls" v-if="canDeleteColumns"></th>
+                    <th class="row-controls" v-if="canDeleteRows"></th>
                 </tr>
             </thead>
 
@@ -31,7 +31,7 @@
                         <td v-for="(cell, cellIndex) in row.value.cells">
                             <input type="text" v-model="row.value.cells[cellIndex]" class="input-text" :readonly="isReadOnly" @focus="$emit('focus')" @blur="$emit('blur')" />
                         </td>
-                        <td class="row-controls" v-if="canDeleteColumns">
+                        <td class="row-controls" v-if="canDeleteRows">
                             <button @click="confirmDeleteRow(rowIndex)" class="inline opacity-25 text-lg antialiased hover:opacity-75" :aria-label="__('Delete Row')">&times;</button>
                         </td>
                     </tr>
@@ -107,6 +107,7 @@ export default {
 
         value(value, oldValue) {
             if (JSON.stringify(value) == JSON.stringify(oldValue)) return;
+            if (JSON.stringify(value) == JSON.stringify(this.sortableToArray(this.data))) return;
             this.data = this.arrayToSortable(value);
         }
     },
@@ -137,6 +138,10 @@ export default {
         },
 
         canAddRows() {
+            return !this.isReadOnly;
+        },
+
+        canDeleteRows() {
             return !this.isReadOnly;
         },
 
@@ -198,13 +203,6 @@ export default {
         deleteCancelled() {
             this.deletingRow = false;
             this.deletingColumn = false;
-        },
-
-        arrayToSortable(arr) {
-            return _.map(arr, value => {
-                return this.data.find(v => JSON.stringify(v.value) == JSON.stringify(value))
-                    || new SortableKeyValue(null, value);
-            });
         }
     }
 

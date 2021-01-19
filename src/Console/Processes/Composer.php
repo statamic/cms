@@ -82,8 +82,8 @@ class Composer extends Process
     public function require(string $package, string $version = null)
     {
         $version
-            ? $this->queueComposerCommand('require', $package, $version)
-            : $this->queueComposerCommand('require', $package);
+            ? $this->queueComposerCommand('require', $package, $version, '--update-with-dependencies')
+            : $this->queueComposerCommand('require', $package, '--update-with-dependencies');
     }
 
     /**
@@ -103,7 +103,7 @@ class Composer extends Process
      */
     public function update(string $package)
     {
-        $this->queueComposerCommand('update', $package);
+        $this->queueComposerCommand('update', $package, '--with-dependencies');
     }
 
     /**

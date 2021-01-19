@@ -12,6 +12,7 @@
             :vertical="true"
             :item-class="sortableItemClass"
             :handle-class="sortableHandleClass"
+            constrain-dimensions
             @dragstart="$emit('focus')"
             @dragend="$emit('blur')"
         >
