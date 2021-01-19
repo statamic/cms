@@ -15,9 +15,11 @@ class EntryInterface extends InterfaceType
         'name' => self::NAME,
     ];
 
+    protected static $extraFields = [];
+
     public function fields(): array
     {
-        return [
+        $fields = [
             'id' => [
                 'type' => Type::nonNull(Type::ID()),
             ],
@@ -49,6 +51,12 @@ class EntryInterface extends InterfaceType
                 'type' => Type::nonNull(GraphQL::type(CollectionType::NAME)),
             ],
         ];
+
+        foreach (static::$extraFields as $field => $closure) {
+            $fields[$field] = $closure();
+        }
+
+        return $fields;
     }
 
     public function resolveType($entry)
@@ -80,5 +88,10 @@ class EntryInterface extends InterfaceType
                 new EntryPageType($item['collection'], $item['blueprint']),
             ];
         })->all());
+    }
+
+    public static function addField($field, $closure)
+    {
+        static::$extraFields[$field] = $closure;
     }
 }

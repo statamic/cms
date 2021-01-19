@@ -2,6 +2,8 @@
 
 namespace Tests\Feature\GraphQL;
 
+use GraphQL\Type\Definition\Type;
+use Statamic\GraphQL\Types\EntryInterface;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -60,6 +62,61 @@ GQL;
                         'title' => 'Events',
                         'handle' => 'events',
                     ],
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_can_add_custom_fields_to_entry()
+    {
+        EntryInterface::addField('one', function () {
+            return [
+                'type' => Type::string(),
+                'resolve' => function ($a) {
+                    return 'first';
+                },
+            ];
+        });
+
+        EntryInterface::addField('two', function () {
+            return [
+                'type' => Type::string(),
+                'resolve' => function ($a) {
+                    return 'second';
+                },
+            ];
+        });
+
+        EntryInterface::addField('title', function () {
+            return [
+                'type' => Type::string(),
+                'resolve' => function ($a) {
+                    return 'the overridden title';
+                },
+            ];
+        });
+
+        $query = <<<'GQL'
+{
+    entry(id: "3") {
+        id
+        one
+        two
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'id' => '3',
+                    'one' => 'first',
+                    'two' => 'second',
+                    'title' => 'the overridden title',
                 ],
             ]]);
     }

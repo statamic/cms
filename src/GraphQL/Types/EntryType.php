@@ -38,7 +38,7 @@ class EntryType extends \Rebing\GraphQL\Support\Type
         return $this->blueprint->fields()->toGraphQL()
             ->merge((new EntryInterface)->fields())
             ->map(function (array $arr) {
-                $arr['resolve'] = $this->resolver();
+                $arr['resolve'] = $arr['resolve'] ?? $this->resolver();
 
                 return $arr;
             })
