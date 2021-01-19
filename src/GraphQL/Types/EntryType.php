@@ -2,9 +2,9 @@
 
 namespace Statamic\GraphQL\Types;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Value;
 use Statamic\Support\Str;
@@ -37,6 +37,9 @@ class EntryType extends \Rebing\GraphQL\Support\Type
     {
         return $this->blueprint->fields()->toGraphQL()
             ->merge((new EntryInterface)->fields())
+            ->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(function ($closure) {
+                return $closure();
+            }))
             ->map(function (array $arr) {
                 $arr['resolve'] = $arr['resolve'] ?? $this->resolver();
 

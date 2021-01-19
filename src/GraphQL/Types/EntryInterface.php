@@ -3,9 +3,9 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use Rebing\GraphQL\Support\InterfaceType;
 use Statamic\Facades\Collection;
+use Statamic\Facades\GraphQL;
 
 class EntryInterface extends InterfaceType
 {
@@ -14,8 +14,6 @@ class EntryInterface extends InterfaceType
     protected $attributes = [
         'name' => self::NAME,
     ];
-
-    protected static $extraFields = [];
 
     public function fields(): array
     {
@@ -52,7 +50,7 @@ class EntryInterface extends InterfaceType
             ],
         ];
 
-        foreach (static::$extraFields as $field => $closure) {
+        foreach (GraphQL::getExtraTypeFields(static::NAME) as $field => $closure) {
             $fields[$field] = $closure();
         }
 
@@ -88,10 +86,5 @@ class EntryInterface extends InterfaceType
                 new EntryPageType($item['collection'], $item['blueprint']),
             ];
         })->all());
-    }
-
-    public static function addField($field, $closure)
-    {
-        static::$extraFields[$field] = $closure;
     }
 }
