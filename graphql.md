@@ -1094,3 +1094,52 @@ EntriesQuery::auth(function () {
     return true; // true authorizes, false denies.
 });
 ```
+
+## Custom Fields
+
+You can add fields to certain types by using the `addField` method on the corresponding class.
+
+The method expects the field name and a closure that return a GraphQL field definition array.
+
+For example, if you wanted to include a thumbnail from an asset, you could do that here. You can even have arguments. In this example, we'll expect the width of the thumbnail to be passed in.
+
+```php
+use GraphQL\Type\Definition\Type;
+use Statamic\Facades\Image;
+use Statamic\Facades\URL;
+
+EntryInterface::addField('thumbnail', function () {
+    return [
+        'type' => Type::string(),
+        'args' => [
+            'width' => [
+                'type' => Type::int(),
+            ]
+        ],
+        'resolve' => function ($entry, $args) {
+            $asset = $entry->augmentedValue('image')->value();
+            $url = Image::manipulate($asset)->width($args['width'])->build();
+            return URL::makeAbsolute($url);
+        }
+    ];
+});
+```
+
+```graphql
+{
+    entry(id: 1) {
+        thumbnail(width: 100)
+    }
+}
+```
+
+```json
+
+{
+    "entry": {
+        "thumbnail": "http://yoursite.com/img/asset/abc123?w=100"
+    }
+}
+```
+
+The closure you pass to the method should return a GraphQL field definition array.
