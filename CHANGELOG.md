@@ -1,5 +1,26 @@
 # Release Notes
 
+## 3.0.39 (2021-01-19)
+
+### What's improved
+- Fixed a handful of translation issues. [#2511](https://github.com/statamic/cms/issues/2511) [#2520](https://github.com/statamic/cms/issues/2520) [#2515](https://github.com/statamic/cms/issues/2515) [#2510](https://github.com/statamic/cms/issues/2510) [#2509](https://github.com/statamic/cms/issues/2509) [#2641](https://github.com/statamic/cms/issues/2641) [#2514](https://github.com/statamic/cms/issues/2514) [#3119](https://github.com/statamic/cms/issues/3119)
+- The `multisite` command will enable pro and update your config file for you. [#3125](https://github.com/statamic/cms/issues/3125)
+
+### What's fixed
+- Fix error in the `multisite` command. [#3125](https://github.com/statamic/cms/issues/3125)
+- Fix table fieldtype duplicating data. [#2470](https://github.com/statamic/cms/issues/2470)
+- Fix table fieldtype not showing delete row button. [#2790](https://github.com/statamic/cms/issues/2790)
+- Fix entries etc not being removed from search index when deleted. [#3121](https://github.com/statamic/cms/issues/3121)
+- Fix API URL related error when using Live Preview while creating an entry. [#3112](https://github.com/statamic/cms/issues/3112)
+- Fix time being added to the date fieldtype unnecessarily. [#3118](https://github.com/statamic/cms/issues/3118)
+- Prevent null values from being saved in Bard and Replicator fields. [#3126](https://github.com/statamic/cms/issues/3126)
+- Prevent a situation where you could move a page into a child of the root, which isn't allowed. [#3104](https://github.com/statamic/cms/issues/3104)
+- Prevent orderable collections from having a parent field. [#2012](https://github.com/statamic/cms/issues/2012)
+- Removed route model binding for users. [#3088](https://github.com/statamic/cms/issues/3088)
+- Fix 404s within the CP rendering as front-end 404s. [#3098](https://github.com/statamic/cms/issues/3098)
+
+
+
 ## 3.0.38 (2021-01-11)
 
 ### What's new
