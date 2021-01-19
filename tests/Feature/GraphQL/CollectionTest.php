@@ -43,8 +43,6 @@ GQL;
     /** @test */
     public function it_queries_the_structure_and_its_tree()
     {
-        config(['app.debug' => true]);
-
         $collection = Collection::make('pages')->title('Pages')->routes(['en' => '{parent_uri}/{slug}']);
         $structure = (new CollectionStructure)->collection($collection)->maxDepth(3)->expectsRoot(true);
         $collection->structure($structure)->save();

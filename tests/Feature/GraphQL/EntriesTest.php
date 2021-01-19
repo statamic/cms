@@ -230,7 +230,6 @@ GQL;
     {
         $this->createEntries();
 
-        config(['app.debug' => true]);
         EntryFactory::collection('blog')->id('6')->data([
             'title' => 'That was so rad!',
         ])->create();
