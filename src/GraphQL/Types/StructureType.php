@@ -2,7 +2,6 @@
 
 namespace Statamic\GraphQL\Types;
 
-use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Statamic\Structures\TreeBuilder;

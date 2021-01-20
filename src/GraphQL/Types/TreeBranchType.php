@@ -2,7 +2,6 @@
 
 namespace Statamic\GraphQL\Types;
 
-use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
 
 class TreeBranchType extends \Rebing\GraphQL\Support\Type

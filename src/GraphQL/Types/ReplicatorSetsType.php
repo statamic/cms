@@ -2,8 +2,8 @@
 
 namespace Statamic\GraphQL\Types;
 
-use Statamic\Facades\GraphQL;
 use Rebing\GraphQL\Support\UnionType;
+use Statamic\Facades\GraphQL;
 use Statamic\Support\Str;
 
 class ReplicatorSetsType extends UnionType

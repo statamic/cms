@@ -2,9 +2,9 @@
 
 namespace Statamic\GraphQL\Types;
 
-use Statamic\Facades\GraphQL;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Assets\AssetContainer;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
