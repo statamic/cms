@@ -16,6 +16,10 @@ class TermsQuery extends Query
 {
     use QueriesConditions;
 
+    protected $attributes = [
+        'name' => 'terms',
+    ];
+
     protected $middleware = [
         ResolvePage::class,
     ];

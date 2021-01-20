@@ -10,6 +10,10 @@ use Statamic\GraphQL\Types\GlobalSetInterface;
 
 class GlobalSetsQuery extends Query
 {
+    protected $attributes = [
+        'name' => 'globalSets',
+    ];
+
     public function type(): Type
     {
         return GraphQL::listOf(GraphQL::type(GlobalSetInterface::NAME));

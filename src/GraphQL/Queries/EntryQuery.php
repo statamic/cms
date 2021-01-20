@@ -9,6 +9,10 @@ use Statamic\GraphQL\Types\EntryInterface;
 
 class EntryQuery extends Query
 {
+    protected $attributes = [
+        'name' => 'entry',
+    ];
+
     public function type(): Type
     {
         return GraphQL::type(EntryInterface::NAME);

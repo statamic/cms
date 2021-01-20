@@ -11,6 +11,10 @@ use Statamic\Support\Str;
 
 class AssetsQuery extends Query
 {
+    protected $attributes = [
+        'name' => 'assets',
+    ];
+
     protected $middleware = [
         ResolvePage::class,
     ];

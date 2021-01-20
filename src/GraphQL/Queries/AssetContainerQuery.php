@@ -9,6 +9,10 @@ use Statamic\GraphQL\Types\AssetContainerType;
 
 class AssetContainerQuery extends Query
 {
+    protected $attributes = [
+        'name' => 'assetContainer',
+    ];
+
     public function type(): Type
     {
         return GraphQL::type(AssetContainerType::NAME);

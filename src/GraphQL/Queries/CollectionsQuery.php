@@ -9,6 +9,10 @@ use Statamic\GraphQL\Types\CollectionType;
 
 class CollectionsQuery extends Query
 {
+    protected $attributes = [
+        'name' => 'collections',
+    ];
+
     public function type(): Type
     {
         return GraphQL::listOf(GraphQL::type(CollectionType::NAME));

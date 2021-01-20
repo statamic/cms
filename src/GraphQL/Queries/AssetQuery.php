@@ -10,6 +10,10 @@ use Statamic\GraphQL\Types\AssetInterface;
 
 class AssetQuery extends Query
 {
+    protected $attributes = [
+        'name' => 'asset',
+    ];
+
     public function type(): Type
     {
         return GraphQL::type(AssetInterface::NAME);
