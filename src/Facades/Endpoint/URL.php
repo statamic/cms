@@ -82,10 +82,6 @@ class URL
      */
     public function isAncestorOf($child, $ancestor)
     {
-        if ($ancestor === '') {
-            return false;
-        }
-
         $child = Str::before($child, '?');
         $child = Str::ensureRight($child, '/');
         $ancestor = Str::ensureRight($ancestor, '/');
