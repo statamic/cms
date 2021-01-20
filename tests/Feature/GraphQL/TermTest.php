@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -41,5 +42,144 @@ GQL;
                     'slug' => 'bravo',
                 ],
             ]]);
+    }
+
+    /** @test */
+    public function it_can_add_custom_fields_to_interface()
+    {
+        GraphQL::addField('TermInterface', 'one', function () {
+            return [
+                'type' => GraphQL::string(),
+                'resolve' => function ($a) {
+                    return 'first';
+                },
+            ];
+        });
+
+        GraphQL::addField('TermInterface', 'two', function () {
+            return [
+                'type' => GraphQL::string(),
+                'resolve' => function ($a) {
+                    return 'second';
+                },
+            ];
+        });
+
+        GraphQL::addField('TermInterface', 'title', function () {
+            return [
+                'type' => GraphQL::string(),
+                'resolve' => function ($a) {
+                    return 'the overridden title';
+                },
+            ];
+        });
+
+        Taxonomy::make('tags')->save();
+        Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alpha')->data(['title' => 'Alpha'])->save();
+
+        $query = <<<'GQL'
+{
+    term(id: "tags::alpha") {
+        id
+        one
+        two
+        title
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'term' => [
+                    'id' => 'tags::alpha',
+                    'one' => 'first',
+                    'two' => 'second',
+                    'title' => 'the overridden title',
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_can_add_custom_fields_to_an_implementation()
+    {
+        GraphQL::addField('Term_Tags_Tags', 'one', function () {
+            return [
+                'type' => GraphQL::string(),
+                'resolve' => function ($a) {
+                    return 'first';
+                },
+            ];
+        });
+
+        GraphQL::addField('Term_Tags_Tags', 'title', function () {
+            return [
+                'type' => GraphQL::string(),
+                'resolve' => function ($a) {
+                    return 'the overridden title';
+                },
+            ];
+        });
+
+        Taxonomy::make('tags')->save();
+        Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alpha')->data(['title' => 'Alpha'])->save();
+
+        $query = <<<'GQL'
+{
+    term(id: "tags::alpha") {
+        id
+        ... on Term_Tags_Tags {
+            one
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'term' => [
+                    'id' => 'tags::alpha',
+                    'one' => 'first',
+                    'title' => 'the overridden title',
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function adding_custom_field_to_an_implementation_does_not_add_it_to_the_interface()
+    {
+        GraphQL::addField('Term_Tags_Tags', 'one', function () {
+            return [
+                'type' => GraphQL::string(),
+                'resolve' => function ($a) {
+                    return 'first';
+                },
+            ];
+        });
+
+        Taxonomy::make('tags')->save();
+        Term::make()->taxonomy('tags')->inDefaultLocale()->slug('alpha')->data(['title' => 'Alpha'])->save();
+
+        $query = <<<'GQL'
+{
+    term(id: "tags::alpha") {
+        id
+        one
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertJson(['errors' => [[
+                'message' => 'Cannot query field "one" on type "TermInterface". Did you mean to use an inline fragment on "Term_Tags_Tags"?',
+            ]]]);
     }
 }
