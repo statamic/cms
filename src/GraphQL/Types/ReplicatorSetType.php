@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
+use Statamic\Facades\GraphQL;
 use Statamic\Support\Str;
 
 class ReplicatorSetType extends \Rebing\GraphQL\Support\Type
@@ -28,7 +29,7 @@ class ReplicatorSetType extends \Rebing\GraphQL\Support\Type
         return $this->fieldtype->fields($this->handle)->toGraphQL()
             ->merge([
                 'type' => [
-                    'type' => Type::nonNull(Type::string()),
+                    'type' => GraphQL::nonNull(GraphQL::string()),
                 ],
             ])
             ->all();

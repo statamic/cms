@@ -19,34 +19,34 @@ class EntryInterface extends InterfaceType
     {
         $fields = [
             'id' => [
-                'type' => Type::nonNull(Type::ID()),
+                'type' => GraphQL::nonNull(GraphQL::id()),
             ],
             'title' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
             'slug' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
             'url' => [
-                'type' => Type::string(),
+                'type' => GraphQL::string(),
             ],
             'uri' => [
-                'type' => Type::string(),
+                'type' => GraphQL::string(),
             ],
             'edit_url' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
             'permalink' => [
-                'type' => Type::string(),
+                'type' => GraphQL::string(),
             ],
             'published' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => GraphQL::nonNull(GraphQL::boolean()),
             ],
             'private' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => GraphQL::nonNull(GraphQL::boolean()),
             ],
             'collection' => [
-                'type' => Type::nonNull(GraphQL::type(CollectionType::NAME)),
+                'type' => GraphQL::nonNull(GraphQL::type(CollectionType::NAME)),
             ],
         ];
 

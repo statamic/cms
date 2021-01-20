@@ -3,7 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Value;
 
 class CollectionType extends \Rebing\GraphQL\Support\Type
@@ -18,10 +18,10 @@ class CollectionType extends \Rebing\GraphQL\Support\Type
     {
         return collect([
             'handle' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
             'title' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
             'structure' => [
                 'type' => GraphQL::type(CollectionStructureType::NAME),

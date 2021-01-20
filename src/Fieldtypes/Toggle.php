@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use GraphQL\Type\Definition\Type;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 
 class Toggle extends Fieldtype
@@ -26,6 +26,6 @@ class Toggle extends Fieldtype
 
     public function toGqlType()
     {
-        return Type::boolean();
+        return GraphQL::boolean();
     }
 }

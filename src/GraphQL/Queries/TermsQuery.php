@@ -3,7 +3,7 @@
 namespace Statamic\GraphQL\Queries;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Term;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Types\JsonArgument;
@@ -28,11 +28,11 @@ class TermsQuery extends Query
     public function args(): array
     {
         return [
-            'taxonomy' => Type::listOf(Type::string()),
-            'limit' => Type::int(),
-            'page' => Type::int(),
+            'taxonomy' => GraphQL::listOf(GraphQL::string()),
+            'limit' => GraphQL::int(),
+            'page' => GraphQL::int(),
             'filter' => GraphQL::type(JsonArgument::NAME),
-            'sort' => Type::listOf(Type::string()),
+            'sort' => GraphQL::listOf(GraphQL::string()),
         ];
     }
 

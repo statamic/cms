@@ -3,9 +3,9 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use Rebing\GraphQL\Support\InterfaceType;
 use Statamic\Facades\GlobalSet;
+use Statamic\Facades\GraphQL;
 
 class GlobalSetInterface extends InterfaceType
 {
@@ -19,7 +19,7 @@ class GlobalSetInterface extends InterfaceType
     {
         return [
             'handle' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
         ];
     }

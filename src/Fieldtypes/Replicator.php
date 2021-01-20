@@ -2,8 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\ReplicatorSetsType;
@@ -167,7 +166,7 @@ class Replicator extends Fieldtype
     {
         $type = GraphQL::type(ReplicatorSetsType::buildName($this));
 
-        return Type::listOf($type);
+        return GraphQL::listOf($type);
     }
 
     public function addGqlTypes()

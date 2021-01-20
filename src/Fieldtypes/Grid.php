@@ -2,8 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Types\GridItemType;
@@ -170,7 +169,7 @@ class Grid extends Fieldtype
 
     public function toGqlType()
     {
-        return Type::listOf(GraphQL::type('GridItem_'.Str::studly($this->field->handle())));
+        return GraphQL::listOf(GraphQL::type('GridItem_'.Str::studly($this->field->handle())));
     }
 
     public function addGqlTypes()

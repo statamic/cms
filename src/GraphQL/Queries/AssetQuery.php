@@ -3,9 +3,9 @@
 namespace Statamic\GraphQL\Queries;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Types\AssetInterface;
 
 class AssetQuery extends Query
@@ -18,9 +18,9 @@ class AssetQuery extends Query
     public function args(): array
     {
         return [
-            'id' => Type::string(),
-            'container' => Type::string(),
-            'path' => Type::string(),
+            'id' => GraphQL::string(),
+            'container' => GraphQL::string(),
+            'path' => GraphQL::string(),
         ];
     }
 

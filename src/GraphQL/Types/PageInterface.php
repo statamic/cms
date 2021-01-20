@@ -2,7 +2,7 @@
 
 namespace Statamic\GraphQL\Types;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GraphQL;
 
 class PageInterface extends EntryInterface
 {

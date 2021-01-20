@@ -3,7 +3,7 @@
 namespace Statamic\GraphQL\Queries;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Nav;
 use Statamic\GraphQL\Types\NavType;
 
@@ -17,7 +17,7 @@ class NavQuery extends Query
     public function args(): array
     {
         return [
-            'handle' => Type::string(),
+            'handle' => GraphQL::string(),
         ];
     }
 

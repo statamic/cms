@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
+use Statamic\Facades\GraphQL;
 use Statamic\Support\Str;
 
 class BardTextType extends \Rebing\GraphQL\Support\Type
@@ -25,10 +26,10 @@ class BardTextType extends \Rebing\GraphQL\Support\Type
     {
         return [
             'type' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
             'text' => [
-                'type' => Type::string(),
+                'type' => GraphQL::string(),
             ],
         ];
     }

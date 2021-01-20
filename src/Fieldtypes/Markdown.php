@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use GraphQL\Type\Definition\Type;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Markdown as MarkdownFilter;
 use Statamic\Support\Html;
@@ -119,10 +119,10 @@ class Markdown extends Fieldtype
     public function toGqlType()
     {
         return [
-            'type' => Type::string(),
+            'type' => GraphQL::string(),
             'args' => [
                 'format' => [
-                    'type' => Type::string(),
+                    'type' => GraphQL::string(),
                     'description' => 'How the value should be formatted. Either "markdown" or "html". Defaults to "html".',
                     'defaultValue' => 'html',
                 ],
