@@ -16,11 +16,20 @@ class GlobalSetInterface extends InterfaceType
 
     public function fields(): array
     {
-        return [
+        $fields = [
             'handle' => [
                 'type' => GraphQL::nonNull(GraphQL::string()),
             ],
+            'title' => [
+                'type' => GraphQL::nonNull(GraphQL::string()),
+            ],
         ];
+
+        foreach (GraphQL::getExtraTypeFields(static::NAME) as $field => $closure) {
+            $fields[$field] = $closure();
+        }
+
+        return $fields;
     }
 
     public function resolveType($globals)
