@@ -20,4 +20,22 @@ class EntryPageType extends EntryType
             GraphQL::type(PageInterface::NAME),
         ];
     }
+
+    public function fields(): array
+    {
+        return $this->blueprint->fields()->toGraphQL()
+            ->merge((new PageInterface)->fields())
+            ->merge(collect(GraphQL::getExtraTypeFields(EntryInterface::NAME))->map(function ($closure) {
+                return $closure();
+            }))
+            ->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(function ($closure) {
+                return $closure();
+            }))
+            ->map(function (array $arr) {
+                $arr['resolve'] = $arr['resolve'] ?? $this->resolver();
+
+                return $arr;
+            })
+            ->all();
+    }
 }

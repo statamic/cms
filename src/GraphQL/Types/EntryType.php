@@ -11,8 +11,8 @@ use Statamic\Support\Str;
 
 class EntryType extends \Rebing\GraphQL\Support\Type
 {
-    private $collection;
-    private $blueprint;
+    protected $collection;
+    protected $blueprint;
 
     public function __construct($collection, $blueprint)
     {
@@ -48,7 +48,7 @@ class EntryType extends \Rebing\GraphQL\Support\Type
             ->all();
     }
 
-    private function resolver()
+    protected function resolver()
     {
         return function (EntryContract $entry, $args, $context, $info) {
             $value = $entry->augmentedValue($info->fieldName);

@@ -1143,3 +1143,14 @@ EntryInterface::addField('thumbnail', function () {
 ```
 
 The closure you pass to the method should return a GraphQL field definition array.
+
+You may add custom fields to the following types and any of their implementations:
+
+- `EntryInterface`
+- `PageInterface`
+- `TermInterface`
+- `AssetInterface`
+- `GlobalSetInterface`
+
+Note that if you add fields to an `EntryInterface`, it will be shared with the `PageInterface`.
+If you add fields to a `PageInterface`, it will _not_ be shared with the `EntryInterface`.
