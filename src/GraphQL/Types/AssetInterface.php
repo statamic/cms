@@ -17,11 +17,20 @@ class AssetInterface extends InterfaceType
 
     public function fields(): array
     {
-        return [
+        $fields = [
             'path' => [
                 'type' => GraphQL::nonNull(GraphQL::string()),
             ],
+            'extension' => [
+                'type' => GraphQL::nonNull(GraphQL::string()),
+            ],
         ];
+
+        foreach (GraphQL::getExtraTypeFields(static::NAME) as $field => $closure) {
+            $fields[$field] = $closure();
+        }
+
+        return $fields;
     }
 
     public function resolveType(Asset $asset)

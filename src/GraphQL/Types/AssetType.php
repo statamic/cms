@@ -36,8 +36,11 @@ class AssetType extends \Rebing\GraphQL\Support\Type
     {
         return $this->blueprint->fields()->toGraphQL()
             ->merge((new AssetInterface)->fields())
+            ->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(function ($closure) {
+                return $closure();
+            }))
             ->map(function (array $arr) {
-                $arr['resolve'] = $this->resolver();
+                $arr['resolve'] = $arr['resolve'] ?? $this->resolver();
 
                 return $arr;
             })
