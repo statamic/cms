@@ -17,7 +17,7 @@ class TermInterface extends InterfaceType
 
     public function fields(): array
     {
-        return [
+        $fields = [
             'id' => [
                 'type' => GraphQL::nonNull(GraphQL::id()),
             ],
@@ -28,6 +28,12 @@ class TermInterface extends InterfaceType
                 'type' => GraphQL::nonNull(GraphQL::string()),
             ],
         ];
+
+        foreach (GraphQL::getExtraTypeFields(static::NAME) as $field => $closure) {
+            $fields[$field] = $closure();
+        }
+
+        return $fields;
     }
 
     public function resolveType(Term $term)
