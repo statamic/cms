@@ -2,7 +2,6 @@
 
 namespace Tests\Feature\GraphQL;
 
-use GraphQL\Type\Definition\Type;
 use Statamic\Facades\GraphQL;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -71,7 +70,7 @@ GQL;
     {
         GraphQL::addField('EntryInterface', 'one', function () {
             return [
-                'type' => Type::string(),
+                'type' => GraphQL::string(),
                 'resolve' => function ($a) {
                     return 'first';
                 },
@@ -80,7 +79,7 @@ GQL;
 
         GraphQL::addField('EntryInterface', 'two', function () {
             return [
-                'type' => Type::string(),
+                'type' => GraphQL::string(),
                 'resolve' => function ($a) {
                     return 'second';
                 },
@@ -89,7 +88,7 @@ GQL;
 
         GraphQL::addField('EntryInterface', 'title', function () {
             return [
-                'type' => Type::string(),
+                'type' => GraphQL::string(),
                 'resolve' => function ($a) {
                     return 'the overridden title';
                 },
@@ -126,7 +125,7 @@ GQL;
     {
         GraphQL::addField('Entry_Blog_ArtDirected', 'one', function () {
             return [
-                'type' => Type::string(),
+                'type' => GraphQL::string(),
                 'resolve' => function ($a) {
                     return 'first';
                 },
@@ -135,7 +134,7 @@ GQL;
 
         GraphQL::addField('Entry_Blog_ArtDirected', 'title', function () {
             return [
-                'type' => Type::string(),
+                'type' => GraphQL::string(),
                 'resolve' => function ($a) {
                     return 'the overridden title';
                 },
@@ -172,7 +171,7 @@ GQL;
     {
         GraphQL::addField('Entry_Blog_ArtDirected', 'one', function () {
             return [
-                'type' => Type::string(),
+                'type' => GraphQL::string(),
                 'resolve' => function ($a) {
                     return 'first';
                 },
