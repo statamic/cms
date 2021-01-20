@@ -9,6 +9,10 @@ use Statamic\GraphQL\Types\TermInterface;
 
 class TermQuery extends Query
 {
+    protected $attributes = [
+        'name' => 'term',
+    ];
+
     public function type(): Type
     {
         return GraphQL::type(TermInterface::NAME);

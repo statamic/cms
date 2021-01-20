@@ -16,6 +16,10 @@ class EntriesQuery extends Query
 {
     use QueriesConditions;
 
+    protected $attributes = [
+        'name' => 'entries',
+    ];
+
     protected $middleware = [
         ResolvePage::class,
     ];

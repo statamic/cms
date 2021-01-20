@@ -9,6 +9,10 @@ use Statamic\GraphQL\Types\NavType;
 
 class NavsQuery extends Query
 {
+    protected $attributes = [
+        'name' => 'navs',
+    ];
+
     public function type(): Type
     {
         return GraphQL::listOf(GraphQL::type(NavType::NAME));

@@ -9,6 +9,10 @@ use Statamic\GraphQL\Types\TaxonomyType;
 
 class TaxonomyQuery extends Query
 {
+    protected $attributes = [
+        'name' => 'taxonomy',
+    ];
+
     public function type(): Type
     {
         return GraphQL::type(TaxonomyType::NAME);

@@ -7,6 +7,10 @@ use Statamic\Facades\GraphQL;
 
 class PingQuery extends Query
 {
+    protected $attributes = [
+        'name' => 'ping',
+    ];
+
     public function type(): Type
     {
         return GraphQL::string();
