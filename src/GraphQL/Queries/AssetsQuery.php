@@ -3,8 +3,8 @@
 namespace Statamic\GraphQL\Queries;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Facades\Asset;
+use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\Support\Str;
@@ -23,10 +23,10 @@ class AssetsQuery extends Query
     public function args(): array
     {
         return [
-            'container' => Type::nonNull(Type::string()),
-            'limit' => Type::int(),
-            'page' => Type::int(),
-            'sort' => Type::listOf(Type::string()),
+            'container' => GraphQL::nonNull(GraphQL::string()),
+            'limit' => GraphQL::int(),
+            'page' => GraphQL::int(),
+            'sort' => GraphQL::listOf(GraphQL::string()),
         ];
     }
 

@@ -2,7 +2,7 @@
 
 namespace Statamic\GraphQL\Types;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GraphQL;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Fields\Blueprint;

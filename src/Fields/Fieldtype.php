@@ -2,11 +2,11 @@
 
 namespace Statamic\Fields;
 
-use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Facades\GraphQL;
 use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -216,7 +216,7 @@ abstract class Fieldtype implements Arrayable
 
     public function toGqlType()
     {
-        return Type::string();
+        return GraphQL::string();
     }
 
     public function addGqlTypes()

@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Value;
 
 class AssetContainerType extends \Rebing\GraphQL\Support\Type
@@ -17,10 +18,10 @@ class AssetContainerType extends \Rebing\GraphQL\Support\Type
     {
         return collect([
             'handle' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
             'title' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
         ])->map(function (array $arr) {
             $arr['resolve'] = $this->resolver();

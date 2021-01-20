@@ -3,8 +3,8 @@
 namespace Statamic\GraphQL\Queries;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use Statamic\Facades\Entry;
+use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Middleware\ResolvePage;
 use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\GraphQL\Types\JsonArgument;
@@ -28,11 +28,11 @@ class EntriesQuery extends Query
     public function args(): array
     {
         return [
-            'collection' => Type::listOf(Type::string()),
-            'limit' => Type::int(),
-            'page' => Type::int(),
+            'collection' => GraphQL::listOf(GraphQL::string()),
+            'limit' => GraphQL::int(),
+            'page' => GraphQL::int(),
             'filter' => GraphQL::type(JsonArgument::NAME),
-            'sort' => Type::listOf(Type::string()),
+            'sort' => GraphQL::listOf(GraphQL::string()),
         ];
     }
 

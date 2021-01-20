@@ -1025,7 +1025,7 @@ use GraphQL\Type\Definition\Type;
 
 public function toGqlType()
 {
-    return Type::string();
+    return GraphQL::string();
 }
 ```
 
@@ -1037,7 +1037,7 @@ use GraphQL\Type\Definition\Type;
 public function toGqlType()
 {
     return [
-        'type' => Type::string(),
+        'type' => GraphQL::string(),
         'args' => [
             //
         ]
@@ -1110,10 +1110,10 @@ use Statamic\Facades\URL;
 
 EntryInterface::addField('thumbnail', function () {
     return [
-        'type' => Type::string(),
+        'type' => GraphQL::string(),
         'args' => [
             'width' => [
-                'type' => Type::int(),
+                'type' => GraphQL::int(),
             ]
         ],
         'resolve' => function ($entry, $args) {

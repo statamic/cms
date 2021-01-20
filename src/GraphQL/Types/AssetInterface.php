@@ -3,10 +3,10 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use Rebing\GraphQL\Support\InterfaceType;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\GraphQL;
 
 class AssetInterface extends InterfaceType
 {
@@ -20,7 +20,7 @@ class AssetInterface extends InterfaceType
     {
         return [
             'path' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
         ];
     }

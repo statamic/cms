@@ -3,9 +3,9 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
 use Rebing\GraphQL\Support\InterfaceType;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Taxonomy;
 
 class TermInterface extends InterfaceType
@@ -20,13 +20,13 @@ class TermInterface extends InterfaceType
     {
         return [
             'id' => [
-                'type' => Type::nonNull(Type::ID()),
+                'type' => GraphQL::nonNull(GraphQL::id()),
             ],
             'title' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
             'slug' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
         ];
     }

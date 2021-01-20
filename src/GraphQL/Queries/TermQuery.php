@@ -3,7 +3,7 @@
 namespace Statamic\GraphQL\Queries;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Term;
 use Statamic\GraphQL\Types\TermInterface;
 
@@ -17,7 +17,7 @@ class TermQuery extends Query
     public function args(): array
     {
         return [
-            'id' => Type::string(),
+            'id' => GraphQL::string(),
         ];
     }
 

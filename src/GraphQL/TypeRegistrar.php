@@ -2,7 +2,7 @@
 
 namespace Statamic\GraphQL;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Types\AssetContainerType;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\GraphQL\Types\CollectionStructureType;

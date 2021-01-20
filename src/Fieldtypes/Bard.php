@@ -2,9 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
-use GraphQL\Type\Definition\Type;
 use ProseMirrorToHtml\Renderer;
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
 use Statamic\GraphQL\Types\BardSetsType;
@@ -380,7 +379,7 @@ class Bard extends Replicator
 
     public function toGqlType()
     {
-        return $this->config('sets') ? parent::toGqlType() : Type::string();
+        return $this->config('sets') ? parent::toGqlType() : GraphQL::string();
     }
 
     public function addGqlTypes()

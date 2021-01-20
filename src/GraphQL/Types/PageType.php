@@ -2,7 +2,7 @@
 
 namespace Statamic\GraphQL\Types;
 
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Value;
 use Statamic\Structures\Page;
 

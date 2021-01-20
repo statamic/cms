@@ -3,7 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Statamic\Structures\TreeBuilder;
 use Statamic\Support\Str;
@@ -14,19 +14,19 @@ class StructureType extends \Rebing\GraphQL\Support\Type
     {
         return collect([
             'handle' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
             'title' => [
-                'type' => Type::nonNull(Type::string()),
+                'type' => GraphQL::nonNull(GraphQL::string()),
             ],
             'max_depth' => [
-                'type' => Type::int(),
+                'type' => GraphQL::int(),
             ],
             'expects_root' => [
-                'type' => Type::nonNull(Type::boolean()),
+                'type' => GraphQL::nonNull(GraphQL::boolean()),
             ],
             'tree' => [
-                'type' => Type::listOf(GraphQL::type(TreeBranchType::NAME)),
+                'type' => GraphQL::listOf(GraphQL::type(TreeBranchType::NAME)),
             ],
         ])->map(function (array $arr) {
             $arr['resolve'] = $this->resolver();

@@ -3,7 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use GraphQL\Type\Definition\Type;
-use Rebing\GraphQL\Support\Facades\GraphQL;
+use Statamic\Facades\GraphQL;
 
 class TreeBranchType extends \Rebing\GraphQL\Support\Type
 {
@@ -17,13 +17,13 @@ class TreeBranchType extends \Rebing\GraphQL\Support\Type
     {
         return [
             'depth' => [
-                'type' => Type::nonNull(Type::int()),
+                'type' => GraphQL::nonNull(GraphQL::int()),
             ],
             'page' => [
                 'type' => GraphQL::type(PageInterface::NAME),
             ],
             'children' => [
-                'type' => Type::listOf(GraphQL::type(self::NAME)),
+                'type' => GraphQL::listOf(GraphQL::type(self::NAME)),
             ],
         ];
     }

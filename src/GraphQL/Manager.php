@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL;
 
+use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Facades\GraphQL;
 
 class Manager
@@ -31,5 +32,40 @@ class Manager
     public function type($type)
     {
         return GraphQL::type($type);
+    }
+
+    public function nonNull($type)
+    {
+        return Type::nonNull($type);
+    }
+
+    public function listOf($type)
+    {
+        return Type::listOf($type);
+    }
+
+    public function id()
+    {
+        return Type::id();
+    }
+
+    public function string()
+    {
+        return Type::string();
+    }
+
+    public function int()
+    {
+        return Type::int();
+    }
+
+    public function boolean()
+    {
+        return Type::boolean();
+    }
+
+    public function paginate($type)
+    {
+        return GraphQL::paginate($type);
     }
 }
