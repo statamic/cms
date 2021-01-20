@@ -2,7 +2,6 @@
 
 namespace Statamic\GraphQL\Types;
 
-use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\InterfaceType;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;

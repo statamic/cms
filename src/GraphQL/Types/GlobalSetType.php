@@ -2,8 +2,8 @@
 
 namespace Statamic\GraphQL\Types;
 
-use Statamic\Facades\GraphQL;
 use Statamic\Contracts\Globals\Variables;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Value;
 use Statamic\Support\Str;
 
