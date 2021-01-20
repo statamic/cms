@@ -28,4 +28,10 @@ class PageInterface extends EntryInterface
         GraphQL::addType(self::class);
         GraphQL::addType(PageType::class);
     }
+
+    protected function extraFields()
+    {
+        return collect(GraphQL::getExtraTypeFields(static::NAME))
+            ->merge(GraphQL::getExtraTypeFields(EntryInterface::NAME));
+    }
 }

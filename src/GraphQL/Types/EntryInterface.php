@@ -49,11 +49,16 @@ class EntryInterface extends InterfaceType
             ],
         ];
 
-        foreach (GraphQL::getExtraTypeFields(static::NAME) as $field => $closure) {
+        foreach ($this->extraFields() as $field => $closure) {
             $fields[$field] = $closure();
         }
 
         return $fields;
+    }
+
+    protected function extraFields()
+    {
+        return GraphQL::getExtraTypeFields(static::NAME);
     }
 
     public function resolveType($entry)
