@@ -1504,7 +1504,9 @@ class CoreModifiers extends Modifier
      */
     public function ray($value)
     {
-        ray($value);
+        return tap($value, function ($value) {
+            ray($value);
+        });
     }
 
     /**
