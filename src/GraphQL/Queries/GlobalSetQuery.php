@@ -23,12 +23,13 @@ class GlobalSetQuery extends Query
     {
         return [
             'handle' => GraphQL::string(),
+            'site' => GraphQL::string(),
         ];
     }
 
     public function resolve($root, $args)
     {
-        $site = Site::default()->handle();
+        $site = $args['site'] ?? Site::default()->handle();
 
         return GlobalSet::find($args['handle'])->in($site);
     }

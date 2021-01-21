@@ -6,6 +6,7 @@ use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\GlobalFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\GraphQL;
+use Statamic\Facades\Site;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -28,6 +29,9 @@ class GlobalTest extends TestCase
 {
     globalSet(handle: "social") {
         handle
+        site {
+            handle
+        }
         ... on GlobalSet_Social {
             twitter
         }
@@ -41,7 +45,50 @@ GQL;
             ->assertGqlOk()
             ->assertExactJson(['data' => ['globalSet' => [
                 'handle' => 'social',
+                'site' => ['handle' => 'en'],
                 'twitter' => '@statamic',
+            ]]]);
+    }
+
+    /** @test */
+    public function it_queries_a_global_set_in_a_specific_site()
+    {
+        Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+            ],
+        ]);
+
+        $set = GlobalFactory::handle('social')->data(['twitter' => '@statamic'])->create();
+        $variables = $set->makeLocalization('fr')->data(['twitter' => '@statamic_fr']);
+        $set->addLocalization($variables);
+        $social = Blueprint::makeFromFields(['twitter' => ['type' => 'text']])->setHandle('social')->setNamespace('globals');
+        BlueprintRepository::shouldReceive('find')->with('globals.social')->andReturn($social);
+
+        $query = <<<'GQL'
+{
+    globalSet(handle: "social", site: "fr") {
+        handle
+        site {
+            handle
+        }
+        ... on GlobalSet_Social {
+            twitter
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['globalSet' => [
+                'handle' => 'social',
+                'site' => ['handle' => 'fr'],
+                'twitter' => '@statamic_fr',
             ]]]);
     }
 

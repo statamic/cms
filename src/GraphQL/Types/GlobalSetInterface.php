@@ -23,6 +23,12 @@ class GlobalSetInterface extends InterfaceType
             'title' => [
                 'type' => GraphQL::nonNull(GraphQL::string()),
             ],
+            'site' => [
+                'type' => GraphQL::nonNull(GraphQL::type(SiteType::NAME)),
+                'resolve' => function ($globals) {
+                    return $globals->site();
+                },
+            ],
         ];
 
         foreach (GraphQL::getExtraTypeFields(static::NAME) as $field => $closure) {
