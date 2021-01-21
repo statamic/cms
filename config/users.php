@@ -89,4 +89,17 @@ return [
 
     'database' => config('database.default'),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Authentication Guard
+    |--------------------------------------------------------------------------
+    |
+    | By default, Statamic will use the `web` authentication guard. However,
+    | if you want to run Statamic alongside the default Laravel auth
+    | guard, you can configure that here.
+    |
+    */
+
+    'guard' => 'web',
+
 ];
