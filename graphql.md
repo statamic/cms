@@ -933,6 +933,39 @@ Grid fields can be queried with no extra requirements. You can just use the nest
 }
 ```
 
+### Select, Radio, Checkboxes, and Button Group
+
+These fieldtypes provide you with labels and values. You'll need to use a sub selection.
+
+```graphql
+my_select_field {
+    value
+    label
+}
+```
+
+```json
+"my_single_select_field": {
+    "value": "potato",
+    "label": "Potato"
+}
+```
+
+The same syntax is used when multiple values are expected. e.g. a select field with multiple values enabled, or a checkboxes field. You'll just get a nested array returned. 
+
+```json
+"my_multi_select_field": [
+    {
+        "value": "potato",
+        "label": "Potato"
+    },
+    {
+        "value": "tomato",
+        "label": "Tomato",
+    }
+]
+```
+
 ## Recursive Tree Branches
 
 Often, when dealing with navs, you need to recursively output all the child branches. For example, when using the `nav` tag in Antlers, you might do something like this:
