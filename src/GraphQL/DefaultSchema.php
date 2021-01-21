@@ -15,6 +15,7 @@ use Statamic\GraphQL\Queries\GlobalSetsQuery;
 use Statamic\GraphQL\Queries\NavQuery;
 use Statamic\GraphQL\Queries\NavsQuery;
 use Statamic\GraphQL\Queries\PingQuery;
+use Statamic\GraphQL\Queries\SitesQuery;
 use Statamic\GraphQL\Queries\TaxonomiesQuery;
 use Statamic\GraphQL\Queries\TaxonomyQuery;
 use Statamic\GraphQL\Queries\TermQuery;
@@ -43,6 +44,7 @@ class DefaultSchema
                 GlobalSetQuery::class,
                 NavsQuery::class,
                 NavQuery::class,
+                SitesQuery::class,
             ],
             'mutation' => [],
             'middleware' => [],
