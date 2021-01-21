@@ -26,6 +26,11 @@ class StructureType extends \Rebing\GraphQL\Support\Type
             ],
             'tree' => [
                 'type' => GraphQL::listOf(GraphQL::type(TreeBranchType::NAME)),
+                'args' => [
+                    'site' => [
+                        'type' => GraphQL::string(),
+                    ],
+                ],
             ],
         ])->map(function (array $arr) {
             $arr['resolve'] = $this->resolver();
@@ -47,7 +52,7 @@ class StructureType extends \Rebing\GraphQL\Support\Type
             if ($field === 'tree') {
                 return (new TreeBuilder)->build([
                     'structure' => $structure->handle(),
-                    'site' => Site::default()->handle(),
+                    'site' => $args['site'] ?? Site::default()->handle(),
                     'include_home' => $structure->expectsRoot(),
                 ]);
             }
