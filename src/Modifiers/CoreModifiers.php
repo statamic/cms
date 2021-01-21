@@ -1505,7 +1505,7 @@ class CoreModifiers extends Modifier
     public function ray($value)
     {
         return tap($value, function ($value) {
-            ray($value);
+            app(\Spatie\LaravelRay\Ray::class)->send($value);
         });
     }
 
