@@ -25,6 +25,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\Fields\Value;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
@@ -666,5 +667,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function getProtectionScheme()
     {
         return $this->value('protect');
+    }
+
+    public function resolveGqlValue($field)
+    {
+        $value = $this->augmentedValue($field);
+
+        if ($value instanceof Value) {
+            $value = $value->value();
+        }
+
+        return $value;
     }
 }
