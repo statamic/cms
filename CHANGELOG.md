@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.0.40 (2021-01-21)
+
+### What's fixed
+- Fix error when saving a root page. [#3132](https://github.com/statamic/cms/issues/3132)
+
+
+
 ## 3.0.39 (2021-01-19)
 
 ### What's improved
