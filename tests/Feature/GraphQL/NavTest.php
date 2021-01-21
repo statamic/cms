@@ -254,6 +254,57 @@ GQL;
             ]]);
     }
 
+    /** @test */
+    public function it_queries_the_tree_inside_a_nav_in_a_specific_site()
+    {
+        $this->createFooterNav();
+
+        $query = <<<'GQL'
+{
+    nav(handle: "footer") {
+        tree(site: "fr") {
+            depth
+            page {
+                url
+            }
+            children {
+                depth
+                page {
+                    url
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'nav' => [
+                    'tree' => [
+                        [
+                            'depth' => 1,
+                            'page' => ['url' => '/fr-one'],
+                            'children' => [
+                                [
+                                    'depth' => 2,
+                                    'page' => ['url' => '/fr-one/fr-nested'],
+                                ],
+                            ],
+                        ],
+                        [
+                            'depth' => 1,
+                            'page' => ['url' => '/fr-two'],
+                            'children' => [],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
+
     private function createFooterNav()
     {
         Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
@@ -283,6 +334,34 @@ GQL;
                 [
                     'url' => '/two',
                     'title' => 'Two',
+                ],
+            ]));
+            $nav->addTree($nav->makeTree('fr')->tree([
+                [
+                    'url' => '/fr-one',
+                    'title' => 'Fr One',
+                    'children' => [
+                        [
+                            'url' => '/fr-one/fr-nested',
+                            'title' => 'Fr Nested',
+                            'children' => [
+                                [
+                                    'url' => '/fr-one/fr-nested/fr-double-nested',
+                                    'title' => 'Fr Double Nested',
+                                    'children' => [
+                                        [
+                                            'url' => '/fr-one/fr-nested/fr-double-nested/fr-triple-nested',
+                                            'title' => 'Fr Triple Nested',
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                [
+                    'url' => '/fr-two',
+                    'title' => 'Fr Two',
                 ],
             ]));
             $nav->save();
