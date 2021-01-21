@@ -1497,6 +1497,17 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Send data to Laravel Ray.
+     *
+     * @param $value
+     * @return void
+     */
+    public function ray($value)
+    {
+        ray($value);
+    }
+
+    /**
      * Estimate the read time based on a given number of words per minute.
      *
      * @param $value
