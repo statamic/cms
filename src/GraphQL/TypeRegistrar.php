@@ -12,6 +12,7 @@ use Statamic\GraphQL\Types\GlobalSetInterface;
 use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\GraphQL\Types\NavType;
 use Statamic\GraphQL\Types\PageInterface;
+use Statamic\GraphQL\Types\SiteType;
 use Statamic\GraphQL\Types\TaxonomyType;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\GraphQL\Types\TreeBranchType;
@@ -27,6 +28,7 @@ class TypeRegistrar
         }
 
         GraphQL::addType(JsonArgument::class);
+        GraphQL::addType(SiteType::class);
         GraphQL::addType(CollectionType::class);
         GraphQL::addType(CollectionStructureType::class);
         GraphQL::addType(TaxonomyType::class);
