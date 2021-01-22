@@ -30,7 +30,7 @@ class Email extends Mailable
     public function build()
     {
         $this
-            ->subject($this->config['subject'] ?? __('Form Submission'))
+            ->subject($this->config['subject'] ? __($this->config['subject']) : __('Form Submission'))
             ->addAddresses()
             ->addViews()
             ->addData();
