@@ -29,8 +29,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app[\Illuminate\Contracts\Http\Kernel::class]
             ->pushMiddleware(\Statamic\Http\Middleware\PoweredByHeader::class)
-            ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class)
-            ->pushMiddleware(\Statamic\Http\Middleware\UserGuards::class);
+            ->pushMiddleware(\Statamic\Http\Middleware\CheckMultisite::class);
 
         $this->loadViewsFrom("{$this->root}/resources/views", 'statamic');
 
@@ -128,6 +127,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->make(Router::class)->middlewareGroup('statamic.web', [
             \Statamic\Http\Middleware\StacheLock::class,
             \Statamic\Http\Middleware\Localize::class,
+            \Statamic\Http\Middleware\UserGuards::class,
             \Statamic\StaticCaching\Middleware\Cache::class,
         ]);
     }

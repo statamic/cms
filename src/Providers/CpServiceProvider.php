@@ -70,6 +70,7 @@ class CpServiceProvider extends ServiceProvider
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \Statamic\Http\Middleware\CP\ControlPanel::class,
             \Statamic\Http\Middleware\CP\ContactOutpost::class,
+            \Statamic\Http\Middleware\UserGuards::class,
         ]);
 
         $router->middlewareGroup('statamic.cp.authenticated', [
