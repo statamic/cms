@@ -1504,9 +1504,11 @@ class CoreModifiers extends Modifier
      */
     public function ray($value)
     {
-        return tap($value, function ($value) {
-            app(\Spatie\LaravelRay\Ray::class)->send($value);
-        });
+        throw_unless(function_exists('ray'), new \Exception('Ray is not installed. Run `composer require spatie/laravel-ray --dev`'));
+
+        ray($value);
+
+        return $value;
     }
 
     /**
