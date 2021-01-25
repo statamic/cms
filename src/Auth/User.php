@@ -18,6 +18,7 @@ use Statamic\Data\TracksQueriedColumns;
 use Statamic\Events\UserDeleted;
 use Statamic\Events\UserSaved;
 use Statamic\Facades;
+use Statamic\Fields\Value;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
 use Statamic\Statamic;
@@ -218,5 +219,16 @@ abstract class User implements
     protected function shallowAugmentedArrayKeys()
     {
         return ['id', 'name', 'email', 'api_url'];
+    }
+
+    public function resolveGqlValue($field)
+    {
+        $value = $this->augmentedValue($field);
+
+        if ($value instanceof Value) {
+            $value = $value->value();
+        }
+
+        return $value;
     }
 }

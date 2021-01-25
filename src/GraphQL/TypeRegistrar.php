@@ -17,6 +17,7 @@ use Statamic\GraphQL\Types\SiteType;
 use Statamic\GraphQL\Types\TaxonomyType;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\GraphQL\Types\TreeBranchType;
+use Statamic\GraphQL\Types\UserType;
 
 class TypeRegistrar
 {
@@ -37,6 +38,7 @@ class TypeRegistrar
         GraphQL::addType(AssetContainerType::class);
         GraphQL::addType(NavType::class);
         GraphQL::addType(TreeBranchType::class);
+        GraphQL::addType(UserType::class);
         PageInterface::addTypes();
         EntryInterface::addTypes();
         TermInterface::addTypes();
