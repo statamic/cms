@@ -25,6 +25,7 @@ class AssetTest extends TestCase
         $query = <<<'GQL'
 {
     asset(id: "test::b.txt") {
+        id
         path
         extension
     }
@@ -37,6 +38,7 @@ GQL;
             ->assertGqlOk()
             ->assertExactJson(['data' => [
                 'asset' => [
+                    'id' => 'test::b.txt',
                     'path' => 'b.txt',
                     'extension' => 'txt',
                 ],

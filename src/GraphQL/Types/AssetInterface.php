@@ -18,6 +18,9 @@ class AssetInterface extends InterfaceType
     public function fields(): array
     {
         $fields = [
+            'id' => [
+                'type' => GraphQL::nonNull(GraphQL::string()),
+            ],
             'path' => [
                 'type' => GraphQL::nonNull(GraphQL::string()),
             ],
