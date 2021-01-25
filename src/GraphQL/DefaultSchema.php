@@ -20,6 +20,7 @@ use Statamic\GraphQL\Queries\TaxonomiesQuery;
 use Statamic\GraphQL\Queries\TaxonomyQuery;
 use Statamic\GraphQL\Queries\TermQuery;
 use Statamic\GraphQL\Queries\TermsQuery;
+use Statamic\GraphQL\Queries\UsersQuery;
 
 class DefaultSchema
 {
@@ -45,6 +46,7 @@ class DefaultSchema
                 NavsQuery::class,
                 NavQuery::class,
                 SitesQuery::class,
+                UsersQuery::class,
             ],
             'mutation' => [],
             'middleware' => [],
