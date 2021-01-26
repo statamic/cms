@@ -18,6 +18,7 @@ use Statamic\GraphQL\Types\TableRowType;
 use Statamic\GraphQL\Types\TaxonomyType;
 use Statamic\GraphQL\Types\TermInterface;
 use Statamic\GraphQL\Types\TreeBranchType;
+use Statamic\GraphQL\Types\UserGroupType;
 use Statamic\GraphQL\Types\UserType;
 
 class TypeRegistrar
@@ -40,6 +41,7 @@ class TypeRegistrar
         GraphQL::addType(NavType::class);
         GraphQL::addType(TreeBranchType::class);
         GraphQL::addType(UserType::class);
+        GraphQL::addType(UserGroupType::class);
         GraphQL::addType(TableRowType::class);
         PageInterface::addTypes();
         EntryInterface::addTypes();
