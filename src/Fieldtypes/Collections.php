@@ -4,6 +4,8 @@ namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
 use Statamic\Facades\Collection;
+use Statamic\Facades\GraphQL;
+use Statamic\GraphQL\Types\CollectionType;
 
 class Collections extends Relationship
 {
@@ -46,5 +48,16 @@ class Collections extends Relationship
     protected function augmentValue($value)
     {
         return Collection::findByHandle($value);
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type(CollectionType::NAME);
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
     }
 }
