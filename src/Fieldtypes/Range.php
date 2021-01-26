@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 
 class Range extends Fieldtype
@@ -54,5 +55,10 @@ class Range extends Fieldtype
                 'width' => 50,
             ],
         ];
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::int();
     }
 }

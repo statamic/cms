@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 
 class Lists extends Fieldtype
@@ -26,5 +27,10 @@ class Lists extends Fieldtype
         return collect($data)->reject(function ($item) {
             return in_array($item, [null, ''], true);
         })->values()->all();
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::listOf(GraphQL::string());
     }
 }
