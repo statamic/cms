@@ -127,8 +127,10 @@ class Markdown extends Fieldtype
                     'defaultValue' => 'html',
                 ],
             ],
-            'resolve' => function ($value, $args) {
-                return $args['format'] == 'html' ? $this->augment($value) : $value;
+            'resolve' => function ($entry, $args, $context, $info) {
+                return $args['format'] == 'html'
+                    ? $entry->resolveGqlValue($info->fieldName)
+                    : $entry->resolveRawGqlValue($info->fieldName);
             },
         ];
     }
