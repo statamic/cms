@@ -20,13 +20,13 @@ jobs:
         os: [ubuntu-20.04]
         include:
           - laravel: 8.*
-            laravel-constraint: ^8.18.1
-          - laravel: 8.*
             testbench: 6.*
+            laravel-constraint: ^8.18.1
           - laravel: 7.*
             testbench: 5.*
           - laravel: 6.*
             testbench: 4.*
+            laravel-constraint: ^6.6.2
           - php: 7.4
             dependency-version: prefer-lowest
             additional-deps: '"mockery/mockery:>=1.2.3"'
