@@ -25,6 +25,9 @@ class UserType extends \Rebing\GraphQL\Support\Type
                     'type' => GraphQL::string(),
                 ],
             ])
+            ->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(function ($closure) {
+                return $closure();
+            }))
             ->map(function (array $arr) {
                 $arr['resolve'] = $arr['resolve'] ?? $this->resolver();
 
