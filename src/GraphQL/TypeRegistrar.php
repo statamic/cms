@@ -13,6 +13,7 @@ use Statamic\GraphQL\Types\JsonArgument;
 use Statamic\GraphQL\Types\LabeledValueType;
 use Statamic\GraphQL\Types\NavType;
 use Statamic\GraphQL\Types\PageInterface;
+use Statamic\GraphQL\Types\RoleType;
 use Statamic\GraphQL\Types\SiteType;
 use Statamic\GraphQL\Types\TableRowType;
 use Statamic\GraphQL\Types\TaxonomyType;
@@ -42,6 +43,7 @@ class TypeRegistrar
         GraphQL::addType(TreeBranchType::class);
         GraphQL::addType(UserType::class);
         GraphQL::addType(UserGroupType::class);
+        GraphQL::addType(RoleType::class);
         GraphQL::addType(TableRowType::class);
         PageInterface::addTypes();
         EntryInterface::addTypes();
