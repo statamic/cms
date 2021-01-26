@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades\Nav;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -11,6 +12,12 @@ class NavTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
+
+    public function setUp(): void
+    {
+        parent::setUp();
+        BlueprintRepository::partialMock();
+    }
 
     /** @test */
     public function it_queries_a_nav_by_handle()

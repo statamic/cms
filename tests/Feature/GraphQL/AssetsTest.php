@@ -15,6 +15,12 @@ class AssetsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+        BlueprintRepository::partialMock();
+    }
+
     /** @test */
     public function it_queries_assets()
     {

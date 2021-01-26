@@ -2,6 +2,7 @@
 
 namespace Tests\Feature\GraphQL;
 
+use Facades\Statamic\Fields\BlueprintRepository;
 use Statamic\Facades\GraphQL;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -15,6 +16,8 @@ class EntryTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        BlueprintRepository::partialMock();
 
         $this->createEntries();
     }

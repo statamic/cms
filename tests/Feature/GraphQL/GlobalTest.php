@@ -15,6 +15,12 @@ class GlobalTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+        BlueprintRepository::partialMock();
+    }
+
     /** @test */
     public function it_queries_a_global_set_by_handle()
     {

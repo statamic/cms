@@ -12,6 +12,12 @@ abstract class FieldtypeTestCase extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+        BlueprintRepository::partialMock();
+    }
+
     protected function createEntryWithFields($arr)
     {
         EntryFactory::collection('test')->id('1')->data(

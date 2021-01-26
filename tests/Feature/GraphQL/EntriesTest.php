@@ -14,6 +14,12 @@ class EntriesTest extends TestCase
     use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+        BlueprintRepository::partialMock();
+    }
+
     /** @test */
     public function it_queries_entries()
     {
