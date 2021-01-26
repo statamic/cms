@@ -14,6 +14,12 @@ class TermsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+        BlueprintRepository::partialMock();
+    }
+
     private function createTaxonomies()
     {
         Taxonomy::make('tags')->save();

@@ -13,6 +13,12 @@ class BardFieldtypeTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
 
+    public function setUp(): void
+    {
+        parent::setUp();
+        BlueprintRepository::partialMock();
+    }
+
     /** @test */
     public function it_outputs_bard_fields()
     {
