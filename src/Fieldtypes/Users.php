@@ -3,7 +3,9 @@
 namespace Statamic\Fieldtypes;
 
 use Statamic\CP\Column;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\User;
+use Statamic\GraphQL\Types\UserType;
 
 class Users extends Relationship
 {
@@ -118,5 +120,16 @@ class Users extends Relationship
     protected function getCreateItemUrl()
     {
         return cp_route('users.create');
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type(UserType::NAME);
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
     }
 }
