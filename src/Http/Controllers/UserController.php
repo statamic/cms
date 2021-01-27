@@ -5,9 +5,10 @@ namespace Statamic\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Illuminate\Support\MessageBag;
-use Statamic\Contracts\Auth\User as UserContract;
+use Illuminate\Validation\ValidationException;
 use Statamic\Events\UserRegistered;
+use Statamic\Events\UserRegistering;
+use Statamic\Exceptions\SilentFormFailureException;
 use Statamic\Facades\User;
 
 class UserController extends Controller
@@ -53,10 +54,8 @@ class UserController extends Controller
 
         $validator = Validator::make($request->all(), $fieldRules);
 
-        $errorResponse = $request->has('_error_redirect') ? redirect($request->input('_error_redirect')) : back();
-
         if ($validator->fails()) {
-            return $errorResponse->withErrors($validator->errors(), 'user.register');
+            return $this->userRegistrationFailure($validator->errors());
         }
 
         $values = $fields->process()->values()->except(['email', 'groups', 'roles']);
@@ -70,7 +69,13 @@ class UserController extends Controller
             $user->roles($roles);
         }
 
-        // TODO: Registering event
+        try {
+            throw_if(UserRegistering::dispatch($user) === false, new SilentFormFailureException);
+        } catch (ValidationException $e) {
+            return $this->userRegistrationFailure($e->errors());
+        } catch (SilentFormFailureException $e) {
+            return $this->userRegistrationSuccess(true);
+        }
 
         $user->save();
 
@@ -78,45 +83,23 @@ class UserController extends Controller
 
         Auth::login($user);
 
-        $response = $request->has('_redirect') ? redirect($request->get('_redirect')) : back();
-
-        session()->flash('user.register.success', __('Registration successful.'));
-
-        return $response;
+        return $this->userRegistrationSuccess();
     }
 
-    /**
-     * Run the `user.registering` event.
-     *
-     * This allows the registration to be short-circuited before it gets saved and show errors.
-     * Or, the user may be modified. Lastly, an addon could just 'do something' here without
-     * modifying/stopping the registration.
-     *
-     * Expects an array of event responses (multiple listeners can listen for the same event).
-     * Each response in the array should be another array with an `errors` array.
-     *
-     * @param  UserContract $user
-     * @return MessageBag
-     */
-    protected function runRegisteringEvent(UserContract $user)
+    private function userRegistrationFailure($errors = null)
     {
-        $errors = [];
+        $errorResponse = request()->has('_error_redirect') ? redirect(request()->input('_error_redirect')) : back();
 
-        $responses = event('user.registering', $user);
+        return $errorResponse->withErrors($errors, 'user.register');
+    }
 
-        foreach ($responses as $response) {
-            // Ignore any non-arrays
-            if (! is_array($response)) {
-                continue;
-            }
+    private function userRegistrationSuccess(bool $silentFailure = false)
+    {
+        $response = request()->has('_redirect') ? redirect(request()->get('_redirect')) : back();
 
-            // If the event returned errors, tack those onto the array.
-            if ($response_errors = array_get($response, 'errors')) {
-                $errors = array_merge($response_errors, $errors);
-                continue;
-            }
-        }
+        session()->flash('user.register.success', __('Registration successful.'));
+        session()->flash('user.register.user_created', ! $silentFailure);
 
-        return new MessageBag($errors);
+        return $response;
     }
 }

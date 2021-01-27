@@ -4,7 +4,6 @@ namespace Statamic\StaticCaching;
 
 use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
-use Statamic\StaticCaching\Middleware\Retrieve;
 
 class ServiceProvider extends LaravelServiceProvider
 {
@@ -34,8 +33,6 @@ class ServiceProvider extends LaravelServiceProvider
 
     public function boot()
     {
-        $this->app['router']->prependMiddlewareToGroup('web', Retrieve::class);
-
         Event::subscribe(Invalidate::class);
     }
 }

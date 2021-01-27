@@ -136,7 +136,7 @@ class FileCacher extends AbstractCacher
         return sprintf('%s%s_%s.html',
             $this->getCachePath(),
             $parts['path'],
-            array_get($parts, 'query', '')
+            $this->config('ignore_query_strings') ? '' : array_get($parts, 'query', '')
         );
     }
 }

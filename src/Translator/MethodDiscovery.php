@@ -40,13 +40,13 @@ class MethodDiscovery
     {
         return '(trans(?:_choice)?|__n?)'
             .'\([\'"`]'
-            .'([\w\d\s\t\n\r,.\'\":\\\?!@£$%^&*<>_\-=\|\+]+)'
+            .'([\w\d\s\t\n\r,.\'\":\\\?!@£$%^&*<>_\-=\/\|\+]+)'
             .'[\'\"`]';
     }
 
     protected function annotatedReturnRegex()
     {
         return '\/\**? @translation \*\/\s+'
-            .'return ([\'"])([\w\d\s\t\n\r,.\'\":\\\?!@£$%^&*<>_\-=\|\+]+)\1;';
+            .'return ([\'"])([\w\d\s\t\n\r,.\'\":\\\?!@£$%^&*<>_\-=\/\|\+]+)\1;';
     }
 }

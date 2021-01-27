@@ -121,7 +121,7 @@
 
                                 <div class="flex items-center border-t justify-between px-2 py-1" v-if="!revisionsEnabled">
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
-                                    <toggle-input :value="published" @input="setFieldValue('published', $event)" />
+                                    <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
                                 </div>
 
                                 <div class="border-t p-2" v-if="revisionsEnabled && !isCreating">
@@ -297,6 +297,7 @@ export default {
         revisionsEnabled: Boolean,
         preloadedAssets: Array,
         canEditBlueprint: Boolean,
+        canManagePublishState: Boolean,
         createAnotherUrl: String,
         listingUrl: String,
     },
