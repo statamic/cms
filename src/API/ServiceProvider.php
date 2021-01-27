@@ -15,5 +15,13 @@ class ServiceProvider extends LaravelServiceProvider
     public function register()
     {
         Resource::mapDefaults();
+
+        $this->app->singleton(ApiCacheManager::class, function ($app) {
+            return new ApiCacheManager($app);
+        });
+
+        $this->app->bind(Cacher::class, function ($app) {
+            return $app[ApiCacheManager::class]->driver();
+        });
     }
 }
