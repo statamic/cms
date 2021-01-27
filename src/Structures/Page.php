@@ -8,16 +8,18 @@ use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\GraphQL\ResolvesValues;
 
-class Page implements Entry, Augmentable, Responsable, Protectable
+class Page implements Entry, Augmentable, Responsable, Protectable, ResolvesValuesContract
 {
-    use HasAugmentedInstance, ForwardsCalls;
+    use HasAugmentedInstance, ForwardsCalls, ResolvesValues;
 
     protected $tree;
     protected $reference;
