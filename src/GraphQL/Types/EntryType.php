@@ -39,8 +39,10 @@ class EntryType extends \Rebing\GraphQL\Support\Type
             ->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(function ($closure) {
                 return $closure();
             }))
-            ->map(function (array $arr) {
-                $arr['resolve'] = $arr['resolve'] ?? $this->resolver();
+            ->map(function ($arr) {
+                if (is_array($arr)) {
+                    $arr['resolve'] = $arr['resolve'] ?? $this->resolver();
+                }
 
                 return $arr;
             })

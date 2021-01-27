@@ -37,6 +37,7 @@ class EntryTest extends TestCase
         permalink
         published
         private
+        date
         collection {
             title
             handle
@@ -60,6 +61,7 @@ GQL;
                     'permalink' => 'http://localhost/events/event-one',
                     'published' => true,
                     'private' => false,
+                    'date' => 'November 3rd, 2017',
                     'collection' => [
                         'title' => 'Events',
                         'handle' => 'events',

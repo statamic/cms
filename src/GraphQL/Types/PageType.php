@@ -26,7 +26,9 @@ class PageType extends \Rebing\GraphQL\Support\Type
         return collect()
             ->merge((new PageInterface)->fields())
             ->map(function ($field) {
-                $field['resolve'] = $this->resolver();
+                if (is_array($field)) {
+                    $field['resolve'] = $this->resolver();
+                }
 
                 return $field;
             })

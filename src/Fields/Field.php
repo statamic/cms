@@ -5,6 +5,7 @@ namespace Statamic\Fields;
 use Facades\Statamic\Fields\FieldtypeRepository;
 use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Support\Arrayable;
+use Rebing\GraphQL\Support\Field as GqlField;
 use Statamic\Facades\GraphQL;
 use Statamic\Support\Str;
 
@@ -301,6 +302,10 @@ class Field implements Arrayable
     public function toGraphQL(): array
     {
         $type = $this->fieldtype()->toGqlType();
+
+        if ($type instanceof GqlField) {
+            $type = $type->toArray();
+        }
 
         if ($type instanceof Type) {
             $type = ['type' => $type];
