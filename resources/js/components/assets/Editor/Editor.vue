@@ -92,7 +92,7 @@
                     </div>
 
                     <div class="editor-file-actions">
-                        <button v-if="isImage" type="button" class="btn" @click.prevent="openFocalPointEditor">
+                        <button v-if="isImage && isFocalPointEditorEnabled" type="button" class="btn" @click.prevent="openFocalPointEditor">
                             {{ __('Set Focal Point') }}
                         </button>
 
@@ -153,7 +153,7 @@
 
         <portal to="outside">
             <focal-point-editor
-                v-if="showFocalPointEditor"
+                v-if="showFocalPointEditor && isFocalPointEditorEnabled"
                 :data="values.focus"
                 :image="asset.preview"
                 @selected="selectFocalPoint"
@@ -240,8 +240,12 @@ export default {
         canUseGoogleDocsViewer()
         {
             return Statamic.$config.get('googleDocsViewer');
-        }
+        },
 
+        isFocalPointEditorEnabled()
+        {
+            return Statamic.$config.get("focalPointEditorEnabled");
+        }
     },
 
 

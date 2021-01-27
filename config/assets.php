@@ -128,4 +128,16 @@ return [
 
     'cache_meta' => true,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Enable Focal Point Editor
+    |--------------------------------------------------------------------------
+    |
+    | Enable the statamic focal point editor for uploaded images
+    | When working with third-party image providers such as Cloudinary it can
+    | be useful to disable the statamic built-in focal point editor.
+    |
+    */
+
+    'focal_point_editor_enabled' => true,
 ];
