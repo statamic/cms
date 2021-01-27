@@ -1,11 +1,11 @@
 <?php
 
-namespace Statamic\Providers;
+namespace Statamic\API;
 
-use Illuminate\Support\ServiceProvider;
+use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Http\Resources\API\Resource;
 
-class ApiServiceProvider extends ServiceProvider
+class ServiceProvider extends LaravelServiceProvider
 {
     /**
      * Register API resources.
