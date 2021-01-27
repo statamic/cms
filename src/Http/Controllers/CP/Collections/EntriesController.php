@@ -127,6 +127,7 @@ class EntriesController extends CpController
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
+            'canManagePublishState' => User::current()->can('publish', $entry),
         ];
 
         if ($request->wantsJson()) {
@@ -176,8 +177,13 @@ class EntriesController extends CpController
 
         if ($collection->structure() && ! $collection->orderable()) {
             $entry->afterSave(function ($entry) use ($parent) {
-                $entry->structure()
-                    ->in($entry->locale())
+                $tree = $entry->structure()->in($entry->locale());
+
+                if ($parent && optional($tree->page($parent))->isRoot()) {
+                    $parent = null;
+                }
+
+                $tree
                     ->move($entry->id(), $parent)
                     ->save();
             });
@@ -189,7 +195,7 @@ class EntriesController extends CpController
                 ->user(User::current())
                 ->save();
         } else {
-            if (! $entry->revisionsEnabled()) {
+            if (! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
                 $entry->published($request->published);
             }
 
@@ -254,6 +260,7 @@ class EntriesController extends CpController
             })->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
+            'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
         ];
 
         if ($request->wantsJson()) {

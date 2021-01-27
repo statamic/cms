@@ -76,6 +76,8 @@ class AugmentedEntryTest extends AugmentedTestCase
             ->setSupplement('three', 'the "three" value supplemented on the entry')
             ->setSupplement('four', 'the "four" value supplemented on the entry and in the blueprint');
 
+        $mount = tap(Collection::make('mountable')->mount($entry->id()))->save();
+
         $augmented = new AugmentedEntry($entry);
 
         $expectations = [
@@ -93,6 +95,7 @@ class AugmentedEntryTest extends AugmentedTestCase
             'order'         => ['type' => 'null', 'value' => null], // todo: test for when this is an int
             'is_entry'      => ['type' => 'bool', 'value' => true],
             'collection'    => ['type' => CollectionContract::class, 'value' => $collection],
+            'mount'         => ['type' => CollectionContract::class, 'value' => $mount],
             'last_modified' => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
             'updated_at'    => ['type' => Carbon::class, 'value' => '2017-02-03 14:10'],
             'updated_by'    => ['type' => UserContract::class, 'value' => 'test-user'],
@@ -108,5 +111,26 @@ class AugmentedEntryTest extends AugmentedTestCase
         ];
 
         $this->assertAugmentedCorrectly($expectations, $augmented);
+    }
+
+    /** @test */
+    public function it_gets_the_mount_from_the_value_first_if_it_exists()
+    {
+        $mount = tap(Collection::make('a'))->save();
+
+        $entry = EntryFactory::id('entry-id')
+            ->collection('test')
+            ->slug('entry-slug')
+            ->create();
+
+        $augmented = new AugmentedEntry($entry);
+
+        $this->assertNull($augmented->get('mount'));
+
+        $mount->mount($entry->id())->save();
+        $this->assertEquals($mount, $augmented->get('mount'));
+
+        $entry->set('mount', 'b');
+        $this->assertEquals('b', $augmented->get('mount'));
     }
 }

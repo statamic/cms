@@ -5,6 +5,7 @@ namespace Statamic\Fieldtypes;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldtype;
 use Statamic\Query\Scopes\Filters\Fields\Replicator as ReplicatorFilter;
+use Statamic\Support\Arr;
 
 class Replicator extends Fieldtype
 {
@@ -56,7 +57,9 @@ class Replicator extends Fieldtype
 
         $fields = $this->fields($row['type'])->addValues($row)->process()->values()->all();
 
-        return array_merge($row, $fields);
+        $row = array_merge($row, $fields);
+
+        return Arr::removeNullValues($row);
     }
 
     public function preProcess($data)

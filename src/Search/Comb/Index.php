@@ -92,7 +92,7 @@ class Index extends BaseIndex
             return;
         }
 
-        $data->forget($document->id());
+        $data->forget($document->reference());
 
         $this->save($data);
     }

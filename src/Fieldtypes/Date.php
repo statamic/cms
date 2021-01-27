@@ -111,7 +111,7 @@ class Date extends Fieldtype
             $data = array_get($data, 'start', null);
         }
 
-        return Carbon::createFromFormat($this->dateFormat($data), $data)->format('Y-m-d H:i');
+        return Carbon::createFromFormat($this->dateFormat($data), $data)->format($this->config('time_enabled') ? 'Y-m-d H:i' : 'Y-m-d');
     }
 
     public function process($data)
