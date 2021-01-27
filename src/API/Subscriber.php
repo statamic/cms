@@ -31,7 +31,7 @@ class Subscriber
             return;
         }
 
-        app(Cacher::class)->handleInvalidation($event);
+        app(Cacher::class)->handleInvalidationEvent($event);
     }
 
     /**

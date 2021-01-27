@@ -6,6 +6,7 @@ use Closure;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Statamic\API\AbstractCacher;
+use Statamic\Events\Event;
 
 class DefaultCacher extends AbstractCacher
 {
@@ -17,7 +18,66 @@ class DefaultCacher extends AbstractCacher
      */
     public function remember(Request $request, Closure $callback)
     {
-        return Cache::remember($this->cacheKey($request), $this->cacheExpiry(), $callback);
+        $key = $this->trackEndpoint($request);
+
+        return Cache::remember($key, $this->cacheExpiry(), $callback);
+    }
+
+    /**
+     * Handle event based API cache invalidation.
+     *
+     * @param Event $event
+     * @return void
+     */
+    public function handleInvalidationEvent(Event $event)
+    {
+        $this->getTrackedEndpoints()->each(function ($key) {
+            Cache::forget($key);
+        });
+
+        Cache::forget($this->getTrackingKey());
+    }
+
+    /**
+     * Track endpoint and return new cache key.
+     *
+     * @param Request $request
+     * @return string
+     */
+    protected function trackEndpoint($request)
+    {
+        $newKey = $this->getCacheKey($request);
+
+        $keys = $this
+            ->getTrackedEndpoints()
+            ->push($newKey)
+            ->unique()
+            ->values()
+            ->all();
+
+        Cache::put($this->getTrackingKey(), $keys);
+
+        return $newKey;
+    }
+
+    /**
+     * Get tracked endpoints.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getTrackedEndpoints()
+    {
+        return collect(Cache::get($this->getTrackingKey(), []));
+    }
+
+    /**
+     * Get tracking cache key for storing invalidatable endpoints.
+     *
+     * @return string
+     */
+    protected function getTrackingKey()
+    {
+        return $this->normalizeKey('tracked-endpoints');
     }
 
     /**
@@ -26,7 +86,7 @@ class DefaultCacher extends AbstractCacher
      * @param Request $request
      * @return string
      */
-    public function cacheKey(Request $request)
+    protected function getCacheKey(Request $request)
     {
         $domain = $request->root();
         $fullUrl = $request->fullUrl();
