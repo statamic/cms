@@ -38,6 +38,7 @@ class EntryTest extends TestCase
         published
         private
         date
+        last_modified
         collection {
             title
             handle
@@ -62,6 +63,7 @@ GQL;
                     'published' => true,
                     'private' => false,
                     'date' => 'November 3rd, 2017',
+                    'last_modified' => 'December 25th, 2017',
                     'collection' => [
                         'title' => 'Events',
                         'handle' => 'events',

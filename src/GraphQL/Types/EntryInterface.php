@@ -5,6 +5,7 @@ namespace Statamic\GraphQL\Types;
 use Rebing\GraphQL\Support\InterfaceType;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
+use Statamic\GraphQL\Fields\DateField;
 
 class EntryInterface extends InterfaceType
 {
@@ -47,7 +48,8 @@ class EntryInterface extends InterfaceType
             'collection' => [
                 'type' => GraphQL::nonNull(GraphQL::type(CollectionType::NAME)),
             ],
-            'date' => new \Statamic\GraphQL\Fields\DateField,
+            'date' => new DateField,
+            'last_modified' => new DateField,
         ];
 
         foreach ($this->extraFields() as $field => $closure) {

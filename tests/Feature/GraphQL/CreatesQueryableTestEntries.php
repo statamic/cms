@@ -38,7 +38,10 @@ trait CreatesQueryableTestEntries
             ->id('3')
             ->slug('event-one')
             ->date('2017-11-03')
-            ->data(['title' => 'Event One'])
+            ->data([
+                'title' => 'Event One',
+                'updated_at' => '1514208540',
+            ])
             ->create();
 
         EntryFactory::collection('events')->id('4')->slug('event-two')->data(['title' => 'Event Two'])->create();
