@@ -3,9 +3,8 @@
 namespace Statamic\Fieldtypes;
 
 use Carbon\Carbon;
-use Statamic\Contracts\GraphQL\ResolvesValues;
-use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
+use Statamic\GraphQL\Fields\DateField;
 use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
 
 class Date extends Fieldtype
@@ -157,22 +156,6 @@ class Date extends Fieldtype
 
     public function toGqlType()
     {
-        return [
-            'type' => GraphQL::string(),
-            'args' => [
-                'format' => GraphQL::string(),
-            ],
-            'resolve' => function (ResolvesValues $entry, $args, $context, $info) {
-                if (! $date = $entry->resolveGqlValue($info->fieldName)) {
-                    return null;
-                }
-
-                if ($format = $args['format'] ?? null) {
-                    return $date->format($format);
-                }
-
-                return (string) $date;
-            },
-        ];
+        return new DateField;
     }
 }

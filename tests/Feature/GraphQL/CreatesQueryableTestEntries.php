@@ -34,7 +34,12 @@ trait CreatesQueryableTestEntries
                 'content' => 'The art directed blog post content',
             ])->create();
 
-        EntryFactory::collection('events')->id('3')->slug('event-one')->data(['title' => 'Event One'])->create();
+        EntryFactory::collection('events')
+            ->id('3')
+            ->slug('event-one')
+            ->date('2017-11-03')
+            ->data(['title' => 'Event One'])
+            ->create();
 
         EntryFactory::collection('events')->id('4')->slug('event-two')->data(['title' => 'Event Two'])->create();
 
