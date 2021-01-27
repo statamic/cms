@@ -2,6 +2,7 @@
 
 namespace Statamic\API;
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
 use Statamic\Http\Resources\API\Resource;
 
@@ -23,5 +24,7 @@ class ServiceProvider extends LaravelServiceProvider
         $this->app->bind(Cacher::class, function ($app) {
             return $app[ApiCacheManager::class]->driver();
         });
+
+        Event::subscribe(Subscriber::class);
     }
 }
