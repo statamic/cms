@@ -117,7 +117,9 @@ class Submission implements SubmissionContract, Augmentable
 
         $data = collect($data)->intersectByKeys($this->fields())->all();
 
-        $this->data = $data;
+        $this->data = array_merge($data, [
+            'date' => $this->date(),
+        ]);
 
         return $this;
     }
