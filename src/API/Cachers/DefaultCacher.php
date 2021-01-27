@@ -31,7 +31,7 @@ class DefaultCacher extends AbstractCacher
      */
     public function handleInvalidationEvent(Event $event)
     {
-        $this->getTrackedEndpoints()->each(function ($key) {
+        $this->getTrackedResponses()->each(function ($key) {
             Cache::forget($key);
         });
 
@@ -49,7 +49,7 @@ class DefaultCacher extends AbstractCacher
         $newKey = $this->getCacheKey($request);
 
         $keys = $this
-            ->getTrackedEndpoints()
+            ->getTrackedResponses()
             ->push($newKey)
             ->unique()
             ->values()
@@ -61,11 +61,11 @@ class DefaultCacher extends AbstractCacher
     }
 
     /**
-     * Get tracked endpoints.
+     * Get tracked responses.
      *
      * @return \Illuminate\Support\Collection
      */
-    protected function getTrackedEndpoints()
+    protected function getTrackedResponses()
     {
         return collect(Cache::get($this->getTrackingKey(), []));
     }
@@ -77,7 +77,7 @@ class DefaultCacher extends AbstractCacher
      */
     protected function getTrackingKey()
     {
-        return $this->normalizeKey('tracked-endpoints');
+        return $this->normalizeKey('tracked-responses');
     }
 
     /**
