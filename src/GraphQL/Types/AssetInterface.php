@@ -27,6 +27,78 @@ class AssetInterface extends InterfaceType
             'extension' => [
                 'type' => GraphQL::nonNull(GraphQL::string()),
             ],
+            'is_audio' => [
+                'type' => GraphQL::boolean(),
+            ],
+            'is_image' => [
+                'type' => GraphQL::boolean(),
+            ],
+            'is_video' => [
+                'type' => GraphQL::boolean(),
+            ],
+            'blueprint' => [
+                'type' => GraphQL::string(),
+            ],
+            'edit_url' => [
+                'type' => GraphQL::string(),
+            ],
+            'container' => [
+                'type' => GraphQL::nonNull(GraphQL::type(AssetContainerType::NAME)),
+            ],
+            'folder' => [
+                'type' => GraphQL::string(),
+            ],
+            'url' => [
+                'type' => GraphQL::string(),
+            ],
+            'permalink' => [
+                'type' => GraphQL::string(),
+            ],
+            'size' => [
+                'type' => GraphQL::string(),
+            ],
+            'size_bytes' => [
+                'type' => GraphQL::int(),
+            ],
+            'size_kilobytes' => [
+                'type' => GraphQL::float(),
+            ],
+            'size_megabytes' => [
+                'type' => GraphQL::float(),
+            ],
+            'size_gigabytes' => [
+                'type' => GraphQL::float(),
+            ],
+            'size_b' => [
+                'type' => GraphQL::int(),
+            ],
+            'size_kb' => [
+                'type' => GraphQL::float(),
+            ],
+            'size_mb' => [
+                'type' => GraphQL::float(),
+            ],
+            'size_gb' => [
+                'type' => GraphQL::float(),
+            ],
+            'last_modified' => [
+                'type' => GraphQL::string(),
+            ],
+            'focus_css' => [
+                'type' => GraphQL::string(),
+            ],
+            'height' => [
+                'type' => GraphQL::int(),
+            ],
+            'width' => [
+                'type' => GraphQL::int(),
+            ],
+            'orientation' => [
+                'type' => GraphQL::string(),
+            ],
+            'ratio' => [
+                'type' => GraphQL::float(),
+            ],
         ];
 
         foreach (GraphQL::getExtraTypeFields(static::NAME) as $field => $closure) {

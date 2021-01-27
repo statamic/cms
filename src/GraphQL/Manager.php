@@ -59,6 +59,11 @@ class Manager
         return Type::int();
     }
 
+    public function float()
+    {
+        return Type::float();
+    }
+
     public function boolean()
     {
         return Type::boolean();
