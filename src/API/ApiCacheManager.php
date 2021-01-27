@@ -2,7 +2,6 @@
 
 namespace Statamic\API;
 
-use Illuminate\Cache\Repository;
 use InvalidArgumentException;
 use Statamic\API\Cachers\DefaultCacher;
 use Statamic\API\Cachers\NullCacher;
@@ -33,9 +32,7 @@ class ApiCacheManager extends Manager
 
     public function createClassDriver(string $driverClass, array $config)
     {
-        $cache = app(Repository::class);
-
-        return new $driverClass($cache, $config);
+        return new $driverClass($config);
     }
 
     protected function getConfig($name)
