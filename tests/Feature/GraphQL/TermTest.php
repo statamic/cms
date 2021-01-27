@@ -27,6 +27,14 @@ class TermTest extends TestCase
         id
         title
         slug
+        url
+        uri
+        edit_url
+        permalink
+        taxonomy {
+            title
+            handle
+        }
     }
 }
 GQL;
@@ -40,6 +48,14 @@ GQL;
                     'id' => 'tags::bravo',
                     'title' => 'Bravo',
                     'slug' => 'bravo',
+                    'url' => '/tags/bravo',
+                    'uri' => '/tags/bravo',
+                    'edit_url' => 'http://localhost/cp/taxonomies/tags/terms/bravo/en',
+                    'permalink' => 'http://localhost/tags/bravo',
+                    'taxonomy' => [
+                        'title' => 'Tags',
+                        'handle' => 'tags',
+                    ],
                 ],
             ]]);
     }

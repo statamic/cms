@@ -27,6 +27,21 @@ class TermInterface extends InterfaceType
             'slug' => [
                 'type' => GraphQL::nonNull(GraphQL::string()),
             ],
+            'url' => [
+                'type' => GraphQL::string(),
+            ],
+            'uri' => [
+                'type' => GraphQL::string(),
+            ],
+            'edit_url' => [
+                'type' => GraphQL::nonNull(GraphQL::string()),
+            ],
+            'permalink' => [
+                'type' => GraphQL::string(),
+            ],
+            'taxonomy' => [
+                'type' => GraphQL::nonNull(GraphQL::type(TaxonomyType::NAME)),
+            ],
         ];
 
         foreach (GraphQL::getExtraTypeFields(static::NAME) as $field => $closure) {
