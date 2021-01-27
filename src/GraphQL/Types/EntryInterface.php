@@ -5,7 +5,6 @@ namespace Statamic\GraphQL\Types;
 use Rebing\GraphQL\Support\InterfaceType;
 use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
-use Statamic\GraphQL\Fields\DateField;
 
 class EntryInterface extends InterfaceType
 {
