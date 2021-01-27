@@ -23,13 +23,13 @@ class UserTest extends TestCase
 
     private function createUsers()
     {
-        User::make()->id('1')->email('a@example.com')->set('name', 'Carmen')->save();
-        User::make()->id('2')->email('b@example.com')->set('name', 'Edgar')->save();
-        User::make()->id('3')->email('c@example.com')->set('name', 'Burt')->save();
-        User::make()->id('4')->email('d@example.com')->set('name', 'Gary')->save();
-        User::make()->id('5')->email('e@example.com')->set('name', 'Dolores')->save();
-        User::make()->id('6')->email('f@example.com')->set('name', 'Alan')->save();
-        User::make()->id('7')->email('g@example.com')->set('name', 'Fred')->save();
+        User::make()->id('1')->email('a@example.com')->set('name', 'Carmen Sandiego')->save();
+        User::make()->id('2')->email('b@example.com')->set('name', 'Edgar Allen Poe')->save();
+        User::make()->id('3')->email('c@example.com')->set('name', 'Burt Wonderstone')->save();
+        User::make()->id('4')->email('d@example.com')->set('name', 'Gary Busey')->save();
+        User::make()->id('5')->email('e@example.com')->set('name', 'Dolores Mulva')->save();
+        User::make()->id('6')->email('f@example.com')->set('name', 'Alan Alda')->save();
+        User::make()->id('7')->email('g@example.com')->set('name', 'Fred Armisen')->save();
     }
 
     /** @test */
@@ -43,6 +43,8 @@ class UserTest extends TestCase
         id
         email
         name
+        initials
+        edit_url
     }
 }
 GQL;
@@ -55,7 +57,9 @@ GQL;
                 'user' => [
                     'id' => '3',
                     'email' => 'c@example.com',
-                    'name' => 'Burt',
+                    'name' => 'Burt Wonderstone',
+                    'initials' => 'BW',
+                    'edit_url' => 'http://localhost/cp/users/3/edit',
                 ],
             ]]);
     }

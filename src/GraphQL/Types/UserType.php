@@ -24,6 +24,15 @@ class UserType extends \Rebing\GraphQL\Support\Type
                 'email' => [
                     'type' => GraphQL::string(),
                 ],
+                'name' => [
+                    'type' => GraphQL::string(),
+                ],
+                'initials' => [
+                    'type' => GraphQL::string(),
+                ],
+                'edit_url' => [
+                    'type' => GraphQL::string(),
+                ],
             ])
             ->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(function ($closure) {
                 return $closure();
