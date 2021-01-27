@@ -87,7 +87,7 @@ GQL;
                 'user' => [
                     'id' => '3',
                     'email' => 'c@example.com',
-                    'name' => 'Burt',
+                    'name' => 'Burt Wonderstone',
                 ],
             ]]);
     }
