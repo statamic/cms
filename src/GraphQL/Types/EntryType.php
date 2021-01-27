@@ -3,7 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use Statamic\Contracts\Entries\Collection;
-use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Contracts\GraphQL\ResolvesValues;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Blueprint;
 use Statamic\Support\Str;
@@ -49,7 +49,7 @@ class EntryType extends \Rebing\GraphQL\Support\Type
 
     protected function resolver()
     {
-        return function (EntryContract $entry, $args, $context, $info) {
+        return function (ResolvesValues $entry, $args, $context, $info) {
             return $entry->resolveGqlValue($info->fieldName);
         };
     }
