@@ -18,7 +18,7 @@ class DateField extends Field
         return [
             'format' => [
                 'type' => Type::string(),
-            ]
+            ],
         ];
     }
 
