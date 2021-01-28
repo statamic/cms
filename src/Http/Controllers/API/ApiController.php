@@ -19,7 +19,7 @@ class ApiController extends Controller
     protected $request;
 
     /**
-     * Create a new CpController.
+     * Create a new ApiController.
      *
      * @param \Illuminate\Http\Request $request
      */
