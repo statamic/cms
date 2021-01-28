@@ -898,12 +898,12 @@ fields:
 
 ### Bard
 
-Bard fields work the same as Replicator, except that you also have an additional `BardText_{FieldHandle}` for the text fragment.
+Bard fields work the same as Replicator, except that you also have an additional `BardText` for the text fragment.
 
 ```graphql
 {
     content_blocks {
-        ... on BardText_ContentBlocks {
+        ... on BardText {
             type
             text
         }

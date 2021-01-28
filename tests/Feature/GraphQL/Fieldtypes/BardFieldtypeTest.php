@@ -64,7 +64,7 @@ class BardFieldtypeTest extends TestCase
         title
         ... on Entry_Blog_Article {
             things {
-                ... on BardText_Things {
+                ... on BardText {
                     type
                     text
                 }
