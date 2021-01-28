@@ -10,13 +10,18 @@ class ReplicatorSetsType extends UnionType
 {
     protected $fieldtype;
     protected $types;
+    protected $typeMap;
 
-    public function __construct($fieldtype, $types)
+    public function __construct($fieldtype, $name, $types)
     {
         $this->fieldtype = $fieldtype;
-        $this->types = $types;
+        $this->attributes['name'] = $name;
 
-        $this->attributes['name'] = static::buildName($fieldtype);
+        $this->types = $types->mapWithKeys(function ($item) {
+            return [$item['name'] => GraphQL::type($item['name'])];
+        })->all();
+
+        $this->typeMap = $types->pluck('name', 'handle')->all();
     }
 
     public static function buildName($fieldtype)
@@ -31,6 +36,6 @@ class ReplicatorSetsType extends UnionType
 
     public function resolveType($value)
     {
-        return GraphQL::type(ReplicatorSetType::buildName($this->fieldtype, $value['type']));
+        return GraphQL::type($this->typeMap[$value['type']]);
     }
 }

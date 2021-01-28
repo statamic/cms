@@ -147,4 +147,117 @@ GQL;
                 ],
             ]]);
     }
+
+    /** @test */
+    public function it_outputs_nested_bard_fields()
+    {
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'things' => [
+                ['type' => 'text', 'text' => 'first text'],
+                ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke', 'extras' => [
+                    ['type' => 'food', 'item' => 'fries'],
+                    ['type' => 'food', 'item' => 'ketchup'],
+                ]],
+                ['type' => 'text', 'text' => 'second text'],
+                ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
+                ['type' => 'meal', 'food' => 'salad', 'drink' => 'water', 'extras' => [
+                    ['type' => 'food', 'item' => 'dressing'],
+                ]],
+                ['type' => 'text', 'text' => 'last text'],
+            ],
+        ])->create();
+
+        $article = Blueprint::makeFromFields([
+            'things' => [
+                'type' => 'bard',
+                'sets' => [
+                    'meal' => [
+                        'fields' => [
+                            ['handle' => 'food', 'field' => ['type' => 'text']],
+                            ['handle' => 'drink', 'field' => ['type' => 'text']],
+                            [
+                                'handle' => 'extras',
+                                'field' => [
+                                    'type' => 'bard',
+                                    'sets' => [
+                                        'food' => [
+                                            'fields' => [
+                                                ['handle' => 'item', 'field' => ['type' => 'text']],
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                    'car' => [
+                        'fields' => [
+                            ['handle' => 'make', 'field' => ['type' => 'text']],
+                            ['handle' => 'model', 'field' => ['type' => 'text']],
+                        ],
+                    ],
+                ],
+            ],
+        ]);
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'article' => $article->setHandle('article'),
+        ]));
+
+        $query = <<<'GQL'
+{
+    entry(id: "1") {
+        title
+        ... on Entry_Blog_Article {
+            things {
+                ... on BardText {
+                    type
+                    text
+                }
+                ... on Set_Things_Meal {
+                    type
+                    food
+                    drink
+                    extras {
+                        ... on Set_Things_Extras_Food {
+                            type
+                            item
+                        }
+                    }
+                }
+                ... on Set_Things_Car {
+                    type
+                    make
+                    model
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'title' => 'Main Post',
+                    'things' => [
+                        ['type' => 'text', 'text' => '<p>first text</p>'],
+                        ['type' => 'meal', 'food' => 'burger', 'drink' => 'coke', 'extras' => [
+                            ['type' => 'food', 'item' => 'fries'],
+                            ['type' => 'food', 'item' => 'ketchup'],
+                        ]],
+                        ['type' => 'text', 'text' => '<p>second text</p>'],
+                        ['type' => 'car', 'make' => 'toyota', 'model' => 'corolla'],
+                        ['type' => 'meal', 'food' => 'salad', 'drink' => 'water', 'extras' => [
+                            ['type' => 'food', 'item' => 'dressing'],
+                        ]],
+                        ['type' => 'text', 'text' => '<p>last text</p>'],
+                    ],
+                ],
+            ]]);
+    }
 }

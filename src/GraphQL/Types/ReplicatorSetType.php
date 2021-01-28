@@ -3,24 +3,17 @@
 namespace Statamic\GraphQL\Types;
 
 use Statamic\Facades\GraphQL;
-use Statamic\Support\Str;
 
 class ReplicatorSetType extends \Rebing\GraphQL\Support\Type
 {
     protected $fieldtype;
     protected $handle;
 
-    public function __construct($fieldtype, $handle)
+    public function __construct($fieldtype, $name, $handle)
     {
         $this->fieldtype = $fieldtype;
         $this->handle = $handle;
-
-        $this->attributes['name'] = static::buildName($fieldtype, $handle);
-    }
-
-    public static function buildName($fieldtype, $set)
-    {
-        return 'Set_'.Str::studly($fieldtype->field()->handle()).'_'.Str::studly($set);
+        $this->attributes['name'] = $name;
     }
 
     public function fields(): array

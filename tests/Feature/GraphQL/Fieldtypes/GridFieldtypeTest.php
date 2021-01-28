@@ -72,4 +72,107 @@ GQL;
                 ],
             ]]);
     }
+
+    /** @test */
+    public function it_outputs_nested_grid_fields()
+    {
+        EntryFactory::collection('blog')->id('1')->data([
+            'title' => 'Main Post',
+            'meals' => [
+                [
+                    'food' => 'burger',
+                    'drink' => 'coke',
+                    'extras' => [
+                        ['item' => 'fries'],
+                        ['item' => 'ketchup'],
+                    ],
+                ],
+                [
+                    'food' => 'salad',
+                    'drink' => 'water',
+                    'extras' => [
+                        ['item' => 'dressing'],
+                    ],
+                ],
+            ],
+            'extras' => [
+                ['foo' => 'bar'],
+            ],
+        ])->create();
+
+        $article = Blueprint::makeFromFields([
+            'meals' => [
+                'type' => 'grid',
+                'fields' => [
+                    ['handle' => 'food', 'field' => ['type' => 'text']],
+                    ['handle' => 'drink', 'field' => ['type' => 'text']],
+                    [
+                        'handle' => 'extras',
+                        'field' => [
+                            'type' => 'grid',
+                            'fields' => [
+                                ['handle' => 'item', 'field' => ['type' => 'text']],
+                            ],
+                        ],
+                    ],
+                ],
+            ],
+            // Add a top level field with the same handle as the nested grid
+            // to ensure a conflict and that it doesn't accidentally pass.
+            'extras' => [
+                'type' => 'grid',
+                'fields' => [
+                    ['handle' => 'foo', 'field' => ['type' => 'text']],
+                ],
+            ],
+        ]);
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'article' => $article->setHandle('article'),
+        ]));
+
+        $query = <<<'GQL'
+{
+    entry(id: "1") {
+        title
+        ... on Entry_Blog_Article {
+            meals {
+                food
+                drink
+                extras {
+                    item
+                }
+            }
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'title' => 'Main Post',
+                    'meals' => [
+                        [
+                            'food' => 'burger',
+                            'drink' => 'coke',
+                            'extras' => [
+                                ['item' => 'fries'],
+                                ['item' => 'ketchup'],
+                            ],
+                        ],
+                        [
+                            'food' => 'salad',
+                            'drink' => 'water',
+                            'extras' => [
+                                ['item' => 'dressing'],
+                            ],
+                        ],
+                    ],
+                ],
+            ]]);
+    }
 }

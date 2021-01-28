@@ -896,6 +896,9 @@ fields:
 }
 ```
 
+> If you have a field nested in another, rather than just the handle, you should use the parent's handle, (and grandparent's, great grandparent's, and so on).
+> e.g. `Set_TopLevelReplicator_NestedReplicator_DeeplyNestedReplicator_SetHandle`
+
 ### Bard
 
 Bard fields work the same as Replicator, except that you also have an additional `BardText` for the text fragment.

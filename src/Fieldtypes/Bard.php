@@ -384,21 +384,33 @@ class Bard extends Replicator
 
     public function addGqlTypes()
     {
-        $types = collect($this->config('sets'))->mapWithKeys(function ($config, $handle) {
-            $type = new ReplicatorSetType($this, $handle);
+        $types = collect($this->config('sets'))
+            ->each(function ($set, $handle) {
+                $this->fields($handle)->all()->each(function ($field) {
+                    $field->fieldtype()->addGqlTypes();
+                });
+            })
+            ->map(function ($config, $handle) {
+                $type = new ReplicatorSetType($this, $this->gqlSetTypeName($handle), $handle);
 
-            return [$type->name => $type];
-        });
+                return [
+                    'handle' => $handle,
+                    'name' => $type->name,
+                    'type' => $type,
+                ];
+            })->values();
 
         $text = new BardTextType($this);
 
-        $types->put($text->name, $text);
+        $types->push([
+            'handle' => 'text',
+            'name' => $text->name,
+            'type' => $text,
+        ]);
 
-        GraphQL::addTypes($types->all());
+        GraphQL::addTypes($types->pluck('type', 'name')->all());
 
-        $union = new BardSetsType($this, $types->map(function ($type, $name) {
-            return GraphQL::type($name);
-        })->all());
+        $union = new BardSetsType($this, $this->gqlSetsTypeName(), $types);
 
         GraphQL::addType($union);
     }

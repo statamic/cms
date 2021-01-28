@@ -3,16 +3,15 @@
 namespace Statamic\GraphQL\Types;
 
 use Rebing\GraphQL\Support\Type;
-use Statamic\Support\Str;
 
 class GridItemType extends Type
 {
     protected $fieldtype;
 
-    public function __construct($fieldtype)
+    public function __construct($fieldtype, $name)
     {
         $this->fieldtype = $fieldtype;
-        $this->attributes['name'] = 'GridItem_'.Str::studly($fieldtype->field()->handle());
+        $this->attributes['name'] = $name;
     }
 
     public function fields(): array

@@ -105,7 +105,7 @@ class Grid extends Fieldtype
 
     public function fields()
     {
-        return new Fields($this->config('fields'), $this->field()->parent());
+        return new Fields($this->config('fields'), $this->field()->parent(), $this->field());
     }
 
     public function rules(): array
@@ -169,13 +169,22 @@ class Grid extends Fieldtype
 
     public function toGqlType()
     {
-        return GraphQL::listOf(GraphQL::type('GridItem_'.Str::studly($this->field->handle())));
+        return GraphQL::listOf(GraphQL::type($this->gqlItemTypeName()));
     }
 
     public function addGqlTypes()
     {
-        $type = new GridItemType($this);
+        GraphQL::addType($type = new GridItemType($this, $this->gqlItemTypeName()));
 
-        GraphQL::addType($type);
+        $this->fields()->all()->each(function ($field) {
+            $field->fieldtype()->addGqlTypes();
+        });
+    }
+
+    private function gqlItemTypeName()
+    {
+        return 'GridItem_'.collect($this->field->handlePath())->map(function ($part) {
+            return Str::studly($part);
+        })->join('_');
     }
 }
