@@ -36,8 +36,8 @@ class ApiController extends Controller
      */
     protected function withCache($closure)
     {
-        return app(Cacher::class)->remember($this->request, function () use ($closure) {
-            return $closure()->toResponse($this->request);
+        return app(Cacher::class)->remember(request(), function () use ($closure) {
+            return $closure()->toResponse(request());
         });
     }
 
