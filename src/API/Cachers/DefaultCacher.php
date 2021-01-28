@@ -20,15 +20,7 @@ class DefaultCacher extends AbstractCacher
     {
         $key = $this->trackEndpoint($request);
 
-        if (Cache::has($key)) {
-            return Cache::get($key);
-        }
-
-        $response = $this->getCallbackResponse($callback, $request);
-
-        Cache::put($key, $response, $this->cacheExpiry());
-
-        return $response;
+        return Cache::remember($key, $this->cacheExpiry(), $callback);
     }
 
     /**

@@ -2,9 +2,6 @@
 
 namespace Statamic\API;
 
-use Closure;
-use Illuminate\Http\Request;
-use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Carbon;
 
 abstract class AbstractCacher implements Cacher
@@ -49,24 +46,6 @@ abstract class AbstractCacher implements Cacher
     protected function normalizeKey($key)
     {
         return "api-cache:$key";
-    }
-
-    /**
-     * Get callback response.
-     *
-     * @param Closure $callback
-     * @param Request $request
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function getCallbackResponse(Closure $callback, Request $request)
-    {
-        $result = $callback();
-
-        if ($result instanceof JsonResource) {
-            $result = $result->toResponse($request);
-        }
-
-        return $result;
     }
 
     /**
