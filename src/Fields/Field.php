@@ -16,6 +16,7 @@ class Field implements Arrayable
     protected $config;
     protected $value;
     protected $parent;
+    protected $parentField;
 
     public function __construct($handle, array $config)
     {
@@ -27,6 +28,7 @@ class Field implements Arrayable
     {
         return (new static($this->handle, $this->config))
             ->setParent($this->parent)
+            ->setParentField($this->parentField)
             ->setValue($this->value);
     }
 
@@ -40,6 +42,15 @@ class Field implements Arrayable
     public function handle()
     {
         return $this->handle;
+    }
+
+    public function handlePath()
+    {
+        $path = $this->parentField ? $this->parentField->handlePath() : [];
+
+        $path[] = $this->handle();
+
+        return $path;
     }
 
     public function setPrefix($prefix)
@@ -212,6 +223,18 @@ class Field implements Arrayable
     public function parent()
     {
         return $this->parent;
+    }
+
+    public function setParentField($field)
+    {
+        $this->parentField = $field;
+
+        return $this;
+    }
+
+    public function parentField()
+    {
+        return $this->parentField;
     }
 
     public function process()

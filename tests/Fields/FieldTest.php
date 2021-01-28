@@ -563,4 +563,16 @@ class FieldTest extends TestCase
         $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $type['type']);
         $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type['type']->getWrappedType());
     }
+
+    /** @test */
+    public function it_gets_the_path_of_handles_for_nested_fields()
+    {
+        $top = (new Field('a', ['type' => 'text']));
+        $second = (new Field('b', ['type' => 'text']))->setParentField($top);
+        $third = (new Field('c', ['type' => 'text']))->setParentField($second);
+
+        $this->assertEquals(['a'], $top->handlePath());
+        $this->assertEquals(['a', 'b'], $second->handlePath());
+        $this->assertEquals(['a', 'b', 'c'], $third->handlePath());
+    }
 }
