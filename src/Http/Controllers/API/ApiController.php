@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Statamic\API\Cacher;
+use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\QueriesConditions;
@@ -126,5 +127,25 @@ class ApiController extends Controller
         return $query
             ->paginate($this->request->input('limit', 25), $columns)
             ->appends($this->request->only(['filter', 'limit', 'page']));
+    }
+
+    /**
+     * Get query param.
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    protected function queryParam($key, $default = null)
+    {
+        if ($key === 'site') {
+            return $this->request->input('site', Site::default()->handle());
+        }
+
+        if ($key === 'fields') {
+            return explode(',', $this->request->input($key, '*'));
+        }
+
+        return $this->request->input($key, $default);
     }
 }
