@@ -4,6 +4,7 @@ namespace Statamic\API\Cachers;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\Cache;
 use Statamic\API\AbstractCacher;
 use Statamic\Events\Event;
@@ -20,7 +21,19 @@ class DefaultCacher extends AbstractCacher
     {
         $key = $this->trackEndpoint($request);
 
-        return Cache::remember($key, $this->cacheExpiry(), $callback);
+        if (Cache::has($key)) {
+            return Cache::get($key);
+        }
+
+        $result = $callback();
+
+        if ($result instanceof JsonResource) {
+            $result = $result->toResponse($request);
+        }
+
+        Cache::put($key, $result, $this->cacheExpiry());
+
+        return $result;
     }
 
     /**
