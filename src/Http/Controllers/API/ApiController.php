@@ -3,6 +3,7 @@
 namespace Statamic\Http\Controllers\API;
 
 use Illuminate\Http\Request;
+use Statamic\API\Cacher;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\QueriesConditions;
@@ -24,6 +25,13 @@ class ApiController extends Controller
     public function __construct(Request $request)
     {
         $this->request = $request;
+    }
+
+    protected function withCache($request, $closure)
+    {
+        return app(Cacher::class)->remember($request, function () use ($request, $closure) {
+            return $closure()->toResponse($request);
+        });
     }
 
     /**

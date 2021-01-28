@@ -10,7 +10,7 @@ class CollectionEntriesController extends ApiController
 {
     public function index($collection, Request $request)
     {
-        return app(Cacher::class)->remember($request, function () use ($collection) {
+        return $this->withCache($request, function () use ($collection) {
             return app(EntryResource::class)::collection(
                 $this->filterSortAndPaginate($collection->queryEntries())
             );
