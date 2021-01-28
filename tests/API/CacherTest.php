@@ -5,6 +5,7 @@ namespace Tests\API;
 use Closure;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\API\AbstractCacher;
 use Statamic\Events\EntrySaved;
@@ -21,9 +22,6 @@ class CacherTest extends TestCase
     {
         parent::setUp();
 
-        $defaultConfig = include __DIR__.'/../../config/api.php';
-
-        Facades\Config::set('statamic.api', $defaultConfig);
         Facades\Config::set('statamic.api.enabled', true);
 
         $this->collection = Facades\Collection::make('articles')->save();
@@ -49,6 +47,28 @@ class CacherTest extends TestCase
 
         $this->assertTrue(Cache::has($cacheKey));
         $this->assertEquals([$cacheKey], Cache::get('api-cache:tracked-responses'));
+    }
+
+    /**
+     * @test
+     * @environment-setup setCustomExpiry
+     */
+    public function it_caches_endpoint_using_configured_expiry()
+    {
+        $this->makeEntry('apple')->save();
+
+        $endpoint = '/api/collections/articles/entries';
+        $cacheKey = "api-cache:$endpoint";
+
+        Carbon::setTestNow(now());
+
+        $this->get($endpoint)->assertOk();
+
+        $this->assertTrue(Cache::has($cacheKey));
+
+        Carbon::setTestNow(now()->addMinutes(14));
+
+        $this->assertFalse(Cache::has($cacheKey));
     }
 
     /** @test */
@@ -218,6 +238,11 @@ class CacherTest extends TestCase
         $entry->save();
 
         $this->assertFalse(Cache::has('custom-cache'));
+    }
+
+    protected function setCustomExpiry($app)
+    {
+        $app->config->set('statamic.api.cache.expiry', 13);
     }
 }
 
