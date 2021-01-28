@@ -28,10 +28,16 @@ class ApiController extends Controller
         $this->request = $request;
     }
 
-    protected function withCache($request, $closure)
+    /**
+     * Wrap with cache.
+     *
+     * @param \Closure $closure
+     * @return \Illuminate\Http\JsonResponse
+     */
+    protected function withCache($closure)
     {
-        return app(Cacher::class)->remember($request, function () use ($request, $closure) {
-            return $closure()->toResponse($request);
+        return app(Cacher::class)->remember($this->request, function () use ($closure) {
+            return $closure()->toResponse($this->request);
         });
     }
 
