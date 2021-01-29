@@ -208,6 +208,8 @@ class Terms extends Relationship
         if (! $term = Term::find($id)) {
             return $this->invalidItemArray($id);
         }
+        
+        $term = $term->in(Site::current()->handle());
 
         return [
             'id' => $id,
