@@ -4,6 +4,8 @@ namespace Statamic\Http\Controllers\API;
 
 use Illuminate\Http\Request;
 use Statamic\API\Cacher;
+use Statamic\Exceptions\Concerns\RendersApiExceptions;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Support\Str;
@@ -11,7 +13,7 @@ use Statamic\Tags\Concerns\QueriesConditions;
 
 class ApiController extends Controller
 {
-    use QueriesConditions;
+    use QueriesConditions, RendersApiExceptions;
 
     /**
      * Wrap with cache.
@@ -22,7 +24,11 @@ class ApiController extends Controller
     protected function withCache($closure)
     {
         return app(Cacher::class)->remember(request(), function () use ($closure) {
-            return $closure()->toResponse(request());
+            try {
+                return $closure()->toResponse(request());
+            } catch (NotFoundHttpException $e) {
+                return $this->renderException(request(), $e);
+            }
         });
     }
 
