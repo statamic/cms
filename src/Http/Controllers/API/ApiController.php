@@ -14,21 +14,6 @@ class ApiController extends Controller
     use QueriesConditions;
 
     /**
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
-
-    /**
-     * Create a new ApiController.
-     *
-     * @param \Illuminate\Http\Request $request
-     */
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
-
-    /**
      * Wrap with cache.
      *
      * @param \Closure $closure
@@ -65,7 +50,7 @@ class ApiController extends Controller
      */
     protected function filter($query)
     {
-        collect($this->request->filter ?? [])
+        collect(request()->filter ?? [])
             ->each(function ($value, $filter) use ($query) {
                 if ($value === 'true') {
                     $value = true;
@@ -99,7 +84,7 @@ class ApiController extends Controller
      */
     protected function sort($query)
     {
-        if (! $sorts = $this->request->sort) {
+        if (! $sorts = request()->sort) {
             return $this;
         }
 
@@ -128,11 +113,11 @@ class ApiController extends Controller
      */
     protected function paginate($query)
     {
-        $columns = explode(',', $this->request->input('fields', '*'));
+        $columns = explode(',', request()->input('fields', '*'));
 
         return $query
-            ->paginate($this->request->input('limit', 25), $columns)
-            ->appends($this->request->only(['filter', 'limit', 'page']));
+            ->paginate(request()->input('limit', 25), $columns)
+            ->appends(request()->only(['filter', 'limit', 'page']));
     }
 
     /**
@@ -145,13 +130,13 @@ class ApiController extends Controller
     protected function queryParam($key, $default = null)
     {
         if ($key === 'site') {
-            return $this->request->input('site', Site::default()->handle());
+            return request()->input('site', Site::default()->handle());
         }
 
         if ($key === 'fields') {
-            return explode(',', $this->request->input($key, '*'));
+            return explode(',', request()->input($key, '*'));
         }
 
-        return $this->request->input($key, $default);
+        return request()->input($key, $default);
     }
 }
