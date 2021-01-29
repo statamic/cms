@@ -2,8 +2,8 @@
 
 namespace Tests\API;
 
-use Closure;
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
@@ -47,6 +47,13 @@ class CacherTest extends TestCase
 
         $this->assertTrue(Cache::has($cacheKey));
         $this->assertEquals([$cacheKey], Cache::get('api-cache:tracked-responses'));
+
+        // manually manipulate whats in the cache so we can be sure it uses it.
+        Cache::put($cacheKey, response()->json(['foo' => 'bar']), 10);
+
+        $this->get($endpoint)
+            ->assertOk()
+            ->assertJson(['foo' => 'bar']);
     }
 
     /**
@@ -248,9 +255,14 @@ class CacherTest extends TestCase
 
 class CustomCacher extends AbstractCacher
 {
-    public function remember(Request $request, Closure $callback)
+    public function get(Request $request)
     {
-        return Cache::remember('custom-cache', 1, $callback);
+        return Cache::get('custom-cache');
+    }
+
+    public function put(Request $request, JsonResponse $response)
+    {
+        return Cache::put('custom-cache', $response, 1);
     }
 
     public function handleInvalidationEvent(Event $event)

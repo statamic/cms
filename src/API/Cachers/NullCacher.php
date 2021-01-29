@@ -2,16 +2,21 @@
 
 namespace Statamic\API\Cachers;
 
-use Closure;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Statamic\API\Cacher;
 use Statamic\Events\Event;
 
 class NullCacher implements Cacher
 {
-    public function remember(Request $request, Closure $callback)
+    public function get(Request $request)
     {
-        return $callback();
+        //
+    }
+
+    public function put(Request $request, JsonResponse $response)
+    {
+        //
     }
 
     public function handleInvalidationEvent(Event $event)

@@ -2,7 +2,7 @@
 
 namespace Statamic\API\Cachers;
 
-use Closure;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Cache;
 use Statamic\API\AbstractCacher;
@@ -11,16 +11,21 @@ use Statamic\Events\Event;
 class DefaultCacher extends AbstractCacher
 {
     /**
-     * Remember cache by endpoint.
-     *
-     * @param Request $request
-     * @param Closure $callback
+     * {@inheritdoc}
      */
-    public function remember(Request $request, Closure $callback)
+    public function get(Request $request)
+    {
+        return Cache::get($this->getCacheKey($request));
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function put(Request $request, JsonResponse $response)
     {
         $key = $this->trackEndpoint($request);
 
-        return Cache::remember($key, $this->cacheExpiry(), $callback);
+        Cache::put($key, $response, $this->cacheExpiry());
     }
 
     /**

@@ -2,19 +2,28 @@
 
 namespace Statamic\API;
 
-use Closure;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Statamic\Events\Event;
 
 interface Cacher
 {
     /**
-     * Remember an API request.
+     * Get a response from the cache.
      *
-     * @param \Illuminate\Http\Request $request     Request associated with the endpoint to be cached
-     * @param Closure                  $callback    The reponse callback to be cached
+     * @param Request $request
+     * @return JsonResponse|null
      */
-    public function remember(Request $request, Closure $callback);
+    public function get(Request $request);
+
+    /**
+     * Put a response into the cache.
+     *
+     * @param Request $request
+     * @param JsonResponse $response
+     * @return void
+     */
+    public function put(Request $request, JsonResponse $response);
 
     /**
      * Handle event based API cache invalidation.
