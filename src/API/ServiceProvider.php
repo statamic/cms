@@ -24,7 +24,10 @@ class ServiceProvider extends LaravelServiceProvider
         $this->app->bind(Cacher::class, function ($app) {
             return $app[ApiCacheManager::class]->driver();
         });
+    }
 
+    public function boot()
+    {
         Event::subscribe(Subscriber::class);
     }
 }
