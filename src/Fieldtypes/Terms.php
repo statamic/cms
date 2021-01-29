@@ -241,9 +241,9 @@ class Terms extends Relationship
             $query->where('title', 'like', '%'.$search.'%');
         }
 
-        // if ($site = $request->site) {
-        //     $query->where('site', $site);
-        // }
+        if ($site = $request->site) {
+            $query->where('site', $site);
+        }
 
         if ($request->exclusions) {
             $query->whereNotIn('id', $request->exclusions);
