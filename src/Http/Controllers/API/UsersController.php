@@ -10,18 +10,14 @@ class UsersController extends ApiController
 {
     public function index()
     {
-        return $this->withCache(function () {
-            return app(UserResource::class)::collection(
-                $this->filterSortAndPaginate(User::query())
-            );
-        });
+        return app(UserResource::class)::collection(
+            $this->filterSortAndPaginate(User::query())
+        );
     }
 
     public function show($id)
     {
-        return $this->withCache(function () use ($id) {
-            return app(UserResource::class)::make($this->getUser($id));
-        });
+        return app(UserResource::class)::make($this->getUser($id));
     }
 
     private function getUser($id)

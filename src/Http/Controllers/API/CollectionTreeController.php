@@ -9,11 +9,9 @@ class CollectionTreeController extends ApiController
 {
     public function show($collection)
     {
-        return $this->withCache(function () use ($collection) {
-            return app(TreeResource::class)::make($this->getCollectionTree($collection))
-                ->fields($this->queryParam('fields'))
-                ->maxDepth($this->queryParam('max_depth'));
-        });
+        return app(TreeResource::class)::make($this->getCollectionTree($collection))
+            ->fields($this->queryParam('fields'))
+            ->maxDepth($this->queryParam('max_depth'));
     }
 
     private function getCollectionTree($collection)

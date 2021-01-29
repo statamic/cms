@@ -2,10 +2,6 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Illuminate\Http\Request;
-use Statamic\API\Cacher;
-use Statamic\Exceptions\Concerns\RendersApiExceptions;
-use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Support\Str;
@@ -13,24 +9,7 @@ use Statamic\Tags\Concerns\QueriesConditions;
 
 class ApiController extends Controller
 {
-    use QueriesConditions, RendersApiExceptions;
-
-    /**
-     * Wrap with cache.
-     *
-     * @param \Closure $closure
-     * @return \Illuminate\Http\JsonResponse
-     */
-    protected function withCache($closure)
-    {
-        return app(Cacher::class)->remember(request(), function () use ($closure) {
-            try {
-                return $closure()->toResponse(request());
-            } catch (NotFoundHttpException $e) {
-                return $this->renderException(request(), $e);
-            }
-        });
-    }
+    use QueriesConditions;
 
     /**
      * Filter, sort, and paginate query for API resource output.

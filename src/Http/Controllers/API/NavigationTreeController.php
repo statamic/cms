@@ -10,11 +10,9 @@ class NavigationTreeController extends ApiController
 {
     public function show($handle)
     {
-        return $this->withCache(function () use ($handle) {
-            return app(TreeResource::class)::make($this->getNavTree($handle))
-                ->fields($this->queryParam('fields'))
-                ->maxDepth($this->queryParam('max_depth'));
-        });
+        return app(TreeResource::class)::make($this->getNavTree($handle))
+            ->fields($this->queryParam('fields'))
+            ->maxDepth($this->queryParam('max_depth'));
     }
 
     private function getNavTree($handle)

@@ -15,8 +15,6 @@ class CollectionEntriesController extends ApiController
 
     public function show($collection, $entry)
     {
-        return $this->withCache(function () use ($entry) {
-            return app(EntryResource::class)::make($entry);
-        });
+        return app(EntryResource::class)::make($entry);
     }
 }

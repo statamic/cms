@@ -8,10 +8,8 @@ class TaxonomyTermEntriesController extends ApiController
 {
     public function index($taxonomy, $term)
     {
-        return $this->withCache(function () use ($term) {
-            return app(EntryResource::class)::collection(
-                $this->filterSortAndPaginate($term->queryEntries())
-            );
-        });
+        return app(EntryResource::class)::collection(
+            $this->filterSortAndPaginate($term->queryEntries())
+        );
     }
 }

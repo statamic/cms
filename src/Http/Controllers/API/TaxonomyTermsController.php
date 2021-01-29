@@ -8,17 +8,13 @@ class TaxonomyTermsController extends ApiController
 {
     public function index($taxonomy)
     {
-        return $this->withCache(function () use ($taxonomy) {
-            return app(TermResource::class)::collection(
-                $this->filterSortAndPaginate($taxonomy->queryTerms())
-            );
-        });
+        return app(TermResource::class)::collection(
+            $this->filterSortAndPaginate($taxonomy->queryTerms())
+        );
     }
 
     public function show($collection, $term)
     {
-        return $this->withCache(function () use ($term) {
-            return app(TermResource::class)::make($term);
-        });
+        return app(TermResource::class)::make($term);
     }
 }
