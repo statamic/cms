@@ -2,7 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Illuminate\Http\Request;
+use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\QueriesConditions;
@@ -10,21 +10,6 @@ use Statamic\Tags\Concerns\QueriesConditions;
 class ApiController extends Controller
 {
     use QueriesConditions;
-
-    /**
-     * @var \Illuminate\Http\Request
-     */
-    protected $request;
-
-    /**
-     * Create a new CpController.
-     *
-     * @param \Illuminate\Http\Request $request
-     */
-    public function __construct(Request $request)
-    {
-        $this->request = $request;
-    }
 
     /**
      * Filter, sort, and paginate query for API resource output.
@@ -50,7 +35,7 @@ class ApiController extends Controller
      */
     protected function filter($query)
     {
-        collect($this->request->filter ?? [])
+        collect(request()->filter ?? [])
             ->each(function ($value, $filter) use ($query) {
                 if ($value === 'true') {
                     $value = true;
@@ -84,7 +69,7 @@ class ApiController extends Controller
      */
     protected function sort($query)
     {
-        if (! $sorts = $this->request->sort) {
+        if (! $sorts = request()->sort) {
             return $this;
         }
 
@@ -113,10 +98,30 @@ class ApiController extends Controller
      */
     protected function paginate($query)
     {
-        $columns = explode(',', $this->request->input('fields', '*'));
+        $columns = explode(',', request()->input('fields', '*'));
 
         return $query
-            ->paginate($this->request->input('limit', 25), $columns)
-            ->appends($this->request->only(['filter', 'limit', 'page']));
+            ->paginate(request()->input('limit', 25), $columns)
+            ->appends(request()->only(['filter', 'limit', 'page']));
+    }
+
+    /**
+     * Get query param.
+     *
+     * @param string $key
+     * @param mixed $default
+     * @return mixed
+     */
+    protected function queryParam($key, $default = null)
+    {
+        if ($key === 'site') {
+            return request()->input('site', Site::default()->handle());
+        }
+
+        if ($key === 'fields') {
+            return explode(',', request()->input($key, '*'));
+        }
+
+        return request()->input($key, $default);
     }
 }

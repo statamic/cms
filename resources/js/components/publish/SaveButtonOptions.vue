@@ -78,12 +78,10 @@ export default {
         },
     },
 
-    watch: {
-        currentOption: 'setPreference',
-    },
-
     mounted() {
         this.setInitialValue();
+
+        this.$watch('currentOption', value => this.setPreference(value));
     },
 
     methods: {

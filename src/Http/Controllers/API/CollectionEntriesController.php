@@ -2,12 +2,11 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Illuminate\Http\Request;
 use Statamic\Http\Resources\API\EntryResource;
 
 class CollectionEntriesController extends ApiController
 {
-    public function index($collection, Request $request)
+    public function index($collection)
     {
         return app(EntryResource::class)::collection(
             $this->filterSortAndPaginate($collection->queryEntries())
