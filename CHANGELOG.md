@@ -1,5 +1,16 @@
 # Release Notes
 
+## 3.1.0-alpha.1 (2020-02-01)
+
+### What's new
+- GraphQL [#2982](https://github.com/statamic/cms/issues/2982)
+- White labeling [#3013](https://github.com/statamic/cms/issues/3013)
+- Update Scripts [#3024](https://github.com/statamic/cms/issues/3024)
+- API Caching [#3168](https://github.com/statamic/cms/issues/3168)
+- Nav and Collection structure tree API endpoints [#2999](https://github.com/statamic/cms/issues/2999)
+
+
+
 ## 3.0.40 (2021-01-21)
 
 ### What's fixed
