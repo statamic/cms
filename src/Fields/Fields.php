@@ -265,8 +265,8 @@ class Fields
         return $this->validator()->withRules($extraRules)->validate();
     }
 
-    public function toGraphQL()
+    public function toGql()
     {
-        return $this->fields->map->toGraphQL();
+        return $this->fields->map->toGql();
     }
 }

@@ -531,7 +531,7 @@ class FieldTest extends TestCase
 
         $field = new Field('test', ['type' => 'fieldtype']);
 
-        $type = $field->toGraphQL();
+        $type = $field->toGql();
 
         $this->assertIsArray($type);
         $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $type['type']);
@@ -557,7 +557,7 @@ class FieldTest extends TestCase
 
         $field = new Field('test', ['type' => 'fieldtype', 'validate' => 'required']);
 
-        $type = $field->toGraphQL();
+        $type = $field->toGql();
 
         $this->assertIsArray($type);
         $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $type['type']);

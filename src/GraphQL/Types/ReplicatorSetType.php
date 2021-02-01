@@ -18,7 +18,7 @@ class ReplicatorSetType extends \Rebing\GraphQL\Support\Type
 
     public function fields(): array
     {
-        return $this->fieldtype->fields($this->handle)->toGraphQL()
+        return $this->fieldtype->fields($this->handle)->toGql()
             ->merge([
                 'type' => [
                     'type' => GraphQL::nonNull(GraphQL::string()),

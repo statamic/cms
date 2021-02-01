@@ -23,7 +23,7 @@ class EntryPageType extends EntryType
 
     public function fields(): array
     {
-        return $this->blueprint->fields()->toGraphQL()
+        return $this->blueprint->fields()->toGql()
             ->merge((new PageInterface)->fields())
             ->merge(collect(GraphQL::getExtraTypeFields(EntryInterface::NAME))->map(function ($closure) {
                 return $closure();

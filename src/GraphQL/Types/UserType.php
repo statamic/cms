@@ -16,7 +16,7 @@ class UserType extends \Rebing\GraphQL\Support\Type
 
     public function fields(): array
     {
-        return User::blueprint()->fields()->toGraphQL()
+        return User::blueprint()->fields()->toGql()
             ->merge([
                 'id' => [
                     'type' => GraphQL::string(),

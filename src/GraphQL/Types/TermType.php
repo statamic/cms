@@ -35,7 +35,7 @@ class TermType extends \Rebing\GraphQL\Support\Type
 
     public function fields(): array
     {
-        return $this->blueprint->fields()->toGraphQL()
+        return $this->blueprint->fields()->toGql()
             ->merge((new TermInterface)->fields())
             ->merge(collect(GraphQL::getExtraTypeFields($this->name))->map(function ($closure) {
                 return $closure();

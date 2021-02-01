@@ -322,7 +322,7 @@ class Field implements Arrayable
         return $this->fieldtype()->preload();
     }
 
-    public function toGraphQL(): array
+    public function toGql(): array
     {
         $type = $this->fieldtype()->toGqlType();
 

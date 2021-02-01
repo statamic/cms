@@ -761,7 +761,7 @@ class FieldsTest extends TestCase
             ['handle' => 'two', 'field' => ['type' => 'text', 'validate' => 'required']],
         ]);
 
-        $types = $fields->toGraphQL();
+        $types = $fields->toGql();
 
         $this->assertInstanceOf(Collection::class, $types);
         $this->assertCount(2, $types);

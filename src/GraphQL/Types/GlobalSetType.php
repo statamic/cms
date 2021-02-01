@@ -32,7 +32,7 @@ class GlobalSetType extends \Rebing\GraphQL\Support\Type
     public function fields(): array
     {
         $fields = ($blueprint = $this->globals->blueprint())
-            ? $blueprint->fields()->toGraphQL()
+            ? $blueprint->fields()->toGql()
             : collect();
 
         return $fields

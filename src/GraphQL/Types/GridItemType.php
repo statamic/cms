@@ -16,6 +16,6 @@ class GridItemType extends Type
 
     public function fields(): array
     {
-        return $this->fieldtype->fields()->toGraphQL()->all();
+        return $this->fieldtype->fields()->toGql()->all();
     }
 }
