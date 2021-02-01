@@ -16,6 +16,7 @@ use Statamic\Query\Scopes\Scope;
 use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Tags;
+use Statamic\UpdateScripts as Updates;
 use Statamic\Widgets;
 use Statamic\Widgets\Widget;
 
@@ -181,7 +182,9 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Forms\Widget::class,
     ];
 
-    protected $updateScripts = [];
+    protected $updateScripts = [
+        Updates\AddPerEntryPermissions::class,
+    ];
 
     public function register()
     {
