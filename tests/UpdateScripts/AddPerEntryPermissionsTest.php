@@ -1,9 +1,9 @@
 <?php
 
-namespace Tests\UpdateScripts\Core;
+namespace Tests\UpdateScripts;
 
 use Statamic\Facades\Role;
-use Statamic\UpdateScripts\Core\AddPerEntryPermissions;
+use Statamic\UpdateScripts\AddPerEntryPermissions;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Tests\UpdateScripts\Concerns\RunsUpdateScripts;

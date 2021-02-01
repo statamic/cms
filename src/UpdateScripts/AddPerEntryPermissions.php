@@ -1,9 +1,8 @@
 <?php
 
-namespace Statamic\UpdateScripts\Core;
+namespace Statamic\UpdateScripts;
 
 use Statamic\Facades\Role;
-use Statamic\UpdateScripts\UpdateScript;
 
 class AddPerEntryPermissions extends UpdateScript
 {
