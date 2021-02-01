@@ -73,7 +73,8 @@ class Email extends Mailable
         }
 
         if ($html) {
-            $this->view($html);
+            $method = array_get($this->config, 'markdown') ? 'markdown' : 'view';
+            $this->$method($html);
         }
 
         return $this;
