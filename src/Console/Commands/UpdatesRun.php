@@ -18,7 +18,7 @@ class UpdatesRun extends Command
      */
     protected $signature = 'statamic:updates:run
         { version : Specify the version you are updating from }
-        { --package : Specify a specific package you are updating from (ie. john/my-addon) }';
+        { --package= : Specify a specific package you are updating from (ie. john/my-addon) }';
 
     /**
      * The console command description.
