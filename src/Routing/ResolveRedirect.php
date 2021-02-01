@@ -11,6 +11,11 @@ class ResolveRedirect
 {
     public function __invoke($redirect, $parent = null)
     {
+        return $this->resolve($redirect, $parent);
+    }
+
+    public function resolve($redirect, $parent = null)
+    {
         if ($redirect === '@child') {
             $redirect = $this->firstChildUrl($parent);
         }

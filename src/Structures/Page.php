@@ -9,6 +9,7 @@ use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
@@ -16,10 +17,11 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\GraphQL\ResolvesValues;
 
-class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializable
+class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializable, ResolvesValuesContract
 {
-    use HasAugmentedInstance, ForwardsCalls, TracksQueriedColumns;
+    use HasAugmentedInstance, ForwardsCalls, TracksQueriedColumns, ResolvesValues;
 
     protected $tree;
     protected $reference;
@@ -124,12 +126,12 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
         return $this->entry() !== null;
     }
 
-    public function parent(): ?Page
+    public function parent(): ?self
     {
         return $this->parent;
     }
 
-    public function setParent(?Page $parent): self
+    public function setParent(?self $parent): self
     {
         $this->parent = $parent;
 

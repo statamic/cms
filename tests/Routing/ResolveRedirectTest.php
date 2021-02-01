@@ -152,4 +152,14 @@ class ResolveRedirectTest extends TestCase
 
         $this->assertSame(404, $resolver('entry::123'));
     }
+
+    /** @test */
+    public function it_can_invoke_the_class_or_call_resolve()
+    {
+        $resolve = $this->partialMock(ResolveRedirect::class);
+
+        $resolve->shouldReceive('resolve')->once()->with('foo', 'bar')->andReturn('hello');
+
+        $this->assertEquals('hello', $resolve('foo', 'bar'));
+    }
 }

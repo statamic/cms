@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes;
 
 use Carbon\Carbon;
 use Statamic\Fields\Fieldtype;
+use Statamic\GraphQL\Fields\DateField;
 use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
 
 class Date extends Fieldtype
@@ -138,5 +139,23 @@ class Date extends Fieldtype
             'format',
             strlen($date) > 10 ? 'Y-m-d H:i' : 'Y-m-d'
         );
+    }
+
+    public function augment($value)
+    {
+        if (! $value) {
+            return null;
+        }
+
+        if ($value instanceof Carbon) {
+            return $value;
+        }
+
+        return Carbon::createFromFormat($this->dateFormat($value), $value);
+    }
+
+    public function toGqlType()
+    {
+        return new DateField;
     }
 }
