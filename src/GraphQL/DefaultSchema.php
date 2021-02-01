@@ -2,6 +2,7 @@
 
 namespace Statamic\GraphQL;
 
+use Statamic\GraphQL\Middleware\CacheResponse;
 use Statamic\GraphQL\Queries\AssetContainerQuery;
 use Statamic\GraphQL\Queries\AssetContainersQuery;
 use Statamic\GraphQL\Queries\AssetQuery;
@@ -27,6 +28,11 @@ class DefaultSchema
 {
     public static function config()
     {
+        return app(self::class)->getConfig();
+    }
+
+    public function getConfig()
+    {
         return [
             'query' => [
                 PingQuery::class,
@@ -51,7 +57,9 @@ class DefaultSchema
                 UserQuery::class,
             ],
             'mutation' => [],
-            'middleware' => [],
+            'middleware' => [
+                CacheResponse::class,
+            ],
             'method' => ['get', 'post'],
         ];
     }

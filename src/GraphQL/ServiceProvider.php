@@ -2,7 +2,11 @@
 
 namespace Statamic\GraphQL;
 
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\ServiceProvider as LaravelProvider;
+use Statamic\Contracts\GraphQL\ResponseCache;
+use Statamic\GraphQL\ResponseCache\DefaultCache;
+use Statamic\GraphQL\ResponseCache\NullCache;
 use Statamic\Http\Middleware\API\SwapExceptionHandler;
 use Statamic\Http\Middleware\RequireStatamicPro;
 
@@ -10,6 +14,12 @@ class ServiceProvider extends LaravelProvider
 {
     public function register()
     {
+        $this->app->bind(ResponseCache::class, function ($app) {
+            return config('statamic.graphql.cache') === false
+                ? new NullCache
+                : new DefaultCache;
+        });
+
         $this->app->booting(function () {
             if ($this->hasPublishedConfig()) {
                 return;
@@ -23,6 +33,11 @@ class ServiceProvider extends LaravelProvider
             $this->disableGraphiql();
             $this->setDefaultSchema();
         });
+    }
+
+    public function boot()
+    {
+        Event::subscribe(Subscriber::class);
     }
 
     private function hasPublishedConfig()

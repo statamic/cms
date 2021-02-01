@@ -1190,3 +1190,37 @@ You may add custom fields to the following types and any of their implementation
 
 Note that if you add fields to an `EntryInterface`, it will be shared with the `PageInterface`.
 If you add fields to a `PageInterface`, it will _not_ be shared with the `EntryInterface`.
+
+## Caching
+
+GraphQL uses a basic whole-response cache by default. Each query/variables combination's response will be cached for an hour. You may customize the cache expiry in `config/statamic/graphql.php`.
+
+```php
+'cache' => [
+    'expiry' => 60,
+],
+```
+
+> More in depth per query or per node caching options may come in the future. 
+
+### Cache Invalidation
+
+Cached responses are automatically invalidated when content is changed. Depending on your GraphQL usage and blueprint schema, you may also wish to ignore specific events when invalidating.
+
+```php
+'cache' => [
+    'expiry' => 60,
+    'ignored_events' => [
+        \Statamic\Events\UserSaved::class,
+        \Statamic\Events\UserDeleted::class,
+    ],
+],
+```
+
+### Disabling Caching
+
+If you wish to disable caching altogether, set `cache` to `false`.
+
+```php
+'cache' => false,
+```
