@@ -257,9 +257,7 @@ class UpdateScriptTest extends TestCase
 
         Facades\User::shouldReceive('all')->andReturn($users);
 
-        $this
-            ->clearRegistered()
-            ->register(UpdatePermissions::class);
+        $this->register(UpdatePermissions::class);
 
         $console = $this->mock(Command::class, function ($mock) {
             $mock->shouldReceive('info')->once()->with('Running update script <comment>['.UpdatePermissions::class.']</comment>');
@@ -312,13 +310,6 @@ class UpdateScriptTest extends TestCase
         }
 
         return new $class($package);
-    }
-
-    private function clearRegistered()
-    {
-        app()->instance('statamic.update-scripts', collect());
-
-        return $this;
     }
 
     private function getRegistered()
