@@ -340,7 +340,7 @@
 - `Str::isUrl()` checks more URLs. [#2759](https://github.com/statamic/cms/issues/2759)
 - Dutch translation has been updated. [#2754](https://github.com/statamic/cms/issues/2754)
 - The Entry facade docblock has been updated. [#2720](https://github.com/statamic/cms/issues/2720)
-- The `@statamic_svg` Blade directive is only registered on CP routes. Prevents conflicts with things like Blade UI Kit. [99e812e6c](https://github.com/statamic/cms/commit/99e812e6c)
+- The `@svg` Blade directive is only registered on CP routes. Prevents conflicts with things like Blade UI Kit. [99e812e6c](https://github.com/statamic/cms/commit/99e812e6c)
 - The `shuffle` modifier works for Collections. [#2709](https://github.com/statamic/cms/issues/2709)
 - The `.idea` directory is git ignored, and we now require `ext-json`, which improves the experience for PhpStorm users. [#2735](https://github.com/statamic/cms/issues/2735)
 
