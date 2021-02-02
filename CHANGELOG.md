@@ -8,6 +8,7 @@
 - Update Scripts [#3024](https://github.com/statamic/cms/issues/3024)
 - API Caching [#3168](https://github.com/statamic/cms/issues/3168)
 - Nav and Collection structure tree API endpoints [#2999](https://github.com/statamic/cms/issues/2999)
+- Entry author permissions [#3053](https://github.com/statamic/cms/issues/3053)
 
 
 
