@@ -20,7 +20,7 @@
                     <a href="{{ cp_route('utilities.licensing.refresh') }}" class="btn-primary btn-lg">{{ __('Try again') }}</a>
                 </div>
                 <div class="hidden md:block w-1/2 pl-6">
-                    @svg('empty/navigation')
+                    @statamic_svg('empty/navigation')
                 </div>
             </div>
         </div>

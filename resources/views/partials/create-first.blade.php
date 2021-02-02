@@ -1,7 +1,7 @@
 <div class="no-results border-dashed border-2">
     <div class="text-center max-w-md mx-auto mt-5 rounded-lg px-4 py-8">
 
-        @svg($svg)
+        @statamic_svg($svg)
 
         <h1 class="my-3">
             @if ($can ?? $user->can('super'))

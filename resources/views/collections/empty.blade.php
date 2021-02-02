@@ -15,7 +15,7 @@
     <div class="flex flex-wrap">
         <a href="{{ cp_route('collections.edit', $collection->handle()) }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
-                @svg('hammer-wrench')
+                @statamic_svg('hammer-wrench')
             </div>
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
                 <h3 class="mb-1 text-blue">{{ __('Configure Collection') }} &rarr;</h3>
@@ -29,7 +29,7 @@
             class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group"
         >
             <div class="h-8 w-8 mr-2 text-grey-80">
-                @svg('content-writing')
+                @statamic_svg('content-writing')
             </div>
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
                 <h3 class="mb-1 text-blue">{{ __('Create Entry') }} @if (!$multipleBlueprints)&rarr;@endif</h3>
@@ -44,7 +44,7 @@
         @if ($multipleBlueprints)</div>@else</a>@endif
         <a href="{{ cp_route('collections.scaffold', $collection->handle()) }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
-                @svg('crane')
+                @statamic_svg('crane')
             </div>
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
                 <h3 class="mb-1 text-blue">{{ __('Scaffold Resources') }} &rarr;</h3>
@@ -53,7 +53,7 @@
         </a>
         <a href="{{ Statamic::docsUrl('collections') }}" target="_blank" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
-                @svg('book-pages')
+                @statamic_svg('book-pages')
             </div>
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
                 <h3 class="mb-1 text-blue">{{ __('Read the Documentation') }} &rarr;</h3>

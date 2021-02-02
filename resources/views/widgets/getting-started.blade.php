@@ -6,7 +6,7 @@
     <div class="flex flex-wrap p-2">
         <a href="https://statamic.dev" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
-                @svg('book-pages')
+                @statamic_svg('book-pages')
             </div>
             <div class="flex-1">
                 <h3 class="mb-1 text-blue">{{ __('Read the Documentation') }}</h3>
@@ -16,7 +16,7 @@
         @if (!Statamic::pro())
         <a href="https://statamic.dev/licensing" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
-                @svg('pro-ribbon')
+                @statamic_svg('pro-ribbon')
             </div>
             <div class="flex-1">
                 <h3 class="mb-1 text-blue">{{ __('Enable Pro Mode') }}</h3>
@@ -26,7 +26,7 @@
         @endif
         <a href="{{ cp_route('collections.create') }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
-                @svg('content-writing')
+                @statamic_svg('content-writing')
             </div>
             <div class="flex-1">
                 <h3 class="mb-1 text-blue">{{ __('Create a Collection') }}</h3>
@@ -35,7 +35,7 @@
         </a>
         <a href="{{ cp_route('blueprints.index') }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
-                @svg('blueprints')
+                @statamic_svg('blueprints')
             </div>
             <div class="flex-1">
                 <h3 class="mb-1 text-blue">{{ __('Create a Blueprint') }}</h3>
@@ -44,7 +44,7 @@
         </a>
         <a href="{{ cp_route('navigation.create') }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
-                @svg('hierarchy-files')
+                @statamic_svg('hierarchy-files')
             </div>
             <div class="flex-1">
                 <h3 class="mb-1 text-blue">{{ __('Create a Navigation') }}</h3>

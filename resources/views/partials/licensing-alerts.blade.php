@@ -32,7 +32,7 @@
                             <button @click="hideBanner" class="mr-2 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
                             @can('access licensing utility')
                             <a href="{{ cp_route('utilities.licensing') }}" class="text-white hover:text-yellow flex items-center" aria-label="{{ __('Go to Your License Settings') }}">
-                                @svg('arrow-right')
+                                @statamic_svg('arrow-right')
                             </a>
                             @endcan
                         </div>
@@ -44,7 +44,7 @@
                             <button @click="hideBanner" class="mr-2 text-2xs opacity-50 hover:opacity-75">{{ __('Dismiss') }}</button>
                             @can('access licensing utility')
                                 <a href="{{ cp_route('utilities.licensing') }}" class="text-white hover:text-yellow flex items-center" aria-label="{{ __('Go to Your License Settings') }}">
-                                    @svg('arrow-right')
+                                    @statamic_svg('arrow-right')
                                 </a>
                             @endcan
                         </div>

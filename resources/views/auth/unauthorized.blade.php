@@ -4,7 +4,7 @@
 
 @section('content')
 <div class="logo pt-7">
-    @svg('statamic-wordmark')
+    @statamic_svg('statamic-wordmark')
 </div>
 
 <div class="card auth-card mx-auto text-center text-grey-70">

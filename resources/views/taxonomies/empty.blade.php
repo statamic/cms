@@ -15,7 +15,7 @@
     <div class="flex flex-wrap">
         <a href="{{ cp_route('taxonomies.edit', $taxonomy->handle()) }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
-                @svg('hammer-wrench')
+                @statamic_svg('hammer-wrench')
             </div>
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
                 <h3 class="mb-1 text-blue">{{ __('Configure Taxonomy') }} &rarr;</h3>
@@ -24,7 +24,7 @@
         </a>
         <a href="{{ cp_route('taxonomies.terms.create', [$taxonomy->handle(), $site]) }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
-                @svg('content-writing')
+                @statamic_svg('content-writing')
             </div>
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
                 <h3 class="mb-1 text-blue">{{ __('Create Term') }} &rarr;</h3>
@@ -33,7 +33,7 @@
         </a>
         <a href="{{ Statamic::docsUrl('taxonomies') }}" target="_blank" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
-                @svg('book-pages')
+                @statamic_svg('book-pages')
             </div>
             <div class="flex-1 mb-2 md:mb-0 md:mr-3">
                 <h3 class="mb-1 text-blue">{{ __('Read the Documentation') }} &rarr;</h3>

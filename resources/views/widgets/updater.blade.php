@@ -2,11 +2,11 @@
     <div class="rounded-l py-2 md:w-40 border-r h-full flex items-center justify-center bg-grey-10">
         @if ($count)
             <div class="svg-icon flex px-1 items-center justify-center h-full" style="width: 9rem; ">
-                @svg('marketing/tooter-yay')
+                @statamic_svg('marketing/tooter-yay')
             </div>
         @else
             <div class="svg-icon w-24 flex px-1 items-center justify-center h-full">
-                @svg('marketing/tooter-nay')
+                @statamic_svg('marketing/tooter-nay')
             </div>
         @endif
     </div>
@@ -25,7 +25,7 @@
     @if ($hasStatamicUpdate)
         <div class="px-3 py-1 border-t flex items-center">
             <div class="h-4 w-4 mr-1 text-blue">
-                @svg('hammer-wrench')
+                @statamic_svg('hammer-wrench')
             </div>
             <div class="flex-1 mr-3">
                 <a href="{{ cp_route('updater.product', 'statamic') }}"class="text-blue text-sm font-bold">Statamic Core</a>
@@ -36,7 +36,7 @@
     @foreach ($updatableAddons as $slug => $name)
         <div class="px-3 py-1 border-t flex items-center">
             <div class="h-4 w-4 mr-1 text-blue">
-                @svg('addons')
+                @statamic_svg('addons')
             </div>
             <div class="flex-1 mr-3">
                 <a href="{{ cp_route('updater.product', $slug) }}" class="text-blue text-sm font-bold">{{ $name }}</a>
