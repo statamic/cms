@@ -10,7 +10,8 @@ use Statamic\Tags\Tags as BaseTags;
 class Tags extends BaseTags
 {
     use Concerns\OutputsItems,
-        Concerns\QueriesConditions;
+        Concerns\QueriesConditions,
+        Concerns\QueriesOrderBys;
     use Concerns\GetsQueryResults {
         results as getQueryResults;
     }
@@ -33,6 +34,7 @@ class Tags extends BaseTags
         $this->querySite($builder);
         $this->queryStatus($builder);
         $this->queryConditions($builder);
+        $this->queryOrderBys($builder);
 
         $results = $this->getQueryResults($builder);
         $results = $this->addResultTypes($results);
