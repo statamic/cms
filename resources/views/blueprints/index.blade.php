@@ -37,7 +37,7 @@
                     <tr>
                         <td>
                             <div class="flex items-center">
-                                <div class="w-4 h-4 mr-2">@statamic_svg('content-writing')</div>
+                                <div class="w-4 h-4 mr-2">@cp_svg('content-writing')</div>
                                 <a href="{{ cp_route('collections.blueprints.edit', [$collection, $blueprint]) }}">{{ $blueprint->title() }}</a>
                             </div>
                         </td>
@@ -60,7 +60,7 @@
                     <tr>
                         <td>
                             <div class="flex items-center">
-                                <div class="w-4 h-4 mr-2">@statamic_svg('tags')</div>
+                                <div class="w-4 h-4 mr-2">@cp_svg('tags')</div>
                                 <a href="{{ cp_route('taxonomies.blueprints.edit', [$taxonomy, $blueprint]) }}">{{ $blueprint->title() }}</a>
                             </div>
                         </td>
@@ -82,7 +82,7 @@
                 <tr>
                     <td>
                         <div class="flex items-center">
-                            <div class="w-4 h-4 mr-2">@statamic_svg('earth')</div>
+                            <div class="w-4 h-4 mr-2">@cp_svg('earth')</div>
                             <a href="{{ cp_route('globals.blueprint.edit', $set->handle()) }}">{{ $set->title() }}</a>
                         </div>
                     </td>
@@ -102,7 +102,7 @@
                 <tr>
                     <td>
                         <div class="flex items-center">
-                            <div class="w-4 h-4 mr-2">@statamic_svg('assets')</div>
+                            <div class="w-4 h-4 mr-2">@cp_svg('assets')</div>
                             <a href="{{ cp_route('asset-containers.blueprint.edit', $container->handle()) }}">{{ $container->title() }}</a>
                         </div>
                     </td>
@@ -122,7 +122,7 @@
                 <tr>
                     <td>
                         <div class="flex items-center">
-                            <div class="w-4 h-4 mr-2">@statamic_svg('drawer-file')</div>
+                            <div class="w-4 h-4 mr-2">@cp_svg('drawer-file')</div>
                             <a href="{{ cp_route('forms.blueprint.edit', $form->handle()) }}">{{ $form->title() }}</a>
                         </div>
                     </td>
@@ -139,7 +139,7 @@
             <tr>
                 <td>
                     <div class="flex items-center">
-                        <div class="w-4 h-4 mr-2">@statamic_svg('users')</div>
+                        <div class="w-4 h-4 mr-2">@cp_svg('users')</div>
                         <a href="{{ cp_route('users.blueprint.edit') }}">{{ __('User') }}</a>
                     </div>
                 </td>

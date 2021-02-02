@@ -19,7 +19,7 @@
             @endunless
         </div>
         <div class="hidden md:block w-1/2 pl-6">
-            @statamic_svg($svg ?? 'empty/content')
+            @cp_svg($svg ?? 'empty/content')
         </div>
     </div>
 </div>
