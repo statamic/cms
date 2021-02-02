@@ -82,6 +82,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return Site::get($this->locale());
     }
 
+    public function authors()
+    {
+        return collect($this->value('author'));
+    }
+
     public function collection($collection = null)
     {
         return $this

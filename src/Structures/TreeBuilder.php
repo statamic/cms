@@ -5,6 +5,7 @@ namespace Statamic\Structures;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Structure;
+use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -79,8 +80,9 @@ class TreeBuilder
                 'title'       => $page->title(),
                 'url'         => $page->url(),
                 'edit_url'    => $page->editUrl(),
+                'can_delete'  => $page->referenceExists() ? User::current()->can('delete', $page->entry()) : true,
                 'slug'        => $page->slug(),
-                'redirect'    => $page->reference() ? $page->entry()->get('redirect') : null,
+                'redirect'    => $page->referenceExists() ? $page->entry()->get('redirect') : null,
                 'collection'  => ! $collection ? null : [
                     'handle' => $collection->handle(),
                     'title' => $collection->title(),

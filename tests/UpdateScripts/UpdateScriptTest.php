@@ -25,6 +25,8 @@ class UpdateScriptTest extends TestCase
         $this->previousLockPath = storage_path('statamic/updater/composer.lock.bak');
 
         $this->removeLockFiles();
+
+        app()->instance('statamic.update-scripts', collect());
     }
 
     public function tearDown(): void
