@@ -1497,6 +1497,21 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Send data to Laravel Ray.
+     *
+     * @param $value
+     * @return void
+     */
+    public function ray($value)
+    {
+        throw_unless(function_exists('ray'), new \Exception('Ray is not installed. Run `composer require spatie/laravel-ray --dev`'));
+
+        ray($value);
+
+        return $value;
+    }
+
+    /**
      * Estimate the read time based on a given number of words per minute.
      *
      * @param $value
