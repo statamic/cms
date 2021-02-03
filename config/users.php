@@ -96,10 +96,13 @@ return [
     |
     | By default, Statamic will use the `web` authentication guard. However,
     | if you want to run Statamic alongside the default Laravel auth
-    | guard, you can configure that here.
+    | guard, you can configure that for your cp and/or frontend.
     |
     */
 
-    'guard' => 'web',
+    'guard' => [
+        'cp' => 'web',
+        'web' => 'web',
+    ],
 
 ];
