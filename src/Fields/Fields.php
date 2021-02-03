@@ -13,11 +13,13 @@ class Fields
     protected $items;
     protected $fields;
     protected $parent;
+    protected $parentField;
 
-    public function __construct($items = [], $parent = null)
+    public function __construct($items = [], $parent = null, $parentField = null)
     {
         $this
             ->setParent($parent)
+            ->setParentField($parentField)
             ->setItems($items);
     }
 
@@ -48,6 +50,13 @@ class Fields
         return $this;
     }
 
+    public function setParentField($field)
+    {
+        $this->parentField = $field;
+
+        return $this;
+    }
+
     public function items()
     {
         return $this->items;
@@ -72,6 +81,7 @@ class Fields
     {
         return (new static)
             ->setParent($this->parent)
+            ->setParentField($this->parentField)
             ->setItems($this->items)
             ->setFields($this->fields);
     }
@@ -185,7 +195,9 @@ class Fields
 
     protected function newField($handle, $config)
     {
-        return (new Field($handle, $config))->setParent($this->parent);
+        return (new Field($handle, $config))
+            ->setParent($this->parent)
+            ->setParentField($this->parentField);
     }
 
     private function getReferencedField(array $config): Field
@@ -223,6 +235,7 @@ class Fields
 
         if ($prefix = array_get($config, 'prefix')) {
             $fields = $fields->mapWithKeys(function ($field) use ($prefix) {
+                $field = clone $field;
                 $handle = $prefix.$field->handle();
                 $prefix = $prefix.$field->prefix();
 
@@ -250,5 +263,10 @@ class Fields
     public function validate($extraRules = [])
     {
         return $this->validator()->withRules($extraRules)->validate();
+    }
+
+    public function toGql()
+    {
+        return $this->fields->map->toGql();
     }
 }

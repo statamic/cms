@@ -19,6 +19,8 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $listen = [];
     protected $subscribe = [];
     protected $tags = [];
+    protected $scopes = [];
+    protected $actions = [];
     protected $fieldtypes = [];
     protected $modifiers = [];
     protected $widgets = [];
@@ -30,6 +32,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $publishables = [];
     protected $routes = [];
     protected $middlewareGroups = [];
+    protected $updateScripts = [];
     protected $viewNamespace;
     protected $publishAfterInstall = true;
     protected $config = true;
@@ -45,6 +48,8 @@ abstract class AddonServiceProvider extends ServiceProvider
             $this
                 ->bootEvents()
                 ->bootTags()
+                ->bootScopes()
+                ->bootActions()
                 ->bootFieldtypes()
                 ->bootModifiers()
                 ->bootWidgets()
@@ -58,6 +63,7 @@ abstract class AddonServiceProvider extends ServiceProvider
                 ->bootTranslations()
                 ->bootRoutes()
                 ->bootMiddleware()
+                ->bootUpdateScripts()
                 ->bootViews()
                 ->bootPublishAfterInstall();
         });
@@ -81,6 +87,24 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected function bootTags()
     {
         foreach ($this->tags as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootScopes()
+    {
+        foreach ($this->scopes as $class) {
+            $class::register();
+        }
+
+        return $this;
+    }
+
+    protected function bootActions()
+    {
+        foreach ($this->actions as $class) {
             $class::register();
         }
 
@@ -316,6 +340,15 @@ abstract class AddonServiceProvider extends ServiceProvider
             foreach ($middleware as $class) {
                 $this->app['router']->pushMiddlewareToGroup($group, $class);
             }
+        }
+
+        return $this;
+    }
+
+    protected function bootUpdateScripts()
+    {
+        foreach ($this->updateScripts as $class) {
+            $class::register($this->getAddon()->package());
         }
 
         return $this;

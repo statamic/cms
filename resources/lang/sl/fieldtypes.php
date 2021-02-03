@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'any.config.antlers' => 'Ali želite, da to polje razčleni Antlers.',
     'any.config.cast_booleans' => 'Možnosti z vrednostmi true in false bodo shranjene kot logične vrednosti.',
     'any.config.default' => 'Nastavite privzeto vrednost.',
     'array.config.keys' => 'Nastavite matrične tipke (spremenljivke) in izbirne oznake.',
@@ -71,6 +72,7 @@ return [
     'replicator.config.collapse.accordion' => 'Naenkrat dovolite razširitev samo enega niza',
     'replicator.config.collapse.disabled' => 'Vsi nabori so privzeto razširjeni',
     'replicator.config.collapse.enabled' => 'Vsi nabori so privzeto strnjeni',
+    'replicator.config.max_sets' => 'Največje število sklopov.',
     'select.config.clearable' => 'Omogoči, če želite omogočiti preklic izbire možnosti.',
     'select.config.multiple' => 'Dovoli več izbir.',
     'select.config.options' => 'Nastavite tipke in njihove izbirne nalepke.',

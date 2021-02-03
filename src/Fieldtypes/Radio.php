@@ -2,8 +2,10 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\Fields\LabeledValue;
+use Statamic\GraphQL\Types\LabeledValueType;
 
 class Radio extends Fieldtype
 {
@@ -68,5 +70,17 @@ class Radio extends Fieldtype
     public function preProcessIndex($value)
     {
         return collect($this->config('options'))->get($value, $value);
+    }
+
+    public function toGqlType()
+    {
+        return [
+            'type' => GraphQL::type(LabeledValueType::NAME),
+            'resolve' => function ($item, $args, $context, $info) {
+                $resolved = $item->resolveGqlValue($info->fieldName);
+
+                return $resolved->value() ? $resolved : null;
+            },
+        ];
     }
 }

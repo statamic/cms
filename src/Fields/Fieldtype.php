@@ -6,6 +6,7 @@ use Illuminate\Contracts\Support\Arrayable;
 use Statamic\Extend\HasHandle;
 use Statamic\Extend\HasTitle;
 use Statamic\Extend\RegistersItself;
+use Statamic\Facades\GraphQL;
 use Statamic\Query\Scopes\Filters\Fields\FieldtypeFilter;
 use Statamic\Statamic;
 use Statamic\Support\Str;
@@ -211,5 +212,15 @@ abstract class Fieldtype implements Arrayable
     public static function docsUrl()
     {
         return Statamic::docsUrl('fieldtypes/'.static::handle());
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::string();
+    }
+
+    public function addGqlTypes()
+    {
+        //
     }
 }

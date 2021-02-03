@@ -5,10 +5,10 @@ namespace Statamic\Assets;
 use Facades\Statamic\Assets\Dimensions;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Cache;
-use League\Flysystem\Filesystem;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ContainsData;
 use Statamic\Data\Data;
 use Statamic\Data\HasAugmentedInstance;
@@ -17,8 +17,6 @@ use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
-use Statamic\Facades\Blueprint;
-use Statamic\Facades\File;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
@@ -693,7 +691,7 @@ class Asset implements AssetContract, Augmentable
         return Facades\Asset::{$method}(...$parameters);
     }
 
-    public function newAugmentedInstance()
+    public function newAugmentedInstance(): Augmented
     {
         return new AugmentedAsset($this);
     }

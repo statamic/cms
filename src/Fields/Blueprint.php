@@ -26,6 +26,7 @@ class Blueprint implements Augmentable
     protected $handle;
     protected $namespace;
     protected $order;
+    protected $hidden = false;
     protected $initialPath;
     protected $contents;
     protected $fieldsCache;
@@ -70,6 +71,22 @@ class Blueprint implements Augmentable
     public function order()
     {
         return $this->order;
+    }
+
+    public function setHidden(?bool $hidden)
+    {
+        if (is_null($hidden)) {
+            $hidden = false;
+        }
+
+        $this->hidden = $hidden;
+
+        return $this;
+    }
+
+    public function hidden()
+    {
+        return $this->hidden;
     }
 
     public function setInitialPath(string $path)
@@ -127,7 +144,10 @@ class Blueprint implements Augmentable
         }
 
         return array_filter(
-            array_merge(['order' => $this->order], $contents)
+            array_merge([
+                'hide' => $this->hidden,
+                'order' => $this->order,
+            ], $contents)
         );
     }
 
@@ -368,6 +388,19 @@ class Blueprint implements Augmentable
         return $this->ensureField($handle, $field, $section, true);
     }
 
+    public function ensureFieldHasConfig($handle, $config)
+    {
+        if (! $this->hasField($handle)) {
+            return $this;
+        }
+
+        foreach ($this->sections()->keys() as $sectionKey) {
+            if ($this->hasFieldInSection($handle, $sectionKey)) {
+                return $this->ensureFieldInSectionHasConfig($handle, $sectionKey, $config);
+            }
+        }
+    }
+
     public function removeField($handle, $section = null)
     {
         if (! $this->hasField($handle)) {
@@ -413,6 +446,28 @@ class Blueprint implements Augmentable
 
         // Pull it out.
         Arr::pull($this->contents['sections'][$section]['fields'], $fieldKey);
+
+        return $this->resetFieldsCache();
+    }
+
+    protected function ensureFieldInSectionHasConfig($handle, $section, $config)
+    {
+        $fields = collect($this->contents['sections'][$section]['fields'] ?? []);
+
+        // See if field already exists in section.
+        if ($this->hasFieldInSection($handle, $section)) {
+            $fieldKey = $fields->search(function ($field) use ($handle) {
+                return Arr::get($field, 'handle') === $handle;
+            });
+        } else {
+            return $this;
+        }
+
+        // Get existing field config.
+        $existingConfig = Arr::get($this->contents['sections'][$section]['fields'][$fieldKey], 'field', []);
+
+        // Merge in new field config.
+        $this->contents['sections'][$section]['fields'][$fieldKey]['field'] = array_merge($existingConfig, $config);
 
         return $this->resetFieldsCache();
     }
@@ -469,5 +524,10 @@ class Blueprint implements Augmentable
         }
 
         return $this;
+    }
+
+    public function addGqlTypes()
+    {
+        $this->fields()->all()->map->fieldtype()->each->addGqlTypes();
     }
 }

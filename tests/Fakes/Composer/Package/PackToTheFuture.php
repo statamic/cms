@@ -3,10 +3,12 @@
 namespace Tests\Fakes\Composer\Package;
 
 use Illuminate\Support\Facades\File;
+use Statamic\Facades\Path;
 
 class PackToTheFuture
 {
     const DEFAULT_TEST_PACKAGE = 'test/package';
+    const DEFAULT_TEST_PACKAGE_LOCATION = __DIR__.'/../../../Composer/__fixtures__/test-package';
 
     /**
      * Set version on default test package.
@@ -52,14 +54,88 @@ class PackToTheFuture
      * @param string $package
      * @param string $version
      * @param array $extra
+     * @param string|null $version
      */
-    private static function generateComposerJson(string $package, string $version, array $extra = [])
+    public static function generateComposerJson(string $package, string $version, array $extra = [], $path = null)
     {
         $content = array_merge([
             'name' => $package,
             'version' => $version,
         ], $extra);
 
-        File::put(__DIR__.'/../../../Composer/__fixtures__/test-package/composer.json', json_encode($content, JSON_UNESCAPED_SLASHES));
+        file_put_contents(
+            static::preparePath($path ?? static::DEFAULT_TEST_PACKAGE_LOCATION.'/composer.json'),
+            json_encode($content, JSON_UNESCAPED_SLASHES)
+        );
+    }
+
+    /**
+     * Generate composer.lock file for our test package.
+     *
+     * @param string $package
+     * @param string $version
+     * @param string|null $path
+     */
+    public static function generateComposerLock(string $package, string $version, $path = null)
+    {
+        $content = [
+            'packages' => [
+                [
+                    'name' => $package,
+                    'version' => $version,
+                ],
+            ],
+        ];
+
+        file_put_contents(
+            static::preparePath($path ?? static::DEFAULT_TEST_PACKAGE_LOCATION.'/composer.lock'),
+            json_encode($content, JSON_UNESCAPED_SLASHES)
+        );
+    }
+
+    /**
+     * Generate composer.lock file for multiple test packages.
+     *
+     * @param string $packages
+     * @param string|null $path
+     */
+    public static function generateComposerLockForMultiple($packages, $path = null)
+    {
+        $packages = collect($packages)
+            ->map(function ($version, $package) {
+                return [
+                    'name' => $package,
+                    'version' => $version,
+                ];
+            })
+            ->values()
+            ->all();
+
+        $content = [
+            'packages' => $packages,
+        ];
+
+        file_put_contents(
+            static::preparePath($path ?? static::DEFAULT_TEST_PACKAGE_LOCATION.'/composer.lock'),
+            json_encode($content, JSON_UNESCAPED_SLASHES)
+        );
+    }
+
+    /**
+     * Prepare path.
+     *
+     * @param string $path
+     * @param string
+     */
+    private static function preparePath($path)
+    {
+        $files = app('files');
+        $folder = preg_replace('/(.*)\/[^\/]+\.[^\/]+/', '$1', Path::resolve($path));
+
+        if (! $files->exists($folder)) {
+            $files->makeDirectory($folder, 0755, true);
+        }
+
+        return $path;
     }
 }

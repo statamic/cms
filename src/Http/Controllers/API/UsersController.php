@@ -2,21 +2,30 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Illuminate\Http\Request;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\User;
 use Statamic\Http\Resources\API\UserResource;
 
 class UsersController extends ApiController
 {
-    public function index(Request $request)
+    public function index()
     {
         return app(UserResource::class)::collection(
             $this->filterSortAndPaginate(User::query())
         );
     }
 
-    public function show($user)
+    public function show($id)
     {
-        return app(UserResource::class)::make($user);
+        return app(UserResource::class)::make($this->getUser($id));
+    }
+
+    private function getUser($id)
+    {
+        $user = User::find($id);
+
+        throw_unless($user, new NotFoundHttpException("User [$id] not found."));
+
+        return $user;
     }
 }

@@ -84,6 +84,7 @@
                                     v-for="asset in assets"
                                     :key="asset.id"
                                     :asset="asset"
+                                    :read-only="isReadOnly"
                                     @updated="assetUpdated"
                                     @removed="assetRemoved">
                                 </asset-tile>
@@ -105,6 +106,7 @@
                                             v-for="asset in assets"
                                             :key="asset.id"
                                             :asset="asset"
+                                            :read-only="isReadOnly"
                                             @updated="assetUpdated"
                                             @removed="assetRemoved">
                                         </tr>
@@ -455,7 +457,9 @@ export default {
             // our fieldtype is only concerned with their respective IDs.
             this.update(_.pluck(assets, 'id'));
 
-            this.updateMeta({ data: assets });
+            let meta = this.meta;
+            meta.data = assets;
+            this.updateMeta(meta);
         },
 
         loading(loading) {

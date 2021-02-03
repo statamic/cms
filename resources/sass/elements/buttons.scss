@@ -7,7 +7,7 @@ button {
 }
 
 // Base button styles that shouldn't need overriding
-[class*="btn"] {
+[class^="btn"], [class*=" btn"] {
     @apply cursor-pointer select-none h-auto rounded relative;
     @apply leading-normal inline-block align-middle whitespace-no-wrap;
     @apply text-center text-sm subpixel-antialiased;

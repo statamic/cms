@@ -10,13 +10,22 @@ use Statamic\Extensions\FileStore;
 class CacheServiceProvider extends ServiceProvider
 {
     /**
+     * Register any application services.
+     *
+     * @return void
+     */
+    public function register()
+    {
+        $this->extendFileStore();
+    }
+
+    /**
      * Bootstrap services.
      *
      * @return void
      */
     public function boot()
     {
-        $this->extendFileStore();
         $this->macroRememberWithExpiration();
     }
 
@@ -27,17 +36,19 @@ class CacheServiceProvider extends ServiceProvider
      */
     private function extendFileStore()
     {
-        Cache::extend('statamic', function () {
-            return Cache::repository(new FileStore(
-                $this->app['files'],
-                $this->app['config']['cache.stores.file']['path']
-            ));
-        });
+        $this->app->booting(function () {
+            Cache::extend('statamic', function () {
+                return Cache::repository(new FileStore(
+                    $this->app['files'],
+                    $this->app['config']['cache.stores.file']['path']
+                ));
+            });
 
-        if (config('cache.default') === 'file') {
-            config(['cache.stores.statamic' => ['driver' => 'statamic']]);
-            config(['cache.default' => 'statamic']);
-        }
+            if (config('cache.default') === 'file') {
+                config(['cache.stores.statamic' => ['driver' => 'statamic']]);
+                config(['cache.default' => 'statamic']);
+            }
+        });
     }
 
     /**

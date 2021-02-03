@@ -14,7 +14,6 @@ use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
-use Statamic\Facades\Config;
 use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Ignition\Value as IgnitionViewValue;
@@ -876,6 +875,7 @@ class Parser
         // Re-inject any strings we extracted
         $condition = $this->injectExtractions($condition, '__cond_str');
         $condition = $this->injectExtractions($condition, '__cond_exists');
+        $condition = $this->injectExtractions($condition, '__cond_callbacks');
 
         return $condition;
     }

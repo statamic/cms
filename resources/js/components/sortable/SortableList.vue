@@ -34,6 +34,9 @@ export default {
         },
         vertical: {
             type: Boolean
+        },
+        constrainDimensions: {
+            type: Boolean
         }
     },
 
@@ -47,7 +50,7 @@ export default {
                 swapAnimation: { vertical: this.vertical, horizontal: !this.vertical },
                 plugins: [Plugins.SwapAnimation],
                 mirror: {
-                    constrainDimensions: false
+                    constrainDimensions: this.constrainDimensions
                 },
             }, this.options);
 

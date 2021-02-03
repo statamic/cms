@@ -17,6 +17,7 @@ return [
     'asset_container_rename_instructions' => 'Indien ingeschakeld, kunnen gebruikers files hernoemen in deze container.',
     'asset_container_title_instructions' => 'Meestal een zelfstandig naamwoord in meervoud, zoals  Afbeeldingen of Documenten.',
     'asset_folders_directory_instructions' => 'We adviseren om spaties en speciale karakters niet te gebruiken om URL\'s netjes te houden.',
+    'blueprints_hidden_instructions' => 'Toon deze blueprint niet in toevoeg-menu\'s in het CP.',
     'blueprints_intro' => 'Blueprints definiëren en organiseren velden zodat je blauwdrukken kunt maken voor de inhoud van collecties, formulieren en andere datatypes.',
     'blueprints_title_instructions' => 'Meestal een zelfstandig naamwoord in enkelvoud, zoals Artikel of Product.',
     'cache_utility_application_cache_description' => 'Laravel\'s samengevoegde cache die wordt gebruikt door Statamic, add-ons van derden en composer packages.',

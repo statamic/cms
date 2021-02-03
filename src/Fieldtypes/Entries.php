@@ -6,6 +6,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
@@ -42,6 +43,7 @@ class Entries extends Relationship
         'revisionsEnabled' => 'revisionsEnabled',
         'breadcrumbs' => 'breadcrumbs',
         'collectionHandle' => 'collection',
+        'canManagePublishState' => 'canManagePublishState',
     ];
 
     protected function configFieldItems(): array
@@ -193,12 +195,12 @@ class Entries extends Relationship
 
     protected function augmentValue($value)
     {
-        if (is_string($value)) {
+        if (! is_object($value)) {
             $value = Entry::find($value);
-            if ($value != null && $parent = $this->field()->parent()) {
-                $site = $parent instanceof Localization ? $parent->locale() : Site::current()->handle();
-                $value = $value->in($site);
-            }
+        }
+        if ($value != null && $parent = $this->field()->parent()) {
+            $site = $parent instanceof Localization ? $parent->locale() : Site::current()->handle();
+            $value = $value->in($site);
         }
 
         return $value;
@@ -224,5 +226,16 @@ class Entries extends Relationship
         return empty($collections = $this->config('collections'))
             ? Collection::handles()->all()
             : $collections;
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type('EntryInterface');
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
     }
 }

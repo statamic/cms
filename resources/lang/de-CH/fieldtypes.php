@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'any.config.antlers' => 'Soll dieses Feld von Antlers geparst werden?',
     'any.config.cast_booleans' => 'Optionen mit den Werten *true* und *false* als Booleans speichern.',
     'any.config.default' => 'Standardwert festlegen.',
     'array.config.keys' => 'Arrayschlüssel (Variablen) und optionale Beschriftungen festlegen.',
@@ -71,6 +72,7 @@ return [
     'replicator.config.collapse.accordion' => 'Nur ein Set kann jeweils auf einmal ausgeklappt werden',
     'replicator.config.collapse.disabled' => 'Alle Sets sind standardmässig eingeklappt',
     'replicator.config.collapse.enabled' => 'Alle Sets sind standardmässig ausgeklappt',
+    'replicator.config.max_sets' => 'Die maximale Anzahl Sets.',
     'select.config.clearable' => 'Option zum Abwählen der Auswahl aktivieren.',
     'select.config.multiple' => 'Mehrfachauswahl zulassen.',
     'select.config.options' => 'Arrayschlüssel und deren optionale Beschriftungen festlegen.',

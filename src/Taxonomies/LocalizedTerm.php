@@ -7,7 +7,9 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Data\ContainsSupplementalData;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
@@ -21,7 +23,7 @@ use Statamic\Statamic;
 
 class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
 {
-    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified;
+    use Revisable, Routable, Publishable, HasAugmentedInstance, TracksQueriedColumns, TracksLastModified, ContainsSupplementalData;
 
     protected $locale;
     protected $term;
@@ -30,6 +32,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
     {
         $this->term = $term;
         $this->locale = $locale;
+        $this->supplements = collect();
     }
 
     public function get($key, $fallback = null)
@@ -329,6 +332,11 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
         ])->all();
     }
 
+    public function status()
+    {
+        return 'published';
+    }
+
     public function toResponse($request)
     {
         if (! view()->exists($this->template())) {
@@ -369,7 +377,7 @@ class LocalizedTerm implements Term, Responsable, Augmentable, Protectable
         return $this->set('layout', $layout);
     }
 
-    public function newAugmentedInstance()
+    public function newAugmentedInstance(): Augmented
     {
         return new AugmentedTerm($this);
     }

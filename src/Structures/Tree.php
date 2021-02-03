@@ -9,6 +9,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 abstract class Tree implements Contract, Localization
@@ -237,8 +238,14 @@ abstract class Tree implements Contract, Localization
 
     public function move($entry, $target)
     {
-        if (optional($this->page($entry)->parent())->id() === $target) {
+        $parent = optional($this->page($entry)->parent());
+
+        if ($parent->id() === $target || $parent->isRoot() && is_null($target)) {
             return $this;
+        }
+
+        if ($this->structure()->expectsRoot() && Arr::get($this->tree, '0.entry') === $target) {
+            throw new \Exception('Root page cannot have children');
         }
 
         [$match, $branches] = $this->removeFromInBranches($entry, $this->tree);

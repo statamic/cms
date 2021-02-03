@@ -2,8 +2,10 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\UserGroup;
+use Statamic\GraphQL\Types\UserGroupType;
 
 class UserGroups extends Relationship
 {
@@ -41,5 +43,16 @@ class UserGroups extends Relationship
     public function getSelectionFilters()
     {
         return Scope::filters('user-groups-fieldtype', []);
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type(UserGroupType::NAME);
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
     }
 }

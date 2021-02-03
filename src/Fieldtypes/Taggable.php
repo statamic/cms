@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 
 class Taggable extends Fieldtype
@@ -25,5 +26,10 @@ class Taggable extends Fieldtype
     public function preProcess($data)
     {
         return ($data) ? $data : [];
+    }
+
+    public function toGqlType()
+    {
+        return GraphQL::listOf(GraphQL::string());
     }
 }

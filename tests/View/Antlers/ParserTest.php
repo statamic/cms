@@ -1977,6 +1977,19 @@ EOT;
             ],
         ]));
     }
+
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/2936
+     **/
+    public function it_compares_to_a_string_that_looks_like_array_access()
+    {
+        $template = '{{ if test == "price:desc" }}yes{{ else }}no{{ /if }}';
+
+        $this->assertEquals('yes', $this->parse($template, [
+            'test' => 'price:desc',
+        ]));
+    }
 }
 
 class NonArrayableObject

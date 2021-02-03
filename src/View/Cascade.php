@@ -4,6 +4,7 @@ namespace Statamic\View;
 
 use Illuminate\Http\Request;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Facades;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\URL;
 use Statamic\Sites\Site;
@@ -180,6 +181,7 @@ class Cascade
             'old' => Arr::sanitize(old(null, [])),
 
             'site' => $this->site,
+            'sites' => Facades\Site::all()->values(),
             'homepage' => $this->site->url(),
             'cp_url' => cp_route('index'),
         ];

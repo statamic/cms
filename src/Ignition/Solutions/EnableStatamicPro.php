@@ -3,9 +3,7 @@
 namespace Statamic\Ignition\Solutions;
 
 use Facade\IgnitionContracts\RunnableSolution;
-use Statamic\Facades\File;
 use Statamic\Statamic;
-use Statamic\Support\Str;
 
 class EnableStatamicPro implements RunnableSolution
 {
@@ -38,17 +36,7 @@ class EnableStatamicPro implements RunnableSolution
 
     public function run(array $parameters = [])
     {
-        $path = config_path('statamic/editions.php');
-
-        $contents = File::get($path);
-
-        if (! Str::contains($contents, "'pro' => false,")) {
-            throw new \Exception('Could not reliably update the config file.');
-        }
-
-        $contents = str_replace("'pro' => false,", "'pro' => true,", $contents);
-
-        File::put($path, $contents);
+        Statamic::enablePro();
     }
 
     public function getRunParameters(): array

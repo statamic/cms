@@ -61,4 +61,11 @@ class LengthAwarePaginator extends BasePaginator
             return $item->resource;
         });
     }
+
+    public function withQueryString()
+    {
+        $this->appends(request()->query());
+
+        return $this;
+    }
 }

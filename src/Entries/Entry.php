@@ -7,8 +7,10 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Carbon;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as Contract;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
@@ -21,22 +23,23 @@ use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable
+class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract
 {
     use Routable {
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified;
+    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified, ResolvesValues;
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -79,6 +82,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return Site::get($this->locale());
     }
 
+    public function authors()
+    {
+        return collect($this->value('author'));
+    }
+
     public function collection($collection = null)
     {
         return $this
@@ -118,7 +126,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this->collection;
     }
 
-    public function newAugmentedInstance()
+    public function newAugmentedInstance(): Augmented
     {
         return new AugmentedEntry($this);
     }
@@ -247,7 +255,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function apiUrl()
     {
-        return Statamic::apiRoute('collections.entries.show', [$this->collectionHandle(), $this->id()]);
+        if (! $id = $this->id()) {
+            return null;
+        }
+
+        return Statamic::apiRoute('collections.entries.show', [$this->collectionHandle(), $id]);
     }
 
     public function reference()
@@ -434,6 +446,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
+            'date' => $this->collection()->dated() ? $this->date()->timestamp : null,
             'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
         ];
     }
@@ -448,10 +461,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $attrs = $revision->attributes();
 
-        return $entry
+        $entry
             ->published($attrs['published'])
             ->data($attrs['data'])
             ->slug($attrs['slug']);
+
+        if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
+            $entry->date(Carbon::createFromTimestamp($date));
+        }
+
+        return $entry;
     }
 
     public function status()

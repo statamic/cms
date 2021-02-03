@@ -75,6 +75,10 @@ class EntriesController extends CpController
 
         $blueprint = $entry->blueprint();
 
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
+        }
+
         [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
         if ($hasOrigin = $entry->hasOrigin()) {
@@ -127,6 +131,7 @@ class EntriesController extends CpController
             'preloadedAssets' => $this->extractAssetsFromValues($values),
             'revisionsEnabled' => $entry->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
+            'canManagePublishState' => User::current()->can('publish', $entry),
         ];
 
         if ($request->wantsJson()) {
@@ -148,7 +153,15 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
-        $fields = $entry->blueprint()->fields()->addValues($request->except('id'));
+        $blueprint = $entry->blueprint();
+
+        $data = $request->except('id');
+
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $data['author'] = $entry->value('author');
+        }
+
+        $fields = $entry->blueprint()->fields()->addValues($data);
 
         $fields->validate(Entry::updateRules($collection, $entry));
 
@@ -176,8 +189,13 @@ class EntriesController extends CpController
 
         if ($collection->structure() && ! $collection->orderable()) {
             $entry->afterSave(function ($entry) use ($parent) {
-                $entry->structure()
-                    ->in($entry->locale())
+                $tree = $entry->structure()->in($entry->locale());
+
+                if ($parent && optional($tree->page($parent))->isRoot()) {
+                    $parent = null;
+                }
+
+                $tree
                     ->move($entry->id(), $parent)
                     ->save();
             });
@@ -189,7 +207,7 @@ class EntriesController extends CpController
                 ->user(User::current())
                 ->save();
         } else {
-            if (! $entry->revisionsEnabled()) {
+            if (! $entry->revisionsEnabled() && User::current()->can('publish', $entry)) {
                 $entry->published($request->published);
             }
 
@@ -207,6 +225,10 @@ class EntriesController extends CpController
 
         if (! $blueprint) {
             throw new \Exception(__('A valid blueprint is required.'));
+        }
+
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
         }
 
         $values = [];
@@ -254,6 +276,7 @@ class EntriesController extends CpController
             })->all(),
             'revisionsEnabled' => $collection->revisionsEnabled(),
             'breadcrumbs' => $this->breadcrumbs($collection),
+            'canManagePublishState' => User::current()->can('publish '.$collection->handle().' entries'),
         ];
 
         if ($request->wantsJson()) {
@@ -269,7 +292,13 @@ class EntriesController extends CpController
 
         $blueprint = $collection->entryBlueprint($request->_blueprint);
 
-        $fields = $blueprint->fields()->addValues($request->all());
+        $data = $request->all();
+
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $data['author'] = [User::current()->id()];
+        }
+
+        $fields = $blueprint->fields()->addValues($data);
 
         $fields->validate(Entry::createRules($collection, $site));
 

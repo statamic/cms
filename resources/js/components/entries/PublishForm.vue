@@ -23,7 +23,7 @@
 
                 <save-button-options
                     v-if="!readOnly"
-                    :show-options="!revisionsEnabled"
+                    :show-options="!revisionsEnabled && !isInline"
                     :button-class="saveButtonClass"
                     :preferences-prefix="preferencesPrefix"
                 >
@@ -121,7 +121,7 @@
 
                                 <div class="flex items-center border-t justify-between px-2 py-1" v-if="!revisionsEnabled">
                                     <label v-text="__('Published')" class="publish-field-label font-medium" />
-                                    <toggle-input :value="published" @input="setFieldValue('published', $event)" />
+                                    <toggle-input :value="published" :read-only="!canManagePublishState" @input="setFieldValue('published', $event)" />
                                 </div>
 
                                 <div class="border-t p-2" v-if="revisionsEnabled && !isCreating">
@@ -290,12 +290,14 @@ export default {
         method: String,
         amp: Boolean,
         isCreating: Boolean,
+        isInline: Boolean,
         initialReadOnly: Boolean,
         initialIsRoot: Boolean,
         initialPermalink: String,
         revisionsEnabled: Boolean,
         preloadedAssets: Array,
         canEditBlueprint: Boolean,
+        canManagePublishState: Boolean,
         createAnotherUrl: String,
         listingUrl: String,
     },
@@ -492,12 +494,12 @@ export default {
                     }
 
                     // If the user has opted to create another entry, redirect them to create page.
-                    if (this.afterSaveOption === 'create_another') {
+                    if (!this.isInline && this.afterSaveOption === 'create_another') {
                         window.location = this.createAnotherUrl;
                     }
 
                     // If the user has opted to go to listing (default/null option), redirect them there.
-                    else if (this.afterSaveOption === null) {
+                    else if (!this.isInline && this.afterSaveOption === null) {
                         window.location = this.listingUrl;
                     }
 

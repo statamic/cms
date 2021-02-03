@@ -2,12 +2,16 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Entries\Entry;
 use Statamic\CP\Column;
 use Statamic\Exceptions\TermsFieldtypeBothOptionsUsedException;
 use Statamic\Exceptions\TermsFieldtypeTaxonomyOptionUsed;
 use Statamic\Facades;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
+use Statamic\GraphQL\Types\TermInterface;
 use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
 use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Support\Arr;
@@ -86,11 +90,11 @@ class Terms extends Relationship
                 // entry, but could also be something else, like another taxonomy term.
                 $parent = $this->field->parent();
 
-                if ($parent && $this->field->handle() === $taxonomy->handle()) {
+                if ($parent && $parent instanceof Entry && $this->field->handle() === $taxonomy->handle()) {
                     $term->collection($parent->collection());
                 }
 
-                $locale = $parent
+                $locale = $parent && $parent instanceof Localization
                     ? $parent->locale()
                     : Site::current()->handle();
 
@@ -287,5 +291,16 @@ class Terms extends Relationship
         $term->save();
 
         return $term->id();
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type(TermInterface::NAME);
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
     }
 }

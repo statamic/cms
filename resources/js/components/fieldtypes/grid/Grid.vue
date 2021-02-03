@@ -17,6 +17,7 @@
             :meta="meta.existing"
             :name="name"
             :can-delete-rows="canDeleteRows"
+            :can-add-rows="canAddRows"
             @updated="updated"
             @meta-updated="updateRowMeta"
             @removed="removed"

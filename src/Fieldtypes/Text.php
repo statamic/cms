@@ -24,6 +24,7 @@ class Text extends Fieldtype
                 'options' => [
                     'color',
                     'email',
+                    'hidden',
                     'month',
                     'number',
                     'password',
@@ -50,6 +51,12 @@ class Text extends Fieldtype
                 'display' => __('Append'),
                 'instructions' => __('statamic::fieldtypes.text.config.append'),
                 'type' => 'text',
+                'width' => 50,
+            ],
+            'antlers' => [
+                'display' => 'Antlers',
+                'instructions' => __('statamic::fieldtypes.any.config.antlers'),
+                'type' => 'toggle',
                 'width' => 50,
             ],
         ];

@@ -2,7 +2,10 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
+use Statamic\Fields\LabeledValue;
+use Statamic\GraphQL\Types\LabeledValueType;
 
 class Checkboxes extends Fieldtype
 {
@@ -38,5 +41,23 @@ class Checkboxes extends Fieldtype
                 'label' => array_get($this->config('options'), $value, $value),
             ];
         })->all();
+    }
+
+    public function toGqlType()
+    {
+        return [
+            'type' => GraphQL::listOf(GraphQL::type(LabeledValueType::NAME)),
+            'resolve' => function ($item, $args, $context, $info) {
+                $resolved = $item->resolveGqlValue($info->fieldName);
+
+                if (empty($resolved)) {
+                    return null;
+                }
+
+                return collect($resolved)->map(function ($item) {
+                    return new LabeledValue($item['value'], $item['label']);
+                })->all();
+            },
+        ];
     }
 }

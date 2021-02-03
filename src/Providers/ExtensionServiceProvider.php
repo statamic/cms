@@ -13,8 +13,10 @@ use Statamic\Modifiers\CoreModifiers;
 use Statamic\Modifiers\Modifier;
 use Statamic\Query\Scopes;
 use Statamic\Query\Scopes\Scope;
+use Statamic\Statamic;
 use Statamic\Support\Str;
 use Statamic\Tags;
+use Statamic\UpdateScripts as Updates;
 use Statamic\Widgets;
 use Statamic\Widgets\Widget;
 
@@ -45,6 +47,7 @@ class ExtensionServiceProvider extends ServiceProvider
         Fieldtypes\Color::class,
         Fieldtypes\Date::class,
         Fieldtypes\Entries::class,
+        Fieldtypes\Floatval::class,
         Fieldtypes\GlobalSetSites::class,
         Fieldtypes\Grid::class,
         Fieldtypes\Hidden::class,
@@ -179,10 +182,15 @@ class ExtensionServiceProvider extends ServiceProvider
         \Statamic\Forms\Widget::class,
     ];
 
+    protected $updateScripts = [
+        Updates\AddPerEntryPermissions::class,
+    ];
+
     public function register()
     {
         $this->registerExtensions();
         $this->registerAddonManifest();
+        $this->registerUpdateScripts();
     }
 
     protected function registerAddonManifest()
@@ -284,5 +292,14 @@ class ExtensionServiceProvider extends ServiceProvider
         $this->app['statamic.extensions'][Modifier::class] = collect()
             ->merge($this->app['statamic.extensions'][Modifier::class] ?? [])
             ->merge($modifiers);
+    }
+
+    protected function registerUpdateScripts()
+    {
+        $this->app->instance('statamic.update-scripts', collect());
+
+        foreach ($this->updateScripts as $class) {
+            $class::register(Statamic::PACKAGE);
+        }
     }
 }

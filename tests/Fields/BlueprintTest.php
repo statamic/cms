@@ -64,6 +64,22 @@ class BlueprintTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_hidden_property_which_is_false_by_default()
+    {
+        $blueprint = new Blueprint;
+        $this->assertSame(false, $blueprint->hidden());
+
+        $blueprint->setHidden(true);
+        $this->assertSame(true, $blueprint->hidden());
+
+        $blueprint->setHidden(false);
+        $this->assertSame(false, $blueprint->hidden());
+
+        $blueprint->setHidden(null);
+        $this->assertSame(false, $blueprint->hidden());
+    }
+
+    /** @test */
     public function the_title_falls_back_to_a_humanized_handle()
     {
         $blueprint = (new Blueprint)->setHandle('the_blueprint_handle');
@@ -338,6 +354,7 @@ class BlueprintTest extends TestCase
                             'input_type' => 'text',
                             'prepend' => null,
                             'append' => null,
+                            'antlers' => false,
                         ],
                     ],
                 ],
@@ -356,6 +373,7 @@ class BlueprintTest extends TestCase
                             'validate' => 'min:2',
                             'character_limit' => null,
                             'component' => 'textarea',
+                            'antlers' => false,
                         ],
                     ],
                 ],
@@ -428,6 +446,7 @@ class BlueprintTest extends TestCase
                             'component' => 'text',
                             'instructions' => null,
                             'required' => false,
+                            'antlers' => false,
                         ],
                         [
                             'handle' => 'nested_deeper_two',
@@ -442,6 +461,7 @@ class BlueprintTest extends TestCase
                             'component' => 'text',
                             'instructions' => null,
                             'required' => false,
+                            'antlers' => false,
                         ],
                     ],
                 ],
@@ -516,6 +536,37 @@ class BlueprintTest extends TestCase
             ],
         ]], $blueprint->contents());
         $this->assertEquals(['type' => 'textarea'], $blueprint->fields()->get('new')->config());
+    }
+
+    /** @test */
+    public function it_ensures_a_field_has_config()
+    {
+        $blueprint = (new Blueprint)->setContents(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'title', 'field' => ['type' => 'text']],
+                    ['handle' => 'author', 'field' => ['type' => 'text', 'do_not_touch_other_config' => true]],
+                ],
+            ],
+            'section_two' => [
+                'fields' => [
+                    ['handle' => 'content', 'field' => ['type' => 'text']],
+                ],
+            ],
+        ]]);
+
+        $fields = $blueprint->ensureFieldHasConfig('author', ['read_only' => true])->fields();
+
+        $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
+        $this->assertEquals(['type' => 'text'], $fields->get('content')->config());
+
+        $expectedConfig = [
+            'type' => 'text',
+            'do_not_touch_other_config' => true,
+            'read_only' => true,
+        ];
+
+        $this->assertEquals($expectedConfig, $fields->get('author')->config());
     }
 
     /** @test */

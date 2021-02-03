@@ -3,7 +3,6 @@
 namespace Statamic\Contracts\Forms;
 
 use Illuminate\Contracts\Support\Arrayable;
-use Statamic\Fields\Blueprint;
 
 interface Form extends Arrayable
 {

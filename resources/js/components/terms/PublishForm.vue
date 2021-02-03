@@ -394,6 +394,24 @@ export default {
             this.saving = true;
             this.clearErrors();
 
+            this.runBeforeSaveHook();
+        },
+
+        runBeforeSaveHook() {
+            Statamic.$hooks.run('term.saving', {
+                taxonomy: this.taxonomyHandle,
+                values: this.values,
+                container: this.$refs.container,
+                storeName: this.publishContainer,
+            })
+            .then(this.performSaveRequest)
+            .catch(error => {
+                this.saving = false;
+                this.$toast.error(error || 'Something went wrong');
+            });
+        },
+
+        performSaveRequest() {
             const payload = { ...this.values, ...{
                 _blueprint: this.fieldset.handle,
                 published: this.published,
@@ -407,7 +425,7 @@ export default {
                 this.isWorkingCopy = true;
                 if (!this.isCreating) this.$toast.success(__('Saved'));
                 this.$refs.container.saved();
-                this.handleSuccess(response);
+                this.runAfterSaveHook(response);
             }).catch(e => this.handleAxiosError(e));
         },
 
@@ -417,21 +435,29 @@ export default {
             }
         },
 
-        handleSuccess(response) {
-            // If the user has opted to create another entry, redirect them to create page.
-            if (! this.revisionsEnabled && this.afterSaveOption === 'create_another') {
-                window.location = this.createAnotherUrl;
-            }
+        runAfterSaveHook(response) {
+            Statamic.$hooks
+                .run('term.saved', {
+                    taxonomy: this.taxonomyHandle,
+                    reference: this.initialReference,
+                    response
+                })
+                .then(() => {
+                    // If the user has opted to create another entry, redirect them to create page.
+                    if (! this.revisionsEnabled && this.afterSaveOption === 'create_another') {
+                        window.location = this.createAnotherUrl;
+                    }
 
-            // If the user has opted to go to listing (default/null option), redirect them there.
-            else if (! this.revisionsEnabled && this.afterSaveOption === null) {
-                window.location = this.listingUrl;
-            }
+                    // If the user has opted to go to listing (default/null option), redirect them there.
+                    else if (! this.revisionsEnabled && this.afterSaveOption === null) {
+                        window.location = this.listingUrl;
+                    }
 
-            // Otherwise, leave them on the edit form and emit an event.
-            else {
-                this.$nextTick(() => this.$emit('saved', response));
-            }
+                    // Otherwise, leave them on the edit form and emit an event.
+                    else {
+                        this.$nextTick(() => this.$emit('saved', response));
+                    }
+                }).catch(e => {});
         },
 
         handleAxiosError(e) {

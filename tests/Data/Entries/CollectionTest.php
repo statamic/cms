@@ -5,9 +5,12 @@ namespace Tests\Data\Entries;
 use Facades\Statamic\Contracts\Structures\TreeRepository;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
+use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Entries\Collection;
+use Statamic\Events\CollectionCreated;
+use Statamic\Events\CollectionSaved;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades;
 use Statamic\Facades\Antlers;
@@ -294,12 +297,42 @@ class CollectionTest extends TestCase
         $collection = (new Collection)->handle('test');
 
         Facades\Collection::shouldReceive('save')->with($collection)->once();
+        Facades\Collection::shouldReceive('handleExists')->with('test')->once();
         Facades\Blink::shouldReceive('forget')->with('collection-handles')->once();
         Facades\Blink::shouldReceive('flushStartingWith')->with('collection-test')->once();
 
         $return = $collection->save();
 
         $this->assertEquals($collection, $return);
+    }
+
+    /** @test */
+    public function it_dispatches_collection_saved()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('test');
+        $collection->save();
+
+        Event::assertDispatched(CollectionSaved::class, function ($event) use ($collection) {
+            return $event->collection === $collection;
+        });
+    }
+
+    /** @test */
+    public function it_dispatches_collection_created_only_once()
+    {
+        Event::fake();
+
+        $collection = (new Collection)->handle('test');
+        $collection->save();
+        $collection->save();
+
+        Event::assertDispatched(CollectionCreated::class, function ($event) use ($collection) {
+            return $event->collection === $collection;
+        });
+        Event::assertDispatched(CollectionSaved::class, 2);
+        Event::assertDispatched(CollectionCreated::class, 1);
     }
 
     /** @test */

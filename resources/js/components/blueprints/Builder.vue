@@ -18,6 +18,15 @@
                 </div>
                 <input type="text" name="title" class="input-text" v-model="blueprint.title" autofocus="autofocus">
             </div>
+
+            <div class="form-group">
+                <label class="block">{{ __('Hidden') }}</label>
+                <small class="help-block">{{ __('messages.blueprints_hidden_instructions') }}</small>
+                <div v-if="errors.hidden">
+                    <small class="help-block text-red" v-for="(error, i) in errors.hidden" :key="i" v-text="error" />
+                </div>
+                <toggle-input name="hidden" v-model="blueprint.hidden" />
+            </div>
         </div>
 
         <div class="content mt-5 mb-2" v-if="useSections">

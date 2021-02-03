@@ -11,6 +11,7 @@ class ConsoleServiceProvider extends ServiceProvider
     protected $commands = [
         Commands\ListCommand::class,
         Commands\AddonsDiscover::class,
+        Commands\AssetsGeneratePresets::class,
         Commands\AssetsMeta::class,
         Commands\GlideClear::class,
         Commands\Install::class,
@@ -34,6 +35,7 @@ class ConsoleServiceProvider extends ServiceProvider
         Commands\AuthMigration::class,
         Commands\Multisite::class,
         Commands\SiteClear::class,
+        Commands\UpdatesRun::class,
     ];
 
     public function boot()
