@@ -22,6 +22,9 @@ class EntryQuery extends Query
     {
         return [
             'id' => GraphQL::string(),
+            'slug' => GraphQL::string(),
+            'collection' => GraphQL::string(),
+            'uri' => GraphQL::string(),
         ];
     }
 
@@ -29,8 +32,20 @@ class EntryQuery extends Query
     {
         $query = Facades\Entry::query();
 
-        if ($id = $args['id']) {
+        if ($id = $args['id'] ?? null) {
             $query->where('id', $id);
+        }
+
+        if ($slug = $args['slug'] ?? null) {
+            $query->where('slug', $slug);
+        }
+
+        if ($collection = $args['collection'] ?? null) {
+            $query->where('collection', $collection);
+        }
+
+        if ($uri = $args['uri'] ?? null) {
+            $query->where('uri', $uri);
         }
 
         return $query->limit(1)->get()->first();

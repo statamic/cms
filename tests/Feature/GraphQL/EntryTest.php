@@ -3,6 +3,7 @@
 namespace Tests\Feature\GraphQL;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\GraphQL;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -68,6 +69,78 @@ GQL;
                         'title' => 'Events',
                         'handle' => 'events',
                     ],
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_queries_an_entry_by_slug()
+    {
+        EntryFactory::collection('blog')->id('123')->slug('foo')->create();
+        EntryFactory::collection('events')->id('456')->slug('foo')->create();
+
+        $query = <<<'GQL'
+{
+    entry(slug: "foo") {
+        id
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'id' => '123',
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_queries_an_entry_by_slug_and_collection()
+    {
+        EntryFactory::collection('blog')->id('123')->slug('foo')->create();
+        EntryFactory::collection('events')->id('456')->slug('foo')->create();
+
+        $query = <<<'GQL'
+{
+    entry(slug: "foo", collection: "events") {
+        id
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'id' => '456',
+                ],
+            ]]);
+    }
+
+    /** @test */
+    public function it_queries_an_entry_by_uri()
+    {
+        $query = <<<'GQL'
+{
+    entry(uri: "/events/event-two") {
+        id
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'id' => '4',
                 ],
             ]]);
     }
