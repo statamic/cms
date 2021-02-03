@@ -46,8 +46,8 @@ class TermRepository implements RepositoryContract
     public function findByUri(string $uri, string $site = null): ?Term
     {
         $collection = Collection::all()
-            ->first(function ($collection) use ($uri) {
-                if (Str::startsWith($uri, $collection->url())) {
+            ->first(function ($collection) use ($uri, $site) {
+                if (Str::startsWith($uri, $collection->uri($site))) {
                     return true;
                 }
 
@@ -55,7 +55,7 @@ class TermRepository implements RepositoryContract
             });
 
         if ($collection) {
-            $uri = Str::after($uri, $collection->url() ?? $collection->handle());
+            $uri = Str::after($uri, $collection->uri($site) ?? $collection->handle());
         }
 
         $uri = Str::removeLeft($uri, '/');
