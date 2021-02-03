@@ -124,6 +124,28 @@ GQL;
     }
 
     /** @test */
+    public function it_queries_an_entry_by_uri()
+    {
+        $query = <<<'GQL'
+{
+    entry(uri: "/events/event-two") {
+        id
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => [
+                'entry' => [
+                    'id' => '4',
+                ],
+            ]]);
+    }
+
+    /** @test */
     public function it_can_add_custom_fields_to_interface()
     {
         GraphQL::addField('EntryInterface', 'one', function () {
