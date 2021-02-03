@@ -1,5 +1,5 @@
 <div class="global-header">
-    <div class="lg:flex-1 pl-1 md:pl-3 h-full flex items-center">
+    <div class="lg:min-w-xl pl-1 md:pl-3 h-full flex items-center">
         <button class="nav-toggle hidden md:block ml-sm flex-shrink-0" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">@svg('burger')</button>
         <button class="nav-toggle md:hidden ml-sm flex-shrink-0" @click="toggleMobileNav" v-if="! mobileNavOpen" aria-label="{{ __('Toggle Mobile Nav') }}">@svg('burger')</button>
         <button class="nav-toggle md:hidden ml-sm flex-shrink-0" @click="toggleMobileNav" v-else v-cloak aria-label="{{ __('Toggle Mobile Nav') }}">@svg('close')</button>
@@ -15,12 +15,12 @@
         </a>
     </div>
 
-    <div class="sm:px-4 w-full flex-1 lg:flex items-center justify-center mx-auto max-w-full">
+    <div class="sm:px-4 w-full flex-1 lg:flex items-center lg:justify-center mx-auto max-w-full">
         <global-search endpoint="{{ cp_route('search') }}" placeholder="{{ __('Search...') }}">
         </global-search>
     </div>
 
-    <div class="head-link h-full md:pr-3 flex items-center justify-end lg:flex-1">
+    <div class="head-link h-full md:pr-3 flex items-center justify-end">
 
         @if (Statamic\Facades\Site::hasMultiple())
             <global-site-selector>
