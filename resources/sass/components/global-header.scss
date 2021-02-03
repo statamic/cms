@@ -3,7 +3,7 @@
    ========================================================================== */
 
 .global-header {
-    @apply bg-white shadow pr-2 h-13 items-center flex justify-between relative w-full;
+    @apply bg-white shadow pr-2 h-13 items-center flex relative w-full;
     z-index: 997; // Let Live Preview stack on top
 }
 
