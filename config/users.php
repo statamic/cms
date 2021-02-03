@@ -91,7 +91,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Authentication Guard
+    | Authentication Guards
     |--------------------------------------------------------------------------
     |
     | By default, Statamic will use the `web` authentication guard. However,
@@ -100,7 +100,7 @@ return [
     |
     */
 
-    'guard' => [
+    'guards' => [
         'cp' => 'web',
         'web' => 'web',
     ],
