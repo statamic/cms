@@ -33,9 +33,9 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
 
         $assets = $this->collect($assets);
 
-        // If any assets were deleted through the filesystem (e.g. by hand or through git)
-        // during the file listing cache window, the conversion above would have resulted
-        // in nulls. In that case, we'll just remove the nulls.
+        // If any assets were deleted through the filesystem (e.g. manually or
+        // through git) during the file listing cache window, the conversion
+        // above would have resulted in nulls. We remove the nulls here.
         return $assets->filter()->values();
     }
 
