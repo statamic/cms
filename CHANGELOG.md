@@ -1,5 +1,14 @@
 # Release Notes
 
+## 3.0.42 (2021-02-04)
+
+### What's fixed
+- Fix error in asset listings when one has recently been deleted. [#3201](https://github.com/statamic/cms/issues/3201)
+- Fix Taxonomy facade accessor. [#3199](https://github.com/statamic/cms/issues/3199)
+- Small clean up of `trans` tag. [#3197](https://github.com/statamic/cms/issues/3197)
+
+
+
 ## 3.0.41 (2021-02-03)
 
 ### What's new
