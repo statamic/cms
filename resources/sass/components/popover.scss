@@ -6,6 +6,11 @@
     pointer-events: none;
     visibility: hidden;
     z-index: 999;
+    position: absolute;
+    top: auto;
+    bottom: auto;
+    left: auto;
+    right: auto;
 
     .popover-content {
         min-width: 180px;
