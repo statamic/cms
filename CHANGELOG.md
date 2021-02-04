@@ -12,6 +12,34 @@
 
 
 
+## 3.0.42 (2021-02-04)
+
+### What's fixed
+- Fix error in asset listings when one has recently been deleted. [#3201](https://github.com/statamic/cms/issues/3201)
+- Fix Taxonomy facade accessor. [#3199](https://github.com/statamic/cms/issues/3199)
+- Small clean up of `trans` tag. [#3197](https://github.com/statamic/cms/issues/3197)
+
+
+
+## 3.0.41 (2021-02-03)
+
+### What's new
+- Added a `ray` modifier. [#3137](https://github.com/statamic/cms/issues/3137)
+
+### What's improved
+- Form email subjects can be translated. [#3144](https://github.com/statamic/cms/issues/3144)
+- View site button in CP uses the selected site. [#3139](https://github.com/statamic/cms/issues/3139)
+- Updated Danish, German, and French translations. [#3161](https://github.com/statamic/cms/issues/3161) [#3134](https://github.com/statamic/cms/issues/3134) [#3129](https://github.com/statamic/cms/issues/3129)
+
+### What's fixed
+- Prevent moving pages to end of top level when already there. [#3152](https://github.com/statamic/cms/issues/3152)
+- Fix form widget styling. [#3169](https://github.com/statamic/cms/issues/3169)
+- Fix Bard line wrapping issue. [#3115](https://github.com/statamic/cms/issues/3115)
+- Inject the Symfony Yaml component. [#3164](https://github.com/statamic/cms/issues/3164)
+- Adjust Action Facade docblock [#3150](https://github.com/statamic/cms/issues/3150)
+
+
+
 ## 3.0.40 (2021-01-21)
 
 ### What's fixed

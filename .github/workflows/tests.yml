@@ -14,7 +14,6 @@ jobs:
     strategy:
       matrix:
         php: [7.4, 7.3, 7.2, 8.0]
-        composer: [1, 2]
         laravel: [8.*, 7.*, 6.*]
         dependency-version: [prefer-lowest, prefer-stable]
         os: [ubuntu-20.04]
@@ -37,7 +36,7 @@ jobs:
           - laravel: 8.*
             php: 7.2
 
-    name: P${{ matrix.php }} - C${{ matrix.composer }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ubuntu-latest
+    name: P${{ matrix.php }} - L${{ matrix.laravel }} - ${{ matrix.dependency-version }} - ubuntu-latest
 
     steps:
       - name: Checkout code
@@ -47,7 +46,6 @@ jobs:
         uses: shivammathur/setup-php@v2
         with:
           php-version: ${{ matrix.php }}
-          tools: composer:v${{ matrix.composer }}
           extensions: dom, curl, libxml, mbstring, zip, pcntl, pdo, sqlite, pdo_sqlite, bcmath, soap, intl, gd, exif, iconv, imagick
           coverage: none
 
