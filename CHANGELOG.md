@@ -1,5 +1,18 @@
 # Release Notes
 
+## 3.1.0-alpha.2 (2020-02-04)
+
+### What's new
+
+- Ability to query an entry by slug or URI in GraphQL. [#3193](https://github.com/statamic/cms/issues/3193)
+
+### What's fixed
+- Fixed GraphQL nested subfield handling for Replicator, Bard, and Grid fields. [#3202](https://github.com/statamic/cms/issues/3202)
+- Fixed Safari display issue. [#1999](https://github.com/statamic/cms/issues/1999)
+- Brought over changes from 3.0.41-42
+
+
+
 ## 3.1.0-alpha.1 (2020-02-01)
 
 ### What's new
