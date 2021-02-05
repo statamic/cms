@@ -3,6 +3,7 @@
 namespace Statamic\Assets;
 
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Assets\QueryBuilder as Contract;
 use Statamic\Facades;
@@ -30,7 +31,12 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
             $assets = $this->convertPathsToAssets($assets);
         }
 
-        return $this->collect($assets);
+        $assets = $this->collect($assets);
+
+        // If any assets were deleted through the filesystem (e.g. manually or
+        // through git) during the file listing cache window, the conversion
+        // above would have resulted in nulls. We remove the nulls here.
+        return $assets->filter()->values();
     }
 
     protected function limitItems($items)
@@ -57,11 +63,30 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
     {
         $items = parent::get($columns);
 
-        if (! $this->requiresAssetInstances()) {
-            $items = $this->convertPathsToAssets($items);
+        // If we required asset instances, they would have already been converted.
+        if ($this->requiresAssetInstances()) {
+            return $items;
         }
 
-        return $items;
+        $items = $this->convertPathsToAssets($items);
+
+        // If any assets were deleted through the filesystem (e.g. manually or through git)
+        // during the file listing cache window, the conversion above would have resulted
+        // in nulls. In that case, we'll bust the cache and requery. We also only care
+        // when it's being limited like in pagination or when using the take method.
+        if ($this->hasAnyNulls($items) && $this->limit) {
+            Cache::forget($this->container->filesCacheKey());
+            Cache::forget($this->container->filesCacheKey($this->folder));
+
+            return $this->get($columns);
+        }
+
+        return $items->filter()->values();
+    }
+
+    private function hasAnyNulls($items)
+    {
+        return $items->reject()->isNotEmpty();
     }
 
     private function requiresAssetInstances()
