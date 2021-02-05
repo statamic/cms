@@ -50,6 +50,12 @@ class EntryInterface extends InterfaceType
             ],
             'date' => new DateField,
             'last_modified' => new DateField,
+            'locale' => [
+                'type' => GraphQL::nonNull(GraphQL::string()),
+            ],
+            'site' => [
+                'type' => GraphQL::nonNull(GraphQL::type(SiteType::NAME)),
+            ],
         ];
 
         foreach ($this->extraFields() as $field => $closure) {
