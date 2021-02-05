@@ -44,6 +44,11 @@ class EntryTest extends TestCase
             title
             handle
         }
+        locale
+        site {
+            handle
+            name
+        }
     }
 }
 GQL;
@@ -68,6 +73,11 @@ GQL;
                     'collection' => [
                         'title' => 'Events',
                         'handle' => 'events',
+                    ],
+                    'locale' => 'en',
+                    'site' => [
+                        'handle' => 'en',
+                        'name' => 'English',
                     ],
                 ],
             ]]);
