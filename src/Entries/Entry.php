@@ -49,7 +49,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $date;
     protected $locale;
     protected $localizations;
-    protected $withoutEvents = false;
     protected $afterSaveCallbacks = [];
 
     public function __construct()
@@ -139,7 +138,12 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         ];
     }
 
-    public function delete()
+    public function deleteQuietly()
+    {
+        return $this->delete(false);
+    }
+
+    public function delete($deleteWithEvents = true)
     {
         if ($this->descendants()->map->fresh()->filter()->isNotEmpty()) {
             throw new \Exception('Cannot delete an entry with localizations.');
@@ -163,7 +167,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         Facades\Entry::delete($this);
 
-        if(! $this->withoutEvents){
+        if($deleteWithEvents) {
             EntryDeleted::dispatch($this);
         }
 
@@ -270,12 +274,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this;
     }
 
-    public function save()
+    public function saveQuietly()
+    {
+        return $this->save(false);
+    }
+
+    public function save($saveWithEvents = true)
     {
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
-
-        if (! $this->withoutEvents) {
+        if($saveWithEvents){
             if (EntrySaving::dispatch($this) === false) {
                 return false;
             }
@@ -297,7 +305,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $callback($this);
         }
 
-        if(! $this->withoutEvents){
+        if($saveWithEvents) {
             EntrySaved::dispatch($this);
         }
 
@@ -334,9 +342,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         }
 
         return $this->structure()->in($this->locale())
-            ->flattenedPages()
-            ->map->reference()
-            ->flip()->get($this->id) + 1;
+                   ->flattenedPages()
+                   ->map->reference()
+                   ->flip()->get($this->id) + 1;
     }
 
     public function template($template = null)
@@ -645,13 +653,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function fileExtension()
     {
         return 'md';
-    }
-
-    public function silently()
-    {
-        $this->withoutEvents = true;
-
-        return $this;
     }
 
     public function fresh()
