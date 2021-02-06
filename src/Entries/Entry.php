@@ -167,7 +167,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         Facades\Entry::delete($this);
 
-        EntryDeleted::dispatchIf($deleteWithEvents,$this);
+        EntryDeleted::dispatchIf($deleteWithEvents, $this);
 
         return true;
     }
