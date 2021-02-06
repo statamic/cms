@@ -283,7 +283,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     {
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
-        if ($saveWithEvents){
+        if ($saveWithEvents) {
             if (EntrySaving::dispatch($this) === false) {
                 return false;
             }
@@ -305,7 +305,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $callback($this);
         }
 
-        if($saveWithEvents) {
+        if ($saveWithEvents) {
             EntrySaved::dispatch($this);
         }
 
