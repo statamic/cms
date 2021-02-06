@@ -49,6 +49,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $date;
     protected $locale;
     protected $localizations;
+    protected $withoutEvents = false;
     protected $afterSaveCallbacks = [];
 
     public function __construct()
@@ -162,7 +163,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         Facades\Entry::delete($this);
 
-        EntryDeleted::dispatch($this);
+        if(! $this->withoutEvents){
+            EntryDeleted::dispatch($this);
+        }
 
         return true;
     }
@@ -272,8 +275,10 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
-        if (EntrySaving::dispatch($this) === false) {
-            return false;
+        if (! $this->withoutEvents) {
+            if (EntrySaving::dispatch($this) === false) {
+                return false;
+            }
         }
 
         Facades\Entry::save($this);
@@ -292,7 +297,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $callback($this);
         }
 
-        EntrySaved::dispatch($this);
+        if(! $this->withoutEvents){
+            EntrySaved::dispatch($this);
+        }
 
         return true;
     }
@@ -638,6 +645,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function fileExtension()
     {
         return 'md';
+    }
+
+    public function silently()
+    {
+        $this->withoutEvents = true;
+
+        return $this;
     }
 
     public function fresh()
