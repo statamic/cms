@@ -167,7 +167,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         Facades\Entry::delete($this);
 
-        EntryDeleted::dispatchIf($deleteWithEvents, $this);
+        if ($deleteWithEvents) {
+            EntryDeleted::dispatch($this);
+        }
 
         return true;
     }
@@ -282,7 +284,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
         if ($saveWithEvents) {
-            if (EntrySaving::dispatchIf($saveWithEvents, $this) === false) {
+            if (EntrySaving::dispatch($this) === false) {
                 return false;
             }
         }
@@ -304,7 +306,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         }
 
         if ($saveWithEvents) {
-            EntrySaved::dispatchIf($saveWithEvents, $this);
+            EntrySaved::dispatch($this);
         }
 
         return true;
