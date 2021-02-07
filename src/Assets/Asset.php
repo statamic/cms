@@ -206,7 +206,9 @@ class Asset implements AssetContract, Augmentable
      */
     public function folder()
     {
-        return pathinfo($this->path())['dirname'];
+        $dirname = pathinfo($this->path())['dirname'];
+
+        return $dirname === '.' ? '' : $dirname;
     }
 
     /**

@@ -181,6 +181,12 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_the_empty_folder_name()
+    {
+        $this->assertEquals('', (new Asset)->path('asset.jpg')->folder());
+    }
+
+    /** @test */
     public function it_gets_the_resolved_path()
     {
         $container = $this->mock(AssetContainer::class);
