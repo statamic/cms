@@ -52,7 +52,7 @@ return [
         |
         */
 
-        'cache' => false,
+        'cache' => env('STATAMIC_ASSETS_CACHE', false),
         'cache_path' => public_path('img'),
 
         /*
