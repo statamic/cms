@@ -43,7 +43,7 @@ trait HasAvatar
      */
     public function avatarFieldUrl()
     {
-        return $this->avatarFieldValue()->value()->url();
+        return optional($this->avatarFieldValue()->value())->url();
     }
 
     /**
