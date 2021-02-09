@@ -5,15 +5,15 @@
             :key="$index"
             class="option"
         >
-            <label>
-                <input type="radio"
-                    ref="radio"
-                    :name="name"
-                    @input="update($event.target.value)"
-                    :value="option.value"
-                    :disabled="isReadOnly"
-                    :checked="value === option.value"
-                />
+            <input type="radio"
+                   ref="radio"
+                   :name="name"
+                   @input="update($event.target.value)"
+                   :value="option.value"
+                   :disabled="isReadOnly"
+                   :checked="value === option.value"
+            />
+            <label :for="name">
                 {{ option.label || option.value }}
             </label>
         </div>

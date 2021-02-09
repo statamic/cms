@@ -1,14 +1,14 @@
 <template>
     <div class="checkboxes-fieldtype-wrapper"  :class="{'inline-mode': config.inline}">
         <div class="option" v-for="(option, $index) in options" :key="$index">
-            <label>
-                <input type="checkbox"
-                       ref="checkbox"
-                       :name="name + '[]'"
-                       :value="option.value"
-                       :disabled="isReadOnly"
-                       v-model="values"
-                />
+            <input type="checkbox"
+                   ref="checkbox"
+                   :name="name + '[]'"
+                   :value="option.value"
+                   :disabled="isReadOnly"
+                   v-model="values"
+            />
+            <label :for="name + '[]'">
                 {{ option.label || option.value }}
             </label>
         </div>
