@@ -1,14 +1,14 @@
 <div class="global-header">
     <div class="lg:min-w-xl pl-1 md:pl-3 h-full flex items-center">
-        <button class="nav-toggle hidden md:block ml-sm flex-shrink-0" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">@svg('burger')</button>
-        <button class="nav-toggle md:hidden ml-sm flex-shrink-0" @click="toggleMobileNav" v-if="! mobileNavOpen" aria-label="{{ __('Toggle Mobile Nav') }}">@svg('burger')</button>
-        <button class="nav-toggle md:hidden ml-sm flex-shrink-0" @click="toggleMobileNav" v-else v-cloak aria-label="{{ __('Toggle Mobile Nav') }}">@svg('close')</button>
+        <button class="nav-toggle hidden md:block ml-sm flex-shrink-0" @click="toggleNav" aria-label="{{ __('Toggle Nav') }}">@cp_svg('burger')</button>
+        <button class="nav-toggle md:hidden ml-sm flex-shrink-0" @click="toggleMobileNav" v-if="! mobileNavOpen" aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('burger')</button>
+        <button class="nav-toggle md:hidden ml-sm flex-shrink-0" @click="toggleMobileNav" v-else v-cloak aria-label="{{ __('Toggle Mobile Nav') }}">@cp_svg('close')</button>
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
             <div v-tooltip="version" class="hidden md:block flex-shrink-0">
                 @if (Statamic::pro() && config('statamic.cp.custom_logo_url'))
                     <img src="{{ config('statamic.cp.custom_logo_url') }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="white-label-logo">
                 @else
-                    @svg('statamic-wordmark')
+                    @cp_svg('statamic-wordmark')
                     @if (Statamic::pro())<span class="font-bold text-4xs align-top">PRO</span>@endif
                 @endif
             </div>
