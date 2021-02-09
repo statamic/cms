@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Statamic\Support\Str;
 use Stringy\StaticStringy;
 
 class Statamic
@@ -32,6 +33,21 @@ class Statamic
     public static function pro()
     {
         return config('statamic.editions.pro');
+    }
+
+    public static function enablePro()
+    {
+        $path = config_path('statamic/editions.php');
+
+        $contents = File::get($path);
+
+        if (! Str::contains($contents, "'pro' => false,")) {
+            throw new \Exception('Could not reliably update the config file.');
+        }
+
+        $contents = str_replace("'pro' => false,", "'pro' => true,", $contents);
+
+        File::put($path, $contents);
     }
 
     public static function availableScripts(Request $request)
