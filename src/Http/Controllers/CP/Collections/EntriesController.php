@@ -179,7 +179,7 @@ class EntriesController extends CpController
             $entry->afterSave(function ($entry) use ($parent) {
                 $tree = $entry->structure()->in($entry->locale());
 
-                if (optional($tree->page($parent))->isRoot()) {
+                if ($parent && optional($tree->page($parent))->isRoot()) {
                     $parent = null;
                 }
 

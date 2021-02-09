@@ -181,6 +181,8 @@ class Bard extends Replicator
             unset($row['attrs']['enabled']);
         }
 
+        $row['attrs']['values'] = Arr::removeNullValues($row['attrs']['values']);
+
         return $row;
     }
 
