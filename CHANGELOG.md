@@ -113,7 +113,7 @@
 
 ## 3.0.34 (2020-12-09)
 
-### What's new
+### What's new 
 - PHP 8 support. [#2944](https://github.com/statamic/cms/issues/2944)
 
 ### What's fixed
