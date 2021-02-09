@@ -6,7 +6,7 @@
         <a href="{{ route('statamic.cp.index') }}" class="flex items-end">
             <div v-tooltip="version" class="hidden md:block flex-shrink-0">
                 @if (Statamic::pro() && config('statamic.cp.custom_logo_url'))
-                    <img src="{{ config('statamic.cp.custom_logo_url') }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="white-label-logo">
+                    <img src="{{ config('statamic.cp.custom_logo_url.nav') ?? config('statamic.cp.custom_logo_url') }}" alt="{{ config('statamic.cp.custom_cms_name') }}" class="white-label-logo">
                 @else
                     @cp_svg('statamic-wordmark')
                     @if (Statamic::pro())<span class="font-bold text-4xs align-top">PRO</span>@endif
