@@ -270,11 +270,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function saveQuietly()
     {
-        $this->disableEvents();
+        $this->withEvents = false;
 
         $result = $this->save();
 
-        $this->enableEvents();
+        $this->withEvents = true;
 
         return $result;
     }
@@ -342,9 +342,9 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         }
 
         return $this->structure()->in($this->locale())
-                   ->flattenedPages()
-                   ->map->reference()
-                   ->flip()->get($this->id) + 1;
+            ->flattenedPages()
+            ->map->reference()
+            ->flip()->get($this->id) + 1;
     }
 
     public function template($template = null)
@@ -678,16 +678,6 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function values()
     {
         return $this->collection()->cascade()->merge($this->originValues());
-    }
-
-    public function disableEvents()
-    {
-        $this->withEvents = false;
-    }
-
-    public function enableEvents()
-    {
-        $this->withEvents = true;
     }
 
     public function defaultAugmentedArrayKeys()
