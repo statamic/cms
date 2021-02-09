@@ -9,7 +9,7 @@ class ControlPanel
 {
     public function handle($request, Closure $next)
     {
-        Blade::directive('statamic_svg', function ($expression) {
+        Blade::directive('cp_svg', function ($expression) {
             return "<?php echo Statamic::svg({$expression}) ?>";
         });
 
