@@ -39,4 +39,21 @@ return [
 
     'pagination_size' => 50,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Caching
+    |--------------------------------------------------------------------------
+    |
+    | By default, Statamic will cache each endpoint until the specified
+    | expiry, or until content is changed. See the documentation for
+    | more details on how to customize your cache implementation.
+    |
+    | https://statamic.dev/content-api#caching
+    |
+    */
+
+    'cache' => [
+        'expiry' => 60,
+    ],
+
 ];

@@ -3,7 +3,10 @@
 namespace Statamic\Fields;
 
 use Facades\Statamic\Fields\FieldtypeRepository;
+use GraphQL\Type\Definition\Type;
 use Illuminate\Contracts\Support\Arrayable;
+use Rebing\GraphQL\Support\Field as GqlField;
+use Statamic\Facades\GraphQL;
 use Statamic\Support\Str;
 
 class Field implements Arrayable
@@ -13,6 +16,7 @@ class Field implements Arrayable
     protected $config;
     protected $value;
     protected $parent;
+    protected $parentField;
 
     public function __construct($handle, array $config)
     {
@@ -24,6 +28,7 @@ class Field implements Arrayable
     {
         return (new static($this->handle, $this->config))
             ->setParent($this->parent)
+            ->setParentField($this->parentField)
             ->setValue($this->value);
     }
 
@@ -37,6 +42,15 @@ class Field implements Arrayable
     public function handle()
     {
         return $this->handle;
+    }
+
+    public function handlePath()
+    {
+        $path = $this->parentField ? $this->parentField->handlePath() : [];
+
+        $path[] = $this->handle();
+
+        return $path;
     }
 
     public function setPrefix($prefix)
@@ -211,6 +225,18 @@ class Field implements Arrayable
         return $this->parent;
     }
 
+    public function setParentField($field)
+    {
+        $this->parentField = $field;
+
+        return $this;
+    }
+
+    public function parentField()
+    {
+        return $this->parentField;
+    }
+
     public function process()
     {
         return $this->newInstance()->setValue(
@@ -294,5 +320,24 @@ class Field implements Arrayable
     public function meta()
     {
         return $this->fieldtype()->preload();
+    }
+
+    public function toGql(): array
+    {
+        $type = $this->fieldtype()->toGqlType();
+
+        if ($type instanceof GqlField) {
+            $type = $type->toArray();
+        }
+
+        if ($type instanceof Type) {
+            $type = ['type' => $type];
+        }
+
+        if ($this->isRequired()) {
+            $type['type'] = GraphQL::nonNull($type['type']);
+        }
+
+        return $type;
     }
 }

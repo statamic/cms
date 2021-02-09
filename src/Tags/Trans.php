@@ -15,6 +15,6 @@ class Trans extends Tags
         $locale = $this->params->pull('locale') ?? $this->params->pull('site');
         $params = $this->params->all();
 
-        return __($key, $this->params->all(), $locale);
+        return __($key, $params, $locale);
     }
 }

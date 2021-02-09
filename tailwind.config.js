@@ -222,6 +222,7 @@ module.exports = {
       '120':  '120px',
       'md':   '160px',
       'lg':   '200px',
+      'xl':   '260px',
       'full': '100%',
     },
     width: {

@@ -2,8 +2,10 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Role;
 use Statamic\Facades\Scope;
+use Statamic\GraphQL\Types\RoleType;
 
 class UserRoles extends Relationship
 {
@@ -53,5 +55,16 @@ class UserRoles extends Relationship
     public function getSelectionFilters()
     {
         return Scope::filters('user-roles-fieldtype', []);
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type(RoleType::NAME);
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
     }
 }

@@ -1,5 +1,58 @@
 # Release Notes
 
+## 3.1.0-alpha.2 (2020-02-04)
+
+### What's new
+
+- Ability to query an entry by slug or URI in GraphQL. [#3193](https://github.com/statamic/cms/issues/3193)
+
+### What's fixed
+- Fixed GraphQL nested subfield handling for Replicator, Bard, and Grid fields. [#3202](https://github.com/statamic/cms/issues/3202)
+- Fixed Safari display issue. [#1999](https://github.com/statamic/cms/issues/1999)
+- Brought over changes from 3.0.41-42
+
+
+
+## 3.1.0-alpha.1 (2020-02-01)
+
+### What's new
+- GraphQL [#2982](https://github.com/statamic/cms/issues/2982)
+- White labeling [#3013](https://github.com/statamic/cms/issues/3013)
+- Update Scripts [#3024](https://github.com/statamic/cms/issues/3024)
+- API Caching [#3168](https://github.com/statamic/cms/issues/3168)
+- Nav and Collection structure tree API endpoints [#2999](https://github.com/statamic/cms/issues/2999)
+- Entry author permissions [#3053](https://github.com/statamic/cms/issues/3053)
+
+
+
+## 3.0.42 (2021-02-04)
+
+### What's fixed
+- Fix error in asset listings when one has recently been deleted. [#3201](https://github.com/statamic/cms/issues/3201)
+- Fix Taxonomy facade accessor. [#3199](https://github.com/statamic/cms/issues/3199)
+- Small clean up of `trans` tag. [#3197](https://github.com/statamic/cms/issues/3197)
+
+
+
+## 3.0.41 (2021-02-03)
+
+### What's new
+- Added a `ray` modifier. [#3137](https://github.com/statamic/cms/issues/3137)
+
+### What's improved
+- Form email subjects can be translated. [#3144](https://github.com/statamic/cms/issues/3144)
+- View site button in CP uses the selected site. [#3139](https://github.com/statamic/cms/issues/3139)
+- Updated Danish, German, and French translations. [#3161](https://github.com/statamic/cms/issues/3161) [#3134](https://github.com/statamic/cms/issues/3134) [#3129](https://github.com/statamic/cms/issues/3129)
+
+### What's fixed
+- Prevent moving pages to end of top level when already there. [#3152](https://github.com/statamic/cms/issues/3152)
+- Fix form widget styling. [#3169](https://github.com/statamic/cms/issues/3169)
+- Fix Bard line wrapping issue. [#3115](https://github.com/statamic/cms/issues/3115)
+- Inject the Symfony Yaml component. [#3164](https://github.com/statamic/cms/issues/3164)
+- Adjust Action Facade docblock [#3150](https://github.com/statamic/cms/issues/3150)
+
+
+
 ## 3.0.40 (2021-01-21)
 
 ### What's fixed

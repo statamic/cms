@@ -2,6 +2,8 @@
 
 namespace Tests;
 
+use PHPUnit\Framework\Assert;
+
 abstract class TestCase extends \Orchestra\Testbench\TestCase
 {
     protected $shouldFakeVersion = true;
@@ -28,6 +30,8 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             \Statamic\Facades\CP\Nav::shouldReceive('build')->andReturn([]);
             $this->addToAssertionCount(-1); // Dont want to assert this
         }
+
+        $this->addGqlMacros();
     }
 
     public function tearDown(): void
@@ -43,7 +47,10 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
     protected function getPackageProviders($app)
     {
-        return ['Statamic\Providers\StatamicServiceProvider'];
+        return [
+            \Statamic\Providers\StatamicServiceProvider::class,
+            \Rebing\GraphQL\GraphQLServiceProvider::class,
+        ];
     }
 
     protected function getPackageAliases($app)
@@ -91,6 +98,7 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         $app['config']->set('statamic.stache.stores.asset-containers.directory', __DIR__.'/__fixtures__/content/assets');
 
         $app['config']->set('statamic.api.enabled', true);
+        $app['config']->set('statamic.graphql.enabled', true);
 
         $app['config']->set('statamic.editions.pro', true);
 
@@ -186,5 +194,47 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
         method_exists(static::class, 'assertDirectoryDoesNotExist')
             ? static::assertDirectoryDoesNotExist($filename, $message)
             : parent::assertDirectoryNotExists($filename, $message);
+    }
+
+    private function addGqlMacros()
+    {
+        $testResponseClass = version_compare($this->app->version(), 7, '<')
+            ? \Illuminate\Foundation\Testing\TestResponse::class
+            : \Illuminate\Testing\TestResponse::class;
+
+        $testResponseClass::macro('assertGqlOk', function () {
+            $this->assertOk();
+
+            $json = $this->json();
+
+            if (isset($json['errors'])) {
+                throw new \PHPUnit\Framework\ExpectationFailedException(
+                    'GraphQL response contained errors',
+                    new \SebastianBergmann\Comparator\ComparisonFailure('', '', '', json_encode($json, JSON_PRETTY_PRINT))
+                );
+            }
+
+            return $this;
+        });
+
+        $testResponseClass::macro('assertGqlUnauthorized', function () {
+            $this->assertOk();
+
+            $json = $this->json();
+
+            if (! isset($json['errors'])) {
+                throw new \PHPUnit\Framework\ExpectationFailedException(
+                    'GraphQL response contained no errors',
+                    new \SebastianBergmann\Comparator\ComparisonFailure('', '', json_encode(['errors' => [['message' => 'Unauthorized']]], JSON_PRETTY_PRINT), json_encode($json, JSON_PRETTY_PRINT))
+                );
+            }
+
+            Assert::assertTrue(
+                collect($json['errors'])->map->message->contains('Unauthorized'),
+                'No unauthorized error message in response'
+            );
+
+            return $this;
+        });
     }
 }

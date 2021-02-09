@@ -4,6 +4,7 @@ namespace Statamic\Http\Controllers\CP\Collections;
 
 use Illuminate\Http\Request;
 use Statamic\Facades\Entry;
+use Statamic\Facades\User;
 use Statamic\Http\Controllers\CP\CpController;
 use Statamic\Support\Arr;
 
@@ -13,11 +14,13 @@ class CollectionStructureController extends CpController
     {
         $this->authorize('reorder', $collection);
 
-        $deletedEntries = collect(
-            $request->deletedEntries ?? []
-        )->map(function ($id) {
-            return Entry::find($id);
-        });
+        $deletedEntries = collect($request->deletedEntries ?? [])
+            ->map(function ($id) {
+                return Entry::find($id);
+            })
+            ->filter(function ($entry) {
+                return User::current()->can('delete', $entry);
+            });
 
         if ($request->deleteLocalizationBehavior === 'copy') {
             $deletedEntries->each->detachLocalizations();

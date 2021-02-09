@@ -6,6 +6,7 @@ use Statamic\Contracts\Data\Localization;
 use Statamic\Exceptions\CollectionNotFoundException;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Scope;
 use Statamic\Facades\Site;
 use Statamic\Http\Resources\CP\Entries\Entries as EntriesResource;
@@ -225,5 +226,16 @@ class Entries extends Relationship
         return empty($collections = $this->config('collections'))
             ? Collection::handles()->all()
             : $collections;
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type('EntryInterface');
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
     }
 }
