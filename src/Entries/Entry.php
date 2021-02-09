@@ -50,6 +50,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $locale;
     protected $localizations;
     protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -138,12 +139,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         ];
     }
 
-    public function deleteQuietly()
-    {
-        return $this->delete(false);
-    }
-
-    public function delete($deleteWithEvents = true)
+    public function delete()
     {
         if ($this->descendants()->map->fresh()->filter()->isNotEmpty()) {
             throw new \Exception('Cannot delete an entry with localizations.');
@@ -167,9 +163,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         Facades\Entry::delete($this);
 
-        if ($deleteWithEvents) {
-            EntryDeleted::dispatch($this);
-        }
+        EntryDeleted::dispatch($this);
 
         return true;
     }
@@ -276,14 +270,20 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function saveQuietly()
     {
-        return $this->save(false);
+        $this->disableEvents();
+
+        $result = $this->save();
+
+        $this->enableEvents();
+
+        return $result;
     }
 
-    public function save($saveWithEvents = true)
+    public function save()
     {
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
-        if ($saveWithEvents) {
+        if ($this->withEvents) {
             if (EntrySaving::dispatch($this) === false) {
                 return false;
             }
@@ -305,7 +305,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $callback($this);
         }
 
-        if ($saveWithEvents) {
+        if ($this->withEvents) {
             EntrySaved::dispatch($this);
         }
 
@@ -678,6 +678,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function values()
     {
         return $this->collection()->cascade()->merge($this->originValues());
+    }
+
+    public function disableEvents()
+    {
+        $this->withEvents = false;
+    }
+
+    public function enableEvents()
+    {
+        $this->withEvents = true;
     }
 
     public function defaultAugmentedArrayKeys()
