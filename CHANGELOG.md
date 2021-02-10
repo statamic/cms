@@ -23,6 +23,10 @@
 - Nav and Collection structure tree API endpoints [#2999](https://github.com/statamic/cms/issues/2999)
 - Entry author permissions [#3053](https://github.com/statamic/cms/issues/3053)
 
+### What's changing
+- The `date` fieldtype now augments to Carbon instances. If you use them in Antlers without any modifiers, they will now be output using the default
+  `date_format` (e.g. January 1st, 2020). Previously, the raw value (e.g. 2020-01-02) would have been output. Actual entry dates (i.e. the `date` field) would have behaved this way already. If you were using a modifier (e.g. `format`), there will be no change.
+
 
 
 ## 3.0.42 (2021-02-04)
