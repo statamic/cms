@@ -624,6 +624,21 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+        $entry = (new Entry)->id('a')->collection(new Collection);
+        Facades\Entry::shouldReceive('save')->with($entry);
+        Facades\Entry::shouldReceive('taxonomize')->with($entry);
+
+        $return = $entry->saveQuietly();
+
+        $this->assertTrue($return);
+        Event::assertNotDispatched(EntrySaving::class);
+        Event::assertNotDispatched(EntrySaved::class);
+    }
+
+    /** @test */
     public function it_clears_blink_caches_when_saving()
     {
         $collection = tap(Collection::make('test')->structure(new CollectionStructure))->save();
