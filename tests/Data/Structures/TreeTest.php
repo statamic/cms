@@ -279,6 +279,37 @@ class TreeTest extends TestCase
 
     /**
      * @test
+     * @see https://github.com/statamic/cms/issues/3148
+     */
+    public function it_doesnt_get_moved_to_root_if_its_already_there_and_the_target_is_null()
+    {
+        $tree = $this->tree()->tree($arr = [
+            [
+                'entry' => 'pages-home',
+            ],
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                    ],
+                    [
+                        'entry' => 'pages-directors',
+                    ],
+                ],
+            ],
+            [
+                'entry' => 'pages-blog',
+            ],
+        ]);
+
+        $tree->move('pages-about', null);
+
+        $this->assertEquals($arr, $tree->tree());
+    }
+
+    /**
+     * @test
      * @see https://github.com/statamic/cms/issues/1548
      **/
     public function it_can_move_the_root()
@@ -400,6 +431,85 @@ class TreeTest extends TestCase
         $tree->tree($secondContents);
         $tree->tree();
         $tree->tree();
+    }
+
+    /** @test */
+    public function it_cannot_move_into_root_if_structure_expects_root()
+    {
+        $this->expectExceptionMessage('Root page cannot have children');
+
+        $tree = $this->tree()->tree([
+            [
+                'entry' => 'pages-home',
+            ],
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                    ],
+                    [
+                        'entry' => 'pages-directors',
+                    ],
+                ],
+            ],
+            [
+                'entry' => 'pages-blog',
+            ],
+        ]);
+
+        $tree->move('pages-board', 'pages-home');
+    }
+
+    /** @test */
+    public function it_can_move_into_root_if_structure_does_not_expect_root()
+    {
+        $tree = $this->tree();
+        $tree->structure()->expectsRoot(false);
+
+        $tree->tree([
+            [
+                'entry' => 'pages-home',
+            ],
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                    ],
+                    [
+                        'entry' => 'pages-directors',
+                    ],
+                ],
+            ],
+            [
+                'entry' => 'pages-blog',
+            ],
+        ]);
+
+        $tree->move('pages-board', 'pages-home');
+
+        $this->assertEquals([
+            [
+                'entry' => 'pages-home',
+                'children' => [
+                    [
+                        'entry' => 'pages-board',
+                    ],
+                ],
+            ],
+            [
+                'entry' => 'pages-about',
+                'children' => [
+                    [
+                        'entry' => 'pages-directors',
+                    ],
+                ],
+            ],
+            [
+                'entry' => 'pages-blog',
+            ],
+        ], $tree->tree());
     }
 
     protected function tree()

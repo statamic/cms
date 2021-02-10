@@ -13,6 +13,12 @@ use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 class Yaml
 {
     protected $file;
+    protected $yaml;
+
+    public function __construct(SymfonyYaml $yaml)
+    {
+        $this->yaml = $yaml;
+    }
 
     public function file($file)
     {
@@ -51,7 +57,7 @@ class Yaml
         }
 
         try {
-            $yaml = SymfonyYaml::parse($str);
+            $yaml = $this->yaml->parse($str);
         } catch (\Exception $e) {
             throw $this->viewException($e, $str);
         }
@@ -81,7 +87,7 @@ class Yaml
             $data['content'] = $content;
         }
 
-        return SymfonyYaml::dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
+        return $this->yaml->dump($data, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK);
     }
 
     /**

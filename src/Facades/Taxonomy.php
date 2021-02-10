@@ -3,7 +3,7 @@
 namespace Statamic\Facades;
 
 use Illuminate\Support\Facades\Facade;
-use Statamic\Stache\Repositories\TaxonomyRepository;
+use Statamic\Contracts\Taxonomies\TaxonomyRepository;
 
 /**
  * @method static \Illuminate\Support\Collection all()
