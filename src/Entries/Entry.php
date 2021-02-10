@@ -308,11 +308,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $callback($this);
         }
 
-        if ($isNew) {
-            EntryCreated::dispatch($this);
-        }
-
         if ($this->withEvents) {
+            if ($isNew) {
+                EntryCreated::dispatch($this);
+            }
+
             EntrySaved::dispatch($this);
         }
 
