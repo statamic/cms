@@ -1828,6 +1828,19 @@ EOT;
     }
 
     /** @test */
+    public function it_can_remove_escaping_characters_from_tenary_output_with_truth_coalescence()
+    {
+        $vars = [
+            'truthy' => true,
+            'string' => "Let's work together",
+            'link' => 'https://statamic.com',
+        ];
+
+        $this->assertEquals("Let's work together", $this->parse('{{ truthy ?= string }}', $vars));
+        $this->assertEquals('https://statamic.com', $this->parse('{{ truthy ?= link }}', $vars));
+    }
+
+    /** @test */
     public function empty_collections_are_considered_empty_in_conditions()
     {
         $template = '{{ if stuff }}yes{{ else }}no{{ /if }}';
