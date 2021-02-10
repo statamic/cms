@@ -645,7 +645,7 @@ class EntryTest extends TestCase
         Event::assertDispatched(EntrySaved::class, 3);
         Event::assertDispatched(EntryCreated::class, 1);
     }
-    
+
     /** @test */
     public function it_saves_quietly()
     {
