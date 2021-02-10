@@ -12,8 +12,9 @@
                    :value="option.value"
                    :disabled="isReadOnly"
                    :checked="value === option.value"
+                   :id="name + '[' + option.label + ']'"
             />
-            <label :for="name">
+            <label :for="name + '[' + option.label + ']'">
                 {{ option.label || option.value }}
             </label>
         </div>
