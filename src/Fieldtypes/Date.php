@@ -95,16 +95,12 @@ class Date extends Fieldtype
         }
 
         if ($this->config('mode') === 'range') {
-
             // If switching from single to range, all bets are off.
             if (! is_array($data)) {
                 return null;
             }
 
-            return [
-                'start' => Carbon::parse($data['start'])->format('Y-m-d'),
-                'end' => Carbon::parse($data['end'])->format('Y-m-d'),
-            ];
+            return $data;
         }
 
         // If switching from range mode to single, use the start date.
@@ -151,7 +147,24 @@ class Date extends Fieldtype
             return $value;
         }
 
-        return Carbon::createFromFormat($this->dateFormat($value), $value);
+        if ($this->config('mode') === 'range') {
+            return [
+                'start' => Carbon::createFromFormat($this->dateFormat($value['start']), $value['start'])->startOfDay(),
+                'end' => Carbon::createFromFormat($this->dateFormat($value['end']), $value['end'])->startOfDay(),
+            ];
+        }
+
+        $date = Carbon::createFromFormat($this->dateFormat($value), $value);
+
+        // Make sure that if it was only a date saved, then the time would be reset
+        // to the beginning of the day, otherwise it would inherit the hour and
+        // minute from the current time. If they've defined a custom format
+        // we'll skip this since it'll already be what they wanted.
+        if (! $this->config('format') && strlen($value) === 10) {
+            $date->startOfDay();
+        }
+
+        return $date;
     }
 
     public function toGqlType()
