@@ -612,7 +612,7 @@ class EntryTest extends TestCase
         $entry = (new Entry)->id('a')->collection(new Collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
-        Facades\Entry::shouldReceive('find')->with('a')->once();
+        Facades\Entry::shouldReceive('find')->with('a')->once()->andReturnNull();
 
         $return = $entry->save();
 
@@ -633,15 +633,16 @@ class EntryTest extends TestCase
         $entry = (new Entry)->id('1')->collection(new Collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
-        Facades\Entry::shouldReceive('find')->with('1');
+        Facades\Entry::shouldReceive('find')->with('1')->times(3)->andReturn(null, $entry, $entry);
 
+        $entry->save();
         $entry->save();
         $entry->save();
 
         Event::assertDispatched(EntryCreated::class, function ($event) use ($entry) {
             return $event->entry === $entry;
         });
-        Event::assertDispatched(EntrySaved::class, 2);
+        Event::assertDispatched(EntrySaved::class, 3);
         Event::assertDispatched(EntryCreated::class, 1);
     }
 
@@ -673,6 +674,7 @@ class EntryTest extends TestCase
         $entry = (new Entry)->id('a')->collection(new Collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
+        Facades\Entry::shouldReceive('find')->with('a')->times(2)->andReturn(null, $entry);
         $callbackOneRan = 0;
         $callbackTwoRan = 0;
 
