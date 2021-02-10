@@ -155,7 +155,7 @@ class TermsController extends CpController
 
         $fields->validate([
             'title' => 'required',
-            'slug' => 'required|alpha_dash|unique_term_value:'.$taxonomy->handle().','.$taxonomy->id().','.$site->handle(),
+            'slug' => 'required|alpha_dash|unique_term_value:'.$taxonomy->handle().','.$term->id().','.$site->handle(),
         ]);
 
         $values = $fields->process()->values();
