@@ -1,5 +1,61 @@
 # Release Notes
 
+## 3.0.42 (2021-02-04)
+
+### What's fixed
+- Fix error in asset listings when one has recently been deleted. [#3201](https://github.com/statamic/cms/issues/3201)
+- Fix Taxonomy facade accessor. [#3199](https://github.com/statamic/cms/issues/3199)
+- Small clean up of `trans` tag. [#3197](https://github.com/statamic/cms/issues/3197)
+
+
+
+## 3.0.41 (2021-02-03)
+
+### What's new
+- Added a `ray` modifier. [#3137](https://github.com/statamic/cms/issues/3137)
+
+### What's improved
+- Form email subjects can be translated. [#3144](https://github.com/statamic/cms/issues/3144)
+- View site button in CP uses the selected site. [#3139](https://github.com/statamic/cms/issues/3139)
+- Updated Danish, German, and French translations. [#3161](https://github.com/statamic/cms/issues/3161) [#3134](https://github.com/statamic/cms/issues/3134) [#3129](https://github.com/statamic/cms/issues/3129)
+
+### What's fixed
+- Prevent moving pages to end of top level when already there. [#3152](https://github.com/statamic/cms/issues/3152)
+- Fix form widget styling. [#3169](https://github.com/statamic/cms/issues/3169)
+- Fix Bard line wrapping issue. [#3115](https://github.com/statamic/cms/issues/3115)
+- Inject the Symfony Yaml component. [#3164](https://github.com/statamic/cms/issues/3164)
+- Adjust Action Facade docblock [#3150](https://github.com/statamic/cms/issues/3150)
+
+
+
+## 3.0.40 (2021-01-21)
+
+### What's fixed
+- Fix error when saving a root page. [#3132](https://github.com/statamic/cms/issues/3132)
+
+
+
+## 3.0.39 (2021-01-19)
+
+### What's improved
+- Fixed a handful of translation issues. [#2511](https://github.com/statamic/cms/issues/2511) [#2520](https://github.com/statamic/cms/issues/2520) [#2515](https://github.com/statamic/cms/issues/2515) [#2510](https://github.com/statamic/cms/issues/2510) [#2509](https://github.com/statamic/cms/issues/2509) [#2641](https://github.com/statamic/cms/issues/2641) [#2514](https://github.com/statamic/cms/issues/2514) [#3119](https://github.com/statamic/cms/issues/3119)
+- The `multisite` command will enable pro and update your config file for you. [#3125](https://github.com/statamic/cms/issues/3125)
+
+### What's fixed
+- Fix error in the `multisite` command. [#3125](https://github.com/statamic/cms/issues/3125)
+- Fix table fieldtype duplicating data. [#2470](https://github.com/statamic/cms/issues/2470)
+- Fix table fieldtype not showing delete row button. [#2790](https://github.com/statamic/cms/issues/2790)
+- Fix entries etc not being removed from search index when deleted. [#3121](https://github.com/statamic/cms/issues/3121)
+- Fix API URL related error when using Live Preview while creating an entry. [#3112](https://github.com/statamic/cms/issues/3112)
+- Fix time being added to the date fieldtype unnecessarily. [#3118](https://github.com/statamic/cms/issues/3118)
+- Prevent null values from being saved in Bard and Replicator fields. [#3126](https://github.com/statamic/cms/issues/3126)
+- Prevent a situation where you could move a page into a child of the root, which isn't allowed. [#3104](https://github.com/statamic/cms/issues/3104)
+- Prevent orderable collections from having a parent field. [#2012](https://github.com/statamic/cms/issues/2012)
+- Removed route model binding for users. [#3088](https://github.com/statamic/cms/issues/3088)
+- Fix 404s within the CP rendering as front-end 404s. [#3098](https://github.com/statamic/cms/issues/3098)
+
+
+
 ## 3.0.38 (2021-01-11)
 
 ### What's new

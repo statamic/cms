@@ -97,6 +97,7 @@ class EntriesController extends CpController
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
             'collection' => $collection->handle(),
+            'collectionHasRoutes' => ! is_null($collection->route($entry->locale())),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => User::current()->cant('edit', $entry),
             'locale' => $entry->locale(),
@@ -179,7 +180,7 @@ class EntriesController extends CpController
             $entry->afterSave(function ($entry) use ($parent) {
                 $tree = $entry->structure()->in($entry->locale());
 
-                if (optional($tree->page($parent))->isRoot()) {
+                if ($parent && optional($tree->page($parent))->isRoot()) {
                     $parent = null;
                 }
 
@@ -244,6 +245,7 @@ class EntriesController extends CpController
             'values' => $values->all(),
             'meta' => $fields->meta(),
             'collection' => $collection->handle(),
+            'collectionHasRoutes' => ! is_null($collection->route($site->handle())),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
             'locale' => $site->handle(),
