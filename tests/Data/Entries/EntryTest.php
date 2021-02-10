@@ -620,6 +620,9 @@ class EntryTest extends TestCase
         Event::assertDispatched(EntrySaving::class, function ($event) use ($entry) {
             return $event->entry === $entry;
         });
+        Event::assertDispatched(EntryCreated::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
         Event::assertDispatched(EntrySaved::class, function ($event) use ($entry) {
             return $event->entry === $entry;
         });
@@ -639,9 +642,6 @@ class EntryTest extends TestCase
         $entry->save();
         $entry->save();
 
-        Event::assertDispatched(EntryCreated::class, function ($event) use ($entry) {
-            return $event->entry === $entry;
-        });
         Event::assertDispatched(EntrySaved::class, 3);
         Event::assertDispatched(EntryCreated::class, 1);
     }
@@ -653,12 +653,14 @@ class EntryTest extends TestCase
         $entry = (new Entry)->id('a')->collection(new Collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
+        Facades\Entry::shouldReceive('find')->with('a')->once()->andReturnNull();
 
         $return = $entry->saveQuietly();
 
         $this->assertTrue($return);
         Event::assertNotDispatched(EntrySaving::class);
         Event::assertNotDispatched(EntrySaved::class);
+        Event::assertNotDispatched(EntryCreated::class);
     }
 
     /** @test */
