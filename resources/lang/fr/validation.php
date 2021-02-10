@@ -85,6 +85,7 @@ return [
     'uploaded' => 'Échec du téléchargement.',
     'url' => 'Le format est invalide.',
     'unique_entry_value' => 'Cette valeur a déjà été prise.',
+    'unique_term_value' => 'Cette valeur a déjà été prise.',
     'unique_user_value' => 'Cette valeur a déjà été prise.',
     'duplicate_field_handle' => 'Le champ avec l’identifiant :handle ne peut pas être utilisé plus d’une fois.',
     'one_site_without_origin' => 'Au moins un site ne doit pas avoir d’origine.',

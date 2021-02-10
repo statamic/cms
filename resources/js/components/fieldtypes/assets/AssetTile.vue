@@ -35,7 +35,7 @@
 
                 </template>
 
-                <div class="asset-controls">
+                <div class="asset-controls" v-if="!readOnly">
                     <button
                         @click="edit"
                         class="btn btn-icon icon icon-pencil"

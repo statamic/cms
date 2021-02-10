@@ -2,6 +2,7 @@
 
 namespace Statamic\Exceptions;
 
+use Statamic\Statamic;
 use Statamic\View\View;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException as SymfonyException;
 
@@ -9,6 +10,10 @@ class NotFoundHttpException extends SymfonyException
 {
     public function render()
     {
+        if (Statamic::isCpRoute()) {
+            return response()->view('statamic::errors.404', [], 404);
+        }
+
         if (view()->exists('errors.404')) {
             return response($this->contents(), 404);
         }

@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\CP\Column;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Scope;
 use Statamic\Facades\User;
 use Statamic\Facades\UserGroup;
@@ -79,6 +80,9 @@ class UsersController extends CpController
 
         $fields = $blueprint->fields()->preProcess();
 
+        $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
+        $expiry = config("auth.passwords.{$broker}.expire") / 60;
+
         $viewData = [
             'title' => __('Create'),
             'values' => $fields->values()->all(),
@@ -87,7 +91,7 @@ class UsersController extends CpController
             'actions' => [
                 'save' => cp_route('users.store'),
             ],
-            'expiry' => config('auth.passwords.'.PasswordReset::BROKER_ACTIVATIONS.'.expire') / 60,
+            'expiry' => $expiry,
         ];
 
         if ($request->wantsJson()) {
@@ -145,6 +149,8 @@ class UsersController extends CpController
 
     public function edit(Request $request, $user)
     {
+        throw_unless($user = User::find($user), new NotFoundHttpException);
+
         $this->authorize('edit', $user);
 
         $blueprint = $user->blueprint();
@@ -187,6 +193,8 @@ class UsersController extends CpController
 
     public function update(Request $request, $user)
     {
+        throw_unless($user = User::find($user), new NotFoundHttpException);
+
         $this->authorize('edit', $user);
 
         $fields = $user->blueprint()->fields()->except(['password'])->addValues($request->all());
@@ -215,6 +223,8 @@ class UsersController extends CpController
 
     public function destroy($user)
     {
+        throw_unless($user = User::find($user), new NotFoundHttpException);
+
         if (! $user = User::find($user)) {
             return $this->pageNotFound();
         }

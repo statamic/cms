@@ -11,7 +11,7 @@ use Statamic\Actions\ActionRepository;
  * @method static mixed for($item, $context = [])
  * @method static mixed forBulk($items, $context = [])
  *
- * @see \Statamic\Assets\ActionRepository
+ * @see \Statamic\Actions\ActionRepository
  */
 class Action extends Facade
 {

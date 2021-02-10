@@ -3,6 +3,7 @@
 namespace Statamic\StaticCaching\Middleware;
 
 use Closure;
+use Statamic\Statamic;
 use Statamic\StaticCaching\Cacher;
 
 class Cache
@@ -26,34 +27,50 @@ class Cache
      */
     public function handle($request, Closure $next)
     {
-        return $next($request);
+        if ($this->canBeCached($request) && ($cached = $this->cacher->getCachedPage($request))) {
+            return response($cached);
+        }
+
+        $response = $next($request);
+
+        if ($this->shouldBeCached($request, $response)) {
+            $this->cacher->cachePage($request, $response);
+        }
+
+        return $response;
     }
 
-    /**
-     * Perform any final actions for the request lifecycle.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \Symfony\Component\HttpFoundation\Response  $response
-     * @return void
-     */
-    public function terminate($request, $response)
+    private function canBeCached($request)
+    {
+        if ($request->method() !== 'GET') {
+            return false;
+        }
+
+        if (Statamic::isCpRoute()) {
+            return false;
+        }
+
+        return true;
+    }
+
+    private function shouldBeCached($request, $response)
     {
         // Only GET requests should be cached. For instance, Live Preview hits frontend URLs as
         // POST requests to preview the changes. We don't want those to trigger any caching,
         // or else pending changes will be shown immediately, even without hitting save.
         if ($request->method() !== 'GET') {
-            return;
+            return false;
         }
 
         // Draft pages should not be cached.
         if ($response->headers->has('X-Statamic-Draft')) {
-            return;
+            return false;
         }
 
         if ($response->getStatusCode() !== 200 || $response->getContent() == '') {
-            return;
+            return false;
         }
 
-        $this->cacher->cachePage($request, $response);
+        return true;
     }
 }
