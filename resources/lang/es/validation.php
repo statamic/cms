@@ -85,6 +85,7 @@ return [
     'uploaded' => 'Error al subir',
     'url' => 'El formato no es válido',
     'unique_entry_value' => 'Este valor ya ha sido tomado.',
+    'unique_term_value' => 'Este valor ya ha sido tomado.',
     'unique_user_value' => 'Este valor ya ha sido tomado.',
     'duplicate_field_handle' => 'El campo con un identificador de :handle no se puede usar más de una vez.',
     'one_site_without_origin' => 'Al menos un sitio no debe tener un origen.',

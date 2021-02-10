@@ -155,7 +155,7 @@ class TermsController extends CpController
 
         $fields->validate([
             'title' => 'required',
-            'slug' => 'required|alpha_dash',
+            'slug' => 'required|alpha_dash|unique_term_value:'.$taxonomy->handle().','.$term->id().','.$site->handle(),
         ]);
 
         $values = $fields->process()->values();
@@ -252,7 +252,7 @@ class TermsController extends CpController
 
         $fields->validate([
             'title' => 'required',
-            'slug' => 'required',
+            'slug' => 'required|unique_term_value:'.$taxonomy->handle().',null,'.$site->handle(),
         ]);
 
         $values = $fields->process()->values()->except(['slug', 'blueprint']);
