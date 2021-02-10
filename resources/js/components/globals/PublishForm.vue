@@ -38,8 +38,8 @@
 
         <div v-if="fieldset.empty" class="text-center mt-5 border-2 border-dashed rounded-lg px-4 py-8">
             <div class="max-w-md mx-auto opacity-50">
-                <h1 class="my-3">This Global Set has no fields.</h1>
-                <p>You can add fields to the Blueprint, or you can manually add variables to the set itself.</p>
+                <h1 class="my-3" v-text="__('This Global Set has no fields.')" />
+                <p v-text="__('messages.global_set_no_fields_description')" />
             </div>
         </div>
 

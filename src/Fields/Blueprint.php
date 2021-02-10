@@ -14,6 +14,7 @@ use Statamic\Events\BlueprintDeleted;
 use Statamic\Events\BlueprintSaved;
 use Statamic\Exceptions\DuplicateFieldException;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -25,6 +26,7 @@ class Blueprint implements Augmentable
     protected $handle;
     protected $namespace;
     protected $order;
+    protected $hidden = false;
     protected $initialPath;
     protected $contents;
     protected $fieldsCache;
@@ -71,6 +73,22 @@ class Blueprint implements Augmentable
         return $this->order;
     }
 
+    public function setHidden(?bool $hidden)
+    {
+        if (is_null($hidden)) {
+            $hidden = false;
+        }
+
+        $this->hidden = $hidden;
+
+        return $this;
+    }
+
+    public function hidden()
+    {
+        return $this->hidden;
+    }
+
     public function setInitialPath(string $path)
     {
         $this->initialPath = $path;
@@ -103,6 +121,18 @@ class Blueprint implements Augmentable
 
     public function contents(): array
     {
+        return Blink::once($this->contentsBlinkKey(), function () {
+            return $this->getContents();
+        });
+    }
+
+    private function contentsBlinkKey()
+    {
+        return "blueprint-contents-{$this->namespace()}-{$this->handle()}";
+    }
+
+    private function getContents()
+    {
         $contents = $this->contents;
 
         $contents['sections'] = $contents['sections'] ?? [
@@ -114,7 +144,10 @@ class Blueprint implements Augmentable
         }
 
         return array_filter(
-            array_merge(['order' => $this->order], $contents)
+            array_merge([
+                'hide' => $this->hidden,
+                'order' => $this->order,
+            ], $contents)
         );
     }
 
@@ -418,6 +451,8 @@ class Blueprint implements Augmentable
     protected function resetFieldsCache()
     {
         $this->fieldsCache = null;
+
+        Blink::forget($this->contentsBlinkKey());
 
         return $this;
     }

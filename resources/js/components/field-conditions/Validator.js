@@ -26,7 +26,7 @@ export default class {
             return this.passesCustomCondition(this.prepareCondition(conditions));
         }
 
-        conditions = this.converter.fromBlueprint(conditions);
+        conditions = this.converter.fromBlueprint(conditions, this.field.prefix);
 
         let passes = this.passOnAny
             ? this.passesAnyConditions(conditions)

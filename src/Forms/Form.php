@@ -8,13 +8,11 @@ use Statamic\Events\FormBlueprintFound;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
 use Statamic\Facades\Blueprint;
-use Statamic\Facades\Config;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Support\Arr;
-use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Form implements FormContract

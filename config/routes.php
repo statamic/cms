@@ -10,7 +10,7 @@ return [
     | Statamic adds its own routes to the front-end of your site. You are
     | free to disable this behavior.
     |
-    | More info: https://docs.statamic.com/routing
+    | More info: https://statamic.dev/routing
     |
     */
 

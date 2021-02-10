@@ -49,7 +49,7 @@ class UserPolicy
         $user = User::fromUser($user);
         $authed = User::fromUser($authed);
 
-        if ($authed === $user) {
+        if ($authed->id() === $user->id()) {
             return true; // Users may change their own passwords.
         }
 

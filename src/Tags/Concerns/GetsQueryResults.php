@@ -2,6 +2,8 @@
 
 namespace Statamic\Tags\Concerns;
 
+use Statamic\Facades\Blink;
+
 trait GetsQueryResults
 {
     protected function results($query)
@@ -36,7 +38,11 @@ trait GetsQueryResults
             $this->queryPaginationFriendlyOffset($query, $offset);
         }
 
-        return tap($query->paginate($perPage), function ($paginator) {
+        $paginator = $query->paginate($perPage);
+
+        Blink::put('tag-paginator', $paginator);
+
+        return tap($paginator, function ($paginator) {
             $paginator->setCollection($paginator->getCollection()->values());
         });
     }

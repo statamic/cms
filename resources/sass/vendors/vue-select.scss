@@ -1,5 +1,5 @@
 .v-select {
-	@apply rounded;
+	@apply rounded min-w-0;
 	position: relative;
 	font-family: inherit
 }
@@ -54,6 +54,10 @@
 	.vs--disabled & {
 		@apply bg-grey-20;
 	}
+}
+
+.vs__selected-options {
+    @apply min-w-0;
 }
 
 .v-select:not(.vs--unsearchable) .vs__selected-options {

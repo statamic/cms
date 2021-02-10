@@ -115,7 +115,7 @@ class Str extends \Illuminate\Support\Str
 
     public static function isUrl($string)
     {
-        return self::startsWith($string, ['http://', 'https://', '/']);
+        return self::startsWith($string, '/') || filter_var($string, FILTER_VALIDATE_URL) !== false;
     }
 
     public static function deslugify($string)

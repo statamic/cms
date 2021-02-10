@@ -30,6 +30,13 @@ class Associations extends Index
             })->all();
     }
 
+    public function forgetEntry($id)
+    {
+        $this->items = $this->items()->reject(function ($association) use ($id) {
+            return $association['entry'] === $id;
+        })->all();
+    }
+
     public function updateItem($item)
     {
         //

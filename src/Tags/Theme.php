@@ -4,7 +4,6 @@ namespace Statamic\Tags;
 
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
-use Statamic\Facades\Path;
 use Statamic\Facades\URL;
 use Statamic\Support\Str;
 

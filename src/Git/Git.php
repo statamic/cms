@@ -4,7 +4,6 @@ namespace Statamic\Git;
 
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Processes\Git as GitProcess;
-use Statamic\Events\Event;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Path;
 use Statamic\Facades\User;

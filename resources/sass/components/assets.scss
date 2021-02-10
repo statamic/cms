@@ -115,25 +115,27 @@
 /* Solo Asset (max_files: 1)
   ========================================================================== */
 
- .asset-solo-container {
+.asset-solo-container {
 
     .asset-tile {
         padding: 0;
         max-width: 300px;
     }
 
-    .asset-tile .asset-thumb img {
-         height: auto;
-         width: auto;
-         max-width: 100%;
-         max-height: 100%;
+    .asset-tile .asset-thumb {
+        img,
+        .svg-img {
+            height: auto;
+            width: 100%;
+            max-width: 100%;
+            max-height: 100%;
+        }
+    }
 
-     }
-
-     .asset-tile .asset-meta {
+    .asset-tile .asset-meta {
          max-width: 100%;
-     }
- }
+    }
+}
 
 
  /* Asset Tile
@@ -145,14 +147,19 @@
     padding: 8px;
 
     .asset-thumb {
-        text-align: center;
+        @apply shadow flex justify-center items-center;
+        overflow: hidden;
 
-        img {
-            @apply shadow block w-auto h-auto;
+        img,
+        .svg-img {
             border: 5px solid #fff;
             max-height: 150px;
             max-width: 150px;
             margin: 0 auto;
+        }
+
+        img {
+            @apply block w-auto h-auto;
         }
     }
 
@@ -188,17 +195,12 @@
         border-radius: 4px;
     }
 
-    &.is-svg {
-        .asset-thumb-container {
-            background: url('../img/trans-bg.gif');
-        }
-    }
-
     .svg-img {
         background-size: contain;
         background-position: 50% 50%;
         background-repeat: no-repeat;
         padding-bottom: 100%;
+        padding-bottom: calc(100% - 10px); // take the border of 5px each into account
         height: 150px;
         width: 150px;
     }

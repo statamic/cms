@@ -5,6 +5,7 @@
     </div>
     <collection-widget
         collection="{{ $collection->handle() }}"
+        :filters="{{ $filters->toJson() }}"
         initial-sort-column="{{ $sortColumn }}"
         initial-sort-direction="{{ $sortDirection }}"
         :initial-per-page="{{ $limit }}"

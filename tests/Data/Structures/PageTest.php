@@ -39,7 +39,9 @@ class PageTest extends TestCase
             ->with('example-page')
             ->andReturn($entry = new Entry);
 
-        $page = new Page;
+        $tree = $this->mock(Tree::class)->shouldReceive('entry')->with('example-page')->once()->andReturn($entry)->getMock();
+
+        $page = (new Page)->setTree($tree);
         $this->assertNull($page->entry());
 
         $return = $page->setEntry('example-page');
@@ -55,7 +57,9 @@ class PageTest extends TestCase
             ->with(3)
             ->andReturn($entry = new Entry);
 
-        $page = new Page;
+        $tree = $this->mock(Tree::class)->shouldReceive('entry')->with(3)->once()->andReturn($entry)->getMock();
+
+        $page = (new Page)->setTree($tree);
         $this->assertNull($page->entry());
 
         $return = $page->setEntry(3);

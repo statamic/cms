@@ -208,6 +208,58 @@ class FieldsTest extends TestCase
         $this->assertEquals('test_two', $fields['test_two']->handle());
     }
 
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/2869
+     **/
+    public function it_prefixes_the_handles_of_nested_imported_fieldsets()
+    {
+        $outer = (new Fieldset)->setHandle('outer')->setContents([
+            'fields' => [
+                [
+                    'import' => 'inner',
+                    'prefix' => 'prefix_',
+                ],
+            ],
+        ]);
+
+        $inner = (new Fieldset)->setHandle('inner')->setContents([
+            'fields' => [
+                [
+                    'handle' => 'foo',
+                    'field' => ['type' => 'text'],
+                ],
+                [
+                    'handle' => 'bar',
+                    'field' => ['type' => 'text'],
+                ],
+            ],
+        ]);
+
+        FieldsetRepository::shouldReceive('find')->with('outer')->times(2)->andReturn($outer);
+        FieldsetRepository::shouldReceive('find')->with('inner')->times(1)->andReturn($inner);
+
+        $fields = new Fields([
+            [
+                'import' => 'outer',
+                'prefix' => 'first_',
+            ],
+            [
+                'import' => 'outer',
+                'prefix' => 'second_',
+            ],
+        ]);
+
+        $fields = $fields->all();
+
+        $this->assertInstanceOf(Collection::class, $fields);
+        $this->assertCount(4, $fields);
+        $this->assertEquals('first_prefix_foo', $fields['first_prefix_foo']->handle());
+        $this->assertEquals('first_prefix_bar', $fields['first_prefix_bar']->handle());
+        $this->assertEquals('second_prefix_foo', $fields['second_prefix_foo']->handle());
+        $this->assertEquals('second_prefix_bar', $fields['second_prefix_bar']->handle());
+    }
+
     /** @test */
     public function it_throws_exception_when_trying_to_import_a_non_existent_fieldset()
     {
@@ -355,6 +407,7 @@ class FieldsTest extends TestCase
         $this->assertEquals([
             [
                 'handle' => 'one',
+                'prefix' => null,
                 'type' => 'text',
                 'display' => 'One',
                 'instructions' => 'One instructions',
@@ -366,9 +419,11 @@ class FieldsTest extends TestCase
                 'input_type' => 'text',
                 'prepend' => null,
                 'append' => null,
+                'antlers' => false,
             ],
             [
                 'handle' => 'two',
+                'prefix' => null,
                 'type' => 'textarea',
                 'display' => 'Two',
                 'instructions' => 'Two instructions',
@@ -376,6 +431,76 @@ class FieldsTest extends TestCase
                 'validate' => 'min:2',
                 'character_limit' => null,
                 'component' => 'textarea',
+                'antlers' => false,
+            ],
+        ], $fields->toPublishArray());
+    }
+
+    /** @test */
+    public function converts_to_array_suitable_for_rendering_prefixed_conditional_fields_in_publish_component()
+    {
+        FieldsetRepository::shouldReceive('find')
+            ->with('deeper_partial')
+            ->andReturn((new Fieldset)->setHandle('deeper_partial')->setContents([
+                'title' => 'Deeper Partial',
+                'fields' => [
+                    [
+                        'handle' => 'two',
+                        'field' => ['type' => 'text'],
+                    ],
+                ],
+            ]));
+
+        FieldsetRepository::shouldReceive('find')
+            ->with('partial')
+            ->andReturn((new Fieldset)->setHandle('partial')->setContents([
+                'title' => 'Partial',
+                'fields' => [
+                    [
+                        'handle' => 'one',
+                        'field' => ['type' => 'text'],
+                    ],
+                    [
+                        'import' => 'deeper_partial',
+                        'prefix' => 'deeper_',
+                    ],
+                ],
+            ]));
+
+        $fields = new Fields([
+            ['import' => 'partial', 'prefix' => 'nested_'],
+        ]);
+
+        $this->assertEquals([
+            [
+                'handle' => 'nested_one',
+                'prefix' => 'nested_',
+                'type' => 'text',
+                'display' => 'Nested One',
+                'placeholder' => null,
+                'input_type' => 'text',
+                'character_limit' => 0,
+                'prepend' => null,
+                'append' => null,
+                'component' => 'text',
+                'instructions' => null,
+                'required' => false,
+                'antlers' => false,
+            ],
+            [
+                'handle' => 'nested_deeper_two',
+                'prefix' => 'nested_deeper_',
+                'type' => 'text',
+                'display' => 'Nested Deeper Two',
+                'placeholder' => null,
+                'input_type' => 'text',
+                'character_limit' => 0,
+                'prepend' => null,
+                'append' => null,
+                'component' => 'text',
+                'instructions' => null,
+                'required' => false,
+                'antlers' => false,
             ],
         ], $fields->toPublishArray());
     }

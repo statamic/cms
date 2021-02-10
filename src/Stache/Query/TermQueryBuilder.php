@@ -3,7 +3,7 @@
 namespace Statamic\Stache\Query;
 
 use Statamic\Facades;
-use Statamic\Facades\Taxonomy;
+use Statamic\Facades\Collection;
 use Statamic\Taxonomies\TermCollection;
 
 class TermQueryBuilder extends Builder
@@ -61,7 +61,7 @@ class TermQueryBuilder extends Builder
             : $this->getKeysFromTaxonomiesWithWheres($taxonomies, $this->wheres);
 
         return $keys->unique(function ($key) {
-            return explode('::', $key)[2];
+            return collect(explode('::', $key))->forget(1)->join('::');
         });
     }
 
@@ -128,5 +128,19 @@ class TermQueryBuilder extends Builder
 
             return $carry;
         }, collect());
+    }
+
+    public function get($columns = ['*'])
+    {
+        $items = parent::get($columns);
+
+        // If a single collection has been queried, we'll supply it to the terms so
+        // things like URLs will be scoped to the collection. We can't do it when
+        // multiple collections are queried because it would be ambiguous.
+        if ($this->collections && count($this->collections) == 1) {
+            $items->each->collection(Collection::findByHandle($this->collections[0]));
+        }
+
+        return $items;
     }
 }

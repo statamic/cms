@@ -8,9 +8,7 @@ use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\Entry;
-use Statamic\Facades\Path;
 use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
@@ -142,6 +140,13 @@ class Term implements TermContract
     public function entries()
     {
         return $this->queryEntries()->get();
+    }
+
+    public function entriesCount()
+    {
+        return Blink::once('term-entries-count-'.$this->id(), function () {
+            return Facades\Term::entriesCount($this);
+        });
     }
 
     public function queryEntries()

@@ -34,6 +34,7 @@ trait OutputsItems
 
     protected function paginatedOutput($paginator)
     {
+        $paginator->withQueryString();
         $as = $this->params->get('as', $this->defaultAsKey ?? 'results');
         $items = $paginator->getCollection()->supplement('total_results', $paginator->total());
 

@@ -9,6 +9,7 @@ use Statamic\Support\Str;
 class Field implements Arrayable
 {
     protected $handle;
+    protected $prefix;
     protected $config;
     protected $value;
     protected $parent;
@@ -36,6 +37,18 @@ class Field implements Arrayable
     public function handle()
     {
         return $this->handle;
+    }
+
+    public function setPrefix($prefix)
+    {
+        $this->prefix = $prefix;
+
+        return $this;
+    }
+
+    public function prefix()
+    {
+        return $this->prefix;
     }
 
     public function type()
@@ -145,6 +158,7 @@ class Field implements Arrayable
     {
         return array_merge($this->preProcessedConfig(), [
             'handle' => $this->handle,
+            'prefix' => $this->prefix,
             'type' => $this->type(),
             'display' => $this->display(),
             'instructions' => $this->instructions(),

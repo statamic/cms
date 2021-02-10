@@ -40,6 +40,7 @@ class ListedTerm extends JsonResource
                 'slug' => $term->slug(),
             ])),
 
+            'permalink' => $term->absoluteUrl(),
             'edit_url' => $term->editUrl(),
             'viewable' => User::current()->can('view', $term),
             'editable' => User::current()->can('edit', $term),

@@ -47,18 +47,29 @@ class TaxonomiesController extends CpController
     {
         $this->authorize('view', $taxonomy);
 
-        $blueprints = $taxonomy->termBlueprints()->map(function ($blueprint) {
-            return [
-                'handle' => $blueprint->handle(),
-                'title' => $blueprint->title(),
-            ];
-        });
+        $blueprints = $taxonomy
+            ->termBlueprints()
+            ->reject->hidden()
+            ->map(function ($blueprint) {
+                return [
+                    'handle' => $blueprint->handle(),
+                    'title' => $blueprint->title(),
+                ];
+            })->values();
+
+        $columns = $taxonomy
+            ->termBlueprint()
+            ->columns()
+            ->setPreferred("taxonomies.{$taxonomy->handle()}.columns")
+            ->rejectUnlisted()
+            ->values();
 
         $viewData = [
             'taxonomy' => $taxonomy,
             'hasTerms' => true, // todo $taxonomy->queryTerms()->count(),
             'blueprints' => $blueprints,
             'site' => Site::selected()->handle(),
+            'columns' => $columns,
             'filters' => Scope::filters('terms', [
                 'taxonomy' => $taxonomy->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),

@@ -2,7 +2,6 @@
 
 namespace Statamic\Auth;
 
-use Statamic\Facades\Blueprint;
 use Statamic\Facades\URL;
 use Statamic\Facades\User;
 use Statamic\Fields\Field;

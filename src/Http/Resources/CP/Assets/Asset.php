@@ -34,7 +34,6 @@ class Asset extends JsonResource
                     'height' => $this->height(),
                     'preview' => $this->previewUrl(),
                     'thumbnail' => $this->thumbnailUrl('small'),
-                    'toenail' => $this->thumbnailUrl('large'),
                 ];
             }),
 

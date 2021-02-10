@@ -30,9 +30,8 @@ export default class SetNode extends Node {
     commands({ type, schema }) {
         return attrs => (state, dispatch) => {
             const { selection } = state;
-            const position = selection.$cursor ? selection.$cursor.pos : selection.$to.pos;
             const node = type.create(attrs);
-            const transaction = state.tr.insert(position, node);
+            const transaction = state.tr.insert(selection.$cursor.pos - 1, node);
             dispatch(transaction);
         };
     }

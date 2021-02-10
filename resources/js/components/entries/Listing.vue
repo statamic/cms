@@ -12,6 +12,7 @@
             :sort="false"
             :sort-column="sortColumn"
             :sort-direction="sortDirection"
+            @visible-columns-updated="visibleColumns = $event"
         >
             <div slot-scope="{ hasSelections }">
                 <div class="card p-0 relative">

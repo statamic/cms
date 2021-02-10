@@ -10,7 +10,7 @@ export default {
 
     computed: {
         limitReached() {
-            return this.currentLength >= this.limit;
+            return this.currentLength > this.limit;
         },
         currentLength() {
             return (this.value) ? this.value.length : 0

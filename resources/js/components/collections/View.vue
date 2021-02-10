@@ -89,6 +89,7 @@
             :collection="handle"
             :initial-sort-column="sortColumn"
             :initial-sort-direction="sortDirection"
+            :initial-columns="columns"
             :filters="filters"
             :run-action-url="runActionUrl"
             :bulk-actions-url="bulkActionsUrl"
@@ -183,6 +184,7 @@ export default {
         structured: { type: Boolean, default: false },
         sortColumn: { type: String, required: true },
         sortDirection: { type: String, required: true },
+        columns: { type: Array, required: true },
         filters: { type: Array, required: true },
         runActionUrl: { type: String, required: true },
         bulkActionsUrl: { type: String, required: true },

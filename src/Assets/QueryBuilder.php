@@ -3,6 +3,7 @@
 namespace Statamic\Assets;
 
 use Exception;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Assets\QueryBuilder as Contract;
 use Statamic\Facades;
@@ -16,15 +17,103 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
 
     protected function getBaseItems()
     {
-        $container = $this->container instanceof AssetContainer
-            ? $this->container
-            : Facades\AssetContainer::find($this->container);
-
         $recursive = $this->folder ? $this->recursive : true;
 
-        return $this->collect($container->files($this->folder, $recursive)->map(function ($path) use ($container) {
-            return $container->asset($path);
-        }));
+        $cacheKey = 'asset-folder-files-'.$this->getContainer()->handle().'-'.$this->folder;
+
+        $assets = $this->getContainer()->files($this->folder, $recursive);
+
+        if (empty($this->wheres) && $this->limit) {
+            $assets = $assets->skip($this->offset)->take($this->limit)->values();
+        }
+
+        if ($this->requiresAssetInstances()) {
+            $assets = $this->convertPathsToAssets($assets);
+        }
+
+        $assets = $this->collect($assets);
+
+        // If any assets were deleted through the filesystem (e.g. manually or
+        // through git) during the file listing cache window, the conversion
+        // above would have resulted in nulls. We remove the nulls here.
+        return $assets->filter()->values();
+    }
+
+    protected function limitItems($items)
+    {
+        if (! empty($this->wheres) || ! $this->limit) {
+            return parent::limitItems($items);
+        }
+
+        return $items;
+    }
+
+    protected function getFilteredItems()
+    {
+        $items = $this->getBaseItems();
+
+        if ($this->requiresAssetInstances()) {
+            $items = $this->filterWheres($items);
+        }
+
+        return $items;
+    }
+
+    public function get($columns = ['*'])
+    {
+        $items = parent::get($columns);
+
+        // If we required asset instances, they would have already been converted.
+        if ($this->requiresAssetInstances()) {
+            return $items;
+        }
+
+        $items = $this->convertPathsToAssets($items);
+
+        // If any assets were deleted through the filesystem (e.g. manually or through git)
+        // during the file listing cache window, the conversion above would have resulted
+        // in nulls. In that case, we'll bust the cache and requery. We also only care
+        // when it's being limited like in pagination or when using the take method.
+        if ($this->hasAnyNulls($items) && $this->limit) {
+            Cache::forget($this->container->filesCacheKey());
+            Cache::forget($this->container->filesCacheKey($this->folder));
+
+            return $this->get($columns);
+        }
+
+        return $items->filter()->values();
+    }
+
+    private function hasAnyNulls($items)
+    {
+        return $items->reject()->isNotEmpty();
+    }
+
+    private function requiresAssetInstances()
+    {
+        if (! empty($this->wheres)) {
+            return true;
+        }
+
+        if (! empty($this->orderBys)) {
+            return true;
+        }
+
+        return false;
+    }
+
+    private function convertPathsToAssets($paths)
+    {
+        return $paths->map(function ($path) {
+            return $this->getContainer()->asset($path);
+        });
+    }
+
+    private function getContainer()
+    {
+        return $this->container instanceof AssetContainer
+            ? $this->container
+            : Facades\AssetContainer::find($this->container);
     }
 
     public function where($column, $operator = null, $value = null)

@@ -149,6 +149,7 @@ Statamic.app({
         showLoginModal: false,
         navOpen: true,
         mobileNavOpen: false,
+        showBanner: true,
         modals: [],
         stacks: [],
         panes: [],
@@ -210,6 +211,10 @@ Statamic.app({
 
         toggleMobileNav() {
             this.mobileNavOpen = ! this.mobileNavOpen;
+        },
+
+        hideBanner() {
+            this.showBanner = false;
         }
     }
 

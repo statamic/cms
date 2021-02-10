@@ -60,8 +60,8 @@ class Manifest extends PackageManifest
             'latestVersion' => data_get($marketplaceData, 'latest_version', null),
             'version' => Str::removeLeft($package['version'], 'v'),
             'namespace' => $namespace,
-            'directory' => $directory,
             'autoload' => $autoload,
+            'provider' => $provider,
 
             // Local data for marketplace GUI?
             'name' => $statamic['name'] ?? Arr::last($providerParts),

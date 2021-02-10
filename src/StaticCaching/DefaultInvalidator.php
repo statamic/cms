@@ -3,6 +3,8 @@
 namespace Statamic\StaticCaching;
 
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Globals\GlobalSet;
+use Statamic\Contracts\Structures\Nav;
 use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Support\Arr;
 
@@ -23,33 +25,50 @@ class DefaultInvalidator implements Invalidator
             return $this->cacher->flush();
         }
 
-        // Invalidate the item's own URL.
-        if ($url = $item->url()) {
-            $this->cacher->invalidateUrl($url);
-        }
-
         if ($item instanceof Entry) {
             $this->invalidateEntryUrls($item);
         } elseif ($item instanceof Term) {
             $this->invalidateTermUrls($item);
+        } elseif ($item instanceof Nav) {
+            $this->invalidateNavUrls($item);
+        } elseif ($item instanceof GlobalSet) {
+            $this->invalidateGlobalUrls($item);
         }
     }
 
     protected function invalidateEntryUrls($entry)
     {
-        $collection = $entry->collectionHandle();
+        if ($url = $entry->url()) {
+            $this->cacher->invalidateUrl($url);
+        }
 
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "collections.$collection.urls")
+            Arr::get($this->rules, "collections.{$entry->collectionHandle()}.urls")
         );
     }
 
     protected function invalidateTermUrls($term)
     {
-        $taxonomy = $term->taxonomyHandle();
+        if ($url = $term->url()) {
+            $this->cacher->invalidateUrl($url);
+        }
 
         $this->cacher->invalidateUrls(
-            Arr::get($this->rules, "taxonomies.$taxonomy.urls")
+            Arr::get($this->rules, "taxonomies.{$term->taxonomyHandle()}.urls")
+        );
+    }
+
+    protected function invalidateNavUrls($nav)
+    {
+        $this->cacher->invalidateUrls(
+            Arr::get($this->rules, "navigation.{$nav->handle()}.urls")
+        );
+    }
+
+    protected function invalidateGlobalUrls($set)
+    {
+        $this->cacher->invalidateUrls(
+            Arr::get($this->rules, "globals.{$set->handle()}.urls")
         );
     }
 }

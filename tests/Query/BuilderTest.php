@@ -1,10 +1,12 @@
 <?php
 
-namespace Tests;
+namespace Tests\Query;
 
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
+use Tests\PreventSavingStacheItemsToDisk;
+use Tests\TestCase;
 
 class BuilderTest extends TestCase
 {

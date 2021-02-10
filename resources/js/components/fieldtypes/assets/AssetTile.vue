@@ -15,7 +15,7 @@
 
         <div class="asset-thumb-container">
 
-            <div class="asset-thumb">
+            <div class="asset-thumb" :class="{ 'bg-checkerboard': canBeTransparent }">
 
                 <!-- Solo Bard -->
                 <template v-if="isImage && isInBardField && !isInAssetBrowser">
@@ -35,7 +35,7 @@
 
                 </template>
 
-                <div class="asset-controls">
+                <div class="asset-controls" v-if="!readOnly">
                     <button
                         @click="edit"
                         class="btn btn-icon icon icon-pencil"

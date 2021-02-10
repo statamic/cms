@@ -13,6 +13,7 @@
         :blueprints='@json($blueprints)'
         sort-column="{{ $collection->sortField() }}"
         sort-direction="{{ $collection->sortDirection() }}"
+        :columns="{{ $columns->toJson() }}"
         :filters="{{ $filters->toJson() }}"
         run-action-url="{{ cp_route('collections.entries.actions.run', $collection->handle()) }}"
         bulk-actions-url="{{ cp_route('collections.entries.actions.bulk', $collection->handle()) }}"

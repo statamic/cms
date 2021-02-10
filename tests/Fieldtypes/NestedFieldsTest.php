@@ -77,6 +77,7 @@ class NestedFieldsTest extends TestCase
                 'validate' => 'required',
                 'component' => 'assets',
                 'handle' => 'image',
+                'prefix' => null,
                 'required' => true,
             ],
         ], $actual);
@@ -139,6 +140,7 @@ class NestedFieldsTest extends TestCase
                     'character_limit' => 0,
                     'prepend' => null,
                     'append' => null,
+                    'antlers' => false,
                     'component' => 'text',
                     'width' => 50,
                     'display' => 'Second Field',

@@ -26,7 +26,7 @@ export default {
         },
         placement: {
             type: String,
-            default: 'bottom-start',
+            default: 'bottom-end',
         },
         offset: {
             type: Array,

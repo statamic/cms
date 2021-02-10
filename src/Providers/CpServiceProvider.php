@@ -68,6 +68,7 @@ class CpServiceProvider extends ServiceProvider
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+            \Statamic\Http\Middleware\CP\ControlPanel::class,
             \Statamic\Http\Middleware\CP\ContactOutpost::class,
         ]);
 

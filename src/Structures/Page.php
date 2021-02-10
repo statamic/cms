@@ -6,12 +6,12 @@ use Illuminate\Contracts\Support\Responsable;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
+use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Routing\UrlBuilder;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
-use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 
@@ -108,7 +108,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable
         }
 
         return Blink::store('structure-page-entries')->once($this->reference, function () {
-            return EntryAPI::find($this->reference);
+            return $this->tree->entry($this->reference);
         });
     }
 
@@ -245,7 +245,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable
         return $this->pages()->flattenedPages();
     }
 
-    public function newAugmentedInstance()
+    public function newAugmentedInstance(): Augmented
     {
         return new AugmentedPage($this);
     }

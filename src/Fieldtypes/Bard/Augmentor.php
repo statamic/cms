@@ -5,7 +5,6 @@ namespace Statamic\Fieldtypes\Bard;
 use ProseMirrorToHtml\Nodes\Image as DefaultImageNode;
 use ProseMirrorToHtml\Renderer;
 use Statamic\Fields\Field;
-use Statamic\Fields\Fields;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Bard\ImageNode as CustomImageNode;
 use Statamic\Fieldtypes\Text;
@@ -138,11 +137,11 @@ class Augmentor
         $augmentMethod = $shallow ? 'shallowAugment' : 'augment';
 
         return $value->map(function ($set) use ($augmentMethod) {
-            if (! $config = $this->fieldtype->config("sets.{$set['type']}.fields")) {
+            if (! $this->fieldtype->config("sets.{$set['type']}.fields")) {
                 return $set;
             }
 
-            $values = (new Fields($config))->addValues($set)->{$augmentMethod}()->values()->all();
+            $values = $this->fieldtype->fields($set['type'])->addValues($set)->{$augmentMethod}()->values()->all();
 
             return array_merge($values, ['type' => $set['type']]);
         })->all();

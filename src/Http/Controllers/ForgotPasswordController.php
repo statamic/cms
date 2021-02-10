@@ -27,7 +27,7 @@ class ForgotPasswordController extends Controller
 
     public function sendResetLinkEmail(Request $request)
     {
-        if ($url = $request->reset_url) {
+        if ($url = $request->_reset_url) {
             PasswordReset::resetFormUrl(URL::makeAbsolute($url));
         }
 

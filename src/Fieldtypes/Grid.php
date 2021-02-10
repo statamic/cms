@@ -102,7 +102,7 @@ class Grid extends Fieldtype
 
     private function fields()
     {
-        return new Fields($this->config('fields'));
+        return new Fields($this->config('fields'), $this->field()->parent());
     }
 
     public function rules(): array

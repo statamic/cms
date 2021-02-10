@@ -17,4 +17,9 @@ class Toggle extends Fieldtype
     {
         return (bool) $data;
     }
+
+    public function augment($data)
+    {
+        return (bool) $data;
+    }
 }

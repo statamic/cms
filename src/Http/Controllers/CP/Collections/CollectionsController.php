@@ -51,19 +51,30 @@ class CollectionsController extends CpController
     {
         $this->authorize('view', $collection, __('You are not authorized to view this collection.'));
 
-        $blueprints = $collection->entryBlueprints()->map(function ($blueprint) {
-            return [
-                'handle' => $blueprint->handle(),
-                'title' => $blueprint->title(),
-            ];
-        });
+        $blueprints = $collection
+            ->entryBlueprints()
+            ->reject->hidden()
+            ->map(function ($blueprint) {
+                return [
+                    'handle' => $blueprint->handle(),
+                    'title' => $blueprint->title(),
+                ];
+            })->values();
 
         $site = $request->site ? Site::get($request->site) : Site::selected();
+
+        $columns = $collection
+            ->entryBlueprint()
+            ->columns()
+            ->setPreferred("collections.{$collection->handle()}.columns")
+            ->rejectUnlisted()
+            ->values();
 
         $viewData = [
             'collection' => $collection,
             'blueprints' => $blueprints,
             'site' => $site->handle(),
+            'columns' => $columns,
             'filters' => Scope::filters('entries', [
                 'collection' => $collection->handle(),
                 'blueprints' => $blueprints->pluck('handle')->all(),

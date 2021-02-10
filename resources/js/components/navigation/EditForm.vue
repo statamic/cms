@@ -74,7 +74,14 @@ export default {
             }
         },
 
-    }
+    },
+
+    created() {
+        this.$keys.bindGlobal(['mod+s'], e => {
+            e.preventDefault();
+            this.submit();
+        });
+    },
 
 }
 </script>

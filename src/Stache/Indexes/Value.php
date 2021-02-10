@@ -22,7 +22,7 @@ class Value extends Index
         }
 
         if ($method === 'entriesCount') {
-            return $item->queryEntries()->count();
+            return $item->entriesCount();
         }
 
         return method_exists($item, $method)

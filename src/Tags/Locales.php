@@ -27,6 +27,14 @@ class Locales extends Tags
     }
 
     /**
+     * The {{ locales:count }} tag.
+     */
+    public function count()
+    {
+        return $this->getLocales()->count();
+    }
+
+    /**
      * The {{ locales:[key] }} tag.
      */
     public function wildcard($key)

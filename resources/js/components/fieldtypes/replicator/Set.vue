@@ -32,7 +32,7 @@
             </div>
         </div>
 
-        <div class="replicator-set-body" v-show="!collapsed">
+        <div class="replicator-set-body" v-if="!collapsed">
             <set-field
                 v-for="field in fields"
                 v-show="showField(field)"
@@ -48,7 +48,7 @@
                 @meta-updated="metaUpdated(field.handle, $event)"
                 @focus="$emit('focus')"
                 @blur="$emit('blur')"
-                @replicator-preview-updated="previews[field.handle] = $event"
+                @replicator-preview-updated="previewUpdated(field.handle, $event)"
             />
         </div>
 
@@ -115,6 +115,7 @@ export default {
             type: String
         },
         isReadOnly: Boolean,
+        previews: Object,
     },
 
     computed: {
@@ -141,10 +142,6 @@ export default {
 
     },
 
-    created() {
-        this.initPreviews();
-    },
-
     methods: {
 
         updated(handle, value) {
@@ -157,6 +154,12 @@ export default {
             let meta = clone(this.meta);
             meta[handle] = value;
             this.$emit('meta-updated', meta);
+        },
+
+        previewUpdated(handle, value) {
+            let previews = this.previews;
+            previews[handle] = value;
+            this.$emit('previews-updated', previews);
         },
 
         destroy() {

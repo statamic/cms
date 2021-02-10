@@ -5,6 +5,7 @@ namespace Statamic\Query;
 use Illuminate\Database\Eloquent\Builder as EloquentBuilder;
 use Statamic\Contracts\Query\Builder;
 use Statamic\Extensions\Pagination\LengthAwarePaginator;
+use Statamic\Support\Arr;
 
 abstract class EloquentQueryBuilder implements Builder
 {
@@ -91,6 +92,8 @@ abstract class EloquentQueryBuilder implements Builder
 
     protected function selectableColumns($columns = ['*'])
     {
+        $columns = Arr::wrap($columns);
+
         if (! in_array('*', $columns)) {
             // Any requested columns that aren't actually columns should just be
             // ignored. In actual Laravel Query Builder, you'd get a database

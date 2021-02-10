@@ -29,6 +29,8 @@ class CollectionStructureController extends CpController
 
         $tree = $this->toTree($request->pages);
 
+        $tree = $collection->structure()->validateTree($tree, $request->site);
+
         $collection
             ->structure()
             ->in($request->site)

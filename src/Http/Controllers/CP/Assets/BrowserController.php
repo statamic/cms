@@ -71,9 +71,7 @@ class BrowserController extends CpController
 
         $folder = $container->assetFolder($path);
 
-        $assets = $folder->queryAssets()
-            ->orderBy($request->sort ?? 'basename', $request->order ?? 'asc')
-            ->paginate(30);
+        $assets = $folder->queryAssets()->paginate(30);
 
         return (new FolderAssetsCollection($assets))->folder($folder);
     }

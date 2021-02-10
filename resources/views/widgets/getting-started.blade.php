@@ -13,6 +13,7 @@
                 <p>{{ __('statamic::messages.getting_started_widget_docs') }}</p>
             </div>
         </a>
+        @if (!Statamic::pro())
         <a href="https://statamic.dev/licensing" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
                 @svg('pro-ribbon')
@@ -22,6 +23,7 @@
                 <p>{{ __('statamic::messages.getting_started_widget_pro') }}</p>
             </div>
         </a>
+        @endif
         <a href="{{ cp_route('collections.create') }}" class="w-full lg:w-1/2 p-2 flex items-start hover:bg-grey-20 rounded-md group">
             <div class="h-8 w-8 mr-2 text-grey-80">
                 @svg('content-writing')

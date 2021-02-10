@@ -3,6 +3,7 @@
 namespace Statamic\Modifiers;
 
 use Carbon\Carbon;
+use Illuminate\Contracts\Support\Arrayable;
 use Illuminate\Support\Collection;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Data\Augmentable;
@@ -10,7 +11,6 @@ use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Data;
 use Statamic\Facades\File;
-use Statamic\Facades\Localization;
 use Statamic\Facades\Markdown;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Path;
@@ -90,7 +90,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return array
+     * @return array|void
      */
     public function alias($value, $params)
     {
@@ -146,8 +146,8 @@ class CoreModifiers extends Modifier
      * Removes a given number ($param[0]) of characters from the end of a variable.
      *
      * @param $value
-     * @param array $params
-     * @return string
+     * @param $params
+     * @return array|false|string
      */
     public function backspace($value, $params)
     {
@@ -473,8 +473,8 @@ class CoreModifiers extends Modifier
      * Uses <!--more--> by default.
      *
      * @param $value
-     * @param array $params
-     * @return string
+     * @param $params
+     * @return array|false|string
      */
     public function excerpt($value, $params)
     {
@@ -753,6 +753,10 @@ class CoreModifiers extends Modifier
      */
     public function joinplode($value, $params)
     {
+        if (is_null($value)) {
+            return '';
+        }
+
         // Workaround to support pipe characters. If there are multiple params
         // that means a pipe was used. We'll just join them for now.
         if (count($params) > 1) {
@@ -1032,7 +1036,7 @@ class CoreModifiers extends Modifier
      */
     public function isUrl($value)
     {
-        return filter_var($value, FILTER_VALIDATE_URL) !== false;
+        return Str::isUrl($value);
     }
 
     /**
@@ -1103,6 +1107,10 @@ class CoreModifiers extends Modifier
      */
     public function length($value)
     {
+        if ($value instanceof Arrayable) {
+            $value = $value->toArray();
+        }
+
         return (is_array($value)) ? count($value) : Stringy::length($value);
     }
 
@@ -1111,7 +1119,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return array
+     * @return array|Collection
      */
     public function limit($value, $params)
     {
@@ -1159,7 +1167,7 @@ class CoreModifiers extends Modifier
      */
     public function localize($value)
     {
-        return Localization::fetch($value);
+        return $this->trans($value);
     }
 
     /**
@@ -1232,6 +1240,18 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Generate an md5 hash of a value.
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function md5($value)
+    {
+        return md5($value);
+    }
+
+    /**
      * Get the date difference in minutes.
      *
      * @param Carbon  $value
@@ -1249,6 +1269,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
+     * @param $context
      * @return int
      */
     public function mod($value, $params, $context)
@@ -1290,7 +1311,8 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return mixed
+     * @param $context
+     * @return float|int
      */
     public function multiply($value, $params, $context)
     {
@@ -1418,9 +1440,11 @@ class CoreModifiers extends Modifier
 
     /**
      * Renders an array variable with a partial, context aware.
-     * @param  $value
-     * @param  $params
-     * @return [string
+     *
+     * @param $value
+     * @param $params
+     * @param $context
+     * @return string
      */
     public function partial($value, $params, $context)
     {
@@ -1470,6 +1494,21 @@ class CoreModifiers extends Modifier
     public function rawurlencode($value)
     {
         return implode('/', array_map('rawurlencode', explode('/', $value)));
+    }
+
+    /**
+     * Send data to Laravel Ray.
+     *
+     * @param $value
+     * @return void
+     */
+    public function ray($value)
+    {
+        throw_unless(function_exists('ray'), new \Exception('Ray is not installed. Run `composer require spatie/laravel-ray --dev`'));
+
+        ray($value);
+
+        return $value;
     }
 
     /**
@@ -1599,6 +1638,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
+     * @param $context
      * @return string
      */
     public function repeat($value, $params, $context)
@@ -1728,7 +1768,6 @@ class CoreModifiers extends Modifier
      *
      * @param Carbon  $value
      * @param $params
-     *
      * @return int
      */
     public function secondsAgo($value, $params)
@@ -1811,6 +1850,10 @@ class CoreModifiers extends Modifier
             return collect($value)->shuffle()->all();
         }
 
+        if ($value instanceof Collection) {
+            return $value->shuffle();
+        }
+
         return Stringy::shuffle($value);
     }
 
@@ -1818,8 +1861,6 @@ class CoreModifiers extends Modifier
      * Get the singular form of an English word.
      *
      * @param $value
-     * @param $params
-     * @param $context
      * @return string
      */
     public function singular($value)
@@ -1840,6 +1881,18 @@ class CoreModifiers extends Modifier
     public function slugify($value)
     {
         return Stringy::slugify($value, '-', Config::getShortLocale());
+    }
+
+    /**
+     * Parse with SmartyPants. Aren't you fancy?
+     *
+     * @param $value
+     * @param $params
+     * @return string
+     */
+    public function smartypants($value, $params)
+    {
+        return Html::smartypants($value);
     }
 
     /**
@@ -1902,6 +1955,7 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
+     * @param $context
      * @return string
      */
     public function stripTags($value, $params, $context)
@@ -1925,7 +1979,8 @@ class CoreModifiers extends Modifier
      *
      * @param $value
      * @param $params
-     * @return mixed
+     * @param $context
+     * @return int|float
      */
     public function subtract($value, $params, $context)
     {
@@ -1954,7 +2009,17 @@ class CoreModifiers extends Modifier
      */
     public function sum($value, $params)
     {
-        return collect($value)->sum(Arr::get($params, 0, null));
+        $key = Arr::get($params, 0, null);
+
+        return collect($value)->reduce(function ($carry, $value) use ($key) {
+            if ($key) {
+                $value = data_get($value, $key);
+            }
+
+            $value = $value instanceof Value ? $value->value() : $value;
+
+            return $carry + (int) $value;
+        }, 0);
     }
 
     /**
@@ -2038,6 +2103,7 @@ class CoreModifiers extends Modifier
      * Converts the data to json.
      *
      * @param $value
+     * @param $params
      * @return string
      */
     public function toJson($value, $params)
@@ -2272,8 +2338,7 @@ class CoreModifiers extends Modifier
      *
      * @param array $value
      * @param $params
-     *
-     * @return Collection
+     * @return array
      */
     public function where($value, $params)
     {
@@ -2354,13 +2419,20 @@ class CoreModifiers extends Modifier
      * direct to the page.
      *
      * @param string  $url
-     *
      * @return string
      */
     public function embedUrl($url)
     {
-        if (Str::contains($url, 'youtube')) {
-            return str_replace('watch?v=', 'embed/', $url);
+        if (Str::contains($url, 'vimeo')) {
+            $url = str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
+
+            if (Str::contains($url, '?')) {
+                $url = str_replace('?', '?dnt=1&', $url);
+            } else {
+                $url .= '?dnt=1';
+            }
+
+            return $url;
         }
 
         if (Str::contains($url, 'youtu.be')) {
@@ -2370,12 +2442,14 @@ class CoreModifiers extends Modifier
             if (Str::contains($url, '?t=')) {
                 $url = str_replace('?t=', '?start=', $url);
             }
-
-            return $url;
         }
 
-        if (Str::contains($url, 'vimeo')) {
-            return str_replace('/vimeo.com', '/player.vimeo.com/video', $url);
+        if (Str::contains($url, 'youtube.com/watch?v=')) {
+            $url = str_replace('watch?v=', 'embed/', $url);
+        }
+
+        if (Str::contains($url, 'youtube.com')) {
+            $url = str_replace('youtube.com', 'youtube-nocookie.com', $url);
         }
 
         return $url;
@@ -2410,6 +2484,7 @@ class CoreModifiers extends Modifier
      * Takes a modifier array, split on ":", and formats it for HTML attribute key:value pairs.
      *
      * @param $params
+     * @param string $delimiter
      * @return array
      */
     private function buildAttributesFromParameters($params, $delimiter = ':')

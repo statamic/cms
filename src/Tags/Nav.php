@@ -16,7 +16,8 @@ class Nav extends Structure
 
     public function breadcrumbs()
     {
-        $url = Str::removeLeft(URL::getCurrent(), Site::current()->url());
+        $currentUrl = URL::makeAbsolute(URL::getCurrent());
+        $url = Str::removeLeft($currentUrl, Site::current()->absoluteUrl());
         $url = Str::ensureLeft($url, '/');
         $segments = explode('/', $url);
         $segments[0] = '/';
@@ -31,6 +32,8 @@ class Nav extends Structure
 
             return $uri;
         })->mapWithKeys(function ($uri) {
+            $uri = Str::ensureLeft($uri, '/');
+
             return [$uri => Data::findByUri($uri, Site::current()->handle())];
         })->filter();
 

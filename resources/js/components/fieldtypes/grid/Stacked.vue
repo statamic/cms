@@ -20,6 +20,7 @@
                 :name="name"
                 :error-key-prefix="errorKeyPrefix"
                 :can-delete="canDeleteRows"
+                :can-add-rows="canAddRows"
                 @updated="(row, value) => $emit('updated', row, value)"
                 @meta-updated="$emit('meta-updated', row._id, $event)"
                 @removed="(row) => $emit('removed', row)"

@@ -3,16 +3,16 @@
 namespace Statamic\Http\Controllers;
 
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Auth\ResetsPasswords;
+use Statamic\Contracts\Auth\User;
 use Statamic\Http\Middleware\RedirectIfAuthenticated;
 
 class ResetPasswordController extends Controller
 {
-    use ResetsPasswords {
-        resetPassword as protected traitResetPassword;
-    }
+    use ResetsPasswords;
 
     public function __construct()
     {
@@ -44,14 +44,17 @@ class ResetPasswordController extends Controller
         return request('redirect') ?? route('statamic.site');
     }
 
-    protected function resetPassword($user, $password)
+    protected function setUserPassword($user, $password)
     {
-        // We override because the parent (trait) method hashes the password first,
-        // but the Statamic User class's password method also hashes, which would
-        // result in a double-hashed password. Also, it uses the mutator style.
-        $user->password($password);
-
-        $this->traitResetPassword($user, $password);
+        // The Statamic user class has a password method that will hash a given plain
+        // text password. If we're using the "statamic" user provider, we'll get a
+        // Statamic user. Otherwise (i.e. using the "eloquent" provider), we'd
+        // just a User model, which requires the password to be pre-hashed.
+        if ($user instanceof User) {
+            $user->password($password);
+        } else {
+            $user->password = Hash::make($password);
+        }
     }
 
     public function broker()

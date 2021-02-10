@@ -22,7 +22,7 @@ class GlideServer
             'response' => new LaravelResponseFactory(app('request')),
             'driver'   => Config::get('statamic.assets.image_manipulation.driver'),
             'cache_with_file_extensions' => true,
-            'presets' => $this->presets(),
+            'presets' => Image::manipulationPresets(),
         ]);
     }
 
@@ -36,21 +36,5 @@ class GlideServer
         return Config::get('statamic.assets.image_manipulation.cache')
             ? Config::get('statamic.assets.image_manipulation.cache_path')
             : storage_path('statamic/glide');
-    }
-
-    /**
-     * Get glide presets.
-     *
-     * @return array
-     */
-    private function presets()
-    {
-        $presets = Config::getImageManipulationPresets();
-
-        if (config('statamic.cp.enabled')) {
-            $presets = array_merge($presets, Image::getCpImageManipulationPresets());
-        }
-
-        return $presets;
     }
 }

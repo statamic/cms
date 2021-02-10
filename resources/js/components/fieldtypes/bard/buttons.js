@@ -20,6 +20,7 @@ const availableButtons = () => [
     { name: 'image', text: __('Image'), command: 'image', args: { src: '' }, icon: 'picture-o', condition: (config) => config.container },
     { name: 'code', text: __('Inline Code'), command: 'code', svg: 'angle-brackets-bold' },
     { name: 'codeblock', text: __('Code Block'), command: 'code_block', svg: 'code-block' },
+    { name: 'horizontalrule', text: __('Horizontal Rule'), command: 'horizontal_rule', svg: 'range' },
 ];
 
 const addButtonHtml = (buttons) => {
