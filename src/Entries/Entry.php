@@ -265,7 +265,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function save()
     {
-        $isNew = ! is_null(Facades\Entry::find($this->id()));
+        $isNew = is_null(Facades\Entry::find($this->id()));
 
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
