@@ -139,5 +139,5 @@ return [
     |
     */
 
-    'focal_point_editor_enabled' => true,
+    'focal_point_editor' => true,
 ];
