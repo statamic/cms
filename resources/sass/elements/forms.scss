@@ -169,7 +169,7 @@ input.input-text-minimal:read-only,
 
 .radio-fieldtype .inline-mode,
 .checkboxes-fieldtype .inline-mode {
-    @apply flex items-center;
+    @apply flex items-center flex-wrap;
 
     .option {
         @apply mr-2 mb-1.5;

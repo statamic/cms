@@ -80,6 +80,9 @@ class UsersController extends CpController
 
         $fields = $blueprint->fields()->preProcess();
 
+        $broker = config('statamic.users.passwords.'.PasswordReset::BROKER_ACTIVATIONS);
+        $expiry = config("auth.passwords.{$broker}.expire") / 60;
+
         $viewData = [
             'title' => __('Create'),
             'values' => $fields->values()->all(),
@@ -88,7 +91,7 @@ class UsersController extends CpController
             'actions' => [
                 'save' => cp_route('users.store'),
             ],
-            'expiry' => config('auth.passwords.'.PasswordReset::BROKER_ACTIVATIONS.'.expire') / 60,
+            'expiry' => $expiry,
         ];
 
         if ($request->wantsJson()) {
