@@ -7,6 +7,7 @@
         method="post"
         :initial-title="__('Create Entry')"
         :collection-handle="collectionHandle"
+        :collection-has-routes="collectionHasRoutes"
         :initial-fieldset="fieldset"
         :initial-values="values"
         :initial-meta="meta"
@@ -31,6 +32,7 @@ export default {
     props: [
         'actions',
         'collectionHandle',
+        'collectionHasRoutes',
         'fieldset',
         'values',
         'meta',
