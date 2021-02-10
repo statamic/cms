@@ -7,6 +7,7 @@ use Statamic\GraphQL\Types\AssetContainerType;
 use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\GraphQL\Types\CollectionStructureType;
 use Statamic\GraphQL\Types\CollectionType;
+use Statamic\GraphQL\Types\DateRangeType;
 use Statamic\GraphQL\Types\EntryInterface;
 use Statamic\GraphQL\Types\GlobalSetInterface;
 use Statamic\GraphQL\Types\JsonArgument;
@@ -33,6 +34,7 @@ class TypeRegistrar
         }
 
         GraphQL::addType(JsonArgument::class);
+        GraphQL::addType(DateRangeType::class);
         GraphQL::addType(SiteType::class);
         GraphQL::addType(LabeledValueType::class);
         GraphQL::addType(CollectionType::class);

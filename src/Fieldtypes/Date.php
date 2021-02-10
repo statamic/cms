@@ -3,8 +3,10 @@
 namespace Statamic\Fieldtypes;
 
 use Carbon\Carbon;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Fields\DateField;
+use Statamic\GraphQL\Types\DateRangeType;
 use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
 
 class Date extends Fieldtype
@@ -169,6 +171,10 @@ class Date extends Fieldtype
 
     public function toGqlType()
     {
+        if ($this->config('mode') === 'range') {
+            return GraphQL::type(DateRangeType::NAME);
+        }
+
         return new DateField;
     }
 }
