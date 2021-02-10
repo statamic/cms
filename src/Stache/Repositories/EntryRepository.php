@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
 use Statamic\Contracts\Entries\QueryBuilder;
@@ -51,6 +52,25 @@ class EntryRepository implements RepositoryContract
     public function findByUri(string $uri, string $site = null): ?Entry
     {
         $site = $site ?? $this->stache->sites()->first();
+
+        $preview = request()->get('preview');
+        if ($preview && $preview !== 'false') {
+            $livePreviewCache = Cache::get('live-preview-data', []);
+
+            if (! isset($livePreviewCache[$preview][$uri])) {
+                return null;
+            }
+
+            $data = $livePreviewCache[$preview][$uri];
+            $entry = \Statamic\Facades\Entry::make()
+                    ->locale($site)
+                    ->collection($data['collection'])
+                    ->slug($data['slug'])
+                    ->blueprint($data['blueprint'])
+                    ->data($data['data']);
+
+            return $entry;
+        }
 
         $entry = $this->query()
                 ->where('uri', $uri)

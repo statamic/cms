@@ -15,7 +15,6 @@ class EntryResource extends JsonResource
     public function toArray($request)
     {
         return $this->resource
-            ->forLivePreview()
             ->toAugmentedCollection()
             ->withShallowNesting()
             ->toArray();
