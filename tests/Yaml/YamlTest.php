@@ -5,6 +5,8 @@ namespace Tests\Yaml;
 use Exception;
 use Statamic\Facades\YAML;
 use Statamic\Yaml\ParseException;
+use Statamic\Yaml\Yaml as StatamicYaml;
+use Symfony\Component\Yaml\Yaml as SymfonyYaml;
 use Tests\TestCase;
 
 class YamlTest extends TestCase
@@ -19,19 +21,16 @@ class YamlTest extends TestCase
             'array' => ['one', 'two'],
         ];
 
-        $expected = <<<'EOT'
-foo: bar
-two_words: 'two words'
-multiline: |
-  first
-  second
-array:
-  - one
-  - two
+        $symfonyYaml = $this->mock(SymfonyYaml::class)
+            ->shouldReceive('dump')
+            ->with($array, 100, 2, SymfonyYaml::DUMP_MULTI_LINE_LITERAL_BLOCK)
+            ->once()
+            ->andReturn('some properly dumped yaml from symfony')
+            ->getMock();
 
-EOT;
+        $this->app->instance(StatamicYaml::class, new StatamicYaml($symfonyYaml));
 
-        $this->assertEqualsIgnoringLineEndings($expected, YAML::dump($array));
+        $this->assertEquals('some properly dumped yaml from symfony', YAML::dump($array));
     }
 
     /** @test */

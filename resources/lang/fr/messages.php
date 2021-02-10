@@ -99,6 +99,7 @@ return [
     'git_utility_description' => 'Gérez le contenu suivi Git',
     'global_search_open_using_slash' => 'Vous pouvez ouvrir la recherche globale en utilisant la touche <kbd>/</kbd>',
     'global_set_config_intro' => 'Les jeux de globales gèrent le contenu mis à disposition sur l’ensemble du site, comme les détails de l’entreprise, les coordonnées ou les paramètres frontaux.',
+    'global_set_no_fields_description' => 'Vous pouvez ajouter des champs au Blueprint ou vous pouvez aussi ajoutez manuellement et directement des variables au jeu.',
     'globals_blueprint_instructions' => 'Contrôle les champs à afficher lors de la modification des variables.',
     'globals_configure_handle_instructions' => 'Comment vous allez faire référence à ce jeu de globales sur le frontal. Ne peut pas être facilement changé.',
     'globals_configure_intro' => 'Un jeu de globales est un groupe de variables disponibles pour toutes les pages frontales du site.',
