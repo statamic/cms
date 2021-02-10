@@ -82,6 +82,22 @@ class HasAvatarTest extends TestCase
         $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=128', $user->gravatarUrl(128));
     }
 
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/3207
+     **/
+    public function it_gets_the_gravatar_if_theres_a_field_defined_in_the_blueprint_and_an_uploaded_asset_was_deleted()
+    {
+        $user = $this->withAvatarField()->withGravatar()->user()->set('avatar', 'john.jpg');
+
+        $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=64', $user->avatar());
+        $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=64', $user->avatar(64));
+        $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=128', $user->avatar(128));
+        $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=64', $user->gravatarUrl());
+        $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=64', $user->gravatarUrl(64));
+        $this->assertEquals('https://www.gravatar.com/avatar/d4c74594d841139328695756648b6bd6?s=128', $user->gravatarUrl(128));
+    }
+
     /** @test */
     public function it_gets_the_gravatar_if_theres_a_field_defined_but_nothing_has_been_uploaded()
     {
