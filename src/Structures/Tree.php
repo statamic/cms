@@ -238,7 +238,9 @@ class Tree implements Localization
 
     public function move($entry, $target)
     {
-        if (optional($this->page($entry)->parent())->id() === $target) {
+        $parent = optional($this->page($entry)->parent());
+
+        if ($parent->id() === $target || $parent->isRoot() && is_null($target)) {
             return $this;
         }
 
