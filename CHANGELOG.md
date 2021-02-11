@@ -1,5 +1,33 @@
 # Release Notes
 
+## 3.1.0-alpha.3 (2020-02-11)
+
+### What's new
+- Add site and locale to entries. [#3205](https://github.com/statamic/cms/issues/3205)
+- Date fields in range mode can be queried in GraphQL. [#3223](https://github.com/statamic/cms/issues/3223)
+
+### What's fixed
+- Support separate logos for outside/inside. [cad7451e](https://github.com/statamic/cms/commit/cad7451e)
+- Fix date fields not augmenting ranges. [#3223](https://github.com/statamic/cms/issues/3223)
+- Brought over changes from 3.0.43
+
+### What's changing
+- The `@svg` directive has been renamed to `@cp_svg` to avoid potential conflicts. [#3186](https://github.com/statamic/cms/issues/3186)
+
+
+
+## 3.1.0-alpha.2 (2020-02-04)
+
+### What's new
+- Ability to query an entry by slug or URI in GraphQL. [#3193](https://github.com/statamic/cms/issues/3193)
+
+### What's fixed
+- Fixed GraphQL nested subfield handling for Replicator, Bard, and Grid fields. [#3202](https://github.com/statamic/cms/issues/3202)
+- Fixed Safari display issue. [#1999](https://github.com/statamic/cms/issues/1999)
+- Brought over changes from 3.0.41-42
+
+
+
 ## 3.1.0-alpha.1 (2020-02-01)
 
 ### What's new
@@ -9,6 +37,62 @@
 - API Caching [#3168](https://github.com/statamic/cms/issues/3168)
 - Nav and Collection structure tree API endpoints [#2999](https://github.com/statamic/cms/issues/2999)
 - Entry author permissions [#3053](https://github.com/statamic/cms/issues/3053)
+
+### What's changing
+- The `date` fieldtype now augments to Carbon instances. If you use them in Antlers without any modifiers, they will now be output using the default
+  `date_format` (e.g. January 1st, 2020). Previously, the raw value (e.g. 2020-01-02) would have been output. Actual entry dates (i.e. the `date` field) would have behaved this way already. If you were using a modifier (e.g. `format`), there will be no change.
+
+
+
+## 3.0.43 (2020-02-11)
+
+### What's new
+- Added an `EntryCreated` event. [#3078](https://github.com/statamic/cms/issues/3078)
+- Ability to save entries without triggering events. [#3208](https://github.com/statamic/cms/issues/3208)
+- Add `sort` and `query_scope` parameters to `search:results` tag. [#2383](https://github.com/statamic/cms/issues/2383)
+- Ability to disable focal point editor. [#3160](https://github.com/statamic/cms/issues/3160)
+
+### What's improved
+- Added Chinese translations. [#3211](https://github.com/statamic/cms/issues/3211)
+- Updated French translations. [#3206](https://github.com/statamic/cms/issues/3206)
+
+### What's fixed
+- Fix Radio input position. [#3183](https://github.com/statamic/cms/issues/3183)
+- Fix Antlers ternary condition escaping. [#3123](https://github.com/statamic/cms/issues/3123)
+- Prevent terms being created with existing slugs, which prevents overriding existing terms. [#3114](https://github.com/statamic/cms/issues/3114)
+- The "Visit URL" button gets hidden when a collection has no route. [#3080](https://github.com/statamic/cms/issues/3080)
+- Fix stroke color of the taxonomy icon. [#3225](https://github.com/statamic/cms/issues/3225)
+- Fix issue where date range fields would sometimes be a day behind. [#3221](https://github.com/statamic/cms/issues/3221)
+- Prevent error when a user's avatar is deleted. [#3212](https://github.com/statamic/cms/issues/3212)
+- Use more data when augmenting a form submission, which prevents the wrong date being shown. [#3204](https://github.com/statamic/cms/issues/3204)
+
+
+
+## 3.0.42 (2021-02-04)
+
+### What's fixed
+- Fix error in asset listings when one has recently been deleted. [#3201](https://github.com/statamic/cms/issues/3201)
+- Fix Taxonomy facade accessor. [#3199](https://github.com/statamic/cms/issues/3199)
+- Small clean up of `trans` tag. [#3197](https://github.com/statamic/cms/issues/3197)
+
+
+
+## 3.0.41 (2021-02-03)
+
+### What's new
+- Added a `ray` modifier. [#3137](https://github.com/statamic/cms/issues/3137)
+
+### What's improved
+- Form email subjects can be translated. [#3144](https://github.com/statamic/cms/issues/3144)
+- View site button in CP uses the selected site. [#3139](https://github.com/statamic/cms/issues/3139)
+- Updated Danish, German, and French translations. [#3161](https://github.com/statamic/cms/issues/3161) [#3134](https://github.com/statamic/cms/issues/3134) [#3129](https://github.com/statamic/cms/issues/3129)
+
+### What's fixed
+- Prevent moving pages to end of top level when already there. [#3152](https://github.com/statamic/cms/issues/3152)
+- Fix form widget styling. [#3169](https://github.com/statamic/cms/issues/3169)
+- Fix Bard line wrapping issue. [#3115](https://github.com/statamic/cms/issues/3115)
+- Inject the Symfony Yaml component. [#3164](https://github.com/statamic/cms/issues/3164)
+- Adjust Action Facade docblock [#3150](https://github.com/statamic/cms/issues/3150)
 
 
 

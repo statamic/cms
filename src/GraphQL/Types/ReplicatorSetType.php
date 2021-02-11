@@ -3,6 +3,7 @@
 namespace Statamic\GraphQL\Types;
 
 use Statamic\Facades\GraphQL;
+use Statamic\Fields\Value;
 
 class ReplicatorSetType extends \Rebing\GraphQL\Support\Type
 {
@@ -24,6 +25,15 @@ class ReplicatorSetType extends \Rebing\GraphQL\Support\Type
                     'type' => GraphQL::nonNull(GraphQL::string()),
                 ],
             ])
+            ->map(function ($field) {
+                $field['resolve'] = function ($row, $args, $context, $info) {
+                    $value = $row[$info->fieldName];
+
+                    return $value instanceof Value ? $value->value() : $value;
+                };
+
+                return $field;
+            })
             ->all();
     }
 }

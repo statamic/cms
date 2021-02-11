@@ -2,12 +2,15 @@
 
 namespace Statamic\GraphQL\Fields;
 
+use Closure;
 use GraphQL\Type\Definition\ResolveInfo;
 use GraphQL\Type\Definition\Type;
 use Rebing\GraphQL\Support\Field;
 
 class DateField extends Field
 {
+    private $valueResolver;
+
     public function type(): Type
     {
         return Type::string();
@@ -24,7 +27,7 @@ class DateField extends Field
 
     protected function resolve($entry, $args, $context, ResolveInfo $info)
     {
-        if (! $date = $entry->resolveGqlValue($info->fieldName)) {
+        if (! $date = $this->getValueResolver()($entry, $args, $context, $info)) {
             return null;
         }
 
@@ -33,5 +36,19 @@ class DateField extends Field
         }
 
         return (string) $date;
+    }
+
+    public function setValueResolver(Closure $resolver)
+    {
+        $this->valueResolver = $resolver;
+
+        return $this;
+    }
+
+    public function getValueResolver()
+    {
+        return $this->valueResolver ?? function ($entry, $args, $context, $info) {
+            return $entry->resolveGqlValue($info->fieldName);
+        };
     }
 }
