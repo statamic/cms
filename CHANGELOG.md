@@ -2,16 +2,16 @@
 
 ## 3.1.0-alpha.3 (2020-02-11)
 
-## What's new
+### What's new
 - Add site and locale to entries. [#3205](https://github.com/statamic/cms/issues/3205)
 - Date fields in range mode can be queried in GraphQL. [#3223](https://github.com/statamic/cms/issues/3223)
 
-## What's fixed
+### What's fixed
 - Support separate logos for outside/inside. [cad7451e](https://github.com/statamic/cms/commit/cad7451e)
 - Fix date fields not augmenting ranges. [#3223](https://github.com/statamic/cms/issues/3223)
 - Brought over changes from 3.0.43
 
-## What's changing
+### What's changing
 - The `@svg` directive has been renamed to `@cp_svg` to avoid potential conflicts. [#3186](https://github.com/statamic/cms/issues/3186)
 
 
