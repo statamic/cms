@@ -62,11 +62,13 @@ class EntryRepository implements RepositoryContract
             }
 
             $data = $livePreviewCache[$preview][$uri];
-            $entry = \Statamic\Facades\Entry::make()
-                    ->locale($site)
+            $entry = $this->make()
                     ->collection($data['collection'])
-                    ->slug($data['slug'])
                     ->blueprint($data['blueprint'])
+                    ->locale($site)
+                    ->published(true)
+                    ->slug($data['slug'])
+                    ->model($this->make())
                     ->data($data['data']);
 
             return $entry;
