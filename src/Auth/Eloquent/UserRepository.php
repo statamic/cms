@@ -81,11 +81,17 @@ class UserRepository extends BaseRepository
     public function save(UserContract $user)
     {
         $user->saveToDatabase();
+
+        Blink::forget("eloquent-user-find-{$user->id()}");
+        Blink::forget("eloquent-user-find-{$user->email()}");
     }
 
     public function delete(UserContract $user)
     {
         $user->model()->delete();
+
+        Blink::forget("eloquent-user-find-{$user->id()}");
+        Blink::forget("eloquent-user-find-{$user->email()}");
     }
 
     public function fromUser($user): ?UserContract
