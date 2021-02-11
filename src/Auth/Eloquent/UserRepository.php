@@ -46,11 +46,13 @@ class UserRepository extends BaseRepository
 
     public function findByEmail(string $email): ?UserContract
     {
-        if (! $model = $this->model('where', 'email', $email)->first()) {
-            return null;
-        }
+        return Blink::once("eloquent-user-find-{$email}", function () use ($email) {
+            if (! $model = $this->model('where', 'email', $email)->first()) {
+                return null;
+            }
 
-        return $this->makeUser($model);
+            return $this->makeUser($model);
+        });
     }
 
     public function model($method, ...$args)
