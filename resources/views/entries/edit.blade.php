@@ -10,6 +10,7 @@
         :initial-actions="{{ json_encode($actions) }}"
         method="patch"
         collection-handle="{{ $collection }}"
+        :collection-has-routes="{{ Statamic\Support\Str::bool($collectionHasRoutes) }}"
         initial-title="{{ $title }}"
         initial-reference="{{ $reference }}"
         :initial-fieldset="{{ json_encode($blueprint) }}"

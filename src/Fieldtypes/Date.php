@@ -120,10 +120,7 @@ class Date extends Fieldtype
         }
 
         if ($this->config('mode') === 'range') {
-            return [
-                'start' => Carbon::parse($data['start'])->format('Y-m-d'),
-                'end' => Carbon::parse($data['end'])->format('Y-m-d'),
-            ];
+            return $data;
         }
 
         $date = Carbon::parse($data);
