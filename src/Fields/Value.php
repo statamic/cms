@@ -61,7 +61,7 @@ class Value implements IteratorAggregate, JsonSerializable
 
         if ($value instanceof Augmentable || $value instanceof Collection) {
             $value = $value->toAugmentedArray();
-        } else if ($value instanceof Arrayable) {
+        } elseif ($value instanceof Arrayable) {
             $value = $value->toArray();
         }
 
