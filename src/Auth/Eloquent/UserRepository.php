@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Statamic\Auth\UserCollection;
 use Statamic\Auth\UserRepository as BaseRepository;
 use Statamic\Contracts\Auth\User as UserContract;
+use Statamic\Facades\Blink;
 
 class UserRepository extends BaseRepository
 {
@@ -34,11 +35,13 @@ class UserRepository extends BaseRepository
 
     public function find($id): ?UserContract
     {
-        if ($model = $this->model('find', $id)) {
-            return $this->makeUser($model);
-        }
+        return Blink::once("eloquent-user-find-{$id}", function () use ($id) {
+            if ($model = $this->model('find', $id)) {
+                return $this->makeUser($model);
+            }
 
-        return null;
+            return null;
+        });
     }
 
     public function findByEmail(string $email): ?UserContract
