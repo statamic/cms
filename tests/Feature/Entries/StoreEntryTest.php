@@ -114,6 +114,14 @@ class StoreEntryTest extends TestCase
         $this->assertCount(0, Entry::all());
     }
 
+    /** @test */
+    public function user_without_permission_to_manage_publish_state_cannot_change_publish_status()
+    {
+        // when revisions are disabled
+
+        $this->markTestIncomplete();
+    }
+
     private function store($payload)
     {
         return $this->post(cp_route('collections.entries.store', ['blog', 'en']), $payload);

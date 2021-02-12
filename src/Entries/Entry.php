@@ -17,6 +17,7 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Events\EntryCreated;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
@@ -28,6 +29,7 @@ use Statamic\Facades\Stache;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
+use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class Entry implements Contract, Augmentable, Responsable, Localization, Protectable
@@ -49,6 +51,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $locale;
     protected $localizations;
     protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -247,7 +250,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
     public function apiUrl()
     {
-        return Statamic::apiRoute('collections.entries.show', [$this->collectionHandle(), $this->id()]);
+        if (! $id = $this->id()) {
+            return null;
+        }
+
+        return Statamic::apiRoute('collections.entries.show', [$this->collectionHandle(), $id]);
     }
 
     public function reference()
@@ -262,13 +269,27 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this;
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        $result = $this->save();
+
+        $this->withEvents = true;
+
+        return $result;
+    }
+
     public function save()
     {
+        $isNew = is_null(Facades\Entry::find($this->id()));
+
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
-
-        if (EntrySaving::dispatch($this) === false) {
-            return false;
+        if ($this->withEvents) {
+            if (EntrySaving::dispatch($this) === false) {
+                return false;
+            }
         }
 
         Facades\Entry::save($this);
@@ -287,7 +308,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $callback($this);
         }
 
-        EntrySaved::dispatch($this);
+        if ($this->withEvents) {
+            if ($isNew) {
+                EntryCreated::dispatch($this);
+            }
+
+            EntrySaved::dispatch($this);
+        }
 
         return true;
     }
@@ -434,6 +461,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             'id' => $this->id(),
             'slug' => $this->slug(),
             'published' => $this->published(),
+            'date' => $this->collection()->dated() ? $this->date()->timestamp : null,
             'data' => $this->data()->except(['updated_by', 'updated_at'])->all(),
         ];
     }
@@ -448,10 +476,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
 
         $attrs = $revision->attributes();
 
-        return $entry
+        $entry
             ->published($attrs['published'])
             ->data($attrs['data'])
             ->slug($attrs['slug']);
+
+        if ($this->collection()->dated() && ($date = Arr::get($attrs, 'date'))) {
+            $entry->date(Carbon::createFromTimestamp($date));
+        }
+
+        return $entry;
     }
 
     public function status()

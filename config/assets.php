@@ -128,4 +128,16 @@ return [
 
     'cache_meta' => true,
 
+    /*
+    |--------------------------------------------------------------------------
+    | Focal Point Editor
+    |--------------------------------------------------------------------------
+    |
+    | When editing images in the Control Panel, there is an option to choose
+    | a focal point. When working with third-party image providers such as
+    | Cloudinary it can be useful to disable Statamic's built-in editor.
+    |
+    */
+
+    'focal_point_editor' => true,
 ];

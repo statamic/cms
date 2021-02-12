@@ -18,7 +18,7 @@
     "@simonwep/pickr": "^1.7.4",
     "ansi-to-html": "^0.6.14",
     "autosize": "~3.0.12",
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "body-scroll-lock": "^2.6.4",
     "codemirror": "^5.52.0",
     "cookies-js": "^1.2.2",

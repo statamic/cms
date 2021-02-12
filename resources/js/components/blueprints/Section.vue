@@ -14,6 +14,9 @@
                     <span class="font-medium mr-1">
                         <input ref="displayInput" type="text" v-model="section.display" class="bg-transparent w-full outline-none" />
                     </span>
+                    <span class="font-mono text-xs text-grey-70 mr-1">
+                        <input type="text" v-model="section.handle" @input="handleSyncedWithDisplay = false" class="bg-transparent w-full outline-none" />
+                    </span>
                 </div>
                 <div class="flex items-center px-1.5">
                     <button @click.prevent="toggleEditing" class="text-grey-60 hover:text-grey-100 mr-1">
@@ -84,6 +87,7 @@ export default {
         return {
             isEditing: false,
             editingField: null,
+            handleSyncedWithDisplay: false
         }
     },
 
@@ -103,9 +107,19 @@ export default {
         },
 
         'section.display': function(display) {
-            this.section.handle = this.$slugify(display, '_');
+            if (this.handleSyncedWithDisplay) {
+                this.section.handle = this.$slugify(display, '_');
+            }
         }
 
+    },
+
+    created() {
+        // This logic isn't ideal, but it was better than passing along a 'isNew' boolean and having
+        // to deal with stripping it out and making it not new, etc. Good enough for a quick win.
+        if (!this.section.handle || this.section.handle == 'new_section' || this.section.handle == 'new_set') {
+            this.handleSyncedWithDisplay = true;
+        }
     },
 
     methods: {

@@ -177,6 +177,14 @@ class UpdateEntryTest extends TestCase
         ], $entry->data());
     }
 
+    /** @test */
+    public function user_without_permission_to_manage_publish_state_cannot_change_publish_status()
+    {
+        // when revisions are disabled
+
+        $this->markTestIncomplete();
+    }
+
     private function save($entry, $payload)
     {
         return $this->patch($entry->updateUrl(), $payload);
