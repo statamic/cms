@@ -30,18 +30,18 @@ trait Routable
         return app(UrlBuilder::class)->content($this)->build($route);
     }
 
-    public function url()
+    public function url($follow_redirect = true)
     {
-        if ($this->isRedirect()) {
+        if ($this->isRedirect() && $follow_redirect) {
             return $this->redirectUrl();
         }
 
-        return URL::makeRelative($this->absoluteUrl());
+        return URL::makeRelative($this->absoluteUrl($follow_redirect));
     }
 
-    public function absoluteUrl()
+    public function absoluteUrl($follow_redirect = true)
     {
-        if ($this->isRedirect()) {
+        if ($this->isRedirect() && $follow_redirect) {
             return $this->redirectUrl();
         }
 

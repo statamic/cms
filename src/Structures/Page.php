@@ -36,18 +36,18 @@ class Page implements Entry, Augmentable, Responsable, Protectable
         return $this;
     }
 
-    public function url()
+    public function url($follow_redirect = true)
     {
         if ($this->url) {
             return $this->url;
         }
 
-        if ($this->isRedirect()) {
+        if ($this->isRedirect() && $follow_redirect) {
             return $this->redirectUrl();
         }
 
         if ($this->reference && $this->referenceExists()) {
-            return URL::makeRelative($this->absoluteUrl());
+            return URL::makeRelative($this->absoluteUrl($follow_redirect));
         }
     }
 
@@ -178,13 +178,13 @@ class Page implements Entry, Augmentable, Responsable, Protectable
             ->build($this->route);
     }
 
-    public function absoluteUrl()
+    public function absoluteUrl($follow_redirect = true)
     {
         if ($this->url) {
             return $this->url;
         }
 
-        if ($this->isRedirect()) {
+        if ($this->isRedirect() && $follow_redirect) {
             return $this->redirectUrl();
         }
 
