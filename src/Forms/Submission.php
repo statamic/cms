@@ -224,6 +224,11 @@ class Submission implements SubmissionContract, Augmentable
             ->all();
     }
 
+    public function augmentedArrayData()
+    {
+        return $this->toArray();
+    }
+
     public function blueprint()
     {
         return $this->form->blueprint();

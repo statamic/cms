@@ -159,11 +159,12 @@ input.input-text-minimal:read-only,
     @apply mt-1.5 flex items-center;
 
     input {
-        @apply leading-normal mr-1 relative;
+        @apply leading-normal mr-sm relative;
+        top: -1px;
     }
 
     label {
-        @apply font-normal leading-none block;
+        @apply font-normal leading-none flex items-center;
     }
 }
 
