@@ -85,6 +85,7 @@ return [
     'uploaded' => 'Gagal mengunggah.',
     'url' => 'Format tidak valid.',
     'unique_entry_value' => 'Nilai ini sudah diambil.',
+    'unique_term_value' => 'Nilai ini sudah diambil.',
     'unique_user_value' => 'Nilai ini sudah diambil.',
     'duplicate_field_handle' => 'Bidang dengan handle :handle tidak dapat digunakan lebih dari sekali.',
     'one_site_without_origin' => 'Setidaknya satu situs tidak boleh memiliki asal.',
