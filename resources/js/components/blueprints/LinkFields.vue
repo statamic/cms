@@ -139,7 +139,21 @@ export default {
                 fieldtype: field.type,
                 field_reference: this.reference,
                 handle: field.handle,
-                config: { ...field.config, isNew: true },
+                icon: field.config.icon,
+                config: {
+                    ...field.config,
+                    width: field.config.width || 100,
+                    sets: field.config.sets
+                        ? field.config.sets.map(set => ({
+                            ...set,
+                            fields: set.fields.map(field => ({
+                                handle: field.handle,
+                                field: { ...field },
+                            })),
+                        }))
+                        : undefined,
+                    isNew: true,
+                },
                 config_overrides: []
             });
         },
