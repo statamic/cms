@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 3.0.43 (2020-02-11)
 
 ### What's new
 - Added an `EntryCreated` event. [#3078](https://github.com/statamic/cms/issues/3078)
