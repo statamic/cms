@@ -42,6 +42,8 @@ class Entries extends Relationship
         'revisionsEnabled' => 'revisionsEnabled',
         'breadcrumbs' => 'breadcrumbs',
         'collectionHandle' => 'collection',
+        'canManagePublishState' => 'canManagePublishState',
+        'collectionHasRoutes' => 'collectionHasRoutes',
     ];
 
     protected function configFieldItems(): array

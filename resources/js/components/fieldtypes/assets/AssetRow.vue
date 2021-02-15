@@ -14,7 +14,7 @@
         </td>
         <td class="p-0 pr-1 w-10 text-right align-middle">
 
-            <button class="flex items-center p-1 w-full h-full text-grey-60 hover:text-grey-90" @click="remove" :aria-label="__('Remove Asset')">
+            <button v-if="!readOnly" class="flex items-center p-1 w-full h-full text-grey-60 hover:text-grey-90" @click="remove" :aria-label="__('Remove Asset')">
                 <svg-icon name="trash" />
             </button>
 

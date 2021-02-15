@@ -49,7 +49,7 @@ export default {
         options: { default: []},
         placeholder: {
             required: false,
-            default: 'Choose...'
+            default: () => __('Choose...')
         },
         value: {},
         isReadOnly: { type: Boolean },

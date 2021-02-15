@@ -22,7 +22,7 @@ class RevisionsTest extends TestCase
         Carbon::setTestNow($now = Carbon::parse('2019-03-25 13:15'));
 
         $revision = EntryFactory::id('123')
-            ->collection(Collection::make('test'))
+            ->collection(tap(Collection::make('test'))->save())
             ->slug('my-entry')
             ->data(['foo' => 'bar'])
             ->make()
@@ -37,8 +37,26 @@ class RevisionsTest extends TestCase
         $this->assertEquals($user, $revision->user());
         $this->assertEquals($now, $revision->date());
         $this->assertEquals('collections/test/en/123', $revision->key());
-        $this->assertEquals(['id' => '123', 'published' => true, 'slug' => 'my-entry', 'data' => ['foo' => 'bar']], $revision->attributes());
+        $this->assertEquals(['id' => '123', 'published' => true, 'slug' => 'my-entry', 'data' => ['foo' => 'bar'], 'date' => null], $revision->attributes());
         $this->assertEquals('123', $revision->attribute('id'));
         $this->assertEquals('/path/to/collections/test/en/123/'.$now->timestamp.'.yaml', $revision->path());
+    }
+
+    /** @test */
+    public function a_revision_can_be_made_from_a_dated_entry()
+    {
+        config(['statamic.revisions.path' => '/path/to']);
+
+        Carbon::setTestNow($now = Carbon::parse('2019-03-25 13:15'));
+
+        $revision = EntryFactory::id('123')
+            ->collection(tap(Collection::make('test')->dated(true))->save())
+            ->slug('my-entry')
+            ->data(['foo' => 'bar'])
+            ->date('2016-12-25')
+            ->make()
+            ->makeRevision();
+
+        $this->assertEquals(['id' => '123', 'published' => true, 'slug' => 'my-entry', 'data' => ['foo' => 'bar'], 'date' => '1482624000'], $revision->attributes());
     }
 }

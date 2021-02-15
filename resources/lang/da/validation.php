@@ -85,6 +85,7 @@ return [
     'uploaded' => 'Kunne ikke uploade.',
     'url' => 'Format er ugyldigt.',
     'unique_entry_value' => 'Denne værdi er allerede taget.',
+    'unique_term_value' => 'Denne værdi er allerede taget.',
     'unique_user_value' => 'Denne værdi er allerede taget.',
     'duplicate_field_handle' => 'Felt med et håndtag på :handle kan ikke bruges mere end én gang.',
     'one_site_without_origin' => 'Mindst et websted må ikke have sin oprindelse.',
