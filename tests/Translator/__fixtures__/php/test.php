@@ -19,6 +19,8 @@ class Test
             trans_choice('php trans_choice single quote :param', 2, ['param']),
             trans_choice('php trans_choice double quote string', 2),
             trans_choice('php trans_choice double quote :param', 2, ['param']),
+
+            __('php with/slash'),
         ];
     }
 
@@ -50,5 +52,11 @@ class Test
     {
         /* @translation */
         return 'php annotated return with single asterisk';
+    }
+
+    public function returnMethodSix()
+    {
+        /** @translation */
+        return 'php annotated return with/slash';
     }
 }

@@ -67,6 +67,25 @@ class FileCacherTest extends TestCase
     }
 
     /** @test */
+    public function gets_file_path_from_url_and_ignores_query_strings()
+    {
+        $cacher = $this->fileCacher([
+            'path' => 'test/path',
+            'ignore_query_strings' => true,
+        ]);
+
+        $this->assertEquals(
+            'test/path/foo/bar_.html',
+            $cacher->getFilePath('http://domain.com/foo/bar?baz=qux&one=two')
+        );
+
+        $this->assertEquals(
+            'test/path/foo/bar_.html',
+            $cacher->getFilePath('http://domain.com/foo/bar')
+        );
+    }
+
+    /** @test */
     public function gets_file_path_with_multiple_locations()
     {
         $cacher = $this->fileCacher([

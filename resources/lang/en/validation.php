@@ -123,6 +123,7 @@ return [
     */
 
     'unique_entry_value' => 'This value has already been taken.',
+    'unique_term_value' => 'This value has already been taken.',
     'unique_user_value' => 'This value has already been taken.',
     'duplicate_field_handle' => 'Field with a handle of :handle cannot be used more than once.',
     'one_site_without_origin' => 'At least one site must not have an origin.',

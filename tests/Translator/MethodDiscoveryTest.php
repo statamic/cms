@@ -43,6 +43,7 @@ class MethodDiscoveryTest extends TestCase
             'vue template backtick quote',
             'vue template backtick quote :count',
             'vue template backtick quote :param',
+            'vue template with/slash',
             'vue script single quote',
             'vue script single quote :count',
             'vue script single quote :param',
@@ -52,6 +53,7 @@ class MethodDiscoveryTest extends TestCase
             'vue script backtick quote',
             'vue script backtick quote :count',
             'vue script backtick quote :param',
+            'vue script with/slash',
 
             'blade trans single quote string',
             'blade trans single quote :param',
@@ -62,6 +64,8 @@ class MethodDiscoveryTest extends TestCase
             'blade trans_choice single quote :param',
             'blade trans_choice double quote string',
             'blade trans_choice double quote :param',
+
+            'blade with/slash',
 
             'php trans single quote string',
             'php trans single quote :param',
@@ -78,6 +82,9 @@ class MethodDiscoveryTest extends TestCase
             'php annotated return double quote string',
             'php annotated return double quote :param',
             'php annotated return with single asterisk',
+
+            'php with/slash',
+            'php annotated return with/slash',
 
             'vue template trans single quote',
             'vue template trans single quote :param',
