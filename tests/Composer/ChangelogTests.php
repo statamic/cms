@@ -2,6 +2,7 @@
 
 namespace Tests\Composer;
 
+use Carbon\Carbon;
 use Facades\GuzzleHttp\Client;
 use GuzzleHttp\Psr7\Response;
 
@@ -43,7 +44,7 @@ trait ChangelogTests
         $this->assertFalse($contents[4]->latest);
 
         collect($contents)->each(function ($release) {
-            $this->assertEquals('November 6th, 2018', $release->date);
+            $this->assertEquals('November 6th, 2018',Carbon::parse($release->date)->format(config('statamic.system.date_format')));
             $this->assertContainsHtml($release->body);
         });
     }
