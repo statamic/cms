@@ -1,5 +1,15 @@
 # Release Notes
 
+## Unreleased
+
+### What's fixed
+- Full measure static caching no longer logs when creating the page. [#3255](https://github.com/statamic/cms/issues/3255)
+
+### What's changing
+- A `hasCachedPage` method has been added to the `Statamic\StaticCaching\Cacher` interface.
+
+
+
 ## 3.1.0-alpha.3 (2020-02-11)
 
 ### What's new
