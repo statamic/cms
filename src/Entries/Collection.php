@@ -522,8 +522,9 @@ class Collection implements Contract, AugmentableContract
             })
             ->setter(function ($structure) {
                 if ($structure) {
-                    $structure->collection($this);
+                    $structure->handle($this->handle());
                 }
+
                 $this->structureContents = null;
                 Blink::forget("collection-{$this->id()}-structure");
 
@@ -557,25 +558,10 @@ class Collection implements Contract, AugmentableContract
 
     protected function makeStructureFromContents()
     {
-        $structure = (new CollectionStructure)
-            ->collection($this)
+        return (new CollectionStructure)
+            ->handle($this->handle())
             ->expectsRoot($this->structureContents['root'] ?? false)
             ->maxDepth($this->structureContents['max_depth'] ?? null);
-
-        // For backwards compatibility, we'll allow the tree to be included in the collection's
-        // yaml file. However when saving the structure, it'll be moved to the dedicated files.
-        if ($trees = $this->structureContents['tree'] ?? null) {
-            if (! Site::hasMultiple()) {
-                $trees = [Site::default()->handle() => $trees];
-            }
-
-            foreach ($trees as $site => $contents) {
-                $tree = $structure->makeTree($site, $contents);
-                $structure->addTree($tree);
-            }
-        }
-
-        return $structure;
     }
 
     public function structureHandle()

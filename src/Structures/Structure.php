@@ -57,39 +57,17 @@ abstract class Structure implements StructureContract
     public function makeTree($site, $tree = [])
     {
         return $this->newTreeInstance()
+            ->handle($this->handle())
             ->locale($site)
-            ->structure($this)
             ->tree($tree)
             ->syncOriginal();
     }
 
     abstract public function newTreeInstance();
 
-    public function addTree($tree)
-    {
-        $tree->structure($this);
+    abstract public function existsIn($site);
 
-        $this->trees[$tree->locale()] = $tree;
-
-        return $this;
-    }
-
-    public function removeTree($tree)
-    {
-        unset($this->trees[$tree->locale()]);
-
-        return $this;
-    }
-
-    public function existsIn($site)
-    {
-        return isset($this->trees[$site]);
-    }
-
-    public function in($site)
-    {
-        return $this->trees[$site] ?? null;
-    }
+    abstract public function in($site);
 
     abstract public function collections($collections = null);
 

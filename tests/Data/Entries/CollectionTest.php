@@ -2,9 +2,7 @@
 
 namespace Tests\Data\Entries;
 
-use Facades\Statamic\Contracts\Structures\TreeRepository;
 use Facades\Statamic\Fields\BlueprintRepository;
-use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Entries\Entry;
@@ -17,7 +15,6 @@ use Statamic\Facades\Antlers;
 use Statamic\Facades\Site;
 use Statamic\Fields\Blueprint;
 use Statamic\Structures\CollectionStructure;
-use Statamic\Structures\CollectionStructureTree;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -271,20 +268,18 @@ class CollectionTest extends TestCase
         $this->assertEquals('date', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
-        $structureWithMaxDepthOfOne = $this->makeStructure()->maxDepth(1);
-        $ordered = (new Collection)->structure($structureWithMaxDepthOfOne);
+        $ordered = (new Collection)->structureContents(['max_depth' => 1]);
         $this->assertEquals('order', $ordered->sortField());
         $this->assertEquals('asc', $ordered->sortDirection());
 
-        $datedAndOrdered = (new Collection)->dated(true)->structure($structureWithMaxDepthOfOne);
+        $datedAndOrdered = (new Collection)->dated(true)->structureContents(['max_depth' => 1]);
         $this->assertEquals('order', $datedAndOrdered->sortField());
         $this->assertEquals('asc', $datedAndOrdered->sortDirection());
 
-        $structure = $this->makeStructure();
-        $alpha->structure($structure);
+        $alpha->structureContents(['max_depth' => 99]);
         $this->assertEquals('title', $alpha->sortField());
         $this->assertEquals('asc', $alpha->sortDirection());
-        $dated->structure($structure);
+        $dated->structureContents(['max_depth' => 99]);
         $this->assertEquals('date', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
@@ -403,6 +398,8 @@ class CollectionTest extends TestCase
     {
         $structure = new CollectionStructure;
         $collection = (new Collection)->handle('test');
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
         $this->assertFalse($collection->hasStructure());
         $this->assertNull($collection->structure());
         $this->assertNull($structure->handle());
@@ -411,120 +408,8 @@ class CollectionTest extends TestCase
 
         $this->assertTrue($collection->hasStructure());
         $this->assertSame($structure, $collection->structure());
-        $this->assertEquals('collection::test', $structure->handle());
+        $this->assertEquals('test', $structure->handle());
         $this->assertEquals('Test', $structure->title());
-    }
-
-    /** @test */
-    public function it_sets_the_structure_inline()
-    {
-        // This applies to a file-based approach.
-
-        $collection = (new Collection)->handle('test');
-        $this->assertFalse($collection->hasStructure());
-        $this->assertNull($collection->structure());
-
-        EntryFactory::id('123')->collection('test')->create();
-        EntryFactory::id('456')->collection('test')->create();
-        EntryFactory::id('789')->collection('test')->create();
-
-        $return = $collection->structureContents([
-            'max_depth' => 2,
-        ]);
-
-        TreeRepository::shouldReceive('find')->with('collections/test')->once()->andReturn(
-            (new CollectionStructureTree)->locale('en')->tree([
-                ['entry' => '123', 'children' => [
-                    ['entry' => '789'],
-                ]],
-                ['entry' => '456'],
-            ])->syncOriginal()
-        );
-
-        $this->assertEquals($collection, $return);
-        $this->assertEquals(['root' => false, 'max_depth' => 2], $collection->structureContents());
-        $this->assertTrue($collection->hasStructure());
-        $structure = $collection->structure();
-        $this->assertInstanceOf(CollectionStructure::class, $structure);
-        $this->assertEquals('collection::test', $structure->handle());
-        $this->assertSame($collection, $structure->collection());
-        $this->assertEquals(2, $structure->in('en')->pages()->all()->count());
-        $this->assertEquals(3, $structure->in('en')->flattenedPages()->count());
-        $this->assertEquals(2, $structure->maxDepth());
-    }
-
-    /** @test */
-    public function it_works_with_putting_the_whole_tree_in_there()
-    {
-        $this->markTestIncomplete();
-    }
-
-    /** @test */
-    public function it_sets_the_structure_inline_when_collection_has_multiple_sites()
-    {
-        Site::setConfig(['sites' => [
-            'en' => ['url' => 'http://domain.com/'],
-            'fr' => ['url' => 'http://domain.com/fr/'],
-            'de' => ['url' => 'http://domain.com/de/'],
-            'es' => ['url' => 'http://domain.com/es/'],
-        ]]);
-
-        // This applies to a file-based approach.
-
-        $collection = (new Collection)->handle('test')->sites(['en', 'fr', 'de']);
-        $this->assertFalse($collection->hasStructure());
-        $this->assertNull($collection->structure());
-
-        EntryFactory::id('1')->collection('test')->locale('en')->create();
-        EntryFactory::id('2')->collection('test')->locale('en')->create();
-        EntryFactory::id('3')->collection('test')->locale('en')->create();
-
-        EntryFactory::id('4')->collection('test')->locale('fr')->create();
-        EntryFactory::id('5')->collection('test')->locale('fr')->create();
-        EntryFactory::id('6')->collection('test')->locale('fr')->create();
-        EntryFactory::id('7')->collection('test')->locale('fr')->create();
-
-        $return = $collection->structureContents([
-            'max_depth' => 2,
-        ]);
-
-        TreeRepository::shouldReceive('find')->with('collections/test/en')->once()->andReturn(
-            (new CollectionStructureTree)->locale('en')->tree([
-                ['entry' => '1', 'children' => [
-                    ['entry' => '3'],
-                ]],
-                ['entry' => '2'],
-            ])->syncOriginal()
-        );
-
-        TreeRepository::shouldReceive('find')->with('collections/test/fr')->once()->andReturn(
-            (new CollectionStructureTree)->locale('fr')->tree([
-                ['entry' => '4', 'children' => [
-                    ['entry' => '6'],
-                ]],
-                ['entry' => '5'],
-                ['entry' => '7'],
-            ])->syncOriginal()
-        );
-
-        TreeRepository::shouldReceive('find')->with('collections/test/de')->once()->andReturnNull();
-        TreeRepository::shouldReceive('find')->with('collections/test/es')->once()->andReturnNull();
-
-        $this->assertEquals($collection, $return);
-        $this->assertEquals(['root' => false, 'max_depth' => 2], $collection->structureContents());
-        $this->assertTrue($collection->hasStructure());
-        $structure = $collection->structure();
-        $this->assertInstanceOf(CollectionStructure::class, $structure);
-        $this->assertEquals('collection::test', $structure->handle());
-        $this->assertSame($collection, $structure->collection());
-        $this->assertEquals(2, $structure->in('en')->pages()->all()->count());
-        $this->assertEquals(3, $structure->in('en')->flattenedPages()->count());
-        $this->assertEquals(3, $structure->in('fr')->pages()->all()->count());
-        $this->assertEquals(4, $structure->in('fr')->flattenedPages()->count());
-        $this->assertEquals(0, $structure->in('de')->pages()->all()->count());
-        $this->assertEquals(0, $structure->in('de')->flattenedPages()->count());
-        $this->assertNull($structure->in('es'));
-        $this->assertEquals(2, $structure->maxDepth());
     }
 
     /** @test */
@@ -637,12 +522,5 @@ class CollectionTest extends TestCase
 
         $collection->updateEntryUris();
         $collection->updateEntryUris(['one', 'two']);
-    }
-
-    private function makeStructure()
-    {
-        return (new CollectionStructure)->tap(function ($s) {
-            $s->addTree($s->makeTree('en'));
-        });
     }
 }

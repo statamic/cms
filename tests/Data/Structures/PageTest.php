@@ -116,7 +116,7 @@ class PageTest extends TestCase
         $parent->shouldReceive('uri')->andReturn('/the/parent/uri');
         $parent->shouldReceive('isRoot')->andReturnFalse();
 
-        $tree = $this->newTree()->structure(
+        $tree = $this->newTree()->setStructure(
             $this->mock(CollectionStructure::class)->shouldReceive('collection')->andReturn($collection)->getMock()
         );
 
@@ -138,7 +138,7 @@ class PageTest extends TestCase
         $entry->shouldReceive('uri')->andReturn('/the/actual/entry/uri');
         $entry->shouldReceive('value')->with('redirect')->andReturnNull();
 
-        $tree = $this->newTree()->structure(
+        $tree = $this->newTree()->setStructure(
             $this->mock(Nav::class)
         );
 
@@ -161,7 +161,7 @@ class PageTest extends TestCase
         $entry->shouldReceive('uri')->andReturn('/the/actual/entry/uri');
         $entry->shouldReceive('value')->with('redirect')->andReturn('http://example.com/page');
 
-        $tree = $this->newTree()->structure(
+        $tree = $this->newTree()->setStructure(
             $this->mock(Nav::class)
         );
 
@@ -178,7 +178,7 @@ class PageTest extends TestCase
     /** @test */
     public function it_gets_child_pages()
     {
-        $tree = $this->newTree()->structure($this->mock(Structure::class));
+        $tree = $this->newTree()->setStructure($this->mock(Structure::class));
 
         $page = (new Page)
             ->setTree($tree)
@@ -257,7 +257,7 @@ class PageTest extends TestCase
         $entry->shouldReceive('id')->andReturn('root');
         $entry->shouldReceive('slug')->andReturn('');
 
-        $tree = $this->newTree()->structure(
+        $tree = $this->newTree()->setStructure(
             $this->mock(Structure::class)->shouldReceive('collection')->andReturnFalse()->getMock()
         );
 
@@ -296,9 +296,23 @@ class PageTest extends TestCase
     protected function newTree()
     {
         return new class extends Tree {
+            private $structure;
+
             public function path()
             {
                 //
+            }
+
+            public function structure()
+            {
+                return $this->structure;
+            }
+
+            public function setStructure($structure)
+            {
+                $this->structure = $structure;
+
+                return $this;
             }
         };
     }

@@ -15,11 +15,11 @@ class NavigationsTest extends TestCase
     public function it_queries_navigations()
     {
         Nav::make('links')->title('Links')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {
-            $nav->addTree($nav->makeTree('en'));
+            $nav->makeTree('en')->save();
             $nav->save();
         });
         Nav::make('footer')->title('Footer')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {
-            $nav->addTree($nav->makeTree('en'));
+            $nav->makeTree('en')->save();
             $nav->save();
         });
 

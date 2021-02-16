@@ -53,6 +53,16 @@ return [
             'directory' => base_path('content/navigation'),
         ],
 
+        'collection-trees' => [
+            'class' => Stores\CollectionTreeStore::class,
+            'directory' => base_path('content/structures/collections'),
+        ],
+
+        'nav-trees' => [
+            'class' => Stores\NavTreeStore::class,
+            'directory' => base_path('content/structures/navigation'),
+        ],
+
         'globals' => [
             'class' => Stores\GlobalsStore::class,
             'directory' => base_path('content/globals'),

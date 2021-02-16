@@ -87,6 +87,11 @@ class PagesTest extends TestCase
             {
                 //
             }
+
+            public function structure()
+            {
+                //
+            }
         };
     }
 }

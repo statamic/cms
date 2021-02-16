@@ -2,24 +2,40 @@
 
 namespace Statamic\Structures;
 
+use Statamic\Events\NavTreeDeleted;
 use Statamic\Events\NavTreeSaved;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Nav;
 use Statamic\Facades\Site;
+use Statamic\Facades\Stache;
 
 class NavTree extends Tree
 {
+    public function structure()
+    {
+        return Blink::once('nav-tree-structure-'.$this->handle(), function () {
+            return Nav::findByHandle($this->handle());
+        });
+    }
+
     public function path()
     {
-        $path = base_path('content/structures/navigation/'.$this->handle());
+        $path = Stache::store('nav-trees')->directory();
 
         if (Site::hasMultiple()) {
-            $path .= '/'.$this->locale();
+            $path .= $this->locale().'/';
         }
 
-        return $path.'.yaml';
+        return "{$path}{$this->handle()}.yaml";
     }
 
     protected function dispatchSavedEvent()
     {
         NavTreeSaved::dispatch($this);
+    }
+
+    protected function dispatchDeletedEvent()
+    {
+        NavTreeDeleted::dispatch($this);
     }
 }

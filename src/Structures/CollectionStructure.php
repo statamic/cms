@@ -2,21 +2,12 @@
 
 namespace Statamic\Structures;
 
-use Facades\Statamic\Contracts\Structures\TreeRepository;
+use Statamic\Contracts\Structures\CollectionTreeRepository;
+use Statamic\Facades\Blink;
+use Statamic\Facades\Collection;
 
 class CollectionStructure extends Structure
 {
-    public function handle($handle = null)
-    {
-        if (func_num_args() === 1) {
-            throw new \LogicException('Handle cannot be set.');
-        }
-
-        if ($collection = $this->collection()) {
-            return 'collection::'.$collection->handle();
-        }
-    }
-
     public function title($title = null)
     {
         if (func_num_args() === 1) {
@@ -26,11 +17,11 @@ class CollectionStructure extends Structure
         return $this->collection()->title();
     }
 
-    public function collection($collection = null)
+    public function collection()
     {
-        return $this
-            ->fluentlyGetOrSet('collection')
-            ->args(func_get_args());
+        return Blink::once('collection-structure-collection-'.$this->handle(), function () {
+            return Collection::findByHandle($this->handle());
+        });
     }
 
     public function entryUri($entry)
@@ -54,7 +45,7 @@ class CollectionStructure extends Structure
 
     public function route(string $site): ?string
     {
-        return $this->collection->route($site);
+        return $this->collection()->route($site);
     }
 
     public function newTreeInstance()
@@ -69,10 +60,10 @@ class CollectionStructure extends Structure
         $entryIds = $this->getEntryIdsFromTree($tree);
 
         if ($entryId = $entryIds->duplicates()->first()) {
-            throw new \Exception("Duplicate entry [{$entryId}] in [{$this->collection->handle()}] collection's structure.");
+            throw new \Exception("Duplicate entry [{$entryId}] in [{$this->collection()->handle()}] collection's structure.");
         }
 
-        $thisCollectionsEntries = $this->collection->queryEntries()
+        $thisCollectionsEntries = $this->collection()->queryEntries()
             ->where('site', $locale)
             ->get(['id', 'site'])
             ->map->id();
@@ -135,25 +126,11 @@ class CollectionStructure extends Structure
 
     public function in($site)
     {
-        if (isset($this->trees[$site])) {
-            return $this->trees[$site];
-        }
-
-        $name = 'collections/'.$this->collection()->handle();
-
-        if ($this->collection()->sites()->count() > 1) {
-            $name .= '/'.$site;
-        }
-
-        if ($tree = TreeRepository::find($name)) {
-            $tree->locale($site)->structure($this);
-        }
+        $tree = app(CollectionTreeRepository::class)->find($this->collection()->handle(), $site);
 
         if (! $tree && $this->existsIn($site)) {
             $tree = $this->makeTree($site);
         }
-
-        $this->trees[$site] = $tree;
 
         return $tree;
     }

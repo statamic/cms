@@ -36,7 +36,7 @@ class TreeTest extends TestCase
 
         $tree = $this->newTree()
             ->locale('the-locale')
-            ->structure($structure);
+            ->setStructure($structure);
 
         $this->assertEquals('/the-route/{slug}', $tree->route());
     }
@@ -47,7 +47,7 @@ class TreeTest extends TestCase
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('editUrl')->withNoArgs()->once()->andReturn('/edit-url');
 
-        $tree = $this->newTree()->structure($structure);
+        $tree = $this->newTree()->setStructure($structure);
 
         $this->assertEquals('/edit-url', $tree->editUrl());
     }
@@ -58,7 +58,7 @@ class TreeTest extends TestCase
         $structure = $this->mock(Structure::class);
         $structure->shouldReceive('deleteUrl')->withNoArgs()->once()->andReturn('/delete-url');
 
-        $tree = $this->newTree()->structure($structure);
+        $tree = $this->newTree()->setStructure($structure);
 
         $this->assertEquals('/delete-url', $tree->deleteUrl());
     }
@@ -72,7 +72,7 @@ class TreeTest extends TestCase
 
         $tree = $this->newTree()
             ->locale('the-locale')
-            ->structure($structure);
+            ->setStructure($structure);
 
         $this->assertEquals('/show-url', $tree->showUrl());
     }
@@ -86,7 +86,7 @@ class TreeTest extends TestCase
 
         $tree = $this->newTree()
             ->locale('the-locale')
-            ->structure($structure);
+            ->setStructure($structure);
 
         $this->assertEquals('/show-url', $tree->showUrl());
     }
@@ -425,7 +425,7 @@ class TreeTest extends TestCase
         $structure->shouldReceive('validateTree')->with($firstContents, 'the-locale')->once()->andReturn($firstContents);
         $structure->shouldReceive('validateTree')->with($secondContents, 'the-locale')->once()->andReturn($secondContents);
 
-        $tree = $this->newTree()->structure($structure)->locale('the-locale');
+        $tree = $this->newTree()->setStructure($structure)->locale('the-locale');
 
         // Calling tree multiple times doesn't re-validate
         $tree->tree($firstContents);
@@ -527,7 +527,7 @@ class TreeTest extends TestCase
     {
         return $this->newTree()
             ->locale('en')
-            ->structure((new Nav)->expectsRoot(true))
+            ->setStructure((new Nav)->expectsRoot(true))
             ->tree($tree ?? [
                 [
                     'entry' => 'pages-home',
@@ -555,9 +555,23 @@ class TreeTest extends TestCase
     protected function newTree()
     {
         return new class extends Tree {
+            private $structure;
+
             public function path()
             {
                 //
+            }
+
+            public function structure()
+            {
+                return $this->structure;
+            }
+
+            public function setStructure($structure)
+            {
+                $this->structure = $structure;
+
+                return $this;
             }
         };
     }

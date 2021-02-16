@@ -3,6 +3,7 @@
 namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Statamic\Stache\Repositories\CollectionTreeRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
@@ -255,7 +256,10 @@ class EntryTest extends TestCase
         $noChildren = tap((new Entry)->id('3')->locale('en')->collection($collection)->slug('nochildren')->set('redirect', '@child'))->save();
 
         $collection->structureContents([
-            'tree' => [
+            'expects_root' => false, // irrelevant. just can't pass an empty array at the moment.
+        ])->save();
+        $collection->structure()->in('en')->tree(
+            [
                 [
                     'entry' => '1',
                     'children' => [
@@ -265,8 +269,8 @@ class EntryTest extends TestCase
                 [
                     'entry' => '3',
                 ],
-            ],
-        ])->save();
+            ]
+        )->save();
 
         $this->assertEquals('/parent', $parent->uri());
         $this->assertEquals('/parent/child', $parent->url());
@@ -442,12 +446,14 @@ class EntryTest extends TestCase
 
         $collection->structureContents([
             'max_depth' => 1,
-            'tree' => [
+        ])->save();
+        $collection->structure()->in('en')->tree(
+            [
                 ['entry' => 'three'],
                 ['entry' => 'one'],
                 ['entry' => 'two'],
-            ],
-        ])->save();
+            ]
+        )->save();
 
         $this->assertEquals(2, $one->order());
         $this->assertEquals(3, $two->order());
@@ -1002,9 +1008,9 @@ class EntryTest extends TestCase
         $tree = $this->partialMock(CollectionStructureTree::class);
         $tree->locale('en');
         $tree->shouldReceive('page')->with('entry-id')->andReturn($page);
+        CollectionTreeRepository::shouldReceive('find', 'en')->andReturn($tree);
 
         $structure = new CollectionStructure;
-        $structure->addTree($tree);
         $collection = tap(Collection::make('test')->structure($structure))->save();
 
         $entry = (new Entry)->id('entry-id')->locale('en')->collection($collection);

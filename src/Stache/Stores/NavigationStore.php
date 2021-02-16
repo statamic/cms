@@ -51,16 +51,10 @@ class NavigationStore extends BasicStore
 
     protected function makeSingleSiteStructureFromFile($handle, $path, $data)
     {
-        $structure = $this
+        return $this
             ->makeBaseStructureFromFile($handle, $path, $data)
             ->maxDepth($data['max_depth'] ?? null)
             ->collections($data['collections'] ?? null);
-
-        return $structure->addTree(
-            $structure
-                ->makeTree(Site::default()->handle())
-                ->tree($data['tree'] ?? [])
-        );
     }
 
     protected function makeMultiSiteStructureFromFile($handle, $path, $data)
