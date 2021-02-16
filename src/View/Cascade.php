@@ -203,7 +203,7 @@ class Cascade
 
         return collect($all)
             ->reverse()
-            ->reduce(function ($carry, $data, $path) {
+            ->reduce(function ($carry, $data) {
                 return $carry->merge($data);
             }, collect())
             ->merge($all[$view])
