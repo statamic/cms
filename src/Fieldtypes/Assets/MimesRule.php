@@ -14,7 +14,7 @@ class MimesRule implements Rule
         if (in_array('jpg', $parameters) || in_array('jpeg', $parameters)) {
             $parameters = array_unique(array_merge($parameters, ['jpg', 'jpeg']));
         }
-        
+
         $this->parameters = $parameters;
     }
 

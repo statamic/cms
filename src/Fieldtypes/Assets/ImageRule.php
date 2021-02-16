@@ -42,5 +42,3 @@ class ImageRule implements Rule
         return __('statamic::validation.image');
     }
 }
-
-
