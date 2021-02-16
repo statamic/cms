@@ -46,5 +46,3 @@ class MimesRule implements Rule
         return str_replace(':values', join(', ', $this->parameters), __('statamic::validation.mimes'));
     }
 }
-
-
