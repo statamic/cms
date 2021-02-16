@@ -2523,4 +2523,13 @@ class CoreModifiers extends Modifier
 
         return $value;
     }
+
+    public function pluck($value, $params, $context)
+    {
+        $fieldName = array_get($params, 0);
+        $mapped = $value->map(function ($value) use ($fieldName) {
+            return $value->get($fieldName);
+        });
+        return $mapped->toArray();
+    }
 }
