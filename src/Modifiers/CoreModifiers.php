@@ -2530,6 +2530,7 @@ class CoreModifiers extends Modifier
         $mapped = $value->map(function ($value) use ($fieldName) {
             return $value->get($fieldName);
         });
+
         return $mapped->toArray();
     }
 }
