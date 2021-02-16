@@ -102,6 +102,11 @@ abstract class Fieldtype implements Arrayable
         return $value;
     }
 
+    public function preProcessRules($rules)
+    {
+        return $rules;
+    }
+
     public function defaultValue()
     {
         return $this->defaultValue;

@@ -167,6 +167,27 @@ class Assets extends Fieldtype
         return $rules;
     }
 
+    public function preProcessRules($rules)
+    {
+        return collect($rules)->map(function ($rules) {
+            return collect($rules)->map(function ($rule) {
+                $name = Str::before($rule, ':');
+
+                if ($name === 'image') {
+                    return new ImageRule();
+                }
+
+                if ($name === 'mimes') {
+                    $parameters = explode(',', Str::after($rule, ':'));
+
+                    return new MimesRule($parameters);
+                }
+
+                return $rule;
+            })->all();
+        })->all();
+    }
+
     public function preProcessIndex($data)
     {
         if (! $assets = $this->augment($data)) {

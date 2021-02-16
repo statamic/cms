@@ -241,6 +241,11 @@ class Field implements Arrayable
         );
     }
 
+    public function preProcessedRules()
+    {
+        return $this->fieldtype()->preProcessRules($this->rules());
+    }
+
     public function augment()
     {
         return $this->newInstance()->setValue(
