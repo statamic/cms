@@ -89,7 +89,7 @@ class Asset implements AssetContract, Augmentable
     {
         $this->meta = $this->meta();
 
-        $this->data = collect($this->meta['data']);
+        $this->data = collect(Arr::get($this->meta, 'data', []));
 
         return $this;
     }
@@ -360,7 +360,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function lastModified()
     {
-        return Carbon::createFromTimestamp($this->meta()['last_modified']);
+        return Carbon::createFromTimestamp(Arr::get($this->meta(), 'last_modified'));
     }
 
     /**
@@ -492,7 +492,10 @@ class Asset implements AssetContract, Augmentable
      */
     public function dimensions()
     {
-        return [$this->meta()['width'], $this->meta()['height']];
+        return [
+            Arr::get($this->meta(), 'width'),
+            Arr::get($this->meta(), 'height'),
+        ];
     }
 
     /**
@@ -554,7 +557,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function size()
     {
-        return $this->meta()['size'];
+        return Arr::get($this->meta(), 'size');
     }
 
     /**
