@@ -196,4 +196,17 @@ class Cascade
 
         return $this;
     }
+
+    public function getViewData($view)
+    {
+        $all = $this->get('views') ?? [];
+
+        return collect($all)
+            ->reverse()
+            ->reduce(function ($carry, $data) {
+                return $carry->merge($data);
+            }, collect())
+            ->merge($all[$view])
+            ->all();
+    }
 }
