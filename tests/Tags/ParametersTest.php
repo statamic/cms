@@ -199,6 +199,12 @@ class ParametersTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_nested()
+    {
+        $this->assertSame('bar', $this->params->get(':evaluatednested'));
+    }
+
+    /** @test */
     public function it_is_iterable()
     {
         $expected = [

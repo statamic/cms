@@ -1157,7 +1157,7 @@ class Parser
      * @param  mixed        $default Default value to use if not found
      * @return mixed
      */
-    protected function getVariable($key, $context, $default = null)
+    public function getVariable($key, $context, $default = null)
     {
         [$key, $modifiers] = $this->parseModifiers($key);
 

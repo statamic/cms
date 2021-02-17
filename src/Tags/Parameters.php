@@ -17,7 +17,7 @@ class Parameters extends ArrayAccessor
             // Values in parameters prefixed with a colon should be treated as the corresponding field's value in the context.
             if (Str::startsWith($key, ':')) {
                 $key = substr($key, 1);
-                $value = $context->get($value);
+                $value = \Statamic\Facades\Antlers::parser()->getVariable($value, $context->all());
             }
 
             if ($value instanceof Value) {
