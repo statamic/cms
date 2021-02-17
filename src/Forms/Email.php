@@ -9,6 +9,7 @@ use Statamic\Facades\Config;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Parse;
 use Statamic\Sites\Site;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Email extends Mailable
@@ -85,7 +86,7 @@ class Email extends Mailable
 
         $data = array_merge($augmented, $this->getGlobalsData(), [
             'config'     => config()->all(),
-            'fields'     => $this->getRenderableFieldData($augmented),
+            'fields'     => $this->getRenderableFieldData(Arr::except($augmented, ['id', 'date'])),
             'site_url'   => Config::getSiteUrl(),
             'date'       => now(),
             'now'        => now(),
