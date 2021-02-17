@@ -1646,6 +1646,8 @@ class CoreModifiers extends Modifier
         $times = Arr::get($params, 0, 1);
         $times = is_numeric($times) ? $times : Arr::get($context, $times);
 
+        $times = ($times instanceof Value) ? $times->value() : $times;
+
         return str_repeat($value, $times);
     }
 
