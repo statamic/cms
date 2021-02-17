@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Repositories;
 
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Contracts\Entries\EntryRepository as RepositoryContract;
