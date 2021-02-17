@@ -16,6 +16,8 @@ return [
     'bard.config.always_show_set_button' => 'Enable to always show the "Add Set" button.',
     'bard.config.buttons' => 'Choose which buttons to show in the toolbar.',
     'bard.config.container' => 'Choose which asset container to use for this field.',
+    'bard.config.enable_input_rules' => 'Enables Markdown-style shortcuts when typing content.',
+    'bard.config.enable_paste_rules' => 'Enables Markdown-style shortcuts when pasting content.',
     'bard.config.fullscreen' => 'Enable to toggle into fullscreen mode',
     'bard.config.link_noopener' => 'Set `rel="noopener` on all links.',
     'bard.config.link_noreferrer' => 'Set `rel="noreferrer` on all links.',
