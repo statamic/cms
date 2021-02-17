@@ -238,11 +238,15 @@ class ParametersTest extends TestCase
             ':evaluated' => 'foo|upper',
             ':double_quotes' => '"double"|upper',
             ':single_quotes' => "'single'|upper",
+            ':double_quotes_with_spaces' => '"double" | upper',
+            ':single_quotes_with_spaces' => "'single' | upper",
         ], $context);
 
         $this->assertSame('BAR', $params->get('evaluated'));
         $this->assertSame('DOUBLE', $params->get('double_quotes'));
         $this->assertSame('SINGLE', $params->get('single_quotes'));
+        $this->assertSame('DOUBLE', $params->get('double_quotes_with_spaces'));
+        $this->assertSame('SINGLE', $params->get('single_quotes_with_spaces'));
     }
 
     /** @test */
