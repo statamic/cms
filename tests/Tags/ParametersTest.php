@@ -198,10 +198,35 @@ class ParametersTest extends TestCase
         $this->assertSame('fallback', $this->params->float('unknown', 'fallback'));
     }
 
-    /** @test */
-    public function it_gets_nested()
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/3248
+     */
+    public function it_gets_nested_values()
     {
-        $this->assertSame('bar', $this->params->get(':evaluatednested'));
+        $augmentable = new class implements \Statamic\Contracts\Data\Augmentable {
+            use \Statamic\Data\HasAugmentedData;
+
+            public function augmentedArrayData()
+            {
+                return [
+                    'foo' => 'a',
+                ];
+            }
+        };
+
+        $context = new Context([
+            'array' => ['foo' => 'b'],
+            'object' => $augmentable,
+        ]);
+
+        $params = Parameters::make([
+            ':arr' => 'array:foo',
+            ':obj' => 'object:foo',
+        ], $context);
+
+        $this->assertSame('b', $params->get('arr'));
+        $this->assertSame('a', $params->get('obj'));
     }
 
     /** @test */
