@@ -126,6 +126,8 @@ class Parser
 
         $this->view = $view;
 
+        $data = array_merge($data, ['view' => $this->cascade->getViewData($view)]);
+
         try {
             $parsed = $this->parse($text, $data);
         } catch (\Exception | \Error $e) {
@@ -1218,24 +1220,6 @@ class Parser
             // If it's not found in the context, we'll try looking for it in the cascade.
             if ($cascading = $this->cascade->get($first)) {
                 return $this->getVariableExistenceAndValue($rest, $cascading);
-            }
-
-            // If the first part of the variable is "view", we'll try to get the value from
-            // values defined in any views' front-matter. They are stored in the cascade
-            // organized by the view paths. It should be able to get a value from any
-            // loaded view, but the current view should take precedence. (ie. if
-            // you define the same var in this view and another view, the one
-            // from this view should win.)
-            if ($first == 'view') {
-                $views = collect($this->cascade->get('views'));
-                $thisView = $views->pull($this->view);
-                $views->prepend($thisView, $this->view);
-                foreach ($views as $viewData) {
-                    $viewExistAndVal = $this->getVariableExistenceAndValue($rest, $viewData);
-                    if ($viewExistAndVal[0]) {
-                        return $viewExistAndVal;
-                    }
-                }
             }
 
             return [false, null];
