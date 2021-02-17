@@ -44,7 +44,7 @@ class Validator
         }
 
         return $this->fields->preProcessValidatables()->all()->reduce(function ($carry, $field) {
-            return $carry->merge($field->preProcessedRules());
+            return $carry->merge($field->rules());
         }, collect());
     }
 
