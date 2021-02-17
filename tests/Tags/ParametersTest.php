@@ -230,6 +230,22 @@ class ParametersTest extends TestCase
     }
 
     /** @test */
+    public function it_can_use_modifiers()
+    {
+        $context = new Context(['foo' => 'bar']);
+
+        $params = Parameters::make([
+            ':evaluated' => 'foo|upper',
+            ':double_quotes' => '"double"|upper',
+            ':single_quotes' => "'single'|upper",
+        ], $context);
+
+        $this->assertSame('BAR', $params->get('evaluated'));
+        $this->assertSame('DOUBLE', $params->get('double_quotes'));
+        $this->assertSame('SINGLE', $params->get('single_quotes'));
+    }
+
+    /** @test */
     public function it_is_iterable()
     {
         $expected = [
