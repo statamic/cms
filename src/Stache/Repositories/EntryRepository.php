@@ -69,6 +69,7 @@ class EntryRepository implements RepositoryContract
                     ->published(true)
                     ->slug($data['slug'])
                     ->model($this->make())
+                    ->date($data['data']['date'] ?? Carbon::now())
                     ->data($data['data']);
 
             return $entry;
