@@ -4,7 +4,10 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
+use Illuminate\Support\Str;
+use Illuminate\Support\Stringable;
 use Statamic\Console\RunsInPlease;
+use Statamic\Facades\File;
 
 class AuthMigration extends Command
 {
@@ -28,6 +31,12 @@ class AuthMigration extends Command
         $to = database_path("migrations/{$file}.php");
 
         copy($from, $to);
+
+        $contents = str_replace('USERS_TABLE', config('statamic.users.tables.users', 'users'), File::get($to));
+        $contents = str_replace('ROLE_USER_TABLE', config('statamic.users.tables.role_user', 'role_user'), $contents);
+        $contents = str_replace('GROUP_USER_TABLE', config('statamic.users.tables.group_user', 'group_user'), $contents);
+
+        File::put($to, $contents);
 
         $this->line("<info>Created Migration:</info> {$file}");
 
