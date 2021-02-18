@@ -46,13 +46,11 @@ class UserRepository extends BaseRepository
 
     public function findByEmail(string $email): ?UserContract
     {
-        return Blink::once("eloquent-user-find-{$email}", function () use ($email) {
-            if (! $model = $this->model('where', 'email', $email)->first()) {
-                return null;
-            }
+        if (! $model = $this->model('where', 'email', $email)->first()) {
+            return null;
+        }
 
-            return $this->makeUser($model);
-        });
+        return $this->makeUser($model);
     }
 
     public function model($method, ...$args)
@@ -83,7 +81,6 @@ class UserRepository extends BaseRepository
         $user->saveToDatabase();
 
         Blink::forget("eloquent-user-find-{$user->id()}");
-        Blink::forget("eloquent-user-find-{$user->email()}");
     }
 
     public function delete(UserContract $user)
@@ -91,7 +88,6 @@ class UserRepository extends BaseRepository
         $user->model()->delete();
 
         Blink::forget("eloquent-user-find-{$user->id()}");
-        Blink::forget("eloquent-user-find-{$user->email()}");
     }
 
     public function fromUser($user): ?UserContract
