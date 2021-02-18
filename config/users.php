@@ -89,4 +89,10 @@ return [
 
     'database' => config('database.default'),
 
+    'tables' => [
+        'users' => 'users',
+        'role_user' => 'role_user',
+        'group_user' => 'group_user',
+    ],
+
 ];
