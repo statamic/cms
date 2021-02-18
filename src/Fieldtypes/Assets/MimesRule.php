@@ -4,6 +4,7 @@ namespace Statamic\Fieldtypes\Assets;
 
 use Illuminate\Contracts\Validation\Rule;
 use Statamic\Facades\Asset;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 class MimesRule implements Rule
 {
@@ -28,6 +29,10 @@ class MimesRule implements Rule
     public function passes($attribute, $value)
     {
         return collect($value)->every(function ($id) {
+            if ($id instanceof UploadedFile) {
+                return in_array($id->guessExtension(), $this->parameters);
+            }
+
             if (! $asset = Asset::find($id)) {
                 return false;
             }
