@@ -5,6 +5,7 @@ namespace Statamic\View;
 use Illuminate\Http\Request;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\URL;
 use Statamic\Sites\Site;
@@ -179,6 +180,7 @@ class Cascade
             'get' => Arr::sanitize($this->request->query->all()),
             'post' => $this->request->isMethod('post') ? Arr::sanitize($this->request->request->all()) : [],
             'old' => Arr::sanitize(old(null, [])),
+            'template' => Blink::get('statamic-template'),
 
             'site' => $this->site,
             'sites' => Facades\Site::all()->values(),
