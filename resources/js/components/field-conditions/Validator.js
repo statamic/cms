@@ -124,6 +124,11 @@ export default class {
             lhs = null;
         }
 
+        // When lhs is an empty array and we're not using an array operator, cast to null.
+        if (_.isArray(lhs) && _.isEmpty(lhs) && operator !== 'includes' && operator !== 'includes_any') {
+            lhs = null;
+        }
+
         // Prepare for eval() and return.
         return _.isString(lhs)
             ? JSON.stringify(lhs.trim())
