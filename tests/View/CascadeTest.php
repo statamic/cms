@@ -4,6 +4,7 @@ namespace Tests\View;
 
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
+use Statamic\Facades\Blink;
 use Statamic\Facades\GlobalSet;
 use Statamic\Facades\Site;
 use Statamic\Facades\User;
@@ -250,6 +251,19 @@ class CascadeTest extends TestCase
         tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
             $expected = ['foo' => 'bar', 'script' => '&lt;script&gt;', 'tag' => '&lbrace;&lbrace; foo &rbrace;&rbrace;'];
             $this->assertEquals($expected, $cascade['old']);
+        });
+    }
+
+    /** @test */
+    public function it_hydrates_template()
+    {
+        Blink::shouldReceive('get')->with('statamic-template')->andReturn('eins')->once();
+
+        $this->get('/');
+
+        tap($this->cascade()->hydrate()->toArray(), function ($cascade) {
+            $expected = 'eins';
+            $this->assertEquals($expected, $cascade['template']);
         });
     }
 
