@@ -3,6 +3,7 @@
 namespace Statamic\View;
 
 use Facades\Statamic\View\Cascade;
+use Statamic\Facades\Blink;
 use Statamic\Support\Str;
 use Statamic\View\Events\ViewRendered;
 
@@ -56,6 +57,8 @@ class View
         }
 
         $this->template = $template;
+
+        Blink::put('statamic-template', $template);
 
         return $this;
     }
