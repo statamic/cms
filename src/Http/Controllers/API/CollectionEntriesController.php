@@ -9,7 +9,7 @@ class CollectionEntriesController extends ApiController
     public function index($collection)
     {
         return app(EntryResource::class)::collection(
-            $this->filterSortAndPaginate($collection->queryEntries())
+            $this->filterSortAndPaginate($collection->queryEntries()->where('status', 'published'))
         );
     }
 
