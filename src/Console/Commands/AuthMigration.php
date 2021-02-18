@@ -4,8 +4,6 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
-use Illuminate\Support\Str;
-use Illuminate\Support\Stringable;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 
