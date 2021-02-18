@@ -3,6 +3,7 @@
 namespace Tests\View\Antlers;
 
 use Illuminate\Support\Facades\Event;
+use Statamic\Facades\Blink;
 use Statamic\View\Events\ViewRendered;
 use Statamic\View\View;
 use Tests\FakesViews;
@@ -138,6 +139,8 @@ class ViewTest extends TestCase
     /** @test */
     public function gets_template()
     {
+        Blink::shouldReceive('put')->with('statamic-template', 'foo')->once();
+
         $view = (new View)->template('foo');
 
         $this->assertEquals('foo', $view->template());
