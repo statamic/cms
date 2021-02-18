@@ -75,7 +75,7 @@ class Field implements Arrayable
     {
         $rules = [$this->handle => $this->addNullableRule(array_merge(
             $this->get('required') ? ['required'] : [],
-            Validator::explodeRules(array_get($this->config, 'validate')),
+            Validator::explodeRules($this->fieldtype()->fieldRules()),
             Validator::explodeRules($this->fieldtype()->rules())
         ))];
 
@@ -91,7 +91,7 @@ class Field implements Arrayable
         $nullable = true;
 
         foreach ($rules as $rule) {
-            if (preg_match('/^required_?/', $rule)) {
+            if (is_string($rule) && preg_match('/^required_?/', $rule)) {
                 $nullable = false;
                 break;
             }
