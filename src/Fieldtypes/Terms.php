@@ -94,7 +94,7 @@ class Terms extends Relationship
 
                 $locale = $parent && $parent instanceof Localization
                     ? $parent->locale()
-                    : Site::current()->handle();
+                    : Site::current()->handle(); // Use the "current" site so this will get localized appropriately on the front-end.
 
                 return $term->in($locale);
             });
