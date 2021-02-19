@@ -15,7 +15,7 @@
         :revisions="{{ Statamic\Support\Str::bool($revisionsEnabled ) }}"
         :breadcrumbs="{{ $breadcrumbs->toJson() }}"
         site="{{ $locale }}"
-        create-another-url="{{ cp_route('collections.entries.create', [$collection, $locale, 'blueprint' => $blueprint['handle']]) }}"
+        create-another-url="{{ cp_route('collections.entries.create', [$collection, $locale, 'blueprint' => $blueprint['handle'], 'parent' => $values['parent']]) }}"
         listing-url="{{ cp_route('collections.show', $collection) }}"
         :can-manage-publish-state="{{ Statamic\Support\Str::bool($canManagePublishState) }}"
     ></base-entry-create-form>
