@@ -134,6 +134,21 @@ class Asset implements AssetContract, Augmentable
         });
     }
 
+    protected function metaValue($key)
+    {
+        $value = array_get($this->meta(), $key);
+
+        if (! is_null($value)) {
+            return $value;
+        }
+
+        Cache::forget($this->metaCacheKey());
+
+        $this->writeMeta($meta = $this->generateMeta());
+
+        return array_get($meta, $key);
+    }
+
     public function generateMeta()
     {
         $meta = ['data' => $this->data->all()];
@@ -360,7 +375,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function lastModified()
     {
-        return Carbon::createFromTimestamp($this->meta()['last_modified']);
+        return Carbon::createFromTimestamp($this->metaValue('last_modified'));
     }
 
     /**
@@ -492,7 +507,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function dimensions()
     {
-        return [$this->meta()['width'], $this->meta()['height']];
+        return [$this->metaValue('width'), $this->metaValue('height')];
     }
 
     /**
@@ -554,7 +569,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function size()
     {
-        return $this->meta()['size'];
+        return $this->metaValue('size');
     }
 
     /**
