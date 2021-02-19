@@ -209,7 +209,15 @@ class Terms extends Relationship
             return $this->invalidItemArray($id);
         }
 
-        $term = $term->in(Site::current()->handle());
+        // The parent is the item this terms fieldtype exists on. Most commonly an
+        // entry, but could also be something else, like another taxonomy term.
+        $parent = $this->field->parent();
+
+        $locale = $parent && $parent instanceof Localization
+            ? $parent->locale()
+            : Site::default()->handle();
+
+        $term = $term->in($locale);
 
         return [
             'id' => $id,
