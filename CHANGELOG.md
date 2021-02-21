@@ -7,6 +7,7 @@
 
 ### What's changing
 - A `hasCachedPage` method has been added to the `Statamic\StaticCaching\Cacher` interface.
+- GraphQL queries are all disabled by default. [#3289](https://github.com/statamic/cms/issues/3289)
 
 
 
