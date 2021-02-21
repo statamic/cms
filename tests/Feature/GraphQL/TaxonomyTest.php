@@ -10,6 +10,21 @@ use Tests\TestCase;
 class TaxonomyTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['taxonomies'];
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{taxonomy}'])
+            ->assertSee('Cannot query field \"taxonomy\" on type \"Query\"', false);
+    }
 
     /** @test */
     public function it_queries_a_taxonomy_by_handle()

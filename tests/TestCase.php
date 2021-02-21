@@ -99,19 +99,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
 
         $app['config']->set('statamic.api.enabled', true);
         $app['config']->set('statamic.graphql.enabled', true);
-        $app['config']->set('statamic.graphql.queries', [
-            'entries' => true,
-            'collections' => true,
-            'assets' => true,
-            'asset-containers' => true,
-            'taxonomies' => true,
-            'taxonomy-terms' => true,
-            'globals' => true,
-            'navs' => true,
-            'sites' => true,
-            'users' => true,
-        ]);
-
         $app['config']->set('statamic.editions.pro', true);
 
         $app['config']->set('cache.stores.outpost', [

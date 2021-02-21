@@ -12,11 +12,26 @@ class NavTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['navs'];
 
     public function setUp(): void
     {
         parent::setUp();
         BlueprintRepository::partialMock();
+    }
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{nav}'])
+            ->assertSee('Cannot query field \"nav\" on type \"Query\"', false);
     }
 
     /** @test */

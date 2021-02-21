@@ -10,6 +10,21 @@ use Tests\TestCase;
 class CollectionsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['collections'];
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{collections}'])
+            ->assertSee('Cannot query field \"collections\" on type \"Query\"', false);
+    }
 
     /** @test */
     public function it_queries_collections()

@@ -13,6 +13,9 @@ use Tests\TestCase;
 class PageTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['collections', 'entries'];
 
     private function createData()
     {

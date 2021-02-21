@@ -12,11 +12,26 @@ use Tests\TestCase;
 class GlobalsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['globals'];
 
     public function setUp(): void
     {
         parent::setUp();
         BlueprintRepository::partialMock();
+    }
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{globalSets}'])
+            ->assertSee('Cannot query field \"globalSets\" on type \"Query\"', false);
     }
 
     /** @test */
