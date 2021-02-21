@@ -34,33 +34,30 @@ class DefaultSchema
     public function getConfig()
     {
         return [
-            'query' => [
-                PingQuery::class,
-                EntriesQuery::class,
-                EntryQuery::class,
-                CollectionsQuery::class,
-                CollectionQuery::class,
-                AssetsQuery::class,
-                AssetQuery::class,
-                AssetContainersQuery::class,
-                AssetContainerQuery::class,
-                TaxonomiesQuery::class,
-                TaxonomyQuery::class,
-                TermsQuery::class,
-                TermQuery::class,
-                GlobalSetsQuery::class,
-                GlobalSetQuery::class,
-                NavsQuery::class,
-                NavQuery::class,
-                SitesQuery::class,
-                UsersQuery::class,
-                UserQuery::class,
-            ],
+            'query' => $this->getQueries(),
             'mutation' => [],
             'middleware' => [
                 CacheResponse::class,
             ],
             'method' => ['get', 'post'],
         ];
+    }
+
+    private function getQueries()
+    {
+        return collect([
+            'entries' => [EntriesQuery::class, EntryQuery::class],
+            'collections' => [CollectionsQuery::class, CollectionQuery::class],
+            'assets' => [AssetsQuery::class, AssetQuery::class],
+            'asset-containers' => [AssetContainersQuery::class, AssetContainerQuery::class],
+            'taxonomies' => [TaxonomiesQuery::class, TaxonomyQuery::class],
+            'taxonomy-terms' => [TermsQuery::class, TermQuery::class],
+            'globals' => [GlobalSetsQuery::class, GlobalSetQuery::class],
+            'navs' => [NavsQuery::class, NavQuery::class],
+            'sites' => [SitesQuery::class],
+            'users' => [UsersQuery::class, UserQuery::class],
+        ])->reduce(function ($carry, $queries, $key) {
+            return $carry->merge(config('statamic.graphql.queries.'.$key) ? $queries : []);
+        }, collect())->prepend(PingQuery::class)->all();
     }
 }
