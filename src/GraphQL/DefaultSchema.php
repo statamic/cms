@@ -56,7 +56,7 @@ class DefaultSchema
             'navs' => [NavsQuery::class, NavQuery::class],
             'sites' => [SitesQuery::class],
             'users' => [UsersQuery::class, UserQuery::class],
-        ])->reduce(function ($carry, $queries, $key) {
+        ])->reduceWithKeys(function ($carry, $queries, $key) {
             return $carry->merge(config('statamic.graphql.queries.'.$key) ? $queries : []);
         }, collect())->prepend(PingQuery::class)->all();
     }
