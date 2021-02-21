@@ -45,7 +45,9 @@ class DefaultSchema
 
     private function getQueries()
     {
-        return collect([
+        $queries = collect([PingQuery::class]);
+
+        collect([
             'entries' => [EntriesQuery::class, EntryQuery::class],
             'collections' => [CollectionsQuery::class, CollectionQuery::class],
             'assets' => [AssetsQuery::class, AssetQuery::class],
@@ -56,8 +58,10 @@ class DefaultSchema
             'navs' => [NavsQuery::class, NavQuery::class],
             'sites' => [SitesQuery::class],
             'users' => [UsersQuery::class, UserQuery::class],
-        ])->reduceWithKeys(function ($carry, $queries, $key) {
-            return $carry->merge(config('statamic.graphql.queries.'.$key) ? $queries : []);
-        }, collect())->prepend(PingQuery::class)->all();
+        ])->each(function ($qs, $key) use (&$queries) {
+            $queries = $queries->merge(config('statamic.graphql.queries.'.$key) ? $qs : []);
+        });
+
+        return $queries->all();
     }
 }
