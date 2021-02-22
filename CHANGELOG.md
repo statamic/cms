@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 3.0.45 (2020-02-22)
 
 ### What's new
 - Add new `chunk` modifier. [849ae0ccb](https://github.com/statamic/cms/commit/849ae0ccb)
