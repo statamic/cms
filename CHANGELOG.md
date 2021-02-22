@@ -7,6 +7,7 @@
 
 ### What's changing
 - A `hasCachedPage` method has been added to the `Statamic\StaticCaching\Cacher` interface.
+- Global search is now only triggered with a slash. (Not ctrl/alt/shift+f)
 
 
 

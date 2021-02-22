@@ -188,7 +188,7 @@ export default {
     },
 
     mounted() {
-        this.$keys.bind(['/', 'ctrl+f', 'alt+f', 'shift+f'], e => {
+        this.$keys.bind('/', e => {
             e.preventDefault();
             this.focus();
         });
