@@ -371,6 +371,16 @@ class Asset implements AssetContract, Augmentable
     }
 
     /**
+     * Get the guessed file extension of the asset based on its MIME type.
+     *
+     * @return string
+     */
+    public function guessedExtension()
+    {
+        return $this->metaValue('guessed_extension');
+    }
+
+    /**
      * Get the last modified time of the asset.
      *
      * @return \Carbon\Carbon
@@ -685,6 +695,16 @@ class Asset implements AssetContract, Augmentable
     public function extensionIsOneOf($filetypes = [])
     {
         return in_array(strtolower($this->extension()), $filetypes);
+    }
+
+    /**
+     * Check if asset's guessed file extension is one of a given list.
+     *
+     * @return string
+     */
+    public function guessedExtensionIsOneOf($filetypes = [])
+    {
+        return in_array(strtolower($this->guessedExtension()), $filetypes);
     }
 
     public function __toString()

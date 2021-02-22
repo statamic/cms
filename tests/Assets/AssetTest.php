@@ -346,6 +346,8 @@ class AssetTest extends TestCase
             'data' => [],
             'size' => 723,
             'last_modified' => Carbon::parse('2012-01-02 4:57pm')->timestamp,
+            'mime_type' => 'image/jpeg',
+            'guessed_extension' => 'jpg',
             'width' => 30,
             'height' => 60,
         ];
@@ -354,6 +356,8 @@ class AssetTest extends TestCase
             'data' => ['foo' => 'bar'],
             'size' => 723,
             'last_modified' => Carbon::parse('2012-01-02 4:57pm')->timestamp,
+            'mime_type' => 'image/jpeg',
+            'guessed_extension' => 'jpg',
             'width' => 30,
             'height' => 60,
         ];
@@ -397,6 +401,8 @@ class AssetTest extends TestCase
             'data' => [],
             'size' => 723,
             'last_modified' => $timestamp,
+            'mime_type' => 'image/jpeg',
+            'guessed_extension' => 'jpg',
             'width' => 30,
             'height' => 60,
         ];

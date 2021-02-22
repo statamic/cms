@@ -33,6 +33,8 @@ class AssetRepositoryTest extends TestCase
 data: {  }
 size: 723
 last_modified: $timestamp
+mime_type: image/jpeg
+guessed_extension: jpg
 width: 30
 height: 60
 
