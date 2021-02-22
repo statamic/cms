@@ -171,15 +171,21 @@ class Assets extends Fieldtype
     {
         return collect(parent::fieldRules())->map(function ($rule) {
             $name = Str::before($rule, ':');
+            
+            if ($parameters = Str::after($rule, ':')) {
+                $parameters = explode(',', $rule);
+            }
 
             if ($name === 'image') {
                 return new ImageRule();
             }
 
             if ($name === 'mimes') {
-                $parameters = explode(',', Str::after($rule, ':'));
-
                 return new MimesRule($parameters);
+            }
+
+            if ($name === 'mimetypes') {
+                return new MimetypesRule($parameters);
             }
 
             return $rule;

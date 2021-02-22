@@ -10,7 +10,6 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ContainsData;
-use Statamic\Data\Data;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetSaved;
@@ -27,6 +26,7 @@ use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements AssetContract, Augmentable
 {
@@ -159,6 +159,8 @@ class Asset implements AssetContract, Augmentable
             $meta = array_merge($meta, [
                 'size' => $this->disk()->size($this->path()),
                 'last_modified' => $this->disk()->lastModified($this->path()),
+                'mime_type' => $mimeType = $this->disk()->mimeType($this->path()),
+                'guessed_extension' => MimeTypes::getDefault()->getExtensions($mimeType)[0] ?? null,
                 'width' => $dimensions[0],
                 'height' => $dimensions[1],
             ]);
@@ -546,6 +548,16 @@ class Asset implements AssetContract, Augmentable
         }
 
         return null;
+    }
+
+    /**
+     * Get the asset's MIME type.
+     *
+     * @return
+     */
+    public function mimeType()
+    {
+        return $this->metaValue('mime_type');
     }
 
     /**
