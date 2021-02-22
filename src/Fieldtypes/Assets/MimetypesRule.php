@@ -27,7 +27,7 @@ class MimetypesRule implements Rule
         return collect($value)->every(function ($id) {
             if ($id instanceof UploadedFile) {
                 $mimeType = $id->getMimeType();
-            } else if (! ($mimeType = optional(Asset::find($id))->mimeType())) {
+            } elseif (! ($mimeType = optional(Asset::find($id))->mimeType())) {
                 return false;
             }
 
