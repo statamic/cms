@@ -85,6 +85,7 @@ return [
     'uploaded' => 'Nalaganje ni uspelo.',
     'url' => 'Oblika ni veljavna.',
     'unique_entry_value' => 'Ta vrednost je že sprejeta.',
+    'unique_term_value' => 'Ta vrednost je že sprejeta.',
     'unique_user_value' => 'Ta vrednost je že sprejeta.',
     'duplicate_field_handle' => 'Polja z ročajem :handle ni mogoče uporabiti več kot enkrat.',
     'one_site_without_origin' => 'Vsaj eno spletno mesto ne sme imeti izvora.',

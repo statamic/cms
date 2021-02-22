@@ -126,6 +126,8 @@ class Parser
 
         $this->view = $view;
 
+        $data = array_merge($data, ['view' => $this->cascade->getViewData($view)]);
+
         try {
             $parsed = $this->parse($text, $data);
         } catch (\Exception | \Error $e) {
@@ -739,7 +741,7 @@ class Parser
                     $conditional = '<?php if ('.$condition.'): ?>'.addslashes($this->getVariable($if_true, $data)).'<?php endif ?>';
 
                     // Do the evaluation
-                    $output = $this->parsePhp($conditional);
+                    $output = stripslashes($this->parsePhp($conditional));
 
                     // Slide it on back into the template
                     $text = str_replace($match[0], $output, $text);
@@ -760,7 +762,7 @@ class Parser
                     $conditional = '<?php echo('.$condition.') ? "'.addslashes($this->getVariable(trim($if_true), $data)).'" : "'.addslashes($this->getVariable(trim($if_false), $data)).'"; ?>';
 
                     // Do the evaluation
-                    $output = $this->parsePhp($conditional);
+                    $output = stripslashes($this->parsePhp($conditional));
 
                     // Slide it on back into the template
                     $text = str_replace($match[0], $output, $text);
@@ -1155,7 +1157,7 @@ class Parser
      * @param  mixed        $default Default value to use if not found
      * @return mixed
      */
-    protected function getVariable($key, $context, $default = null)
+    public function getVariable($key, $context, $default = null)
     {
         [$key, $modifiers] = $this->parseModifiers($key);
 
@@ -1218,24 +1220,6 @@ class Parser
             // If it's not found in the context, we'll try looking for it in the cascade.
             if ($cascading = $this->cascade->get($first)) {
                 return $this->getVariableExistenceAndValue($rest, $cascading);
-            }
-
-            // If the first part of the variable is "view", we'll try to get the value from
-            // values defined in any views' front-matter. They are stored in the cascade
-            // organized by the view paths. It should be able to get a value from any
-            // loaded view, but the current view should take precedence. (ie. if
-            // you define the same var in this view and another view, the one
-            // from this view should win.)
-            if ($first == 'view') {
-                $views = collect($this->cascade->get('views'));
-                $thisView = $views->pull($this->view);
-                $views->prepend($thisView, $this->view);
-                foreach ($views as $viewData) {
-                    $viewExistAndVal = $this->getVariableExistenceAndValue($rest, $viewData);
-                    if ($viewExistAndVal[0]) {
-                        return $viewExistAndVal;
-                    }
-                }
             }
 
             return [false, null];

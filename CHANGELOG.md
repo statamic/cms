@@ -1,5 +1,37 @@
 # Release Notes
 
+## 3.0.44 (2020-02-17)
+
+### What's fixed
+- Allow `view` data to be passed into tags parameters. [#3252](https://github.com/statamic/cms/issues/3252)
+- Fix error when submitting a form with emails. [#3239](https://github.com/statamic/cms/issues/3239)
+
+
+
+## 3.0.43 (2020-02-11)
+
+### What's new
+- Added an `EntryCreated` event. [#3078](https://github.com/statamic/cms/issues/3078)
+- Ability to save entries without triggering events. [#3208](https://github.com/statamic/cms/issues/3208)
+- Add `sort` and `query_scope` parameters to `search:results` tag. [#2383](https://github.com/statamic/cms/issues/2383)
+- Ability to disable focal point editor. [#3160](https://github.com/statamic/cms/issues/3160)
+
+### What's improved
+- Added Chinese translations. [#3211](https://github.com/statamic/cms/issues/3211)
+- Updated French translations. [#3206](https://github.com/statamic/cms/issues/3206)
+
+### What's fixed
+- Fix Radio input position. [#3183](https://github.com/statamic/cms/issues/3183)
+- Fix Antlers ternary condition escaping. [#3123](https://github.com/statamic/cms/issues/3123)
+- Prevent terms being created with existing slugs, which prevents overriding existing terms. [#3114](https://github.com/statamic/cms/issues/3114)
+- The "Visit URL" button gets hidden when a collection has no route. [#3080](https://github.com/statamic/cms/issues/3080)
+- Fix stroke color of the taxonomy icon. [#3225](https://github.com/statamic/cms/issues/3225)
+- Fix issue where date range fields would sometimes be a day behind. [#3221](https://github.com/statamic/cms/issues/3221)
+- Prevent error when a user's avatar is deleted. [#3212](https://github.com/statamic/cms/issues/3212)
+- Use more data when augmenting a form submission, which prevents the wrong date being shown. [#3204](https://github.com/statamic/cms/issues/3204)
+
+
+
 ## 3.0.42 (2021-02-04)
 
 ### What's fixed

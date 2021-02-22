@@ -16,6 +16,7 @@ use Statamic\Data\HasOrigin;
 use Statamic\Data\Publishable;
 use Statamic\Data\TracksLastModified;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Events\EntryCreated;
 use Statamic\Events\EntryDeleted;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
@@ -49,6 +50,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     protected $locale;
     protected $localizations;
     protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function __construct()
     {
@@ -266,13 +268,27 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         return $this;
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        $result = $this->save();
+
+        $this->withEvents = true;
+
+        return $result;
+    }
+
     public function save()
     {
+        $isNew = is_null(Facades\Entry::find($this->id()));
+
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
-
-        if (EntrySaving::dispatch($this) === false) {
-            return false;
+        if ($this->withEvents) {
+            if (EntrySaving::dispatch($this) === false) {
+                return false;
+            }
         }
 
         Facades\Entry::save($this);
@@ -291,7 +307,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $callback($this);
         }
 
-        EntrySaved::dispatch($this);
+        if ($this->withEvents) {
+            if ($isNew) {
+                EntryCreated::dispatch($this);
+            }
+
+            EntrySaved::dispatch($this);
+        }
 
         return true;
     }

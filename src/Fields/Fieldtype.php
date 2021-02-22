@@ -92,6 +92,11 @@ abstract class Fieldtype implements Arrayable
         return Validator::explodeRules($this->rules);
     }
 
+    public function fieldRules()
+    {
+        return $this->config('validate');
+    }
+
     public function extraRules(): array
     {
         return array_map([Validator::class, 'explodeRules'], $this->extraRules);
