@@ -377,6 +377,38 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_generates_meta_on_demand_if_a_required_value_is_missing()
+    {
+        Storage::fake('test');
+
+        $file = UploadedFile::fake()->image('image.jpg', 30, 60); // creates a 723 byte image
+        Storage::disk('test')->putFileAs('foo', $file, 'image.jpg');
+        $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix().'foo/image.jpg';
+        touch($realFilePath, $timestamp = Carbon::parse('2021-02-22 09:41:42')->timestamp);
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+        $asset = (new Asset)->container($container)->path('foo/image.jpg');
+
+        $incompleteMeta = [
+            'data' => [],
+        ];
+
+        $completeMeta = [
+            'data' => [],
+            'size' => 723,
+            'last_modified' => $timestamp,
+            'width' => 30,
+            'height' => 60,
+        ];
+
+        Storage::disk('test')->put('foo/.meta/image.jpg.yaml', YAML::dump($incompleteMeta));
+
+        $asset->size();
+
+        $this->assertEquals($completeMeta, YAML::parse(Storage::disk('test')->get('foo/.meta/image.jpg.yaml')));
+    }
+
+    /** @test */
     public function it_hydrates_data_from_meta_file()
     {
         $disk = Storage::fake('test');
