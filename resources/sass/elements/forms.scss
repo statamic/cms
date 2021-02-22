@@ -83,7 +83,7 @@ input.input-text-minimal:read-only,
     }
 
     .input-text {
-        @apply .flex-1 border-grey-50;
+        @apply .flex-1 border-grey-50 min-w-0;
     }
 
     .input-text:not(:first-child) {

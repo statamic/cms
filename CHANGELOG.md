@@ -1,6 +1,14 @@
 # Release Notes
 
-## Unreleased
+## 3.0.44 (2020-02-17)
+
+### What's fixed
+- Allow `view` data to be passed into tags parameters. [#3252](https://github.com/statamic/cms/issues/3252)
+- Fix error when submitting a form with emails. [#3239](https://github.com/statamic/cms/issues/3239)
+
+
+
+## 3.0.43 (2020-02-11)
 
 ### What's new
 - Added an `EntryCreated` event. [#3078](https://github.com/statamic/cms/issues/3078)

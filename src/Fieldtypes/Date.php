@@ -129,6 +129,11 @@ class Date extends Fieldtype
         return $date->format($this->dateFormat($data));
     }
 
+    public function preProcessIndex($data)
+    {
+        return Carbon::parse($data)->format(config('statamic.cp.date_format'));
+    }
+
     private function dateFormat($date)
     {
         return $this->config(
