@@ -8,6 +8,6 @@ class AugmentedForm extends AbstractAugmented
 {
     public function keys()
     {
-        return ['handle', 'title'];
+        return ['handle', 'title', 'fields'];
     }
 }
