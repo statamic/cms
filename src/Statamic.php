@@ -73,7 +73,7 @@ class Statamic
         if (is_null($version)) {
             return '';
         } elseif (is_string($version)) {
-            return '?v=' . e($version);
+            return '?v='.e($version);
         } elseif (is_array($version)) {
             return '?'.http_build_query($version);
         } elseif ($version instanceof Collection) {
