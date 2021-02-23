@@ -1,6 +1,5 @@
 <?php
 
-
 namespace Statamic\Testing\Extend;
 
 use Illuminate\Support\Facades\Request;
@@ -9,7 +8,6 @@ use Tests\TestCase;
 
 class ResourcesPathsTest extends TestCase
 {
-
     /** @test */
     public function scripts_can_be_created_without_version()
     {
@@ -137,5 +135,4 @@ class ResourcesPathsTest extends TestCase
         $this->assertContains('paramtest.css?v=3.1.0&key=apikey', $testStyles);
         $this->assertContains('collecttest.css?v=3.1.0&key=apikey&name=test', $testStyles);
     }
-
 }
