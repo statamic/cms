@@ -75,23 +75,12 @@ class Statamic
         } else if (is_string($version)) {
             return '?v=' . e($version);
         } else if (is_array($version)) {
-            return self::buildQueryString($version);
+            return '?'.http_build_query($version);
         } else if ($version instanceof Collection) {
-            return self::buildQueryString($version->all());
+            return '?'.http_build_query($version->all());
         }
 
         return '';
-    }
-
-    protected static function buildQueryString(array $parameters)
-    {
-        $queryParts = [];
-
-        foreach ($parameters as $name => $value) {
-            $queryParts[] = urlencode(e($name)).'='.urlencode(e(strval($value)));
-        }
-
-        return '?'.implode('&', $queryParts);
     }
 
     public static function externalScript($url)
