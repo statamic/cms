@@ -30,7 +30,6 @@
 
 <script>
 import Actions from './Actions';
-import qs from 'qs';
 
 export default {
 
