@@ -4,6 +4,7 @@ namespace Statamic;
 
 use Closure;
 use Illuminate\Http\Request;
+use Illuminate\Support\Collection;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
@@ -60,11 +61,37 @@ class Statamic
         return static::$externalScripts;
     }
 
-    public static function script($name, $path)
+    public static function script($name, $path, $version = null)
     {
-        static::$scripts[$name][] = str_finish($path, '.js');
+        static::$scripts[$name][] = str_finish($path, '.js').self::getResourceSuffix($version);
 
         return new static;
+    }
+
+    protected static function getResourceSuffix($version)
+    {
+        if (is_null($version)) {
+            return '';
+        } else if (is_string($version)) {
+            return '?v=' . e($version);
+        } else if (is_array($version)) {
+            return self::buildQueryString($version);
+        } else if ($version instanceof Collection) {
+            return self::buildQueryString($version->all());
+        }
+
+        return '';
+    }
+
+    protected static function buildQueryString(array $parameters)
+    {
+        $queryParts = [];
+
+        foreach ($parameters as $name => $value) {
+            $queryParts[] = urlencode(e($name)).'='.urlencode(e(strval($value)));
+        }
+
+        return '?'.implode('&', $queryParts);
     }
 
     public static function externalScript($url)
@@ -79,9 +106,9 @@ class Statamic
         return static::$styles;
     }
 
-    public static function style($name, $path)
+    public static function style($name, $path, $version = null)
     {
-        static::$styles[$name][] = str_finish($path, '.css');
+        static::$styles[$name][] = str_finish($path, '.css').self::getResourceSuffix($version);
 
         return new static;
     }
