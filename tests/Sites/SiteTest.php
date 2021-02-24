@@ -226,6 +226,7 @@ class SiteTest extends TestCase
             'name' => 'Test',
             'url' => 'http://test.com',
             'locale' => 'en_US',
+            'autopublish' => false,
         ]);
 
         $values = $site->augmented()->all();
@@ -236,6 +237,7 @@ class SiteTest extends TestCase
             'locale' => 'en_US',
             'short_locale' => 'en',
             'url' => 'http://test.com',
+            'autopublish' => false,
         ], $values->all());
 
         $this->assertEquals(
