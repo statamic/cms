@@ -4,6 +4,7 @@ namespace Statamic\Sites;
 
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
+use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Site implements Augmentable
@@ -72,9 +73,7 @@ class Site implements Augmentable
 
     public function autoPublish()
     {
-        return isset($this->config['autopublish'])
-            ? $this->config['autopublish']
-            : false;
+        return Arr::get($this->config, 'autopublish', false);
     }
 
     private function removePath($url)
