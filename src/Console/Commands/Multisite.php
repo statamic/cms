@@ -48,7 +48,7 @@ class Multisite extends Command
 
         $this->info("Please enter the handles of the additional sites. Just press enter when you're done.");
         do {
-            if ($site = $this->ask('Handle of site #'.$this->sites->count() + 1)) {
+            if ($site = $this->ask('Handle of site #'.($this->sites->count() + 1))) {
                 $this->sites->add($site);
             }
         } while ($site !== null);
