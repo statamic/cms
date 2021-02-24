@@ -316,6 +316,19 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             EntrySaved::dispatch($this);
         }
 
+        if ($isNew && is_null($this->localizations)) {
+            \Statamic\Facades\Site::all()
+                ->filter(function ($site) {
+                    return $site->autoPublish();
+                })
+                ->reject(function ($site) {
+                    return $site->handle() === $this->site()->handle();
+                })
+                ->each(function ($site) {
+                    $this->makeLocalization($site->handle())->saveQuietly();
+                });
+        }
+
         return true;
     }
 
