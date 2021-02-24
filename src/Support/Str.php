@@ -178,7 +178,7 @@ class Str extends \Illuminate\Support\Str
             }, $value);
 
             // step 2, replace last space with &nbsp;
-            $value = preg_replace("/(?<!<[p|li|h1|h2|h3|h4|h5|h6|div|figcaption])([^\s])[ \t]+([^\s]+(?:[\s]*<\/(?:p|li|h1|h2|h3|h4|h5|h6|div|figcaption)>))$/im", '$1&nbsp;$2', rtrim($value));
+            $value = preg_replace("/(?<!<[p|li|h1|h2|h3|h4|h5|h6|div|figcaption])([^\s])[ \t]+([^\s]+(?:[\s]*<\/(?:p|li|h1|h2|h3|h4|h5|h6|div|figcaption)>))/", '$1&nbsp;$2', rtrim($value));
 
             // step 3, re-replace the code from step 1 with spaces
             return str_replace('%###%##%', ' ', $value);
