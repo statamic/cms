@@ -29,7 +29,7 @@ return [
     |
     */
 
-    'connection' => env('STATAMIC_GIT_QUEUE_CONNECTION');
+    'connection' => env('STATAMIC_GIT_QUEUE_CONNECTION'),
 
     /*
     |--------------------------------------------------------------------------
