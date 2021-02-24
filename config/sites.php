@@ -19,6 +19,7 @@ return [
             'name' => config('app.name'),
             'locale' => 'en_US',
             'url' => '/',
+            'autopublish' => false,
         ],
 
     ],

@@ -70,6 +70,13 @@ class Site implements Augmentable
         return $path === '' ? '/' : $path;
     }
 
+    public function autoPublish()
+    {
+        return isset($this->config['autopublish'])
+            ? $this->config['autopublish']
+            : false;
+    }
+
     private function removePath($url)
     {
         $parsed = parse_url($url);
@@ -85,6 +92,7 @@ class Site implements Augmentable
             'locale' => $this->locale(),
             'short_locale' => $this->shortLocale(),
             'url' => $this->url(),
+            'autopublish' => $this->autopublish(),
         ];
     }
 
