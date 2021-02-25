@@ -139,7 +139,7 @@ class Date extends Fieldtype
             $start = Carbon::parse($data['start'])->format(config('statamic.cp.date_format'));
             $end = Carbon::parse($data['end'])->format(config('statamic.cp.date_format'));
 
-            return $start . ' to ' . $end;
+            return $start.' to '.$end;
         }
 
         return Carbon::parse($data)->format(config('statamic.cp.date_format'));
