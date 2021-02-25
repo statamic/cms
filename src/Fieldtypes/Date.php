@@ -131,6 +131,14 @@ class Date extends Fieldtype
 
     public function preProcessIndex($data)
     {
+        if (! $data) { return; }
+
+        if ($this->config('mode') === 'range') {
+            $start = Carbon::parse($data['start'])->format(config('statamic.cp.date_format'));
+            $end = Carbon::parse($data['end'])->format(config('statamic.cp.date_format'));
+            return $start . ' to ' . $end;
+        }
+
         return Carbon::parse($data)->format(config('statamic.cp.date_format'));
     }
 
