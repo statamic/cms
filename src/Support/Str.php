@@ -177,9 +177,9 @@ class Str extends \Illuminate\Support\Str
             }, $value);
 
             // step 2, replace all spaces based on params with &nbsp;
-            $value = preg_replace_callback("/(?<!<[p|li|h1|h2|h3|h4|h5|h6|div|figcaption])([^\s]\s)([^\s]*\s?){{$params}}(<\/(?:p|li|h1|h2|h3|h4|h5|h6|div|figcaption)>)/", function($matches) {
+            $value = preg_replace_callback("/(?<!<[p|li|h1|h2|h3|h4|h5|h6|div|figcaption])([^\s]\s)([^\s]*\s?){{$params}}(<\/(?:p|li|h1|h2|h3|h4|h5|h6|div|figcaption)>)/", function ($matches) {
                 return preg_replace("/([\s])/", '&nbsp;', rtrim($matches[0]));
-            },$value);
+            }, $value);
 
             // step 3, re-replace the code from step 1 with spaces
             return str_replace('%###%##%', ' ', $value);
@@ -189,10 +189,9 @@ class Str extends \Illuminate\Support\Str
 
             $value = preg_replace_callback(
                 "/([^\s]\s)([^\s]*\s?){{$params}}$/im",
-                function($matches) {
+                function ($matches) {
                     return preg_replace("/([\s])/", '&nbsp;', rtrim($matches[0]));
-                    },
-                $value);
+                    }, $value);
 
 
             return $value;
