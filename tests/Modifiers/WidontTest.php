@@ -7,7 +7,6 @@ use Tests\TestCase;
 
 class WidontTest extends TestCase
 {
-
     /**
      * @test
      */

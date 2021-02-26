@@ -186,7 +186,6 @@ class Str extends \Illuminate\Support\Str
 
         // otherwise
         } else {
-
             $value = preg_replace_callback("/([^\s]\s)([^\s]*\s?){{$params}}$/im", function ($matches) {
                 return preg_replace("/([\s])/", '&nbsp;', rtrim($matches[0]));
             }, $value);
