@@ -165,11 +165,8 @@ class Str extends \Illuminate\Support\Str
      * @param string $value
      * @return string
      */
-    public static function widont($value, $params)
+    public static function widont($value, $params = 1)
     {
-        //Not Sure why its an array when running a test
-        $params = Arr::get($params, 0, '1');
-
         // thanks to Shaun Inman for inspiration here
         // http://www.shauninman.com/archive/2008/08/25/widont_2_1_1
         // if there are content tags
