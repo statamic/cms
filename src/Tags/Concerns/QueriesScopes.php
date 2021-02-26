@@ -6,23 +6,30 @@ use Statamic\Support\Arr;
 
 trait QueriesScopes
 {
-    public function queryScopes($query)
+    public function queryScopes($query, $scopes = null, $params = null)
     {
-        $this->parseQueryScopes()
+        $this->parseQueryScopes($scopes)
             ->map(function ($handle) {
                 return app('statamic.scopes')->get($handle);
             })
             ->filter()
-            ->each(function ($class) use ($query) {
+            ->each(function ($class) use ($query, $params) {
                 $scope = app($class);
-                $scope->apply($query, $this->params);
+                $scope->apply($query, $params ?? $this->params);
             });
     }
 
-    protected function parseQueryScopes()
+    protected function parseQueryScopes($scopes = null)
     {
-        $scopes = Arr::getFirst($this->params, ['query_scope', 'filter']);
+        if (is_null($scopes)) {
+            $scopes = $this->getScopesFromTagParams();
+        }
 
-        return collect(explode('|', $scopes));
+        return collect(preg_split('/[,|]/', $scopes));
+    }
+
+    protected function getScopesFromTagParams()
+    {
+        return Arr::getFirst($this->params, ['query_scope', 'filter']);
     }
 }
