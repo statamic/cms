@@ -6,10 +6,12 @@ use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Support\Str;
 use Statamic\Tags\Concerns\QueriesConditions;
+use Statamic\Tags\Concerns\QueriesScopes;
 
 class ApiController extends Controller
 {
-    use QueriesConditions;
+    use QueriesConditions,
+        QueriesScopes;
 
     /**
      * Filter, sort, and paginate query for API resource output.
@@ -20,9 +22,28 @@ class ApiController extends Controller
     protected function filterSortAndPaginate($query)
     {
         return $this
+            ->scope($query)
             ->filter($query)
             ->sort($query)
             ->paginate($query);
+    }
+
+    /**
+     * Filters a query based on query scope(s).
+     *
+     * /endpoint?query_scope=your_query_scope
+     * /endpoint?query_scope=your_query_scope,another_query_scope
+     *
+     * @param \Statamic\Query\Builder $query
+     * @return $this
+     */
+    protected function scope($query)
+    {
+        if ($scopes = request()->input('query_scope')) {
+            $this->queryScopes($query, $scopes, request()->all());
+        }
+
+        return $this;
     }
 
     /**
