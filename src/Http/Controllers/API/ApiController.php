@@ -12,6 +12,28 @@ class ApiController extends Controller
     use QueriesConditions;
 
     /**
+     * Instantiate API controller.
+     */
+    public function __construct()
+    {
+        $this->abortIfEndpointIsDisabled();
+    }
+
+    /**
+     * Abort if endpoint config is disabled.
+     */
+    protected function abortIfEndpointIsDisabled()
+    {
+        if (! isset($this->endpointConfigKey)) {
+            return;
+        }
+
+        collect($this->endpointConfigKey)->each(function ($key) {
+            abort_unless(config("statamic.api.endpoints.{$key}") === true, 404);
+        });
+    }
+
+    /**
      * Filter, sort, and paginate query for API resource output.
      *
      * @param \Statamic\Query\Builder $query
