@@ -8,6 +8,8 @@ use Statamic\Http\Resources\API\UserResource;
 
 class UsersController extends ApiController
 {
+    public $endpointConfigKey = 'users';
+
     public function index()
     {
         return app(UserResource::class)::collection(

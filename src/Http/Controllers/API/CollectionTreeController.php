@@ -7,6 +7,8 @@ use Statamic\Http\Resources\API\TreeResource;
 
 class CollectionTreeController extends ApiController
 {
+    public $endpointConfigKey = 'entries';
+
     public function show($collection)
     {
         return app(TreeResource::class)::make($this->getCollectionTree($collection))

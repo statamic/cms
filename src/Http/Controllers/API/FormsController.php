@@ -7,6 +7,8 @@ use Statamic\Http\Resources\API\FormResource;
 
 class FormsController extends ApiController
 {
+    public $endpointConfigKey = 'forms';
+
     public function index()
     {
         return app(FormResource::class)::collection(

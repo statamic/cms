@@ -7,6 +7,8 @@ use Statamic\Http\Resources\API\GlobalSetResource;
 
 class GlobalsController extends ApiController
 {
+    public $endpointConfigKey = 'globals';
+
     public function index()
     {
         return app(GlobalSetResource::class)::collection(

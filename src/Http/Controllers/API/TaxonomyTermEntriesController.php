@@ -6,6 +6,8 @@ use Statamic\Http\Resources\API\EntryResource;
 
 class TaxonomyTermEntriesController extends ApiController
 {
+    public $endpointConfigKey = ['taxonomy-terms', 'entries'];
+
     public function index($taxonomy, $term)
     {
         return app(EntryResource::class)::collection(

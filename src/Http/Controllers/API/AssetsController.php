@@ -6,6 +6,8 @@ use Statamic\Http\Resources\API\AssetResource;
 
 class AssetsController extends ApiController
 {
+    public $endpointConfigKey = 'assets';
+
     public function index($assetContainer)
     {
         return app(AssetResource::class)::collection(

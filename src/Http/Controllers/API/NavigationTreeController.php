@@ -8,6 +8,8 @@ use Statamic\Http\Resources\API\TreeResource;
 
 class NavigationTreeController extends ApiController
 {
+    public $endpointConfigKey = 'navs';
+
     public function show($handle)
     {
         return app(TreeResource::class)::make($this->getNavTree($handle))
