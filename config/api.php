@@ -7,11 +7,23 @@ return [
     | API
     |--------------------------------------------------------------------------
     |
-    | Whether the API should be enabled, and through what route.
+    | Whether the API should be enabled, and through what route. You
+    | can enable or disable the whole API, and expose individual
+    | endpoints per environent, depending on your site needs.
     |
     */
 
     'enabled' => env('STATAMIC_API_ENABLED', false),
+
+    'endpoints' => [
+        'entries' => false,
+        'navs' => false,
+        'taxonomy-terms' => false,
+        'assets' => false,
+        'globals' => false,
+        'forms' => false,
+        'users' => false,
+    ],
 
     'route' => env('STATAMIC_API_ROUTE', 'api'),
 
