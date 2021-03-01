@@ -7,10 +7,13 @@ use Statamic\Http\Resources\API\TreeResource;
 
 class CollectionTreeController extends ApiController
 {
-    public $endpointConfigKey = 'entries';
+    protected $endpointConfigKey = 'entries';
+    protected $limitRouteResource = 'collection';
 
     public function show($collection)
     {
+        $this->abortIfDisabled();
+
         return app(TreeResource::class)::make($this->getCollectionTree($collection))
             ->fields($this->queryParam('fields'))
             ->maxDepth($this->queryParam('max_depth'));

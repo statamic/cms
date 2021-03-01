@@ -8,10 +8,13 @@ use Statamic\Http\Resources\API\TreeResource;
 
 class NavigationTreeController extends ApiController
 {
-    public $endpointConfigKey = 'navs';
+    protected $endpointConfigKey = 'navs';
+    protected $limitRouteResource = 'nav';
 
     public function show($handle)
     {
+        $this->abortIfDisabled();
+
         return app(TreeResource::class)::make($this->getNavTree($handle))
             ->fields($this->queryParam('fields'))
             ->maxDepth($this->queryParam('max_depth'));

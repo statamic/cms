@@ -7,17 +7,22 @@ use Statamic\Http\Resources\API\FormResource;
 
 class FormsController extends ApiController
 {
-    public $endpointConfigKey = 'forms';
+    protected $endpointConfigKey = 'forms';
+    protected $limitRouteResource = 'form';
 
     public function index()
     {
+        $this->abortIfDisabled();
+
         return app(FormResource::class)::collection(
-            Form::all()
+            $this->filterAllowedResources(Form::all())
         );
     }
 
     public function show($form)
     {
+        $this->abortIfDisabled();
+
         return app(FormResource::class)::make($form);
     }
 }

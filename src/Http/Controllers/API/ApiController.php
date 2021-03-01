@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Support\Str;
@@ -11,25 +12,70 @@ class ApiController extends Controller
 {
     use QueriesConditions;
 
-    /**
-     * Instantiate API controller.
-     */
-    public function __construct()
-    {
-        $this->abortIfEndpointIsDisabled();
-    }
+    protected $endpointConfigKey;
+    protected $limitRouteResource;
 
     /**
-     * Abort if endpoint config is disabled.
+     * Abort if endpoint is disabled.
      */
-    protected function abortIfEndpointIsDisabled()
+    protected function abortIfDisabled()
     {
-        if (! isset($this->endpointConfigKey)) {
+        if (! $this->endpointConfigKey) {
             return;
         }
 
-        collect($this->endpointConfigKey)->each(function ($key) {
-            abort_unless(config("statamic.api.endpoints.{$key}") === true, 404);
+        $config = config("statamic.api.endpoints.{$this->endpointConfigKey}");
+
+        if ($config === false) {
+            throw new NotFoundHttpException;
+        }
+
+        if (! $this->limitRouteResource || ! is_array($config)) {
+            return;
+        }
+
+        foreach ($config as $resource) {
+            $this->abortIfRouteResourceDisabled($this->limitRouteResource, $resource);
+        }
+    }
+
+    /**
+     * Abort if route resource is disabled.
+     *
+     * @param string $routeSegment
+     * @param string $resource
+     */
+    protected function abortIfRouteResourceDisabled($routeSegment, $resource)
+    {
+        if (! $handle = request()->route($routeSegment)) {
+            return;
+        }
+
+        if (! is_string($handle)) {
+            $handle = $handle->handle();
+        }
+
+        if ($handle && $handle !== $resource) {
+            throw new NotFoundHttpException;
+        }
+    }
+
+    /**
+     * If endpoint config is an array, filter allowed resources.
+     *
+     * @param \Illuminate\Support\Collection $items
+     * @return \Illuminate\Support\Collection
+     */
+    protected function filterAllowedResources($items)
+    {
+        $allowedResources = config("statamic.api.endpoints.{$this->endpointConfigKey}");
+
+        if (! is_array($allowedResources)) {
+            return $items;
+        }
+
+        return $items->filter(function ($item) use ($allowedResources) {
+            return in_array($item->handle(), $allowedResources);
         });
     }
 

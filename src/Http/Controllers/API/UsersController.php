@@ -8,10 +8,12 @@ use Statamic\Http\Resources\API\UserResource;
 
 class UsersController extends ApiController
 {
-    public $endpointConfigKey = 'users';
+    protected $endpointConfigKey = 'users';
 
     public function index()
     {
+        $this->abortIfDisabled();
+
         return app(UserResource::class)::collection(
             $this->filterSortAndPaginate(User::query())
         );
@@ -19,6 +21,8 @@ class UsersController extends ApiController
 
     public function show($id)
     {
+        $this->abortIfDisabled();
+
         return app(UserResource::class)::make($this->getUser($id));
     }
 
