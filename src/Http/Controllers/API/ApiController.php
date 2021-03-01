@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Support\Str;
@@ -10,6 +11,19 @@ use Statamic\Tags\Concerns\QueriesConditions;
 class ApiController extends Controller
 {
     use QueriesConditions;
+
+    protected $filterPublished = false;
+
+    /**
+     * Abort if item is unpublished.
+     *
+     * @param mixed $item
+     * @return bool
+     */
+    protected function abortIfUnpublished($item)
+    {
+        throw_if($item->published() === false, new NotFoundHttpException);
+    }
 
     /**
      * Filter, sort, and paginate query for API resource output.
@@ -35,7 +49,7 @@ class ApiController extends Controller
      */
     protected function filter($query)
     {
-        collect(request()->filter ?? [])
+        $this->getFilters()
             ->each(function ($value, $filter) use ($query) {
                 if ($value === 'true') {
                     $value = true;
@@ -54,6 +68,37 @@ class ApiController extends Controller
             });
 
         return $this;
+    }
+
+    /**
+     * Get filters for querying.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getFilters()
+    {
+        $filters = collect(request()->filter ?? []);
+
+        if ($this->filterPublished && $this->doesntHaveFilter('status') && $this->doesntHaveFilter('published')) {
+            $filters->put('status:is', 'published');
+        }
+
+        return $filters;
+    }
+
+    /**
+     * Check if user is not filtering by a specific field, for applying default filters.
+     *
+     * @param string $fieldS
+     * @return bool
+     */
+    public function doesntHaveFilter($field)
+    {
+        return ! collect(request()->filter ?? [])
+            ->map(function ($value, $param) {
+                return explode(':', $param)[0];
+            })
+            ->contains($field);
     }
 
     /**
