@@ -68,12 +68,22 @@ EOT;
         $this->assertEquals($fieldset, $this->repo->find('sub/test'));
     }
 
-    /** @test */
-    public function it_returns_null_if_fieldset_doesnt_exist()
+    /**
+     * Test the added functionality in App\Fields\FieldsetRepository.
+     * @test
+     */
+    public function it_returns_not_found_content_if_fieldset_doesnt_exist()
     {
         File::shouldReceive('exists')->with('/path/to/resources/fieldsets/unknown.yaml')->once()->andReturnFalse();
 
-        $this->assertNull($this->repo->find('unknown'));
+        $fieldset = $this->repo->find('unknown');
+
+        $this->assertInstanceOf(Fieldset::class, $fieldset);
+        $this->assertEquals('unknown', $fieldset->handle());
+        $this->assertEquals('not-found', $fieldset->fields()->all()->first()->handle());
+        $this->assertEquals('Fieldset not found.', $fieldset->fields()->all()->first()->display());
+        $this->assertEquals('section', $fieldset->fields()->all()->first()->type());
+        $this->assertEquals('You tried to import \''.$fieldset->handle().'\' but the file could not be found. Please check if the fieldset has been removed or renamed.', $fieldset->fields()->all()->first()->instructions());
     }
 
     /** @test */
