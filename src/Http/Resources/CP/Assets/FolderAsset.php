@@ -17,7 +17,9 @@ class FolderAsset extends JsonResource
             'url' => $this->absoluteUrl(),
 
             'size_formatted' => Str::fileSizeForHumans($this->size(), 0),
+            'size' => $this->size(),
             'last_modified_relative' => $this->lastModified()->diffForHumans(),
+            'last_modified' => $this->lastModified(),
 
             $this->mergeWhen($this->isImage(), function () {
                 return [
