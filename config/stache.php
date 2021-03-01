@@ -55,12 +55,12 @@ return [
 
         'collection-trees' => [
             'class' => Stores\CollectionTreeStore::class,
-            'directory' => base_path('content/structures/collections'),
+            'directory' => base_path('content/trees/collections'),
         ],
 
         'nav-trees' => [
             'class' => Stores\NavTreeStore::class,
-            'directory' => base_path('content/structures/navigation'),
+            'directory' => base_path('content/trees/navigation'),
         ],
 
         'globals' => [
