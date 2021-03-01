@@ -32,13 +32,13 @@ class WidontTest extends TestCase
             Lorem ipsum dolor sit amet.
             Lorem ipsum dolor sit amet.
             Lorem ipsum dolor sit amet.
-            EOD;
+EOD;
 
         $expected = <<<'EOD'
             Lorem ipsum dolor sit&nbsp;amet.
             Lorem ipsum dolor sit&nbsp;amet.
             Lorem ipsum dolor sit&nbsp;amet.
-            EOD;
+EOD;
 
         $this->assertEquals($expected, $this->modify($value, 1));
     }
