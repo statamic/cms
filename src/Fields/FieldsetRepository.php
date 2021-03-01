@@ -28,9 +28,7 @@ class FieldsetRepository
         $handle = str_replace('/', '.', $handle);
         $path = str_replace('.', '/', $handle);
 
-        if (! File::exists($path = "{$this->directory}/{$path}.yaml")) {
-            return null;
-        }
+        $content = File::exists($path) ? YAML::file($path)->parse() : $this->notFoundContent($handle);
 
         $fieldset = (new Fieldset)
             ->setHandle($handle)
@@ -89,5 +87,22 @@ class FieldsetRepository
     public function delete(Fieldset $fieldset)
     {
         File::delete("{$this->directory}/{$fieldset->handle()}.yaml");
+    }
+
+    protected function notFoundContent(string $handle): array
+    {
+        return [
+            'handle' => $handle,
+            'fields' => [
+                [
+                    'handle' => 'not-found',
+                    'field' => [
+                        'type' => 'section',
+                        'display' => 'Fieldset not found.',
+                        'instructions' => 'You tried to import \''.$handle.'\' but the file could not be found. Please check if the fieldset has been removed or renamed.',
+                    ],
+                ],
+            ],
+        ];
     }
 }
