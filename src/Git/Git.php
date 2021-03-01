@@ -75,7 +75,7 @@ class Git
         }
 
         CommitJob::dispatch($message)
-            ->onConnection(config('statamic.git.queue'))
+            ->onConnection(config('statamic.git.queue_connection'))
             ->delay($delayInMinutes ?? null);
     }
 
