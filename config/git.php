@@ -43,6 +43,7 @@ return [
     */
 
     'queue_connection' => env('STATAMIC_GIT_QUEUE_CONNECTION'),
+
     /*
     |--------------------------------------------------------------------------
     | Dispatch Delay
