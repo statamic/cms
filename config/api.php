@@ -11,6 +11,8 @@ return [
     | can enable or disable the whole API, and expose individual
     | endpoints per environent, depending on your site needs.
     |
+    | https://statamic.dev/content-api#enable-the-api
+    |
     */
 
     'enabled' => env('STATAMIC_API_ENABLED', false),
