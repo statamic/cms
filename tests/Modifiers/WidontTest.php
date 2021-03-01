@@ -40,7 +40,7 @@ EOD;
             Lorem ipsum dolor sit&nbsp;amet.
 EOD;
 
-        $this->assertEquals($expected, $this->modify($value, 1));
+        $this->assertEquals($expected, $this->modify($value));
     }
 
     /** @test */
@@ -50,9 +50,9 @@ EOD;
         $value2 = '<h1>Lorem ipsum dolor sit amet.</h1>';
         $value3 = '<h2>Lorem ipsum dolor sit amet.</h2>';
 
-        $this->assertEquals('<p>Lorem ipsum dolor sit&nbsp;amet.</p>', $this->modify($value1, 1));
-        $this->assertEquals('<h1>Lorem ipsum dolor sit&nbsp;amet.</h1>', $this->modify($value2, 1));
-        $this->assertEquals('<h2>Lorem ipsum dolor sit&nbsp;amet.</h2>', $this->modify($value3, 1));
+        $this->assertEquals('<p>Lorem ipsum dolor sit&nbsp;amet.</p>', $this->modify($value1));
+        $this->assertEquals('<h1>Lorem ipsum dolor sit&nbsp;amet.</h1>', $this->modify($value2));
+        $this->assertEquals('<h2>Lorem ipsum dolor sit&nbsp;amet.</h2>', $this->modify($value3));
     }
 
     /** @test */
@@ -88,10 +88,10 @@ EOD;
     {
         $value = '<p>Lorem ipsum dolor sit amet.</p><p></p><p>Consectetur adipiscing elit.</p>';
 
-        $this->assertEquals('<p>Lorem ipsum dolor sit&nbsp;amet.</p><p></p><p>Consectetur adipiscing&nbsp;elit.</p>', $this->modify($value, 1));
+        $this->assertEquals('<p>Lorem ipsum dolor sit&nbsp;amet.</p><p></p><p>Consectetur adipiscing&nbsp;elit.</p>', $this->modify($value));
     }
 
-    public function modify($value, $params = 1)
+    public function modify($value, $params = [])
     {
         return Modify::value($value)->widont($params)->fetch();
     }

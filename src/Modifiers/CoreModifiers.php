@@ -2375,9 +2375,9 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function widont($value, $params = 1)
+    public function widont($value, $params)
     {
-        //Not Sure why its an array when running a test
+
         $params = Arr::get($params, 0, '1');
 
         return Str::widont($value, $params);

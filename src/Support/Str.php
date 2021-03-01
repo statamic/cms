@@ -165,7 +165,7 @@ class Str extends \Illuminate\Support\Str
      * @param string $value
      * @return string
      */
-    public static function widont($value, $params = 1)
+    public static function widont($value, $words = 1)
     {
         // thanks to Shaun Inman for inspiration here
         // http://www.shauninman.com/archive/2008/08/25/widont_2_1_1
@@ -177,7 +177,7 @@ class Str extends \Illuminate\Support\Str
             }, $value);
 
             // step 2, replace all spaces based on params with &nbsp;
-            $value = preg_replace_callback("/(?<!<[p|li|h1|h2|h3|h4|h5|h6|div|figcaption])([^\s]\s)([^\s]*\s?){{$params}}(<\/(?:p|li|h1|h2|h3|h4|h5|h6|div|figcaption)>)/", function ($matches) {
+            $value = preg_replace_callback("/(?<!<[p|li|h1|h2|h3|h4|h5|h6|div|figcaption])([^\s]\s)([^\s]*\s?){{$words}}(<\/(?:p|li|h1|h2|h3|h4|h5|h6|div|figcaption)>)/", function ($matches) {
                 return preg_replace("/([\s])/", '&nbsp;', rtrim($matches[0]));
             }, $value);
 
@@ -186,11 +186,9 @@ class Str extends \Illuminate\Support\Str
 
         // otherwise
         } else {
-            $value = preg_replace_callback("/([^\s]\s)([^\s]*\s?){{$params}}$/im", function ($matches) {
+            return preg_replace_callback("/([^\s]\s)([^\s]*\s?){{$words}}$/im", function ($matches) {
                 return preg_replace("/([\s])/", '&nbsp;', rtrim($matches[0]));
             }, $value);
-
-            return $value;
         }
     }
 
