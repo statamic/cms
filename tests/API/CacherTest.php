@@ -23,6 +23,7 @@ class CacherTest extends TestCase
         parent::setUp();
 
         Facades\Config::set('statamic.api.enabled', true);
+        Facades\Config::set('statamic.api.endpoints.entries', true);
 
         $this->collection = Facades\Collection::make('articles')->save();
     }
