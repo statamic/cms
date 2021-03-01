@@ -22,14 +22,14 @@ return [
     | Queue Connection
     |--------------------------------------------------------------------------
     |
-    | The default queue connection is used when dispatching the jobs.
-    | If you want to use a different queue connection for the git integration
-    | set `STATAMIC_GIT_QUEUE_CONNECTION` in your `.env` to a valid queue connection.
-    | See `config/queues.php` for the possible values.
+    | You may choose which queue connection should be used when dispatching
+    | commit jobs. Unless specified, the default connection will be used.
+    |
+    | https://statamic.dev/git-integration#queueing-commits
     |
     */
 
-    'connection' => env('STATAMIC_GIT_QUEUE_CONNECTION'),
+    'queue' => env('STATAMIC_GIT_QUEUE_CONNECTION'),
 
     /*
     |--------------------------------------------------------------------------
