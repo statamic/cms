@@ -127,8 +127,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable
                     $page->{$method}($entry);
                 }
             }
-        }
-        while ($page = $page->parent());
+        } while ($page = $page->parent());
 
         return $entry;
     }
