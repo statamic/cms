@@ -29,6 +29,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable
     protected $url;
     protected $title;
     protected $depth;
+    protected $protect;
     protected $inheritableValues = [
         'protect',
     ];
