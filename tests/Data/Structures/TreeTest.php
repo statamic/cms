@@ -343,7 +343,6 @@ class TreeTest extends TestCase
                 ],
             ],
         ]);
-        $this->assertEquals([], $tree->diff()->affected());
 
         $tree->move('pages-home', 'pages-board');
 
@@ -368,8 +367,6 @@ class TreeTest extends TestCase
                 ],
             ],
         ], $tree->tree());
-
-        $this->assertEquals(['pages-home'], $tree->diff()->affected());
     }
 
     /** @test */

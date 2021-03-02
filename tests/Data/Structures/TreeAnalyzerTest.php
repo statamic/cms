@@ -20,6 +20,7 @@ class TreeAnalyzerTest extends TestCase
         $this->assertEquals([], $analyzer->added());
         $this->assertEquals([], $analyzer->removed());
         $this->assertEquals([], $analyzer->moved());
+        $this->assertEquals([], $analyzer->relocated());
     }
 
     /** @test */
@@ -37,6 +38,7 @@ class TreeAnalyzerTest extends TestCase
         $this->assertEquals(['1'], $analyzer->added());
         $this->assertEquals([], $analyzer->removed());
         $this->assertEquals([], $analyzer->moved());
+        $this->assertEquals([], $analyzer->relocated());
     }
 
     /** @test */
@@ -54,27 +56,75 @@ class TreeAnalyzerTest extends TestCase
         $this->assertEquals([], $analyzer->added());
         $this->assertEquals(['1'], $analyzer->removed());
         $this->assertEquals([], $analyzer->moved());
+        $this->assertEquals([], $analyzer->relocated());
     }
 
     /** @test */
     public function it_sees_moves()
     {
+        // Simply moving 2 after 4 will consider 2,3,4 all moved because their indexes change.
+
         $old = [
             ['entry' => '1', 'a' => 'b'],
             ['entry' => '2', 'c' => 'd'],
+            ['entry' => '3', 'e' => 'f'],
+            ['entry' => '4', 'g' => 'h'],
+            ['entry' => '5', 'i' => 'j'],
         ];
         $new = [
-            ['entry' => '2', 'c' => 'd'],
             ['entry' => '1', 'a' => 'b'],
+            ['entry' => '3', 'e' => 'f'],
+            ['entry' => '4', 'g' => 'h'],
+            ['entry' => '2', 'c' => 'd'],
+            ['entry' => '5', 'i' => 'j'],
         ];
 
         $analyzer = (new TreeAnalyzer)->analyze($old, $new);
 
         $this->assertTrue($analyzer->hasChanged());
-        $this->assertEquals(['1', '2'], $analyzer->affected());
+        $this->assertEquals(['2', '3', '4'], $analyzer->affected());
         $this->assertEquals([], $analyzer->added());
         $this->assertEquals([], $analyzer->removed());
-        $this->assertEquals(['1', '2'], $analyzer->moved());
+        $this->assertEquals(['2', '3', '4'], $analyzer->moved());
+        $this->assertEquals([], $analyzer->relocated());
+    }
+
+    /** @test */
+    public function it_sees_moves_within_a_branch()
+    {
+        // Simply moving 12 after 14 will consider 12,13,14 all moved because their indexes change.
+
+        $old = [
+            ['entry' => '1'],
+            ['entry' => '2', 'children' => [
+                ['entry' => '11'],
+                ['entry' => '12'],
+                ['entry' => '13'],
+                ['entry' => '14'],
+                ['entry' => '15'],
+            ]],
+            ['entry' => '3'],
+        ];
+        $new = [
+            ['entry' => '1'],
+            ['entry' => '2', 'children' => [
+                ['entry' => '11'],
+                ['entry' => '13'],
+                ['entry' => '14'],
+                ['entry' => '12'],
+                ['entry' => '15'],
+            ]],
+            ['entry' => '3'],
+        ];
+
+        $analyzer = (new TreeAnalyzer)->analyze($old, $new);
+
+        $this->assertTrue($analyzer->hasChanged());
+        $this->assertEquals(['12', '13', '14'], $analyzer->affected());
+        $this->assertEquals([], $analyzer->added());
+        $this->assertEquals([], $analyzer->removed());
+        $this->assertEquals(['12', '13', '14'], $analyzer->moved());
+        $this->assertEquals([], $analyzer->relocated());
     }
 
     /** @test */
@@ -93,6 +143,7 @@ class TreeAnalyzerTest extends TestCase
         $this->assertEquals(['1', '2'], $analyzer->affected());
         $this->assertEquals(['2'], $analyzer->added());
         $this->assertEquals(['1'], $analyzer->removed());
+        $this->assertEquals([], $analyzer->relocated());
     }
 
     /** @test */
@@ -100,6 +151,9 @@ class TreeAnalyzerTest extends TestCase
     {
         $old = [
             ['entry' => '1', 'a' => 'b', 'children' => [
+                ['entry' => '6', 'q' => 'r'],
+                ['entry' => '16', 'w' => 'x'],
+                ['entry' => '61', 'y' => 'z'],
                 ['entry' => '7', 'c' => 'd'],
                 ['entry' => '8', 'e' => 'f'],
                 ['entry' => '10', 'g' => 'h'],
@@ -111,7 +165,11 @@ class TreeAnalyzerTest extends TestCase
         ];
 
         $new = [
-            ['entry' => '1', 'a' => 'b'],
+            ['entry' => '1', 'a' => 'b', 'children' => [
+                ['entry' => '6', 'q' => 'r'],
+                ['entry' => '61', 'y' => 'z'],
+                ['entry' => '16', 'w' => 'x'],
+            ]],
             ['entry' => '2', 'i' => 'j', 'children' => [
                 ['entry' => '3', 'k' => 'l'],
                 ['entry' => '13', 'm' => 'n'],
@@ -125,7 +183,48 @@ class TreeAnalyzerTest extends TestCase
         $this->assertTrue($analyzer->hasChanged());
         $this->assertEquals(['9'], $analyzer->added());
         $this->assertEquals(['7', '8'], $analyzer->removed());
-        $this->assertEquals(['10'], $analyzer->moved());
-        $this->assertEquals(['7', '8', '9', '10'], $analyzer->affected());
+        $this->assertEquals(['16', '61', '10'], $analyzer->moved());
+        $this->assertEquals(['7', '8', '9', '16', '61', '10'], $analyzer->affected());
+        $this->assertEquals(['10'], $analyzer->relocated());
+    }
+
+    /** @test */
+    public function movement_of_an_ancestor_does_not_cause_a_child_to_be_considered_moved()
+    {
+        // Entry 5 is what this test is really all about.
+        // Moving 2 will cause 4 (5's parent) to be moved, but we want to make sure 5 isn't considered moved.
+
+        $old = [
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '3'],
+            ['entry' => '4', 'children' => [
+                ['entry' => '5'],
+                ['entry' => '6', 'children' => [
+                    ['entry' => '7'],
+                ]],
+            ]],
+        ];
+
+        $new = [
+            ['entry' => '1'],                    // it's still 1st
+            ['entry' => '3'],                    // moved from 3rd to 1st
+            ['entry' => '4', 'children' => [     // moved from 4th to 3rd
+                ['entry' => '5'],                // it's still 1st under entry '4'
+                ['entry' => '2'],                // it was moved from the parent level
+                ['entry' => '6', 'children' => [ // moved from 2nd to 3rd
+                    ['entry' => '7'],            // it's still 1st under entry '6', under entry '4'
+                ]],
+            ]],
+        ];
+
+        $analyzer = (new TreeAnalyzer)->analyze($old, $new);
+
+        $this->assertTrue($analyzer->hasChanged());
+        $this->assertEquals([], $analyzer->added());
+        $this->assertEquals([], $analyzer->removed());
+        $this->assertEquals([2, 3, 4, 6], $analyzer->moved());
+        $this->assertEquals([2, 3, 4, 6], $analyzer->affected());
+        $this->assertEquals([2], $analyzer->relocated());
     }
 }
