@@ -43,6 +43,7 @@ class Collection implements Contract, AugmentableContract
     protected $sortDirection;
     protected $ampable = false;
     protected $revisions = false;
+    protected $hidden = false;
     protected $positions;
     protected $defaultPublishState = true;
     protected $futureDateBehavior = 'public';
@@ -423,6 +424,7 @@ class Collection implements Contract, AugmentableContract
                 'past' => $this->pastDateBehavior,
                 'future' => $this->futureDateBehavior,
             ],
+            'hidden' => $this->hidden,
         ]));
 
         if (! Site::hasMultiple()) {
@@ -494,6 +496,7 @@ class Collection implements Contract, AugmentableContract
             'mount' => $this->mount,
             'taxonomies' => $this->taxonomies,
             'revisions' => $this->revisions,
+            'hidden' => $this->hidden,
         ];
     }
 
@@ -517,6 +520,15 @@ class Collection implements Contract, AugmentableContract
                 }
 
                 return $enabled;
+            })
+            ->args(func_get_args());
+    }
+
+    public function hidden($hidden = null)
+    {
+        return $this->fluentlyGetOrSet('hidden')
+            ->getter(function ($hidden) {
+                return $hidden ?? false;
             })
             ->args(func_get_args());
     }

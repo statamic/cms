@@ -72,7 +72,7 @@ class CoreNav
             ->icon('content-writing')
             ->can('index', Collection::class)
             ->children(function () {
-                return CollectionAPI::all()->sortBy->title()->map(function ($collection) {
+                return CollectionAPI::all()->sortBy->title()->reject->hidden()->map(function ($collection) {
                     return Nav::item($collection->title())
                               ->url($collection->showUrl())
                               ->can('view', $collection);

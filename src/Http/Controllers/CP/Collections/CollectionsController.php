@@ -22,6 +22,8 @@ class CollectionsController extends CpController
 
         $collections = Collection::all()->filter(function ($collection) {
             return User::current()->can('view', $collection);
+        })->reject(function ($collection) {
+            return $collection->hidden();
         })->map(function ($collection) {
             return [
                 'id' => $collection->handle(),
