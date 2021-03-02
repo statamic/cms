@@ -3,6 +3,7 @@
 namespace Statamic\Structures;
 
 use Illuminate\Contracts\Support\Responsable;
+use Illuminate\Support\Str;
 use Illuminate\Support\Traits\ForwardsCalls;
 use Statamic\Contracts\Auth\Protect\Protectable;
 use Statamic\Contracts\Data\Augmentable;
@@ -14,7 +15,6 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
-use Illuminate\Support\Str;
 
 class Page implements Entry, Augmentable, Responsable, Protectable
 {
