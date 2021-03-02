@@ -135,7 +135,7 @@ class Page implements Entry, Augmentable, Responsable, Protectable
 
     public function impressProtectOnEntry($entry)
     {
-        if ($entry->getProtectionScheme()) {
+        if (! is_null($entry->getProtectionScheme())) {
             return;
         }
 
