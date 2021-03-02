@@ -15,7 +15,10 @@ class CollectionTreeStore extends NavTreeStore
     {
         [$site, $handle] = $this->parseTreePath($path);
 
-        return (new CollectionStructureTree)->locale($site)->handle($handle);
+        return (new CollectionStructureTree)
+            ->initialPath($path)
+            ->locale($site)
+            ->handle($handle);
     }
 
     public function getItemKey($item)

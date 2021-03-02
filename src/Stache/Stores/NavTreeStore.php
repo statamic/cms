@@ -34,7 +34,10 @@ class NavTreeStore extends BasicStore
     {
         [$site, $handle] = $this->parseTreePath($path);
 
-        return (new NavTree)->locale($site)->handle($handle);
+        return (new NavTree)
+            ->initialPath($path)
+            ->locale($site)
+            ->handle($handle);
     }
 
     protected function parseTreePath($path)
