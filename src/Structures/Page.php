@@ -108,8 +108,52 @@ class Page implements Entry, Augmentable, Responsable, Protectable
         }
 
         return Blink::store('structure-page-entries')->once($this->reference, function () {
-            return $this->tree->entry($this->reference);
+            return $this->impressInheritables($this->tree->entry($this->reference));
         });
+    }
+
+    /**
+     * Loop through this Page's parents to find inheritable values and apply them to the Entry as appropriate.
+     */
+    protected function impressInheritables(?Entry $entry): ?Entry
+    {
+        $page = $this;
+
+        do {
+            foreach ($this->inheritableValues as $inherit) {
+                $method = Str::camel("impress_{$inherit}_on_entry");
+
+                if (method_exists($page, $method)) {
+                    $page->{$method}($entry);
+                }
+            }
+        }
+        while ($page = $page->parent());
+
+        return $entry;
+    }
+
+    public function impressProtectOnEntry($entry)
+    {
+        if ($entry->getProtectionScheme()) {
+            return;
+        }
+
+        if ($protect = $this->protect()) {
+            $entry->set('protect', $protect);
+        }
+    }
+
+    public function protect()
+    {
+        return $this->protect;
+    }
+
+    public function setProtect($protect)
+    {
+        $this->protect = $protect;
+
+        return $this;
     }
 
     public function reference()
