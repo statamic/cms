@@ -8,6 +8,7 @@ class TreeAnalyzer
     protected $removed = [];
     protected $moved = [];
     protected $relocated = [];
+    private $positions;
 
     public function analyze($old, $new)
     {
@@ -17,11 +18,11 @@ class TreeAnalyzer
 
         $old = $this->prepare($old);
         $new = $this->prepare($new);
-
+        $this->positions = $this->preparePositions($old, $new);
         $this->added = $new->keys()->diff($old->keys())->values()->all();
         $this->removed = $old->keys()->diff($new->keys())->values()->all();
-        $this->moved = $this->analyzeMoved($old, $new);
-        $this->relocated = $this->analyzeRelocated($old, $new);
+        $this->moved = $this->analyzeMoved();
+        $this->relocated = $this->analyzeRelocated();
 
         return $this;
     }
@@ -98,39 +99,36 @@ class TreeAnalyzer
         return $this->relocated;
     }
 
-    private function analyzeMoved($old, $new)
+    private function preparePositions($old, $new)
     {
         $positions = [];
 
         foreach ($old as $id => $item) {
-            $positions[$id][] = $item['path'].'.'.$item['index'];
+            $positions[$id][] = $item;
         }
 
         foreach ($new as $id => $item) {
-            $positions[$id][] = $item['path'].'.'.$item['index'];
+            $positions[$id][] = $item;
         }
 
         return collect($positions)->filter(function ($positions) {
-            return count($positions) > 1
-                && $positions[0] !== $positions[1];
+            return count($positions) > 1;
+        });
+    }
+
+    private function analyzeMoved()
+    {
+        return $this->positions->filter(function ($item) {
+            [$a, $b] = $item;
+
+            return $a['path'].'.'.$a['index'] !== $b['path'].'.'.$b['index'];
         })->keys()->all();
     }
 
-    private function analyzeRelocated($old, $new)
+    private function analyzeRelocated()
     {
-        $positions = [];
-
-        foreach ($old as $id => $item) {
-            $positions[$id][] = $item['path'];
-        }
-
-        foreach ($new as $id => $item) {
-            $positions[$id][] = $item['path'];
-        }
-
-        return collect($positions)->filter(function ($positions) {
-            return count($positions) > 1
-                && $positions[0] !== $positions[1];
+        return $this->positions->filter(function ($item) {
+            return $item[0]['path'] !== $item[1]['path'];
         })->keys()->all();
     }
 }
