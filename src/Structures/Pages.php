@@ -68,6 +68,7 @@ class Pages
                 ->setUrl($branch['url'] ?? null)
                 ->setTitle($branch['title'] ?? null)
                 ->setDepth($this->depth)
+                ->setProtect($branch['protect'] ?? null)
                 ->setChildren($branch['children'] ?? []);
 
             if ($this->route) {
