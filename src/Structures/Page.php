@@ -14,6 +14,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
+use Illuminate\Support\Str;
 
 class Page implements Entry, Augmentable, Responsable, Protectable
 {
@@ -28,6 +29,9 @@ class Page implements Entry, Augmentable, Responsable, Protectable
     protected $url;
     protected $title;
     protected $depth;
+    protected $inheritableValues = [
+        'protect',
+    ];
 
     public function setUrl($url)
     {
