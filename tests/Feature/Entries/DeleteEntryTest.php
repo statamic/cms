@@ -69,7 +69,7 @@ class DeleteEntryTest extends TestCase
                         ]],
                     ]],
                 ]],
-            ],
+            ]
         )->save();
         $originalStructure = $collection->structure();
         $originalTree = $originalStructure->in('en');
