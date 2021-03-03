@@ -130,7 +130,7 @@ class LocalizeEntryTest extends TestCase
             [
                 ['entry' => 'fr-home'],
                 ['entry' => 'fr-about'],
-            ],
+            ]
         )->save();
 
         $this->assertEquals([
@@ -174,7 +174,7 @@ class LocalizeEntryTest extends TestCase
         $collection->structure()->in('fr')->tree(
             [
                 ['entry' => 'fr-home'],
-            ],
+            ]
         )->save();
 
         $this->assertEquals([
