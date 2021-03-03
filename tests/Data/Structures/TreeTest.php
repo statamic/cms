@@ -153,7 +153,6 @@ class TreeTest extends TestCase
     public function it_appends_an_entry()
     {
         $tree = $this->tree();
-        $this->assertEquals([], $tree->diff()->affected());
 
         $tree->append(Entry::make()->id('appended-page'));
 
@@ -181,14 +180,12 @@ class TreeTest extends TestCase
                 'entry' => 'appended-page',
             ],
         ], $tree->tree());
-        $this->assertEquals(['appended-page'], $tree->diff()->affected());
     }
 
     /** @test */
     public function it_appends_an_entry_to_another_page()
     {
         $tree = $this->tree();
-        $this->assertEquals([], $tree->diff()->affected());
 
         $tree->appendTo('pages-board', Entry::make()->id('appended-page'));
 
@@ -216,14 +213,12 @@ class TreeTest extends TestCase
                 'entry' => 'pages-blog',
             ],
         ], $tree->tree());
-        $this->assertEquals(['appended-page'], $tree->diff()->affected());
     }
 
     /** @test */
     public function it_moves_an_entry_to_another_page()
     {
         $tree = $this->tree();
-        $this->assertEquals([], $tree->diff()->affected());
 
         // Add [foo=>bar] to the directors page, just so we can test the whole array gets moved.
         $treeContent = $tree->tree();
@@ -252,7 +247,6 @@ class TreeTest extends TestCase
                 'entry' => 'pages-blog',
             ],
         ], $tree->tree());
-        $this->assertEquals(['pages-directors'], $tree->diff()->affected());
     }
 
     /** @test */
@@ -277,12 +271,10 @@ class TreeTest extends TestCase
                 'entry' => 'pages-blog',
             ],
         ]);
-        $this->assertEquals([], $tree->diff()->affected());
 
         $tree->move('pages-board', 'pages-about');
 
         $this->assertEquals($arr, $tree->tree());
-        $this->assertEquals([], $tree->diff()->affected());
     }
 
     /**

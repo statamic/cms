@@ -2,6 +2,7 @@
 
 namespace Statamic\Structures;
 
+use Facades\Statamic\Structures\CollectionTreeDiff;
 use Statamic\Events\CollectionStructureTreeDeleted;
 use Statamic\Events\CollectionStructureTreeSaved;
 use Statamic\Facades\Blink;
@@ -44,5 +45,10 @@ class CollectionStructureTree extends Tree
     public function collection()
     {
         return $this->structure()->collection();
+    }
+
+    public function diff()
+    {
+        return CollectionTreeDiff::analyze($this->original['tree'], $this->tree);
     }
 }

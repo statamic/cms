@@ -2,10 +2,10 @@
 
 namespace Tests\Data\Structures;
 
-use Statamic\Structures\TreeAnalyzer;
+use Statamic\Structures\CollectionTreeDiff;
 use Tests\TestCase;
 
-class TreeAnalyzerTest extends TestCase
+class CollectionTreeDiffTest extends TestCase
 {
     /** @test */
     public function it_sees_no_changes()
@@ -13,7 +13,7 @@ class TreeAnalyzerTest extends TestCase
         $old = [];
         $new = [];
 
-        $analyzer = (new TreeAnalyzer)->analyze($old, $new);
+        $analyzer = (new CollectionTreeDiff)->analyze($old, $new);
 
         $this->assertFalse($analyzer->hasChanged());
         $this->assertEquals([], $analyzer->affected());
@@ -31,7 +31,7 @@ class TreeAnalyzerTest extends TestCase
             ['entry' => '1', 'a' => 'b'],
         ];
 
-        $analyzer = (new TreeAnalyzer)->analyze($old, $new);
+        $analyzer = (new CollectionTreeDiff)->analyze($old, $new);
 
         $this->assertTrue($analyzer->hasChanged());
         $this->assertEquals(['1'], $analyzer->affected());
@@ -49,7 +49,7 @@ class TreeAnalyzerTest extends TestCase
         ];
         $new = [];
 
-        $analyzer = (new TreeAnalyzer)->analyze($old, $new);
+        $analyzer = (new CollectionTreeDiff)->analyze($old, $new);
 
         $this->assertTrue($analyzer->hasChanged());
         $this->assertEquals(['1'], $analyzer->affected());
@@ -79,7 +79,7 @@ class TreeAnalyzerTest extends TestCase
             ['entry' => '5', 'i' => 'j'],
         ];
 
-        $analyzer = (new TreeAnalyzer)->analyze($old, $new);
+        $analyzer = (new CollectionTreeDiff)->analyze($old, $new);
 
         $this->assertTrue($analyzer->hasChanged());
         $this->assertEquals(['2', '3', '4'], $analyzer->affected());
@@ -117,7 +117,7 @@ class TreeAnalyzerTest extends TestCase
             ['entry' => '3'],
         ];
 
-        $analyzer = (new TreeAnalyzer)->analyze($old, $new);
+        $analyzer = (new CollectionTreeDiff)->analyze($old, $new);
 
         $this->assertTrue($analyzer->hasChanged());
         $this->assertEquals(['12', '13', '14'], $analyzer->affected());
@@ -137,7 +137,7 @@ class TreeAnalyzerTest extends TestCase
             ['entry' => '2', 'c' => 'd'],
         ];
 
-        $analyzer = (new TreeAnalyzer)->analyze($old, $new);
+        $analyzer = (new CollectionTreeDiff)->analyze($old, $new);
 
         $this->assertTrue($analyzer->hasChanged());
         $this->assertEquals(['1', '2'], $analyzer->affected());
@@ -178,7 +178,7 @@ class TreeAnalyzerTest extends TestCase
             ['entry' => '9', 'o' => 'p'],
         ];
 
-        $analyzer = (new TreeAnalyzer)->analyze($old, $new);
+        $analyzer = (new CollectionTreeDiff)->analyze($old, $new);
 
         $this->assertTrue($analyzer->hasChanged());
         $this->assertEquals(['9'], $analyzer->added());
@@ -218,7 +218,7 @@ class TreeAnalyzerTest extends TestCase
             ]],
         ];
 
-        $analyzer = (new TreeAnalyzer)->analyze($old, $new);
+        $analyzer = (new CollectionTreeDiff)->analyze($old, $new);
 
         $this->assertTrue($analyzer->hasChanged());
         $this->assertEquals([], $analyzer->added());

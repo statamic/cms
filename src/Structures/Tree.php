@@ -2,7 +2,6 @@
 
 namespace Statamic\Structures;
 
-use Facades\Statamic\Structures\TreeAnalyzer;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Structures\Tree as Contract;
 use Statamic\Data\ExistsAsFile;
@@ -331,11 +330,6 @@ abstract class Tree implements Contract, Localization
         ];
 
         return $this;
-    }
-
-    public function diff()
-    {
-        return TreeAnalyzer::analyze($this->original['tree'], $this->tree);
     }
 
     public function __sleep()

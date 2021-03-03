@@ -2,7 +2,7 @@
 
 namespace Statamic\Structures;
 
-class TreeAnalyzer
+class CollectionTreeDiff
 {
     protected $added = [];
     protected $removed = [];

@@ -6,6 +6,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Structures\CollectionStructureTree;
+use Statamic\Structures\CollectionTreeDiff;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Tests\UnlinksPaths;
@@ -73,5 +74,46 @@ class CollectionStructureTreeTest extends TestCase
         Collection::shouldReceive('findByHandle')->with('pages')->andReturn($collection);
         $tree = $collection->structure()->makeTree('en');
         $this->assertEquals('/path/to/structures/collections/en/pages.yaml', $tree->path());
+    }
+
+    /** @test */
+    public function it_does_a_diff()
+    {
+        $collection = Collection::make('pages')->structureContents(['root' => true]);
+        Collection::shouldReceive('findByHandle')->with('pages')->andReturn($collection);
+
+        $tree = $collection->structure()->makeTree('en', [
+            ['entry' => '1.0', 'children' => [
+                ['entry' => '1.1'],
+                ['entry' => '1.2'],
+                ['entry' => '1.3'],
+            ]],
+            ['entry' => '2.0', 'children' => [
+                ['entry' => '2.1'],
+                ['entry' => '2.2'],
+                ['entry' => '2.3'],
+            ]],
+        ]);
+
+        $tree->tree([
+            ['entry' => '1.0', 'children' => [
+                ['entry' => '1.4'],
+                ['entry' => '1.2'],
+            ]],
+            ['entry' => '2.0', 'children' => [
+                ['entry' => '2.1'],
+                ['entry' => '1.1'],
+                ['entry' => '2.2'],
+                ['entry' => '2.3'],
+            ]],
+            ['entry' => '3.0'],
+        ]);
+
+        $diff = $tree->diff();
+        $this->assertInstanceOf(CollectionTreeDiff::class, $diff);
+        $this->assertEquals(['1.4', '3.0'], $diff->added());
+        $this->assertEquals(['1.3'], $diff->removed());
+        $this->assertEquals(['1.1', '2.2', '2.3'], $diff->moved());
+        $this->assertEquals(['1.1'], $diff->relocated());
     }
 }
