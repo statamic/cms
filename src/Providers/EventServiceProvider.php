@@ -16,6 +16,7 @@ class EventServiceProvider extends ServiceProvider
         ],
         \Statamic\Events\CollectionStructureTreeSaved::class => [
             \Statamic\Entries\UpdateStructuredEntryUris::class,
+            \Statamic\Entries\UpdateStructuredEntryOrder::class,
         ],
     ];
 

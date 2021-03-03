@@ -370,6 +370,13 @@ class Collection implements Contract, AugmentableContract
         return $this;
     }
 
+    public function updateEntryOrder($ids = null)
+    {
+        Facades\Collection::updateEntryOrder($this, $ids);
+
+        return $this;
+    }
+
     public function path()
     {
         return vsprintf('%s/%s.yaml', [

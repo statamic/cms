@@ -82,6 +82,14 @@ class CollectionsStore extends BasicStore
             ->update();
     }
 
+    public function updateEntryOrder($collection, $ids = null)
+    {
+        Stache::store('entries')
+            ->store($collection->handle())
+            ->index('order')
+            ->update();
+    }
+
     public function handleFileChanges()
     {
         if ($this->fileChangesHandled || ! config('statamic.stache.watcher')) {
