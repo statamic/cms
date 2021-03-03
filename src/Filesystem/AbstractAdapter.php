@@ -9,11 +9,11 @@ abstract class AbstractAdapter implements Filesystem
 {
     public function get($path, $fallback = null)
     {
-        if (! $this->exists($path)) {
+        try {
+            return $this->filesystem->get($this->normalizePath($path));
+        } catch (\Exception $e) {
             return $fallback;
         }
-
-        return $this->filesystem->get($this->normalizePath($path));
     }
 
     public function exists($path = null)
