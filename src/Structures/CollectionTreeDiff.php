@@ -7,7 +7,7 @@ class CollectionTreeDiff
     protected $added = [];
     protected $removed = [];
     protected $moved = [];
-    protected $relocated = [];
+    protected $ancestryChanged = [];
     private $positions;
 
     public function analyze($old, $new)
@@ -22,7 +22,7 @@ class CollectionTreeDiff
         $this->added = $new->keys()->diff($old->keys())->values()->all();
         $this->removed = $old->keys()->diff($new->keys())->values()->all();
         $this->moved = $this->analyzeMoved();
-        $this->relocated = $this->analyzeRelocated();
+        $this->ancestryChanged = $this->analyzeAncestryChanges();
 
         return $this;
     }
@@ -92,11 +92,11 @@ class CollectionTreeDiff
 
     /**
      * Items that have changed positions and their "uri" would be affected.
-     * An item that has changed postitions and kept the same ancestors will not be considered relocated.
+     * An item that has changed postitions at the same depth but kept same ancestors will not be included here.
      */
-    public function relocated()
+    public function ancestryChanged()
     {
-        return $this->relocated;
+        return $this->ancestryChanged;
     }
 
     private function preparePositions($old, $new)
@@ -125,7 +125,7 @@ class CollectionTreeDiff
         })->keys()->all();
     }
 
-    private function analyzeRelocated()
+    private function analyzeAncestryChanges()
     {
         return $this->positions->filter(function ($item) {
             return $item[0]['path'] !== $item[1]['path'];

@@ -20,7 +20,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([], $analyzer->added());
         $this->assertEquals([], $analyzer->removed());
         $this->assertEquals([], $analyzer->moved());
-        $this->assertEquals([], $analyzer->relocated());
+        $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
     /** @test */
@@ -38,7 +38,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals(['1'], $analyzer->added());
         $this->assertEquals([], $analyzer->removed());
         $this->assertEquals([], $analyzer->moved());
-        $this->assertEquals([], $analyzer->relocated());
+        $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
     /** @test */
@@ -56,7 +56,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([], $analyzer->added());
         $this->assertEquals(['1'], $analyzer->removed());
         $this->assertEquals([], $analyzer->moved());
-        $this->assertEquals([], $analyzer->relocated());
+        $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
     /** @test */
@@ -86,7 +86,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([], $analyzer->added());
         $this->assertEquals([], $analyzer->removed());
         $this->assertEquals(['2', '3', '4'], $analyzer->moved());
-        $this->assertEquals([], $analyzer->relocated());
+        $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
     /** @test */
@@ -124,7 +124,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([], $analyzer->added());
         $this->assertEquals([], $analyzer->removed());
         $this->assertEquals(['12', '13', '14'], $analyzer->moved());
-        $this->assertEquals([], $analyzer->relocated());
+        $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
     /** @test */
@@ -143,7 +143,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals(['1', '2'], $analyzer->affected());
         $this->assertEquals(['2'], $analyzer->added());
         $this->assertEquals(['1'], $analyzer->removed());
-        $this->assertEquals([], $analyzer->relocated());
+        $this->assertEquals([], $analyzer->ancestryChanged());
     }
 
     /** @test */
@@ -185,7 +185,7 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals(['7', '8'], $analyzer->removed());
         $this->assertEquals(['16', '61', '10'], $analyzer->moved());
         $this->assertEquals(['7', '8', '9', '16', '61', '10'], $analyzer->affected());
-        $this->assertEquals(['10'], $analyzer->relocated());
+        $this->assertEquals(['10'], $analyzer->ancestryChanged());
     }
 
     /** @test */
@@ -225,6 +225,6 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([], $analyzer->removed());
         $this->assertEquals([2, 3, 4, 6], $analyzer->moved());
         $this->assertEquals([2, 3, 4, 6], $analyzer->affected());
-        $this->assertEquals([2], $analyzer->relocated());
+        $this->assertEquals([2], $analyzer->ancestryChanged());
     }
 }

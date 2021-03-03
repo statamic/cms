@@ -114,6 +114,6 @@ class CollectionStructureTreeTest extends TestCase
         $this->assertEquals(['1.4', '3.0'], $diff->added());
         $this->assertEquals(['1.3'], $diff->removed());
         $this->assertEquals(['1.1', '2.2', '2.3'], $diff->moved());
-        $this->assertEquals(['1.1'], $diff->relocated());
+        $this->assertEquals(['1.1'], $diff->ancestryChanged());
     }
 }

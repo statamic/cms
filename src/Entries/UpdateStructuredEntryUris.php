@@ -18,7 +18,7 @@ class UpdateStructuredEntryUris
 
         $diff = $tree->diff();
 
-        $ids = array_merge($diff->relocated(), $diff->added());
+        $ids = array_merge($diff->ancestryChanged(), $diff->added());
 
         if (empty($ids)) {
             return;
