@@ -337,4 +337,16 @@ abstract class Tree implements Contract, Localization
     {
         return TreeAnalyzer::analyze($this->original['tree'], $this->tree);
     }
+
+    public function __sleep()
+    {
+        $vars = Arr::except(get_object_vars($this), ['original']);
+
+        return array_keys($vars);
+    }
+
+    public function __wakeup()
+    {
+        $this->syncOriginal();
+    }
 }
