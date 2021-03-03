@@ -8,7 +8,17 @@ class UpdateStructuredEntryUris
 {
     public function handle(CollectionStructureTreeSaved $event)
     {
-        $ids = $event->tree->diff()->affected();
+        $tree = $event->tree;
+
+        // If it's orderable (single depth structure) then changing the
+        // position of the entries is never going to affect the uris.
+        if ($tree->collection()->orderable()) {
+            return;
+        }
+
+        $diff = $tree->diff();
+
+        $ids = array_merge($diff->relocated(), $diff->added());
 
         if (empty($ids)) {
             return;
