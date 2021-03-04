@@ -49,6 +49,10 @@ class CollectionStructureTree extends Tree
 
     public function diff()
     {
-        return CollectionTreeDiff::analyze($this->original['tree'], $this->tree);
+        return CollectionTreeDiff::analyze(
+            $this->original['tree'],
+            $this->tree,
+            $this->structure()->expectsRoot()
+        );
     }
 }

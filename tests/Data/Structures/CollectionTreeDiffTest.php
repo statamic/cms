@@ -227,4 +227,108 @@ class CollectionTreeDiffTest extends TestCase
         $this->assertEquals([2, 3, 4, 6], $analyzer->affected());
         $this->assertEquals([2], $analyzer->ancestryChanged());
     }
+
+    /** @test */
+    public function moving_a_top_level_item_to_the_start_while_expecting_a_root_will_consider_it_an_ancestry_change()
+    {
+        $old = [
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '3'],
+        ];
+
+        $new = [
+            ['entry' => '2'],
+            ['entry' => '1'],
+            ['entry' => '3'],
+        ];
+
+        $analyzer = (new CollectionTreeDiff)->analyze($old, $new, true);
+
+        $this->assertTrue($analyzer->hasChanged());
+        $this->assertEquals([], $analyzer->added());
+        $this->assertEquals([], $analyzer->removed());
+        $this->assertEquals([1, 2], $analyzer->moved());
+        $this->assertEquals([1, 2], $analyzer->affected());
+        $this->assertEquals([1, 2], $analyzer->ancestryChanged());
+    }
+
+    /** @test */
+    public function moving_a_top_level_item_to_the_start_while_not_expecting_a_root_will_not_consider_it_an_ancestry_change()
+    {
+        $old = [
+            ['entry' => '1'],
+            ['entry' => '2'],
+            ['entry' => '3'],
+        ];
+
+        $new = [
+            ['entry' => '2'],
+            ['entry' => '1'],
+            ['entry' => '3'],
+        ];
+
+        $analyzer = (new CollectionTreeDiff)->analyze($old, $new);
+
+        $this->assertTrue($analyzer->hasChanged());
+        $this->assertEquals([], $analyzer->added());
+        $this->assertEquals([], $analyzer->removed());
+        $this->assertEquals([1, 2], $analyzer->moved());
+        $this->assertEquals([1, 2], $analyzer->affected());
+        $this->assertEquals([], $analyzer->ancestryChanged());
+    }
+
+    /** @test */
+    public function moving_a_nested_item_to_the_start_while_expecting_a_root_will_not_consider_it_an_ancestry_change()
+    {
+        $old = [
+            ['entry' => '1', 'children' => [
+                ['entry' => '2'],
+                ['entry' => '3'],
+            ]],
+        ];
+
+        $new = [
+            ['entry' => '1', 'children' => [
+                ['entry' => '3'],
+                ['entry' => '2'],
+            ]],
+        ];
+
+        $analyzer = (new CollectionTreeDiff)->analyze($old, $new, true);
+
+        $this->assertTrue($analyzer->hasChanged());
+        $this->assertEquals([], $analyzer->added());
+        $this->assertEquals([], $analyzer->removed());
+        $this->assertEquals([2, 3], $analyzer->moved());
+        $this->assertEquals([2, 3], $analyzer->affected());
+        $this->assertEquals([], $analyzer->ancestryChanged());
+    }
+
+    /** @test */
+    public function moving_a_nested_item_to_the_start_while_not_expecting_a_root_will_not_consider_it_an_ancestry_change()
+    {
+        $old = [
+            ['entry' => '1', 'children' => [
+                ['entry' => '2'],
+                ['entry' => '3'],
+            ]],
+        ];
+
+        $new = [
+            ['entry' => '1', 'children' => [
+                ['entry' => '3'],
+                ['entry' => '2'],
+            ]],
+        ];
+
+        $analyzer = (new CollectionTreeDiff)->analyze($old, $new);
+
+        $this->assertTrue($analyzer->hasChanged());
+        $this->assertEquals([], $analyzer->added());
+        $this->assertEquals([], $analyzer->removed());
+        $this->assertEquals([2, 3], $analyzer->moved());
+        $this->assertEquals([2, 3], $analyzer->affected());
+        $this->assertEquals([], $analyzer->ancestryChanged());
+    }
 }

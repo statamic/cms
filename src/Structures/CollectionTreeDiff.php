@@ -8,14 +8,16 @@ class CollectionTreeDiff
     protected $removed = [];
     protected $moved = [];
     protected $ancestryChanged = [];
+    protected $expectsRoot = false;
     private $positions;
 
-    public function analyze($old, $new)
+    public function analyze($old, $new, $expectsRoot = false)
     {
         if ($old === $new) {
             return $this;
         }
 
+        $this->expectsRoot = $expectsRoot;
         $old = $this->prepare($old);
         $new = $this->prepare($new);
         $this->positions = $this->preparePositions($old, $new);
@@ -50,8 +52,12 @@ class CollectionTreeDiff
 
     private function addPaths($arr, $path = '*')
     {
-        return collect($arr)->map(function ($item) use ($path) {
+        return collect($arr)->map(function ($item, $i) use ($path) {
             $item['path'] = "$path";
+
+            if ($this->expectsRoot && $path == '*' && $i == 0) {
+                $item['path'] = '^';
+            }
 
             if (isset($item['children'])) {
                 $item['children'] = $this->addPaths($item['children'], $path.'.'.$item['entry']);
