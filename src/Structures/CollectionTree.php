@@ -3,6 +3,7 @@
 namespace Statamic\Structures;
 
 use Facades\Statamic\Structures\CollectionTreeDiff;
+use Statamic\Contracts\Structures\CollectionTreeRepository;
 use Statamic\Events\CollectionTreeDeleted;
 use Statamic\Events\CollectionTreeSaved;
 use Statamic\Facades\Blink;
@@ -54,5 +55,10 @@ class CollectionTree extends Tree
             $this->tree,
             $this->structure()->expectsRoot()
         );
+    }
+
+    protected function repository()
+    {
+        return app(CollectionTreeRepository::class);
     }
 }

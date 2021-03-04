@@ -562,6 +562,11 @@ class TreeTest extends TestCase
 
                 return $this;
             }
+
+            protected function repository()
+            {
+                //
+            }
         };
     }
 }

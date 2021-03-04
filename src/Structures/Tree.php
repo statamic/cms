@@ -145,13 +145,7 @@ abstract class Tree implements Contract, Localization
         return true;
     }
 
-    protected function repository()
-    {
-        // todo clean this up.
-        return $this instanceof \Statamic\Structures\NavTree
-            ? app(\Statamic\Contracts\Structures\NavTreeRepository::class)
-            : app(\Statamic\Contracts\Structures\CollectionTreeRepository::class);
-    }
+    abstract protected function repository();
 
     protected function dispatchSavedEvent()
     {

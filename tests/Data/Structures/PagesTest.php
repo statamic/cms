@@ -92,6 +92,11 @@ class PagesTest extends TestCase
             {
                 //
             }
+
+            protected function repository()
+            {
+                //
+            }
         };
     }
 }

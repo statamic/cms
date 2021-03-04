@@ -2,6 +2,7 @@
 
 namespace Statamic\Structures;
 
+use Statamic\Contracts\Structures\NavTreeRepository;
 use Statamic\Events\NavTreeDeleted;
 use Statamic\Events\NavTreeSaved;
 use Statamic\Facades\Blink;
@@ -37,5 +38,10 @@ class NavTree extends Tree
     protected function dispatchDeletedEvent()
     {
         NavTreeDeleted::dispatch($this);
+    }
+
+    protected function repository()
+    {
+        return app(NavTreeRepository::class);
     }
 }

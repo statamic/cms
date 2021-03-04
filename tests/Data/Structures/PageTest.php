@@ -314,6 +314,11 @@ class PageTest extends TestCase
 
                 return $this;
             }
+
+            protected function repository()
+            {
+                //
+            }
         };
     }
 }
