@@ -13,7 +13,7 @@ class UseDedicatedTrees extends UpdateScript
 {
     public function shouldUpdate($newVersion, $oldVersion)
     {
-        return $this->isUpdatingTo('3.1');
+        return $this->isUpdatingTo('3.1.0-alpha.4');
     }
 
     public function update()
