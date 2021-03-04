@@ -16,6 +16,11 @@ class UpdateStructuredEntryUris
             return;
         }
 
+        // If the collection has no route, there are no uris to update.
+        if (! $tree->collection()->route($tree->locale())) {
+            return;
+        }
+
         $diff = $tree->diff();
 
         $ids = array_merge($diff->ancestryChanged(), $diff->added());
