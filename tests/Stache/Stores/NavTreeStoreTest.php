@@ -112,6 +112,21 @@ YAML;
     /** @test */
     public function it_saves_to_disk()
     {
+        $tree = Facades\Nav::make('links')->makeTree('en', [
+            ['title' => 'Test', 'url' => '/test'],
+        ]);
+
+        $this->store->save($tree);
+
+        $expected = <<<'EOT'
+tree:
+  -
+    title: Test
+    url: /test
+
+EOT;
+
+        $this->assertStringEqualsFile($this->tempDir.'/links.yaml', $expected);
     }
 
     private function assertTree($array, $item)

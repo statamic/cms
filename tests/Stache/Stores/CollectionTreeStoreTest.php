@@ -111,6 +111,22 @@ YAML;
     /** @test */
     public function it_saves_to_disk()
     {
+        $collection = Facades\Collection::make('pages')->structureContents(['root' => true]);
+        Facades\Collection::shouldReceive('findByHandle')->with('pages')->andReturn($collection);
+        $tree = $collection->structure()->makeTree('en', [
+            ['entry' => 'test'],
+        ]);
+
+        $this->store->save($tree);
+
+        $expected = <<<'EOT'
+tree:
+  -
+    entry: test
+
+EOT;
+
+        $this->assertStringEqualsFile($this->tempDir.'/pages.yaml', $expected);
     }
 
     private function assertTree($array, $item)
