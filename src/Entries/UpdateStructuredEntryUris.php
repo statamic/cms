@@ -9,15 +9,16 @@ class UpdateStructuredEntryUris
     public function handle(CollectionStructureTreeSaved $event)
     {
         $tree = $event->tree;
+        $collection = $tree->collection();
 
         // If it's orderable (single depth structure) then changing the
         // position of the entries is never going to affect the uris.
-        if ($tree->collection()->orderable()) {
+        if ($collection->orderable()) {
             return;
         }
 
         // If the collection has no route, there are no uris to update.
-        if (! $tree->collection()->route($tree->locale())) {
+        if (! $collection->route($tree->locale())) {
             return;
         }
 
@@ -29,6 +30,6 @@ class UpdateStructuredEntryUris
             return;
         }
 
-        $event->tree->collection()->updateEntryUris($ids);
+        $collection->updateEntryUris($ids);
     }
 }

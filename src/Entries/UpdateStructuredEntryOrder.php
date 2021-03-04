@@ -9,10 +9,11 @@ class UpdateStructuredEntryOrder
     public function handle(CollectionStructureTreeSaved $event)
     {
         $tree = $event->tree;
+        $collection = $tree->collection();
 
         // Only orderable (single depth structure) entries will
         // have order attributes, so don't bother otherwise.
-        if (! $tree->collection()->orderable()) {
+        if (! $collection->orderable()) {
             return;
         }
 
@@ -24,6 +25,6 @@ class UpdateStructuredEntryOrder
             return;
         }
 
-        $event->tree->collection()->updateEntryOrder($ids);
+        $collection->updateEntryOrder($ids);
     }
 }
