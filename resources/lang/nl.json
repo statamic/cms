@@ -4,7 +4,7 @@
     ":count row|:count rows": ":count rij|:count rijen",
     ":count selected|:count selected": ":count geseselecteerd|:count geselecteerd",
     ":count set|:count sets": ":count set|:count sets",
-    ":count\/:max selected": "count/:max geselecteerd",
+    ":count\/:max selected": ":count/:max geselecteerd",
     ":file uploaded": ":file geüpload",
     "A blueprint with that name already exists.": "Een blueprint met die naam bestaat al.",
     "A fieldset with that name already exists.": "Een fieldset met die naam bestaat al.",
