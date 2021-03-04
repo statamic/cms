@@ -178,14 +178,18 @@ class UpdateScriptTest extends TestCase
         PackToTheFuture::generateComposerLock('statamic/cms', 'v3.1.8', $this->lockPath);
 
         // The fake update script will call this closure.
-        app()->instance('version-assertions', function ($newVersion, $oldVersion) {
+        $callbackRan = false;
+        app()->instance('version-assertions', function ($newVersion, $oldVersion) use (&$callbackRan) {
             $this->assertEquals('3.1.8.0', $newVersion);
             $this->assertEquals('3.0.25.0-alpha2', $oldVersion);
+            $callbackRan = true;
         });
 
         $this->register(VersionAssertionUpdate::class);
 
         Manager::runAll();
+
+        $this->assertTrue($callbackRan);
     }
 
     /** @test */
