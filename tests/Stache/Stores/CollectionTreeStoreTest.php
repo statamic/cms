@@ -9,7 +9,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\CollectionTreeStore;
-use Statamic\Structures\CollectionStructureTree;
+use Statamic\Structures\CollectionTree;
 use Tests\TestCase;
 
 class CollectionTreeStoreTest extends TestCase
@@ -63,7 +63,7 @@ tree:
 YAML;
         $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/pages.yaml'), $contents);
 
-        $this->assertInstanceOf(CollectionStructureTree::class, $item);
+        $this->assertInstanceOf(CollectionTree::class, $item);
         $this->assertEquals('en', $item->locale());
         $this->assertTree([
             ['entry' => 1],
@@ -88,7 +88,7 @@ tree:
 YAML;
         $item = $this->store->makeItemFromFile(Path::tidy($this->tempDir.'/fr/pages.yaml'), $contents);
 
-        $this->assertInstanceOf(CollectionStructureTree::class, $item);
+        $this->assertInstanceOf(CollectionTree::class, $item);
         $this->assertEquals('fr', $item->locale());
         $this->assertTree([
             ['entry' => 3],

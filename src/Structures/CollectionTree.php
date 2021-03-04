@@ -3,14 +3,14 @@
 namespace Statamic\Structures;
 
 use Facades\Statamic\Structures\CollectionTreeDiff;
-use Statamic\Events\CollectionStructureTreeDeleted;
-use Statamic\Events\CollectionStructureTreeSaved;
+use Statamic\Events\CollectionTreeDeleted;
+use Statamic\Events\CollectionTreeSaved;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 
-class CollectionStructureTree extends Tree
+class CollectionTree extends Tree
 {
     public function structure()
     {
@@ -34,12 +34,12 @@ class CollectionStructureTree extends Tree
 
     protected function dispatchSavedEvent()
     {
-        CollectionStructureTreeSaved::dispatch($this);
+        CollectionTreeSaved::dispatch($this);
     }
 
     protected function dispatchDeletedEvent()
     {
-        CollectionStructureTreeDeleted::dispatch($this);
+        CollectionTreeDeleted::dispatch($this);
     }
 
     public function collection()

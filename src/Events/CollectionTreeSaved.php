@@ -4,7 +4,7 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
-class CollectionStructureTreeSaved extends Event implements ProvidesCommitMessage
+class CollectionTreeSaved extends Event implements ProvidesCommitMessage
 {
     public $tree;
 
@@ -15,6 +15,6 @@ class CollectionStructureTreeSaved extends Event implements ProvidesCommitMessag
 
     public function commitMessage()
     {
-        return __('Collection structure tree saved', [], config('statamic.git.locale'));
+        return __('Collection tree saved', [], config('statamic.git.locale'));
     }
 }

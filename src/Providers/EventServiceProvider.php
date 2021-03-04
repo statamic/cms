@@ -14,7 +14,7 @@ class EventServiceProvider extends ServiceProvider
         \Illuminate\Auth\Events\Login::class => [
             \Statamic\Auth\SetLastLoginTimestamp::class,
         ],
-        \Statamic\Events\CollectionStructureTreeSaved::class => [
+        \Statamic\Events\CollectionTreeSaved::class => [
             \Statamic\Entries\UpdateStructuredEntryUris::class,
             \Statamic\Entries\UpdateStructuredEntryOrder::class,
         ],

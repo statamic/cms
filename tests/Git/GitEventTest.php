@@ -186,8 +186,8 @@ class GitEventTest extends TestCase
     public function it_commits_when_a_collection_tree_is_saved_and_deleted()
     {
         Git::shouldReceive('dispatchCommit')->with('Collection saved')->once();
-        Git::shouldReceive('dispatchCommit')->with('Collection structure tree saved')->once();
-        Git::shouldReceive('dispatchCommit')->with('Collection structure tree deleted')->once();
+        Git::shouldReceive('dispatchCommit')->with('Collection tree saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Collection tree deleted')->once();
 
         $collection = Facades\Collection::make('pages')->structureContents(['max_depth' => 10])->save();
         $tree = $collection->structure()->makeTree('en');

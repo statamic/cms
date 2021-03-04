@@ -2,11 +2,11 @@
 
 namespace Statamic\Entries;
 
-use Statamic\Events\CollectionStructureTreeSaved;
+use Statamic\Events\CollectionTreeSaved;
 
 class UpdateStructuredEntryUris
 {
-    public function handle(CollectionStructureTreeSaved $event)
+    public function handle(CollectionTreeSaved $event)
     {
         $tree = $event->tree;
         $collection = $tree->collection();

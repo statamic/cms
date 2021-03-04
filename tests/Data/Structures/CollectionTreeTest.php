@@ -5,13 +5,13 @@ namespace Tests\Data\Structures;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
-use Statamic\Structures\CollectionStructureTree;
+use Statamic\Structures\CollectionTree;
 use Statamic\Structures\CollectionTreeDiff;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 use Tests\UnlinksPaths;
 
-class CollectionStructureTreeTest extends TestCase
+class CollectionTreeTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
     use UnlinksPaths;
@@ -27,7 +27,7 @@ class CollectionStructureTreeTest extends TestCase
     /** @test */
     public function it_can_get_and_set_the_handle()
     {
-        $tree = new CollectionStructureTree;
+        $tree = new CollectionTree;
         $this->assertNull($tree->handle());
 
         $return = $tree->handle('test');
@@ -45,7 +45,7 @@ class CollectionStructureTreeTest extends TestCase
 
         $this->assertNull(Blink::get($blinkKey = 'collection-tree-structure-test'));
 
-        $tree = (new CollectionStructureTree)->handle('test');
+        $tree = (new CollectionTree)->handle('test');
 
         // Do it twice combined with the once() in the mock to show blink works.
         $this->assertSame($structure, $tree->structure());

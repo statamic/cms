@@ -4,7 +4,7 @@ namespace Statamic\Events;
 
 use Statamic\Contracts\Git\ProvidesCommitMessage;
 
-class CollectionStructureTreeDeleted extends Event implements ProvidesCommitMessage
+class CollectionTreeDeleted extends Event implements ProvidesCommitMessage
 {
     public $tree;
 
@@ -15,6 +15,6 @@ class CollectionStructureTreeDeleted extends Event implements ProvidesCommitMess
 
     public function commitMessage()
     {
-        return __('Collection structure tree deleted', [], config('statamic.git.locale'));
+        return __('Collection tree deleted', [], config('statamic.git.locale'));
     }
 }

@@ -18,7 +18,7 @@ use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Sites\Site;
 use Statamic\Structures\CollectionStructure;
-use Statamic\Structures\CollectionStructureTree;
+use Statamic\Structures\CollectionTree;
 use Statamic\Structures\Page;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -1005,7 +1005,7 @@ class EntryTest extends TestCase
         $parentPage = $this->mock(Page::class);
         $page = $this->mock(Page::class);
         $page->shouldReceive('parent')->andReturn($parentPage);
-        $tree = $this->partialMock(CollectionStructureTree::class);
+        $tree = $this->partialMock(CollectionTree::class);
         $tree->locale('en');
         $tree->shouldReceive('page')->with('entry-id')->andReturn($page);
         CollectionTreeRepository::shouldReceive('find', 'en')->andReturn($tree);

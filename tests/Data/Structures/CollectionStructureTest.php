@@ -10,7 +10,7 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Structures\CollectionStructure;
-use Statamic\Structures\CollectionStructureTree;
+use Statamic\Structures\CollectionTree;
 use Statamic\Structures\Page;
 use Statamic\Structures\Tree;
 
@@ -136,7 +136,7 @@ class CollectionStructureTest extends StructureTestCase
         $this->assertTrue($structure->existsIn('fr'));
         $this->assertFalse($structure->existsIn('de'));
         $this->assertSame($enTree, $structure->in('en'));
-        $this->assertInstanceOf(CollectionStructureTree::class, $structure->in('fr'));
+        $this->assertInstanceOf(CollectionTree::class, $structure->in('fr'));
         $this->assertNull($structure->in('de'));
     }
 

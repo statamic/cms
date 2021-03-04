@@ -2,7 +2,7 @@
 
 namespace Statamic\Stache\Stores;
 
-use Statamic\Structures\CollectionStructureTree;
+use Statamic\Structures\CollectionTree;
 
 class CollectionTreeStore extends NavTreeStore
 {
@@ -15,7 +15,7 @@ class CollectionTreeStore extends NavTreeStore
     {
         [$site, $handle] = $this->parseTreePath($path);
 
-        return (new CollectionStructureTree)
+        return (new CollectionTree)
             ->initialPath($path)
             ->locale($site)
             ->handle($handle);

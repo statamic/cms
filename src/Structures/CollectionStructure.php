@@ -50,7 +50,7 @@ class CollectionStructure extends Structure
 
     public function newTreeInstance()
     {
-        return new CollectionStructureTree;
+        return new CollectionTree;
     }
 
     public function validateTree(array $tree, string $locale): array
