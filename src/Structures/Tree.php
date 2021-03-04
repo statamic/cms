@@ -5,6 +5,7 @@ namespace Statamic\Structures;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Facades\Blink;
+use Statamic\Facades\Entry;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
@@ -18,6 +19,7 @@ class Tree implements Localization
     protected $tree = [];
     protected $structure;
     protected $cachedFlattenedPages;
+    protected $withEntries = false;
 
     public function locale($locale = null)
     {
@@ -295,6 +297,10 @@ class Tree implements Localization
 
     public function entry($entry)
     {
+        if (! $this->withEntries) {
+            return Entry::find($entry);
+        }
+
         $blink = $this->structure->handle().'-'.$this->locale();
 
         $entries = Blink::store('structure-entries')->once($blink, function () {
@@ -304,5 +310,12 @@ class Tree implements Localization
         });
 
         return $entries->get($entry);
+    }
+
+    public function withEntries()
+    {
+        $this->withEntries = true;
+
+        return $this;
     }
 }
