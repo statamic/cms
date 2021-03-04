@@ -1,5 +1,20 @@
 # Release Notes
 
+## Unreleased
+
+### What's new
+- Added a form endpoint to the REST API. [#3271](https://github.com/statamic/cms/issues/3271)
+
+### What's fixed
+- Full measure static caching no longer logs when creating the page. [#3255](https://github.com/statamic/cms/issues/3255)
+- Form fieldtypes now show data in the API rather than an empty object. [#3182](https://github.com/statamic/cms/issues/3182)
+
+### What's changing
+- A `hasCachedPage` method has been added to the `Statamic\StaticCaching\Cacher` interface.
+- Global search is now only triggered with a slash. (Not ctrl/alt/shift+f)
+
+
+
 ## 3.1.0-alpha.3 (2020-02-11)
 
 ### What's new

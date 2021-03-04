@@ -118,6 +118,20 @@ class Bard extends Replicator
                 'default' => true,
                 'width' => 50,
             ],
+            'enable_input_rules' => [
+                'display' => __('Enable Input Rules'),
+                'instructions' => __('statamic::fieldtypes.bard.config.enable_input_rules'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
+            'enable_paste_rules' => [
+                'display' => __('Enable Paste Rules'),
+                'instructions' => __('statamic::fieldtypes.bard.config.enable_paste_rules'),
+                'type' => 'toggle',
+                'default' => true,
+                'width' => 50,
+            ],
         ];
     }
 
