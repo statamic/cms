@@ -172,6 +172,23 @@ class UpdateScriptTest extends TestCase
     }
 
     /** @test */
+    public function it_passes_normalized_versions_into_shouldUpdate()
+    {
+        PackToTheFuture::generateComposerLock('statamic/cms', 'v3.0.25-alpha.2', $this->previousLockPath);
+        PackToTheFuture::generateComposerLock('statamic/cms', 'v3.1.8', $this->lockPath);
+
+        // The fake update script will call this closure.
+        app()->instance('version-assertions', function ($newVersion, $oldVersion) {
+            $this->assertEquals('3.1.8.0', $newVersion);
+            $this->assertEquals('3.0.25.0-alpha2', $oldVersion);
+        });
+
+        $this->register(VersionAssertionUpdate::class);
+
+        Manager::runAll();
+    }
+
+    /** @test */
     public function it_deletes_previous_lock_file_after_running_update_scripts()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0.25', $this->previousLockPath);
@@ -398,5 +415,18 @@ class SeoProUpdate extends UpdateScript
     public function update()
     {
         cache()->put('seo-pro-update-successful', true);
+    }
+}
+
+class VersionAssertionUpdate extends UpdateScript
+{
+    public function shouldUpdate($newVersion, $oldVersion)
+    {
+        app('version-assertions')($newVersion, $oldVersion);
+    }
+
+    public function update()
+    {
+        //
     }
 }
