@@ -124,6 +124,19 @@ class UpdateScriptTest extends TestCase
     }
 
     /** @test */
+    public function it_properly_normalizes_the_version_you_pass_in_when_checking_for_updating_to_a_version()
+    {
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0-beta.1', $this->previousLockPath);
+        PackToTheFuture::generateComposerLock('statamic/cms', 'v3.1.0', $this->lockPath);
+
+        $script = $this->register(UpdatePermissions::class);
+
+        $this->assertTrue($script->isUpdatingTo('3.1'));
+        $this->assertTrue($script->isUpdatingTo('3.1.0'));
+        $this->assertFalse($script->isUpdatingTo('3.1.1'));
+    }
+
+    /** @test */
     public function it_can_check_if_version_is_normalized_when_user_overrides_lock_version()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0', $this->previousLockPath);
