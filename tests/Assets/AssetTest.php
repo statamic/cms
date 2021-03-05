@@ -639,7 +639,7 @@ class AssetTest extends TestCase
         $asset = (new Asset)
             ->container($this->container)
             ->path('path/to/asset.jpg')
-            ->set('focus', '75% 25%');
+            ->set('focus', '75-25');
 
         $this->assertSame($asset->augmentedValue('focus_css'), '75% 25%');
     }
