@@ -80,6 +80,7 @@ class NavTest extends TestCase
         $this->assertEquals('Droids', $item->section());
         $this->assertEquals('R2-D2', $item->name());
         $this->assertEquals('http://localhost/r2', $item->url());
+        $this->assertEquals('_self', $item->target());
     }
 
     /** @test */
@@ -91,7 +92,8 @@ class NavTest extends TestCase
             ->active('threepio*')
             ->url('/human-cyborg-relations')
             ->view('cp.nav.importer')
-            ->can('index', 'DroidsClass');
+            ->can('index', 'DroidsClass')
+            ->target('_blank');
 
         $item = Nav::build()->get('Droids')->first();
 
@@ -102,6 +104,7 @@ class NavTest extends TestCase
         $this->assertEquals('threepio*', $item->active());
         $this->assertEquals('index', $item->authorization()->ability);
         $this->assertEquals('DroidsClass', $item->authorization()->arguments);
+        $this->assertEquals('_blank', $item->target());
     }
 
     /** @test */
