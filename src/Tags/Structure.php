@@ -35,7 +35,7 @@ class Structure extends Tags
         $tree = (new TreeBuilder)->build([
             'structure' => $handle,
             'include_home' => $this->params->get('include_home'),
-            'filter_published' => $this->params->get('filter_published', true),
+            'show_unpublished' => $this->params->get('show_unpublished', false),
             'site' => $this->params->get('site', Site::current()->handle()),
             'from' => $this->params->get('from'),
         ]);

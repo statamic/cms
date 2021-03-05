@@ -89,7 +89,7 @@ class ApiController extends Controller
     /**
      * Check if user is not filtering by a specific field, for applying default filters.
      *
-     * @param string $fieldS
+     * @param string $field
      * @return bool
      */
     public function doesntHaveFilter($field)
