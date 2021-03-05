@@ -17,7 +17,7 @@ class PageTest extends TestCase
     private function createData()
     {
         $collection = Collection::make('pages')->title('Pages')->routes(['en' => '{parent_uri}/{slug}']);
-        $structure = (new CollectionStructure)->collection($collection)->maxDepth(3)->expectsRoot(true);
+        $structure = (new CollectionStructure)->maxDepth(3)->expectsRoot(true);
         $collection->structure($structure)->save();
 
         EntryFactory::collection('pages')->id('home')->slug('home')->create();

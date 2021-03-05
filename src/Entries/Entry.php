@@ -165,8 +165,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                         $tree->move($child->id(), optional($parent)->id());
                     });
                     $tree->remove($this);
-                });
-            })->save();
+                })->save();
+            });
         }
 
         Facades\Entry::delete($this);

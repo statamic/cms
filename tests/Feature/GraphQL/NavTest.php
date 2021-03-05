@@ -23,9 +23,8 @@ class NavTest extends TestCase
     public function it_queries_a_nav_by_handle()
     {
         Nav::make('links')->title('Links')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {
-            $nav->addTree($nav->makeTree('en'));
-            $nav->save();
-        });
+            $nav->makeTree('en')->save();
+        })->save();
         $this->createFooterNav();
 
         $query = <<<'GQL'
@@ -186,7 +185,7 @@ GQL;
         $this->createEntries();
 
         Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
-            $nav->addTree($nav->makeTree('en')->tree([
+            $nav->makeTree('en', [
                 [
                     'entry' => '1',
                     'children' => [
@@ -195,9 +194,8 @@ GQL;
                         ],
                     ],
                 ],
-            ]));
-            $nav->save();
-        });
+            ])->save();
+        })->save();
 
         $query = <<<'GQL'
 {
@@ -315,7 +313,7 @@ GQL;
     private function createFooterNav()
     {
         Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
-            $nav->addTree($nav->makeTree('en')->tree([
+            $nav->makeTree('en', [
                 [
                     'url' => '/one',
                     'title' => 'One',
@@ -342,8 +340,8 @@ GQL;
                     'url' => '/two',
                     'title' => 'Two',
                 ],
-            ]));
-            $nav->addTree($nav->makeTree('fr')->tree([
+            ])->save();
+            $nav->makeTree('fr', [
                 [
                     'url' => '/fr-one',
                     'title' => 'Fr One',
@@ -370,8 +368,7 @@ GQL;
                     'url' => '/fr-two',
                     'title' => 'Fr Two',
                 ],
-            ]));
-            $nav->save();
-        });
+            ])->save();
+        })->save();
     }
 }

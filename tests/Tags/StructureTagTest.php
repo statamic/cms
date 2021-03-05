@@ -127,7 +127,7 @@ EOT;
     {
         $nav = Nav::make('test');
 
-        $nav->addTree($nav->makeTree('en')->tree($tree));
+        $nav->makeTree('en', $tree)->save();
 
         $nav->save();
     }
