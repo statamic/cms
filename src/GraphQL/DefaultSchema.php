@@ -56,7 +56,7 @@ class DefaultSchema
             'sites' => [SitesQuery::class],
             'users' => [UsersQuery::class, UserQuery::class],
         ])->each(function ($qs, $key) use (&$queries) {
-            $queries = $queries->merge(config('statamic.graphql.queries.'.$key) ? $qs : []);
+            $queries = $queries->merge(config('statamic.graphql.resources.'.$key) ? $qs : []);
         });
 
         return $queries->all();

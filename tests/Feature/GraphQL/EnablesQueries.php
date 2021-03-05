@@ -12,7 +12,7 @@ trait EnablesQueries
 
         if ($this->enabledQueries) {
             foreach (Arr::wrap($this->enabledQueries) as $key) {
-                $app['config']->set('statamic.graphql.queries.'.$key, true);
+                $app['config']->set('statamic.graphql.resources.'.$key, true);
             }
         }
     }

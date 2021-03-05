@@ -4,7 +4,7 @@ return [
 
     'enabled' => env('STATAMIC_GRAPHQL_ENABLED', false),
 
-    'queries' => [
+    'resources' => [
         'collections' => false,
         'navs' => false,
         'taxonomies' => false,
