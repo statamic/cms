@@ -36,7 +36,7 @@ class Arr extends Fieldtype
 
     public function preProcess($data)
     {
-        return array_merge($this->blankKeyed(), $data ?? []);
+        return array_replace($this->blankKeyed(), $data ?? []);
     }
 
     public function preProcessConfig($data)
