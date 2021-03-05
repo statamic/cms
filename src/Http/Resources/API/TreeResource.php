@@ -48,6 +48,7 @@ class TreeResource extends JsonResource
         return (new TreeBuilder)->build([
             'structure' => $this->resource->structure()->handle(),
             'include_home' => true,
+            'filter_published' => true,
             'site' => Site::default()->handle(),
             'fields' => $this->fields,
             'max_depth' => $this->maxDepth,
