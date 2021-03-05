@@ -8,8 +8,10 @@ use Statamic\CP\Column;
 use Statamic\Exceptions\TermsFieldtypeBothOptionsUsedException;
 use Statamic\Exceptions\TermsFieldtypeTaxonomyOptionUsed;
 use Statamic\Facades;
+use Statamic\Facades\GraphQL;
 use Statamic\Facades\Site;
 use Statamic\Facades\Term;
+use Statamic\GraphQL\Types\TermInterface;
 use Statamic\Http\Resources\CP\Taxonomies\Terms as TermsResource;
 use Statamic\Query\Scopes\Filters\Fields\Terms as TermsFilter;
 use Statamic\Support\Arr;
@@ -289,5 +291,16 @@ class Terms extends Relationship
         $term->save();
 
         return $term->id();
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type(TermInterface::NAME);
+
+        if ($this->config('max_items') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
     }
 }

@@ -2,12 +2,11 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Illuminate\Http\Request;
 use Statamic\Http\Resources\API\TermResource;
 
 class TaxonomyTermsController extends ApiController
 {
-    public function index($taxonomy, Request $request)
+    public function index($taxonomy)
     {
         return app(TermResource::class)::collection(
             $this->filterSortAndPaginate($taxonomy->queryTerms())

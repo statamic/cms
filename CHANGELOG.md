@@ -3,6 +3,66 @@
 ## Unreleased
 
 ### What's new
+- Added a form endpoint to the REST API. [#3271](https://github.com/statamic/cms/issues/3271)
+
+### What's fixed
+- Full measure static caching no longer logs when creating the page. [#3255](https://github.com/statamic/cms/issues/3255)
+- Form fieldtypes now show data in the API rather than an empty object. [#3182](https://github.com/statamic/cms/issues/3182)
+
+### What's changing
+- A `hasCachedPage` method has been added to the `Statamic\StaticCaching\Cacher` interface.
+- GraphQL queries are all disabled by default. [#3289](https://github.com/statamic/cms/issues/3289)
+- Global search is now only triggered with a slash. (Not ctrl/alt/shift+f)
+
+
+
+## 3.1.0-alpha.3 (2020-02-11)
+
+### What's new
+- Add site and locale to entries. [#3205](https://github.com/statamic/cms/issues/3205)
+- Date fields in range mode can be queried in GraphQL. [#3223](https://github.com/statamic/cms/issues/3223)
+
+### What's fixed
+- Support separate logos for outside/inside. [cad7451e](https://github.com/statamic/cms/commit/cad7451e)
+- Fix date fields not augmenting ranges. [#3223](https://github.com/statamic/cms/issues/3223)
+- Brought over changes from 3.0.43
+
+### What's changing
+- The `@svg` directive has been renamed to `@cp_svg` to avoid potential conflicts. [#3186](https://github.com/statamic/cms/issues/3186)
+
+
+
+## 3.1.0-alpha.2 (2020-02-04)
+
+### What's new
+- Ability to query an entry by slug or URI in GraphQL. [#3193](https://github.com/statamic/cms/issues/3193)
+
+### What's fixed
+- Fixed GraphQL nested subfield handling for Replicator, Bard, and Grid fields. [#3202](https://github.com/statamic/cms/issues/3202)
+- Fixed Safari display issue. [#1999](https://github.com/statamic/cms/issues/1999)
+- Brought over changes from 3.0.41-42
+
+
+
+## 3.1.0-alpha.1 (2020-02-01)
+
+### What's new
+- GraphQL [#2982](https://github.com/statamic/cms/issues/2982)
+- White labeling [#3013](https://github.com/statamic/cms/issues/3013)
+- Update Scripts [#3024](https://github.com/statamic/cms/issues/3024)
+- API Caching [#3168](https://github.com/statamic/cms/issues/3168)
+- Nav and Collection structure tree API endpoints [#2999](https://github.com/statamic/cms/issues/2999)
+- Entry author permissions [#3053](https://github.com/statamic/cms/issues/3053)
+
+### What's changing
+- The `date` fieldtype now augments to Carbon instances. If you use them in Antlers without any modifiers, they will now be output using the default
+  `date_format` (e.g. January 1st, 2020). Previously, the raw value (e.g. 2020-01-02) would have been output. Actual entry dates (i.e. the `date` field) would have behaved this way already. If you were using a modifier (e.g. `format`), there will be no change.
+
+
+
+## 3.0.43 (2020-02-11)
+
+### What's new
 - Added an `EntryCreated` event. [#3078](https://github.com/statamic/cms/issues/3078)
 - Ability to save entries without triggering events. [#3208](https://github.com/statamic/cms/issues/3208)
 - Add `sort` and `query_scope` parameters to `search:results` tag. [#2383](https://github.com/statamic/cms/issues/2383)

@@ -3,6 +3,7 @@
 namespace Statamic\Providers;
 
 use Illuminate\Routing\Router;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\View;
 use Illuminate\Support\ServiceProvider;
 use Statamic\CP\Utilities\CoreUtilities;
@@ -31,6 +32,10 @@ class CpServiceProvider extends ServiceProvider
         View::composer(NavComposer::VIEWS, NavComposer::class);
 
         CoreUtilities::boot();
+
+        Blade::directive('cp_svg', function ($expression) {
+            return "<?php echo Statamic::svg({$expression}) ?>";
+        });
 
         $this->registerMiddlewareGroups();
     }
@@ -68,7 +73,6 @@ class CpServiceProvider extends ServiceProvider
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
-            \Statamic\Http\Middleware\CP\ControlPanel::class,
             \Statamic\Http\Middleware\CP\ContactOutpost::class,
         ]);
 

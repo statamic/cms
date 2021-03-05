@@ -34,9 +34,29 @@ class ServiceProvider extends LaravelServiceProvider
 
         $stache->sites(Site::all()->keys()->all());
 
-        $stache->registerStores(collect(config('statamic.stache.stores'))->map(function ($config) {
+        $this->registerStores($stache);
+    }
+
+    private function registerStores($stache)
+    {
+        // Merge the stores from our config file with the stores in the user's published
+        // config file. If we ever need to add more stores, they won't need to add them.
+        $config = require __DIR__.'/../../config/stache.php';
+        $published = config('statamic.stache.stores');
+
+        $nativeStores = collect($config['stores'])
+            ->map(function ($config, $key) use ($published) {
+                return array_merge($config, $published[$key] ?? []);
+            });
+
+        // Merge in any user defined stores that aren't native.
+        $stores = $nativeStores->merge(collect($published)->diffKeys($nativeStores));
+
+        $stores = $stores->map(function ($config) {
             return app($config['class'])->directory($config['directory']);
-        })->all());
+        });
+
+        $stache->registerStores($stores->all());
     }
 
     private function locks()

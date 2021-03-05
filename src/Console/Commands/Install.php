@@ -2,7 +2,10 @@
 
 namespace Statamic\Console\Commands;
 
+use Exception;
+use Facades\Statamic\UpdateScripts\Manager as UpdateScriptManager;
 use Illuminate\Console\Command;
+use Statamic\Console\Composer\Json as ComposerJson;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 use Statamic\Statamic;
@@ -37,7 +40,8 @@ class Install extends Command
              ->publish()
              ->runCallbacks()
              ->clearViews()
-             ->clearCache();
+             ->clearCache()
+             ->runUpdateScripts();
     }
 
     protected function addons()
@@ -104,6 +108,49 @@ class Install extends Command
     protected function runCallbacks()
     {
         Statamic::runAfterInstalledCallbacks($this);
+
+        return $this;
+    }
+
+    protected function runUpdateScripts()
+    {
+        if (ComposerJson::isMissingPreUpdateCmd()) {
+            return $this->addPreUpdateCmdAndRunFirstTime();
+        }
+
+        UpdateScriptManager::runAll($this);
+
+        return $this;
+    }
+
+    protected function addPreUpdateCmdAndRunFirstTime()
+    {
+        try {
+            ComposerJson::addPreUpdateCmd();
+        } catch (Exception $exception) {
+            return $this->outputMissingPreUpdateCmd();
+        }
+
+        UpdateScriptManager::runUpdatesForSpecificPackageVersion(Statamic::PACKAGE, '3.0.0', $this);
+
+        return $this;
+    }
+
+    protected function outputMissingPreUpdateCmd()
+    {
+        $this->error('We notice you are missing a composer hook!');
+        $this->error('Please ensure the following is registered in the `scripts` section of your composer.json file,');
+        $this->error('And re-run [php please updates:run 3.0] when complete.');
+
+        $this->line(<<<'EOT'
+"scripts": {
+    "pre-update-cmd": [
+        "Statamic\\Console\\Composer\\Scripts::preUpdateCmd"
+    ],
+    ...
+}
+EOT
+        );
 
         return $this;
     }

@@ -220,6 +220,8 @@ abstract class Store
         $deleted->each(function ($path) {
             if ($key = $this->getKeyFromPath($path)) {
                 $this->forgetItem($key);
+                $this->forgetPath($key);
+                $this->resolveIndexes()->each->forgetItem($key);
                 $this->handleDeletedItem($path, $key);
             }
         });

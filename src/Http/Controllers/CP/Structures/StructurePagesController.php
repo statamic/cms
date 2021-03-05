@@ -11,13 +11,13 @@ use Statamic\Support\Arr;
 
 class StructurePagesController extends CpController
 {
-    public function index(Request $request, $structure)
+    public function index(Request $request, $handle)
     {
-        $structure = Structure::find($structure);
+        $structure = Structure::find($handle);
         $site = $request->site ?? Site::selected()->handle();
 
         $pages = (new TreeBuilder)->buildForController([
-            'structure' => $structure->handle(),
+            'structure' => $handle,
             'include_home' => true,
             'site' => $site,
         ]);

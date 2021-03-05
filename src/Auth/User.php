@@ -13,11 +13,14 @@ use Statamic\Auth\Passwords\PasswordReset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
 use Statamic\Events\UserDeleted;
 use Statamic\Events\UserSaved;
 use Statamic\Facades;
+use Statamic\Fields\Value;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Notifications\ActivateAccount as ActivateAccountNotification;
 use Statamic\Notifications\PasswordReset as PasswordResetNotification;
 use Statamic\Statamic;
@@ -28,9 +31,10 @@ abstract class User implements
     Authenticatable,
     CanResetPasswordContract,
     Augmentable,
-    AuthorizableContract
+    AuthorizableContract,
+    ResolvesValuesContract
 {
-    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, HasAvatar;
+    use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, HasAvatar, ResolvesValues;
 
     abstract public function get($key, $fallback = null);
 
