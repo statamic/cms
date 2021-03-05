@@ -207,7 +207,7 @@ class FeatureTest extends TestCase
 
         $this->assertStringEqualsFile(
             $path = __DIR__.'/__fixtures__/content/collections/new.yaml',
-            "title: 'New Collection'\nrevisions: true\ndate: true\ndefault_status: draft\ninject:\n  foo: bar\n"
+            "title: 'New Collection'\nrevisions: true\nhidden: false\ndate: true\ndefault_status: draft\ninject:\n  foo: bar\n"
         );
         @unlink($path);
     }
