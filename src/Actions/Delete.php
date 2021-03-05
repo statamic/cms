@@ -19,7 +19,7 @@ class Delete extends Action
         if (! $item instanceof Entry) {
             return false;
         }
-        
+
         if ($item->collection()->sites()->count() > 1) {
             return false;
         }
