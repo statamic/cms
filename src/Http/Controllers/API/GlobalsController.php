@@ -7,8 +7,8 @@ use Statamic\Http\Resources\API\GlobalSetResource;
 
 class GlobalsController extends ApiController
 {
-    protected $endpointConfigKey = 'globals';
-    protected $limitRouteResource = 'global';
+    protected $resourceConfigKey = 'globals';
+    protected $routeResourceKey = 'global';
 
     public function index()
     {

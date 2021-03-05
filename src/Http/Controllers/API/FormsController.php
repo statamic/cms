@@ -7,8 +7,8 @@ use Statamic\Http\Resources\API\FormResource;
 
 class FormsController extends ApiController
 {
-    protected $endpointConfigKey = 'forms';
-    protected $limitRouteResource = 'form';
+    protected $resourceConfigKey = 'forms';
+    protected $routeResourceKey = 'form';
 
     public function index()
     {

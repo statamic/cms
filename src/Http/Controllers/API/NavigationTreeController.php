@@ -8,8 +8,8 @@ use Statamic\Http\Resources\API\TreeResource;
 
 class NavigationTreeController extends ApiController
 {
-    protected $endpointConfigKey = 'navs';
-    protected $limitRouteResource = 'nav';
+    protected $resourceConfigKey = 'navs';
+    protected $routeResourceKey = 'nav';
 
     public function show($handle)
     {

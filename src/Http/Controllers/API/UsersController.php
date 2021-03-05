@@ -8,7 +8,7 @@ use Statamic\Http\Resources\API\UserResource;
 
 class UsersController extends ApiController
 {
-    protected $endpointConfigKey = 'users';
+    protected $resourceConfigKey = 'users';
 
     public function index()
     {

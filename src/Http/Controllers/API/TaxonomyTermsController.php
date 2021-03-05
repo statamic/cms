@@ -6,8 +6,8 @@ use Statamic\Http\Resources\API\TermResource;
 
 class TaxonomyTermsController extends ApiController
 {
-    protected $endpointConfigKey = 'taxonomy-terms';
-    protected $limitRouteResource = 'taxonomy';
+    protected $resourceConfigKey = 'taxonomies';
+    protected $routeResourceKey = 'taxonomy';
 
     public function index($taxonomy)
     {

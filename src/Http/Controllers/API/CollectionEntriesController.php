@@ -6,8 +6,8 @@ use Statamic\Http\Resources\API\EntryResource;
 
 class CollectionEntriesController extends ApiController
 {
-    protected $endpointConfigKey = 'entries';
-    protected $limitRouteResource = 'collection';
+    protected $resourceConfigKey = 'collections';
+    protected $routeResourceKey = 'collection';
 
     public function index($collection)
     {

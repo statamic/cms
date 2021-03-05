@@ -9,7 +9,7 @@ return [
     |
     | Whether the API should be enabled, and through what route. You
     | can enable or disable the whole API, and expose individual
-    | endpoints per environent, depending on your site needs.
+    | resources per environent, depending on your site needs.
     |
     | https://statamic.dev/content-api#enable-the-api
     |
@@ -17,10 +17,10 @@ return [
 
     'enabled' => env('STATAMIC_API_ENABLED', false),
 
-    'endpoints' => [
-        'entries' => false,
+    'resources' => [
+        'collections' => false,
         'navs' => false,
-        'taxonomy-terms' => false,
+        'taxonomies' => false,
         'assets' => false,
         'globals' => false,
         'forms' => false,

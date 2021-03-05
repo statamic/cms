@@ -12,30 +12,30 @@ class ApiController extends Controller
 {
     use QueriesConditions;
 
-    protected $endpointConfigKey;
-    protected $limitRouteResource;
+    protected $resourceConfigKey;
+    protected $routeResourceKey;
 
     /**
      * Abort if endpoint is disabled.
      */
     protected function abortIfDisabled()
     {
-        if (! $this->endpointConfigKey) {
+        if (! $this->resourceConfigKey) {
             return;
         }
 
-        $config = config("statamic.api.endpoints.{$this->endpointConfigKey}");
+        $config = config("statamic.api.resources.{$this->resourceConfigKey}");
 
         if ($config === false) {
             throw new NotFoundHttpException;
         }
 
-        if (! $this->limitRouteResource || ! is_array($config)) {
+        if (! $this->routeResourceKey || ! is_array($config)) {
             return;
         }
 
         foreach ($config as $resource) {
-            $this->abortIfRouteResourceDisabled($this->limitRouteResource, $resource);
+            $this->abortIfRouteResourceDisabled($this->routeResourceKey, $resource);
         }
     }
 
@@ -68,7 +68,7 @@ class ApiController extends Controller
      */
     protected function filterAllowedResources($items)
     {
-        $allowedResources = config("statamic.api.endpoints.{$this->endpointConfigKey}");
+        $allowedResources = config("statamic.api.resources.{$this->resourceConfigKey}");
 
         if (! is_array($allowedResources)) {
             return $items;

@@ -8,14 +8,14 @@ class TaxonomyTermEntriesController extends ApiController
 {
     protected function abortIfDisabled()
     {
-        // Abort if `taxonomy-terms` endpoint is disabled
-        $this->endpointConfigKey = 'taxonomy-terms';
-        $this->limitRouteResource = 'taxonomy';
+        // Abort if `taxonomies` resource is disabled
+        $this->resourceConfigKey = 'taxonomies';
+        $this->routeResourceKey = 'taxonomy';
         parent::abortIfDisabled();
 
-        // Abort if `abort` if endpoint is totally disabled
-        $this->endpointConfigKey = 'entries';
-        $this->limitRouteResource = false;
+        // Abort if `collections` resource is disabled
+        $this->resourceConfigKey = 'collections';
+        $this->routeResourceKey = false;
         parent::abortIfDisabled();
     }
 
@@ -36,7 +36,7 @@ class TaxonomyTermEntriesController extends ApiController
 
     private function allowedCollections()
     {
-        $entriesConfig = config('statamic.api.endpoints.entries');
+        $entriesConfig = config('statamic.api.resources.collections');
 
         return is_array($entriesConfig) ? $entriesConfig : [];
     }

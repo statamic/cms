@@ -7,8 +7,8 @@ use Statamic\Http\Resources\API\TreeResource;
 
 class CollectionTreeController extends ApiController
 {
-    protected $endpointConfigKey = 'entries';
-    protected $limitRouteResource = 'collection';
+    protected $resourceConfigKey = 'collections';
+    protected $routeResourceKey = 'collection';
 
     public function show($collection)
     {

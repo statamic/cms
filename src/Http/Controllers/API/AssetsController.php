@@ -6,8 +6,8 @@ use Statamic\Http\Resources\API\AssetResource;
 
 class AssetsController extends ApiController
 {
-    protected $endpointConfigKey = 'assets';
-    protected $limitRouteResource = 'asset_container';
+    protected $resourceConfigKey = 'assets';
+    protected $routeResourceKey = 'asset_container';
 
     public function index($assetContainer)
     {
