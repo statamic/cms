@@ -20,11 +20,7 @@ class Delete extends Action
             return false;
         }
 
-        if ($item->collection()->sites()->count() > 1) {
-            return false;
-        }
-
-        return true;
+        return $item->collection()->sites()->count() === 1;
     }
 
     public function authorize($user, $item)
