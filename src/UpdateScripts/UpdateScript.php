@@ -2,6 +2,7 @@
 
 namespace Statamic\UpdateScripts;
 
+use Composer\Package\Version\VersionParser;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Console\Composer\Lock;
 use Statamic\Console\NullConsole;
@@ -66,8 +67,9 @@ abstract class UpdateScript
      */
     public function isUpdatingTo($version)
     {
-        $newVersion = Lock::file()->getInstalledVersion($this->package());
-        $oldVersion = Lock::file(self::BACKUP_PATH)->getInstalledVersion($this->package());
+        $version = (new VersionParser)->normalize($version);
+        $newVersion = Lock::file()->getNormalizedInstalledVersion($this->package());
+        $oldVersion = Lock::file(self::BACKUP_PATH)->getNormalizedInstalledVersion($this->package());
 
         return version_compare($version, $newVersion, '<=') && version_compare($version, $oldVersion, '>');
     }

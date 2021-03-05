@@ -51,7 +51,7 @@ class StructureType extends \Rebing\GraphQL\Support\Type
 
             if ($field === 'tree') {
                 return (new TreeBuilder)->build([
-                    'structure' => $structure->handle(),
+                    'structure' => $structure,
                     'site' => $args['site'] ?? Site::default()->handle(),
                     'include_home' => $structure->expectsRoot(),
                 ]);

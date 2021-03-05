@@ -3,7 +3,6 @@
 namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
-use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Event;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Entries\Entry;
@@ -269,20 +268,18 @@ class CollectionTest extends TestCase
         $this->assertEquals('date', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
-        $structureWithMaxDepthOfOne = $this->makeStructure()->maxDepth(1);
-        $ordered = (new Collection)->structure($structureWithMaxDepthOfOne);
+        $ordered = (new Collection)->structureContents(['max_depth' => 1]);
         $this->assertEquals('order', $ordered->sortField());
         $this->assertEquals('asc', $ordered->sortDirection());
 
-        $datedAndOrdered = (new Collection)->dated(true)->structure($structureWithMaxDepthOfOne);
+        $datedAndOrdered = (new Collection)->dated(true)->structureContents(['max_depth' => 1]);
         $this->assertEquals('order', $datedAndOrdered->sortField());
         $this->assertEquals('asc', $datedAndOrdered->sortDirection());
 
-        $structure = $this->makeStructure();
-        $alpha->structure($structure);
+        $alpha->structureContents(['max_depth' => 99]);
         $this->assertEquals('title', $alpha->sortField());
         $this->assertEquals('asc', $alpha->sortDirection());
-        $dated->structure($structure);
+        $dated->structureContents(['max_depth' => 99]);
         $this->assertEquals('date', $dated->sortField());
         $this->assertEquals('desc', $dated->sortDirection());
 
@@ -401,6 +398,8 @@ class CollectionTest extends TestCase
     {
         $structure = new CollectionStructure;
         $collection = (new Collection)->handle('test');
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
+
         $this->assertFalse($collection->hasStructure());
         $this->assertNull($collection->structure());
         $this->assertNull($structure->handle());
@@ -409,55 +408,21 @@ class CollectionTest extends TestCase
 
         $this->assertTrue($collection->hasStructure());
         $this->assertSame($structure, $collection->structure());
-        $this->assertEquals('collection::test', $structure->handle());
+        $this->assertEquals('test', $structure->handle());
         $this->assertEquals('Test', $structure->title());
     }
 
     /** @test */
-    public function it_sets_the_structure_inline()
-    {
-        // This applies to a file-based approach.
-
-        $collection = (new Collection)->handle('test');
-        $this->assertFalse($collection->hasStructure());
-        $this->assertNull($collection->structure());
-
-        EntryFactory::id('123')->collection('test')->create();
-        EntryFactory::id('456')->collection('test')->create();
-        EntryFactory::id('789')->collection('test')->create();
-
-        $return = $collection->structureContents($contents = [
-            'max_depth' => 2,
-            'tree' => [
-                ['entry' => '123', 'children' => [
-                    ['entry' => '789'],
-                ]],
-                ['entry' => '456'],
-            ],
-        ]);
-
-        $this->assertEquals($collection, $return);
-        $this->assertEquals($contents, $collection->structureContents());
-        $this->assertTrue($collection->hasStructure());
-        $structure = $collection->structure();
-        $this->assertInstanceOf(CollectionStructure::class, $structure);
-        $this->assertEquals('collection::test', $structure->handle());
-        $this->assertSame($collection, $structure->collection());
-        $this->assertEquals(2, $structure->in('en')->pages()->all()->count());
-        $this->assertEquals(3, $structure->in('en')->flattenedPages()->count());
-        $this->assertEquals(2, $structure->maxDepth());
-    }
-
-    /** @test */
-    public function setting_a_structure_removes_the_existing_inline_structure()
+    public function setting_a_structure_overrides_the_existing_inline_structure()
     {
         $collection = (new Collection)->handle('test');
-        $collection->structureContents($contents = ['tree' => []]);
+        $collection->structureContents($contents = ['root' => true, 'max_depth' => 3]);
         $this->assertSame($contents, $collection->structureContents());
 
-        $collection->structure(new CollectionStructure);
+        $collection->structure($structure = (new CollectionStructure)->expectsRoot(false)->maxDepth(13));
 
-        $this->assertNull($collection->structureContents());
+        $this->assertEquals(['root' => false, 'max_depth' => 13], $collection->structureContents());
+        $this->assertSame($structure, $collection->structure());
     }
 
     /** @test */
@@ -467,7 +432,7 @@ class CollectionTest extends TestCase
         $collection->structure($structure = (new CollectionStructure)->maxDepth(2));
         $this->assertSame($structure, $collection->structure());
         $this->assertEquals(2, $collection->structure()->maxDepth());
-        $this->assertNull($collection->structureContents());
+        $this->assertEquals(['root' => false, 'max_depth' => 2], $collection->structureContents());
 
         $collection->structureContents(['max_depth' => 13, 'tree' => []]);
 
@@ -547,10 +512,15 @@ class CollectionTest extends TestCase
         $this->assertEquals('/fr/le-blog', $collection->url('fr'));
     }
 
-    private function makeStructure()
+    /** @test */
+    public function it_updates_entry_uris_through_the_repository()
     {
-        return (new CollectionStructure)->tap(function ($s) {
-            $s->addTree($s->makeTree('en'));
-        });
+        $collection = (new Collection)->handle('test');
+
+        Facades\Collection::shouldReceive('updateEntryUris')->with($collection, null)->once()->ordered();
+        Facades\Collection::shouldReceive('updateEntryUris')->with($collection, ['one', 'two'])->once()->ordered();
+
+        $collection->updateEntryUris();
+        $collection->updateEntryUris(['one', 'two']);
     }
 }
