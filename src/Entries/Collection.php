@@ -424,7 +424,7 @@ class Collection implements Contract, AugmentableContract
                 'past' => $this->pastDateBehavior,
                 'future' => $this->futureDateBehavior,
             ],
-            'hidden' => $this->hidden,
+            'hidden' => $this->hidden ? true : null,
         ]));
 
         if (! Site::hasMultiple()) {
