@@ -200,4 +200,13 @@ class NavItem
     {
         return $this->fluentlyGetOrSet('view')->value($view);
     }
+
+    public function target($target = null)
+    {
+        return $this->fluentlyGetOrSet('target')
+            ->getter(function ($value) {
+                return $value ?? '_self';
+            })
+            ->value($target);
+    }
 }
