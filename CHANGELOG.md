@@ -11,6 +11,7 @@
 
 ### What's changing
 - A `hasCachedPage` method has been added to the `Statamic\StaticCaching\Cacher` interface.
+- GraphQL queries are all disabled by default. [#3289](https://github.com/statamic/cms/issues/3289)
 - Global search is now only triggered with a slash. (Not ctrl/alt/shift+f)
 
 

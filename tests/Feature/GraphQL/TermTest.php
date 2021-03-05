@@ -12,6 +12,21 @@ use Tests\TestCase;
 class TermTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['taxonomies'];
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{terms}'])
+            ->assertSee('Cannot query field \"terms\" on type \"Query\"', false);
+    }
 
     /** @test */
     public function it_queries_a_term_by_id()

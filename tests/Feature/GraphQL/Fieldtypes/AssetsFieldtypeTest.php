@@ -7,6 +7,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Blueprint;
+use Tests\Feature\GraphQL\EnablesQueries;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -14,6 +15,9 @@ use Tests\TestCase;
 class AssetsFieldtypeTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['collections'];
 
     public function setUp(): void
     {

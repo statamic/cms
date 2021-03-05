@@ -7,6 +7,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Role;
 use Tests\FakesRoles;
+use Tests\Feature\GraphQL\EnablesQueries;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -15,6 +16,9 @@ class UserRolesFieldtypeTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
     use FakesRoles;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['collections'];
 
     public function setUp(): void
     {
