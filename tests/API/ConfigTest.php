@@ -4,7 +4,6 @@ namespace Tests\API;
 
 use Illuminate\Support\Facades\Storage;
 use Statamic\Facades;
-use Statamic\Facades\Nav;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -28,7 +27,7 @@ class ConfigTest extends TestCase
     /** @test */
     public function config_can_enable_all_collections_resources()
     {
-        Facades\Collection::make('pages')->structureContents(['expects_root' => false, 'tree' => []])->save();
+        Facades\Collection::make('pages')->structureContents(['expects_root' => false])->save();
         Facades\Collection::make('articles')->save();
         Facades\Entry::make()->collection('pages')->id('about')->slug('about')->save();
         Facades\Entry::make()->collection('articles')->id('dance')->slug('dance')->save();
@@ -46,7 +45,7 @@ class ConfigTest extends TestCase
     /** @test */
     public function config_can_disable_all_collections_resources()
     {
-        Facades\Collection::make('pages')->structureContents(['expects_root' => false, 'tree' => []])->save();
+        Facades\Collection::make('pages')->structureContents(['expects_root' => false])->save();
         Facades\Collection::make('articles')->save();
         Facades\Entry::make()->collection('pages')->id('about')->slug('about')->save();
         Facades\Entry::make()->collection('articles')->id('dance')->slug('dance')->save();
@@ -64,7 +63,7 @@ class ConfigTest extends TestCase
     /** @test */
     public function config_can_enable_some_collections_resources()
     {
-        Facades\Collection::make('pages')->structureContents(['expects_root' => false, 'tree' => []])->save();
+        Facades\Collection::make('pages')->structureContents(['expects_root' => false])->save();
         Facades\Collection::make('articles')->save();
         Facades\Entry::make()->collection('pages')->id('about')->slug('about')->save();
         Facades\Entry::make()->collection('articles')->id('dance')->slug('dance')->save();
@@ -396,15 +395,11 @@ class ConfigTest extends TestCase
 
     private function makeNav($handle)
     {
-        return Nav::make($handle)->title(ucfirst($handle))->expectsRoot(false)->tap(function ($nav) {
-            $nav->addTree($nav->makeTree('en')->tree([
-                [
-                    'url' => '/one',
-                    'title' => 'One',
-                    'children' => [],
-                ],
-            ]));
-        });
+        $nav = Facades\Nav::make($handle);
+
+        $nav->makeTree('en', [])->save();
+
+        return $nav;
     }
 
     private function assertEndpointNotFound($endpoint)

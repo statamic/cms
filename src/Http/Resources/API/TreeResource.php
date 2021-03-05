@@ -46,7 +46,7 @@ class TreeResource extends JsonResource
     public function toArray($request)
     {
         return (new TreeBuilder)->build([
-            'structure' => $this->resource->structure()->handle(),
+            'structure' => $this->resource->structure(),
             'include_home' => true,
             'filter_published' => true,
             'site' => Site::default()->handle(),
