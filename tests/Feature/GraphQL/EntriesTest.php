@@ -15,7 +15,7 @@ class EntriesTest extends TestCase
     use CreatesQueryableTestEntries;
     use EnablesQueries;
 
-    protected $enabledQueries = ['entries'];
+    protected $enabledQueries = ['collections'];
 
     public function setUp(): void
     {

@@ -18,7 +18,7 @@ class UserGroupsFieldtypeTest extends TestCase
     use FakesUserGroups;
     use EnablesQueries;
 
-    protected $enabledQueries = ['entries'];
+    protected $enabledQueries = ['collections'];
 
     public function setUp(): void
     {

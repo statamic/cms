@@ -15,7 +15,7 @@ class TermsTest extends TestCase
     use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
 
-    protected $enabledQueries = ['taxonomy-terms'];
+    protected $enabledQueries = ['taxonomies'];
 
     public function setUp(): void
     {

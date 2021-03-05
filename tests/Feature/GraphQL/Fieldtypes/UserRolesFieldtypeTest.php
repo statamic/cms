@@ -18,7 +18,7 @@ class UserRolesFieldtypeTest extends TestCase
     use FakesRoles;
     use EnablesQueries;
 
-    protected $enabledQueries = ['entries'];
+    protected $enabledQueries = ['collections'];
 
     public function setUp(): void
     {

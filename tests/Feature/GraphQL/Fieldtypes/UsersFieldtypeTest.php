@@ -16,7 +16,7 @@ class UsersFieldtypeTest extends TestCase
     use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
 
-    protected $enabledQueries = ['entries'];
+    protected $enabledQueries = ['collections'];
 
     public function setUp(): void
     {

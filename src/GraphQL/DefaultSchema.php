@@ -48,12 +48,9 @@ class DefaultSchema
         $queries = collect([PingQuery::class]);
 
         collect([
-            'entries' => [EntriesQuery::class, EntryQuery::class],
-            'collections' => [CollectionsQuery::class, CollectionQuery::class],
-            'assets' => [AssetsQuery::class, AssetQuery::class],
-            'asset-containers' => [AssetContainersQuery::class, AssetContainerQuery::class],
-            'taxonomies' => [TaxonomiesQuery::class, TaxonomyQuery::class],
-            'taxonomy-terms' => [TermsQuery::class, TermQuery::class],
+            'collections' => [CollectionsQuery::class, CollectionQuery::class, EntriesQuery::class, EntryQuery::class],
+            'assets' => [AssetContainersQuery::class, AssetContainerQuery::class, AssetsQuery::class, AssetQuery::class],
+            'taxonomies' => [TaxonomiesQuery::class, TaxonomyQuery::class, TermsQuery::class, TermQuery::class],
             'globals' => [GlobalSetsQuery::class, GlobalSetQuery::class],
             'navs' => [NavsQuery::class, NavQuery::class],
             'sites' => [SitesQuery::class],

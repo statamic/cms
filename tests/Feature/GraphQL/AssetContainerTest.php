@@ -12,7 +12,7 @@ class AssetContainerTest extends TestCase
     use PreventSavingStacheItemsToDisk;
     use EnablesQueries;
 
-    protected $enabledQueries = ['asset-containers'];
+    protected $enabledQueries = ['assets'];
 
     /**
      * @test
