@@ -125,6 +125,6 @@ class AugmentedAsset extends AbstractAugmented
 
     protected function focusCss()
     {
-        return Modify::value($this->get('focus'))->backgroundPosition()->fetch();
+        return Modify::value($this->get('focus') ?? '50-50')->backgroundPosition()->fetch();
     }
 }
