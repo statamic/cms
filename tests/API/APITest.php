@@ -65,9 +65,13 @@ class APITest extends TestCase
     {
         Facades\Config::set('statamic.api.resources.collections', true);
         Facades\Config::set('statamic.api.resources.taxonomies', true);
+
         Facades\Taxonomy::make('topics')->save();
+
         Facades\Term::make()->taxonomy('topics')->inDefaultLocale()->slug('dance')->data([])->save();
+
         Facades\Collection::make('pages')->taxonomies(['topics'])->save();
+
         Facades\Entry::make()->collection('pages')->slug('one')->published(true)->data(['topics' => 'dance'])->save();
         Facades\Entry::make()->collection('pages')->slug('two')->published(false)->data(['topics' => 'dance'])->save();
         Facades\Entry::make()->collection('pages')->slug('three')->published(false)->data(['topics' => 'dance'])->save();
@@ -82,7 +86,7 @@ class APITest extends TestCase
     /** @test */
     public function it_filters_published_entries_in_nav_route_by_default()
     {
-        Facades\Config::set('statamic.api.resources.collections', true);
+        Facades\Config::set('statamic.api.resources.navs', true);
 
         Facades\Collection::make('pages')->save();
 
