@@ -201,6 +201,12 @@ class NavItem
         return $this->fluentlyGetOrSet('view')->value($view);
     }
 
+    /**
+     * Get or set target attribute.
+     *
+     * @param string|null $target
+     * @return mixed
+     */
     public function target($target = null)
     {
         return $this->fluentlyGetOrSet('target')
