@@ -304,6 +304,7 @@ class BlueprintTest extends TestCase
             ->andReturn(new Field('field_two', [
                 'type' => 'textarea',
                 'display' => 'Two',
+                'placeholder' => null,
                 'instructions' => 'Two instructions',
                 'validate' => 'min:2',
             ]));
@@ -371,6 +372,7 @@ class BlueprintTest extends TestCase
                             'instructions' => 'Two instructions',
                             'required' => false,
                             'validate' => 'min:2',
+                            'placeholder' => null,
                             'character_limit' => null,
                             'component' => 'textarea',
                             'antlers' => false,

@@ -13,7 +13,9 @@ class TreeBuilder
 {
     public function build($params)
     {
-        if (! $structure = Structure::find($params['structure'])) {
+        if ($params['structure'] instanceof \Statamic\Contracts\Structures\Structure) {
+            $structure = $params['structure'];
+        } elseif (! $structure = Structure::find($params['structure'])) {
             return null;
         }
 

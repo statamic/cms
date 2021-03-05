@@ -7,6 +7,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\UserGroup;
 use Tests\FakesUserGroups;
+use Tests\Feature\GraphQL\EnablesQueries;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -15,6 +16,9 @@ class UserGroupsFieldtypeTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
     use FakesUserGroups;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['collections'];
 
     public function setUp(): void
     {

@@ -14,6 +14,21 @@ use Tests\TestCase;
 class AssetTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['assets'];
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{asset}'])
+            ->assertSee('Cannot query field \"asset\" on type \"Query\"', false);
+    }
 
     /** @test */
     public function it_queries_an_asset_by_id()

@@ -383,15 +383,11 @@ class FrontendTest extends TestCase
         // The bug would happen if the non-routable collection happened to be created first. It's not
         // really specific to the naming. However when reading from files, it goes in alphabetical
         // order which makes it seem like it could be an alphabetical problem.
-        Collection::make('services')->structureContents([
-            'root' => true,
-            'tree' => [['entry' => '2']],
-        ])->save();
+        $c = tap(Collection::make('services')->structureContents(['root' => true]))->save();
+        $c->structure()->in('en')->tree([['entry' => '2']])->save();
 
-        Collection::make('pages')->routes('{slug}')->structureContents([
-            'root' => true,
-            'tree' => [['entry' => '1']],
-        ])->save();
+        $c = tap(Collection::make('pages')->routes('{slug}')->structureContents(['root' => true]))->save();
+        $c->structure()->in('en')->tree([['entry' => '1']])->save();
 
         EntryFactory::id('1')->slug('service')->collection('services')->data(['title' => 'Service'])->create();
         EntryFactory::id('2')->slug('home')->collection('pages')->data(['title' => 'Home'])->create();
