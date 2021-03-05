@@ -38,7 +38,7 @@
                     :columns="columns"
                     :selections="selectedAssets"
                     :max-selections="maxFiles"
-                    :sort="true"
+                    :sort="false"
                     :sort-column="sortColumn"
                     :sort-direction="sortDirection"
                     @selections-updated="(ids) => $emit('selections-updated', ids)"
@@ -273,9 +273,9 @@ export default {
     data() {
         return {
             columns: [
-                { label: __('File'), field: 'basename', visible: true, sortable: true },
-                { label: __('Size'), field: 'size', value: 'size_formatted', visible: true, sortable: true },
-                { label: __('Last Modified'), field: 'last_modified', value: 'last_modified_relative', visible: true, sortable: true },
+                { label: __('File'), field: 'basename', visible: true },
+                { label: __('Size'), field: 'size', value: 'size_formatted', visible: true },
+                { label: __('Last Modified'), field: 'last_modified', value: 'last_modified_relative', visible: true },
             ],
             containers: [],
             container: {},
