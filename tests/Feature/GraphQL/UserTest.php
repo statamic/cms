@@ -13,6 +13,9 @@ class UserTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['users'];
 
     public function setUp(): void
     {
@@ -30,6 +33,18 @@ class UserTest extends TestCase
         User::make()->id('5')->email('e@example.com')->set('name', 'Dolores Mulva')->save();
         User::make()->id('6')->email('f@example.com')->set('name', 'Alan Alda')->save();
         User::make()->id('7')->email('g@example.com')->set('name', 'Fred Armisen')->save();
+    }
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{user}'])
+            ->assertSee('Cannot query field \"user\" on type \"Query\"', false);
     }
 
     /** @test */

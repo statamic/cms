@@ -13,6 +13,9 @@ use Tests\TestCase;
 class TermsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['taxonomies'];
 
     public function setUp(): void
     {
@@ -51,6 +54,18 @@ class TermsTest extends TestCase
         BlueprintRepository::shouldReceive('in')->with('taxonomies/sizes')->andReturn(collect(['size' => $size->setHandle('size')]));
 
         return $this;
+    }
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{terms}'])
+            ->assertSee('Cannot query field \"terms\" on type \"Query\"', false);
     }
 
     /** @test */

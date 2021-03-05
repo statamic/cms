@@ -7,9 +7,15 @@ use Tests\TestCase;
 /** @group graphql */
 class SitesTest extends TestCase
 {
+    use EnablesQueries {
+        getEnvironmentSetup as enableQueryEnvironmentSetup;
+    }
+
+    protected $enabledQueries = ['sites'];
+
     public function getEnvironmentSetUp($app)
     {
-        parent::getEnvironmentSetUp($app);
+        $this->enableQueryEnvironmentSetup($app);
 
         $app['config']->set('statamic.sites', [
             'default' => 'en',
@@ -19,6 +25,18 @@ class SitesTest extends TestCase
                 'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
             ],
         ]);
+    }
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{entries}'])
+            ->assertSee('Cannot query field \"entries\" on type \"Query\"', false);
     }
 
     /** @test */

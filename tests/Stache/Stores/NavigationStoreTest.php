@@ -97,7 +97,6 @@ EOT;
     public function it_saves_to_disk()
     {
         $structure = Facades\Nav::make()->handle('pages');
-        $structure->addTree($structure->makeTree('en'));
 
         $this->store->save($structure);
 

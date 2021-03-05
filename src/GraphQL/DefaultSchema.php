@@ -34,33 +34,31 @@ class DefaultSchema
     public function getConfig()
     {
         return [
-            'query' => [
-                PingQuery::class,
-                EntriesQuery::class,
-                EntryQuery::class,
-                CollectionsQuery::class,
-                CollectionQuery::class,
-                AssetsQuery::class,
-                AssetQuery::class,
-                AssetContainersQuery::class,
-                AssetContainerQuery::class,
-                TaxonomiesQuery::class,
-                TaxonomyQuery::class,
-                TermsQuery::class,
-                TermQuery::class,
-                GlobalSetsQuery::class,
-                GlobalSetQuery::class,
-                NavsQuery::class,
-                NavQuery::class,
-                SitesQuery::class,
-                UsersQuery::class,
-                UserQuery::class,
-            ],
+            'query' => $this->getQueries(),
             'mutation' => [],
             'middleware' => [
                 CacheResponse::class,
             ],
             'method' => ['get', 'post'],
         ];
+    }
+
+    private function getQueries()
+    {
+        $queries = collect([PingQuery::class]);
+
+        collect([
+            'collections' => [CollectionsQuery::class, CollectionQuery::class, EntriesQuery::class, EntryQuery::class],
+            'assets' => [AssetContainersQuery::class, AssetContainerQuery::class, AssetsQuery::class, AssetQuery::class],
+            'taxonomies' => [TaxonomiesQuery::class, TaxonomyQuery::class, TermsQuery::class, TermQuery::class],
+            'globals' => [GlobalSetsQuery::class, GlobalSetQuery::class],
+            'navs' => [NavsQuery::class, NavQuery::class],
+            'sites' => [SitesQuery::class],
+            'users' => [UsersQuery::class, UserQuery::class],
+        ])->each(function ($qs, $key) use (&$queries) {
+            $queries = $queries->merge(config('statamic.graphql.resources.'.$key) ? $qs : []);
+        });
+
+        return $queries->all();
     }
 }

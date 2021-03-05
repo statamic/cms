@@ -14,11 +14,26 @@ use Tests\TestCase;
 class AssetsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['assets'];
 
     public function setUp(): void
     {
         parent::setUp();
         BlueprintRepository::partialMock();
+    }
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{assets}'])
+            ->assertSee('Cannot query field \"assets\" on type \"Query\"', false);
     }
 
     /** @test */

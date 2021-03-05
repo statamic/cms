@@ -13,6 +13,9 @@ class EntryTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['collections'];
 
     public function setUp(): void
     {
@@ -21,6 +24,18 @@ class EntryTest extends TestCase
         BlueprintRepository::partialMock();
 
         $this->createEntries();
+    }
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{entry}'])
+            ->assertSee('Cannot query field \"entry\" on type \"Query\"', false);
     }
 
     /** @test */

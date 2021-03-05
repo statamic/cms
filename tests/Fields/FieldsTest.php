@@ -432,6 +432,7 @@ class FieldsTest extends TestCase
                 'character_limit' => null,
                 'component' => 'textarea',
                 'antlers' => false,
+                'placeholder' => null,
             ],
         ], $fields->toPublishArray());
     }

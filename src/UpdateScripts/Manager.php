@@ -83,8 +83,8 @@ class Manager
             ->filter(function ($script) use ($newLockFile, $oldLockFile) {
                 try {
                     return $script->shouldUpdate(
-                        $newLockFile->getInstalledVersion($script->package()),
-                        $oldLockFile->getInstalledVersion($script->package())
+                        $newLockFile->getNormalizedInstalledVersion($script->package()),
+                        $oldLockFile->getNormalizedInstalledVersion($script->package())
                     );
                 } catch (ComposerLockFileNotFoundException | ComposerLockPackageNotFoundException $exception) {
                     return false;

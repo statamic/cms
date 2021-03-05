@@ -10,16 +10,31 @@ use Tests\TestCase;
 class NavigationsTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['navs'];
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{navs}'])
+            ->assertSee('Cannot query field \"navs\" on type \"Query\"', false);
+    }
 
     /** @test */
     public function it_queries_navigations()
     {
         Nav::make('links')->title('Links')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {
-            $nav->addTree($nav->makeTree('en'));
+            $nav->makeTree('en')->save();
             $nav->save();
         });
         Nav::make('footer')->title('Footer')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {
-            $nav->addTree($nav->makeTree('en'));
+            $nav->makeTree('en')->save();
             $nav->save();
         });
 

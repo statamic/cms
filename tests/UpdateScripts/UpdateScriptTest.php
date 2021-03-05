@@ -124,6 +124,19 @@ class UpdateScriptTest extends TestCase
     }
 
     /** @test */
+    public function it_properly_normalizes_the_version_you_pass_in_when_checking_for_updating_to_a_version()
+    {
+        PackToTheFuture::generateComposerLock('statamic/cms', '3.1.0-beta.1', $this->previousLockPath);
+        PackToTheFuture::generateComposerLock('statamic/cms', 'v3.1.0', $this->lockPath);
+
+        $script = $this->register(UpdatePermissions::class);
+
+        $this->assertTrue($script->isUpdatingTo('3.1'));
+        $this->assertTrue($script->isUpdatingTo('3.1.0'));
+        $this->assertFalse($script->isUpdatingTo('3.1.1'));
+    }
+
+    /** @test */
     public function it_can_check_if_version_is_normalized_when_user_overrides_lock_version()
     {
         PackToTheFuture::generateComposerLock('statamic/cms', '3.0', $this->previousLockPath);
@@ -156,6 +169,27 @@ class UpdateScriptTest extends TestCase
         $this->assertTrue(cache()->has('permissions-update-successful'));
         $this->assertFalse(cache()->has('trees-update-successful'));
         $this->assertTrue(cache()->has('taxonomies-update-successful'));
+    }
+
+    /** @test */
+    public function it_passes_normalized_versions_into_shouldUpdate()
+    {
+        PackToTheFuture::generateComposerLock('statamic/cms', 'v3.0.25-alpha.2', $this->previousLockPath);
+        PackToTheFuture::generateComposerLock('statamic/cms', 'v3.1.8', $this->lockPath);
+
+        // The fake update script will call this closure.
+        $callbackRan = false;
+        app()->instance('version-assertions', function ($newVersion, $oldVersion) use (&$callbackRan) {
+            $this->assertEquals('3.1.8.0', $newVersion);
+            $this->assertEquals('3.0.25.0-alpha2', $oldVersion);
+            $callbackRan = true;
+        });
+
+        $this->register(VersionAssertionUpdate::class);
+
+        Manager::runAll();
+
+        $this->assertTrue($callbackRan);
     }
 
     /** @test */
@@ -385,5 +419,18 @@ class SeoProUpdate extends UpdateScript
     public function update()
     {
         cache()->put('seo-pro-update-successful', true);
+    }
+}
+
+class VersionAssertionUpdate extends UpdateScript
+{
+    public function shouldUpdate($newVersion, $oldVersion)
+    {
+        app('version-assertions')($newVersion, $oldVersion);
+    }
+
+    public function update()
+    {
+        //
     }
 }
