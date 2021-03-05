@@ -1,5 +1,16 @@
 # Release Notes
 
+## 3.0.46 (2020-03-05)
+
+### What's new
+- You can get a user's email via a property. [#3331](https://github.com/statamic/cms/issues/3331)
+
+### What's fixed
+- Fix range field overflowing issue. [#3292](https://github.com/statamic/cms/issues/3292)
+- Show valid data for a Form fields in the content API. [#3270](https://github.com/statamic/cms/issues/3270)
+- Enable fixed toolbar on a Bard field inside a set. [#3240](https://github.com/statamic/cms/issues/3240)
+
+
 ## 3.0.45 (2020-02-22)
 
 ### What's new
