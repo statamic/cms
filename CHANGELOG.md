@@ -1,14 +1,16 @@
 # Release Notes
 
-## Unreleased
+## 3.1.0-alpha.4 (2020-03-08)
 
 ### What's new
 - Collection and Nav Trees are now stored separately from their config. [#2768](https://github.com/statamic/cms/issues/2768)
+- Added configuration to make REST API resources opt-in. [#3318](https://github.com/statamic/cms/issues/3318)
 - Added a form endpoint to the REST API. [#3271](https://github.com/statamic/cms/issues/3271)
 - You can disable paste and input rules on Bard fields. [e23f2103](https://github.com/statamic/cms/commit/e23f2103)
 - You can add placeholder text to `textarea` fieldtypes. [dc8fb06f](https://github.com/statamic/cms/commit/dc8fb06f)
 
 ### What's fixed
+- The REST API will filter out draft entries by default. [#3317](https://github.com/statamic/cms/issues/3317)
 - Full measure static caching no longer logs when creating the page. [#3255](https://github.com/statamic/cms/issues/3255)
 - Form fieldtypes now show data in the API rather than an empty object. [#3182](https://github.com/statamic/cms/issues/3182)
 - Removed the minimum character limit for search queries. [4327e68c](https://github.com/statamic/cms/commit/4327e68c)
@@ -21,6 +23,7 @@
 - A `hasCachedPage` method has been added to the `Statamic\StaticCaching\Cacher` interface.
 - GraphQL queries are all disabled by default. [#3289](https://github.com/statamic/cms/issues/3289)
 - Global search is now only triggered with a slash. (Not ctrl/alt/shift+f) [cad87068](https://github.com/statamic/cms/commit/cad87068)
+- Since REST API resources are now opt-in, everything will 404 until you update your config. [#3318](https://github.com/statamic/cms/issues/3318)
 
 
 
