@@ -369,11 +369,6 @@ class AssetContainerTest extends TestCase
         $this->assertEquals('foo', $folder->title());
         $this->assertEquals('foo', $folder->path());
         $this->assertEquals($container, $folder->container());
-
-        Storage::disk('test')->put('foo/folder.yaml', "title: 'Test Folder'");
-        $folder = $container->assetFolder('foo');
-
-        $this->assertEquals('Test Folder', $folder->title());
     }
 
     private function containerWithDisk()

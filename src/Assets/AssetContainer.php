@@ -18,7 +18,6 @@ use Statamic\Facades\File;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
-use Statamic\Facades\YAML;
 use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
@@ -342,16 +341,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function assetFolder($path)
     {
-        $filePath = ltrim("{$path}/folder.yaml", '/');
-
-        $contents = $this->disk()->get($filePath, '');
-
-        $data = YAML::parse($contents);
-
-        return (new AssetFolder)
-            ->container($this)
-            ->path($path)
-            ->title(array_get($data, 'title'));
+        return (new AssetFolder)->container($this)->path($path);
     }
 
     /**
