@@ -24,9 +24,9 @@ class ApiController extends Controller
             return;
         }
 
-        $config = config("statamic.api.resources.{$this->resourceConfigKey}");
+        $config = config("statamic.api.resources.{$this->resourceConfigKey}", false);
 
-        if ($config === false) {
+        if ($config !== true && ! is_array($config)) {
             throw new NotFoundHttpException;
         }
 

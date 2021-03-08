@@ -22,6 +22,8 @@ class ConfigTest extends TestCase
 
         Storage::fake('test');
         Storage::disk('test')->put('file.txt', '');
+
+        Facades\Form::all()->each->delete();
     }
 
     /** @test */
@@ -51,6 +53,51 @@ class ConfigTest extends TestCase
         Facades\Entry::make()->collection('articles')->id('dance')->slug('dance')->save();
 
         Facades\Config::set('statamic.api.resources.collections', false);
+
+        $this->assertEndpointNotFound('/api/collections/pages/tree');
+        $this->assertEndpointNotFound('/api/collections/pages/entries');
+        $this->assertEndpointNotFound('/api/collections/articles/entries');
+
+        $this->assertEndpointNotFound('/api/collections/pages/entries/about');
+        $this->assertEndpointNotFound('/api/collections/articles/entries/dance');
+    }
+
+    /** @test */
+    public function config_can_disable_resources_with_null()
+    {
+        // Exact same test as above, but using null instead of false. It would
+        // be null if the user had their own config array with only a subset
+        // of resources. Any missing resources would come through as null.
+
+        Facades\Collection::make('pages')->structureContents(['expects_root' => false])->save();
+        Facades\Collection::make('articles')->save();
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about')->save();
+        Facades\Entry::make()->collection('articles')->id('dance')->slug('dance')->save();
+
+        Facades\Config::set('statamic.api.resources.collections', null);
+
+        $this->assertEndpointNotFound('/api/collections/pages/tree');
+        $this->assertEndpointNotFound('/api/collections/pages/entries');
+        $this->assertEndpointNotFound('/api/collections/articles/entries');
+
+        $this->assertEndpointNotFound('/api/collections/pages/entries/about');
+        $this->assertEndpointNotFound('/api/collections/articles/entries/dance');
+    }
+
+    /** @test */
+    public function config_can_disable_resources_with_unexpected_value()
+    {
+        // Exact same test as above, but using a weird string instead of false.
+        // It would
+        // be null if the user had their own config array with only a subset
+        // of resources. Any missing resources would come through as null.
+
+        Facades\Collection::make('pages')->structureContents(['expects_root' => false])->save();
+        Facades\Collection::make('articles')->save();
+        Facades\Entry::make()->collection('pages')->id('about')->slug('about')->save();
+        Facades\Entry::make()->collection('articles')->id('dance')->slug('dance')->save();
+
+        Facades\Config::set('statamic.api.resources.collections', 'we only want arrays or booleans');
 
         $this->assertEndpointNotFound('/api/collections/pages/tree');
         $this->assertEndpointNotFound('/api/collections/pages/entries');
