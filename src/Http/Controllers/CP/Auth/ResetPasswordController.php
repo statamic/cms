@@ -2,25 +2,16 @@
 
 namespace Statamic\Http\Controllers\CP\Auth;
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Password;
 use Statamic\Auth\Passwords\PasswordReset;
-use Statamic\Http\Controllers\ForgotPasswordController as Controller;
+use Statamic\Http\Controllers\ResetPasswordController as Controller;
 use Statamic\Http\Middleware\CP\RedirectIfAuthorized;
 
-class ForgotPasswordController extends Controller
+class ResetPasswordController extends Controller
 {
     public function __construct()
     {
         $this->middleware(RedirectIfAuthorized::class);
-    }
-
-    public function sendResetLinkEmail(Request $request)
-    {
-        PasswordReset::resetFormRoute('statamic.cp.password.reset');
-        PasswordReset::redirectAfterReset(route('statamic.cp.index'));
-
-        return parent::sendResetLinkEmail($request);
     }
 
     public function broker()
@@ -32,5 +23,10 @@ class ForgotPasswordController extends Controller
         }
 
         return Password::broker($broker);
+    }
+
+    protected function resetFormAction()
+    {
+        return route('statamic.cp.password.reset.action');
     }
 }

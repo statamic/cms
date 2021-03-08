@@ -74,6 +74,7 @@ class CpServiceProvider extends ServiceProvider
             \Illuminate\Foundation\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
             \Statamic\Http\Middleware\CP\ContactOutpost::class,
+            \Statamic\Http\Middleware\CP\AuthGuard::class,
         ]);
 
         $router->middlewareGroup('statamic.cp.authenticated', [
