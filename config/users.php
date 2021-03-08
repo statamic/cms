@@ -80,24 +80,14 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | DB Connection
+    | Database
     |--------------------------------------------------------------------------
     |
-    | Default database connection.
+    | Here you may configure the database connection and its table names.
     |
     */
 
     'database' => config('database.default'),
-
-    /*
-    |--------------------------------------------------------------------------
-    | DB Tables
-    |--------------------------------------------------------------------------
-    |
-    | Configure the database tables used when running Statamic users from
-    | the database.
-    |
-    */
 
     'tables' => [
         'users' => 'users',
