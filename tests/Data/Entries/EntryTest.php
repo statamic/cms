@@ -3,12 +3,14 @@
 namespace Tests\Data\Entries;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Facades\Statamic\Stache\Repositories\CollectionTreeRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Event;
 use Mockery;
 use Statamic\Entries\Collection;
 use Statamic\Entries\Entry;
+use Statamic\Events\EntryCreated;
 use Statamic\Events\EntrySaved;
 use Statamic\Events\EntrySaving;
 use Statamic\Facades;
@@ -16,8 +18,8 @@ use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Sites\Site;
 use Statamic\Structures\CollectionStructure;
+use Statamic\Structures\CollectionTree;
 use Statamic\Structures\Page;
-use Statamic\Structures\Tree;
 use Statamic\Support\Arr;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -254,7 +256,10 @@ class EntryTest extends TestCase
         $noChildren = tap((new Entry)->id('3')->locale('en')->collection($collection)->slug('nochildren')->set('redirect', '@child'))->save();
 
         $collection->structureContents([
-            'tree' => [
+            'expects_root' => false, // irrelevant. just can't pass an empty array at the moment.
+        ])->save();
+        $collection->structure()->in('en')->tree(
+            [
                 [
                     'entry' => '1',
                     'children' => [
@@ -264,8 +269,8 @@ class EntryTest extends TestCase
                 [
                     'entry' => '3',
                 ],
-            ],
-        ])->save();
+            ]
+        )->save();
 
         $this->assertEquals('/parent', $parent->uri());
         $this->assertEquals('/parent/child', $parent->url());
@@ -441,12 +446,14 @@ class EntryTest extends TestCase
 
         $collection->structureContents([
             'max_depth' => 1,
-            'tree' => [
+        ])->save();
+        $collection->structure()->in('en')->tree(
+            [
                 ['entry' => 'three'],
                 ['entry' => 'one'],
                 ['entry' => 'two'],
-            ],
-        ])->save();
+            ]
+        )->save();
 
         $this->assertEquals(2, $one->order());
         $this->assertEquals(3, $two->order());
@@ -611,6 +618,7 @@ class EntryTest extends TestCase
         $entry = (new Entry)->id('a')->collection(new Collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
+        Facades\Entry::shouldReceive('find')->with('a')->once()->andReturnNull();
 
         $return = $entry->save();
 
@@ -618,9 +626,47 @@ class EntryTest extends TestCase
         Event::assertDispatched(EntrySaving::class, function ($event) use ($entry) {
             return $event->entry === $entry;
         });
+        Event::assertDispatched(EntryCreated::class, function ($event) use ($entry) {
+            return $event->entry === $entry;
+        });
         Event::assertDispatched(EntrySaved::class, function ($event) use ($entry) {
             return $event->entry === $entry;
         });
+    }
+
+    /** @test */
+    public function it_dispatches_entry_created_only_once()
+    {
+        Event::fake();
+
+        $entry = (new Entry)->id('1')->collection(new Collection);
+        Facades\Entry::shouldReceive('save')->with($entry);
+        Facades\Entry::shouldReceive('taxonomize')->with($entry);
+        Facades\Entry::shouldReceive('find')->with('1')->times(3)->andReturn(null, $entry, $entry);
+
+        $entry->save();
+        $entry->save();
+        $entry->save();
+
+        Event::assertDispatched(EntrySaved::class, 3);
+        Event::assertDispatched(EntryCreated::class, 1);
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+        $entry = (new Entry)->id('a')->collection(new Collection);
+        Facades\Entry::shouldReceive('save')->with($entry);
+        Facades\Entry::shouldReceive('taxonomize')->with($entry);
+        Facades\Entry::shouldReceive('find')->with('a')->once()->andReturnNull();
+
+        $return = $entry->saveQuietly();
+
+        $this->assertTrue($return);
+        Event::assertNotDispatched(EntrySaving::class);
+        Event::assertNotDispatched(EntrySaved::class);
+        Event::assertNotDispatched(EntryCreated::class);
     }
 
     /** @test */
@@ -651,6 +697,7 @@ class EntryTest extends TestCase
         $entry = (new Entry)->id('a')->collection(new Collection);
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
+        Facades\Entry::shouldReceive('find')->with('a')->times(2)->andReturn(null, $entry);
         $callbackOneRan = 0;
         $callbackTwoRan = 0;
 
@@ -958,12 +1005,12 @@ class EntryTest extends TestCase
         $parentPage = $this->mock(Page::class);
         $page = $this->mock(Page::class);
         $page->shouldReceive('parent')->andReturn($parentPage);
-        $tree = $this->partialMock(Tree::class);
+        $tree = $this->partialMock(CollectionTree::class);
         $tree->locale('en');
         $tree->shouldReceive('page')->with('entry-id')->andReturn($page);
+        CollectionTreeRepository::shouldReceive('find', 'en')->andReturn($tree);
 
         $structure = new CollectionStructure;
-        $structure->addTree($tree);
         $collection = tap(Collection::make('test')->structure($structure))->save();
 
         $entry = (new Entry)->id('entry-id')->locale('en')->collection($collection);

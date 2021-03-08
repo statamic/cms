@@ -266,7 +266,7 @@ class CollectionsController extends CpController
     protected function makeStructure($collection, $maxDepth, $expectsRoot, $sites)
     {
         if (! $structure = $collection->structure()) {
-            $structure = (new CollectionStructure)->collection($collection);
+            $structure = new CollectionStructure;
         }
 
         return $structure

@@ -75,6 +75,10 @@ class EntriesController extends CpController
 
         $blueprint = $entry->blueprint();
 
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
+        }
+
         [$values, $meta] = $this->extractFromFields($entry, $blueprint);
 
         if ($hasOrigin = $entry->hasOrigin()) {
@@ -97,6 +101,7 @@ class EntriesController extends CpController
             'values' => array_merge($values, ['id' => $entry->id()]),
             'meta' => $meta,
             'collection' => $collection->handle(),
+            'collectionHasRoutes' => ! is_null($collection->route($entry->locale())),
             'blueprint' => $blueprint->toPublishArray(),
             'readOnly' => User::current()->cant('edit', $entry),
             'locale' => $entry->locale(),
@@ -149,7 +154,15 @@ class EntriesController extends CpController
 
         $entry = $entry->fromWorkingCopy();
 
-        $fields = $entry->blueprint()->fields()->addValues($request->except('id'));
+        $blueprint = $entry->blueprint();
+
+        $data = $request->except('id');
+
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $data['author'] = $entry->value('author');
+        }
+
+        $fields = $entry->blueprint()->fields()->addValues($data);
 
         $fields->validate(Entry::updateRules($collection, $entry));
 
@@ -215,6 +228,10 @@ class EntriesController extends CpController
             throw new \Exception(__('A valid blueprint is required.'));
         }
 
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $blueprint->ensureFieldHasConfig('author', ['read_only' => true]);
+        }
+
         $values = [];
 
         if ($collection->hasStructure() && $request->parent) {
@@ -244,6 +261,7 @@ class EntriesController extends CpController
             'values' => $values->all(),
             'meta' => $fields->meta(),
             'collection' => $collection->handle(),
+            'collectionHasRoutes' => ! is_null($collection->route($site->handle())),
             'blueprint' => $blueprint->toPublishArray(),
             'published' => $collection->defaultPublishState(),
             'locale' => $site->handle(),
@@ -276,7 +294,13 @@ class EntriesController extends CpController
 
         $blueprint = $collection->entryBlueprint($request->_blueprint);
 
-        $fields = $blueprint->fields()->addValues($request->all());
+        $data = $request->all();
+
+        if (User::current()->cant('edit-other-authors-entries', [EntryContract::class, $collection, $blueprint])) {
+            $data['author'] = [User::current()->id()];
+        }
+
+        $fields = $blueprint->fields()->addValues($data);
 
         $fields->validate(Entry::createRules($collection, $site));
 

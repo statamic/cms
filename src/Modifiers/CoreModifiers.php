@@ -194,6 +194,22 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Breaks arrays or collections into smaller ones of a given size.
+     *
+     * @param $value
+     * @return array
+     */
+    public function chunk($value, $params)
+    {
+        return collect($value)
+            ->chunk(Arr::get($params, 0))
+            ->map(function ($chunk) {
+                return ['chunk' => $chunk];
+            })
+            ->all();
+    }
+
+    /**
      * Collapses an array of arrays into a flat array.
      *
      * @param $value
@@ -1645,6 +1661,8 @@ class CoreModifiers extends Modifier
     {
         $times = Arr::get($params, 0, 1);
         $times = is_numeric($times) ? $times : Arr::get($context, $times);
+
+        $times = ($times instanceof Value) ? $times->value() : $times;
 
         return str_repeat($value, $times);
     }

@@ -85,6 +85,7 @@ return [
     'uploaded' => 'Het uploaden is mislukt.',
     'url' => 'Formaat is ongeldig.',
     'unique_entry_value' => 'Deze waarde is al gekozen.',
+    'unique_term_value' => 'Deze waarde is al gekozen.',
     'unique_user_value' => 'Deze waarde is al gekozen.',
     'duplicate_field_handle' => 'Een veld met de handle :handle kan niet meer dan één keer gebruikt worden.',
     'one_site_without_origin' => 'Minstens één site heeft geen oorsprong.',

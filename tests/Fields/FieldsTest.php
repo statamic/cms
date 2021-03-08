@@ -432,6 +432,7 @@ class FieldsTest extends TestCase
                 'character_limit' => null,
                 'component' => 'textarea',
                 'antlers' => false,
+                'placeholder' => null,
             ],
         ], $fields->toPublishArray());
     }
@@ -748,5 +749,30 @@ class FieldsTest extends TestCase
         Validator::shouldReceive('validate')->once();
 
         $fields->validate(['foo' => 'bar']);
+    }
+
+    /**
+     * @test
+     * @group graphql
+     **/
+    public function it_gets_the_fields_as_graphql_types()
+    {
+        $fields = new Fields([
+            ['handle' => 'one', 'field' => ['type' => 'text']],
+            ['handle' => 'two', 'field' => ['type' => 'text', 'validate' => 'required']],
+        ]);
+
+        $types = $fields->toGql();
+
+        $this->assertInstanceOf(Collection::class, $types);
+        $this->assertCount(2, $types);
+
+        $this->assertIsArray($types['one']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $types['one']['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['one']['type']);
+
+        $this->assertIsArray($types['two']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $types['two']['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\StringType::class, $types['two']['type']->getWrappedType());
     }
 }
