@@ -106,8 +106,8 @@ class AppServiceProvider extends ServiceProvider
                 ->setRepository('user', \Statamic\Contracts\Auth\UserRepository::class);
         });
 
-        $this->app->bind(\Statamic\Fields\BlueprintRepository::class, function ($app) {
-            return (new \Statamic\Fields\BlueprintRepository($app['files']))
+        $this->app->bind(\Statamic\Fields\BlueprintRepository::class, function () {
+            return (new \Statamic\Fields\BlueprintRepository)
                 ->setDirectory(resource_path('blueprints'))
                 ->setFallback('default', function () {
                     return \Statamic\Facades\Blueprint::makeFromFields([
@@ -116,8 +116,8 @@ class AppServiceProvider extends ServiceProvider
                 });
         });
 
-        $this->app->bind(\Statamic\Fields\FieldsetRepository::class, function ($app) {
-            return (new \Statamic\Fields\FieldsetRepository($app['files']))
+        $this->app->bind(\Statamic\Fields\FieldsetRepository::class, function () {
+            return (new \Statamic\Fields\FieldsetRepository)
                 ->setDirectory(resource_path('fieldsets'));
         });
     }
