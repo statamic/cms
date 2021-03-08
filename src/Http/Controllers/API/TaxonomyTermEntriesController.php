@@ -6,6 +6,8 @@ use Statamic\Http\Resources\API\EntryResource;
 
 class TaxonomyTermEntriesController extends ApiController
 {
+    protected $filterPublished = true;
+
     protected function abortIfDisabled()
     {
         // Abort if `taxonomies` resource is disabled

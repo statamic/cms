@@ -8,6 +8,7 @@ class CollectionEntriesController extends ApiController
 {
     protected $resourceConfigKey = 'collections';
     protected $routeResourceKey = 'collection';
+    protected $filterPublished = true;
 
     public function index($collection)
     {
@@ -21,6 +22,7 @@ class CollectionEntriesController extends ApiController
     public function show($collection, $entry)
     {
         $this->abortIfDisabled();
+        $this->abortIfUnpublished($entry);
 
         return app(EntryResource::class)::make($entry);
     }

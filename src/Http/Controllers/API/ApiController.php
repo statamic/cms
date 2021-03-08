@@ -14,6 +14,18 @@ class ApiController extends Controller
 
     protected $resourceConfigKey;
     protected $routeResourceKey;
+    protected $filterPublished = false;
+
+    /**
+     * Abort if item is unpublished.
+     *
+     * @param mixed $item
+     * @return bool
+     */
+    protected function abortIfUnpublished($item)
+    {
+        throw_if($item->published() === false, new NotFoundHttpException);
+    }
 
     /**
      * Abort if endpoint is disabled.
@@ -103,7 +115,7 @@ class ApiController extends Controller
      */
     protected function filter($query)
     {
-        collect(request()->filter ?? [])
+        $this->getFilters()
             ->each(function ($value, $filter) use ($query) {
                 if ($value === 'true') {
                     $value = true;
@@ -122,6 +134,37 @@ class ApiController extends Controller
             });
 
         return $this;
+    }
+
+    /**
+     * Get filters for querying.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getFilters()
+    {
+        $filters = collect(request()->filter ?? []);
+
+        if ($this->filterPublished && $this->doesntHaveFilter('status') && $this->doesntHaveFilter('published')) {
+            $filters->put('status:is', 'published');
+        }
+
+        return $filters;
+    }
+
+    /**
+     * Check if user is not filtering by a specific field, for applying default filters.
+     *
+     * @param string $field
+     * @return bool
+     */
+    public function doesntHaveFilter($field)
+    {
+        return ! collect(request()->filter ?? [])
+            ->map(function ($value, $param) {
+                return explode(':', $param)[0];
+            })
+            ->contains($field);
     }
 
     /**
