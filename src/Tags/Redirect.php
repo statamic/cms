@@ -2,7 +2,6 @@
 
 namespace Statamic\Tags;
 
-use Illuminate\Support\Facades\Route;
 use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Fields\Value;
 
