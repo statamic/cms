@@ -511,7 +511,48 @@ GQL;
 
         $query = <<<'GQL'
 {
+    entries(filter: {published: true}) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '1', 'title' => 'Standard Blog Post'],
+                ['id' => '3', 'title' => 'Event One'],
+                ['id' => '5', 'title' => 'Hamburger'],
+            ]]]]);
+
+        $query = <<<'GQL'
+{
     entries(filter: {status: "draft"}) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+                ->withoutExceptionHandling()
+                ->post('/graphql', ['query' => $query])
+                ->assertGqlOk()
+                ->assertExactJson(['data' => ['entries' => ['data' => [
+                    ['id' => '2', 'title' => 'Art Directed Blog Post'],
+                    ['id' => '4', 'title' => 'Event Two'],
+                ]]]]);
+
+        $query = <<<'GQL'
+{
+    entries(filter: {published: false}) {
         data {
             id
             title
