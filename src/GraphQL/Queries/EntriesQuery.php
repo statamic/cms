@@ -48,19 +48,19 @@ class EntriesQuery extends Query
             $query->whereIn('collection', $collection);
         }
 
-        if ($filters = $args['filter'] ?? null) {
-            $this->filterQuery($query, $filters);
-        }
+        $this->filterQuery($query, $args['filter'] ?? []);
 
-        if ($sort = $args['sort'] ?? null) {
-            $this->sortQuery($query, $sort);
-        }
+        $this->sortQuery($query, $args['sort'] ?? []);
 
         return $query->paginate($args['limit'] ?? 1000);
     }
 
     private function filterQuery($query, $filters)
     {
+        if (! isset($filters['status']) && ! isset($filters['published'])) {
+            $filters['status'] = 'published';
+        }
+
         foreach ($filters as $field => $definitions) {
             if (! is_array($definitions)) {
                 $definitions = [['equals' => $definitions]];
@@ -82,6 +82,10 @@ class EntriesQuery extends Query
 
     private function sortQuery($query, $sorts)
     {
+        if (empty($sorts)) {
+            $sorts = ['id'];
+        }
+
         foreach ($sorts as $sort) {
             $order = 'asc';
 
