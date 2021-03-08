@@ -485,6 +485,7 @@ GQL;
     public function it_only_shows_published_entries_by_default()
     {
         $this->createEntries();
+        Entry::find(1)->date(now()->addMonths(2))->save();
         Entry::find(2)->published(false)->save();
         Entry::find(4)->published(false)->save();
 
@@ -504,7 +505,6 @@ GQL;
             ->post('/graphql', ['query' => $query])
             ->assertGqlOk()
             ->assertExactJson(['data' => ['entries' => ['data' => [
-                ['id' => '1', 'title' => 'Standard Blog Post'],
                 ['id' => '3', 'title' => 'Event One'],
                 ['id' => '5', 'title' => 'Hamburger'],
             ]]]]);
@@ -527,6 +527,25 @@ GQL;
                 ->assertExactJson(['data' => ['entries' => ['data' => [
                     ['id' => '2', 'title' => 'Art Directed Blog Post'],
                     ['id' => '4', 'title' => 'Event Two'],
+                ]]]]);
+
+        $query = <<<'GQL'
+{
+    entries(filter: {status: "scheduled"}) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+                ->withoutExceptionHandling()
+                ->post('/graphql', ['query' => $query])
+                ->assertGqlOk()
+                ->assertExactJson(['data' => ['entries' => ['data' => [
+                    ['id' => '1', 'title' => 'Standard Blog Post'],
                 ]]]]);
     }
 }
