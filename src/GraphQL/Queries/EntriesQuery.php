@@ -52,9 +52,7 @@ class EntriesQuery extends Query
             $this->filterQuery($query, $filters);
         }
 
-        if ($sort = $args['sort'] ?? null) {
-            $this->sortQuery($query, $sort);
-        }
+        $this->sortQuery($query, $args['sort'] ?? []);
 
         return $query->paginate($args['limit'] ?? 1000);
     }
@@ -82,6 +80,10 @@ class EntriesQuery extends Query
 
     private function sortQuery($query, $sorts)
     {
+        if (empty($sorts)) {
+            $sorts = ['id'];
+        }
+
         foreach ($sorts as $sort) {
             $order = 'asc';
 
