@@ -28,9 +28,7 @@ class AuthMigration extends Command
         $file = date('Y_m_d_His', time()).'_statamic_auth_tables';
         $to = database_path("migrations/{$file}.php");
 
-        copy($from, $to);
-
-        $contents = str_replace('USERS_TABLE', config('statamic.users.tables.users', 'users'), File::get($to));
+        $contents = str_replace('USERS_TABLE', config('statamic.users.tables.users', 'users'), File::get($from));
         $contents = str_replace('ROLE_USER_TABLE', config('statamic.users.tables.role_user', 'role_user'), $contents);
         $contents = str_replace('GROUP_USER_TABLE', config('statamic.users.tables.group_user', 'group_user'), $contents);
 
