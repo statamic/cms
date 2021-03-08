@@ -48,9 +48,7 @@ class EntriesQuery extends Query
             $query->whereIn('collection', $collection);
         }
 
-        if ($filters = $args['filter'] ?? null) {
-            $this->filterQuery($query, $filters);
-        }
+        $this->filterQuery($query, $args['filter'] ?? []);
 
         $this->sortQuery($query, $args['sort'] ?? []);
 
@@ -59,6 +57,10 @@ class EntriesQuery extends Query
 
     private function filterQuery($query, $filters)
     {
+        if (! isset($filters['status'])) {
+            $filters['status'] = 'published';
+        }
+
         foreach ($filters as $field => $definitions) {
             if (! is_array($definitions)) {
                 $definitions = [['equals' => $definitions]];
