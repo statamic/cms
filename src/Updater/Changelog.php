@@ -35,7 +35,7 @@ abstract class Changelog
                 'type' => $this->parseReleaseType($release['version'], $index),
                 'latest' => $index === 0,
                 'licensed' => $this->isLicensed($release['version']),
-                'date' => Carbon::parse($release['date'])->format('F jS, Y'),
+                'date' => Carbon::parse($release['date'])->format(config('statamic.cp.date_format')),
                 'body' => (string) new GithubReleasePresenter($release['changelog']),
             ];
         });

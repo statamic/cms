@@ -36,8 +36,11 @@
                     <div class="vs__selected-options-outside flex flex-wrap">
                         <span v-for="option in selectedOptions" :key="option.value" class="vs__selected mt-1">
                             {{ option.label }}
-                            <button @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
+                            <button v-if="!readOnly" @click="deselect(option)" type="button" :aria-label="__('Deselect option')" class="vs__deselect">
                                 <span>×</span>
+                            </button>
+                            <button v-else type="button" class="vs__deselect">
+                                <span class="opacity-50">×</span>
                             </button>
                         </span>
                     </div>

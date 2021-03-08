@@ -35,6 +35,12 @@ trait UserContractTests
     }
 
     /** @test */
+    public function it_gets_email_as_property()
+    {
+        $this->assertEquals('john@example.com', $this->user()->email);
+    }
+
+    /** @test */
     public function gets_the_name()
     {
         $this->assertEquals('John', $this->makeUser()->set('name', 'John')->name());
