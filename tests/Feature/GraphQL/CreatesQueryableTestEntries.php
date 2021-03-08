@@ -46,7 +46,7 @@ trait CreatesQueryableTestEntries
 
         EntryFactory::collection('events')->id('4')->slug('event-two')->data(['title' => 'Event Two'])->create();
 
-        EntryFactory::collection('food')->id('5')->data([
+        EntryFactory::collection('food')->id('5')->slug('hamburger')->data([
             'title' => 'Hamburger',
             'calories' => 350,
         ])->create();

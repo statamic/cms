@@ -69,8 +69,8 @@ GQL;
     {
         $this->createEntries();
         // Add some more entries to be able to make pagination assertions a little more obvious
-        EntryFactory::collection('food')->id('6')->data(['title' => 'Cheeseburger'])->create();
-        EntryFactory::collection('food')->id('7')->data(['title' => 'Fries'])->create();
+        EntryFactory::collection('food')->id('6')->slug('cheeseburger')->data(['title' => 'Cheeseburger'])->create();
+        EntryFactory::collection('food')->id('7')->slug('fries')->data(['title' => 'Fries'])->create();
 
         $query = <<<'GQL'
 {
@@ -251,17 +251,23 @@ GQL;
     {
         $this->createEntries();
 
-        EntryFactory::collection('blog')->id('6')->data([
-            'title' => 'That was so rad!',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->create();
 
-        EntryFactory::collection('blog')->id('7')->data([
-            'title' => 'I wish I was as cool as Daniel Radcliffe!',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('7')
+            ->slug('as-cool-as-radcliffe')
+            ->data(['title' => 'I wish I was as cool as Daniel Radcliffe!'])
+            ->create();
 
-        EntryFactory::collection('blog')->id('8')->data([
-            'title' => 'I hate radishes.',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('8')
+            ->slug('i-hate-radishes')
+            ->data(['title' => 'I hate radishes.'])
+            ->create();
 
         $query = <<<'GQL'
 {
@@ -330,17 +336,23 @@ GQL;
     {
         $this->createEntries();
 
-        EntryFactory::collection('blog')->id('6')->data([
-            'title' => 'This is rad',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('this-is-rad')
+            ->data(['title' => 'This is rad'])
+            ->create();
 
-        EntryFactory::collection('blog')->id('7')->data([
-            'title' => 'This is awesome',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('7')
+            ->slug('this-is-awesome')
+            ->data(['title' => 'This is awesome'])
+            ->create();
 
-        EntryFactory::collection('blog')->id('8')->data([
-            'title' => 'This is both rad and awesome',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('8')
+            ->slug('this-is-rad-and-awesome')
+            ->data(['title' => 'This is both rad and awesome'])
+            ->create();
 
         $query = <<<'GQL'
 {
