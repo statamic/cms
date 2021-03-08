@@ -1,5 +1,12 @@
 # Release Notes
 
+## Unreleased
+
+### What's fixed
+- GraphQL will filter out draft entries from the entries query by default. [#3349](https://github.com/statamic/cms/issues/3349)
+
+
+
 ## 3.1.0-alpha.4 (2020-03-08)
 
 ### What's new
