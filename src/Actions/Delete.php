@@ -16,11 +16,7 @@ class Delete extends Action
 
     public function visibleTo($item)
     {
-        if ($item instanceof Entry && $item->collection()->sites()->count() > 1) {
-            return false;
-        }
-
-        return true;
+        return $item instanceof Entry && $item->collection()->sites()->count() === 1;
     }
 
     public function authorize($user, $item)
