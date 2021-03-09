@@ -229,7 +229,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
         }
 
         $key = $this->filesCacheKey($folder, $recursive);
-        $cacheFor = config('statamic.assets.file_listing_cache_length', 60);
+        $ttl = $this->fileListingCacheLength();
 
         $callback = function () use ($folder, $recursive) {
             $files = collect($this->disk()->getFiles($folder, $recursive));
@@ -244,8 +244,8 @@ class AssetContainer implements AssetContainerContract, Augmentable
             return $files->values();
         };
 
-        return Blink::once($key, function () use ($key, $cacheFor, $callback) {
-            return Cache::remember($key, $cacheFor, $callback);
+        return Blink::once($key, function () use ($key, $ttl, $callback) {
+            return Cache::remember($key, $ttl, $callback);
         });
     }
 
@@ -279,7 +279,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
         }
 
         $key = $this->foldersCacheKey($folder, $recursive);
-        $cacheFor = config('statamic.assets.file_listing_cache_length', 60);
+        $ttl = $this->fileListingCacheLength();
 
         $callback = function () use ($folder, $recursive) {
             $paths = $this->disk()->getFolders($folder, $recursive);
@@ -289,8 +289,8 @@ class AssetContainer implements AssetContainerContract, Augmentable
             })->values();
         };
 
-        return Blink::once($key, function () use ($key, $cacheFor, $callback) {
-            return Cache::remember($key, $cacheFor, $callback);
+        return Blink::once($key, function () use ($key, $ttl, $callback) {
+            return Cache::remember($key, $ttl, $callback);
         });
     }
 
@@ -523,5 +523,25 @@ class AssetContainer implements AssetContainerContract, Augmentable
     public static function __callStatic($method, $parameters)
     {
         return Facades\AssetContainer::{$method}(...$parameters);
+    }
+
+    private function fileListingCacheLength()
+    {
+        // @deprecated
+        $ttl = config('statamic.assets.file_listing_cache_length', false);
+
+        if (! $ttl) {
+            $ttl = config('statamic.assets.cache_listings', false);
+        }
+
+        if (! $ttl) {
+            return 0;
+        }
+
+        if ($ttl === true) {
+            return null;
+        }
+
+        return $ttl;
     }
 }

@@ -283,6 +283,7 @@ class AssetContainerTest extends TestCase
     /** @test */
     public function it_gets_the_files_from_the_filesystem_only_once()
     {
+        config(['statamic.assets.cache_listings' => 60]);
         Carbon::setTestNow(now()->startOfMinute());
 
         $disk = $this->mock(Filesystem::class);
@@ -324,6 +325,7 @@ class AssetContainerTest extends TestCase
     /** @test */
     public function it_gets_the_folders_from_the_filesystem_only_once()
     {
+        config(['statamic.assets.cache_listings' => 60]);
         Carbon::setTestNow(now()->startOfMinute());
 
         $disk = $this->mock(Filesystem::class);
