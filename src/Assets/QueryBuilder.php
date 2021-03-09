@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\AssetContainer;
 use Statamic\Contracts\Assets\QueryBuilder as Contract;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Query\IteratorBuilder as BaseQueryBuilder;
 
 class QueryBuilder extends BaseQueryBuilder implements Contract
@@ -77,7 +78,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
         if ($this->hasAnyNulls($items) && $this->limit) {
             Cache::forget($this->container->filesCacheKey());
             Cache::forget($this->container->filesCacheKey($this->folder));
-            \Statamic\Facades\Blink::forget('disk-paths-'.$this->container->handle());
+            Blink::forget($this->container->pathsCacheKey());
 
             return $this->get($columns);
         }
