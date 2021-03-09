@@ -13,11 +13,22 @@ class Cache extends Tags
             return [];
         }
 
-        if ($cached = LaraCache::get($key = $this->getCacheKey())) {
-            return $cached;
-        }
+        if (count($cacheTags = $this->params->explode('tags', [])) < 1) {
 
-        LaraCache::put($key, $html = (string) $this->parse([]), $this->getCacheLength());
+            if ($cached = LaraCache::get($key = $this->getCacheKey())) {
+                return $cached;
+            }
+
+            LaraCache::put($key, $html = (string) $this->parse([]), $this->getCacheLength());
+
+        } else {
+
+            if ($cached = LaraCache::tags($cacheTags)->get($key = $this->getCacheKey())) {
+                return $cached;
+            }
+
+            LaraCache::tags($cacheTags)->put($key, $html = (string) $this->parse([]), $this->getCacheLength());
+        }
 
         return $html;
     }
