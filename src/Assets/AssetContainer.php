@@ -263,11 +263,6 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return 'asset-folders-'.$this->handle().'-'.$folder.$rec;
     }
 
-    public function pathsCacheKey()
-    {
-        return 'asset-paths-'.$this->handle();
-    }
-
     /**
      * Get all the subfolders in this container.
      *

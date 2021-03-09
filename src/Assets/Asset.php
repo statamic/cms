@@ -111,9 +111,7 @@ class Asset implements AssetContract, Augmentable
             return false;
         }
 
-        return Blink::once($this->container()->pathsCacheKey(), function () {
-            return $this->disk()->getFilesRecursively('/');
-        })->contains($path);
+        return $this->container()->files()->contains($path);
     }
 
     public function meta($key = null)
@@ -497,7 +495,6 @@ class Asset implements AssetContract, Augmentable
     public function move($folder, $filename = null)
     {
         Cache::forget($this->container()->filesCacheKey($this->folder()));
-        Blink::forget($this->container()->pathsCacheKey());
 
         $filename = $filename ?: $this->filename();
         $oldPath = $this->path();
