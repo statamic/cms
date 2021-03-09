@@ -140,7 +140,7 @@ class Asset implements AssetContract, Augmentable
 
     private function metaValue($key)
     {
-        $value = array_get($this->meta(), $key);
+        $value = Arr::get($this->meta(), $key);
 
         if (! is_null($value)) {
             return $value;
@@ -150,7 +150,7 @@ class Asset implements AssetContract, Augmentable
 
         $this->writeMeta($meta = $this->generateMeta());
 
-        return array_get($meta, $key);
+        return Arr::get($meta, $key);
     }
 
     public function generateMeta()
