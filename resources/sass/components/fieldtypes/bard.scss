@@ -36,7 +36,7 @@
     position: sticky;
     padding: 4px 8px;
     z-index: 5;
-    top:  52px;
+    top: 0;
 
     .bard-toolbar-button {
         @apply text-grey-80 rounded px-sm flex items-center justify-center text-base text-center;
@@ -84,8 +84,31 @@
     }
 }
 
+// Fixed toolbar inside another bard field
 .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar {
-    position: relative;
+    z-index: 4;
+    top: 40px;
+}
+
+// Fixed toolbar inside the live preview
+.live-preview-fields .bard-fixed-toolbar { top: 0; }
+.live-preview-fields .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 40px; }
+
+// Fixed toolbar inside a stack
+.stack-content .bard-fixed-toolbar { top: -24px; }
+
+// Responive Wangjangling
+@screen md {
+    // Fixed toolbar below fixed global header
+    .bard-fixed-toolbar { top: 52px; } 
+    .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 92px; } 
+    
+    // Fixed toolbar inside the live preview
+    .live-preview-fields .bard-fixed-toolbar { top: -24px; }
+    .live-preview-fields .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 16px; }
+
+    // Fixed toolbar inside a stack
+    .stack-content .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 16px; }
 }
 
 .bard-floating-toolbar {
@@ -461,28 +484,4 @@
     &:hover {
         cursor: grab;
     }
-}
-
-
-/* Bard inside a set
-  ========================================================================== */
-
-.replicator-set-body .bard-fixed-toolbar {
-    top: 0;
-    position: relative;
-    z-index: 1;
-}
-
-/* Bard inside the live preview
-  ========================================================================== */
-
-.live-preview-fields .bard-fixed-toolbar {
-    top: 0;
-}
-
-/* Bard inside a stack
-  ========================================================================== */
-
-.stack-content .bard-fixed-toolbar {
-      top: -24px;
 }

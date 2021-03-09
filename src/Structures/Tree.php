@@ -3,21 +3,22 @@
 namespace Statamic\Structures;
 
 use Statamic\Contracts\Data\Localization;
+use Statamic\Contracts\Structures\Tree as Contract;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Site;
-use Statamic\Facades\Stache;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Tree implements Localization
+abstract class Tree implements Contract, Localization
 {
     use ExistsAsFile, FluentlyGetsAndSets;
 
+    protected $handle;
     protected $locale;
     protected $tree = [];
-    protected $structure;
     protected $cachedFlattenedPages;
+    protected $original;
 
     public function locale($locale = null)
     {
@@ -29,19 +30,16 @@ class Tree implements Localization
         return Site::get($this->locale());
     }
 
-    public function structure($structure = null)
-    {
-        return $this->fluentlyGetOrSet('structure')->args(func_get_args());
-    }
+    abstract public function structure();
 
     public function tree($tree = null)
     {
         return $this->fluentlyGetOrSet('tree')
             ->getter(function ($tree) {
-                $key = "structure-{$this->structure->handle()}-{$this->locale()}-".md5(json_encode($tree));
+                $key = "structure-{$this->handle()}-{$this->locale()}-".md5(json_encode($tree));
 
                 return Blink::once($key, function () use ($tree) {
-                    return $this->structure->validateTree($tree, $this->locale());
+                    return $this->structure()->validateTree($tree, $this->locale());
                 });
             })
             ->args(func_get_args());
@@ -60,23 +58,14 @@ class Tree implements Localization
         return $root['entry'];
     }
 
-    public function handle()
+    public function handle($handle = null)
     {
-        return $this->structure->handle();
+        return $this->fluentlyGetOrSet('handle')->args(func_get_args());
     }
 
     public function route()
     {
-        return $this->structure->route($this->locale());
-    }
-
-    public function path()
-    {
-        return vsprintf('%s/%s/%s.yaml', [
-            rtrim(Stache::store('navigation')->directory(), '/'),
-            $this->locale(),
-            $this->handle(),
-        ]);
+        return $this->structure()->route($this->locale());
     }
 
     public function parent()
@@ -140,10 +129,32 @@ class Tree implements Localization
     {
         $this->cachedFlattenedPages = null;
 
-        $this
-            ->structure()
-            ->addTree($this)
-            ->save();
+        $this->repository()->save($this);
+
+        $this->dispatchSavedEvent();
+
+        $this->syncOriginal();
+    }
+
+    public function delete()
+    {
+        $this->repository()->delete($this);
+
+        $this->dispatchDeletedEvent();
+
+        return true;
+    }
+
+    abstract protected function repository();
+
+    protected function dispatchSavedEvent()
+    {
+        //
+    }
+
+    protected function dispatchDeletedEvent()
+    {
+        //
     }
 
     public function fileData()
@@ -174,17 +185,17 @@ class Tree implements Localization
             $params['site'] = $this->locale();
         }
 
-        return $this->structure->showUrl($params);
+        return $this->structure()->showUrl($params);
     }
 
     public function editUrl()
     {
-        return $this->structure->editUrl();
+        return $this->structure()->editUrl();
     }
 
     public function deleteUrl()
     {
-        return $this->structure->deleteUrl();
+        return $this->structure()->deleteUrl();
     }
 
     public function append($entry)
@@ -295,7 +306,7 @@ class Tree implements Localization
 
     public function entry($entry)
     {
-        $blink = $this->structure->handle().'-'.$this->locale();
+        $blink = $this->structure()->handle().'-'.$this->locale();
 
         $entries = Blink::store('structure-entries')->once($blink, function () {
             $refs = $this->flattenedPages()->map->reference()->filter()->all();
@@ -304,5 +315,26 @@ class Tree implements Localization
         });
 
         return $entries->get($entry);
+    }
+
+    public function syncOriginal()
+    {
+        $this->original = [
+            'tree' => $this->tree,
+        ];
+
+        return $this;
+    }
+
+    public function __sleep()
+    {
+        $vars = Arr::except(get_object_vars($this), ['original']);
+
+        return array_keys($vars);
+    }
+
+    public function __wakeup()
+    {
+        $this->syncOriginal();
     }
 }

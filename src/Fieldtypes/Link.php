@@ -2,18 +2,18 @@
 
 namespace Statamic\Fieldtypes;
 
+use Facades\Statamic\Routing\ResolveRedirect;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
-use Statamic\Routing\ResolveRedirect;
 use Statamic\Support\Str;
 
 class Link extends Fieldtype
 {
     public function augment($value)
     {
-        $redirect = (new ResolveRedirect)($value, $this->field->parent());
+        $redirect = ResolveRedirect::resolve($value, $this->field->parent());
 
         return $redirect === 404 ? null : $redirect;
     }

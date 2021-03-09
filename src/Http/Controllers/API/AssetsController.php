@@ -2,13 +2,17 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Illuminate\Http\Request;
 use Statamic\Http\Resources\API\AssetResource;
 
 class AssetsController extends ApiController
 {
-    public function index($assetContainer, Request $request)
+    protected $resourceConfigKey = 'assets';
+    protected $routeResourceKey = 'asset_container';
+
+    public function index($assetContainer)
     {
+        $this->abortIfDisabled();
+
         return app(AssetResource::class)::collection(
             $this->filterSortAndPaginate($assetContainer->queryAssets())
         );
@@ -16,6 +20,8 @@ class AssetsController extends ApiController
 
     public function show($assetContainer, $asset)
     {
+        $this->abortIfDisabled();
+
         return app(AssetResource::class)::make($asset);
     }
 }

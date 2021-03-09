@@ -35,13 +35,8 @@ class DeleteEntryTest extends TestCase
     }
 
     /** @test */
-    public function entries_get_removed_from_the_structure_and_child_pages_are_moved_to_the_parent()
+    public function entries_get_removed_from_the_structure_tree_and_child_pages_are_moved_to_the_parent()
     {
-        // We need to confirm that the structure actually gets saved, which would mean it becomes a new object.
-        // When using the array cache driver, the same instance would always be returned.
-        config(['cache.default' => 'file']);
-        \Illuminate\Support\Facades\Cache::clear();
-
         $this->withoutExceptionHandling();
         $user = tap(User::make('test')->makeSuper())->save();
         EntryFactory::id('1')->slug('one')->collection('test')->create();
@@ -55,7 +50,11 @@ class DeleteEntryTest extends TestCase
         EntryFactory::id('9')->slug('six')->collection('test')->create();
 
         $collection = tap(Collection::findByHandle('test')->structureContents([
-            'tree' => [
+            'max_depth' => 10, // irrelevant to test. just cant pass in an empty array at the moment.
+        ]))->save();
+
+        $collection->structure()->in('en')->tree(
+            [
                 ['entry' => '1', 'children' => [
                     ['entry' => '4'],
                     ['entry' => '5', 'children' => [
@@ -70,9 +69,10 @@ class DeleteEntryTest extends TestCase
                         ]],
                     ]],
                 ]],
-            ],
-        ]))->save();
+            ]
+        )->save();
         $originalStructure = $collection->structure();
+        $originalTree = $originalStructure->in('en');
 
         $this->assertCount(9, Entry::all());
 
@@ -113,7 +113,7 @@ class DeleteEntryTest extends TestCase
             return $item['entry'] == '5';
         }));
 
-        $this->assertNotSame($originalStructure, $updatedStructure);
+        $this->assertNotSame($originalTree, $updatedTree);
     }
 
     /** @test */
