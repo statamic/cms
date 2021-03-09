@@ -113,8 +113,12 @@ class Asset implements AssetContract, Augmentable
         return $this->disk()->exists($path);
     }
 
-    public function meta()
+    public function meta($key = null)
     {
+        if (func_num_args() === 1) {
+            return $this->metaValue($key);
+        }
+
         if (! config('statamic.assets.cache_meta')) {
             return $this->generateMeta();
         }
@@ -132,6 +136,21 @@ class Asset implements AssetContract, Augmentable
 
             return $meta;
         });
+    }
+
+    private function metaValue($key)
+    {
+        $value = Arr::get($this->meta(), $key);
+
+        if (! is_null($value)) {
+            return $value;
+        }
+
+        Cache::forget($this->metaCacheKey());
+
+        $this->writeMeta($meta = $this->generateMeta());
+
+        return Arr::get($meta, $key);
     }
 
     public function generateMeta()
@@ -360,7 +379,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function lastModified()
     {
-        return Carbon::createFromTimestamp($this->meta()['last_modified']);
+        return Carbon::createFromTimestamp($this->meta('last_modified'));
     }
 
     /**
@@ -492,7 +511,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function dimensions()
     {
-        return [$this->meta()['width'], $this->meta()['height']];
+        return [$this->meta('width'), $this->meta('height')];
     }
 
     /**
@@ -554,7 +573,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function size()
     {
-        return $this->meta()['size'];
+        return $this->meta('size');
     }
 
     /**
