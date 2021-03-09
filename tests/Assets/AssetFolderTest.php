@@ -48,15 +48,10 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_and_sets_the_title()
+    public function the_title_is_the_folder_name()
     {
         $folder = (new Folder)->path('path/to/somewhere');
         $this->assertEquals('somewhere', $folder->title());
-
-        $return = $folder->title('My Custom Folder Title');
-
-        $this->assertEquals($folder, $return);
-        $this->assertEquals('My Custom Folder Title', $folder->title());
     }
 
     /** @test */
@@ -151,7 +146,7 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    public function it_saves_meta_file_to_disk()
+    public function it_creates_directory_when_saving()
     {
         Storage::fake('local');
 
@@ -160,61 +155,18 @@ class AssetFolderTest extends TestCase
 
         $folder = (new Folder)
             ->container($container)
-            ->path('path/to/folder')
-            ->title('My Folder');
-
-        $return = $folder->save();
-
-        $expected = <<<'EOT'
-title: 'My Folder'
-
-EOT;
-
-        $this->assertEquals($folder, $return);
-        $disk->assertExists($path = 'path/to/folder/folder.yaml');
-        $this->assertEquals($expected, $disk->get($path));
-    }
-
-    /** @test */
-    public function it_deletes_existing_meta_file_if_the_title_is_identical_to_computed_title()
-    {
-        Storage::fake('local');
-        $disk = Storage::disk('local');
-        $path = 'path/to/folder/folder.yaml';
-        $disk->put($path, 'title: Original Title');
-
-        $container = $this->mock(AssetContainer::class);
-        $container->shouldReceive('disk')->andReturn($disk);
-
-        $folder = (new Folder)
-            ->container($container)
-            ->path('path/to/folder')
-            ->title('folder')
-            ->save();
+            ->path($path = 'path/to/folder');
 
         $disk->assertMissing($path);
-    }
-
-    /** @test */
-    public function it_doesnt_save_meta_file_if_theres_no_title()
-    {
-        Storage::fake('local');
-
-        $container = $this->mock(AssetContainer::class);
-        $container->shouldReceive('disk')->andReturn($disk = Storage::disk('local'));
-
-        $folder = (new Folder)
-            ->container($container)
-            ->path('path/to/folder')
-            ->title(null);
 
         $return = $folder->save();
 
-        $disk->assertMissing('path/to/folder/folder.yaml');
+        $this->assertEquals($folder, $return);
+        $disk->assertExists($path);
     }
 
     /** @test */
-    public function deleting_a_folder_deletes_the_assets_and_the_meta_file()
+    public function deleting_a_folder_deletes_the_assets_and_directory()
     {
         Storage::fake('local');
         $container = Facades\AssetContainer::make('test')->disk('local');
@@ -222,12 +174,11 @@ EOT;
 
         $disk = Storage::disk('local');
         $disk->put('path/to/folder/one.txt', '');
-        $disk->put('path/to/sub/folder/folder.yaml', "title: 'Folder Title'\n");
         $disk->put('path/to/sub/folder/two.txt', '');
         $disk->put('path/to/sub/folder/three.txt', '');
         $disk->put('path/to/sub/folder/four.txt', '');
         $disk->put('path/to/sub/folder/subdirectory/five.txt', '');
-        $this->assertCount(6, $disk->allFiles());
+        $this->assertCount(5, $disk->allFiles());
 
         $folder = (new Folder)
             ->container($container)
@@ -237,6 +188,7 @@ EOT;
 
         $this->assertEquals($folder, $return);
         $this->assertEquals(['path/to/folder/one.txt'], $disk->allFiles());
+        $disk->assertMissing('path/to/sub/folder');
 
         // TODO: assert about event
     }
@@ -283,12 +235,11 @@ EOT;
             ->andReturn((new Folder)->container($container)->path('grandparent/parent'));
 
         $folder = (new Folder)
-            ->title('Test')
             ->container($container)
             ->path('grandparent/parent/child');
 
         $this->assertEquals([
-            'title' => 'Test',
+            'title' => 'child',
             'path' => 'grandparent/parent/child',
             'parent_path' => 'grandparent/parent',
             'basename' => 'child',
