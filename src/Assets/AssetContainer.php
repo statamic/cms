@@ -13,6 +13,7 @@ use Statamic\Events\AssetContainerDeleted;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Search;
@@ -227,9 +228,10 @@ class AssetContainer implements AssetContainerContract, Augmentable
             $recursive = true;
         }
 
+        $key = $this->filesCacheKey($folder, $recursive);
         $cacheFor = config('statamic.assets.file_listing_cache_length', 60);
 
-        return Cache::remember($this->filesCacheKey($folder, $recursive), $cacheFor, function () use ($folder, $recursive) {
+        $callback = function () use ($folder, $recursive) {
             $files = collect($this->disk()->getFiles($folder, $recursive));
 
             // Get rid of files we never want to show up.
@@ -240,6 +242,10 @@ class AssetContainer implements AssetContainerContract, Augmentable
             });
 
             return $files->values();
+        };
+
+        return Blink::once($key, function () use ($key, $cacheFor, $callback) {
+            return Cache::remember($key, $cacheFor, $callback);
         });
     }
 

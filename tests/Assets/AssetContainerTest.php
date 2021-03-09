@@ -12,6 +12,7 @@ use Statamic\Assets\AssetContainer;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetFolder;
 use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\File;
 use Statamic\Fields\Blueprint;
 use Statamic\Filesystem\Filesystem;
@@ -299,6 +300,7 @@ class AssetContainerTest extends TestCase
         File::shouldReceive('disk')->with('test')->andReturn($disk);
 
         $this->assertFalse(Cache::has($cacheKey = 'asset-files-test-/-recursive'));
+        $this->assertFalse(Blink::has($cacheKey));
 
         $container = (new AssetContainer)->handle('test')->disk('test');
 
@@ -309,11 +311,14 @@ class AssetContainerTest extends TestCase
         $this->assertEquals($expected, $first->all());
         $this->assertEquals($expected, $second->all());
         $this->assertTrue(Cache::has($cacheKey));
+        $this->assertTrue(Blink::has($cacheKey));
 
         Carbon::setTestNow(now()->addSeconds(60));
         $this->assertTrue(Cache::has($cacheKey));
+        $this->assertTrue(Blink::has($cacheKey));
         Carbon::setTestNow(now()->addSeconds(1));
         $this->assertFalse(Cache::has($cacheKey));
+        $this->assertTrue(Blink::has($cacheKey));
     }
 
     /** @test */
