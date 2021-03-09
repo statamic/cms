@@ -67,7 +67,9 @@ abstract class Store
 
         $items = $files->map(function ($timestamp, $path) {
             return $this->getItemByPath($path);
-        })->keyBy(function ($item) {
+        })
+        ->filter()
+        ->keyBy(function ($item) {
             return $this->getItemKey($item);
         });
 
