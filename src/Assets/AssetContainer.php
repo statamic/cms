@@ -220,16 +220,16 @@ class AssetContainer implements AssetContainerContract, Augmentable
      * @param bool $recursive
      * @return \Illuminate\Support\Collection
      */
-    public function files($folder = null, $recursive = false)
+    public function files($folder = '/', $recursive = false)
     {
         // When requesting files() as-is, we want all of them.
-        if ($folder == null) {
+        if (func_num_args() === 0) {
             $recursive = true;
         }
 
         $cacheFor = config('statamic.assets.file_listing_cache_length', 60);
 
-        return Cache::remember($this->filesCacheKey($folder), $cacheFor, function () use ($folder, $recursive) {
+        return Cache::remember($this->filesCacheKey($folder, $recursive), $cacheFor, function () use ($folder, $recursive) {
             $files = collect($this->disk()->getFiles($folder, $recursive));
 
             // Get rid of files we never want to show up.
@@ -243,9 +243,11 @@ class AssetContainer implements AssetContainerContract, Augmentable
         });
     }
 
-    public function filesCacheKey($folder = '/')
+    public function filesCacheKey($folder = '/', $recursive = false)
     {
-        return 'asset-files-'.$this->handle().'-'.$folder;
+        $rec = $recursive ? '-recursive' : '';
+
+        return 'asset-files-'.$this->handle().'-'.$folder.$rec;
     }
 
     public function pathsCacheKey()
