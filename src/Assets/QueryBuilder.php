@@ -77,6 +77,7 @@ class QueryBuilder extends BaseQueryBuilder implements Contract
         if ($this->hasAnyNulls($items) && $this->limit) {
             Cache::forget($this->container->filesCacheKey());
             Cache::forget($this->container->filesCacheKey($this->folder));
+            \Statamic\Facades\Blink::forget('disk-paths-'.$this->container->handle());
 
             return $this->get($columns);
         }

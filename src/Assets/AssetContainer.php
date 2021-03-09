@@ -325,7 +325,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     {
         $asset = Facades\Asset::make()->container($this)->path($path);
 
-        if (! $asset->disk()->exists($asset->path())) {
+        if (! $asset->exists()) {
             return null;
         }
 

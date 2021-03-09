@@ -17,6 +17,7 @@ use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
@@ -110,7 +111,9 @@ class Asset implements AssetContract, Augmentable
             return false;
         }
 
-        return $this->disk()->exists($path);
+        return Blink::once('disk-paths-'.$this->containerHandle(), function () {
+            return $this->disk()->getFilesRecursively('/');
+        })->contains($path);
     }
 
     public function meta($key = null)
@@ -486,6 +489,7 @@ class Asset implements AssetContract, Augmentable
     public function move($folder, $filename = null)
     {
         Cache::forget($this->container()->filesCacheKey($this->folder()));
+        Blink::forget('disk-paths-'.$this->containerHandle());
 
         $filename = $filename ?: $this->filename();
         $oldPath = $this->path();
