@@ -3,10 +3,12 @@
 namespace Statamic\Assets;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\AssetFolder as Contract;
 use Statamic\Events\AssetFolderDeleted;
 use Statamic\Events\AssetFolderSaved;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
 use Statamic\Facades\YAML;
 use Statamic\Support\Arr;
@@ -125,6 +127,8 @@ class AssetFolder implements Contract, Arrayable
             $this->disk()->put($path, YAML::dump($arr));
         }
 
+        $this->clearCaches();
+
         AssetFolderSaved::dispatch($this);
 
         return $this;
@@ -146,9 +150,23 @@ class AssetFolder implements Contract, Arrayable
         // Delete the actual folder that'll be leftover. It'll include any empty subfolders.
         $this->disk()->delete($this->path());
 
+        $this->clearCaches();
+
         AssetFolderDeleted::dispatch($this);
 
         return $this;
+    }
+
+    private function clearCaches()
+    {
+        Cache::forget($this->container()->foldersCacheKey('/', true));
+        Cache::forget($this->container()->foldersCacheKey('/', false));
+        Cache::forget($this->container()->foldersCacheKey($this->path(), true));
+        Cache::forget($this->container()->foldersCacheKey($this->path(), false));
+        Blink::forget($this->container()->foldersCacheKey('/', true));
+        Blink::forget($this->container()->foldersCacheKey('/', false));
+        Blink::forget($this->container()->foldersCacheKey($this->path(), true));
+        Blink::forget($this->container()->foldersCacheKey($this->path(), false));
     }
 
     /**

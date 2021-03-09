@@ -256,6 +256,13 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return 'asset-files-'.$this->handle().'-'.$folder.$rec;
     }
 
+    public function foldersCacheKey($folder = '/', $recursive = false)
+    {
+        $rec = $recursive ? '-recursive' : '';
+
+        return 'asset-folders-'.$this->handle().'-'.$folder.$rec;
+    }
+
     public function pathsCacheKey()
     {
         return 'asset-paths-'.$this->handle();
@@ -268,19 +275,28 @@ class AssetContainer implements AssetContainerContract, Augmentable
      * @param bool $recursive
      * @return \Illuminate\Support\Collection
      */
-    public function folders($folder = null, $recursive = false)
+    public function folders($folder = '/', $recursive = false)
     {
         // When requesting folders() as-is, we want all of them.
-        if ($folder == null) {
+        if (func_num_args() === 0) {
             $folder = '/';
             $recursive = true;
         }
 
-        $paths = $this->disk()->getFolders($folder, $recursive);
+        $key = $this->foldersCacheKey($folder, $recursive);
+        $cacheFor = config('statamic.assets.file_listing_cache_length', 60);
 
-        return collect($paths)->reject(function ($path) {
-            return basename($path) === '.meta';
-        })->values();
+        $callback = function () use ($folder, $recursive) {
+            $paths = $this->disk()->getFolders($folder, $recursive);
+
+            return collect($paths)->reject(function ($path) {
+                return basename($path) === '.meta';
+            })->values();
+        };
+
+        return Blink::once($key, function () use ($key, $cacheFor, $callback) {
+            return Cache::remember($key, $cacheFor, $callback);
+        });
     }
 
     /**

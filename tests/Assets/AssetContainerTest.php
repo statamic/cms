@@ -324,6 +324,41 @@ class AssetContainerTest extends TestCase
     /** @test */
     public function it_gets_the_folders_from_the_filesystem_only_once()
     {
+        Carbon::setTestNow(now()->startOfMinute());
+
+        $disk = $this->mock(Filesystem::class);
+        $disk->shouldReceive('getFolders')
+            ->with('/', true)
+            ->once()
+            ->andReturn(collect([
+                '.meta',
+                'one',
+                'one/.meta',
+                'two',
+            ]));
+
+        File::shouldReceive('disk')->with('test')->andReturn($disk);
+
+        $this->assertFalse(Cache::has($cacheKey = 'asset-folders-test-/-recursive'));
+        $this->assertFalse(Blink::has($cacheKey));
+
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        $first = $container->folders();
+        $second = $container->folders();
+
+        $expected = ['one', 'two'];
+        $this->assertEquals($expected, $first->all());
+        $this->assertEquals($expected, $second->all());
+        $this->assertTrue(Cache::has($cacheKey));
+        $this->assertTrue(Blink::has($cacheKey));
+
+        Carbon::setTestNow(now()->addSeconds(60));
+        $this->assertTrue(Cache::has($cacheKey));
+        $this->assertTrue(Blink::has($cacheKey));
+        Carbon::setTestNow(now()->addSeconds(1));
+        $this->assertFalse(Cache::has($cacheKey));
+        $this->assertTrue(Blink::has($cacheKey));
     }
 
     /** @test */

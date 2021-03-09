@@ -229,6 +229,15 @@ EOT;
         $disk->put('path/to/sub/folder/subdirectory/five.txt', '');
         $this->assertCount(6, $disk->allFiles());
 
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/folder',
+            'path/to/sub',
+            'path/to/sub/folder',
+            'path/to/sub/folder/subdirectory',
+        ], $container->folders()->all());
+
         $folder = (new Folder)
             ->container($container)
             ->path('path/to/sub/folder');
@@ -237,6 +246,13 @@ EOT;
 
         $this->assertEquals($folder, $return);
         $this->assertEquals(['path/to/folder/one.txt'], $disk->allFiles());
+
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/folder',
+            'path/to/sub',
+        ], $container->folders()->all());
 
         // TODO: assert about event
     }

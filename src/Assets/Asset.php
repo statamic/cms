@@ -426,8 +426,16 @@ class Asset implements AssetContract, Augmentable
         $this->meta = null;
 
         Cache::forget($this->metaCacheKey());
-        Cache::forget($this->container()->filesCacheKey());
-        Cache::forget($this->container()->filesCacheKey($this->folder()));
+
+        Cache::forget($this->container()->filesCacheKey('/', true));
+        Cache::forget($this->container()->filesCacheKey('/', false));
+        Cache::forget($this->container()->filesCacheKey($this->folder(), true));
+        Cache::forget($this->container()->filesCacheKey($this->folder(), false));
+
+        Blink::forget($this->container()->filesCacheKey('/', true));
+        Blink::forget($this->container()->filesCacheKey('/', false));
+        Blink::forget($this->container()->filesCacheKey($this->folder(), true));
+        Blink::forget($this->container()->filesCacheKey($this->folder(), false));
     }
 
     /**
