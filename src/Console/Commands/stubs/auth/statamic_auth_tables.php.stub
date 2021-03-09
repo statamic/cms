@@ -14,7 +14,6 @@ class StatamicAuthTables extends Migration
     public function up()
     {
         USERS_TABLE_REPLACE
-
         Schema::create('ROLE_USER_TABLE', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('user_id');
