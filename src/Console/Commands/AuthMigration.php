@@ -4,6 +4,7 @@ namespace Statamic\Console\Commands;
 
 use Illuminate\Console\Command;
 use Illuminate\Support\Composer;
+use Illuminate\Support\Facades\Schema;
 use Statamic\Console\RunsInPlease;
 use Statamic\Facades\File;
 
@@ -28,7 +29,15 @@ class AuthMigration extends Command
         $file = date('Y_m_d_His', time()).'_statamic_auth_tables';
         $to = database_path("migrations/{$file}.php");
 
-        $contents = str_replace('USERS_TABLE', config('statamic.users.tables.users', 'users'), File::get($from));
+        $contents = File::get($from);
+
+        if (Schema::hasTable(config('statamic.users.tables.users', 'users'))) {
+            $contents = str_replace('USERS_TABLE_REPLACE', File::get(__DIR__.'/stubs/auth/update_users_table.php.stub'), $contents);
+        } else {
+            $contents = str_replace('USERS_TABLE_REPLACE', File::get(__DIR__.'/stubs/auth/create_users_table.php.stub'), $contents);
+        }
+
+        $contents = str_replace('USERS_TABLE', config('statamic.users.tables.users', 'users'), $contents);
         $contents = str_replace('ROLE_USER_TABLE', config('statamic.users.tables.role_user', 'role_user'), $contents);
         $contents = str_replace('GROUP_USER_TABLE', config('statamic.users.tables.group_user', 'group_user'), $contents);
 
