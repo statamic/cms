@@ -164,8 +164,6 @@ class Asset implements AssetContract, Augmentable
             $meta = array_merge($meta, [
                 'size' => $this->disk()->size($this->path()),
                 'last_modified' => $this->disk()->lastModified($this->path()),
-                'mime_type' => $mimeType = $this->disk()->mimeType($this->path()),
-                'guessed_extension' => MimeTypes::getDefault()->getExtensions($mimeType)[0] ?? null,
                 'width' => $dimensions[0],
                 'height' => $dimensions[1],
                 'mime_type' => $this->disk()->mimeType($this->path()),
@@ -585,16 +583,6 @@ class Asset implements AssetContract, Augmentable
         }
 
         return null;
-    }
-
-    /**
-     * Get the asset's MIME type.
-     *
-     * @return
-     */
-    public function mimeType()
-    {
-        return $this->metaValue('mime_type');
     }
 
     /**
