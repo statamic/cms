@@ -152,6 +152,7 @@ class AssetFolderTest extends TestCase
 
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('disk')->andReturn($disk = Storage::disk('local'));
+        $container->shouldReceive('foldersCacheKey')->andReturn('irrelevant for test');
 
         $folder = (new Folder)
             ->container($container)
