@@ -274,4 +274,9 @@ abstract class AbstractCacher implements Cacher
 
         return $this->normalizeKey($this->makeHash($domain).'.urls');
     }
+
+    public function hasCachedPage(Request $request)
+    {
+        return $this->getCachedPage($request) !== null;
+    }
 }

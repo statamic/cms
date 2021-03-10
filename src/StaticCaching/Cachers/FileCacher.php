@@ -63,6 +63,13 @@ class FileCacher extends AbstractCacher
         return File::get($this->getFilePath($url));
     }
 
+    public function hasCachedPage(Request $request)
+    {
+        $url = $this->getUrl($request);
+
+        return File::exists($this->getFilePath($url));
+    }
+
     /**
      * Flush out the entire static cache.
      *

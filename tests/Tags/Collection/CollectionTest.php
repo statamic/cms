@@ -403,7 +403,7 @@ class CollectionTest extends TestCase
             ['entry' => 'g'], // Grape
             ['entry' => 'e'], // Egg
             ['entry' => 'd'], // Danish
-        ], $this->foods)->maxDepth(1);
+        ], 'foods')->maxDepth(1);
 
         $this->foods->structure($structure)->save();
 
@@ -452,7 +452,7 @@ class CollectionTest extends TestCase
             ['entry' => 'g'], // Grape
             ['entry' => 'e'], // Egg
             ['entry' => 'd'], // Danish
-        ], $this->foods)->maxDepth(1);
+        ], 'foods')->maxDepth(1);
 
         $this->foods->structure($structure)->save();
 
@@ -542,14 +542,13 @@ class CollectionTest extends TestCase
         return $this->collectionTag->{$tagMethod}()->map->get('title')->values()->all();
     }
 
-    protected function makeStructure($tree = [], $collection = null)
+    protected function makeStructure($tree, $collection)
     {
-        $structure = new CollectionStructure;
+        $structure = (new CollectionStructure)->handle($collection);
+        $structure->save();
 
-        if ($collection) {
-            $structure->collection($collection);
-        }
+        $structure->makeTree('en')->tree($tree)->save();
 
-        return $structure->addTree($structure->makeTree('en')->tree($tree));
+        return $structure;
     }
 }

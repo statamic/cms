@@ -164,10 +164,36 @@ class GitEventTest extends TestCase
         Git::shouldReceive('dispatchCommit')->with('Navigation deleted')->once();
 
         $nav = Facades\Nav::make()->handle('footer');
-        $nav->addTree($nav->makeTree(Facades\Site::default()->handle()));
 
         $nav->save();
         $nav->delete();
+    }
+
+    /** @test */
+    public function it_commits_when_a_navigation_tree_is_saved_and_deleted()
+    {
+        Git::shouldReceive('dispatchCommit')->with('Navigation tree saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Navigation tree deleted')->once();
+
+        $nav = Facades\Nav::make()->handle('footer');
+        $tree = $nav->makeTree('en');
+
+        $tree->save();
+        $tree->delete();
+    }
+
+    /** @test */
+    public function it_commits_when_a_collection_tree_is_saved_and_deleted()
+    {
+        Git::shouldReceive('dispatchCommit')->with('Collection saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Collection tree saved')->once();
+        Git::shouldReceive('dispatchCommit')->with('Collection tree deleted')->once();
+
+        $collection = Facades\Collection::make('pages')->structureContents(['max_depth' => 10])->save();
+        $tree = $collection->structure()->makeTree('en');
+
+        $tree->save();
+        $tree->delete();
     }
 
     /** @test */

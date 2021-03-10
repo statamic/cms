@@ -511,4 +511,68 @@ class FieldTest extends TestCase
             $this->assertEquals('foo shallow augmented', $value->value());
         });
     }
+
+    /**
+     * @test
+     * @group graphql
+     **/
+    public function it_gets_the_graphql_type()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function toGqlType()
+            {
+                return new \GraphQL\Type\Definition\FloatType;
+            }
+        };
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn($fieldtype);
+
+        $field = new Field('test', ['type' => 'fieldtype']);
+
+        $type = $field->toGql();
+
+        $this->assertIsArray($type);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NullableType::class, $type['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type['type']);
+    }
+
+    /**
+     * @test
+     * @group graphql
+     **/
+    public function it_makes_the_graphql_type_non_nullable_if_its_required()
+    {
+        $fieldtype = new class extends Fieldtype {
+            public function toGqlType()
+            {
+                return new \GraphQL\Type\Definition\FloatType;
+            }
+        };
+
+        FieldtypeRepository::shouldReceive('find')
+            ->with('fieldtype')
+            ->andReturn($fieldtype);
+
+        $field = new Field('test', ['type' => 'fieldtype', 'validate' => 'required']);
+
+        $type = $field->toGql();
+
+        $this->assertIsArray($type);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\NonNull::class, $type['type']);
+        $this->assertInstanceOf(\GraphQL\Type\Definition\FloatType::class, $type['type']->getWrappedType());
+    }
+
+    /** @test */
+    public function it_gets_the_path_of_handles_for_nested_fields()
+    {
+        $top = (new Field('a', ['type' => 'text']));
+        $second = (new Field('b', ['type' => 'text']))->setParentField($top);
+        $third = (new Field('c', ['type' => 'text']))->setParentField($second);
+
+        $this->assertEquals(['a'], $top->handlePath());
+        $this->assertEquals(['a', 'b'], $second->handlePath());
+        $this->assertEquals(['a', 'b', 'c'], $third->handlePath());
+    }
 }

@@ -13,7 +13,7 @@
                 :readonly="isReadOnly"
                 :disabled="isReadOnly"
                 :id="fieldId"
-                class="flex-1"
+                class="flex-1 min-w-0"
             />
             <div class="rounded border px-1 py-sm mx-1 bg-grey-10">{{ val }}</div>
             <div v-if="config.append" v-text="config.append" />

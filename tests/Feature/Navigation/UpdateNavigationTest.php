@@ -56,7 +56,7 @@ class UpdateNavigationTest extends TestCase
         ]]);
 
         $nav = $this->createNav();
-        $nav->addTree($nav->makeTree('de'));
+        $nav->makeTree('de')->save();
         $this->assertCount(1, Nav::all());
         $this->assertEquals(['en', 'de'], Nav::all()->first()->trees()->keys()->all());
 
@@ -74,6 +74,9 @@ class UpdateNavigationTest extends TestCase
         $this->assertEquals(2, $updated->maxDepth());
         $this->assertTrue($updated->expectsRoot());
         $this->assertEquals(['en', 'fr'], $updated->trees()->keys()->all());
+        $this->assertTrue($updated->existsIn('en'));
+        $this->assertTrue($updated->existsIn('fr'));
+        $this->assertFalse($updated->existsIn('de'));
     }
 
     /** @test */
@@ -103,7 +106,7 @@ class UpdateNavigationTest extends TestCase
             ->maxDepth(1)
             ->expectsRoot(false)
             ->tap(function ($nav) {
-                $nav->addTree($nav->makeTree('en'));
+                $nav->makeTree('en')->save();
                 $nav->save();
             });
     }

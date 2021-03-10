@@ -2,11 +2,15 @@
 
 namespace Tests\Data\Structures;
 
+use Facades\Statamic\Stache\Repositories\CollectionTreeRepository;
 use Statamic\Contracts\Entries\Collection;
 use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Facades;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
 use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Structures\CollectionStructure;
+use Statamic\Structures\CollectionTree;
 use Statamic\Structures\Page;
 use Statamic\Structures\Tree;
 
@@ -29,11 +33,7 @@ class CollectionStructureTest extends StructureTestCase
 
     public function structure($handle = null)
     {
-        if ($handle !== null) {
-            throw new \Exception('Handle should not be set in the test');
-        }
-
-        return (new CollectionStructure)->collection($this->collection);
+        return (new CollectionStructure)->handle($handle);
     }
 
     public function queryBuilderGetReturnValue()
@@ -42,20 +42,52 @@ class CollectionStructureTest extends StructureTestCase
     }
 
     /** @test */
-    public function the_handle_comes_from_the_collection()
+    public function it_gets_and_sets_the_handle()
     {
-        $this->collection->shouldReceive('handle')->once()->andReturn('test');
+        $structure = $this->structure();
+        $this->assertNull($structure->handle());
 
-        $this->assertEquals('collection::test', $this->structure()->handle());
+        $return = $structure->handle('test');
+
+        $this->assertEquals('test', $structure->handle());
+        $this->assertEquals($structure, $return);
     }
 
     /** @test */
-    public function the_handle_cannot_be_set()
+    public function it_gets_the_collection()
     {
-        $this->expectException(\LogicException::class);
-        $this->expectExceptionMessage('Handle cannot be set.');
+        $structure = $this->structure('test');
+        $collection = $this->mock(Collection::class);
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->once()->andReturn($collection);
 
-        $this->structure()->handle('test');
+        $this->assertNull(Blink::get($blinkKey = 'collection-structure-collection-test'));
+
+        // Do it twice combined with the once() in the mock to show blink works.
+        $this->assertEquals($collection, $structure->collection());
+        $this->assertEquals($collection, $structure->collection());
+        $this->assertSame($collection, Blink::get($blinkKey));
+    }
+
+    /** @test */
+    public function it_makes_a_tree()
+    {
+        Facades\Collection::shouldReceive('findByHandle')->andReturn($this->collection);
+        $structure = $this->structure()->handle('test');
+        $this->collection->shouldReceive('structure')->andReturn($structure);
+        $this->collection->shouldReceive('handle')->andReturn('test');
+
+        $this->queryBuilderGetReturnValue = collect([
+            Entry::make()->id('1'),
+        ]);
+
+        $tree = $structure->makeTree('fr', [
+            ['entry' => 1],
+        ]);
+        $this->assertEquals('fr', $tree->locale());
+        $this->assertEquals('test', $tree->handle());
+        $this->assertEquals([
+            ['entry' => 1],
+        ], $tree->tree());
     }
 
     /** @test */
@@ -63,10 +95,11 @@ class CollectionStructureTest extends StructureTestCase
     {
         $collection = $this->mock(Collection::class);
         $collection->shouldReceive('title')->once()->andReturn('Test');
+        Facades\Collection::shouldReceive('findByHandle')->andReturn($collection);
 
-        $structure = $this->structure()->collection($collection);
+        $structure = $this->structure();
 
-        $this->assertEquals('Test', $structure->collection($collection)->title());
+        $this->assertEquals('Test', $structure->title());
     }
 
     /** @test */
@@ -81,11 +114,19 @@ class CollectionStructureTest extends StructureTestCase
     /** @test */
     public function trees_exist_based_on_whether_the_site_is_enabled_on_the_collection()
     {
+        // ...unlike nav trees, which only exist if there's a tree file.
+
+        $structure = $this->structure('test');
+
         $this->collection->shouldReceive('handle')->andReturn('test');
         $this->collection->shouldReceive('sites')->andReturn(collect(['en', 'fr']));
+        $this->collection->shouldReceive('structure')->andReturn($structure);
 
-        $structure = $this->structure();
-        $structure->addTree($structure->makeTree('en')->tree(['foo' => 'bar']));
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
+
+        CollectionTreeRepository::shouldReceive('find')->with('test', 'en')->andReturn($enTree = $structure->makeTree('en'));
+        CollectionTreeRepository::shouldReceive('find')->with('test', 'fr')->andReturnNull();
+        CollectionTreeRepository::shouldReceive('find')->with('test', 'de')->andReturnNull();
 
         $trees = $structure->trees();
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $trees);
@@ -94,8 +135,9 @@ class CollectionStructureTest extends StructureTestCase
         $this->assertTrue($structure->existsIn('en'));
         $this->assertTrue($structure->existsIn('fr'));
         $this->assertFalse($structure->existsIn('de'));
-        $this->assertEquals(['foo' => 'bar'], $structure->in('en')->tree()); // manually added tree is maintained
-        $this->assertEquals([], $structure->in('fr')->tree());
+        $this->assertSame($enTree, $structure->in('en'));
+        $this->assertInstanceOf(CollectionTree::class, $structure->in('fr'));
+        $this->assertNull($structure->in('de'));
     }
 
     /** @test */
@@ -119,7 +161,9 @@ class CollectionStructureTest extends StructureTestCase
     /** @test */
     public function it_gets_an_entry_uri()
     {
-        $structure = $this->structure();
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
+
+        $structure = $this->structure('test');
 
         $this->collection->shouldReceive('handle')->andReturn('test');
         $this->collection->shouldReceive('route')->with('en')->once()->andReturn('{slug}');
@@ -132,7 +176,8 @@ class CollectionStructureTest extends StructureTestCase
         $tree->shouldReceive('structure')->andReturn($structure);
         $tree->shouldReceive('locale')->andReturn('en');
         $tree->shouldReceive('flattenedPages')->andReturn(collect([$page]));
-        $structure->addTree($tree);
+
+        CollectionTreeRepository::shouldReceive('find')->with('test', 'en')->andReturn($tree);
 
         $entry = $this->mock(EntryContract::class);
         $entry->shouldReceive('id')->andReturn('the-entry-id');
@@ -144,7 +189,8 @@ class CollectionStructureTest extends StructureTestCase
     /** @test */
     public function the_entry_uri_is_null_if_the_collection_doesnt_have_a_route()
     {
-        $structure = $this->structure();
+        $structure = $this->structure('test');
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
 
         $this->collection->shouldReceive('route')->with('en')->once()->andReturnNull();
 
@@ -160,8 +206,9 @@ class CollectionStructureTest extends StructureTestCase
     {
         $collection = $this->mock(Collection::class);
         $collection->shouldReceive('route')->once()->andReturn('/the-route/{slug}');
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
 
-        $this->assertEquals('/the-route/{slug}', $this->structure()->collection($collection)->route('en'));
+        $this->assertEquals('/the-route/{slug}', $this->structure('test')->route('en'));
     }
 
     /** @test */
@@ -172,7 +219,8 @@ class CollectionStructureTest extends StructureTestCase
         $collection->shouldReceive('route')->with('fr')->once()->andReturn('/fr-route');
         $collection->shouldReceive('route')->with('de')->once()->andReturnNull();
 
-        $structure = $this->structure()->collection($collection);
+        $structure = $this->structure('test');
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
 
         $this->assertEquals('/en-route', $structure->route('en'));
         $this->assertEquals('/fr-route', $structure->route('fr'));
@@ -185,8 +233,9 @@ class CollectionStructureTest extends StructureTestCase
         $this->expectException(\Exception::class);
         $this->expectExceptionMessage('Duplicate entry [123] in [test] collection\'s structure.');
         $this->collection->shouldReceive('handle')->once()->andReturn('test');
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
 
-        $this->structure()
+        $this->structure('test')
             ->validateTree([
                 [
                     'entry' => '123',
@@ -205,6 +254,8 @@ class CollectionStructureTest extends StructureTestCase
     /** @test */
     public function the_tree_root_can_have_children_when_not_expecting_root()
     {
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
+
         $this->queryBuilderGetReturnValue = collect([
             Entry::make()->id('123'),
             Entry::make()->id('456'),
@@ -216,12 +267,14 @@ class CollectionStructureTest extends StructureTestCase
     /** @test */
     public function only_entries_belonging_to_the_associated_collection_may_be_in_the_tree()
     {
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
+
         $this->queryBuilderGetReturnValue = collect([
             Entry::make()->id('1'),
             Entry::make()->id('2'),
         ]);
 
-        $validated = $this->structure()->validateTree([
+        $validated = $this->structure('test')->validateTree([
             [
                 'entry' => '1',
                 'children' => [
@@ -245,6 +298,8 @@ class CollectionStructureTest extends StructureTestCase
     /** @test */
     public function entries_not_explicitly_in_the_tree_should_be_appended_to_the_end_of_the_tree()
     {
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
+
         $this->queryBuilderGetReturnValue = collect([
             Entry::make()->id('1'),
             Entry::make()->id('2'),
@@ -253,7 +308,7 @@ class CollectionStructureTest extends StructureTestCase
             Entry::make()->id('5'),
         ]);
 
-        $actual = $this->structure()->validateTree([
+        $actual = $this->structure('test')->validateTree([
             [
                 'entry' => '1',
                 'children' => [
@@ -281,12 +336,26 @@ class CollectionStructureTest extends StructureTestCase
     /** @test */
     public function it_saves_through_the_collection()
     {
-        $structure = $this->structure();
+        $structure = $this->structure('test');
         $collection = $this->mock(Collection::class);
         $collection->shouldReceive('structure')->with($structure)->once()->ordered()->andReturnSelf();
         $collection->shouldReceive('save')->once()->ordered()->andReturnTrue();
-        $structure->collection($collection);
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($collection);
 
         $this->assertTrue($structure->save());
+    }
+
+    /** @test **/
+    public function the_root_doesnt_need_to_be_an_entry_if_the_tree_is_empty()
+    {
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
+        parent::the_root_doesnt_need_to_be_an_entry_if_the_tree_is_empty();
+    }
+
+    /** @test **/
+    public function the_root_doesnt_need_to_be_an_entry_when_not_expecting_root()
+    {
+        Facades\Collection::shouldReceive('findByHandle')->with('test')->andReturn($this->collection);
+        parent::the_root_doesnt_need_to_be_an_entry_when_not_expecting_root();
     }
 }

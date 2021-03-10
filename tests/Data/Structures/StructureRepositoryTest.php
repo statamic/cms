@@ -39,12 +39,13 @@ class StructureRepositoryTest extends TestCase
         $this->assertInstanceOf(\Illuminate\Support\Collection::class, $structures);
         $this->assertCount(5, $structures);
         $this->assertEveryItemIsInstanceOf(StructureContract::class, $structures);
+        $this->assertEquals([0, 1, 2, 3, 4], $structures->keys()->all());
         $this->assertEquals([
             'nav-a',
             'nav-b',
             'nav-c',
-            'collection::collection-structure-a',
-            'collection::collection-structure-b',
+            'collection-structure-a',
+            'collection-structure-b',
         ], $structures->map->handle()->all());
     }
 

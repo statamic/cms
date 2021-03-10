@@ -379,6 +379,10 @@ class User extends BaseUser
             return $this->model()->timestamps;
         }
 
+        if ($key == 'email') {
+            return $this->email();
+        }
+
         return $this->$key;
     }
 }

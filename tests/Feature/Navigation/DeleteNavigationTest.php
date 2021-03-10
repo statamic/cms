@@ -56,7 +56,7 @@ class DeleteNavigationTest extends TestCase
             ->maxDepth(1)
             ->expectsRoot(false)
             ->tap(function ($nav) {
-                $nav->addTree($nav->makeTree('en'));
+                $nav->makeTree('en')->save();
                 $nav->save();
             });
     }

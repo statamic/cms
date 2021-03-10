@@ -37,6 +37,7 @@ mime_type: image/jpeg
 guessed_extension: jpg
 width: 30
 height: 60
+mime_type: image/jpeg
 
 EOT;
         $this->assertEquals($contents, $disk->get($path));

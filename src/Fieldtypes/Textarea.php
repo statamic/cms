@@ -10,6 +10,12 @@ class Textarea extends Fieldtype
     protected function configFieldItems(): array
     {
         return [
+            'placeholder' => [
+                'display' => __('Placeholder'),
+                'instructions' => __('statamic::fieldtypes.text.config.placeholder'),
+                'type' => 'text',
+                'width' => 50,
+            ],
             'character_limit' => [
                 'display' => __('Character Limit'),
                 'instructions' => __('statamic::fieldtypes.text.config.character_limit'),

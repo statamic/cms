@@ -9,6 +9,7 @@ use Statamic\Facades\Entry as EntryAPI;
 use Statamic\Stache\Repositories\EntryRepository;
 use Statamic\Stache\Stache;
 use Statamic\Stache\Stores\CollectionsStore;
+use Statamic\Stache\Stores\CollectionTreeStore;
 use Statamic\Stache\Stores\EntriesStore;
 use Statamic\Stache\Stores\NavigationStore;
 use Tests\TestCase;
@@ -29,6 +30,7 @@ class EntryRepositoryTest extends TestCase
             (new CollectionsStore($this->stache, app('files')))->directory($this->directory),
             (new EntriesStore($this->stache, app('files')))->directory($this->directory),
             (new NavigationStore($this->stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/navigation'),
+            (new CollectionTreeStore($this->stache, app('files')))->directory(__DIR__.'/../__fixtures__/content/structures/collections'),
         ]);
 
         $this->repo = new EntryRepository($this->stache);
