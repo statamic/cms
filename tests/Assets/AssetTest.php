@@ -192,14 +192,6 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_the_extension()
-    {
-        $this->assertEquals('jpg', (new Asset)->path('asset.jpg')->extension());
-        $this->assertEquals('txt', (new Asset)->path('asset.txt')->extension());
-        $this->assertNull((new Asset)->path('asset')->extension());
-    }
-
-    /** @test */
     public function it_checks_if_an_extension_matches()
     {
         $asset = (new Asset)->path('asset.jpg');
@@ -207,6 +199,21 @@ class AssetTest extends TestCase
         $this->assertTrue($asset->extensionIsOneof(['jpg']));
         $this->assertTrue($asset->extensionIsOneof(['jpg', 'txt']));
         $this->assertFalse($asset->extensionIsOneof(['txt', 'mp3']));
+    }
+
+    /** @test */
+    public function it_gets_the_extension_guessed_extension_and_mime_type()
+    {
+        Storage::fake('test');
+        Storage::disk('test')->put('.meta/foo.mp4a.yaml', YAML::dump(['mime_type' => 'audio/mp4']));
+
+        $container = Facades\AssetContainer::make('test')->disk('test');
+
+        $asset = (new Asset)->container($container)->path('foo.mp4a');
+
+        $this->assertEquals('audio/mp4', $asset->mimeType());
+        $this->assertEquals('m4a', $asset->guessedExtension());
+        $this->assertEquals('mp4a', $asset->extension());
     }
 
     /** @test */
@@ -348,6 +355,7 @@ class AssetTest extends TestCase
             'last_modified' => Carbon::parse('2012-01-02 4:57pm')->timestamp,
             'width' => 30,
             'height' => 60,
+            'mime_type' => 'image/jpeg',
         ];
 
         $metaWithData = [
@@ -356,6 +364,7 @@ class AssetTest extends TestCase
             'last_modified' => Carbon::parse('2012-01-02 4:57pm')->timestamp,
             'width' => 30,
             'height' => 60,
+            'mime_type' => 'image/jpeg',
         ];
 
         // The meta that's saved to file will also be cached, but will not include in-memory data...
@@ -399,6 +408,7 @@ class AssetTest extends TestCase
             'last_modified' => $timestamp,
             'width' => 30,
             'height' => 60,
+            'mime_type' => 'image/jpeg',
         ];
 
         Storage::disk('test')->put('foo/.meta/image.jpg.yaml', YAML::dump($incompleteMeta));
