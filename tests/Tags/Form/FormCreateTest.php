@@ -699,10 +699,10 @@ EOT
         preg_match_all('/<p class="inline-error">(.+)<\/p>/U', $output, $inlineErrors);
 
         $expected = [
-            'The Full Name must be at least 3 characters.',
-            'The Full Name may only contain letters and numbers.',
-            'The Email Address field is required.',
-            'The Message field is required.',
+            trans('validation.min.string', ['attribute' => 'Full Name', 'min' => 3]), // 'The Full Name must be at least 3 characters.',
+            trans('validation.alpha_num', ['attribute' => 'Full Name']), // 'The Full Name must only contain letters and numbers.',
+            trans('validation.required', ['attribute' => 'Email Address']), // 'The Email Address field is required.',
+            trans('validation.required', ['attribute' => 'Message']), // 'The Message field is required.',
         ];
 
         $expectedInline = [
