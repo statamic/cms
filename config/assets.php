@@ -142,7 +142,7 @@ return [
     |
     */
 
-    'cache_listings' => false,
+    'cache_listings' => env('STATAMIC_CACHE_ASSET_LISTINGS'),
 
     /*
     |--------------------------------------------------------------------------
