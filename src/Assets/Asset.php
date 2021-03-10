@@ -421,19 +421,22 @@ class Asset implements AssetContract, Augmentable
      */
     private function clearCaches()
     {
+        $container = $this->container();
+
+        $keys = [
+            $container->filesCacheKey('/', true),
+            $container->filesCacheKey('/', false),
+            $container->filesCacheKey($this->folder(), true),
+            $container->filesCacheKey($this->folder(), false),
+        ];
+
+        foreach ($keys as $key) {
+            Cache::forget($key);
+            Blink::forget($key);
+        }
+
         $this->meta = null;
-
         Cache::forget($this->metaCacheKey());
-
-        Cache::forget($this->container()->filesCacheKey('/', true));
-        Cache::forget($this->container()->filesCacheKey('/', false));
-        Cache::forget($this->container()->filesCacheKey($this->folder(), true));
-        Cache::forget($this->container()->filesCacheKey($this->folder(), false));
-
-        Blink::forget($this->container()->filesCacheKey('/', true));
-        Blink::forget($this->container()->filesCacheKey('/', false));
-        Blink::forget($this->container()->filesCacheKey($this->folder(), true));
-        Blink::forget($this->container()->filesCacheKey($this->folder(), false));
     }
 
     /**

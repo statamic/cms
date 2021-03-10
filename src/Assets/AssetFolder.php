@@ -133,14 +133,19 @@ class AssetFolder implements Contract, Arrayable
 
     private function clearCaches()
     {
-        Cache::forget($this->container()->foldersCacheKey('/', true));
-        Cache::forget($this->container()->foldersCacheKey('/', false));
-        Cache::forget($this->container()->foldersCacheKey($this->path(), true));
-        Cache::forget($this->container()->foldersCacheKey($this->path(), false));
-        Blink::forget($this->container()->foldersCacheKey('/', true));
-        Blink::forget($this->container()->foldersCacheKey('/', false));
-        Blink::forget($this->container()->foldersCacheKey($this->path(), true));
-        Blink::forget($this->container()->foldersCacheKey($this->path(), false));
+        $container = $this->container();
+
+        $keys = [
+            $container->foldersCacheKey('/', true),
+            $container->foldersCacheKey('/', false),
+            $container->foldersCacheKey($this->path(), true),
+            $container->foldersCacheKey($this->path(), false),
+        ];
+
+        foreach ($keys as $key) {
+            Cache::forget($key);
+            Blink::forget($key);
+        }
     }
 
     /**
