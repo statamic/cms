@@ -17,6 +17,7 @@ use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
@@ -110,7 +111,7 @@ class Asset implements AssetContract, Augmentable
             return false;
         }
 
-        return $this->disk()->exists($path);
+        return $this->container()->files()->contains($path);
     }
 
     public function meta($key = null)
@@ -420,11 +421,22 @@ class Asset implements AssetContract, Augmentable
      */
     private function clearCaches()
     {
-        $this->meta = null;
+        $container = $this->container();
 
+        $keys = [
+            $container->filesCacheKey('/', true),
+            $container->filesCacheKey('/', false),
+            $container->filesCacheKey($this->folder(), true),
+            $container->filesCacheKey($this->folder(), false),
+        ];
+
+        foreach ($keys as $key) {
+            Cache::forget($key);
+            Blink::forget($key);
+        }
+
+        $this->meta = null;
         Cache::forget($this->metaCacheKey());
-        Cache::forget($this->container()->filesCacheKey());
-        Cache::forget($this->container()->filesCacheKey($this->folder()));
     }
 
     /**

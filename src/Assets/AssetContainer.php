@@ -13,6 +13,7 @@ use Statamic\Events\AssetContainerDeleted;
 use Statamic\Events\AssetContainerSaved;
 use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Search;
@@ -219,16 +220,17 @@ class AssetContainer implements AssetContainerContract, Augmentable
      * @param bool $recursive
      * @return \Illuminate\Support\Collection
      */
-    public function files($folder = null, $recursive = false)
+    public function files($folder = '/', $recursive = false)
     {
         // When requesting files() as-is, we want all of them.
-        if ($folder == null) {
+        if (func_num_args() === 0) {
             $recursive = true;
         }
 
-        $cacheFor = config('statamic.assets.file_listing_cache_length', 60);
+        $key = $this->filesCacheKey($folder, $recursive);
+        $ttl = $this->fileListingCacheLength();
 
-        return Cache::remember($this->filesCacheKey($folder), $cacheFor, function () use ($folder, $recursive) {
+        $callback = function () use ($folder, $recursive) {
             $files = collect($this->disk()->getFiles($folder, $recursive));
 
             // Get rid of files we never want to show up.
@@ -239,12 +241,25 @@ class AssetContainer implements AssetContainerContract, Augmentable
             });
 
             return $files->values();
+        };
+
+        return Blink::once($key, function () use ($key, $ttl, $callback) {
+            return Cache::remember($key, $ttl, $callback);
         });
     }
 
-    public function filesCacheKey($folder = '/')
+    public function filesCacheKey($folder = '/', $recursive = false)
     {
-        return 'asset-files-'.$this->handle().'-'.$folder;
+        $rec = $recursive ? '-recursive' : '';
+
+        return 'asset-files-'.$this->handle().'-'.$folder.$rec;
+    }
+
+    public function foldersCacheKey($folder = '/', $recursive = false)
+    {
+        $rec = $recursive ? '-recursive' : '';
+
+        return 'asset-folders-'.$this->handle().'-'.$folder.$rec;
     }
 
     /**
@@ -254,19 +269,28 @@ class AssetContainer implements AssetContainerContract, Augmentable
      * @param bool $recursive
      * @return \Illuminate\Support\Collection
      */
-    public function folders($folder = null, $recursive = false)
+    public function folders($folder = '/', $recursive = false)
     {
         // When requesting folders() as-is, we want all of them.
-        if ($folder == null) {
+        if (func_num_args() === 0) {
             $folder = '/';
             $recursive = true;
         }
 
-        $paths = $this->disk()->getFolders($folder, $recursive);
+        $key = $this->foldersCacheKey($folder, $recursive);
+        $ttl = $this->fileListingCacheLength();
 
-        return collect($paths)->reject(function ($path) {
-            return basename($path) === '.meta';
-        })->values();
+        $callback = function () use ($folder, $recursive) {
+            $paths = $this->disk()->getFolders($folder, $recursive);
+
+            return collect($paths)->reject(function ($path) {
+                return basename($path) === '.meta';
+            })->values();
+        };
+
+        return Blink::once($key, function () use ($key, $ttl, $callback) {
+            return Cache::remember($key, $ttl, $callback);
+        });
     }
 
     /**
@@ -324,7 +348,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
     {
         $asset = Facades\Asset::make()->container($this)->path($path);
 
-        if (! $asset->disk()->exists($asset->path())) {
+        if (! $asset->exists()) {
             return null;
         }
 
@@ -489,5 +513,25 @@ class AssetContainer implements AssetContainerContract, Augmentable
     public static function __callStatic($method, $parameters)
     {
         return Facades\AssetContainer::{$method}(...$parameters);
+    }
+
+    private function fileListingCacheLength()
+    {
+        // @deprecated
+        $ttl = config('statamic.assets.file_listing_cache_length', false);
+
+        if (! $ttl) {
+            $ttl = config('statamic.assets.cache_listings', false);
+        }
+
+        if (! $ttl) {
+            return 0;
+        }
+
+        if ($ttl === true) {
+            return null;
+        }
+
+        return $ttl;
     }
 }

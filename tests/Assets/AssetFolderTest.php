@@ -152,6 +152,7 @@ class AssetFolderTest extends TestCase
 
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('disk')->andReturn($disk = Storage::disk('local'));
+        $container->shouldReceive('foldersCacheKey')->andReturn('irrelevant for test');
 
         $folder = (new Folder)
             ->container($container)
@@ -180,6 +181,15 @@ class AssetFolderTest extends TestCase
         $disk->put('path/to/sub/folder/subdirectory/five.txt', '');
         $this->assertCount(5, $disk->allFiles());
 
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/folder',
+            'path/to/sub',
+            'path/to/sub/folder',
+            'path/to/sub/folder/subdirectory',
+        ], $container->folders()->all());
+
         $folder = (new Folder)
             ->container($container)
             ->path('path/to/sub/folder');
@@ -189,6 +199,13 @@ class AssetFolderTest extends TestCase
         $this->assertEquals($folder, $return);
         $this->assertEquals(['path/to/folder/one.txt'], $disk->allFiles());
         $disk->assertMissing('path/to/sub/folder');
+
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/folder',
+            'path/to/sub',
+        ], $container->folders()->all());
 
         // TODO: assert about event
     }
