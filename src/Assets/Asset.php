@@ -10,7 +10,6 @@ use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ContainsData;
-use Statamic\Data\Data;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetSaved;
@@ -711,6 +710,16 @@ class Asset implements AssetContract, Augmentable
     public function extensionIsOneOf($filetypes = [])
     {
         return in_array(strtolower($this->extension()), $filetypes);
+    }
+
+    /**
+     * Check if asset's guessed file extension is one of a given list.
+     *
+     * @return string
+     */
+    public function guessedExtensionIsOneOf($filetypes = [])
+    {
+        return in_array(strtolower($this->guessedExtension()), $filetypes);
     }
 
     public function __toString()

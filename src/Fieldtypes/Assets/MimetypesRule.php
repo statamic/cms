@@ -6,16 +6,12 @@ use Illuminate\Contracts\Validation\Rule;
 use Statamic\Facades\Asset;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
-class MimesRule implements Rule
+class MimetypesRule implements Rule
 {
     protected $parameters;
 
     public function __construct($parameters)
     {
-        if (in_array('jpg', $parameters) || in_array('jpeg', $parameters)) {
-            $parameters = array_unique(array_merge($parameters, ['jpg', 'jpeg']));
-        }
-
         $this->parameters = $parameters;
     }
 
@@ -30,14 +26,13 @@ class MimesRule implements Rule
     {
         return collect($value)->every(function ($id) {
             if ($id instanceof UploadedFile) {
-                return in_array($id->guessExtension(), $this->parameters);
-            }
-
-            if (! $asset = Asset::find($id)) {
+                $mimeType = $id->getMimeType();
+            } elseif (! ($mimeType = optional(Asset::find($id))->mimeType())) {
                 return false;
             }
 
-            return $asset->guessedExtensionIsOneOf($this->parameters);
+            return in_array($mimeType, $this->parameters) ||
+                in_array(explode('/', $mimeType)[0].'/*', $this->parameters);
         });
     }
 
@@ -48,6 +43,6 @@ class MimesRule implements Rule
      */
     public function message()
     {
-        return str_replace(':values', join(', ', $this->parameters), __('statamic::validation.mimes'));
+        return str_replace(':values', join(', ', $this->parameters), __('statamic::validation.mimetypes'));
     }
 }
