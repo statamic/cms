@@ -11,6 +11,8 @@ Route::group(['prefix' => 'auth', 'namespace' => 'Auth'], function () {
 
     Route::get('password/reset', 'ForgotPasswordController@showLinkRequestForm')->name('password.request');
     Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.email');
+    Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset');
+    Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.action');
 
     Route::get('token', 'CsrfTokenController')->name('token');
     Route::get('extend', 'ExtendSessionController')->name('extend');
@@ -190,6 +192,11 @@ Route::middleware('statamic.cp.authenticated')->group(function () {
 
     Route::get('utilities', 'Utilities\UtilitiesController@index')->name('utilities.index');
     Utility::routes();
+
+    if (config('statamic.graphql.enabled')) {
+        Route::get('graphql', 'GraphQLController@index')->name('graphql.index');
+        Route::get('graphiql', 'GraphQLController@graphiql')->name('graphql.graphiql');
+    }
 
     Route::group(['prefix' => 'fieldtypes', 'namespace' => 'Fieldtypes'], function () {
         Route::get('relationship', 'RelationshipFieldtypeController@index')->name('relationship.index');

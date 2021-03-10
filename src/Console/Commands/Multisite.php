@@ -57,6 +57,7 @@ class Multisite extends Command
 
         Collection::all()->each(function ($collection) {
             $this->moveCollectionContent($collection);
+            $this->moveCollectionTrees($collection);
             $this->updateCollection($collection);
             $this->checkLine("Collection [<comment>{$collection->handle()}</comment>] updated.");
         });
@@ -157,15 +158,18 @@ class Multisite extends Command
 
     protected function updateCollection($collection)
     {
-        $collection->sites([$this->siteOne, $this->siteTwo]);
+        $collection
+            ->sites([$this->siteOne, $this->siteTwo])
+            ->save();
+    }
 
-        if ($structure = $collection->structureContents()) {
-            $tree = $structure['tree'];
-            $structure['tree'] = [$this->siteOne => $tree];
-            $collection->structureContents($structure);
+    protected function moveCollectionTrees($collection)
+    {
+        if (! $collection->structure()) {
+            return;
         }
 
-        $collection->save();
+        $collection->structure()->trees()->each->save();
     }
 
     protected function moveGlobalSet($set)
@@ -181,13 +185,11 @@ class Multisite extends Command
 
     protected function moveNav($nav)
     {
-        $yaml = YAML::file($nav->path())->parse();
-        $tree = $yaml['tree'] ?? [];
+        $default = $nav->trees()->first();
 
-        $nav
-            ->addTree($nav->makeTree($this->siteOne)->tree($tree))
-            ->addTree($nav->makeTree($this->siteTwo)->tree($tree))
-            ->save();
+        $default->save();
+
+        $nav->makeTree($this->siteTwo, $default->tree())->save();
     }
 
     protected function validateRunningOfCommand()

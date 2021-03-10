@@ -71,18 +71,21 @@ class LocalizeEntryTest extends TestCase
         $frAbout = EntryFactory::collection($collection)->slug('about')->locale('fr')->id('fr-about')->origin('about')->create();
         $enTeam = EntryFactory::collection($collection)->slug('team')->locale('en')->id('team')->create();
         $this->assertNull($enTeam->in('fr'));
-        $collection->structureContents(['root' => true, 'tree' => [
-            'en' => [
+        $collection->structureContents(['root' => true])->save();
+        $collection->structure()->in('en')->tree(
+            [
                 ['entry' => 'home'],
                 ['entry' => 'about', 'children' => [
                     ['entry' => 'team'],
                 ]],
-            ],
-            'fr' => [
+            ]
+        )->save();
+        $collection->structure()->in('fr')->tree(
+            [
                 ['entry' => 'fr-home'],
                 ['entry' => 'fr-about'],
-            ],
-        ]])->save();
+            ]
+        )->save();
 
         $this->assertEquals([
             ['entry' => 'fr-home'],
@@ -115,17 +118,20 @@ class LocalizeEntryTest extends TestCase
         $frAbout = EntryFactory::collection($collection)->slug('about')->locale('fr')->id('fr-about')->origin('about')->create();
         $enTeam = EntryFactory::collection($collection)->slug('team')->locale('en')->id('team')->create();
         $this->assertNull($enTeam->in('fr'));
-        $collection->structureContents(['root' => true, 'tree' => [
-            'en' => [
+        $collection->structureContents(['root' => true])->save();
+        $collection->structure()->in('en')->tree(
+            [
                 ['entry' => 'home'],
                 ['entry' => 'about'],
                 ['entry' => 'team'],
-            ],
-            'fr' => [
+            ]
+        )->save();
+        $collection->structure()->in('fr')->tree(
+            [
                 ['entry' => 'fr-home'],
                 ['entry' => 'fr-about'],
-            ],
-        ]])->save();
+            ]
+        )->save();
 
         $this->assertEquals([
             ['entry' => 'fr-home'],
@@ -156,17 +162,20 @@ class LocalizeEntryTest extends TestCase
         $enAbout = EntryFactory::collection($collection)->slug('about')->locale('en')->id('about')->create();
         $enTeam = EntryFactory::collection($collection)->slug('team')->locale('en')->id('team')->create();
         $this->assertNull($enTeam->in('fr'));
-        $collection->structureContents(['root' => true, 'tree' => [
-            'en' => [
+        $collection->structureContents(['root' => true])->save();
+        $collection->structure()->in('en')->tree(
+            [
                 ['entry' => 'home'],
                 ['entry' => 'about', 'children' => [
                     ['entry' => 'team'],
                 ]],
-            ],
-            'fr' => [
+            ]
+        )->save();
+        $collection->structure()->in('fr')->tree(
+            [
                 ['entry' => 'fr-home'],
-            ],
-        ]])->save();
+            ]
+        )->save();
 
         $this->assertEquals([
             ['entry' => 'fr-home'],

@@ -3,13 +3,13 @@
 namespace Statamic\Assets;
 
 use Illuminate\Contracts\Support\Arrayable;
+use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\AssetFolder as Contract;
 use Statamic\Events\AssetFolderDeleted;
 use Statamic\Events\AssetFolderSaved;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
-use Statamic\Facades\YAML;
-use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetFolder implements Contract, Arrayable
@@ -43,17 +43,7 @@ class AssetFolder implements Contract, Arrayable
         return pathinfo($this->path(), PATHINFO_BASENAME);
     }
 
-    public function title($title = null)
-    {
-        return $this
-            ->fluentlyGetOrSet('title')
-            ->getter(function ($title) {
-                return $title ?? $this->computedTitle();
-            })
-            ->args(func_get_args());
-    }
-
-    protected function computedTitle()
+    public function title()
     {
         return pathinfo($this->path(), PATHINFO_FILENAME);
     }
@@ -109,21 +99,9 @@ class AssetFolder implements Contract, Arrayable
 
     public function save()
     {
-        $path = $this->path().'/folder.yaml';
-
-        if ($this->title === $this->computedTitle()) {
-            $this->disk()->delete($path);
-
-            return $this;
-        }
-
         $this->disk()->makeDirectory($this->path());
 
-        $arr = Arr::removeNullValues(['title' => $this->title]);
-
-        if (! empty($arr)) {
-            $this->disk()->put($path, YAML::dump($arr));
-        }
+        $this->clearCaches();
 
         AssetFolderSaved::dispatch($this);
 
@@ -146,9 +124,28 @@ class AssetFolder implements Contract, Arrayable
         // Delete the actual folder that'll be leftover. It'll include any empty subfolders.
         $this->disk()->delete($this->path());
 
+        $this->clearCaches();
+
         AssetFolderDeleted::dispatch($this);
 
         return $this;
+    }
+
+    private function clearCaches()
+    {
+        $container = $this->container();
+
+        $keys = [
+            $container->foldersCacheKey('/', true),
+            $container->foldersCacheKey('/', false),
+            $container->foldersCacheKey($this->path(), true),
+            $container->foldersCacheKey($this->path(), false),
+        ];
+
+        foreach ($keys as $key) {
+            Cache::forget($key);
+            Blink::forget($key);
+        }
     }
 
     /**

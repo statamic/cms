@@ -27,8 +27,8 @@ class Cache
      */
     public function handle($request, Closure $next)
     {
-        if ($this->canBeCached($request) && ($cached = $this->cacher->getCachedPage($request))) {
-            return response($cached);
+        if ($this->canBeCached($request) && $this->cacher->hasCachedPage($request)) {
+            return response($this->cacher->getCachedPage($request));
         }
 
         $response = $next($request);

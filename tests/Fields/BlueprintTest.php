@@ -304,6 +304,7 @@ class BlueprintTest extends TestCase
             ->andReturn(new Field('field_two', [
                 'type' => 'textarea',
                 'display' => 'Two',
+                'placeholder' => null,
                 'instructions' => 'Two instructions',
                 'validate' => 'min:2',
             ]));
@@ -371,6 +372,7 @@ class BlueprintTest extends TestCase
                             'instructions' => 'Two instructions',
                             'required' => false,
                             'validate' => 'min:2',
+                            'placeholder' => null,
                             'character_limit' => null,
                             'component' => 'textarea',
                             'antlers' => false,
@@ -536,6 +538,37 @@ class BlueprintTest extends TestCase
             ],
         ]], $blueprint->contents());
         $this->assertEquals(['type' => 'textarea'], $blueprint->fields()->get('new')->config());
+    }
+
+    /** @test */
+    public function it_ensures_a_field_has_config()
+    {
+        $blueprint = (new Blueprint)->setContents(['sections' => [
+            'section_one' => [
+                'fields' => [
+                    ['handle' => 'title', 'field' => ['type' => 'text']],
+                    ['handle' => 'author', 'field' => ['type' => 'text', 'do_not_touch_other_config' => true]],
+                ],
+            ],
+            'section_two' => [
+                'fields' => [
+                    ['handle' => 'content', 'field' => ['type' => 'text']],
+                ],
+            ],
+        ]]);
+
+        $fields = $blueprint->ensureFieldHasConfig('author', ['read_only' => true])->fields();
+
+        $this->assertEquals(['type' => 'text'], $fields->get('title')->config());
+        $this->assertEquals(['type' => 'text'], $fields->get('content')->config());
+
+        $expectedConfig = [
+            'type' => 'text',
+            'do_not_touch_other_config' => true,
+            'read_only' => true,
+        ];
+
+        $this->assertEquals($expectedConfig, $fields->get('author')->config());
     }
 
     /** @test */

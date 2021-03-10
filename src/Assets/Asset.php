@@ -17,6 +17,7 @@ use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
+use Statamic\Facades\Blink;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
@@ -27,6 +28,7 @@ use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements AssetContract, Augmentable
 {
@@ -110,11 +112,15 @@ class Asset implements AssetContract, Augmentable
             return false;
         }
 
-        return $this->disk()->exists($path);
+        return $this->container()->files()->contains($path);
     }
 
-    public function meta()
+    public function meta($key = null)
     {
+        if (func_num_args() === 1) {
+            return $this->metaValue($key);
+        }
+
         if (! config('statamic.assets.cache_meta')) {
             return $this->generateMeta();
         }
@@ -134,6 +140,21 @@ class Asset implements AssetContract, Augmentable
         });
     }
 
+    private function metaValue($key)
+    {
+        $value = Arr::get($this->meta(), $key);
+
+        if (! is_null($value)) {
+            return $value;
+        }
+
+        Cache::forget($this->metaCacheKey());
+
+        $this->writeMeta($meta = $this->generateMeta());
+
+        return Arr::get($meta, $key);
+    }
+
     public function generateMeta()
     {
         $meta = ['data' => $this->data->all()];
@@ -146,6 +167,7 @@ class Asset implements AssetContract, Augmentable
                 'last_modified' => $this->disk()->lastModified($this->path()),
                 'width' => $dimensions[0],
                 'height' => $dimensions[1],
+                'mime_type' => $this->disk()->mimeType($this->path()),
             ]);
         }
 
@@ -354,13 +376,33 @@ class Asset implements AssetContract, Augmentable
     }
 
     /**
+     * Get the extension based on the mime type.
+     *
+     * @return string|null The guessed extension or null if it cannot be guessed
+     */
+    public function guessedExtension()
+    {
+        return MimeTypes::getDefault()->getExtensions($this->mimeType())[0] ?? null;
+    }
+
+    /**
+     * Get the mime type.
+     *
+     * @return string
+     */
+    public function mimeType()
+    {
+        return $this->meta('mime_type');
+    }
+
+    /**
      * Get the last modified time of the asset.
      *
      * @return \Carbon\Carbon
      */
     public function lastModified()
     {
-        return Carbon::createFromTimestamp($this->meta()['last_modified']);
+        return Carbon::createFromTimestamp($this->meta('last_modified'));
     }
 
     /**
@@ -401,11 +443,22 @@ class Asset implements AssetContract, Augmentable
      */
     private function clearCaches()
     {
-        $this->meta = null;
+        $container = $this->container();
 
+        $keys = [
+            $container->filesCacheKey('/', true),
+            $container->filesCacheKey('/', false),
+            $container->filesCacheKey($this->folder(), true),
+            $container->filesCacheKey($this->folder(), false),
+        ];
+
+        foreach ($keys as $key) {
+            Cache::forget($key);
+            Blink::forget($key);
+        }
+
+        $this->meta = null;
         Cache::forget($this->metaCacheKey());
-        Cache::forget($this->container()->filesCacheKey());
-        Cache::forget($this->container()->filesCacheKey($this->folder()));
     }
 
     /**
@@ -492,7 +545,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function dimensions()
     {
-        return [$this->meta()['width'], $this->meta()['height']];
+        return [$this->meta('width'), $this->meta('height')];
     }
 
     /**
@@ -554,7 +607,7 @@ class Asset implements AssetContract, Augmentable
      */
     public function size()
     {
-        return $this->meta()['size'];
+        return $this->meta('size');
     }
 
     /**

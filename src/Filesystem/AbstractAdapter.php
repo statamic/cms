@@ -2,6 +2,7 @@
 
 namespace Statamic\Filesystem;
 
+use Illuminate\Contracts\Filesystem\FileNotFoundException;
 use Statamic\Support\FileCollection;
 use Statamic\Support\Str;
 
@@ -9,11 +10,11 @@ abstract class AbstractAdapter implements Filesystem
 {
     public function get($path, $fallback = null)
     {
-        if (! $this->exists($path)) {
+        try {
+            return $this->filesystem->get($this->normalizePath($path)) ?: $fallback;
+        } catch (FileNotFoundException $e) {
             return $fallback;
         }
-
-        return $this->filesystem->get($this->normalizePath($path));
     }
 
     public function exists($path = null)

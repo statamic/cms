@@ -7,11 +7,17 @@
    transition: .12s ease-out;
 }
 
+.outside .white-label-logo {
+    @apply mx-auto mb-4;
+    max-width: 300px;
+}
+
+
 
 /* Rad Mode Stylez
   ========================================================================== */
 
-.outside.rad-mode {
+.outside.rad-theme {
     .auth-card {
         @apply .rounded-lg;
         box-shadow:

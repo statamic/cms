@@ -1,5 +1,122 @@
 # Release Notes
 
+## Unreleased
+
+### What's fixed
+- GraphQL will filter out draft entries from the entries query by default. [#3349](https://github.com/statamic/cms/issues/3349)
+
+
+
+## 3.1.0-alpha.4 (2020-03-08)
+
+### What's new
+- Collection and Nav Trees are now stored separately from their config. [#2768](https://github.com/statamic/cms/issues/2768)
+- Added configuration to make REST API resources opt-in. [#3318](https://github.com/statamic/cms/issues/3318)
+- Added a form endpoint to the REST API. [#3271](https://github.com/statamic/cms/issues/3271)
+- You can disable paste and input rules on Bard fields. [e23f2103](https://github.com/statamic/cms/commit/e23f2103)
+- You can add placeholder text to `textarea` fieldtypes. [dc8fb06f](https://github.com/statamic/cms/commit/dc8fb06f)
+
+### What's fixed
+- The REST API will filter out draft entries by default. [#3317](https://github.com/statamic/cms/issues/3317)
+- Full measure static caching no longer logs when creating the page. [#3255](https://github.com/statamic/cms/issues/3255)
+- Form fieldtypes now show data in the API rather than an empty object. [#3182](https://github.com/statamic/cms/issues/3182)
+- Removed the minimum character limit for search queries. [4327e68c](https://github.com/statamic/cms/commit/4327e68c)
+- Added the missing jpeg file type icon. [0c019840](https://github.com/statamic/cms/commit/0c019840)
+- Update scripts and lock file class will normalize versions even more normalized. [#3335](https://github.com/statamic/cms/issues/3335)
+- Brought over changes from 3.0.44-46
+
+### What's changing
+- A bunch of structure tree related things outlined in [#2768](https://github.com/statamic/cms/issues/2768)
+- A `hasCachedPage` method has been added to the `Statamic\StaticCaching\Cacher` interface.
+- GraphQL queries are all disabled by default. [#3289](https://github.com/statamic/cms/issues/3289)
+- Global search is now only triggered with a slash. (Not ctrl/alt/shift+f) [cad87068](https://github.com/statamic/cms/commit/cad87068)
+- Since REST API resources are now opt-in, everything will 404 until you update your config. [#3318](https://github.com/statamic/cms/issues/3318)
+
+
+
+## 3.1.0-alpha.3 (2020-02-11)
+
+### What's new
+- Add site and locale to entries. [#3205](https://github.com/statamic/cms/issues/3205)
+- Date fields in range mode can be queried in GraphQL. [#3223](https://github.com/statamic/cms/issues/3223)
+
+### What's fixed
+- Support separate logos for outside/inside. [cad7451e](https://github.com/statamic/cms/commit/cad7451e)
+- Fix date fields not augmenting ranges. [#3223](https://github.com/statamic/cms/issues/3223)
+- Brought over changes from 3.0.43
+
+### What's changing
+- The `@svg` directive has been renamed to `@cp_svg` to avoid potential conflicts. [#3186](https://github.com/statamic/cms/issues/3186)
+
+
+
+## 3.1.0-alpha.2 (2020-02-04)
+
+### What's new
+- Ability to query an entry by slug or URI in GraphQL. [#3193](https://github.com/statamic/cms/issues/3193)
+
+### What's fixed
+- Fixed GraphQL nested subfield handling for Replicator, Bard, and Grid fields. [#3202](https://github.com/statamic/cms/issues/3202)
+- Fixed Safari display issue. [#1999](https://github.com/statamic/cms/issues/1999)
+- Brought over changes from 3.0.41-42
+
+
+
+## 3.1.0-alpha.1 (2020-02-01)
+
+### What's new
+- GraphQL [#2982](https://github.com/statamic/cms/issues/2982)
+- White labeling [#3013](https://github.com/statamic/cms/issues/3013)
+- Update Scripts [#3024](https://github.com/statamic/cms/issues/3024)
+- API Caching [#3168](https://github.com/statamic/cms/issues/3168)
+- Nav and Collection structure tree API endpoints [#2999](https://github.com/statamic/cms/issues/2999)
+- Entry author permissions [#3053](https://github.com/statamic/cms/issues/3053)
+
+### What's changing
+- The `date` fieldtype now augments to Carbon instances. If you use them in Antlers without any modifiers, they will now be output using the default
+  `date_format` (e.g. January 1st, 2020). Previously, the raw value (e.g. 2020-01-02) would have been output. Actual entry dates (i.e. the `date` field) would have behaved this way already. If you were using a modifier (e.g. `format`), there will be no change.
+
+
+
+## 3.0.46 (2020-03-05)
+
+### What's new
+- You can get a user's email via a property. [#3331](https://github.com/statamic/cms/issues/3331)
+
+### What's fixed
+- Fix range field overflowing issue. [#3292](https://github.com/statamic/cms/issues/3292)
+- Show valid data for a Form fields in the content API. [#3270](https://github.com/statamic/cms/issues/3270)
+- Enable fixed toolbar on a Bard field inside a set. [#3240](https://github.com/statamic/cms/issues/3240)
+
+
+
+## 3.0.45 (2020-02-22)
+
+### What's new
+- Add new `chunk` modifier. [849ae0ccb](https://github.com/statamic/cms/commit/849ae0ccb)
+- Support `image` and `mimes` validation rules for assets. [#3253](https://github.com/statamic/cms/issues/3253)
+- Parameters can now access:nested:variables. [#3267](https://github.com/statamic/cms/issues/3267)
+- Added syringe icon. [#3232](https://github.com/statamic/cms/issues/3232)
+
+### What's improved
+- Improve Spanish translations. [#3243](https://github.com/statamic/cms/issues/3243)
+
+### What's fixed
+- Fix error when attempting to filter a collection by a single taxonomy. [#3244](https://github.com/statamic/cms/issues/3244)
+- Prevent deleting `select` field selections when in read only. [#3283](https://github.com/statamic/cms/issues/3283)
+- Preserve numeric keys in the `array` fieldtype. [#3284](https://github.com/statamic/cms/issues/3284)
+- Localize the taxonomy `terms` field. [#3172](https://github.com/statamic/cms/issues/3172)
+- Persist the `parent` when using the create another entry button. [#3285](https://github.com/statamic/cms/issues/3285)
+- Fix disabled `select` field styling issues. [#3275](https://github.com/statamic/cms/issues/3275)
+- Prevent excessive user database queries. [#3227](https://github.com/statamic/cms/issues/3227)
+- Handle null labels correctly in the `array` fieldtype. [#3260](https://github.com/statamic/cms/issues/3260)
+- Keep text field width within limits in Firefox. [#3258](https://github.com/statamic/cms/issues/3258)
+- Fix type error in `repeat` modifier. [#3261](https://github.com/statamic/cms/issues/3261)
+- The `date` fieldtype in a listing uses use the `date_format` setting. [#3264](https://github.com/statamic/cms/issues/3264)
+- Use `date_format` in updater changelogs. [#3246](https://github.com/statamic/cms/issues/3246)
+
+
+
 ## 3.0.44 (2020-02-17)
 
 ### What's fixed

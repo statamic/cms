@@ -130,6 +130,22 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Cache Directory Listings
+    |--------------------------------------------------------------------------
+    |
+    | When retrieving the contents of a particular directory, Statamic will
+    | read from disk which will provide the most up to date listings. You
+    | can choose to cache these to reduce overhead, but you will need
+    | to either update the cache manually or use the Control Panel.
+    |
+    | https://statamic.dev/knowledge-base/caching-asset-directory-listings
+    |
+    */
+
+    'cache_listings' => env('STATAMIC_CACHE_ASSET_LISTINGS'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Focal Point Editor
     |--------------------------------------------------------------------------
     |
