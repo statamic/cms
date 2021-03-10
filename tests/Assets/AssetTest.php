@@ -205,15 +205,15 @@ class AssetTest extends TestCase
     public function it_gets_the_extension_guessed_extension_and_mime_type()
     {
         Storage::fake('test');
-        Storage::disk('test')->put('.meta/foo.m3a.yaml', YAML::dump(['mime_type' => 'audio/mpeg']));
+        Storage::disk('test')->put('.meta/foo.mp4a.yaml', YAML::dump(['mime_type' => 'audio/mp4']));
 
         $container = Facades\AssetContainer::make('test')->disk('test');
 
-        $asset = (new Asset)->container($container)->path('foo.m3a');
+        $asset = (new Asset)->container($container)->path('foo.mp4a');
 
-        $this->assertEquals('audio/mpeg', $asset->mimeType());
-        $this->assertEquals('mp3', $asset->guessedExtension());
-        $this->assertEquals('m3a', $asset->extension());
+        $this->assertEquals('audio/mp4', $asset->mimeType());
+        $this->assertEquals('m4a', $asset->guessedExtension());
+        $this->assertEquals('mp4a', $asset->extension());
     }
 
     /** @test */
