@@ -2,8 +2,18 @@
 
 ## Unreleased
 
+## What's new
+- You can configure Statamic to use separate authentication from the rest of your app. [#3143](https://github.com/statamic/cms/issues/3143) 
+- Added support for the `mimetypes` validation rule. [#3290](https://github.com/statamic/cms/issues/3290)
+
+### What's improved
+- A whole bunch of Amazon S3 performance optimization. [#3353](https://github.com/statamic/cms/issues/3353) [#3354](https://github.com/statamic/cms/issues/3354) [#3359](https://github.com/statamic/cms/issues/3359) [#3362](https://github.com/statamic/cms/issues/3362)
+- The `mimes` and `image` validation rules now use the actual mime type rather than just the extension. [#3290](https://github.com/statamic/cms/issues/3290)
+
 ### What's fixed
 - GraphQL will filter out draft entries from the entries query by default. [#3349](https://github.com/statamic/cms/issues/3349)
+- Fix an error when there's missing asset metadata. It's now lazily loaded. [#3280](https://github.com/statamic/cms/issues/3280)
+- Brought over changes from 3.0.47
 
 
 
