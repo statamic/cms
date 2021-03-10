@@ -28,6 +28,7 @@ use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 use Stringy\Stringy;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements AssetContract, Augmentable
 {
@@ -166,6 +167,7 @@ class Asset implements AssetContract, Augmentable
                 'last_modified' => $this->disk()->lastModified($this->path()),
                 'width' => $dimensions[0],
                 'height' => $dimensions[1],
+                'mime_type' => $this->disk()->mimeType($this->path()),
             ]);
         }
 
@@ -371,6 +373,26 @@ class Asset implements AssetContract, Augmentable
     public function extension()
     {
         return Path::extension($this->path());
+    }
+
+    /**
+     * Get the extension based on the mime type.
+     *
+     * @return string|null The guessed extension or null if it cannot be guessed
+     */
+    public function guessedExtension()
+    {
+        return MimeTypes::getDefault()->getExtensions($this->mimeType())[0] ?? null;
+    }
+
+    /**
+     * Get the mime type.
+     *
+     * @return string
+     */
+    public function mimeType()
+    {
+        return $this->meta('mime_type');
     }
 
     /**
