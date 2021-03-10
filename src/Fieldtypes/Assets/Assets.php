@@ -173,10 +173,7 @@ class Assets extends Fieldtype
     {
         return collect(parent::fieldRules())->map(function ($rule) {
             $name = Str::before($rule, ':');
-
-            if ($parameters = Str::after($rule, ':')) {
-                $parameters = explode(',', $rule);
-            }
+            $parameters = explode(',', Str::after($rule, ':'));
 
             if ($name === 'image') {
                 return new ImageRule();
