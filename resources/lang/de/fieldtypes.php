@@ -16,6 +16,8 @@ return [
     'bard.config.always_show_set_button' => 'Ermöglicht das ständige Anzeigen des „Set hinzufügen“-Buttons.',
     'bard.config.buttons' => 'Auswählen, welche Buttons in der Symbolleiste angezeigt werden sollen.',
     'bard.config.container' => 'Datei-Container für dieses Feld auswählen.',
+    'bard.config.enable_input_rules' => 'Unterstützt beim Schreiben Tastenkombinationen im Markdown-Stil.',
+    'bard.config.enable_paste_rules' => 'Unterstützt beim Einfügen Tastenkombinationen im Markdown-Stil.',
     'bard.config.fullscreen' => 'Ermöglicht das Umschalten in den Vollbildmodus.',
     'bard.config.link_noopener' => 'Sämtliche Links mit `rel="noopener"` ausstatten.',
     'bard.config.link_noreferrer' => 'Sämtliche Links mit `rel="noreferrer"` ausstatten.',
