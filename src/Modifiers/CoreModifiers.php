@@ -1726,9 +1726,11 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function sanitize($value)
+    public function sanitize($value, $params)
     {
-        return htmlspecialchars($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), false);
+        $double_encode = (bool) Arr::get($params, 0, false);
+
+        return htmlspecialchars($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), $double_encode);
     }
 
     /**
