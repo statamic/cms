@@ -99,9 +99,11 @@ abstract class Store
 
     public function cacheIndexUsage($index)
     {
+        $index = $index instanceof Index ? $index->name() : $index;
+
         $indexes = $this->indexUsage();
 
-        if ($indexes->contains($index = $index->name())) {
+        if ($indexes->contains($index)) {
             $this->usedIndexes = $indexes;
 
             return;
@@ -357,6 +359,8 @@ abstract class Store
         Cache::forever($this->pathsCacheKey(), $paths->all());
 
         $this->paths = $paths;
+
+        $this->cacheIndexUsage('path');
     }
 
     protected function clearCachedPaths()
@@ -367,7 +371,7 @@ abstract class Store
 
     protected function pathsCacheKey()
     {
-        return "stache::indexes::{$this->key()}::_paths";
+        return "stache::indexes::{$this->key()}::path";
     }
 
     public function clear()
