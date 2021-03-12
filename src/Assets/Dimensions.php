@@ -35,7 +35,13 @@ class Dimensions
      */
     public function get()
     {
-        return $this->asset->isImage() ? $this->getImageDimensions() : [null, null];
+        if ($this->asset->isImage()) {
+            return $this->getImageDimensions();
+        } elseif ($this->asset->isSvg()) {
+            return $this->getSvgDimensions();
+        }
+
+        return [null, null];
     }
 
     /**
@@ -59,7 +65,7 @@ class Dimensions
     }
 
     /**
-     * Get the dimensions.
+     * Get the dimensions of an image.
      *
      * @return array
      */
@@ -85,6 +91,43 @@ class Dimensions
         $cache->delete($cachePath);
 
         return $size ? array_splice($size, 0, 2) : [null, null];
+    }
+
+    /**
+     * Get the dimensions of an SVG.
+     *
+     * @return array
+     */
+    private function getSVGDimensions()
+    {
+        // Since assets may be located on external platforms like Amazon S3, we can't simply
+        // grab the dimensions. So we'll copy it locally and read the dimensions from there.
+        $manager = new MountManager([
+            'source' => $this->asset->disk()->filesystem()->getDriver(),
+            'cache' => $cache = $this->getCacheFlysystem(),
+        ]);
+
+        $cachePath = "{$this->asset->containerId()}/{$this->asset->path()}";
+
+        if ($manager->has($destination = "cache://{$cachePath}")) {
+            $manager->delete($destination);
+        }
+
+        $manager->copy("source://{$this->asset->path()}", $destination);
+
+        $svg = simplexml_load_file($cache->getAdapter()->getPathPrefix().$cachePath);
+
+        $cache->delete($cachePath);
+
+        if ($svg['width'] && $svg['height']) {
+            return [(int) $svg['width'], (int) $svg['height']];
+        } elseif ($svg['viewBox']) {
+            $viewBox = preg_split('/[\s,]+/', $svg['viewBox'] ?: '');
+
+            return [$viewBox[2], $viewBox[3]];
+        }
+
+        return [null, null];
     }
 
     private function getCacheFlysystem()
