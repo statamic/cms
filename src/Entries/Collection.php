@@ -250,7 +250,7 @@ class Collection implements Contract, AugmentableContract
 
         return Blink::once($blink, function () use ($blueprint) {
             return is_null($blueprint)
-                ? $this->entryBlueprints()->first()
+                ? $this->entryBlueprints()->reject->hidden()->first()
                 : $this->entryBlueprints()->keyBy->handle()->get($blueprint);
         });
     }
