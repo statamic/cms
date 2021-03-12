@@ -3,13 +3,12 @@
 namespace Statamic\Assets;
 
 use Illuminate\Contracts\Support\Arrayable;
-use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\AssetFolder as Contract;
 use Statamic\Events\AssetFolderDeleted;
 use Statamic\Events\AssetFolderSaved;
 use Statamic\Facades\AssetContainer;
-use Statamic\Facades\Blink;
 use Statamic\Facades\Path;
+use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetFolder implements Contract, Arrayable
@@ -101,8 +100,6 @@ class AssetFolder implements Contract, Arrayable
     {
         $this->disk()->makeDirectory($this->path());
 
-        $this->clearCaches();
-
         AssetFolderSaved::dispatch($this);
 
         return $this;
@@ -124,28 +121,17 @@ class AssetFolder implements Contract, Arrayable
         // Delete the actual folder that'll be leftover. It'll include any empty subfolders.
         $this->disk()->delete($this->path());
 
-        $this->clearCaches();
+        $cache = $this->container->contents();
+        $cache->directories()->keys()->filter(function ($path) {
+            return Str::startsWith($path, $this->path());
+        })->each(function ($path) use ($cache) {
+            $cache->forget($path);
+        });
+        $cache->save();
 
         AssetFolderDeleted::dispatch($this);
 
         return $this;
-    }
-
-    private function clearCaches()
-    {
-        $container = $this->container();
-
-        $keys = [
-            $container->foldersCacheKey('/', true),
-            $container->foldersCacheKey('/', false),
-            $container->foldersCacheKey($this->path(), true),
-            $container->foldersCacheKey($this->path(), false),
-        ];
-
-        foreach ($keys as $key) {
-            Cache::forget($key);
-            Blink::forget($key);
-        }
     }
 
     /**

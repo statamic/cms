@@ -2,7 +2,6 @@
 
 namespace Statamic\Assets;
 
-use Illuminate\Support\Facades\Cache;
 use Statamic\Contracts\Assets\AssetContainer as AssetContainerContract;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
@@ -213,6 +212,18 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $this->disk;
     }
 
+    public function listContents()
+    {
+        return $this->contents()->all();
+    }
+
+    public function contents()
+    {
+        return Blink::once('asset-listing-cache-'.$this->handle(), function () {
+            return new AssetContainerContents($this);
+        });
+    }
+
     /**
      * Get all the asset files in this container.
      *
@@ -227,32 +238,28 @@ class AssetContainer implements AssetContainerContract, Augmentable
             $recursive = true;
         }
 
-        $key = $this->filesCacheKey($folder, $recursive);
-        $ttl = $this->fileListingCacheLength();
+        $files = $this->contents()->files();
 
-        $callback = function () use ($folder, $recursive) {
-            $files = collect($this->disk()->getFiles($folder, $recursive));
+        // Filter by folder and recursiveness. But don't bother if we're
+        // requesting the root recursively as it's already that way.
+        if ($folder === '/' && $recursive) {
+            //
+        } else {
+            $files = $files->filter(function ($file) use ($folder, $recursive) {
+                $dir = $file['dirname'] ?: '/';
 
-            // Get rid of files we never want to show up.
-            $files = $files->reject(function ($path) {
-                return Str::startsWith($path, '.meta/')
-                    || Str::contains($path, '/.meta/')
-                    || Str::endsWith($path, ['.DS_Store', '.gitkeep', '.gitignore']);
+                return $recursive ? Str::startsWith($dir, $folder) : $dir == $folder;
             });
+        }
 
-            return $files->values();
-        };
-
-        return Blink::once($key, function () use ($key, $ttl, $callback) {
-            return Cache::remember($key, $ttl, $callback);
+        // Get rid of files we never want to show up.
+        $files = $files->reject(function ($file, $path) {
+            return Str::startsWith($path, '.meta/')
+                || Str::contains($path, '/.meta/')
+                || Str::endsWith($path, ['.DS_Store', '.gitkeep', '.gitignore']);
         });
-    }
 
-    public function filesCacheKey($folder = '/', $recursive = false)
-    {
-        $rec = $recursive ? '-recursive' : '';
-
-        return 'asset-files-'.$this->handle().'-'.$folder.$rec;
+        return $files->keys();
     }
 
     public function foldersCacheKey($folder = '/', $recursive = false)
@@ -273,24 +280,28 @@ class AssetContainer implements AssetContainerContract, Augmentable
     {
         // When requesting folders() as-is, we want all of them.
         if (func_num_args() === 0) {
-            $folder = '/';
             $recursive = true;
         }
 
-        $key = $this->foldersCacheKey($folder, $recursive);
-        $ttl = $this->fileListingCacheLength();
+        $files = $this->contents()->directories();
 
-        $callback = function () use ($folder, $recursive) {
-            $paths = $this->disk()->getFolders($folder, $recursive);
+        // Filter by folder and recursiveness. But don't bother if we're
+        // requesting the root recursively as it's already that way.
+        if ($folder === '/' && $recursive) {
+            //
+        } else {
+            $files = $files->filter(function ($file) use ($folder, $recursive) {
+                $dir = $file['dirname'] ?: '/';
 
-            return collect($paths)->reject(function ($path) {
-                return basename($path) === '.meta';
-            })->values();
-        };
+                return $recursive ? Str::startsWith($dir, $folder) : $dir == $folder;
+            });
+        }
 
-        return Blink::once($key, function () use ($key, $ttl, $callback) {
-            return Cache::remember($key, $ttl, $callback);
+        $files = $files->reject(function ($file) {
+            return $file['basename'] == '.meta';
         });
+
+        return $files->keys();
     }
 
     /**
@@ -300,9 +311,17 @@ class AssetContainer implements AssetContainerContract, Augmentable
      * @param bool $recursive Whether to look for assets recursively
      * @return AssetCollection
      */
-    public function assets($folder = null, $recursive = false)
+    public function assets($folder = '/', $recursive = false)
     {
         $query = $this->queryAssets();
+
+        if (func_num_args() === 0) {
+            $recursive = true;
+        }
+
+        if ($folder === '/' && $recursive) {
+            $folder = null;
+        }
 
         if ($folder && $recursive) {
             $query->where('folder', 'like', "{$folder}%");
@@ -335,7 +354,10 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function makeAsset($path)
     {
-        return AssetAPI::make()->path($path)->container($this);
+        return AssetAPI::make()
+            ->path($path)
+            ->container($this)
+            ->syncOriginal();
     }
 
     /**
@@ -513,25 +535,5 @@ class AssetContainer implements AssetContainerContract, Augmentable
     public static function __callStatic($method, $parameters)
     {
         return Facades\AssetContainer::{$method}(...$parameters);
-    }
-
-    private function fileListingCacheLength()
-    {
-        // @deprecated
-        $ttl = config('statamic.assets.file_listing_cache_length', false);
-
-        if (! $ttl) {
-            $ttl = config('statamic.assets.cache_listings', false);
-        }
-
-        if (! $ttl) {
-            return 0;
-        }
-
-        if ($ttl === true) {
-            return null;
-        }
-
-        return $ttl;
     }
 }

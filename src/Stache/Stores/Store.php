@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Stache\Indexes;
+use Statamic\Stache\Indexes\Index;
 
 abstract class Store
 {
@@ -24,7 +25,7 @@ abstract class Store
 
     public function directory($directory = null)
     {
-        if ($directory === null) {
+        if (func_num_args() === 0) {
             return $this->directory;
         }
 

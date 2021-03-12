@@ -73,6 +73,10 @@ return [
             'directory' => base_path('content/assets'),
         ],
 
+        'assets' => [
+            'class' => Stores\AssetsStore::class,
+        ],
+
         'users' => [
             'class' => Stores\UsersStore::class,
             'directory' => base_path('users'),

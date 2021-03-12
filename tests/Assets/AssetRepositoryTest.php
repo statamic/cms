@@ -6,12 +6,14 @@ use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\AssetRepository;
-use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
 class AssetRepositoryTest extends TestCase
 {
+    use PreventSavingStacheItemsToDisk;
+
     /** @test */
     public function it_saves_the_meta_file_to_disk()
     {
@@ -22,8 +24,8 @@ class AssetRepositoryTest extends TestCase
         $realFilePath = Storage::disk('test')->getAdapter()->getPathPrefix().'foo/image.jpg';
         touch($realFilePath, $timestamp = Carbon::now()->subMinutes(3)->timestamp);
 
-        $container = AssetContainer::make('test')->disk('test');
-        $asset = Asset::make()->container($container)->path('foo/image.jpg');
+        $container = tap(AssetContainer::make('test')->disk('test'))->save();
+        $asset = $container->makeAsset('foo/image.jpg');
         $disk->assertMissing('foo/.meta/image.jpg.yaml');
 
         (new AssetRepository)->save($asset);

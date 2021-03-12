@@ -3,6 +3,7 @@
 namespace Statamic\Stache;
 
 use Illuminate\Support\ServiceProvider as LaravelServiceProvider;
+use Statamic\Assets\QueryBuilder as AssetQueryBuilder;
 use Statamic\Facades\File;
 use Statamic\Facades\Site;
 use Statamic\Stache\Query\EntryQueryBuilder;
@@ -25,6 +26,10 @@ class ServiceProvider extends LaravelServiceProvider
 
         $this->app->bind(EntryQueryBuilder::class, function () {
             return new EntryQueryBuilder($this->app->make(Stache::class)->store('entries'));
+        });
+
+        $this->app->bind(AssetQueryBuilder::class, function () {
+            return new AssetQueryBuilder($this->app->make(Stache::class)->store('assets'));
         });
     }
 
@@ -53,7 +58,7 @@ class ServiceProvider extends LaravelServiceProvider
         $stores = $nativeStores->merge(collect($published)->diffKeys($nativeStores));
 
         $stores = $stores->map(function ($config) {
-            return app($config['class'])->directory($config['directory']);
+            return app($config['class'])->directory($config['directory'] ?? null);
         });
 
         $stache->registerStores($stores->all());

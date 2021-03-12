@@ -25,8 +25,14 @@ class Value extends Index
             return $item->entriesCount();
         }
 
-        return method_exists($item, $method)
-            ? $item->{$method}()
-            : $item->value($this->name);
+        if (method_exists($item, $method)) {
+            return $item->{$method}();
+        }
+
+        if (method_exists($item, 'value')) {
+            return $item->value($this->name);
+        }
+
+        return $item->get($this->name);
     }
 }
