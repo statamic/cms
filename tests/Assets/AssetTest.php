@@ -783,7 +783,6 @@ class AssetTest extends TestCase
     /** @test */
     public function it_can_upload_a_file()
     {
-        ray()->clearAll();
         Event::fake();
         $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg');
         Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
