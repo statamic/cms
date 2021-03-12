@@ -335,7 +335,7 @@ class AssetContainerTest extends TestCase
         ]));
 
         $cacheHits = 0;
-        Event::listen(function (CacheHit $event) use (&$cacheHits, $cacheKey) {
+        Event::listen(CacheHit::class, function ($event) use (&$cacheHits, $cacheKey) {
             if ($event->key === $cacheKey) {
                 $cacheHits++;
             }
@@ -401,7 +401,7 @@ class AssetContainerTest extends TestCase
         ]));
 
         $cacheHits = 0;
-        Event::listen(function (CacheHit $event) use (&$cacheHits, $cacheKey) {
+        Event::listen(CacheHit::class, function ($event) use (&$cacheHits, $cacheKey) {
             if ($event->key === $cacheKey) {
                 $cacheHits++;
             }
