@@ -233,6 +233,28 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_first_non_hidden_entry_blueprint()
+    {
+        $collection = (new Collection)->handle('blog');
+
+        BlueprintRepository::shouldReceive('in')->with('collections/blog')->andReturn(collect([
+            'apple' => $blueprintOne = (new Blueprint)->setHandle('apple')->setHidden(true),
+            'berry' => $blueprintTwo = (new Blueprint)->setHandle('berry'),
+            'cherry' => $blueprintThree = (new Blueprint)->setHandle('cherry')->setHidden(true),
+        ]));
+
+        $blueprints = $collection->entryBlueprints();
+
+        $this->assertCount(3, $blueprints);
+
+        // Assert that it ignores hidden blueprints by default.
+        $this->assertEquals($blueprintTwo, $collection->entryBlueprint());
+
+        // But assert that it can still get a specific blueprint for editing the blueprint, etc.
+        $this->assertEquals($blueprintThree, $collection->entryBlueprint('cherry'));
+    }
+
+    /** @test */
     public function no_existing_blueprints_will_fall_back_to_a_default_named_after_the_collection()
     {
         $collection = (new Collection)->handle('blog');
