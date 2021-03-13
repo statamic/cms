@@ -324,7 +324,7 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         }
 
         if ($isNew && is_null($this->localizations)) {
-            \Statamic\Facades\Site::all()
+            Site::all()
                 ->filter(function ($site) {
                     return $site->autoPublish();
                 })
