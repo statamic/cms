@@ -5,8 +5,8 @@ namespace Statamic\Actions;
 use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Entries\Entry;
-use Statamic\Contracts\Taxonomies\Term;
 use Statamic\Contracts\Forms\Submission;
+use Statamic\Contracts\Taxonomies\Term;
 
 class Delete extends Action
 {
