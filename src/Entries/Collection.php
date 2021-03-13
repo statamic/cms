@@ -329,7 +329,7 @@ class Collection implements Contract, AugmentableContract
     public function autoPublish($autoPublish = null)
     {
         return $this
-            ->fluentlyGetOrSet('autopublish')
+            ->fluentlyGetOrSet('autoPublish')
             ->getter(function ($autoPublish) {
                 return $autoPublish ?? false;
             })
@@ -451,6 +451,10 @@ class Collection implements Contract, AugmentableContract
 
         if ($this->hasStructure()) {
             $array['structure'] = $this->structureContents();
+        }
+
+        if ($this->autoPublish()) {
+            $array['autopublish'] = $this->autoPublish();
         }
 
         return $array;
