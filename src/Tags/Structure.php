@@ -64,7 +64,7 @@ class Structure extends Tags
                 'depth'       => $depth,
                 'is_current'  => rtrim(URL::getCurrent(), '/') == rtrim($page->url(), '/'),
                 'is_parent'   => Site::current()->url() === $page->url() ? false : URL::isAncestorOf(URL::getCurrent(), $page->url()),
-                'is_external' => URL::isExternal($page->absoluteUrl()),
+                'is_external' => URL::isExternal($page->url()),
             ]);
         })->filter()->values()->all();
     }
