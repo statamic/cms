@@ -19,7 +19,7 @@ class Delete extends Action
 
     public function visibleTo($item)
     {
-        if ($item instanceof Asset || $item instanceof Term || $item instanceof Submission || $item instanceof UserContract ) {
+        if ($item instanceof Asset || $item instanceof Term || $item instanceof Submission || $item instanceof UserContract) {
             return true;
         }
 
