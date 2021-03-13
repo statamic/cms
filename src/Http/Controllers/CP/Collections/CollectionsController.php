@@ -421,7 +421,7 @@ class CollectionsController extends CpController
                     'autopublish' => [
                         'type' => 'toggle',
                         'display' => __('Auto Publish'),
-                        'instructions' => __('Should new entries in this collection automatically be published to all other localizations?'),
+                        'instructions' => __('statamic::messages.collection_configure_autopublish_instructions'),
                     ],
                 ],
             ];
