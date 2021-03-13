@@ -730,6 +730,42 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_auto_publishes_entry_if_configured()
+    {
+        $this->markTestIncomplete();
+
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)->handle('pages')->autoPublish(true)->save();
+        $entry = (new Entry)->id('a')->locale('en')->collection($collection);
+
+        Facades\Entry::shouldReceive('save')->with($entry);
+        Facades\Entry::shouldReceive('taxonomize')->with($entry);
+        Facades\Entry::shouldReceive('find')->with('a')->times(2)->andReturn(null, $entry);
+        Facades\Entry::shouldReceive('make')->andReturn(new Entry);
+
+        Facades\Entry::shouldReceive('save');
+        Facades\Entry::shouldReceive('taxonomize');
+        Facades\Entry::shouldReceive('find')->with(null)->andReturn(new Entry);
+
+        Facades\Collection::shouldReceive('findByHandle')->with('pages')->andReturn($collection);
+        Facades\Collection::shouldReceive('findByMount');
+
+        $return = $entry->save();
+
+        // For some reason $entry doesn't have any $localizations at this point...
+    }
+
+    /** @test */
     public function if_saving_event_returns_false_the_entry_doesnt_save()
     {
         Facades\Entry::spy();
