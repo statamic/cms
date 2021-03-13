@@ -2,8 +2,11 @@
 
 namespace Statamic\Actions;
 
+use Statamic\Contracts\Assets\Asset;
 use Statamic\Contracts\Auth\User as UserContract;
 use Statamic\Contracts\Entries\Entry;
+use Statamic\Contracts\Taxonomies\Term;
+use Statamic\Contracts\Forms\Submission;
 
 class Delete extends Action
 {
@@ -16,6 +19,10 @@ class Delete extends Action
 
     public function visibleTo($item)
     {
+        if ($item instanceof Asset || $item instanceof Term || $item instanceof Submission || $item instanceof UserContract ) {
+            return true;
+        }
+
         return $item instanceof Entry && $item->collection()->sites()->count() === 1;
     }
 
