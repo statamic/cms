@@ -324,16 +324,16 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
         }
 
         if ($isNew && is_null($this->localizations)) {
-            Site::all()
-                ->filter(function ($site) {
-                    return $site->autoPublish();
-                })
-                ->reject(function ($site) {
-                    return $site->handle() === $this->site()->handle();
-                })
-                ->each(function ($site) {
-                    $this->makeLocalization($site->handle())->saveQuietly();
-                });
+            // Site::all()
+            //     ->filter(function ($site) {
+            //         return $site->autoPublish();
+            //     })
+            //     ->reject(function ($site) {
+            //         return $site->handle() === $this->site()->handle();
+            //     })
+            //     ->each(function ($site) {
+            //         $this->makeLocalization($site->handle())->saveQuietly();
+            //     });
         }
 
         return true;
