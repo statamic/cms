@@ -4,7 +4,6 @@ namespace Statamic\Sites;
 
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
-use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
 class Site implements Augmentable
@@ -71,11 +70,6 @@ class Site implements Augmentable
         return $path === '' ? '/' : $path;
     }
 
-    public function autoPublish()
-    {
-        return Arr::get($this->config, 'autopublish', false);
-    }
-
     private function removePath($url)
     {
         $parsed = parse_url($url);
@@ -91,7 +85,6 @@ class Site implements Augmentable
             'locale' => $this->locale(),
             'short_locale' => $this->shortLocale(),
             'url' => $this->url(),
-            'autopublish' => $this->autopublish(),
         ];
     }
 
