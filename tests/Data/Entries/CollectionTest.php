@@ -172,6 +172,27 @@ class CollectionTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_auto_publish_configuration_from_collection()
+    {
+        $collection = new Collection;
+        $collection->autoPublish(true);
+
+        $return = $collection->autoPublish();
+
+        $this->assertTrue($return);
+    }
+
+    /** @test */
+    public function it_gets_default_auto_publish_configuration()
+    {
+        $collection = new Collection;
+
+        $return = $collection->autoPublish();
+
+        $this->assertFalse($return);
+    }
+
+    /** @test */
     public function it_stores_cascading_data_in_a_collection()
     {
         $collection = new Collection;

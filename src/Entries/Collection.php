@@ -36,6 +36,7 @@ class Collection implements Contract, AugmentableContract
     protected $template;
     protected $layout;
     protected $sites;
+    protected $autoPublish;
     protected $blueprints = [];
     protected $searchIndex;
     protected $dated = false;
@@ -325,6 +326,16 @@ class Collection implements Contract, AugmentableContract
             ->args(func_get_args());
     }
 
+    public function autoPublish($autoPublish = null)
+    {
+        return $this
+            ->fluentlyGetOrSet('autopublish')
+            ->getter(function ($autoPublish) {
+                return $autoPublish ?? false;
+            })
+            ->args(func_get_args());
+    }
+
     public function template($template = null)
     {
         return $this
@@ -477,6 +488,7 @@ class Collection implements Contract, AugmentableContract
             'default_publish_state' => $this->defaultPublishState,
             'amp' => $this->ampable,
             'sites' => $this->sites,
+            'autopublish' => $this->autoPublish,
             'template' => $this->template,
             'layout' => $this->layout,
             'cascade' => $this->cascade->all(),
