@@ -745,12 +745,12 @@ class EntryTest extends TestCase
             ],
         ]);
 
-        $collection = (new Collection)->handle('pages')->autoPublish(true)->save();
+        $collection = (new Collection)->handle('pages')->autoPublish(true)->sites(['en', 'fr', 'de'])->save();
         $entry = (new Entry)->id('a')->locale('en')->collection($collection);
 
         Facades\Entry::shouldReceive('save')->with($entry);
         Facades\Entry::shouldReceive('taxonomize')->with($entry);
-        Facades\Entry::shouldReceive('find')->with('a')->times(2)->andReturn(null, $entry);
+        Facades\Entry::shouldReceive('find')->with('a')->andReturn(null, $entry);
         Facades\Entry::shouldReceive('make')->andReturn(new Entry);
 
         Facades\Entry::shouldReceive('save');
