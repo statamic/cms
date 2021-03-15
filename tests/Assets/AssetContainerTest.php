@@ -3,9 +3,11 @@
 namespace Tests\Assets;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Cache\Events\CacheHit;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
@@ -283,24 +285,23 @@ class AssetContainerTest extends TestCase
     /** @test */
     public function it_gets_the_files_from_the_filesystem_only_once()
     {
-        config(['statamic.assets.cache_listings' => 60]);
         Carbon::setTestNow(now()->startOfMinute());
 
         $disk = $this->mock(Filesystem::class);
-        $disk->shouldReceive('getFiles')
+        $disk->shouldReceive('filesystem->getDriver->listContents')
             ->with('/', true)
             ->once()
-            ->andReturn(collect([
-                '.meta/one.jpg.yaml',
-                '.DS_Store',
-                '.gitignore',
-                'one.jpg',
-                'two.jpg',
-            ]));
+            ->andReturn([
+                '.meta/one.jpg.yaml' => ['type' => 'file', 'path' => '.meta/one.jpg.yaml', 'basename' => 'one.jpg.yaml'],
+                '.DS_Store' => ['type' => 'file', 'path' => '.DS_Store', 'basename' => '.DS_Store'],
+                '.gitignore' => ['type' => 'file', 'path' => '.gitignore', 'basename' => '.gitignore'],
+                'one.jpg' => ['type' => 'file', 'path' => 'one.jpg', 'basename' => 'one.jpg'],
+                'two.jpg' => ['type' => 'file', 'path' => 'two.jpg', 'basename' => 'two.jpg'],
+            ]);
 
         File::shouldReceive('disk')->with('test')->andReturn($disk);
 
-        $this->assertFalse(Cache::has($cacheKey = 'asset-files-test-/-recursive'));
+        $this->assertFalse(Cache::has($cacheKey = 'asset-list-contents-test'));
         $this->assertFalse(Blink::has($cacheKey));
 
         $container = (new AssetContainer)->handle('test')->disk('test');
@@ -312,36 +313,59 @@ class AssetContainerTest extends TestCase
         $this->assertEquals($expected, $first->all());
         $this->assertEquals($expected, $second->all());
         $this->assertTrue(Cache::has($cacheKey));
-        $this->assertTrue(Blink::has($cacheKey));
 
-        Carbon::setTestNow(now()->addSeconds(60));
+        Carbon::setTestNow(now()->addYears(5)); // i.e. forever.
         $this->assertTrue(Cache::has($cacheKey));
-        $this->assertTrue(Blink::has($cacheKey));
-        Carbon::setTestNow(now()->addSeconds(1));
-        $this->assertFalse(Cache::has($cacheKey));
-        $this->assertTrue(Blink::has($cacheKey));
+    }
+
+    /** @test */
+    public function it_gets_the_files_from_the_cache_only_once()
+    {
+        $cacheKey = 'asset-list-contents-test';
+
+        Cache::put($cacheKey, collect([
+            '.meta/one.jpg.yaml' => ['type' => 'file', 'path' => '.meta/one.jpg.yaml', 'basename' => 'one.jpg.yaml'],
+            '.DS_Store' => ['type' => 'file', 'path' => '.DS_Store', 'basename' => '.DS_Store'],
+            '.gitignore' => ['type' => 'file', 'path' => '.gitignore', 'basename' => '.gitignore'],
+            'one.jpg' => ['type' => 'file', 'path' => 'one.jpg', 'basename' => 'one.jpg'],
+            'two.jpg' => ['type' => 'file', 'path' => 'two.jpg', 'basename' => 'two.jpg'],
+        ]));
+
+        $cacheHits = 0;
+        Event::listen(CacheHit::class, function ($event) use (&$cacheHits, $cacheKey) {
+            if ($event->key === $cacheKey) {
+                $cacheHits++;
+            }
+        });
+
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        $expected = ['one.jpg', 'two.jpg'];
+        $this->assertEquals($expected, $container->files()->all());
+        $this->assertEquals(1, $cacheHits);
+        $this->assertEquals($expected, $container->files()->all());
+        $this->assertEquals(1, $cacheHits);
     }
 
     /** @test */
     public function it_gets_the_folders_from_the_filesystem_only_once()
     {
-        config(['statamic.assets.cache_listings' => 60]);
         Carbon::setTestNow(now()->startOfMinute());
 
         $disk = $this->mock(Filesystem::class);
-        $disk->shouldReceive('getFolders')
+        $disk->shouldReceive('filesystem->getDriver->listContents')
             ->with('/', true)
             ->once()
-            ->andReturn(collect([
-                '.meta',
-                'one',
-                'one/.meta',
-                'two',
-            ]));
+            ->andReturn([
+                '.meta' => ['type' => 'dir', 'path' => '.meta', 'basename' => '.meta'],
+                'one' => ['type' => 'dir', 'path' => 'one', 'basename' => 'one'],
+                'one/.meta' => ['type' => 'dir', 'path' => 'one/.meta', 'basename' => '.meta'],
+                'two' => ['type' => 'dir', 'path' => 'two', 'basename' => 'two'],
+            ]);
 
         File::shouldReceive('disk')->with('test')->andReturn($disk);
 
-        $this->assertFalse(Cache::has($cacheKey = 'asset-folders-test-/-recursive'));
+        $this->assertFalse(Cache::has($cacheKey = 'asset-list-contents-test'));
         $this->assertFalse(Blink::has($cacheKey));
 
         $container = (new AssetContainer)->handle('test')->disk('test');
@@ -353,14 +377,43 @@ class AssetContainerTest extends TestCase
         $this->assertEquals($expected, $first->all());
         $this->assertEquals($expected, $second->all());
         $this->assertTrue(Cache::has($cacheKey));
-        $this->assertTrue(Blink::has($cacheKey));
 
-        Carbon::setTestNow(now()->addSeconds(60));
+        Carbon::setTestNow(now()->addYears(5)); // i.e. forever.
         $this->assertTrue(Cache::has($cacheKey));
-        $this->assertTrue(Blink::has($cacheKey));
-        Carbon::setTestNow(now()->addSeconds(1));
-        $this->assertFalse(Cache::has($cacheKey));
-        $this->assertTrue(Blink::has($cacheKey));
+    }
+
+    /** @test */
+    public function it_gets_the_folders_from_the_cache_and_blink_only_once()
+    {
+        $cacheKey = 'asset-list-contents-test';
+
+        Cache::put($cacheKey, collect([
+            '.meta' => ['type' => 'dir', 'path' => '.meta', 'basename' => '.meta'],
+            'one' => ['type' => 'dir', 'path' => 'one', 'basename' => 'one'],
+            'one/.meta' => ['type' => 'dir', 'path' => 'one/.meta', 'basename' => '.meta'],
+            'two' => ['type' => 'dir', 'path' => 'two', 'basename' => 'two'],
+        ]));
+
+        $cacheHits = 0;
+        Event::listen(CacheHit::class, function ($event) use (&$cacheHits, $cacheKey) {
+            if ($event->key === $cacheKey) {
+                $cacheHits++;
+            }
+        });
+
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        $expected = ['one', 'two'];
+        $this->assertEquals($expected, $container->folders()->all());
+        $this->assertEquals(1, $cacheHits);
+        $this->assertEquals($expected, $container->folders()->all());
+        $this->assertEquals(1, $cacheHits);
+
+        // This checks that we're using blink to persist across instances in case the container
+        // was newed up again. If wouldn't persist if we simply put the cache into a property.
+        $anotherInstanceOfTheContainer = (new AssetContainer)->handle('test')->disk('test');
+        $this->assertEquals($expected, $anotherInstanceOfTheContainer->folders()->all());
+        $this->assertEquals(1, $cacheHits);
     }
 
     /** @test */
@@ -466,6 +519,10 @@ class AssetContainerTest extends TestCase
             'root' => __DIR__.'/__fixtures__/container',
         ]]);
 
-        return (new AssetContainer)->handle('test')->disk('test');
+        $container = (new AssetContainer)->handle('test')->disk('test');
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->andReturn($container);
+
+        return $container;
     }
 }

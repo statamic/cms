@@ -7,6 +7,7 @@ use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\File;
 use Statamic\Facades\Path;
 use Statamic\Stache\Indexes;
+use Statamic\Stache\Indexes\Index;
 
 abstract class Store
 {
@@ -24,7 +25,7 @@ abstract class Store
 
     public function directory($directory = null)
     {
-        if ($directory === null) {
+        if (func_num_args() === 0) {
             return $this->directory;
         }
 
@@ -99,9 +100,11 @@ abstract class Store
 
     public function cacheIndexUsage($index)
     {
+        $index = $index instanceof Index ? $index->name() : $index;
+
         $indexes = $this->indexUsage();
 
-        if ($indexes->contains($index = $index->name())) {
+        if ($indexes->contains($index)) {
             $this->usedIndexes = $indexes;
 
             return;
@@ -357,6 +360,8 @@ abstract class Store
         Cache::forever($this->pathsCacheKey(), $paths->all());
 
         $this->paths = $paths;
+
+        $this->cacheIndexUsage('path');
     }
 
     protected function clearCachedPaths()
@@ -367,7 +372,7 @@ abstract class Store
 
     protected function pathsCacheKey()
     {
-        return "stache::indexes::{$this->key()}::_paths";
+        return "stache::indexes::{$this->key()}::path";
     }
 
     public function clear()

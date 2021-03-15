@@ -3,6 +3,7 @@
 namespace Tests\Assets;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetFolder as Folder;
@@ -13,6 +14,16 @@ use Tests\TestCase;
 
 class AssetFolderTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        // use the file cache driver so we can test that the cached file listings
+        // are coming from the cache and not just the in-memory collection
+        config(['cache.default' => 'file']);
+        Cache::clear();
+    }
+
     /** @test */
     public function it_gets_and_sets_the_container()
     {
@@ -171,6 +182,7 @@ class AssetFolderTest extends TestCase
     {
         Storage::fake('local');
         $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         Facades\AssetContainer::shouldReceive('save')->with($container);
 
         $disk = Storage::disk('local');
@@ -206,6 +218,14 @@ class AssetFolderTest extends TestCase
             'path/to/folder',
             'path/to/sub',
         ], $container->folders()->all());
+
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/folder',
+            'path/to/folder/one.txt',
+            'path/to/sub',
+        ], $container->contents()->cached()->keys()->all());
 
         // TODO: assert about event
     }

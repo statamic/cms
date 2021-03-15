@@ -107,10 +107,6 @@ abstract class TestCase extends \Orchestra\Testbench\TestCase
             'driver' => 'file',
             'path' => storage_path('framework/cache/outpost-data'),
         ]);
-
-        // It's disabled by default, but we want it enabled in tests so we can make
-        // sure all the moving parts throughout the app still work with it on.
-        $app['config']->set('statamic.assets.cache_listings', true);
     }
 
     protected function assertEveryItem($items, $callback)

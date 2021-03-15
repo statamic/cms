@@ -11,12 +11,12 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ContainsData;
 use Statamic\Data\HasAugmentedInstance;
+use Statamic\Data\TracksQueriedColumns;
 use Statamic\Events\AssetDeleted;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
 use Statamic\Facades\AssetContainer as AssetContainerAPI;
-use Statamic\Facades\Blink;
 use Statamic\Facades\Image;
 use Statamic\Facades\Path;
 use Statamic\Facades\URL;
@@ -31,7 +31,7 @@ use Symfony\Component\Mime\MimeTypes;
 
 class Asset implements AssetContract, Augmentable
 {
-    use HasAugmentedInstance, FluentlyGetsAndSets, ContainsData {
+    use HasAugmentedInstance, FluentlyGetsAndSets, TracksQueriedColumns, ContainsData {
         set as traitSet;
         get as traitGet;
         remove as traitRemove;
@@ -41,6 +41,7 @@ class Asset implements AssetContract, Augmentable
     protected $container;
     protected $path;
     protected $meta;
+    protected $original;
 
     public function __construct()
     {
@@ -129,8 +130,8 @@ class Asset implements AssetContract, Augmentable
         }
 
         return $this->meta = Cache::rememberForever($this->metaCacheKey(), function () {
-            if ($this->disk()->exists($path = $this->metaPath())) {
-                return YAML::parse($this->disk()->get($path));
+            if ($contents = $this->disk()->get($this->metaPath())) {
+                return YAML::parse($contents);
             }
 
             $this->writeMeta($meta = $this->generateMeta());
@@ -227,7 +228,9 @@ class Asset implements AssetContract, Augmentable
      */
     public function folder()
     {
-        return pathinfo($this->path())['dirname'];
+        $dirname = pathinfo($this->path())['dirname'];
+
+        return $dirname === '.' ? '/' : $dirname;
     }
 
     /**
@@ -430,6 +433,8 @@ class Asset implements AssetContract, Augmentable
         $this->disk()->delete($this->path());
         $this->disk()->delete($this->metaPath());
 
+        Facades\Asset::delete($this);
+
         $this->clearCaches();
 
         AssetDeleted::dispatch($this);
@@ -442,20 +447,6 @@ class Asset implements AssetContract, Augmentable
      */
     private function clearCaches()
     {
-        $container = $this->container();
-
-        $keys = [
-            $container->filesCacheKey('/', true),
-            $container->filesCacheKey('/', false),
-            $container->filesCacheKey($this->folder(), true),
-            $container->filesCacheKey($this->folder(), false),
-        ];
-
-        foreach ($keys as $key) {
-            Cache::forget($key);
-            Blink::forget($key);
-        }
-
         $this->meta = null;
         Cache::forget($this->metaCacheKey());
     }
@@ -518,8 +509,6 @@ class Asset implements AssetContract, Augmentable
      */
     public function move($folder, $filename = null)
     {
-        Cache::forget($this->container()->filesCacheKey($this->folder()));
-
         $filename = $filename ?: $this->filename();
         $oldPath = $this->path();
         $oldMetaPath = $this->metaPath();
@@ -758,8 +747,27 @@ class Asset implements AssetContract, Augmentable
         return new AugmentedAsset($this);
     }
 
+    public function defaultAugmentedArrayKeys()
+    {
+        return $this->selectedQueryColumns;
+    }
+
     protected function shallowAugmentedArrayKeys()
     {
         return ['id', 'url', 'permalink', 'api_url'];
+    }
+
+    public function syncOriginal()
+    {
+        $this->original = [
+            'path' => $this->path,
+        ];
+
+        return $this;
+    }
+
+    public function getOriginal($key = null, $fallback = null)
+    {
+        return Arr::get($this->original, $key, $fallback);
     }
 }

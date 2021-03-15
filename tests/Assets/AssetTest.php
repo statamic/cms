@@ -12,6 +12,7 @@ use Statamic\Assets\AssetContainer;
 use Statamic\Events\AssetSaved;
 use Statamic\Events\AssetUploaded;
 use Statamic\Facades;
+use Statamic\Facades\File;
 use Statamic\Facades\YAML;
 use Statamic\Fields\Blueprint;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -24,6 +25,11 @@ class AssetTest extends TestCase
     public function setUp(): void
     {
         parent::setUp();
+
+        // use the file cache driver so we can test that the cached file listings
+        // are coming from the cache and not just the in-memory collection
+        config(['cache.default' => 'file']);
+        Cache::clear();
 
         config(['filesystems.disks.test' => [
             'driver' => 'local',
@@ -177,6 +183,7 @@ class AssetTest extends TestCase
     /** @test */
     public function it_gets_the_folder_name()
     {
+        $this->assertEquals('/', (new Asset)->path('asset.jpg')->folder());
         $this->assertEquals('path/to', (new Asset)->path('path/to/asset.jpg')->folder());
     }
 
@@ -285,7 +292,7 @@ class AssetTest extends TestCase
     }
 
     /** @test */
-    public function it_generates_and_clears_meta_and_filesystem_listing_caches()
+    public function it_generates_and_clears_meta_caches()
     {
         Storage::fake('test');
         Storage::disk('test')->put('foo/test.txt', '');
@@ -294,24 +301,19 @@ class AssetTest extends TestCase
             'size' => 123,
         ]));
 
-        $container = Facades\AssetContainer::make('test')->disk('test');
+        $container = tap(Facades\AssetContainer::make('test')->disk('test'))->save();
         $asset = (new Asset)->container($container)->path('foo/test.txt');
 
         // Caches shouldn't be generated until asked for...
         $this->assertFalse(Cache::has($asset->metaCacheKey()));
-        $this->assertFalse(Cache::has($container->filesCacheKey('foo')));
 
-        // Ask for meta and files to generate caches...
+        // Asking for meta results in it being cached
         $asset->meta();
-        $container->files('foo');
         $this->assertTrue(Cache::has($asset->metaCacheKey()));
-        $this->assertTrue(Cache::has($container->filesCacheKey('foo')));
 
-        // Deleting asset and container should clear caches...
+        // Deleting asset should clear cache
         $asset->delete();
-        $container->delete();
         $this->assertFalse(Cache::has($asset->metaCacheKey()));
-        $this->assertFalse(Cache::has($container->filesCacheKey('foo')));
     }
 
     /** @test */
@@ -347,7 +349,8 @@ class AssetTest extends TestCase
         touch($realFilePath, Carbon::now()->subMinutes(3)->timestamp);
 
         $container = Facades\AssetContainer::make('test')->disk('test');
-        $asset = (new Asset)->container($container)->path('foo/image.jpg')->set('foo', 'bar');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('foo/image.jpg')->set('foo', 'bar');
 
         $metaWithoutData = [
             'data' => [],
@@ -452,20 +455,97 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function it_doesnt_add_path_to_container_listing_if_it_doesnt_exist()
+    {
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $this->container->makeAsset('one/two/foo.jpg')->save();
+
+        $this->assertEquals([], $this->container->contents()->cached()->keys()->all());
+    }
+
+    /** @test */
+    public function it_doesnt_add_path_to_container_listing_if_it_doesnt_exist_with_asserts_disabled_and_using_local()
+    {
+        // the local adapter doesn't really matter. its just checking that if getMetadata
+        // with asserts disabled returns throws an exception (which local does, but not s3).
+
+        $this->container->disk()->filesystem()->getConfig()->set('disable_asserts', true);
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $this->container->makeAsset('one/two/foo.jpg')->save();
+
+        $this->assertEquals([], $this->container->contents()->cached()->keys()->all());
+    }
+
+    /** @test */
+    public function it_doesnt_add_path_to_container_listing_if_it_doesnt_exist_with_asserts_disabled_and_using_s3()
+    {
+        // the s3 adapter doesn't really matter. its just checking that if getMetadata
+        // with asserts disabled returns false (which s3 does, but local doesn't).
+
+        // these mocks are ugly but it was simpler than setting up an s3 driver.
+        // we just want to make sure getMetadata returns false.
+        $driver = $this->mock(\League\Flysystem\Filesystem::class);
+        $driver->shouldReceive('listContents')->andReturn([]);
+        $driver->shouldReceive('getMetadata')->andReturnFalse(); // this is the meaningful line
+        $filesystem = $this->mock(\Illuminate\Filesystem\FilesystemAdapter::class);
+        $filesystem->shouldReceive('getDriver')->andReturn($driver);
+        $disk = $this->mock(\Statamic\Filesystem\Filesystem::class);
+        $disk->shouldReceive('filesystem')->andReturn($filesystem);
+        $disk->shouldReceive('put');
+
+        File::shouldReceive('disk')->with('test')->andReturn($disk);
+
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
+
+        $this->container->makeAsset('one/two/foo.jpg')->save();
+
+        $this->assertEquals([], $this->container->contents()->cached()->keys()->all());
+    }
+
+    /** @test */
     public function it_deletes()
     {
         Storage::fake('local');
         $disk = Storage::disk('local');
         $disk->put('path/to/asset.txt', '');
+        $disk->put('path/to/another-asset.txt', '');
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         $asset = (new Asset)->container($container)->path('path/to/asset.txt');
         $disk->assertExists('path/to/asset.txt');
+        $this->assertEquals([
+            'path/to/another-asset.txt',
+            'path/to/asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'path/to/asset.txt' => [],
+            'path/to/another-asset.txt' => [],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
 
         $return = $asset->delete();
 
         $this->assertEquals($asset, $return);
         $disk->assertMissing('path/to/asset.txt');
+        $this->assertEquals([
+            'path/to/another-asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
+            'path/to/another-asset.txt' => [],
+        ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/another-asset.txt',
+        ], $container->contents()->cached()->keys()->all());
 
         // TODO: Assert about event, or convert to a callback
     }
@@ -479,10 +559,14 @@ class AssetTest extends TestCase
         $disk->put('old/asset.txt', 'The asset contents');
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
-        $asset = (new Asset)->container($container)->path('old/asset.txt')->data(['foo' => 'bar']);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
+        $this->assertEquals([
+            'old/asset.txt',
+        ], $container->files()->all());
         $this->assertEquals([
             'old/asset.txt' => ['foo' => 'bar'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
@@ -497,10 +581,18 @@ class AssetTest extends TestCase
         $disk->assertExists('new/asset.txt');
         $disk->assertExists('new/.meta/asset.txt.yaml');
         $this->assertEquals([
+            'new/asset.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
             'new/asset.txt' => ['foo' => 'bar'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
+        $this->assertEquals([
+            'old', // the empty directory doesnt actually get deleted
+            'new',
+            'new/asset.txt',
+        ], $container->contents()->cached()->keys()->all());
         Event::assertDispatched(AssetSaved::class);
     }
 
@@ -512,7 +604,8 @@ class AssetTest extends TestCase
         $disk->put('old/asset.txt', 'The asset contents');
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
-        $asset = (new Asset)->container($container)->path('old/asset.txt')->data(['foo' => 'bar']);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
@@ -534,6 +627,11 @@ class AssetTest extends TestCase
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
+        $this->assertEquals([
+            'old', // the empty directory doesnt actually get deleted
+            'new',
+            'new/newfilename.txt',
+        ], $container->contents()->cached()->keys()->all());
     }
 
     /** @test */
@@ -544,10 +642,14 @@ class AssetTest extends TestCase
         $disk->put('old/asset.txt', 'The asset contents');
         $container = Facades\AssetContainer::make('test')->disk('local');
         Facades\AssetContainer::shouldReceive('save')->with($container);
-        $asset = (new Asset)->container($container)->path('old/asset.txt')->data(['foo' => 'bar']);
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
+        $asset = $container->makeAsset('old/asset.txt')->data(['foo' => 'bar']);
         $asset->save();
         $disk->assertExists('old/asset.txt');
         $disk->assertExists('old/.meta/asset.txt.yaml');
+        $this->assertEquals([
+            'old/asset.txt',
+        ], $container->files()->all());
         $this->assertEquals([
             'old/asset.txt' => ['foo' => 'bar'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
@@ -562,10 +664,17 @@ class AssetTest extends TestCase
         $disk->assertExists('old/newfilename.txt');
         $disk->assertExists('old/.meta/newfilename.txt.yaml');
         $this->assertEquals([
+            'old/newfilename.txt',
+        ], $container->files()->all());
+        $this->assertEquals([
             'old/newfilename.txt' => ['foo' => 'bar'],
         ], $container->assets('/', true)->keyBy->path()->map(function ($item) {
             return $item->data()->all();
         })->all());
+        $this->assertEquals([
+            'old',
+            'old/newfilename.txt',
+        ], $container->contents()->cached()->keys()->all());
         Event::assertDispatched(AssetSaved::class);
     }
 
@@ -676,13 +785,34 @@ class AssetTest extends TestCase
     {
         Event::fake();
         $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->assertMissing('path/to/asset.jpg');
+
+        $this->assertEquals([
+        ], $this->container->files()->all());
+        $this->assertEquals([
+        ], $this->container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
 
         $return = $asset->upload(UploadedFile::fake()->image('asset.jpg'));
 
         $this->assertEquals($asset, $return);
         Storage::disk('test')->assertExists('path/to/asset.jpg');
         $this->assertEquals('path/to/asset.jpg', $asset->path());
+        $this->assertEquals([
+            'path/to/asset.jpg',
+        ], $this->container->files()->all());
+        $this->assertEquals([
+            'path/to/asset.jpg' => [],
+        ], $this->container->assets('/', true)->keyBy->path()->map(function ($item) {
+            return $item->data()->all();
+        })->all());
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/asset.jpg',
+        ], Cache::get('asset-list-contents-test_container')->keys()->all());
         Event::assertDispatched(AssetUploaded::class, function ($event) use ($asset) {
             return $event->asset = $asset;
         });
@@ -694,7 +824,8 @@ class AssetTest extends TestCase
     {
         Event::fake();
         Carbon::setTestNow(Carbon::createFromTimestamp(1549914700));
-        $asset = (new Asset)->container($this->container)->path('path/to/asset.jpg');
+        $asset = $this->container->makeAsset('path/to/asset.jpg');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test_container')->andReturn($this->container);
         Storage::disk('test')->put('path/to/asset.jpg', '');
         Storage::disk('test')->assertExists('path/to/asset.jpg');
 
