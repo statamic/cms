@@ -7,8 +7,9 @@
 - Added support for the `mimetypes` validation rule. [#3290](https://github.com/statamic/cms/issues/3290)
 
 ### What's improved
-- A whole bunch of Amazon S3 performance optimization. [#3353](https://github.com/statamic/cms/issues/3353) [#3354](https://github.com/statamic/cms/issues/3354) [#3359](https://github.com/statamic/cms/issues/3359) [#3362](https://github.com/statamic/cms/issues/3362)
+- A whole bunch of Amazon S3 performance optimization. [#3369](https://github.com/statamic/cms/issues/3369) [#3353](https://github.com/statamic/cms/issues/3353) [#3354](https://github.com/statamic/cms/issues/3354) [#3359](https://github.com/statamic/cms/issues/3359) [#3362](https://github.com/statamic/cms/issues/3362)
 - The `mimes` and `image` validation rules now use the actual mime type rather than just the extension. [#3290](https://github.com/statamic/cms/issues/3290)
+- SVG assets can provide their dimensions. [#2865](https://github.com/statamic/cms/issues/2865)
 
 ### What's fixed
 - GraphQL will filter out draft entries from the entries query by default. [#3349](https://github.com/statamic/cms/issues/3349)
