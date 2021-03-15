@@ -33,7 +33,7 @@ return [
     'collection_configure_handle_instructions' => 'Used to reference this collection on the frontend. It\'s non-trivial to change later.',
     'collection_configure_intro' => 'A collection is a group of related entries that share behavior, attributes, and settings.',
     'collection_configure_layout_instructions' => 'Set this collection\'s default layout. Entries can override this setting with a `template` field named `layout`. It is unusual to change this setting.',
-    'collection_configure_autopublish_instructions' => 'Should new entries in this collection automatically be published to all other localizations?',
+    'collection_configure_autopublish_instructions' => 'Should new entries in this collection be automatically published to all configured sites?',
     'collection_configure_template_instructions' => 'Set this collection\'s default template. Entries can override this setting with a `template` field.',
     'collection_configure_title_instructions' => 'We recommend a plural noun, like "Articles" or "Products".',
     'collection_next_steps_configure_description' => 'Configure URLs and routes, define blueprints, date behaviors, ordering and other options.',
