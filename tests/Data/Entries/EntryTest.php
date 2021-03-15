@@ -761,6 +761,67 @@ class EntryTest extends TestCase
     }
 
     /** @test */
+    public function it_does_not_auto_publish_if_not_configured()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->sites(['en', 'fr', 'de'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertNull($entry->descendants()->get('fr'));
+        $this->assertNull($entry->descendants()->get('de'));
+    }
+
+    /** @test */
+    public function it_does_not_auto_publish_in_site_not_configured_for_collection()
+    {
+        Event::fake();
+
+        Facades\Site::setConfig([
+            'default' => 'en',
+            'sites' => [
+                'en' => ['name' => 'English', 'locale' => 'en_US', 'url' => 'http://test.com/'],
+                'fr' => ['name' => 'French', 'locale' => 'fr_FR', 'url' => 'http://fr.test.com/'],
+                'de' => ['name' => 'German', 'locale' => 'de_DE', 'url' => 'http://test.com/de/'],
+            ],
+        ]);
+
+        $collection = (new Collection)
+            ->handle('pages')
+            ->autoPublish(true)
+            ->sites(['en', 'fr'])
+            ->save();
+
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
+
+        $return = $entry->save();
+
+        $this->assertIsObject($entry->descendants()->get('fr'));
+        $this->assertNull($entry->descendants()->get('de'));
+    }
+
+    /** @test */
     public function if_saving_event_returns_false_the_entry_doesnt_save()
     {
         Facades\Entry::spy();
