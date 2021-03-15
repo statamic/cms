@@ -1929,6 +1929,14 @@ class CoreModifiers extends Modifier
 
         $value = $value instanceof Collection ? $value : collect($value);
 
+        // Working with a DataCollection
+        if (method_exists($value, 'multisort')) {
+            $value = $value->multisort(implode(':', $params));
+
+            return $value->values();
+        }
+
+        // Working with array data
         if ($key === 'random') {
             return $value->shuffle();
         }
