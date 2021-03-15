@@ -17,7 +17,18 @@ class ContainerAssetsStore extends ChildStore
 
     public function handleFileChanges()
     {
-        //
+        // We only want to act on any file changes one time per store.
+        if ($this->fileChangesHandled) {
+            return;
+        }
+
+        $this->fileChangesHandled = true;
+
+        if (! config('statamic.stache.watcher')) {
+            return;
+        }
+
+        $this->clear();
     }
 
     public function getItem($key)
