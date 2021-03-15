@@ -107,7 +107,7 @@ class Term implements TermContract
             })->all();
         }
 
-        return $array->all();
+        return $array;
     }
 
     public function in($site)
