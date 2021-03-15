@@ -31,6 +31,7 @@ class Form implements FormContract, Augmentable
     protected $store;
     protected $email;
     protected $metrics;
+    protected $afterSaveCallbacks = [];
 
     /**
      * Get or set the handle.
@@ -140,12 +141,22 @@ class Form implements FormContract, Augmentable
         return config('statamic.forms.forms')."/{$this->handle()}.yaml";
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
     /**
      * Save form.
      */
     public function save()
     {
         $isNew = is_null(Facades\Form::find($this->handle()));
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
 
         $data = collect([
             'title' => $this->title,
@@ -161,6 +172,10 @@ class Form implements FormContract, Augmentable
         }
 
         File::put($this->path(), YAML::dump($data));
+
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
 
         if ($isNew) {
             FormCreated::dispatch($this);
