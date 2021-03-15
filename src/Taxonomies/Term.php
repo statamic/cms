@@ -7,6 +7,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Events\TermCreated;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
+use Statamic\Events\TermSaving;
 use Statamic\Facades;
 use Statamic\Facades\Blink;
 use Statamic\Facades\Entry;
@@ -24,6 +25,7 @@ class Term implements TermContract
     protected $blueprint;
     protected $collection;
     protected $data;
+    protected $afterSaveCallbacks = [];
 
     public function __construct()
     {
@@ -164,11 +166,25 @@ class Term implements TermContract
         return $this->inDefaultLocale()->title();
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
     public function save()
     {
         $isNew = is_null(Facades\Term::find($this->id()));
 
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
         Facades\Term::save($this);
+
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
 
         if ($isNew) {
             TermCreated::dispatch($this);
