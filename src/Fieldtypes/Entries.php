@@ -193,9 +193,9 @@ class Entries extends Relationship
         return (new EntryResource($entry))->resolve();
     }
 
-    public function augment($value)
+    protected function collect($value)
     {
-        return new \Statamic\Entries\EntryCollection(parent::augment($value));
+        return new \Statamic\Entries\EntryCollection($value);
     }
 
     protected function augmentValue($value)
