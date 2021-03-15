@@ -98,7 +98,7 @@ class Dimensions
      *
      * @return array
      */
-    private function getSVGDimensions()
+    private function getSvgDimensions()
     {
         // Since assets may be located on external platforms like Amazon S3, we can't simply
         // grab the dimensions. So we'll copy it locally and read the dimensions from there.
