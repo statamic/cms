@@ -285,7 +285,6 @@ class AssetContainerTest extends TestCase
     /** @test */
     public function it_gets_the_files_from_the_filesystem_only_once()
     {
-        config(['statamic.assets.cache_listings' => 60]);
         Carbon::setTestNow(now()->startOfMinute());
 
         $disk = $this->mock(Filesystem::class);
@@ -315,10 +314,8 @@ class AssetContainerTest extends TestCase
         $this->assertEquals($expected, $second->all());
         $this->assertTrue(Cache::has($cacheKey));
 
-        Carbon::setTestNow(now()->addSeconds(60));
+        Carbon::setTestNow(now()->addYears(5)); // i.e. forever.
         $this->assertTrue(Cache::has($cacheKey));
-        Carbon::setTestNow(now()->addSeconds(1));
-        $this->assertFalse(Cache::has($cacheKey));
     }
 
     /** @test */
@@ -353,7 +350,6 @@ class AssetContainerTest extends TestCase
     /** @test */
     public function it_gets_the_folders_from_the_filesystem_only_once()
     {
-        config(['statamic.assets.cache_listings' => 60]);
         Carbon::setTestNow(now()->startOfMinute());
 
         $disk = $this->mock(Filesystem::class);
@@ -382,10 +378,8 @@ class AssetContainerTest extends TestCase
         $this->assertEquals($expected, $second->all());
         $this->assertTrue(Cache::has($cacheKey));
 
-        Carbon::setTestNow(now()->addSeconds(60));
+        Carbon::setTestNow(now()->addYears(5)); // i.e. forever.
         $this->assertTrue(Cache::has($cacheKey));
-        Carbon::setTestNow(now()->addSeconds(1));
-        $this->assertFalse(Cache::has($cacheKey));
     }
 
     /** @test */
