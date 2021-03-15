@@ -17,6 +17,7 @@ use Statamic\Facades;
 use Statamic\Facades\User;
 use Statamic\Fields\Blueprint;
 use Statamic\Sites\Site;
+use Statamic\Stache\Query\EntryQueryBuilder;
 use Statamic\Structures\CollectionStructure;
 use Statamic\Structures\CollectionTree;
 use Statamic\Structures\Page;
@@ -732,8 +733,6 @@ class EntryTest extends TestCase
     /** @test */
     public function it_auto_publishes_entry_if_configured()
     {
-        $this->markTestIncomplete();
-
         Event::fake();
 
         Facades\Site::setConfig([
@@ -745,24 +744,21 @@ class EntryTest extends TestCase
             ],
         ]);
 
-        $collection = (new Collection)->handle('pages')->autoPublish(true)->sites(['en', 'fr', 'de'])->save();
-        $entry = (new Entry)->id('a')->locale('en')->collection($collection);
+        $collection = (new Collection)
+            ->handle('pages')
+            ->autoPublish(true)
+            ->sites(['en', 'fr', 'de'])
+            ->save();
 
-        Facades\Entry::shouldReceive('save')->with($entry);
-        Facades\Entry::shouldReceive('taxonomize')->with($entry);
-        Facades\Entry::shouldReceive('find')->with('a')->andReturn(null, $entry);
-        Facades\Entry::shouldReceive('make')->andReturn(new Entry);
-
-        Facades\Entry::shouldReceive('save');
-        Facades\Entry::shouldReceive('taxonomize');
-        Facades\Entry::shouldReceive('find')->with(null)->andReturn(new Entry);
-
-        Facades\Collection::shouldReceive('findByHandle')->with('pages')->andReturn($collection);
-        Facades\Collection::shouldReceive('findByMount');
+        $entry = (new Entry)
+            ->id('a')
+            ->locale('en')
+            ->collection($collection);
 
         $return = $entry->save();
 
-        // For some reason $entry doesn't have any $localizations at this point...
+        $this->assertIsObject($entry->descendants()->get('fr'));
+        $this->assertIsObject($entry->descendants()->get('de'));
     }
 
     /** @test */
