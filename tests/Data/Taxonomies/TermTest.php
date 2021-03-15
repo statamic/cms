@@ -119,7 +119,7 @@ class TermTest extends TestCase
     }
 
     /** @test */
-    public function it_dispatches_entry_created_only_once()
+    public function it_dispatches_term_created_only_once()
     {
         Event::fake();
 
