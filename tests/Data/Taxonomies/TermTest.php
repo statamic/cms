@@ -113,7 +113,7 @@ class TermTest extends TestCase
             return $event->term === $term;
         });
 
-        Event::assertDispatched(TermSaving::class, function ($event) use ($term) {
+        Event::assertDispatched(TermSaved::class, function ($event) use ($term) {
             return $event->term === $term;
         });
     }
