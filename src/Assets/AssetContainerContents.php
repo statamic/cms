@@ -86,21 +86,6 @@ class AssetContainerContents
 
     private function ttl()
     {
-        // @deprecated
-        $ttl = config('statamic.assets.file_listing_cache_length', false);
-
-        if (! $ttl) {
-            $ttl = config('statamic.assets.cache_listings', false);
-        }
-
-        if (! $ttl) {
-            return 0;
-        }
-
-        if ($ttl === true) {
-            return null;
-        }
-
-        return $ttl;
+        return config('statamic.stache.watcher') ? 0 : null;
     }
 }
