@@ -193,6 +193,11 @@ class Entries extends Relationship
         return (new EntryResource($entry))->resolve();
     }
 
+    public function augment($value)
+    {
+        return new \Statamic\Entries\EntryCollection(parent::augment($value));
+    }
+
     protected function augmentValue($value)
     {
         if (! is_object($value)) {
