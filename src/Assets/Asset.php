@@ -747,6 +747,11 @@ class Asset implements AssetContract, Augmentable
         return new AugmentedAsset($this);
     }
 
+    public function defaultAugmentedArrayKeys()
+    {
+        return $this->selectedQueryColumns;
+    }
+
     protected function shallowAugmentedArrayKeys()
     {
         return ['id', 'url', 'permalink', 'api_url'];
