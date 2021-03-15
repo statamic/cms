@@ -8,6 +8,7 @@ use Statamic\Contracts\Forms\Form as FormContract;
 use Statamic\Contracts\Forms\Submission;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\FormBlueprintFound;
+use Statamic\Events\FormCreated;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
 use Statamic\Facades\Blueprint;
@@ -144,6 +145,8 @@ class Form implements FormContract, Augmentable
      */
     public function save()
     {
+        $isNew = is_null(Facades\Form::find($this->handle()));
+
         $data = collect([
             'title' => $this->title,
             'honeypot' => $this->honeypot,
@@ -158,6 +161,10 @@ class Form implements FormContract, Augmentable
         }
 
         File::put($this->path(), YAML::dump($data));
+
+        if ($isNew) {
+            FormCreated::dispatch($this);
+        }
 
         FormSaved::dispatch($this);
     }
