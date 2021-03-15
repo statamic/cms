@@ -89,6 +89,22 @@
 
 
 
+## 3.0.47 (2020-03-15)
+
+### What's new
+- Added a `route` param to `redirect` tag. [#3308](https://github.com/statamic/cms/issues/3308)
+- Added a "double encode" option to the `sanizite` modifier. [#3067](https://github.com/statamic/cms/issues/3067)
+
+### What's fixed
+- Fix sorting on aliased entries. [#3363](https://github.com/statamic/cms/issues/3363)
+- Fix default entry blueprint when hiding some of them. [#3368](https://github.com/statamic/cms/issues/3368)
+- Fix error when using SVGs in Glide tag pairs. [#3366](https://github.com/statamic/cms/issues/3366)
+- Fix JS error when field condition would result in an unevaluatable string. [#3366](https://github.com/statamic/cms/issues/3366)
+- Fix CP index dates in range-mode. [#3306](https://github.com/statamic/cms/issues/3306)
+- Removed unused dependencies in Fieldset and Blueprint repositories. [#3307](https://github.com/statamic/cms/issues/3307)
+
+
+
 ## 3.0.46 (2020-03-05)
 
 ### What's new

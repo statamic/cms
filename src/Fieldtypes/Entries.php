@@ -194,6 +194,11 @@ class Entries extends Relationship
         return (new EntryResource($entry))->resolve();
     }
 
+    protected function collect($value)
+    {
+        return new \Statamic\Entries\EntryCollection($value);
+    }
+
     protected function augmentValue($value)
     {
         if (! is_object($value)) {

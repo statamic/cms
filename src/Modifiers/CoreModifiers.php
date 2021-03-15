@@ -1726,9 +1726,11 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function sanitize($value)
+    public function sanitize($value, $params)
     {
-        return htmlspecialchars($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), false);
+        $double_encode = (bool) Arr::get($params, 0, false);
+
+        return htmlspecialchars($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), $double_encode);
     }
 
     /**
@@ -1927,6 +1929,14 @@ class CoreModifiers extends Modifier
 
         $value = $value instanceof Collection ? $value : collect($value);
 
+        // Working with a DataCollection
+        if (method_exists($value, 'multisort')) {
+            $value = $value->multisort(implode(':', $params));
+
+            return $value->values();
+        }
+
+        // Working with array data
         if ($key === 'random') {
             return $value->shuffle();
         }

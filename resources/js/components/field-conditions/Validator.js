@@ -206,6 +206,10 @@ export default class {
             condition.rhs = true;
         }
 
+        if (_.isObject(condition.lhs)) {
+            return false;
+        }
+
         return eval(`${condition.lhs} ${condition.operator} ${condition.rhs}`);
     }
 
