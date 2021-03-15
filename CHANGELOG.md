@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 3.0.47 (2020-03-15)
 
 ### What's new
 - Added a `route` param to `redirect` tag. [#3308](https://github.com/statamic/cms/issues/3308)
