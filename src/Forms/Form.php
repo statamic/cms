@@ -15,6 +15,7 @@ use Statamic\Events\FormSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
+use Statamic\Facades\Form as FormFacade;
 use Statamic\Facades\YAML;
 use Statamic\Forms\Exceptions\BlueprintUndefinedException;
 use Statamic\Statamic;
@@ -33,6 +34,7 @@ class Form implements FormContract, Augmentable
     protected $email;
     protected $metrics;
     protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     /**
      * Get or set the handle.
@@ -149,18 +151,31 @@ class Form implements FormContract, Augmentable
         return $this;
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        $result = $this->save();
+
+        $this->withEvents = true;
+
+        return $result;
+    }
+
     /**
      * Save form.
      */
     public function save()
     {
-        $isNew = is_null(Facades\Term::find($this->handle()));
+        $isNew = is_null(FormFacade::find($this->handle()));
 
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
-        if (FormSaving::dispatch($this) === false) {
-            return false;
+        if ($this->withEvents) {
+            if (FormSaving::dispatch($this) === false) {
+                return false;
+            }
         }
 
         $data = collect([
@@ -182,11 +197,13 @@ class Form implements FormContract, Augmentable
             $callback($this);
         }
 
-        if ($isNew) {
-            FormCreated::dispatch($this);
-        }
+        if ($this->withEvents) {
+            if ($isNew) {
+                FormCreated::dispatch($this);
+            }
 
-        FormSaved::dispatch($this);
+            FormSaved::dispatch($this);
+        }
 
         return true;
     }
