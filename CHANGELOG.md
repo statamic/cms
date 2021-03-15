@@ -1,8 +1,8 @@
 # Release Notes
 
-## Unreleased
+## 3.1.0-beta.1 (2020-03-15)
 
-## What's new
+### What's new
 - You can configure Statamic to use separate authentication from the rest of your app. [#3143](https://github.com/statamic/cms/issues/3143) 
 - Added support for the `mimetypes` validation rule. [#3290](https://github.com/statamic/cms/issues/3290)
 
