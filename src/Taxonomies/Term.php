@@ -106,7 +106,7 @@ class Term implements TermContract
                 return Arr::removeNullValues($item->all());
             })->all();
         }
-        
+
         if (is_array($array)) {
             return $array;
         }
