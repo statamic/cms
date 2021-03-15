@@ -180,6 +180,10 @@ class Term implements TermContract
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
+        if (TermSaving::dispatch($this) === false) {
+            return false;
+        }
+
         Facades\Term::save($this);
 
         foreach ($afterSaveCallbacks as $callback) {
