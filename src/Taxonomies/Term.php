@@ -4,6 +4,7 @@ namespace Statamic\Taxonomies;
 
 use Statamic\Contracts\Taxonomies\Term as TermContract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Events\TermCreated;
 use Statamic\Events\TermDeleted;
 use Statamic\Events\TermSaved;
 use Statamic\Facades;
@@ -165,7 +166,13 @@ class Term implements TermContract
 
     public function save()
     {
+        $isNew = is_null(Facades\Term::find($this->id()));
+
         Facades\Term::save($this);
+
+        if ($isNew) {
+            TermCreated::dispatch($this);
+        }
 
         TermSaved::dispatch($this);
 
