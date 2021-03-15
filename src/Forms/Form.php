@@ -11,6 +11,7 @@ use Statamic\Events\FormBlueprintFound;
 use Statamic\Events\FormCreated;
 use Statamic\Events\FormDeleted;
 use Statamic\Events\FormSaved;
+use Statamic\Events\FormSaving;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\File;
 use Statamic\Facades\Folder;
@@ -153,10 +154,14 @@ class Form implements FormContract, Augmentable
      */
     public function save()
     {
-        $isNew = is_null(Facades\Form::find($this->handle()));
+        $isNew = is_null(Facades\Term::find($this->handle()));
 
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
+
+        if (FormSaving::dispatch($this) === false) {
+            return false;
+        }
 
         $data = collect([
             'title' => $this->title,
@@ -182,6 +187,8 @@ class Form implements FormContract, Augmentable
         }
 
         FormSaved::dispatch($this);
+
+        return true;
     }
 
     /**
