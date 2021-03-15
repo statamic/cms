@@ -3,10 +3,15 @@
 namespace Tests\Data\Taxonomies;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Illuminate\Support\Facades\Event;
 use Mockery;
+use Statamic\Events\TermCreated;
+use Statamic\Events\TermSaved;
+use Statamic\Events\TermSaving;
 use Statamic\Facades;
 use Statamic\Facades\Taxonomy;
 use Statamic\Fields\Blueprint;
+use Statamic\Taxonomies\Taxonomy as TaxonomiesTaxonomy;
 use Statamic\Taxonomies\Term;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -86,5 +91,63 @@ class TermTest extends TestCase
 
         $this->assertEquals(7, $term->entriesCount());
         $this->assertEquals(7, $term->entriesCount());
+    }
+
+    /** @test */
+    public function it_saves_through_the_api()
+    {
+        Event::fake();
+
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
+
+        $return = $term->save();
+
+        $this->assertTrue($return);
+
+        Event::assertDispatched(TermSaving::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
+
+        Event::assertDispatched(TermCreated::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
+
+        Event::assertDispatched(TermSaving::class, function ($event) use ($term) {
+            return $event->term === $term;
+        });
+    }
+
+    /** @test */
+    public function it_dispatches_entry_created_only_once()
+    {
+        Event::fake();
+
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
+
+        $term->save();
+        $term->save();
+        $term->save();
+
+        Event::assertDispatched(TermSaved::class, 3);
+        Event::assertDispatched(TermCreated::class, 1);
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+
+        $taxonomy = (new TaxonomiesTaxonomy)->handle('tags')->save();
+        $term = (new Term)->taxonomy('tags')->slug('foo')->data(['foo' => 'bar']);
+
+        $return = $term->saveQuietly();
+
+        $this->assertTrue($return);
+
+        Event::assertNotDispatched(TermSaving::class);
+        Event::assertNotDispatched(TermSaved::class);
+        Event::assertNotDispatched(TermCreated::class);
     }
 }
