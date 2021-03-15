@@ -788,7 +788,6 @@ class EntryTest extends TestCase
 
         $this->assertNull($entry->descendants()->get('fr'));
         $this->assertNull($entry->descendants()->get('de'));
-
     }
 
     /** @test */
