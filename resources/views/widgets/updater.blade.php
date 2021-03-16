@@ -1,46 +1,32 @@
-<div class="card p-0 content flex h-full">
-    <div class="rounded-l py-2 md:w-40 border-r h-full flex items-center justify-center bg-grey-10">
-        @if ($count)
-            <div class="svg-icon flex px-1 items-center justify-center h-full" style="width: 9rem; ">
-                @cp_svg('marketing/tooter-yay')
+<div class="card p-0 h-full">
+    <header class="flex justify-between items-center p-2 border-b">
+        <h2 class="flex items-center">
+            <div class="h-6 w-6 mr-1 text-grey-80">
+                @svg('loading-bar')
             </div>
-        @else
-            <div class="svg-icon w-24 flex px-1 items-center justify-center h-full">
-                @cp_svg('marketing/tooter-nay')
+            <span>{{ __('Updates') }}</span>
+        </h2>
+        @if ($count)
+            <a href="{{ cp_route('updater') }}" class="badge-sm bg-green text-white">
+                {{ trans_choice('1 update available|:count updates avaialble', $count) }}
+            </a>
+        @endif
+    </header>
+    <section class="px-2 py-1">
+        @if (! $count)
+            <p class="text-base text-center text-grey-70">{{ __('Everything is up to date.') }}</p>
+        @endif
+
+        @if ($hasStatamicUpdate)
+            <div class="flex items-center justify-between text-sm">
+                <a href="{{ cp_route('updater.product', 'statamic') }}"class="hover:text-blue font-bold py-sm">Statamic Core</a>
             </div>
         @endif
-    </div>
-    <div class="p-3 flex flex-1 items-center">
-        <div>
-            @if ($count)
-                <h1>{{ __('statamic::messages.updates_available') }}</h1>
-                <p class="text-base">{{ __('There is a new version of Statamic available.') }}</p>
-            @else
-                <h1>{{ __('Everything is up to date.') }}</h1>
-                <p class="text-base">{{ __('This site is running the newest version of Statamic.') }}</p>
-            @endif
-        </div>
-    </div>
 
-    @if ($hasStatamicUpdate)
-        <div class="px-3 py-1 border-t flex items-center">
-            <div class="h-4 w-4 mr-1 text-blue">
-                @cp_svg('hammer-wrench')
+        @foreach ($updatableAddons as $slug => $addon)
+            <div class="flex items-center justify-between w-full text-sm">
+                <a href="{{ cp_route('updater.product', $slug) }}" class="hover:text-blue py-sm">{{ $addon }}</a>
             </div>
-            <div class="flex-1 mr-3">
-                <a href="{{ cp_route('updater.product', 'statamic') }}"class="text-blue text-sm font-bold">Statamic Core</a>
-            </div>
-        </div>
-    @endif
-
-    @foreach ($updatableAddons as $slug => $name)
-        <div class="px-3 py-1 border-t flex items-center">
-            <div class="h-4 w-4 mr-1 text-blue">
-                @cp_svg('addons')
-            </div>
-            <div class="flex-1 mr-3">
-                <a href="{{ cp_route('updater.product', $slug) }}" class="text-blue text-sm font-bold">{{ $name }}</a>
-            </div>
-        </div>
-    @endforeach
+        @endforeach
+    </section>
 </div>
