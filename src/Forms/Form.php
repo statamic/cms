@@ -204,8 +204,6 @@ class Form implements FormContract, Augmentable
 
             FormSaved::dispatch($this);
         }
-
-        return true;
     }
 
     /**
