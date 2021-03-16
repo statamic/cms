@@ -3,6 +3,10 @@
 namespace Tests\Fields;
 
 use Facades\Statamic\Fields\FieldsetRepository;
+use Illuminate\Support\Facades\Event;
+use Statamic\Events\FieldsetCreated;
+use Statamic\Events\FieldsetSaved;
+use Statamic\Events\FieldsetSaving;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fields;
 use Statamic\Fields\Fieldset;
@@ -137,10 +141,64 @@ class FieldsetTest extends TestCase
     /** @test */
     public function it_saves_through_the_repository()
     {
-        FieldsetRepository::shouldReceive('save')->with($fieldset = new Fieldset)->once();
+        Event::fake();
+
+        $fieldset = (new Fieldset)->setHandle('seo');
+
+        FieldsetRepository::shouldReceive('find')->with($fieldset->handle());
+        FieldsetRepository::shouldReceive('save')->with($fieldset)->once();
 
         $return = $fieldset->save();
 
         $this->assertEquals($fieldset, $return);
+
+        Event::assertDispatched(FieldsetSaving::class, function ($event) use ($fieldset) {
+            return $event->fieldset === $fieldset;
+        });
+
+        Event::assertDispatched(FieldsetCreated::class, function ($event) use ($fieldset) {
+            return $event->fieldset === $fieldset;
+        });
+
+        Event::assertDispatched(FieldsetSaved::class, function ($event) use ($fieldset) {
+            return $event->fieldset === $fieldset;
+        });
+    }
+
+    /** @test */
+    public function it_dispatches_fieldset_created_only_once()
+    {
+        Event::fake();
+
+        $fieldset = (new Fieldset)->setHandle('seo');
+
+        FieldsetRepository::shouldReceive('find')->with($fieldset->handle());
+        FieldsetRepository::shouldReceive('save')->with($fieldset)->once();
+
+        $fieldset->save();
+        $fieldset->save();
+        $fieldset->save();
+
+        Event::assertDispatched(FieldsetSaved::class, 3);
+        Event::assertDispatched(FieldsetCreated::class, 1); // TODO: fix
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+
+        $fieldset = (new Fieldset)->setHandle('seo');
+
+        FieldsetRepository::shouldReceive('find')->with($fieldset->handle());
+        FieldsetRepository::shouldReceive('save')->with($fieldset)->once();
+
+        $return = $fieldset->saveQuietly();
+
+        $this->assertEquals($fieldset, $return);
+
+        Event::assertNotDispatched(FieldsetSaving::class);
+        Event::assertNotDispatched(FieldsetSaved::class);
+        Event::assertNotDispatched(FieldsetCreated::class);
     }
 }
