@@ -7,6 +7,7 @@ use Statamic\Data\ExistsAsFile;
 use Statamic\Events\GlobalSetCreated;
 use Statamic\Events\GlobalSetDeleted;
 use Statamic\Events\GlobalSetSaved;
+use Statamic\Events\GlobalSetSaving;
 use Statamic\Facades;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Site;
@@ -70,6 +71,10 @@ class GlobalSet implements Contract
 
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
+
+        if (GlobalSetSaving::dispatch($this) === false) {
+            return false;
+        }
 
         Facades\GlobalSet::save($this);
 
