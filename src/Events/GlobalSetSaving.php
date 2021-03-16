@@ -4,11 +4,11 @@ namespace Statamic\Events;
 
 class GlobalSetSaving extends Event
 {
-    public $globalSet;
+    public $globals;
 
-    public function __construct($globalSet)
+    public function __construct($globals)
     {
-        $this->globalSet = $globalSet;
+        $this->globals = $globals;
     }
 
     /**
