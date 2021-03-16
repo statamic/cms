@@ -21,6 +21,7 @@ class GlobalSet implements Contract
     protected $title;
     protected $handle;
     protected $localizations;
+    protected $afterSaveCallbacks = [];
 
     public function id()
     {
@@ -56,11 +57,25 @@ class GlobalSet implements Contract
         ]);
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
     public function save()
     {
         $isNew = is_null(Facades\GlobalSet::find($this->id()));
 
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
         Facades\GlobalSet::save($this);
+
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
 
         if ($isNew) {
             GlobalSetCreated::dispatch($this);
