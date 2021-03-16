@@ -16,8 +16,10 @@ use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Data\TracksQueriedColumns;
+use Statamic\Events\UserCreated;
 use Statamic\Events\UserDeleted;
 use Statamic\Events\UserSaved;
+use Statamic\Events\UserSaving;
 use Statamic\Facades;
 use Statamic\Fields\Value;
 use Statamic\GraphQL\ResolvesValues;
@@ -35,6 +37,9 @@ abstract class User implements
     ResolvesValuesContract
 {
     use Authorizable, Notifiable, CanResetPassword, HasAugmentedInstance, TracksQueriedColumns, HasAvatar, ResolvesValues;
+
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     abstract public function get($key, $fallback = null);
 
@@ -132,9 +137,30 @@ abstract class User implements
 
     public function save()
     {
+        $isNew = is_null(Facades\User::find($this->getAuthIdentifier()));
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($this->withEvents) {
+            if (UserSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         Facades\User::save($this);
 
-        UserSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($this->withEvents) {
+            if ($isNew) {
+                UserCreated::dispatch($this);
+            }
+
+            UserSaved::dispatch($this);
+        }
 
         return $this;
     }
