@@ -4,11 +4,15 @@ namespace Tests\Assets;
 
 use Facades\Statamic\Fields\BlueprintRepository;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Facades\Event;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetContainer;
 use Statamic\Contracts\Assets\Asset as AssetContract;
 use Statamic\Contracts\Assets\AssetFolder;
+use Statamic\Events\AssetContainerCreated;
+use Statamic\Events\AssetContainerSaved;
+use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
 use Statamic\Fields\Blueprint;
 use Statamic\Filesystem\FlysystemAdapter;
@@ -176,6 +180,7 @@ class AssetContainerTest extends TestCase
     /** @test */
     public function it_saves_the_container_through_the_api()
     {
+        Event::fake();
         Facades\AssetContainer::spy();
 
         $container = new AssetContainer;
@@ -183,7 +188,53 @@ class AssetContainerTest extends TestCase
         $return = $container->save();
 
         $this->assertEquals($container, $return);
-        Facades\AssetContainer::shouldHaveReceived('save')->with($container)->once();
+
+        Event::assertDispatched(AssetContainerSaving::class, function ($event) use ($container) {
+            return $event->container === $container;
+        });
+
+        Event::assertDispatched(AssetContainerCreated::class, function ($event) use ($container) {
+            return $event->container === $container;
+        });
+
+        Event::assertDispatched(AssetContainerSaved::class, function ($event) use ($container) {
+            return $event->container === $container;
+        });
+    }
+
+    /** @test */
+    public function it_dispatches_asset_container_created_only_once()
+    {
+        Event::fake();
+        Facades\AssetContainer::spy();
+
+        $container = new AssetContainer;
+
+        $container->save();
+        $container->save();
+        $container->save();
+
+        Facades\AssetContainer::shouldHaveReceived('save')->with($container)->times(3);
+
+        Event::assertDispatched(AssetContainerSaved::class, 3);
+        Event::assertDispatched(AssetContainerCreated::class, 1); // TODO: fix this
+    }
+
+    /** @test */
+    public function it_saves_quietly()
+    {
+        Event::fake();
+        Facades\AssetContainer::spy();
+
+        $container = new AssetContainer;
+
+        $return = $container->saveQuietly();
+
+        $this->assertEquals($container, $return);
+
+        Event::assertNotDispatched(AssetContainerSaving::class);
+        Event::assertNotDispatched(AssetContainerSaved::class);
+        Event::assertNotDispatched(AssetContainerCreated::class);
     }
 
     /** @test */

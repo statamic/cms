@@ -9,8 +9,10 @@ use Statamic\Contracts\Data\Augmented;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
 use Statamic\Events\AssetContainerBlueprintFound;
+use Statamic\Events\AssetContainerCreated;
 use Statamic\Events\AssetContainerDeleted;
 use Statamic\Events\AssetContainerSaved;
+use Statamic\Events\AssetContainerSaving;
 use Statamic\Facades;
 use Statamic\Facades\Asset as AssetAPI;
 use Statamic\Facades\Blueprint;
@@ -36,6 +38,8 @@ class AssetContainer implements AssetContainerContract, Augmentable
     protected $allowRenaming;
     protected $createFolders;
     protected $searchIndex;
+    protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function id($id = null)
     {
@@ -170,6 +174,24 @@ class AssetContainer implements AssetContainerContract, Augmentable
         return $blueprint;
     }
 
+    public function afterSave($callback)
+    {
+        $this->afterSaveCallbacks[] = $callback;
+
+        return $this;
+    }
+
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        $result = $this->save();
+
+        $this->withEvents = true;
+
+        return $result;
+    }
+
     /**
      * Save the container.
      *
@@ -177,9 +199,30 @@ class AssetContainer implements AssetContainerContract, Augmentable
      */
     public function save()
     {
+        $isNew = is_null(Facades\AssetContainer::find($this->id()));
+
+        $afterSaveCallbacks = $this->afterSaveCallbacks;
+        $this->afterSaveCallbacks = [];
+
+        if ($this->withEvents) {
+            if (AssetContainerSaving::dispatch($this) === false) {
+                return false;
+            }
+        }
+
         Facades\AssetContainer::save($this);
 
-        AssetContainerSaved::dispatch($this);
+        foreach ($afterSaveCallbacks as $callback) {
+            $callback($this);
+        }
+
+        if ($this->withEvents) {
+            if ($isNew) {
+                AssetContainerCreated::dispatch($this);
+            }
+
+            AssetContainerSaved::dispatch($this);
+        }
 
         return $this;
     }
