@@ -4,6 +4,7 @@ namespace Statamic\Globals;
 
 use Statamic\Contracts\Globals\GlobalSet as Contract;
 use Statamic\Data\ExistsAsFile;
+use Statamic\Events\GlobalSetCreated;
 use Statamic\Events\GlobalSetDeleted;
 use Statamic\Events\GlobalSetSaved;
 use Statamic\Facades;
@@ -57,7 +58,13 @@ class GlobalSet implements Contract
 
     public function save()
     {
+        $isNew = is_null(Facades\GlobalSet::find($this->id()));
+
         Facades\GlobalSet::save($this);
+
+        if ($isNew) {
+            GlobalSetCreated::dispatch($this);
+        }
 
         GlobalSetSaved::dispatch($this);
 
