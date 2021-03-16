@@ -23,6 +23,7 @@ class GlobalSet implements Contract
     protected $handle;
     protected $localizations;
     protected $afterSaveCallbacks = [];
+    protected $withEvents = true;
 
     public function id()
     {
@@ -65,6 +66,17 @@ class GlobalSet implements Contract
         return $this;
     }
 
+    public function saveQuietly()
+    {
+        $this->withEvents = false;
+
+        $result = $this->save();
+
+        $this->withEvents = true;
+
+        return $result;
+    }
+
     public function save()
     {
         $isNew = is_null(Facades\GlobalSet::find($this->id()));
@@ -72,8 +84,10 @@ class GlobalSet implements Contract
         $afterSaveCallbacks = $this->afterSaveCallbacks;
         $this->afterSaveCallbacks = [];
 
-        if (GlobalSetSaving::dispatch($this) === false) {
-            return false;
+        if ($this->withEvents) {
+            if (GlobalSetSaving::dispatch($this) === false) {
+                return false;
+            }
         }
 
         Facades\GlobalSet::save($this);
@@ -82,11 +96,13 @@ class GlobalSet implements Contract
             $callback($this);
         }
 
-        if ($isNew) {
-            GlobalSetCreated::dispatch($this);
-        }
+        if ($this->withEvents) {
+            if ($isNew) {
+                GlobalSetCreated::dispatch($this);
+            }
 
-        GlobalSetSaved::dispatch($this);
+            GlobalSetSaved::dispatch($this);
+        }
 
         return $this;
     }
