@@ -2,6 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Fieldtype;
 
@@ -107,5 +108,15 @@ class Code extends Fieldtype
         }
 
         return new ArrayableString($value, ['mode' => $this->config('mode', 'htmlmixed')]);
+    }
+
+    public function toGqlType()
+    {
+        return [
+            'type' => GraphQL::string(),
+            'resolve' => function ($item, $args, $context, $info) {
+                return $item->resolveGqlValue($info->fieldName)->value();
+            },
+        ];
     }
 }
