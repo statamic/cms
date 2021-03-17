@@ -12,10 +12,10 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Data\HasAugmentedData;
 use Statamic\Facades\Antlers;
 use Statamic\Facades\Entry;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Blueprint;
 use Statamic\Fields\Field;
 use Statamic\Fields\Fieldtype;
-use Statamic\Fields\LabeledValue;
 use Statamic\Fields\Value;
 use Statamic\Tags\Tags;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -1707,12 +1707,12 @@ EOT;
     }
 
     /** @test */
-    public function it_outputs_the_value_when_a_LabeledValue_object_is_used_as_string()
+    public function it_outputs_the_value_when_a_ArrayableString_object_is_used_as_string()
     {
         $fieldtype = new class extends Fieldtype {
             public function augment($value)
             {
-                return new LabeledValue('world', 'World');
+                return new ArrayableString('world', ['label' => 'World']);
             }
         };
 
@@ -1724,32 +1724,32 @@ EOT;
     }
 
     /** @test */
-    public function it_can_treat_a_LabeledValue_object_as_an_array()
+    public function it_can_treat_a_ArrayableString_object_as_an_array()
     {
         $fieldtype = new class extends Fieldtype {
             public function augment($value)
             {
-                return new LabeledValue('world', 'World');
+                return new ArrayableString('world', ['label' => 'World']);
             }
         };
 
         $value = new Value('world', 'hello', $fieldtype);
 
         $this->assertEquals(
-            'world, world, World',
-            $this->parse('{{ hello }}{{ key }}, {{ value }}, {{ label }}{{ /hello }}', [
+            'world, World',
+            $this->parse('{{ hello }}{{ value }}, {{ label }}{{ /hello }}', [
                 'hello' => $value,
             ])
         );
     }
 
     /** @test */
-    public function it_can_access_LabeledValue_properties_by_colon_notation()
+    public function it_can_access_ArrayableString_properties_by_colon_notation()
     {
         $fieldtype = new class extends Fieldtype {
             public function augment($value)
             {
-                return new LabeledValue('world', 'World');
+                return new ArrayableString('world', ['label' => 'World']);
             }
         };
 
@@ -1758,19 +1758,18 @@ EOT;
         $vars = ['hello' => $value];
 
         $this->assertEquals('world', $this->parse('{{ hello:value }}', $vars));
-        $this->assertEquals('world', $this->parse('{{ hello:key }}', $vars));
         $this->assertEquals('World', $this->parse('{{ hello:label }}', $vars));
     }
 
     /** @test */
-    public function it_can_use_LabeledValue_objects_in_conditions()
+    public function it_can_use_ArrayableString_objects_in_conditions()
     {
         $fieldtype = new class extends Fieldtype {
             public function augment($value)
             {
                 $label = is_null($value) ? null : strtoupper($value);
 
-                return new LabeledValue($value, $label);
+                return new ArrayableString($value, ['label' => $label]);
             }
         };
 

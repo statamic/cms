@@ -14,7 +14,7 @@ use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
-use Statamic\Fields\LabeledValue;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Ignition\Value as IgnitionViewValue;
 use Statamic\Modifiers\ModifierException;
@@ -1540,7 +1540,7 @@ class Parser
 
     protected function isNullWhenUsedInStrings($value)
     {
-        if ($value instanceof LabeledValue) {
+        if ($value instanceof ArrayableString) {
             $value = $value->value();
         }
 
