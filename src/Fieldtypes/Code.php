@@ -2,7 +2,7 @@
 
 namespace Statamic\Fieldtypes;
 
-use Statamic\Fields\ArrayableStringValue;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Fieldtype;
 
 class Code extends Fieldtype
@@ -105,6 +105,6 @@ class Code extends Fieldtype
         $value = str_replace('<?php', '&lt;?php', $value);
         $mode = ['mode' => $this->config('mode')];
 
-        return new ArrayableStringValue($value, $mode);
+        return new ArrayableString($value, $mode);
     }
 }
