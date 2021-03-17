@@ -102,7 +102,10 @@ class Code extends Fieldtype
 
     public function augment($value)
     {
-        $value = str_replace('<?php', '&lt;?php', $value);
+        if ($value) {
+            $value = str_replace('<?php', '&lt;?php', $value);
+        }
+
         $mode = ['mode' => $this->config('mode')];
 
         return new ArrayableString($value, $mode);
