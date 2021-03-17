@@ -13,6 +13,9 @@ class EntryTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['collections'];
 
     public function setUp(): void
     {
@@ -21,6 +24,18 @@ class EntryTest extends TestCase
         BlueprintRepository::partialMock();
 
         $this->createEntries();
+    }
+
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{entry}'])
+            ->assertSee('Cannot query field \"entry\" on type \"Query\"', false);
     }
 
     /** @test */
@@ -38,6 +53,7 @@ class EntryTest extends TestCase
         permalink
         published
         private
+        status
         date
         last_modified
         collection {
@@ -68,6 +84,7 @@ GQL;
                     'permalink' => 'http://localhost/events/event-one',
                     'published' => true,
                     'private' => false,
+                    'status' => 'published',
                     'date' => 'November 3rd, 2017',
                     'last_modified' => 'December 25th, 2017',
                     'collection' => [

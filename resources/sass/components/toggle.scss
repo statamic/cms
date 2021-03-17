@@ -95,6 +95,13 @@ $toggle_radius: 20px;
     }
 }
 
+/* Inside the Sidebar
+  ========================================================================== */
+.publish-sidebar .toggle-fieldtype {
+    @apply flex items-center justify-between;
+    .field-inner > label { margin: 0; }
+}
+
 /* Inside a Grid field
   ========================================================================== */
 

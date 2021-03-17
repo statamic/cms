@@ -2,6 +2,7 @@
 
 namespace Statamic\Console\Composer;
 
+use Composer\Package\Version\VersionParser;
 use Illuminate\Filesystem\Filesystem;
 use Statamic\Exceptions\ComposerLockFileNotFoundException;
 use Statamic\Exceptions\ComposerLockPackageNotFoundException;
@@ -105,7 +106,18 @@ class Lock
             throw new ComposerLockPackageNotFoundException($package);
         }
 
-        return $this->normalizeVersion($installed->version);
+        return $installed->version;
+    }
+
+    /**
+     * Get installed version of a specific package, normalized for comparisons.
+     *
+     * @param string $package
+     * @return string
+     */
+    public function getNormalizedInstalledVersion(string $package)
+    {
+        return (new VersionParser)->normalize($this->getInstalledVersion($package));
     }
 
     /**
@@ -122,7 +134,7 @@ class Lock
         $packages = collect($content['packages'])
             ->map(function ($packageDetails) use ($package, $version) {
                 if ($packageDetails['name'] === $package) {
-                    $packageDetails['version'] = $this->normalizeVersion($version);
+                    $packageDetails['version'] = $version;
                 }
 
                 return $packageDetails;
@@ -134,26 +146,5 @@ class Lock
         $this->files->put($this->path, json_encode($content, JSON_UNESCAPED_SLASHES));
 
         return $this;
-    }
-
-    /**
-     * Sometimes composer returns versions with a 'v', sometimes it doesn't.
-     *
-     * @param string $version
-     * @return string
-     */
-    protected function normalizeVersion(string $version)
-    {
-        $version = ltrim($version, 'v');
-
-        if (preg_match('/^\d+\.\d+$/', $version)) {
-            $version .= '.0';
-        }
-
-        if (preg_match('/^\d+$/', $version)) {
-            $version .= '.0.0';
-        }
-
-        return $version;
     }
 }

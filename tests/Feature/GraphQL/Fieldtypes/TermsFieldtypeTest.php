@@ -7,6 +7,7 @@ use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
 use Statamic\Facades\Taxonomy;
 use Statamic\Facades\Term;
+use Tests\Feature\GraphQL\EnablesQueries;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -14,6 +15,9 @@ use Tests\TestCase;
 class TermsFieldtypeTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['collections'];
 
     public function setUp(): void
     {

@@ -45,6 +45,9 @@ class EntryInterface extends InterfaceType
             'private' => [
                 'type' => GraphQL::nonNull(GraphQL::boolean()),
             ],
+            'status' => [
+                'type' => GraphQL::nonNull(GraphQL::string()),
+            ],
             'collection' => [
                 'type' => GraphQL::nonNull(GraphQL::type(CollectionType::NAME)),
             ],

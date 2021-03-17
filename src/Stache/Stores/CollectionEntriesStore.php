@@ -9,7 +9,6 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\YAML;
 use Statamic\Stache\Indexes;
-use Statamic\Structures\CollectionStructure;
 use Statamic\Support\Str;
 use Symfony\Component\Finder\SplFileInfo;
 
@@ -131,31 +130,11 @@ class CollectionEntriesStore extends ChildStore
             return;
         }
 
-        $contents = $collection->structureContents();
-
-        $trees = $contents['tree'] ?? [Site::default()->handle() => $contents['tree']];
-        unset($contents['tree']);
-        $contents['tree'] = $trees;
-
-        $structure = (new CollectionStructure)
-            ->collection($collection)
-            ->expectsRoot($contents['root'] ?? false)
-            ->maxDepth($contents['max_depth'] ?? null);
-
-        $tempStructure = new class extends \Statamic\Structures\Structure {
-            public function collections($collections = null)
-            {
-                return collect();
-            }
-        };
-
-        foreach ($trees as $site => $treeContents) {
-            $structure->addTree(
-                $tempStructure->makeTree($site)->tree($treeContents)->remove($id)
-            );
-        }
-
-        $collection->structure($structure)->save();
+        $collection->structure()->trees()->each(function ($tree) use ($id) {
+            $tree
+                ->remove($id)
+                ->save();
+        });
     }
 
     protected function storeIndexes()

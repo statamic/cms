@@ -1,0 +1,7 @@
+tree:
+  -
+    entry: pages-home
+  -
+    entry: pages-about
+  -
+    entry: pages-contact

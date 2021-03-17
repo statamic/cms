@@ -12,6 +12,9 @@ class NavTest extends TestCase
 {
     use PreventSavingStacheItemsToDisk;
     use CreatesQueryableTestEntries;
+    use EnablesQueries;
+
+    protected $enabledQueries = ['navs'];
 
     public function setUp(): void
     {
@@ -19,13 +22,24 @@ class NavTest extends TestCase
         BlueprintRepository::partialMock();
     }
 
+    /**
+     * @test
+     * @environment-setup disableQueries
+     **/
+    public function query_only_works_if_enabled()
+    {
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => '{nav}'])
+            ->assertSee('Cannot query field \"nav\" on type \"Query\"', false);
+    }
+
     /** @test */
     public function it_queries_a_nav_by_handle()
     {
         Nav::make('links')->title('Links')->maxDepth(1)->expectsRoot(false)->tap(function ($nav) {
-            $nav->addTree($nav->makeTree('en'));
-            $nav->save();
-        });
+            $nav->makeTree('en')->save();
+        })->save();
         $this->createFooterNav();
 
         $query = <<<'GQL'
@@ -186,7 +200,7 @@ GQL;
         $this->createEntries();
 
         Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
-            $nav->addTree($nav->makeTree('en')->tree([
+            $nav->makeTree('en', [
                 [
                     'entry' => '1',
                     'children' => [
@@ -195,9 +209,8 @@ GQL;
                         ],
                     ],
                 ],
-            ]));
-            $nav->save();
-        });
+            ])->save();
+        })->save();
 
         $query = <<<'GQL'
 {
@@ -315,7 +328,7 @@ GQL;
     private function createFooterNav()
     {
         Nav::make('footer')->title('Footer')->maxDepth(3)->expectsRoot(false)->tap(function ($nav) {
-            $nav->addTree($nav->makeTree('en')->tree([
+            $nav->makeTree('en', [
                 [
                     'url' => '/one',
                     'title' => 'One',
@@ -342,8 +355,8 @@ GQL;
                     'url' => '/two',
                     'title' => 'Two',
                 ],
-            ]));
-            $nav->addTree($nav->makeTree('fr')->tree([
+            ])->save();
+            $nav->makeTree('fr', [
                 [
                     'url' => '/fr-one',
                     'title' => 'Fr One',
@@ -370,8 +383,7 @@ GQL;
                     'url' => '/fr-two',
                     'title' => 'Fr Two',
                 ],
-            ]));
-            $nav->save();
-        });
+            ])->save();
+        })->save();
     }
 }
