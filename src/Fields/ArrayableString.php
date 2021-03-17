@@ -5,7 +5,7 @@ namespace Statamic\Fields;
 use Illuminate\Contracts\Support\Arrayable;
 use JsonSerializable;
 
-class ArrayableStringValue implements Arrayable, JsonSerializable
+class ArrayableString implements Arrayable, JsonSerializable
 {
     protected $value;
     protected $extra;
