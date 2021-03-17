@@ -10,7 +10,7 @@ class ArrayableString implements Arrayable, JsonSerializable
     protected $value;
     protected $extra;
 
-    public function __construct($value, array $extra)
+    public function __construct($value, array $extra = [])
     {
         $this->value = $value;
         $this->extra = $extra;
