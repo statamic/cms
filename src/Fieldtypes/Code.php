@@ -106,8 +106,6 @@ class Code extends Fieldtype
             $value = str_replace('<?php', '&lt;?php', $value);
         }
 
-        $mode = ['mode' => $this->config('mode')];
-
-        return new ArrayableString($value, $mode);
+        return new ArrayableString($value, ['mode' => $this->config('mode')]);
     }
 }
