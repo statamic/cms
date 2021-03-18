@@ -19,6 +19,19 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Git Binary
+    |--------------------------------------------------------------------------
+    |
+    | The path to the git binary. By default Statamic will try to use the git
+    | command, but you can set an absolute path to the git binary, if the
+    | command is not available in the php environment.
+    |
+    */
+
+    'binary' => env('STATAMIC_GIT_BINARY', 'git'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Automatically Run
     |--------------------------------------------------------------------------
     |
