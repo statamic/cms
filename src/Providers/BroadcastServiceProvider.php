@@ -2,7 +2,6 @@
 
 namespace Statamic\Providers;
 
-use Illuminate\Broadcasting\BroadcastController;
 use Illuminate\Support\ServiceProvider;
 use Statamic\Statamic;
 
@@ -39,6 +38,6 @@ class BroadcastServiceProvider extends ServiceProvider
 
     protected function authEndpoint()
     {
-        return $this->app['url']->action([BroadcastController::class, 'authenticate']);
+        return config('broadcasting.auth_endpoint', url('/broadcasting/auth'));
     }
 }
