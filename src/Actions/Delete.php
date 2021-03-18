@@ -18,6 +18,7 @@ class Delete extends Action
         switch (true) {
             case $item instanceof Contracts\Entries\Entry && $item->collection()->sites()->count() > 1:
             case $item instanceof Contracts\Taxonomies\Term:
+            case $item instanceof Contracts\Assets\Asset:
             case $item instanceof Contracts\Forms\Submission:
             case $item instanceof Contracts\Auth\User:
                 return true;
