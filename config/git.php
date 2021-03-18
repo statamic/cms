@@ -22,7 +22,7 @@ return [
     | Git Binary
     |--------------------------------------------------------------------------
     |
-    | By default, Statamic will try to use the "git" command, but you can set 
+    | By default, Statamic will try to use the "git" command, but you can set
     | an absolute path to the git binary if necessary for your environment.
     |
     */
