@@ -630,6 +630,35 @@ class AssetTest extends TestCase
     }
 
     /** @test */
+    public function can_use_set_focus_in_augmented_focus_css_value()
+    {
+        Facades\Blueprint::shouldReceive('find')
+            ->with('assets/test_container')
+            ->andReturn($blueprint = (new Blueprint)->setHandle('test_container')->setNamespace('assets'));
+
+        $asset = (new Asset)
+            ->container($this->container)
+            ->path('path/to/asset.jpg')
+            ->set('focus', '75-25');
+
+        $this->assertSame($asset->augmentedValue('focus_css'), '75% 25%');
+    }
+
+    /** @test */
+    public function can_fallback_to_default_augmented_focus_css_value_if_focus_not_set()
+    {
+        Facades\Blueprint::shouldReceive('find')
+            ->with('assets/test_container')
+            ->andReturn($blueprint = (new Blueprint)->setHandle('test_container')->setNamespace('assets'));
+
+        $asset = (new Asset)
+            ->container($this->container)
+            ->path('path/to/asset.jpg');
+
+        $this->assertSame($asset->augmentedValue('focus_css'), '50% 50%');
+    }
+
+    /** @test */
     public function it_can_upload_a_file()
     {
         Event::fake();
@@ -719,7 +748,7 @@ class AssetTest extends TestCase
             'size', 'size_bytes', 'size_kilobytes', 'size_megabytes', 'size_gigabytes',
             'size_b', 'size_kb', 'size_mb', 'size_gb',
             'last_modified', 'last_modified_timestamp', 'last_modified_instance',
-            'focus_css',
+            'focus', 'focus_css',
         ];
     }
 }
