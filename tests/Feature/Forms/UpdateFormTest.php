@@ -68,14 +68,12 @@ class UpdateFormTest extends TestCase
             [
                 'to' => 'john@example.com',
                 'from' => 'jane@example.com',
-                'markdown' => false,
             ],
             [
                 'to' => 'foo@example.com',
                 'from' => 'bar@example.com',
                 'text' => 'emails.contact.text',
                 'html' => 'emails.contact.html',
-                'markdown' => false,
             ],
         ];
 
