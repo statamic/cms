@@ -1,6 +1,68 @@
 # Release Notes
 
-## Unreleased
+## 3.0.47 (2020-03-15)
+
+### What's new
+- Added a `route` param to `redirect` tag. [#3308](https://github.com/statamic/cms/issues/3308)
+- Added a "double encode" option to the `sanizite` modifier. [#3067](https://github.com/statamic/cms/issues/3067)
+
+### What's fixed
+- Fix sorting on aliased entries. [#3363](https://github.com/statamic/cms/issues/3363)
+- Fix default entry blueprint when hiding some of them. [#3368](https://github.com/statamic/cms/issues/3368)
+- Fix error when using SVGs in Glide tag pairs. [#3366](https://github.com/statamic/cms/issues/3366)
+- Fix JS error when field condition would result in an unevaluatable string. [#3366](https://github.com/statamic/cms/issues/3366)
+- Fix CP index dates in range-mode. [#3306](https://github.com/statamic/cms/issues/3306)
+- Removed unused dependencies in Fieldset and Blueprint repositories. [#3307](https://github.com/statamic/cms/issues/3307)
+
+
+
+## 3.0.46 (2020-03-05)
+
+### What's new
+- You can get a user's email via a property. [#3331](https://github.com/statamic/cms/issues/3331)
+
+### What's fixed
+- Fix range field overflowing issue. [#3292](https://github.com/statamic/cms/issues/3292)
+- Show valid data for a Form fields in the content API. [#3270](https://github.com/statamic/cms/issues/3270)
+- Enable fixed toolbar on a Bard field inside a set. [#3240](https://github.com/statamic/cms/issues/3240)
+
+
+## 3.0.45 (2020-02-22)
+
+### What's new
+- Add new `chunk` modifier. [849ae0ccb](https://github.com/statamic/cms/commit/849ae0ccb)
+- Support `image` and `mimes` validation rules for assets. [#3253](https://github.com/statamic/cms/issues/3253)
+- Parameters can now access:nested:variables. [#3267](https://github.com/statamic/cms/issues/3267)
+- Added syringe icon. [#3232](https://github.com/statamic/cms/issues/3232)
+
+### What's improved
+- Improve Spanish translations. [#3243](https://github.com/statamic/cms/issues/3243)
+
+### What's fixed
+- Fix error when attempting to filter a collection by a single taxonomy. [#3244](https://github.com/statamic/cms/issues/3244)
+- Prevent deleting `select` field selections when in read only. [#3283](https://github.com/statamic/cms/issues/3283)
+- Preserve numeric keys in the `array` fieldtype. [#3284](https://github.com/statamic/cms/issues/3284)
+- Localize the taxonomy `terms` field. [#3172](https://github.com/statamic/cms/issues/3172)
+- Persist the `parent` when using the create another entry button. [#3285](https://github.com/statamic/cms/issues/3285)
+- Fix disabled `select` field styling issues. [#3275](https://github.com/statamic/cms/issues/3275)
+- Prevent excessive user database queries. [#3227](https://github.com/statamic/cms/issues/3227)
+- Handle null labels correctly in the `array` fieldtype. [#3260](https://github.com/statamic/cms/issues/3260)
+- Keep text field width within limits in Firefox. [#3258](https://github.com/statamic/cms/issues/3258)
+- Fix type error in `repeat` modifier. [#3261](https://github.com/statamic/cms/issues/3261)
+- The `date` fieldtype in a listing uses use the `date_format` setting. [#3264](https://github.com/statamic/cms/issues/3264)
+- Use `date_format` in updater changelogs. [#3246](https://github.com/statamic/cms/issues/3246)
+
+
+
+## 3.0.44 (2020-02-17)
+
+### What's fixed
+- Allow `view` data to be passed into tags parameters. [#3252](https://github.com/statamic/cms/issues/3252)
+- Fix error when submitting a form with emails. [#3239](https://github.com/statamic/cms/issues/3239)
+
+
+
+## 3.0.43 (2020-02-11)
 
 ### What's new
 - Added an `EntryCreated` event. [#3078](https://github.com/statamic/cms/issues/3078)

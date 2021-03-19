@@ -94,7 +94,7 @@ class Terms extends Relationship
 
                 $locale = $parent && $parent instanceof Localization
                     ? $parent->locale()
-                    : Site::current()->handle();
+                    : Site::current()->handle(); // Use the "current" site so this will get localized appropriately on the front-end.
 
                 return $term->in($locale);
             });
@@ -209,6 +209,16 @@ class Terms extends Relationship
             return $this->invalidItemArray($id);
         }
 
+        // The parent is the item this terms fieldtype exists on. Most commonly an
+        // entry, but could also be something else, like another taxonomy term.
+        $parent = $this->field->parent();
+
+        $locale = $parent && $parent instanceof Localization
+            ? $parent->locale()
+            : Site::default()->handle();
+
+        $term = $term->in($locale);
+
         return [
             'id' => $id,
             'title' => $term->value('title'),
@@ -241,9 +251,9 @@ class Terms extends Relationship
             $query->where('title', 'like', '%'.$search.'%');
         }
 
-        // if ($site = $request->site) {
-        //     $query->where('site', $site);
-        // }
+        if ($site = $request->site) {
+            $query->where('site', $site);
+        }
 
         if ($request->exclusions) {
             $query->whereNotIn('id', $request->exclusions);
