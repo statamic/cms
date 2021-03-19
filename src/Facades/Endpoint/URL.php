@@ -6,6 +6,7 @@ use Statamic\Data\Services\ContentService;
 use Statamic\Facades\Config;
 use Statamic\Facades\Path;
 use Statamic\Facades\Pattern;
+use Statamic\Facades\Site;
 use Statamic\Support\Str;
 
 /**
@@ -219,9 +220,13 @@ class URL
      */
     public function isExternal($url)
     {
+        if (Str::startsWith($url, '/')) {
+            return false;
+        }
+
         return ! Pattern::startsWith(
             Str::ensureRight($url, '/'),
-            self::prependSiteUrl('/')
+            Site::current()->absoluteUrl()
         );
     }
 
