@@ -66,7 +66,7 @@ abstract class Store
         $files = Traverser::filter([$this, 'getItemFilter'])->traverse($this);
 
         $items = $files->map(function ($timestamp, $path) {
-            return $this->getItemByPath($path) ?? $this->makeItemFromFile($path, File::get($path));
+            return $this->getItemByPath($path);
         })
         ->filter()
         ->keyBy(function ($item) {
