@@ -339,12 +339,13 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
             $prefix = $this->date->format($this->hasTime() ? 'Y-m-d-Hi' : 'Y-m-d').'.';
         }
 
-        return vsprintf('%s/%s/%s%s%s.%s', [
+        return vsprintf('%s/%s/%s%s%s.%s.%s', [
             rtrim(Stache::store('entries')->directory(), '/'),
             $this->collectionHandle(),
             Site::hasMultiple() ? $this->locale().'/' : '',
             $prefix,
             $this->slug(),
+            $this->id(),
             $this->fileExtension(),
         ]);
     }

@@ -64,6 +64,10 @@ class CollectionEntriesStore extends ChildStore
 
         $slug = pathinfo(Path::clean($path), PATHINFO_FILENAME);
 
+        if (isset($idGenerated) && str_contains($slug, $id)) {
+            $slug = str_replace(".{$id}", '', $slug);
+        }
+
         if ($origin = array_pull($data, 'origin')) {
             $entry->origin($origin);
         }
