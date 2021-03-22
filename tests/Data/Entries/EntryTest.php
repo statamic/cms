@@ -380,7 +380,7 @@ class EntryTest extends TestCase
         $entry = (new Entry)->id('foo-bar-baz')->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/post.foo-bar-baz.md', $entry->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/2018-01-02.post.md', $entry->date('2018-01-02')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/2018-01-02.post.foo-bar-baz.md', $entry->date('2018-01-02')->path());
     }
 
     /** @test */
@@ -395,7 +395,7 @@ class EntryTest extends TestCase
         $entry = (new Entry)->id('foo-bar-baz')->collection($collection)->locale('en')->slug('post');
 
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/post.foo-bar-baz.md', $entry->path());
-        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/2018-01-02.post.md', $entry->date('2018-01-02')->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/2018-01-02.post.foo-bar-baz.md', $entry->date('2018-01-02')->path());
     }
 
     /** @test */
