@@ -297,6 +297,7 @@ class EntryRevisionsTest extends TestCase
             ->slug('test')
             ->collection('blog')
             ->published(false)
+            ->date(Carbon::createFromTimestamp('1553546421'))
             ->data([
                 'blueprint' => 'test',
                 'title' => 'Title',
