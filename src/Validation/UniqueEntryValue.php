@@ -8,7 +8,7 @@ class UniqueEntryValue
 {
     public function validate($attribute, $value, $parameters, $validator)
     {
-        [$collection, $except, $site] = array_pad($parameters, 3, null);
+        [$collection, $except, $site, $uri, $slug] = array_pad($parameters, 5, null);
 
         $query = Entry::query();
 
@@ -18,6 +18,10 @@ class UniqueEntryValue
 
         if ($site) {
             $query->where('site', $site);
+        }
+
+        if ($uri) {
+            $query->where('uri', str_replace($slug, '', $uri));
         }
 
         $existing = $query

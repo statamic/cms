@@ -16,7 +16,7 @@ use Statamic\Contracts\Entries\EntryRepository;
  * @method static \Statamic\Contracts\Entries\QueryBuilder query()
  * @method static void save($entry)
  * @method static void delete($entry)
- * @method static array createRules($collection, $site)
+ * @method static array createRules($collection, $site, $uri, $slug)
  * @method static array updateRules($collection, $entry)
  *
  * @see \Statamic\Stache\Repositories\EntryRepository

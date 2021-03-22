@@ -99,11 +99,11 @@ class EntryRepository implements RepositoryContract
         });
     }
 
-    public function createRules($collection, $site)
+    public function createRules($collection, $site, $uri, $slug)
     {
         return [
             'title' => 'required',
-            'slug' => 'required|unique_entry_value:'.$collection->handle().',null,'.$site->handle(),
+            'slug' => 'required|unique_entry_value:'.$collection->handle().',null,'.$site->handle().','.$uri.','.$slug,
         ];
     }
 
@@ -111,7 +111,7 @@ class EntryRepository implements RepositoryContract
     {
         return [
             'title' => 'required',
-            'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id().','.$entry->locale(),
+            'slug' => 'required|alpha_dash|unique_entry_value:'.$collection->handle().','.$entry->id().','.$entry->locale().','.$entry->uri().','.$entry->slug(),
         ];
     }
 

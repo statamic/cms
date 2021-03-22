@@ -24,7 +24,7 @@ interface EntryRepository
 
     public function delete($entry);
 
-    public function createRules($collection, $site);
+    public function createRules($collection, $site, $uri, $slug);
 
     public function updateRules($collection, $entry);
 }

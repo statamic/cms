@@ -302,7 +302,11 @@ class EntriesController extends CpController
 
         $fields = $blueprint->fields()->addValues($data);
 
-        $fields->validate(Entry::createRules($collection, $site));
+        $parentEntryUri = isset($data['parent'][0])
+            ? Entry::find($data['parent'][0])->uri()
+            : null;
+
+        $fields->validate(Entry::createRules($collection, $site, $parentEntryUri, $data['slug']));
 
         $values = $fields->process()->values()->except(['slug', 'date', 'blueprint']);
 
