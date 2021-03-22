@@ -377,9 +377,9 @@ class EntryTest extends TestCase
         ]]);
 
         $collection = (new Collection)->handle('blog');
-        $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
+        $entry = (new Entry)->id('foo-bar-baz')->collection($collection)->locale('en')->slug('post');
 
-        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/post.md', $entry->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/post.foo-bar-baz.md', $entry->path());
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/2018-01-02.post.md', $entry->date('2018-01-02')->path());
     }
 
@@ -392,9 +392,9 @@ class EntryTest extends TestCase
         ]]);
 
         $collection = (new Collection)->handle('blog');
-        $entry = (new Entry)->collection($collection)->locale('en')->slug('post');
+        $entry = (new Entry)->id('foo-bar-baz')->collection($collection)->locale('en')->slug('post');
 
-        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/post.md', $entry->path());
+        $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/post.foo-bar-baz.md', $entry->path());
         $this->assertEquals($this->fakeStacheDirectory.'/content/collections/blog/en/2018-01-02.post.md', $entry->date('2018-01-02')->path());
     }
 
