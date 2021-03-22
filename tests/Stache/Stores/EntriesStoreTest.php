@@ -123,7 +123,7 @@ class EntriesStoreTest extends TestCase
 
         $this->parent->store('blog')->save($entry);
 
-        $this->assertFileEqualsString($path = $this->directory.'/blog/2017-07-04.test.md', $entry->fileContents());
+        $this->assertFileEqualsString($path = $this->directory.'/blog/2017-07-04.test.123.md', $entry->fileContents());
         @unlink($path);
         $this->assertFileNotExists($path);
 
