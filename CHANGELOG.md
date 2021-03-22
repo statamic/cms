@@ -1,5 +1,21 @@
 # Release Notes
 
+## 3.0.48 (2020-03-22)
+
+### What's new
+- The Git integration can use a custom queue connection. [#3305](https://github.com/statamic/cms/issues/3305)
+
+### What's improved
+- The Stache watcher now uses an environment variable by default. [#3403](https://github.com/statamic/cms/issues/3403)
+
+### What's fixed
+- Fix `markdown` modifier not using custom parser. [#3373](https://github.com/statamic/cms/issues/3373)
+- Fix issue where the `nav` tag would incorrect label urls as external. [#3401](https://github.com/statamic/cms/issues/3401)
+- Assets default their `focus` and `focus_css` values to `50-50-1`. [#3340](https://github.com/statamic/cms/issues/3340)
+- Fix wrong Closure typehint. [#3375](https://github.com/statamic/cms/issues/3375)
+
+
+
 ## 3.0.47 (2020-03-15)
 
 ### What's new
