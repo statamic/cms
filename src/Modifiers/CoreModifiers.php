@@ -1233,7 +1233,7 @@ class CoreModifiers extends Modifier
 
         $parser = $params[0] ?? 'default';
 
-        if (in_array($parser, [true, 'true', ''])) {
+        if (in_array($parser, [true, 'true', ''], true)) {
             $parser = 'default';
         }
 

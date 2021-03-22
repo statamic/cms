@@ -32,6 +32,20 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Queue Connection
+    |--------------------------------------------------------------------------
+    |
+    | You may choose which queue connection should be used when dispatching
+    | commit jobs. Unless specified, the default connection will be used.
+    |
+    | https://statamic.dev/git-integration#queueing-commits
+    |
+    */
+
+    'queue_connection' => env('STATAMIC_GIT_QUEUE_CONNECTION'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Dispatch Delay
     |--------------------------------------------------------------------------
     |
