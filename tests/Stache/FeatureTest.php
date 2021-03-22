@@ -282,7 +282,7 @@ class FeatureTest extends TestCase
             ->data(['title' => 'Test Entry', 'foo' => 'bar'])
         )->save();
 
-        $this->assertFileExists(__DIR__.'/__fixtures__/content/collections/blog/2017-07-04.test-entry.md');
+        $this->assertFileExists(__DIR__.'/__fixtures__/content/collections/blog/2017-07-04.test-entry.123.md');
 
         $entry->delete();
     }
