@@ -18,7 +18,6 @@ use Statamic\Facades\File;
 use Statamic\Facades\Search;
 use Statamic\Facades\Stache;
 use Statamic\Facades\URL;
-use Statamic\Support\Str;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
 class AssetContainer implements AssetContainerContract, Augmentable
@@ -238,28 +237,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
             $recursive = true;
         }
 
-        $files = $this->contents()->files();
-
-        // Filter by folder and recursiveness. But don't bother if we're
-        // requesting the root recursively as it's already that way.
-        if ($folder === '/' && $recursive) {
-            //
-        } else {
-            $files = $files->filter(function ($file) use ($folder, $recursive) {
-                $dir = $file['dirname'] ?: '/';
-
-                return $recursive ? Str::startsWith($dir, $folder) : $dir == $folder;
-            });
-        }
-
-        // Get rid of files we never want to show up.
-        $files = $files->reject(function ($file, $path) {
-            return Str::startsWith($path, '.meta/')
-                || Str::contains($path, '/.meta/')
-                || Str::endsWith($path, ['.DS_Store', '.gitkeep', '.gitignore']);
-        });
-
-        return $files->keys();
+        return $this->contents()->filteredFilesIn($folder, $recursive)->keys();
     }
 
     public function foldersCacheKey($folder = '/', $recursive = false)
@@ -283,25 +261,7 @@ class AssetContainer implements AssetContainerContract, Augmentable
             $recursive = true;
         }
 
-        $files = $this->contents()->directories();
-
-        // Filter by folder and recursiveness. But don't bother if we're
-        // requesting the root recursively as it's already that way.
-        if ($folder === '/' && $recursive) {
-            //
-        } else {
-            $files = $files->filter(function ($file) use ($folder, $recursive) {
-                $dir = $file['dirname'] ?: '/';
-
-                return $recursive ? Str::startsWith($dir, $folder) : $dir == $folder;
-            });
-        }
-
-        $files = $files->reject(function ($file) {
-            return $file['basename'] == '.meta';
-        });
-
-        return $files->keys();
+        return $this->contents()->filteredDirectoriesIn($folder, $recursive)->keys();
     }
 
     /**
