@@ -1,5 +1,31 @@
 # Release Notes
 
+## 3.1.0-beta.2 (2020-03-22)
+
+### What's new
+- Added option to set a custom path to git binary. [#3393](https://github.com/statamic/cms/issues/3393)
+- Added `ArrayableString` class, and apply to the `code` fieldtype. [#3347](https://github.com/statamic/cms/issues/3347)
+- Added support for `date` input type on `text` fieldtype. [39323eab4](https://github.com/statamic/cms/commit/39323eab4)
+- Added ability to set HTML attributes on `NavItem`s. [#3386](https://github.com/statamic/cms/issues/3386)
+
+### What's improved
+- More asset performance improvements. [#3409](https://github.com/statamic/cms/issues/3409)
+- Redesign the updater widget. [3b8538814](https://github.com/statamic/cms/commit/3b8538814)
+- Set widget heights to full for a more pleasing experience. [d7b55bd47](https://github.com/statamic/cms/commit/d7b55bd47)
+- Display toggle fieldtypes inline when in sidebar. [a521286ea](https://github.com/statamic/cms/commit/a521286ea)
+- Don't show error templates in the template fieldtype. [da84894de](https://github.com/statamic/cms/commit/da84894de)
+- When a Replicator has a single set, the add button will not show the set selector. [68722c23a](https://github.com/statamic/cms/commit/68722c23a)
+- Added an icon to the collection widget. [28e2290a0](https://github.com/statamic/cms/commit/28e2290a0)
+
+### What's fixed
+- Fix custom logo when using arrays with null. [#3408](https://github.com/statamic/cms/issues/3408)
+- Fix `trans_choice()` pluralization. [#3405](https://github.com/statamic/cms/issues/3405)
+- Fix broadcasting error if you have your routes cached. [#3395](https://github.com/statamic/cms/issues/3395)
+- Prevent delete action showing outside of core listings. [8a4d84fc](https://github.com/statamic/cms/commit/8a4d84fc)
+- Brought over changes from 3.0.48
+
+
+
 ## 3.1.0-beta.1 (2020-03-15)
 
 ### What's new
