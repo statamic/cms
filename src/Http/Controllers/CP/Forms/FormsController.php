@@ -256,6 +256,14 @@ class FormsController extends CpController
                                 ],
                             ],
                             [
+                                'handle' => 'markdown',
+                                'field' => [
+                                    'type' => 'toggle',
+                                    'display' => __('Use markdown'),
+                                    'instructions' => __('statamic::messages.form_configure_email_markdown_instructions'),
+                                ],
+                            ],
+                            [
                                 'handle' => 'text',
                                 'field' => [
                                     'type' => 'template',
