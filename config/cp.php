@@ -89,7 +89,7 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Login Theme
+    | Theme
     |--------------------------------------------------------------------------
     |
     | Optionally spice up the login and other outside-the-control-panel
