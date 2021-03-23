@@ -67,6 +67,9 @@ blueprint: test
 EOL;
         $item = $this->store->makeItemFromFile($this->tempDir.'/example.yaml', $contents);
 
+        // When assets are queried below, it looks for the container.
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('example')->andReturn($item);
+
         $this->assertInstanceOf(AssetContainer::class, $item);
         $this->assertEquals(File::disk('test'), $item->disk());
         $this->assertEquals('example', $item->handle());

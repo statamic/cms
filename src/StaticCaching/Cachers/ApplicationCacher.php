@@ -12,6 +12,11 @@ class ApplicationCacher extends AbstractCacher
     protected $cache;
 
     /**
+     * @var string|null
+     */
+    private $cached;
+
+    /**
      * Cache a page.
      *
      * @param \Illuminate\Http\Request $request     Request associated with the page to be cached
@@ -43,12 +48,28 @@ class ApplicationCacher extends AbstractCacher
     }
 
     /**
+     * Check if a page has been cached.
+     *
+     * @param Request $request
+     * @return bool
+     */
+    public function hasCachedPage(Request $request)
+    {
+        return (bool) $this->cached = $this->getFromCache($request);
+    }
+
+    /**
      * Get a cached page.
      *
      * @param Request $request
      * @return string
      */
     public function getCachedPage(Request $request)
+    {
+        return $this->cached ?? $this->getFromCache($request);
+    }
+
+    private function getFromCache(Request $request)
     {
         $url = $this->getUrl($request);
 

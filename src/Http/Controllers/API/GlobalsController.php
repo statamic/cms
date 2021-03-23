@@ -2,24 +2,27 @@
 
 namespace Statamic\Http\Controllers\API;
 
-use Illuminate\Http\Request;
 use Statamic\Facades\GlobalSet;
-use Statamic\Facades\Site;
 use Statamic\Http\Resources\API\GlobalSetResource;
 
 class GlobalsController extends ApiController
 {
-    public function index(Request $request)
+    protected $resourceConfigKey = 'globals';
+    protected $routeResourceKey = 'global';
+
+    public function index()
     {
-        $site = Site::default()->handle();
+        $this->abortIfDisabled();
 
         return app(GlobalSetResource::class)::collection(
-            GlobalSet::all()->map->in($site)
+            $this->filterAllowedResources(GlobalSet::all()->map->in($this->queryParam('site')))
         );
     }
 
     public function show($globalSet)
     {
+        $this->abortIfDisabled();
+
         return app(GlobalSetResource::class)::make($globalSet);
     }
 }

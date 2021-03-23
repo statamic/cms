@@ -10,6 +10,7 @@ use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Data\Augmented;
 use Statamic\Contracts\Data\Localization;
 use Statamic\Contracts\Entries\Entry as Contract;
+use Statamic\Contracts\GraphQL\ResolvesValues as ResolvesValuesContract;
 use Statamic\Data\ContainsData;
 use Statamic\Data\ExistsAsFile;
 use Statamic\Data\HasAugmentedInstance;
@@ -26,19 +27,20 @@ use Statamic\Facades\Blink;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Site;
 use Statamic\Facades\Stache;
+use Statamic\GraphQL\ResolvesValues;
 use Statamic\Revisions\Revisable;
 use Statamic\Routing\Routable;
 use Statamic\Statamic;
 use Statamic\Support\Arr;
 use Statamic\Support\Traits\FluentlyGetsAndSets;
 
-class Entry implements Contract, Augmentable, Responsable, Localization, Protectable
+class Entry implements Contract, Augmentable, Responsable, Localization, Protectable, ResolvesValuesContract
 {
     use Routable {
         uri as routableUri;
     }
 
-    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified;
+    use ContainsData, ExistsAsFile, HasAugmentedInstance, FluentlyGetsAndSets, Revisable, Publishable, TracksQueriedColumns, TracksLastModified, ResolvesValues;
     use HasOrigin {
         value as originValue;
         values as originValues;
@@ -80,6 +82,11 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
     public function site()
     {
         return Site::get($this->locale());
+    }
+
+    public function authors()
+    {
+        return collect($this->value('author'));
     }
 
     public function collection($collection = null)
@@ -158,8 +165,8 @@ class Entry implements Contract, Augmentable, Responsable, Localization, Protect
                         $tree->move($child->id(), optional($parent)->id());
                     });
                     $tree->remove($this);
-                });
-            })->save();
+                })->save();
+            });
         }
 
         Facades\Entry::delete($this);

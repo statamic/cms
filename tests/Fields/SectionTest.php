@@ -159,6 +159,7 @@ class SectionTest extends TestCase
                     'character_limit' => null,
                     'component' => 'textarea',
                     'antlers' => false,
+                    'placeholder' => null,
                 ],
             ],
         ], $section->toPublishArray());

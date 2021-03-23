@@ -5,6 +5,7 @@ namespace Statamic\Structures;
 use Statamic\Contracts\Structures\Nav;
 use Statamic\Facades\Entry;
 use Statamic\Facades\Structure;
+use Statamic\Facades\User;
 use Statamic\Support\Arr;
 use Statamic\Support\Str;
 
@@ -12,7 +13,9 @@ class TreeBuilder
 {
     public function build($params)
     {
-        if (! $structure = Structure::find($params['structure'])) {
+        if ($params['structure'] instanceof \Statamic\Contracts\Structures\Structure) {
+            $structure = $params['structure'];
+        } elseif (! $structure = Structure::find($params['structure'])) {
             return null;
         }
 
@@ -37,20 +40,30 @@ class TreeBuilder
                 ->all();
         }
 
-        return $this->toTree($pages, 1);
+        return $this->toTree($pages, $params);
     }
 
-    protected function toTree($pages, $depth)
+    protected function toTree($pages, $params, $depth = 1)
     {
-        return $pages->map(function ($page) use ($depth) {
+        $maxDepth = $params['max_depth'] ?? null;
+        $fields = $params['fields'] ?? null;
+        $showUnpublished = $params['show_unpublished'] ?? true;
+
+        if ($maxDepth && $depth > $maxDepth) {
+            return [];
+        }
+
+        return $pages->map(function ($page) use ($fields, $params, $depth, $showUnpublished) {
             if ($page->reference() && ! $page->referenceExists()) {
+                return null;
+            } elseif (! $showUnpublished && $page->entry() && $page->entry()->status() !== 'published') {
                 return null;
             }
 
             return [
-                'page' => $page,
+                'page' => $page->selectedQueryColumns($fields),
                 'depth' => $depth,
-                'children' => $this->toTree($page->pages()->all(), $depth + 1),
+                'children' => $this->toTree($page->pages()->all(), $params, $depth + 1),
             ];
         })->filter()->values()->all();
     }
@@ -73,8 +86,9 @@ class TreeBuilder
                 'title'       => $page->title(),
                 'url'         => $page->url(),
                 'edit_url'    => $page->editUrl(),
+                'can_delete'  => $page->referenceExists() ? User::current()->can('delete', $page->entry()) : true,
                 'slug'        => $page->slug(),
-                'redirect'    => $page->reference() ? $page->entry()->get('redirect') : null,
+                'redirect'    => $page->referenceExists() ? $page->entry()->get('redirect') : null,
                 'collection'  => ! $collection ? null : [
                     'handle' => $collection->handle(),
                     'title' => $collection->title(),

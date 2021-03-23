@@ -194,6 +194,22 @@ class CoreModifiers extends Modifier
     }
 
     /**
+     * Breaks arrays or collections into smaller ones of a given size.
+     *
+     * @param $value
+     * @return array
+     */
+    public function chunk($value, $params)
+    {
+        return collect($value)
+            ->chunk(Arr::get($params, 0))
+            ->map(function ($chunk) {
+                return ['chunk' => $chunk];
+            })
+            ->all();
+    }
+
+    /**
      * Collapses an array of arrays into a flat array.
      *
      * @param $value
@@ -1217,7 +1233,7 @@ class CoreModifiers extends Modifier
 
         $parser = $params[0] ?? 'default';
 
-        if (in_array($parser, [true, 'true', ''])) {
+        if (in_array($parser, [true, 'true', ''], true)) {
             $parser = 'default';
         }
 
@@ -1646,6 +1662,8 @@ class CoreModifiers extends Modifier
         $times = Arr::get($params, 0, 1);
         $times = is_numeric($times) ? $times : Arr::get($context, $times);
 
+        $times = ($times instanceof Value) ? $times->value() : $times;
+
         return str_repeat($value, $times);
     }
 
@@ -1708,9 +1726,11 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function sanitize($value)
+    public function sanitize($value, $params)
     {
-        return htmlspecialchars($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), false);
+        $double_encode = (bool) Arr::get($params, 0, false);
+
+        return htmlspecialchars($value, ENT_QUOTES, Config::get('statamic.system.charset', 'UTF-8'), $double_encode);
     }
 
     /**
@@ -1909,6 +1929,14 @@ class CoreModifiers extends Modifier
 
         $value = $value instanceof Collection ? $value : collect($value);
 
+        // Working with a DataCollection
+        if (method_exists($value, 'multisort')) {
+            $value = $value->multisort(implode(':', $params));
+
+            return $value->values();
+        }
+
+        // Working with array data
         if ($key === 'random') {
             return $value->shuffle();
         }

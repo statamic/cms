@@ -23,6 +23,7 @@ class Text extends Fieldtype
                 'width' => 50,
                 'options' => [
                     'color',
+                    'date',
                     'email',
                     'hidden',
                     'month',

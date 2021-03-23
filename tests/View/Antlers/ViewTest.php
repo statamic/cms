@@ -173,4 +173,32 @@ EOT;
 
         $this->assertEquals($expected, trim($view->render()));
     }
+
+    /** @test */
+    public function current_view_data_wins()
+    {
+        $this->viewShouldReturnRaw('template', file_get_contents(__DIR__.'/fixtures/template-with-front-matter.antlers.html')."\n{{ partial:partial }}");
+        $this->viewShouldReturnRaw('partial', file_get_contents(__DIR__.'/fixtures/partial-with-front-matter.antlers.html'));
+        $this->viewShouldReturnRaw('layout', file_get_contents(__DIR__.'/fixtures/layout-with-front-matter.antlers.html'));
+
+        $view = (new View)
+            ->template('template')
+            ->layout('layout');
+
+        $expected = <<<'EOT'
+layout:
+layout-foo
+template-bar
+
+template:
+template-foo
+template-bar
+
+partial:
+partial-foo
+partial-bar
+EOT;
+
+        $this->assertEquals($expected, trim($view->render()));
+    }
 }

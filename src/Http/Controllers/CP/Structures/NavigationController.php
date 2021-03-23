@@ -109,11 +109,11 @@ class NavigationController extends CpController
         if ($sites = Arr::get($values, 'sites')) {
             foreach ($sites as $site) {
                 $tree = $nav->in($site) ?? $nav->makeTree($site);
-                $nav->addTree($tree);
+                $tree->save();
             }
 
             foreach (array_diff($existingSites, $sites) as $site) {
-                $nav->removeTree($nav->in($site));
+                $nav->in($site)->delete();
             }
         }
 
@@ -144,7 +144,7 @@ class NavigationController extends CpController
             ->title($values['title'])
             ->handle($values['handle']);
 
-        $structure->addTree($structure->makeTree(Site::default()->handle()));
+        $structure->makeTree(Site::default()->handle())->save();
 
         $structure->save();
 

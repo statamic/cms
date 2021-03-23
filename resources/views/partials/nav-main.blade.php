@@ -9,14 +9,14 @@
                     @foreach ($items as $item)
                         @unless ($item->view())
                             <li class="{{ $item->isActive() ? 'current' : '' }}">
-                                <a href="{{ $item->url() }}">
+                                <a href="{{ $item->url() }}" {{ $item->attributes() }}>
                                     <i>{!! $item->icon() !!}</i><span>{{ __($item->name()) }}</span>
                                 </a>
                                 @if ($item->children() && $item->isActive())
                                     <ul>
                                         @foreach ($item->children() as $child)
                                             <li class="{{ $child->isActive() ? 'current' : '' }}">
-                                                <a href="{{ $child->url() }}">{{ __($child->name()) }}</a>
+                                                <a href="{{ $child->url() }}" {{ $item->attributes() }}>{{ __($child->name()) }}</a>
                                             </li>
                                         @endforeach
                                     </ul>

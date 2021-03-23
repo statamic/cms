@@ -198,6 +198,57 @@ class ParametersTest extends TestCase
         $this->assertSame('fallback', $this->params->float('unknown', 'fallback'));
     }
 
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/3248
+     */
+    public function it_gets_nested_values()
+    {
+        $augmentable = new class implements \Statamic\Contracts\Data\Augmentable {
+            use \Statamic\Data\HasAugmentedData;
+
+            public function augmentedArrayData()
+            {
+                return [
+                    'foo' => 'a',
+                ];
+            }
+        };
+
+        $context = new Context([
+            'array' => ['foo' => 'b'],
+            'object' => $augmentable,
+        ]);
+
+        $params = Parameters::make([
+            ':arr' => 'array:foo',
+            ':obj' => 'object:foo',
+        ], $context);
+
+        $this->assertSame('b', $params->get('arr'));
+        $this->assertSame('a', $params->get('obj'));
+    }
+
+    /** @test */
+    public function it_can_use_modifiers()
+    {
+        $context = new Context(['foo' => 'bar']);
+
+        $params = Parameters::make([
+            ':evaluated' => 'foo|upper',
+            ':double_quotes' => '"double"|upper|reverse',
+            ':single_quotes' => "'single'|upper|reverse",
+            ':double_quotes_with_spaces' => '"double" | upper | reverse',
+            ':single_quotes_with_spaces' => "'single' | upper | reverse",
+        ], $context);
+
+        $this->assertSame('BAR', $params->get('evaluated'));
+        $this->assertSame('ELBUOD', $params->get('double_quotes'));
+        $this->assertSame('ELGNIS', $params->get('single_quotes'));
+        $this->assertSame('ELBUOD', $params->get('double_quotes_with_spaces'));
+        $this->assertSame('ELGNIS', $params->get('single_quotes_with_spaces'));
+    }
+
     /** @test */
     public function it_is_iterable()
     {

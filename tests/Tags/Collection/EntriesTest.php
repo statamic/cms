@@ -404,15 +404,13 @@ class EntriesTest extends TestCase
         $this->makeEntry('b')->save();
         $this->makeEntry('c')->save();
 
-        $structure = (new CollectionStructure)->collection($this->collection)->maxDepth(1)->tap(function ($s) {
-            $s->addTree($s->makeTree('en')->tree([
-                ['entry' => 'b'],
-                ['entry' => 'c'],
-                ['entry' => 'a'],
-            ]));
-        });
-
+        $structure = (new CollectionStructure)->maxDepth(1);
         $this->collection->structure($structure)->save();
+        $structure->makeTree('en')->tree([
+            ['entry' => 'b'],
+            ['entry' => 'c'],
+            ['entry' => 'a'],
+        ])->save();
 
         $this->assertEquals(['a', 'b', 'c'], $this->getEntries(['sort' => 'id'])->map->id()->all());
         $this->assertEquals(['b', 'c', 'a'], $this->getEntries(['sort' => 'order|title'])->map->id()->all());
