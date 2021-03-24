@@ -1,5 +1,12 @@
 # Release Notes
 
+## 3.1.0 (2020-03-24)
+
+### What's new
+- Official 3.1 release. 🎉
+
+
+
 ## 3.1.0-beta.3 (2020-03-24)
 
 ### What's new
