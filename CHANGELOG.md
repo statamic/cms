@@ -1,5 +1,19 @@
 # Release Notes
 
+## 3.1.0-beta.3 (2020-03-24)
+
+### What's new
+- `form:create` action and method params. [#3411](https://github.com/statamic/cms/issues/3411)
+
+### What's fixed
+- Redirect to CP after CP-based user activation. [5e2ff7df7](https://github.com/statamic/cms/commit/5e2ff7df7)
+- Allow grid tables to dynamically use the most appropriate space. [12529a8bf](https://github.com/statamic/cms/commit/12529a8bf)
+- Preprocess default values in Bard, Grid and Replicator preload methods. [#3235](https://github.com/statamic/cms/issues/3235)
+- Bumped `laravel/framework` requirement to versions with security patches. [#3416](https://github.com/statamic/cms/issues/3416)
+- Changes from 3.0.49
+
+
+
 ## 3.1.0-beta.2 (2020-03-22)
 
 ### What's new
