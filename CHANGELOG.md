@@ -128,6 +128,18 @@
 
 
 
+## 3.0.49 (2020-03-24)
+
+### What's new
+- Add markdown option to render form emails. [#3414](https://github.com/statamic/cms/issues/3414)
+
+### What's fixed
+- Widont adds spaces for all paragraphs, and fixed up the modifier parameter. [#3303](https://github.com/statamic/cms/issues/3303)
+- Vertically align fieldtypes in a grid. [#3387](https://github.com/statamic/cms/issues/3387)
+- Bump elliptic from 6.5.3 to 6.5.4. [#3352](https://github.com/statamic/cms/issues/3352)
+
+
+
 ## 3.0.48 (2020-03-22)
 
 ### What's new
