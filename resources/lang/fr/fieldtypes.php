@@ -43,7 +43,7 @@ return [
     'date.config.format' => 'Formatez éventuellement la chaîne de date à l’aide de [moment.js](https://momentjs.com/docs/#/displaying/format/).',
     'date.config.full_width' => 'Étirez le calendrier pour utiliser toute la largeur.',
     'date.config.inline' => 'Ignorez le champ de saisie déroulant et affichez directement le calendrier.',
-    'date.config.mode' => 'Choisissez entre les modes simple ou plage (la plage désactive le sélecteur d’horaire).',
+    'date.config.mode' => 'Choisissez entre le mode unitaire (Single) ou Intervalle (ce dernier désactive l’horodatage).',
     'date.config.rows' => 'Afficher plusieurs mois à la fois, en lignes et en colonnes.',
     'date.config.time_enabled' => 'Activez le sélecteur d’horaire.',
     'date.config.time_required' => 'Exiger l’horodatage en plus de la date.',
