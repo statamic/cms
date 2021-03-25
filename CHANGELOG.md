@@ -1,5 +1,22 @@
 # Release Notes
 
+## 3.1.1 (2020-03-25)
+
+### What's improved
+- French translations. [#3429](https://github.com/statamic/cms/issues/3429)
+
+### What's fixed
+- Fix widths for certain fieldtypes within Grid tables. [#3426](https://github.com/statamic/cms/issues/3426)
+- Fix update issue when a nav doesn't have a tree. [#3430](https://github.com/statamic/cms/issues/3430)
+- Fix link color inside updater. [#3423](https://github.com/statamic/cms/issues/3423)
+- Fix translation typo [#3428](https://github.com/statamic/cms/issues/3428)
+- Fix date fieldtypes not displaying. [#3422](https://github.com/statamic/cms/issues/3422)
+- Fix issue where the delete action wouldn't show, or would show twice. [#3420](https://github.com/statamic/cms/issues/3420)
+- Prevent error on `/cp/auth` when logged in. [#3425](https://github.com/statamic/cms/issues/3425)
+- Don't check for composer scripts during tests. [#3427](https://github.com/statamic/cms/issues/3427)
+
+
+
 ## 3.1.0 (2020-03-24)
 
 ### What's new
