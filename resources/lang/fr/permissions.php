@@ -9,7 +9,7 @@ return [
     'configure_fields' => 'Configurer les champs',
     'configure_fields_desc' => 'Capacité à modifier les Blueprints, les jeux de champs et leurs champs.',
     'configure_addons' => 'Configurer les addons',
-    'configure_addons_desc' => 'Possibilité d\'accéder à la zone des addons pour en installer et/ou désinstaller.',
+    'configure_addons_desc' => 'Possibilité d’accéder à la zone des addons pour en installer et/ou désinstaller.',
     'group_collections' => 'Collections',
     'configure_collections' => 'Configurer les collections',
     'configure_collections_desc' => 'Permet d’accéder à toutes les autorisations liées à la collection.',
