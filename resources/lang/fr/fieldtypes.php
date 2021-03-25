@@ -16,6 +16,8 @@ return [
     'bard.config.always_show_set_button' => 'Activez l’option pour toujours afficher le bouton "Ajouter un ensemble".',
     'bard.config.buttons' => 'Choisissez les boutons à afficher dans la barre d’outils.',
     'bard.config.container' => 'Choisissez quel conteneur de ressources à utiliser pour ce champ.',
+    'bard.config.enable_input_rules' => 'Active des raccourcis Markdown lorsqu\'on saisit du contenu.',
+    'bard.config.enable_paste_rules' => 'Active des raccourcis Markdown lorsqu\'on colle du contenu.',
     'bard.config.fullscreen' => 'Activez l’option pour basculer en mode plein écran.',
     'bard.config.link_noopener' => 'Définissez `rel="noopener"` sur tous les liens.',
     'bard.config.link_noreferrer' => 'Définissez `rel="noreferrer"` sur tous les liens.',
