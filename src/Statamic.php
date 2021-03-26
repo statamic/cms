@@ -261,6 +261,8 @@ class Statamic
         foreach (static::$bootedCallbacks as $callback) {
             $callback();
         }
+
+        static::$bootedCallbacks = [];
     }
 
     public static function afterInstalled(Closure $callback)
@@ -273,6 +275,8 @@ class Statamic
         foreach (static::$afterInstalledCallbacks as $callback) {
             $callback($command);
         }
+
+        static::$afterInstalledCallbacks = [];
     }
 
     public static function repository($abstract, $concrete)
