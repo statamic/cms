@@ -26,12 +26,11 @@ class FormTest extends TestCase
 
         $blueprint = (new Blueprint)->setHandle('post')->save();
 
-        Form::make('contact_us')
+        $form = Form::make('contact_us')
             ->title('Contact Us')
-            ->honeypot('winnie')
-            ->save();
+            ->honeypot('winnie');
 
-        $form = Form::find('contact_us');
+        $form->save();
 
         $this->assertEquals('contact_us', $form->handle());
         $this->assertEquals('Contact Us', $form->title());
