@@ -295,11 +295,17 @@ class AssetContainer implements AssetContainerContract, Augmentable
     /**
      * Get all the asset folders in this container.
      *
-     * @param string|null $folder Narrow down by folder
+     * @param string $folder Narrow down by folder
+     * @param bool $recursive Whether to look for subfolders recursively
+     * @return Collection  A collection of AssetFolder instances
      */
-    public function assetFolders($folder = null)
+    public function assetFolders($folder = '/', $recursive = false)
     {
-        return $this->folders($folder)->keyBy(function ($path) {
+        if (func_num_args() === 0) {
+            $recursive = true;
+        }
+
+        return $this->folders($folder, $recursive)->keyBy(function ($path) {
             return $path;
         })->map(function ($path) {
             return $this->assetFolder($path);

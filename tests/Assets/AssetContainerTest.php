@@ -255,6 +255,11 @@ class AssetContainerTest extends TestCase
             'nested',
             'nested/double-nested',
         ], $this->containerWithDisk()->folders()->all());
+
+        $this->assertEquals([
+            'nested',
+            'nested/double-nested',
+        ], $this->containerWithDisk()->assetFolders()->map->path()->values()->all());
     }
 
     /** @test */
@@ -265,8 +270,16 @@ class AssetContainerTest extends TestCase
         ], $this->containerWithDisk()->folders('/')->all());
 
         $this->assertEquals([
+            'nested',
+        ], $this->containerWithDisk()->assetFolders('/')->map->path()->values()->all());
+
+        $this->assertEquals([
             'nested/double-nested',
         ], $this->containerWithDisk()->folders('nested')->all());
+
+        $this->assertEquals([
+            'nested/double-nested',
+        ], $this->containerWithDisk()->assetFolders('nested')->map->path()->values()->all());
     }
 
     /** @test */
@@ -278,8 +291,17 @@ class AssetContainerTest extends TestCase
         ], $this->containerWithDisk()->folders('/', true)->all());
 
         $this->assertEquals([
+            'nested',
+            'nested/double-nested',
+        ], $this->containerWithDisk()->assetFolders('/', true)->map->path()->values()->all());
+
+        $this->assertEquals([
             'nested/double-nested',
         ], $this->containerWithDisk()->folders('nested', true)->all());
+
+        $this->assertEquals([
+            'nested/double-nested',
+        ], $this->containerWithDisk()->assetFolders('nested', true)->map->path()->values()->all());
     }
 
     /** @test */
