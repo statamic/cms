@@ -271,15 +271,15 @@ class TermsController extends CpController
         if ($site->handle() !== $defaultSite) {
             $term
                 ->in($defaultSite)
-                ->slug($slug)
                 ->published($published)
-                ->data($values);
+                ->data($values)
+                ->slug($slug);
         }
 
         $term
-            ->slug($slug)
             ->published($published)
-            ->data($values);
+            ->data($values)
+            ->slug($slug);
 
         if ($term->revisionsEnabled()) {
             $term->store([
