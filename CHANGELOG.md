@@ -1,12 +1,13 @@
 # Release Notes
 
-## Unreleased
+## 3.1.2 (2020-03-30)
 
 ### What's improved
 - Prevent the need to hit enter to add a validation rule. [bdf9e03a5](https://github.com/statamic/cms/commit/bdf9e03a5)
 - Updated German translations. [#3434](https://github.com/statamic/cms/issues/3434)
 
 ### What's fixed
+- Fix taxonomies url and data handling which fixes a `nav:breadcrumbs` issue. [#3448](https://github.com/statamic/cms/issues/3448)
 - Fix "move asset" action not listing all folders. [#3447](https://github.com/statamic/cms/issues/3447)
 - Prevent action and glide routes being disabled by config. [#3446](https://github.com/statamic/cms/issues/3446)
 - Prevent error during addon tests. [#3435](https://github.com/statamic/cms/issues/3435)
