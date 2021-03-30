@@ -237,7 +237,12 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
 
     public function url()
     {
-        return URL::tidy(Site::current()->url().$this->uri());
+        return URL::makeRelative($this->absoluteUrl());
+    }
+
+    public function absoluteUrl()
+    {
+        return URL::tidy(Site::current()->absoluteUrl().$this->uri());
     }
 
     public function uri()
@@ -245,6 +250,11 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
         $site = Site::current();
 
         $prefix = $this->collection() ? $this->collection()->uri($site->handle()) : $site->url();
+
+        // If the site's url was defined absolutely, it'll be absolute.
+        // We need it relative. Perhaps the url method should return
+        // a relative url already, but that's a problem for later.
+        $prefix = URL::makeRelative($prefix);
 
         return URL::tidy($prefix.str_replace('_', '-', '/'.$this->handle));
     }
@@ -332,6 +342,7 @@ class Taxonomy implements Contract, Responsable, AugmentableContract
             'handle' => $this->handle(),
             'uri' => $this->uri(),
             'url' => $this->url(),
+            'permalink' => $this->absoluteUrl(),
         ], $this->supplements->all());
     }
 }
