@@ -2,6 +2,7 @@
 
 namespace Statamic\Tags;
 
+use League\Glide\Filesystem\FileNotFoundException;
 use League\Glide\Server;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Facades\Asset;
@@ -127,13 +128,17 @@ class Glide extends Tags
         $item = $this->normalizeItem($item);
         $params = $this->getGlideParams($item);
 
-        if (is_string($item) && Str::isUrl($item)) {
-            return Str::startsWith($item, ['http://', 'https://'])
-                ? $this->getGenerator()->generateByUrl($item, $params)
-                : $this->getGenerator()->generateByPath($item, $params);
-        }
+        try {
+            if (is_string($item) && Str::isUrl($item)) {
+                return Str::startsWith($item, ['http://', 'https://'])
+                    ? $this->getGenerator()->generateByUrl($item, $params)
+                    : $this->getGenerator()->generateByPath($item, $params);
+            }
 
-        return $this->getGenerator()->generateByAsset(Asset::find($item), $params);
+            return $this->getGenerator()->generateByAsset(Asset::find($item), $params);
+        } catch (FileNotFoundException $e) {
+            return null;
+        }
     }
 
     /**
