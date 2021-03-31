@@ -33,6 +33,7 @@
                 :editing-field="editingField"
                 :exclude-fieldset="fieldset.handle"
                 :is-section-expanded="true"
+                :suggestable-condition-fields="suggestableConditionFields"
                 @field-created="fieldCreated"
                 @field-updated="fieldUpdated"
                 @field-linked="fieldLinked"
@@ -77,6 +78,10 @@ export default {
             set(fields) {
                 this.fieldset.fields = fields;
             }
+        },
+
+        suggestableConditionFields() {
+            return this.fieldset.fields.map(field => field.handle);
         }
 
     },
