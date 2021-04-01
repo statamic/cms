@@ -17,7 +17,6 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
-use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
