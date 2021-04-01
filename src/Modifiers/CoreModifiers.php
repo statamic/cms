@@ -1228,20 +1228,13 @@ class CoreModifiers extends Modifier
      */
     public function markdown($value, $params)
     {
-        if ($value instanceof ArrayableString) {
-            // NOTE: Could use 'instanceof Stringable' instead (and then cast to string) in PHP8+
-            $value = $value->value();
-        } elseif (! is_string($value)) {
-            return $value;
-        }
-
         $parser = $params[0] ?? 'default';
 
         if (in_array($parser, [true, 'true', ''], true)) {
             $parser = 'default';
         }
 
-        return Markdown::parser($parser)->parse($value);
+        return Markdown::parser($parser)->parse((string) $value);
     }
 
     /**
