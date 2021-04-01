@@ -17,6 +17,7 @@ use Statamic\Facades\Path;
 use Statamic\Facades\Site;
 use Statamic\Facades\URL;
 use Statamic\Facades\YAML;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Support\Arr;
 use Statamic\Support\Html;
@@ -1227,7 +1228,10 @@ class CoreModifiers extends Modifier
      */
     public function markdown($value, $params)
     {
-        if (! is_string($value)) {
+        if ($value instanceof ArrayableString) {
+            // NOTE: Could use 'instanceof Stringable' instead (and then cast to string) in PHP8+
+            $value = $value->value();
+        } elseif (! is_string($value)) {
             return $value;
         }
 
