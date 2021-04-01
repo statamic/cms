@@ -1140,7 +1140,6 @@ class Parser
             foreach ($this->extractions[$type] as $hash => $replacement) {
                 if (strpos($text, "{$type}_{$hash}") !== false) {
                     $text = str_replace("{$type}_{$hash}", $replacement, $text);
-                    unset($this->extractions[$type][$hash]);
                 }
             }
         }
