@@ -4,6 +4,7 @@
         <div class="page-move w-6" />
         <div class="flex items-center flex-1 p-1 ml-1 text-xs leading-normal">
             <div class="flex items-center flex-1">
+                <div class="little-dot mr-1" :class="getStatusClass()" />
                 <svg-icon name="home-page" class="mr-1 h-4 w-4 text-grey-80" v-if="isRoot" v-tooltip="__('This is the root page')" />
                 <a
                     @click="$emit('edit', $event)"
@@ -87,6 +88,20 @@ export default {
     },
 
     methods: {
+
+        getStatusClass() {
+            switch (this.page.status) {
+                case 'published':
+                    return 'bg-green';
+                case 'draft':
+                    return 'bg-grey-40';
+                case 'expired':
+                case 'scheduled':
+                    return 'bg-transparent border border-grey-60';
+                default:
+                    return 'bg-transparent';
+            }
+        },
 
         remove() {
             const store = this.page._vm.store;
