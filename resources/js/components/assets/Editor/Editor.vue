@@ -273,7 +273,7 @@ export default {
         load() {
             this.loading = true;
 
-            const url = cp_url(`assets/${btoa(this.id)}`);
+            const url = cp_url(`assets/${utf8btoa(this.id)}`);
 
             this.$axios.get(url).then(response => {
                 const data = response.data.data;
@@ -321,7 +321,7 @@ export default {
          */
         save() {
             this.saving = true;
-            const url = cp_url(`assets/${btoa(this.id)}`);
+            const url = cp_url(`assets/${utf8btoa(this.id)}`);
 
             this.$axios.patch(url, this.values).then(response => {
                 this.$emit('saved', response.data.asset);
