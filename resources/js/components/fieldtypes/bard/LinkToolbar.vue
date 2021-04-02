@@ -24,8 +24,24 @@
                 </div>
             </div>
             <div class="bard-link-toolbar-buttons">
+                <relationship-input
+                    class="hidden"
+                    ref="relationshipInput"
+                    name="link"
+                    :value="[]"
+                    :config="relationshipConfig"
+                    :item-data-url="itemDataUrl"
+                    :selections-url="selectionsUrl"
+                    :filters-url="filtersUrl"
+                    :columns="[{ label: __('Title'), field: 'title' }]"
+                    :max-items="1"
+                    @item-data-updated="relationshipItemDataUpdated"
+                />
                 <button @click="edit" v-tooltip="__('Edit Link')" v-show="!isEditing">
                     <span class="icon icon-pencil" />
+                </button>
+                <button @click="openSelector" v-tooltip="`${__('Browse')}...`" v-show="isEditing">
+                    <span class="icon icon-magnifying-glass" />
                 </button>
                 <button @click="remove" v-tooltip="__('Remove Link')" v-show="hasLink && isEditing">
                     <span class="icon icon-trash" />
@@ -46,6 +62,8 @@
 </template>
 
 <script>
+import qs from 'qs';
+
 export default {
 
     props: {
@@ -80,6 +98,42 @@ export default {
         actualLinkText() {
             return this.isInternalLink ? this.internalLink.text : this.linkAttrs.href;
         },
+
+        relationshipConfig() {
+            return {
+                type: 'entries',
+                collections: this.collections,
+                max_items: 1,
+            };
+        },
+
+        itemDataUrl() {
+            return cp_url('fieldtypes/relationship/data') + '?' + qs.stringify({
+                config: this.configParameter
+            });
+        },
+
+        selectionsUrl() {
+            return cp_url('fieldtypes/relationship') + '?' + qs.stringify({
+                config: this.configParameter,
+                collections: this.collections,
+            });
+        },
+
+        filtersUrl() {
+            return cp_url('fieldtypes/relationship/filters') + '?' + qs.stringify({
+                config: this.configParameter,
+                collections: this.collections,
+            });
+        },
+
+        configParameter() {
+            return utf8btoa(JSON.stringify(this.relationshipConfig));
+        },
+
+        collections() {
+            return ['pages'];
+        }
 
     },
 
@@ -140,6 +194,18 @@ export default {
                         'https://' + str :
                             str;
         },
+
+        openSelector() {
+            this.$refs.relationshipInput.$refs.existing.click();
+        },
+
+        relationshipItemDataUpdated(data) {
+            if (! data.length) return;
+
+            this.linkInput = 'statamic://entry::'+data[0].id;
+
+            this.commit();
+        }
 
     }
 
