@@ -115,7 +115,7 @@ class GlideController extends Controller
         try {
             return $this->generator->$method($item, $this->request->all());
         } catch (FileNotFoundException $e) {
-            abort(404);
+            throw new NotFoundHttpException;
         }
     }
 
