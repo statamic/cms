@@ -8,6 +8,7 @@ use Statamic\Fields\Fieldtype;
 use Statamic\GraphQL\Fields\DateField;
 use Statamic\GraphQL\Types\DateRangeType;
 use Statamic\Query\Scopes\Filters\Fields\Date as DateFilter;
+use Statamic\Support\DateFormatter;
 
 class Date extends Fieldtype
 {
@@ -53,6 +54,7 @@ class Date extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.date.config.format'),
                 'type' => 'text',
                 'width' => 50,
+                'default' => DateFormatter::fromPhpToMoment(config('statamic.cp.date_format')),
             ],
             'full_width' => [
                 'display' => __('Full Width'),

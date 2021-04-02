@@ -27,6 +27,7 @@
                     :formats="formats"
                     :mode="config.mode"
                     :input="value"
+                    :masks="masks"
                     :is-required="config.required"
                     :is-inline="config.inline"
                     :is-expanded="name === 'date' || config.full_width"
@@ -67,7 +68,7 @@ export default {
                 title: 'MMMM YYYY',
                 weekdays: 'W',
                 navMonths: 'MMM',
-                input: ['L', 'YYYY-MM-DD HH:mm', 'YYYY-MM-DD'],
+                input: ['YYYY-MM-DD HH:mm', 'YYYY-MM-DD'],
                 dayPopover: 'L',
             },
             attrs: [
@@ -103,6 +104,12 @@ export default {
 
         format() {
             return (this.time) ? 'YYYY-MM-DD HH:mm' : 'YYYY-MM-DD';
+        },
+
+        masks() {
+            return {
+                input: [this.config.format]
+            }
         }
     },
 
