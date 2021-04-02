@@ -4,7 +4,7 @@ namespace Statamic\Imaging;
 
 use GuzzleHttp\Client;
 use League\Flysystem\Adapter\Local;
-use League\Flysystem\FileNotFoundException;
+use League\Flysystem\FileNotFoundException as FlysystemFileNotFoundException;
 use League\Flysystem\Filesystem;
 use League\Glide\Server;
 use Statamic\Events\GlideImageGenerated;
@@ -182,11 +182,8 @@ class ImageGenerator
             $mime = $this->asset->mimeType();
         } else {
             $path = $this->path;
-            try {
-                $mime = File::mimeType(public_path($this->path));
-            } catch (\Exception $e) {
-                throw new FileNotFoundException($path);
-            }
+            throw_unless(File::exists($path), new FlysystemFileNotFoundException($path));
+            $mime = File::mimeType(public_path($this->path));
         }
 
         if ($mime !== null && strncmp($mime, 'image/', 6) !== 0) {
