@@ -6,8 +6,10 @@ use GuzzleHttp\Client;
 use League\Flysystem\Adapter\Local;
 use League\Flysystem\FileNotFoundException as FlysystemFileNotFoundException;
 use League\Flysystem\Filesystem;
+use League\Glide\Filesystem\FileNotFoundException as GlideFileNotFoundException;
 use League\Glide\Server;
 use Statamic\Events\GlideImageGenerated;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Config;
 use Statamic\Facades\File;
 
@@ -144,7 +146,11 @@ class ImageGenerator
             $this->validateImage();
         }
 
-        $path = $this->server->makeImage($image, $this->params);
+        try {
+            $path = $this->server->makeImage($image, $this->params);
+        } catch (GlideFileNotFoundException $e) {
+            throw new NotFoundHttpException;
+        }
 
         GlideImageGenerated::dispatch($path, $this->params);
 
