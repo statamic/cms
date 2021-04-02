@@ -1,6 +1,6 @@
 # Release Notes
 
-## Unreleased
+## 3.1.3 (2020-04-02)
 
 ### What's new
 - Status icons are shown in collections' tree views. [#3461](https://github.com/statamic/cms/issues/3461)
