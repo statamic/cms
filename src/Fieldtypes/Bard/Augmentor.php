@@ -2,11 +2,13 @@
 
 namespace Statamic\Fieldtypes\Bard;
 
+use ProseMirrorToHtml\Marks\Link as DefaultLinkMark;
 use ProseMirrorToHtml\Nodes\Image as DefaultImageNode;
 use ProseMirrorToHtml\Renderer;
 use Statamic\Fields\Field;
 use Statamic\Fields\Value;
 use Statamic\Fieldtypes\Bard\ImageNode as CustomImageNode;
+use Statamic\Fieldtypes\Bard\LinkMark as CustomLinkMark;
 use Statamic\Fieldtypes\Text;
 use Statamic\Support\Arr;
 
@@ -94,6 +96,7 @@ class Augmentor
     {
         return (new Renderer)
             ->replaceNode(DefaultImageNode::class, CustomImageNode::class)
+            ->replaceMark(DefaultLinkMark::class, CustomLinkMark::class)
             ->addNode(SetNode::class)
             ->addNodes(static::$customNodes)
             ->addMarks(static::$customMarks)
