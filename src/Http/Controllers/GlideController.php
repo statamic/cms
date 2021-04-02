@@ -7,6 +7,7 @@ use League\Flysystem\FileNotFoundException;
 use League\Glide\Server;
 use League\Glide\Signatures\SignatureException;
 use League\Glide\Signatures\SignatureFactory;
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
 use Statamic\Facades\Config;
@@ -97,6 +98,8 @@ class GlideController extends Controller
         [$container, $path] = explode('/', $decoded, 2);
 
         $asset = AssetContainer::find($container)->asset($path);
+
+        throw_unless($asset, new NotFoundHttpException);
 
         return $this->createResponse($this->generateBy('asset', $asset));
     }
