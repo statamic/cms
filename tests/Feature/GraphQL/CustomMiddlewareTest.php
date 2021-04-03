@@ -38,6 +38,22 @@ class CustomMiddlewareTest extends TestCase
     {
         GraphQL::addMiddleware(CountRequests::class);
     }
+
+    /**
+     * @test
+     * @environment-setup addCustomMiddlewareThroughConfig
+     **/
+    public function a_custom_middleware_can_be_added_to_the_default_schema_through_config()
+    {
+        $this->post('/graphql', ['query' => '{ping}']);
+
+        $this->assertEquals(1, app('request-count'));
+    }
+
+    protected function addCustomMiddlewareThroughConfig($app)
+    {
+        $app['config']->set('statamic.graphql.middleware', [CountRequests::class]);
+    }
 }
 
 class CountRequests
