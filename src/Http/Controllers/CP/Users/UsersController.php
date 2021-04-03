@@ -132,6 +132,8 @@ class UsersController extends CpController
 
         $user->save();
 
+        PasswordReset::redirectAfterReset(cp_route('index'));
+
         if ($request->invitation['send']) {
             ActivateAccount::subject($request->invitation['subject']);
             ActivateAccount::body($request->invitation['message']);

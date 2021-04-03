@@ -88,6 +88,7 @@ class TreeBuilder
                 'edit_url'    => $page->editUrl(),
                 'can_delete'  => $page->referenceExists() ? User::current()->can('delete', $page->entry()) : true,
                 'slug'        => $page->slug(),
+                'status'      => $page->referenceExists() ? $page->status() : null,
                 'redirect'    => $page->referenceExists() ? $page->entry()->get('redirect') : null,
                 'collection'  => ! $collection ? null : [
                     'handle' => $collection->handle(),

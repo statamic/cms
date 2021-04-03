@@ -341,7 +341,9 @@ class Bard extends Replicator
         })->toArray();
 
         $defaults = collect($this->config('sets'))->map(function ($set) {
-            return (new Fields($set['fields']))->all()->map->defaultValue()->all();
+            return (new Fields($set['fields']))->all()->map(function ($field) {
+                return $field->fieldtype()->preProcess($field->defaultValue());
+            })->all();
         })->all();
 
         $new = collect($this->config('sets'))->map(function ($set, $handle) use ($defaults) {

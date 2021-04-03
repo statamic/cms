@@ -37,9 +37,9 @@ export default function choose(message, number, locale) {
 
 const getPluralForm = function(count, locale) {
     // For regional locales with dashes, we just need the main part of the locale
-    // e.g. For de-CH we just want de.
-    if (locale.includes('-')) {
-        locale = locale.substr(0, locale.indexOf('-'));
+    // e.g. For de_CH we just want de.
+    if (locale.includes('_')) {
+        locale = locale.substr(0, locale.indexOf('_'));
     }
 
     switch (locale) {

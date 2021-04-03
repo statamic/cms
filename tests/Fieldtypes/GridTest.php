@@ -298,4 +298,21 @@ class GridTest extends TestCase
             ],
         ], $field->process()->value());
     }
+
+    /** @test */
+    public function it_preloads_preprocessed_default_values()
+    {
+        $field = (new Field('test', [
+            'type' => 'grid',
+            'fields' => [
+                ['handle' => 'things', 'field' => ['type' => 'array']],
+            ],
+        ]));
+
+        $expected = [
+            'things' => [],
+        ];
+
+        $this->assertSame($expected, $field->fieldtype()->preload()['defaults']->all());
+    }
 }

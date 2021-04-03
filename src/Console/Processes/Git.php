@@ -54,7 +54,7 @@ class Git extends Process
      */
     private function prepareProcessArguments($parts)
     {
-        return collect(['git'])
+        return collect([config('statamic.git.binary')])
             ->merge($parts)
             ->flatten()
             ->reject(function ($part) {

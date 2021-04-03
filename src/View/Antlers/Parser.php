@@ -14,7 +14,7 @@ use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
-use Statamic\Fields\LabeledValue;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Ignition\Value as IgnitionViewValue;
 use Statamic\Modifiers\ModifierException;
@@ -79,8 +79,8 @@ class Parser
         $this->variableTagRegex = '/{{\s*('.$this->looseVariableRegex.')\s*}}/m';
 
         // Matches the callback handle for a matching tag pair, captures the contents, and ignores the parameters.
-        // We assume it's a callback because the of the matching tag pair and lack of "?" in the expression.
-        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')(?:\s([^?]*?))}}(.*?){{\s*\/\1\s*}}/ms';
+        // We assume it's a callback because the of the matching tag pair, no pipe modifiers, and lack of "?" in the expression.
+        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')(?!\s*\|)(?:\s([^?]*?))}}(.*?){{\s*\/\1\s*}}/ms';
 
         // Matches a recursive children loop.
         $this->recursiveRegex = '/{{\s*\*recursive\s*('.$this->variableRegex.')\*\s*}}/ms';
@@ -1540,7 +1540,7 @@ class Parser
 
     protected function isNullWhenUsedInStrings($value)
     {
-        if ($value instanceof LabeledValue) {
+        if ($value instanceof ArrayableString) {
             $value = $value->value();
         }
 

@@ -1227,17 +1227,13 @@ class CoreModifiers extends Modifier
      */
     public function markdown($value, $params)
     {
-        if (! is_string($value)) {
-            return $value;
-        }
-
         $parser = $params[0] ?? 'default';
 
-        if (in_array($parser, [true, 'true', ''])) {
+        if (in_array($parser, [true, 'true', ''], true)) {
             $parser = 'default';
         }
 
-        return Markdown::parser($parser)->parse($value);
+        return Markdown::parser($parser)->parse((string) $value);
     }
 
     /**
@@ -2385,9 +2381,11 @@ class CoreModifiers extends Modifier
      * @param $value
      * @return string
      */
-    public function widont($value)
+    public function widont($value, $params)
     {
-        return Str::widont($value);
+        $params = Arr::get($params, 0, '1');
+
+        return Str::widont($value, $params);
     }
 
     /**
