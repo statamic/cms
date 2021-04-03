@@ -64,7 +64,10 @@ class DefaultSchema implements ConfigConvertible
             $queries = $queries->merge(config('statamic.graphql.resources.'.$key) ? $qs : []);
         });
 
-        return $queries->merge(GraphQL::getExtraQueries())->all();
+        return $queries
+            ->merge(config('statamic.graphql.queries', []))
+            ->merge(GraphQL::getExtraQueries())
+            ->all();
     }
 
     private function getMiddleware()

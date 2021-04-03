@@ -22,7 +22,7 @@ class CustomQueryTest extends TestCase
 
     /**
      * @test
-     * @environment-setup addCustomQuery
+     * @environment-setup addCustomQueryWithMethod
      **/
     public function a_custom_query_can_be_added_to_the_default_schema()
     {
@@ -32,9 +32,26 @@ class CustomQueryTest extends TestCase
             ->assertExactJson(['data' => ['foo' => 'bar']]);
     }
 
-    protected function addCustomQuery($app)
+    protected function addCustomQueryWithMethod($app)
     {
         GraphQL::addQuery(FooQuery::class);
+    }
+
+    /**
+     * @test
+     * @environment-setup addCustomQueryThroughConfig
+     **/
+    public function a_custom_query_can_be_added_to_the_default_schema_through_config()
+    {
+        $this
+            ->post('/graphql', ['query' => '{foo}'])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['foo' => 'bar']]);
+    }
+
+    protected function addCustomQueryThroughConfig($app)
+    {
+        $app['config']->set('statamic.graphql.queries', [FooQuery::class]);
     }
 }
 
