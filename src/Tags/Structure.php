@@ -36,8 +36,10 @@ class Structure extends Tags
             'structure' => $handle,
             'include_home' => $this->params->get('include_home'),
             'show_unpublished' => $this->params->get('show_unpublished', false),
+            'show_hidden' => $this->params->get('show_hidden', false),
             'site' => $this->params->get('site', Site::current()->handle()),
             'from' => $this->params->get('from'),
+            'max_depth' => $this->params->get('max_depth'),
         ]);
 
         return $this->toArray($tree);

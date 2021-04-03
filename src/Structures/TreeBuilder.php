@@ -48,15 +48,22 @@ class TreeBuilder
         $maxDepth = $params['max_depth'] ?? null;
         $fields = $params['fields'] ?? null;
         $showUnpublished = $params['show_unpublished'] ?? true;
+        $showHidden = $params['show_hidden'] ?? true;
 
         if ($maxDepth && $depth > $maxDepth) {
             return [];
         }
 
-        return $pages->map(function ($page) use ($fields, $params, $depth, $showUnpublished) {
+        return $pages->map(function ($page) use ($fields, $params, $depth, $showUnpublished, $showHidden) {
             if ($page->reference() && ! $page->referenceExists()) {
                 return null;
-            } elseif (! $showUnpublished && $page->entry() && $page->entry()->status() !== 'published') {
+            }
+
+            if (! $showUnpublished && $page->entry() && $page->entry()->status() !== 'published') {
+                return null;
+            }
+
+            if (! $showHidden && $page->entry() && $page->entry()->get('is_hidden')) {
                 return null;
             }
 
