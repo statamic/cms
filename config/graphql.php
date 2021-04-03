@@ -14,6 +14,14 @@ return [
         'users' => false,
     ],
 
+    'queries' => [
+        //
+    ],
+
+    'middleware' => [
+        //
+    ],
+
     'cache' => [
         'expiry' => 60,
     ],
