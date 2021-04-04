@@ -656,7 +656,7 @@ class Asset implements AssetContract, Augmentable
             '#' => '-',
         ];
 
-        $str = Stringy::create($string)->toAscii();
+        $str = Stringy::create(urldecode($string))->toAscii();
 
         foreach ($replacements as $from => $to) {
             $str = $str->replace($from, $to);
