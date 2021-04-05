@@ -15,11 +15,17 @@
 
                 <div :class="isEditing ? 'flex items-center' : 'hidden'">
                     <input
+                        v-show="!isInternalLink"
                         type="text"
                         ref="input"
                         v-model="linkInput"
                         class="flex-1 input"
                         @keydown.enter.prevent="commit"
+                    />
+                    <div
+                        v-show="isInternalLink"
+                        v-text="actualLinkText"
+                        class="flex-1 input h-auto cursor-not-allowed"
                     />
                 </div>
             </div>
@@ -79,6 +85,7 @@ export default {
             linkInput: this.initialLinkAttrs.href,
             targetBlank: null,
             isEditing: false,
+            internalLink: null,
         }
     },
 
@@ -89,15 +96,15 @@ export default {
         },
 
         isInternalLink() {
-            return false;
+            return !! this.internalLink;
         },
 
         actualLinkHref() {
-            return this.isInternalLink ? this.internalLink.url : this.linkAttrs.href;
+            return this.isInternalLink ? this.internalLink.permalink : this.linkAttrs.href;
         },
 
         actualLinkText() {
-            return this.isInternalLink ? this.internalLink.text : this.linkAttrs.href;
+            return this.isInternalLink ? this.internalLink.title : this.linkAttrs.href;
         },
 
         relationshipConfig() {
@@ -143,6 +150,8 @@ export default {
             ? this.linkAttrs.target == '_blank'
             : this.config.target_blank;
 
+        this.internalLink = this.getInternalLinkFromUrl(this.linkAttrs.href);
+
         if (!this.linkAttrs.href) {
             this.edit();
         }
@@ -153,6 +162,7 @@ export default {
             this.linkAttrs = attrs;
             this.linkInput = attrs.href;
             this.targetBlank = attrs.target == '_blank';
+            this.internalLink = this.getInternalLinkFromUrl(attrs.href);
         });
 
         this.bard.$on('link-deselected', () => this.$emit('deselected'));
@@ -208,9 +218,30 @@ export default {
         relationshipItemDataUpdated(data) {
             if (! data.length) return;
 
-            this.linkInput = 'statamic://entry::'+data[0].id;
+            const item = data[0];
+            const ref = `entry::${item.id}`;
+
+            this.pushItemDataIntoMeta(ref, item);
+
+            this.linkInput = `statamic://${ref}`;
 
             this.commit();
+        },
+
+        pushItemDataIntoMeta(ref, item) {
+            let meta = this.bard.meta;
+            meta.linkData[ref] = item;
+            this.bard.updateMeta(meta);
+        },
+
+        getReferenceFromInternalUrl(url) {
+            return url.substr(11); // everything after statamic://
+        },
+
+        getInternalLinkFromUrl(url) {
+            if (!url || url.substr(0, 11) !== 'statamic://') return null;
+
+            return this.bard.meta.linkData[this.getReferenceFromInternalUrl(url)];
         }
 
     }
