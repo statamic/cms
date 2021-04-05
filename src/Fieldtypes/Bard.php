@@ -364,7 +364,7 @@ class Bard extends Replicator
             'collapsed' => [],
             'previews' => $previews,
             '__collaboration' => ['existing'],
-            'link_collections' => empty($collections = $this->config('link_collections')) ? Collection::handles()->all() : $collections,
+            'linkCollections' => empty($collections = $this->config('link_collections')) ? Collection::handles()->all() : $collections,
         ];
     }
 

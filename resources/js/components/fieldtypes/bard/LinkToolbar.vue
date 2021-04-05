@@ -133,7 +133,7 @@ export default {
         },
 
         collections() {
-            return this.bard.meta.link_collections;
+            return this.bard.meta.linkCollections;
         }
 
     },
