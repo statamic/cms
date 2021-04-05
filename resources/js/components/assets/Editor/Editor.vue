@@ -135,7 +135,7 @@
                         </div>
 
                         <div class="editor-form-actions text-right">
-                            <button v-if="canRunAction('delete')" type="button" class="btn-danger mr-1" @click="runAction('delete')">
+                            <button v-if="allowDeleting && canRunAction('delete')" type="button" class="btn-danger mr-1" @click="runAction('delete')">
                                 {{ __('Delete') }}
                             </button>
                             <button type="button" class="btn-primary" @click="save">
