@@ -212,7 +212,13 @@ export default {
             });
 
             return indexes;
-        }
+        },
+
+        site() {
+            if (! this.storeName) return this.$config.get('selectedSite');
+
+            return this.$store.state.publish[this.storeName].site;
+        },
 
     },
 

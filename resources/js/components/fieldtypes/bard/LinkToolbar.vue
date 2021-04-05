@@ -35,6 +35,7 @@
                     :filters-url="filtersUrl"
                     :columns="[{ label: __('Title'), field: 'title' }]"
                     :max-items="1"
+                    :site="bard.site"
                     @item-data-updated="relationshipItemDataUpdated"
                 />
                 <button @click="edit" v-tooltip="__('Edit Link')" v-show="!isEditing">
