@@ -158,6 +158,11 @@ export default {
         this.bard.$on('link-deselected', () => this.$emit('deselected'));
     },
 
+    beforeDestroy() {
+        this.bard.$off('link-selected');
+        this.bard.$off('link-deselected');
+    },
+
     methods: {
 
         edit() {
