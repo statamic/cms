@@ -76,7 +76,7 @@
             </editor-floating-menu>
 
             <editor-content :editor="editor" v-show="!showSource" :id="fieldId" />
-            <bard-source :html="html" v-if="showSource" />
+            <bard-source :html="htmlWithReplacedLinks" v-if="showSource" />
         </div>
         <div class="bard-footer-toolbar" v-if="config.reading_time">
             {{ readingTime }} {{ __('Reading Time') }}
@@ -219,6 +219,12 @@ export default {
 
             return this.$store.state.publish[this.storeName].site;
         },
+
+        htmlWithReplacedLinks() {
+            return this.html.replaceAll(/\"statamic:\/\/(.*)\"/g, (match, ref) => {
+                return `"${this.meta.linkData[ref].permalink}"`;
+            });
+        }
 
     },
 
