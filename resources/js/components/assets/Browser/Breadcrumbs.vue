@@ -1,14 +1,15 @@
 <template>
 
-    <div class="px-2 pt-1 flex flex-wrap">
+    <div class="px-2 py-1 flex flex-wrap text-sm bg-grey-10 border-t border-b">
         <a
             v-for="(part, index) in pathParts"
             :key="index"
             @click="selectFolder(index)"
-            class="mr-1"
+            class="mr-1 group"
         >
-            <span class="icon icon-folder mr-0.5 text-blue-lighter hover:text-blue" />
-            <span>{{ part }}</span>
+            <span v-if="index !== 0" class="px-sm text-grey-70">></span>
+            <span class="icon icon-folder  text-blue-lighter group-hover:text-blue" />
+            <span class="text-grey-70 group-hover:text-grey-80">{{ part }}</span>
         </a>
     </div>
 
