@@ -3,6 +3,7 @@
 namespace Statamic\Fieldtypes;
 
 use ProseMirrorToHtml\Renderer;
+use Statamic\Facades\Collection;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
@@ -363,6 +364,7 @@ class Bard extends Replicator
             'collapsed' => [],
             'previews' => $previews,
             '__collaboration' => ['existing'],
+            'link_collections' => empty($collections = $this->config('link_collections')) ? Collection::handles()->all() : $collections,
         ];
     }
 

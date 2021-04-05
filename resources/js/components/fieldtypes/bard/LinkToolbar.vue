@@ -132,7 +132,7 @@ export default {
         },
 
         collections() {
-            return ['pages'];
+            return this.bard.meta.link_collections;
         }
 
     },
