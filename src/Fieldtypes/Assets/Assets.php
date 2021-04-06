@@ -5,7 +5,9 @@ namespace Statamic\Fieldtypes\Assets;
 use Statamic\Exceptions\AssetContainerNotFoundException;
 use Statamic\Facades\Asset;
 use Statamic\Facades\AssetContainer;
+use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fieldtype;
+use Statamic\GraphQL\Types\AssetInterface;
 use Statamic\Http\Resources\CP\Assets\Asset as AssetResource;
 use Statamic\Support\Str;
 
@@ -171,15 +173,18 @@ class Assets extends Fieldtype
     {
         return collect(parent::fieldRules())->map(function ($rule) {
             $name = Str::before($rule, ':');
+            $parameters = explode(',', Str::after($rule, ':'));
 
             if ($name === 'image') {
                 return new ImageRule();
             }
 
             if ($name === 'mimes') {
-                $parameters = explode(',', Str::after($rule, ':'));
-
                 return new MimesRule($parameters);
+            }
+
+            if ($name === 'mimetypes') {
+                return new MimetypesRule($parameters);
             }
 
             return $rule;
@@ -212,5 +217,16 @@ class Assets extends Fieldtype
 
             return $arr;
         });
+    }
+
+    public function toGqlType()
+    {
+        $type = GraphQL::type(AssetInterface::NAME);
+
+        if ($this->config('max_files') !== 1) {
+            $type = GraphQL::listOf($type);
+        }
+
+        return $type;
     }
 }

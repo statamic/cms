@@ -1,6 +1,6 @@
 <template>
 
-    <div class="relationship-input">
+    <div class="relationship-input" :class="{ 'relationship-input-empty': items.length == 0 }">
 
         <relationship-select-field
             v-if="!initializing && usesSelectField"
@@ -42,7 +42,7 @@
                 <span>{{ __('Maximum items selected:')}}</span>
                 <span>{{ maxItems }}/{{ maxItems }}</span>
             </div>
-            <div v-if="canSelectOrCreate" class="relative" :class="{ 'mt-2': items.length > 0 }" >
+            <div v-if="canSelectOrCreate" class="relationship-input-buttons relative" :class="{ 'mt-2': items.length > 0 }" >
                 <div class="flex flex-wrap items-center text-sm -mb-1">
                     <div class="relative mb-1">
                         <create-button

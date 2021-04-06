@@ -47,6 +47,7 @@ class AugmentedAsset extends AbstractAugmented
                 'last_modified',
                 'last_modified_timestamp',
                 'last_modified_instance',
+                'focus',
                 'focus_css',
                 'height',
                 'width',
@@ -121,6 +122,11 @@ class AugmentedAsset extends AbstractAugmented
     protected function lastModifiedInstance()
     {
         return $this->data->lastModified();
+    }
+
+    protected function focus()
+    {
+        return $this->data->get('focus', '50-50-1');
     }
 
     protected function focusCss()

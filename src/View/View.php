@@ -35,7 +35,9 @@ class View
 
     public function gatherData()
     {
-        return array_merge($this->cascade(), $this->data);
+        return array_merge($this->cascade(), $this->data, [
+            'current_template' => $this->template(),
+        ]);
     }
 
     public function layout($layout = null)

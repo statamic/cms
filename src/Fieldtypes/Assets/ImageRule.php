@@ -24,16 +24,18 @@ class ImageRule implements Rule
      */
     public function passes($attribute, $value)
     {
-        return collect($value)->every(function ($id) {
+        $extensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
+
+        return collect($value)->every(function ($id) use ($extensions) {
             if ($id instanceof UploadedFile) {
-                return in_array($id->guessExtension(), ['jpg', 'jpeg', 'png', 'gif', 'webp']);
+                return in_array($id->guessExtension(), $extensions);
             }
 
             if (! $asset = Asset::find($id)) {
                 return false;
             }
 
-            return $asset->isImage();
+            return $asset->guessedExtensionIsOneOf($extensions);
         });
     }
 
