@@ -13,19 +13,17 @@ class Cache extends Tags
             return [];
         }
 
-        if (count($cacheTags = $this->params->explode('tags', [])) < 1) {
-            if ($cached = LaraCache::get($key = $this->getCacheKey())) {
-                return $cached;
-            }
+        $store = LaraCache::store();
 
-            LaraCache::put($key, $html = (string) $this->parse([]), $this->getCacheLength());
-        } else {
-            if ($cached = LaraCache::tags($cacheTags)->get($key = $this->getCacheKey())) {
-                return $cached;
-            }
-
-            LaraCache::tags($cacheTags)->put($key, $html = (string) $this->parse([]), $this->getCacheLength());
+        if (count($tags = $this->params->explode('tags', []))) {
+            $store = $store->tags($tags);
         }
+
+        if ($cached = $store->get($key = $this->getCacheKey())) {
+            return $cached;
+        }
+
+        $store->put($key, $html = (string) $this->parse([]), $this->getCacheLength());
 
         return $html;
     }
