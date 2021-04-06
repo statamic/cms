@@ -78,6 +78,7 @@ return [
     'form_configure_email_from_instructions' => 'Laissez vide pour revenir à la valeur par défaut du site.',
     'form_configure_email_html_instructions' => 'La vue pour la version HTML de cet e-mail.',
     'form_configure_email_instructions' => 'Configurez les emails à envoyer quand de nouvelles soumissions de formulaires sont reçues.',
+    'form_configure_email_markdown_instructions' => 'Rendez la version HTML de cet e-mail en utilisant Markdown.',
     'form_configure_email_reply_to_instructions' => 'Laissez le champ vide pour un retour à l’expéditeur.',
     'form_configure_email_subject_instructions' => 'Objet de l’e-mail.',
     'form_configure_email_text_instructions' => 'La vue pour la version Texte de cet e-mail.',

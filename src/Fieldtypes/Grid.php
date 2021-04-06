@@ -145,7 +145,9 @@ class Grid extends Fieldtype
 
     protected function defaultRowData()
     {
-        return $this->fields()->all()->map->defaultValue();
+        return $this->fields()->all()->map(function ($field) {
+            return $field->fieldtype()->preProcess($field->defaultValue());
+        });
     }
 
     public function augment($value)

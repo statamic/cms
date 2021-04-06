@@ -6,6 +6,7 @@ use Statamic\Data\Services\ContentService;
 use Statamic\Facades\Config;
 use Statamic\Facades\Path;
 use Statamic\Facades\Pattern;
+use Statamic\Facades\Site;
 use Statamic\Support\Str;
 
 /**
@@ -219,9 +220,13 @@ class URL
      */
     public function isExternal($url)
     {
+        if (Str::startsWith($url, '/')) {
+            return false;
+        }
+
         return ! Pattern::startsWith(
             Str::ensureRight($url, '/'),
-            self::prependSiteUrl('/')
+            Site::current()->absoluteUrl()
         );
     }
 
@@ -235,11 +240,11 @@ class URL
             return config('app.url');
         }
 
-        $protocol = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443)
+        $protocol = (! empty(request()->server('HTTPS')) && request()->server('HTTPS') !== 'off' || request()->server('SERVER_PORT') == 443)
             ? 'https://'
             : 'http://';
 
-        $domain_name = $_SERVER['HTTP_HOST'].'/';
+        $domain_name = request()->server('HTTP_HOST').'/';
 
         return $protocol.$domain_name;
     }

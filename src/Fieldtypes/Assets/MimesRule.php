@@ -37,7 +37,7 @@ class MimesRule implements Rule
                 return false;
             }
 
-            return $asset->extensionIsOneOf($this->parameters);
+            return $asset->guessedExtensionIsOneOf($this->parameters);
         });
     }
 

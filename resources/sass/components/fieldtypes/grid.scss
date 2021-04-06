@@ -6,7 +6,7 @@
     @apply w-full text-left border text-grey relative mb-2 outline-none shadow-sm rounded;
     border-collapse: separate;
     border-spacing: 0;
-    table-layout: fixed;
+    table-layout: auto;
 }
 
 .grid-table thead {
