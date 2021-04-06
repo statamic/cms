@@ -1,5 +1,23 @@
 # Release Notes
 
+## 3.1.4 (2020-04-06)
+
+### What's new
+- Ability to push queries and middleware into GraphQL. [#3385](https://github.com/statamic/cms/issues/3385)
+- Add breadcrumbs to asset browser. [#3475](https://github.com/statamic/cms/issues/3475)
+- Add limit param to foreach tag. [fc034eec1](https://github.com/statamic/cms/commit/fc034eec1)
+
+### What's fixed
+- Fix squished sidebar toggle. [#3456](https://github.com/statamic/cms/issues/3456)
+- Prevent unintended deletion of assets through editor. [#3474](https://github.com/statamic/cms/issues/3474)
+- Fix autofocus issues in Safari and Firefox. [#3471](https://github.com/statamic/cms/issues/3471)
+- Handle encoded characters in uploaded asset filenames. [#3473](https://github.com/statamic/cms/issues/3473)
+- Fix Glide 404ing for images in the `public` directory. [#3484](https://github.com/statamic/cms/issues/3484)
+- Fix assets being incorrect every other request in some cases. [#3485](https://github.com/statamic/cms/issues/3485)
+- Use request helper instead of server variables to fix an issue with Laravel Octane. [#3483](https://github.com/statamic/cms/issues/3483)
+
+
+
 ## 3.1.3 (2020-04-02)
 
 ### What's new
