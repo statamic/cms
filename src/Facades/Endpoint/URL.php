@@ -240,11 +240,11 @@ class URL
             return config('app.url');
         }
 
-        $protocol = (! empty($_SERVER['HTTPS']) && $_SERVER['HTTPS'] !== 'off' || $_SERVER['SERVER_PORT'] == 443)
+        $protocol = (! empty(request()->server('HTTPS')) && request()->server('HTTPS') !== 'off' || request()->server('SERVER_PORT') == 443)
             ? 'https://'
             : 'http://';
 
-        $domain_name = $_SERVER['HTTP_HOST'].'/';
+        $domain_name = request()->server('HTTP_HOST').'/';
 
         return $protocol.$domain_name;
     }
