@@ -158,7 +158,6 @@ return [
     'taxonomy_next_steps_create_term_description' => 'Créez votre premier terme ou écrasez une poignée de termes génériques, à vous de jouer.',
     'taxonomy_next_steps_documentation_description' => 'Apprenez-en plus au sujet des taxonomies, comment elles fonctionnent et comment les configurer.',
     'try_again_in_seconds' => '{0,1} Réessayez maintenant. | Réessayez dans :count secondes.',
-    'updates_available' => 'Des mises à jour sont disponibles !',
     'user_groups_handle_instructions' => 'Comment vous allez faire référence à ce groupe d’utilisateurs sur le frontal. Ne peut pas être facilement changé.',
     'user_groups_intro' => 'Les groupes d’utilisateurs vous permettent d’organiser les utilisateurs et d’appliquer des rôles basés sur des autorisations dans leur ensemble.',
     'user_groups_role_instructions' => 'Affectez des rôles afin de donner aux utilisateurs de ce groupe toutes les autorisations correspondantes.',
