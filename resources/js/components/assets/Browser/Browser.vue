@@ -129,7 +129,7 @@
 
                                                 <data-list-inline-actions
                                                     :item="folder.path"
-                                                    :url="runFolderActionUrl"
+                                                    :run-action-url="runFolderActionUrl"
                                                     :actions="folderActions(folder)"
                                                     @started="actionStarted"
                                                     @completed="actionCompleted"
@@ -164,7 +164,6 @@
                                         <data-list-inline-actions
                                             :item="asset.id"
                                             :run-action-url="runActionUrl"
-                                            :bulk-actions-url="bulkActionsUrl"
                                             :actions="asset.actions"
                                             @started="actionStarted"
                                             @completed="actionCompleted"

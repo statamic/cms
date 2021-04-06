@@ -82,7 +82,6 @@
                                 <data-list-inline-actions
                                     :item="entry.id"
                                     :run-action-url="runActionUrl"
-                                    :bulk-actions-url="bulkActionsUrl"
                                     :actions="entry.actions"
                                     @started="actionStarted"
                                     @completed="actionCompleted"

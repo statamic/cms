@@ -51,7 +51,6 @@
                                 <data-list-inline-actions
                                     :item="submission.id"
                                     :run-action-url="runActionUrl"
-                                    :bulk-actions-url="bulkActionsUrl"
                                     :actions="submission.actions"
                                     @started="actionStarted"
                                     @completed="actionCompleted"

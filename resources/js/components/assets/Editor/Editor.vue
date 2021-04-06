@@ -163,7 +163,7 @@
                 v-if="actions.length"
                 :id="id"
                 :actions="actions"
-                :url="runActionUrl"
+                :run-action-url="runActionUrl"
                 @started="actionStarted"
                 @completed="actionCompleted" />
         </portal>

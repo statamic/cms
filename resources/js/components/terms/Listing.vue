@@ -76,7 +76,6 @@
                                 <data-list-inline-actions
                                     :item="term.id"
                                     :run-action-url="runActionUrl"
-                                    :bulk-actions-url="bulkActionsUrl"
                                     :actions="term.actions"
                                     @started="actionStarted"
                                     @completed="actionCompleted"
