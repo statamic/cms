@@ -50,6 +50,7 @@ abstract class QueryBuilder extends BaseQueryBuilder
             if ($data = Data::find($result['id'])) {
                 $data->set('search_score', $result['search_score'] ?? null);
             }
+
             return $data;
         })->filter()->values();
     }
