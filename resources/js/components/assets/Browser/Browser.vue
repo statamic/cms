@@ -76,7 +76,8 @@
                                 <breadcrumbs :path="path" @navigated="selectFolder" />
 
                                 <data-list-bulk-actions
-                                    :url="bulkActionsUrl"
+                                    :run-action-url="runActionUrl"
+                                    :bulk-actions-url="bulkActionsUrl"
                                     :context="actionContext"
                                     :show-always="mode === 'grid'"
                                     @started="actionStarted"
@@ -162,7 +163,8 @@
                                         <div class="divider" v-if="asset.actions.length" />
                                         <data-list-inline-actions
                                             :item="asset.id"
-                                            :url="runActionUrl"
+                                            :run-action-url="runActionUrl"
+                                            :bulk-actions-url="bulkActionsUrl"
                                             :actions="asset.actions"
                                             @started="actionStarted"
                                             @completed="actionCompleted"

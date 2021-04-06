@@ -7,7 +7,8 @@ export default {
     },
 
     props: {
-        url: String
+        runActionUrl: String,
+        bulkActionsUrl: String,
     },
 
     data() {
@@ -43,7 +44,7 @@ export default {
                 values
             };
 
-            this.$axios.post(this.url, payload, { responseType: 'blob' }).then(response => {
+            this.$axios.post(this.runActionUrl, payload, { responseType: 'blob' }).then(response => {
                 if (response.headers['content-disposition']) {
                     this.downloadFile(response);
                 }

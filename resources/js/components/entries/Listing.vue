@@ -47,7 +47,8 @@
                     <div v-show="items.length === 0" class="p-3 text-center text-grey-50" v-text="__('No results')" />
 
                     <data-list-bulk-actions
-                        :url="bulkActionsUrl"
+                        :run-action-url="runActionUrl"
+                        :bulk-actions-url="bulkActionsUrl"
                         @started="actionStarted"
                         @completed="actionCompleted"
                     />
@@ -80,7 +81,8 @@
                                 <div class="divider" v-if="entry.actions.length" />
                                 <data-list-inline-actions
                                     :item="entry.id"
-                                    :url="runActionUrl"
+                                    :run-action-url="runActionUrl"
+                                    :bulk-actions-url="bulkActionsUrl"
                                     :actions="entry.actions"
                                     @started="actionStarted"
                                     @completed="actionCompleted"
