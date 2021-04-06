@@ -386,6 +386,7 @@ abstract class Store
             app('stache.indexes')->forget("{$this->key()}.{$index->name()}");
         });
 
+        $this->usedIndexes = collect();
         Cache::forget($this->indexUsageCacheKey());
 
         $this->clearCachedPaths();
