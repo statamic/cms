@@ -61,9 +61,4 @@ class CollectionTree extends Tree
     {
         return app(CollectionTreeRepository::class);
     }
-
-    protected function entriesBlinkKey()
-    {
-        return 'collection-tree-entries-'.$this->structure()->handle().'-'.$this->locale();
-    }
 }

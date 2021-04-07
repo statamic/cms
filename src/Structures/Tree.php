@@ -306,7 +306,9 @@ abstract class Tree implements Contract, Localization
 
     public function entry($entry)
     {
-        $entries = Blink::store('structure-entries')->once($this->entriesBlinkKey(), function () {
+        $blink = static::class.'-'.$this->structure()->handle().'-'.$this->locale();
+
+        $entries = Blink::store('structure-entries')->once($blink, function () {
             $refs = $this->flattenedPages()->map->reference()->filter()->all();
 
             return \Statamic\Facades\Entry::query()->whereIn('id', $refs)->get()->keyBy->id();
