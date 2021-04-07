@@ -29,9 +29,7 @@ class FrontendController extends Controller
      */
     public function index(Request $request)
     {
-        $url = Site::current()->relativePath(
-            str_finish($request->getUri(), '/')
-        );
+        $url = Site::current()->relativePath($request->getUri());
 
         if ($url === '') {
             $url = '/';
@@ -43,10 +41,6 @@ class FrontendController extends Controller
 
         if (Str::contains($url, '?')) {
             $url = substr($url, 0, strpos($url, '?'));
-        }
-
-        if (Str::endsWith($url, '/') && Str::length($url) > 1) {
-            $url = rtrim($url, '/');
         }
 
         if ($data = Data::findByUri($url, Site::current()->handle())) {
