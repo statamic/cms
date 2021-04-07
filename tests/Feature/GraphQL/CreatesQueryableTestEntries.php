@@ -11,12 +11,17 @@ trait CreatesQueryableTestEntries
 {
     public function createEntries()
     {
-        Collection::make('blog')->routes(['en' => '/blog/{slug}'])->save();
+        Collection::make('blog')
+            ->routes(['en' => '/blog/{slug}'])
+            ->dated(true)
+            ->futureDateBehavior('private')
+            ->save();
         Collection::make('events')->routes(['en' => '/events/{slug}'])->save();
         Collection::make('food')->routes(['en' => '/food/{slug}'])->save();
 
         EntryFactory::collection('blog')
             ->id('1')
+            ->date(now()->subMonths(2))
             ->slug('standard-blog-post')
             ->data([
                 'title' => 'Standard Blog Post',
@@ -26,6 +31,7 @@ trait CreatesQueryableTestEntries
 
         EntryFactory::collection('blog')
             ->id('2')
+            ->date(now()->subMonths(3))
             ->slug('art-directed-blog-post')
             ->data([
                 'blueprint' => 'art_directed',
@@ -46,7 +52,7 @@ trait CreatesQueryableTestEntries
 
         EntryFactory::collection('events')->id('4')->slug('event-two')->data(['title' => 'Event Two'])->create();
 
-        EntryFactory::collection('food')->id('5')->data([
+        EntryFactory::collection('food')->id('5')->slug('hamburger')->data([
             'title' => 'Hamburger',
             'calories' => 350,
         ])->create();

@@ -7,7 +7,7 @@ use Statamic\Console\RunsInPlease;
 use Statamic\Facades\Asset;
 use Statamic\Facades\Config;
 use Statamic\Facades\Image;
-use Statamic\Imaging\PresetGenerator;
+use Statamic\Jobs\GeneratePresetImageManipulation;
 
 class AssetsGeneratePresets extends Command
 {
@@ -18,7 +18,7 @@ class AssetsGeneratePresets extends Command
      *
      * @var string
      */
-    protected $signature = 'statamic:assets:generate-presets';
+    protected $signature = 'statamic:assets:generate-presets {--queue : Queue the image generation.}';
 
     /**
      * The console command description.
@@ -28,26 +28,27 @@ class AssetsGeneratePresets extends Command
     protected $description = 'Generate asset preset manipulations.';
 
     /**
-     * @var PresetGenerator
-     */
-    protected $generator;
-
-    /**
      * @var \Statamic\Assets\AssetCollection
      */
     protected $imageAssets;
 
-    public function __construct(PresetGenerator $generator)
-    {
-        $this->generator = $generator;
-        parent::__construct();
-    }
+    /**
+     * @var bool
+     */
+    protected $shouldQueue = false;
 
     /**
      * Execute the console command.
      */
     public function handle()
     {
+        $this->shouldQueue = $this->option('queue');
+
+        if ($this->shouldQueue && config('queue.default') === 'sync') {
+            $this->error('The queue connection is set to "sync". Queueing will be disabled.');
+            $this->shouldQueue = false;
+        }
+
         $this->imageAssets = Asset::all()->filter(function ($asset) {
             return $asset->isImage();
         });
@@ -97,15 +98,22 @@ class AssetsGeneratePresets extends Command
     {
         foreach ($presets as $preset => $params) {
             $bar = $this->output->createProgressBar($this->imageAssets->count());
-            $bar->setFormat("[%current%/%max%] Generating <comment>$preset</comment>... %filename%");
+
+            $verb = $this->shouldQueue ? 'Queueing' : 'Generating';
+            $bar->setFormat("[%current%/%max%] $verb <comment>$preset</comment>... %filename%");
 
             foreach ($this->imageAssets as $asset) {
                 $bar->setMessage($asset->basename(), 'filename');
-                $this->generator->generate($asset, $preset);
+
+                $dispatchMethod = $this->shouldQueue ? 'dispatch' : 'dispatchSync';
+                GeneratePresetImageManipulation::$dispatchMethod($asset, $preset);
+
                 $bar->advance();
             }
 
-            $bar->setFormat("<info>[✓] Images generated for <comment>$preset</comment>.</info>");
+            $verb = $this->shouldQueue ? 'queued' : 'generated';
+            $bar->setFormat("<info>[✓] Images $verb for <comment>$preset</comment>.</info>");
+
             $bar->finish();
 
             $this->output->newLine();

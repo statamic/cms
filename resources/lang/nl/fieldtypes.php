@@ -16,6 +16,8 @@ return [
     'bard.config.always_show_set_button' => 'Schakel in om altijd de voeg-set-knop-toe te tonen.',
     'bard.config.buttons' => 'Kies welke knoppen er in de toolbar zitten.',
     'bard.config.container' => 'Kies welke asset-container er voor dit veld gebruikt moet worden.',
+    'bard.config.enable_input_rules' => 'Schakelt Markdown-style shortcuts in tijdens typen.',
+    'bard.config.enable_paste_rules' => 'Schakelt Markdown-style shortcuts in tijdens plakken.',
     'bard.config.fullscreen' => 'Schakel de optie in dat mensen volledige schermweergave kunnen gebruiken.',
     'bard.config.link_noopener' => 'Gebruik `rel="noopener"` op alle links.',
     'bard.config.link_noreferrer' => 'Gebruik `rel="noreferrer"` op alle links.',

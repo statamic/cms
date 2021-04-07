@@ -97,13 +97,16 @@ class Glide extends Tags
         $items = is_iterable($items) ? collect($items) : collect([$items]);
 
         return $items->map(function ($item) {
-            $url = $this->generateGlideUrl($item);
+            $data = ['url' => $this->generateGlideUrl($item)];
 
-            $path = $this->generateImage($item);
+            if ($this->isResizable($item)) {
+                $path = $this->generateImage($item);
 
-            [$width, $height] = getimagesize($this->getServer()->getCache()->getAdapter()->getPathPrefix().$path);
+                [$width, $height] = getimagesize($this->getServer()->getCache()->getAdapter()->getPathPrefix().$path);
 
-            $data = compact('url', 'width', 'height');
+                $data['width'] = $width;
+                $data['height'] = $height;
+            }
 
             if ($item instanceof Augmentable) {
                 $data = array_merge($item->toAugmentedArray(), $data);

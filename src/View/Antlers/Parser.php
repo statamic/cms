@@ -14,7 +14,7 @@ use Illuminate\Support\ViewErrorBag;
 use ReflectionProperty;
 use Statamic\Contracts\Data\Augmentable;
 use Statamic\Contracts\Query\Builder;
-use Statamic\Fields\LabeledValue;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Value;
 use Statamic\Ignition\Value as IgnitionViewValue;
 use Statamic\Modifiers\ModifierException;
@@ -79,8 +79,8 @@ class Parser
         $this->variableTagRegex = '/{{\s*('.$this->looseVariableRegex.')\s*}}/m';
 
         // Matches the callback handle for a matching tag pair, captures the contents, and ignores the parameters.
-        // We assume it's a callback because the of the matching tag pair and lack of "?" in the expression.
-        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')(?:\s([^?]*?))}}(.*?){{\s*\/\1\s*}}/ms';
+        // We assume it's a callback because the of the matching tag pair, no pipe modifiers, and lack of "?" in the expression.
+        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')(?!\s*\|)(?:\s([^?]*?))}}(.*?){{\s*\/\1\s*}}/ms';
 
         // Matches a recursive children loop.
         $this->recursiveRegex = '/{{\s*\*recursive\s*('.$this->variableRegex.')\*\s*}}/ms';
@@ -125,6 +125,8 @@ class Parser
         $existingView = $this->view;
 
         $this->view = $view;
+
+        $data = array_merge($data, ['view' => $this->cascade->getViewData($view)]);
 
         try {
             $parsed = $this->parse($text, $data);
@@ -1155,7 +1157,7 @@ class Parser
      * @param  mixed        $default Default value to use if not found
      * @return mixed
      */
-    protected function getVariable($key, $context, $default = null)
+    public function getVariable($key, $context, $default = null)
     {
         [$key, $modifiers] = $this->parseModifiers($key);
 
@@ -1218,24 +1220,6 @@ class Parser
             // If it's not found in the context, we'll try looking for it in the cascade.
             if ($cascading = $this->cascade->get($first)) {
                 return $this->getVariableExistenceAndValue($rest, $cascading);
-            }
-
-            // If the first part of the variable is "view", we'll try to get the value from
-            // values defined in any views' front-matter. They are stored in the cascade
-            // organized by the view paths. It should be able to get a value from any
-            // loaded view, but the current view should take precedence. (ie. if
-            // you define the same var in this view and another view, the one
-            // from this view should win.)
-            if ($first == 'view') {
-                $views = collect($this->cascade->get('views'));
-                $thisView = $views->pull($this->view);
-                $views->prepend($thisView, $this->view);
-                foreach ($views as $viewData) {
-                    $viewExistAndVal = $this->getVariableExistenceAndValue($rest, $viewData);
-                    if ($viewExistAndVal[0]) {
-                        return $viewExistAndVal;
-                    }
-                }
             }
 
             return [false, null];
@@ -1556,7 +1540,7 @@ class Parser
 
     protected function isNullWhenUsedInStrings($value)
     {
-        if ($value instanceof LabeledValue) {
+        if ($value instanceof ArrayableString) {
             $value = $value->value();
         }
 

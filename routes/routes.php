@@ -30,8 +30,6 @@ if (config('statamic.cp.enabled')) {
     });
 }
 
-if (config('statamic.routes.enabled')) {
-    Route::middleware(config('statamic.routes.middleware', 'web'))
-        ->namespace('Statamic\Http\Controllers')
-        ->group(__DIR__.'/web.php');
-}
+Route::middleware(config('statamic.routes.middleware', 'web'))
+    ->namespace('Statamic\Http\Controllers')
+    ->group(__DIR__.'/web.php');

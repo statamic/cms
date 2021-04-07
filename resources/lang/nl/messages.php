@@ -99,6 +99,7 @@ return [
     'git_utility_description' => 'Beheer door Git bijgehouden inhoud.',
     'global_search_open_using_slash' => 'Focus zoekveld met de <kbd>/</kbd> toets',
     'global_set_config_intro' => 'Met globalsets kun je content beheren die sitebreed beschikbaar moet zijn, zoals bedrijfsgegevens, contactinformatie of frontend-settings.',
+    'global_set_no_fields_description' => 'Je kunt velden toevoegen aan de blueprint, of handmatig variabelen aan de set zelf toevoegen.',
     'globals_blueprint_instructions' => 'Welke velden weergegeven moeten worden als de variabelen worden bewerkt.',
     'globals_configure_handle_instructions' => 'Wordt gebruikt om deze globalset aan de voorkant aan te roepen. Het is niet persé eenvoudig om dit nadien te wijzigen.',
     'globals_configure_intro' => 'Een globalset is een groep met variabelen die over de gehele frontend beschikbaar is.',

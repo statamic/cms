@@ -4,7 +4,7 @@
         <table v-if="isKeyed" class="array-table">
             <tbody>
                 <tr v-if="data" v-for="(element, index) in keyedData" :key="element._id">
-                    <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ config.keys[element.key] }}</label></th>
+                    <th class="w-1/4"><label :for="fieldId+'__'+element.key">{{ config.keys[element.key] || element.key }}</label></th>
                     <td>
                         <input type="text" class="input-text-minimal" :id="fieldId+'__'+element.key" v-model="data[index].value" :readonly="isReadOnly" />
                     </td>
@@ -114,7 +114,7 @@ export default {
         },
 
         keyedData() {
-            return _.filter(this.data, element => this.config.keys[element.key]);
+            return this.data.filter(element => this.config.keys.hasOwnProperty(element.key));
         },
 
         maxItems() {

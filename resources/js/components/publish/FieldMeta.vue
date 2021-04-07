@@ -58,7 +58,7 @@ export default {
             this.loading = true;
 
             const params = {
-                config: btoa(JSON.stringify(this.config)),
+                config: utf8btoa(JSON.stringify(this.config)),
                 value: this.value,
             };
 
