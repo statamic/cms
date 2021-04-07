@@ -14,7 +14,7 @@
                 <span v-if="isReadOnly" class="text-grey-50 font-normal text-2xs mx-sm">
                     {{ isLocked ? __('Locked') : __('Read Only') }}
                 </span>
-                <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="$config.get('sites').length > 1 && config.localizable" v-tooltip.top="__('Localizable field')" />
+                <svg-icon name="translate" class="h-4 ml-sm w-4 text-grey-60" v-if="isLocalizable" v-tooltip.top="__('Localizable field')" />
 
                 <button
                     v-if="!isReadOnly"
@@ -120,9 +120,17 @@ export default {
         },
 
         isReadOnly() {
+            if (this.config.type === 'section') return false;
+
             if (this.storeState.isRoot === false && !this.config.localizable) return true;
 
             return this.isLocked || this.readOnly || this.config.read_only || false;
+        },
+
+        isLocalizable() {
+            if (this.config.type === 'section') return false;
+
+            return this.$config.get('sites').length > 1 && this.config.localizable;
         },
 
         classes() {
