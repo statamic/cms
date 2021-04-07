@@ -25,10 +25,12 @@ class Tags extends BaseTags
             return $this->parseNoResults();
         }
 
+        $supplementData = $this->params->get('supplement_data', true);
+
         $builder = Search::index($this->params->get('index'))
             ->ensureExists()
             ->search($query)
-            ->withData($this->params->get('supplement_data', true))
+            ->withData($supplementData)
             ->limit($this->params->get('limit'))
             ->offset($this->params->get('offset'));
 
@@ -39,7 +41,10 @@ class Tags extends BaseTags
         $this->queryOrderBys($builder);
 
         $results = $this->getQueryResults($builder);
-        $results = $this->addResultTypes($results);
+
+        if ($supplementData) {
+            $results = $this->addResultTypes($results);
+        }
 
         return $this->output($results);
     }
