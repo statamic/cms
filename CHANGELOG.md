@@ -1,5 +1,20 @@
 # Release Notes
 
+## 3.1.5 (2020-04-07)
+
+### What's new
+- The Bard link toolbar allows you to browse for entries. [#3466](https://github.com/statamic/cms/issues/3466)
+- Added a `queue` option to the `assets:generate-presets` command. [#3490](https://github.com/statamic/cms/issues/3490)
+- The `cache` tag supports cache tags. (Naming is hard.) [#3357](https://github.com/statamic/cms/issues/3357)
+- Add status UI for text nav items. [#3489](https://github.com/statamic/cms/issues/3489)
+
+### What's fixed
+- Fix SVG dimensions when not using pixels. [#3482](https://github.com/statamic/cms/issues/3482)
+- Prevent the 'read only' label and translation icons on `section` fieldtypes. [#3492](https://github.com/statamic/cms/issues/3492)
+- Prevent incorrect nav output when you had a nav named the same as a collection. [#3491](https://github.com/statamic/cms/issues/3491)
+
+
+
 ## 3.1.4 (2020-04-06)
 
 ### What's new
