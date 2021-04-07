@@ -3,6 +3,8 @@
 namespace Statamic\Fieldtypes;
 
 use ProseMirrorToHtml\Renderer;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Data;
 use Statamic\Facades\GraphQL;
 use Statamic\Fields\Fields;
 use Statamic\Fieldtypes\Bard\Augmentor;
@@ -11,6 +13,7 @@ use Statamic\GraphQL\Types\BardTextType;
 use Statamic\GraphQL\Types\ReplicatorSetType;
 use Statamic\Query\Scopes\Filters\Fields\Bard as BardFilter;
 use Statamic\Support\Arr;
+use Statamic\Support\Str;
 
 class Bard extends Replicator
 {
@@ -96,6 +99,12 @@ class Bard extends Replicator
                 'default' => false,
                 'width' => 50,
                 'instructions' => __('statamic::fieldtypes.bard.config.target_blank'),
+            ],
+            'link_collections' => [
+                'display' => __('Link Collections'),
+                'instructions' => __('statamic::fieldtypes.bard.config.link_collections'),
+                'type' => 'collections',
+                'mode' => 'select',
             ],
             'reading_time' => [
                 'display' => __('Show Reading Time'),
@@ -363,6 +372,8 @@ class Bard extends Replicator
             'collapsed' => [],
             'previews' => $previews,
             '__collaboration' => ['existing'],
+            'linkCollections' => empty($collections = $this->config('link_collections')) ? Collection::handles()->all() : $collections,
+            'linkData' => $this->getLinkData($value),
         ];
     }
 
@@ -429,5 +440,39 @@ class Bard extends Replicator
         $union = new BardSetsType($this, $this->gqlSetsTypeName(), $types);
 
         GraphQL::addType($union);
+    }
+
+    public function getLinkData($value)
+    {
+        return collect($value)->mapWithKeys(function ($node) {
+            return $this->extractLinkDataFromNode($node);
+        })->all();
+    }
+
+    private function extractLinkDataFromNode($node)
+    {
+        $data = collect();
+
+        if ($node['type'] === 'link') {
+            $href = $node['attrs']['href'] ?? null;
+
+            if (Str::startsWith($href, 'statamic://')) {
+                $ref = Str::after($href, 'statamic://');
+                $item = Data::find($ref);
+                $data[$ref] = [
+                    'title' => $item->value('title'),
+                    'permalink' => $item->absoluteUrl(),
+                ];
+            }
+        }
+
+        $childData = collect()
+            ->merge($node['content'] ?? [])
+            ->merge($node['marks'] ?? [])
+            ->mapWithKeys(function ($node) {
+                return $this->extractLinkDataFromNode($node);
+            });
+
+        return $data->merge($childData);
     }
 }
