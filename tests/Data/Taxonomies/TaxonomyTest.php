@@ -3,6 +3,9 @@
 namespace Tests\Data\Taxonomies;
 
 use Facades\Statamic\Fields\BlueprintRepository;
+use Statamic\Contracts\Entries\Entry as EntryContract;
+use Statamic\Facades\Collection;
+use Statamic\Facades\Entry;
 use Statamic\Fields\Blueprint;
 use Statamic\Taxonomies\Taxonomy;
 use Tests\PreventSavingStacheItemsToDisk;
@@ -96,5 +99,32 @@ class TaxonomyTest extends TestCase
 
         $this->assertEquals($blueprint, $taxonomy->termBlueprint('tags'));
         $this->assertNull($taxonomy->termBlueprint('two'));
+    }
+
+    /** @test */
+    public function it_gets_the_url()
+    {
+        $taxonomy = (new Taxonomy)->handle('tags');
+
+        $this->assertEquals('/tags', $taxonomy->uri());
+        $this->assertEquals('/tags', $taxonomy->url());
+        $this->assertEquals('http://localhost/tags', $taxonomy->absoluteUrl());
+    }
+
+    /** @test */
+    public function it_gets_the_url_with_a_collection()
+    {
+        $entry = $this->mock(EntryContract::class);
+        $entry->shouldReceive('in')->andReturnSelf();
+        $entry->shouldReceive('uri')->andReturn('/blog');
+        Entry::shouldReceive('find')->with('blog-page')->andReturn($entry);
+
+        $collection = tap(Collection::make('blog')->mount('blog-page'))->save();
+
+        $taxonomy = (new Taxonomy)->handle('tags')->collection($collection);
+
+        $this->assertEquals('/blog/tags', $taxonomy->uri());
+        $this->assertEquals('/blog/tags', $taxonomy->url());
+        $this->assertEquals('http://localhost/blog/tags', $taxonomy->absoluteUrl());
     }
 }

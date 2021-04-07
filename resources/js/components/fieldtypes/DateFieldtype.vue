@@ -23,7 +23,7 @@
                     :popover="{ visibility: 'click' }"
                     :class="{'input-text border border-grey-50 border-l-0': !config.inline }"
                     :attributes="attrs"
-                    :locale="$config.get('locale')"
+                    :locale="$config.get('locale').replace('_', '-')"
                     :formats="formats"
                     :mode="config.mode"
                     :input="value"

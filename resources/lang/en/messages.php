@@ -77,6 +77,7 @@ return [
     'form_configure_blueprint_instructions' => 'Choose from existing Blueprints or create a new one.',
     'form_configure_email_from_instructions' => 'Leave blank to fall back to the site default',
     'form_configure_email_html_instructions' => 'The view for the html version of this email.',
+    'form_configure_email_markdown_instructions' => 'Render the HTML version of this email using markdown.',
     'form_configure_email_instructions' => 'Configure emails to be sent when new form submission are received.',
     'form_configure_email_reply_to_instructions' => 'Leave blank to fall back to sender.',
     'form_configure_email_subject_instructions' => 'Email subject line.',

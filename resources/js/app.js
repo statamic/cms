@@ -185,9 +185,11 @@ Statamic.app({
         }
 
         // Set moment locale
-        window.moment.locale(Statamic.$config.get('locale'))
-        Vue.moment.locale(Statamic.$config.get('locale'))
-        Vue.prototype.$moment.locale(Statamic.$config.get('locale'))
+        window.moment.locale(Statamic.$config.get('locale'));
+        Vue.moment.locale(Statamic.$config.get('locale'));
+        Vue.prototype.$moment.locale(Statamic.$config.get('locale'));
+        
+        this.fixAutofocus();
     },
 
     created() {
@@ -215,6 +217,17 @@ Statamic.app({
 
         hideBanner() {
             this.showBanner = false;
+        },
+
+        fixAutofocus() {
+            // Fix autofocus issues in Safari and Firefox
+            setTimeout(() => {
+                const inputs = document.querySelectorAll('input[autofocus]');
+                for (let input of inputs) {
+                    input.blur();
+                    input.focus();    
+                }
+            }, 0);
         }
     }
 

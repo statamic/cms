@@ -2,6 +2,8 @@
 
 namespace Statamic\Fieldtypes;
 
+use Statamic\Facades\GraphQL;
+use Statamic\Fields\ArrayableString;
 use Statamic\Fields\Fieldtype;
 
 class Code extends Fieldtype
@@ -101,6 +103,20 @@ class Code extends Fieldtype
 
     public function augment($value)
     {
-        return str_replace('<?php', '&lt;?php', $value);
+        if ($value) {
+            $value = str_replace('<?php', '&lt;?php', $value);
+        }
+
+        return new ArrayableString($value, ['mode' => $this->config('mode', 'htmlmixed')]);
+    }
+
+    public function toGqlType()
+    {
+        return [
+            'type' => GraphQL::string(),
+            'resolve' => function ($item, $args, $context, $info) {
+                return $item->resolveGqlValue($info->fieldName)->value();
+            },
+        ];
     }
 }

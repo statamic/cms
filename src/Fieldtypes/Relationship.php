@@ -225,11 +225,16 @@ abstract class Relationship extends Fieldtype
 
     public function augment($values)
     {
-        $values = collect($values)->map(function ($value) {
+        $values = $this->collect($values)->map(function ($value) {
             return $this->augmentValue($value);
         })->filter()->values();
 
         return $this->config('max_items') === 1 ? $values->first() : $values;
+    }
+
+    protected function collect($value)
+    {
+        return collect($value);
     }
 
     public function shallowAugment($values)

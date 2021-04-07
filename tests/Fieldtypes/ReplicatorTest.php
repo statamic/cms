@@ -262,4 +262,25 @@ class ReplicatorTest extends TestCase
             ],
         ], $field->process()->value());
     }
+
+    /** @test */
+    public function it_preloads_preprocessed_default_values()
+    {
+        $field = (new Field('test', [
+            'type' => 'replicator',
+            'sets' => [
+                'main' => [
+                    'fields' => [
+                        ['handle' => 'things', 'field' => ['type' => 'array']],
+                    ],
+                ],
+            ],
+        ]));
+
+        $expected = [
+            'things' => [],
+        ];
+
+        $this->assertEquals($expected, $field->fieldtype()->preload()['defaults']['main']->all());
+    }
 }

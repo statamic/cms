@@ -40,6 +40,11 @@ export default {
                 });
             }
 
+            // Filter out error templates
+            templates = _.reject(templates, function(template) {
+                return template.startsWith('errors/');
+            });
+
             // Set default
             var options = [];
 
