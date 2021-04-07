@@ -119,7 +119,9 @@ class Dimensions
 
         $cache->delete($cachePath);
 
-        if ($svg['width'] && $svg['height']) {
+        if ($svg['width'] && $svg['height']
+            && is_numeric((string) $svg['width'])
+            && is_numeric((string) $svg['height'])) {
             return [(int) $svg['width'], (int) $svg['height']];
         } elseif ($svg['viewBox']) {
             $viewBox = preg_split('/[\s,]+/', $svg['viewBox'] ?: '');

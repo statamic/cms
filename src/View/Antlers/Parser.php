@@ -79,8 +79,8 @@ class Parser
         $this->variableTagRegex = '/{{\s*('.$this->looseVariableRegex.')\s*}}/m';
 
         // Matches the callback handle for a matching tag pair, captures the contents, and ignores the parameters.
-        // We assume it's a callback because the of the matching tag pair and lack of "?" in the expression.
-        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')(?:\s([^?]*?))}}(.*?){{\s*\/\1\s*}}/ms';
+        // We assume it's a callback because the of the matching tag pair, no pipe modifiers, and lack of "?" in the expression.
+        $this->callbackBlockRegex = '/{{\s*('.$this->variableRegex.')(?!\s*\|)(?:\s([^?]*?))}}(.*?){{\s*\/\1\s*}}/ms';
 
         // Matches a recursive children loop.
         $this->recursiveRegex = '/{{\s*\*recursive\s*('.$this->variableRegex.')\*\s*}}/ms';

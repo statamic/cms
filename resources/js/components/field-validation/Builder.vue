@@ -43,6 +43,7 @@
                         v-on="events"
                         class="vs__search"
                         @keydown.enter="ifSearchNotFoundAddCustom"
+                        @blur="ifSearchNotFoundAddCustom"
                     />
                 </template>
                 <template #option="{ value, display }">
@@ -58,6 +59,7 @@
                 v-model="customRule"
                 ref="customRuleInput"
                 @keydown.enter.prevent="add(customRule)"
+                @blur="add(customRule)"
             />
 
             <div class="v-select">

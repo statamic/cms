@@ -128,6 +128,29 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_subfolders_in_this_folder_non_recursively()
+    {
+        $container = $this->mock(AssetContainer::class);
+        $container
+            ->shouldReceive('assetFolders')
+            ->with('path/to/folder', false)
+            ->once()
+            ->andReturn(collect([
+                (new Folder)->container($container)->path('path/to/folder/one'),
+                (new Folder)->container($container)->path('path/to/folder/two'),
+            ]));
+
+        $folder = (new Folder)
+            ->container($container)
+            ->path('path/to/folder');
+
+        $this->assertEquals([
+            'path/to/folder/one',
+            'path/to/folder/two',
+        ], $folder->assetFolders()->map->path()->values()->all());
+    }
+
+    /** @test */
     public function it_gets_the_last_modified_date_by_aggregating_all_files()
     {
         Carbon::setTestNow(now());

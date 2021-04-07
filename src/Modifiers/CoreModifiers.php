@@ -1227,17 +1227,13 @@ class CoreModifiers extends Modifier
      */
     public function markdown($value, $params)
     {
-        if (! is_string($value)) {
-            return $value;
-        }
-
         $parser = $params[0] ?? 'default';
 
         if (in_array($parser, [true, 'true', ''], true)) {
             $parser = 'default';
         }
 
-        return Markdown::parser($parser)->parse($value);
+        return Markdown::parser($parser)->parse((string) $value);
     }
 
     /**

@@ -1,5 +1,71 @@
 # Release Notes
 
+## 3.1.4 (2020-04-06)
+
+### What's new
+- Ability to push queries and middleware into GraphQL. [#3385](https://github.com/statamic/cms/issues/3385)
+- Add breadcrumbs to asset browser. [#3475](https://github.com/statamic/cms/issues/3475)
+- Add limit param to foreach tag. [fc034eec1](https://github.com/statamic/cms/commit/fc034eec1)
+
+### What's fixed
+- Fix squished sidebar toggle. [#3456](https://github.com/statamic/cms/issues/3456)
+- Prevent unintended deletion of assets through editor. [#3474](https://github.com/statamic/cms/issues/3474)
+- Fix autofocus issues in Safari and Firefox. [#3471](https://github.com/statamic/cms/issues/3471)
+- Handle encoded characters in uploaded asset filenames. [#3473](https://github.com/statamic/cms/issues/3473)
+- Fix Glide 404ing for images in the `public` directory. [#3484](https://github.com/statamic/cms/issues/3484)
+- Fix assets being incorrect every other request in some cases. [#3485](https://github.com/statamic/cms/issues/3485)
+- Use request helper instead of server variables to fix an issue with Laravel Octane. [#3483](https://github.com/statamic/cms/issues/3483)
+
+
+
+## 3.1.3 (2020-04-02)
+
+### What's new
+- Status icons are shown in collections' tree views. [#3461](https://github.com/statamic/cms/issues/3461)
+- Addons can add external stylesheets. [#3464](https://github.com/statamic/cms/issues/3464)
+- Added a `honeypot` variable inside forms. [#3462](https://github.com/statamic/cms/issues/3462)
+
+### What's fixed
+- Glide routes will return 404s for non-existent images. [#3450](https://github.com/statamic/cms/issues/3450)
+- Recognize tag pairs correctly for a collection alias. [#3457](https://github.com/statamic/cms/issues/3457)
+- Fix utf8 handling of base64 encoded strings. [#3421](https://github.com/statamic/cms/issues/3421)
+- Fix `markdown` modifier not working with the `code` fieldtype. [#3460](https://github.com/statamic/cms/issues/3460)
+- Allow `symfony/var-exporter` 5.1. [#3463](https://github.com/statamic/cms/issues/3463)
+- Bump y18n from 4.0.0 to 4.0.1. [#3443](https://github.com/statamic/cms/issues/3443)
+
+
+
+## 3.1.2 (2020-03-30)
+
+### What's improved
+- Prevent the need to hit enter to add a validation rule. [bdf9e03a5](https://github.com/statamic/cms/commit/bdf9e03a5)
+- Updated German translations. [#3434](https://github.com/statamic/cms/issues/3434)
+
+### What's fixed
+- Fix taxonomies url and data handling which fixes a `nav:breadcrumbs` issue. [#3448](https://github.com/statamic/cms/issues/3448)
+- Fix "move asset" action not listing all folders. [#3447](https://github.com/statamic/cms/issues/3447)
+- Prevent action and glide routes being disabled by config. [#3446](https://github.com/statamic/cms/issues/3446)
+- Prevent error during addon tests. [#3435](https://github.com/statamic/cms/issues/3435)
+
+
+
+## 3.1.1 (2020-03-25)
+
+### What's improved
+- French translations. [#3429](https://github.com/statamic/cms/issues/3429)
+
+### What's fixed
+- Fix widths for certain fieldtypes within Grid tables. [#3426](https://github.com/statamic/cms/issues/3426)
+- Fix update issue when a nav doesn't have a tree. [#3430](https://github.com/statamic/cms/issues/3430)
+- Fix link color inside updater. [#3423](https://github.com/statamic/cms/issues/3423)
+- Fix translation typo [#3428](https://github.com/statamic/cms/issues/3428)
+- Fix date fieldtypes not displaying. [#3422](https://github.com/statamic/cms/issues/3422)
+- Fix issue where the delete action wouldn't show, or would show twice. [#3420](https://github.com/statamic/cms/issues/3420)
+- Prevent error on `/cp/auth` when logged in. [#3425](https://github.com/statamic/cms/issues/3425)
+- Don't check for composer scripts during tests. [#3427](https://github.com/statamic/cms/issues/3427)
+
+
+
 ## 3.1.0 (2020-03-24)
 
 ### What's new

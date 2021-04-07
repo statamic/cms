@@ -27,6 +27,7 @@ abstract class AddonServiceProvider extends ServiceProvider
     protected $policies = [];
     protected $commands = [];
     protected $stylesheets = [];
+    protected $externalStylesheets = [];
     protected $scripts = [];
     protected $externalScripts = [];
     protected $publishables = [];
@@ -173,6 +174,10 @@ abstract class AddonServiceProvider extends ServiceProvider
             $this->registerStylesheet($path);
         }
 
+        foreach ($this->externalStylesheets as $url) {
+            $this->registerExternalStylesheet($url);
+        }
+
         return $this;
     }
 
@@ -182,8 +187,8 @@ abstract class AddonServiceProvider extends ServiceProvider
             $this->registerScript($path);
         }
 
-        foreach ($this->externalScripts as $path) {
-            $this->registerExternalScript($path);
+        foreach ($this->externalScripts as $url) {
+            $this->registerExternalScript($url);
         }
 
         return $this;
@@ -393,6 +398,11 @@ abstract class AddonServiceProvider extends ServiceProvider
         ], $this->getAddon()->slug());
 
         Statamic::style($name, $filename);
+    }
+
+    public function registerExternalStylesheet(string $url)
+    {
+        Statamic::externalStyle($url);
     }
 
     protected function schedule($schedule)

@@ -73,6 +73,8 @@
 
                                 </div>
 
+                                <breadcrumbs :path="path" @navigated="selectFolder" />
+
                                 <data-list-bulk-actions
                                     :url="bulkActionsUrl"
                                     :context="actionContext"
@@ -242,6 +244,7 @@
 <script>
 import AssetThumbnail from './Thumbnail.vue';
 import AssetEditor from '../Editor/Editor.vue';
+import Breadcrumbs from './Breadcrumbs.vue';
 import FolderCreator from '../Folder/Create.vue';
 import FolderEditor from '../Folder/Edit.vue';
 import Uploader from '../Uploader.vue';
@@ -252,6 +255,7 @@ export default {
     components: {
         AssetThumbnail,
         AssetEditor,
+        Breadcrumbs,
         Uploader,
         Uploads,
         FolderEditor,

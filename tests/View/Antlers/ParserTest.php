@@ -2020,6 +2020,18 @@ EOT;
             'test' => 'price:desc',
         ]));
     }
+
+    /**
+     * @test
+     * @see https://github.com/statamic/cms/issues/3374
+     **/
+    public function it_parses_single_and_tag_pairs_with_modifiers()
+    {
+        $data = ['items' => ['one', 'two', 'three']];
+
+        $this->assertEquals('<one><two>3', $this->parse('{{ items limit="2" }}<{{ value }}>{{ /items }}{{ items | count }}', $data));
+        $this->assertEquals('3<one><two>', $this->parse('{{ items | count }}{{ items limit="2" }}<{{ value }}>{{ /items }}', $data));
+    }
 }
 
 class NonArrayableObject

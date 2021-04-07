@@ -65,4 +65,47 @@ class DimensionsTest extends TestCase
         $this->assertEquals(30, $dimensions->width());
         $this->assertEquals(60, $dimensions->height());
     }
+
+    /** @test */
+    public function it_gets_the_dimensions_of_an_svg()
+    {
+        $asset = $this->svgAsset('<svg width="30" height="60" viewBox="0 0 100 200"></svg>');
+
+        $this->assertEquals([30, 60], $this->dimensions->asset($asset)->get());
+    }
+
+    /** @test */
+    public function it_uses_the_viewbox_if_the_svg_dimensions_havent_been_provided()
+    {
+        $asset = $this->svgAsset('<svg viewBox="0 0 300 600"></svg>');
+
+        $this->assertEquals([300, 600], $this->dimensions->asset($asset)->get());
+    }
+
+    /** @test */
+    public function it_uses_the_viewbox_if_the_svg_dimensions_are_percents()
+    {
+        $asset = $this->svgAsset('<svg width="100%" height="100%" viewBox="0 0 300 600"></svg>');
+
+        $this->assertEquals([300, 600], $this->dimensions->asset($asset)->get());
+    }
+
+    /** @test */
+    public function it_uses_the_viewbox_if_the_svg_dimensions_are_ems()
+    {
+        $asset = $this->svgAsset('<svg width="1em" height="2em" viewBox="0 0 300 600"></svg>');
+
+        $this->assertEquals([300, 600], $this->dimensions->asset($asset)->get());
+    }
+
+    private function svgAsset($svg)
+    {
+        $asset = (new Asset)
+            ->container(AssetContainer::make('test-container')->disk('test'))
+            ->path('path/to/asset.svg');
+
+        Storage::disk('test')->put('path/to/asset.svg', $svg);
+
+        return $asset;
+    }
 }

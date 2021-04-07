@@ -7,7 +7,7 @@ use Illuminate\Support\Carbon;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Cache;
 use Statamic\Facades\Form;
-use Statamic\GraphQL\DefaultSchema;
+use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Queries\PingQuery;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
@@ -21,9 +21,9 @@ class RequestCacheTest extends TestCase
     {
         parent::getEnvironmentSetUp($app);
 
-        // todo: if/when https://github.com/rebing/graphql-laravel/pull/706 is merged,
-        // we'll be able to just push a custom query within the test.
-        $app->instance(DefaultSchema::class, new CustomSchema);
+        GraphQL::addQuery(QueryOne::class);
+        GraphQL::addQuery(QueryTwo::class);
+        GraphQL::addMiddleware(TrackRequests::class);
     }
 
     /** @test */
@@ -168,20 +168,6 @@ class RequestCacheTest extends TestCase
             ['query' => '{one}', 'variables' => null],
             ['query' => '{one}', 'variables' => null],
         ], $requests->all());
-    }
-}
-
-class CustomSchema extends DefaultSchema
-{
-    public function getConfig()
-    {
-        $config = parent::getConfig();
-
-        $config['query'][] = QueryOne::class;
-        $config['query'][] = QueryTwo::class;
-        $config['middleware'][] = TrackRequests::class;
-
-        return $config;
     }
 }
 
