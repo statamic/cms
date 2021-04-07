@@ -44,4 +44,9 @@ class NavTree extends Tree
     {
         return app(NavTreeRepository::class);
     }
+
+    protected function entriesBlinkKey()
+    {
+        return 'nav-tree-entries-'.$this->structure()->handle().'-'.$this->locale();
+    }
 }
