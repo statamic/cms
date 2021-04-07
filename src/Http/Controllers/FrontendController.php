@@ -45,6 +45,10 @@ class FrontendController extends Controller
             $url = substr($url, 0, strpos($url, '?'));
         }
 
+        if (Str::endsWith($url, '/')) {
+            $url = rtrim($url, '/');
+        }
+
         if ($data = Data::findByUri($url, Site::current()->handle())) {
             return $data;
         }
