@@ -72,7 +72,7 @@ class UseDedicatedTrees extends UpdateScript
 
             $yaml = YAML::file($path)->parse();
 
-            return $nav->makeTree($site->handle(), $yaml['tree']);
+            return $nav->makeTree($site->handle(), $yaml['tree'] ?? []);
         })->filter();
     }
 

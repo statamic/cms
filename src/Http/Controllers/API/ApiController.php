@@ -2,6 +2,7 @@
 
 namespace Statamic\Http\Controllers\API;
 
+use Statamic\Exceptions\NotFoundHttpException;
 use Statamic\Facades\Site;
 use Statamic\Http\Controllers\Controller;
 use Statamic\Support\Str;
@@ -10,6 +11,85 @@ use Statamic\Tags\Concerns\QueriesConditions;
 class ApiController extends Controller
 {
     use QueriesConditions;
+
+    protected $resourceConfigKey;
+    protected $routeResourceKey;
+    protected $filterPublished = false;
+
+    /**
+     * Abort if item is unpublished.
+     *
+     * @param mixed $item
+     * @return bool
+     */
+    protected function abortIfUnpublished($item)
+    {
+        throw_if($item->published() === false, new NotFoundHttpException);
+    }
+
+    /**
+     * Abort if endpoint is disabled.
+     */
+    protected function abortIfDisabled()
+    {
+        if (! $this->resourceConfigKey) {
+            return;
+        }
+
+        $config = config("statamic.api.resources.{$this->resourceConfigKey}", false);
+
+        if ($config !== true && ! is_array($config)) {
+            throw new NotFoundHttpException;
+        }
+
+        if (! $this->routeResourceKey || ! is_array($config)) {
+            return;
+        }
+
+        foreach ($config as $resource) {
+            $this->abortIfRouteResourceDisabled($this->routeResourceKey, $resource);
+        }
+    }
+
+    /**
+     * Abort if route resource is disabled.
+     *
+     * @param string $routeSegment
+     * @param string $resource
+     */
+    protected function abortIfRouteResourceDisabled($routeSegment, $resource)
+    {
+        if (! $handle = request()->route($routeSegment)) {
+            return;
+        }
+
+        if (! is_string($handle)) {
+            $handle = $handle->handle();
+        }
+
+        if ($handle && $handle !== $resource) {
+            throw new NotFoundHttpException;
+        }
+    }
+
+    /**
+     * If endpoint config is an array, filter allowed resources.
+     *
+     * @param \Illuminate\Support\Collection $items
+     * @return \Illuminate\Support\Collection
+     */
+    protected function filterAllowedResources($items)
+    {
+        $allowedResources = config("statamic.api.resources.{$this->resourceConfigKey}");
+
+        if (! is_array($allowedResources)) {
+            return $items;
+        }
+
+        return $items->filter(function ($item) use ($allowedResources) {
+            return in_array($item->handle(), $allowedResources);
+        });
+    }
 
     /**
      * Filter, sort, and paginate query for API resource output.
@@ -35,7 +115,7 @@ class ApiController extends Controller
      */
     protected function filter($query)
     {
-        collect(request()->filter ?? [])
+        $this->getFilters()
             ->each(function ($value, $filter) use ($query) {
                 if ($value === 'true') {
                     $value = true;
@@ -54,6 +134,37 @@ class ApiController extends Controller
             });
 
         return $this;
+    }
+
+    /**
+     * Get filters for querying.
+     *
+     * @return \Illuminate\Support\Collection
+     */
+    protected function getFilters()
+    {
+        $filters = collect(request()->filter ?? []);
+
+        if ($this->filterPublished && $this->doesntHaveFilter('status') && $this->doesntHaveFilter('published')) {
+            $filters->put('status:is', 'published');
+        }
+
+        return $filters;
+    }
+
+    /**
+     * Check if user is not filtering by a specific field, for applying default filters.
+     *
+     * @param string $field
+     * @return bool
+     */
+    public function doesntHaveFilter($field)
+    {
+        return ! collect(request()->filter ?? [])
+            ->map(function ($value, $param) {
+                return explode(':', $param)[0];
+            })
+            ->contains($field);
     }
 
     /**

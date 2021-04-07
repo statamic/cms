@@ -3,6 +3,7 @@
 namespace Tests\Assets;
 
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\Storage;
 use Statamic\Assets\Asset;
 use Statamic\Assets\AssetFolder as Folder;
@@ -13,6 +14,16 @@ use Tests\TestCase;
 
 class AssetFolderTest extends TestCase
 {
+    public function setUp(): void
+    {
+        parent::setUp();
+
+        // use the file cache driver so we can test that the cached file listings
+        // are coming from the cache and not just the in-memory collection
+        config(['cache.default' => 'file']);
+        Cache::clear();
+    }
+
     /** @test */
     public function it_gets_and_sets_the_container()
     {
@@ -48,15 +59,10 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    public function it_gets_and_sets_the_title()
+    public function the_title_is_the_folder_name()
     {
         $folder = (new Folder)->path('path/to/somewhere');
         $this->assertEquals('somewhere', $folder->title());
-
-        $return = $folder->title('My Custom Folder Title');
-
-        $this->assertEquals($folder, $return);
-        $this->assertEquals('My Custom Folder Title', $folder->title());
     }
 
     /** @test */
@@ -122,6 +128,29 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
+    public function it_gets_subfolders_in_this_folder_non_recursively()
+    {
+        $container = $this->mock(AssetContainer::class);
+        $container
+            ->shouldReceive('assetFolders')
+            ->with('path/to/folder', false)
+            ->once()
+            ->andReturn(collect([
+                (new Folder)->container($container)->path('path/to/folder/one'),
+                (new Folder)->container($container)->path('path/to/folder/two'),
+            ]));
+
+        $folder = (new Folder)
+            ->container($container)
+            ->path('path/to/folder');
+
+        $this->assertEquals([
+            'path/to/folder/one',
+            'path/to/folder/two',
+        ], $folder->assetFolders()->map->path()->values()->all());
+    }
+
+    /** @test */
     public function it_gets_the_last_modified_date_by_aggregating_all_files()
     {
         Carbon::setTestNow(now());
@@ -151,83 +180,50 @@ class AssetFolderTest extends TestCase
     }
 
     /** @test */
-    public function it_saves_meta_file_to_disk()
+    public function it_creates_directory_when_saving()
     {
         Storage::fake('local');
 
         $container = $this->mock(AssetContainer::class);
         $container->shouldReceive('disk')->andReturn($disk = Storage::disk('local'));
+        $container->shouldReceive('foldersCacheKey')->andReturn('irrelevant for test');
 
         $folder = (new Folder)
             ->container($container)
-            ->path('path/to/folder')
-            ->title('My Folder');
-
-        $return = $folder->save();
-
-        $expected = <<<'EOT'
-title: 'My Folder'
-
-EOT;
-
-        $this->assertEquals($folder, $return);
-        $disk->assertExists($path = 'path/to/folder/folder.yaml');
-        $this->assertEquals($expected, $disk->get($path));
-    }
-
-    /** @test */
-    public function it_deletes_existing_meta_file_if_the_title_is_identical_to_computed_title()
-    {
-        Storage::fake('local');
-        $disk = Storage::disk('local');
-        $path = 'path/to/folder/folder.yaml';
-        $disk->put($path, 'title: Original Title');
-
-        $container = $this->mock(AssetContainer::class);
-        $container->shouldReceive('disk')->andReturn($disk);
-
-        $folder = (new Folder)
-            ->container($container)
-            ->path('path/to/folder')
-            ->title('folder')
-            ->save();
+            ->path($path = 'path/to/folder');
 
         $disk->assertMissing($path);
-    }
-
-    /** @test */
-    public function it_doesnt_save_meta_file_if_theres_no_title()
-    {
-        Storage::fake('local');
-
-        $container = $this->mock(AssetContainer::class);
-        $container->shouldReceive('disk')->andReturn($disk = Storage::disk('local'));
-
-        $folder = (new Folder)
-            ->container($container)
-            ->path('path/to/folder')
-            ->title(null);
 
         $return = $folder->save();
 
-        $disk->assertMissing('path/to/folder/folder.yaml');
+        $this->assertEquals($folder, $return);
+        $disk->assertExists($path);
     }
 
     /** @test */
-    public function deleting_a_folder_deletes_the_assets_and_the_meta_file()
+    public function deleting_a_folder_deletes_the_assets_and_directory()
     {
         Storage::fake('local');
         $container = Facades\AssetContainer::make('test')->disk('local');
+        Facades\AssetContainer::shouldReceive('findByHandle')->with('test')->andReturn($container);
         Facades\AssetContainer::shouldReceive('save')->with($container);
 
         $disk = Storage::disk('local');
         $disk->put('path/to/folder/one.txt', '');
-        $disk->put('path/to/sub/folder/folder.yaml', "title: 'Folder Title'\n");
         $disk->put('path/to/sub/folder/two.txt', '');
         $disk->put('path/to/sub/folder/three.txt', '');
         $disk->put('path/to/sub/folder/four.txt', '');
         $disk->put('path/to/sub/folder/subdirectory/five.txt', '');
-        $this->assertCount(6, $disk->allFiles());
+        $this->assertCount(5, $disk->allFiles());
+
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/folder',
+            'path/to/sub',
+            'path/to/sub/folder',
+            'path/to/sub/folder/subdirectory',
+        ], $container->folders()->all());
 
         $folder = (new Folder)
             ->container($container)
@@ -237,6 +233,22 @@ EOT;
 
         $this->assertEquals($folder, $return);
         $this->assertEquals(['path/to/folder/one.txt'], $disk->allFiles());
+        $disk->assertMissing('path/to/sub/folder');
+
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/folder',
+            'path/to/sub',
+        ], $container->folders()->all());
+
+        $this->assertEquals([
+            'path',
+            'path/to',
+            'path/to/folder',
+            'path/to/folder/one.txt',
+            'path/to/sub',
+        ], $container->contents()->cached()->keys()->all());
 
         // TODO: assert about event
     }
@@ -283,12 +295,11 @@ EOT;
             ->andReturn((new Folder)->container($container)->path('grandparent/parent'));
 
         $folder = (new Folder)
-            ->title('Test')
             ->container($container)
             ->path('grandparent/parent/child');
 
         $this->assertEquals([
-            'title' => 'Test',
+            'title' => 'child',
             'path' => 'grandparent/parent/child',
             'parent_path' => 'grandparent/parent',
             'basename' => 'child',

@@ -8,11 +8,16 @@ class PasswordReset
     const BROKER_ACTIVATIONS = 'activations';
 
     protected static $url;
+    protected static $route;
     protected static $redirect;
 
     public static function url($token, $broker)
     {
         $route = $broker === self::BROKER_ACTIVATIONS ? 'statamic.account.activate' : 'statamic.password.reset';
+
+        if (static::$route) {
+            $route = static::$route;
+        }
 
         $defaultUrl = route($route, $token);
 
@@ -34,6 +39,11 @@ class PasswordReset
     public static function resetFormUrl($url)
     {
         static::$url = $url;
+    }
+
+    public static function resetFormRoute($route)
+    {
+        static::$route = $route;
     }
 
     public static function redirectAfterReset($redirect)

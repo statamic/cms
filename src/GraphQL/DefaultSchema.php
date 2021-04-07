@@ -2,6 +2,8 @@
 
 namespace Statamic\GraphQL;
 
+use Rebing\GraphQL\Support\Contracts\ConfigConvertible;
+use Statamic\Facades\GraphQL;
 use Statamic\GraphQL\Middleware\CacheResponse;
 use Statamic\GraphQL\Queries\AssetContainerQuery;
 use Statamic\GraphQL\Queries\AssetContainersQuery;
@@ -24,8 +26,13 @@ use Statamic\GraphQL\Queries\TermsQuery;
 use Statamic\GraphQL\Queries\UserQuery;
 use Statamic\GraphQL\Queries\UsersQuery;
 
-class DefaultSchema
+class DefaultSchema implements ConfigConvertible
 {
+    public function toConfig(): array
+    {
+        return $this->getConfig();
+    }
+
     public static function config()
     {
         return app(self::class)->getConfig();
@@ -36,9 +43,7 @@ class DefaultSchema
         return [
             'query' => $this->getQueries(),
             'mutation' => [],
-            'middleware' => [
-                CacheResponse::class,
-            ],
+            'middleware' => $this->getMiddleware(),
             'method' => ['get', 'post'],
         ];
     }
@@ -59,6 +64,18 @@ class DefaultSchema
             $queries = $queries->merge(config('statamic.graphql.resources.'.$key) ? $qs : []);
         });
 
-        return $queries->all();
+        return $queries
+            ->merge(config('statamic.graphql.queries', []))
+            ->merge(GraphQL::getExtraQueries())
+            ->all();
+    }
+
+    private function getMiddleware()
+    {
+        return array_merge(
+            [CacheResponse::class],
+            config('statamic.graphql.middleware', []),
+            GraphQL::getExtraMiddleware()
+        );
     }
 }

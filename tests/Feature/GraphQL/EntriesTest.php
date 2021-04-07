@@ -5,6 +5,7 @@ namespace Tests\Feature\GraphQL;
 use Facades\Statamic\Fields\BlueprintRepository;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Blueprint;
+use Statamic\Facades\Entry;
 use Tests\PreventSavingStacheItemsToDisk;
 use Tests\TestCase;
 
@@ -69,8 +70,8 @@ GQL;
     {
         $this->createEntries();
         // Add some more entries to be able to make pagination assertions a little more obvious
-        EntryFactory::collection('food')->id('6')->data(['title' => 'Cheeseburger'])->create();
-        EntryFactory::collection('food')->id('7')->data(['title' => 'Fries'])->create();
+        EntryFactory::collection('food')->id('6')->slug('cheeseburger')->data(['title' => 'Cheeseburger'])->create();
+        EntryFactory::collection('food')->id('7')->slug('fries')->data(['title' => 'Fries'])->create();
 
         $query = <<<'GQL'
 {
@@ -251,17 +252,23 @@ GQL;
     {
         $this->createEntries();
 
-        EntryFactory::collection('blog')->id('6')->data([
-            'title' => 'That was so rad!',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('that-was-so-rad')
+            ->data(['title' => 'That was so rad!'])
+            ->create();
 
-        EntryFactory::collection('blog')->id('7')->data([
-            'title' => 'I wish I was as cool as Daniel Radcliffe!',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('7')
+            ->slug('as-cool-as-radcliffe')
+            ->data(['title' => 'I wish I was as cool as Daniel Radcliffe!'])
+            ->create();
 
-        EntryFactory::collection('blog')->id('8')->data([
-            'title' => 'I hate radishes.',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('8')
+            ->slug('i-hate-radishes')
+            ->data(['title' => 'I hate radishes.'])
+            ->create();
 
         $query = <<<'GQL'
 {
@@ -330,17 +337,23 @@ GQL;
     {
         $this->createEntries();
 
-        EntryFactory::collection('blog')->id('6')->data([
-            'title' => 'This is rad',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('6')
+            ->slug('this-is-rad')
+            ->data(['title' => 'This is rad'])
+            ->create();
 
-        EntryFactory::collection('blog')->id('7')->data([
-            'title' => 'This is awesome',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('7')
+            ->slug('this-is-awesome')
+            ->data(['title' => 'This is awesome'])
+            ->create();
 
-        EntryFactory::collection('blog')->id('8')->data([
-            'title' => 'This is both rad and awesome',
-        ])->create();
+        EntryFactory::collection('blog')
+            ->id('8')
+            ->slug('this-is-rad-and-awesome')
+            ->data(['title' => 'This is both rad and awesome'])
+            ->create();
 
         $query = <<<'GQL'
 {
@@ -466,5 +479,114 @@ GQL;
                 ['id' => '1', 'title' => 'Beta', 'number' => 2],
                 ['id' => '4', 'title' => 'Beta', 'number' => 1],
             ]]]]);
+    }
+
+    /** @test */
+    public function it_only_shows_published_entries_by_default()
+    {
+        $this->createEntries();
+        Entry::find(1)->date(now()->addMonths(2))->save();
+        Entry::find(2)->published(false)->save();
+        Entry::find(4)->published(false)->save();
+
+        $query = <<<'GQL'
+{
+    entries {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '3', 'title' => 'Event One'],
+                ['id' => '5', 'title' => 'Hamburger'],
+            ]]]]);
+
+        $query = <<<'GQL'
+{
+    entries(filter: {published: true}) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+            ->withoutExceptionHandling()
+            ->post('/graphql', ['query' => $query])
+            ->assertGqlOk()
+            ->assertExactJson(['data' => ['entries' => ['data' => [
+                ['id' => '1', 'title' => 'Standard Blog Post'],
+                ['id' => '3', 'title' => 'Event One'],
+                ['id' => '5', 'title' => 'Hamburger'],
+            ]]]]);
+
+        $query = <<<'GQL'
+{
+    entries(filter: {status: "draft"}) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+                ->withoutExceptionHandling()
+                ->post('/graphql', ['query' => $query])
+                ->assertGqlOk()
+                ->assertExactJson(['data' => ['entries' => ['data' => [
+                    ['id' => '2', 'title' => 'Art Directed Blog Post'],
+                    ['id' => '4', 'title' => 'Event Two'],
+                ]]]]);
+
+        $query = <<<'GQL'
+{
+    entries(filter: {published: false}) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+                ->withoutExceptionHandling()
+                ->post('/graphql', ['query' => $query])
+                ->assertGqlOk()
+                ->assertExactJson(['data' => ['entries' => ['data' => [
+                    ['id' => '2', 'title' => 'Art Directed Blog Post'],
+                    ['id' => '4', 'title' => 'Event Two'],
+                ]]]]);
+
+        $query = <<<'GQL'
+{
+    entries(filter: {status: "scheduled"}) {
+        data {
+            id
+            title
+        }
+    }
+}
+GQL;
+
+        $this
+                ->withoutExceptionHandling()
+                ->post('/graphql', ['query' => $query])
+                ->assertGqlOk()
+                ->assertExactJson(['data' => ['entries' => ['data' => [
+                    ['id' => '1', 'title' => 'Standard Blog Post'],
+                ]]]]);
     }
 }

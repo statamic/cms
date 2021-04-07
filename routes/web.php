@@ -29,7 +29,7 @@ Route::name('statamic.')->group(function () {
         Route::get('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@show')->name('protect.password.show');
         Route::post('protect/password', '\Statamic\Auth\Protect\Protectors\Password\Controller@store')->name('protect.password.store');
 
-        Route::group(['prefix' => 'auth'], function () {
+        Route::group(['prefix' => 'auth', 'middleware' => [\Statamic\Http\Middleware\AuthGuard::class]], function () {
             Route::post('login', 'UserController@login')->name('login');
             Route::get('logout', 'UserController@logout')->name('logout');
             Route::post('register', 'UserController@register')->name('register');
@@ -37,7 +37,9 @@ Route::name('statamic.')->group(function () {
             Route::post('password/email', 'ForgotPasswordController@sendResetLinkEmail')->name('password.email');
             Route::get('password/reset/{token}', 'ResetPasswordController@showResetForm')->name('password.reset');
             Route::post('password/reset', 'ResetPasswordController@reset')->name('password.reset.action');
+        });
 
+        Route::group(['prefix' => 'auth', 'middleware' => [\Statamic\Http\Middleware\CP\AuthGuard::class]], function () {
             Route::get('activate/{token}', 'ActivateAccountController@showResetForm')->name('account.activate');
             Route::post('activate', 'ActivateAccountController@reset')->name('account.activate.action');
         });
@@ -51,12 +53,14 @@ Route::name('statamic.')->group(function () {
     }
 });
 
-Statamic::additionalWebRoutes();
+if (config('statamic.routes.enabled')) {
+    Statamic::additionalWebRoutes();
 
-/**
- * Front-end
- * All front-end website requests go through a single controller method.
- */
-Route::any('/{segments?}', 'FrontendController@index')
-    ->where('segments', '.*')
-    ->name('statamic.site');
+    /*
+     * Front-end
+     * All front-end website requests go through a single controller method.
+     */
+    Route::any('/{segments?}', 'FrontendController@index')
+        ->where('segments', '.*')
+        ->name('statamic.site');
+}

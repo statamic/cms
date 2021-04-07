@@ -16,7 +16,7 @@ class EngineTest extends TestCase
 
         $this->engine = new Engine(
             $this->files = Mockery::mock(Filesystem::class),
-            new Parser
+            app(Parser::class)
         );
     }
 
@@ -67,21 +67,6 @@ class EngineTest extends TestCase
         $this->assertEquals(
             'Hello World {{ bar }} Bar',
             $this->engine->get('/path/to/foo.antlers.html', ['foo' => 'World', 'bar' => 'Bar'])
-        );
-    }
-
-    /** @test */
-    public function templates_can_have_front_matter_and_override_data()
-    {
-        $this->markTestSkipped(); //todo
-        $this->files
-            ->shouldReceive('get')
-            ->with('/path/to/foo.antlers.html')
-            ->andReturn("---\nfoo: John\n---\nHello {{ foo }}");
-
-        $this->assertEquals(
-            'Hello John',
-            $this->engine->get('/path/to/foo.antlers.html', ['foo' => 'World'])
         );
     }
 

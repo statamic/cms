@@ -15,7 +15,7 @@ return [
     |
     */
 
-    'watcher' => true,
+    'watcher' => env('STATAMIC_STACHE_WATCHER', true),
 
     /*
     |--------------------------------------------------------------------------
@@ -71,6 +71,10 @@ return [
         'asset-containers' => [
             'class' => Stores\AssetContainersStore::class,
             'directory' => base_path('content/assets'),
+        ],
+
+        'assets' => [
+            'class' => Stores\AssetsStore::class,
         ],
 
         'users' => [

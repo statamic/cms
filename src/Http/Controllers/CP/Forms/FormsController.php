@@ -263,6 +263,14 @@ class FormsController extends CpController
                                     'instructions' => __('statamic::messages.form_configure_email_text_instructions'),
                                 ],
                             ],
+                            [
+                                'handle' => 'markdown',
+                                'field' => [
+                                    'type' => 'toggle',
+                                    'display' => __('Markdown'),
+                                    'instructions' => __('statamic::messages.form_configure_email_markdown_instructions'),
+                                ],
+                            ],
                         ],
                     ],
                 ],
