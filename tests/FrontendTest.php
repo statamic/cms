@@ -77,6 +77,27 @@ class FrontendTest extends TestCase
     }
 
     /** @test */
+    public function page_is_displayed_with_query_string_and_ending_slash()
+    {
+        $this->withStandardBlueprints();
+        $this->withFakeViews();
+        $this->viewShouldReturnRaw('layout', '{{ template_content }}');
+        $this->viewShouldReturnRaw('some_template', '<h1>{{ title }}</h1> <p>{{ content }}</p>');
+
+        $page = $this->createPage('about', [
+            'with' => [
+                'title' => 'The About Page',
+                'content' => 'This is the about page.',
+                'template' => 'some_template',
+            ],
+        ]);
+
+        $response = $this->get('/about/?some=querystring')->assertStatus(200);
+
+        $this->assertEquals('<h1>The About Page</h1> <p>This is the about page.</p>', trim($response->content()));
+    }
+
+    /** @test */
     public function drafts_are_not_visible()
     {
         $this->withStandardFakeErrorViews();
