@@ -25,7 +25,7 @@
                     <div
                         v-show="isInternalLink"
                         v-text="actualLinkText"
-                        class="flex-1 input h-auto cursor-not-allowed"
+                        class="flex-1 input whitespace-no-wrap overflow-hidden text-overflow-ellipsis h-auto cursor-not-allowed"
                     />
                 </div>
             </div>
