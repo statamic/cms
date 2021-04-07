@@ -45,7 +45,7 @@ class FrontendController extends Controller
             $url = substr($url, 0, strpos($url, '?'));
         }
 
-        if (Str::endsWith($url, '/')) {
+        if (Str::endsWith($url, '/') && Str::length($url) > 1) {
             $url = rtrim($url, '/');
         }
 
