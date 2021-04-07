@@ -100,9 +100,9 @@
 // Responive Wangjangling
 @screen md {
     // Fixed toolbar below fixed global header
-    .bard-fixed-toolbar { top: 52px; } 
-    .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 92px; } 
-    
+    .bard-fixed-toolbar { top: 52px; }
+    .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 92px; }
+
     // Fixed toolbar inside the live preview
     .live-preview-fields .bard-fixed-toolbar { top: -24px; }
     .live-preview-fields .bard-fieldtype .bard-fieldtype .bard-fixed-toolbar { top: 16px; }
@@ -427,7 +427,7 @@
   ========================================================================== */
 
   .bard-link-toolbar {
-    @apply bg-black rounded absolute leading-none shadow mt-1;
+    @apply bg-white rounded absolute leading-none shadow mt-1;
     z-index: 100;
     width: 300px;
     top: 100%;
@@ -435,25 +435,25 @@
     &:before {
         content: '';
         border: 6px solid transparent;
-        border-bottom-color: black;
+        border-bottom-color: white;
         position: absolute;
         bottom: 100%;
         left: 10px;
     }
 
     .link-container {
-        @apply w-full overflow-hidden text-white leading-normal;
+        @apply w-full overflow-hidden leading-normal;
         text-overflow: ellipsis;
     }
 
     .link {
-        @apply text-xs text-white whitespace-no-wrap;
+        @apply text-xs whitespace-no-wrap;
 
         &:hover { @apply text-blue }
     }
 
     .input {
-        @apply p-0 text-xs text-white h-8 bg-transparent shadow-none border-none;
+        @apply p-0 text-xs h-8 bg-transparent shadow-none border-none;
         width: 240px;
         outline: none;
     }
@@ -463,11 +463,11 @@
     }
 
     button {
-        @apply p-0 text-grey-20 h-10 ml-1;
+        @apply p-0 text-grey-70 h-10 ml-1 outline-none;
         font-size: 16px;
 
         &:hover {
-            @apply text-white;
+            @apply text-grey-90;
         }
     }
 

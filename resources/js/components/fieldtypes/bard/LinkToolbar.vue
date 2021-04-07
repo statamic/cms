@@ -58,9 +58,9 @@
                 </button>
             </div>
         </div>
-        <div class="p-sm pt-1 border-t border-faint-white" v-show="isEditing">
-            <label class="text-2xs text-white flex items-center">
-                <input class="checkbox mr-1 -mt-sm" type="checkbox" v-model="targetBlank">
+        <div class="p-sm pt-1 border-t" v-show="isEditing">
+            <label class="text-2xs flex items-center">
+                <input class="checkbox mr-1" type="checkbox" v-model="targetBlank">
                 {{ __('Open in new window') }}
             </label>
         </div>
