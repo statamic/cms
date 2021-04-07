@@ -45,7 +45,7 @@ class AssetsGeneratePresets extends Command
         $this->shouldQueue = $this->option('queue');
 
         if ($this->shouldQueue && config('queue.default') === 'sync') {
-            $this->error('The queue driver is set to "sync". Queueing will be disabled.');
+            $this->error('The queue connection is set to "sync". Queueing will be disabled.');
             $this->shouldQueue = false;
         }
 
