@@ -100,6 +100,12 @@ class Bard extends Replicator
                 'width' => 50,
                 'instructions' => __('statamic::fieldtypes.bard.config.target_blank'),
             ],
+            'link_collections' => [
+                'display' => __('Link Collections'),
+                'instructions' => __('statamic::fieldtypes.bard.config.link_collections'),
+                'type' => 'collections',
+                'mode' => 'select',
+            ],
             'reading_time' => [
                 'display' => __('Show Reading Time'),
                 'instructions' => __('statamic::fieldtypes.bard.config.reading_time'),
