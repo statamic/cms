@@ -28,10 +28,10 @@ class ViewsTest extends TestCase
         $this->withStandardFakeViews();
 
         Collection::make('pages')->routes('{slug}')->sites(['en', 'fr'])->save();
-        $blog = EntryFactory::collection('pages')->locale('en')->slug('the-blog')->create();
-        $frenchBlog = EntryFactory::collection('pages')->locale('fr')->slug('le-blog')->origin($blog->id())->create();
+        $this->blogEntry = EntryFactory::collection('pages')->locale('en')->slug('the-blog')->create();
+        $this->frenchBlogEntry = EntryFactory::collection('pages')->locale('fr')->slug('le-blog')->origin($this->blogEntry->id())->create();
 
-        Collection::make('blog')->sites(['en', 'fr'])->mount($blog->id())->taxonomies(['tags'])->save();
+        $this->blogCollection = tap(Collection::make('blog')->sites(['en', 'fr'])->taxonomies(['tags']))->save();
 
         Taxonomy::make('tags')->sites(['en', 'fr'])->title('Tags')->save();
 
@@ -80,12 +80,16 @@ class ViewsTest extends TestCase
     /** @test */
     public function the_collection_specific_taxonomy_url_404s_if_the_view_doesnt_exist()
     {
+        $this->mountBlogPageToBlogCollection();
+
         $this->get('/the-blog/tags/test')->assertNotFound();
     }
 
     /** @test */
     public function it_loads_the_collection_specific_taxonomy_url_if_the_view_exists()
     {
+        $this->mountBlogPageToBlogCollection();
+
         $this->viewShouldReturnRaw('blog.tags.index', '{{ title }} index');
 
         $this->get('/the-blog/tags')->assertOk()->assertSee('Tags index');
@@ -94,12 +98,16 @@ class ViewsTest extends TestCase
     /** @test */
     public function the_collection_specific_term_url_404s_if_the_view_doesnt_exist()
     {
+        $this->mountBlogPageToBlogCollection();
+
         $this->get('/the-blog/tags/test')->assertNotFound();
     }
 
     /** @test */
     public function it_loads_the_collection_specific_term_url_if_the_view_exists()
     {
+        $this->mountBlogPageToBlogCollection();
+
         $this->viewShouldReturnRaw('blog.tags.show', 'showing {{ title }}');
 
         $this->get('/the-blog/tags/test')->assertOk()->assertSee('showing Test');
@@ -108,6 +116,8 @@ class ViewsTest extends TestCase
     /** @test */
     public function it_loads_the_localized_collection_specific_taxonomy_url_if_the_view_exists()
     {
+        $this->mountBlogPageToBlogCollection();
+
         $this->viewShouldReturnRaw('blog.tags.index', '{{ title }} index');
 
         $this->get('/fr/le-blog/tags')->assertOk()->assertSee('Tags index');
@@ -116,8 +126,43 @@ class ViewsTest extends TestCase
     /** @test */
     public function it_loads_the_localized_collection_specific_term_url_if_the_view_exists()
     {
+        $this->mountBlogPageToBlogCollection();
+
         $this->viewShouldReturnRaw('blog.tags.show', 'showing {{ title }}');
 
         $this->get('/fr/le-blog/tags/le-test')->assertOk()->assertSee('showing Le Test');
+    }
+
+    /** @test */
+    public function the_unmounted_collection_specific_taxonomy_url_404s_if_the_view_doesnt_exist()
+    {
+        $this->get('/blog/tags/test')->assertNotFound();
+    }
+
+    /** @test */
+    public function it_loads_the_unmounted_collection_specific_taxonomy_url_if_the_view_exists()
+    {
+        $this->viewShouldReturnRaw('blog.tags.index', '{{ title }} index');
+
+        $this->get('/blog/tags')->assertOk()->assertSee('Tags index');
+    }
+
+    /** @test */
+    public function the_unmounted_collection_specific_term_url_404s_if_the_view_doesnt_exist()
+    {
+        $this->get('/blog/tags/test')->assertNotFound();
+    }
+
+    /** @test */
+    public function it_loads_the_unmounted_collection_specific_term_url_if_the_view_exists()
+    {
+        $this->viewShouldReturnRaw('blog.tags.show', 'showing {{ title }}');
+
+        $this->get('/blog/tags/test')->assertOk()->assertSee('showing Test');
+    }
+
+    private function mountBlogPageToBlogCollection()
+    {
+        $this->blogCollection->mount($this->blogEntry->id())->save();
     }
 }
