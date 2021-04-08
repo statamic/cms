@@ -6,7 +6,6 @@ use Illuminate\Support\Collection;
 use Statamic\Contracts\Taxonomies\Taxonomy;
 use Statamic\Contracts\Taxonomies\TaxonomyRepository as RepositoryContract;
 use Statamic\Facades;
-use Statamic\Facades\Site;
 use Statamic\Stache\Stache;
 use Statamic\Support\Str;
 
@@ -67,7 +66,7 @@ class TaxonomyRepository implements RepositoryContract
                     return true;
                 }
 
-                return Site::hasMultiple() ? false : Str::startsWith($uri, '/'.$collection->handle());
+                return Str::startsWith($uri, '/'.$collection->handle());
             });
 
         if ($collection) {
