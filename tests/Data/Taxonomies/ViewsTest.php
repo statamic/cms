@@ -80,7 +80,7 @@ class ViewsTest extends TestCase
     /** @test */
     public function the_collection_specific_taxonomy_url_404s_if_the_view_doesnt_exist()
     {
-        $this->get('/tags/test')->assertNotFound();
+        $this->get('/the-blog/tags/test')->assertNotFound();
     }
 
     /** @test */
