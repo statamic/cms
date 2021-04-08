@@ -62,8 +62,8 @@ class TaxonomyRepository implements RepositoryContract
     public function findByUri(string $uri, string $site = null): ?Taxonomy
     {
         $collection = Facades\Collection::all()
-            ->first(function ($collection) use ($uri) {
-                if (Str::startsWith($uri, $collection->url())) {
+            ->first(function ($collection) use ($uri, $site) {
+                if (Str::startsWith($uri, $collection->uri($site))) {
                     return true;
                 }
 
@@ -71,7 +71,7 @@ class TaxonomyRepository implements RepositoryContract
             });
 
         if ($collection) {
-            $uri = Str::after($uri, $collection->url() ?? $collection->handle());
+            $uri = Str::after($uri, $collection->uri($site) ?? $collection->handle());
         }
 
         // If the collection is mounted to the home page, the uri would have
