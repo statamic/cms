@@ -2,6 +2,7 @@
 
 namespace Tests\Query;
 
+use Carbon\Carbon;
 use Facades\Tests\Factories\EntryFactory;
 use Statamic\Facades\Collection;
 use Statamic\Facades\Entry;
@@ -16,9 +17,9 @@ class BuilderTest extends TestCase
     {
         Collection::make('posts')->save();
 
-        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'author' => 'John Doe'])->create();
-        $entry = EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'author' => 'Jane Smith'])->create();
-        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'author' => 'John Doe'])->create();
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'author' => 'John Doe', 'publish_date' => Carbon::parse('21st December 2020')->format('Y-m-d')])->create();
+        $entry = EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'author' => 'Jane Smith', 'publish_date' => Carbon::parse('2nd January 2021')->format('Y-m-d')])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'author' => 'John Doe', 'publish_date' => Carbon::parse('12th December 2020')->format('Y-m-d')])->create();
 
         return $entry;
     }
@@ -56,6 +57,21 @@ class BuilderTest extends TestCase
         $this->assertSame('3', $queryResults->last()->id());
 
         $this->assertArrayNotHasKey('2', $queryResults->pluck('id')->toArray());
+    }
+
+    /** @test */
+    public function entries_are_returned_where_date_is_greater_than_1st_january()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $queryResults = Entry::query()->whereDate('publish_date', '>=', Carbon::parse('1st January 2021'))->get();
+
+        $this->assertCount(1, $queryResults);
+
+        $this->assertSame('2', $queryResults->first()->id());
+
+        $this->assertArrayNotHasKey('1', $queryResults->pluck('id')->toArray());
+        $this->assertArrayNotHasKey('3', $queryResults->pluck('id')->toArray());
     }
 
     /** @test */
