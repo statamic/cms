@@ -2,6 +2,7 @@
 
 namespace Statamic\Stache\Query;
 
+use Carbon\Carbon;
 use Statamic\Data\DataCollection;
 use Statamic\Query\Builder as BaseBuilder;
 use Statamic\Stache\Stores\Store;
@@ -110,6 +111,15 @@ abstract class Builder extends BaseBuilder
             $method = 'filterTest'.$this->operators[$where['operator']];
 
             return $this->{$method}($value, $where['value']);
+        });
+    }
+
+    protected function filterWhereDate($values, $where)
+    {
+        return $values->filter(function ($value) use ($where) {
+            $method = 'filterTest'.$this->operators[$where['operator']];
+
+            return $this->{$method}(Carbon::parse($value)->timestamp, Carbon::parse($where['value'])->timestamp);
         });
     }
 

@@ -85,6 +85,29 @@ abstract class Builder implements Contract
         return $this;
     }
 
+    public function whereDate($column, $operator = null, $value = null)
+    {
+        // Here we will make some assumptions about the operator. If only 2 values are
+        // passed to the method, we will assume that the operator is an equals sign
+        // and keep going. Otherwise, we'll require the operator to be passed in.
+        [$value, $operator] = $this->prepareValueAndOperator(
+            $value, $operator, func_num_args() === 2
+        );
+
+        // If the given operator is not found in the list of valid operators we will
+        // assume that the developer is just short-cutting the '=' operators and
+        // we will set the operators to '=' and set the values appropriately.
+        if ($this->invalidOperator($operator)) {
+            [$value, $operator] = [$operator, '='];
+        }
+
+        $type = 'Date';
+
+        $this->wheres[] = compact('type', 'column', 'value', 'operator');
+
+        return $this;
+    }
+
     public function prepareValueAndOperator($value, $operator, $useDefault = false)
     {
         if ($useDefault) {
