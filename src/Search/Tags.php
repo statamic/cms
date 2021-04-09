@@ -41,28 +41,25 @@ class Tags extends BaseTags
         $this->queryOrderBys($builder);
 
         $results = $this->getQueryResults($builder);
-
-        if ($supplementData) {
-            $results = $this->addResultTypes($results);
-        }
+        $results = $this->addResultTypes($results);
 
         return $this->output($results);
     }
 
     protected function addResultTypes($results)
     {
-        return $results->supplement('result_type', function ($result) {
-            $type = null;
+        return $results->map(function ($result) {
+            $reference = is_array($result) ? $result['reference'] : $result->reference();
 
-            if ($result instanceof \Statamic\Contracts\Entries\Entry) {
-                $type = 'entry';
-            } elseif ($result instanceof \Statamic\Contracts\Taxonomies\Term) {
-                $type = 'term';
-            } elseif ($result instanceof \Statamic\Contracts\Assets\Asset) {
-                $type = 'asset';
+            [$type, $id] = explode('::', $reference, 2);
+
+            if (is_array($result)) {
+                $result['result_type'] = $type;
+            } else {
+                $result->setSupplement('result_type', $type);
             }
 
-            return $type;
+            return $result;
         });
     }
 
