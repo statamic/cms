@@ -17,7 +17,7 @@ class BuilderTest extends TestCase
         Collection::make('posts')->save();
 
         EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'author' => 'John Doe'])->create();
-        $entry = EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'author' => 'John Doe'])->create();
+        $entry = EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'author' => 'Jane Smith'])->create();
         EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'author' => 'John Doe'])->create();
 
         return $entry;
@@ -41,5 +41,35 @@ class BuilderTest extends TestCase
 
         $this->assertSame($searchedEntry, $retrievedEntry);
         $this->assertSame($retrievedEntry->selectedQueryColumns(), $columns);
+    }
+
+    /** @test */
+    public function entries_are_returned_where_author_is_john_doe()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $queryResults = Entry::query()->where('author', 'John Doe')->get();
+
+        $this->assertCount(2, $queryResults);
+
+        $this->assertSame('1', $queryResults->first()->id());
+        $this->assertSame('3', $queryResults->last()->id());
+
+        $this->assertArrayNotHasKey('2', $queryResults->pluck('id')->toArray());
+    }
+
+    /** @test */
+    public function entries_are_returned_where_in_title()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $queryResults = Entry::query()->whereIn('title', ['Post 1', 'Post 2'])->get();
+
+        $this->assertCount(2, $queryResults);
+
+        $this->assertSame('1', $queryResults->first()->id());
+        $this->assertSame('2', $queryResults->last()->id());
+
+        $this->assertArrayNotHasKey('3', $queryResults->pluck('id')->toArray());
     }
 }
