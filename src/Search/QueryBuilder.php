@@ -47,7 +47,7 @@ abstract class QueryBuilder extends BaseQueryBuilder
         }
 
         return $this->collect($results)->map(function ($result) {
-            if ($data = Data::find($result['id'])) {
+            if ($data = Data::find($result['reference'])) {
                 $data->setSupplement('search_score', $result['search_score'] ?? null);
             }
 

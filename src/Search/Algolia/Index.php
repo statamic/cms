@@ -80,7 +80,7 @@ class Index extends BaseIndex
         }
 
         return collect($response['hits'])->map(function ($hit) {
-            $hit['id'] = $hit['objectID'];
+            $hit['reference'] = $hit['objectID'];
 
             return $hit;
         });
