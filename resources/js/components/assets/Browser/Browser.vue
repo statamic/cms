@@ -453,7 +453,7 @@ export default {
 
             const url = this.searchQuery
                 ? cp_url(`assets/browse/search/${this.container.id}`)
-                : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`.trim('/'));
+                : cp_url(`assets/browse/folders/${this.container.id}/${this.path || ''}`).replace(/\/$/, '');
 
             this.$axios.get(url, { params: this.parameters }).then(response => {
                 const data = response.data;
