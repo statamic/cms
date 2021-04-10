@@ -38,6 +38,7 @@ class Structure extends Tags
             'show_unpublished' => $this->params->get('show_unpublished', false),
             'site' => $this->params->get('site', Site::current()->handle()),
             'from' => $this->params->get('from'),
+            'max_depth' => $this->params->get('max_depth'),
         ]);
 
         return $this->toArray($tree);
