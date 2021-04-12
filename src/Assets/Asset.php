@@ -130,8 +130,8 @@ class Asset implements AssetContract, Augmentable
         }
 
         return $this->meta = Cache::rememberForever($this->metaCacheKey(), function () {
-            if ($contents = $this->disk()->get($this->metaPath())) {
-                return YAML::parse($contents);
+            if ($contents = $this->disk()->get($path = $this->metaPath())) {
+                return YAML::file($path)->parse($contents);
             }
 
             $this->writeMeta($meta = $this->generateMeta());
