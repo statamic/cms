@@ -275,6 +275,60 @@ EOT;
     }
 
     /** @test */
+    public function it_doesnt_maintain_files_across_uses()
+    {
+        YAML::file('path/to/file/previously/used.yaml')->parse('foo: bar');
+
+        $yaml = <<<'EOT'
+---
+foo: 'bar
+baz: 'qux'
+---
+some content
+EOT;
+
+        try {
+            YAML::parse($yaml);
+        } catch (Exception $e) {
+            $this->assertInstanceOf(ParseException::class, $e);
+            $this->assertEquals('Unexpected characters near "qux\'" at line 3 (near "baz: \'qux\'").', $e->getMessage());
+            $path = storage_path('statamic/tmp/yaml-'.md5("---\nfoo: 'bar\nbaz: 'qux'"));
+            $this->assertEquals($path, $e->getFile());
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    /** @test */
+    public function it_doesnt_maintain_files_across_uses_when_previous_call_had_no_yaml()
+    {
+        YAML::file('path/to/file/previously/used.yaml')->parse('');
+
+        $yaml = <<<'EOT'
+---
+foo: 'bar
+baz: 'qux'
+---
+some content
+EOT;
+
+        try {
+            YAML::parse($yaml);
+        } catch (Exception $e) {
+            $this->assertInstanceOf(ParseException::class, $e);
+            $this->assertEquals('Unexpected characters near "qux\'" at line 3 (near "baz: \'qux\'").', $e->getMessage());
+            $path = storage_path('statamic/tmp/yaml-'.md5("---\nfoo: 'bar\nbaz: 'qux'"));
+            $this->assertEquals($path, $e->getFile());
+
+            return;
+        }
+
+        $this->fail('Exception was not thrown.');
+    }
+
+    /** @test */
     public function it_throws_an_exception_when_an_array_cannot_be_returned()
     {
         $string = <<<'EOT'

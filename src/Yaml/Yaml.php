@@ -43,6 +43,8 @@ class Yaml
         }
 
         if (empty($str)) {
+            $this->file = null;
+
             return [];
         }
 
@@ -64,6 +66,8 @@ class Yaml
 
         $this->validateString($yaml, $str);
         $this->validateDocumentContent($yaml, $content, $originalStr);
+
+        $this->file = null;
 
         return isset($content)
             ? $yaml + ['content' => $content]
