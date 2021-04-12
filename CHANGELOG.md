@@ -5,6 +5,7 @@
 ### What's new
 - Added a `pluck` modifier. [#3502](https://github.com/statamic/cms/issues/3502)
 - The `multisite` command lets you add more than one additional site. [#3302](https://github.com/statamic/cms/issues/3302)
+- Added a `max_depth` parameter to the `nav` tag. [#3513](https://github.com/statamic/cms/issues/3513)
 
 ### What's improved
 - Updated French translations. [#3497](https://github.com/statamic/cms/issues/3497)
