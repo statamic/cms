@@ -1,5 +1,27 @@
 # Release Notes
 
+## 3.1.6 (2020-04-12)
+
+### What's new
+- Added a `pluck` modifier. [#3502](https://github.com/statamic/cms/issues/3502)
+- The `multisite` command lets you add more than one additional site. [#3302](https://github.com/statamic/cms/issues/3302)
+
+### What's improved
+- Updated French translations. [#3497](https://github.com/statamic/cms/issues/3497)
+- Gracefully handle incorrect-but-close-enough usage of `custom` field conditions. [73f941c5e](https://github.com/statamic/cms/commit/73f941c5e)
+
+### What's fixed
+- Fix taxonomy routing when using localization. [#3505](https://github.com/statamic/cms/issues/3505)
+- In the `search:results` tag, include `search_score`, and fix `result_type` when not supplementing data. [#3477](https://github.com/statamic/cms/issues/3477)
+- Preserve user defined defaults for new entries. [#3472](https://github.com/statamic/cms/issues/3472)
+- Prevent newly added navigation items being greyed out even if they're published. [#3510](https://github.com/statamic/cms/issues/3510)
+- Fix trailing slash on URLs which sometimes makes the asset browser not load. [#3504](https://github.com/statamic/cms/issues/3504)
+- Fix error in the `assets:generate-presets` command on older versions of Laravel. [#3511](https://github.com/statamic/cms/issues/3511)
+- Fix error wen `CarbonImmutable` is used app-wide. [#3499](https://github.com/statamic/cms/issues/3499)
+- Fix 404 error when URLs have both ending slash and query parameters. [#3494](https://github.com/statamic/cms/issues/3494)
+- Fix NaN and other glitches in the `time` fieldtype. [#3496](https://github.com/statamic/cms/issues/3496)
+
+
 ## 3.1.5 (2020-04-07)
 
 ### What's new
