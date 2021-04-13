@@ -53,6 +53,7 @@ class Date extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.date.config.format'),
                 'type' => 'text',
                 'width' => 50,
+            ],
             'display_format' => [
                 'display' => __('Display Format'),
                 'instructions' => __('statamic::fieldtypes.date.config.display_format'),
