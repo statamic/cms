@@ -70,6 +70,6 @@ class Roles
      */
     private function table()
     {
-        return DB::connection(config('statamic.users.database'))->table('role_user');
+        return DB::connection(config('statamic.users.database'))->table(config('statamic.users.tables.role_user', 'role_user'));
     }
 }
