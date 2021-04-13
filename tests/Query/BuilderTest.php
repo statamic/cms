@@ -64,7 +64,7 @@ class BuilderTest extends TestCase
     {
         $this->createDummyCollectionAndEntries();
 
-        $queryResults = Entry::query()->whereDate('publish_date', '>=', Carbon::parse('1st January 2021'))->get();
+        $queryResults = Entry::query()->whereDate('publish_date', '>', '2021-01-01')->get();
 
         $this->assertCount(1, $queryResults);
 
@@ -72,6 +72,66 @@ class BuilderTest extends TestCase
 
         $this->assertArrayNotHasKey('1', $queryResults->pluck('id')->toArray());
         $this->assertArrayNotHasKey('3', $queryResults->pluck('id')->toArray());
+    }
+
+    /** @test */
+    public function entries_are_returned_where_date_is_greater_than_1st_january_as_carbon_instance()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $queryResults = Entry::query()->whereDate('publish_date', '>', Carbon::parse('1st January 2021'))->get();
+
+        $this->assertCount(1, $queryResults);
+
+        $this->assertSame('2', $queryResults->first()->id());
+
+        $this->assertArrayNotHasKey('1', $queryResults->pluck('id')->toArray());
+        $this->assertArrayNotHasKey('3', $queryResults->pluck('id')->toArray());
+    }
+
+    /** @test */
+    public function entries_are_returned_where_date_is_more_than_or_greater_than_1st_january()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $queryResults = Entry::query()->whereDate('publish_date', '>=', '2021-01-01')->get();
+
+        $this->assertCount(1, $queryResults);
+
+        $this->assertSame('2', $queryResults->first()->id());
+
+        $this->assertArrayNotHasKey('1', $queryResults->pluck('id')->toArray());
+        $this->assertArrayNotHasKey('3', $queryResults->pluck('id')->toArray());
+    }
+
+    /** @test */
+    public function entries_are_returned_where_date_is_less_than_1st_january()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $queryResults = Entry::query()->whereDate('publish_date', '<', '2021-01-01')->get();
+
+        $this->assertCount(2, $queryResults);
+
+        $this->assertSame('1', $queryResults->first()->id());
+        $this->assertSame('3', $queryResults->last()->id());
+
+        $this->assertArrayNotHasKey('2', $queryResults->pluck('id')->toArray());
+    }
+
+    /** @test */
+    public function entries_are_returned_where_date_is_less_or_equal_to_than_1st_january()
+    {
+        $this->createDummyCollectionAndEntries();
+
+        $queryResults = Entry::query()->whereDate('publish_date', '<=', '2021-01-01')->get();
+
+        $this->assertCount(2, $queryResults);
+
+        $this->assertSame('1', $queryResults->first()->id());
+        $this->assertSame('3', $queryResults->last()->id());
+
+        $this->assertArrayNotHasKey('2', $queryResults->pluck('id')->toArray());
     }
 
     /** @test */
