@@ -17,9 +17,9 @@ class BuilderTest extends TestCase
     {
         Collection::make('posts')->save();
 
-        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'author' => 'John Doe', 'publish_date' => Carbon::parse('21st December 2020')->format('Y-m-d')])->create();
-        $entry = EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'author' => 'Jane Smith', 'publish_date' => Carbon::parse('2nd January 2021')->format('Y-m-d')])->create();
-        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'author' => 'John Doe', 'publish_date' => Carbon::parse('12th December 2020')->format('Y-m-d')])->create();
+        EntryFactory::id('1')->slug('post-1')->collection('posts')->data(['title' => 'Post 1', 'author' => 'John Doe', 'publish_date' => '2020-12-21'])->create();
+        $entry = EntryFactory::id('2')->slug('post-2')->collection('posts')->data(['title' => 'Post 2', 'author' => 'Jane Smith', 'publish_date' => '2021-01-02'])->create();
+        EntryFactory::id('3')->slug('post-3')->collection('posts')->data(['title' => 'Post 3', 'author' => 'John Doe', 'publish_date' => '2020-12-12'])->create();
 
         return $entry;
     }
