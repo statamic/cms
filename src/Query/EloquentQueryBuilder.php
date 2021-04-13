@@ -69,6 +69,13 @@ abstract class EloquentQueryBuilder implements Builder
         return $this;
     }
 
+    public function whereDate($column, $operator = null, $value = null)
+    {
+        $this->builder->whereDate($this->column($column), $operator, $value);
+
+        return $this;
+    }
+
     public function whereIn($column, $values)
     {
         $this->builder->whereIn($this->column($column), $values);
