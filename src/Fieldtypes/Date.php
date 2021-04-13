@@ -53,6 +53,11 @@ class Date extends Fieldtype
                 'instructions' => __('statamic::fieldtypes.date.config.format'),
                 'type' => 'text',
                 'width' => 50,
+            'display_format' => [
+                'display' => __('Display Format'),
+                'instructions' => __('statamic::fieldtypes.date.config.display_format'),
+                'type' => 'text',
+                'width' => 50,
             ],
             'full_width' => [
                 'display' => __('Full Width'),
@@ -134,14 +139,16 @@ class Date extends Fieldtype
             return;
         }
 
+        $format = $this->config('display_format') ?? config('statamic.cp.date_format');
+
         if ($this->config('mode') === 'range') {
-            $start = Carbon::parse($data['start'])->format(config('statamic.cp.date_format'));
-            $end = Carbon::parse($data['end'])->format(config('statamic.cp.date_format'));
+            $start = Carbon::parse($data['start'])->format($format);
+            $end = Carbon::parse($data['end'])->format($format);
 
             return $start.' - '.$end;
         }
 
-        return Carbon::parse($data)->format(config('statamic.cp.date_format'));
+        return Carbon::parse($data)->format($format);
     }
 
     private function dateFormat($date)

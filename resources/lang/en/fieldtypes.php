@@ -41,6 +41,7 @@ return [
     'date.config.columns' => 'Show multiple months at one time, in rows and columns',
     'date.config.earliest_date' => 'Set the earliest selectable date.',
     'date.config.format' => 'Optionally format the date string using [moment.js](https://momentjs.com/docs/#/displaying/format/).',
+    'date.config.display_format' => 'Optionally format the date string using [moment.js](https://momentjs.com/docs/#/displaying/format/).',
     'date.config.full_width' => 'Stretch the calendar to use up the full width.',
     'date.config.inline' => 'Skip the dropdown input field and show the calendar directly.',
     'date.config.mode' => 'Choose between single or range mode (range disables time picker).',
