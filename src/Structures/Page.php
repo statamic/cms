@@ -46,18 +46,21 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
             return $this->url;
         }
 
-        if ($this->isRedirect()) {
-            return $this->redirectUrl();
+        return optional($this->entry())->url();
+    }
+
+    public function urlWithoutRedirect()
+    {
+        if ($this->url) {
+            return $this->url;
         }
 
-        if ($this->reference && $this->referenceExists()) {
-            return URL::makeRelative($this->absoluteUrl());
-        }
+        return optional($this->entry())->urlWithoutRedirect();
     }
 
     public function isRedirect()
     {
-        return optional($this->entry())->isRedirect();
+        return optional($this->entry())->isRedirect() ?? false;
     }
 
     public function setDepth($depth)
@@ -157,8 +160,12 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
 
     public function uri()
     {
+        if ($this->url) {
+            return $this->url();
+        }
+
         if (! $this->reference) {
-            return optional($this->parent)->uri();
+            return null;
         }
 
         $uris = Blink::store('structure-uris');
@@ -185,21 +192,19 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
     public function absoluteUrl()
     {
         if ($this->url) {
-            return $this->url;
+            return URL::makeAbsolute($this->url);
         }
 
-        if ($this->isRedirect()) {
-            return $this->redirectUrl();
+        return optional($this->entry())->absoluteUrl();
+    }
+
+    public function absoluteUrlWithoutRedirect()
+    {
+        if ($this->url) {
+            return $this->absoluteUrl();
         }
 
-        if ($this->reference && $this->referenceExists()) {
-            $url = vsprintf('%s/%s', [
-                rtrim($this->site()->absoluteUrl(), '/'),
-                ltrim($this->uri(), '/'),
-            ]);
-
-            return $url === '/' ? $url : rtrim($url, '/');
-        }
+        return optional($this->entry())->absoluteUrlWithoutRedirect();
     }
 
     public function isRoot()
