@@ -42,20 +42,12 @@ class Page implements Entry, Augmentable, Responsable, Protectable, JsonSerializ
 
     public function url()
     {
-        if ($this->url) {
-            return $this->url;
-        }
-
-        return optional($this->entry())->url();
+        return $this->url ?? optional($this->entry())->url();
     }
 
     public function urlWithoutRedirect()
     {
-        if ($this->url) {
-            return $this->url;
-        }
-
-        return optional($this->entry())->urlWithoutRedirect();
+        return $this->url ?? optional($this->entry())->urlWithoutRedirect();
     }
 
     public function isRedirect()
