@@ -2,6 +2,7 @@
 
 namespace Tests\Tags;
 
+use Statamic\Facades\Data;
 use Statamic\Facades\Parse;
 use Statamic\Facades\Site;
 use Tests\TestCase;
@@ -166,5 +167,55 @@ class PathTest extends TestCase
         $this->setSiteUrl('http://example.com/sub/');
         $this->assertEquals('/sub/the/path', $this->tag('{{ path to="the/path" absolute="false" }}'));
         $this->assertEquals('/sub/the/path', $this->tag('{{ path to="/the/path" absolute="false" }}'));
+    }
+
+    /** @test */
+    public function it_outputs_datas_url_if_not_providing_a_url()
+    {
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('in')->with('en')->andReturnSelf();
+        $entry->shouldReceive('url')->andReturn('/test');
+
+        Data::shouldReceive('find')->with('123')->andReturn($entry);
+
+        $this->assertEquals('/test', $this->tag('{{ path to="123" }}'));
+        $this->assertEquals('/test', $this->tag('{{ path to="123" absolute="false" }}'));
+    }
+
+    /** @test */
+    public function it_outputs_datas_url_for_a_specific_site_if_not_providing_a_url()
+    {
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('in')->with('fr')->andReturnSelf();
+        $entry->shouldReceive('url')->andReturn('/test');
+
+        Data::shouldReceive('find')->with('123')->andReturn($entry);
+
+        $this->assertEquals('/test', $this->tag('{{ path to="123" in="fr" }}'));
+        $this->assertEquals('/test', $this->tag('{{ path to="123" in="fr" absolute="false" }}'));
+    }
+
+    /** @test */
+    public function it_outputs_datas_absolute_url_if_not_providing_a_url()
+    {
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('in')->with('en')->andReturnSelf();
+        $entry->shouldReceive('absoluteUrl')->andReturn('http://example.com/test');
+
+        Data::shouldReceive('find')->with('123')->andReturn($entry);
+
+        $this->assertEquals('http://example.com/test', $this->tag('{{ path to="123" absolute="true" }}'));
+    }
+
+    /** @test */
+    public function it_outputs_datas_absolute_url_for_a_specific_site_if_not_providing_a_url()
+    {
+        $entry = $this->mock(Entry::class);
+        $entry->shouldReceive('in')->with('fr')->andReturnSelf();
+        $entry->shouldReceive('absoluteUrl')->andReturn('http://example.com/test');
+
+        Data::shouldReceive('find')->with('123')->andReturn($entry);
+
+        $this->assertEquals('http://example.com/test', $this->tag('{{ path to="123" in="fr" absolute="true" }}'));
     }
 }
