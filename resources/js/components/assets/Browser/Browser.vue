@@ -103,8 +103,8 @@
                                     <tr v-if="folder && folder.parent_path && !restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.parent_path)">
-                                            <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter hover:text-blue"></file-icon>
+                                            <a class="flex items-center cursor-pointer group">
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter group-hover:text-blue"></file-icon>
                                                 ..
                                             </a>
                                         </td>
@@ -113,8 +113,8 @@
                                     <tr v-for="(folder, i) in folders" :key="folder.path" v-if="!restrictFolderNavigation">
                                         <td />
                                         <td @click="selectFolder(folder.path)">
-                                            <a class="flex items-center cursor-pointer">
-                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter hover:text-blue"></file-icon>
+                                            <a class="flex items-center cursor-pointer group">
+                                                <file-icon extension="folder" class="w-8 h-8 mr-1 inline-block text-blue-lighter group-hover:text-blue"></file-icon>
                                                 {{ folder.basename }}
                                             </a>
                                         </td>
