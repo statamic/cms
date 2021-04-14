@@ -10,25 +10,14 @@ class ExistsAsFileTest extends TestCase
     /** @test */
     public function it_dumps_yaml_without_front_matter_when_the_file_extension_is_yaml()
     {
-        $item = new class extends ExistsAsFileItem {
-            public function fileExtension()
-            {
-                return 'yaml';
-            }
-
-            public function shouldRemoveNullsFromFileData()
-            {
-                return false;
-            }
-
-            public function fileData()
-            {
-                return [
-                    'foo' => 'bar',
-                    'content' => 'the content',
-                ];
-            }
-        };
+        $item = $this->makeItem([
+            'extension' => 'yaml',
+            'removeNulls' => false,
+            'data' => [
+                'foo' => 'bar',
+                'content' => 'the content',
+            ],
+        ]);
 
         $expected = <<<'EOT'
 foo: bar
@@ -41,25 +30,14 @@ EOT;
     /** @test */
     public function it_dumps_yaml_with_front_matter_when_theres_content()
     {
-        $item = new class extends ExistsAsFileItem {
-            public function fileExtension()
-            {
-                return 'md';
-            }
-
-            public function shouldRemoveNullsFromFileData()
-            {
-                return false;
-            }
-
-            public function fileData()
-            {
-                return [
-                    'foo' => 'bar',
-                    'content' => 'the content',
-                ];
-            }
-        };
+        $item = $this->makeItem([
+            'extension' => 'md',
+            'removeNulls' => false,
+            'data' => [
+                'foo' => 'bar',
+                'content' => 'the content',
+            ],
+        ]);
 
         $expected = <<<'EOT'
 ---
@@ -74,24 +52,13 @@ EOT;
     /** @test */
     public function it_dumps_yaml_with_front_matter_when_content_is_missing()
     {
-        $item = new class extends ExistsAsFileItem {
-            public function fileExtension()
-            {
-                return 'md';
-            }
-
-            public function shouldRemoveNullsFromFileData()
-            {
-                return false;
-            }
-
-            public function fileData()
-            {
-                return [
-                    'foo' => 'bar',
-                ];
-            }
-        };
+        $item = $this->makeItem([
+            'extension' => 'md',
+            'removeNulls' => false,
+            'data' => [
+                'foo' => 'bar',
+            ],
+        ]);
 
         $expected = <<<'EOT'
 ---
@@ -105,25 +72,14 @@ EOT;
     /** @test */
     public function it_dumps_yaml_without_front_matter_when_content_is_literally_null()
     {
-        $item = new class extends ExistsAsFileItem {
-            public function fileExtension()
-            {
-                return 'md';
-            }
-
-            public function shouldRemoveNullsFromFileData()
-            {
-                return false;
-            }
-
-            public function fileData()
-            {
-                return [
-                    'foo' => 'bar',
-                    'content' => null,
-                ];
-            }
-        };
+        $item = $this->makeItem([
+            'extension' => 'md',
+            'removeNulls' => false,
+            'data' => [
+                'foo' => 'bar',
+                'content' => null,
+            ],
+        ]);
 
         $expected = <<<'EOT'
 foo: bar
@@ -132,14 +88,42 @@ EOT;
 
         $this->assertEquals($expected, trim($item->fileContents()));
     }
-}
 
-class ExistsAsFileItem
-{
-    use ExistsAsFile;
-
-    public function path()
+    private function makeItem($args)
     {
-        //
+        return new class($args['extension'] ?? 'yaml', $args['removeNulls'] ?? true, $args['data'] ?? []) {
+            use ExistsAsFile;
+
+            protected $extension;
+            protected $shouldRemoveNulls;
+            protected $fileData;
+
+            public function __construct($extension, $shouldRemoveNulls, $fileData)
+            {
+                $this->extension = $extension;
+                $this->shouldRemoveNulls = $shouldRemoveNulls;
+                $this->fileData = $fileData;
+            }
+
+            public function path()
+            {
+                //
+            }
+
+            public function fileExtension()
+            {
+                return $this->extension;
+            }
+
+            public function shouldRemoveNullsFromFileData()
+            {
+                return $this->shouldRemoveNulls;
+            }
+
+            public function fileData()
+            {
+                return $this->fileData;
+            }
+        };
     }
 }
